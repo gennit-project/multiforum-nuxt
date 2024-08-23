@@ -1,5 +1,5 @@
 <template>
     <div>
-        CreateDiscussion.vue
+        AccountSettings.vue
     </div>
 </template>

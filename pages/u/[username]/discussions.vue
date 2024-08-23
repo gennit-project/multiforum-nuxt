@@ -1,3 +1,3 @@
 <template>
-    <div>user/discussions</div>
+    <div>UserDiscussions.vue</div>
 </template>

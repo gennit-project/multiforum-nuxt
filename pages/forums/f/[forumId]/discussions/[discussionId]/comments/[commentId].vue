@@ -1,5 +1,5 @@
 <template>
     <div>
-    discussion detail
+   discussion comment permalink
 </div>
 </template>

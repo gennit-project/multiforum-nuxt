@@ -24,20 +24,15 @@
       "markdown-it",
       "node",
       "vite/client",
+      "@nuxt/types"
     ],
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["./*"]
     },
-    "lib": [
-      "esnext",
-      "dom",
-      "dom.iterable",
-      "scripthost"
-    ]
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": [
+    ".nuxt/**/*.ts",
     "src/**/*.ts",
     "src/**/.d.ts",
     "src/**/*.tsx",
@@ -48,7 +43,5 @@
     "cypress/**/*.ts",
     "cypress/support/e2e.ts" // or wherever your file is
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

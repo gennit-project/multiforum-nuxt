@@ -1,3 +1,3 @@
 <template>
-    <div>user/events</div>
+    <div>UserEvents.vue</div>
 </template>
