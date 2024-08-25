@@ -1,7 +1,7 @@
 import { ONLINE_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
 import eventsForFilteringTests from "../../support/seedData/eventsForFilteringTests";
-import config from "../../../src/config";
+import config from "../../../config";
 
 describe("Filter events by text", () => {
   beforeEach(function () {

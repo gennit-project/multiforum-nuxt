@@ -1,14 +1,9 @@
 import { defineNuxtConfig } from "nuxt/config";
+import config from "./config";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-
-  // Enable auto-imports globally
-  imports: {
-    autoImport: true,
-  },
-  ssr: true,
-  // Global CSS
+  components: true,
   css: [
     "@/assets/css/index.css",
     "@fortawesome/fontawesome-free/css/all.css",
@@ -17,6 +12,13 @@ export default defineNuxtConfig({
     "@kangc/v-md-editor/lib/style/preview.css",
     "@kangc/v-md-editor/lib/style/codemirror-editor.css",
   ],
+  // Enable auto-imports globally
+  imports: {
+    autoImport: true,
+  },
+  ssr: true,
+  // Global CSS
+  
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
@@ -28,14 +30,8 @@ export default defineNuxtConfig({
   apollo: {
     clients: {
       default: {
-        httpEndpoint: process.env.GRAPHQL_URL,
-        tokenName: "apollo-token",
-        defaultOptions: {
-          $query: {
-            fetchPolicy: "network-only",
-          },
-        },
-      },
+        httpEndpoint: config.graphqlUrl,
+      }
     },
   },
 
@@ -72,13 +68,13 @@ export default defineNuxtConfig({
   // Runtime Config
   runtimeConfig: {
     public: {
-      googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY,
+      googleMapsApiKey: config.googleMapsApiKey,
     },
   },
 
   // Sentry
   sentry: {
-    dsn: process.env.SENTRY_DSN,
+    dsn: config.sentryDsn,
     tracing: true,
     config: {}, // Sentry configuration options
   },

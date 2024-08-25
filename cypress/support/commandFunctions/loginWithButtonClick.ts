@@ -1,4 +1,4 @@
-import config from "../../../src/config";
+import config from "../../../config";
 
 const ONLINE_EVENT_LIST = `${config.baseUrl}/events/list/search`
 

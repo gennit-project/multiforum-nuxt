@@ -1,4 +1,4 @@
-import config from '../../src/config'
+import config from '../../config'
 const baseUrl = config.baseUrl
 
 export const EVENT_CREATION_FORM = `${baseUrl}/events/create`;

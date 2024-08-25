@@ -1,0 +1,139 @@
+<script lang="ts">
+import { defineComponent, ref, PropType } from "vue";
+import ListboxButton from "@/components/buttons/ListboxButton.vue";
+import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
+import CheckIcon from '@/components/icons/CheckIcon.vue'
+import { SelectOptionData } from "@/types/GenericFormTypes";
+
+export default defineComponent({
+  name: "SelectMenu",
+  components: {
+    CheckIcon,
+    Listbox,
+    ListboxOption,
+    ListboxOptions,
+    ListboxButton,
+  },
+  props: {
+    defaultOption: {
+      type: Object as PropType<SelectOptionData | null>,
+      required: false,
+      default: null,
+    },
+    options: {
+      type: Array as PropType<Array<SelectOptionData>>,
+      required: true,
+    },
+  },
+  setup(props) {
+    const defaultOption = props.defaultOption ? ref(props.defaultOption) : ref(props.options[0]);
+    return {
+      selected: defaultOption,
+    };
+  },
+  methods: {
+    handleSelect(event: any){
+      this.$emit('selected', event)
+    }
+  }
+});
+</script>
+
+<template>
+  <Listbox
+    v-model="selected"
+    as="div"
+    @update:modelValue="handleSelect"
+  >
+    <div class="mt-1 relative">
+      <ListboxButton
+        class="
+          bg-white dark:bg-gray-800
+          dark:text-gray-200
+          relative
+          w-full
+          border border-gray-300
+          rounded-md
+          shadow-sm
+          pl-3
+          pr-10
+          text-left
+          cursor-default
+          focus:outline-none
+          focus:ring-1
+          focus:ring-blue-500
+          focus:border-blue-500
+        "
+        :label="selected.label"
+      >
+        <span
+          class="
+            absolute
+            inset-y-0
+            right-0
+            flex
+            items-center
+            pr-2
+            pointer-events-none
+          "
+        />
+      </ListboxButton>
+      <ListboxOptions
+        class="
+          absolute
+          z-10
+          mt-1
+          w-full
+          bg-white dark:bg-gray-800
+          dark:text-gray-200
+          shadow-lg
+          max-h-60
+          rounded-md
+          py-1
+          text-base
+          ring-1 ring-black ring-opacity-5
+          overflow-auto
+          focus:outline-none
+          sm:text-sm
+        "
+      >
+        <ListboxOption
+          v-for="(option, i) in options"
+          :key="i"
+          v-slot="{ active, selected: isSelected }"
+          as="template"
+          :value="option"
+        >
+          <li
+            :class="[
+              active ? 'text-white bg-blue-600' : 'text-gray-900 dark:text-gray-200',
+              'cursor-default select-none relative py-1 pl-3 pr-9',
+            ]"
+          >
+            <span
+              :class="[
+                selected ? 'font-semibold' : 'font-normal',
+                'block truncate',
+              ]"
+            >
+              {{ option.label }}
+            </span>
+
+            <span
+              v-if="isSelected"
+              :class="[
+                active ? 'text-white' : 'text-blue-600',
+                'absolute inset-y-0 right-0 flex items-center pr-4',
+              ]"
+            >
+              <CheckIcon
+                class="h-5 w-5"
+                aria-hidden="true"
+              />
+            </span>
+          </li>
+        </ListboxOption>
+      </ListboxOptions>
+    </div>
+  </Listbox>
+</template>

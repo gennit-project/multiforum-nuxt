@@ -24,7 +24,8 @@
       "markdown-it",
       "node",
       "vite/client",
-      "@nuxt/types"
+      "@nuxt/types",
+      "./types"
     ],
     "paths": {
       "@/*": ["./*"]
@@ -41,7 +42,10 @@
     "tests/**/*.tsx",
     "src/main.ts",
     "cypress/**/*.ts",
-    "cypress/support/e2e.ts" // or wherever your file is
-  ],
+    "cypress/support/e2e.ts",
+    "types/**/*.d.ts",
+    "components/**/*.vue",
+    "pages/**/*.vue"
+, "config.ts", "types/Channel.ts", "types/Comment.ts", "types/Discussion.ts", "types/Event.ts", "types/Tag.ts", "types/User.ts", "types/GenericFormTypes.ts"  ],
   "exclude": ["node_modules"]
 }
