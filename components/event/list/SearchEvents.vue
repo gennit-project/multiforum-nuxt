@@ -1,13 +1,13 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
-import { router } from "@/router";
-import { useRoute } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { DateTime } from "luxon";
 
 export default defineComponent({
   name: "SearchEvents",
   setup() {
     const route = useRoute();
+    const router = useRouter();
 
     const channelId = computed(() => {
       if (typeof route.params.channelId === "string") {
@@ -15,6 +15,7 @@ export default defineComponent({
       }
       return "";
     });
+
     const now = DateTime.now();
 
     return {
@@ -32,14 +33,14 @@ export default defineComponent({
         this.router.push({
           name: "MapView",
           query: {
-            ...this.$route.query,
+            ...this.route.query,
           },
         });
       } else {
         this.router.push({
           name: "MapView",
           query: {
-            ...this.$route.query,
+            ...this.route.query,
             channels: [this.channelId],
             backToChannel: this.channelId,
           },
@@ -55,11 +56,9 @@ export default defineComponent({
   },
 });
 </script>
+
 <template>
-  <div
-    class="flex h-full justify-center"
-    :class="channelId ? '' : 'mt-6'"
-  >
+  <div class="flex h-full justify-center" :class="channelId ? '' : 'mt-6'">
     <div :class="channelId ? '' : 'max-w-5xl'">
       <router-view
         @updateLoadedEventCount="setLoadedEventCount"

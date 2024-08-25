@@ -1,13 +1,13 @@
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
-import { useRoute } from "vue-router";
-import { Event } from "@/__generated__/graphql";
+import { defineComponent, computed } from "vue";
+import type { PropType } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import type { Event } from "@/__generated__/graphql";
 import { getDatePieces } from "@/utils/dateTimeUtils";
 import Tag from "@/components/Tag.vue";
 import HighlightedSearchTerms from "../../HighlightedSearchTerms.vue";
 import { DateTime } from "luxon";
-import { SearchEventValues } from "@/types/Event";
-import { router } from "@/router";
+import type { SearchEventValues } from "@/types/Event";
 import MenuButton from "@/components/buttons/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
@@ -28,15 +28,11 @@ export default defineComponent({
     },
     selectedTags: {
       type: Array as PropType<string[]>,
-      default: () => {
-        return [];
-      },
+      default: () => [],
     },
     selectedChannels: {
       type: Array as PropType<string[]>,
-      default: () => {
-        return [];
-      },
+      default: () => [],
     },
     currentChannelId: {
       type: String,
@@ -58,10 +54,10 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
+    const router = useRouter();
     const startTimeObj = DateTime.fromISO(props.event.startTime);
 
-    const { timeOfDay, weekday, month, day, year } =
-      getDatePieces(startTimeObj);
+    const { timeOfDay, weekday, month, day, year } = getDatePieces(startTimeObj);
 
     const now = DateTime.now();
     const currentYear = now.year;
@@ -71,10 +67,7 @@ export default defineComponent({
     }`;
 
     const eventIdInParams = computed(() => {
-      if (typeof route.params.eventId === "string") {
-        return route.params.eventId;
-      }
-      return "";
+      return typeof route.params.eventId === "string" ? route.params.eventId : "";
     });
 
     const defaultUniqueName = computed(() => {
@@ -82,11 +75,7 @@ export default defineComponent({
         return props.currentChannelId;
       }
       if (props.event.EventChannels.length > 0) {
-        const channelUniqueName =
-          props.event.EventChannels[0].channelUniqueName;
-        if (typeof channelUniqueName === "string") {
-          return channelUniqueName;
-        }
+        return props.event.EventChannels[0].channelUniqueName || "";
       }
       return "";
     });
@@ -125,29 +114,16 @@ export default defineComponent({
               channelId: dc.channelUniqueName,
             },
           }).href,
-          event: "",
         };
-      }).sort((a, b) => {
-        return b.label.localeCompare(a.label);
-      });
+      }).sort((a, b) => b.label.localeCompare(a.label));
     });
 
     const commentCount = computed(() => {
-      let count = 0;
-      if (props.event) {
-        return props.event.CommentsAggregate?.count;
-      }
-      return count;
+      return props.event?.CommentsAggregate?.count || 0;
     });
 
     const channelCount = computed(() => {
-      if (props.event) {
-        const discussionChannels = props.event.EventChannels;
-        if (discussionChannels) {
-          return discussionChannels.length;
-        }
-      }
-      return 0;
+      return props.event?.EventChannels.length || 0;
     });
 
     const truncatedDescription = computed(() => {
@@ -185,21 +161,16 @@ export default defineComponent({
   },
   computed: {
     selectedTagsMap() {
-      let obj: any = {};
-      for (let i = 0; i < this.selectedTags.length; i++) {
-        const tag = this.selectedTags[i];
+      return this.selectedTags.reduce((obj, tag) => {
         obj[tag] = true;
-      }
-      return obj;
+        return obj;
+      }, {});
     },
     previewLink() {
       if (!this.event) {
         return "";
       }
-      if (
-        this.$route.name === "MapView" ||
-        this.$route.name === "MapEventPreview"
-      ) {
+      if (this.$route.name === "MapView" || this.$route.name === "MapEventPreview") {
         return `/map/search/${this.event.id}`;
       }
       if (this.$route.name === "SitewideSearchEventPreview") {
@@ -212,13 +183,6 @@ export default defineComponent({
     },
   },
   methods: {
-    // getCommentCount(commentSection: CommentSectionData) {
-    //   const count = commentSection.CommentsAggregate.count;
-    //   return ` ${count} comment${count === 1 ? "" : "s"}`;
-    // },
-    // getChannel(commentSection: CommentSectionData) {
-    //   return commentSection.Channel.uniqueName;
-    // },
     handleClickTag(tagText: string) {
       const currentQuery = this.$route.query;
 
@@ -227,34 +191,19 @@ export default defineComponent({
           typeof currentQuery.tags === "string" &&
           tagText === currentQuery.tags
         ) {
-          // If we're already filtering by the tag, clear it.
           const newQuery = { ...this.$route.query };
-          delete newQuery["tags"];
+          delete newQuery.tags;
 
-          this.$router.replace({
-            query: {
-              ...newQuery,
-            },
-          });
+          this.$router.replace({ query: { ...newQuery } });
         } else if (
-          typeof currentQuery.tags === "object" &&
+          Array.isArray(currentQuery.tags) &&
           currentQuery.tags.includes(tagText)
         ) {
-          // If we're already filtering by multiple tags including this tag,
-          // remove only this tag.
           const newQuery = { ...this.$route.query };
-          newQuery.tags = newQuery.tags.filter((tag: string) => {
-            return tag !== tagText;
-          });
+          newQuery.tags = newQuery.tags.filter((tag: string) => tag !== tagText);
 
-          this.$router.replace({
-            query: {
-              ...newQuery,
-            },
-          });
+          this.$router.replace({ query: { ...newQuery } });
         } else {
-          // If we are not already filtering by the tag,
-          // overwrite existing tag filters with it.
           this.updateFilters({ tags: [tagText] });
         }
       } else {
@@ -269,34 +218,19 @@ export default defineComponent({
           typeof currentQuery.channels === "string" &&
           uniqueName === currentQuery.channels
         ) {
-          // If we're already filtering by the channel, clear it.
           const newQuery = { ...this.$route.query };
-          delete newQuery["channels"];
+          delete newQuery.channels;
 
-          this.$router.replace({
-            query: {
-              ...newQuery,
-            },
-          });
+          this.$router.replace({ query: { ...newQuery } });
         } else if (
-          typeof currentQuery.channels === "object" &&
+          Array.isArray(currentQuery.channels) &&
           currentQuery.channels.includes(uniqueName)
         ) {
-          // If we're already filtering by multiple channels including this channel,
-          // remove only this channel.
           const newQuery = { ...this.$route.query };
-          newQuery.channels = newQuery.channels.filter((channel: string) => {
-            return channel !== uniqueName;
-          });
+          newQuery.channels = newQuery.channels.filter((channel: string) => channel !== uniqueName);
 
-          this.$router.replace({
-            query: {
-              ...newQuery,
-            },
-          });
+          this.$router.replace({ query: { ...newQuery } });
         } else {
-          // If we are not already filtering by the channel,
-          // overwrite existing channel filters with it.
           this.updateFilters({ channels: [uniqueName] });
         }
       } else {
@@ -304,7 +238,7 @@ export default defineComponent({
       }
     },
     getDetailLink(uniqueName: string) {
-      return router.resolve({
+      return this.$router.resolve({
         name: "EventDetail",
         params: {
           channelId: uniqueName,
@@ -314,14 +248,8 @@ export default defineComponent({
     },
     updateFilters(params: SearchEventValues) {
       const existingQuery = this.$route.query;
-      // Updating the URL params causes the events
-      // to be refetched by the EventListView
-      // and MapView components
       this.$router.replace({
-        query: {
-          ...existingQuery,
-          ...params,
-        },
+        query: { ...existingQuery, ...params },
       });
     },
     handleClick() {
@@ -503,6 +431,7 @@ export default defineComponent({
     </div>
   </li>
 </template>
+
 <style>
 .highlighted {
   background-color: #f9f95d;

@@ -1,31 +1,29 @@
-<script lang="ts">
-import { defineComponent } from "vue";
-import PrimaryButton from "./PrimaryButton.vue";
-import { router } from "@/router";
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
+import { defineProps } from 'vue';
 
-export default defineComponent({
-  components: {
-    PrimaryButton
+const props = defineProps({
+  to: {
+    type: String,
+    required: true
   },
-  props: {
-    to: {
-      type: String,
-      required: true
-    },
-    label: {
-      type: String,
-      required: true
-    }
-  },
-  setup() {
-    return { router };
-  },
+  label: {
+    type: String,
+    required: true
+  }
 });
+
+const router = useRouter();
+
+const handleClick = () => {
+  router.push(props.to);
+};
 </script>
+
 <template>
   <PrimaryButton
     data-testid="primary-button"
     :label="label"
-    @click="router.push(to)"
+    @click="handleClick"
   />
 </template>
