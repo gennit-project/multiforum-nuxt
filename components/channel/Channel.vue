@@ -1,153 +1,122 @@
-<script lang="ts">
-import ChannelTabs from "./ChannelTabs.vue";
-import { useRoute } from "vue-router";
-import { defineComponent, computed, ref, watch } from "vue";
+<script setup lang="ts">
+import ChannelTabs from "~/components/ChannelTabs.vue";
+import ChannelContent from "~/components/ChannelContent.vue";
+import ChannelHeaderMobile from "~/components/ChannelHeaderMobile.vue";
+import ChannelHeaderDesktop from "~/components/ChannelHeaderDesktop.vue";
+import DiscussionTitleEditForm from "~/components/discussion/detail/DiscussionTitleEditForm.vue";
+import EventTitleEditForm from "~/components/event/detail/EventTitleEditForm.vue";
+
+import { useRoute } from "#app"; // Nuxt 3 uses '#app' to provide routing composables
 import { useDisplay } from "vuetify";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import { computed, ref } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";
-import type { User } from "@/src/__generated__/graphql";
-import ChannelContent from "./ChannelContent.vue";
-import ChannelHeaderMobile from "./ChannelHeaderMobile.vue";
-import ChannelHeaderDesktop from "./ChannelHeaderDesktop.vue";
-import type { Channel } from "@/src/__generated__/graphql";
-import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
-import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import type { Channel, User } from "@/src/__generated__/graphql";
 
-export default defineComponent({
-  name: "ChannelComponent",
-  components: {
-    ChannelContent,
-    ChannelHeaderMobile,
-    ChannelTabs,
-    ChannelHeaderDesktop,
-    DiscussionTitleEditForm,
-    EventTitleEditForm,
-  },
-  setup() {
-    const route = useRoute();
+// Define Apollo client-side query for the theme
+const GET_THEME = gql`
+  query getTheme {
+    theme @client
+  }
+`;
 
-    const isDiscussionDetailPage = computed(() => route.name === "DiscussionDetail");
-    const isEventDetailPage = computed(() => route.name === "EventDetail");
+const route = useRoute();
 
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
-    const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
+// Determine if the current route is for a discussion or event detail page
+const isDiscussionDetailPage = computed(() => route.name === "DiscussionDetail");
+const isEventDetailPage = computed(() => route.name === "EventDetail");
 
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return "";
-      }
-      return themeResult.value.theme;
-    });
+// Query for the theme using Apollo client
+const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
 
-    const channelId = computed(() => {
-      if (typeof route.params.channelId !== "string") {
-        return "";
-      }
-      return route.params.channelId;
-    });
-
-    const { result: getChannelResult, loading: getChannelLoading, error: getChannelError, onResult: onGetChannelResult } = useQuery(GET_CHANNEL, {
-      uniqueName: channelId,
-      now: new Date().toISOString(),
-    });
-
-    const channel = computed(() => {
-      if (getChannelLoading.value || getChannelError.value) {
-        return null;
-      }
-      return getChannelResult.value.channels[0];
-    });
-
-    const addForumToLocalStorage = (channel: Channel) => {
-      let recentForums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
-
-      const sideNavItem = {
-        uniqueName: channelId.value,
-        displayName: channel.displayName,
-        channelIconURL: channel.channelIconURL,
-      };
-
-      // Save the most recent 20
-      recentForums = recentForums.slice(0, 20);
-      recentForums.push(sideNavItem);
-
-      // Filter out any values that are strings instead of objects
-      recentForums = recentForums.filter((forum: any) => typeof forum === "object");
-
-      // Deduplicate the array
-      recentForums = recentForums.filter(
-        (forum: any, index: number, self: any) =>
-          index === self.findIndex((t: any) => t.uniqueName === forum.uniqueName)
-      );
-
-      localStorage.setItem("recentForums", JSON.stringify(recentForums));
-    };
-
-    onGetChannelResult((result) => {
-      const channel = result.data?.channels[0];
-      if (channel) {
-        addForumToLocalStorage(channel);
-      }
-    });
-
-    const discussionId = computed(() => route.params.discussionId);
-    const eventId = computed(() => route.params.eventId);
-
-    const adminList = computed(() => {
-      return channel.value ? channel.value.Admins.map((user: User) => user.username) : [];
-    });
-
-    // Using Vuetify's `useDisplay()` for responsive conditions
-    const display = useDisplay();
-    const lgAndDown = display.lgAndDown;
-    const lgAndUp = display.lgAndUp;
-    const mdAndUp = display.mdAndUp;
-    const mdAndDown = display.mdAndDown;
-    const smAndDown = display.smAndDown;
-
-    const showChannelHeader = computed(() => {
-      const validRoutes = ["SearchDiscussionsInChannel", "SearchEventsInChannel", "EditChannel", "OpenIssues", "ClosedIssues", "About"];
-      return validRoutes.includes(route.name as string);
-    });
-
-    return {
-      adminList,
-      channel,
-      channelId,
-      discussionId,
-      eventId,
-      isDiscussionDetailPage,
-      isEventDetailPage,
-      route,
-      lgAndDown,
-      leftColumnIsExpanded: ref(true),
-      mdAndDown,
-      lgAndUp,
-      mdAndUp,
-      showChannelHeader,
-      showMenu: ref(false),
-      smAndDown,
-      theme,
-    };
-  },
-  created() {
-    watch(
-      () => this.$route,
-      (newRoute) => {
-        this.route = newRoute;
-      }
-    );
-  },
+const theme = computed(() => {
+  if (themeLoading.value || themeError.value) {
+    return "";
+  }
+  return themeResult.value.theme;
 });
+
+// Extract the channel ID from the route parameters
+const channelId = computed(() => {
+  return typeof route.params.channelId === "string" ? route.params.channelId : "";
+});
+
+// Query for the channel using Apollo client
+const { result: getChannelResult, loading: getChannelLoading, error: getChannelError, onResult: onGetChannelResult } = useQuery(GET_CHANNEL, {
+  uniqueName: channelId,
+  now: new Date().toISOString(),
+});
+
+// Extract channel information from the query result
+const channel = computed(() => {
+  if (getChannelLoading.value || getChannelError.value) {
+    return null;
+  }
+  return getChannelResult.value?.channels?.[0] ?? null;
+});
+
+// Utility to add the forum to local storage
+const addForumToLocalStorage = (channel: Channel) => {
+  let recentForums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
+
+  const sideNavItem = {
+    uniqueName: channelId.value,
+    displayName: channel.displayName,
+    channelIconURL: channel.channelIconURL,
+  };
+
+  // Save the most recent 20
+  recentForums = recentForums.slice(0, 20);
+  recentForums.push(sideNavItem);
+
+  // Filter out any values that are strings instead of objects
+  recentForums = recentForums.filter((forum: any) => typeof forum === "object");
+
+  // Deduplicate the array
+  recentForums = recentForums.filter(
+    (forum: any, index: number, self: any) =>
+      index === self.findIndex((t: any) => t.uniqueName === forum.uniqueName)
+  );
+
+  localStorage.setItem("recentForums", JSON.stringify(recentForums));
+};
+
+// React to channel query results and update local storage
+onGetChannelResult((result) => {
+  const channel = result.data?.channels[0];
+  if (channel) {
+    addForumToLocalStorage(channel);
+  }
+});
+
+// Extract discussionId and eventId from the route parameters
+const discussionId = computed(() => route.params.discussionId);
+const eventId = computed(() => route.params.eventId);
+
+// Get admin list from the channel
+const adminList = computed(() => {
+  return channel.value ? channel.value.Admins.map((user: User) => user.username) : [];
+});
+
+// Use Vuetify's display composable to handle responsive layouts
+const display = useDisplay();
+const lgAndDown = display.lgAndDown;
+const smAndDown = display.smAndDown;
+
+// Conditionally show the channel header based on the route
+const showChannelHeader = computed(() => {
+  const validRoutes = ["SearchDiscussionsInChannel", "SearchEventsInChannel", "EditChannel", "OpenIssues", "ClosedIssues", "About"];
+  return validRoutes.includes(route.name as string);
+});
+
+const showMenu = ref(false);
+
 </script>
 
 <template>
   <div class="flex-col justify-center dark:bg-black">
+    <!-- Mobile Header -->
     <ChannelHeaderMobile
       v-if="smAndDown && channel"
       :channel="channel"
@@ -181,6 +150,7 @@ export default defineComponent({
       </article>
     </div>
 
+    <!-- Desktop Header -->
     <article v-if="!smAndDown && channel" class="w-full">
       <ChannelHeaderDesktop
         :channel="channel"
