@@ -13,12 +13,12 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { CreateEditEventFormValues } from "@/types/Event";
 import { checkUrl } from "@/utils/formValidation";
 import { DateTime } from "luxon";
-import { getDuration } from "@/components/utils";
-import AddImage from "@/components/buttons/AddImage.vue";
+import { getDuration } from "@/utils";
+import AddImage from "@/components/AddImage.vue";
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
-} from "@/components/utils";
+} from "@/utils";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";

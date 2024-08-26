@@ -13,7 +13,7 @@ import {
   WeekdayData,
   HourRangeData,
 } from "@/types/Event";
-import ResetButton from "@/components/buttons/ResetButton.vue";
+import ResetButton from "@/components/ResetButton.vue";
 
 
 export default defineComponent({

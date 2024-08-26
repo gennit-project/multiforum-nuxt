@@ -12,7 +12,7 @@ import { Issue } from "@/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import "md-editor-v3/lib/style.css";
-import BackLink from "@/components/buttons/BackLink.vue";
+import BackLink from "@/components/BackLink.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
 import { DateTime } from "luxon";
 import DiscussionDetails from "@/components/mod/DiscussionDetails.vue";

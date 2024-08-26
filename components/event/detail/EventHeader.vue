@@ -11,7 +11,7 @@ import useClipboard from "vue-clipboard3";
 import Notification from "@/components/Notification.vue";
 import { DateTime } from "luxon";
 import { useRouter } from "vue-router";
-import MenuButton from "@/components/buttons/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import {
@@ -22,9 +22,9 @@ import { DELETE_EVENT } from "@/graphQLData/event/mutations";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { getDuration } from "@/components/utils";
+import { getDuration } from "@/utils";
 import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
-import { ALLOWED_ICONS } from "@/components/buttons/MenuButton.vue";
+import { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import { ADD_FEEDBACK_COMMENT_TO_EVENT } from "@/graphQLData/event/mutations";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 

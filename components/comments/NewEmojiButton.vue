@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import VoteButton from "@/components/buttons/VoteButton.vue";
+import VoteButton from "@/components/VoteButton.vue";
 import FloatingDropdown from "../FloatingDropdown.vue";
 import EmojiPicker from "./EmojiPicker.vue";
 

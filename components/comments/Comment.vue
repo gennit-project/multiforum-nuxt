@@ -12,12 +12,12 @@ import { ApolloError, gql } from "@apollo/client/core";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRoute, useRouter } from "vue-router";
 import { Comment } from "@/__generated__/graphql";
-import MenuButton from "@/components/buttons/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "../icons/EllipsisHorizontal.vue";
 import RightArrowIcon from "../icons/RightArrowIcon.vue";
 import useClipboard from "vue-clipboard3";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { ALLOWED_ICONS } from "@/components/buttons/MenuButton.vue";
+import { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import CommentHeader from "./CommentHeader.vue";
 
 const MAX_COMMENT_DEPTH = 5;

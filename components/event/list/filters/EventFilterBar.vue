@@ -4,7 +4,7 @@ import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar
 // import TagPicker from "@/components/TagPicker.vue";
 import ChannelIcon from "@/components/icons/ChannelIcon.vue";
 import TagIcon from "@/components/icons/TagIcon.vue";
-import { getTagLabel, getChannelLabel } from "@/components/utils";
+import { getTagLabel, getChannelLabel } from "@/utils";
 import SearchBar from "../../../SearchBar.vue";
 import { DistanceUnit, SearchEventValues } from "@/types/Event";
 import {
@@ -23,8 +23,8 @@ import {
   defaultSelectedHourRanges,
   defaultSelectedWeeklyHourRanges,
 } from "./eventSearchOptions";
-import GenericButton from "@/components/buttons/GenericButton.vue";
-import FilterChip from "@/components/buttons/FilterChip.vue";
+import GenericButton from "@/components/GenericButton.vue";
+import FilterChip from "@/components/FilterChip.vue";
 import SelectCanceled from "./SelectCanceled.vue";
 import SelectFree from "./SelectFree.vue";
 import Popper from "vue3-popper";

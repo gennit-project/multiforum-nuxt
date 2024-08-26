@@ -1,10 +1,10 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import VoteButton from "@/components/buttons/VoteButton.vue";
+import VoteButton from "@/components/VoteButton.vue";
 import HandThumbDownIcon from "../icons/HandThumbDownIcon.vue";
 import { SelectOptionData } from "@/types/GenericFormTypes";
 import { ALLOWED_ICONS } from "../buttons/MenuButton.vue";
-import MenuButton from "@/components/buttons/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 
 export default defineComponent({
   name: "VoteComponent",

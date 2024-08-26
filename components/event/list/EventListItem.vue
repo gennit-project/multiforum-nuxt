@@ -8,7 +8,7 @@ import Tag from "@/components/Tag.vue";
 import HighlightedSearchTerms from "../../HighlightedSearchTerms.vue";
 import { DateTime } from "luxon";
 import type { SearchEventValues } from "@/types/Event";
-import MenuButton from "@/components/buttons/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useDisplay } from "vuetify";

@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed, PropType, ref } from "vue";
-import { getLinksInText } from "@/components/utils";
+import { getLinksInText } from "@/utils";
 import { Discussion } from "@/__generated__/graphql";
 import { useRoute } from "vue-router";
 import Tag from "../../Tag.vue";

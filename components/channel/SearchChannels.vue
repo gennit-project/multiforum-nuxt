@@ -7,10 +7,10 @@ import { GET_TAGS } from "@/graphQLData/tag/queries";
 import { TagData } from "@/types/Tag";
 import { Channel } from "@/__generated__/graphql";
 import TagIcon from "@/components/icons/TagIcon.vue";
-import FilterChip from "@/components/buttons/FilterChip.vue";
+import FilterChip from "@/components/FilterChip.vue";
 // import TagPicker from "@/components/TagPicker.vue";
 import ErrorBanner from "../ErrorBanner.vue";
-import { getTagLabel } from "@/components/utils";
+import { getTagLabel } from "@/utils";
 import { useRoute } from "vue-router";
 import SearchBar from "../SearchBar.vue";
 

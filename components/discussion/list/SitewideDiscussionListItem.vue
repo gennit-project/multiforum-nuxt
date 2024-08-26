@@ -6,7 +6,7 @@ import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/Tag.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import MenuButton from "@/components/buttons/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 
@@ -65,21 +65,18 @@ export default defineComponent({
       return props.discussion?.DiscussionChannels.length || 0;
     });
 
+    
+
     const discussionDetailOptions = computed(() => {
       if (!props.discussion) return [];
       return props.discussion.DiscussionChannels.map((dc) => {
         const commentCount = dc.CommentsAggregate?.count || 0;
+        const discussionDetailLink  = `/channels/c/${dc.channelUniqueName}/discussions/d/${props.discussion?.id}`;
         return {
           label: `${commentCount} ${
             commentCount === 1 ? "comment" : "comments"
           } in ${dc.channelUniqueName}`,
-          value: router.resolve({
-            name: "DiscussionDetail",
-            params: {
-              discussionId: props.discussion?.id,
-              channelId: dc.channelUniqueName,
-            },
-          }).href,
+          value: discussionDetailLink,
           event: "",
         };
       }).sort((a, b) => b.label.localeCompare(a.label));
@@ -128,13 +125,7 @@ export default defineComponent({
       if (!this.discussion) {
         return "";
       }
-      return this.$router.resolve({
-        name: "DiscussionDetail",
-        params: {
-          discussionId: this.discussion.id,
-          channelId,
-        },
-      }).href;
+      return `/channels/c/${channelId}/discussions/d/${this.discussion.id}`;
     },
   },
 });

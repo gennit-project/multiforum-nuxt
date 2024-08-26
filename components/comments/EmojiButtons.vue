@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import VoteButton from "@/components/buttons/VoteButton.vue";
+import VoteButton from "@/components/VoteButton.vue";
 import {
   ADD_EMOJI_TO_COMMENT,
   REMOVE_EMOJI_FROM_COMMENT,

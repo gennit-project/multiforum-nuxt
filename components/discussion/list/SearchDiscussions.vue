@@ -3,7 +3,7 @@ import { computed, defineComponent, ref } from "vue";
 import ChannelDiscussionList from "./ChannelDiscussionList.vue";
 import SitewideDiscussionList from "./SitewideDiscussionList.vue";
 import { useRoute, useRouter } from "vue-router";
-import { getTagLabel, getChannelLabel } from "@/components/utils";
+import { getTagLabel, getChannelLabel } from "@/utils";
 import { useDisplay } from "vuetify";
 import { SearchDiscussionValues } from "@/types/Discussion";
 import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";

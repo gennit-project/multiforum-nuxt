@@ -14,7 +14,7 @@ import "md-editor-v3/lib/style.css";
 import EventFooter from "./EventFooter.vue";
 import { useDisplay } from "vuetify";
 import EventHeader from "./EventHeader.vue";
-import GenericButton from "@/components/buttons/GenericButton.vue";
+import GenericButton from "@/components/GenericButton.vue";
 import EventBody from "./EventBody.vue";
 import ExpandableImage from "@/components/ExpandableImage.vue";
 import EventCommentsWrapper from "./EventCommentsWrapper.vue";

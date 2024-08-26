@@ -4,7 +4,6 @@ import CheckCircleIcon from "../icons/CheckCircleIcon.vue";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
 import { useQuery, useMutation } from "@vue/apollo-composable";
-import { useAuth0 } from "@auth0/auth0-vue";
 import ExclamationIcon from "../icons/ExclamationIcon.vue";
 import PrimaryButton from "../buttons/PrimaryButton.vue";
 import ErrorBanner from "../ErrorBanner.vue";

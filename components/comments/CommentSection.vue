@@ -24,7 +24,7 @@ import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
 import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
-import SortButtons from "@/components/buttons/SortButtons.vue";
+import SortButtons from "@/components/SortButtons.vue";
 import { modProfileNameVar } from "@/cache";
 import Notification from "@/components/Notification.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";

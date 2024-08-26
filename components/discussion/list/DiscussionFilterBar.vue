@@ -2,15 +2,15 @@
 import { defineComponent, computed, ref, Ref } from "vue";
 // import TagPicker from "@/components/TagPicker.vue";
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
-import FilterChip from "@/components/buttons/FilterChip.vue";
+import FilterChip from "@/components/FilterChip.vue";
 import ChannelIcon from "@/components/icons/ChannelIcon.vue";
 import TagIcon from "@/components/icons/TagIcon.vue";
-import { getTagLabel, getChannelLabel } from "@/components/utils";
+import { getTagLabel, getChannelLabel } from "@/utils";
 import SearchBar from "../../SearchBar.vue";
 import { SearchDiscussionValues } from "@/types/Discussion";
 import { useRoute } from "vue-router";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
-import SortButtons from "@/components/buttons/SortButtons.vue";
+import SortButtons from "@/components/SortButtons.vue";
 import { useDisplay } from "vuetify";
 import SearchableTagList from '@/components/forms/SearchableTagList.vue'
 
@@ -72,6 +72,18 @@ export default defineComponent({
     });
     const { smAndDown } = useDisplay();
 
+    watch(
+      () => route.query,
+      () => {
+        if (route.query) {
+          filterValues.value = getFilterValuesFromParams({
+            route: route,
+            channelId: channelId.value,
+          });
+        }
+      }
+    );
+
     return {
       channelId,
       channelLabel,
@@ -83,16 +95,7 @@ export default defineComponent({
       tagLabel,
     };
   },
-  created() {
-    this.$watch("$route.query", () => {
-      if (this.route.query) {
-        this.filterValues = getFilterValuesFromParams({
-          route: this.route,
-          channelId: this.channelId,
-        });
-      }
-    });
-  },
+  
   methods: {
     handleClickMoreFilters() {
       this.drawerIsOpen = true;

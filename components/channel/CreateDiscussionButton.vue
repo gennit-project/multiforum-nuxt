@@ -3,7 +3,7 @@ import { defineComponent, computed } from "vue";
 import { useRoute } from "vue-router";
 import RequireAuth from "../auth/RequireAuth.vue";
 import CreateButton from "../buttons/CreateButton.vue";
-import PrimaryButton from "@/components/buttons/PrimaryButton.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
 
 export default defineComponent({
   components: {

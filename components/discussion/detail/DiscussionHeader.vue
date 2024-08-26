@@ -9,7 +9,7 @@ import WarningModal from "../../WarningModal.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import MenuButton from "@/components/buttons/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import useClipboard from "vue-clipboard3";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
@@ -17,7 +17,7 @@ import {
 } from "@/graphQLData/user/queries";
 import Notification from "@/components/Notification.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import { ALLOWED_ICONS } from "@/components/buttons/MenuButton.vue";
+import { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 
 type MenuItem = {

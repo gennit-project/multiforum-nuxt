@@ -7,11 +7,11 @@ import TextInput from "@/components/forms/TextInput.vue";
 import FormRow from "@/components/forms/FormRow.vue";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import { CreateEditChannelFormValues } from "@/types/Channel";
-import AddImage from "@/components/buttons/AddImage.vue";
+import AddImage from "@/components/AddImage.vue";
 import {
   getUploadFileName,
   uploadAndGetEmbeddedLink,
-} from "@/components/utils";
+} from "@/utils";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";

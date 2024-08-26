@@ -1,74 +1,72 @@
-<script lang="ts">
-import { defineComponent, nextTick, ref } from "vue";
+<script setup lang="ts">
+import { ref, onMounted, nextTick } from "vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 
-interface Ref<T> {
-  value: T;
-}
-
-export default defineComponent({
-  components: {
-    SearchIcon,
+// Props
+const props = defineProps({
+  autoFocus: {
+    type: Boolean,
+    default: true,
   },
-  props: {
-    autoFocus: {
-      type: Boolean,
-      default: true,
-    },
-    initialValue: {
-      type: String,
-      default: "",
-    },
-    searchPlaceholder: {
-      type: String,
-      default: "",
-    },
-    small: {
-      type: Boolean,
-      default: false,
-    },
-    leftSideIsRounded: {
-      type: Boolean,
-      default: true,
-    },
-    rightSideIsRounded: {
-      type: Boolean,
-      default: true,
-    },
+  initialValue: {
+    type: String,
+    default: "",
   },
-  setup(props) {
-    const input: Ref<string> = ref(props.initialValue);
-    return { input, searchInputRef: ref(null) };
+  searchPlaceholder: {
+    type: String,
+    default: "",
   },
-  created() {
-    nextTick(() => {
-      if (this.autoFocus && this.searchInputRef) {
-        (this.searchInputRef as any).focus();
-      }
-    });
+  small: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    removeQuotationMarks(input: string) {
-      // Prevent errors when quotation marks are added
-      // to GraphQL query
-      return input.split("'").join("").split('"').join("");
-    },
-    updateSearchInput(e: any) {
-      if (this.timeout) clearTimeout(this.timeout);
-      this.timeout = setTimeout(() => {
-        this.$emit(
-          "updateSearchInput",
-          this.removeQuotationMarks(e.target.value),
-        );
-      }, 500);
-    },
-    clear() {
-      this.$emit("updateSearchInput", "");
-      this.input = "";
-    },
+  leftSideIsRounded: {
+    type: Boolean,
+    default: true,
+  },
+  rightSideIsRounded: {
+    type: Boolean,
+    default: true,
   },
 });
+
+// Emit event
+const emit = defineEmits(["updateSearchInput"]);
+
+// Template refs
+const searchInputRef = ref<HTMLElement | null>(null);
+const input = ref(props.initialValue);
+
+// Lifecycle hooks
+onMounted(() => {
+  if (props.autoFocus && searchInputRef.value) {
+    nextTick(() => {
+      if (searchInputRef.value instanceof HTMLElement) {
+        searchInputRef.value.focus();
+      }
+    });
+  }
+});
+
+// Methods
+const removeQuotationMarks = (input: string) => {
+  return input.split("'").join("").split('"').join("");
+};
+
+let timeout: ReturnType<typeof setTimeout> | null = null;
+const updateSearchInput = (e: any) => {
+  if (timeout) clearTimeout(timeout);
+  timeout = setTimeout(() => {
+    emit("updateSearchInput", removeQuotationMarks(e.target.value));
+  }, 500);
+};
+
+const clear = () => {
+  emit("updateSearchInput", "");
+  input.value = "";
+};
 </script>
+
 <template>
   <div>
     <label
