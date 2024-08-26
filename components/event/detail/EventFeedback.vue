@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Event } from "@/__generated__/graphql";
+import { Event } from "@/src/__generated__/graphql";
 import BackLink from "@/components/BackLink.vue";
 import { GET_EVENT_FEEDBACK } from "@/graphQLData/event/queries";
 import { useQuery } from "@vue/apollo-composable";

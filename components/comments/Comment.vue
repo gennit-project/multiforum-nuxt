@@ -11,7 +11,7 @@ import { getLinksInText } from "../utils";
 import { ApolloError, gql } from "@apollo/client/core";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRoute, useRouter } from "vue-router";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "../icons/EllipsisHorizontal.vue";
 import RightArrowIcon from "../icons/RightArrowIcon.vue";

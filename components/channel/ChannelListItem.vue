@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Channel } from "@/__generated__/graphql";
+import { Channel } from "@/src/__generated__/graphql";
 import { TagData } from "@/types/Tag";
 import HighlightedSearchTerms from "../HighlightedSearchTerms.vue";
 import Tag from "@/components/Tag.vue";

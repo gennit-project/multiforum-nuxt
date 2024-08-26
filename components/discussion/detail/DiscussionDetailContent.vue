@@ -8,7 +8,7 @@ import {
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from "@/graphQLData/comment/queries";
 import { relativeTime } from "../../../dateTimeUtils";
-import { Discussion } from "@/__generated__/graphql";
+import { Discussion } from "@/src/__generated__/graphql";
 import ErrorBanner from "../../ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import DiscussionBody from "./DiscussionBody.vue";
@@ -18,9 +18,9 @@ import DiscussionChannelLinks from "./DiscussionChannelLinks.vue";
 import DiscussionRootCommentFormWrapper from "@/components/discussion/form/DiscussionRootCommentFormWrapper.vue";
 import DiscussionVotes from "../vote/DiscussionVotes.vue";
 import "md-editor-v3/lib/style.css";
-import { DiscussionChannel } from "@/__generated__/graphql";
+import { DiscussionChannel } from "@/src/__generated__/graphql";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import PageNotFound from "@/components/PageNotFound.vue";
 import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
 import ConfirmUndoDiscussionFeedbackModal from "@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue";

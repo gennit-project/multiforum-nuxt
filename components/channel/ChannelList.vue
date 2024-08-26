@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import { Channel } from "@/__generated__/graphql";
+import { Channel } from "@/src/__generated__/graphql";
 import ChannelListItem from "@/components/channel/ChannelListItem.vue";
 import LoadMore from "../LoadMore.vue";
 

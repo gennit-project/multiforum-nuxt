@@ -10,7 +10,7 @@ import MenuButton from "../buttons/MenuButton.vue";
 import { DELETE_COMMENT } from "@/graphQLData/comment/mutations";
 import { HandleEditFeedbackInput, HandleFeedbackInput } from "./Comment.vue";
 import { useRoute, useRouter } from "vue-router";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import { PropType } from "vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import TextEditor from "../forms/TextEditor.vue";

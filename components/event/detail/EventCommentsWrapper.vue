@@ -11,7 +11,7 @@ import {
   Event,
   CommentCreateInput,
   Comment as CommentType,
-} from "@/__generated__/graphql";
+} from "@/src/__generated__/graphql";
 import { COMMENT_LIMIT } from "@/components/event/detail/EventRootCommentFormWrapper.vue";
 import { useRoute } from "vue-router";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";

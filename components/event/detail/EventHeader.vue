@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, ref } from "vue";
 import { useRoute } from "vue-router";
-import { Event } from "@/__generated__/graphql";
+import { Event } from "@/src/__generated__/graphql";
 import { CANCEL_EVENT } from "@/graphQLData/event/mutations";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LinkIcon from "@/components/icons/LinkIcon.vue";

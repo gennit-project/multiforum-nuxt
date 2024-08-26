@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, ref } from "vue";
-import { Discussion, DiscussionChannel } from "@/__generated__/graphql";
+import { Discussion, DiscussionChannel } from "@/src/__generated__/graphql";
 import { relativeTime } from "../../../dateTimeUtils";
 import { useRoute } from "vue-router";
 import Tag from "@/components/Tag.vue";

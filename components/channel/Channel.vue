@@ -6,11 +6,11 @@ import { useDisplay } from "vuetify";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";
-import type { User } from "@/__generated__/graphql";
+import type { User } from "@/src/__generated__/graphql";
 import ChannelContent from "./ChannelContent.vue";
 import ChannelHeaderMobile from "./ChannelHeaderMobile.vue";
 import ChannelHeaderDesktop from "./ChannelHeaderDesktop.vue";
-import { Channel } from "@/__generated__/graphql";
+import type { Channel } from "@/src/__generated__/graphql";
 import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
 import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
 

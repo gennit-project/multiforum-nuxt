@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import GenericModal from "@/components/GenericModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/comment/queries";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import { UPDATE_COMMENT } from "@/graphQLData/comment/mutations";

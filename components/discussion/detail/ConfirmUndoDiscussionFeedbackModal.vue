@@ -5,7 +5,7 @@ import GenericModal from "@/components/GenericModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { DELETE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/discussion/queries";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 

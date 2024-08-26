@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType, computed, ref } from "vue";
-import { Discussion } from "@/__generated__/graphql";
-import { DiscussionChannel } from "@/__generated__/graphql";
+import { Discussion } from "@/src/__generated__/graphql";
+import { DiscussionChannel } from "@/src/__generated__/graphql";
 import { useRoute, useRouter } from "vue-router";
 import VoteButtons from "./VoteButtons.vue";
 import {

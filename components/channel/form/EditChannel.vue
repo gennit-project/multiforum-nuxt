@@ -19,7 +19,7 @@ import {
   ChannelTagsConnectOrCreateFieldInput,
   ChannelTagsDisconnectFieldInput,
   ChannelUpdateInput,
-} from "@/__generated__/graphql";
+} from "@/src/__generated__/graphql";
 import Notification from '@/components/Notification.vue'
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 

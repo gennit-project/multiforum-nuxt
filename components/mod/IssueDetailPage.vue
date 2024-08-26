@@ -8,7 +8,7 @@ import {
   GET_ISSUES_BY_CHANNEL,
 } from "@/graphQLData/issue/queries";
 import { CLOSE_ISSUE, REOPEN_ISSUE } from "@/graphQLData/issue/mutations";
-import { Issue } from "@/__generated__/graphql";
+import { Issue } from "@/src/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import "md-editor-v3/lib/style.css";

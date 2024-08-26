@@ -2,7 +2,7 @@
 import { defineComponent, computed, PropType } from "vue";
 import DiscussionChannelLink from "./DiscussionChannelLink.vue";
 import { useRoute } from "vue-router";
-import { DiscussionChannel } from "@/__generated__/graphql";
+import { DiscussionChannel } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "DiscussionChannelLinks",

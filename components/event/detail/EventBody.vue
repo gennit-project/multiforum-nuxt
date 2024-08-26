@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import { Event } from "@/__generated__/graphql";
+import { Event } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "EventBody",

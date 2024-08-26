@@ -2,7 +2,7 @@
 import { defineComponent, PropType, computed, ref, Ref } from "vue";
 import { GET_CHANNEL_NAMES } from "@/graphQLData/channel/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { Channel } from "@/__generated__/graphql";
+import { Channel } from "@/src/__generated__/graphql";
 import SearchBar from "@/components/SearchBar.vue";
 
 export default defineComponent({

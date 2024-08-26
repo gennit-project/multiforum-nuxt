@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, computed, PropType, ref } from "vue";
 import { getLinksInText } from "@/utils";
-import { Discussion } from "@/__generated__/graphql";
+import { Discussion } from "@/src/__generated__/graphql";
 import { useRoute } from "vue-router";
 import Tag from "../../Tag.vue";
 import "md-editor-v3/lib/preview.css";

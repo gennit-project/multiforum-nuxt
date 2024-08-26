@@ -16,12 +16,12 @@ import {
 import { apolloClient } from "@/main";
 import CreateEditDiscussionFields from "./CreateEditDiscussionFields.vue";
 import RequireAuth from "../../auth/RequireAuth.vue";
-import { DiscussionChannel } from "@/__generated__/graphql";
+import { DiscussionChannel } from "@/src/__generated__/graphql";
 import {
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
-} from "@/__generated__/graphql";
+} from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "EditDiscussion",

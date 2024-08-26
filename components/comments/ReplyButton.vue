@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import { PropType } from "vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 

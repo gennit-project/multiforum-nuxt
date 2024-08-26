@@ -2,7 +2,7 @@
 import { defineComponent, PropType, computed } from "vue";
 import EventListItem from "./EventListItem.vue";
 import { useRoute, useRouter } from "vue-router";
-import { Event } from "@/__generated__/graphql"
+import { Event } from "@/src/__generated__/graphql"
 import LoadMore from "../../LoadMore.vue";
 
 export default defineComponent({

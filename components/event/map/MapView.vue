@@ -23,7 +23,7 @@ import EventFilterBar from "../list/filters/EventFilterBar.vue";
 import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
 import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
 import gql from "graphql-tag";
-import { Event as EventData } from "@/__generated__/graphql";
+import { Event as EventData } from "@/src/__generated__/graphql";
 import placeIcon from "@/assets/images/place-icon.svg"
 import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg"
 

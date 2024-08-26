@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, PropType, computed } from "vue";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
 import clickOutside from "vue-click-outside";
 import { relativeTime } from "../../dateTimeUtils";

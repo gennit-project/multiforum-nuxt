@@ -32,7 +32,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import {
   CommentCreateInput,
   Comment as CommentType,
-} from "@/__generated__/graphql";
+} from "@/src/__generated__/graphql";
 import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
 import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
 

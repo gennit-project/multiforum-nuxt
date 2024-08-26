@@ -2,7 +2,7 @@
 import { defineComponent, computed, PropType } from "vue";
 import EventChannelLink from "@/components/event/detail/EventChannelLink.vue";
 import { useRoute } from "vue-router";
-import { EventChannel } from "@/__generated__/graphql";
+import { EventChannel } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "EventChannelLinks",

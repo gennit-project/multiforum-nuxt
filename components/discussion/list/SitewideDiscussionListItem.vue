@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import type { PropType } from "vue";
-import type { Discussion as DiscussionData } from "@/__generated__/graphql";
+import type { Discussion as DiscussionData } from "@/src/__generated__/graphql";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/Tag.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";

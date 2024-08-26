@@ -11,7 +11,7 @@ import {
   DiscussionChannel,
   CommentCreateInput,
   Comment as CommentType,
-} from "@/__generated__/graphql";
+} from "@/src/__generated__/graphql";
 import { COMMENT_LIMIT } from "@/components/discussion/detail/DiscussionDetailContent.vue";
 import { useRoute } from "vue-router";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";

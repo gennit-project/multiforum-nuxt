@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed, PropType, ref } from "vue";
-import { Discussion } from "@/__generated__/graphql";
+import { Discussion } from "@/src/__generated__/graphql";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { DateTime } from "luxon";

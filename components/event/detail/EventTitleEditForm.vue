@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, nextTick, computed } from "vue";
-import { Event } from "@/__generated__/graphql";
+import { Event } from "@/src/__generated__/graphql";
 import { useDisplay } from "vuetify";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import CreateButton from "@/components/CreateButton.vue";

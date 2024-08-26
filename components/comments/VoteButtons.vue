@@ -1,6 +1,6 @@
 <script lang="ts">
 import { PropType, computed, defineComponent } from "vue";
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import Votes from "./Votes.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import {

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { Comment } from "@/__generated__/graphql";
+import { Comment } from "@/src/__generated__/graphql";
 import { computed, defineComponent, PropType, ref } from "vue";
 import { useRoute } from "vue-router";
 import InfoBanner from "@/components/InfoBanner.vue";

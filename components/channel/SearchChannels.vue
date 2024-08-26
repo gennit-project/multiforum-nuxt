@@ -5,7 +5,7 @@ import ChannelList from "./ChannelList.vue";
 import { GET_CHANNELS } from "@/graphQLData/channel/queries";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
 import { TagData } from "@/types/Tag";
-import { Channel } from "@/__generated__/graphql";
+import { Channel } from "@/src/__generated__/graphql";
 import TagIcon from "@/components/icons/TagIcon.vue";
 import FilterChip from "@/components/FilterChip.vue";
 // import TagPicker from "@/components/TagPicker.vue";

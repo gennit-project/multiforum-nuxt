@@ -12,7 +12,7 @@ import { apolloClient } from "@/main";
 import EditAccountSettingsFields from "./EditAccountSettingsFields.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { UserUpdateInput } from "@/__generated__/graphql";
+import { UserUpdateInput } from "@/src/__generated__/graphql";
 import { EditAccountSettingsFormValues } from "@/types/User";
 import Notification from "../Notification.vue";
 

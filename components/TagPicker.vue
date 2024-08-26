@@ -2,7 +2,7 @@
 import { defineComponent, PropType, computed, ref, Ref } from "vue";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { Tag } from "@/__generated__/graphql";
+import { Tag } from "@/src/__generated__/graphql";
 import clickOutside from "vue-click-outside";
 import SearchableTagList from '@/components/forms/SearchableTagList.vue'
 

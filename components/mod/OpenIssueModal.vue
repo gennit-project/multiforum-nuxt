@@ -8,7 +8,7 @@ import { REOPEN_ISSUE } from "@/graphQLData/issue/mutations";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import { useRoute } from "vue-router";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { IssueCreateInput } from "@/__generated__/graphql";
+import { IssueCreateInput } from "@/src/__generated__/graphql";
 import {
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   CHECK_EVENT_ISSUE_EXISTENCE,

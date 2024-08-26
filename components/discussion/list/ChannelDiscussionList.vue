@@ -3,7 +3,7 @@ import { defineComponent, PropType, computed, ref, Ref } from "vue";
 import ChannelDiscussionListItem from "./ChannelDiscussionListItem.vue";
 import LoadMore from "../../LoadMore.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
-import { Discussion as DiscussionData } from "@/__generated__/graphql";
+import { Discussion as DiscussionData } from "@/src/__generated__/graphql";
 import { useRoute } from "vue-router";
 import WarningModal from "../../WarningModal.vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";

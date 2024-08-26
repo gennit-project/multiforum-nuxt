@@ -4,7 +4,7 @@ import { TagData } from "../../types/Tag";
 import { relativeTime } from "../../dateTimeUtils";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/Tag.vue";
-import { Event } from "@/__generated__/graphql";
+import { Event } from "@/src/__generated__/graphql";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 
 export default defineComponent({

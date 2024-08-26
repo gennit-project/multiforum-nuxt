@@ -14,7 +14,7 @@ import {
   Channel,
   ChannelCreateInput,
   ChannelTagsConnectOrCreateFieldInput,
-} from "@/__generated__/graphql";
+} from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "CreateChannel",

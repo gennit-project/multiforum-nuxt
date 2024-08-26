@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import { Issue } from "@/__generated__/graphql";
+import { Issue } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   props: {

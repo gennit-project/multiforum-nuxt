@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import { Issue } from "@/__generated__/graphql";
+import { Issue } from "@/src/__generated__/graphql";
 import { GET_CLOSED_ISSUES_BY_CHANNEL } from "@/graphQLData/issue/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";

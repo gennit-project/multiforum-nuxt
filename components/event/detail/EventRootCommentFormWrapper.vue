@@ -1,6 +1,6 @@
 <script lang="ts">
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
-import { Comment, Event } from "@/__generated__/graphql";
+import { Comment, Event } from "@/src/__generated__/graphql";
 import { defineComponent, ref, PropType, computed } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CreateEditCommentFormValues } from "@/types/Comment";

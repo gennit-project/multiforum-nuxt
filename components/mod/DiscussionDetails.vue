@@ -3,7 +3,7 @@ import { defineComponent, computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { Issue } from "@/__generated__/graphql";
+import { Issue } from "@/src/__generated__/graphql";
 import LoadingSpinner from "../LoadingSpinner.vue";
 import { DateTime } from "luxon";
 import MarkdownPreview from "../MarkdownPreview.vue";

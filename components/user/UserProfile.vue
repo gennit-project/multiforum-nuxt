@@ -9,7 +9,7 @@ import gql from "graphql-tag";
 import { useDisplay } from "vuetify";
 import UserProfileTabs from "./UserProfileTabs.vue";
 import UserProfileSidebar from "./UserProfileSidebar.vue";
-import { User } from "@/__generated__/graphql";
+import { User } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   components: {
