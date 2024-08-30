@@ -1,3 +1,3 @@
 <template>
-    UserComments.vue
+    <div>User comments</div>
 </template>

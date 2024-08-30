@@ -24,7 +24,7 @@ import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModa
 import ConfirmUndoDiscussionFeedbackModal from "@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue";
 import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
-import Notification from "@/components/Notification.vue";
+import Notification from "@/components/NotificationComponent.vue";
 import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.vue";
 import DiscussionAlbum from "./DiscussionAlbum.vue";
 

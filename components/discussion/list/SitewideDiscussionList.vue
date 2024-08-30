@@ -86,8 +86,6 @@ const aggregateDiscussionCount = computed(() => {
   return discussionResult.value.getSiteWideDiscussionList.aggregateDiscussionCount;
 });
 
-const reachedEndOfResults = ref(false);
-
 const loadMore = () => {
   fetchMore({
     variables: {

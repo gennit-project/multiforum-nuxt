@@ -1,16 +1,16 @@
-<script lang="ts">
-import type { Comment } from "@/src/__generated__/graphql";
-import type { PropType} from "vue";
-import { computed, defineComponent, ref } from "vue";
-import { useRoute } from "vue-router";
-import InfoBanner from "@/components/InfoBanner.vue";
-import LoadMore from "@/components/LoadMore.vue";
-import CommentOnFeedbackPage from "./CommentOnFeedbackPage.vue";
-import Notification from "../Notification.vue";
-import PermalinkedFeedbackComment from "@/components/comments/PermalinkedFeedbackComment.vue";
-import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
-import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
-import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
+<script setup lang="ts">
+import { ref, computed } from 'vue';
+import { useRoute } from 'vue-router';
+import InfoBanner from '@/components/InfoBanner.vue';
+import LoadMore from '@/components/LoadMore.vue';
+import CommentOnFeedbackPage from './CommentOnFeedbackPage.vue';
+import Notification from '../NotificationComponent.vue';
+import PermalinkedFeedbackComment from '@/components/comments/PermalinkedFeedbackComment.vue';
+import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
+import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
+import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
+import type { Comment } from '@/src/__generated__/graphql';
+import type { PropType } from 'vue';
 
 type GiveFeedbackInput = {
   commentData: Comment;
@@ -21,136 +21,118 @@ type EditFeedbackInput = {
   commentData: Comment;
 };
 
-export default defineComponent({
-  name: "CommentFeedback",
-  components: {
-    InfoBanner,
-    LoadMore,
-    Notification,
-    PermalinkedFeedbackComment,
-    CommentOnFeedbackPage,
-    GenericFeedbackFormModal,
-    ConfirmUndoCommentFeedbackModal,
-    EditCommentFeedbackModal,
+const props = defineProps({
+  addFeedbackCommentToCommentError: {
+    type: String,
+    required: true,
   },
-  props: {
-    addFeedbackCommentToCommentError: {
-      type: String,
-      required: true,
-    },
-    addFeedbackCommentToCommentLoading: {
-      type: Boolean,
-      required: true,
-    },
-    commentToGiveFeedbackOn: {
-      type: Object as PropType<Comment>,
-      default: null,
-    },
-    commentToRemoveFeedbackFrom: {
-      type: Object as PropType<Comment>,
-      default: null,
-    },
-    feedbackCommentsAggregate: {
-      type: Number,
-      required: true,
-    },
-    feedbackComments: {
-      type: Array as () => Comment[],
-      required: true,
-    },
-    loading: {
-      type: Boolean,
-      required: true,
-    },
-    loadMore: {
-      type: Function,
-      required: true,
-    },
-    loggedInUserModName: {
-      type: String,
-      default: "",
-    },
-    reachedEndOfResults: {
-      type: Boolean,
-      required: true,
-    },
-    showFeedbackFormModal: {
-      type: Boolean,
-      required: true,
-    },
-    showFeedbackSubmittedSuccessfully: {
-      type: Boolean,
-      required: true,
-    },
-    showPermalinkedFeedback: {
-      type: Boolean,
-      required: true,
-    },
+  addFeedbackCommentToCommentLoading: {
+    type: Boolean,
+    required: true,
   },
-  setup() {
-    const route = useRoute();
-    const channelId = computed(() => {
-      if (typeof route.params.channelId === "string") {
-        return route.params.channelId;
-      }
-      return "";
-    });
-    const feedbackId = computed(() => {
-      if (typeof route.params.feedbackId === "string") {
-        return route.params.feedbackId;
-      }
-      return "";
-    });
-    const showConfirmUndoFeedbackModal = ref(false);
-    const showEditCommentFeedbackModal = ref(false);
-
-    return {
-      channelId,
-      feedbackId,
-      showCopiedLinkNotification: ref(false),
-      showConfirmUndoFeedbackModal,
-      showEditCommentFeedbackModal,
-    };
+  commentToGiveFeedbackOn: {
+    type: Object as PropType<Comment>,
+    default: null,
   },
-  methods: {
-    handleClickGiveFeedback(input: GiveFeedbackInput) {
-      const { commentData, parentCommentId } = input;
-      this.$emit("openFeedbackFormModal", { commentData, parentCommentId });
-      this.$emit("updateCommentToGiveFeedbackOn", commentData);
-    },
-    handleClickUndoFeedback(input: GiveFeedbackInput) {
-      const { commentData } = input;
-      this.showConfirmUndoFeedbackModal = true;
-      this.$emit("updateCommentToRemoveFeedbackFrom", commentData);
-    },
-    handleClickEditFeedback(input: EditFeedbackInput) {
-      const { commentData } = input;
-      this.$emit("updateCommentToGiveFeedbackOn", commentData);
-      this.showEditCommentFeedbackModal = true;
-    },
-    updateFeedback(text: string) {
-      this.feedbackText = text;
-    },
-    handleSubmitFeedback() {
-      if (!this.commentToGiveFeedbackOn?.id) {
-        console.error("commentId is required to submit feedback");
-        return;
-      }
-      if (!this.loggedInUserModName) {
-        console.error("modName is required to submit feedback");
-        return;
-      }
-      const feedbackInput = {
-        commentId: this.commentToGiveFeedbackOn?.id,
-        text: this.feedbackText,
-        modProfileName: this.loggedInUserModName,
-        channelId: this.channelId,
-      };
-      this.$emit('addFeedbackCommentToComment', feedbackInput);
-    },
+  commentToRemoveFeedbackFrom: {
+    type: Object as PropType<Comment>,
+    default: null,
+  },
+  feedbackCommentsAggregate: {
+    type: Number,
+    required: true,
+  },
+  feedbackComments: {
+    type: Array as () => Comment[],
+    required: true,
+  },
+  loading: {
+    type: Boolean,
+    required: true,
+  },
+  loadMore: {
+    type: Function,
+    required: true,
+  },
+  loggedInUserModName: {
+    type: String,
+    default: '',
+  },
+  reachedEndOfResults: {
+    type: Boolean,
+    required: true,
+  },
+  showFeedbackFormModal: {
+    type: Boolean,
+    required: true,
+  },
+  showFeedbackSubmittedSuccessfully: {
+    type: Boolean,
+    required: true,
+  },
+  showPermalinkedFeedback: {
+    type: Boolean,
+    required: true,
   },
 });
+
+const emit = defineEmits([
+  'openFeedbackFormModal',
+  'updateCommentToGiveFeedbackOn',
+  'updateCommentToRemoveFeedbackFrom',
+  'addFeedbackCommentToComment',
+  'closeFeedbackFormModal',
+]);
+
+const route = useRoute();
+const channelId = computed(() => (typeof route.params.channelId === 'string' ? route.params.channelId : ''));
+const feedbackId = computed(() => (typeof route.params.feedbackId === 'string' ? route.params.feedbackId : ''));
+
+const showConfirmUndoFeedbackModal = ref(false);
+const showEditCommentFeedbackModal = ref(false);
+const showCopiedLinkNotification = ref(false);
+
+function handleClickGiveFeedback(input: GiveFeedbackInput) {
+  const { commentData, parentCommentId } = input;
+  emit('openFeedbackFormModal', { commentData, parentCommentId });
+  emit('updateCommentToGiveFeedbackOn', commentData);
+}
+
+function handleClickUndoFeedback(input: GiveFeedbackInput) {
+  const { commentData } = input;
+  showConfirmUndoFeedbackModal.value = true;
+  emit('updateCommentToRemoveFeedbackFrom', commentData);
+}
+
+function handleClickEditFeedback(input: EditFeedbackInput) {
+  const { commentData } = input;
+  emit('updateCommentToGiveFeedbackOn', commentData);
+  showEditCommentFeedbackModal.value = true;
+}
+
+function updateFeedback(text: string) {
+  this.feedbackText = text;
+}
+
+function handleSubmitFeedback() {
+  if (!props.commentToGiveFeedbackOn?.id) {
+    console.error('commentId is required to submit feedback');
+    return;
+  }
+  if (!props.loggedInUserModName) {
+    console.error('modName is required to submit feedback');
+    return;
+  }
+  const feedbackInput = {
+    commentId: props.commentToGiveFeedbackOn?.id,
+    text: this.feedbackText,
+    modProfileName: props.loggedInUserModName,
+    channelId: channelId.value,
+  };
+  emit('addFeedbackCommentToComment', feedbackInput);
+}
 </script>
+
 <template>
   <div>
     <h2 class="mt-4 text-wrap text-center text-xl font-bold dark:text-gray-200">
@@ -216,7 +198,7 @@ export default defineComponent({
       :open="showFeedbackFormModal"
       :loading="addFeedbackCommentToCommentLoading"
       :error="addFeedbackCommentToCommentError"
-      @close="$emit('closeFeedbackFormModal')"
+      @close="emit('closeFeedbackFormModal')"
       @update-feedback="updateFeedback"
       @primary-button-click="handleSubmitFeedback"
     />

@@ -1,7 +1,9 @@
 import { defineConfig } from "cypress";
 // Populate process.env with values from .env file
  
-require("dotenv").config({ path: ".env" });
+import dotenv from "dotenv";
+
+dotenv.config({ path: ".env" });
 
 module.exports = defineConfig({
   env: {

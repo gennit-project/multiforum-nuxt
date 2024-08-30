@@ -1,55 +1,56 @@
-<script lang="ts">
-import { defineComponent, ref } from "vue";
-import ExclamationTriangleIcon from "@/components/icons/ExclamationIcon.vue";
+<script setup lang="ts">
+import { ref, watchEffect, defineExpose } from 'vue';
+import ExclamationTriangleIcon from '@/components/icons/ExclamationIcon.vue';
 
-export default defineComponent({
-  components: {
-    ExclamationTriangleIcon,
+const props = defineProps({
+  disabled: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
-    errorMessage: {
-      type: String,
-      default: "",
-    },
-    value: {
-      type: String,
-      default: "",
-    },
-    invalid: {
-      type: Boolean,
-      default: false,
-    },
-    placeholder: {
-      type: String,
-      default: "",
-    },
-    rows: {
-      type: Number,
-      default: 1,
-    },
-    testId: {
-      type: String,
-      default: "",
-    },
+  errorMessage: {
+    type: String,
+    default: '',
   },
-  setup(props, { expose }) {
-    const inputRef = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
-    
-    const focus = () => {
-      inputRef.value?.focus();
-    };
+  value: {
+    type: String,
+    default: '',
+  },
+  invalid: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: '',
+  },
+  rows: {
+    type: Number,
+    default: 1,
+  },
+  testId: {
+    type: String,
+    default: '',
+  },
+});
 
-    expose({ focus });
+const emit = defineEmits(['update']);
 
-    return {
-      inputRef,
-      text: ref(props.value),
-    };
-  },
+const inputRef = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
+const text = ref(props.value);
+
+const focus = () => {
+  inputRef.value?.focus();
+};
+
+// Watch for changes in props.value to keep `text` in sync
+watchEffect(() => {
+  text.value = props.value;
+});
+
+defineExpose({ focus });
+
+watchEffect(() => {
+  emit('update', text.value);
 });
 </script>
 

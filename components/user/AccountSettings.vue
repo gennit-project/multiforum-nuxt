@@ -13,7 +13,7 @@ import EditAccountSettingsFields from "./EditAccountSettingsFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type { UserUpdateInput } from "@/src/__generated__/graphql";
 import type { EditAccountSettingsFormValues } from "@/types/User";
-import Notification from "../Notification.vue";
+import Notification from "../NotificationComponent.vue";
 
 export default defineComponent({
   name: "EditAccountSettings",

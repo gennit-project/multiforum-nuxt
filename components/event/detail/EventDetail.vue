@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed, ref, watch } from "vue";
-import Tag from "@/components/Tag.vue";
+import Tag from "@/components/TagComponent.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";
 import { GET_EVENT } from "@/graphQLData/event/queries";

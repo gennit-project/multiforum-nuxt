@@ -4,7 +4,7 @@ import { defineComponent, computed, ref } from "vue";
 import type { Discussion, DiscussionChannel } from "@/src/__generated__/graphql";
 import { relativeTime } from "../../../dateTimeUtils";
 import { useRoute } from "vue-router";
-import Tag from "@/components/Tag.vue";
+import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
@@ -217,7 +217,7 @@ export default defineComponent({
       const query = { ...this.$route.query };
       for (const key in query) {
         if (!query[key]) {
-          delete query[key];
+          Reflect.deleteProperty(query, key);
         }
       }
       return query;

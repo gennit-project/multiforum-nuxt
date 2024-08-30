@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
-import gql from "graphql-tag";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
@@ -10,7 +9,7 @@ import {
   uploadAndGetEmbeddedLink,
   getUploadFileName,
 } from "@/utils";
-import ErrorBanner from "../ErrorBanner.vue";
+import ErrorBanner from "./ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 
 // Props
@@ -40,22 +39,12 @@ const props = defineProps({
     default: 4,
   },
 });
-
-// Apollo Queries and Mutations
-const GET_THEME = gql`
-  query GetTheme {
-    theme @client
-  }
-`;
-
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
 const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const { result: themeResult } = useQuery(GET_THEME);
 
 // Computed properties
 const username = computed(() => localUsernameResult.value?.username || "");
-const theme = computed(() => themeResult.value?.theme || "light");
 
 // Refs
 const editorRef = ref<HTMLTextAreaElement | null>(null);

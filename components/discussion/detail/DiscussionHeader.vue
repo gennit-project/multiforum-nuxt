@@ -16,7 +16,7 @@ import {
   GET_LOCAL_MOD_PROFILE_NAME,
   GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
-import Notification from "@/components/Notification.vue";
+import Notification from "@/components/NotificationComponent.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 

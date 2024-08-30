@@ -15,7 +15,7 @@ import { useDisplay } from "vuetify";
 import { useRoute } from "vue-router";
 
 // Authentication
-const { isAuthenticated, loginWithPopup, loginWithRedirect } = useAuth0();
+const { isAuthenticated } = useAuth0();
 
 // Route handling
 const route = useRoute();

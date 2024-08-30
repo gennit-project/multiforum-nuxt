@@ -1,115 +1,113 @@
-<script lang="ts">
-import { defineComponent, computed } from "vue";
-import VoteButton from "@/components/VoteButton.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
-import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
-import type { SelectOptionData } from "@/types/GenericFormTypes";
+<script setup lang="ts">
+import { computed } from 'vue';
+import VoteButton from '@/components/VoteButton.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
+import MenuButton, { ALLOWED_ICONS } from '@/components/MenuButton.vue';
+import type { SelectOptionData } from '@/types/GenericFormTypes';
 
-export default defineComponent({
-  name: "VoteComponent",
-  components: {
-    HandThumbDownIcon,
-    MenuButton,
-    RequireAuth,
-    VoteButton,
+const props = defineProps({
+  downvoteActive: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    downvoteActive: {
-      type: Boolean,
-      default: false,
-    },
-    upvoteActive: {
-      type: Boolean,
-      default: false,
-    },
-    downvoteCount: {
-      type: Number,
-      default: 0,
-    },
-    upvoteCount: {
-      type: Number,
-      default: 0,
-    },
-    hasModProfile: {
-      type: Boolean,
-      default: false,
-    },
-    showDownvote: {
-      type: Boolean,
-      default: true,
-    },
-    upvoteLoading: {
-      type: Boolean,
-      default: false,
-    },
-    downvoteLoading: {
-      type: Boolean,
-      default: false,
-    },
+  upvoteActive: {
+    type: Boolean,
+    default: false,
   },
-  setup(props) {
-    const thumbsDownMenuItems = computed(() => {
-      let items: SelectOptionData[] = [
-        {
-          label: "View Feedback",
-          icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-          value: "",
-          event: "viewFeedback",
-        },
-      ];
-
-      if (props.downvoteActive) {
-        items = items.concat([
-          {
-            label: "Undo feedback",
-            icon: ALLOWED_ICONS.UNDO,
-            value: "",
-            event: "undoFeedback",
-          },
-          {
-            label: "Edit feedback",
-            icon: ALLOWED_ICONS.EDIT,
-            value: "",
-            event: "editFeedback",
-          },
-        ]);
-      } else {
-        items = items.concat([
-          {
-            label: "Give feedback",
-            icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-            value: "",
-            event: "giveFeedback",
-          },
-        ]);
-      }
-      return items;
-    });
-
-    return {
-      thumbsDownMenuItems,
-    };
+  downvoteCount: {
+    type: Number,
+    default: 0,
   },
-  methods: {
-    editFeedback() {
-      this.$emit("editFeedback");
-    },
-    undoFeedback() {
-      this.$emit("undoFeedback");
-    },
-    giveFeedback() {
-      this.$emit("giveFeedback");
-    },
-    viewFeedback() {
-      this.$emit("viewFeedback");
-    },
-    clickUp() {
-      this.$emit("clickUp");
-    },
+  upvoteCount: {
+    type: Number,
+    default: 0,
+  },
+  hasModProfile: {
+    type: Boolean,
+    default: false,
+  },
+  showDownvote: {
+    type: Boolean,
+    default: true,
+  },
+  upvoteLoading: {
+    type: Boolean,
+    default: false,
+  },
+  downvoteLoading: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits([
+  'editFeedback',
+  'undoFeedback',
+  'giveFeedback',
+  'viewFeedback',
+  'clickUp',
+]);
+
+const thumbsDownMenuItems = computed(() => {
+  let items: SelectOptionData[] = [
+    {
+      label: 'View Feedback',
+      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+      value: '',
+      event: 'viewFeedback',
+    },
+  ];
+
+  if (props.downvoteActive) {
+    items = items.concat([
+      {
+        label: 'Undo feedback',
+        icon: ALLOWED_ICONS.UNDO,
+        value: '',
+        event: 'undoFeedback',
+      },
+      {
+        label: 'Edit feedback',
+        icon: ALLOWED_ICONS.EDIT,
+        value: '',
+        event: 'editFeedback',
+      },
+    ]);
+  } else {
+    items = items.concat([
+      {
+        label: 'Give feedback',
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+        value: '',
+        event: 'giveFeedback',
+      },
+    ]);
+  }
+  return items;
+});
+
+const editFeedback = () => {
+  emit('editFeedback');
+};
+
+const undoFeedback = () => {
+  emit('undoFeedback');
+};
+
+const giveFeedback = () => {
+  emit('giveFeedback');
+};
+
+const viewFeedback = () => {
+  emit('viewFeedback');
+};
+
+const clickUp = () => {
+  emit('clickUp');
+};
 </script>
+
 <template>
   <RequireAuth :full-width="false">
     <template #has-auth>

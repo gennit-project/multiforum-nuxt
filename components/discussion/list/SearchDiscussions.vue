@@ -8,7 +8,7 @@ import { getFilterValuesFromParams } from "@/components/event/list/filters/getFi
 import type { SearchDiscussionValues } from "@/types/Discussion";
 
 // Props and Emits
-const emit = defineEmits(["filterByTag", "filterByChannel"]);
+defineEmits(["filterByTag", "filterByChannel"]);
 
 // Setup function
 const route = useRoute();

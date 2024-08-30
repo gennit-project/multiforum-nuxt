@@ -28,7 +28,10 @@ export default defineComponent({
       default: "",
     },
   },
-  setup(props, { emit }) {
+  setup(props, ) {
+    const emit = defineEmits([
+      "setSelectedTags",
+    ]);
     const searchInput: Ref<string> = ref("");
 
     const searchInputComputed = computed(() => {

@@ -3,7 +3,7 @@ import type { PropType } from "vue";
 import { defineComponent, computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
-import Tag from "@/components/Tag.vue";
+import Tag from "@/components/TagComponent.vue";
 import "md-editor-v3/lib/style.css";
 import { useDisplay } from "vuetify";
 import gql from "graphql-tag";

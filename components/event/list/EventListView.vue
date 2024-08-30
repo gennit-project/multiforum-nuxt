@@ -61,7 +61,6 @@ const {
   error: eventError,
   result: eventResult,
   loading: eventLoading,
-  refetch: refetchEvents,
   onResult: onEventResult,
   fetchMore,
 } = useQuery(

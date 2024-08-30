@@ -13,18 +13,20 @@ import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
   SOFT_DELETE_COMMENT,
- CREATE_COMMENT , ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
+  CREATE_COMMENT,
+  ADD_FEEDBACK_COMMENT_TO_COMMENT,
+} from "@/graphQLData/comment/mutations";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "../ErrorBanner.vue";
 import WarningModal from "../WarningModal.vue";
-import type { Ref , PropType} from "vue";
+import type { Ref, PropType } from "vue";
 import PermalinkedComment from "./PermalinkedComment.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
+import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import SortButtons from "@/components/SortButtons.vue";
 import { modProfileNameVar } from "@/cache";
-import Notification from "@/components/Notification.vue";
+import Notification from "@/components/NotificationComponent.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import type {
@@ -118,12 +120,21 @@ export default defineComponent({
     showCommentSortButtons: {
       type: Boolean,
       required: false,
-      default: true
-    }
+      default: true,
+    },
   },
-  setup(props, { emit }) {
+  setup(props, ) {
     const route = useRoute();
     const router = useRouter();
+    const emit = defineEmits([
+      "updateCommentSectionQueryResult",
+      "decrementCommentCount",
+      "updateCommentSectionQueryResult",
+      "decrementCommentCount",
+      "incrementCommentCount",
+      "updateCreateReplyCommentInput",
+      "loadMore",
+    ]);
 
     const channelId = computed(() => {
       if (typeof route.params.channelId !== "string") {
@@ -171,7 +182,7 @@ export default defineComponent({
     } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
       update: (cache: any, result: any) => {
         const parentId = JSON.parse(
-          JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value),
+          JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
         );
         const newFeedbackComment = result.data.createComments.comments[0];
 
@@ -204,7 +215,7 @@ export default defineComponent({
                   return updatedComment;
                 }
                 return comment;
-              },
+              }
             );
 
             const writeQueryData = {
@@ -309,7 +320,7 @@ export default defineComponent({
 
               // 2. Filter out the deleted reply.
               const filteredReplies = existingReplies.filter(
-                (reply: CommentType) => reply.id !== commentToDeleteId.value,
+                (reply: CommentType) => reply.id !== commentToDeleteId.value
               );
 
               const existingChildCommentAggregate =
@@ -319,7 +330,7 @@ export default defineComponent({
               // 3. Decrease the aggregate count.
               const newChildCommentAggregate = Math.max(
                 0,
-                existingChildCommentAggregate - 1,
+                existingChildCommentAggregate - 1
               );
 
               const writeQueryData = {
@@ -662,7 +673,7 @@ export default defineComponent({
         text: this.feedbackText,
         modProfileName: this.loggedInUserModName,
         channelId: this.channelId,
-      }
+      };
       this.addFeedbackCommentToComment(feedbackInput);
     },
     updateFeedback(text: string) {
@@ -685,27 +696,17 @@ export default defineComponent({
   <div class="bg-white dark:bg-gray-800">
     <div>
       <div class="align-items flex justify-between">
-        <h2
-          id="comments"
-          ref="commentSectionHeader"
-          class="px-1 text-lg"
-        >
+        <h2 id="comments" ref="commentSectionHeader" class="px-1 text-lg">
           {{ `Comments (${aggregateCommentCount})` }}
         </h2>
-        <SortButtons
-          v-if="showCommentSortButtons"
-          :show-top-options="false"
-        />
+        <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />
       </div>
       <ErrorBanner
         v-if="locked"
         class="mr-10 mt-2"
         :text="'This comment section is locked because the post was removed from the channel.'"
       />
-      <LoadingSpinner
-        v-if="loading"
-        class="ml-2"
-      />
+      <LoadingSpinner v-if="loading" class="ml-2" />
       <PermalinkedComment
         v-if="isPermalinkPage"
         :key="permalinkedCommentId"
@@ -752,10 +753,7 @@ export default defineComponent({
           There are no comments yet.
         </div>
         <div :key="activeSort">
-          <div
-            v-for="comment in comments || []"
-            :key="comment.id"
-          >
+          <div v-for="comment in comments || []" :key="comment.id">
             <Comment
               v-if="comment.id !== permalinkedCommentId"
               :aggregate-comment-count="aggregateCommentCount"
@@ -778,10 +776,14 @@ export default defineComponent({
               @click-edit-comment="handleClickEdit"
               @delete-comment="handleClickDelete"
               @create-comment="handleClickCreate"
-              @update-create-reply-comment-input="updateCreateInputValuesForReply"
+              @update-create-reply-comment-input="
+                updateCreateInputValuesForReply
+              "
               @update-edit-comment-input="updateEditInputValues"
               @save-edit="handleSaveEdit"
-              @show-copied-link-notification="showCopiedLinkNotification = $event"
+              @show-copied-link-notification="
+                showCopiedLinkNotification = $event
+              "
               @open-mod-profile-modal="showModProfileModal = true"
               @scroll-to-top="scrollToTop"
               @click-report="handleClickReport"

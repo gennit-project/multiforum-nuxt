@@ -15,11 +15,6 @@ import {
 import LocationFilterTypes from "./locationFilterTypes";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
-import {
-  defaultSelectedWeekdays,
-  defaultSelectedHourRanges,
-  defaultSelectedWeeklyHourRanges,
-} from "./eventSearchOptions";
 import GenericButton from "@/components/GenericButton.vue";
 import FilterChip from "@/components/FilterChip.vue";
 import SelectCanceled from "./SelectCanceled.vue";
@@ -144,11 +139,11 @@ const updateFilters = (params: any) => {
     {}
   );
 
-  const existingQueryCopy = { ...route.query };
+  const existingQueryCopy: { [key: string]: any } = {};
 
-  Object.keys(paramsWithEmptyValues).forEach((key: string) => {
-    if (isEmpty(paramsWithEmptyValues[key])) {
-      delete existingQueryCopy[key];
+  Object.keys(route.query).forEach((key: string) => {
+    if (!isEmpty(paramsWithEmptyValues[key])) {
+      existingQueryCopy[key] = route.query[key];
     }
   });
 

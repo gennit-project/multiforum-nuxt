@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, defineProps } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
-import TextEditor from "@/components/forms/TextEditor.vue";
-import FormRow from "@/components/forms/FormRow.vue";
-import Form from "@/components/forms/Form.vue";
-import TagPicker from "@/components/forms/TagPicker.vue";
+import TextEditor from "@/components/TextEditor.vue";
+import FormRow from "@/components/FormRow.vue";
+import TagPicker from "@/components/TagPicker.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import TextInput from "@/components/forms/TextInput.vue";
+import TextInput from "@/components/TextInput.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 
@@ -21,6 +20,8 @@ const props = defineProps<{
   createDiscussionLoading: boolean;
   updateDiscussionLoading: boolean;
 }>();
+
+defineEmits(["submit", "updateFormValues"]);
 
 // Setup reactive variables
 const formTitle = computed(() => props.editMode ? "Edit Discussion" : "Start Discussion");

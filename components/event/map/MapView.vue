@@ -1,47 +1,63 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import type { Ref } from "vue";
 import { useQuery } from "@vue/apollo-composable";
+import { useRouter, useRoute } from "vue-router";
+import { useDisplay } from "vuetify";
+
 import EventPreview from "../list/EventPreview.vue";
 import EventList from "../list/EventList.vue";
+import EventMap from "./Map.vue";
 import PreviewContainer from "../list/PreviewContainer.vue";
 import CloseButton from "../../buttons/CloseButton.vue";
-import { useRoute, useRouter } from "vue-router";
-import { useDisplay } from "vuetify";
 import ErrorBanner from "../../ErrorBanner.vue";
+import EventFilterBar from "../list/filters/EventFilterBar.vue";
+import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
+import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
+import gql from "graphql-tag";
+import { GET_EVENTS } from "@/graphQLData/event/queries";
+import getEventWhere from "../list/filters/getEventWhere";
+import { getFilterValuesFromParams } from "../list/filters/getFilterValuesFromParams";
 import {
   chronologicalOrder,
   reverseChronologicalOrder,
 } from "../list/filters/filterStrings";
 import { timeShortcutValues } from "../list/filters/eventSearchOptions";
-import EventFilterBar from "../list/filters/EventFilterBar.vue";
-import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
-import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
-import gql from "graphql-tag";
-import type { Event as EventData } from "@/src/__generated__/graphql";
 import placeIcon from "@/assets/images/place-icon.svg";
 import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg";
+import type { Event as EventData } from "@/src/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
-import getEventWhere from "../list/filters/getEventWhere";
-import { GET_EVENTS } from "@/graphQLData/event/queries";
+import type { Ref, PropType } from "vue";
 
-// Client-side rendering for EventMap
-let EventMap: any;
-if (import.meta.client) {
-  EventMap = defineAsyncComponent(() => import("./Map.vue"));
-}
+defineProps({
+  selectedTags: {
+    type: Array as PropType<Array<string>>,
+    default: () => [],
+  },
+  selectedChannels: {
+    type: Array as PropType<Array<string>>,
+    default: () => [],
+  },
+  channelId: {
+    type: String,
+    default: "",
+  },
+  searchInput: {
+    type: String,
+    default: "",
+  },
+});
 
-// Setup function
+defineEmits([
+  "filterByTag",
+  "filterByChannel",
+  "highlightEvent",
+  "openPreview",
+  "unhighlight",
+]);
+
 const { mdAndUp } = useDisplay();
 const route = useRoute();
 const router = useRouter();
-
-const channelId = computed(() => {
-  return typeof route.params.channelId === "string"
-    ? route.params.channelId
-    : "";
-});
 const showOnlineOnly = route.name === "SearchEventsList";
 const showInPersonOnly =
   route.name === "MapEventPreview" || route.name === "MapView";
@@ -75,7 +91,6 @@ const {
   result: eventResult,
   loading: eventLoading,
   onResult: onGetEventResult,
-  fetchMore,
 } = useQuery(GET_EVENTS, {
   limit: 25,
   offset: 0,
@@ -84,17 +99,13 @@ const {
 });
 
 onGetEventResult((value) => {
-  // If the preview pane is blank, fill it with the details
-  // of the first result, if there is one.
   if (!value.data || value.data.events.length === 0) {
     return;
   }
   const defaultSelectedEvent = value.data.events[0].id;
-
-  sendToPreview(defaultSelectedEvent, "");
+  sendToPreview(defaultSelectedEvent.id, "");
 });
 
-const previewIsOpen = ref(false);
 const sendToPreview = (eventId: string, eventLocationId: string) => {
   if (eventId) {
     const escapedEventLocationId = eventLocationId
@@ -104,46 +115,20 @@ const sendToPreview = (eventId: string, eventLocationId: string) => {
     if (!channelId.value) {
       router.push({
         name: "MapEventPreview",
-        params: {
-          eventId,
-        },
+        params: { eventId },
         hash: `#${escapedEventLocationId}`,
         query: route.query,
       });
     } else {
       router.push({
         name: "SearchEventPreview",
-        params: {
-          eventId,
-        },
+        params: { eventId },
         hash: `#${escapedEventLocationId}`,
         query: route.query,
       });
     }
   }
 };
-
-const loadMore = () => {
-  fetchMore({
-    variables: {
-      offset: eventResult.value.events.length,
-    },
-    updateQuery: (previousResult, { fetchMoreResult }) => {
-      if (!fetchMoreResult) return previousResult;
-
-      return {
-        ...previousResult,
-        events: [...previousResult.events, ...fetchMoreResult.events],
-      };
-    },
-  });
-};
-
-const createEventPath = computed(() => {
-  return channelId.value
-    ? `/channels/c/${channelId.value}/events/create`
-    : "/events/create";
-});
 
 const GET_THEME = gql`
   query GetTheme {
@@ -157,7 +142,8 @@ const theme = computed(() => {
   return result.value?.theme || "light";
 });
 
-// State and data management
+// Data functions and properties from `data` and `methods` section
+// const highlightedMarker = ref(null);
 const mobileMarkerMap = ref<any>({});
 const desktopMarkerMap = ref<any>({});
 const mobileMap = ref<any>({});
@@ -170,14 +156,9 @@ const multipleEventPreviewIsOpen = ref(false);
 const selectedEvent = ref<EventData | null>(null);
 const selectedEvents = ref<EventData[]>([]);
 
-// Method definitions
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
-  // Updating the URL params causes the events
-  // to be refetched by the EventListView
-  // and MapView components
   router.replace({
-    // @ts-ignore
     query: {
       ...existingQuery,
       ...params,
@@ -187,10 +168,9 @@ const updateFilters = (params: SearchEventValues) => {
 
 const filterByChannel = (channel: string) => {
   const alreadySelected = filterValues.value.channels.includes(channel);
-
   if (alreadySelected) {
     filterValues.value.channels = filterValues.value.channels.filter(
-      (c: string) => c !== channel
+      (c) => c !== channel
     );
   } else {
     filterValues.value.channels.push(channel);
@@ -200,11 +180,8 @@ const filterByChannel = (channel: string) => {
 
 const filterByTag = (tag: string) => {
   const alreadySelected = filterValues.value.tags.includes(tag);
-
   if (alreadySelected) {
-    filterValues.value.tags = filterValues.value.tags.filter(
-      (t: string) => t !== tag
-    );
+    filterValues.value.tags = filterValues.value.tags.filter((t) => t !== tag);
   } else {
     filterValues.value.tags.push(tag);
   }
@@ -215,10 +192,19 @@ const setMarkerData = (data: any) => {
   mobileMap.value = data.map;
   mobileMarkerMap.value = data.markerMap;
 
-  // Keep desktop and mobile maps consistent
   desktopMap.value = data.map;
   desktopMarkerMap.value = data.markerMap;
 };
+
+// const updateMapCenter = (placeData: any) => {
+//   const coords = {
+//     lat: placeData.geometry.location.lat(),
+//     lng: placeData.geometry.location.lng(),
+//   };
+
+//   mobileMap.value.setCenter(coords);
+//   desktopMap.value.setCenter(coords);
+// };
 
 const highlightEventOnMap = ({
   eventId,
@@ -283,11 +269,7 @@ const highlightEventOnMap = ({
     const eventLocation =
       markerMap[eventLocationId].events[highlightedEventId.value]?.locationName;
 
-    // If the user mouses over a map marker with multiple events,
-    // open a generic infowindow.
     if (clickedMapMarker && numberOfEvents > 1) {
-      // Dispatch a custom event to indicate InfoWindow is open
-      // so the Cypress test can wait for it to open
       window.dispatchEvent(
         new CustomEvent("GenericInfoWindowOpen", {
           detail: {
@@ -296,16 +278,10 @@ const highlightEventOnMap = ({
         })
       );
       openGenericInfowindow();
-    }
-
-    // If the user mouses over a map marker with a single event,
-    // open a specific infowindow.
-    else if (clickedMapMarker && numberOfEvents === 1) {
+    } else if (clickedMapMarker && numberOfEvents === 1) {
       const defaultEventId = Object.keys(markerMap[eventLocationId].events)[0];
       highlightedEventId.value = defaultEventId;
 
-      // Dispatch a custom event to indicate InfoWindow is open
-      // so the Cypress test can wait for it to open
       window.dispatchEvent(
         new CustomEvent("SpecificInfoWindowOpen", {
           detail: {
@@ -315,15 +291,9 @@ const highlightEventOnMap = ({
         })
       );
       openSpecificInfowindow();
-    }
-
-    // If the user mouses over an event list item in the event list,
-    // always open a specific infowindow.
-    else if (eventId) {
+    } else if (eventId) {
       highlightedEventId.value = eventId;
 
-      // Dispatch a custom event to indicate InfoWindow is open
-      // so the Cypress test can wait for it to open
       window.dispatchEvent(
         new CustomEvent("SpecificInfoWindowOpen", {
           detail: {
@@ -339,16 +309,12 @@ const highlightEventOnMap = ({
       const selectedEventsObject = markerMap[eventLocationId].events;
       const getArrayFromObject = (obj: any) => {
         const ary = [];
-
         for (const key in obj) {
           ary.push(obj[key]);
         }
-
         return ary;
       };
-      const selectedEventsArray = getArrayFromObject(selectedEventsObject);
-
-      selectedEvents.value = selectedEventsArray;
+      selectedEvents.value = getArrayFromObject(selectedEventsObject);
     }
   }
 };
@@ -357,13 +323,11 @@ const highlightEvent = (
   eventLocationId: string,
   eventId: string,
   eventData: EventData,
-  clickedMapMarker: boolean | false
+  clickedMapMarker = false
 ) => {
   sendToPreview(eventId, eventLocationId);
-
   highlightedEventLocationId.value = eventLocationId;
 
-  // Keep desktop and mobile maps in sync
   highlightEventOnMap({
     eventId,
     eventLocationId,
@@ -400,14 +364,12 @@ const unhighlightEventOnMap = (markerMap: any) => {
 };
 
 const unhighlight = () => {
-  // Keep desktop and mobile map markers consistent
   unhighlightEventOnMap(mobileMarkerMap.value);
   unhighlightEventOnMap(desktopMarkerMap.value);
 };
 
 const closeEventPreview = () => {
   eventPreviewIsOpen.value = false;
-
   if (!multipleEventPreviewIsOpen.value) {
     colorLocked.value = false;
   }
@@ -420,25 +382,16 @@ const closeMultipleEventPreview = () => {
   unhighlight();
 };
 
-const openPreview = (event: EventData, openedFromMap: boolean | false) => {
+const openPreview = (event: EventData, openedFromMap = false) => {
   if (openedFromMap) {
-    // When opening from a map, count how
-    // many events are at the clicked location.
-    // If there is one event, open the preview for
-    // that event. If there is more than one,
-    // open a preview for multiple events.
     const eventsAtClickedLocation =
-      // We assume desktop and mobile marker maps are in sync.
       desktopMarkerMap.value[highlightedEventLocationId.value].numberOfEvents;
-
     if (eventsAtClickedLocation > 1) {
       multipleEventPreviewIsOpen.value = true;
     } else {
       eventPreviewIsOpen.value = true;
     }
   } else {
-    // If opened from a list,
-    // always preview a specific event.
     eventPreviewIsOpen.value = true;
   }
   selectedEvent.value = event;

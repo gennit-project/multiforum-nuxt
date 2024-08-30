@@ -1,19 +1,18 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, defineProps, defineEmits } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
-import Form from "~/components/forms/Form.vue";
-import TagPicker from "~/components/forms/TagPicker.vue";
-import TextInput from "~/components/forms/TextInput.vue";
-import FormRow from "~/components/forms/FormRow.vue";
-import TextEditor from "~/components/forms/TextEditor.vue";
-import AddImage from "~/components/AddImage.vue";
-import { getUploadFileName, uploadAndGetEmbeddedLink } from "~/utils";
+import TagPicker from "@/components/TagPicker.vue";
+import TextInput from "@/components/TextInput.vue";
+import FormRow from "@/components/FormRow.vue";
+import TextEditor from "@/components/TextEditor.vue";
+import AddImage from "@/components/AddImage.vue";
+import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import { useQuery, useMutation } from "@vue/apollo-composable";
-import { GET_LOCAL_USERNAME } from "~/graphQLData/user/queries";
-import { CREATE_SIGNED_STORAGE_URL } from "~/graphQLData/discussion/mutations";
-import ErrorBanner from "~/components/ErrorBanner.vue";
-import XmarkIcon from "~/components/icons/XmarkIcon.vue";
-import type { CreateEditChannelFormValues } from "~/types/Channel";
+import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
+import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import XmarkIcon from "@/components/icons/XmarkIcon.vue";
+import type { CreateEditChannelFormValues } from "@/types/Channel";
 
 const props = defineProps({
   editMode: {
@@ -103,6 +102,7 @@ const upload = async (file: File) => {
       file,
       filename,
       signedStorageURL,
+      fileType: file.type,
     });
 
     return embeddedLink;

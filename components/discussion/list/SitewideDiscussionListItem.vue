@@ -2,8 +2,8 @@
 import { defineComponent, computed } from "vue";
 import type { PropType } from "vue";
 import type { Discussion as DiscussionData } from "@/src/__generated__/graphql";
-import { useRoute, useRouter } from "vue-router";
-import Tag from "@/components/Tag.vue";
+import { useRoute } from "vue-router";
+import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import MenuButton from "@/components/MenuButton.vue";
@@ -45,7 +45,6 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
-    const router = useRouter();
 
     const commentCount = computed(() => {
       let count = 0;
@@ -58,7 +57,7 @@ export default defineComponent({
     });
 
     const submittedToMultipleChannels = computed(() => {
-      return props.discussion?.DiscussionChannels?.length > 1 || false;
+      return props.discussion?.DiscussionChannels?.length || false;
     });
 
     const channelCount = computed(() => {

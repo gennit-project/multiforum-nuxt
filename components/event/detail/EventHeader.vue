@@ -9,7 +9,7 @@ import LinkIcon from "@/components/icons/LinkIcon.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
 import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
 import useClipboard from "vue-clipboard3";
-import Notification from "@/components/Notification.vue";
+import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
 import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";

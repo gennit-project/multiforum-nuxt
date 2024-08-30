@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import { timeFilterShortcuts, timeShortcutValues } from "./eventSearchOptions";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import type { SearchEventValues } from "@/types/Event";
-import Tag from "@/components/Tag.vue";
+import Tag from "@/components/TagComponent.vue";
 
 // Props
 const props = defineProps({

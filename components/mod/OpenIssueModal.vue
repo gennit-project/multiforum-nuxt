@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
-import TextEditor from '@/components/forms/TextEditor.vue';
+import TextEditor from '@/components/TextEditor.vue';
 import {
   REPORT_CONTENT,
   REOPEN_ISSUE,

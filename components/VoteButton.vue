@@ -40,6 +40,9 @@ export default defineComponent({
     },
   },
   setup() {
+    defineEmits([
+      "vote",
+    ]);
     return {};
   },
 });

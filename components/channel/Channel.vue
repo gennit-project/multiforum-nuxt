@@ -1,41 +1,21 @@
 <script setup lang="ts">
-import ChannelTabs from "~/components/ChannelTabs.vue";
-import ChannelContent from "~/components/ChannelContent.vue";
-import ChannelHeaderMobile from "~/components/ChannelHeaderMobile.vue";
-import ChannelHeaderDesktop from "~/components/ChannelHeaderDesktop.vue";
-import DiscussionTitleEditForm from "~/components/discussion/detail/DiscussionTitleEditForm.vue";
-import EventTitleEditForm from "~/components/event/detail/EventTitleEditForm.vue";
-
-import { useRoute } from "#app"; // Nuxt 3 uses '#app' to provide routing composables
+import ChannelTabs from "@/components/channel/ChannelTabs.vue";
+import ChannelContent from "@/components/channel/ChannelContent.vue";
+import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
+import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
+import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
+import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
 import { useDisplay } from "vuetify";
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
-import gql from "graphql-tag";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import type { Channel, User } from "@/src/__generated__/graphql";
-
-// Define Apollo client-side query for the theme
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
 
 const route = useRoute();
 
 // Determine if the current route is for a discussion or event detail page
 const isDiscussionDetailPage = computed(() => route.name === "DiscussionDetail");
 const isEventDetailPage = computed(() => route.name === "EventDetail");
-
-// Query for the theme using Apollo client
-const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
-
-const theme = computed(() => {
-  if (themeLoading.value || themeError.value) {
-    return "";
-  }
-  return themeResult.value.theme;
-});
 
 // Extract the channel ID from the route parameters
 const channelId = computed(() => {
@@ -90,9 +70,6 @@ onGetChannelResult((result) => {
   }
 });
 
-// Extract discussionId and eventId from the route parameters
-const discussionId = computed(() => route.params.discussionId);
-const eventId = computed(() => route.params.eventId);
 
 // Get admin list from the channel
 const adminList = computed(() => {
@@ -101,16 +78,9 @@ const adminList = computed(() => {
 
 // Use Vuetify's display composable to handle responsive layouts
 const display = useDisplay();
-const lgAndDown = display.lgAndDown;
 const smAndDown = display.smAndDown;
 
-// Conditionally show the channel header based on the route
-const showChannelHeader = computed(() => {
-  const validRoutes = ["SearchDiscussionsInChannel", "SearchEventsInChannel", "EditChannel", "OpenIssues", "ClosedIssues", "About"];
-  return validRoutes.includes(route.name as string);
-});
 
-const showMenu = ref(false);
 
 </script>
 

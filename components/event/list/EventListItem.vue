@@ -4,7 +4,7 @@ import type { PropType } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import type { Event } from "@/src/__generated__/graphql";
 import { getDatePieces } from "@/utils/dateTimeUtils";
-import Tag from "@/components/Tag.vue";
+import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "../../HighlightedSearchTerms.vue";
 import { DateTime } from "luxon";
 import type { SearchEventValues } from "@/types/Event";

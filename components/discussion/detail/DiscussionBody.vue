@@ -4,7 +4,7 @@ import { defineComponent, computed, ref } from "vue";
 import { getLinksInText } from "@/utils";
 import type { Discussion } from "@/src/__generated__/graphql";
 import { useRoute } from "vue-router";
-import Tag from "../../Tag.vue";
+import Tag from "../../TagComponent.vue";
 import "md-editor-v3/lib/preview.css";
 import { useQuery } from "@vue/apollo-composable";
 import gql from "graphql-tag";

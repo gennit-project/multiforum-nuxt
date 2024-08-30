@@ -4,7 +4,7 @@ import { defineComponent } from "vue";
 import type { Channel } from "@/src/__generated__/graphql";
 import type { TagData } from "@/types/Tag";
 import HighlightedSearchTerms from "../HighlightedSearchTerms.vue";
-import Tag from "@/components/Tag.vue";
+import Tag from "@/components/TagComponent.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 

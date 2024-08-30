@@ -20,7 +20,7 @@ import type {
   ChannelTagsDisconnectFieldInput,
   ChannelUpdateInput,
 } from "@/src/__generated__/graphql";
-import Notification from '@/components/Notification.vue'
+import Notification from '@/components/NotificationComponent.vue'
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({

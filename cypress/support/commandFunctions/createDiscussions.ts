@@ -58,8 +58,6 @@ const createDiscussions = (discussions: DiscussionCreateInputWithChannels[]) => 
       },
       body: getOperation(discussion),
     });
-
-    const channelConnections = discussion.channelConnections;
   }
 };
 

@@ -17,8 +17,7 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from "@/components/comments/getSortFromQuery";
-
-export const DISCUSSION_PAGE_LIMIT = 25;
+const DISCUSSION_PAGE_LIMIT = 25;
 
 const emit = defineEmits(['filterByTag', 'filterByChannel']);
 

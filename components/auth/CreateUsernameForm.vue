@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, nextTick, computed } from "vue";
-import CheckCircleIcon from "~/components/icons/CheckCircleIcon.vue";
-import ExclamationIcon from "~/components/icons/ExclamationIcon.vue";
-import PrimaryButton from "~/components/buttons/PrimaryButton.vue";
-import ErrorBanner from "~/components/ErrorBanner.vue";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+import ExclamationIcon from "@/components/icons/ExclamationIcon.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const { isAuthenticated, user } = useAuth();
+const { user } = useAuth();
 const newUsername = ref(props.email?.split("@")[0]);
 
 const {
