@@ -1,52 +1,41 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import GenericModal from "@/components/GenericModal.vue";
 import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
 import TextEditor from '@/components/forms/TextEditor.vue'
 import ErrorBanner from "@/components/ErrorBanner.vue";
 
-export default defineComponent({
-  name: "DiscussionFeedbackFormModal",
-  components: {
-    ErrorBanner,
-    GenericModal,
-    HandThumbDownIcon,
-    TextEditor,
+const props = defineProps({
+  error: {
+    type: String,
+    default: "",
   },
-  props: {
-    error: {
-      type: String,
-      default: "",
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    open: {
-      type: Boolean,
-      default: false,
-    },
+  loading: {
+    type: Boolean,
+    default: false,
   },
-  setup() {
-    return {
-      title: "Give Semi-anonymous Feedback",
-      body: "Do you have any actionable feedback for the author?",
-    };
-  },
-  methods: {
-    updateFeedback(text: string) {
-      this.$emit('updateFeedback', text);
-    },
+  open: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits(['updateFeedback']);
+
+const title = "Give Semi-anonymous Feedback";
+const body = "Do you have any actionable feedback for the author?";
+
+function updateFeedback(text: string) {
+  emit('updateFeedback', text);
+}
 </script>
+
 <template>
   <GenericModal
     :highlight-color="'yellow'"
     :title="title"
     :body="body"
-    :open="open"
-    :loading="loading"
+    :open="props.open"
+    :loading="props.loading"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
   >
@@ -66,8 +55,8 @@ export default defineComponent({
         @update="updateFeedback"
       />
       <ErrorBanner
-        v-if="error"
-        :text="error"
+        v-if="props.error"
+        :text="props.error"
       />
       <p class="text-gray-600 dark:text-gray-400">
         Feedback is intended to be a helpful tool for the author. If you think

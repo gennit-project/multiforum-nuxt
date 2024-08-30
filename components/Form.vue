@@ -1,37 +1,34 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { useRouter } from 'vue-router';
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import FormRow from "@/components/forms/FormRow.vue";
 
-export default defineComponent({
-  name: "FormComponent",
-  components: {
-    CancelButton,
-    FormRow,
-    SaveButton,
+const props = defineProps({
+  formTitle: {
+    type: String,
+    default: "",
   },
-  props: {
-    formTitle: {
-      type: String,
-      default: "",
-    },
-    needsChanges: {
-      type: Boolean,
-      default: false,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    showCancelButton: {
-      type: Boolean,
-      default: true,
-    }
+  needsChanges: {
+    type: Boolean,
+    default: false,
   },
-  setup() {
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  showCancelButton: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const emit = defineEmits(["submit"]);
+const router = useRouter();
+
+function handleCancel() {
+  router.go(-1);
+}
 </script>
 
 <template>
@@ -41,20 +38,18 @@ export default defineComponent({
   >
     <div class="px-6 lg:px-14">
       <div class="flex justify-between">
-        <h2
-          class="font-semibold pt-3 text-base leading-7 text-gray-900 dark:text-gray-100"
-        >
-          {{ formTitle }}
+        <h2 class="font-semibold pt-3 text-base leading-7 text-gray-900 dark:text-gray-100">
+          {{ props.formTitle }}
         </h2>
         <div class="float-right">
           <CancelButton
-            v-if="!loading && showCancelButton"
-            @click.prevent="$router.go(-1)" 
+            v-if="!props.loading && props.showCancelButton"
+            @click.prevent="handleCancel"
           />
           <SaveButton
-            :disabled="needsChanges"
-            :loading="loading"
-            @click.prevent="$emit('submit')"
+            :disabled="props.needsChanges"
+            :loading="props.loading"
+            @click.prevent="emit('submit')"
           />
         </div>
       </div>
@@ -63,14 +58,14 @@ export default defineComponent({
         <template #content>
           <div class="pb-5 pt-5">
             <div class="flex justify-end">
-              <CancelButton 
-                v-if="!loading && showCancelButton"
-                @click.prevent="$router.go(-1)"
+              <CancelButton
+                v-if="!props.loading && props.showCancelButton"
+                @click.prevent="handleCancel"
               />
               <SaveButton
-                :disabled="needsChanges"
-                :loading="loading"
-                @click.prevent="$emit('submit')"
+                :disabled="props.needsChanges"
+                :loading="props.loading"
+                @click.prevent="emit('submit')"
               />
             </div>
           </div>

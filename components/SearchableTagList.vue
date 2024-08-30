@@ -1,87 +1,61 @@
-<script lang="ts">
-import type { PropType, Ref } from "vue";
-import { defineComponent, computed, ref } from "vue";
-import { GET_TAGS } from "@/graphQLData/tag/queries";
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
 import { useQuery } from "@vue/apollo-composable";
+import { GET_TAGS } from "@/graphQLData/tag/queries";
 import type { Tag } from "@/src/__generated__/graphql";
 import SearchBar from "@/components/SearchBar.vue";
 
-export default defineComponent({
-  components: {
-    SearchBar,
+const props = defineProps({
+  hideSelected: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    hideSelected: {
-      type: Boolean,
-      default: false,
-    },
-    selectedTags: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-    description: {
-      type: String,
-      default: "",
-    },
+  selectedTags: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
-  setup(props) {
-    const searchInput: Ref<string> = ref("");
-
-    const searchInputComputed = computed(() => {
-      return searchInput.value;
-    });
-
-    const {
-      loading: tagsLoading,
-      error: tagsError,
-      result: tagsResult,
-    } = useQuery(GET_TAGS, {
-      where: {
-        text_CONTAINS: searchInputComputed,
-      },
-    });
-
-    const isDropdownOpen = ref(false);
-
-    const tagOptions = computed(() => {
-      if (!tagsResult.value || !tagsResult.value.tags) {
-        return [];
-      }
-      return tagsResult.value.tags.map((tag: Tag) => ({
-        text: tag.text,
-      }));
-    });
-
-    const selected = ref([...props.selectedTags]);
-
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
-    };
-    return {
-      tagsError,
-      tagsLoading,
-      tagOptions,
-      isDropdownOpen,
-      toggleDropdown,
-      searchInput,
-      selected,
-    };
-  },
-  watch: {
-    selectedTags(newVal) {
-      this.selected = [...newVal];
-    },
-  },
-  methods: {
-    updateSearchResult(input: string) {
-      this.searchInput = input;
-    },
-    outside() {
-      this.isDropdownOpen = false;
-    },
+  description: {
+    type: String,
+    default: "",
   },
 });
+
+const emit = defineEmits(['toggleSelection']);
+
+const searchInput: Ref<string> = ref("");
+
+const searchInputComputed = computed(() => searchInput.value);
+
+const { loading: tagsLoading, error: tagsError, result: tagsResult } = useQuery(GET_TAGS, {
+  where: {
+    text_CONTAINS: searchInputComputed,
+  },
+});
+
+const tagOptions = computed(() => {
+  if (!tagsResult.value || !tagsResult.value.tags) {
+    return [];
+  }
+  return tagsResult.value.tags.map((tag: Tag) => ({
+    text: tag.text,
+  }));
+});
+
+const selected = ref([...props.selectedTags]);
+
+watch(
+  () => props.selectedTags,
+  (newVal) => {
+    selected.value = [...newVal];
+  }
+);
+function updateSearchResult(input: string) {
+  searchInput.value = input;
+}
+
+
 </script>
+
 <template>
   <div
     class="absolute z-10 mt-1 max-h-96 w-full overflow-y-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white shadow-lg dark:bg-gray-800"
@@ -118,9 +92,7 @@ export default defineComponent({
           :value="tag.text"
           :checked="selected.includes(tag.text)"
           class="form-checkbox"
-          @change="() => {
-            $emit('toggleSelection',tag.text)
-          }"
+          @change="() => emit('toggleSelection', tag.text)"
         >
         <div class="flex items-center space-x-2">
           <div class="flex-col">

@@ -1,5 +1,4 @@
-<script>
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import {
   Dialog,
   DialogPanel,
@@ -7,70 +6,59 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import ErrorBanner from '@/components/ErrorBanner.vue'
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
-export default defineComponent({
-  components: {
-    ErrorBanner,
-    DialogComponent: Dialog,
-    DialogPanel,
-    DialogTitle,
-    TransitionChild,
-    TransitionRoot,
+const props = defineProps({
+  title: {
+    type: String,
+    required: true,
+    default: "Are you sure?",
   },
-  props: {
-    title: {
-      type: String,
-      require: true,
-      default: "Are you sure?",
-    },
-    highlightColor: {
-      type: String,
-      default: "yellow",
-    },
-    body: {
-      type: String,
-      require: true,
-      default: "",
-    },
-    open: {
-      type: Boolean,
-      default: false,
-    },
-    primaryButtonText: {
-      type: String,
-      default: "Delete",
-    },
-    secondaryButtonText: {
-      type: String,
-      default: "Cancel",
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    error: {
-      type: String,
-      default: "",
-    },
-    primaryButtonDisabled: {
-      type: Boolean,
-      default: false,
-    },
+  highlightColor: {
+    type: String,
+    default: "yellow",
   },
-  setup() {},
+  body: {
+    type: String,
+    required: true,
+    default: "",
+  },
+  open: {
+    type: Boolean,
+    default: false,
+  },
+  primaryButtonText: {
+    type: String,
+    default: "Delete",
+  },
+  secondaryButtonText: {
+    type: String,
+    default: "Cancel",
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  error: {
+    type: String,
+    default: "",
+  },
+  primaryButtonDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+const emit = defineEmits(['close', 'primaryButtonClick']);
 </script>
+
 <template>
-  <TransitionRoot
-    as="template"
-    :show="open"
-  >
-    <DialogComponent
+  <TransitionRoot as="template" :show="props.open">
+    <Dialog
       as="div"
       class="relative"
       style="z-index: 1000"
-      @close="$emit('close')"
+      @close="emit('close')"
     >
       <TransitionChild
         as="template"
@@ -106,7 +94,7 @@ export default defineComponent({
                 <div class="flex space-x-2 items-center">
                   <div
                     :class="[
-                      highlightColor === 'red'
+                      props.highlightColor === 'red'
                         ? `bg-red-100 dark:bg-red-transparent`
                         : `bg-yellow-100 dark:bg-yellow-transparent`,
                     ]"
@@ -120,59 +108,55 @@ export default defineComponent({
                       as="h3"
                       class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
                     >
-                      {{ title }}
+                      {{ props.title }}
                     </DialogTitle>
                   </div>
                 </div>
                 <div
-                  v-if="body"
+                  v-if="props.body"
                   class="mt-2"
                 >
                   <p class="text-sm text-gray-500 dark:text-gray-300">
-                    {{ body }}
+                    {{ props.body }}
                   </p>
                 </div>
               </div>
               <slot name="content" />
               <ErrorBanner
-                v-if="error" 
+                v-if="props.error" 
                 class="mt-5"
-                :text="error"
+                :text="props.error"
               />
               <div
                 class="mt-5 items-center sm:mt-4 sm:flex sm:flex-row-reverse"
               >
                 <button
                   type="button"
-                  :disabled="primaryButtonDisabled"
+                  :disabled="props.primaryButtonDisabled"
                   class="max-h-10"
                   :class="[
-                    !primaryButtonDisabled
+                    !props.primaryButtonDisabled
                       ? `border-transparent border bg-blue-600 text-white hover:bg-blue-500`
                       : 'bg-gray-300 text-black dark:bg-gray-700 dark:text-gray-200',
                     `inline-flex w-full justify-center rounded-full  px-4 py-2 text-base font-medium shadow-sm  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm`,
                   ]"
-                  @click="
-                    () => {
-                      $emit('primaryButtonClick');
-                    }
-                  "
+                  @click="emit('primaryButtonClick')"
                 >
-                  {{ loading ? "Saving..." : primaryButtonText }}
+                  {{ props.loading ? "Saving..." : props.primaryButtonText }}
                 </button>
                 <button
                   ref="cancelButtonRef"
                   type="button"
                   class="hover:bg-gray-50 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-gray-200 sm:mt-0 sm:w-auto sm:text-sm"
-                  @click="$emit('close')"
+                  @click="emit('close')"
                 >
-                  {{ secondaryButtonText }}
+                  {{ props.secondaryButtonText }}
                 </button>
               </div>
             </DialogPanel>
           </TransitionChild>
         </div>
       </div>
-    </DialogComponent>
+    </Dialog>
   </TransitionRoot>
 </template>

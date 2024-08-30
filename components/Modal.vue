@@ -1,5 +1,4 @@
-<script>
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import {
   Dialog,
   DialogPanel,
@@ -9,48 +8,32 @@ import {
 } from "@headlessui/vue";
 import CheckIcon from "../icons/CheckIcon.vue";
 
-export default defineComponent({
-  name: "ModalComponent",
-  components: {
-    CheckIcon,
-    TailwindDialog: Dialog,
-    DialogPanel,
-    DialogTitle,
-    TransitionChild,
-    TransitionRoot,
+const props = defineProps({
+  primaryButtonText: {
+    type: String,
+    required: false,
+    default: "",
   },
-  props: {
-    primaryButtonText: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    show: {
-      type: Boolean,
-      required: true,
-    },
-    title: {
-      type: String,
-      required: true,
-    },
-    useCustomButtons: {
-      type: Boolean,
-      default: false
-    }
+  show: {
+    type: Boolean,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  useCustomButtons: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits(["close", "primaryButtonClick", "secondaryButtonClick"]);
 </script>
+
 <template>
-  <TransitionRoot
-    as="template"
-    :show="show"
-    @click="$emit('close')"
-  >
-    <TailwindDialog
-      as="div"
-      class="relative z-10"
-      @close="$emit('close')"
-    >
+  <TransitionRoot as="template" :show="props.show" @click="emit('close')">
+    <Dialog as="div" class="relative z-10" @close="emit('close')">
       <TransitionChild
         as="template"
         enter="ease-out duration-300"
@@ -60,10 +43,7 @@ export default defineComponent({
         leave-from="opacity-100"
         leave-to="opacity-0"
       >
-        <div
-        
-          class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"
-        />
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" />
       </TransitionChild>
 
       <div class="fixed z-10 inset-0 overflow-y-auto">
@@ -90,7 +70,6 @@ export default defineComponent({
             <DialogPanel
               class="
                 relative
-                 
                 rounded-lg
                 px-4
                 pt-5
@@ -127,7 +106,7 @@ export default defineComponent({
                     as="h3"
                     class="text-lg text-center leading-6 font-medium text-gray-900"
                   >
-                    {{ title }}
+                    {{ props.title }}
                   </DialogTitle>
                   <div class="mt-2">
                     <slot name="content" />
@@ -135,7 +114,7 @@ export default defineComponent({
                 </div>
               </div>
               <div
-                v-if="!useCustomButtons"
+                v-if="!props.useCustomButtons"
                 class="
                   mt-5
                   sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense
@@ -163,12 +142,12 @@ export default defineComponent({
                     focus:ring-indigo-500
                     sm:col-start-2 sm:text-sm
                   "
-                  @click="()=>{
-                    $emit('close')
-                    $emit('primaryButtonClick')
+                  @click="() => {
+                    emit('close');
+                    emit('primaryButtonClick');
                   }"
                 >
-                  {{ primaryButtonText ? primaryButtonText : 'Close' }}
+                  {{ props.primaryButtonText ? props.primaryButtonText : 'Close' }}
                 </button>
                 <slot name="secondaryButton">
                   <button
@@ -183,7 +162,6 @@ export default defineComponent({
                       shadow-sm
                       px-4
                       py-2
-                       
                       text-base
                       font-medium
                       text-gray-700
@@ -194,9 +172,9 @@ export default defineComponent({
                       focus:ring-indigo-500
                       sm:mt-0 sm:col-start-1 sm:text-sm
                     "
-                    @click="()=>{
-                      $emit('secondaryButtonClick')
-                      $emit('close')
+                    @click="() => {
+                      emit('secondaryButtonClick');
+                      emit('close');
                     }"
                   >
                     Cancel
@@ -207,7 +185,6 @@ export default defineComponent({
           </TransitionChild>
         </div>
       </div>
-    </TailwindDialog>
+    </Dialog>
   </TransitionRoot>
 </template>
-

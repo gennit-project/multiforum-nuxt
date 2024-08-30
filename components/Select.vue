@@ -1,43 +1,30 @@
-<script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent, ref } from "vue";
-import ListboxButton from "@/components/ListboxButton.vue";
+<script setup lang="ts">
+import { ref, defineProps, defineEmits } from "vue";
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
-import CheckIcon from '@/components/icons/CheckIcon.vue'
+import ListboxButton from "@/components/ListboxButton.vue";
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 import type { SelectOptionData } from "@/types/GenericFormTypes";
 
-export default defineComponent({
-  name: "SelectMenu",
-  components: {
-    CheckIcon,
-    Listbox,
-    ListboxOption,
-    ListboxOptions,
-    ListboxButton,
+const props = defineProps({
+  defaultOption: {
+    type: Object as PropType<SelectOptionData | null>,
+    required: false,
+    default: null,
   },
-  props: {
-    defaultOption: {
-      type: Object as PropType<SelectOptionData | null>,
-      required: false,
-      default: null,
-    },
-    options: {
-      type: Array as PropType<Array<SelectOptionData>>,
-      required: true,
-    },
+  options: {
+    type: Array as PropType<Array<SelectOptionData>>,
+    required: true,
   },
-  setup(props) {
-    const defaultOption = props.defaultOption ? ref(props.defaultOption) : ref(props.options[0]);
-    return {
-      selected: defaultOption,
-    };
-  },
-  methods: {
-    handleSelect(event: any){
-      this.$emit('selected', event)
-    }
-  }
 });
+
+const emit = defineEmits(['selected']);
+
+const selected = ref(props.defaultOption || props.options[0]);
+
+function handleSelect(event: SelectOptionData) {
+  emit('selected', event);
+}
+
 </script>
 
 <template>
@@ -99,7 +86,7 @@ export default defineComponent({
         "
       >
         <ListboxOption
-          v-for="(option, i) in options"
+          v-for="(option, i) in props.options"
           :key="i"
           v-slot="{ active, selected: isSelected }"
           as="template"
@@ -113,7 +100,7 @@ export default defineComponent({
           >
             <span
               :class="[
-                selected ? 'font-semibold' : 'font-normal',
+                isSelected ? 'font-semibold' : 'font-normal',
                 'block truncate',
               ]"
             >
