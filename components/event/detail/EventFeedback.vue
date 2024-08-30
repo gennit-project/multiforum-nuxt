@@ -225,7 +225,7 @@ export default defineComponent({
     <LoadMore
       v-if="!getEventLoading && !reachedEndOfResults"
       :reached-end-of-results="reachedEndOfResults"
-      @loadMore="loadMore"
+      @load-more="loadMore"
     />
     <div v-if="getEventLoading">
       Loading...

@@ -73,8 +73,8 @@ export default defineComponent({
         value: '',
       },
     ]"
-    @lightMode="setLightMode"
-    @darkMode="setDarkMode"
-    @systemMode="setSystemMode"
+    @light-mode="setLightMode"
+    @dark-mode="setDarkMode"
+    @system-mode="setSystemMode"
   />
 </template>

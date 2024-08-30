@@ -116,7 +116,7 @@ export default defineComponent({
         v-if="!commentLoading && !reachedEndOfResults"
         class="pl-8"
         :reached-end-of-results="reachedEndOfResults"
-        @loadMore="loadMore"
+        @load-more="loadMore"
       />
     </div>
     <div v-if="commentLoading">

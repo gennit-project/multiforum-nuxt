@@ -40,12 +40,10 @@ export default defineNuxtConfig({
     "@kangc/v-md-editor/lib/style/codemirror-editor.css",
   ],
   devtools: { enabled: true },
-  extends: [
-    "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:vue/vue3-recommended",
-    "plugin:nuxt/recommended",
-  ],
+  eslint: {
+    fix: true, // Automatically fix ESLint errors on save
+    cache: false, // Disable caching for ESLint
+  },
   // fontawesome: {
   //   component: "fa",
   //   icons: {
@@ -78,6 +76,7 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/apollo",
     "@sidebase/nuxt-auth",
+    "@nuxtjs/eslint-module",
     // "@nuxtjs/fontawesome",
     // "@nuxtjs/vuetify",
   ],
@@ -85,7 +84,6 @@ export default defineNuxtConfig({
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/apollo", mode: "client" },
-    "@typescript-eslint",
   ],
   runtimeConfig: {
     auth0: {
@@ -105,11 +103,4 @@ export default defineNuxtConfig({
   //   config: {}, // Sentry configuration options
   // },
   ssr: true,
-  vite: {
-    resolve: {
-      alias: {
-        "#app": "/.nuxt/app",
-      },
-    },
-  },
 });

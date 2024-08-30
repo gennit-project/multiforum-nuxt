@@ -1,6 +1,6 @@
 import { defineConfig } from "cypress";
 // Populate process.env with values from .env file
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+ 
 require("dotenv").config({ path: ".env" });
 
 module.exports = defineConfig({

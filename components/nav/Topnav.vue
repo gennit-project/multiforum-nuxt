@@ -1,121 +1,86 @@
-<script lang="ts">
-import { defineComponent, computed, ref } from "vue";
+<script setup lang="ts">
+import { computed, ref } from "vue";
 import HamburgerMenuButton from "@/components/nav/MenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
-import ThemeSwitcher from "./ThemeSwitcher.vue";
+import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import {
   GET_LOCAL_USERNAME,
   GET_LOCAL_MOD_PROFILE_NAME,
 } from "@/graphQLData/user/queries";
-import { useRoute } from "vue-router";
-import CreateAnythingButton from "./CreateAnythingButton.vue";
-import { useRouter } from "vue-router";
+import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useDisplay } from "vuetify";
-// import SearchButton from "./SearchButton.vue";
+import { useRoute } from "vue-router";
 
-export default defineComponent({
-  name: "TopNav",
-  components: {
-    CreateAnythingButton,
-    ThemeSwitcher,
-    HamburgerMenuButton,
-    UserProfileDropdownMenu,
-    ArrowUpBoldBox,
-    // SearchButton
-  },
-  props: {
-    sideNavIsOpen: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  setup() {
-    const { isAuthenticated, loginWithPopup, loginWithRedirect } = useAuth0();
-    const route = useRoute();
-    const router = useRouter();
-    const { smAndDown } = useDisplay();
+// Authentication
+const { isAuthenticated, loginWithPopup, loginWithRedirect } = useAuth0();
 
-    const { result } = useQuery(GET_LOCAL_USERNAME);
-    const username = computed(() => {
-      let username = result.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
-    });
+// Route handling
+const route = useRoute();
 
-    const channelId = computed(() => {
-      if (typeof route.params.channelId !== "string") {
-        return "";
-      }
-      return route.params.channelId;
-    });
+// Display utilities
+const { smAndDown } = useDisplay();
 
-    const { result: modNameResult } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
-    const modName = computed(() => {
-      let modName = modNameResult.value?.modProfileName;
-      if (modName) {
-        return modName;
-      }
-      return "";
-    });
-
-    return {
-      channelId,
-      isAuthenticated,
-      login: () => {
-        if (window.parent.Cypress) {
-          // Cypress cannot test popups. It has to stay
-          // in the same window.
-          loginWithRedirect();
-        } else {
-          loginWithPopup();
-        }
-      },
-      modName,
-      route,
-      router,
-      username,
-      showCreateMenu: ref(false),
-      smAndDown,
-    };
-  },
-  computed: {
-    shouldShowChannelId() {
-      return this.channelId;
-    },
-    shouldShowRouteInfo() {
-      return (
-        this.route.name === "MapView" || this.route.name === "SearchChannels"
-      );
-    },
-    routeInfoLabel() {
-      if (this.route.name === "MapView") {
-        return "events map";
-      } else if (this.route.name === "SearchChannels") {
-        return "Forums";
-      }
-      return "";
-    },
-  },
-  methods: {
-    getLabel() {
-      if (this.route.name === "SitewideSearchDiscussionPreview") {
-        return "• discussions";
-      }
-      if (this.route.name === "SearchEventsList") {
-        return "• online events";
-      }
-      if (this.route.name === "MapEventPreview") {
-        return "• in-person events";
-      }
-    },
-  },
+// Queries
+const { result } = useQuery(GET_LOCAL_USERNAME);
+const username = computed(() => {
+  let username = result.value?.username;
+  if (username) {
+    return username;
+  }
+  return "";
 });
+
+const channelId = computed(() => {
+  if (typeof route.params.channelId !== "string") {
+    return "";
+  }
+  return route.params.channelId;
+});
+
+const { result: modNameResult } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+const modName = computed(() => {
+  let modName = modNameResult.value?.modProfileName;
+  if (modName) {
+    return modName;
+  }
+  return "";
+});
+
+// Component state
+const sideNavIsOpen = ref(false);
+
+// Computed properties
+const shouldShowChannelId = computed(() => channelId.value);
+const shouldShowRouteInfo = computed(() => {
+  return (
+    route.name === "MapView" || route.name === "SearchChannels"
+  );
+});
+const routeInfoLabel = computed(() => {
+  if (route.name === "MapView") {
+    return "events map";
+  } else if (route.name === "SearchChannels") {
+    return "Forums";
+  }
+  return "";
+});
+
+// Methods
+function getLabel() {
+  if (route.name === "SitewideSearchDiscussionPreview") {
+    return "• discussions";
+  }
+  if (route.name === "SearchEventsList") {
+    return "• online events";
+  }
+  if (route.name === "MapEventPreview") {
+    return "• in-person events";
+  }
+}
+
 </script>
 
 <template>
@@ -134,17 +99,17 @@ export default defineComponent({
         <div
           class="flex items-center space-x-1 ml-12 text-sm text-gray-500 dark:text-white"
         >
-          <router-link
+          <NuxtLink
             to="/"
             class="flex gap-2 items-center"
           >
-            <arrow-up-bold-box
+            <ArrowUpBoldBox
               :size="38"
               class="text-black dark:text-blue-500"
             />
             <span class="font-bold text-black dark:text-white">Topical</span>
             <span class="text-blue-500 text-xs py-0.5 px-1 border rounded-md border-blue-500 dark:text-blue-500">ALPHA</span>
-          </router-link>
+          </NuxtLink>
           <div
             v-if="shouldShowChannelId && !smAndDown"
             class="flex items-center gap-1"
@@ -204,6 +169,7 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
 <style scoped>
 .fixed-menu-button {
   position: fixed;  /* Makes the button stay in the same place on the screen */

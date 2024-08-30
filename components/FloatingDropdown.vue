@@ -48,7 +48,7 @@ export default defineComponent({
       :model-value="modelValue"  
       :close-on-content-click="false"
       location="bottom"
-      @update:modelValue="$emit('update:modelValue', $event)"
+      @update:model-value="$emit('update:modelValue', $event)"
     >
       <template #activator="{ props }">
         <div v-bind="props">

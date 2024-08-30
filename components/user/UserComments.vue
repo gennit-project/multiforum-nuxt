@@ -118,7 +118,7 @@ export default defineComponent({
         :reached-end-of-results="
           commentsAggregate === commentResult.users[0].Comments.length
         "
-        @loadMore="loadMore"
+        @load-more="loadMore"
       />
     </div>
   </div>

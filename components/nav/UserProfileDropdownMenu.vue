@@ -81,8 +81,8 @@ export default defineComponent({
   <IconButtonDropdown
     :items="menuItems"
     @logout="logout"
-    @goToUserProfile="goToUserProfile"
-    @goToModProfile="goToModProfile"
+    @go-to-user-profile="goToUserProfile"
+    @go-to-mod-profile="goToModProfile"
   >
     <Avatar
       :key="profilePicURL"

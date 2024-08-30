@@ -44,8 +44,8 @@ export default defineComponent({
     <div class="flex items-center">
       <TopNavDropdown 
         :selected-search-type="selectedSearchType" 
-        @updateRoute="updateRoute"
-        @updateSelectedSearchType="setSelectedSearchType" 
+        @update-route="updateRoute"
+        @update-selected-search-type="setSelectedSearchType" 
       />
       <div class="flex flex-grow">
         <label

@@ -61,7 +61,7 @@ export default defineComponent({
           :discussion-channel-id="discussionChannelId"
           :comment-id="commentId"
           :emoji-json="emojiJson"
-          @emojiClick="showMenu = false"
+          @emoji-click="showMenu = false"
           @close="showMenu = false"
         />
       </template>
