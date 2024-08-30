@@ -1,233 +1,147 @@
-<script lang="ts">
-import { computed, defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { computed, ref, watch } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import ChannelDiscussionList from "./ChannelDiscussionList.vue";
 import SitewideDiscussionList from "./SitewideDiscussionList.vue";
-import { useRoute, useRouter } from "vue-router";
-import { getTagLabel, getChannelLabel } from "@/utils";
-import { useDisplay } from "vuetify";
-import { SearchDiscussionValues } from "@/types/Discussion";
 import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import type { SearchDiscussionValues } from "@/types/Discussion";
 
-interface Ref<T> {
-  value: T;
-}
+// Props and Emits
+const emit = defineEmits(["filterByTag", "filterByChannel"]);
 
-export default defineComponent({
-  components: {
-    ChannelDiscussionList,
-    DiscussionFilterBar,
-    SitewideDiscussionList,
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
+// Setup function
+const route = useRoute();
+const router = useRouter();
 
-    const channelId = computed(() => {
-      if (typeof route.params.channelId === "string") {
-        return route.params.channelId;
-      }
-      return "";
-    });
+const channelId = computed(() => {
+  return typeof route.params.channelId === "string"
+    ? route.params.channelId
+    : "";
+});
 
-    const discussionId = computed(() => {
-      if (typeof route.params.discussionId === "string") {
-        return route.params.discussionId;
-      }
-      return "";
-    });
+const filterValues = ref(
+  getFilterValuesFromParams({
+    route,
+    channelId: channelId.value,
+  })
+);
 
-    const filterValues: Ref<SearchDiscussionValues> = ref(
-      getFilterValuesFromParams({
+// Watchers
+watch(
+  () => route.query,
+  () => {
+    if (route.query) {
+      filterValues.value = getFilterValuesFromParams({
         route,
         channelId: channelId.value,
-      }),
-    );
-
-    const selectedTags: Ref<Array<string>> = ref(
-      route.params.tag && typeof route.params.tag === "string"
-        ? [route.params.tag]
-        : [],
-    );
-
-    const setSelectedTags = (tag: Array<string>) => {
-      selectedTags.value = tag;
-    };
-
-    const defaultLabels = {
-      channels: "Channels",
-      tags: "Tags",
-    };
-
-    const channelLabel = computed(() => {
-      return getChannelLabel(filterValues.value.channels);
-    });
-
-    const tagLabel = computed(() => {
-      return getTagLabel(selectedTags.value);
-    });
-
-    const { lgAndDown, lgAndUp, mdAndDown, smAndDown } = useDisplay();
-    const createDiscussionPath = channelId.value
-      ? `/channels/c/${channelId.value}/discussions/create`
-      : "/discussions/create";
-
-    return {
-      channelId,
-      channelLabel,
-      compareDate,
-      createDiscussionPath,
-      defaultLabels,
-      discussionId,
-      filterValues,
-      lgAndDown,
-      lgAndUp,
-      mdAndDown,
-      route,
-      router,
-      setSelectedTags,
-      selectedTags,
-      smAndDown,
-      tagLabel,
-    };
-  },
-  created() {
-    this.$watch("$route.query", () => {
-      if (this.$route.query) {
-        this.filterValues = getFilterValuesFromParams({
-          route: this.route,
-          channelId: this.channelId,
-        });
-      }
-    });
-  },
-  methods: {
-    updateFilters(params: SearchDiscussionValues) {
-      const existingQuery = this.$route.query;
-      // Updating the URL params causes the events
-      // to be refetched by the EventListView
-      // and MapView components
-      this.$router.replace({
-        query: {
-          ...existingQuery,
-          ...params,
-        },
       });
+    }
+  }
+);
+
+// Methods
+const updateFilters = (params: SearchDiscussionValues) => {
+  const existingQuery = route.query;
+  router.replace({
+    query: {
+      ...existingQuery,
+      ...params,
     },
-    handleClickTag(tagText: string) {
-      const currentQuery = this.$route.query;
+  });
+};
 
-      const clearTags = () => {
-        // If we're already filtering by the tag only, clear it.
-        const newQuery = { ...this.$route.query };
-        delete newQuery["tags"];
+const handleClickTag = (tagText: string) => {
+  const currentQuery = route.query;
 
-        this.$router.replace({
-          query: {
-            ...newQuery,
-          },
-        });
+  const clearTags = () => {
+    const newQuery = { ...route.query };
+    delete newQuery["tags"];
+    router.replace({ query: { ...newQuery } });
+    filterValues.value.tags = filterValues.value.tags.filter(
+      (t: string) => t !== tagText
+    );
+  };
 
-        this.filterValues.tags = this.filterValues.tags.filter(
-          (t: string) => t !== tagText,
-        );
-      };
+  const removeOnlyThisTag = () => {
+    const newQuery = { ...route.query };
+    if (newQuery.tags === null) {
+      newQuery.tags = [];
+    }
+    if (typeof newQuery.tags === "string") {
+      newQuery.tags = [newQuery.tags];
+    } else if (Array.isArray(newQuery.tags)) {
+      newQuery.tags = newQuery.tags.filter((tag: any) => tag !== tagText);
+    }
+    router.replace({ query: { ...newQuery } });
+    filterValues.value.tags.push(tagText);
+  };
 
-      const removeOnlyThisTag = () => {
-        // If we're already filtering by multiple tags including this tag,
-        // remove only this tag.
-        const newQuery = { ...this.$route.query };
-        newQuery.tags = newQuery.tags.filter((tag: string) => {
-          return tag !== tagText;
-        });
+  const alreadyFilteringByOnlyThisTag =
+    currentQuery.tags &&
+    typeof currentQuery.tags === "string" &&
+    tagText === currentQuery.tags;
 
-        this.$router.replace({
-          query: {
-            ...newQuery,
-          },
-        });
-        this.filterValues.tags.push(tagText);
-      };
+  const alreadyFilteringByMultipleTagsIncludingThisTag =
+    currentQuery.tags &&
+    typeof currentQuery.tags === "object" &&
+    currentQuery.tags.includes(tagText);
 
-      const alreadyFilteringByOnlyThisTag =
-        currentQuery.tags &&
-        typeof currentQuery.tags === "string" &&
-        tagText === currentQuery.tags;
+  if (alreadyFilteringByOnlyThisTag) {
+    clearTags();
+  } else if (alreadyFilteringByMultipleTagsIncludingThisTag) {
+    removeOnlyThisTag();
+  } else {
+    updateFilters({ tags: [tagText] });
+  }
+};
 
-      const alreadyFilteringByMultipleTagsIncludingThisTag =
-        currentQuery.tags &&
-        typeof currentQuery.tags === "object" &&
-        currentQuery.tags.includes(tagText);
+const handleClickChannel = (uniqueName: string) => {
+  const currentQuery = route.query;
 
-      if (alreadyFilteringByOnlyThisTag) {
-        clearTags();
-      } else if (alreadyFilteringByMultipleTagsIncludingThisTag) {
-        removeOnlyThisTag();
-      } else {
-        // If we are not already filtering by the tag,
-        // add it to the existing tag filters.
-        this.updateFilters({ tags: [tagText] });
-      }
-    },
-    handleClickChannel(uniqueName: string) {
-      const currentQuery = this.$route.query;
+  const alreadyFilteringByThisChannel =
+    currentQuery.channels &&
+    typeof currentQuery.channels === "string" &&
+    uniqueName === currentQuery.channels;
 
-      const alreadyFilteringByThisChannel =
-        currentQuery.channels &&
-        typeof currentQuery.channels === "string" &&
-        uniqueName === currentQuery.channels;
-      const alreadyFilteringByMultipleChannelsIncludingThisChannel =
-        currentQuery.channels &&
-        typeof currentQuery.channels === "object" &&
-        currentQuery.channels.includes(uniqueName);
+  const alreadyFilteringByMultipleChannelsIncludingThisChannel =
+    currentQuery.channels &&
+    typeof currentQuery.channels === "object" &&
+    currentQuery.channels.includes(uniqueName);
 
-      const clearChannels = () => {
-        // If we're already filtering by the channel, clear it.
-        const newQuery = { ...this.$route.query };
-        delete newQuery["channels"];
+  const clearChannels = () => {
+    const newQuery = { ...route.query };
+    delete newQuery["channels"];
+    router.replace({ query: { ...newQuery } });
+    filterValues.value.channels = filterValues.value.channels.filter(
+      (c: string) => c !== uniqueName
+    );
+  };
 
-        this.$router.replace({
-          query: {
-            ...newQuery,
-          },
-        });
+  const removeOnlyThisChannel = () => {
+    const newQuery = { ...route.query };
+    if (newQuery.channels === null) {
+      newQuery.channels = [];
+    }
+    if (typeof newQuery.channels === "string") {
+      newQuery.channels = [newQuery.channels];
+    } else if (Array.isArray(newQuery.channels)) {
+      newQuery.channels = newQuery.channels.filter(
+        (channel: any) => channel !== uniqueName
+      );
+    }
+    router.replace({ query: { ...newQuery } });
+    filterValues.value.channels.push(uniqueName);
+  };
 
-        this.filterValues.channels = this.filterValues.channels.filter(
-          (c: string) => c !== uniqueName,
-        );
-      };
-
-      const removeOnlyThisChannel = () => {
-        // If we're already filtering by multiple channels including this channel,
-        // remove only this channel.
-        const newQuery = { ...this.$route.query };
-        newQuery.channels = newQuery.channels.filter((channel: string) => {
-          return channel !== uniqueName;
-        });
-
-        this.$router.replace({
-          query: {
-            ...newQuery,
-          },
-        });
-        this.filterValues.channels.push(uniqueName);
-      };
-
-      if (alreadyFilteringByThisChannel) {
-        clearChannels();
-      } else if (alreadyFilteringByMultipleChannelsIncludingThisChannel) {
-        removeOnlyThisChannel();
-      } else {
-        // If we are not already filtering by the channel,
-        // add it to the existing channel filters.
-        this.updateFilters({ channels: [uniqueName] });
-      }
-    },
-    setSelectedChannels(channels: Array<string>) {
-      this.selectedChannels = channels;
-    },
-  },
-});
+  if (alreadyFilteringByThisChannel) {
+    clearChannels();
+  } else if (alreadyFilteringByMultipleChannelsIncludingThisChannel) {
+    removeOnlyThisChannel();
+  } else {
+    updateFilters({ channels: [uniqueName] });
+  }
+};
 </script>
 
 <template>

@@ -25,6 +25,7 @@
       "node",
       "vite/client",
       "@nuxt/types",
+      "@types/node",
       "./types"
     ],
     "paths": {
@@ -45,7 +46,15 @@
     "cypress/support/e2e.ts",
     "types/**/*.d.ts",
     "components/**/*.vue",
-    "pages/**/*.vue"
-, "config.ts", "types/Channel.ts", "types/Comment.ts", "types/Discussion.ts", "types/Event.ts", "types/Tag.ts", "types/User.ts", "types/GenericFormTypes.ts"  ],
+    "pages/**/*.vue",
+    "config.ts",
+    "types/Channel.ts",
+    "types/Comment.ts",
+    "types/Discussion.ts",
+    "types/Event.ts",
+    "types/Tag.ts",
+    "types/User.ts",
+    "types/GenericFormTypes.ts"
+  ],
   "exclude": ["node_modules"]
 }

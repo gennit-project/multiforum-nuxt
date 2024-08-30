@@ -44,7 +44,7 @@ export default defineNuxtConfig({
     "eslint:recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:vue/vue3-recommended",
-    "plugin:nuxt/recommended"
+    "plugin:nuxt/recommended",
   ],
   // fontawesome: {
   //   component: "fa",
@@ -85,7 +85,7 @@ export default defineNuxtConfig({
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/apollo", mode: "client" },
-    "@typescript-eslint"
+    "@typescript-eslint",
   ],
   runtimeConfig: {
     auth0: {
@@ -105,4 +105,11 @@ export default defineNuxtConfig({
   //   config: {}, // Sentry configuration options
   // },
   ssr: true,
+  vite: {
+    resolve: {
+      alias: {
+        "#app": "/.nuxt/app",
+      },
+    },
+  },
 });

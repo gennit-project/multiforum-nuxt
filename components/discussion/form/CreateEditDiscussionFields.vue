@@ -1,5 +1,5 @@
-<script lang="ts">
-import { defineComponent, PropType, nextTick, ref } from "vue";
+<script setup lang="ts">
+import { ref, computed, onMounted, defineProps } from "vue";
 import { ApolloError } from "@apollo/client/errors";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import FormRow from "@/components/forms/FormRow.vue";
@@ -7,99 +7,50 @@ import Form from "@/components/forms/Form.vue";
 import TagPicker from "@/components/forms/TagPicker.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import TextInput from "@/components/forms/TextInput.vue";
-import { CreateEditDiscussionFormValues } from "@/types/Discussion";
+import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 
-export default defineComponent({
-  name: "CreateEditDiscussionFields",
-  components: {
-    TailwindForm: Form,
-    FormRow,
-    ForumPicker,
-    TextEditor,
-    TextInput,
-    TagPicker,
-    ErrorBanner,
-  },
-  props: {
-    editMode: {
-      type: Boolean,
-      required: true,
-    },
-    createDiscussionError: {
-      type: Object as PropType<ApolloError | null>,
-      default: () => {
-        return null;
-      },
-    },
-    formValues: {
-      type: Object as PropType<CreateEditDiscussionFormValues | null>,
-      required: false,
-      default: () => {
-        return null;
-      },
-    },
-    getDiscussionError: {
-      type: Object as PropType<ApolloError | null>,
-      default: () => {
-        return null;
-      },
-    },
-    updateDiscussionError: {
-      type: Object as PropType<ApolloError | null>,
-      default: () => {
-        return null;
-      },
-    },
-    discussionLoading: {
-      type: Boolean,
-      default: false,
-    },
-    createDiscussionLoading: {
-      type: Boolean,
-      default: false,
-    },
-    updateDiscussionLoading: {
-      type: Boolean,
-      default: false,
-    },
-  },
-  setup(props) {
-    return {
-      formTitle: props.editMode ? "Edit Discussion" : "Start Discussion",
-      touched: false,
-      titleInputRef: ref(null),
-    };
-  },
-  computed: {
-    needsChanges() {
-      // We do these checks:
-      // - At least one channel is selected
-      // - Title is included
-      const needsChanges = !(
-        this.formValues.selectedChannels.length > 0 &&
-        this.formValues.title.length > 0
-      );
-      return needsChanges;
-    },
-    changesRequiredMessage() {
-      if (!this.formValues.title) {
-        return "A title is required.";
-      } else if (this.formValues.selectedChannels.length === 0) {
-        return "Must select at least one channel.";
-      }
-      return "";
-    },
-  },
-  created() {
+// Props
+const props = defineProps<{
+  editMode: boolean;
+  createDiscussionError: ApolloError | null;
+  formValues: CreateEditDiscussionFormValues | null;
+  getDiscussionError: ApolloError | null;
+  updateDiscussionError: ApolloError | null;
+  discussionLoading: boolean;
+  createDiscussionLoading: boolean;
+  updateDiscussionLoading: boolean;
+}>();
+
+// Setup reactive variables
+const formTitle = computed(() => props.editMode ? "Edit Discussion" : "Start Discussion");
+const touched = ref(false);
+const titleInputRef = ref<HTMLElement | null>(null);
+
+// Computed properties
+const needsChanges = computed(() => {
+  return !(props.formValues?.selectedChannels.length > 0 && props.formValues?.title);
+});
+
+const changesRequiredMessage = computed(() => {
+  if (!props.formValues?.title) {
+    return "A title is required.";
+  } else if (props.formValues?.selectedChannels.length === 0) {
+    return "Must select at least one channel.";
+  }
+  return "";
+});
+
+// Lifecycle hooks
+onMounted(() => {
+  if (titleInputRef.value) {
     nextTick(() => {
-      if (this.titleInputRef) {
-        this.titleInputRef?.$el?.children[0].childNodes[0].focus();
-      }
+      titleInputRef.value?.focus();
     });
-  },
+  }
 });
 </script>
+
 <template>
   <div class="flex w-full flex-col items-center justify-center">
     <div class="mx-auto w-full max-w-3xl">

@@ -1,229 +1,186 @@
-<script lang="ts">
-import { computed, defineComponent, nextTick, PropType, ref } from "vue";
+<script setup lang="ts">
+import { computed, nextTick, ref, defineProps, defineEmits } from "vue";
 import { ApolloError } from "@apollo/client/errors";
-import Form from "@/components/forms/Form.vue";
-import TagPicker from '@/components/forms/TagPicker.vue'
-import TextInput from "@/components/forms/TextInput.vue";
-import FormRow from "@/components/forms/FormRow.vue";
-import TextEditor from "@/components/forms/TextEditor.vue";
-import { CreateEditChannelFormValues } from "@/types/Channel";
-import AddImage from "@/components/AddImage.vue";
-import {
-  getUploadFileName,
-  uploadAndGetEmbeddedLink,
-} from "@/utils";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import XmarkIcon from "@/components/icons/XmarkIcon.vue";
+import Form from "~/components/forms/Form.vue";
+import TagPicker from "~/components/forms/TagPicker.vue";
+import TextInput from "~/components/forms/TextInput.vue";
+import FormRow from "~/components/forms/FormRow.vue";
+import TextEditor from "~/components/forms/TextEditor.vue";
+import AddImage from "~/components/AddImage.vue";
+import { getUploadFileName, uploadAndGetEmbeddedLink } from "~/utils";
+import { useQuery, useMutation } from "@vue/apollo-composable";
+import { GET_LOCAL_USERNAME } from "~/graphQLData/user/queries";
+import { CREATE_SIGNED_STORAGE_URL } from "~/graphQLData/discussion/mutations";
+import ErrorBanner from "~/components/ErrorBanner.vue";
+import XmarkIcon from "~/components/icons/XmarkIcon.vue";
+import type { CreateEditChannelFormValues } from "~/types/Channel";
 
-export default defineComponent({
-  name: "CreateEditChannelFields",
-  components: {
-    AddImage,
-    ErrorBanner,
-    FormRow,
-    TextInput,
-    TailwindForm: Form,
-    TextEditor,
-    TagPicker,
-    XmarkIcon,
+const props = defineProps({
+  editMode: {
+    type: Boolean,
+    required: true,
   },
-  props: {
-    editMode: {
-      type: Boolean,
-      required: true,
-    },
-    createChannelError: {
-      type: Object as PropType<ApolloError | null>,
-      default: () => {
-        return null;
-      },
-    },
-    createChannelLoading: {
-      type: Boolean,
-      default: false,
-    },
-    editChannelLoading: {
-      type: Boolean,
-      default: false,
-    },
-    formValues: {
-      type: Object as PropType<CreateEditChannelFormValues | null>,
-      required: false,
-      default: () => {
-        return null;
-      },
-    },
-    getChannelError: {
-      type: Object as PropType<ApolloError | null>,
-      default: () => {
-        return null;
-      },
-    },
-    updateChannelError: {
-      type: Object as PropType<ApolloError | null>,
-      default: () => {
-        return null;
-      },
-    },
-    channelLoading: {
-      type: Boolean,
-      default: false,
-    },
+  createChannelError: {
+    type: Object as PropType<ApolloError | null>,
+    default: null,
   },
-  setup(props) {
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-
-    const username = computed(() => {
-      let username = localUsernameResult.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
-    });
-    const { mutate: createSignedStorageUrl } = useMutation(
-      CREATE_SIGNED_STORAGE_URL,
-    );
-
-    const isValidTitle = (title: string) => {
-      const validTitlePattern = /^[a-zA-Z0-9_]+$/;
-      return validTitlePattern.test(title);
-    };
-
-    const titleIsInvalid = computed(() => {
-      return !isValidTitle(props.formValues?.uniqueName || '');
-    });
-
-    return {
-      createSignedStorageUrl,
-      touched: false,
-      titleInputRef: ref(null),
-      username,
-      getUploadFileName,
-      uploadAndGetEmbeddedLink,
-      titleIsInvalid,
-    };
+  createChannelLoading: {
+    type: Boolean,
+    default: false,
   },
-  computed: {
-    needsChanges() {
-      const needsChanges = this.titleIsInvalid;
-      return needsChanges;
-    },
+  editChannelLoading: {
+    type: Boolean,
+    default: false,
   },
-  created() {
-    nextTick(() => {
-      if (this.titleInputRef) {
-        this.titleInputRef?.$el?.children[0].childNodes[0].focus();
-      }
-    });
+  formValues: {
+    type: Object as PropType<CreateEditChannelFormValues | null>,
+    required: false,
+    default: null,
   },
-  methods: {
-    async upload(file: any) {
-      if (!this.username) {
-        console.error("No username found");
-        return;
-      }
-      try {
-        const filename = this.getUploadFileName({
-          username: this.username,
-          file,
-        });
-
-        const getSignedStorageURLInput= {
-          filename,
-          contentType: file.type,
-        }
-
-        const signedUrlResult = await this.createSignedStorageUrl(getSignedStorageURLInput);
-
-        const signedStorageURL =
-          signedUrlResult.data?.createSignedStorageURL?.url;
-
-        const embeddedLink = this.uploadAndGetEmbeddedLink({
-          file,
-          filename,
-          signedStorageURL,
-        });
-
-        return embeddedLink;
-      } catch (error) {
-        console.error("Error uploading file:", error);
-      }
-    },
-    async handleImageChange(event: any, fieldName: string) {
-      const selectedFile = event.target.files[0];
-
-      if (selectedFile) {
-        const embeddedLink = await this.upload(selectedFile);
-        if (!embeddedLink) {
-          return;
-        }
-        this.$emit("updateFormValues", { [fieldName]: embeddedLink });
-
-        if (this.editMode) {
-          this.$emit("submit");
-        }
-      }
-    },
-    updateRule(index: number, field: string, value: string) {
-      const updatedRules = [...this.formValues.rules];
-      updatedRules[index][field] = value;
-      this.$emit("updateFormValues", { rules: updatedRules });
-    },
-    addNewRule(event: any) {
-      event.preventDefault();
-      const newRule = { summary: "", detail: "" };
-      const updatedRules = [...this.formValues.rules, newRule];
-      this.$emit("updateFormValues", { rules: updatedRules });
-    },
-    deleteRule(index: number) {
-      const updatedRules = [...this.formValues.rules];
-      updatedRules.splice(index, 1);
-      this.$emit("updateFormValues", { rules: updatedRules });
-    },
+  getChannelError: {
+    type: Object as PropType<ApolloError | null>,
+    default: null,
+  },
+  updateChannelError: {
+    type: Object as PropType<ApolloError | null>,
+    default: null,
+  },
+  channelLoading: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits(["submit", "updateFormValues"]);
+
+// Query for the local username
+const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
+
+const username = computed(() => {
+  return localUsernameResult.value?.username || "";
+});
+
+// Mutation to create a signed storage URL
+const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL);
+
+// Validation function for the title
+const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
+
+const titleIsInvalid = computed(() => !isValidTitle(props.formValues?.uniqueName || ""));
+
+const titleInputRef = ref(null);
+
+const touched = ref(false);
+
+nextTick(() => {
+  if (titleInputRef.value) {
+    titleInputRef.value?.$el?.children[0].childNodes[0].focus();
+  }
+});
+
+// File upload handler
+const upload = async (file: File) => {
+  if (!username.value) {
+    console.error("No username found");
+    return;
+  }
+
+  try {
+    const filename = getUploadFileName({
+      username: username.value,
+      file,
+    });
+
+    const getSignedStorageURLInput = {
+      filename,
+      contentType: file.type,
+    };
+
+    const signedUrlResult = await createSignedStorageUrl(getSignedStorageURLInput);
+    const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+
+    const embeddedLink = uploadAndGetEmbeddedLink({
+      file,
+      filename,
+      signedStorageURL,
+    });
+
+    return embeddedLink;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+  }
+};
+
+// Handler for image changes
+const handleImageChange = async (event: Event, fieldName: string) => {
+  const selectedFile = (event.target as HTMLInputElement).files?.[0];
+
+  if (selectedFile) {
+    const embeddedLink = await upload(selectedFile);
+    if (!embeddedLink) return;
+
+    emit("updateFormValues", { [fieldName]: embeddedLink });
+
+    if (props.editMode) {
+      emit("submit");
+    }
+  }
+};
+
+// Methods for handling rules
+const updateRule = (index: number, field: string, value: string) => {
+  const updatedRules = [...(props.formValues?.rules || [])];
+  updatedRules[index][field] = value;
+  emit("updateFormValues", { rules: updatedRules });
+};
+
+const addNewRule = (event: Event) => {
+  event.preventDefault();
+  const newRule = { summary: "", detail: "" };
+  const updatedRules = [...(props.formValues?.rules || []), newRule];
+  emit("updateFormValues", { rules: updatedRules });
+};
+
+const deleteRule = (index: number) => {
+  const updatedRules = [...(props.formValues?.rules || [])];
+  updatedRules.splice(index, 1);
+  emit("updateFormValues", { rules: updatedRules });
+};
+
 </script>
+
 <template>
-  <v-container
-    fluid
-    class="mt-4 max-w-3xl pt-0 px-0"
-  >
-    <div v-if="channelLoading">
-      Loading...
-    </div>
+  <v-container fluid class="mt-4 max-w-3xl pt-0 px-0">
+    <div v-if="channelLoading">Loading...</div>
 
     <TailwindForm
       v-else-if="formValues"
       :form-title="editMode ? 'Forum Settings' : 'Create Forum'"
-      :needs-changes="needsChanges"
+      :needs-changes="titleIsInvalid"
       :loading="createChannelLoading || editChannelLoading"
       @input="touched = true"
-      @submit="$emit('submit')"
+      @submit="emit('submit')"
     >
       <div>
+        <!-- Error Banners -->
         <div v-if="getChannelError">
           <ErrorBanner
-            v-for="(error, i) of getChannelError?.graphQLErrors"
+            v-for="(error, i) in getChannelError?.graphQLErrors"
+            :key="i"
+            :text="error.message"
+          />
+        </div>
+        <div v-if="createChannelError">
+          <ErrorBanner
+            v-for="(error, i) in createChannelError?.graphQLErrors"
             :key="i"
             :text="error.message"
           />
         </div>
 
-        <div v-if="createChannelError">
-          <ErrorBanner
-            v-for="(error, i) of createChannelError?.graphQLErrors"
-            :key="i"
-            :text="error.message"
-          />
-        </div>
+        <!-- Form Fields -->
         <div class="mt-5 space-y-4 sm:space-y-5">
-          <FormRow
-            section-title="Title"
-            :required="!editMode"
-          >
+          <FormRow section-title="Title" :required="!editMode">
             <template #content>
               <TextInput
                 ref="titleInputRef"
@@ -234,18 +191,13 @@ export default defineComponent({
                 :full-width="true"
                 @update="$emit('updateFormValues', { uniqueName: $event })"
               />
-              <p
-                v-if="titleIsInvalid && touched"
-                class="text-red-500 text-sm mt-2"
-              >
+              <p v-if="titleIsInvalid && touched" class="text-red-500 text-sm mt-2">
                 Title can only contain letters, numbers, and underscores.
               </p>
             </template>
           </FormRow>
-          <FormRow
-            section-title="Display Name"
-            :required="false"
-          >
+
+          <FormRow section-title="Display Name">
             <template #content>
               <TextInput
                 ref="displayNameInputRef"
@@ -257,17 +209,17 @@ export default defineComponent({
               />
             </template>
           </FormRow>
+
           <FormRow section-title="Tags">
             <template #content>
-              <TagPicker 
+              <TagPicker
                 data-testid="tag-input"
                 :selected-tags="formValues.selectedTags"
-                @setSelectedTags="
-                  $emit('updateFormValues', { selectedTags: $event })
-                "
+                @setSelectedTags="$emit('updateFormValues', { selectedTags: $event })"
               />
             </template>
           </FormRow>
+
           <FormRow section-title="Description">
             <template #content>
               <TextEditor
@@ -281,6 +233,8 @@ export default defineComponent({
               />
             </template>
           </FormRow>
+
+          <!-- Forum Icon Upload -->
           <FormRow section-title="Forum Icon">
             <template #content>
               <Avatar
@@ -297,6 +251,8 @@ export default defineComponent({
               />
             </template>
           </FormRow>
+
+          <!-- Forum Banner Upload -->
           <FormRow section-title="Forum Banner">
             <template #content>
               <img
@@ -304,7 +260,7 @@ export default defineComponent({
                 class="w-full shadow-sm"
                 :src="formValues.channelBannerURL"
                 :alt="formValues.uniqueName"
-              >
+              />
               <AddImage
                 key="channel-banner-url"
                 :field-name="'channelBannerURL'"
@@ -312,9 +268,11 @@ export default defineComponent({
               />
             </template>
           </FormRow>
+
+          <!-- Forum Rules -->
           <FormRow section-title="Forum Rules">
             <template #content>
-              <div class="divide-y divide-gray-500 ">
+              <div class="divide-y divide-gray-500">
                 <div
                   v-for="(rule, index) in formValues.rules"
                   :key="index"
@@ -359,10 +317,8 @@ export default defineComponent({
         </div>
       </div>
     </TailwindForm>
-    <div
-      v-for="(error, i) of getChannelError?.graphQLErrors"
-      :key="i"
-    >
+
+    <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
       {{ error.message }}
     </div>
   </v-container>
