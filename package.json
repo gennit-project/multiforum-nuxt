@@ -26,6 +26,7 @@
     "@heroicons/vue": "^2.0.18",
     "@kangc/v-md-editor": "^2.3.16",
     "@mdi/font": "5.9.55",
+    "@nuxt/eslint-config": "^0.5.4",
     "@nuxtjs/eslint-module": "^4.1.0",
     "@sentry/vite-plugin": "^2.20.1",
     "@sentry/vue": "^8.15.0",

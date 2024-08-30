@@ -40,10 +40,6 @@ export default defineNuxtConfig({
     "@kangc/v-md-editor/lib/style/codemirror-editor.css",
   ],
   devtools: { enabled: true },
-  eslint: {
-    fix: true, // Automatically fix ESLint errors on save
-    cache: false, // Disable caching for ESLint
-  },
   // fontawesome: {
   //   component: "fa",
   //   icons: {
