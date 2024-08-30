@@ -7,7 +7,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/discussion/queries";
 import type { Comment } from "@/src/__generated__/graphql";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
-import TextEditor from "@/components/forms/TextEditor.vue";
+import TextEditor from "@/components/TextEditor.vue";
 import { UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 

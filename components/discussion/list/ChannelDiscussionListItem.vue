@@ -2,7 +2,7 @@
 import type { PropType} from "vue";
 import { defineComponent, computed, ref } from "vue";
 import type { Discussion, DiscussionChannel } from "@/src/__generated__/graphql";
-import { relativeTime } from "../../../dateTimeUtils";
+import { relativeTime } from "@/utils";
 import { useRoute } from "vue-router";
 import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";

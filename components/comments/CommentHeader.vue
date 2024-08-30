@@ -4,7 +4,7 @@ import { defineComponent, computed } from "vue";
 import type { Comment } from "@/src/__generated__/graphql";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
 import clickOutside from "vue-click-outside";
-import { relativeTime } from "../../dateTimeUtils";
+import { relativeTime } from "@/utils";
 
 export default defineComponent({
   name: "EmojiPicker",

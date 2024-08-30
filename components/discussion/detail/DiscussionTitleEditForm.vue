@@ -6,7 +6,7 @@ import RequireAuth from "@/components/auth/RequireAuth.vue";
 import CreateButton from "@/components/CreateButton.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import GenericButton from "@/components/GenericButton.vue";
-import TextInput from "@/components/forms/TextInput.vue";
+import TextInput from "@/components/TextInput.vue";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";

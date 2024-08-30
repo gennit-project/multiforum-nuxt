@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
 import RequireAuth from "../auth/RequireAuth.vue";
-import ChevronDownIcon from "../icons/ChevronDownIcon.vue";
+import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import { useRoute, useRouter } from "vue-router";
 import { useDisplay } from "vuetify";

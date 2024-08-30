@@ -7,7 +7,7 @@ import { DELETE_COMMENT, UPDATE_COMMENT } from "@/graphQLData/comment/mutations"
 import { ALLOWED_ICONS, MenuButton } from "../MenuButton.vue";
 import useClipboard from "vue-clipboard3";
 import VoteButtons from "./VoteButtons.vue";
-import EllipsisHorizontal from "../icons/EllipsisHorizontal.vue";
+import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import TextEditor from "../forms/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";

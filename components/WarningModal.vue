@@ -1,7 +1,7 @@
 <script>
 import { defineComponent } from "vue";
 import GenericModal from "./GenericModal.vue";
-import ExclamationIcon from "../icons/ExclamationIcon.vue";
+import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
 export default defineComponent({
   components: {

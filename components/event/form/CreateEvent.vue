@@ -10,12 +10,11 @@ import type { CreateEditEventFormValues } from "@/types/Event";
 import CreateEditEventFields from "./CreateEditEventFields.vue";
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
-import { apolloClient } from "@/main";
-import { getTimePieces } from "@/utils/dateTimeUtils";
+import { getTimePieces } from "@/utils";
 import { DateTime } from "luxon";
 import { gql } from "@apollo/client/core";
 import getDefaultEventFormValues from "./defaultEventFormValues";
-import RequireAuth from "../../auth/RequireAuth.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {
   EventCreateInput,
   EventTagsConnectOrCreateFieldInput,
@@ -30,7 +29,6 @@ export default defineComponent({
   },
   apollo: {},
   setup() {
-    provideApolloClient(apolloClient);
     const now = DateTime.now();
 
     const route = useRoute();

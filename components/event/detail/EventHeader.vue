@@ -22,7 +22,7 @@ import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration } from "@/utils";
-import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
+import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 
 export default defineComponent({

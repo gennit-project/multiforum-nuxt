@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, computed, ref, watchEffect } from "vue";
 import { useRoute } from "vue-router";
-import { relativeTime } from "../../../dateTimeUtils";
+import { relativeTime } from "@/utils";
 import { useDisplay } from "vuetify";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { useQuery } from "@vue/apollo-composable";

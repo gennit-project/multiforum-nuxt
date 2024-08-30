@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import RequireAuth from "../../auth/RequireAuth.vue";
-import LoadingSpinner from "../LoadingSpinner.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({
   name: "VoteButton",

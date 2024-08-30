@@ -13,7 +13,7 @@ import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discus
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import CreateEditDiscussionFields from "./CreateEditDiscussionFields.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
-import RequireAuth from "../../auth/RequireAuth.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import "md-editor-v3/lib/style.css";
 import { DISCUSSION_PAGE_LIMIT } from "@/components/discussion/list/ChannelDiscussionList.vue";
 import {

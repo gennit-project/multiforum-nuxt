@@ -14,7 +14,7 @@ import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import getDefaultEventFormValues from "./defaultEventFormValues";
 import CreateEditEventFields from "./CreateEditEventFields.vue";
-import RequireAuth from "../../auth/RequireAuth.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {
   EventChannel,
   EventUpdateInput,

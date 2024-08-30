@@ -4,9 +4,9 @@ import { GET_COMMENT } from "@/graphQLData/comment/queries";
 import { useQuery } from "@vue/apollo-composable";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import LoadingSpinner from "../LoadingSpinner.vue";
 import ErrorBanner from "../ErrorBanner.vue";
 import { useRoute } from "vue-router";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({
   name: "CommentDetails",

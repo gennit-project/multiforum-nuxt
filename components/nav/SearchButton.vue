@@ -1,6 +1,6 @@
 <script>
 import { defineComponent } from "vue";
-import SearchIcon from "../icons/SearchIcon.vue";
+import SearchIcon from "@/components/icons/SearchIcon.vue";
 
 export default defineComponent({
   components: {

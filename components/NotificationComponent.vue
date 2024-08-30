@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CheckCircleIcon from "../icons/CheckCircleIcon.vue";
-import XMarkIcon from "../icons/XmarkIcon.vue";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+import XMarkIcon from "@/components/icons/XmarkIcon.vue";
 
 const props = defineProps({
   show: {

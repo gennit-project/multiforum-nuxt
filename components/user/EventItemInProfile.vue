@@ -2,7 +2,7 @@
 import type { PropType} from "vue";
 import { defineComponent, computed } from "vue";
 import type { TagData } from "../../types/Tag";
-import { relativeTime } from "../../dateTimeUtils";
+import { relativeTime } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/TagComponent.vue";
 import type { Event } from "@/src/__generated__/graphql";

@@ -2,7 +2,7 @@
 import type { PropType} from "vue";
 import { defineComponent, computed } from "vue";
 import type { DiscussionData } from "../../types/Discussion";
-import { relativeTime } from "../../dateTimeUtils";
+import { relativeTime } from "@/utils";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";

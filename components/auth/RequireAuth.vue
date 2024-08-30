@@ -4,7 +4,7 @@ import { defineComponent, onMounted } from "vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from "@auth0/auth0-vue";
-import LoadingSpinner from "../LoadingSpinner.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({
   components: {

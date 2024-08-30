@@ -13,7 +13,7 @@ import { useRoute } from "vue-router";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import SortButtons from "@/components/SortButtons.vue";
 import { useDisplay } from "vuetify";
-import SearchableTagList from '@/components/forms/SearchableTagList.vue'
+import SearchableTagList from '@/components/SearchableTagList.vue'
 
 export default defineComponent({
   name: "DiscussionFilterBar",

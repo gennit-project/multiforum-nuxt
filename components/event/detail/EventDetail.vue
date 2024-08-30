@@ -6,7 +6,7 @@ import { useRoute } from "vue-router";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import { GET_EVENT_COMMENTS , GET_EVENT_ROOT_COMMENT_AGGREGATE } from "@/graphQLData/comment/queries";
 import type { Event, Comment, EventChannel } from "@/src/__generated__/graphql";
-import { relativeTime } from "../../../dateTimeUtils";
+import { relativeTime } from "@/utils";
 import { DateTime } from "luxon";
 import ErrorBanner from "../../ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";

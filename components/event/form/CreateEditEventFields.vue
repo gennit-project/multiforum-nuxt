@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, nextTick } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
-import TextEditor from "@/components/forms/TextEditor.vue";
-import FormRow from "@/components/forms/FormRow.vue";
+import TextEditor from "@/components/TextEditor.vue";
+import FormRow from "@/components/FormRow.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
-import TextInput from "@/components/forms/TextInput.vue";
+import TextInput from "@/components/TextInput.vue";
 import ErrorMessage from "@/components/ErrorMessage.vue";
-import CheckBox from "@/components/forms/CheckBox.vue";
+import CheckBox from "@/components/CheckBox.vue";
 import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
@@ -18,7 +18,7 @@ import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
-import TagPicker from "@/components/forms/TagPicker.vue";
+import TagPicker from "@/components/TagPicker.vue";
 
 export type UpdateLocationInput = {
   name: string;

@@ -5,7 +5,7 @@ import { GET_TAGS } from "@/graphQLData/tag/queries";
 import { useQuery } from "@vue/apollo-composable";
 import type { Tag } from "@/src/__generated__/graphql";
 import clickOutside from "vue-click-outside";
-import SearchableTagList from '@/components/forms/SearchableTagList.vue'
+import SearchableTagList from '@/components/SearchableTagList.vue'
 
 export default defineComponent({
   components: {

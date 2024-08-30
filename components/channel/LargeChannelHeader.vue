@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
-import ChannelIcon from "../icons/ChannelIcon.vue";
+import ChannelIcon from "@/components/icons/ChannelIcon.vue";
 
 export default defineComponent({
   components: {

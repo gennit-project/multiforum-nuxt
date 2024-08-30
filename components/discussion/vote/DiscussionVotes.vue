@@ -18,7 +18,7 @@ import WarningModal from "@/components/WarningModal.vue";
 import { CREATE_MOD_PROFILE } from "@/graphQLData/user/mutations";
 import { generateSlug } from "random-word-slugs";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
+import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 
 export default defineComponent({
   components: {

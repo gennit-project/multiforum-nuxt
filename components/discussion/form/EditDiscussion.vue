@@ -15,7 +15,7 @@ import type {
 } from "@/types/Discussion";
 import { apolloClient } from "@/main";
 import CreateEditDiscussionFields from "./CreateEditDiscussionFields.vue";
-import RequireAuth from "../../auth/RequireAuth.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type { DiscussionChannel ,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,

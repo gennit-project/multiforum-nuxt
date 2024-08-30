@@ -22,7 +22,7 @@ import SelectFree from "./SelectFree.vue";
 import Popper from "vue3-popper";
 import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
-import SearchableTagList from "@/components/forms/SearchableTagList.vue";
+import SearchableTagList from "@/components/SearchableTagList.vue";
 
 // Props
 const props = defineProps({

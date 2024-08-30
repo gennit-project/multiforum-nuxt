@@ -2,7 +2,7 @@
 import { useRouter } from 'vue-router';
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
-import FormRow from "@/components/forms/FormRow.vue";
+import FormRow from "@/components/FormRow.vue";
 
 const props = defineProps({
   formTitle: {

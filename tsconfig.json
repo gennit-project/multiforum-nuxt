@@ -55,6 +55,6 @@
     "types/Tag.ts",
     "types/User.ts",
     "types/GenericFormTypes.ts"
-  ],
+, "cache.ts"  ],
   "exclude": ["node_modules"]
 }

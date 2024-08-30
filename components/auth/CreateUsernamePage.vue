@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref } from "vue";
-import CheckCircleIcon from "../icons/CheckCircleIcon.vue";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import CreateUsernameForm from "./CreateUsernameForm.vue";
 
 export default defineComponent({

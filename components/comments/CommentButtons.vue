@@ -8,7 +8,7 @@ import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import VoteButtons from "./VoteButtons.vue";
 import ReplyButton from "./ReplyButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
-import TextEditor from "@/components/forms/TextEditor.vue";
+import TextEditor from "@/components/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import EmojiButtons from "./EmojiButtons.vue";
 import NewEmojiButton from "./NewEmojiButton.vue";

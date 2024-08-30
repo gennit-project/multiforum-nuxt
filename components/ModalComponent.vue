@@ -6,7 +6,7 @@ import {
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
-import CheckIcon from "../icons/CheckIcon.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
 
 const props = defineProps({
   primaryButtonText: {

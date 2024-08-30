@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import GenericModal from "@/components/GenericModal.vue";
 import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
-import TextEditor from '@/components/forms/TextEditor.vue'
+import TextEditor from '@/components/TextEditor.vue'
 import ErrorBanner from "@/components/ErrorBanner.vue";
 
 const props = defineProps({

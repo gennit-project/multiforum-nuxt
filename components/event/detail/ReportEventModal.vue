@@ -2,7 +2,7 @@
 import { defineComponent } from "vue";
 import GenericModal from "@/components/GenericModal.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
-import TextEditor from "@/components/forms/TextEditor.vue";
+import TextEditor from "@/components/TextEditor.vue";
 
 export default defineComponent({
   name: "ReportEventModal",

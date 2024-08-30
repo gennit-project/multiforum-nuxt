@@ -4,10 +4,10 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { Issue } from "@/src/__generated__/graphql";
-import LoadingSpinner from "../LoadingSpinner.vue";
 import { DateTime } from "luxon";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import { useRoute } from "vue-router";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({
   components: {
