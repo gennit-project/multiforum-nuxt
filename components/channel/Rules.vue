@@ -20,7 +20,7 @@ export default defineComponent({
   },
   setup(props) {
     const channelRules = computed(() => {
-      let rules: Rule[] = [];
+      const rules: Rule[] = [];
       try {
         const rulesArray = JSON.parse(props.rules) || [];
         for (const rule of rulesArray) {

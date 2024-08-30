@@ -1,7 +1,8 @@
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Channel } from "@/src/__generated__/graphql";
-import { TagData } from "@/types/Tag";
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
+import type { Channel } from "@/src/__generated__/graphql";
+import type { TagData } from "@/types/Tag";
 import HighlightedSearchTerms from "../HighlightedSearchTerms.vue";
 import Tag from "@/components/Tag.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";

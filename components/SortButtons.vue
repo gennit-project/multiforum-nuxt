@@ -115,13 +115,13 @@ export default defineComponent({
       :label="capitalizeCase(activeSortQuery)"
       :items="sortOptions"
       :show-sort-icon="true"
-      @clickedItem="handleSort"
+      @clicked-item="handleSort"
     />
     <TextButtonDropdown
       v-if="showTopOptions && activeSortQuery === availableSortTypes.TOP"
       :label="activeTimeFrameLabel"
       :items="topOptions"
-      @clickedItem="handleTopSort"
+      @clicked-item="handleTopSort"
     />
   </div>
 </template>

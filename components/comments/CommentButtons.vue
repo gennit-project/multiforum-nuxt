@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, computed, ref } from "vue";
-import { Comment } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import type { Comment } from "@/src/__generated__/graphql";
 import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";
@@ -127,7 +128,7 @@ export default defineComponent({
       class="mb-1"
       :comment-id="commentData.id"
       :emoji-json="commentData.emoji"
-      @toggleEmojiPicker="toggleEmojiPicker"
+      @toggle-emoji-picker="toggleEmojiPicker"
     />
     <div
       class="flex flex-wrap items-center gap-1 text-xs text-gray-400 dark:text-gray-300"
@@ -136,15 +137,15 @@ export default defineComponent({
         v-if="!locked"
         :comment-data="commentData"
         :show-downvote="enableFeedback && !loggedInUserIsAuthor"
-        @openModProfile="$emit('openModProfile')"
-        @clickFeedback="$emit('clickFeedback')"
-        @clickUndoFeedback="$emit('clickUndoFeedback')"
-        @clickEditFeedback="$emit('clickEditFeedback')"
-        @viewFeedback="$emit('handleViewFeedback')"
+        @open-mod-profile="$emit('openModProfile')"
+        @click-feedback="$emit('clickFeedback')"
+        @click-undo-feedback="$emit('clickUndoFeedback')"
+        @click-edit-feedback="$emit('clickEditFeedback')"
+        @view-feedback="$emit('handleViewFeedback')"
       />
       <NewEmojiButton
         :comment-id="commentData.id"
-        @toggleEmojiPicker="toggleEmojiPicker"
+        @toggle-emoji-picker="toggleEmojiPicker"
       />
       <ReplyButton
         :show-reply-editor="!!replyFormOpenAtCommentID"

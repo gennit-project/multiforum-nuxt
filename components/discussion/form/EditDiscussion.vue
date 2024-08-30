@@ -8,16 +8,15 @@ import {
   useMutation,
   provideApolloClient,
 } from "@vue/apollo-composable";
-import { TagData } from "@/types/Tag";
-import {
+import type { TagData } from "@/types/Tag";
+import type {
   CreateEditDiscussionFormValues,
   DiscussionData,
 } from "@/types/Discussion";
 import { apolloClient } from "@/main";
 import CreateEditDiscussionFields from "./CreateEditDiscussionFields.vue";
 import RequireAuth from "../../auth/RequireAuth.vue";
-import { DiscussionChannel } from "@/src/__generated__/graphql";
-import {
+import type { DiscussionChannel ,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
@@ -283,7 +282,7 @@ export default defineComponent({
         :form-values="formValues"
         :update-discussion-loading="updateDiscussionLoading"
         @submit="submit"
-        @updateFormValues="updateFormValues"
+        @update-form-values="updateFormValues"
       />
     </template>
     <template #does-not-have-auth>

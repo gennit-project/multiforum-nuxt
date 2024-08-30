@@ -4,8 +4,8 @@ import { useQuery } from "@vue/apollo-composable";
 import ChannelList from "./ChannelList.vue";
 import { GET_CHANNELS } from "@/graphQLData/channel/queries";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
-import { TagData } from "@/types/Tag";
-import { Channel } from "@/src/__generated__/graphql";
+import type { TagData } from "@/types/Tag";
+import type { Channel } from "@/src/__generated__/graphql";
 import TagIcon from "@/components/icons/TagIcon.vue";
 import FilterChip from "@/components/FilterChip.vue";
 // import TagPicker from "@/components/TagPicker.vue";
@@ -218,7 +218,7 @@ export default defineComponent({
         <SearchBar
           class="mr-2 w-full align-middle"
           :search-placeholder="'Search forums'"
-          @updateSearchInput="updateSearchResult"
+          @update-search-input="updateSearchResult"
         />
         <FilterChip
           :label="tagLabel"
@@ -247,8 +247,8 @@ export default defineComponent({
         :result-count="channelResult.channelsAggregate?.count || 0"
         :search-input="searchInput"
         :selected-tags="selectedTags"
-        @filterByTag="filterByTag"
-        @loadMore="loadMore"
+        @filter-by-tag="filterByTag"
+        @load-more="loadMore"
       />
       <div
         v-if="channelLoading"

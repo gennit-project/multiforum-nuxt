@@ -2,7 +2,7 @@
 import { computed, defineComponent } from "vue";
 import VoteButton from "@/components/VoteButton.vue";
 import HandThumbDownIcon from "../icons/HandThumbDownIcon.vue";
-import { SelectOptionData } from "@/types/GenericFormTypes";
+import type { SelectOptionData } from "@/types/GenericFormTypes";
 import { ALLOWED_ICONS } from "../buttons/MenuButton.vue";
 import MenuButton from "@/components/MenuButton.vue";
 
@@ -139,10 +139,10 @@ export default defineComponent({
       v-if="showDownvote"
       data-testid="thumbs-down-menu-button"
       :items="thumbsDownMenuItems"
-      @viewFeedback="viewFeedback"
-      @giveFeedback="giveFeedback"
-      @editFeedback="editFeedback"
-      @undoFeedback="undoFeedback"
+      @view-feedback="viewFeedback"
+      @give-feedback="giveFeedback"
+      @edit-feedback="editFeedback"
+      @undo-feedback="undoFeedback"
     >
       <VoteButton
         :test-id="'downvote-comment-button'"

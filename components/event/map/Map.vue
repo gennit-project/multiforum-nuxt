@@ -1,10 +1,11 @@
 <!-- eslint-disable no-undef -->
 <script lang="ts">
+import type {
+  SetupContext} from "vue";
 import {
   defineComponent,
   onMounted,
   ref,
-  SetupContext,
   watch,
   computed,
 } from "vue";
@@ -110,7 +111,7 @@ export default defineComponent({
         map.value = new google.maps.Map(desktopMapDiv.value!, mapConfig);
       }
 
-      let bounds = new google.maps.LatLngBounds();
+      const bounds = new google.maps.LatLngBounds();
 
       const infowindow = new google.maps.InfoWindow();
 

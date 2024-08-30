@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { ChannelData } from "@/types/Channel";
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
+import type { ChannelData } from "@/types/Channel";
 import Tag from "../../Tag.vue";
 
 export default defineComponent({

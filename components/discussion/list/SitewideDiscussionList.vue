@@ -190,8 +190,8 @@ const filterByChannel = (channel: string) => {
           :search-input="filterValues.searchInput"
           :selected-tags="filterValues.tags"
           :selected-channels="filterValues.channels"
-          @filterByTag="filterByTag"
-          @filterByChannel="filterByChannel"
+          @filter-by-tag="filterByTag"
+          @filter-by-channel="filterByChannel"
         />
       </ul>
       <div
@@ -204,7 +204,7 @@ const filterByChannel = (channel: string) => {
             aggregateDiscussionCount ===
             discussionResult.getSiteWideDiscussionList.discussions.length
           "
-          @loadMore="loadMore"
+          @load-more="loadMore"
         />
       </div>
     </div>

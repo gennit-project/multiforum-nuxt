@@ -1,4 +1,4 @@
-import { DiscussionCreateInputWithChannels } from "../seedData/discussions";
+import type { DiscussionCreateInputWithChannels } from "../seedData/discussions";
 
 const createDiscussions = (discussions: DiscussionCreateInputWithChannels[]) => {
   const getOperation = (discussion: DiscussionCreateInputWithChannels) => {

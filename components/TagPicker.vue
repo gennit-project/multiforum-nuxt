@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType, computed, ref, Ref } from "vue";
+import type { PropType, Ref } from "vue";
+import { defineComponent, computed, ref } from "vue";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { Tag } from "@/src/__generated__/graphql";
+import type { Tag } from "@/src/__generated__/graphql";
 import clickOutside from "vue-click-outside";
 import SearchableTagList from '@/components/forms/SearchableTagList.vue'
 
@@ -135,7 +136,7 @@ export default defineComponent({
           v-if="isDropdownOpen"
           v-click-outside="outside"
           :selected-tags="selected"
-          @toggleSelection="toggleSelectedTag"
+          @toggle-selection="toggleSelectedTag"
         />
       </div>
     </div>

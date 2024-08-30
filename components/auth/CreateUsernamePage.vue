@@ -49,8 +49,8 @@ export default defineComponent({
       <CreateUsernameForm 
         v-if="user && user.email" 
         :email="user.email"
-        @updateUsername="updateUsername"
-        @emailAndUserCreated="$emit('emailAndUserCreated')"
+        @update-username="updateUsername"
+        @email-and-user-created="$emit('emailAndUserCreated')"
       />
     </div>
   </div>

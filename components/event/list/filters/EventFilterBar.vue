@@ -220,7 +220,7 @@ const updateSelectedDistance = (distance: DistanceUnit) => {
     updateLocalState({ locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS });
     updateFilters({ radius: 0 });
   } else {
-    let d =
+    const d =
       typeof distance.value === "string"
         ? parseInt(distance.value, 10)
         : distance.value;
@@ -279,7 +279,7 @@ const toggleSelectedTag = (tag: string) => {
           <div class="relative bg-white dark:bg-gray-700 w-96">
             <SearchableForumList
               :selected-channels="filterValues.channels"
-              @toggleSelection="toggleSelectedChannel"
+              @toggle-selection="toggleSelectedChannel"
             />
           </div>
         </template>
@@ -297,7 +297,7 @@ const toggleSelectedTag = (tag: string) => {
           <div class="relative w-96">
             <SearchableTagList
               :selected-tags="filterValues.tags"
-              @toggleSelection="toggleSelectedTag"
+              @toggle-selection="toggleSelectedTag"
             />
           </div>
         </template>
@@ -313,7 +313,7 @@ const toggleSelectedTag = (tag: string) => {
             :search-placeholder="'Search'"
             :full-width="true"
             :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
-            @updateSearchInput="updateSearchInput"
+            @update-search-input="updateSearchInput"
           >
             <Popper v-if="!showLocationSearchBarAndDistanceButtons">
               <button
@@ -355,12 +355,12 @@ const toggleSelectedTag = (tag: string) => {
 
                   <SelectCanceled
                     :show-canceled="filterValues.showCanceledEvents || false"
-                    @updateShowCanceled="updateShowCanceled"
+                    @update-show-canceled="updateShowCanceled"
                   />
 
                   <SelectFree
                     :show-only-free="filterValues.free || false"
-                    @updateShowOnlyFree="updateShowOnlyFree"
+                    @update-show-only-free="updateShowOnlyFree"
                   />
                 </div>
               </template>
@@ -373,7 +373,7 @@ const toggleSelectedTag = (tag: string) => {
             :reference-point-address-name="referencePointName"
             :left-side-is-rounded="false"
             :radius="radiusLabel"
-            @updateLocationInput="updateLocationInput"
+            @update-location-input="updateLocationInput"
           >
             <Popper v-if="showLocationSearchBarAndDistanceButtons">
               <button
@@ -415,12 +415,12 @@ const toggleSelectedTag = (tag: string) => {
 
                   <SelectCanceled
                     :show-canceled="filterValues.showCanceledEvents || false"
-                    @updateShowCanceled="updateShowCanceled"
+                    @update-show-canceled="updateShowCanceled"
                   />
 
                   <SelectFree
                     :show-only-free="filterValues.free || false"
-                    @updateShowOnlyFree="updateShowOnlyFree"
+                    @update-show-only-free="updateShowOnlyFree"
                   />
                 </div>
               </template>

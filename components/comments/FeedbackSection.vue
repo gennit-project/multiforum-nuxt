@@ -1,6 +1,7 @@
 <script lang="ts">
-import { Comment } from "@/src/__generated__/graphql";
-import { computed, defineComponent, PropType, ref } from "vue";
+import type { Comment } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useRoute } from "vue-router";
 import InfoBanner from "@/components/InfoBanner.vue";
 import LoadMore from "@/components/LoadMore.vue";
@@ -175,10 +176,10 @@ export default defineComponent({
         <CommentOnFeedbackPage
           :comment="commentData"
           :is-highlighted="true"
-          @showCopiedLinkNotification="showCopiedLinkNotification = true"
-          @clickFeedback="handleClickGiveFeedback"
-          @clickUndoFeedback="handleClickUndoFeedback"
-          @clickEditFeedback="handleClickEditFeedback"
+          @show-copied-link-notification="showCopiedLinkNotification = true"
+          @click-feedback="handleClickGiveFeedback"
+          @click-undo-feedback="handleClickUndoFeedback"
+          @click-edit-feedback="handleClickEditFeedback"
         />
       </template>
     </PermalinkedFeedbackComment>
@@ -192,16 +193,16 @@ export default defineComponent({
             (showPermalinkedFeedback && comment.id !== feedbackId)
         "
         :comment="comment"
-        @showCopiedLinkNotification="showCopiedLinkNotification = true"
-        @clickFeedback="handleClickGiveFeedback"
-        @clickUndoFeedback="handleClickUndoFeedback"
-        @clickEditFeedback="handleClickEditFeedback"
+        @show-copied-link-notification="showCopiedLinkNotification = true"
+        @click-feedback="handleClickGiveFeedback"
+        @click-undo-feedback="handleClickUndoFeedback"
+        @click-edit-feedback="handleClickEditFeedback"
       />
     </div>
     <LoadMore
       v-if="!loading && !reachedEndOfResults"
       :reached-end-of-results="reachedEndOfResults"
-      @loadMore="() => loadMore()"
+      @load-more="() => loadMore()"
     />
     <div v-if="loading">
       Loading...
@@ -209,15 +210,15 @@ export default defineComponent({
     <Notification
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"
-      @closeNotification="showCopiedLinkNotification = false"
+      @close-notification="showCopiedLinkNotification = false"
     />
     <GenericFeedbackFormModal
       :open="showFeedbackFormModal"
       :loading="addFeedbackCommentToCommentLoading"
       :error="addFeedbackCommentToCommentError"
       @close="$emit('closeFeedbackFormModal')"
-      @updateFeedback="updateFeedback"
-      @primaryButtonClick="handleSubmitFeedback"
+      @update-feedback="updateFeedback"
+      @primary-button-click="handleSubmitFeedback"
     />
     <ConfirmUndoCommentFeedbackModal
       v-if="showConfirmUndoFeedbackModal && commentToRemoveFeedbackFrom"

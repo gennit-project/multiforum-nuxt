@@ -1,15 +1,14 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import { useRoute } from "vue-router";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
+import { GET_USER , GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { relativeTime } from "@/utils/dateTimeUtils";
 import gql from "graphql-tag";
 import { useDisplay } from "vuetify";
 import UserProfileTabs from "./UserProfileTabs.vue";
 import UserProfileSidebar from "./UserProfileSidebar.vue";
-import { User } from "@/src/__generated__/graphql";
+import type { User } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   components: {

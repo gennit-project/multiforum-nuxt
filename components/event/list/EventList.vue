@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
+import type { PropType} from "vue";
+import { defineComponent, computed } from "vue";
 import EventListItem from "./EventListItem.vue";
 import { useRoute, useRouter } from "vue-router";
-import { Event } from "@/src/__generated__/graphql"
+import type { Event } from "@/src/__generated__/graphql"
 import LoadMore from "../../LoadMore.vue";
 
 export default defineComponent({
@@ -182,10 +183,10 @@ export default defineComponent({
             }
           }
         "
-        @clickedEventListItem="handleClickEventListItem(event)"
-        @filterByTag="filterByTag"
-        @filterByChannel="filterByChannel"
-        @openPreview="$emit('openPreview')"
+        @clicked-event-list-item="handleClickEventListItem(event)"
+        @filter-by-tag="filterByTag"
+        @filter-by-channel="filterByChannel"
+        @open-preview="$emit('openPreview')"
       />
     </ul>
 
@@ -194,7 +195,7 @@ export default defineComponent({
       data-testid="load-more-events"
       class="px-8"
       :reached-end-of-results="resultCount === events.length"
-      @loadMore="$emit('loadMore')"
+      @load-more="$emit('loadMore')"
     />
   </div>
 </template>

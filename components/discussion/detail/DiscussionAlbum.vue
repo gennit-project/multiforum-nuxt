@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref, PropType } from "vue";
+import type { PropType } from "vue";
+import { defineComponent, ref } from "vue";
 import Lightgallery from "lightgallery/vue";
 import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgZoom from "lightgallery/plugins/zoom";
@@ -10,7 +11,7 @@ import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-thumbnail.css";
 import "lightgallery/css/lg-zoom.css";
 
-import { Album } from "@/src/__generated__/graphql";
+import type { Album } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "DiscussionAlbum",

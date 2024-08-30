@@ -61,8 +61,8 @@ export default defineComponent({
   <div class="flex h-full justify-center" :class="channelId ? '' : 'mt-6'">
     <div :class="channelId ? '' : 'max-w-5xl'">
       <router-view
-        @updateLoadedEventCount="setLoadedEventCount"
-        @updateResultCount="setResultCount"
+        @update-loaded-event-count="setLoadedEventCount"
+        @update-result-count="setResultCount"
       />
     </div>
   </div>

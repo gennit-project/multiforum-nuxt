@@ -1,5 +1,5 @@
 
-import { TagData } from './Tag'
+import type { TagData } from './Tag'
 
 export type CreateEditCommentFormValues = {
   depth: number

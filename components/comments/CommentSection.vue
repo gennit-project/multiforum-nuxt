@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, ref, computed, PropType, watchEffect } from "vue";
+import { defineComponent, ref, computed, watchEffect } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import Comment from "./Comment.vue";
 import LoadMore from "../LoadMore.vue";
-import {
+import type {
   CreateEditCommentFormValues,
   CreateReplyInputData,
   DeleteCommentInputData,
@@ -13,23 +13,21 @@ import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
   SOFT_DELETE_COMMENT,
-} from "@/graphQLData/comment/mutations";
+ CREATE_COMMENT , ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "../ErrorBanner.vue";
 import WarningModal from "../WarningModal.vue";
-import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
-import type { Ref } from "vue";
+import type { Ref , PropType} from "vue";
 import PermalinkedComment from "./PermalinkedComment.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
-import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import SortButtons from "@/components/SortButtons.vue";
 import { modProfileNameVar } from "@/cache";
 import Notification from "@/components/Notification.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import {
+import type {
   CommentCreateInput,
   Comment as CommentType,
 } from "@/src/__generated__/graphql";
@@ -319,7 +317,7 @@ export default defineComponent({
                   ?.aggregateChildCommentCount || 0;
 
               // 3. Decrease the aggregate count.
-              let newChildCommentAggregate = Math.max(
+              const newChildCommentAggregate = Math.max(
                 0,
                 existingChildCommentAggregate - 1,
               );
@@ -440,7 +438,7 @@ export default defineComponent({
 
           const existingChildCommentAggregate =
             readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
-          let newChildCommentAggregate = existingChildCommentAggregate + 1;
+          const newChildCommentAggregate = existingChildCommentAggregate + 1;
 
           const newGetRepliesData = {
             ...readQueryResult,
@@ -728,24 +726,24 @@ export default defineComponent({
             :edit-comment-error="editCommentError"
             :mod-profile-name="loggedInUserModName"
             :original-poster="originalPoster"
-            @startCommentSave="commentInProcess = true"
-            @openReplyEditor="openReplyEditor"
-            @hideReplyEditor="hideReplyEditor"
-            @openEditCommentEditor="openEditCommentEditor"
-            @hideEditCommentEditor="hideEditCommentEditor"
-            @clickEditComment="handleClickEdit"
-            @deleteComment="handleClickDelete"
-            @createComment="handleClickCreate"
-            @updateCreateReplyCommentInput="updateCreateInputValuesForReply"
-            @updateEditCommentInput="updateEditInputValues"
-            @saveEdit="handleSaveEdit"
-            @scrollToTop="scrollToTop"
-            @clickReport="handleClickReport"
-            @clickFeedback="handleClickGiveFeedback"
-            @clickUndoFeedback="handleClickUndoFeedback"
-            @clickEditFeedback="handleClickEditFeedback"
-            @updateFeedback="updateFeedback"
-            @handleViewFeedback="handleViewFeedback"
+            @start-comment-save="commentInProcess = true"
+            @open-reply-editor="openReplyEditor"
+            @hide-reply-editor="hideReplyEditor"
+            @open-edit-comment-editor="openEditCommentEditor"
+            @hide-edit-comment-editor="hideEditCommentEditor"
+            @click-edit-comment="handleClickEdit"
+            @delete-comment="handleClickDelete"
+            @create-comment="handleClickCreate"
+            @update-create-reply-comment-input="updateCreateInputValuesForReply"
+            @update-edit-comment-input="updateEditInputValues"
+            @save-edit="handleSaveEdit"
+            @scroll-to-top="scrollToTop"
+            @click-report="handleClickReport"
+            @click-feedback="handleClickGiveFeedback"
+            @click-undo-feedback="handleClickUndoFeedback"
+            @click-edit-feedback="handleClickEditFeedback"
+            @update-feedback="updateFeedback"
+            @handle-view-feedback="handleViewFeedback"
           />
         </template>
       </PermalinkedComment>
@@ -772,26 +770,26 @@ export default defineComponent({
               :edit-comment-error="editCommentError"
               :mod-profile-name="loggedInUserModName"
               :original-poster="originalPoster"
-              @startCommentSave="commentInProcess = true"
-              @openReplyEditor="openReplyEditor"
-              @hideReplyEditor="hideReplyEditor"
-              @openEditCommentEditor="openEditCommentEditor"
-              @hideEditCommentEditor="hideEditCommentEditor"
-              @clickEditComment="handleClickEdit"
-              @deleteComment="handleClickDelete"
-              @createComment="handleClickCreate"
-              @updateCreateReplyCommentInput="updateCreateInputValuesForReply"
-              @updateEditCommentInput="updateEditInputValues"
-              @saveEdit="handleSaveEdit"
-              @showCopiedLinkNotification="showCopiedLinkNotification = $event"
-              @openModProfileModal="showModProfileModal = true"
-              @scrollToTop="scrollToTop"
-              @clickReport="handleClickReport"
-              @clickFeedback="handleClickGiveFeedback"
-              @clickUndoFeedback="handleClickUndoFeedback"
-              @clickEditFeedback="handleClickEditFeedback"
-              @updateFeedback="updateFeedback"
-              @handleViewFeedback="handleViewFeedback"
+              @start-comment-save="commentInProcess = true"
+              @open-reply-editor="openReplyEditor"
+              @hide-reply-editor="hideReplyEditor"
+              @open-edit-comment-editor="openEditCommentEditor"
+              @hide-edit-comment-editor="hideEditCommentEditor"
+              @click-edit-comment="handleClickEdit"
+              @delete-comment="handleClickDelete"
+              @create-comment="handleClickCreate"
+              @update-create-reply-comment-input="updateCreateInputValuesForReply"
+              @update-edit-comment-input="updateEditInputValues"
+              @save-edit="handleSaveEdit"
+              @show-copied-link-notification="showCopiedLinkNotification = $event"
+              @open-mod-profile-modal="showModProfileModal = true"
+              @scroll-to-top="scrollToTop"
+              @click-report="handleClickReport"
+              @click-feedback="handleClickGiveFeedback"
+              @click-undo-feedback="handleClickUndoFeedback"
+              @click-edit-feedback="handleClickEditFeedback"
+              @update-feedback="updateFeedback"
+              @handle-view-feedback="handleViewFeedback"
             />
           </div>
         </div>
@@ -801,14 +799,14 @@ export default defineComponent({
       v-if="!reachedEndOfResults"
       class="justify-self-center"
       :reached-end-of-results="reachedEndOfResults"
-      @loadMore="$emit('loadMore')"
+      @load-more="$emit('loadMore')"
     />
     <WarningModal
       :title="'Delete Comment'"
       :body="'Are you sure you want to delete this comment?'"
       :open="showDeleteCommentModal"
       @close="showDeleteCommentModal = false"
-      @primaryButtonClick="handleDeleteComment"
+      @primary-button-click="handleDeleteComment"
     />
     <OpenIssueModal
       v-if="showOpenIssueModal"
@@ -816,7 +814,7 @@ export default defineComponent({
       :comment-id="commentToReport?.id"
       :comment="commentToReport"
       @close="showOpenIssueModal = false"
-      @reportSubmittedSuccessfully="
+      @report-submitted-successfully="
         () => {
           showSuccessfullyReported = true;
           showOpenIssueModal = false;
@@ -826,12 +824,12 @@ export default defineComponent({
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
-      @closeNotification="showSuccessfullyReported = false"
+      @close-notification="showSuccessfullyReported = false"
     />
     <Notification
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"
-      @closeNotification="showCopiedLinkNotification = false"
+      @close-notification="showCopiedLinkNotification = false"
     />
     <WarningModal
       v-if="showModProfileModal"
@@ -840,15 +838,15 @@ export default defineComponent({
       :open="showModProfileModal"
       :primary-button-text="'Yes, create a mod profile'"
       @close="showModProfileModal = false"
-      @primaryButtonClick="handleCreateModProfileClick"
+      @primary-button-click="handleCreateModProfileClick"
     />
     <GenericFeedbackFormModal
       :open="showFeedbackFormModal"
       :loading="addFeedbackCommentToCommentLoading"
       :error="addFeedbackCommentToCommentError?.message || ''"
       @close="showFeedbackFormModal = false"
-      @updateFeedback="updateFeedback"
-      @primaryButtonClick="handleSubmitFeedback"
+      @update-feedback="updateFeedback"
+      @primary-button-click="handleSubmitFeedback"
     />
     <ConfirmUndoCommentFeedbackModal
       v-if="showConfirmUndoFeedbackModal && commentToRemoveFeedbackFrom"
@@ -869,7 +867,7 @@ export default defineComponent({
     <Notification
       :show="showFeedbackSubmittedSuccessfully"
       :title="'Your feedback was submitted successfully.'"
-      @closeNotification="showFeedbackSubmittedSuccessfully = false"
+      @close-notification="showFeedbackSubmittedSuccessfully = false"
     />
   </div>
 </template>

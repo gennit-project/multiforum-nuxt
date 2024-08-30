@@ -140,6 +140,6 @@ export default defineComponent({
       borderColor: theme === 'dark' ? '#1d2433' : '#e2e8f0',
       buttonHoverBackground: theme === 'dark' ? '#2d3748' : '#edf2f7',
     }"
-    @emojiClick="handleEmojiClick"
+    @emoji-click="handleEmojiClick"
   />
 </template>

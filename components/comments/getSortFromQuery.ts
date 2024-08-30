@@ -1,4 +1,4 @@
-import { LocationQuery } from "vue-router";
+import type { LocationQuery } from "vue-router";
 
 export const availableSortTypes: Record<string, string> = {
   HOT: "hot",

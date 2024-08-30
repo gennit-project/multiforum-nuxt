@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, PropType, ref } from "vue";
+import type { PropType} from "vue";
+import { defineComponent, ref } from "vue";
 import clickOutside from "vue-click-outside";
 import SearchableForumList from '@/components/channel/SearchableForumList.vue'
 
@@ -112,8 +113,8 @@ export default defineComponent({
           v-if="isDropdownOpen"
           v-click-outside="outside"
           :selected-channels="selected"
-          @toggleSelection="toggleSelection"
-          @setChannelOptions="channelOptions = $event"
+          @toggle-selection="toggleSelection"
+          @set-channel-options="channelOptions = $event"
         />
       </div>
     </div>

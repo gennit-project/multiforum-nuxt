@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType, computed, ref } from "vue";
-import { useRoute } from "vue-router";
-import { Event } from "@/src/__generated__/graphql";
-import { CANCEL_EVENT } from "@/graphQLData/event/mutations";
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import { useRoute , useRouter } from "vue-router";
+import type { Event } from "@/src/__generated__/graphql";
+import { CANCEL_EVENT , DELETE_EVENT , ADD_FEEDBACK_COMMENT_TO_EVENT } from "@/graphQLData/event/mutations";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LinkIcon from "@/components/icons/LinkIcon.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
@@ -10,22 +11,18 @@ import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
 import useClipboard from "vue-clipboard3";
 import Notification from "@/components/Notification.vue";
 import { DateTime } from "luxon";
-import { useRouter } from "vue-router";
-import MenuButton from "@/components/MenuButton.vue";
+import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
   GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
-import { DELETE_EVENT } from "@/graphQLData/event/mutations";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration } from "@/utils";
 import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
-import { ALLOWED_ICONS } from "@/components/MenuButton.vue";
-import { ADD_FEEDBACK_COMMENT_TO_EVENT } from "@/graphQLData/event/mutations";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 
 export default defineComponent({
@@ -493,15 +490,15 @@ export default defineComponent({
         v-if="showMenuButtons && eventData && menuItems.length > 0"
         data-testid="event-menu-button"
         :items="menuItems"
-        @copyLink="copyLink"
-        @handleEdit="
+        @copy-link="copyLink"
+        @handle-edit="
           router.push(`/channels/c/${channelId}/events/e/${eventId}/edit`)
         "
-        @handleDelete="confirmDeleteIsOpen = true"
-        @handleCancel="confirmCancelIsOpen = true"
-        @handleReport="handleClickReport"
-        @handleFeedback="handleClickGiveFeedback"
-        @handleViewFeedback="handleViewFeedback"
+        @handle-delete="confirmDeleteIsOpen = true"
+        @handle-cancel="confirmCancelIsOpen = true"
+        @handle-report="handleClickReport"
+        @handle-feedback="handleClickGiveFeedback"
+        @handle-view-feedback="handleViewFeedback"
       >
         <EllipsisHorizontal
           class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -511,19 +508,19 @@ export default defineComponent({
     <Notification
       :show="showAddressCopiedNotification"
       :title="'Copied to clipboard!'"
-      @closeNotification="showAddressCopiedNotification = false"
+      @close-notification="showAddressCopiedNotification = false"
     />
     <Notification
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"
-      @closeNotification="showCopiedLinkNotification = false"
+      @close-notification="showCopiedLinkNotification = false"
     />
     <WarningModal
       :title="'Delete Event'"
       :body="'Are you sure you want to delete this event?'"
       :open="confirmDeleteIsOpen"
       @close="confirmDeleteIsOpen = false"
-      @primaryButtonClick="deleteEvent"
+      @primary-button-click="deleteEvent"
     />
 
     <WarningModal
@@ -536,7 +533,7 @@ export default defineComponent({
       :loading="cancelEventLoading"
       :error="cancelEventError"
       @close="confirmCancelIsOpen = false"
-      @primaryButtonClick="cancelEvent"
+      @primary-button-click="cancelEvent"
     />
     <GenericFeedbackFormModal
       :open="showFeedbackFormModal"
@@ -544,18 +541,18 @@ export default defineComponent({
       :loading="addFeedbackCommentToEventLoading"
       @input="handleFeedbackInput"
       @close="showFeedbackFormModal = false"
-      @primaryButtonClick="handleSubmitFeedback"
+      @primary-button-click="handleSubmitFeedback"
     />
     <Notification
       :show="showFeedbackSubmittedSuccessfully"
       :title="'Your feedback has been recorded. Thank you!'"
-      @closeNotification="showFeedbackSubmittedSuccessfully = false"
+      @close-notification="showFeedbackSubmittedSuccessfully = false"
     />
     <OpenIssueModal
       :open="showReportEventModal"
       :event-title="eventData.title"
       @close="showReportEventModal = false"
-      @reportSubmittedSuccessfully="
+      @report-submitted-successfully="
         () => {
           showSuccessfullyReported = true;
           showReportEventModal = false;
@@ -565,7 +562,7 @@ export default defineComponent({
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
-      @closeNotification="showSuccessfullyReported = false"
+      @close-notification="showSuccessfullyReported = false"
     />
   </div>
 </template>

@@ -1,16 +1,15 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { CreateEditChannelFormValues } from "@/types/Channel";
+import type { CreateEditChannelFormValues } from "@/types/Channel";
 import { CREATE_CHANNEL } from "@/graphQLData/channel/mutations";
-import { useMutation, provideApolloClient } from "@vue/apollo-composable";
+import { useMutation, provideApolloClient , useQuery } from "@vue/apollo-composable";
 import { gql } from "@apollo/client/core";
 import { apolloClient } from "@/main";
-import { useQuery } from "@vue/apollo-composable";
 import CreateEditChannelFields from "./CreateEditChannelFields.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import {
+import type {
   Channel,
   ChannelCreateInput,
   ChannelTagsConnectOrCreateFieldInput,
@@ -31,7 +30,7 @@ export default defineComponent({
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -185,7 +184,7 @@ export default defineComponent({
         :form-values="formValues"
         :create-channel-loading="createChannelLoading"
         @submit="submit"
-        @updateFormValues="updateFormValues"
+        @update-form-values="updateFormValues"
       />
     </template>
     <template #does-not-have-auth>

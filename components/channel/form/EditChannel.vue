@@ -6,16 +6,16 @@ import {
   useMutation,
   provideApolloClient,
 } from "@vue/apollo-composable";
-import { TagData } from "@/types/Tag";
-import { UserData } from "@/types/User";
+import type { TagData } from "@/types/Tag";
+import type { UserData } from "@/types/User";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { UPDATE_CHANNEL } from "@/graphQLData/channel/mutations";
 import { apolloClient } from "@/main";
-import { CreateEditChannelFormValues } from "@/types/Channel";
+import type { CreateEditChannelFormValues } from "@/types/Channel";
 import CreateEditChannelFields from "./CreateEditChannelFields.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import {
+import type {
   ChannelTagsConnectOrCreateFieldInput,
   ChannelTagsDisconnectFieldInput,
   ChannelUpdateInput,
@@ -273,12 +273,12 @@ export default defineComponent({
         :form-values="formValues"
         :owner-list="ownerList"
         @submit="submit"
-        @updateFormValues="updateFormValues"
+        @update-form-values="updateFormValues"
       />
       <Notification
         v-if="showSavedChangesNotification"
         :title="'Your changes have been saved.'"
-        @closeNotification="showSavedChangesNotification = false"
+        @close-notification="showSavedChangesNotification = false"
       />
     </template>
     <template #does-not-have-auth>

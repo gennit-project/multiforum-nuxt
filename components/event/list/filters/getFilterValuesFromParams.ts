@@ -1,4 +1,4 @@
-import { SearchEventValues } from "@/types/Event";
+import type { SearchEventValues } from "@/types/Event";
 import { chronologicalOrder, reverseChronologicalOrder } from "./filterStrings";
 import LocationFilterTypes from "./locationFilterTypes";
 import {
@@ -6,9 +6,7 @@ import {
   createDefaultSelectedHourRanges,
   createDefaultSelectedWeekdays,
   hourRangesObject,
-} from "./eventSearchOptions";
-import { timeShortcutValues } from "./eventSearchOptions";
-import { resultOrderTypes } from "./eventSearchOptions";
+ timeShortcutValues , resultOrderTypes } from "./eventSearchOptions";
 
 const defaultPlace = {
   // Default map center is Tempe Public Library

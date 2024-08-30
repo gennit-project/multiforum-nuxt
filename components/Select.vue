@@ -1,9 +1,10 @@
 <script lang="ts">
-import { defineComponent, ref, PropType } from "vue";
+import type { PropType } from "vue";
+import { defineComponent, ref } from "vue";
 import ListboxButton from "@/components/ListboxButton.vue";
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import CheckIcon from '@/components/icons/CheckIcon.vue'
-import { SelectOptionData } from "@/types/GenericFormTypes";
+import type { SelectOptionData } from "@/types/GenericFormTypes";
 
 export default defineComponent({
   name: "SelectMenu",
@@ -43,7 +44,7 @@ export default defineComponent({
   <Listbox
     v-model="selected"
     as="div"
-    @update:modelValue="handleSelect"
+    @update:model-value="handleSelect"
   >
     <div class="mt-1 relative">
       <ListboxButton

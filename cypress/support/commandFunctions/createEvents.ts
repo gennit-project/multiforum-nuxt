@@ -1,5 +1,5 @@
 
-import { EventCreateInputWithChannels } from "../seedData/events";
+import type { EventCreateInputWithChannels } from "../seedData/events";
 
 const createEvents = (events: EventCreateInputWithChannels[]) => {
   const getOperation = (event: EventCreateInputWithChannels) => {

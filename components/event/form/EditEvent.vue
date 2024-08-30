@@ -8,14 +8,14 @@ import {
   provideApolloClient,
 } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
-import { TagData } from "@/types/Tag";
+import type { TagData } from "@/types/Tag";
 import { apolloClient } from "@/main";
-import { CreateEditEventFormValues } from "@/types/Event";
+import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import getDefaultEventFormValues from "./defaultEventFormValues";
 import CreateEditEventFields from "./CreateEditEventFields.vue";
 import RequireAuth from "../../auth/RequireAuth.vue";
-import {
+import type {
   EventChannel,
   EventUpdateInput,
   EventTagsConnectOrCreateFieldInput,
@@ -330,7 +330,7 @@ export default defineComponent({
         :update-post-error="updateEventError"
         :form-values="formValues"
         @submit="submit"
-        @updateFormValues="updateFormValues"
+        @update-form-values="updateFormValues"
       />
     </template>
     <template #does-not-have-auth>

@@ -1,7 +1,7 @@
 import './commands';
-import { EventCreateInputWithChannels } from './seedData/events';
-import { DiscussionCreateInputWithChannels } from './seedData/discussions';
-import { LoginInput } from "../support/commandFunctions/loginWithButtonClick";
+import type { EventCreateInputWithChannels } from './seedData/events';
+import type { DiscussionCreateInputWithChannels } from './seedData/discussions';
+import type { LoginInput } from "../support/commandFunctions/loginWithButtonClick";
 /* eslint-disable @typescript-eslint/no-namespace */
 
 declare global {

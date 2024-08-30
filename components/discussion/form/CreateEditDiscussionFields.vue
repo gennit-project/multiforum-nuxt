@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, defineProps } from "vue";
-import { ApolloError } from "@apollo/client/errors";
+import type { ApolloError } from "@apollo/client/errors";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import FormRow from "@/components/forms/FormRow.vue";
 import Form from "@/components/forms/Form.vue";
@@ -118,7 +118,7 @@ onMounted(() => {
                 <ForumPicker
                   :test-id="'channel-input'"
                   :selected-channels="formValues.selectedChannels"
-                  @setSelectedChannels="
+                  @set-selected-channels="
                     $emit('updateFormValues', { selectedChannels: $event })
                   "
                 />
@@ -144,7 +144,7 @@ onMounted(() => {
                 <TagPicker
                   data-testid="tag-input"
                   :selected-tags="formValues.selectedTags"
-                  @setSelectedTags="
+                  @set-selected-tags="
                     $emit('updateFormValues', { selectedTags: $event })
                   "
                 />

@@ -1,11 +1,13 @@
 <script lang="ts">
-import { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/src/__generated__/graphql";
 import BackLink from "@/components/BackLink.vue";
 import { GET_FEEDBACK_ON_COMMENT } from "@/graphQLData/comment/queries";
 import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
-import { computed, defineComponent, watch, ref, Ref } from "vue";
-import { RouteLocationRaw, useRoute } from "vue-router";
+import type { Ref } from "vue";
+import { computed, defineComponent, watch, ref } from "vue";
+import type { RouteLocationRaw} from "vue-router";
+import { useRoute } from "vue-router";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import PageNotFound from "@/components/PageNotFound.vue";

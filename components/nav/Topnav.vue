@@ -26,7 +26,7 @@ const { smAndDown } = useDisplay();
 // Queries
 const { result } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => {
-  let username = result.value?.username;
+  const username = result.value?.username;
   if (username) {
     return username;
   }
@@ -42,7 +42,7 @@ const channelId = computed(() => {
 
 const { result: modNameResult } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
 const modName = computed(() => {
-  let modName = modNameResult.value?.modProfileName;
+  const modName = modNameResult.value?.modProfileName;
   if (modName) {
     return modName;
   }

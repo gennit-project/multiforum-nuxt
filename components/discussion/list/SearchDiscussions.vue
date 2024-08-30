@@ -151,8 +151,8 @@ const handleClickChannel = (uniqueName: string) => {
   >
     <SitewideDiscussionList
       v-if="!channelId"
-      @filterByTag="handleClickTag"
-      @filterByChannel="handleClickChannel"
+      @filter-by-tag="handleClickTag"
+      @filter-by-channel="handleClickChannel"
     >
       <DiscussionFilterBar />
     </SitewideDiscussionList>
@@ -162,8 +162,8 @@ const handleClickChannel = (uniqueName: string) => {
       :search-input="filterValues.searchInput"
       :selected-tags="filterValues.tags"
       :selected-channels="filterValues.channels"
-      @filterByTag="handleClickTag"
-      @filterByChannel="handleClickChannel"
+      @filter-by-tag="handleClickTag"
+      @filter-by-channel="handleClickChannel"
     >
       <DiscussionFilterBar />
     </ChannelDiscussionList>

@@ -1,9 +1,10 @@
 <script lang="ts">
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
-import { Comment, Event } from "@/src/__generated__/graphql";
-import { defineComponent, ref, PropType, computed } from "vue";
+import type { Comment, Event } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
-import { CreateEditCommentFormValues } from "@/types/Comment";
+import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { useRoute } from "vue-router";
@@ -51,11 +52,11 @@ export default defineComponent({
       createCommentDefaultValues,
     );
 
-    // eslint-disable-next-line no-undef
+     
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -63,7 +64,7 @@ export default defineComponent({
     });
 
     const createCommentInput = computed(() => {
-      let input = {
+      const input = {
         isRootComment: true,
         text: createFormValues.value.text || "",
         CommentAuthor: {
@@ -138,7 +139,7 @@ export default defineComponent({
         const existingEventCommentsData =
           readEventCommentsQueryResult?.getEventComments || null;
 
-        let newRootComments: Comment[] = [
+        const newRootComments: Comment[] = [
           newComment,
           ...(existingEventCommentsData?.Comments || []),
         ];
@@ -242,8 +243,8 @@ export default defineComponent({
       :comment-editor-open="commentEditorOpen"
       @open-comment-editor="commentEditorOpen = true"
       @close-comment-editor="commentEditorOpen = false"
-      @handleCreateComment="handleCreateComment"
-      @handleUpdateComment="handleUpdateComment"
+      @handle-create-comment="handleCreateComment"
+      @handle-update-comment="handleUpdateComment"
     />
   </div>
 </template>

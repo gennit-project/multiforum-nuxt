@@ -1,14 +1,17 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
-import { useQuery } from "@vue/apollo-composable";
+import { useQuery , useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import {
   GET_CLOSED_ISSUES_BY_CHANNEL,
   GET_ISSUE,
   GET_ISSUES_BY_CHANNEL,
 } from "@/graphQLData/issue/queries";
-import { CLOSE_ISSUE, REOPEN_ISSUE } from "@/graphQLData/issue/mutations";
-import { Issue } from "@/src/__generated__/graphql";
+import { CLOSE_ISSUE, REOPEN_ISSUE ,
+  ADD_ISSUE_ACTIVITY_FEED_ITEM,
+  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT,
+} from "@/graphQLData/issue/mutations";
+import type { Issue } from "@/src/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import "md-editor-v3/lib/style.css";
@@ -23,17 +26,12 @@ import IssueBadge from "@/components/mod/IssueBadge.vue";
 import TextEditor from "../forms/TextEditor.vue";
 import GenericButton from "../buttons/GenericButton.vue";
 import SaveButton from "../buttons/SaveButton.vue";
-import { CreateEditCommentFormValues } from "@/types/Comment";
+import type { CreateEditCommentFormValues } from "@/types/Comment";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
   GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
-import { useMutation } from "@vue/apollo-composable";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
-import {
-  ADD_ISSUE_ACTIVITY_FEED_ITEM,
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT,
-} from "@/graphQLData/issue/mutations";
 import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
@@ -439,11 +437,11 @@ export default defineComponent({
       },
     });
 
-    // eslint-disable-next-line no-undef
+     
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }

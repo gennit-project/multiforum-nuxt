@@ -6,7 +6,7 @@ import {
   provideApolloClient,
 } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
-import { CreateEditEventFormValues } from "@/types/Event";
+import type { CreateEditEventFormValues } from "@/types/Event";
 import CreateEditEventFields from "./CreateEditEventFields.vue";
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
@@ -16,7 +16,7 @@ import { DateTime } from "luxon";
 import { gql } from "@apollo/client/core";
 import getDefaultEventFormValues from "./defaultEventFormValues";
 import RequireAuth from "../../auth/RequireAuth.vue";
-import {
+import type {
   EventCreateInput,
   EventTagsConnectOrCreateFieldInput,
   Event,
@@ -39,7 +39,7 @@ export default defineComponent({
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -250,7 +250,7 @@ export default defineComponent({
         :form-values="formValues"
         :create-event-loading="createEventLoading"
         @submit="submit"
-        @updateFormValues="updateFormValues"
+        @update-form-values="updateFormValues"
       />
     </template>
     <template #does-not-have-auth>

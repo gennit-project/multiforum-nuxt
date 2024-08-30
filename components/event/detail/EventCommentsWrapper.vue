@@ -6,8 +6,9 @@
 // The purpose of this component is to separate out the event
 // specific logic from the logic that can be reused in the
 // context of an event's comments.
-import { defineComponent, computed, PropType, ref } from "vue";
-import {
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import type {
   Event,
   CommentCreateInput,
   Comment as CommentType,
@@ -17,7 +18,7 @@ import { useRoute } from "vue-router";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { CreateEditCommentFormValues } from "@/types/Comment";
+import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
 import { GET_EVENT } from "@/graphQLData/event/queries";
@@ -73,7 +74,7 @@ export default defineComponent({
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -214,7 +215,7 @@ export default defineComponent({
 
       const existingEventData = readEventQueryResult?.getEvent;
 
-      let existingCommentAggregate =
+      const existingCommentAggregate =
         existingEventData?.CommentsAggregate?.count || 0;
 
       cache.writeQuery({
@@ -244,7 +245,7 @@ export default defineComponent({
 
       const existingEventData = readEventQueryResult?.getEvent;
 
-      let existingCommentAggregate =
+      const existingCommentAggregate =
         existingEventData?.CommentsAggregate?.count || 0;
 
       cache.writeQuery({
@@ -281,9 +282,9 @@ export default defineComponent({
     :enable-feedback="false"
     :original-poster="originalPoster"
     :show-comment-sort-buttons="false"
-    @decrementCommentCount="decrementCommentCount"
-    @incrementCommentCount="incrementCommentCount"
-    @updateCommentSectionQueryResult="updateCommentSectionQueryResult"
-    @updateCreateReplyCommentInput="updateCreateReplyCommentInput"
+    @decrement-comment-count="decrementCommentCount"
+    @increment-comment-count="incrementCommentCount"
+    @update-comment-section-query-result="updateCommentSectionQueryResult"
+    @update-create-reply-comment-input="updateCreateReplyCommentInput"
   />
 </template>

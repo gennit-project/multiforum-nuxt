@@ -340,7 +340,7 @@ const highlightEventOnMap = ({
       const getArrayFromObject = (obj: any) => {
         const ary = [];
 
-        for (let key in obj) {
+        for (const key in obj) {
           ary.push(obj[key]);
         }
 
@@ -483,9 +483,9 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
                 :loaded-event-count="eventResult.events.length"
                 :result-count="eventResult.eventsAggregate?.count"
                 :show-map="true"
-                @filterByTag="filterByTag"
-                @filterByChannel="filterByChannel"
-                @highlightEvent="highlightEvent"
+                @filter-by-tag="filterByTag"
+                @filter-by-channel="filterByChannel"
+                @highlight-event="highlightEvent"
                 @open-preview="openPreview"
                 @unhighlight="unhighlight"
               />
@@ -516,10 +516,10 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
                 :color-locked="colorLocked"
                 :use-mobile-styles="false"
                 :theme="theme"
-                @highlightEvent="highlightEvent"
+                @highlight-event="highlightEvent"
                 @open-preview="openPreview"
-                @lockColors="colorLocked = true"
-                @setMarkerData="setMarkerData"
+                @lock-colors="colorLocked = true"
+                @set-marker-data="setMarkerData"
               />
             </div>
           </div>
@@ -544,10 +544,10 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
           :color-locked="colorLocked"
           :use-mobile-styles="true"
           :theme="theme"
-          @highlightEvent="highlightEvent"
+          @highlight-event="highlightEvent"
           @open-preview="openPreview"
-          @lockColors="colorLocked = true"
-          @setMarkerData="setMarkerData"
+          @lock-colors="colorLocked = true"
+          @set-marker-data="setMarkerData"
         />
       </div>
       <div class="h-1/3 w-full">
@@ -569,9 +569,9 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
             :selected-channels="filterValues.channels"
             :loaded-event-count="eventResult.events.length"
             :result-count="eventResult.eventsAggregate?.count"
-            @filterByTag="filterByTag"
-            @filterByChannel="filterByChannel"
-            @highlightEvent="highlightEvent"
+            @filter-by-tag="filterByTag"
+            @filter-by-channel="filterByChannel"
+            @highlight-event="highlightEvent"
             @open-preview="openPreview"
             @unhighlight="unhighlight"
           />
@@ -582,12 +582,12 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
     <EventPreview
       :top-layer="true"
       :is-open="eventPreviewIsOpen && !multipleEventPreviewIsOpen"
-      @closePreview="closeEventPreview"
+      @close-preview="closeEventPreview"
     />
     <PreviewContainer
       :is-open="multipleEventPreviewIsOpen"
       :header="'Events at this Location'"
-      @closePreview="closeMultipleEventPreview"
+      @close-preview="closeMultipleEventPreview"
     >
       <EventList
         v-if="selectedEvents"
@@ -597,7 +597,7 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
         :channel-id="channelId"
         :highlighted-event-id="highlightedEventId"
         :show-map="true"
-        @highlightEvent="highlightEvent"
+        @highlight-event="highlightEvent"
         @open-preview="openPreview"
       />
       <div class="flex flex-shrink-0 justify-end px-4 py-4">
@@ -606,7 +606,7 @@ const openPreview = (event: EventData, openedFromMap: boolean | false) => {
       <PreviewContainer
         :is-open="multipleEventPreviewIsOpen && eventPreviewIsOpen"
         :top-layer="true"
-        @closePreview="closeEventPreview"
+        @close-preview="closeEventPreview"
       >
         <router-view />
       </PreviewContainer>

@@ -1,13 +1,14 @@
 <script lang="ts">
-import { defineComponent, ref, PropType, computed } from "vue";
+import type { PropType} from "vue";
+import { defineComponent, ref, computed } from "vue";
 import { GET_LOCAL_USERNAME, GET_USER } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
-import { CreateEditCommentFormValues } from "@/types/Comment";
-import { ApolloError } from "@apollo/client/errors";
+import type { CreateEditCommentFormValues } from "@/types/Comment";
+import type { ApolloError } from "@apollo/client/errors";
 import ErrorBanner from "../ErrorBanner.vue";
 
 export default defineComponent({
@@ -45,7 +46,7 @@ export default defineComponent({
     });
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -53,7 +54,7 @@ export default defineComponent({
     });
 
     const profilePicURL = computed(() => {
-      let profilePicURL = getUserResult.value?.users[0]?.profilePicURL;
+      const profilePicURL = getUserResult.value?.users[0]?.profilePicURL;
       if (profilePicURL) {
         return profilePicURL;
       }

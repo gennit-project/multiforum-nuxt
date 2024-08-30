@@ -12,8 +12,8 @@ export default defineComponent({
   setup() {
     const route = useRoute();
 
-    let defaultSelectedRoute = "Discussions";
-    let selectedSearchType = ref(defaultSelectedRoute);
+    const defaultSelectedRoute = "Discussions";
+    const selectedSearchType = ref(defaultSelectedRoute);
 
     const updateRoute = (path) => {
       if (path.includes("map")) {

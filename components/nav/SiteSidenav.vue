@@ -86,7 +86,7 @@ export default defineComponent({
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -98,7 +98,7 @@ export default defineComponent({
     });
 
     const user = computed(() => {
-      let user = getUserResult.value?.users[0];
+      const user = getUserResult.value?.users[0];
       if (user) {
         return user;
       }
@@ -106,7 +106,7 @@ export default defineComponent({
     });
 
     const profilePicURL = computed(() => {
-      let profilePicURL = user.value?.profilePicURL;
+      const profilePicURL = user.value?.profilePicURL;
       if (profilePicURL) {
         return profilePicURL;
       }

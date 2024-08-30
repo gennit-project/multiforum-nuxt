@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import type { PropType } from "vue";
+import { defineComponent, computed } from "vue";
 import DiscussionChannelLink from "./DiscussionChannelLink.vue";
 import { useRoute } from "vue-router";
-import { DiscussionChannel } from "@/src/__generated__/graphql";
+import type { DiscussionChannel } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "DiscussionChannelLinks",

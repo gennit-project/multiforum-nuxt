@@ -1,7 +1,8 @@
 <script lang="ts">
 import { useRouter } from "vue-router";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import { defineComponent, PropType } from "vue";
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import SortIcon from "@/components/icons/SortIcon.vue";
 

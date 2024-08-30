@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
-import { DiscussionData } from "../../types/Discussion";
+import type { PropType} from "vue";
+import { defineComponent, computed } from "vue";
+import type { DiscussionData } from "../../types/Discussion";
 import { relativeTime } from "../../dateTimeUtils";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/Tag.vue";

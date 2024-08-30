@@ -33,7 +33,7 @@ export default defineComponent({
     const { smAndDown } = useDisplay();
 
     const classes = computed(() => {
-      let classArray = [];
+      const classArray = [];
       if (props.isActive) {
         classArray.push(`border-black dark:border-blue-500 dark:text-gray-100`);
 

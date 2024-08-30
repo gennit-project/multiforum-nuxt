@@ -1,8 +1,9 @@
-import { TagData } from "@/types/tagTypes";
+import type { TagData } from "@/types/tagTypes";
 import { gql } from "@apollo/client/core";
 import config from "@/config";
-import { DateTime, Interval, Duration } from 'luxon';
-import { EventData } from "@/types/Event";
+import type { Duration } from 'luxon';
+import { DateTime, Interval } from 'luxon';
+import type { EventData } from "@/types/Event";
 
 const getTimePieces = (timeObj: DateTime) => {
   const { year, month, day, weekday, hour } = timeObj;

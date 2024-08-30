@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, defineProps, defineEmits } from "vue";
-import { ApolloError } from "@apollo/client/errors";
+import type { ApolloError } from "@apollo/client/errors";
 import Form from "~/components/forms/Form.vue";
 import TagPicker from "~/components/forms/TagPicker.vue";
 import TextInput from "~/components/forms/TextInput.vue";
@@ -215,7 +215,7 @@ const deleteRule = (index: number) => {
               <TagPicker
                 data-testid="tag-input"
                 :selected-tags="formValues.selectedTags"
-                @setSelectedTags="$emit('updateFormValues', { selectedTags: $event })"
+                @set-selected-tags="$emit('updateFormValues', { selectedTags: $event })"
               />
             </template>
           </FormRow>
@@ -260,7 +260,7 @@ const deleteRule = (index: number) => {
                 class="w-full shadow-sm"
                 :src="formValues.channelBannerURL"
                 :alt="formValues.uniqueName"
-              />
+              >
               <AddImage
                 key="channel-banner-url"
                 :field-name="'channelBannerURL'"

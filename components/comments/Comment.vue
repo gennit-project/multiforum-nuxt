@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, ref, computed } from "vue";
-import { CreateReplyInputData } from "@/types/Comment";
+import type { PropType} from "vue";
+import { defineComponent, ref, computed } from "vue";
+import type { CreateReplyInputData } from "@/types/Comment";
 import "md-editor-v3/lib/style.css";
 import { useQuery } from "@vue/apollo-composable";
 import TextEditor from "../forms/TextEditor.vue";
@@ -8,16 +9,16 @@ import ChildComments from "./ChildComments.vue";
 import CommentButtons from "./CommentButtons.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { getLinksInText } from "../utils";
-import { ApolloError, gql } from "@apollo/client/core";
+import type { ApolloError} from "@apollo/client/core";
+import { gql } from "@apollo/client/core";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRoute, useRouter } from "vue-router";
-import { Comment } from "@/src/__generated__/graphql";
-import MenuButton from "@/components/MenuButton.vue";
+import type { Comment } from "@/src/__generated__/graphql";
+import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "../icons/EllipsisHorizontal.vue";
 import RightArrowIcon from "../icons/RightArrowIcon.vue";
 import useClipboard from "vue-clipboard3";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import CommentHeader from "./CommentHeader.vue";
 
 const MAX_COMMENT_DEPTH = 5;
@@ -161,7 +162,7 @@ export default defineComponent({
       return themeResult.value.theme;
     });
 
-    let replyCount = computed(() => {
+    const replyCount = computed(() => {
       if (props.commentData.ChildCommentsAggregate) {
         return props.commentData.ChildCommentsAggregate.count;
       }
@@ -479,21 +480,21 @@ export default defineComponent({
                     :show-replies="showReplies"
                     :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
                     :comment-in-process="commentInProcess && !editCommentError"
-                    @startCommentSave="$emit('startCommentSave')"
-                    @clickEditComment="handleEdit"
-                    @createComment="createComment"
-                    @openReplyEditor="$emit('openReplyEditor', commentData.id)"
-                    @hideReplyEditor="$emit('hideReplyEditor')"
-                    @openEditCommentEditor="
+                    @start-comment-save="$emit('startCommentSave')"
+                    @click-edit-comment="handleEdit"
+                    @create-comment="createComment"
+                    @open-reply-editor="$emit('openReplyEditor', commentData.id)"
+                    @hide-reply-editor="$emit('hideReplyEditor')"
+                    @open-edit-comment-editor="
                       $emit('openEditCommentEditor', commentData.id)
                     "
-                    @hideEditCommentEditor="$emit('hideEditCommentEditor')"
-                    @hideReplies="showReplies = false"
-                    @openModProfile="$emit('openModProfile')"
-                    @saveEdit="$emit('saveEdit')"
-                    @showReplies="showReplies = true"
-                    @updateNewComment="updateNewComment"
-                    @clickFeedback="
+                    @hide-edit-comment-editor="$emit('hideEditCommentEditor')"
+                    @hide-replies="showReplies = false"
+                    @open-mod-profile="$emit('openModProfile')"
+                    @save-edit="$emit('saveEdit')"
+                    @show-replies="showReplies = true"
+                    @update-new-comment="updateNewComment"
+                    @click-feedback="
                       () => {
                         // This event is emitted when the user clicks a menu item from the thumbs-down.
                         // Passing the commentData in at the template instead of the setup
@@ -508,10 +509,10 @@ export default defineComponent({
                         });
                       }
                     "
-                    @handleViewFeedback="
+                    @handle-view-feedback="
                       $emit('handleViewFeedback', commentData.id)
                     "
-                    @clickUndoFeedback="
+                    @click-undo-feedback="
                       () => {
                         // See comment on clickFeedback. The same principle applies.
                         handleUndoFeedback({
@@ -520,7 +521,7 @@ export default defineComponent({
                         });
                       }
                     "
-                    @clickEditFeedback="
+                    @click-edit-feedback="
                       () => {
                         // See comment on clickFeedback. The same principle applies.
                         handleEditFeedback({
@@ -533,10 +534,10 @@ export default defineComponent({
                       v-if="commentMenuItems.length > 0"
                       id="commentMenu"
                       :items="commentMenuItems"
-                      @copyLink="copyLink"
-                      @handleEdit="() => handleEdit(commentData)"
-                      @clickReport="handleReport"
-                      @clickFeedback="
+                      @copy-link="copyLink"
+                      @handle-edit="() => handleEdit(commentData)"
+                      @click-report="handleReport"
+                      @click-feedback="
                         () => {
                           // This event is emitted when the user clicks give feedback in the comment menu.
                           // Passing the commentData in at the template instead of the setup
@@ -550,16 +551,16 @@ export default defineComponent({
                           });
                         }
                       "
-                      @clickUndoFeedback="
+                      @click-undo-feedback="
                         () => {
                           // See comment on clickFeedback. The same principle applies.
                           handleUndoFeedback({ commentData, parentCommentId });
                         }
                       "
-                      @handleViewFeedback="
+                      @handle-view-feedback="
                         $emit('handleViewFeedback', commentData.id)
                       "
-                      @handleDelete="
+                      @handle-delete="
                         () => {
                           const deleteCommentInput = {
                             commentId: commentData.id,
@@ -569,7 +570,7 @@ export default defineComponent({
                           handleDelete(deleteCommentInput);
                         }
                       "
-                      @clickEditFeedback="
+                      @click-edit-feedback="
                         () => {
                           // See comment on clickFeedback. The same principle applies.
                           handleEditFeedback({
@@ -627,29 +628,29 @@ export default defineComponent({
                 :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
                 :mod-profile-name="modProfileName"
                 :original-poster="originalPoster"
-                @startCommentSave="$emit('startCommentSave')"
-                @clickEditComment="$emit('clickEditComment', $event)"
-                @deleteComment="handleDelete"
-                @createComment="$emit('createComment')"
-                @saveEdit="$emit('saveEdit')"
-                @updateCreateReplyCommentInput="updateNewComment"
-                @updateEditCommentInput="updateExistingComment"
-                @showCopiedLinkNotification="
+                @start-comment-save="$emit('startCommentSave')"
+                @click-edit-comment="$emit('clickEditComment', $event)"
+                @delete-comment="handleDelete"
+                @create-comment="$emit('createComment')"
+                @save-edit="$emit('saveEdit')"
+                @update-create-reply-comment-input="updateNewComment"
+                @update-edit-comment-input="updateExistingComment"
+                @show-copied-link-notification="
                   $emit('showCopiedLinkNotification', $event)
                 "
-                @openModProfile="$emit('openModProfile')"
-                @scrollToTop="$emit('scrollToTop')"
-                @openReplyEditor="
+                @open-mod-profile="$emit('openModProfile')"
+                @scroll-to-top="$emit('scrollToTop')"
+                @open-reply-editor="
                   ($event: string) => $emit('openReplyEditor', $event)
                 "
-                @hideReplyEditor="$emit('hideReplyEditor')"
-                @openEditCommentEditor="
+                @hide-reply-editor="$emit('hideReplyEditor')"
+                @open-edit-comment-editor="
                   $emit('openEditCommentEditor', childComment.id)
                 "
-                @hideEditCommentEditor="$emit('hideEditCommentEditor')"
-                @clickFeedback="handleFeedback"
-                @clickUndoFeedback="handleUndoFeedback"
-                @handleViewFeedback="
+                @hide-edit-comment-editor="$emit('hideEditCommentEditor')"
+                @click-feedback="handleFeedback"
+                @click-undo-feedback="handleUndoFeedback"
+                @handle-view-feedback="
                   (commentId: string) => {
                     $emit('handleViewFeedback', commentId);
                   }

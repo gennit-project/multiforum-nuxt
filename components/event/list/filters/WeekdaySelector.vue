@@ -1,10 +1,11 @@
 <script lang="ts">
-import { defineComponent, ref, Ref, PropType, computed } from "vue";
+import type { Ref, PropType} from "vue";
+import { defineComponent, ref, computed } from "vue";
 import {
   weekdays as weekdayData,
   defaultSelectedWeekdays,
 } from "@/components/event/list/filters/eventSearchOptions";
-import { SelectedWeekdays, WeekdayData } from "@/types/Event";
+import type { SelectedWeekdays, WeekdayData } from "@/types/Event";
 import ResetButton from "@/components/ResetButton.vue";
 
 export default defineComponent({
@@ -92,7 +93,7 @@ export default defineComponent({
           class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-blue-500 dark:bg-gray-300"
           :checked="workingCopyOfSelectedWeekdays[weekday.number] === true"
           @input="() => toggleSelectWeekday(weekday)"
-        />
+        >
         <span>{{ weekday.shortName }}</span>
       </label>
     </div>

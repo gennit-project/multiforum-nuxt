@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import type { PropType } from "vue";
+import { defineComponent, computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/Tag.vue";
@@ -7,7 +8,7 @@ import "md-editor-v3/lib/style.css";
 import { useDisplay } from "vuetify";
 import gql from "graphql-tag";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
-import { Channel } from "@/src/__generated__/graphql";
+import type { Channel } from "@/src/__generated__/graphql";
 import ChannelRules from "./Rules.vue";
 import SidebarEventList from "./SidebarEventList.vue";
 import MarkdownPreview from '@/components/MarkdownPreview.vue'

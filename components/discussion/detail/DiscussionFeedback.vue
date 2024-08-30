@@ -1,10 +1,12 @@
 <script lang="ts">
-import { Discussion } from "@/src/__generated__/graphql";
+import type { Discussion } from "@/src/__generated__/graphql";
 import BackLink from "@/components/BackLink.vue";
 import { GET_DISCUSSION_FEEDBACK } from "@/graphQLData/discussion/queries";
 import { useQuery, useMutation } from "@vue/apollo-composable";
-import { computed, defineComponent, ref, watch, Ref } from "vue";
-import { RouteLocationRaw, useRoute } from "vue-router";
+import type { Ref } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
+import type { RouteLocationRaw} from "vue-router";
+import { useRoute } from "vue-router";
 import DiscussionBody from "./DiscussionBody.vue";
 import DiscussionHeader from "./DiscussionHeader.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";

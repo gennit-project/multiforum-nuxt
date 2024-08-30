@@ -28,7 +28,7 @@ export default defineComponent({
     });
 
     const user = computed(() => {
-      let user = getUserResult.value?.users[0];
+      const user = getUserResult.value?.users[0];
       if (user) {
         return user;
       }
@@ -42,7 +42,7 @@ export default defineComponent({
       return "";
     });
 
-    let menuItems = [
+    const menuItems = [
       {
         label: "My Profile",
         value: `/u/${props.username}`,

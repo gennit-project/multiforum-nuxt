@@ -226,9 +226,9 @@ const handleCreateModProfileClick = async () => {
             :search-input="searchInput"
             :selected-tags="selectedTags"
             :selected-channels="selectedChannels"
-            @openModProfile="showModProfileModal = true"
-            @filterByTag="filterByTag"
-            @filterByChannel="filterByChannel"
+            @open-mod-profile="showModProfileModal = true"
+            @filter-by-tag="filterByTag"
+            @filter-by-channel="filterByChannel"
           />
         </ul>
         <div
@@ -246,7 +246,7 @@ const handleCreateModProfileClick = async () => {
                 discussionChannelResult.getDiscussionsInChannel.discussionChannels
                   .length
             "
-            @loadMore="loadMore"
+            @load-more="loadMore"
           />
         </div>
       </div>
@@ -257,7 +257,7 @@ const handleCreateModProfileClick = async () => {
       :open="showModProfileModal"
       :primary-button-text="'Yes, create a mod profile'"
       @close="showModProfileModal = false"
-      @primaryButtonClick="handleCreateModProfileClick"
+      @primary-button-click="handleCreateModProfileClick"
     />
   </div>
 </template>

@@ -1,6 +1,7 @@
 <script lang="ts">
-import { PropType, computed, defineComponent } from "vue";
-import { Comment } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { computed, defineComponent } from "vue";
+import type { Comment } from "@/src/__generated__/graphql";
 import Votes from "./Votes.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import {
@@ -149,13 +150,13 @@ export default defineComponent({
       :show-downvote="showDownvote"
       :show-upvote="showUpvote"
       @upvote="upvoteComment"
-      @undoUpvote="undoUpvoteComment"
-      @undoDownvote="$emit('clickUndoFeedback')"
-      @openModProfile="$emit('openModProfile')"
-      @editFeedback="$emit('clickEditFeedback')"
-      @undoFeedback="$emit('clickUndoFeedback')"
-      @viewFeedback="$emit('viewFeedback')"
-      @giveFeedback="$emit('clickFeedback')"
+      @undo-upvote="undoUpvoteComment"
+      @undo-downvote="$emit('clickUndoFeedback')"
+      @open-mod-profile="$emit('openModProfile')"
+      @edit-feedback="$emit('clickEditFeedback')"
+      @undo-feedback="$emit('clickUndoFeedback')"
+      @view-feedback="$emit('viewFeedback')"
+      @give-feedback="$emit('clickFeedback')"
     />
   </div>
 </template>

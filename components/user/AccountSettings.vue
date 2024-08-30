@@ -6,14 +6,13 @@ import {
   useMutation,
   provideApolloClient,
 } from "@vue/apollo-composable";
-import { GET_USER } from "@/graphQLData/user/queries";
+import { GET_USER , GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { UPDATE_USER } from "@/graphQLData/user/mutations";
 import { apolloClient } from "@/main";
 import EditAccountSettingsFields from "./EditAccountSettingsFields.vue";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { UserUpdateInput } from "@/src/__generated__/graphql";
-import { EditAccountSettingsFormValues } from "@/types/User";
+import type { UserUpdateInput } from "@/src/__generated__/graphql";
+import type { EditAccountSettingsFormValues } from "@/types/User";
 import Notification from "../Notification.vue";
 
 export default defineComponent({
@@ -32,7 +31,7 @@ export default defineComponent({
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -185,12 +184,12 @@ export default defineComponent({
         :update-user-error="updateUserError"
         :form-values="formValues"
         @submit="submit"
-        @updateFormValues="updateFormValues"
+        @update-form-values="updateFormValues"
       />
       <Notification
         v-if="showSavedChangesNotification"
         :title="'Your changes have been saved.'"
-        @closeNotification="showSavedChangesNotification = false"
+        @close-notification="showSavedChangesNotification = false"
       />
     </template>
     <template #does-not-have-auth>

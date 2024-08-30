@@ -1,6 +1,7 @@
 <script lang="ts">
-import { SelectOptionData } from "@/types/GenericFormTypes";
-import { defineComponent, PropType, nextTick, ref, onMounted } from "vue";
+import type { SelectOptionData } from "@/types/GenericFormTypes";
+import type { PropType} from "vue";
+import { defineComponent, nextTick, ref, onMounted } from "vue";
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import LinkIcon from "@/components/icons/LinkIcon.vue";

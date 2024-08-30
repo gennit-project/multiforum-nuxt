@@ -27,6 +27,6 @@ export default defineComponent({
       >Back</span
     >
     <h2 class="text-md font-bold">{{ title }}</h2>
-    <slot></slot>
+    <slot/>
   </div>
 </template>

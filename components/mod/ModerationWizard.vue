@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
-import { Issue } from "@/src/__generated__/graphql";
+import type { Issue } from "@/src/__generated__/graphql";
 import { DateTime } from "luxon";
 import { useRoute } from "vue-router";
 import GenericButton from "../buttons/GenericButton.vue";
@@ -196,7 +196,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.SelectRules.id"
         :title="stepNames.SelectRules.title"
-        @clickBack="activeStep = stepNames.ViolatesRules.id"
+        @click-back="activeStep = stepNames.ViolatesRules.id"
       >
         <textarea
           class="h-24 w-full rounded-lg border border-gray-300 p-2 text-black"
@@ -216,7 +216,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.SelectAction.id"
         :title="stepNames.SelectAction.title"
-        @clickBack="activeStep = stepNames.SelectRules.id"
+        @click-back="activeStep = stepNames.SelectRules.id"
       >
         <fieldset class="mt-4">
           <legend class="sr-only">
@@ -268,7 +268,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.RequestChangeMessage.id"
         :title="stepNames.RequestChangeMessage.title"
-        @clickBack="activeStep = stepNames.SelectAction.id"
+        @click-back="activeStep = stepNames.SelectAction.id"
       >
         <textarea
           class="w-full rounded-lg border border-gray-300 p-2 text-black"
@@ -289,7 +289,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.SuspensionNeeded.id"
         :title="stepNames.SuspensionNeeded.title"
-        @clickBack="activeStep = stepNames.SelectAction.id"
+        @click-back="activeStep = stepNames.SelectAction.id"
       >
         <div class="flex justify-center gap-2">
           <GenericButton
@@ -308,7 +308,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.SuspensionLength.id"
         :title="stepNames.SuspensionLength.title"
-        @clickBack="activeStep = stepNames.SuspensionNeeded.id"
+        @click-back="activeStep = stepNames.SuspensionNeeded.id"
       >
         <fieldset class="mt-4">
           <legend class="sr-only">
@@ -349,7 +349,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.SuspensionMessage.id"
         :title="stepNames.SuspensionMessage.title"
-        @clickBack="activeStep = stepNames.SuspensionLength.id"
+        @click-back="activeStep = stepNames.SuspensionLength.id"
       >
         <textarea
           class="w-full rounded-lg border border-gray-300 p-2 text-black"
@@ -369,7 +369,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.CloseIssue.id"
         :title="stepNames.CloseIssue.title"
-        @clickBack="activeStep = stepNames.SelectAction.id"
+        @click-back="activeStep = stepNames.SelectAction.id"
       >
         <div class="flex justify-center gap-2">
           <GenericButton
@@ -393,7 +393,7 @@ export default defineComponent({
       <ModerationStep
         v-if="activeStep === stepNames.CloseIssueComment.id"
         :title="stepNames.CloseIssueComment.title"
-        @clickBack="activeStep = stepNames.CloseIssue.id"
+        @click-back="activeStep = stepNames.CloseIssue.id"
       >
         <textarea
           class="w-full rounded-lg border border-gray-300 p-2 text-black"

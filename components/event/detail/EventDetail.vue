@@ -4,9 +4,8 @@ import Tag from "@/components/Tag.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";
 import { GET_EVENT } from "@/graphQLData/event/queries";
-import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
-import { GET_EVENT_ROOT_COMMENT_AGGREGATE } from "@/graphQLData/comment/queries";
-import { Event, Comment, EventChannel } from "@/src/__generated__/graphql";
+import { GET_EVENT_COMMENTS , GET_EVENT_ROOT_COMMENT_AGGREGATE } from "@/graphQLData/comment/queries";
+import type { Event, Comment, EventChannel } from "@/src/__generated__/graphql";
 import { relativeTime } from "../../../dateTimeUtils";
 import { DateTime } from "luxon";
 import ErrorBanner from "../../ErrorBanner.vue";
@@ -306,10 +305,10 @@ export default defineComponent({
     },
     addToGoogleCalendar() {
       const googleCalendarDateFormat = "yyyyMMdd'T'HHmmss";
-      let start = DateTime.fromISO(this.event.startTime).toFormat(
+      const start = DateTime.fromISO(this.event.startTime).toFormat(
         googleCalendarDateFormat,
       );
-      let end = DateTime.fromISO(this.event.endTime).toFormat(
+      const end = DateTime.fromISO(this.event.endTime).toFormat(
         googleCalendarDateFormat,
       );
 
@@ -480,7 +479,7 @@ export default defineComponent({
                   :reached-end-of-results="reachedEndOfResults"
                   :previous-offset="previousOffset"
                   :original-poster="originalPoster"
-                  @loadMore="loadMore"
+                  @load-more="loadMore"
                 />
               </div>
               <EventChannelLinks

@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { Channel } from "@/src/__generated__/graphql";
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
+import type { Channel } from "@/src/__generated__/graphql";
 import ChannelListItem from "@/components/channel/ChannelListItem.vue";
 import LoadMore from "../LoadMore.vue";
 
@@ -55,14 +56,14 @@ export default defineComponent({
         :channel="channel"
         :search-input="searchInput"
         :selected-tags="selectedTags"
-        @filterByTag="filterByTag"
+        @filter-by-tag="filterByTag"
       />
     </div>
     <div class="m-10 grid justify-items-stretch">
       <LoadMore
         class="justify-self-center font-normal"
         :reached-end-of-results="resultCount === channels.length"
-        @loadMore="$emit('loadMore')"
+        @load-more="$emit('loadMore')"
       />
     </div>
   </div>

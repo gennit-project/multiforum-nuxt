@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent, computed, PropType } from "vue";
+import type { PropType } from "vue";
+import { defineComponent, computed } from "vue";
 import EventChannelLink from "@/components/event/detail/EventChannelLink.vue";
 import { useRoute } from "vue-router";
-import { EventChannel } from "@/src/__generated__/graphql";
+import type { EventChannel } from "@/src/__generated__/graphql";
 
 export default defineComponent({
   name: "EventChannelLinks",

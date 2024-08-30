@@ -1,8 +1,9 @@
 <script lang="ts">
-import { defineComponent, PropType, computed, ref, Ref } from "vue";
+import type { PropType, Ref } from "vue";
+import { defineComponent, computed, ref } from "vue";
 import { GET_CHANNEL_NAMES } from "@/graphQLData/channel/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { Channel } from "@/src/__generated__/graphql";
+import type { Channel } from "@/src/__generated__/graphql";
 import SearchBar from "@/components/SearchBar.vue";
 
 export default defineComponent({
@@ -116,7 +117,7 @@ export default defineComponent({
       :right-side-is-rounded="false"
       :left-side-is-rounded="false"
       @keydown.enter.prevent
-      @updateSearchInput="updateSearchResult"
+      @update-search-input="updateSearchResult"
     />
     <div v-if="channelsLoading">
       Loading...

@@ -1,4 +1,5 @@
-import { InMemoryCache, ReactiveVar, makeVar } from "@apollo/client/core";
+import type { ReactiveVar} from "@apollo/client/core";
+import { InMemoryCache, makeVar } from "@apollo/client/core";
 
 export const usernameVar: ReactiveVar<string> = makeVar<string>("");
 export const modProfileIdVar: ReactiveVar<string> = makeVar<string>("");

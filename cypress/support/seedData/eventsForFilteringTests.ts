@@ -1,4 +1,4 @@
-import { EventCreateInput } from "../../../src/__generated__/graphql";
+import type { EventCreateInput } from "../../../src/__generated__/graphql";
 
 export type EventCreateInputWithChannels = {
   eventCreateInput: EventCreateInput;

@@ -1,7 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, computed, ref } from "vue";
-import { Discussion } from "@/src/__generated__/graphql";
-import { DiscussionChannel } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import type { Discussion , DiscussionChannel } from "@/src/__generated__/graphql";
 import { useRoute, useRouter } from "vue-router";
 import VoteButtons from "./VoteButtons.vue";
 import {
@@ -280,12 +280,12 @@ export default defineComponent({
     :upvote-loading="
       upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading
     "
-    @viewFeedback="handleClickViewFeedback"
-    @giveFeedback="handleClickGiveFeedback"
-    @editFeedback="handleClickEditFeedback"
-    @undoFeedback="handleClickUndoFeedback"
-    @clickUp="handleClickUp"
-    @openModProfile="showModProfileModal = true"
+    @view-feedback="handleClickViewFeedback"
+    @give-feedback="handleClickGiveFeedback"
+    @edit-feedback="handleClickEditFeedback"
+    @undo-feedback="handleClickUndoFeedback"
+    @click-up="handleClickUp"
+    @open-mod-profile="showModProfileModal = true"
   />
   <WarningModal
     :title="'Create Mod Profile'"
@@ -293,12 +293,12 @@ export default defineComponent({
     :open="showModProfileModal"
     :primary-button-text="'Yes, create a mod profile'"
     @close="showModProfileModal = false"
-    @primaryButtonClick="handleCreateModProfileClick"
+    @primary-button-click="handleCreateModProfileClick"
   />
   <GenericFeedbackFormModal
     :open="showFeedbackFormModal"
     @close="showFeedbackFormModal = false"
-    @primaryButtonClick="handleSubmitFeedback"
+    @primary-button-click="handleSubmitFeedback"
   />
 </template>
 <style>

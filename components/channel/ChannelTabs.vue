@@ -7,7 +7,7 @@ import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import { Channel } from "@/src/__generated__/graphql";
+import type { Channel } from "@/src/__generated__/graphql";
 import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 
@@ -74,7 +74,7 @@ export default defineComponent({
     });
 
     const tabRoutes = computed(() => {
-      let routes: TabRoutes = {
+      const routes: TabRoutes = {
         discussions: `/channels/c/${channelId.value}/discussions`,
         events: `/channels/c/${channelId.value}/events/search`,
         about: `/channels/c/${channelId.value}/about`,

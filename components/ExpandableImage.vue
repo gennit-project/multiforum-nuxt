@@ -1,7 +1,6 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent , ref } from "vue";
 import { setGallery } from "vue-preview-imgs";
-import { ref } from "vue";
 
 type GalleryItem = {
   href: string;

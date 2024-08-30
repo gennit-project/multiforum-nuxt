@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { ModerationAction } from "@/src/__generated__/graphql";
+import type { ModerationAction } from "@/src/__generated__/graphql";
 import DiscussionIcon from "../icons/DiscussionIcon.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
 

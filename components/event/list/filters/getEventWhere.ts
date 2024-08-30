@@ -1,9 +1,8 @@
 import LocationFilterTypes from "./locationFilterTypes";
-import { SearchEventValues } from "@/types/Event";
-import { hourRangesObject } from "./eventSearchOptions";
-import { timeShortcutValues } from "./eventSearchOptions";
+import type { SearchEventValues } from "@/types/Event";
+import { hourRangesObject , timeShortcutValues } from "./eventSearchOptions";
 import { DateTime } from "luxon";
-import { EventWhere } from "@/src/__generated__/graphql";
+import type { EventWhere } from "@/src/__generated__/graphql";
 const now = DateTime.now();
 
 const getStartOfThisWeekend = () => {

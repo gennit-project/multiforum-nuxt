@@ -147,8 +147,8 @@ watch(route.query, () => {
           :search-input="filterValues.searchInput"
           :selected-tags="filterValues.tags"
           :selected-channels="filterValues.channels"
-          @filterByTag="filterByTag"
-          @filterByChannel="filterByChannel"
+          @filter-by-tag="filterByTag"
+          @filter-by-channel="filterByChannel"
         />
       </ul>
       <div v-if="discussions.length > 0">
@@ -156,7 +156,7 @@ watch(route.query, () => {
           class="ml-4 justify-self-center"
           :loading="!data && !error"
           :reached-end-of-results="aggregateDiscussionCount === discussions.length"
-          @loadMore="loadMore"
+          @load-more="loadMore"
         />
       </div>
     </div>

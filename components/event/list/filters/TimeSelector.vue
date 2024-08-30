@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref, Ref, PropType } from "vue";
+import type { Ref, PropType } from "vue";
+import { defineComponent, ref } from "vue";
 import {
   weekdays as weekdayData,
   hourRangesData,
@@ -8,7 +9,7 @@ import {
   defaultSelectedWeeklyHourRanges,
   createDefaultSelectedHourRanges,
 } from "@/components/event/list/filters/eventSearchOptions";
-import {
+import type {
   SelectedHourRanges,
   WeekdayData,
   HourRangeData,
@@ -69,7 +70,7 @@ export default defineComponent({
     },
     flattenHourRanges() {
       const flattenedTimeFilters = [];
-      for (let timeSlot in this.workingCopyOfSelectedHourRanges) {
+      for (const timeSlot in this.workingCopyOfSelectedHourRanges) {
         if (this.workingCopyOfSelectedHourRanges[timeSlot]) {
           flattenedTimeFilters.push({
             startTimeHourOfDay: timeSlot,
@@ -86,7 +87,7 @@ export default defineComponent({
     removeTimeRange(timeRange: HourRangeData) {
       const label = timeRange["12-hour-label"];
       this.workingCopyOfSelectedHourRanges[label] = false;
-      for (let weekday in this.workingCopyOfTimeSlots) {
+      for (const weekday in this.workingCopyOfTimeSlots) {
         // Leave the input enabled if it was locked in place
         // by highlighting the same time slot for the whole week.
         if (!(this.workingCopyOfSelectedWeekdays[weekday] === true)) {
@@ -99,7 +100,7 @@ export default defineComponent({
     addTimeRange(timeRange: HourRangeData) {
       const label = timeRange["12-hour-label"];
       this.workingCopyOfSelectedHourRanges[label] = true;
-      for (let weekday in this.workingCopyOfTimeSlots) {
+      for (const weekday in this.workingCopyOfTimeSlots) {
         this.workingCopyOfTimeSlots[weekday][label] = true;
       }
       // Don't need to emit an event to update params because it is

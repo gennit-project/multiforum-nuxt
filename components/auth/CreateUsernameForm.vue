@@ -116,7 +116,7 @@ nextTick(() => {
           ]"
           class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
           @update:model-value="updateUsername"
-        />
+        >
         <div v-if="usernameIsTaken || usernameIsInvalid" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
           <ExclamationIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
         </div>

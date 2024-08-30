@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, computed, ref, Ref } from "vue";
+import type { Ref } from "vue";
+import { defineComponent, computed, ref } from "vue";
 // import TagPicker from "@/components/TagPicker.vue";
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
 import FilterChip from "@/components/FilterChip.vue";
@@ -7,7 +8,7 @@ import ChannelIcon from "@/components/icons/ChannelIcon.vue";
 import TagIcon from "@/components/icons/TagIcon.vue";
 import { getTagLabel, getChannelLabel } from "@/utils";
 import SearchBar from "../../SearchBar.vue";
-import { SearchDiscussionValues } from "@/types/Discussion";
+import type { SearchDiscussionValues } from "@/types/Discussion";
 import { useRoute } from "vue-router";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import SortButtons from "@/components/SortButtons.vue";
@@ -168,7 +169,7 @@ export default defineComponent({
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search...'"
         :small="true"
-        @updateSearchInput="updateSearchInput"
+        @update-search-input="updateSearchInput"
       />
     </div>
     <div class="mb-4 mt-3 flex items-center justify-end">
@@ -179,7 +180,7 @@ export default defineComponent({
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search...'"
         :small="true"
-        @updateSearchInput="updateSearchInput"
+        @update-search-input="updateSearchInput"
       />
       <FilterChip
         v-if="!channelId"
@@ -195,7 +196,7 @@ export default defineComponent({
           <div class="relative w-96">
             <SearchableForumList
               :selected-channels="filterValues.channels"
-              @toggleSelection="toggleSelectedChannel"
+              @toggle-selection="toggleSelectedChannel"
             />
           </div>
         </template>
@@ -213,7 +214,7 @@ export default defineComponent({
           <div class="relative w-96">
             <SearchableTagList
               :selected-tags="filterValues.tags"
-              @toggleSelection="toggleSelectedTag"
+              @toggle-selection="toggleSelectedTag"
             />
           </div>
         </template>

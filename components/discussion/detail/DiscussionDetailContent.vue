@@ -8,7 +8,7 @@ import {
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from "@/graphQLData/comment/queries";
 import { relativeTime } from "../../../dateTimeUtils";
-import { Discussion } from "@/src/__generated__/graphql";
+import type { Discussion , DiscussionChannel , Comment } from "@/src/__generated__/graphql";
 import ErrorBanner from "../../ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import DiscussionBody from "./DiscussionBody.vue";
@@ -18,9 +18,7 @@ import DiscussionChannelLinks from "./DiscussionChannelLinks.vue";
 import DiscussionRootCommentFormWrapper from "@/components/discussion/form/DiscussionRootCommentFormWrapper.vue";
 import DiscussionVotes from "../vote/DiscussionVotes.vue";
 import "md-editor-v3/lib/style.css";
-import { DiscussionChannel } from "@/src/__generated__/graphql";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { Comment } from "@/src/__generated__/graphql";
 import PageNotFound from "@/components/PageNotFound.vue";
 import GenericFeedbackFormModal from "@/components/forms/GenericFeedbackFormModal.vue";
 import ConfirmUndoDiscussionFeedbackModal from "@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue";
@@ -172,7 +170,7 @@ export default defineComponent({
         return [];
       }
 
-      let rootComments = comments.value.filter((comment: Comment) => {
+      const rootComments = comments.value.filter((comment: Comment) => {
         return comment.ParentComment === null;
       });
       return rootComments.length;
@@ -380,7 +378,7 @@ export default defineComponent({
                   :discussion="discussion"
                   :channel-id="channelId"
                   :compact-mode="compactMode"
-                  @handleClickGiveFeedback="handleClickGiveFeedback"
+                  @handle-click-give-feedback="handleClickGiveFeedback"
                 />
                 <DiscussionBody
                   :discussion="discussion"
@@ -404,9 +402,9 @@ export default defineComponent({
                         :discussion="discussion"
                         :discussion-channel="activeDiscussionChannel"
                         :show-downvote="!loggedInUserIsAuthor"
-                        @handleClickGiveFeedback="handleClickGiveFeedback"
-                        @handleClickUndoFeedback="handleClickUndoFeedback"
-                        @handleClickEditFeedback="handleClickEditFeedback"
+                        @handle-click-give-feedback="handleClickGiveFeedback"
+                        @handle-click-undo-feedback="handleClickUndoFeedback"
+                        @handle-click-edit-feedback="handleClickEditFeedback"
                       />
                     </div>
                   </template>
@@ -434,7 +432,7 @@ export default defineComponent({
               :mod-name="loggedInUserModName"
               :reached-end-of-results="reachedEndOfResults"
               :previous-offset="previousOffset"
-              @loadMore="loadMore"
+              @load-more="loadMore"
             />
           </div>
           <DiscussionChannelLinks
@@ -456,7 +454,7 @@ export default defineComponent({
       :loading="addFeedbackCommentToDiscussionLoading"
       @close="showFeedbackFormModal = false"
       @input="handleFeedbackInput"
-      @primaryButtonClick="handleSubmitFeedback"
+      @primary-button-click="handleSubmitFeedback"
     />
     <ConfirmUndoDiscussionFeedbackModal
       v-if="showConfirmUndoFeedbackModal"
@@ -476,7 +474,7 @@ export default defineComponent({
     <Notification
       :show="showFeedbackSubmittedSuccessfully"
       :title="'Your feedback was submitted successfully.'"
-      @closeNotification="showFeedbackSubmittedSuccessfully = false"
+      @close-notification="showFeedbackSubmittedSuccessfully = false"
     />
   </div>
 </template>

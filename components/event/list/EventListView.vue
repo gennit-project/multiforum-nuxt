@@ -196,10 +196,10 @@ onEventResult((value) => {
       :selected-tags="filterValues.tags"
       :selected-channels="filterValues.channels"
       :show-map="false"
-      @filterByTag="filterByTag"
-      @filterByChannel="filterByChannel"
-      @loadMore="loadMore"
-      @openPreview="openPreview"
+      @filter-by-tag="filterByTag"
+      @filter-by-channel="filterByChannel"
+      @load-more="loadMore"
+      @open-preview="openPreview"
     />
   </v-container>
 </template>

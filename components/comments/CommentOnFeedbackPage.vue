@@ -1,22 +1,20 @@
 <script lang="ts">
-import { defineComponent, computed, ref } from "vue";
+import type { PropType } from "vue";
+import { defineComponent, computed, ref  } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
-import { ALLOWED_ICONS } from "../buttons/MenuButton.vue";
+import MenuButton, { ALLOWED_ICONS } from "../buttons/MenuButton.vue";
 import useClipboard from "vue-clipboard3";
 import VoteButtons from "./VoteButtons.vue";
 import EllipsisHorizontal from "../icons/EllipsisHorizontal.vue";
-import MenuButton from "../buttons/MenuButton.vue";
-import { DELETE_COMMENT } from "@/graphQLData/comment/mutations";
-import { HandleEditFeedbackInput, HandleFeedbackInput } from "./Comment.vue";
+import { DELETE_COMMENT , UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
+import type { HandleEditFeedbackInput, HandleFeedbackInput } from "./Comment.vue";
 import { useRoute, useRouter } from "vue-router";
-import { Comment } from "@/src/__generated__/graphql";
-import { PropType } from "vue";
+import type { Comment } from "@/src/__generated__/graphql";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import TextEditor from "../forms/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
-import { UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import WarningModal from "@/components/WarningModal.vue";
 
@@ -309,10 +307,10 @@ export default defineComponent({
         id="commentMenu"
         class="flex items-center"
         :items="commentMenuItems"
-        @copyLink="copyLink"
-        @handleEdit="() => handleEdit()"
-        @clickReport="handleReport"
-        @clickFeedback="
+        @copy-link="copyLink"
+        @handle-edit="() => handleEdit()"
+        @click-report="handleReport"
+        @click-feedback="
           () => {
             // This event is emitted when the user clicks give feedback in the comment menu.
             // Passing the comment in at the template instead of the setup
@@ -326,19 +324,19 @@ export default defineComponent({
             });
           }
         "
-        @clickUndoFeedback="
+        @click-undo-feedback="
           () => {
             // See comment on clickFeedback. The same principle applies.
             handleUndoFeedback({ commentData: comment, parentCommentId: '' });
           }
         "
-        @handleViewFeedback="() => handleViewFeedback(comment.id)"
-        @handleDelete="
+        @handle-view-feedback="() => handleViewFeedback(comment.id)"
+        @handle-delete="
           () => {
             showDeleteCommentModal = true;
           }
         "
-        @clickEditFeedback="
+        @click-edit-feedback="
           () => {
             // See comment on clickFeedback. The same principle applies.
             handleEditFeedback({
@@ -387,8 +385,8 @@ export default defineComponent({
         :comment-data="comment"
         :show-downvote="comment.CommentAuthor?.displayName !== loggedInModName"
         :show-upvote="false"
-        @openModProfile="$emit('openModProfile')"
-        @clickFeedback="
+        @open-mod-profile="$emit('openModProfile')"
+        @click-feedback="
           () => {
             handleFeedback({
               commentData: comment,
@@ -396,14 +394,14 @@ export default defineComponent({
             });
           }
         "
-        @clickUndoFeedback="
+        @click-undo-feedback="
           () => {
             // See comment on clickFeedback. The same principle applies.
             handleUndoFeedback({ commentData: comment, parentCommentId: '' });
           }
         "
-        @clickEditFeedback="$emit('clickEditFeedback')"
-        @viewFeedback="() => handleViewFeedback(comment.id)"
+        @click-edit-feedback="$emit('clickEditFeedback')"
+        @view-feedback="() => handleViewFeedback(comment.id)"
       />
     </div>
     <WarningModal
@@ -413,7 +411,7 @@ export default defineComponent({
       :loading="deleteCommentLoading"
       :error="deleteCommentError"
       @close="showDeleteCommentModal = false"
-      @primaryButtonClick="handleDeleteComment"
+      @primary-button-click="handleDeleteComment"
     />
   </div>
 </template>

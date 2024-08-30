@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import { DateTime } from "luxon";
-import { Event } from "@/src/__generated__/graphql";
+import type { Event } from "@/src/__generated__/graphql";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_SOONEST_EVENTS_IN_CHANNEL } from "@/graphQLData/channel/queries";
 import { useRoute } from "vue-router";
@@ -85,8 +85,8 @@ export default defineComponent({
       return startTime > tomorrow;
     };
 
-    let dateObj: any = computed(() => {
-      let res: Record<string, Event[]> = {
+    const dateObj: any = computed(() => {
+      const res: Record<string, Event[]> = {
         happeningNow: [],
         happeningToday: [],
         happeningTomorrow: [],
@@ -119,7 +119,7 @@ export default defineComponent({
     });
 
     const dateSectionObj = computed(() => {
-      let res: any = {};
+      const res: any = {};
 
       for (let i = 0; i < dateObj.value.afterTomorrow.length; i++) {
         const event = dateObj.value.afterTomorrow[i];

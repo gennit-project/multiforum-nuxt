@@ -6,8 +6,9 @@
 // The purpose of this component is to separate out the discussion
 // specific logic from the logic that can be reused in the
 // context of an event's comments.
-import { defineComponent, computed, PropType, ref } from "vue";
-import {
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import type {
   DiscussionChannel,
   CommentCreateInput,
   Comment as CommentType,
@@ -18,7 +19,7 @@ import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { CreateEditCommentFormValues } from "@/types/Comment";
+import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
 
 type CommentSectionQueryUpdateInput = {
@@ -79,7 +80,7 @@ export default defineComponent({
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      let username = localUsernameResult.value?.username;
+      const username = localUsernameResult.value?.username;
       if (username) {
         return username;
       }
@@ -253,7 +254,7 @@ export default defineComponent({
       const existingDiscussionChannelData =
         readDiscussionChannelQueryResult?.getCommentSection?.DiscussionChannel;
 
-      let existingCommentAggregate =
+      const existingCommentAggregate =
         existingDiscussionChannelData?.CommentsAggregate?.count || 0;
 
       cache.writeQuery({
@@ -285,7 +286,7 @@ export default defineComponent({
       const existingDiscussionChannelData =
         readDiscussionChannelQueryResult?.getCommentSection?.DiscussionChannel;
 
-      let existingCommentAggregate =
+      const existingCommentAggregate =
         existingDiscussionChannelData?.CommentsAggregate?.count || 0;
 
       cache.writeQuery({
@@ -323,9 +324,9 @@ export default defineComponent({
     :create-comment-input="createCommentInput"
     :previous-offset="previousOffset"
     :original-poster="discussionAuthor"
-    @decrementCommentCount="decrementCommentCount"
-    @incrementCommentCount="incrementCommentCount"
-    @updateCommentSectionQueryResult="updateCommentSectionQueryResult"
-    @updateCreateReplyCommentInput="updateCreateReplyCommentInput"
+    @decrement-comment-count="decrementCommentCount"
+    @increment-comment-count="incrementCommentCount"
+    @update-comment-section-query-result="updateCommentSectionQueryResult"
+    @update-create-reply-comment-input="updateCreateReplyCommentInput"
   />
 </template>

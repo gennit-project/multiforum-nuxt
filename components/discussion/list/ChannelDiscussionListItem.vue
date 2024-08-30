@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, PropType, computed, ref } from "vue";
-import { Discussion, DiscussionChannel } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import type { Discussion, DiscussionChannel } from "@/src/__generated__/graphql";
 import { relativeTime } from "../../../dateTimeUtils";
 import { useRoute } from "vue-router";
 import Tag from "@/components/Tag.vue";
@@ -214,7 +215,7 @@ export default defineComponent({
     },
     filteredQuery() {
       const query = { ...this.$route.query };
-      for (let key in query) {
+      for (const key in query) {
         if (!query[key]) {
           delete query[key];
         }

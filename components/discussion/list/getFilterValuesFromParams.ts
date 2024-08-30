@@ -1,4 +1,4 @@
-import { SearchDiscussionValues } from "@/types/Discussion";
+import type { SearchDiscussionValues } from "@/types/Discussion";
 
 type GetFilterValuesInput = {
   route: any;

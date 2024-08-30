@@ -1,10 +1,11 @@
 <script lang="ts">
-import { defineComponent, PropType, computed } from "vue";
-import { TagData } from "../../types/Tag";
+import type { PropType} from "vue";
+import { defineComponent, computed } from "vue";
+import type { TagData } from "../../types/Tag";
 import { relativeTime } from "../../dateTimeUtils";
 import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/Tag.vue";
-import { Event } from "@/src/__generated__/graphql";
+import type { Event } from "@/src/__generated__/graphql";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 
 export default defineComponent({

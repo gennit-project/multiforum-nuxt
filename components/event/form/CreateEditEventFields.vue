@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, nextTick } from "vue";
-import { ApolloError } from "@apollo/client/errors";
+import type { ApolloError } from "@apollo/client/errors";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import FormRow from "@/components/forms/FormRow.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
@@ -12,9 +12,8 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { checkUrl } from "@/src/utils/formValidation";
 import { DateTime } from "luxon";
-import { getDuration } from "@/utils";
+import { getDuration , getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import AddImage from "@/components/AddImage.vue";
-import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
@@ -316,7 +315,7 @@ const touched = ref(false);
             <ForumPicker
               :test-id="'channel-input'"
               :selected-channels="formValues.selectedChannels"
-              @setSelectedChannels="
+              @set-selected-channels="
                 emit('updateFormValues', { selectedChannels: $event })
               "
             />
@@ -333,7 +332,7 @@ const touched = ref(false);
                     type="date"
                     :value="formattedStartTimeDate"
                     @input="(event) => handleStartTimeDateChange((event.target as HTMLInputElement).value)"
-                  />
+                  >
                   <input
                     v-if="!formValues.isAllDay"
                     data-testid="start-time-time-input"
@@ -341,7 +340,7 @@ const touched = ref(false);
                     type="time"
                     :value="formattedStartTimeTime"
                     @input="(event) => handleStartTimeTimeChange((event.target as HTMLInputElement).value)"
-                  />
+                  >
                 </div>
                 <span class="px-1">to</span>
                 <div class="flex flex-wrap items-center gap-2 xl:flex">
@@ -351,7 +350,7 @@ const touched = ref(false);
                     type="date"
                     :value="formattedEndTimeDate"
                     @input="(event) => handleEndTimeDateChange((event.target as HTMLInputElement).value)"
-                  />
+                  >
                   <input
                     v-if="!formValues.isAllDay"
                     data-testid="end-time-time-input"
@@ -359,7 +358,7 @@ const touched = ref(false);
                     type="time"
                     :value="formattedEndTimeTime"
                     @input="(event) => handleEndTimeTimeChange((event.target as HTMLInputElement).value)"
-                  />
+                  >
                 </div>
                 <div class="pl-2">
                   {{ duration }}
@@ -400,7 +399,7 @@ const touched = ref(false);
                     virtualEventUrl: `https://${$event.target.value}`,
                   })
                 "
-              />
+              >
             </div>
             <ErrorMessage
               :text="
@@ -424,7 +423,7 @@ const touched = ref(false);
               :initial-value="formValues.address"
               :search-placeholder="'Add an address'"
               :full-width="true"
-              @updateLocationInput="handleUpdateLocation"
+              @update-location-input="handleUpdateLocation"
             />
           </template>
         </FormRow>
@@ -448,7 +447,7 @@ const touched = ref(false);
                 alt="Cover Image"
                 :src="formValues.coverImageURL" 
                 class="shadow-sm" 
-                />
+                >
             </div>
             <div v-else>
               <span class="text-sm text-gray-500 dark:text-gray-400">
@@ -463,7 +462,7 @@ const touched = ref(false);
             <TagPicker
               data-testid="tag-input"
               :selected-tags="formValues.selectedTags"
-              @setSelectedTags="
+              @set-selected-tags="
                 emit('updateFormValues', { selectedTags: $event })
               "
             />

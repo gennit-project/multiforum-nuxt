@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import { CreateEditEventFormValues } from "@/types/Event";
+import type { CreateEditEventFormValues } from "@/types/Event";
 
 const now = DateTime.now();
 const defaultStartTimeObj = now.startOf("hour").plus({ hours: 1 });

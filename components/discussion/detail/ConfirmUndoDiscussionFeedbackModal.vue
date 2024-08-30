@@ -1,11 +1,12 @@
 <script lang="ts">
-import { Ref, defineComponent, ref } from "vue";
+import type { Ref} from "vue";
+import { defineComponent, ref } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import GenericModal from "@/components/GenericModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { DELETE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/discussion/queries";
-import { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/src/__generated__/graphql";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 
@@ -114,8 +115,8 @@ export default defineComponent({
     :loading="loading"
     :primary-button-text="'Delete'"
     :secondary-button-text="'Cancel'"
-    @primaryButtonClick="handleDelete"
-    @secondaryButtonClick="$emit('close')"
+    @primary-button-click="handleDelete"
+    @secondary-button-click="$emit('close')"
   >
     <template #icon>
       <i class="fas fa-trash-alt dark:text-white" />

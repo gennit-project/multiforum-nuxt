@@ -1,6 +1,7 @@
 <script lang="ts">
-import { defineComponent, computed, PropType, ref } from "vue";
-import { Discussion } from "@/src/__generated__/graphql";
+import type { PropType} from "vue";
+import { defineComponent, computed, ref } from "vue";
+import type { Discussion } from "@/src/__generated__/graphql";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { DateTime } from "luxon";
@@ -9,7 +10,7 @@ import WarningModal from "../../WarningModal.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import MenuButton from "@/components/MenuButton.vue";
+import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import useClipboard from "vue-clipboard3";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
@@ -17,7 +18,6 @@ import {
 } from "@/graphQLData/user/queries";
 import Notification from "@/components/Notification.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 
 type MenuItem = {
@@ -352,16 +352,16 @@ export default defineComponent({
         v-if="discussion && menuItems.length > 0"
         :items="menuItems"
         data-testid="discussion-menu-button"
-        @copyLink="copyLink"
-        @handleEdit="
+        @copy-link="copyLink"
+        @handle-edit="
           router.push(
             `/channels/c/${channelId}/discussions/d/${discussion.id}/edit`,
           )
         "
-        @handleDelete="deleteModalIsOpen = true"
-        @handleClickReport="showOpenIssueModal = true"
-        @handleFeedback="handleClickGiveFeedback"
-        @handleViewFeedback="
+        @handle-delete="deleteModalIsOpen = true"
+        @handle-click-report="showOpenIssueModal = true"
+        @handle-feedback="handleClickGiveFeedback"
+        @handle-view-feedback="
           () => {
             if (discussion) {
               router.push({
@@ -392,7 +392,7 @@ export default defineComponent({
       :open="showOpenIssueModal"
       :discussion-title="discussion?.title"
       @close="showOpenIssueModal = false"
-      @reportSubmittedSuccessfully="
+      @report-submitted-successfully="
         () => {
           showSuccessfullyReported = true;
           showOpenIssueModal = false;
@@ -402,7 +402,7 @@ export default defineComponent({
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
-      @closeNotification="showSuccessfullyReported = false"
+      @close-notification="showSuccessfullyReported = false"
     />
     <ErrorBanner
       v-if="deleteDiscussionError"
@@ -412,7 +412,7 @@ export default defineComponent({
     <Notification
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"
-      @closeNotification="showCopiedLinkNotification = false"
+      @close-notification="showCopiedLinkNotification = false"
     />
   </div>
 </template>

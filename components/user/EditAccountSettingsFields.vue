@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue';
-import { ApolloError } from '@apollo/client/errors';
+import type { ApolloError } from '@apollo/client/errors';
 import { useRoute } from 'vue-router';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import TextInput from '@/components/forms/TextInput.vue';

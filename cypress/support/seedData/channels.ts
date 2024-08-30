@@ -1,4 +1,4 @@
-import { ChannelCreateInput } from "../../../src/__generated__/graphql";
+import type { ChannelCreateInput } from "../../../src/__generated__/graphql";
 
 const channels: ChannelCreateInput[] = [
   {

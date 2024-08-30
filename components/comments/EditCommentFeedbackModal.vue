@@ -1,14 +1,15 @@
 <script lang="ts">
-import { Ref, computed, defineComponent, ref } from "vue";
+import type { Ref} from "vue";
+import { computed, defineComponent, ref } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import GenericModal from "@/components/GenericModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/comment/queries";
-import { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/src/__generated__/graphql";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import TextEditor from "@/components/forms/TextEditor.vue";
 import { UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
-import { CreateEditCommentFormValues } from "@/types/Comment";
+import type { CreateEditCommentFormValues } from "@/types/Comment";
 import PencilIcon from "../icons/PencilIcon.vue";
 
 export default defineComponent({
@@ -132,8 +133,8 @@ export default defineComponent({
     :loading="loading"
     :primary-button-text="'Update'"
     :secondary-button-text="'Cancel'"
-    @primaryButtonClick="handleEdit"
-    @secondaryButtonClick="$emit('close')"
+    @primary-button-click="handleEdit"
+    @secondary-button-click="$emit('close')"
   >
     <template #icon>
       <PencilIcon class="h-6 w-6" />

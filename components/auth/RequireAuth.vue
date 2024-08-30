@@ -1,5 +1,6 @@
 <script lang="ts">
-import { defineComponent, PropType, onMounted } from "vue";
+import type { PropType} from "vue";
+import { defineComponent, onMounted } from "vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from "@auth0/auth0-vue";
@@ -86,7 +87,7 @@ export default defineComponent({
       if (!this.localUsernameResult) {
         return "";
       }
-      let username = this.localUsernameResult.username;
+      const username = this.localUsernameResult.username;
 
       if (username) {
         return username;

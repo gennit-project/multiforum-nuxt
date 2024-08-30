@@ -3,7 +3,7 @@ import { computed, defineComponent, ref, watch } from "vue";
 import TabButton from "@/components/channel/TabButton.vue";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 import { useRoute } from "vue-router";
-import { User } from "@/src/__generated__/graphql"
+import type { User } from "@/src/__generated__/graphql"
 import { useAuth0 } from "@auth0/auth0-vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
@@ -61,7 +61,7 @@ export default defineComponent({
 
     const { result } = useQuery(GET_LOCAL_USERNAME);
     const username = computed(() => {
-      let username = result.value?.username;
+      const username = result.value?.username;
       if (username) {
         return username;
       }
@@ -69,7 +69,7 @@ export default defineComponent({
     });
 
     const tabs = computed(() => {
-      let tabList: TabData[] = [
+      const tabList: TabData[] = [
         { 
           name: "Comments", 
           href: `/u/${usernameInParams.value}`, 
