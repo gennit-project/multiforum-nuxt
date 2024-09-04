@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { useAuth0 } from '@auth0/auth0-vue'; // Adjust the import path based on your setup
+import { useAuth0 } from '@/hooks/useAuth0';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import CreateUsernameForm from './CreateUsernameForm.vue';
 

@@ -2,7 +2,7 @@
 import { onMounted, computed } from "vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { useAuth0 } from "@auth0/auth0-vue";
+import { useAuth0 } from '@/hooks/useAuth0';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 // Props definition using defineProps

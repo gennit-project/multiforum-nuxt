@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
+import { useAuth0 } from '@/hooks/useAuth0';
 import IconButtonDropdown from "@/components/IconButtonDropdown.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";

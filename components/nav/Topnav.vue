@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import HamburgerMenuButton from "@/components/nav/MenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
-import { useAuth0 } from "@auth0/auth0-vue";
+import { useAuth0 } from '@/hooks/useAuth0';
 import { useQuery } from "@vue/apollo-composable";
 import {
   GET_LOCAL_USERNAME,

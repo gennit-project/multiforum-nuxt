@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue';
-import { useAuth0 } from '@auth0/auth0-vue';
+import { useAuth0 } from '@/hooks/useAuth0';
 import { useQuery } from '@vue/apollo-composable';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';

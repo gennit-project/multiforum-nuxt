@@ -4,7 +4,7 @@ import TabButton from "@/components/channel/TabButton.vue";
 import { useDisplay } from "vuetify/lib/framework.mjs";
 import { useRoute } from "vue-router";
 import type { User } from "@/__generated__/graphql"
-import { useAuth0 } from "@auth0/auth0-vue";
+import { useAuth0 } from '@/hooks/useAuth0';
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 
