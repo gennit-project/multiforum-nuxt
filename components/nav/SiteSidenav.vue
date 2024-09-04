@@ -40,6 +40,9 @@ const showAllForums = ref(false);
 const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
 
 const recentForums = computed(() => {
+  if (!import.meta.client) {
+    return [];
+  }
   const forums = JSON.parse(localStorage.getItem('recentForums') || '""') || [];
   return forums.sort((a: any, b: any) => b.timestamp - a.timestamp);
 });

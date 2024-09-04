@@ -7,6 +7,7 @@ export default defineNuxtPlugin(nuxtApp => {
   const httpLink = new HttpLink({ uri: nuxtApp.$config.public.graphqlUrl })
 
   const authLink = new ApolloLink((operation, forward) => {
+    if (!import.meta.client) return forward(operation)
     const token = localStorage.getItem('token')
     operation.setContext({
       headers: {

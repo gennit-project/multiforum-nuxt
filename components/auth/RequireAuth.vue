@@ -1,102 +1,77 @@
-<script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, onMounted } from "vue";
+<script setup lang="ts">
+import { onMounted, computed } from "vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
-export default defineComponent({
-  components: {
-    LoadingSpinner,
+// Props definition using defineProps
+const props = defineProps({
+  requireOwnership: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    requireOwnership: {
-      type: Boolean,
-      default: false,
-    },
-    owners: {
-      type: Array as PropType<Array<string>>,
-      default: () => [],
-    },
-    justifyLeft: {
-      type: Boolean,
-      default: false,
-    },
-    fullWidth: {
-      type: Boolean,
-      default: true,
-    },
-    // This is not whether auth0 is loading. It's whether
-    // or not some data is loading in the parent component, for example,
-    // an edit form. We don't want to show "you don't have permission" if the
-    // data is loading. Therefore use this prop to block that message while loading.
-    loading: {
-      type: Boolean,
-      default: false,
-    },
+  owners: {
+    type: Array as () => string[],
+    default: () => [],
   },
-  setup() {
-    const {
-      loginWithPopup,
-      loginWithRedirect,
-      isLoading: authLoading,
-      isAuthenticated,
-      idTokenClaims,
-    } = useAuth0();
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-
-    const login = async () => {
-      if (window.parent.Cypress) {
-        await loginWithRedirect();
-      } else {
-        await loginWithPopup();
-      }
-      storeToken();
-    };
-
-    const storeToken = async () => {
-      if (isAuthenticated.value) {
-        const token = await idTokenClaims.value.__raw;
-        localStorage.setItem("token", token);
-      }
-    };
-
-    onMounted(() => {
-      storeToken();
-    });
-
-    return {
-      authLoading,
-      localUsernameResult,
-      login,
-    };
+  justifyLeft: {
+    type: Boolean,
+    default: false,
   },
-  computed: {
-    isOwner() {
-      for (let i = 0; i < this.owners.length; i++) {
-        const owner = this.owners[i];
-
-        if (owner === this.username) {
-          return true;
-        }
-      }
-      return false;
-    },
-    username() {
-      if (!this.localUsernameResult) {
-        return "";
-      }
-      const username = this.localUsernameResult.username;
-
-      if (username) {
-        return username;
-      }
-      return "";
-    },
+  fullWidth: {
+    type: Boolean,
+    default: true,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
   },
 });
+const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
+
+const { loginWithPopup, loginWithRedirect, isLoading: authLoading, isAuthenticated, idTokenClaims } = useAuth0();
+
+// Function to store token in localStorage (client-side only)
+const storeToken = async () => {
+  if (isAuthenticated.value) {
+    const token = await idTokenClaims?.value?.__raw;
+    if (import.meta.client) {
+      localStorage.setItem("token", token || "");
+    }
+  }
+};
+
+// Login function that either uses Cypress for testing or shows a popup
+const login = async () => {
+  if (window.parent.Cypress) {
+    await loginWithRedirect();
+  } else {
+    await loginWithPopup();
+  }
+  storeToken();
+};
+
+// Ensure token is stored on the client-side when mounted
+onMounted(() => {
+  if (import.meta.client) {
+    storeToken();
+  }
+});
+
+// Computed properties for username and ownership
+const username = computed(() => {
+  if (!localUsernameResult.value) {
+    return "";
+  }
+  return localUsernameResult.value.username || "";
+});
+
+const isOwner = computed(() => {
+  return props.owners.includes(username.value);
+});
 </script>
+
 <template>
   <LoadingSpinner v-if="loading || authLoading" />
   <div

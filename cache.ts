@@ -1,11 +1,12 @@
-import type { ReactiveVar} from "@apollo/client/core";
+import type { ReactiveVar } from "@apollo/client/core";
 import { InMemoryCache, makeVar } from "@apollo/client/core";
 
+// Ensure localStorage is accessed only on the client side
 export const usernameVar: ReactiveVar<string> = makeVar<string>("");
 export const modProfileIdVar: ReactiveVar<string> = makeVar<string>("");
 export const modProfileNameVar: ReactiveVar<string> = makeVar<string>("");
 export const themeVar: ReactiveVar<string> = makeVar<string>(
-  localStorage.getItem("theme") || "light"
+  import.meta.client ? localStorage.getItem("theme") || "light" : "light"
 );
 
 const standardMerge = (existing: any, incoming: any, args: any) => {
