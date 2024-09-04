@@ -9,7 +9,7 @@ import TextEditor from '@/components/TextEditor.vue';
 import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import type { Ref } from 'vue';
-import type { Comment } from '@/src/__generated__/graphql';
+import type { Comment } from '@/__generated__/graphql';
 import type { CreateEditCommentFormValues } from '@/types/Comment';
 
 const props = defineProps({

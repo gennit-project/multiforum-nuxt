@@ -19,7 +19,7 @@ import {
 } from '@/graphQLData/issue/queries';
 import { GET_LOCAL_MOD_PROFILE_NAME } from '@/graphQLData/user/queries';
 import { COUNT_OPEN_ISSUES } from '@/graphQLData/mod/queries';
-import type { IssueCreateInput, Comment } from '@/src/__generated__/graphql';
+import type { IssueCreateInput, Comment } from '@/__generated__/graphql';
 
 type UpdateIssueInCacheInput = {
   cache: any;

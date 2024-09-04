@@ -1,8 +1,8 @@
 import type { TagData } from "@/types/tagTypes";
 import { gql } from "@apollo/client/core";
 import config from "@/config";
-import type { Duration } from 'luxon';
-import { DateTime, Interval } from 'luxon';
+import type { Duration } from "luxon";
+import { DateTime, Interval } from "luxon";
 import type { EventData } from "@/types/Event";
 
 const getTimePieces = (timeObj: DateTime) => {
@@ -132,8 +132,6 @@ const compareDate = (e1: EventData, e2: EventData) => {
   return 0;
 };
 
-
-
 const relativeTime = (dateISO: string) => {
   const dateObj = DateTime.fromISO(dateISO);
   const time = dateObj.toRelative();
@@ -141,51 +139,45 @@ const relativeTime = (dateISO: string) => {
   return time;
 };
 
-
-const getReadableTimeFromISO = (timeISO: string)=>{
-  const timeObject = DateTime.fromISO(timeISO)
+const getReadableTimeFromISO = (timeISO: string) => {
+  const timeObject = DateTime.fromISO(timeISO);
   // TIME_SIMPLE yields the time in this format: 1:30 PM
-  const humanReadableTime = timeObject.toLocaleString(DateTime.TIME_SIMPLE)
-  return humanReadableTime
-}
-const convertTimeToReadableFormat = (time: string) => {
-  const timeObject = DateTime.fromISO(time)
-  const humanReadableTime = timeObject.toLocaleString(DateTime.TIME_SIMPLE)
+  const humanReadableTime = timeObject.toLocaleString(DateTime.TIME_SIMPLE);
   return humanReadableTime;
-}
+};
+const convertTimeToReadableFormat = (time: string) => {
+  const timeObject = DateTime.fromISO(time);
+  const humanReadableTime = timeObject.toLocaleString(DateTime.TIME_SIMPLE);
+  return humanReadableTime;
+};
 
 const pluralize = (number: number, word: string) => {
   if (number === 1) {
     return `${number} ${word}`;
   }
   return `${number} ${word}s`;
-}
+};
 
 function timeAgo(jsDate: Date) {
   const then = DateTime.fromJSDate(jsDate);
   const now = DateTime.now();
   const diff = now.diff(then);
 
-  if (diff.as('years') >= 1) {
-    const number = Math.floor(diff.as('years'))
-    return `${pluralize(number, 'year')} ago`;
-
-  } else if (diff.as('months') >= 1) {
-    const number = Math.floor(diff.as('months'))
-    return `${pluralize(number, 'month')} ago`;
-
-  } else if (diff.as('days') >= 1) {
-    const number = Math.floor(diff.as('days'))
-    return `${pluralize(number, 'day')} ago`;
-
-  } else if (diff.as('hours') >= 1) {
-    const number = Math.floor(diff.as('hours'))
-    return `${pluralize(number, 'hour')} ago`;
-
-  } else if (diff.as('minutes') >= 1) {
-    const number = Math.floor(diff.as('minutes'))
-    return `${pluralize(number, 'minute')} ago`;
-
+  if (diff.as("years") >= 1) {
+    const number = Math.floor(diff.as("years"));
+    return `${pluralize(number, "year")} ago`;
+  } else if (diff.as("months") >= 1) {
+    const number = Math.floor(diff.as("months"));
+    return `${pluralize(number, "month")} ago`;
+  } else if (diff.as("days") >= 1) {
+    const number = Math.floor(diff.as("days"));
+    return `${pluralize(number, "day")} ago`;
+  } else if (diff.as("hours") >= 1) {
+    const number = Math.floor(diff.as("hours"));
+    return `${pluralize(number, "hour")} ago`;
+  } else if (diff.as("minutes") >= 1) {
+    const number = Math.floor(diff.as("minutes"));
+    return `${pluralize(number, "minute")} ago`;
   } else {
     return "just now";
   }
@@ -206,7 +198,7 @@ type GetEmbeddedLinkInput = {
 export function getUploadFileName(input: UploadFileInput) {
   const { file, username } = input;
   const filenameWithSpaces = `${Date.now()}-${username}-${file.name}`;
-  const withoutSpaces = filenameWithSpaces.replace(/\s/g, '_');
+  const withoutSpaces = filenameWithSpaces.replace(/\s/g, "_");
   return withoutSpaces;
 }
 
@@ -215,24 +207,20 @@ export function encodeSpacesInURL(url: string) {
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { 
-    signedStorageURL,
-    filename, 
-    file,
-  } = input;
+  const { signedStorageURL, filename, file } = input;
 
   if (!signedStorageURL) {
     console.error("No signedStorageURL provided");
-    return
+    return;
   }
   const { googleCloudStorageBucket } = config;
 
   const encodedFilename = encodeURIComponent(filename);
 
   const embeddedLink = encodeSpacesInURL(
-    `https://storage.googleapis.com/${googleCloudStorageBucket}/${encodedFilename}`,
+    `https://storage.googleapis.com/${googleCloudStorageBucket}/${encodedFilename}`
   );
-  
+
   const response = await fetch(signedStorageURL, {
     method: "PUT",
     body: file,
@@ -255,7 +243,7 @@ export function getDuration(startTime: string, endTime: string) {
   // Format time as "1h 30m"
   const obj = Interval.fromDateTimes(
     DateTime.fromISO(startTime),
-    DateTime.fromISO(endTime),
+    DateTime.fromISO(endTime)
   )
     .toDuration()
     .shiftTo("days", "hours", "minutes")
@@ -290,7 +278,7 @@ export const getLinksInText = (text: string) => {
     return [];
   }
   const matches = text.match(
-    /https?:\/\/(?!(?:.*\.(?:jpe?g|gif|png)))[^\s]+/g,
+    /https?:\/\/(?!(?:.*\.(?:jpe?g|gif|png)))[^\s]+/g
   ) as string[];
   if (matches) {
     return matches;
@@ -328,7 +316,7 @@ export const updateTagsInCache = (cache: any, updatedTags: Array<TagData>) => {
           const newTagRef = tagRefsOnDiscussion[i];
           const alreadyExists = existingTagRefs.some(
             (ref: any) =>
-              readField("text", ref) === readField("text", newTagRef),
+              readField("text", ref) === readField("text", newTagRef)
           );
           if (!alreadyExists) {
             newTagRefs.push(newTagRef);
@@ -341,17 +329,56 @@ export const updateTagsInCache = (cache: any, updatedTags: Array<TagData>) => {
   });
 };
 
+function isAlphaNumeric(str: string) {
+  // The author of this validator is Michael Martin-Smucker. Source:
+  // https://stackoverflow.com/questions/4434076/best-way-to-alphanumeric-check-in-javascript
+  let code, i, len;
+
+  for (i = 0, len = str.length; i < len; i++) {
+    code = str.charCodeAt(i);
+    if (
+      !(code > 47 && code < 58) && // numeric (0-9)
+      !(code > 64 && code < 91) && // upper alpha (A-Z)
+      !(code > 96 && code < 123)
+    ) {
+      // lower alpha (a-z)
+      return false;
+    }
+  }
+  return true;
+}
+
+function checkUrl(str: string) {
+  // Valid URL checker from Devshed
+  // Sources:
+  // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
+  // http://forums.devshed.com/javascript-development-115/regexp-to-match-url-pattern-493764.html
+  const pattern = new RegExp(
+    "^(https?:\\/\\/)" + // protocol
+      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
+      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
+      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
+      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
+      "(\\#[-a-z\\d_]*)?$",
+    "i"
+  ); // fragment locator
+  const valid = !!pattern.test(str);
+  return valid;
+}
+
 export {
-    convertTimeToReadableFormat,
-    getReadableTimeFromISO,
-    timeAgo,
-    formatDuration,
-    formatAbbreviatedDuration,
-    relativeTime,
-    relativeTimeHoursAndMinutes,
-    durationHoursAndMinutes,
-    getDurationObj,
-    compareDate,
-    getDatePieces,
-    getTimePieces
-  };
+  checkUrl,
+  convertTimeToReadableFormat,
+  getReadableTimeFromISO,
+  isAlphaNumeric,
+  timeAgo,
+  formatDuration,
+  formatAbbreviatedDuration,
+  relativeTime,
+  relativeTimeHoursAndMinutes,
+  durationHoursAndMinutes,
+  getDurationObj,
+  compareDate,
+  getDatePieces,
+  getTimePieces,
+};

@@ -2,7 +2,7 @@
 import { ref, watch } from 'vue';
 import type { PropType } from 'vue';
 import SearchableForumList from '@/components/channel/SearchableForumList.vue';
-import type { Channel } from '@/src/__generated__/graphql';
+import type { Channel } from '@/__generated__/graphql';
 
 // Props definition
 const props = defineProps({

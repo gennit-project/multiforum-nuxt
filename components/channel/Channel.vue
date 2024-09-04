@@ -9,7 +9,7 @@ import { useDisplay } from "vuetify";
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import type { Channel, User } from "@/src/__generated__/graphql";
+import type { Channel, User } from "@/__generated__/graphql";
 
 const route = useRoute();
 

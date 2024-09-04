@@ -1,39 +1,33 @@
-<script lang="ts">
+<script lang="ts" setup>
+import { defineProps, defineEmits } from 'vue';
 import type { PropType } from "vue";
-import { defineComponent  } from "vue";
-import type { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/__generated__/graphql";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 
-export default defineComponent({
-  name: "VoteComponent",
-  components: {
-
-    RequireAuth,
+// Define props
+defineProps({
+  showReplyEditor: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    showReplyEditor: {
-      type: Boolean,
-      default: false,
-    },
-    commentData: {
-      type: Object as PropType<Comment>,
-      required: true,
-    },
-    parentCommentId: {
-      type: String,
-      default: "",
-    },
-    depth: {
-      type: Number,
-      default: 0,
-    },
+  commentData: {
+    type: Object as PropType<Comment>,
+    required: true,
   },
-  setup() {
-    return {
-      buttonClasses: "inline-flex gap-1 h-6 cursor-pointer items-center hover:bg-gray-200 border-gray-100 dark:border-gray-600  bg-gray-100 hover:border-gray-400 dark:bg-gray-700 rounded-full border px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500"
-    };
+  parentCommentId: {
+    type: String,
+    default: "",
+  },
+  depth: {
+    type: Number,
+    default: 0,
   },
 });
+
+const emit = defineEmits(['toggleShowReplyEditor']);
+
+const buttonClasses = "inline-flex gap-1 h-6 cursor-pointer items-center hover:bg-gray-200 border-gray-100 dark:border-gray-600 bg-gray-100 hover:border-gray-400 dark:bg-gray-700 rounded-full border px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500";
+
 </script>
 
 <template>
@@ -43,7 +37,7 @@ export default defineComponent({
         <div
           data-testid="reply-comment-button"
           :class="[buttonClasses, showReplyEditor ? 'text-black dark:text-gray-100' : '']"
-          @click="$emit('toggleShowReplyEditor')"
+          @click="emit('toggleShowReplyEditor')"
         >
           <i class="fa-regular fa-comment h-3 w-3" /> Reply
         </div>

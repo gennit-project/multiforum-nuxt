@@ -3,12 +3,12 @@ import { defineComponent, computed } from "vue";
 import { useRoute } from "vue-router";
 import { GET_USER , GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { relativeTime } from "@/utils"";
+import { relativeTime } from "@/utils";
 import gql from "graphql-tag";
 import { useDisplay } from "vuetify";
 import UserProfileTabs from "./UserProfileTabs.vue";
 import UserProfileSidebar from "./UserProfileSidebar.vue";
-import type { User } from "@/src/__generated__/graphql";
+import type { User } from "@/__generated__/graphql";
 
 export default defineComponent({
   components: {

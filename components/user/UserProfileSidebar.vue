@@ -6,7 +6,7 @@ import "md-editor-v3/lib/style.css";
 import { useDisplay } from "vuetify";
 import gql from "graphql-tag";
 import { GET_USER } from "@/graphQLData/user/queries";
-import { relativeTime } from "@/utils"";
+import { relativeTime } from "@/utils";
 import MarkdownPreview from "../MarkdownPreview.vue";
 
 export default defineComponent({

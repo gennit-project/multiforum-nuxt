@@ -13,7 +13,7 @@ import type {
   Channel,
   ChannelCreateInput,
   ChannelTagsConnectOrCreateFieldInput,
-} from "@/src/__generated__/graphql";
+} from "@/__generated__/graphql";
 
 export default defineComponent({
   name: "CreateChannel",

@@ -8,7 +8,7 @@ import "md-editor-v3/lib/style.css";
 import { useDisplay } from "vuetify";
 import gql from "graphql-tag";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
-import type { Channel } from "@/src/__generated__/graphql";
+import type { Channel } from "@/__generated__/graphql";
 import ChannelRules from "./Rules.vue";
 import SidebarEventList from "./SidebarEventList.vue";
 import MarkdownPreview from '@/components/MarkdownPreview.vue'

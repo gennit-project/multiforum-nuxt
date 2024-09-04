@@ -1,45 +1,35 @@
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script lang="ts" setup>
+import { ref } from "vue";
 import VoteButton from "@/components/VoteButton.vue";
-import FloatingDropdown from "../FloatingDropdown.vue";
-import EmojiPicker from "./EmojiPicker.vue";
+import FloatingDropdown from "@/components/FloatingDropdown.vue";
+import EmojiPicker from "@/components/comments/EmojiPicker.vue";
 
-export default defineComponent({
-  name: "NewEmojiButton",
-  components: {
-    EmojiPicker,
-    FloatingDropdown,
-    VoteButton,
+defineProps({
+  commentId: {
+    type: String,
+    required: false,
+    default: "",
   },
-  props: {
-    commentId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    discussionChannelId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    emojiJson: {
-      type: String,
-      required: false,
-      default: "",
-    },
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
   },
-  setup() {
-
-    return {
-      showMenu: ref(false),
-    };
-  },
-  methods: {
-    handleClick() {
-      this.$emit("toggleEmojiPicker");
-    },
+  emojiJson: {
+    type: String,
+    required: false,
+    default: "",
   },
 });
+
+const showMenu = ref(false);
+
+const emit = defineEmits(["toggleEmojiPicker"]);
+
+function handleClick() {
+  emit("toggleEmojiPicker");
+}
+
 </script>
 
 <template>

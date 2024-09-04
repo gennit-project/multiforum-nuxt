@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed, ref } from "vue";
-import type { Issue } from "@/src/__generated__/graphql";
+import type { Issue } from "@/__generated__/graphql";
 import { DateTime } from "luxon";
 import { useRoute } from "vue-router";
 import GenericButton from "../buttons/GenericButton.vue";

@@ -11,7 +11,7 @@ import { UPDATE_USER } from "@/graphQLData/user/mutations";
 import { apolloClient } from "@/main";
 import EditAccountSettingsFields from "./EditAccountSettingsFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import type { UserUpdateInput } from "@/src/__generated__/graphql";
+import type { UserUpdateInput } from "@/__generated__/graphql";
 import type { EditAccountSettingsFormValues } from "@/types/User";
 import Notification from "../NotificationComponent.vue";
 

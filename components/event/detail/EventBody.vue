@@ -2,7 +2,7 @@
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import type { Event } from "@/src/__generated__/graphql";
+import type { Event } from "@/__generated__/graphql";
 
 export default defineComponent({
   name: "EventBody",

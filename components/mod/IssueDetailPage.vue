@@ -11,7 +11,7 @@ import { CLOSE_ISSUE, REOPEN_ISSUE ,
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT,
 } from "@/graphQLData/issue/mutations";
-import type { Issue } from "@/src/__generated__/graphql";
+import type { Issue } from "@/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import "md-editor-v3/lib/style.css";

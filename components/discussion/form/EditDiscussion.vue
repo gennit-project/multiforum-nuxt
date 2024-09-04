@@ -20,7 +20,7 @@ import type { DiscussionChannel ,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
-} from "@/src/__generated__/graphql";
+} from "@/__generated__/graphql";
 
 export default defineComponent({
   name: "EditDiscussion",

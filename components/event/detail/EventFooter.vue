@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { PropType} from "vue";
 import { defineComponent, computed } from "vue";
-import type { Event as EventData , EventChannel } from "@/src/__generated__/graphql";
+import type { Event as EventData , EventChannel } from "@/__generated__/graphql";
 import { useRoute } from "vue-router";
 import { DateTime } from "luxon";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";

@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Discussion } from "@/src/__generated__/graphql";
+import type { Discussion } from "@/__generated__/graphql";
 import BackLink from "@/components/BackLink.vue";
 import { GET_DISCUSSION_FEEDBACK } from "@/graphQLData/discussion/queries";
 import { useQuery, useMutation } from "@vue/apollo-composable";

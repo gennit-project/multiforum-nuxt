@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import type { PropType } from "vue";
-import type { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/__generated__/graphql";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import VoteButtons from "./VoteButtons.vue";
 import ReplyButton from "./ReplyButton.vue";

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import type { Channel } from '@/src/__generated__/graphql';
+import type { Channel } from '@/__generated__/graphql';
 import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
 import SearchBar from '@/components/SearchBar.vue';
 import type { PropType } from 'vue';

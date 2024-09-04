@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/__generated__/graphql";
 import BackLink from "@/components/BackLink.vue";
 import { GET_FEEDBACK_ON_COMMENT } from "@/graphQLData/comment/queries";
 import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";

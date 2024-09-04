@@ -1,133 +1,87 @@
-<script lang="ts">
-import { defineComponent, computed } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import type { PropType } from "vue";
-import type { Discussion as DiscussionData } from "@/src/__generated__/graphql";
 import { useRoute } from "vue-router";
-import Tag from "@/components/TagComponent.vue";
+import type { Discussion, DiscussionChannel, Tag } from "@/__generated__/graphql";
+import TagComponent from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import MenuButton from "@/components/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 
-export default defineComponent({
-  components: {
-    MenuButton,
-    HighlightedSearchTerms,
-    MarkdownPreview,
-    Tag,
-    ChevronDownIcon,
-    UsernameWithTooltip,
+const props = defineProps({
+  discussion: {
+    type: Object as PropType<Discussion>,
+    default: null,
   },
-  inheritAttrs: false,
-  props: {
-    discussion: {
-      type: Object as PropType<DiscussionData | null>,
-      required: false,
-      default: null,
-    },
-    score: {
-      type: Number,
-      default: 0,
-    },
-    searchInput: {
-      type: String,
-      default: "",
-    },
-    selectedTags: {
-      type: Array as PropType<Array<string>>,
-      default: () => [],
-    },
-    selectedChannels: {
-      type: Array as PropType<Array<string>>,
-      default: () => [],
-    },
+  score: {
+    type: Number,
+    default: 0,
   },
-  setup(props) {
-    const route = useRoute();
-
-    const commentCount = computed(() => {
-      let count = 0;
-      if (props.discussion) {
-        props.discussion.DiscussionChannels.forEach((dc) => {
-          count += dc.CommentsAggregate?.count || 0;
-        });
-      }
-      return count;
-    });
-
-    const submittedToMultipleChannels = computed(() => {
-      return props.discussion?.DiscussionChannels?.length || false;
-    });
-
-    const channelCount = computed(() => {
-      return props.discussion?.DiscussionChannels.length || 0;
-    });
-
-    
-
-    const discussionDetailOptions = computed(() => {
-      if (!props.discussion) return [];
-      return props.discussion.DiscussionChannels.map((dc) => {
-        const commentCount = dc.CommentsAggregate?.count || 0;
-        const discussionDetailLink  = `/channels/c/${dc.channelUniqueName}/discussions/d/${props.discussion?.id}`;
-        return {
-          label: `${commentCount} ${
-            commentCount === 1 ? "comment" : "comments"
-          } in ${dc.channelUniqueName}`,
-          value: discussionDetailLink,
-          event: "",
-        };
-      }).sort((a, b) => b.label.localeCompare(a.label));
-    });
-
-    const authorIsAdmin = computed(() => {
-      const serverRoles = props.discussion?.Author?.ServerRoles;
-      return serverRoles?.[0]?.showAdminTag || false;
-    });
-
-    return {
-      authorIsAdmin,
-      channelCount,
-      commentCount,
-      discussionDetailOptions,
-      route,
-      submittedToMultipleChannels,
-    };
+  searchInput: {
+    type: String,
+    default: "",
   },
-
-  data(props) {
-    const route = useRoute();
-
-    const discussionIdInParams = computed(() => {
-      return typeof route.params.discussionId === "string"
-        ? route.params.discussionId
-        : "";
-    });
-
-    return {
-      discussionIdInParams,
-      discussionId: props.discussion?.id || "",
-      previewIsOpen: false,
-      title: props.discussion?.title || "[Deleted]",
-      body: props.discussion?.body || "[Deleted]",
-      createdAt: props.discussion?.createdAt || "",
-      relativeTime: props.discussion
-        ? relativeTime(props.discussion.createdAt)
-        : "",
-      authorUsername: props.discussion?.Author?.username || "Deleted",
-      tags: props.discussion?.Tags.map((tag) => tag.text) || [],
-    };
+  selectedTags: {
+    type: Array,
+    default: () => [],
   },
-  methods: {
-    getDetailLink(channelId: string) {
-      if (!this.discussion) {
-        return "";
-      }
-      return `/channels/c/${channelId}/discussions/d/${this.discussion.id}`;
-    },
+  selectedChannels: {
+    type: Array,
+    default: () => [],
   },
 });
+
+defineEmits(["filterByTag"]);
+
+const route = useRoute();
+
+const commentCount = computed(() => {
+  let count = 0;
+  if (props.discussion) {
+    props.discussion.DiscussionChannels.forEach((dc: DiscussionChannel) => {
+      count += dc.CommentsAggregate?.count || 0;
+    });
+  }
+  return count;
+});
+
+const submittedToMultipleChannels = computed(() => props.discussion?.DiscussionChannels?.length > 1);
+
+const channelCount = computed(() => props.discussion?.DiscussionChannels.length || 0);
+
+const discussionDetailOptions = computed(() => {
+  if (!props.discussion) return [];
+  return props.discussion.DiscussionChannels.map((dc) => {
+    const commentCount = dc.CommentsAggregate?.count || 0;
+    const discussionDetailLink = `/channels/c/${dc.channelUniqueName}/discussions/d/${props.discussion?.id}`;
+    return {
+      label: `${commentCount} ${commentCount === 1 ? "comment" : "comments"} in ${dc.channelUniqueName}`,
+      value: discussionDetailLink,
+      event: "",
+    };
+  }).sort((a, b) => b.label.localeCompare(a.label));
+});
+
+const authorIsAdmin = computed(() => {
+  const serverRoles = props.discussion?.Author?.ServerRoles;
+  return serverRoles?.[0]?.showAdminTag || false;
+});
+
+const getDetailLink = (channelId: string) => {
+  if (!props.discussion) {
+    return "";
+  }
+  return `/channels/c/${channelId}/discussions/d/${props.discussion.id}`;
+};
+
+const discussionIdInParams = computed(() => (typeof route.params.discussionId === "string" ? route.params.discussionId : ""));
+const discussionId = computed(() => props.discussion?.id || "");
+const title = computed(() => props.discussion?.title || "[Deleted]");
+const tags = computed(() => props.discussion?.Tags.map((tag: Tag) => tag.text) || []);
+const authorUsername = computed(() => props.discussion?.Author?.username || "Deleted");
+const relative = computed(() => props.discussion ? relativeTime(props.discussion.createdAt) : "");
 </script>
 
 <template>
@@ -156,7 +110,7 @@ export default defineComponent({
             </router-link>
             <div class="font-medium flex flex-wrap items-center gap-1 text-xs text-gray-600 no-underline dark:text-gray-300">
               <span>
-                {{ `Posted ${relativeTime} by ` }}
+                {{ `Posted ${relative} by ` }}
                 <UsernameWithTooltip
                   v-if="authorUsername"
                   :is-admin="authorIsAdmin"
@@ -175,7 +129,7 @@ export default defineComponent({
           <MarkdownPreview :text="discussion.body" :word-limit="50" :disable-gallery="false" class="-ml-2" />
         </div>
         <div class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline">
-          <Tag
+          <TagComponent
             v-for="tag in tags"
             :key="tag"
             class="my-1"
@@ -215,7 +169,7 @@ export default defineComponent({
   </li>
 </template>
 
-<style>
+<style scoped>
 .highlighted {
   background-color: #f9f95d;
 }

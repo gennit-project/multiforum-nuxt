@@ -21,7 +21,7 @@ import type {
   EventTagsConnectOrCreateFieldInput,
   EventTagsDisconnectFieldInput,
   Event,
-} from "@/src/__generated__/graphql";
+} from "@/__generated__/graphql";
 
 export default defineComponent({
   name: "EditEvent",

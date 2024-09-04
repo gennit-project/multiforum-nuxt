@@ -15,7 +15,7 @@ import SaveButton from "@/components/SaveButton.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import type { PropType } from "vue";
-import type { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/__generated__/graphql";
 import type { HandleEditFeedbackInput, HandleFeedbackInput } from "./Comment.vue";
 import { timeAgo } from "@/utils";
 

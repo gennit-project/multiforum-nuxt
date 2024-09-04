@@ -2,7 +2,7 @@
 import { ref, computed, watch } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
-import type { Tag } from "@/src/__generated__/graphql";
+import type { Tag } from "@/__generated__/graphql";
 import SearchBar from "@/components/SearchBar.vue";
 
 const props = defineProps({

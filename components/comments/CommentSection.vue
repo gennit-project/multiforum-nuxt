@@ -26,7 +26,7 @@ import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type {
   CommentCreateInput,
   Comment as CommentType,
-} from '@/src/__generated__/graphql';
+} from '@/__generated__/graphql';
 import type {
   CreateEditCommentFormValues,
   CreateReplyInputData,

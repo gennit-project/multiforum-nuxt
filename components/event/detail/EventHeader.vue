@@ -2,7 +2,7 @@
 import type { PropType} from "vue";
 import { defineComponent, computed, ref } from "vue";
 import { useRoute , useRouter } from "vue-router";
-import type { Event } from "@/src/__generated__/graphql";
+import type { Event } from "@/__generated__/graphql";
 import { CANCEL_EVENT , DELETE_EVENT , ADD_FEEDBACK_COMMENT_TO_EVENT } from "@/graphQLData/event/mutations";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LinkIcon from "@/components/icons/LinkIcon.vue";

@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
 import { DateTime } from "luxon";
-import type { Event } from "@/src/__generated__/graphql";
+import type { Event } from "@/__generated__/graphql";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_SOONEST_EVENTS_IN_CHANNEL } from "@/graphQLData/channel/queries";
 import { useRoute } from "vue-router";

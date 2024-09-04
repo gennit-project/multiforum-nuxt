@@ -1,45 +1,33 @@
-<script lang="ts">
+<script lang="ts" setup>
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
-import type { Channel } from "@/src/__generated__/graphql";
+import { computed } from "vue";
+import type { Channel } from "@/__generated__/graphql";
 import type { TagData } from "@/types/Tag";
-import HighlightedSearchTerms from "../HighlightedSearchTerms.vue";
+import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import Tag from "@/components/TagComponent.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 
-export default defineComponent({
-  components: {
-    HighlightedSearchTerms,
-    Tag,
-    CalendarIcon,
-    DiscussionIcon,
+// Define props
+const props = defineProps({
+  channel: {
+    type: Object as PropType<Channel>,
+    required: true,
   },
-  props: {
-    channel: {
-      type: Object as PropType<Channel>,
-      required: true,
-    },
-    searchInput: {
-      type: String,
-      default: "",
-    },
-    selectedTags: {
-      type: Array as PropType<Array<string>>,
-      default: () => {
-        return [];
-      },
-    },
+  searchInput: {
+    type: String,
+    default: "",
   },
-  setup() {},
-  data(props) {
-    return {
-      tags: props.channel.Tags.map((tag: TagData) => {
-        return tag.text;
-      }),
-    };
+  selectedTags: {
+    type: Array as PropType<Array<string>>,
+    default: () => [],
   },
 });
+
+const tags = computed(() => props.channel.Tags.map((tag: TagData) => tag.text));
+
+defineEmits(['filterByTag']);
+
 </script>
 
 <template>
@@ -48,22 +36,22 @@ export default defineComponent({
       class="border py-4 md:px-6 border-gray-500 dark:border-gray-600 shadow md:rounded-t-lg bg-white p-3 dark:bg-gray-800 dark:text-gray-200"
     >
       <div class="flex flex-row">
-        <router-link
+        <NuxtLink
           :to="`/channels/c/${channel.uniqueName}/discussions`"
           class="flex cursor-pointer"
         >
           <div class="h-24 w-24">
             <Avatar
               :text="channel.uniqueName"
-              :src="channel?.channelIconURL"
+              :src="channel?.channelIconURL || ''"
               :is-medium="true"
               :square="true"
             />
           </div>
-        </router-link>
+        </NuxtLink>
 
         <div class="flex flex-col px-4">
-          <router-link
+          <NuxtLink
             :to="`/channels/c/${channel.uniqueName}/discussions`"
             class="mt-1 flex cursor-pointer items-center gap-4"
           >
@@ -94,7 +82,7 @@ export default defineComponent({
                 />
               </span>
             </div>
-          </router-link>
+          </NuxtLink>
           <div>
             <div
               v-if="channel.description"
@@ -105,7 +93,7 @@ export default defineComponent({
                 :search-input="searchInput"
               />
             </div>
-    
+
             <div class="flex gap-2">
               <Tag
                 v-for="tag in tags"
@@ -122,31 +110,30 @@ export default defineComponent({
     <div class="md:rounded-b-lg bg-gray-500 text-white">
       <div class="flex w-full py-2 px-2">
         <div class="truncate text-xs font-normal">
-          <router-link
+          <NuxtLink
             class="flex items-center gap-1 rounded-lg px-4 py-2 hover:bg-gray-700"
             :to="`/channels/c/${channel.uniqueName}/discussions`"
           >
             <DiscussionIcon class="h-4 w-4" />
-
             {{ channel?.DiscussionChannelsAggregate?.count }}
             {{
               channel?.DiscussionChannelsAggregate?.count === 1
                 ? "Discussion"
                 : "Discussions"
             }}
-          </router-link>
+          </NuxtLink>
         </div>
         <div
-          v-if="channel?.EventChannelsAggregate?.count > 0"
+          v-if="channel?.EventChannelsAggregate?.count"
           class="truncate text-xs font-normal"
         >
-          <router-link
+          <NuxtLink
             class="flex items-center gap-1 rounded-lg px-4 py-2 hover:bg-gray-700"
             :to="`/channels/c/${channel.uniqueName}/events/search`"
           >
             <CalendarIcon class="h-4 w-4" />
             {{ channel?.EventChannelsAggregate?.count || 0 }} Upcoming Events
-          </router-link>
+          </NuxtLink>
         </div>
       </div>
     </div>

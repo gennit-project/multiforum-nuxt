@@ -1,14 +1,11 @@
-<script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, computed, ref } from "vue";
-import type { Discussion } from "@/src/__generated__/graphql";
+<script lang="ts" setup>
+import { ref, computed } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { DateTime } from "luxon";
 import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
-import WarningModal from "../../WarningModal.vue";
-import ErrorBanner from "../../ErrorBanner.vue";
-import { useDisplay } from "vuetify";
+import WarningModal from "@/components/WarningModal.vue";
+import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
 import useClipboard from "vue-clipboard3";
@@ -26,282 +23,184 @@ type MenuItem = {
   event: string;
   icon: string;
 };
-
-export default defineComponent({
-  components: {
-    EllipsisHorizontal,
-    ErrorBanner,
-    MenuButton,
-    WarningModal,
-    UsernameWithTooltip,
-    Notification,
-    OpenIssueModal,
+const props = defineProps({
+  discussion: {
+    type: Object,
+    required: false,
+    default: null,
   },
-  props: {
-    discussion: {
-      type: Object as PropType<Discussion | null>,
-      required: false,
-      default: null,
-    },
-    compactMode: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    channelId: {
-      type: String,
-      required: false,
-      default: null,
-    },
+  compactMode: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
-  setup(props) {
-    const route = useRoute();
-    const router = useRouter();
-
-    const editedAt = computed(() => {
-      if (!props.discussion?.updatedAt) {
-        return "";
-      }
-      return `Edited ${relativeTime(props.discussion.updatedAt)}`;
-    });
-
-    const createdAt = computed(() => {
-      if (!props.discussion?.createdAt) {
-        return "";
-      }
-      return `posted ${relativeTime(props.discussion?.createdAt)}`;
-    });
-
-    const {
-      mutate: deleteDiscussion,
-      error: deleteDiscussionError,
-      loading: deleteDiscussionLoading,
-      onDone: onDoneDeleting,
-    } = useMutation(DELETE_DISCUSSION, {
-      variables: {
-        id: props.discussion?.id,
-      },
-      update: (cache, { data }) => {
-        if (data?.deleteDiscussions?.nodesDeleted > 0) {
-          cache.evict({
-            id: cache.identify({
-              __typename: "Discussion",
-              id: props.discussion?.id,
-            }),
-          });
-        }
-      },
-    });
-
-    onDoneDeleting(() => {
-      if (props.channelId) {
-        router.push({
-          name: "SearchDiscussionsInChannel",
-          params: {
-            channelId: props.channelId,
-          },
-        });
-      }
-    });
-
-    const defaultChannel = computed(() => {
-      if (!props.discussion) {
-        return "";
-      }
-      const channelInRoute = route.params.channelId;
-
-      if (channelInRoute) {
-        return channelInRoute;
-      }
-      return props.discussion.DiscussionChannels[0].channelUniqueName;
-    });
-
-    const permalinkObject = computed(() => {
-      if (!props.discussion) {
-        return {};
-      }
-      return {
-        name: "DiscussionDetail",
-        params: {
-          discussionId: props.discussion.id,
-          channelId: defaultChannel.value,
-        },
-      };
-    });
-
-    const { toClipboard } = useClipboard();
-
-    const showCopiedLinkNotification = ref(false);
-
-    const copyLink = async (event: any) => {
-      try {
-        const basePath = window.location.origin;
-        const permalink = `${basePath}${
-          router.resolve(permalinkObject.value).href
-        }`;
-        await toClipboard(permalink);
-        showCopiedLinkNotification.value = event;
-      } catch (e: any) {
-        throw new Error(e);
-      }
-      setTimeout(() => {
-        showCopiedLinkNotification.value = false;
-      }, 2000);
-    };
-
-    const deleteModalIsOpen = ref(false);
-    const showOpenIssueModal = ref(false);
-
-    const { lgAndDown, lgAndUp, mdAndDown, mdAndUp, xlAndUp } = useDisplay();
-
-    const {
-      result: localUsernameResult,
-      loading: localUsernameLoading,
-      error: localUsernameError,
-    } = useQuery(GET_LOCAL_USERNAME);
-
-    const username = computed(() => {
-      if (localUsernameLoading.value || localUsernameError.value) {
-        return "";
-      }
-      return localUsernameResult.value.username;
-    });
-
-    const {
-      result: localModProfileNameResult,
-      loading: localModProfileNameLoading,
-      error: localModProfileNameError,
-    } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
-    const loggedInUserModName = computed(() => {
-      if (localModProfileNameLoading.value || localModProfileNameError.value) {
-        return "";
-      }
-      return localModProfileNameResult.value.modProfileName;
-    });
-
-    const menuItems = computed(() => {
-      let out: MenuItem[] = [];
-
-      if (props.discussion) {
-        if (route.name !== "DiscussionFeedback") {
-          out = out.concat([
-            {
-              label: "View Feedback",
-              value: "",
-              event: "handleViewFeedback",
-              icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-            },
-            {
-              label: "Copy Link",
-              value: "",
-              event: "copyLink",
-              icon: ALLOWED_ICONS.COPY_LINK,
-            },
-          ]);
-        }
-      }
-
-      if (props.discussion?.Author?.username === username.value) {
-        // If it's your own post, you can edit or delete it.
-        out.push({
-          label: "Edit",
-          value: "",
-          event: "handleEdit",
-          icon: ALLOWED_ICONS.EDIT,
-        });
-        out.push({
-          label: "Delete",
-          value: "",
-          event: "handleDelete",
-          icon: ALLOWED_ICONS.DELETE,
-        });
-      } else {
-        // If it is someone else's post, you can report it
-        // or give feedback on it.
-        if (username.value && loggedInUserModName.value) {
-          out = out.concat([
-            {
-              label: "Report",
-              value: "",
-              event: "handleClickReport",
-              icon: ALLOWED_ICONS.REPORT,
-            },
-          ]);
-
-          if (route.name !== "DiscussionFeedback") {
-            out = out.concat([
-              {
-                label: "Give Feedback",
-                value: "",
-                event: "handleFeedback",
-                icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-              },
-            ]);
-          }
-        }
-      }
-
-      return out;
-    });
-
-    const authorIsAdmin = computed(() => {
-      const author = props.discussion?.Author;
-      const serverRoles = author?.ServerRoles || [];
-      if (serverRoles.length === 0) {
-        return false;
-      }
-      const serverRole = serverRoles[0];
-      return serverRole.showAdminTag || false;
-    });
-
-    const authorIsMod = computed(() => {
-      const author = props.discussion?.Author;
-      const channelRoles = author?.ChannelRoles || [];
-      if (channelRoles.length === 0) {
-        return false;
-      }
-      const channelRole = channelRoles[0];
-      return channelRole.showModTag || false;
-    });
-
-    return {
-      authorIsAdmin,
-      authorIsMod,
-      copyLink,
-      createdAt,
-      deleteModalIsOpen,
-      deleteDiscussion,
-      deleteDiscussionError,
-      deleteDiscussionLoading,
-      editedAt,
-      menuItems,
-      route,
-      router,
-      lgAndDown,
-      lgAndUp,
-      mdAndDown,
-      mdAndUp,
-      showCopiedLinkNotification,
-      showOpenIssueModal,
-      showSuccessfullyReported: ref(false),
-      xlAndUp,
-    };
-  },
-  methods: {
-    getFormattedDateString(startTime: string) {
-      const startTimeObj = DateTime.fromISO(startTime);
-
-      return startTimeObj.toFormat("cccc LLLL d yyyy");
-    },
-    handleClickGiveFeedback() {
-      this.$emit("handleClickGiveFeedback");
-    },
-    handleClickReport() {
-      this.showOpenIssueModal = true;
-    },
+  channelId: {
+    type: String,
+    required: false,
+    default: null,
   },
 });
+
+const emit = defineEmits(["handleClickGiveFeedback"]);
+
+const route = useRoute();
+const router = useRouter();
+
+const relativeTime = (date: string) => DateTime.fromISO(date).toRelative();
+
+const editedAt = computed(() => {
+  if (!props.discussion?.updatedAt) return "";
+  return `Edited ${relativeTime(props.discussion.updatedAt)}`;
+});
+
+const createdAt = computed(() => {
+  if (!props.discussion?.createdAt) return "";
+  return `Posted ${relativeTime(props.discussion.createdAt)}`;
+});
+
+const {
+  mutate: deleteDiscussion,
+  loading: deleteDiscussionLoading,
+  error: deleteDiscussionError,
+  onDone: onDoneDeleting,
+} = useMutation(DELETE_DISCUSSION, {
+  variables: { id: props.discussion?.id },
+  update: (cache, { data }) => {
+    if (data?.deleteDiscussions?.nodesDeleted > 0) {
+      cache.evict({
+        id: cache.identify({
+          __typename: "Discussion",
+          id: props.discussion?.id,
+        }),
+      });
+    }
+  },
+});
+
+onDoneDeleting(() => {
+  if (props.channelId) {
+    router.push({
+      name: "SearchDiscussionsInChannel",
+      params: { channelId: props.channelId },
+    });
+  }
+});
+
+const defaultChannel = computed(() => {
+  if (!props.discussion) {
+    return "";
+  }
+  const channelInRoute = route.params.channelId;
+  return (
+    channelInRoute || props.discussion?.DiscussionChannels[0].channelUniqueName
+  );
+});
+
+const permalinkObject = computed(() => {
+  if (!props.discussion) return {};
+  return {
+    name: "DiscussionDetail",
+    params: {
+      discussionId: props.discussion.id,
+      channelId: defaultChannel.value,
+    },
+  };
+});
+
+const { toClipboard } = useClipboard();
+
+const showCopiedLinkNotification = ref(false);
+
+const copyLink = async (event: any) => {
+  try {
+    const basePath = window.location.origin;
+    const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
+    await toClipboard(permalink);
+    showCopiedLinkNotification.value = event;
+  } catch (e) {
+    console.error(e);
+  }
+  setTimeout(() => {
+    showCopiedLinkNotification.value = false;
+  }, 2000);
+};
+
+const deleteModalIsOpen = ref(false);
+const showOpenIssueModal = ref(false);
+const showSuccessfullyReported = ref(false);
+
+const {
+  result: localUsernameResult,
+} = useQuery(GET_LOCAL_USERNAME);
+const username = computed(() => localUsernameResult.value?.username || "");
+
+const {
+  result: localModProfileNameResult,
+} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+const loggedInUserModName = computed(
+  () => localModProfileNameResult.value?.modProfileName || ""
+);
+
+const menuItems = computed(() => {
+  let out: MenuItem[] = [];
+
+  if (props.discussion) {
+    if (route.name !== "DiscussionFeedback") {
+      out = out.concat([
+        {
+          label: "View Feedback",
+          event: "handleViewFeedback",
+          icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+          value: props.discussion.id,
+        },
+        {
+          label: "Copy Link",
+          event: "copyLink",
+          icon: ALLOWED_ICONS.COPY_LINK,
+          value: props.discussion.id,
+        },
+      ]);
+    }
+
+    if (props.discussion?.Author?.username === username.value) {
+      out.push({
+        label: "Edit",
+        event: "handleEdit",
+        icon: ALLOWED_ICONS.EDIT,
+        value: props.discussion.id,
+      });
+      out.push({
+        label: "Delete",
+        event: "handleDelete",
+        icon: ALLOWED_ICONS.DELETE,
+        value: props.discussion.id,
+      });
+    } else if (username.value && loggedInUserModName.value) {
+      out.push({
+        label: "Report",
+        event: "handleClickReport",
+        icon: ALLOWED_ICONS.REPORT,
+        value: props.discussion.id,
+      });
+      if (route.name !== "DiscussionFeedback") {
+        out.push({
+          label: "Give Feedback",
+          event: "handleFeedback",
+          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+          value: props.discussion.id,
+        });
+      }
+    }
+  }
+  return out;
+});
+
+const authorIsAdmin = computed(
+  () => props.discussion?.Author?.ServerRoles?.[0]?.showAdminTag || false
+);
+const authorIsMod = computed(
+  () => props.discussion?.Author?.ChannelRoles?.[0]?.showModTag || false
+);
 </script>
 
 <template>
@@ -309,25 +208,16 @@ export default defineComponent({
     <div class="mt-2 flex justify-between">
       <div class="flex flex-wrap items-center space-x-2 text-xs">
         <Avatar
-          :text="
-            discussion && discussion.Author?.username
-              ? discussion.Author.username
-              : '[Deleted]'
-          "
-          :src="
-            discussion && discussion.Author?.profilePicURL
-              ? discussion.Author.profilePicURL
-              : ''
-          "
+          :text="discussion?.Author?.username ?? '[Deleted]'"
+          :src="discussion?.Author?.profilePicURL ?? ''"
           :is-small="true"
         />
         <router-link
-          v-if="discussion && discussion.Author"
+          v-if="discussion?.Author"
           class="cursor-pointer font-bold text-black hover:underline dark:text-white"
           :to="`/u/${discussion.Author.username}`"
         >
           <UsernameWithTooltip
-            v-if="discussion.Author.username"
             :is-admin="authorIsAdmin"
             :is-mod="authorIsMod"
             :username="discussion.Author.username"
@@ -340,12 +230,7 @@ export default defineComponent({
         </router-link>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
-        <span
-          v-if="discussion && discussion.updatedAt"
-          class="mx-2"
-        >
-          &#8226;
-        </span>
+        <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
         <div>{{ editedAt }}</div>
       </div>
       <MenuButton
@@ -355,23 +240,17 @@ export default defineComponent({
         @copy-link="copyLink"
         @handle-edit="
           router.push(
-            `/channels/c/${channelId}/discussions/d/${discussion.id}/edit`,
+            `/channels/c/${channelId}/discussions/d/${discussion.id}/edit`
           )
         "
         @handle-delete="deleteModalIsOpen = true"
         @handle-click-report="showOpenIssueModal = true"
-        @handle-feedback="handleClickGiveFeedback"
+        @handle-feedback="emit('handleClickGiveFeedback')"
         @handle-view-feedback="
-          () => {
-            if (discussion) {
-              router.push({
-                name: 'DiscussionFeedback',
-                params: {
-                  discussionId: discussion.id,
-                },
-              });
-            }
-          }
+          router.push({
+            name: 'DiscussionFeedback',
+            params: { discussionId: discussion.id },
+          })
         "
       >
         <EllipsisHorizontal

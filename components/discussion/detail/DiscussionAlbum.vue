@@ -11,7 +11,7 @@ import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-thumbnail.css";
 import "lightgallery/css/lg-zoom.css";
 
-import type { Album } from "@/src/__generated__/graphql";
+import type { Album } from "@/__generated__/graphql";
 
 export default defineComponent({
   name: "DiscussionAlbum",

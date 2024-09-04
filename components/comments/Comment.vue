@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import useClipboard from "vue-clipboard3";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/core";
-import type { Comment } from "@/src/__generated__/graphql";
+import type { Comment } from "@/__generated__/graphql";
 import type { CreateReplyInputData } from "@/types/Comment";
 import TextEditor from "../forms/TextEditor.vue";
 import ChildComments from "./ChildComments.vue";

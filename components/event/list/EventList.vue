@@ -3,7 +3,7 @@ import { defineProps, defineEmits, computed } from 'vue';
 import EventListItem from './EventListItem.vue';
 import LoadMore from '../../LoadMore.vue';
 import { useRoute, useRouter } from 'vue-router';
-import type { Event } from '@/src/__generated__/graphql';
+import type { Event } from '@/__generated__/graphql';
 
 const props = defineProps({
   highlightedEventLocationId: {

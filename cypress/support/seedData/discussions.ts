@@ -1,4 +1,4 @@
-import type { DiscussionCreateInput } from "../../../src/__generated__/graphql";
+import type { DiscussionCreateInput } from "../../../__generated__/graphql";
 
 export type DiscussionCreateInputWithChannels = {
   discussionCreateInput: DiscussionCreateInput;

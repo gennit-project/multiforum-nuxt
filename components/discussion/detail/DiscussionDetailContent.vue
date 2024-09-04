@@ -8,7 +8,7 @@ import {
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from "@/graphQLData/comment/queries";
 import { relativeTime } from "@/utils";
-import type { Discussion , DiscussionChannel , Comment } from "@/src/__generated__/graphql";
+import type { Discussion , DiscussionChannel , Comment } from "@/__generated__/graphql";
 import ErrorBanner from "../../ErrorBanner.vue";
 import { useDisplay } from "vuetify";
 import DiscussionBody from "./DiscussionBody.vue";

@@ -24,7 +24,7 @@ import {
 import { timeShortcutValues } from "../list/filters/eventSearchOptions";
 import placeIcon from "@/assets/images/place-icon.svg";
 import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg";
-import type { Event as EventData } from "@/src/__generated__/graphql";
+import type { Event as EventData } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
 import type { Ref, PropType } from "vue";
 

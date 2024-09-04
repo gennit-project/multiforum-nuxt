@@ -9,7 +9,7 @@ import PermalinkedFeedbackComment from '@/components/comments/PermalinkedFeedbac
 import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
 import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
 import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
-import type { Comment } from '@/src/__generated__/graphql';
+import type { Comment } from '@/__generated__/graphql';
 import type { PropType } from 'vue';
 
 type GiveFeedbackInput = {
