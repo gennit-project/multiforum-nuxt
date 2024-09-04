@@ -1,83 +1,70 @@
-<script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, ref } from "vue";
-import clickOutside from "vue-click-outside";
-import SearchableForumList from '@/components/channel/SearchableForumList.vue'
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
+import type { PropType } from 'vue';
+import SearchableForumList from '@/components/channel/SearchableForumList.vue';
+import type { Channel } from '@/src/__generated__/graphql';
 
-export default defineComponent({
-  components: {
-    SearchableForumList,
+// Props definition
+const props = defineProps({
+  hideSelected: {
+    type: Boolean,
+    default: false,
   },
-  directives: {
-    clickOutside,
+  selectedChannels: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
-  props: {
-    hideSelected: {
-      type: Boolean,
-      default: false,
-    },
-    selectedChannels: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-    description: {
-      type: String,
-      default: "Select your intended audience",
-    },
-  },
-  setup(props, { emit }) {
-    const isDropdownOpen = ref(false);
-    const selected = ref([...props.selectedChannels]);
-
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
-    };
-
-    const toggleSelection = (channel: string) => {
-      const index = selected.value.indexOf(channel);
-      if (index === -1) {
-        selected.value.push(channel);
-      } else {
-        selected.value.splice(index, 1);
-      }
-      emit("setSelectedChannels", selected.value);
-    };
-
-    return {
-      channelOptions: ref([]),
-      isDropdownOpen,
-      toggleDropdown,
-      selected,
-      toggleSelection,
-    };
-  },
-  watch: {
-    selectedChannels(newVal) {
-      this.selected = [...newVal];
-    },
-  },
-  methods: {
-    updateSearchResult(input: string) {
-      this.searchInput = input;
-    },
-    outside() {
-      this.isDropdownOpen = false;
-    },
-    removeSelection(channel: string) {
-      this.selected = this.selected.filter((c: string) => c !== channel);
-      this.$emit("setSelectedChannels", this.selected);
-    },
+  description: {
+    type: String,
+    default: 'Select your intended audience',
   },
 });
+
+// Emits definition
+const emit = defineEmits(['setSelectedChannels']);
+
+// Refs and state
+const isDropdownOpen = ref(false);
+const selected = ref([...props.selectedChannels]);
+const channelOptions = ref<Channel[]>([]);
+
+// Methods
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const toggleSelection = (channel: string) => {
+  const index = selected.value.indexOf(channel);
+  if (index === -1) {
+    selected.value.push(channel);
+  } else {
+    selected.value.splice(index, 1);
+  }
+  emit('setSelectedChannels', selected.value);
+};
+
+const outside = () => {
+  isDropdownOpen.value = false;
+};
+
+const removeSelection = (channel: string) => {
+  selected.value = selected.value.filter((c) => c !== channel);
+  emit('setSelectedChannels', selected.value);
+};
+
+// Watchers
+watch(
+  () => props.selectedChannels,
+  (newVal) => {
+    selected.value = [...newVal];
+  }
+);
 </script>
 
 <template>
   <div>
     <div>
-      <div
-        v-if="description"
-        class="py-1 text-sm dark:text-gray-300"
-      >
+      <div v-if="description" class="py-1 text-sm dark:text-gray-300">
         {{ description }}
       </div>
       <div class="relative">
@@ -94,17 +81,14 @@ export default defineComponent({
             <Avatar
               :src="
                 channelOptions.find(
-                  (channel) => channel?.uniqueName === channelName,
-                )?.icon || ''
+                  (channel: Channel) => channel?.uniqueName === channelName
+                )?.channelIconURL || ''
               "
               :text="channelName"
               class="mr-1 h-8 w-8"
             />
             <span>{{ channelName }}</span>
-            <span
-              class="ml-1 cursor-pointer"
-              @click.stop="removeSelection(channelName)"
-            >
+            <span class="ml-1 cursor-pointer" @click.stop="removeSelection(channelName)">
               &times;
             </span>
           </div>
@@ -114,7 +98,7 @@ export default defineComponent({
           v-click-outside="outside"
           :selected-channels="selected"
           @toggle-selection="toggleSelection"
-          @set-channel-options="channelOptions = $event"
+          @set-channel-options="(channels: Channel[]) => (channelOptions = channels)"
         />
       </div>
     </div>

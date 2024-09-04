@@ -60,7 +60,7 @@ const confirmedAvailable = computed(
   () => !usernameIsTaken.value && !usernameIsEmpty.value && !usernameIsInvalid.value
 );
 
-const emit = defineEmits(["emailAndUserCreated", "updateUsername"]);
+const emit = defineEmits(["emailAndUserCreated"]);
 
 onEmailAndUserCreated((result) => {
   const user = result.data.createEmailAndUser;
@@ -83,7 +83,6 @@ onEmailAndUserCreated((result) => {
 
 const updateUsername = (newUsernameString: string) => {
   newUsername.value = newUsernameString;
-  emit("updateUsername", newUsernameString);
 };
 
 const usernameInput = ref<HTMLInputElement | null>(null);

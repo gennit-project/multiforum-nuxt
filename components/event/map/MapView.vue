@@ -561,7 +561,7 @@ const openPreview = (event: EventData, openedFromMap = false) => {
         :top-layer="true"
         @close-preview="closeEventPreview"
       >
-        <router-view />
+        <NuxtPage />
       </PreviewContainer>
     </PreviewContainer>
   </div>

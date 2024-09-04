@@ -1,52 +1,40 @@
-<script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent } from "vue";
-import type { Channel } from "@/src/__generated__/graphql";
-import ChannelListItem from "@/components/channel/ChannelListItem.vue";
-import LoadMore from "../LoadMore.vue";
+<script lang="ts" setup>
+import type { PropType } from 'vue';
+import { defineEmits, defineProps } from 'vue';
+import type { Channel } from '@/src/__generated__/graphql';
+import ChannelListItem from '@/components/channel/ChannelListItem.vue';
+import LoadMore from '@/components/LoadMore.vue';
 
-export default defineComponent({
-  components: {
-    ChannelListItem,
-    LoadMore,
+// Define props
+defineProps({
+  channels: {
+    type: Array as PropType<Array<Channel>>,
+    default: () => [],
   },
-  props: {
-    channels: {
-      type: Array as PropType<Array<Channel>>,
-      default: () => {
-        return [];
-      },
-    },
-    resultCount: {
-      type: Number,
-      default: 0,
-    },
-    searchInput: {
-      type: String,
-      default: "",
-    },
-    selectedTags: {
-      type: Array as PropType<Array<string>>,
-      default: () => {
-        return [];
-      },
-    },
+  resultCount: {
+    type: Number,
+    default: 0,
   },
-  setup() {},
-  methods: {
-    filterByTag(tag: string) {
-      this.$emit("filterByTag", tag);
-    },
+  searchInput: {
+    type: String,
+    default: '',
+  },
+  selectedTags: {
+    type: Array as PropType<Array<string>>,
+    default: () => [],
   },
 });
+
+const emit = defineEmits(['filterByTag', 'loadMore']);
+
+function filterByTag(tag: string) {
+  emit('filterByTag', tag);
+}
 </script>
 
 <template>
   <div>
-    <p
-      v-if="channels.length === 0"
-      class="mt-2 text-sm font-normal dark:text-white"
-    >
+    <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
       There are no results.
     </p>
     <div class="grid gap-4 md:grid-cols-1">
@@ -63,8 +51,10 @@ export default defineComponent({
       <LoadMore
         class="justify-self-center font-normal"
         :reached-end-of-results="resultCount === channels.length"
-        @load-more="$emit('loadMore')"
+        @load-more="emit('loadMore')"
       />
     </div>
   </div>
 </template>
+
+<style scoped></style>

@@ -1,110 +1,82 @@
-<script lang="ts">
-import type { PropType, Ref } from "vue";
-import { defineComponent, computed, ref } from "vue";
-import { GET_CHANNEL_NAMES } from "@/graphQLData/channel/queries";
-import { useQuery } from "@vue/apollo-composable";
-import type { Channel } from "@/src/__generated__/graphql";
-import SearchBar from "@/components/SearchBar.vue";
+<script lang="ts" setup>
+import { ref, computed, watch } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import type { Channel } from '@/src/__generated__/graphql';
+import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
+import SearchBar from '@/components/SearchBar.vue';
+import type { PropType } from 'vue';
 
-export default defineComponent({
-  name: "SearchableForumList",
-  components: {
-    SearchBar,
+// Define props
+const props = defineProps({
+  hideSelected: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    hideSelected: {
-      type: Boolean,
-      default: false,
-    },
-    selectedChannels: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-    description: {
-      type: String,
-      default: "Select your intended audience",
-    },
+  selectedChannels: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
-  setup(props, { emit }) {
-    const searchInput: Ref<string> = ref("");
-
-    const searchInputComputed = computed(() => {
-      return `(?i).*${searchInput.value}.*`;
-    });
-
-    const {
-      loading: channelsLoading,
-      error: channelsError,
-      result: channelsResult,
-      onResult: onGetChannelNames,
-    } = useQuery(GET_CHANNEL_NAMES, {
-      channelWhere: {
-        uniqueName_MATCHES: searchInputComputed,
-      },
-    });
-
-    const isDropdownOpen = ref(false);
-
-    const channelOptions = computed(() => {
-      if (!channelsResult.value || !channelsResult.value.channels) {
-        return [];
-      }
-      return channelsResult.value.channels.map((channel: Channel) => ({
-        uniqueName: channel.uniqueName,
-        displayName: channel.displayName,
-        icon: channel.channelIconURL,
-        description: channel.description,
-      }));
-    });
-
-    onGetChannelNames(() => {
-      // set channel names in parent component
-      const channels = channelsResult.value?.channels.map(
-        (channel: Channel) => {
-          return {
-            uniqueName: channel.uniqueName,
-            displayName: channel.displayName,
-            icon: channel.channelIconURL,
-            description: channel.description,
-          };
-        },
-      );
-      emit("setChannelNames", channels);
-    });
-
-    const selected = ref([...props.selectedChannels]);
-
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
-    };
-    return {
-      channelsError,
-      channelsLoading,
-      channelOptions,
-      isDropdownOpen,
-      toggleDropdown,
-      searchInput,
-      selected,
-    };
-  },
-  watch: {
-    selectedChannels(newVal) {
-      this.selected = [...newVal];
-    },
-  },
-  methods: {
-    updateSearchResult(input: string) {
-      this.searchInput = input;
-    },
-    truncate(description: string) {
-      // limit to 100 characters
-      return description.length > 100
-        ? description.substring(0, 100) + "..."
-        : description;
-    },
+  description: {
+    type: String,
+    default: 'Select your intended audience',
   },
 });
+
+// Emit function
+const emit = defineEmits(['setChannelNames', 'toggleSelection']);
+
+// Local state
+const searchInput = ref<string>('');
+const selected = ref([...props.selectedChannels]);
+
+// Computed properties
+const searchInputComputed = computed(() => `(?i).*${searchInput.value}.*`);
+
+const { loading: channelsLoading, error: channelsError, result: channelsResult, onResult: onGetChannelNames } = useQuery(GET_CHANNEL_NAMES, {
+  channelWhere: {
+    uniqueName_MATCHES: searchInputComputed,
+  },
+});
+
+const channelOptions = computed(() => {
+  if (!channelsResult.value || !channelsResult.value.channels) {
+    return [];
+  }
+  return channelsResult.value.channels.map((channel: Channel) => ({
+    uniqueName: channel.uniqueName,
+    displayName: channel.displayName,
+    icon: channel.channelIconURL,
+    description: channel.description,
+  }));
+});
+
+// Watch the query result
+onGetChannelNames(() => {
+  const channels = channelsResult.value?.channels.map((channel: Channel) => ({
+    uniqueName: channel.uniqueName,
+    displayName: channel.displayName,
+    icon: channel.channelIconURL,
+    description: channel.description,
+  }));
+  emit('setChannelNames', channels);
+});
+
+watch(
+  () => props.selectedChannels,
+  (newVal) => {
+    selected.value = [...newVal];
+  }
+);
+
+const updateSearchResult = (input: string) => {
+  searchInput.value = input;
+};
+
+const truncate = (description: string) => {
+  return description.length > 100 ? description.substring(0, 100) + '...' : description;
+};
 </script>
+
 <template>
   <div
     class="absolute z-10 w-full rounded-md max-h-96 overflow-y-auto border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
@@ -123,10 +95,7 @@ export default defineComponent({
       Loading...
     </div>
     <div v-else-if="channelsError">
-      <div
-        v-for="(error, i) of channelsError?.graphQLErrors"
-        :key="i"
-      >
+      <div v-for="(error, i) of channelsError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
     </div>
@@ -141,9 +110,7 @@ export default defineComponent({
           :value="channel.uniqueName"
           :checked="selected.includes(channel.uniqueName)"
           class="form-checkbox"
-          @change="() => {
-            $emit('toggleSelection', channel.uniqueName)
-          }"
+          @change="() => emit('toggleSelection', channel.uniqueName)"
         >
         <div class="flex items-center space-x-2">
           <Avatar
@@ -160,18 +127,14 @@ export default defineComponent({
             :text="channel.uniqueName"
           />
           <div class="flex-col">
-            <span
-              v-if="!channel.displayName"
-              class="font-mono font-bold"
-            >{{
-              channel.uniqueName
-            }}</span>
+            <span v-if="!channel.displayName" class="font-mono font-bold">
+              {{ channel.uniqueName }}
+            </span>
             <div v-else>
               <span class="font-bold">{{ channel.displayName }}</span>
               &#8226;
               <span class="font-mono">{{ channel.uniqueName }}</span>
             </div>
-
             <div>{{ truncate(channel.description || "") }}</div>
           </div>
         </div>

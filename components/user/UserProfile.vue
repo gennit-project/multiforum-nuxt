@@ -183,7 +183,7 @@ export default defineComponent({
                 class="block border-b border-gray-200 dark:border-gray-600"
                 :route="route"
               />
-              <router-view />
+              <NuxtPage />
             </v-col>
           </v-row>
         </v-container>

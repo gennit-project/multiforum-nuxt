@@ -29,7 +29,12 @@
       "./types"
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "#app": ["./.nuxt/types/app/index.d.ts"],
+      "#app/*": ["./.nuxt/types/app/*"],
+      "#build/*": ["./.nuxt/types/build/*"],
+      "#imports": ["./.nuxt/types/imports.d.ts"],
+      "#imports/*": ["./.nuxt/types/imports/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

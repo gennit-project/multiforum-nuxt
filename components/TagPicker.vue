@@ -1,118 +1,62 @@
-<script lang="ts">
-import type { PropType, Ref } from "vue";
-import { defineComponent, computed, ref } from "vue";
-import { GET_TAGS } from "@/graphQLData/tag/queries";
-import { useQuery } from "@vue/apollo-composable";
-import type { Tag } from "@/src/__generated__/graphql";
-import clickOutside from "vue-click-outside";
-import SearchableTagList from '@/components/SearchableTagList.vue'
+<script lang="ts" setup>
+import { ref, watch } from 'vue';
+import SearchableTagList from '@/components/SearchableTagList.vue';
 
-export default defineComponent({
-  components: {
-    SearchableTagList,
+const props = defineProps({
+  hideSelected: {
+    type: Boolean,
+    default: false,
   },
-  directives: {
-    clickOutside,
+  selectedTags: {
+    type: Array as PropType<string[]>,
+    default: () => [],
   },
-  props: {
-    hideSelected: {
-      type: Boolean,
-      default: false,
-    },
-    selectedTags: {
-      type: Array as PropType<string[]>,
-      default: () => [],
-    },
-    description: {
-      type: String,
-      default: "",
-    },
-  },
-  setup(props, ) {
-    const emit = defineEmits([
-      "setSelectedTags",
-    ]);
-    const searchInput: Ref<string> = ref("");
-
-    const searchInputComputed = computed(() => {
-      return searchInput.value;
-    });
-
-    const {
-      loading: tagsLoading,
-      error: tagsError,
-      result: tagsResult,
-    } = useQuery(GET_TAGS, {
-      where: {
-        text_CONTAINS: searchInputComputed,
-      },
-    });
-
-    const isDropdownOpen = ref(false);
-
-    const tagOptions = computed(() => {
-      if (!tagsResult.value || !tagsResult.value.tags) {
-        return [];
-      }
-      return tagsResult.value.tags.map((tag: Tag) => ({
-        text: tag.text,
-      }));
-    });
-
-    const selected = ref([...props.selectedTags]);
-
-    const toggleDropdown = () => {
-      isDropdownOpen.value = !isDropdownOpen.value;
-    };
-
-    const toggleSelectedTag = (tag: string) => {
-      const index = selected.value.indexOf(tag);
-      if (index === -1) {
-        selected.value.push(tag);
-      } else {
-        selected.value.splice(index, 1);
-      }
-      emit("setSelectedTags", selected.value);
-    };
-
-    return {
-      tagsError,
-      tagsLoading,
-      tagOptions,
-      isDropdownOpen,
-      toggleDropdown,
-      searchInput,
-      selected,
-      toggleSelectedTag,
-    };
-  },
-  watch: {
-    selectedTags(newVal) {
-      this.selected = [...newVal];
-    },
-  },
-  methods: {
-    updateSearchResult(input: string) {
-      this.searchInput = input;
-    },
-    outside() {
-      this.isDropdownOpen = false;
-    },
-    removeSelection(tag: string) {
-      this.selected = this.selected.filter((c: string) => c !== tag);
-      this.$emit("setSelectedTags", this.selected);
-    },
+  description: {
+    type: String,
+    default: '',
   },
 });
+
+const emit = defineEmits(['setSelectedTags']);
+
+const isDropdownOpen = ref(false);
+const selected = ref([...props.selectedTags]);
+
+const toggleDropdown = () => {
+  isDropdownOpen.value = !isDropdownOpen.value;
+};
+
+const toggleSelectedTag = (tag: string) => {
+  const index = selected.value.indexOf(tag);
+  if (index === -1) {
+    selected.value.push(tag);
+  } else {
+    selected.value.splice(index, 1);
+  }
+  emit('setSelectedTags', selected.value);
+};
+
+watch(
+  () => props.selectedTags,
+  (newVal) => {
+    selected.value = [...newVal];
+  }
+);
+
+const outside = () => {
+  isDropdownOpen.value = false;
+};
+
+const removeSelection = (tag: string) => {
+  selected.value = selected.value.filter((c) => c !== tag);
+  emit('setSelectedTags', selected.value);
+};
 </script>
 
 <template>
   <div>
     <div>
-      <div
-        v-if="description"
-        class="py-1 text-sm dark:text-gray-300"
-      >
+      <div v-if="description" class="py-1 text-sm dark:text-gray-300">
         {{ description }}
       </div>
       <div class="relative">
@@ -127,10 +71,7 @@ export default defineComponent({
             @click="removeSelection(tag)"
           >
             <span>{{ tag }}</span>
-            <span
-              class="ml-1 cursor-pointer"
-              @click.stop="removeSelection(tag)"
-            >
+            <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
               &times;
             </span>
           </div>

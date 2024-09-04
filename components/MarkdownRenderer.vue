@@ -1,8 +1,10 @@
 <script setup lang="ts">
+/* eslint-disable vue/no-v-html */
 import { computed } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import { useQuery } from "@vue/apollo-composable";
+import DOMPurify from "dompurify";
 import gql from "graphql-tag";
 import 'highlight.js/styles/github-dark.css';
 
@@ -45,10 +47,14 @@ const md = new MarkdownIt({
   },
 });
 
-const renderedMarkdown = computed(() => md.render(props.text));
+const renderedMarkdown = computed(() => {
+  const rawHTML = md.render(props.text);
+  return DOMPurify.sanitize(rawHTML);
+});
 </script>
 
 <template>
+ 
   <div
     :class="['markdown-body', theme]"
     v-html="renderedMarkdown"

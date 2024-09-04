@@ -104,7 +104,7 @@ export default defineComponent({
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
       </router-link>
     </div>
-    <router-view />
+    <NuxtPage />
   </div>
 </template>
 

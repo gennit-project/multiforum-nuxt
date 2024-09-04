@@ -1,75 +1,48 @@
-<script lang="ts">
-import { useRouter } from "vue-router";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import type { PropType } from "vue";
-import { defineComponent } from "vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import SortIcon from "@/components/icons/SortIcon.vue";
+<script lang="ts" setup>
+import { MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import type { PropType } from 'vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import SortIcon from '@/components/icons/SortIcon.vue';
 
 type MenuItemType = {
   value: string;
   label: string;
 };
 
-export default defineComponent({
-  name: "IconButtonDropdown",
-  components: {
-    ChevronDownIcon,
-    DropdownMenu: Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
-    SortIcon,
+defineProps({
+  items: {
+    type: Array as PropType<MenuItemType[]>,
+    required: true,
   },
-  props: {
-    items: {
-      type: Array as PropType<MenuItemType[]>,
-      required: true,
-    },
-    label: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    showSortIcon: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
+  label: {
+    type: String,
+    required: false,
+    default: '',
   },
-  setup() {
-    const router = useRouter();
-    return {
-      router,
-    };
-  },
-  methods: {
-    handleClick(item: MenuItemType) {
-      this.$emit("clickedItem", item.value);
-    },
+  showSortIcon: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
+
+const emit = defineEmits(['clickedItem']);
+
+function handleClick(item: MenuItemType) {
+  emit('clickedItem', item.value);
+}
 </script>
+
 <template>
-  <DropdownMenu
-    as="div"
-    class="relative inline-block text-left"
-  >
+  <DropdownMenu as="div" class="relative inline-block text-left">
     <div>
       <MenuButton
         :data-testid="`text-dropdown-${label}`"
         class="inline-flex border dark:border-gray-600 hover:dark:bg-gray-600 h-10 w-full items-center justify-center gap-x-1.5 rounded-lg bg-white pr-4 pl-3 text-xs text-black hover:bg-gray-200 focus:outline-none dark:bg-gray-700 dark:text-white"
       >
-        <SortIcon
-          v-if="showSortIcon"
-          class="h-4 w-4"
-          aria-hidden="true"
-        />
+        <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
         {{ label }}
-        <ChevronDownIcon
-          class="-mr-1 ml-1 mt-0.5 h-3 w-3"
-          aria-hidden="true"
-        />
+        <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
       </MenuButton>
     </div>
     <transition
@@ -107,6 +80,7 @@ export default defineComponent({
     </transition>
   </DropdownMenu>
 </template>
+
 <style scoped>
 .top {
   z-index: 10000;

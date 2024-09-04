@@ -16,5 +16,5 @@ export default defineComponent({
 </script>
 
 <template>
-  <router-view />
+  <NuxtPage />
 </template>

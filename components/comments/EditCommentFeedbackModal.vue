@@ -1,136 +1,114 @@
-<script lang="ts">
-import type { Ref} from "vue";
-import { computed, defineComponent, ref } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import GenericModal from "@/components/GenericModal.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/comment/queries";
-import type { Comment } from "@/src/__generated__/graphql";
-import CommentHeader from "@/components/comments/CommentHeader.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import { UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
-import type { CreateEditCommentFormValues } from "@/types/Comment";
-import PencilIcon from "@/components/icons/PencilIcon.vue";
+<script lang="ts" setup>
+import { ref, computed } from 'vue';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import GenericModal from '@/components/GenericModal.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { GET_SPECIFIC_COMMENT_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/comment/queries';
+import CommentHeader from '@/components/comments/CommentHeader.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import type { Ref } from 'vue';
+import type { Comment } from '@/src/__generated__/graphql';
+import type { CreateEditCommentFormValues } from '@/types/Comment';
 
-export default defineComponent({
-  name: "EditFeedbackModal",
-  components: {
-    CommentHeader,
-    ErrorBanner,
-    GenericModal,
-    PencilIcon,
-    TextEditor,
+const props = defineProps({
+  commentId: {
+    type: String,
+    required: true,
   },
-  props: {
-    commentId: {
-      type: String,
-      required: true,
-    },
-    modName: {
-      type: String,
-      required: true,
-    },
-    open: {
-      type: Boolean,
-      default: false,
-    },
+  modName: {
+    type: String,
+    required: true,
   },
-  setup(props, { emit }) {
-    // Fetch the feedback from the server - check for feedback comments
-    // that match the comment ID and the mod username.
-    const feedbackToEditID = ref("");
-    const commentData: Ref<Comment | null> = ref(null);
-
-    const {
-      error: getError,
-      result: feedbackResult,
-      onResult,
-    } = useQuery(
-      GET_FEEDBACK,
-      {
-        commentId: props.commentId,
-        modName: props.modName,
-      },
-      {
-        fetchPolicy: "network-only",
-      },
-    );
-
-    const editFormValues = ref<CreateEditCommentFormValues>({
-      text: commentData.value?.text || "",
-      isRootComment: true,
-      depth: 1,
-    });
-
-    const updateCommentInput = computed(() => {
-      return {
-        text: editFormValues.value?.text || "",
-      };
-    });
-
-    onResult((result) => {
-      const comment = result?.data?.comments?.[0];
-      if (!comment) {
-        console.warn("No feedback found");
-        return;
-      }
-      feedbackToEditID.value = comment.id;
-      commentData.value = comment;
-      editFormValues.value.text = comment.text;
-    });
-
-    const {
-      mutate: editComment,
-      loading: editLoading,
-      error: editCommentError,
-      onDone: onDoneUpdatingComment,
-    } = useMutation(UPDATE_COMMENT, () => ({
-      variables: {
-        commentWhere: {
-          id: commentData.value?.id || "",
-        },
-        updateCommentInput: updateCommentInput.value,
-      },
-    }));
-
-    onDoneUpdatingComment(() => {
-      emit("close");
-    });
-
-    return {
-      body: "",
-      commentData,
-      editFormValues,
-      editCommentError,
-      editComment,
-      getError: getError,
-      feedbackResult,
-      feedbackToEditID,
-      loading: editLoading,
-      title: "Edit your feedback",
-    };
-  },
-  methods: {
-    handleEdit() {
-      try {
-        this.editComment();
-      } catch (error) {
-        console.error("Error updating feedback", error);
-      }
-    },
-    updateFeedback(text: string) {
-      this.editFormValues.text = text;
-    },
+  open: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const emit = defineEmits(['close']);
+
+const feedbackToEditID = ref('');
+const commentData: Ref<Comment | null> = ref(null);
+
+const {
+  error: getError,
+  onResult,
+} = useQuery(
+  GET_FEEDBACK,
+  {
+    commentId: props.commentId,
+    modName: props.modName,
+  },
+  {
+    fetchPolicy: 'network-only',
+  }
+);
+
+const editFormValues = ref<CreateEditCommentFormValues>({
+  text: commentData.value?.text || '',
+  isRootComment: true,
+  depth: 1,
+});
+
+const updateCommentInput = computed(() => ({
+  text: editFormValues.value?.text || '',
+}));
+
+onResult((result) => {
+  const comment = result?.data?.comments?.[0];
+  if (!comment) {
+    console.warn('No feedback found');
+    return;
+  }
+  feedbackToEditID.value = comment.id;
+  commentData.value = comment;
+  editFormValues.value.text = comment.text;
+});
+
+const {
+  mutate: editComment,
+  loading: editLoading,
+  error: editCommentError,
+  onDone: onDoneUpdatingComment,
+} = useMutation(UPDATE_COMMENT, () => ({
+  variables: {
+    commentWhere: {
+      id: commentData.value?.id || '',
+    },
+    updateCommentInput: updateCommentInput.value,
+  },
+}));
+
+onDoneUpdatingComment(() => {
+  emit('close');
+});
+
+const handleEdit = () => {
+  try {
+    editComment();
+  } catch (error) {
+    console.error('Error updating feedback', error);
+  }
+};
+
+const updateFeedback = (text: string) => {
+  editFormValues.value.text = text;
+};
+
+const title = 'Edit your feedback';
+const body = '';
+
 </script>
+
 <template>
   <GenericModal
     :highlight-color="'red'"
     :title="title"
     :body="body"
     :open="open"
-    :loading="loading"
+    :loading="editLoading"
     :primary-button-text="'Update'"
     :secondary-button-text="'Cancel'"
     @primary-button-click="handleEdit"
@@ -156,14 +134,8 @@ export default defineComponent({
           @update="updateFeedback"
         />
       </div>
-      <ErrorBanner
-        v-if="getError"
-        :text="getError.message"
-      />
-      <ErrorBanner
-        v-if="editCommentError"
-        :text="editCommentError.message"
-      />
+      <ErrorBanner v-if="getError" :text="getError.message" />
+      <ErrorBanner v-if="editCommentError" :text="editCommentError.message" />
     </template>
   </GenericModal>
 </template>

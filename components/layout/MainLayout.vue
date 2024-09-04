@@ -25,7 +25,7 @@ export default defineComponent({
 <template>
   <div class="flex min-h-screen flex-col">
     <div class="flex-grow">
-      <router-view />
+      <NuxtPage />
     </div>
     <SiteFooter
       v-if="

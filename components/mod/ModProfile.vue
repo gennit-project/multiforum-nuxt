@@ -138,7 +138,7 @@ export default defineComponent({
           </div>
         </div>
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 pb-12">
-          <router-view />
+          <NuxtPage />
         </div>
       </div> -->
     </article>
