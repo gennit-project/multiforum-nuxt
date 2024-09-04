@@ -36,8 +36,6 @@ export default defineNuxtConfig({
     "@fortawesome/fontawesome-free/css/all.css",
     "codemirror/lib/codemirror.css",
     "codemirror/addon/scroll/simplescrollbars.css",
-    "@kangc/v-md-editor/lib/style/preview.css",
-    "@kangc/v-md-editor/lib/style/codemirror-editor.css",
   ],
   devtools: { enabled: true },
   // fontawesome: {

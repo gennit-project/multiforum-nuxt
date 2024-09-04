@@ -336,15 +336,6 @@ const handleDrop = async (event: any) => {
 
 <style lang="scss">
 @media (prefers-color-scheme: dark) {
-  .v-md-editor--preview,
-  .v-md-pre-wrapper {
-    background-color: transparent !important;
-  }
-
-  .v-md-textarea-editor textarea {
-    background-color: transparent;
-    color: white !important;
-  }
 
   .dark {
     table,
