@@ -1,70 +1,46 @@
-<script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, computed } from "vue";
-import type { TagData } from "../../types/Tag";
+<script setup lang="ts">
+import { computed } from "vue";
 import { relativeTime } from "@/utils";
-import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/TagComponent.vue";
-import type { Event } from "@/__generated__/graphql";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
+import type { Event } from "@/__generated__/graphql";
+import type { TagData } from "../../types/Tag";
 
-export default defineComponent({
-  components: {
-    Tag,
-    HighlightedSearchTerms,
+const props = defineProps({
+  event: {
+    type: Object as () => Event,
+    required: true,
   },
-  inheritAttrs: false,
-  props: {
-    event: {
-      type: Object as PropType<Event>,
-      required: true,
-    },
-    searchInput: {
-      type: String,
-      default: "",
-    },
-    selectedTags: {
-      type: Array as PropType<Array<string>>,
-      default: () => {
-        return [];
-      },
-    },
-    selectedChannels: {
-      type: Array as PropType<Array<string>>,
-      default: () => {
-        return [];
-      },
-    },
+  searchInput: {
+    type: String,
+    default: "",
   },
-  setup() {},
-  data(props) {
-    const route = useRoute();
-    const router = useRouter();
-
-    const defaultUniqueName = computed(() => {
-      if (!props.event.EventChannels || !props.event.EventChannels[0]) {
-        return "";
-      }
-      return props.event.EventChannels[0].channelUniqueName;
-    });
-    return {
-      router,
-      defaultUniqueName,
-      previewIsOpen: false,
-      title: props.event.title,
-      createdAt: props.event.createdAt,
-      relativeTime: relativeTime(props.event.createdAt),
-      poster: props.event.Poster ? props.event.Poster.username : "Deleted",
-      // If we are already within the channel, don't show
-      // links to cost channels and don't specify which
-      // channel the comments are in.
-      tags: props.event.Tags.map((tag: TagData) => {
-        return tag.text;
-      }),
-      route,
-    };
+  selectedTags: {
+    type: Array as () => string[],
+    default: () => [],
+  },
+  selectedChannels: {
+    type: Array as () => string[],
+    default: () => [],
   },
 });
+
+defineEmits(["filterByTag"]);
+
+const router = useRouter();
+
+// Computed property for defaultUniqueName
+const defaultUniqueName = computed(() => {
+  if (!props.event.EventChannels || !props.event.EventChannels[0]) {
+    return "";
+  }
+  return props.event.EventChannels[0].channelUniqueName;
+});
+
+const title = props.event.title;
+const relativeTimeText = relativeTime(props.event.createdAt);
+const poster = props.event.Poster ? props.event.Poster.username : "Deleted";
+const tags = props.event.Tags.map((tag: TagData) => tag.text);
 </script>
 
 <template>
@@ -97,11 +73,13 @@ export default defineComponent({
         @click="$emit('filterByTag', tag)"
       />
     </p>
+
     <p
       class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"
     >
-      {{ `Posted ${relativeTime} by ${poster}` }}
+      {{ `Posted ${relativeTimeText} by ${poster}` }}
     </p>
+
     <div
       v-for="(ec, i) in event.EventChannels"
       :key="i"
@@ -117,6 +95,7 @@ export default defineComponent({
     </div>
   </li>
 </template>
+
 <style>
 .highlighted {
   background-color: #f9f95d;

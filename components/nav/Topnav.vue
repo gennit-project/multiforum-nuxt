@@ -14,16 +14,15 @@ import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useDisplay } from "vuetify";
 import { useRoute } from "vue-router";
 
-// Authentication
+
+defineEmits(["toggleDropdown"]);
+
 const { isAuthenticated } = useAuth0();
 
-// Route handling
 const route = useRoute();
 
-// Display utilities
 const { smAndDown } = useDisplay();
 
-// Queries
 const { result } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => {
   const username = result.value?.username;

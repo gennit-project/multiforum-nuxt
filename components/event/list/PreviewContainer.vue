@@ -1,7 +1,6 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import {
-  Dialog,
+  Dialog as DialogComponent,
   DialogOverlay,
   TransitionChild,
   TransitionRoot,
@@ -9,39 +8,26 @@ import {
 } from "@headlessui/vue";
 import XIcon from "@/components/icons/XmarkIcon.vue";
 
-export default defineComponent({
-  name: "PreviewContainer",
-  components: {
-    DialogComponent: Dialog,
-    DialogOverlay,
-    DialogTitle,
-    TransitionChild,
-    TransitionRoot,
-    XIcon,
+defineProps({
+  isOpen: {
+    type: Boolean,
+    required: true,
   },
-  props: {
-    isOpen: {
-      type: Boolean,
-      required: true,
-    },
-    header: {
-      type: String,
-      default: "",
-    },
-    topLayer: {
-      type: Boolean,
-      default: false,
-    },
+  header: {
+    type: String,
+    default: "",
   },
-  setup() {},
+  topLayer: {
+    type: Boolean,
+    default: false,
+  },
 });
+
+defineEmits(["closePreview"]);
 </script>
 
 <template>
-  <TransitionRoot
-    as="template"
-    :show="isOpen"
-  >
+  <TransitionRoot as="template" :show="isOpen">
     <DialogComponent
       as="div"
       class="fixed inset-0 overflow-hidden"
@@ -82,10 +68,7 @@ export default defineComponent({
                           @click="$emit('closePreview')"
                         >
                           <span class="sr-only">Close panel</span>
-                          <XIcon
-                            class="h-6 w-6"
-                            aria-hidden="true"
-                          />
+                          <XIcon class="h-6 w-6" aria-hidden="true" />
                         </button>
                       </div>
                     </div>

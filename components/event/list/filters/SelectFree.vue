@@ -1,36 +1,27 @@
-<script lang="ts">
-import { defineComponent, ref } from "vue";
+<script setup lang="ts">
+import { ref } from "vue";
 
-export default defineComponent({
-  name: "SelectFree",
-  props: {
-    showOnlyFree: {
-      type: Boolean,
-      required: true,
-    },
-  },
-  setup(props) {
-    // take default from params
-    return {
-      copyOfShowOnlyFree: ref(props.showOnlyFree),
-    };
-  },
-  methods: {
-    toggleShowOnlyFree() {
-      this.copyOfShowOnlyFree = !this.copyOfShowOnlyFree;
-      this.$emit("updateShowOnlyFree", this.copyOfShowOnlyFree);
-    },
+const props = defineProps({
+  showOnlyFree: {
+    type: Boolean,
+    required: true,
   },
 });
+
+const emit = defineEmits(["updateShowOnlyFree"]);
+
+const copyOfShowOnlyFree = ref(props.showOnlyFree);
+
+const toggleShowOnlyFree = () => {
+  copyOfShowOnlyFree.value = !copyOfShowOnlyFree.value;
+  emit("updateShowOnlyFree", copyOfShowOnlyFree.value);
+};
 </script>
 <template>
   <div>
     <div class="grid grid-cols-2 gap-2">
       <div class="p-2 rounded cursor-pointer">
-        <label
-          :for="'free'"
-          class="flex items-center"
-        >
+        <label :for="'free'" class="flex items-center">
           <input
             type="checkbox"
             :data-testid="'free-checkbox'"
@@ -38,7 +29,9 @@ export default defineComponent({
             :checked="copyOfShowOnlyFree"
             @input="() => toggleShowOnlyFree()"
           >
-          <span class="ml-2 text-sm font-medium whitespace-nowrap">Show only free events</span>
+          <span class="ml-2 text-sm font-medium whitespace-nowrap"
+            >Show only free events</span
+          >
         </label>
       </div>
     </div>

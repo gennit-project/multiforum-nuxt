@@ -1,6 +1,6 @@
-<script lang="ts">
-import type { Ref, PropType} from "vue";
-import { defineComponent, ref, computed } from "vue";
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import type { PropType } from "vue";
 import {
   weekdays as weekdayData,
   defaultSelectedWeekdays,
@@ -8,76 +8,52 @@ import {
 import type { SelectedWeekdays, WeekdayData } from "@/types/Event";
 import ResetButton from "@/components/ResetButton.vue";
 
-export default defineComponent({
-  components: {
-    ResetButton,
-  },
-  props: {
-    selectedWeekdays: {
-      type: Object as PropType<SelectedWeekdays>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const workingCopyOfSelectedWeekdays: Ref<SelectedWeekdays> = ref(
-      props.selectedWeekdays,
-    );
-
-    const flattenedWeekdays = computed(() => {
-      const flattenedTimeFilters = [];
-
-      for (const day of Object.keys(workingCopyOfSelectedWeekdays.value)) {
-        if (workingCopyOfSelectedWeekdays.value[day]) {
-          flattenedTimeFilters.push({
-            startTimeDayOfWeek: day,
-          });
-        }
-      }
-      const res = JSON.stringify(flattenedTimeFilters);
-      return res;
-    });
-
-    return {
-      defaultSelectedWeekdays,
-      weekdayData,
-      workingCopyOfSelectedWeekdays,
-      flattenedWeekdays,
-    };
-  },
-  methods: {
-    shouldBeDisabled(weekday: WeekdayData) {
-      const weekdayIsSelected =
-        this.workingCopyOfSelectedWeekdays[weekday.number] === true;
-      return weekdayIsSelected;
-    },
-    shouldBeChecked(weekday: WeekdayData) {
-      const weekdayIsSelected =
-        this.workingCopyOfSelectedWeekdays[weekday.number] === true;
-
-      return weekdayIsSelected;
-    },
-    removeWeekday(day: WeekdayData) {
-      this.workingCopyOfSelectedWeekdays[day.number] = false;
-    },
-    addWeekday(day: WeekdayData) {
-      this.workingCopyOfSelectedWeekdays[day.number] = true;
-    },
-    toggleSelectWeekday(day: WeekdayData) {
-      if (this.workingCopyOfSelectedWeekdays[day.number]) {
-        this.removeWeekday(day);
-      } else {
-        this.addWeekday(day);
-      }
-      this.$emit("updateWeekdays", this.flattenedWeekdays);
-    },
-    reset() {
-      this.$emit("reset");
-
-      this.workingCopyOfSelectedWeekdays = [];
-    },
+const props = defineProps({
+  selectedWeekdays: {
+    type: Object as PropType<SelectedWeekdays>,
+    required: true,
   },
 });
+
+const emit = defineEmits(["updateWeekdays", "reset"]);
+
+const workingCopyOfSelectedWeekdays = ref({ ...props.selectedWeekdays });
+
+const flattenedWeekdays = computed(() => {
+  const flattenedTimeFilters = [];
+  for (const day of Object.keys(workingCopyOfSelectedWeekdays.value)) {
+    if (workingCopyOfSelectedWeekdays.value[day]) {
+      flattenedTimeFilters.push({
+        startTimeDayOfWeek: day,
+      });
+    }
+  }
+  return JSON.stringify(flattenedTimeFilters);
+});
+
+const toggleSelectWeekday = (day: WeekdayData) => {
+  if (workingCopyOfSelectedWeekdays.value[day.number]) {
+    removeWeekday(day);
+  } else {
+    addWeekday(day);
+  }
+  emit("updateWeekdays", flattenedWeekdays.value);
+};
+
+const removeWeekday = (day: WeekdayData) => {
+  workingCopyOfSelectedWeekdays.value[day.number] = false;
+};
+
+const addWeekday = (day: WeekdayData) => {
+  workingCopyOfSelectedWeekdays.value[day.number] = true;
+};
+
+const reset = () => {
+  emit("reset");
+  workingCopyOfSelectedWeekdays.value = { ...defaultSelectedWeekdays };
+};
 </script>
+
 <template>
   <div class="w-full">
     <div

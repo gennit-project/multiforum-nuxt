@@ -1,177 +1,145 @@
-<script lang="ts">
-import { defineComponent, computed, ref } from "vue";
-import type { Issue } from "@/__generated__/graphql";
-import { DateTime } from "luxon";
-import { useRoute } from "vue-router";
-import GenericButton from "../buttons/GenericButton.vue";
-import PrimaryButton from "../buttons/PrimaryButton.vue";
+<script setup lang="ts">
+import { ref, computed } from "vue";
 import ModerationStep from "./ModerationStep.vue";
+import type { Issue } from "@/__generated__/graphql";
 
-export default defineComponent({
-  components: {
-    GenericButton,
-    ModerationStep,
-    PrimaryButton,
-  },
-  props: {
-    issue: {
-      type: Object as () => Issue,
-      required: true,
-    },
-  },
-  setup() {
-    const route = useRoute();
-
-    const channelId = computed(() => {
-      if (typeof route.params.channelId === "string") {
-        return route.params.channelId;
-      }
-      return "";
-    });
-
-    const stepNames = {
-      ViolatesRules: {
-        id: "ViolatesRules",
-        title: "Does the post violate the rules?",
-      },
-      SelectRules: {
-        id: "SelectRules",
-        title: "What rules were broken?",
-      },
-      SelectAction: {
-        id: "SelectAction",
-        title: "What do you want to do with the post?",
-      },
-      SuspensionNeeded: {
-        id: "SuspensionNeeded",
-        title: "Should the author be suspended from this forum?",
-      },
-      SuspensionLength: {
-        id: "SuspensionLength",
-        title: "What should be the length of the suspension?",
-      },
-      SuspensionMessage: {
-        id: "SuspensionMessage",
-        title:
-          "This is the message that will be sent to the author to notify them of their suspension. You can edit the message before sending it.",
-      },
-      RequestChangeMessage: {
-        id: "RequestChangeMessage",
-        title:
-          "This is the message that will be sent to the author to request changes to their post. Would you like to edit it?",
-      },
-      CloseIssue: {
-        id: "CloseIssue",
-        title: "Do you want to close the issue?",
-      },
-      CloseIssueComment: {
-        id: "CloseIssueComment",
-        title: "Please leave a comment explaining your decision",
-      },
-      FinishedWizard: {
-        id: "FinishedWizard",
-        title: "Thank you for your help moderating this forum."
-      },
-    };
-
-    const activeStep = ref(stepNames.ViolatesRules.id);
-    const explanationComment = ref("");
-    const brokenRules = ref("");
-    const selectedPostAction = ref("");
-    const selectedSuspensionLength = ref("");
-
-    const postActions = [
-      {
-        id: "remove",
-        title: `Remove the post from ${channelId.value}`,
-      },
-      {
-        id: "hide",
-        title: "Temporarily hide the post and request changes",
-      },
-      {
-        id: "nothing",
-        title: "Do nothing",
-      },
-    ];
-
-    const suspensionLengths = [
-      {
-        id: "2days",
-        title: "2 days",
-      },
-      {
-        id: "2weeks",
-        title: "2 weeks",
-      },
-      {
-        id: "2months",
-        title: "2 months",
-      },
-      {
-        id: "indefinitely",
-        title: "Indefinitely",
-      },
-    ];
-
-    const suspensionMessage = computed(() => {
-      return `
-        Your post has been removed from ${
-          channelId.value
-        } for violating the following rules:
-        ${brokenRules.value}
-
-        As a result, you have been suspended from posting in ${
-          channelId.value
-        } ${
-          selectedSuspensionLength.value === "indefinitely"
-            ? "indefinitely"
-            : `for ${selectedSuspensionLength.value}`
-        }.
-
-        If you believe this was done in error, please open a support ticket.
-        `;
-    });
-
-    const requestChangeMessage = computed(() => {
-      return `
-        Your post has been hidden from ${channelId.value} for violating the following rules:
-        ${brokenRules.value}
-
-        Please edit your post to comply with the rules and then click the "Request Review" button.
-        `;
-    });
-
-    return {
-      activeStep,
-      brokenRules,
-      channelId,
-      // discussion,
-      explanationComment,
-      // getDiscussionError,
-      // getDiscussionLoading,
-      postActions,
-      requestChangeMessage,
-      selectedPostAction,
-      selectedSuspensionLength,
-      stepNames,
-      suspensionLengths,
-      suspensionMessage,
-    };
-  },
-  methods: {
-    formatDate(date: string) {
-      return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
-    },
+// Props definition using defineProps
+defineProps({
+  issue: {
+    type: Object as () => Issue,
+    required: true,
   },
 });
+
+// Emits for custom events
+defineEmits(['close-issue']);
+
+// Route to access params in Nuxt 3
+const route = useRoute();
+
+const channelId = computed(() => {
+  if (typeof route.params.channelId === "string") {
+    return route.params.channelId;
+  }
+  return "";
+});
+
+const stepNames = {
+  ViolatesRules: {
+    id: "ViolatesRules",
+    title: "Does the post violate the rules?",
+  },
+  SelectRules: {
+    id: "SelectRules",
+    title: "What rules were broken?",
+  },
+  SelectAction: {
+    id: "SelectAction",
+    title: "What do you want to do with the post?",
+  },
+  SuspensionNeeded: {
+    id: "SuspensionNeeded",
+    title: "Should the author be suspended from this forum?",
+  },
+  SuspensionLength: {
+    id: "SuspensionLength",
+    title: "What should be the length of the suspension?",
+  },
+  SuspensionMessage: {
+    id: "SuspensionMessage",
+    title:
+      "This is the message that will be sent to the author to notify them of their suspension. You can edit the message before sending it.",
+  },
+  RequestChangeMessage: {
+    id: "RequestChangeMessage",
+    title:
+      "This is the message that will be sent to the author to request changes to their post. Would you like to edit it?",
+  },
+  CloseIssue: {
+    id: "CloseIssue",
+    title: "Do you want to close the issue?",
+  },
+  CloseIssueComment: {
+    id: "CloseIssueComment",
+    title: "Please leave a comment explaining your decision",
+  },
+  FinishedWizard: {
+    id: "FinishedWizard",
+    title: "Thank you for your help moderating this forum.",
+  },
+};
+
+const activeStep = ref(stepNames.ViolatesRules.id);
+const explanationComment = ref("");
+const brokenRules = ref("");
+const selectedPostAction = ref("");
+const selectedSuspensionLength = ref("");
+
+const postActions = [
+  {
+    id: "remove",
+    title: `Remove the post from ${channelId.value}`,
+  },
+  {
+    id: "hide",
+    title: "Temporarily hide the post and request changes",
+  },
+  {
+    id: "nothing",
+    title: "Do nothing",
+  },
+];
+
+const suspensionLengths = [
+  {
+    id: "2days",
+    title: "2 days",
+  },
+  {
+    id: "2weeks",
+    title: "2 weeks",
+  },
+  {
+    id: "2months",
+    title: "2 months",
+  },
+  {
+    id: "indefinitely",
+    title: "Indefinitely",
+  },
+];
+
+// Computed messages for suspension and change requests
+const suspensionMessage = computed(() => {
+  return `
+    Your post has been removed from ${channelId.value} for violating the following rules:
+    ${brokenRules.value}
+
+    As a result, you have been suspended from posting in ${channelId.value} ${
+      selectedSuspensionLength.value === "indefinitely"
+        ? "indefinitely"
+        : `for ${selectedSuspensionLength.value}`
+    }.
+
+    If you believe this was done in error, please open a support ticket.
+  `;
+});
+
+const requestChangeMessage = computed(() => {
+  return `
+    Your post has been hidden from ${channelId.value} for violating the following rules:
+    ${brokenRules.value}
+
+    Please edit your post to comply with the rules and then click the "Request Review" button.
+  `;
+});
+
+
 </script>
 
 <template>
   <div class="flex flex-col justify-center w-full">
-    <h1 class="text-xl font-bold">
-      Moderation Wizard
-    </h1>
+    <h1 class="text-xl font-bold">Moderation Wizard</h1>
     <hr>
     <div class="mt-6 flex justify-center space-y-4">
       <ModerationStep
@@ -219,9 +187,7 @@ export default defineComponent({
         @click-back="activeStep = stepNames.SelectRules.id"
       >
         <fieldset class="mt-4">
-          <legend class="sr-only">
-            Post actions
-          </legend>
+          <legend class="sr-only">Post actions</legend>
           <div class="space-y-4">
             <div
               v-for="action in postActions"
@@ -240,7 +206,8 @@ export default defineComponent({
                 :for="action.id"
                 class="font-medium ml-3 block text-sm leading-6 text-gray-900 dark:text-gray-100"
               >
-                {{ action.title }}</label>
+                {{ action.title }}
+              </label>
             </div>
           </div>
         </fieldset>

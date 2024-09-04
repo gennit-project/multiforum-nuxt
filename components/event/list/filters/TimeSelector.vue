@@ -1,124 +1,65 @@
-<script lang="ts">
-import type { Ref, PropType } from "vue";
-import { defineComponent, ref } from "vue";
-import {
-  weekdays as weekdayData,
-  hourRangesData,
-  defaultSelectedWeekdays,
-  defaultSelectedHourRanges,
-  defaultSelectedWeeklyHourRanges,
-  createDefaultSelectedHourRanges,
-} from "@/components/event/list/filters/eventSearchOptions";
-import type {
-  SelectedHourRanges,
-  WeekdayData,
-  HourRangeData,
-} from "@/types/Event";
+<script setup lang="ts">
+import { ref, computed } from "vue";
+import type { PropType } from "vue";
+import { hourRangesData } from "@/components/event/list/filters/eventSearchOptions";
+import type { SelectedHourRanges, HourRangeData } from "@/types/Event";
 import ResetButton from "@/components/ResetButton.vue";
 
-
-export default defineComponent({
-  components: {
-    ResetButton
-  },
-  props: {
-    selectedHourRanges: {
-      type: Object as PropType<SelectedHourRanges>,
-      required: true,
-    },
-  },
-  setup(props) {
-    const workingCopyOfSelectedHourRanges: Ref<SelectedHourRanges> = ref(
-      props.selectedHourRanges
-    );
-
-    // take defaults from params
-    return {
-      defaultSelectedWeekdays,
-      defaultSelectedHourRanges,
-      defaultSelectedWeeklyHourRanges,
-      hourRangesData,
-      weekdayData,
-      workingCopyOfSelectedHourRanges,
-    };
-  },
-  methods: {
-    shouldBeDisabled(weekday: WeekdayData, range: HourRangeData) {
-      const hourRangeIsSelected =
-        this.workingCopyOfSelectedHourRanges[range["12-hour-label"]] === true;
-      return hourRangeIsSelected;
-    },
-    shouldBeChecked(weekday: WeekdayData, range: HourRangeData) {
-      const hourRangeIsSelected =
-        this.workingCopyOfSelectedHourRanges[range["12-hour-label"]] === true;
-
-      return hourRangeIsSelected;
-    },
-    toggleSelectTimeRange(timeRange: HourRangeData) {
-      // This function makes it so that when an
-      // entire time range range row is selected with
-      // a checkbox in the form for selecting
-      // availability windows, it applies to the
-      // time range filter.
-      const label = timeRange["12-hour-label"];
-      if (this.workingCopyOfSelectedHourRanges[label]) {
-        this.removeTimeRange(timeRange);
-      } else {
-        this.addTimeRange(timeRange);
-      }
-      this.$emit("updateHourRanges", this.flattenHourRanges());
-    },
-    flattenHourRanges() {
-      const flattenedTimeFilters = [];
-      for (const timeSlot in this.workingCopyOfSelectedHourRanges) {
-        if (this.workingCopyOfSelectedHourRanges[timeSlot]) {
-          flattenedTimeFilters.push({
-            startTimeHourOfDay: timeSlot,
-          });
-        }
-      }
-      const res = JSON.stringify(flattenedTimeFilters);
-      return res;
-    },
-    resetTimeSlots() {
-      this.workingCopyOfSelectedHourRanges = createDefaultSelectedHourRanges();
-      this.$emit("resetTimeSlots");
-    },
-    removeTimeRange(timeRange: HourRangeData) {
-      const label = timeRange["12-hour-label"];
-      this.workingCopyOfSelectedHourRanges[label] = false;
-      for (const weekday in this.workingCopyOfTimeSlots) {
-        // Leave the input enabled if it was locked in place
-        // by highlighting the same time slot for the whole week.
-        if (!(this.workingCopyOfSelectedWeekdays[weekday] === true)) {
-          this.workingCopyOfTimeSlots[weekday][label] = false;
-        }
-      }
-      // Don't need to emit an event to update params because it is
-      // already emitted in toggleSelectTimeRange
-    },
-    addTimeRange(timeRange: HourRangeData) {
-      const label = timeRange["12-hour-label"];
-      this.workingCopyOfSelectedHourRanges[label] = true;
-      for (const weekday in this.workingCopyOfTimeSlots) {
-        this.workingCopyOfTimeSlots[weekday][label] = true;
-      }
-      // Don't need to emit an event to update params because it is
-      // already emitted in toggleSelectTimeRange
-    },
-    reset(){
-      this.$emit('reset')
-
-      this.workingCopyOfSelectedHourRanges = {}
-    }
+const props = defineProps({
+  selectedHourRanges: {
+    type: Object as PropType<SelectedHourRanges>,
+    required: true,
   },
 });
+
+const emit = defineEmits(["updateHourRanges", "resetTimeSlots", "reset"]);
+
+const workingCopyOfSelectedHourRanges = ref({ ...props.selectedHourRanges });
+
+const toggleSelectTimeRange = (timeRange: HourRangeData) => {
+  const label = timeRange["12-hour-label"];
+  if (workingCopyOfSelectedHourRanges.value[label]) {
+    removeTimeRange(timeRange);
+  } else {
+    addTimeRange(timeRange);
+  }
+  emit("updateHourRanges", flattenHourRanges());
+};
+
+const flattenHourRanges = () => {
+  const flattenedTimeFilters: any[] = [];
+  for (const timeSlot in workingCopyOfSelectedHourRanges.value) {
+    if (workingCopyOfSelectedHourRanges.value[timeSlot]) {
+      flattenedTimeFilters.push({
+        startTimeHourOfDay: timeSlot,
+      });
+    }
+  }
+  return JSON.stringify(flattenedTimeFilters);
+};
+const removeTimeRange = (timeRange: HourRangeData) => {
+  const label = timeRange["12-hour-label"];
+  workingCopyOfSelectedHourRanges.value[label] = false;
+};
+
+const addTimeRange = (timeRange: HourRangeData) => {
+  const label = timeRange["12-hour-label"];
+  workingCopyOfSelectedHourRanges.value[label] = true;
+};
+
+const reset = () => {
+  emit("reset");
+  workingCopyOfSelectedHourRanges.value = {};
+};
+
+const hourRangesDataComputed = computed(() => hourRangesData);
 </script>
+
 <template>
   <div>
     <div class="grid grid-cols-2 gap-2">
       <div
-        v-for="range in hourRangesData"
+        v-for="range in hourRangesDataComputed"
         :key="range['12-hour-label']"
         class="p-2 rounded"
       >
@@ -134,7 +75,9 @@ export default defineComponent({
             :checked="workingCopyOfSelectedHourRanges[range['12-hour-label']]"
             @input="() => toggleSelectTimeRange(range)"
           >
-          <span class="ml-2 text-sm font-medium whitespace-nowrap">{{ range["12-hour-label"] }}</span>
+          <span class="ml-2 text-sm font-medium whitespace-nowrap">{{
+            range["12-hour-label"]
+          }}</span>
         </label>
       </div>
     </div>

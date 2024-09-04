@@ -1,75 +1,44 @@
-<script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, computed } from "vue";
-import type { DiscussionData } from "../../types/Discussion";
+<script setup lang="ts">
+import { computed } from "vue";
 import { relativeTime } from "@/utils";
-import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
+import type { Discussion } from "@/__generated__/graphql";
 
-export default defineComponent({
-  components: {
-    Tag,
-    HighlightedSearchTerms,
+const props = defineProps({
+  discussion: {
+    type: Object as () => Discussion,
+    required: true,
   },
-  inheritAttrs: false,
-  props: {
-    discussion: {
-      type: Object as PropType<DiscussionData>,
-      required: true,
-    },
-    searchInput: {
-      type: String,
-      default: "",
-    },
-    selectedTags: {
-      type: Array as PropType<Array<string>>,
-      default: () => {
-        return [];
-      },
-    },
-    selectedChannels: {
-      type: Array as PropType<Array<string>>,
-      default: () => {
-        return [];
-      },
-    },
+  searchInput: {
+    type: String,
+    default: "",
   },
-  setup() {},
-  data(props) {
-    const route = useRoute();
-    const router = useRouter();
-
-    const defaultUniqueName = computed(() => {
-      if (
-        !props.discussion.DiscussionChannels ||
-        !props.discussion.DiscussionChannels[0]
-      ) {
-        return "";
-      }
-      return props.discussion.DiscussionChannels[0].Channel?.uniqueName;
-    });
-    return {
-      router,
-      previewIsOpen: false,
-      defaultUniqueName, //props.discussion.DiscussionChannels[0].Channel.uniqueName,
-      title: props.discussion.title,
-      body: props.discussion.body || "",
-      createdAt: props.discussion.createdAt,
-      relativeTime: relativeTime(props.discussion.createdAt),
-      authorUsername: props.discussion.Author
-        ? props.discussion.Author.username
-        : "Deleted",
-      // If we are already within the channel, don't show
-      // links to cost channels and don't specify which
-      // channel the comments are in.
-      tags: props.discussion.Tags.map((tag) => {
-        return tag.text;
-      }),
-      route,
-    };
+  selectedTags: {
+    type: Array as () => string[],
+    default: () => [],
+  },
+  selectedChannels: {
+    type: Array as () => string[],
+    default: () => [],
   },
 });
+
+defineEmits(["filterByTag"]);
+
+const router = useRouter();
+
+const defaultUniqueName = computed(() => {
+  if (!props.discussion.DiscussionChannels || !props.discussion.DiscussionChannels[0]) {
+    return "";
+  }
+  return props.discussion.DiscussionChannels[0].Channel?.uniqueName;
+});
+
+const title = props.discussion.title;
+const relativeTimeText = relativeTime(props.discussion.createdAt);
+const authorUsername = props.discussion.Author ? props.discussion.Author.username : "Deleted";
+const tags = props.discussion.Tags.map(tag => tag.text);
 </script>
 
 <template>
@@ -105,7 +74,7 @@ export default defineComponent({
     <p
       class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"
     >
-      {{ `Posted ${relativeTime} by ${authorUsername}` }}
+      {{ `Posted ${relativeTimeText} by ${authorUsername}` }}
     </p>
     <div class="my-2 space-x-2 text-sm">
       <router-link
@@ -119,6 +88,7 @@ export default defineComponent({
     </div>
   </li>
 </template>
+
 <style>
 .highlighted {
   background-color: #f9f95d;

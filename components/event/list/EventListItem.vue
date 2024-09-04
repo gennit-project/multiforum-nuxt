@@ -268,7 +268,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               }`
             }}</span>
             <span v-if="!isWithinChannel">{{
-               in c/${event.EventChannels[0].channelUniqueName}
+               `in c/${event.EventChannels[0].channelUniqueName}`
             }}</span>
           </button>
         </router-link>

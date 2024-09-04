@@ -5,7 +5,7 @@ import ErrorBanner from "../ErrorBanner.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_MOD } from "@/graphQLData/mod/queries";
 import UsernameLabel from "../UsernameLabel.vue";
-import { relativeTime } from "@/utils"";
+import { relativeTime } from "@/utils";
 
 export default defineComponent({
   components: {
