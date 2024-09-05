@@ -88,6 +88,7 @@
     "@graphql-codegen/client-preset": "^4.0.1",
     "@nuxt/types": "2.18.1",
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
+    "@nuxtjs/tailwindcss": "^6.12.1",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/dompurify": "3.0.5",
     "@types/google.maps": "^3.52.4",
