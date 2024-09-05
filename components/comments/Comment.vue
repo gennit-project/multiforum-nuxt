@@ -7,7 +7,7 @@ import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/core";
 import type { Comment } from "@/__generated__/graphql";
 import type { CreateReplyInputData } from "@/types/Comment";
-import TextEditor from "../forms/TextEditor.vue";
+import TextEditor from "../TextEditor.vue";
 import ChildComments from "./ChildComments.vue";
 import CommentButtons from "./CommentButtons.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";

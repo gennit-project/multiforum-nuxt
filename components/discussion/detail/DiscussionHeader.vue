@@ -240,7 +240,7 @@ const authorIsMod = computed(
         @copy-link="copyLink"
         @handle-edit="
           router.push(
-            `/channels/c/${channelId}/discussions/d/${discussion.id}/edit`
+            `/forums/f/${channelId}/discussions/d/${discussion.id}/edit`
           )
         "
         @handle-delete="deleteModalIsOpen = true"

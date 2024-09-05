@@ -136,7 +136,7 @@ export default defineComponent({
           </div>
           <router-link
             class="my-3 text-sm underline dark:text-gray-200"
-            :to="`/channels/c/${channelId}/edit`"
+            :to="`/forums/f/${channelId}/edit`"
           >
             Edit
           </router-link>

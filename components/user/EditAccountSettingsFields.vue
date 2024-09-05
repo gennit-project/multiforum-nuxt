@@ -6,7 +6,7 @@ import { useMutation, useQuery } from '@vue/apollo-composable';
 import TextInput from '@/components/TextInput.vue';
 import FormRow from '@/components/FormRow.vue';
 import TextEditor from '@/components/TextEditor.vue';
-import AddImage from '@/components/buttons/AddImage.vue';
+import AddImage from '@/components/AddImage.vue';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import { GET_LOCAL_USERNAME } from '@/graphQLData/user/queries';

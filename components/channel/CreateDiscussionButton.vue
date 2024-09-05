@@ -2,7 +2,7 @@
 import { defineComponent, computed } from "vue";
 import { useRoute } from "vue-router";
 import RequireAuth from "../auth/RequireAuth.vue";
-import CreateButton from "../buttons/CreateButton.vue";
+import CreateButton from "../CreateButton.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 
 export default defineComponent({
@@ -37,7 +37,7 @@ export default defineComponent({
     <template #has-auth>
       <CreateButton
         class="ml-2"
-        :to="`/channels/c/${channelId}/discussions/create`"
+        :to="`/forums/f/${channelId}/discussions/create`"
         :label="'New Discussion'"
       />
     </template>

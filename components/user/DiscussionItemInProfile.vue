@@ -48,7 +48,7 @@ const tags = props.discussion.Tags.map(tag => tag.text);
       () => {
         if (defaultUniqueName) {
           router.push(
-            `/channels/c/${defaultUniqueName}/discussions/d/${discussion.id}`,
+            `/forums/f/${defaultUniqueName}/discussions/d/${discussion.id}`,
           );
         }
       }
@@ -81,7 +81,7 @@ const tags = props.discussion.Tags.map(tag => tag.text);
         v-for="(discussionChannel, i) in discussion.DiscussionChannels"
         :key="i"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
-        :to="`/channels/c/${discussionChannel.Channel?.uniqueName}/discussions/d/${discussion.id}`"
+        :to="`/forums/f/${discussionChannel.Channel?.uniqueName}/discussions/d/${discussion.id}`"
       >
         View this post in {{ `c/${discussionChannel.Channel?.uniqueName}` }}
       </router-link>

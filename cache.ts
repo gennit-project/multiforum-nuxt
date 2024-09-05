@@ -73,7 +73,9 @@ const cache = new InMemoryCache({
         },
         FeedbackCommentsAggregate: {
           read(existing) {
-            return existing || { count: 0, __typename: "FeedbackCommentsAggregate" };
+            return (
+              existing || { count: 0, __typename: "FeedbackCommentsAggregate" }
+            );
           },
         },
         GivesFeedbackOnComment: {

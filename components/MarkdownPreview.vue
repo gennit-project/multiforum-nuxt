@@ -5,6 +5,8 @@ import MarkdownIt from "markdown-it";
 import config from "@/config";
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
+console.log("MarkdownPreview.vue");
+
 function linkifyUsernames(markdownString: string) {
   const regex = /(?<!https?:\/\/(?:[\w.-]+))\b(u\/|@)([a-zA-Z0-9_-]+)/g;
   return markdownString.replace(regex, (match, prefix, username) => {
@@ -15,7 +17,7 @@ function linkifyUsernames(markdownString: string) {
 function linkifyChannelNames(markdownString: string) {
   const regex = /(?<!https?:\/\/(?:[\w.-]+))\bc\/([a-zA-Z0-9_-]+)/g;
   return markdownString.replace(regex, (match, channelName) => {
-    return `[${match}](${config.baseUrl}channels/c/${channelName}/discussions)`;
+    return `[${match}](${config.baseUrl}channels/f/${channelName}/discussions)`;
   });
 }
 
@@ -74,8 +76,8 @@ function parseMarkdownForImages(text: string) {
       href: src,
       src,
       thumbnail: src,
-      width: window.innerWidth,
-      height: window.innerHeight,
+      width: import.meta.client ? window.innerWidth : 0,
+      height: import.meta.client ? window.innerHeight : 0,
     };
     images.push(galleryItem);
   }
@@ -134,30 +136,32 @@ export default defineComponent({
     };
 
     const updateImageDimensions = (src: string) => {
-      const img = new Image();
-      img.onload = function () {
-        const { width, height } = calculateAspectRatioFit(
-          this.width,
-          this.height,
-          window.innerWidth,
-          window.innerHeight,
-        );
+      if (import.meta.client) {
+        const img = new Image();
+        img.onload = function () {
+          const { width, height } = calculateAspectRatioFit(
+            this.width,
+            this.height,
+            window.innerWidth,
+            window.innerHeight,
+          );
 
-        const imageItem = embeddedImages.value.find((item) => item.src === src);
-        if (imageItem) {
-          imageItem.width = width;
-          imageItem.height = height;
-        } else {
-          embeddedImages.value.push({
-            href: src,
-            src,
-            thumbnail: src,
-            width,
-            height,
-          });
-        }
-      };
-      img.src = src;
+          const imageItem = embeddedImages.value.find((item) => item.src === src);
+          if (imageItem) {
+            imageItem.width = width;
+            imageItem.height = height;
+          } else {
+            embeddedImages.value.push({
+              href: src,
+              src,
+              thumbnail: src,
+              width,
+              height,
+            });
+          }
+        };
+        img.src = src;
+      }
     };
 
     watchEffect(() => {

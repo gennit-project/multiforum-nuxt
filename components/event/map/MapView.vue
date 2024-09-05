@@ -8,7 +8,7 @@ import EventPreview from "../list/EventPreview.vue";
 import EventList from "../list/EventList.vue";
 import EventMap from "./Map.vue";
 import PreviewContainer from "../list/PreviewContainer.vue";
-import CloseButton from "../../buttons/CloseButton.vue";
+import CloseButton from "../../CloseButton.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
 import EventFilterBar from "../list/filters/EventFilterBar.vue";
 import TimeShortcuts from "../list/filters/TimeShortcuts.vue";

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, defineProps, defineEmits } from "vue";
+import { ref } from "vue";
 import { Listbox, ListboxOption, ListboxOptions } from "@headlessui/vue";
 import ListboxButton from "@/components/ListboxButton.vue";
 import CheckIcon from '@/components/icons/CheckIcon.vue';

@@ -176,7 +176,7 @@ export default defineComponent({
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <router-link
-        :to="`/channels/c/${channelId}/events/e/${event?.id}`"
+        :to="`/forums/f/${channelId}/events/e/${event?.id}`"
         class="flex items-center"
       >
         <span
@@ -212,7 +212,7 @@ export default defineComponent({
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <router-link
-        :to="`/channels/c/${channelId}/events/e/${event?.id}`"
+        :to="`/forums/f/${channelId}/events/e/${event?.id}`"
         class="flex items-center"
       >
         <span
@@ -239,7 +239,7 @@ export default defineComponent({
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <router-link
-        :to="`/channels/c/${channelId}/events/e/${event?.id}`"
+        :to="`/forums/f/${channelId}/events/e/${event?.id}`"
         class="flex items-center"
       >
         <span
@@ -268,7 +268,7 @@ export default defineComponent({
         class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm leading-6 text-gray-500 dark:text-gray-300"
       >
         <router-link
-          :to="`/channels/c/${channelId}/events/e/${event?.id}`"
+          :to="`/forums/f/${channelId}/events/e/${event?.id}`"
           class="flex items-center"
         >
           <span
@@ -288,7 +288,7 @@ export default defineComponent({
     "
   >
     <router-link
-      :to="`/channels/c/${channelId}/events/search`"
+      :to="`/forums/f/${channelId}/events/search`"
       class="flex items-center underline"
     >
       <span class="text-sm font-bold leading-6"> View all events </span>

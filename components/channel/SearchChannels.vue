@@ -183,7 +183,7 @@ export default defineComponent({
   data() {
     return {
       queryChannel: [],
-      createChannelPath: "/channels/create",
+      createChannelPath: "/forums/create",
     };
   },
   methods: {

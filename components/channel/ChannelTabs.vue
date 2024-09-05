@@ -75,11 +75,11 @@ export default defineComponent({
 
     const tabRoutes = computed(() => {
       const routes: TabRoutes = {
-        discussions: `/channels/c/${channelId.value}/discussions`,
-        events: `/channels/c/${channelId.value}/events/search`,
-        about: `/channels/c/${channelId.value}/about`,
-        settings: `/channels/c/${channelId.value}/edit`,
-        moderation: `/channels/c/${channelId.value}/issues`,
+        discussions: `/forums/f/${channelId.value}/discussions`,
+        events: `/forums/f/${channelId.value}/events/search`,
+        about: `/forums/f/${channelId.value}/about`,
+        settings: `/forums/f/${channelId.value}/edit`,
+        moderation: `/forums/f/${channelId.value}/issues`,
       };
 
       return routes;

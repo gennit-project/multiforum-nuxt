@@ -2928,7 +2928,7 @@
 
 "@tailwindcss/forms@^0.5.1":
   version "0.5.8"
-  resolved "https://registry.yarnpkg.com/@tailwindcss/forms/-/forms-0.5.8.tgz#1067d82d9562abe3f8de9abfd528965f7fa116a9"
+  resolved "https://registry.yarnpkg.com/@tailwindcss/-/forms-0.5.8.tgz#1067d82d9562abe3f8de9abfd528965f7fa116a9"
   integrity sha512-DJs7B7NPD0JH7BVvdHWNviWmunlFhuEkz7FyFxE4japOWYMLl9b1D6+Z9mivJJPWr6AEbmlPqgiFRyLwFB1SgQ==
   dependencies:
     mini-svg-data-uri "^1.2.3"
@@ -8823,6 +8823,11 @@ performance-now@^2.1.0:
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-2.1.0.tgz#6309f4e0e5fa913ec1c69307ae364b4b377c9e7b"
   integrity sha512-7EAHlyLHI56VEIdK57uwHdHKIaAGbnXPiw0yWbarQZOKaKpvUIgW0jWRVLiatnM+XXlSwsanIBH/hzGMJulMow==
 
+photoswipe@^5.3.8:
+  version "5.4.4"
+  resolved "https://registry.yarnpkg.com/photoswipe/-/photoswipe-5.4.4.tgz#e045dc036453493188d5c8665b0e8f1000ac4d6e"
+  integrity sha512-WNFHoKrkZNnvFFhbHL93WDkW3ifwVOXSW3w1UuZZelSmgXpIGiZSNlZJq37rR8YejqME2rHs9EhH9ZvlvFH2NA==
+
 picocolors@^1.0.0, picocolors@^1.0.1:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/picocolors/-/picocolors-1.1.0.tgz#5358b76a78cde483ba5cef6a9dc9671440b27d59"
@@ -11061,6 +11066,14 @@ vue-multiselect@^3.0.0:
   resolved "https://registry.yarnpkg.com/vue-multiselect/-/vue-multiselect-3.0.0.tgz#b1e779b9adf054a6941669c99bc97a0209fceac3"
   integrity sha512-uupKdINgz7j83lQToCL7KkgQQxvG43el++hsR39YT9pCe1DwzUGmKzPxjVP6rqskXed5P6DtUASYAlCliW740Q==
 
+vue-preview-imgs@^2.0.1:
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/vue-preview-imgs/-/vue-preview-imgs-2.0.1.tgz#d36489bbbbce34ac7d84e699278d1a00fc9d740d"
+  integrity sha512-QbSLyec9lx7/h7dxjOBgmKNJVzFkd09zElZECJlEpMKHrcOvseeMUE86VQk3pCdgRVVwIYfu2yYWwWPzm89xRA==
+  dependencies:
+    photoswipe "^5.3.8"
+    vue "^3.2.25"
+
 vue-profile-avatar@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/vue-profile-avatar/-/vue-profile-avatar-1.2.0.tgz#7920656a402b4679c642ab598978e606d1bca156"
@@ -11111,7 +11124,7 @@ vue3-popper@^1.5.0:
     "@popperjs/core" "^2.9.2"
     debounce "^1.2.1"
 
-vue@^3.2.41, vue@^3.3.4, vue@^3.5.0, vue@^3.x.x:
+vue@^3.2.25, vue@^3.2.41, vue@^3.3.4, vue@^3.5.0, vue@^3.x.x:
   version "3.5.1"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.5.1.tgz#507eb4ab010a2ad894f8d7765f32e68be1604815"
   integrity sha512-k4UNnbPOEskodSxMtv+B9GljdB0C9ubZDOmW6vnXVGIfMqmEsY2+ohasjGguhGkMkrcP/oOrbH0dSD41x5JQFw==

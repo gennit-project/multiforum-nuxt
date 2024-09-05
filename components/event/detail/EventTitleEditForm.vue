@@ -214,7 +214,7 @@ export default defineComponent({
           <CreateButton
             v-if="!titleEditMode"
             class="ml-2"
-            :to="`/channels/c/${channelId}/events/create`"
+            :to="`/forums/f/${channelId}/events/create`"
             :label="'New Event'"
           />
           <PrimaryButton

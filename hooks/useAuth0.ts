@@ -5,6 +5,7 @@ export const useAuth0 = () => {
     user: { name: "Mock User", email: process.env.VITE_AUTH0_USERNAME }, // Placeholder value
     loginWithRedirect: () => console.log("Mock login"),
     logout: () => console.log("Mock logout"),
+    isLoading: false, // Placeholder value
   };
 };
 

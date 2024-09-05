@@ -19,9 +19,10 @@ import {
 } from "@/components/comments/getSortFromQuery";
 const DISCUSSION_PAGE_LIMIT = 25;
 
+console.log("ChannelDiscussionList.vue");
+
 const emit = defineEmits(['filterByTag', 'filterByChannel']);
 
-// Setup function
 const route = useRoute();
 
 const channelId = computed(() => {

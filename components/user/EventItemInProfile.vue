@@ -49,7 +49,7 @@ const tags = props.event.Tags.map((tag: TagData) => tag.text);
     @click="
       () => {
         if (defaultUniqueName) {
-          router.push(`/channels/c/${defaultUniqueName}/events/e/${event.id}`);
+          router.push(`/forums/f/${defaultUniqueName}/events/e/${event.id}`);
         }
       }
     "
@@ -88,7 +88,7 @@ const tags = props.event.Tags.map((tag: TagData) => tag.text);
       <router-link
         v-if="ec.Channel"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
-        :to="`/channels/c/${ec.Channel.uniqueName}/events/e/${event.id}`"
+        :to="`/forums/f/${ec.Channel.uniqueName}/events/e/${event.id}`"
       >
         {{ `c/${ec.Channel.uniqueName}` }}
       </router-link>

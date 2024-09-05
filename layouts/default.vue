@@ -1,7 +1,11 @@
+<script>
+console.log("default.vue");
+</script>
+
 <template>
   <v-app>
     <main>
-      <NuxtPage />
+      <slot />
     </main>
   </v-app>
 </template>

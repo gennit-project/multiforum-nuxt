@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, nextTick, ref, defineProps, defineEmits } from "vue";
+import { computed, nextTick, ref } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
 import TagPicker from "@/components/TagPicker.vue";
 import TextInput from "@/components/TextInput.vue";

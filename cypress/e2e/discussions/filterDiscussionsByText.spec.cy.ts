@@ -26,7 +26,7 @@ describe("Filter discussions by text", () => {
   });
 
   it("in a channel view, filters discussions by text", () => {
-    const CHANNEL_VIEW = `${config.baseUrl}/channels/c/phx_music/discussions/`
+    const CHANNEL_VIEW = `${config.baseUrl}/forums/f/phx_music/discussions/`
     const searchTerm = "discussion 3";
 
     cy.visit(CHANNEL_VIEW);

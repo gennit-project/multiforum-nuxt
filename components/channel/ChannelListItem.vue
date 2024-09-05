@@ -37,7 +37,7 @@ defineEmits(['filterByTag']);
     >
       <div class="flex flex-row">
         <NuxtLink
-          :to="`/channels/c/${channel.uniqueName}/discussions`"
+          :to="`/forums/f/${channel.uniqueName}/discussions`"
           class="flex cursor-pointer"
         >
           <div class="h-24 w-24">
@@ -52,7 +52,7 @@ defineEmits(['filterByTag']);
 
         <div class="flex flex-col px-4">
           <NuxtLink
-            :to="`/channels/c/${channel.uniqueName}/discussions`"
+            :to="`/forums/f/${channel.uniqueName}/discussions`"
             class="mt-1 flex cursor-pointer items-center gap-4"
           >
             <h3
@@ -112,7 +112,7 @@ defineEmits(['filterByTag']);
         <div class="truncate text-xs font-normal">
           <NuxtLink
             class="flex items-center gap-1 rounded-lg px-4 py-2 hover:bg-gray-700"
-            :to="`/channels/c/${channel.uniqueName}/discussions`"
+            :to="`/forums/f/${channel.uniqueName}/discussions`"
           >
             <DiscussionIcon class="h-4 w-4" />
             {{ channel?.DiscussionChannelsAggregate?.count }}
@@ -129,7 +129,7 @@ defineEmits(['filterByTag']);
         >
           <NuxtLink
             class="flex items-center gap-1 rounded-lg px-4 py-2 hover:bg-gray-700"
-            :to="`/channels/c/${channel.uniqueName}/events/search`"
+            :to="`/forums/f/${channel.uniqueName}/events/search`"
           >
             <CalendarIcon class="h-4 w-4" />
             {{ channel?.EventChannelsAggregate?.count || 0 }} Upcoming Events

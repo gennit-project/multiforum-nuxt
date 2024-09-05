@@ -1,5 +1,9 @@
+<script setup lang="ts">
+
+import DiscussionDetail from '@/components/discussion/detail/DiscussionDetail.vue';
+</script>
 <template>
-    <div>
-    discussion detail
-</div>
+    <NuxtLayout>
+        <DiscussionDetail />
+    </NuxtLayout>
 </template>

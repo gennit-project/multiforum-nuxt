@@ -8,7 +8,9 @@ export default defineComponent({
       required: true
     },
   },
-  setup() {},
+  setup() {
+    console.log("ErrorBanner.vue");
+  },
 });
 </script>
 

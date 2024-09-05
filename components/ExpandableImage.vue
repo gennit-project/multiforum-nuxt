@@ -1,96 +1,31 @@
-<script lang="ts">
-import { defineComponent , ref } from "vue";
-import { setGallery } from "vue-preview-imgs";
+<script setup lang="ts">
+import { ref } from "vue";
+import VueEasyLightbox from "vue-easy-lightbox";
 
-type GalleryItem = {
-  href: string;
-  src: string;
-  thumbnail: string;
-  width: number;
-  height: number;
-};
-
-function calculateAspectRatioFit(
-  srcWidth: number,
-  srcHeight: number,
-  maxWidth: number,
-  maxHeight: number,
-) {
-  const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
-  return { width: srcWidth * ratio, height: srcHeight * ratio };
-}
-
-export default defineComponent({
-  props: {
-    alt: {
-      type: String,
-      required: true,
-    },
-    src: {
-      type: String,
-      required: true,
-    },
-    rounded: {
-      type: Boolean,
-      default: false,
-    },
-    isSquare: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  src: {
+    type: String,
+    required: true,
   },
-  setup(props) {
-    const embeddedImages = ref<GalleryItem[]>([]);
-
-    // Define a function to update the dimensions
-    const updateImageDimensions = (src: string) => {
-      const img = new Image();
-      img.onload = function () {
-        const { width, height } = calculateAspectRatioFit(
-          this.width,
-          this.height,
-          window.innerWidth,
-          window.innerHeight,
-        );
-
-        // Find the image in the embeddedImages array and update its dimensions
-        const imageItem = embeddedImages.value.find((item) => item.src === src);
-        if (imageItem) {
-          imageItem.width = width;
-          imageItem.height = height;
-        } else {
-          // Or add a new item if it doesn't exist
-          embeddedImages.value.push({
-            href: src,
-            src,
-            thumbnail: src,
-            width,
-            height,
-          });
-        }
-      };
-      img.src = src;
-    };
-
-    const imageUrl = props.src;
-    updateImageDimensions(imageUrl);
-
-    return {
-      embeddedImages,
-    };
+  alt: {
+    type: String,
+    required: false,
+    default: "",
   },
-  methods: {
-    handleImageClick() {
-      // Open Gallery with clickedIndex highlighted
-      const lightbox = setGallery({
-        dataSource: this.embeddedImages,
-        wheelToZoom: true,
-      });
-
-      lightbox.loadAndOpen(0);
-    },
+  rounded: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
+
+const visible = ref(false);
+const index = ref(0);
+const images = ref<string[]>([props.src]);
+
+const handleImageClick = () => {
+  visible.value = true;
+};
 </script>
 
 <template>
@@ -99,6 +34,13 @@ export default defineComponent({
     :alt="alt"
     class="cursor-pointer"
     :class="{ 'rounded-full': rounded }"
-    @click="handleImageClick()"
+    @click="handleImageClick"
   >
+  <vue-easy-lightbox
+    v-if="visible"
+    :visible="visible"
+    :imgs="images"
+    :index="index"
+    @hide="visible = false"
+  />
 </template>

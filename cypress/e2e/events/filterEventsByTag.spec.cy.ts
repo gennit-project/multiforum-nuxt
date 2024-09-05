@@ -83,7 +83,7 @@ describe("Filter events by tag", () => {
   });
 
   const CHANNEL_VIEW =
-    `${config.baseUrl}/channels/c/phx_music/events/search/`;
+    `${config.baseUrl}/forums/f/phx_music/events/search/`;
 
   // BROKEN
   it("in a channel view, filters events by tag", () => {

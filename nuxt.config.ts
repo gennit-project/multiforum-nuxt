@@ -61,7 +61,7 @@ export default defineNuxtConfig({
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/apollo", mode: "client" },
-    { src: "@/plugins/vuetify", mode: "client" },
+    { src: "@/plugins/vuetify", mode: "all" },
   ],
   runtimeConfig: {
     auth0: {

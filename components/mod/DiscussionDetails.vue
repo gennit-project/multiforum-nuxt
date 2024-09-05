@@ -82,7 +82,7 @@ export default defineComponent({
       <div class="border-l border-l-2 pl-6">
         <h3 v-if="discussion?.title">
           <router-link
-            :to="`/channels/c/${channelId}/discussions/d/${discussion.id}`"
+            :to="`/forums/f/${channelId}/discussions/d/${discussion.id}`"
             class="text-blue-500 dark:text-blue-400"
             rel="noopener noreferrer"
           >

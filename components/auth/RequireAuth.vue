@@ -5,6 +5,8 @@ import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from '@/hooks/useAuth0';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
+console.log("RequireAuth.vue"); 
+
 // Props definition using defineProps
 const props = defineProps({
   requireOwnership: {
@@ -30,15 +32,21 @@ const props = defineProps({
 });
 const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
-const { loginWithPopup, loginWithRedirect, isLoading: authLoading, isAuthenticated, idTokenClaims } = useAuth0();
+const { 
+  // loginWithPopup, 
+  loginWithRedirect, 
+  isLoading: authLoading, 
+  isAuthenticated, 
+  // idTokenClaims 
+} = useAuth0();
 
 // Function to store token in localStorage (client-side only)
 const storeToken = async () => {
-  if (isAuthenticated.value) {
-    const token = await idTokenClaims?.value?.__raw;
-    if (import.meta.client) {
-      localStorage.setItem("token", token || "");
-    }
+  if (isAuthenticated) {
+    // const token = await idTokenClaims?.value?.__raw;
+    // if (import.meta.client) {
+    //   localStorage.setItem("token", token || "");
+    // }
   }
 };
 
@@ -47,7 +55,7 @@ const login = async () => {
   if (window.parent.Cypress) {
     await loginWithRedirect();
   } else {
-    await loginWithPopup();
+    // await loginWithPopup();
   }
   storeToken();
 };

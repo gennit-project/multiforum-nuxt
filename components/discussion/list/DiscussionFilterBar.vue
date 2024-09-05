@@ -1,162 +1,136 @@
-<script lang="ts">
-import type { Ref } from "vue";
-import { defineComponent, computed, ref } from "vue";
-// import TagPicker from "@/components/TagPicker.vue";
-import SearchableForumList from "@/components/channel/SearchableForumList.vue";
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import SearchBar from "@/components/SearchBar.vue";
 import FilterChip from "@/components/FilterChip.vue";
 import ChannelIcon from "@/components/icons/ChannelIcon.vue";
 import TagIcon from "@/components/icons/TagIcon.vue";
-import { getTagLabel, getChannelLabel } from "@/utils";
-import SearchBar from "../../SearchBar.vue";
-import type { SearchDiscussionValues } from "@/types/Discussion";
-import { useRoute } from "vue-router";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import SearchableForumList from "@/components/channel/SearchableForumList.vue";
+import SearchableTagList from "@/components/SearchableTagList.vue";
 import SortButtons from "@/components/SortButtons.vue";
+import { getTagLabel, getChannelLabel } from "@/utils";
+import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import { useDisplay } from "vuetify";
-import SearchableTagList from '@/components/SearchableTagList.vue'
+import type { SearchDiscussionValues } from "@/types/Discussion";
 
-export default defineComponent({
-  name: "DiscussionFilterBar",
-  // The DiscussionFilterBar component writes to the query
-  // params, while the discussion list components
-  // components consume the query params.
-  components: {
-    ChannelIcon,
-    SortButtons,
-    FilterChip,
-    SearchableForumList,
-    SearchableTagList,
-    SearchBar,
-    TagIcon,
+defineProps({
+  showMap: {
+    type: Boolean,
+    default: false,
   },
-  props: {
-    showMap: {
-      type: Boolean,
-      default: false,
-    },
-    loadedEventCount: {
-      type: Number,
-      default: 0,
-    },
-    resultCount: {
-      type: Number,
-      default: 0,
-    },
+  loadedEventCount: {
+    type: Number,
+    default: 0,
   },
-
-  setup() {
-    const defaultFilterLabels = {
-      channels: "Forums",
-      tags: "Tags",
-    };
-    const channelId = computed(() => {
-      if (typeof route.params.channelId === "string") {
-        return route.params.channelId;
-      }
-      return "";
-    });
-    const route = useRoute();
-
-    const filterValues: Ref<SearchDiscussionValues> = ref(
-      getFilterValuesFromParams({
-        route,
-        channelId: channelId.value,
-      }),
-    );
-
-    const channelLabel = computed(() => {
-      return getChannelLabel(filterValues.value.channels);
-    });
-
-    const tagLabel = computed(() => {
-      return getTagLabel(filterValues.value.tags);
-    });
-    const { smAndDown } = useDisplay();
-
-    watch(
-      () => route.query,
-      () => {
-        if (route.query) {
-          filterValues.value = getFilterValuesFromParams({
-            route: route,
-            channelId: channelId.value,
-          });
-        }
-      }
-    );
-
-    return {
-      channelId,
-      channelLabel,
-      defaultFilterLabels,
-      drawerIsOpen: ref(false),
-      filterValues,
-      route,
-      smAndDown,
-      tagLabel,
-    };
-  },
-  
-  methods: {
-    handleClickMoreFilters() {
-      this.drawerIsOpen = true;
-    },
-    handleCloseFilters() {
-      this.drawerIsOpen = false;
-    },
-    updateFilters(params: SearchDiscussionValues) {
-      const existingQuery = this.$route.query;
-      // Updating the URL params causes the discussions
-      // to be refetched by the discussion list components.
-      this.$router.replace({
-        query: {
-          ...existingQuery,
-          ...params,
-        },
-      });
-    },
-    updateLocalState(params: SearchDiscussionValues) {
-      // Updating filterValues updates local state
-      // so that parts of the filter form don't get
-      // outdated when a related setting is updated.
-      const existingFilterValues = this.filterValues;
-      this.filterValues = {
-        ...existingFilterValues,
-        ...params,
-      };
-    },
-    setSelectedChannels(channels: string[]) {
-      this.updateLocalState({ channels });
-      this.updateFilters({ channels });
-    },
-    setSelectedTags(tags: string[]) {
-      this.updateLocalState({ tags });
-      this.updateFilters({ tags });
-    },
-    updateSearchInput(searchInput: string) {
-      this.updateLocalState({ searchInput });
-      this.updateFilters({ searchInput });
-    },
-    toggleSelectedChannel(channel: string) {
-      const index = this.filterValues.channels.indexOf(channel);
-      if (index === -1) {
-        this.filterValues.channels.push(channel);
-      } else {
-        this.filterValues.channels.splice(index, 1);
-      }
-      this.setSelectedChannels(this.filterValues.channels);
-    },
-    toggleSelectedTag(tag: string) {
-      const index = this.filterValues.tags.indexOf(tag);
-      if (index === -1) {
-        this.filterValues.tags.push(tag);
-      } else {
-        this.filterValues.tags.splice(index, 1);
-      }
-      this.setSelectedTags(this.filterValues.tags);
-    },
+  resultCount: {
+    type: Number,
+    default: 0,
   },
 });
+
+// Nuxt route and router
+const route = useRoute();
+const router = useRouter();
+
+// Default filter labels
+const defaultFilterLabels = {
+  channels: "Forums",
+  tags: "Tags",
+};
+
+// Computed property for channelId from route params
+const channelId = computed(() => {
+  if (typeof route.params.channelId === "string") {
+    return route.params.channelId;
+  }
+  return "";
+});
+
+// Local reactive state for filter values
+const filterValues = ref<SearchDiscussionValues>(
+  getFilterValuesFromParams({
+    route,
+    channelId: channelId.value,
+  })
+);
+
+// Computed properties for labels
+const channelLabel = computed(() => {
+  return getChannelLabel(filterValues.value.channels);
+});
+
+const tagLabel = computed(() => {
+  return getTagLabel(filterValues.value.tags);
+});
+
+// Vuetify display helper for responsive design
+const { smAndDown } = useDisplay();
+
+// Watch for route query changes to update filter values
+watch(
+  () => route.query,
+  () => {
+    if (route.query) {
+      filterValues.value = getFilterValuesFromParams({
+        route,
+        channelId: channelId.value,
+      });
+    }
+  }
+);
+
+const updateFilters = (params: SearchDiscussionValues) => {
+  const existingQuery = route.query;
+  // Updating the URL params causes the discussions to be refetched by the discussion list components.
+  router.replace({
+    query: {
+      ...existingQuery,
+      ...params,
+    },
+  });
+};
+
+const updateLocalState = (params: SearchDiscussionValues) => {
+  // Updating filterValues updates local state
+  filterValues.value = {
+    ...filterValues.value,
+    ...params,
+  };
+};
+
+const setSelectedChannels = (channels: string[]) => {
+  updateLocalState({ channels });
+  updateFilters({ channels });
+};
+
+const setSelectedTags = (tags: string[]) => {
+  updateLocalState({ tags });
+  updateFilters({ tags });
+};
+
+const updateSearchInput = (searchInput: string) => {
+  updateLocalState({ searchInput });
+  updateFilters({ searchInput });
+};
+
+const toggleSelectedChannel = (channel: string) => {
+  const index = filterValues.value.channels.indexOf(channel);
+  if (index === -1) {
+    filterValues.value.channels.push(channel);
+  } else {
+    filterValues.value.channels.splice(index, 1);
+  }
+  setSelectedChannels(filterValues.value.channels);
+};
+
+const toggleSelectedTag = (tag: string) => {
+  const index = filterValues.value.tags.indexOf(tag);
+  if (index === -1) {
+    filterValues.value.tags.push(tag);
+  } else {
+    filterValues.value.tags.splice(index, 1);
+  }
+  setSelectedTags(filterValues.value.tags);
+};
 </script>
 
 <template>

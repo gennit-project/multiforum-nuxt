@@ -6,6 +6,7 @@ import SitewideDiscussionList from "./SitewideDiscussionList.vue";
 import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import type { SearchDiscussionValues } from "@/types/Discussion";
+console.log("SearchDiscussions.vue"); 
 
 // Props and Emits
 defineEmits(["filterByTag", "filterByChannel"]);
@@ -142,6 +143,12 @@ const handleClickChannel = (uniqueName: string) => {
     updateFilters({ channels: [uniqueName] });
   }
 };
+
+console.log({
+  channelId: channelId.value,
+  filterValues: filterValues.value,
+
+})
 </script>
 
 <template>

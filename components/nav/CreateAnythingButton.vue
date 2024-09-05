@@ -37,17 +37,17 @@ export default defineComponent({
       {
         text: '+ New Discussion',
         testId: 'create-discussion-menu-item',
-        action: () => router.push(channelId.value ? `/channels/c/${channelId.value}/discussions/create` : '/discussions/create'),
+        action: () => router.push(channelId.value ? `/forums/f/${channelId.value}/discussions/create` : '/discussions/create'),
       },
       {
         text: '+ New Event',
         testId: 'create-event-menu-item',
-        action: () => router.push(channelId.value ? `/channels/c/${channelId.value}/events/create` : '/events/create'),
+        action: () => router.push(channelId.value ? `/forums/f/${channelId.value}/events/create` : '/events/create'),
       },
       {
         text: '+ New Forum',
         testId: 'create-channel-menu-item',
-        action: () => router.push('/channels/create'),
+        action: () => router.push('/forums/create'),
       },
     ];
     return { 

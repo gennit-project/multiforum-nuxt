@@ -65,7 +65,7 @@ const channelId = computed(() => {
 
 const createEventLink = computed(() => {
   if (channelId.value) {
-    return `/channels/c/${channelId.value}/events/create`;
+    return `/forums/f/${channelId.value}/events/create`;
   }
   return '/events/create';
 });

@@ -71,7 +71,7 @@ const tags = computed(() => props.discussion?.Tags?.map((tag: Tag) => tag.text) 
 
 const detailLink = computed(() => {
   if (!props.discussion) return "";
-  return `/channels/c/${defaultUniqueName.value}/discussions/d/${props.discussionChannel.discussionId}`;
+  return `/forums/f/${defaultUniqueName.value}/discussions/d/${props.discussionChannel.discussionId}`;
 });
 
 const filteredQuery = computed(() => {

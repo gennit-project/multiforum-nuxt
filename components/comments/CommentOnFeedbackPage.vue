@@ -9,7 +9,7 @@ import useClipboard from "vue-clipboard3";
 import VoteButtons from "./VoteButtons.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
-import TextEditor from "../forms/TextEditor.vue";
+import TextEditor from "../TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";

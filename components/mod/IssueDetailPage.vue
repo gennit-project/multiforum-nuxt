@@ -23,9 +23,9 @@ import EventDetail from "@/components/event/detail/EventDetail.vue";
 import CommentDetails from "@/components/mod/CommentDetails.vue";
 import ModerationWizard from "@/components/mod/ModerationWizard.vue";
 import IssueBadge from "@/components/mod/IssueBadge.vue";
-import TextEditor from "../forms/TextEditor.vue";
-import GenericButton from "../buttons/GenericButton.vue";
-import SaveButton from "../buttons/SaveButton.vue";
+import TextEditor from "../TextEditor.vue";
+import GenericButton from "../GenericButton.vue";
+import SaveButton from "../SaveButton.vue";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
@@ -601,7 +601,7 @@ export default defineComponent({
       class="align-center mx-1 mt-2 flex justify-between px-4"
     >
       <BackLink
-        :link="`/channels/c/${channelId}/issues`"
+        :link="`/forums/f/${channelId}/issues`"
         :data-testid="'issue-detail-back-link'"
       />
     </div>
