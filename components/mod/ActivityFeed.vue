@@ -94,7 +94,7 @@ export default defineComponent({
           <div class="relative flex items-start space-x-3">
             <template v-if="activityItem.actionType === 'comment'">
               <div class="relative">
-                <Avatar
+                <AvatarComponent
                   v-if="activityItem.ModerationProfile?.displayName"
                   class="z-10"
                   :is-small="true"

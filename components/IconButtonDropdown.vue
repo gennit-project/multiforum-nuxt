@@ -1,8 +1,6 @@
-<script lang="ts">
-import { useRouter } from "vue-router";
-import { Menu as DropdownMenu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+<script setup lang="ts">
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import type { PropType } from "vue";
-import { defineComponent } from "vue";
 
 type MenuItemType = {
   value: string;
@@ -11,49 +9,38 @@ type MenuItemType = {
   event?: string;
 };
 
-export default defineComponent({
-  name: "IconButtonDropdown",
-  components: {
-    DropdownMenu: Menu,
-    MenuButton,
-    MenuItem,
-    MenuItems,
+defineProps({
+  items: {
+    type: Array as PropType<MenuItemType[]>,
+    required: true,
   },
-  props: {
-    items: {
-      type: Array as PropType<MenuItemType[]>,
-      required: true,
-    },
-    menuButtonIcon: {
-      type: String,
-      required: false,
-      default: "",
-    },
-  },
-  setup() {
-    const router = useRouter();
-    return {
-      router,
-    };
+  menuButtonIcon: {
+    type: String,
+    required: false,
+    default: "",
   },
 });
+
+console.log('icon button dropdown')
+
+const emit = defineEmits(["click"]);
+const router = useRouter();
+
+const handleItemClick = (item: MenuItemType) => {
+  if (item.event) {
+    emit(item.event);
+  }
+  router.push(item.value);
+};
 </script>
+
 <template>
-  <DropdownMenu
-    as="div"
-    class="relative text-left flex items-center"
-  >
+  <Menu as="div" class="relative text-left flex items-center">
     <MenuButton
       class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-white"
     >
-      <i
-        v-if="menuButtonIcon"
-        :class="` ${menuButtonIcon} `"
-      />
-      <div
-        v-else
-        class="flex items-center"
-      >
+      <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />
+      <div v-else class="flex items-center">
         <slot />
       </div>
     </MenuButton>
@@ -75,12 +62,7 @@ export default defineComponent({
             :key="i"
             v-slot="{ active }"
             class="cursor-pointer"
-            @click="() => {
-              if (item.event) {
-                $emit(item.event)
-              }
-              router.push(item.value)
-            }"
+            @click="handleItemClick(item)"
           >
             <span
               :class="[
@@ -90,14 +72,11 @@ export default defineComponent({
                 'block px-4 py-2 text-sm',
               ]"
             >
-              <i
-                v-if="item.icon"
-                :class="item.icon"
-              /> {{ item.label }}
+              <i v-if="item.icon" :class="item.icon" /> {{ item.label }}
             </span>
           </MenuItem>
         </div>
       </MenuItems>
     </transition>
-  </DropdownMenu>
+  </Menu>
 </template>

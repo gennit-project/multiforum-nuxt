@@ -41,7 +41,7 @@ defineEmits(['filterByTag']);
           class="flex cursor-pointer"
         >
           <div class="h-24 w-24">
-            <Avatar
+            <AvatarComponent
               :text="channel.uniqueName"
               :src="channel?.channelIconURL || ''"
               :is-medium="true"

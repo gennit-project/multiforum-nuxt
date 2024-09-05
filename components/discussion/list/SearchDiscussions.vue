@@ -143,12 +143,6 @@ const handleClickChannel = (uniqueName: string) => {
     updateFilters({ channels: [uniqueName] });
   }
 };
-
-console.log({
-  channelId: channelId.value,
-  filterValues: filterValues.value,
-
-})
 </script>
 
 <template>

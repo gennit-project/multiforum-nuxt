@@ -84,7 +84,7 @@ export default defineComponent({
     @go-to-user-profile="goToUserProfile"
     @go-to-mod-profile="goToModProfile"
   >
-    <Avatar
+    <AvatarComponent
       :key="profilePicURL"
       :text="username"
       :src="profilePicURL"

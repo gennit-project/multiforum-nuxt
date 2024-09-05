@@ -88,7 +88,7 @@ export default defineComponent({
 <template>
   <div class="sticky top-0 max-h-screen overflow-auto rounded-lg pt-6">
     <div class="mb-4 mt-6 p-4 flex flex-col gap-2">
-      <Avatar
+      <AvatarComponent
         class="shadow-sm"
         :src="user?.profilePicURL"
         :text="username"

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
 import type { PropType } from 'vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import SortIcon from '@/components/icons/SortIcon.vue';
@@ -34,7 +34,7 @@ function handleClick(item: MenuItemType) {
 </script>
 
 <template>
-  <DropdownMenu as="div" class="relative inline-block text-left">
+  <Menu as="div" class="relative inline-block text-left">
     <div>
       <MenuButton
         :data-testid="`text-dropdown-${label}`"
@@ -78,7 +78,7 @@ function handleClick(item: MenuItemType) {
         </div>
       </MenuItems>
     </transition>
-  </DropdownMenu>
+  </Menu>
 </template>
 
 <style scoped>

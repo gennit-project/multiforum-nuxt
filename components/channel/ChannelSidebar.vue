@@ -210,7 +210,7 @@ export default defineComponent({
                 :to="`/u/${admin.username}`"
                 class="flex items-center"
               >
-                <Avatar
+                <AvatarComponent
                   :text="admin.username"
                   :src="admin.profilePicURL ?? ''"
                   class="mr-2 h-6 w-6"

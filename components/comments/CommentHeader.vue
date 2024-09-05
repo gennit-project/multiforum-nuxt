@@ -105,14 +105,14 @@ export default defineComponent({
     <p v-if="!commentData">
       [Deleted]
     </p>
-    <Avatar
+    <AvatarComponent
       v-else-if="commentData.CommentAuthor?.username"
       class="z-10"
       :is-small="true"
       :text="commentData.CommentAuthor.username"
       :src="commentData.CommentAuthor.profilePicURL || ''"
     />
-    <Avatar
+    <AvatarComponent
       v-else-if="commentData.CommentAuthor?.displayName"
       class="z-10"
       :is-small="true"

@@ -78,7 +78,7 @@ watch(
             class="mr-2 flex items-center rounded-full bg-blue-100 pr-2 text-blue-700 dark:bg-gray-600 dark:text-white"
             @click="removeSelection(channelName)"
           >
-            <Avatar
+            <AvatarComponent
               :src="
                 channelOptions.find(
                   (channel: Channel) => channel?.uniqueName === channelName

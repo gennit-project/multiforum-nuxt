@@ -29,7 +29,7 @@ export default defineComponent({
 
 <template>
   <div class="flex flex-col items-center justify-center gap-4 bg-black">
-    <Avatar
+    <AvatarComponent
       class="h-24 w-24 border-2 shadow-sm dark:border-gray-800 mt-2"
       :text="channelId"
       :src="channel?.channelIconURL ?? ''"

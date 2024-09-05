@@ -113,7 +113,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
             <div class="font-medium flex flex-wrap items-center gap-1 text-xs text-gray-600 no-underline dark:text-gray-300">
               <span>
                 {{ `Posted ${relative} by ` }}
-                <!-- <UsernameWithTooltip
+                <UsernameWithTooltip
                   v-if="authorUsername"
                   :is-admin="authorIsAdmin"
                   :username="authorUsername"
@@ -122,13 +122,13 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
                   :comment-karma="discussion?.Author?.commentKarma ?? 0"
                   :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
                   :account-created="discussion?.Author?.createdAt"
-                /> -->
+                />
               </span>
             </div>
           </div>
         </div>
         <div v-if="discussion && discussion.body" class="border-l-2 border-gray-300">
-          <!-- <MarkdownPreview :text="discussion.body" :word-limit="50" :disable-gallery="false" class="-ml-2" /> -->
+          <MarkdownPreview :text="discussion.body" :word-limit="50" :disable-gallery="false" class="-ml-2" />
         </div>
         <div class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline">
           <TagComponent
@@ -141,7 +141,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
           />
         </div>
 
-        <!-- <router-link
+        <router-link
           v-if="discussion && !submittedToMultipleChannels"
           :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
           class="mt-1 flex cursor-pointer items-center justify-start gap-1 text-xs text-gray-400 dark:text-gray-100"
@@ -151,9 +151,9 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
               commentCount === 1 ? "comment" : "comments"
             } in c/${discussion.DiscussionChannels[0].channelUniqueName}`
           }}</span>
-        </router-link> -->
+        </router-link>
 
-        <!-- <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
+        <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
           <button
             class="-ml-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
           >
@@ -165,7 +165,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
             }}
             <ChevronDownIcon class="-mr-1 ml-2 h-4 w-4" aria-hidden="true" />
           </button>
-        </MenuButton> -->
+        </MenuButton>
       </div>
     </div>
   </li>

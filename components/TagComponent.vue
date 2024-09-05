@@ -88,7 +88,7 @@ function getButtonStyles() {
     @mouseleave="highlightedByMouse = false"
     @click="handleTagClick(props.tag, props.active)"
   >
-    <Avatar
+    <AvatarComponent
       v-if="props.channelMode && !props.hideIcon"
       :class="[props.clearable ? 'mr-1' : '', 'h-6 w-6']"
       class="inline-flex"

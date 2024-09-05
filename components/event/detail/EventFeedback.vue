@@ -189,7 +189,7 @@ export default defineComponent({
       <div
         class="flex gap-2 text-sm leading-8 text-gray-500 dark:text-gray-300"
       >
-        <Avatar
+        <AvatarComponent
           v-if="comment.CommentAuthor?.displayName"
           class="h-36 w-36 border-2 shadow-sm dark:border-gray-800"
           :text="comment.CommentAuthor.displayName"

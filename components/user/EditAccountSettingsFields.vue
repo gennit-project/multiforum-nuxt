@@ -159,7 +159,7 @@ nextTick(() => {
           </FormRow>
           <FormRow section-title="Profile Picture">
             <template #content>
-              <Avatar
+              <AvatarComponent
                 class="shadow-sm"
                 :src="formValues.profilePicURL"
                 :text="username"

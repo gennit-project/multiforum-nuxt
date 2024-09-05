@@ -58,6 +58,7 @@ export default defineComponent({
     },
   },
   setup() {
+    console.log("MenuButton.vue");  
     // Give the button a unique ID so this will work even if there are multiple menu buttons.
     const uniqueID = ref(Math.random().toString(36).substring(7));
     const shouldOpenUpwards = ref(false);

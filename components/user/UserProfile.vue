@@ -127,7 +127,7 @@ export default defineComponent({
       v-if="smAndDown"
       class="flex flex-col justify-center"
     >
-      <Avatar
+      <AvatarComponent
         class="-mt-24 mb-4 h-24 w-24 shadow-sm border"
         :text="username"
         :src="user?.profilePicURL"

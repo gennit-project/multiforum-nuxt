@@ -113,14 +113,14 @@ const truncate = (description: string) => {
           @change="() => emit('toggleSelection', channel.uniqueName)"
         >
         <div class="flex items-center space-x-2">
-          <Avatar
+          <AvatarComponent
             v-if="channel.icon"
             class="z-10"
             :is-small="true"
             :text="channel.uniqueName"
             :src="channel.icon"
           />
-          <Avatar
+          <AvatarComponent
             v-else
             class="z-10"
             :is-small="true"

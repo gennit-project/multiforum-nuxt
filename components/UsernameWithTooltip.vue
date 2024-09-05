@@ -108,7 +108,7 @@ export default defineComponent({
           v-if="!displayName"
           class="text-md flex w-full flex-col"
         >
-          <Avatar
+          <AvatarComponent
             :text="username"
             :src="src"
             :is-medium="true"
@@ -118,7 +118,7 @@ export default defineComponent({
           v-if="displayName"
           class="text-md flex w-full flex-col"
         >
-          <Avatar
+          <AvatarComponent
             :text="username"
             :src="src"
             :is-medium="true"

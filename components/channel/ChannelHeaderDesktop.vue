@@ -61,7 +61,7 @@ export default defineComponent({
             :alt="channelId"
             :src="channel?.channelIconURL ?? ''"
           />
-          <Avatar
+          <AvatarComponent
             v-if="!channel?.channelIconURL"
             class="h-24 w-24 border-2 shadow-sm dark:border-gray-800"
             :text="channelId"

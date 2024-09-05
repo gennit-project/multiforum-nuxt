@@ -237,7 +237,7 @@ const deleteRule = (index: number) => {
           <!-- Forum Icon Upload -->
           <FormRow section-title="Forum Icon">
             <template #content>
-              <Avatar
+              <AvatarComponent
                 class="shadow-sm"
                 :src="formValues.channelIconURL"
                 :text="formValues.uniqueName"

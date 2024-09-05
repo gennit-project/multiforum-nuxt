@@ -4,9 +4,14 @@ import { computed } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import { useQuery } from "@vue/apollo-composable";
-import DOMPurify from "dompurify";
 import gql from "graphql-tag";
 import 'highlight.js/styles/github-dark.css';
+
+// Use DOMPurify only in the client environment
+let DOMPurify;
+if (import.meta.client) {
+  DOMPurify = (await import('dompurify')).default;
+}
 
 const props = defineProps({
   text: {
@@ -49,16 +54,16 @@ const md = new MarkdownIt({
 
 const renderedMarkdown = computed(() => {
   const rawHTML = md.render(props.text);
-  return DOMPurify.sanitize(rawHTML);
+
+  if (import.meta.client && DOMPurify) {
+    return DOMPurify.sanitize(rawHTML);
+  }
+  return rawHTML; // Return the raw HTML if on the server
 });
 </script>
 
 <template>
- 
-  <div
-    :class="['markdown-body', theme]"
-    v-html="renderedMarkdown"
-  />
+  <div :class="['markdown-body', theme]" v-html="renderedMarkdown" />
 </template>
 
 <style lang="scss">

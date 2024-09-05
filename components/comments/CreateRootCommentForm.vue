@@ -62,7 +62,7 @@ const writeReplyStyle =
       :text="createCommentError?.message"
     />
     <div class="flex gap-2">
-      <Avatar
+      <AvatarComponent
         v-if="username"
         class="h-5 w-5"
         :text="username"
