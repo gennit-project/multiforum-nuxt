@@ -54,10 +54,11 @@ export default defineComponent({
         :alt="image.alt"
         class="shadow-sm"
       >
-      <figcaption class="text-center">
-        {{ image.alt }}
-      </figcaption>
+      
     </a>
+    <figcaption class="text-center">
+      {{ image.alt }}
+    </figcaption>
   </lightgallery>
 </template>
 

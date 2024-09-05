@@ -90,7 +90,7 @@ export default defineComponent({
       if (localModProfileNameLoading.value || localModProfileNameError.value) {
         return "";
       }
-      return localModProfileNameResult.value.modProfileName;
+      return localModProfileNameResult.value?.modProfileName || "";
     });
 
     const {

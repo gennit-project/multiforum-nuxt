@@ -207,7 +207,7 @@ const authorIsMod = computed(
   <div class="mb-4">
     <div class="mt-2 flex justify-between">
       <div class="flex flex-wrap items-center space-x-2 text-xs">
-        <Avatar
+        <AvatarComponent
           :text="discussion?.Author?.username ?? '[Deleted]'"
           :src="discussion?.Author?.profilePicURL ?? ''"
           :is-small="true"

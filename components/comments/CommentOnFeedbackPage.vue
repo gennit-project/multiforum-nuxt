@@ -55,7 +55,7 @@ const loggedInModName = computed(() => {
     console.error("Error fetching mod profile name");
     return "";
   }
-  return localModProfileNameResult.value.modProfileName;
+  return localModProfileNameResult.value?.modProfileName || "";
 });
 
 const updateCommentInput = ref({

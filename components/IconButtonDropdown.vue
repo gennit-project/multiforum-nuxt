@@ -1,6 +1,6 @@
 <script lang="ts">
 import { useRouter } from "vue-router";
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import { Menu as DropdownMenu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
 

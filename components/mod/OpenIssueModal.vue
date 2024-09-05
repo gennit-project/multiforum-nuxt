@@ -135,7 +135,7 @@ const {
 const loggedInUserModName = computed(() => {
   return localModProfileNameLoading.value || localModProfileNameError.value
     ? ''
-    : localModProfileNameResult.value.modProfileName;
+    : localModProfileNameResult.value?.modProfileName || '';
 });
 
 const {
