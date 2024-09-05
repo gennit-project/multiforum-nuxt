@@ -7,8 +7,8 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
-import { useAuth } from "#auth"; // For Nuxt's Auth integration
-import { usernameVar, modProfileNameVar } from "@/cache"; // Ensure these are properly imported from your state management
+import { useAuth0 } from "@/hooks/useAuth0";
+import { usernameVar, modProfileNameVar } from "@/cache";
 
 const props = defineProps({
   email: {
@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const { user } = useAuth();
+const { user } = useAuth0();
 const newUsername = ref(props.email?.split("@")[0]);
 
 const {

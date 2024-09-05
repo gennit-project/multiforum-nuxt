@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
-import { defineProps } from 'vue';
 
-// Define the props for the component
 const props = defineProps({
   to: {
     type: String,
@@ -18,10 +16,8 @@ const props = defineProps({
   },
 });
 
-// Use Nuxt's useRouter composable to handle routing
 const router = useRouter();
 
-// Function to handle the button click and route change
 const handleClick = () => {
   if (!props.disabled) {
     router.push(props.to);

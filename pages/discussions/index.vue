@@ -3,9 +3,9 @@ import SearchDiscussions from '@/components/discussion/list/SearchDiscussions.vu
 </script>
 
 <template>
-  <div>
+  <NuxtLayout>
     <SearchDiscussions />
-  </div>
+  </NuxtLayout>
 </template>
 
 <style scoped></style>

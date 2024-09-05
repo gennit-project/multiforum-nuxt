@@ -1,5 +1,7 @@
-<template lang="ts">
+<template>
+  <v-app>
     <main>
-        <NuxtPage />
-      </main>
+      <NuxtPage />
+    </main>
+  </v-app>
 </template>

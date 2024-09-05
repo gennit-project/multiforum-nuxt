@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineProps, defineEmits, computed } from 'vue';
+import { computed } from 'vue';
 import EventListItem from './EventListItem.vue';
 import LoadMore from '../../LoadMore.vue';
 import { useRoute, useRouter } from 'vue-router';

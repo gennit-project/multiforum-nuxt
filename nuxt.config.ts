@@ -1,5 +1,6 @@
 import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
+import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -10,31 +11,12 @@ export default defineNuxtConfig({
       },
     },
   },
-  // auth: {
-  //   isEnabled: true,
-  //   disableServerSideAuth: false,
-  //   originEnvKey: config.baseUrl,
-  //   baseURL: "http://localhost:3000/api/auth",
-  //   provider: {
-  //     type: "authjs",
-  //     trustHost: false,
-  //     defaultProvider: "github",
-  //     addDefaultCallbackUrl: true,
-  //     // domain: config.domain,
-  //     // clientId: config.clientId,
-  //     // clientSecret: config.clientSecret,
-  //   },
-  //   sessionRefresh: {
-  //     enablePeriodically: true,
-  //     enableOnWindowFocus: true,
-  //   },
-  // },
+  build: {
+    transpile: ["vuetify"],
+  },
   compatibilityDate: "2024-04-03",
   components: true,
-  css: [
-    "@/assets/css/index.css",
-    "@fortawesome/fontawesome-free/css/all.css",
-  ],
+  css: ["@/assets/css/index.css", "@fortawesome/fontawesome-free/css/all.css"],
   devtools: { enabled: true },
   // fontawesome: {
   //   component: "fa",
@@ -68,11 +50,18 @@ export default defineNuxtConfig({
   modules: [
     "@nuxtjs/apollo",
     "@nuxtjs/eslint-module",
+    (_options, nuxt) => {
+      nuxt.hooks.hook("vite:extendConfig", (config) => {
+        // @ts-expect-error
+        config.plugins.push(vuetify({ autoImport: true }));
+      });
+    },
   ],
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/apollo", mode: "client" },
+    { src: "@/plugins/vuetify", mode: "client" },
   ],
   runtimeConfig: {
     auth0: {
@@ -92,4 +81,16 @@ export default defineNuxtConfig({
   //   config: {}, // Sentry configuration options
   // },
   ssr: true,
+  vite: {
+    resolve: {
+      alias: {
+        "fast-deep-equal": "fast-deep-equal/index.js",
+      },
+    },
+    vue: {
+      template: {
+        transformAssetUrls,
+      },
+    },
+  },
 });

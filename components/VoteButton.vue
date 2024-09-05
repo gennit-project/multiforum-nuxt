@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineEmits, defineProps } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 defineProps({

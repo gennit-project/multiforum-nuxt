@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits } from 'vue';
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
