@@ -50,7 +50,6 @@ const theme = computed(() => {
   if (themeError.value || !themeResult.value) {
     return "light"; // Default to light theme
   }
-  console.log('theme is',themeResult.value); 
   return themeResult.value
 });
 

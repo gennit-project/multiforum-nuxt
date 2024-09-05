@@ -4,7 +4,7 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import { DELETE_COMMENT, UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
-import { ALLOWED_ICONS, MenuButton } from "../MenuButton.vue";
+import { MenuButton } from "../MenuButton.vue";
 import useClipboard from "vue-clipboard3";
 import VoteButtons from "./VoteButtons.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
@@ -18,6 +18,7 @@ import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
 import type { HandleEditFeedbackInput, HandleFeedbackInput } from "./Comment.vue";
 import { timeAgo } from "@/utils";
+import { ALLOWED_ICONS } from '@/utils';
 
 const props = defineProps({
   comment: {

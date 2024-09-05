@@ -11,7 +11,7 @@ import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
 import useClipboard from "vue-clipboard3";
 import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
-import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import {
@@ -24,6 +24,7 @@ import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
+import { ALLOWED_ICONS } from '@/utils';
 
 export default defineComponent({
   name: "EventHeader",

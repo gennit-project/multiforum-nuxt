@@ -2,8 +2,9 @@
 import { computed } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
 import HandThumbDownIcon from '../icons/HandThumbDownIcon.vue';
-import MenuButton, { ALLOWED_ICONS } from '@/components/MenuButton.vue';
+import MenuButton } from '@/components/MenuButton.vue';
 import type { SelectOptionData } from '@/types/GenericFormTypes';
+import { ALLOWED_ICONS } from '@/utils';
 
 const props = defineProps({
   downvoteActive: {

@@ -3,6 +3,13 @@ import { gql } from "@apollo/client/core";
 import config from "@/config";
 import type { Duration } from "luxon";
 import { DateTime, Interval } from "luxon";
+import LinkIcon from '@/components/icons/LinkIcon.vue'
+import FlagIcon from '@/components/icons/FlagIcon.vue'
+import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue'
+import EyeIcon from '@/components/icons/EyeIcon.vue'
+import PencilIcon from '@/components/icons/PencilIcon.vue'
+import TrashIcon from '@/components/icons/TrashIcon.vue'
+import XmarkIcon from '@/components/icons/XmarkIcon.vue'
 import type { EventData } from "@/types/Event";
 
 const getTimePieces = (timeObj: DateTime) => {
@@ -366,7 +373,31 @@ function checkUrl(str: string) {
   return valid;
 }
 
+const ALLOWED_ICONS = {
+  COPY_LINK: 'COPY_LINK',
+  REPORT: 'REPORT',
+  GIVE_FEEDBACK: 'GIVE_FEEDBACK',
+  VIEW_FEEDBACK: 'VIEW_FEEDBACK',
+  EDIT: 'EDIT',
+  DELETE: 'DELETE',
+  CANCEL: 'CANCEL',
+  UNDO: 'UNDO',
+}
+
+const actionIconMap = {
+  [ALLOWED_ICONS.COPY_LINK]: LinkIcon,
+  [ALLOWED_ICONS.REPORT]: FlagIcon,
+  [ALLOWED_ICONS.GIVE_FEEDBACK]: HandThumbDownIcon,
+  [ALLOWED_ICONS.VIEW_FEEDBACK]: EyeIcon,
+  [ALLOWED_ICONS.EDIT]: PencilIcon,
+  [ALLOWED_ICONS.DELETE]: TrashIcon,
+  [ALLOWED_ICONS.CANCEL]: XmarkIcon,
+  [ALLOWED_ICONS.UNDO]: XmarkIcon,
+}
+
 export {
+  ALLOWED_ICONS,
+  actionIconMap,
   checkUrl,
   convertTimeToReadableFormat,
   getReadableTimeFromISO,

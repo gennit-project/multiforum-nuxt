@@ -7,7 +7,7 @@ import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import MenuButton, { ALLOWED_ICONS } from "@/components/MenuButton.vue";
+import MenuButton from "@/components/MenuButton.vue";
 import useClipboard from "vue-clipboard3";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
@@ -16,6 +16,7 @@ import {
 import Notification from "@/components/NotificationComponent.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
+import { ALLOWED_ICONS } from '@/utils';
 
 type MenuItem = {
   label: string;
