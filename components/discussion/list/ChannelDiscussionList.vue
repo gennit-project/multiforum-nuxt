@@ -197,7 +197,7 @@ const handleCreateModProfileClick = async () => {
             :to="{
               name: 'CreateDiscussionInChannel',
               params: {
-                channelId: channelId,
+                forumId: channelId,
               },
             }"
             class="text-blue-500 underline"

@@ -63,7 +63,7 @@ const filterByTag = (tag: string) => {
   router.push({
     name: "SearchDiscussionsInChannel",
     params: {
-      channelId: props.channelId,
+      forumId: props.channelId,
     },
     query: {
       tags: tag,

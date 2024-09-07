@@ -48,7 +48,7 @@ export default defineComponent({
             name: 'DiscussionDetail',
             params: {
               discussionId,
-              channelId: channel.uniqueName,
+              forumId: channel.uniqueName,
             },
           }"
         >
@@ -60,7 +60,7 @@ export default defineComponent({
             name: 'DiscussionDetail',
             params: {
               discussionId,
-              channelId: channel.uniqueName,
+              forumId: channel.uniqueName,
             },
           }"
         >

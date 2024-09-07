@@ -79,7 +79,7 @@ export default defineComponent({
         :to="{
           name: 'OpenIssues',
           params: {
-            channelId: channelId,
+            forumId: channelId,
           },
         }"
         class="flex flex-row items-center gap-2"
@@ -93,7 +93,7 @@ export default defineComponent({
         :to="{
           name: 'ClosedIssues',
           params: {
-            channelId: channelId,
+            forumId: channelId,
           },
         }"
         class="flex flex-row items-center gap-1 whitespace-nowrap"

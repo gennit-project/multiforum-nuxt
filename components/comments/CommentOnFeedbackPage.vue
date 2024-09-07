@@ -7,7 +7,6 @@ import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
 } from "@/graphQLData/comment/mutations";
-import ClipboardJS from "clipboard";
 import VoteButtons from "./VoteButtons.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
@@ -173,7 +172,7 @@ const getPermalinkObject = () => {
     params: {
       discussionId,
       commentId,
-      channelId,
+      forumId: channelId,
       feedbackId: props.comment.id,
     },
   };
@@ -245,7 +244,7 @@ function handleViewFeedback(feedbackId: string) {
   router.push({
     name: "FeedbackOnCommentFeedback",
     params: {
-      channelId: route.params.forumId,
+      forumId: route.params.forumId,
       discussionId: route.params.discussionId,
       commentId: feedbackId,
     },

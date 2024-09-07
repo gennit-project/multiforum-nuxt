@@ -45,7 +45,7 @@ export default defineComponent({
           name: 'DiscussionDetail',
           params: {
             discussionId,
-            channelId,
+            forumId: channelId,
           },
         }"
       >
@@ -59,7 +59,7 @@ export default defineComponent({
           name: 'DiscussionDetail',
           params: {
             discussionId,
-            channelId,
+            forumId: channelId,
           },
         }"
       >

@@ -18,32 +18,6 @@ export default defineNuxtConfig({
   components: true,
   css: ["@/assets/css/index.css", "@fortawesome/fontawesome-free/css/all.css"],
   devtools: { enabled: true },
-  // fontawesome: {
-  //   component: "fa",
-  //   icons: {
-  //     solid: [
-  //       "faArrowsRotate",
-  //       "faCircleCheck",
-  //       "faComment",
-  //       "faEye",
-  //       "faEyeSlash",
-  //       "faFaceSmile",
-  //       "faFlag",
-  //       "faSun",
-  //       "faMoon",
-  //       "faChevronDown",
-  //       "faDesktop",
-  //       "faTicket",
-  //       "faFire",
-  //       "faImage",
-  //       "faUserLock",
-  //       "faUserMinus",
-  //       "faUserPlus",
-  //       "faXmark",
-  //       "faArrowUpRightFromSquare",
-  //     ],
-  //   },
-  // },
   imports: {
     autoImport: true,
   },
@@ -76,11 +50,6 @@ export default defineNuxtConfig({
       auth0Domain: config.domain,
     },
   },
-  // sentry: {
-  //   dsn: config.sentryDsn,
-  //   tracing: true,
-  //   config: {}, // Sentry configuration options
-  // },
   ssr: true,
   vite: {
     resolve: {

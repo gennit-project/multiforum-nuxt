@@ -58,7 +58,7 @@ export default defineComponent({
           params: {
             discussionId: discussionIdInLink,
             commentId: props.commentId,
-            channelId: channelId.value,
+            forumId: channelId.value,
           },
         };
       }
@@ -70,7 +70,7 @@ export default defineComponent({
           params: {
             eventId: eventIdInLink,
             commentId: props.commentId,
-            channelId: channelId.value,
+            forumId: channelId.value,
           },
         };
       }

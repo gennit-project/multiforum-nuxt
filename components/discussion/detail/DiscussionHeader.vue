@@ -81,7 +81,7 @@ onDoneDeleting(() => {
   if (props.channelId) {
     router.push({
       name: "SearchDiscussionsInChannel",
-      params: { channelId: props.channelId },
+      params: { forumId: props.channelId },
     });
   }
 });

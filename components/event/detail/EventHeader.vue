@@ -12,7 +12,6 @@ import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LinkIcon from "@/components/icons/LinkIcon.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
 import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
-import ClipboardJS from "clipboard";
 import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
 import MenuButton from "@/components/MenuButton.vue";
@@ -28,7 +27,6 @@ import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import ClipboardJS from "clipboard";
 
 export default defineComponent({
   name: "EventHeader",
@@ -125,7 +123,7 @@ export default defineComponent({
         router.push({
           name: "SearchEventsInChannel",
           params: {
-            channelId: channelId.value,
+            forumId: channelId.value,
           },
         });
       }
@@ -180,7 +178,7 @@ export default defineComponent({
         name: "EventDetail",
         params: {
           eventId: eventId.value,
-          channelId: channelId.value,
+          forumId: channelId.value,
         },
       };
     });
@@ -398,7 +396,7 @@ export default defineComponent({
         name: "EventFeedback",
         params: {
           eventId: this.eventId,
-          channelId: this.channelId,
+          forumId: this.channelId,
         },
       });
     },

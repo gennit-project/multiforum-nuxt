@@ -97,7 +97,7 @@ const handleClickEventListItem = (event: Event) => {
         name: 'EventDetail',
         params: {
           eventId: event.id,
-          channelId: channelId.value,
+          forumId: channelId.value,
         },
       });
     }
@@ -105,7 +105,7 @@ const handleClickEventListItem = (event: Event) => {
       name: 'EventDetail',
       params: {
         eventId: event.id,
-        channelId: event.EventChannels[0].channelUniqueName,
+        forumId: event.EventChannels[0].channelUniqueName,
       },
     });
   }

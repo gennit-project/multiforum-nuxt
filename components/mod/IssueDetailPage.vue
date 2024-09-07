@@ -641,7 +641,7 @@ export default defineComponent({
             name: 'DiscussionDetail',
             params: {
               discussionId: activeIssue.relatedDiscussionId,
-              channelId: channelId,
+              forumId: channelId,
             },
           }"
         >
@@ -654,7 +654,7 @@ export default defineComponent({
             name: 'EventDetail',
             params: {
               eventId: activeIssue.relatedEventId,
-              channelId: channelId,
+              forumId: channelId,
             },
           }"
         >

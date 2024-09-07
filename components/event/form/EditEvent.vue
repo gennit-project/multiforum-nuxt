@@ -265,7 +265,7 @@ export default defineComponent({
       router.push({
         name: "EventDetail",
         params: {
-          channelId: formValues.value.selectedChannels[0].channelUniqueName,
+          forumId: formValues.value.selectedChannels[0].channelUniqueName,
           eventId,
         },
       });

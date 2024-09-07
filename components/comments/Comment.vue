@@ -178,7 +178,7 @@ const permalinkObject = computed(() => {
       params: {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
-        channelId:
+        forumId:
           channelId || props.commentData?.DiscussionChannel?.channelUniqueName,
       },
     };

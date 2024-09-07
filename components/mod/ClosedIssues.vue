@@ -71,7 +71,7 @@ export default defineComponent({
             name: 'IssueDetail',
             params: {
               issueId: issue.id,
-              channelId: channelId,
+              forumId: channelId,
             },
           }"
         >

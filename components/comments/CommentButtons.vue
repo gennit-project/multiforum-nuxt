@@ -165,7 +165,7 @@ function toggleEmojiPicker() {
           router.push({
             name: 'DiscussionCommentPermalink',
             params: {
-              channelId: commentData.DiscussionChannel?.channelUniqueName,
+              forumId: commentData.DiscussionChannel?.channelUniqueName,
               discussionId: commentData.DiscussionChannel?.discussionId,
               commentId: commentData.id,
             },

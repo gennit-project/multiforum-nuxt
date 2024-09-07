@@ -17,7 +17,7 @@ import { useRoute } from "vue-router";
 
 defineEmits(["toggleDropdown"]);
 
-const { isAuthenticated } = useAuth0();
+const { isAuthenticated, login } = useAuth0();
 
 const route = useRoute();
 
@@ -147,7 +147,6 @@ function getLabel() {
         </button>
       </div>
       <div class="flex items-center space-x-2">
-        <!-- <SearchButton /> -->
         <CreateAnythingButton />
         <ThemeSwitcher />
         <div
@@ -155,7 +154,6 @@ function getLabel() {
           class="hidden lg:ml-4 lg:block"
         >
           <div class="flex items-center">
-            <!-- <NotificationButton/> -->
             <div class="relative flex-shrink-0">
               <UserProfileDropdownMenu
                 :username="username"

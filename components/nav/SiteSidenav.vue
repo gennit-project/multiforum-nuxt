@@ -123,7 +123,7 @@ const outside = () => {
           <ul class="mb-6">
             <li v-for="forum in visibleRecentForums" :key="forum.uniqueName" class="list-none">
               <router-link
-                :to="{ name: 'SearchDiscussionsInChannel', params: { channelId: forum.uniqueName } }"
+                :to="{ name: 'SearchDiscussionsInChannel', params: { forumId: forum.uniqueName } }"
                 class="font-semibold group flex items-center gap-x-3 rounded-md py-1 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
                 @click="outside"
               >

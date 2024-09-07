@@ -144,7 +144,7 @@ export default defineComponent({
       router.push({
         name: "SearchDiscussionsInChannel",
         params: {
-          channelId: newChannelId,
+          forumId: newChannelId,
         },
       });
     });
