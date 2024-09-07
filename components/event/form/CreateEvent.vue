@@ -20,7 +20,7 @@ const router = useRouter();
 const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => localUsernameResult.value?.username || "");
 
-const channelId = computed(() => (route.params.channelId ? String(route.params.channelId) : ""));
+const channelId = computed(() => (route.params.forumId ? String(route.params.forumId) : ""));
 const createEventDefaultValues = getDefaultEventFormValues(channelId.value);
 const formValues = ref<CreateEditEventFormValues>(createEventDefaultValues);
 const defaultStartTimeObj = now.startOf("hour").plus({ hours: 1 });

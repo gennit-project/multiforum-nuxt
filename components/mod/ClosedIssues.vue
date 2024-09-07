@@ -11,10 +11,10 @@ export default defineComponent({
     const route = useRoute();
 
     const channelId = computed(() => {
-      if (typeof route.params.channelId !== "string") {
+      if (typeof route.params.forumId !== "string") {
         return "";
       }
-      return route.params.channelId;
+      return route.params.forumId;
     });
 
     const {

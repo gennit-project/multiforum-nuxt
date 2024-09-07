@@ -57,8 +57,8 @@ const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  if (typeof route.params.channelId === 'string') {
-    return route.params.channelId;
+  if (typeof route.params.forumId === 'string') {
+    return route.params.forumId;
   }
   return '';
 });

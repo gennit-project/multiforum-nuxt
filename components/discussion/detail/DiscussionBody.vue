@@ -1,115 +1,80 @@
-<script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, computed, ref } from "vue";
-import { getLinksInText } from "@/utils";
-import type { Discussion } from "@/__generated__/graphql";
-import { useRoute } from "vue-router";
-import Tag from "../../TagComponent.vue";
-import "md-editor-v3/lib/preview.css";
-import { useQuery } from "@vue/apollo-composable";
-import gql from "graphql-tag";
+<script lang="ts" setup>
+import { ref, computed, onMounted } from "vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import EmojiButtons from "@/components/comments/EmojiButtons.vue";
 import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
+import Tag from "../../TagComponent.vue";
+import "md-editor-v3/lib/preview.css";
+import type { PropType } from "vue";
+import type { Discussion } from "@/__generated__/graphql";
 
-export default defineComponent({
-  components: {
-    EmojiButtons,
-    Tag,
-    MarkdownPreview,
-    NewEmojiButton,
+const route = useRoute();
+const router = useRouter();
+
+const props = defineProps({
+  channelId: {
+    type: String,
+    required: true,
   },
-  props: {
-    channelId: {
-      type: String,
-      required: true,
-    },
-    discussion: {
-      type: Object as PropType<Discussion | null>,
-      required: false,
-      default: null,
-    },
-    discussionChannelId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    emojiJson: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    showEmojiButton: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    wordLimit: {
-      type: Number,
-      required: false,
-      default: 1000,
-    },
+  discussion: {
+    type: Object as PropType<Discussion | null>,
+    required: false,
+    default: null,
   },
-  setup(props) {
-    const route = useRoute();
-
-    const bodyText = computed(() => {
-      if (!props.discussion || !props.discussion.body) {
-        return "";
-      }
-      return props.discussion.body;
-    });
-
-    const linksInBody = computed(() => {
-      if (!props.discussion || !props.discussion.body) {
-        return [];
-      }
-      const links = getLinksInText(props.discussion.body);
-      return links;
-    });
-
-    const GET_THEME = gql`
-      query GetTheme {
-        theme @client
-      }
-    `;
-
-    const { result } = useQuery(GET_THEME);
-
-    const theme = computed(() => {
-      return result.value?.theme || "light";
-    });
-    return {
-      linksInBody,
-      route,
-      bodyText,
-      scrollElement: document.documentElement,
-      id: "preview-only",
-      showEmojiPicker: ref(false),
-      theme,
-    };
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
   },
-  methods: {
-    filterByTag(tag: string) {
-      this.$router.push({
-        name: "SearchDiscussionsInChannel",
-        params: {
-          channelId: this.channelId,
-        },
-        query: {
-          tags: tag,
-        },
-      });
-    },
+  emojiJson: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  showEmojiButton: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  wordLimit: {
+    type: Number,
+    required: false,
+    default: 1000,
   },
 });
+
+// Computed properties for discussion body and links
+const bodyText = computed(() => {
+  return props.discussion?.body || "";
+});
+
+
+// Scroll element setup, ensure document.documentElement is accessed only on the client-side
+const scrollElement = ref<HTMLElement | null>(null);
+
+onMounted(() => {
+  if (import.meta.client) {
+    scrollElement.value = document.documentElement;
+  }
+});
+
+// Method for filtering discussions by tag
+const filterByTag = (tag: string) => {
+  router.push({
+    name: "SearchDiscussionsInChannel",
+    params: {
+      channelId: props.channelId,
+    },
+    query: {
+      tags: tag,
+    },
+  });
+};
 </script>
+
 <template>
   <div class="md:px-2">
-    <div
-      v-if="discussion?.body"
-      class="-ml-2 md:-ml-4 -mt-4 max-w-none"
-    >
+    <div v-if="discussion?.body" class="-ml-2 md:-ml-4 -mt-4 max-w-none">
       <MarkdownPreview
         :text="bodyText"
         :disable-gallery="route.name !== 'DiscussionDetail'"
@@ -129,23 +94,20 @@ export default defineComponent({
         :key="tag.text"
         class="mt-2"
         :tag="tag.text"
-        @click="
-          () => {
-            filterByTag(tag.text);
-          }
-        "
+        @click="filterByTag(tag.text)"
       />
     </div>
     <slot name="album-slot" />
     <div class="flex items-center gap-2">
       <slot name="button-slot" />
       <NewEmojiButton
-        v-if="showEmojiButton" 
-        :discussion-channel-id="discussionChannelId" 
+        v-if="showEmojiButton"
+        :discussion-channel-id="discussionChannelId"
       />
     </div>
   </div>
 </template>
+
 <style scoped>
 li {
   list-style-type: disc;

@@ -2,7 +2,6 @@
 import { ref, computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
-import useClipboard from "vue-clipboard3";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/core";
 import type { Comment } from "@/__generated__/graphql";
@@ -17,7 +16,7 @@ import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import CommentHeader from "./CommentHeader.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
-import { ALLOWED_ICONS } from '@/utils';
+import { ALLOWED_ICONS } from "@/utils";
 
 const MAX_COMMENT_DEPTH = 5;
 
@@ -139,7 +138,6 @@ const emit = defineEmits([
 const route = useRoute();
 const router = useRouter();
 const { discussionId, channelId } = route.params;
-const { toClipboard } = useClipboard();
 
 const isHighlighted = computed(() => {
   return (
@@ -158,15 +156,21 @@ const replyCount = computed(() => {
 
 const textCopy = computed(() => props.commentData.text);
 
-const { result: localUsernameResult, loading: localUsernameLoading, error: localUsernameError } = useQuery(GET_LOCAL_USERNAME);
+const {
+  result: localUsernameResult,
+  loading: localUsernameLoading,
+  error: localUsernameError,
+} = useQuery(GET_LOCAL_USERNAME);
 
-const canShowPermalink = props.commentData.DiscussionChannel || (discussionId && channelId);
+const canShowPermalink =
+  props.commentData.DiscussionChannel || (discussionId && channelId);
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink) {
     return {};
   }
-  const discussionIdInLink = discussionId || props.commentData?.DiscussionChannel?.discussionId;
+  const discussionIdInLink =
+    discussionId || props.commentData?.DiscussionChannel?.discussionId;
 
   if (discussionIdInLink) {
     return {
@@ -174,7 +178,8 @@ const permalinkObject = computed(() => {
       params: {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
-        channelId: channelId || props.commentData?.DiscussionChannel?.channelUniqueName,
+        channelId:
+          channelId || props.commentData?.DiscussionChannel?.channelUniqueName,
       },
     };
   }
@@ -188,12 +193,18 @@ const permalinkObject = computed(() => {
   };
 });
 
-const basePath = window.location.origin;
+let basePath = "";
+if (import.meta.client) {
+  basePath = window.location.origin;
+} else {
+  basePath = process.env.BASE_URL || "";
+}
+
 const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
 
 const copyLink = async () => {
   try {
-    await toClipboard(permalink);
+    await navigator.clipboard.writeText(permalink);
     emit("showCopiedLinkNotification", true);
   } catch (e: any) {
     throw new Error(e);
@@ -379,7 +390,9 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                       props.editFormOpenAtCommentID !== props.commentData.id
                     "
                     class="-ml-2"
-                    :class="[props.goToPermalinkOnClick ? 'cursor-pointer' : '']"
+                    :class="[
+                      props.goToPermalinkOnClick ? 'cursor-pointer' : '',
+                    ]"
                   >
                     <MarkdownPreview
                       :key="textCopy || ''"
@@ -397,7 +410,8 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                   </div>
                   <TextEditor
                     v-if="
-                      !props.readonly && props.editFormOpenAtCommentID === props.commentData.id
+                      !props.readonly &&
+                      props.editFormOpenAtCommentID === props.commentData.id
                     "
                     id="editExistingComment"
                     class="mb-2 mt-3 p-1"
@@ -411,7 +425,9 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                       !props.readonly &&
                       props.editFormOpenAtCommentID === props.commentData.id
                     "
-                    :text="props.editCommentError && props.editCommentError.message"
+                    :text="
+                      props.editCommentError && props.editCommentError.message
+                    "
                   />
                 </div>
                 <div class="flex items-center">
@@ -419,7 +435,9 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                     v-if="channelId && props.showCommentButtons"
                     class="mb-1 ml-1"
                     :class="[
-                      props.editFormOpenAtCommentID === props.commentData.id ? 'ml-1' : '',
+                      props.editFormOpenAtCommentID === props.commentData.id
+                        ? 'ml-1'
+                        : '',
                     ]"
                     :comment-data="props.commentData"
                     :enable-feedback="props.enableFeedback"
@@ -430,14 +448,22 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                       props.editFormOpenAtCommentID === props.commentData.id
                     "
                     :show-replies="showReplies"
-                    :reply-form-open-at-comment-i-d="props.replyFormOpenAtCommentID"
-                    :comment-in-process="props.commentInProcess && !props.editCommentError"
+                    :reply-form-open-at-comment-i-d="
+                      props.replyFormOpenAtCommentID
+                    "
+                    :comment-in-process="
+                      props.commentInProcess && !props.editCommentError
+                    "
                     @start-comment-save="emit('startCommentSave')"
                     @click-edit-comment="handleEdit"
                     @create-comment="createComment"
-                    @open-reply-editor="(commentId) => emit('openReplyEditor', commentId)"
+                    @open-reply-editor="
+                      (commentId) => emit('openReplyEditor', commentId)
+                    "
                     @hide-reply-editor="emit('hideReplyEditor')"
-                    @open-edit-comment-editor="emit('openEditCommentEditor', props.commentData.id)"
+                    @open-edit-comment-editor="
+                      emit('openEditCommentEditor', props.commentData.id)
+                    "
                     @hide-edit-comment-editor="emit('hideEditCommentEditor')"
                     @hide-replies="showReplies = false"
                     @open-mod-profile="emit('openModProfile')"
@@ -445,22 +471,27 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                     @show-replies="showReplies = true"
                     @update-new-comment="updateNewComment"
                     @click-feedback="
-                      () => handleFeedback({
-                        commentData: props.commentData,
-                        parentCommentId: props.parentCommentId,
-                      })
+                      () =>
+                        handleFeedback({
+                          commentData: props.commentData,
+                          parentCommentId: props.parentCommentId,
+                        })
                     "
-                    @handle-view-feedback="emit('handleViewFeedback', props.commentData.id)"
+                    @handle-view-feedback="
+                      emit('handleViewFeedback', props.commentData.id)
+                    "
                     @click-undo-feedback="
-                      () => handleUndoFeedback({
-                        commentData: props.commentData,
-                        parentCommentId: props.parentCommentId,
-                      })
+                      () =>
+                        handleUndoFeedback({
+                          commentData: props.commentData,
+                          parentCommentId: props.parentCommentId,
+                        })
                     "
                     @click-edit-feedback="
-                      () => handleEditFeedback({
-                        commentData: props.commentData,
-                      })
+                      () =>
+                        handleEditFeedback({
+                          commentData: props.commentData,
+                        })
                     "
                   >
                     <MenuButton
@@ -471,15 +502,22 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                       @handle-edit="() => handleEdit(props.commentData)"
                       @click-report="handleReport"
                       @click-feedback="
-                        () => handleFeedback({
-                          commentData: props.commentData,
-                          parentCommentId: props.parentCommentId,
-                        })
+                        () =>
+                          handleFeedback({
+                            commentData: props.commentData,
+                            parentCommentId: props.parentCommentId,
+                          })
                       "
                       @click-undo-feedback="
-                        () => handleUndoFeedback({ commentData: props.commentData, parentCommentId: props.parentCommentId })
+                        () =>
+                          handleUndoFeedback({
+                            commentData: props.commentData,
+                            parentCommentId: props.parentCommentId,
+                          })
                       "
-                      @handle-view-feedback="emit('handleViewFeedback', props.commentData.id)"
+                      @handle-view-feedback="
+                        emit('handleViewFeedback', props.commentData.id)
+                      "
                       @handle-delete="
                         () => {
                           const deleteCommentInput = {
@@ -491,7 +529,8 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                         }
                       "
                       @click-edit-feedback="
-                        () => handleEditFeedback({ commentData: props.commentData })
+                        () =>
+                          handleEditFeedback({ commentData: props.commentData })
                       "
                     >
                       <EllipsisHorizontal
@@ -506,7 +545,9 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
         </div>
         <router-link
           v-if="
-            canShowPermalink && replyCount > 0 && props.depth + 1 > maxCommentDepth
+            canShowPermalink &&
+            replyCount > 0 &&
+            props.depth + 1 > maxCommentDepth
           "
           class="flex w-full cursor-pointer items-center gap-1 border-gray-300 pl-4 text-gray-400 underline dark:border-gray-500 dark:text-gray-300"
           :to="permalinkObject"
@@ -550,16 +591,24 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                 @save-edit="emit('saveEdit')"
                 @update-create-reply-comment-input="updateNewComment"
                 @update-edit-comment-input="updateExistingComment"
-                @show-copied-link-notification="emit('showCopiedLinkNotification', $event)"
+                @show-copied-link-notification="
+                  emit('showCopiedLinkNotification', $event)
+                "
                 @open-mod-profile="emit('openModProfile')"
                 @scroll-to-top="emit('scrollToTop')"
-                @open-reply-editor="($event: string) => emit('openReplyEditor', $event)"
+                @open-reply-editor="
+                  ($event: string) => emit('openReplyEditor', $event)
+                "
                 @hide-reply-editor="emit('hideReplyEditor')"
-                @open-edit-comment-editor="emit('openEditCommentEditor', childComment.id)"
+                @open-edit-comment-editor="
+                  emit('openEditCommentEditor', childComment.id)
+                "
                 @hide-edit-comment-editor="emit('hideEditCommentEditor')"
                 @click-feedback="handleFeedback"
                 @click-undo-feedback="handleUndoFeedback"
-                @handle-view-feedback="(commentId: string) => emit('handleViewFeedback', commentId)"
+                @handle-view-feedback="
+                  (commentId: string) => emit('handleViewFeedback', commentId)
+                "
               />
             </div>
           </ChildComments>

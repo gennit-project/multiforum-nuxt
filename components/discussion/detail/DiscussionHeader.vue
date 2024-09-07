@@ -8,7 +8,6 @@ import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import MenuButton from "@/components/MenuButton.vue";
-import useClipboard from "vue-clipboard3";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
   GET_LOCAL_USERNAME,
@@ -16,7 +15,7 @@ import {
 import Notification from "@/components/NotificationComponent.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import { ALLOWED_ICONS } from '@/utils';
+import { ALLOWED_ICONS } from "@/utils";
 
 type MenuItem = {
   label: string;
@@ -91,7 +90,7 @@ const defaultChannel = computed(() => {
   if (!props.discussion) {
     return "";
   }
-  const channelInRoute = route.params.channelId;
+  const channelInRoute = route.params.forumId;
   return (
     channelInRoute || props.discussion?.DiscussionChannels[0].channelUniqueName
   );
@@ -103,20 +102,23 @@ const permalinkObject = computed(() => {
     name: "DiscussionDetail",
     params: {
       discussionId: props.discussion.id,
-      channelId: defaultChannel.value,
+      forumId: defaultChannel.value,
     },
   };
 });
-
-const { toClipboard } = useClipboard();
 
 const showCopiedLinkNotification = ref(false);
 
 const copyLink = async (event: any) => {
   try {
-    const basePath = window.location.origin;
+    let basePath = "";
+    if (import.meta.client) {
+      basePath = window.location.origin;
+    } else {
+      basePath = process.env.BASE_URL || "";
+    }
     const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
-    await toClipboard(permalink);
+    await navigator.clipboard.writeText(permalink);
     showCopiedLinkNotification.value = event;
   } catch (e) {
     console.error(e);
@@ -125,19 +127,16 @@ const copyLink = async (event: any) => {
     showCopiedLinkNotification.value = false;
   }, 2000);
 };
-
 const deleteModalIsOpen = ref(false);
 const showOpenIssueModal = ref(false);
 const showSuccessfullyReported = ref(false);
 
-const {
-  result: localUsernameResult,
-} = useQuery(GET_LOCAL_USERNAME);
+const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => localUsernameResult.value?.username || "");
 
-const {
-  result: localModProfileNameResult,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+const { result: localModProfileNameResult } = useQuery(
+  GET_LOCAL_MOD_PROFILE_NAME
+);
 const loggedInUserModName = computed(
   () => localModProfileNameResult.value?.modProfileName || ""
 );

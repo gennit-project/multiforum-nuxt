@@ -62,7 +62,7 @@ export default defineComponent({
         :to="{
           name: 'DiscussionCommentPermalink',
           params: {
-            channelId: route.params.channelId,
+            channelId: route.params.forumId,
             discussionId: route.params.discussionId,
             commentId: parentCommentId,
           },

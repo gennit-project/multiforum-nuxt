@@ -114,7 +114,7 @@ const route = useRoute();
 const router = useRouter();
 
 // Computed properties
-const channelId = computed(() => (typeof route.params.channelId === 'string' ? route.params.channelId : ''));
+const channelId = computed(() => (typeof route.params.forumId === 'string' ? route.params.forumId : ''));
 const activeSort = computed(() => getSortFromQuery(route.query));
 const isPermalinkPage = computed(() => !!route.params.commentId);
 const permalinkedCommentId = ref(`${route.params.commentId}`);

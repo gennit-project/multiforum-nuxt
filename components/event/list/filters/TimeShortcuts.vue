@@ -19,7 +19,7 @@ const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  return typeof route.params.channelId === "string" ? route.params.channelId : "";
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
 const filterValues = ref<SearchEventValues>(

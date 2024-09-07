@@ -43,7 +43,7 @@ defineEmits(["filterByTag"]);
 
 const route = useRoute();
 
-const channelIdInParams = computed(() => (typeof route.params.channelId === "string" ? route.params.channelId : ""));
+const channelIdInParams = computed(() => (typeof route.params.forumId === "string" ? route.params.forumId : ""));
 const defaultUniqueName = computed(() => channelIdInParams.value || props.discussionChannel.channelUniqueName);
 const commentCount = computed(() => props.discussionChannel?.CommentsAggregate?.count || 0);
 

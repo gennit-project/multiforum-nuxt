@@ -38,7 +38,7 @@ export default defineComponent({
 
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
-    const channelId: string | string[] = route.params.channelId;
+    const channelId: string | string[] = route.params.forumId;
 
     const {
       error: getChannelError,

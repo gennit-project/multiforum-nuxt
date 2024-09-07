@@ -50,7 +50,7 @@ export default defineComponent({
     }
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
     const username = computed(() => {
-      return localUsernameResult.value.username;
+      return localUsernameResult.value?.username || "";
     });
 
     // If a comment is being updated, use these mutations.

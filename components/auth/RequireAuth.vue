@@ -72,7 +72,7 @@ const username = computed(() => {
   if (!localUsernameResult.value) {
     return "";
   }
-  return localUsernameResult.value.username || "";
+  return localUsernameResult.value?.username || "";
 });
 
 const isOwner = computed(() => {

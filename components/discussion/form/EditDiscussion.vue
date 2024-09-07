@@ -36,10 +36,10 @@ export default defineComponent({
     const router = useRouter();
 
     const channelId = computed(() => {
-      if (typeof route.params.channelId !== "string") {
+      if (typeof route.params.forumId !== "string") {
         return "";
       }
-      return route.params.channelId;
+      return route.params.forumId;
     });
 
     const discussionId = computed(() => {
@@ -229,7 +229,7 @@ export default defineComponent({
       router.push({
         name: "DiscussionDetail",
         params: {
-          channelId: formValues.value.selectedChannels[0],
+          forumId: formValues.value.selectedChannels[0],
           discussionId: discussionId.value,
         },
       });

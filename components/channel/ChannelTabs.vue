@@ -55,7 +55,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const channelId = ref(props.route.params.channelId);
+    const channelId = ref(props.route.params.forumId);
     const { mdAndDown } = useDisplay();
     watch(
       () => props.route,

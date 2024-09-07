@@ -37,7 +37,7 @@ export default defineComponent({
       return "";
     });
 
-    const channelId: string | string[] = route.params.channelId;
+    const channelId: string | string[] = route.params.forumId;
 
     const createChannelDefaultValues: CreateEditChannelFormValues = {
       uniqueName: "",

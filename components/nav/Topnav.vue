@@ -33,10 +33,10 @@ const username = computed(() => {
 });
 
 const channelId = computed(() => {
-  if (typeof route.params.channelId !== "string") {
+  if (typeof route.params.forumId !== "string") {
     return "";
   }
-  return route.params.channelId;
+  return route.params.forumId;
 });
 
 const { result: modNameResult } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);

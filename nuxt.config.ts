@@ -12,7 +12,7 @@ export default defineNuxtConfig({
     },
   },
   build: {
-    transpile: ["vuetify", "vue-clipboard3"],
+    transpile: ["vuetify"],
   },
   compatibilityDate: "2024-04-03",
   components: true,

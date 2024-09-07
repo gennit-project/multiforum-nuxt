@@ -1,14 +1,18 @@
 <script lang="ts">
-import type { PropType} from "vue";
+import type { PropType } from "vue";
 import { defineComponent, computed, ref } from "vue";
-import { useRoute , useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import type { Event } from "@/__generated__/graphql";
-import { CANCEL_EVENT , DELETE_EVENT , ADD_FEEDBACK_COMMENT_TO_EVENT } from "@/graphQLData/event/mutations";
+import {
+  CANCEL_EVENT,
+  DELETE_EVENT,
+  ADD_FEEDBACK_COMMENT_TO_EVENT,
+} from "@/graphQLData/event/mutations";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LinkIcon from "@/components/icons/LinkIcon.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
 import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
-import useClipboard from "vue-clipboard3";
+import ClipboardJS from "clipboard";
 import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
 import MenuButton from "@/components/MenuButton.vue";
@@ -21,10 +25,10 @@ import {
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { getDuration } from "@/utils";
+import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import { ALLOWED_ICONS } from '@/utils';
+import ClipboardJS from "clipboard";
 
 export default defineComponent({
   name: "EventHeader",
@@ -54,7 +58,6 @@ export default defineComponent({
   },
   setup(props: any) {
     const route = useRoute();
-    const { toClipboard } = useClipboard();
     const router = useRouter();
 
     const showAddressCopiedNotification = ref(false);
@@ -130,10 +133,21 @@ export default defineComponent({
 
     const copyAddress = async () => {
       try {
-        await toClipboard(
-          props.eventData.address ? props.eventData.address : "",
-        );
-        showAddressCopiedNotification.value = true;
+        const address = props.eventData.address ? props.eventData.address : "";
+
+        const clipboard = new ClipboardJS(".copy-btn", {
+          text: () => address,
+        });
+
+        clipboard.on("success", () => {
+          showAddressCopiedNotification.value = true;
+          clipboard.destroy();
+        });
+
+        clipboard.on("error", (e) => {
+          console.error(e);
+          clipboard.destroy();
+        });
       } catch (e: any) {
         throw new Error(e);
       }
@@ -143,8 +157,8 @@ export default defineComponent({
     };
 
     const channelId = computed(() => {
-      if (typeof route.params.channelId === "string") {
-        return route.params.channelId;
+      if (typeof route.params.forumId === "string") {
+        return route.params.forumId;
       }
 
       const defaultChannelId =
@@ -173,11 +187,16 @@ export default defineComponent({
 
     const copyLink = async (event: any) => {
       try {
-        const basePath = window.location.origin;
+        let basePath = "";
+        if (import.meta.client) {
+          basePath = window.location.origin;
+        } else {
+          basePath = process.env.BASE_URL || "";
+        }
         const permalink = `${basePath}${
           router.resolve(permalinkObject.value).href
         }`;
-        await toClipboard(permalink);
+        await navigator.clipboard.writeText(permalink);
         showCopiedLinkNotification.value = event;
       } catch (e: any) {
         throw new Error(e);
@@ -432,10 +451,7 @@ export default defineComponent({
           {{ eventData.virtualEventUrl }}
         </a>
       </li>
-      <li
-        v-if="eventData.address"
-        class="hanging-indent flex items-start"
-      >
+      <li v-if="eventData.address" class="hanging-indent flex items-start">
         <div class="mr-3 h-5 w-5">
           <LocationIcon />
         </div>
@@ -448,10 +464,7 @@ export default defineComponent({
               class="ml-1 h-4 w-4 cursor-pointer"
               @click="copyAddress"
             />
-            <v-tooltip
-              activator="parent"
-              location="top"
-            > Copy </v-tooltip>
+            <v-tooltip activator="parent" location="top"> Copy </v-tooltip>
           </span>
         </div>
       </li>

@@ -19,7 +19,7 @@ const isEventDetailPage = computed(() => route.name === "EventDetail");
 
 // Extract the channel ID from the route parameters
 const channelId = computed(() => {
-  return typeof route.params.channelId === "string" ? route.params.channelId : "";
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
 // Query for the channel using Apollo client
@@ -73,7 +73,7 @@ onGetChannelResult((result) => {
 
 // Get admin list from the channel
 const adminList = computed(() => {
-  return channel.value ? channel.value.Admins.map((user: User) => user.username) : [];
+  return channel.value ? channel.value.Admins.map((user: User) => user?.username) : [];
 });
 
 // Use Vuetify's display composable to handle responsive layouts

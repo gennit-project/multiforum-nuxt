@@ -39,7 +39,7 @@ export default defineComponent({
     },
   },
   setup(props) {
-    const channelId = ref(props.route.params.channelId);
+    const channelId = ref(props.route.params.forumId);
     const { isAuthenticated } = useAuth0();
     
     const { mdAndDown } = useDisplay();

@@ -26,7 +26,7 @@ const emit = defineEmits(['filterByTag', 'filterByChannel']);
 const route = useRoute();
 
 const channelId = computed(() => {
-  return typeof route.params.channelId === "string" ? route.params.channelId : "";
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
 const filterValues = ref(

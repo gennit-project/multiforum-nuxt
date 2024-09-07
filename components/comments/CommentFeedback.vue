@@ -108,7 +108,7 @@ export default defineComponent({
             params: {
               discussionId: route.params.discussionId,
               commentId: contextOfFeedbackComment.value?.id || "",
-              channelId: route.params.channelId,
+              channelId: route.params.forumId,
               feedbackId: originalComment.value.id || "",
             },
           };
@@ -132,7 +132,7 @@ export default defineComponent({
               params: {
                 discussionId: route.params.discussionId,
                 commentId: contextOfFeedbackComment.value?.id || "",
-                channelId: route.params.channelId,
+                channelId: route.params.forumId,
                 feedbackId: originalComment.value.id || "",
               },
             };
@@ -151,8 +151,8 @@ export default defineComponent({
 
     const updateParams = () => {
       channelId.value =
-        typeof route.params.channelId === "string"
-          ? route.params.channelId
+        typeof route.params.forumId === "string"
+          ? route.params.forumId
           : "";
       discussionId.value =
         typeof route.params.discussionId === "string"

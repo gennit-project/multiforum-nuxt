@@ -3,9 +3,11 @@ import { ref, computed } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
-import { DELETE_COMMENT, UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
-import { MenuButton } from "../MenuButton.vue";
-import useClipboard from "vue-clipboard3";
+import {
+  DELETE_COMMENT,
+  UPDATE_COMMENT,
+} from "@/graphQLData/comment/mutations";
+import ClipboardJS from "clipboard";
 import VoteButtons from "./VoteButtons.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
@@ -16,9 +18,11 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
-import type { HandleEditFeedbackInput, HandleFeedbackInput } from "./Comment.vue";
-import { timeAgo } from "@/utils";
-import { ALLOWED_ICONS } from '@/utils';
+import type {
+  HandleEditFeedbackInput,
+  HandleFeedbackInput,
+} from "./Comment.vue";
+import { timeAgo, ALLOWED_ICONS } from "@/utils";
 
 const props = defineProps({
   comment: {
@@ -38,10 +42,8 @@ const emit = defineEmits([
   "clickUndoFeedback",
   "clickEditFeedback",
   "handleViewFeedback",
-  "openModProfile"
+  "openModProfile",
 ]);
-
-const { toClipboard } = useClipboard();
 const route = useRoute();
 const router = useRouter();
 
@@ -178,11 +180,16 @@ const getPermalinkObject = () => {
 };
 
 const copyLink = async () => {
-  const basePath = window.location.origin;
+  let basePath = "";
+  if (import.meta.client) {
+    basePath = window.location.origin;
+  } else {
+    basePath = process.env.BASE_URL || "";
+  }
   const permalinkObject = getPermalinkObject();
   const permalink = `${basePath}${router.resolve(permalinkObject).href}`;
   try {
-    await toClipboard(permalink);
+    await navigator.clipboard.writeText(permalink);
     emit("showCopiedLinkNotification", true);
   } catch (e: any) {
     throw new Error(e);
@@ -238,7 +245,7 @@ function handleViewFeedback(feedbackId: string) {
   router.push({
     name: "FeedbackOnCommentFeedback",
     params: {
-      channelId: route.params.channelId,
+      channelId: route.params.forumId,
       discussionId: route.params.discussionId,
       commentId: feedbackId,
     },
@@ -248,7 +255,9 @@ function handleViewFeedback(feedbackId: string) {
 
 <template>
   <div>
-    <div class="flex flex-wrap items-center gap-x-1 text-sm leading-8 text-gray-500 dark:text-gray-300">
+    <div
+      class="flex flex-wrap items-center gap-x-1 text-sm leading-8 text-gray-500 dark:text-gray-300"
+    >
       <AvatarComponent
         v-if="comment.CommentAuthor?.displayName"
         class="mr-1 h-36 w-36 border-2 shadow-sm dark:border-gray-800"
@@ -274,8 +283,12 @@ function handleViewFeedback(feedbackId: string) {
       <span v-if="loggedInModName === comment?.CommentAuthor?.displayName">
         (You)
       </span>
-      <span class="whitespace-nowrap">{{ `gave feedback ${timeAgo(new Date(comment.createdAt))}` }}</span>
-      <span v-if="isHighlighted" class="rounded-lg bg-blue-500 px-2 text-black">Permalinked</span>
+      <span class="whitespace-nowrap">{{
+        `gave feedback ${timeAgo(new Date(comment.createdAt))}`
+      }}</span>
+      <span v-if="isHighlighted" class="rounded-lg bg-blue-500 px-2 text-black"
+        >Permalinked</span
+      >
       <MenuButton
         v-if="commentMenuItems.length > 0"
         id="commentMenu"
@@ -298,9 +311,11 @@ function handleViewFeedback(feedbackId: string) {
           }
         "
         @handle-view-feedback="handleViewFeedback(comment.id)"
-        @handle-delete="() => {
-          showDeleteCommentModal = true;
-        }"
+        @handle-delete="
+          () => {
+            showDeleteCommentModal = true;
+          }
+        "
         @click-edit-feedback="
           () => {
             handleEditFeedback({
@@ -372,7 +387,11 @@ function handleViewFeedback(feedbackId: string) {
       :open="showDeleteCommentModal"
       :loading="deleteCommentLoading"
       :error="deleteCommentError"
-      @close="() => { showDeleteCommentModal = false }"
+      @close="
+        () => {
+          showDeleteCommentModal = false;
+        }
+      "
       @primary-button-click="handleDeleteComment"
     />
   </div>

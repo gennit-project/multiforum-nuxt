@@ -45,7 +45,7 @@ export default defineComponent({
     const router = useRouter();
 
     const channelId: string = `${
-      route.params.channelId ? route.params.channelId : ""
+      route.params.forumId ? route.params.forumId : ""
     }`;
 
     const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
@@ -191,7 +191,7 @@ export default defineComponent({
         router.push({
           name: "DiscussionDetail",
           params: {
-            channelId,
+            forumId: channelId,
             discussionId: newDiscussionId,
           },
         });
@@ -205,7 +205,7 @@ export default defineComponent({
         router.push({
           name: "DiscussionDetail",
           params: {
-            channelId: formValues.value.selectedChannels[0],
+            forumId: formValues.value.selectedChannels[0],
             discussionId: newDiscussionId,
           },
         });

@@ -85,7 +85,7 @@ const emit = defineEmits([
 ]);
 
 const route = useRoute();
-const channelId = computed(() => (typeof route.params.channelId === 'string' ? route.params.channelId : ''));
+const channelId = computed(() => (typeof route.params.forumId === 'string' ? route.params.forumId : ''));
 const feedbackId = computed(() => (typeof route.params.feedbackId === 'string' ? route.params.feedbackId : ''));
 
 const showConfirmUndoFeedbackModal = ref(false);

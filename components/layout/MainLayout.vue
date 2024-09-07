@@ -11,7 +11,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const channelId = computed(() => {
-      return route.params.channelId;
+      return route.params.forumId;
     });
 
     return {
