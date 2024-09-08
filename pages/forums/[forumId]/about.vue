@@ -1,4 +1,6 @@
+<script setup lang="ts">
+import AboutPage from "@/components/channel/ChannelAboutPage.vue";
+</script>
 <template>
-
-    <div>About.vue</div>
+  <AboutPage />
 </template>

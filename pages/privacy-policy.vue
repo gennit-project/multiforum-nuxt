@@ -1,4 +1,17 @@
-<template>
+<script lang="ts">
+import { defineComponent } from "vue";
+import MarkdownLoader from "@/components/MarkdownLoader.vue";
 
-    <div>PrivacyPolicy.vue</div>
+export default defineComponent({
+  components: {
+    MarkdownLoader,
+  },
+  setup() {
+    return {};
+  },
+});
+</script>
+
+<template>
+  <MarkdownLoader slug="terms/privacy-policy" />
 </template>

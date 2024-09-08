@@ -13,6 +13,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { useDisplay } from "vuetify";
 
 const route = useRoute();
+const router = useRouter();
 
 // Determine if the current route is for a discussion or event detail page
 const isDiscussionDetailPage = computed(
@@ -88,6 +89,18 @@ const adminList = computed(() => {
     : [];
 });
 const { smAndDown, mdAndDown } = useDisplay();
+
+// If we are at forums/[channelId], redirect to forums/[channelId]/discussions
+if (!channelId.value) {
+  if (import.meta.client) {
+    router.push({
+      name: "ChannelDiscussions",
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
+}
 </script>
 
 <template>

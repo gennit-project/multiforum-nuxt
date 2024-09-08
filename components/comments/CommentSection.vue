@@ -539,47 +539,26 @@ function handleViewFeedback(commentId: string) {
         :text="'This comment section is locked because the post was removed from the channel.'"
       />
       <LoadingSpinner v-if="loading" class="ml-2" />
-      <PermalinkedComment
-        v-if="isPermalinkPage"
-        :key="permalinkedCommentId"
-        class="mt-2"
-        :comment-id="permalinkedCommentId"
-      >
-        <template #comment="{ commentData }">
-          <Comment
-            :aggregate-comment-count="aggregateCommentCount"
-            :compact="true"
-            :comment-data="commentData"
-            :enable-feedback="enableFeedback"
-            :depth="1"
-            :locked="locked"
-            :comment-in-process="commentInProcess"
-            :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
-            :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
-            :edit-comment-error="editCommentError"
-            :mod-profile-name="loggedInUserModName"
-            :original-poster="originalPoster"
-            @start-comment-save="commentInProcess = true"
-            @open-reply-editor="openReplyEditor"
-            @hide-reply-editor="hideReplyEditor"
-            @open-edit-comment-editor="openEditCommentEditor"
-            @hide-edit-comment-editor="hideEditCommentEditor"
-            @click-edit-comment="handleClickEdit"
-            @delete-comment="handleClickDelete"
-            @create-comment="handleClickCreate"
-            @update-create-reply-comment-input="updateCreateInputValuesForReply"
-            @update-edit-comment-input="updateEditInputValues"
-            @save-edit="handleSaveEdit"
-            @scroll-to-top="scrollToTop"
-            @click-report="handleClickReport"
-            @click-feedback="handleClickGiveFeedback"
-            @click-undo-feedback="handleClickUndoFeedback"
-            @click-edit-feedback="handleClickEditFeedback"
-            @update-feedback="updateFeedback"
-            @handle-view-feedback="handleViewFeedback"
-          />
-        </template>
-      </PermalinkedComment>
+      <NuxtPage 
+        @start-comment-save="commentInProcess = true"
+        @open-reply-editor="openReplyEditor"
+        @hide-reply-editor="hideReplyEditor"
+        @open-edit-comment-editor="openEditCommentEditor"
+        @hide-edit-comment-editor="hideEditCommentEditor"
+        @click-edit-comment="handleClickEdit"
+        @delete-comment="handleClickDelete"
+        @create-comment="handleClickCreate"
+        @update-create-reply-comment-input="updateCreateInputValuesForReply"
+        @update-edit-comment-input="updateEditInputValues"
+        @save-edit="handleSaveEdit"
+        @scroll-to-top="scrollToTop"
+        @click-report="handleClickReport"
+        @click-feedback="handleClickGiveFeedback"
+        @click-undo-feedback="handleClickUndoFeedback"
+        @click-edit-feedback="handleClickEditFeedback"
+        @update-feedback="updateFeedback"
+        @handle-view-feedback="handleViewFeedback"
+      />
       <div class="my-4">
         <div v-if="!loading && aggregateCommentCount === 0">
           There are no comments yet.

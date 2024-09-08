@@ -8,25 +8,23 @@ import { GET_EVENT_COMMENTS , GET_EVENT_ROOT_COMMENT_AGGREGATE } from "@/graphQL
 import type { Event, Comment, EventChannel } from "@/__generated__/graphql";
 import { relativeTime } from "@/utils";
 import { DateTime } from "luxon";
-import ErrorBanner from "../../ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
-import EventFooter from "./EventFooter.vue";
+import EventFooter from "@/components/event/detail/EventFooter.vue";
 import { useDisplay } from "vuetify";
-import EventHeader from "./EventHeader.vue";
+import EventHeader from "@/components/event/detail/EventHeader.vue";
 import GenericButton from "@/components/GenericButton.vue";
-import EventBody from "./EventBody.vue";
+import EventBody from "@/components/event/detail/EventBody.vue";
 import ExpandableImage from "@/components/ExpandableImage.vue";
-import EventCommentsWrapper from "./EventCommentsWrapper.vue";
+import EventCommentsWrapper from "@/components/event/detail/EventCommentsWrapper.vue";
 import EventRootCommentFormWrapper, {
   COMMENT_LIMIT,
-} from "./EventRootCommentFormWrapper.vue";
+} from "@/components/event/detail/EventRootCommentFormWrapper.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import EventChannelLinks from "./EventChannelLinks.vue";
+import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
 
 export default defineComponent({
   components: {
     EventChannelLinks,
-    ErrorBanner,
     EventBody,
     EventCommentsWrapper,
     EventFooter,

@@ -23,9 +23,6 @@ import EventDetail from "@/components/event/detail/EventDetail.vue";
 import CommentDetails from "@/components/mod/CommentDetails.vue";
 import ModerationWizard from "@/components/mod/ModerationWizard.vue";
 import IssueBadge from "@/components/mod/IssueBadge.vue";
-import TextEditor from "../TextEditor.vue";
-import GenericButton from "../GenericButton.vue";
-import SaveButton from "../SaveButton.vue";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,

@@ -1,12 +1,10 @@
 <script lang="ts" setup>
 import { useAuth0 } from '@/hooks/useAuth0';
 import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
-import CreateUsernameForm from './CreateUsernameForm.vue';
+import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
 
-// Use the Auth0 composable
 const { user } = useAuth0();
 
-// Emit function for custom events
 const emit = defineEmits(['emailAndUserCreated']);
 
 </script>

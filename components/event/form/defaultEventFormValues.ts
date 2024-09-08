@@ -15,6 +15,8 @@ function getDefaultEventFormValues(channelId: string): CreateEditEventFormValues
     latitude: 0,
     longitude: 0,
     locationName: "",
+    isAllDay: false,
+    isHostedByOP: false,
     isInPrivateResidence: false,
     virtualEventUrl: "",
     startTime: defaultStartTimeISO || "",

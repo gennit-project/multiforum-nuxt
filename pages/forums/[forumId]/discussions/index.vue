@@ -1,9 +1,7 @@
-
-
 <script setup lang="ts">
-import ChannelDiscussionList from '@/components/discussion/list/ChannelDiscussionList.vue';
+import SearchDiscussions from "@/components/discussion/list/SearchDiscussions.vue";
 </script>
 
 <template>
-    <ChannelDiscussionList />
+  <SearchDiscussions />
 </template>
