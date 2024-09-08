@@ -132,7 +132,7 @@ export default defineComponent({
   >
     <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
       <BackLink
-        :link="`/forums/f/${channelId}/events/e/${event?.id}`"
+        :link="`/forums/${channelId}/events/${event?.id}`"
         :data-testid="'event-detail-back-link'"
       />
     </div>

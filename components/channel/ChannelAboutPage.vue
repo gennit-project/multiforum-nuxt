@@ -60,7 +60,7 @@ export default defineComponent({
       // Used to determine whether the logged in
       // user should be able to see the buttons for
       // admin actions
-      return admins.value.map((adminData: any) => adminData.username);
+      return admins.value.map((adminData: any) => adminData?.username);
     });
 
     const { mdAndDown, smAndDown } = useDisplay();
@@ -136,7 +136,7 @@ export default defineComponent({
           </div>
           <router-link
             class="my-3 text-sm underline dark:text-gray-200"
-            :to="`/forums/f/${channelId}/edit`"
+            :to="`/forums/${channelId}/edit`"
           >
             Edit
           </router-link>

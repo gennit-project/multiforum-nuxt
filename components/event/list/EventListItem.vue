@@ -66,7 +66,7 @@ const detailLink = computed(() => {
   if (!defaultUniqueName.value) {
     return "";
   }
-  return `/forums/f/${defaultUniqueName.value}/events/${props.event.id}`;
+  return `/forums/${defaultUniqueName.value}/events/${props.event.id}`;
 });
 
 const submittedToMultipleChannels = computed(() => {
@@ -81,7 +81,7 @@ const eventDetailOptions = computed(() => {
     const commentCount = dc.CommentsAggregate?.count || 0;
     return {
       label: `${commentCount} ${commentCount === 1 ? "comment" : "comments"} in ${dc.channelUniqueName}`,
-      value: `/forums/f/${dc.channelUniqueName}/events/${props.event.id}`,
+      value: `/forums/${dc.channelUniqueName}/events/${props.event.id}`,
       event: "",
     };
   }).sort((a, b) => b.label.localeCompare(a.label));

@@ -504,7 +504,7 @@ export default defineComponent({
         :items="menuItems"
         @copy-link="copyLink"
         @handle-edit="
-          router.push(`/forums/f/${channelId}/events/e/${eventId}/edit`)
+          router.push(`/forums/${channelId}/events/${eventId}/edit`)
         "
         @handle-delete="confirmDeleteIsOpen = true"
         @handle-cancel="confirmCancelIsOpen = true"

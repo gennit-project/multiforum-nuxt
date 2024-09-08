@@ -13,8 +13,6 @@ import {
 } from "@/components/comments/getSortFromQuery";
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
-console.log("SitewideDiscussionList.vue");
-
 const DISCUSSION_PAGE_LIMIT = 15;
 
 // Props and Emits

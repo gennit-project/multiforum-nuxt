@@ -37,7 +37,7 @@ export default defineComponent({
     <template #has-auth>
       <CreateButton
         class="ml-2"
-        :to="`/forums/f/${channelId}/discussions/create`"
+        :to="`/forums/${channelId}/discussions/create`"
         :label="'New Discussion'"
       />
     </template>

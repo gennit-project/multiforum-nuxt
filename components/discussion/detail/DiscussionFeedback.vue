@@ -335,7 +335,7 @@ export default defineComponent({
   >
     <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
       <BackLink
-        :link="`/forums/f/${channelId}/discussions/d/${discussion?.id}`"
+        :link="`/forums/${channelId}/discussions/${discussion?.id}`"
         :data-testid="'discussion-detail-back-link'"
       />
     </div>

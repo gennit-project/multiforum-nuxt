@@ -66,20 +66,20 @@ export default defineComponent({
 
     const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
     const username = computed(() => {
-      return localUsernameResult.value.username;
+      return localUsernameResult.value?.username || "";
     });
 
     const loggedInUsername = computed(() => {
-      return localUsernameResult.value.username;
+      return localUsernameResult.value?.username || "";
     });
 
     const tabRoutes = computed(() => {
       const routes: TabRoutes = {
-        discussions: `/forums/f/${channelId.value}/discussions`,
-        events: `/forums/f/${channelId.value}/events/search`,
-        about: `/forums/f/${channelId.value}/about`,
-        settings: `/forums/f/${channelId.value}/edit`,
-        moderation: `/forums/f/${channelId.value}/issues`,
+        discussions: `/forums/${channelId.value}/discussions`,
+        events: `/forums/${channelId.value}/events/search`,
+        about: `/forums/${channelId.value}/about`,
+        settings: `/forums/${channelId.value}/edit`,
+        moderation: `/forums/${channelId.value}/issues`,
       };
 
       return routes;
@@ -106,7 +106,7 @@ export default defineComponent({
       },
     ];
     const adminList = props.channel.Admins.map((user) => {
-      return user.username;
+      return user.username || "";
     });
 
     const modList = props.channel.Moderators.map((modProfile) => {

@@ -601,7 +601,7 @@ export default defineComponent({
       class="align-center mx-1 mt-2 flex justify-between px-4"
     >
       <BackLink
-        :link="`/forums/f/${channelId}/issues`"
+        :link="`/forums/${channelId}/issues`"
         :data-testid="'issue-detail-back-link'"
       />
     </div>

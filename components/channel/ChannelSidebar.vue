@@ -67,7 +67,7 @@ export default defineComponent({
       // Used to determine whether the logged in
       // user should be able to see the buttons for
       // admin actions
-      return admins.value.map((adminData: any) => adminData.username);
+      return admins.value.map((adminData: any) => adminData?.username);
     });
 
     const { mdAndDown } = useDisplay();

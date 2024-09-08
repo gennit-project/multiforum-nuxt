@@ -10,8 +10,6 @@ import MenuButton from "@/components/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 
-console.log("SitewideDiscussionListItem.vue");
-
 const props = defineProps({
   discussion: {
     type: Object as PropType<Discussion>,
@@ -57,7 +55,7 @@ const discussionDetailOptions = computed(() => {
   if (!props.discussion) return [];
   return props.discussion.DiscussionChannels.map((dc) => {
     const commentCount = dc.CommentsAggregate?.count || 0;
-    const discussionDetailLink = `/forums/f/${dc.channelUniqueName}/discussions/d/${props.discussion?.id}`;
+    const discussionDetailLink = `/forums/${dc.channelUniqueName}/discussions/${props.discussion?.id}`;
     return {
       label: `${commentCount} ${commentCount === 1 ? "comment" : "comments"} in ${dc.channelUniqueName}`,
       value: discussionDetailLink,
@@ -75,7 +73,7 @@ const getDetailLink = (channelId: string) => {
   if (!props.discussion) {
     return "";
   }
-  return `/forums/f/${channelId}/discussions/d/${props.discussion.id}`;
+  return `/forums/${channelId}/discussions/${props.discussion.id}`;
 };
 
 const discussionIdInParams = computed(() => (typeof route.params.discussionId === "string" ? route.params.discussionId : ""));

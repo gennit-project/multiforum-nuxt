@@ -21,8 +21,6 @@ defineProps({
   },
 });
 
-console.log('icon button dropdown')
-
 const emit = defineEmits(["click"]);
 const router = useRouter();
 

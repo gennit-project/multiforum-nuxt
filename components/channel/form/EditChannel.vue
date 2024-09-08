@@ -96,7 +96,7 @@ export default defineComponent({
     );
 
     const username = computed(() => {
-      return localUsernameResult.value.username;
+      return localUsernameResult.value?.username;
     });
 
     const ownerList = computed(() => {

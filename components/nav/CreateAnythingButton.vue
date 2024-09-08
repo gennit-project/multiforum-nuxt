@@ -29,7 +29,7 @@ const menuItems = [
     action: () =>
       router.push(
         channelId.value
-          ? `/forums/f/${channelId.value}/discussions/create`
+          ? `/forums/${channelId.value}/discussions/create`
           : "/discussions/create"
       ),
   },
@@ -39,7 +39,7 @@ const menuItems = [
     action: () =>
       router.push(
         channelId.value
-          ? `/forums/f/${channelId.value}/events/create`
+          ? `/forums/${channelId.value}/events/create`
           : "/events/create"
       ),
   },

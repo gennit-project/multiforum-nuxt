@@ -19,8 +19,6 @@ import {
 } from "@/components/comments/getSortFromQuery";
 const DISCUSSION_PAGE_LIMIT = 25;
 
-console.log("ChannelDiscussionList.vue");
-
 const emit = defineEmits(['filterByTag', 'filterByChannel']);
 
 const route = useRoute();
@@ -50,6 +48,10 @@ const searchInput = computed(() => {
 
 const selectedTags = computed(() => {
   return filterValues.value.tags;
+});
+
+const selectedChannels = computed(() => {
+  return filterValues.value.channels;
 });
 
 const {

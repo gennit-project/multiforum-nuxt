@@ -1,17 +1,13 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script setup lang="ts">
+import { defineProps } from 'vue';
 
-export default defineComponent({
-  props: {
-    text: {
-      type: String,
-      required: true
-    },
-  },
-  setup() {
-    console.log("ErrorBanner.vue");
+defineProps({
+  text: {
+    type: String,
+    required: true
   },
 });
+
 </script>
 
 <template>

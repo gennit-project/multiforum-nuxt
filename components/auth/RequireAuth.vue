@@ -5,8 +5,6 @@ import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from '@/hooks/useAuth0';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
-console.log("RequireAuth.vue"); 
-
 // Props definition using defineProps
 const props = defineProps({
   requireOwnership: {

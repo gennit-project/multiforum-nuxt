@@ -212,7 +212,7 @@ export default defineComponent({
           <CreateButton
             v-if="!titleEditMode"
             class="ml-2"
-            :to="`/forums/f/${channelId}/discussions/create`"
+            :to="`/forums/${channelId}/discussions/create`"
             :label="'New Discussion'"
           />
           <PrimaryButton

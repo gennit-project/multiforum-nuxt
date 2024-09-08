@@ -5,7 +5,6 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import WithAuth from "@/components/layout/WithAuth.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import { computed, ref } from "vue";
-console.log("default.vue");
 
 const { isAuthenticated, user, isLoading } = useAuth0();
 const route = useRoute();

@@ -5,8 +5,6 @@ import MarkdownIt from "markdown-it";
 import config from "@/config";
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
-console.log("MarkdownPreview.vue");
-
 function linkifyUsernames(markdownString: string) {
   const regex = /(?<!https?:\/\/(?:[\w.-]+))\b(u\/|@)([a-zA-Z0-9_-]+)/g;
   return markdownString.replace(regex, (match, prefix, username) => {

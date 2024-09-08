@@ -28,7 +28,7 @@ describe("Filter events by text", () => {
 
   it("in a channel view, filters events by text", () => {
     const CHANNEL_VIEW =
-      `${config.baseUrl}/forums/f/phx_music/events/search/`;
+      `${config.baseUrl}/forums/phx_music/events/search/`;
     const searchTerm = "trivia";
 
     cy.visit(CHANNEL_VIEW);

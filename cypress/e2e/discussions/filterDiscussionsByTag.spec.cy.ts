@@ -71,7 +71,7 @@ describe("Filter discussions by tag", () => {
   });
 
   const CHANNEL_VIEW =
-    `${config.baseUrl}/forums/f/phx_music/discussions/`;
+    `${config.baseUrl}/forums/phx_music/discussions/`;
 
   it("in a channel view, filters discussions by tag", () => {
     const searchTerm = "trivia";
