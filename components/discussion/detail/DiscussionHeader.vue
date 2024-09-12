@@ -212,7 +212,7 @@ const authorIsMod = computed(
           :src="discussion?.Author?.profilePicURL ?? ''"
           :is-small="true"
         />
-        <NuxtLink
+        <nuxt-link
           v-if="discussion?.Author"
           class="cursor-pointer font-bold text-black hover:underline dark:text-white"
           :to="{
@@ -230,7 +230,7 @@ const authorIsMod = computed(
             :discussion-karma="discussion.Author.discussionKarma ?? 0"
             :account-created="discussion.Author.createdAt"
           />
-        </NuxtLink>
+        </nuxt-link>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
         <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>

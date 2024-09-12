@@ -194,7 +194,7 @@ const handleCreateModProfileClick = async () => {
 
       <RequireAuth :full-width="false">
         <template #has-auth>
-          <NuxtLink
+          <nuxt-link
             v-if="channelId"
             :to="{
               name: 'forums-forumId-discussions-create',
@@ -205,7 +205,7 @@ const handleCreateModProfileClick = async () => {
             class="text-blue-500 underline"
           >
             Create one?
-          </NuxtLink>
+          </nuxt-link>
         </template>
         <template #does-not-have-auth>
           <span class="cursor-pointer text-blue-500 underline">Create one?</span>

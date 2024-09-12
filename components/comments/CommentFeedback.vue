@@ -297,7 +297,7 @@ onAddFeedbackCommentToCommentDone(() => {
       <ErrorBanner v-if="getCommentError" :text="getCommentError.message" />
       <div v-else>
         <div v-if="originalComment">
-          <NuxtLink
+          <nuxt-link
             v-if="parentCommentId"
             class="text-xs underline"
             :to="{
@@ -309,7 +309,7 @@ onAddFeedbackCommentToCommentDone(() => {
             }"
           >
             View Context
-          </NuxtLink>
+          </nuxt-link>
           <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
             <BackLink
               :link="`/forums/${channelId}/discussions/${discussionId}`"
@@ -344,9 +344,9 @@ onAddFeedbackCommentToCommentDone(() => {
               :disable-gallery="true"
             />
           </div>
-          <NuxtLink :to="contextLink" class="text-blue-500 underline">
+          <nuxt-link :to="contextLink" class="text-blue-500 underline">
             View original context
-          </NuxtLink>
+          </nuxt-link>
         </div>
         <FeedbackSection
           :add-feedback-comment-to-comment-error="

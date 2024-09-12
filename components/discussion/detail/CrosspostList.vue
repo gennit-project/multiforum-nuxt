@@ -42,7 +42,7 @@ export default defineComponent({
         v-for="channel in channelLinks"
         :key="channel.uniqueName"
       >
-        <NuxtLink
+        <nuxt-link
           class="mr-1 underline"
           :to="{
             name: 'forums-forumId-discussions-discussionId',
@@ -53,9 +53,9 @@ export default defineComponent({
           }"
         >
           {{ `${getCommentCount(channel.uniqueName)} comments` }}
-        </NuxtLink>
+        </nuxt-link>
         in
-        <NuxtLink
+        <nuxt-link
           :to="{
             name: 'forums-forumId-discussions-discussionId',
             params: {
@@ -69,7 +69,7 @@ export default defineComponent({
             :tag="channel.uniqueName"
             :channel-mode="true"
           />
-        </NuxtLink>
+        </nuxt-link>
       </li>
     </ul>
   </div>

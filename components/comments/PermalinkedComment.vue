@@ -56,7 +56,7 @@ export default defineComponent({
         commentResult && commentResult.comments && commentResult.comments[0]
       "
     >
-      <NuxtLink
+      <nuxt-link
         v-if="parentCommentId"
         class="text-xs underline"
         :to="{
@@ -69,7 +69,7 @@ export default defineComponent({
         }"
       >
         View Context
-      </NuxtLink>
+      </nuxt-link>
       <slot
         name="comment"
         :comment-data="commentResult.comments[0]"

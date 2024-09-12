@@ -107,12 +107,12 @@ export default defineComponent({
         :show-context-link="true"
         :show-channel="false"
       />
-      <NuxtLink
+      <nuxt-link
         :to="permalinkObject"
         class="text-blue-500 underline"
       >
         Context
-      </NuxtLink>
+      </nuxt-link>
     </div>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
       <MarkdownPreview

@@ -81,7 +81,7 @@ export default defineComponent({
       <p>This is the original discussion:</p>
       <div class="border-l border-l-2 pl-6">
         <h3 v-if="discussion?.title">
-          <NuxtLink
+          <nuxt-link
             :to="{
               name: 'forums-forumId-discussion-discussionId',
               params: {
@@ -93,7 +93,7 @@ export default defineComponent({
             rel="noopener noreferrer"
           >
             {{ discussion.title }}
-          </NuxtLink>
+          </nuxt-link>
         </h3>
         <MarkdownPreview
           v-if="discussion?.body"

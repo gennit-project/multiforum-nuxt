@@ -128,7 +128,7 @@ export default defineComponent({
           showContextLink && parentCommentId && commentData.DiscussionChannel
         "
       >
-        <NuxtLink
+        <nuxt-link
           class="px-2 text-xs underline"
           :to="{
             name: 'forums-forumId-discussions-discussionId-comment-commentId',
@@ -140,13 +140,13 @@ export default defineComponent({
           }"
         >
           View Context
-        </NuxtLink>
+        </nuxt-link>
       </div>
       <div class="mt-2 flex flex-wrap items-center">
         <div
           class="ml-1 flex flex-wrap items-center space-x-2 text-xs dark:text-gray-300"
         >
-          <NuxtLink
+          <nuxt-link
             v-if="commentData.CommentAuthor?.username"
             class="mx-1 font-bold hover:underline dark:text-gray-200"
             :to="{
@@ -168,8 +168,8 @@ export default defineComponent({
                 commentData.CommentAuthor.username === originalPoster
               "
             />
-          </NuxtLink>
-          <NuxtLink
+          </nuxt-link>
+          <nuxt-link
             v-else-if="commentData.CommentAuthor?.displayName"
             class="mx-1 font-bold hover:underline dark:text-gray-200"
             :to="{
@@ -178,7 +178,7 @@ export default defineComponent({
             }"
           >
             {{ commentData.CommentAuthor.displayName }}
-          </NuxtLink>
+          </nuxt-link>
           <span v-else class="flex items-center font-bold">
             <div
               class="mr-2 h-8 w-8 rounded-full border dark:border-gray-500"

@@ -74,7 +74,7 @@ export default defineComponent({
 <template>
   <div class="bg-white dark:bg-gray-900 rounded-t-lg border border-b border-gray-200 dark:border-gray-600">
     <div class="flex items-center rounded-t-lg gap-4 py-3 pl-8">
-      <NuxtLink
+      <nuxt-link
         :to="{
           name: 'mod-issues',
           params: {
@@ -87,8 +87,8 @@ export default defineComponent({
         }"
       >
         <i class="far fa-dot-circle" />{{ openCount }} Open
-      </NuxtLink>
-      <NuxtLink
+      </nuxt-link>
+      <nuxt-link
         :to="{
           name: 'mod-issues-closed',
           params: {
@@ -101,7 +101,7 @@ export default defineComponent({
         }"
       >
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
-      </NuxtLink>
+      </nuxt-link>
     </div>
     <NuxtPage />
   </div>

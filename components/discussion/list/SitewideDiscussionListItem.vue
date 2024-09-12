@@ -93,7 +93,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
             💬
           </div>
           <div>
-            <NuxtLink
+            <nuxt-link
               v-if="discussion"
               :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
             >
@@ -107,7 +107,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
                   :classes="'font-medium text-sm md:text-md lg:text-lg'"
                 />
               </span>
-            </NuxtLink>
+            </nuxt-link>
             <div class="font-medium flex flex-wrap items-center gap-1 text-xs text-gray-600 no-underline dark:text-gray-300">
               <span>
                 {{ `Posted ${relative} by ` }}
@@ -139,7 +139,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
           />
         </div>
 
-        <NuxtLink
+        <nuxt-link
           v-if="discussion && !submittedToMultipleChannels"
           :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
           class="mt-1 flex cursor-pointer items-center justify-start gap-1 text-xs text-gray-400 dark:text-gray-100"
@@ -149,7 +149,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
               commentCount === 1 ? "comment" : "comments"
             } in c/${discussion.DiscussionChannels[0].channelUniqueName}`
           }}</span>
-        </NuxtLink>
+        </nuxt-link>
 
         <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
           <button

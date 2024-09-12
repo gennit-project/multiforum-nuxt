@@ -543,7 +543,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
             </div>
           </div>
         </div>
-        <NuxtLink
+        <nuxt-link
           v-if="
             canShowPermalink &&
             replyCount > 0 &&
@@ -555,7 +555,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
         >
           Continue thread
           <RightArrowIcon class="h-4 w-4" />
-        </NuxtLink>
+        </nuxt-link>
         <div
           v-else-if="replyCount > 0 && showReplies"
           id="childComments"

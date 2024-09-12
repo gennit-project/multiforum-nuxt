@@ -36,7 +36,7 @@ defineEmits(['filterByTag']);
       class="border py-4 md:px-6 border-gray-500 dark:border-gray-600 shadow md:rounded-t-lg bg-white p-3 dark:bg-gray-800 dark:text-gray-200"
     >
       <div class="flex flex-row">
-        <NuxtLink
+        <nuxt-link
           :to="`/forums/${channel.uniqueName}/discussions`"
           class="flex cursor-pointer"
         >
@@ -48,10 +48,10 @@ defineEmits(['filterByTag']);
               :square="true"
             />
           </div>
-        </NuxtLink>
+        </nuxt-link>
 
         <div class="flex flex-col px-4">
-          <NuxtLink
+          <nuxt-link
             :to="`/forums/${channel.uniqueName}/discussions`"
             class="mt-1 flex cursor-pointer items-center gap-4"
           >
@@ -82,7 +82,7 @@ defineEmits(['filterByTag']);
                 />
               </span>
             </div>
-          </NuxtLink>
+          </nuxt-link>
           <div>
             <div
               v-if="channel.description"
@@ -110,7 +110,7 @@ defineEmits(['filterByTag']);
     <div class="md:rounded-b-lg bg-gray-500 text-white">
       <div class="flex w-full py-2 px-2">
         <div class="truncate text-xs font-normal">
-          <NuxtLink
+          <nuxt-link
             class="flex items-center gap-1 rounded-lg px-4 py-2 hover:bg-gray-700"
             :to="`/forums/${channel.uniqueName}/discussions`"
           >
@@ -121,19 +121,19 @@ defineEmits(['filterByTag']);
                 ? "Discussion"
                 : "Discussions"
             }}
-          </NuxtLink>
+          </nuxt-link>
         </div>
         <div
           v-if="channel?.EventChannelsAggregate?.count"
           class="truncate text-xs font-normal"
         >
-          <NuxtLink
+          <nuxt-link
             class="flex items-center gap-1 rounded-lg px-4 py-2 hover:bg-gray-700"
             :to="`/forums/${channel.uniqueName}/events/search`"
           >
             <CalendarIcon class="h-4 w-4" />
             {{ channel?.EventChannelsAggregate?.count || 0 }} Upcoming Events
-          </NuxtLink>
+          </nuxt-link>
         </div>
       </div>
     </div>

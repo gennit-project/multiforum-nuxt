@@ -342,7 +342,7 @@ function handleFeedbackInput(event: any) {
         <div class="mr-3 h-5 w-5">
           <i class="fa-regular fa-user h-5" />
         </div>
-        <NuxtLink
+        <nuxt-link
           :to="{
             name: 'u-username',
             params: { username: eventData.Poster.username },
@@ -359,7 +359,7 @@ function handleFeedbackInput(event: any) {
             :discussion-karma="eventData.Poster.discussionKarma ?? 0"
             :account-created="eventData.Poster.createdAt"
           />
-        </NuxtLink>
+        </nuxt-link>
       </li>
     </ul>
     <div>

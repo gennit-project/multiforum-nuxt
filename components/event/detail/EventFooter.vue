@@ -92,7 +92,7 @@ export default defineComponent({
 <template>
   <div class="mt-4 px-4 text-xs text-gray-700 dark:text-gray-200">
     <div class="organizer flex items-center gap-1">
-      <NuxtLink
+      <nuxt-link
         v-if="eventData.Poster"
         class="underline"
         :to="{
@@ -111,7 +111,7 @@ export default defineComponent({
           :discussion-karma="eventData.Poster.discussionKarma ?? 0"
           :account-created="eventData.Poster.createdAt"
         />
-      </NuxtLink>
+      </nuxt-link>
       <span v-else>[Deleted]</span>
       {{
         `${

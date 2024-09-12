@@ -170,7 +170,7 @@ const reachedEndOfResults = computed(() => {
           :is-square="false"
         />
         <span class="mr-0.5">
-          <NuxtLink
+          <nuxt-link
             v-if="comment.CommentAuthor?.displayName"
             :to="{
               name: 'mod-modId',
@@ -179,7 +179,7 @@ const reachedEndOfResults = computed(() => {
               },
             }"
             class="font-medium text-gray-900 hover:underline dark:text-gray-200"
-          >{{ comment.CommentAuthor?.displayName }}</NuxtLink>
+          >{{ comment.CommentAuthor?.displayName }}</nuxt-link>
         </span>
         <span class="whitespace-nowrap">{{
           `gave feedback in ${comment.Channel?.uniqueName} ${timeAgo(new Date(comment.createdAt))}`

@@ -265,7 +265,7 @@ function handleViewFeedback(feedbackId: string) {
         :is-square="false"
       />
       <span class="mr-0.5">
-        <NuxtLink
+        <nuxt-link
           v-if="comment.CommentAuthor?.displayName"
           :to="{
             name: 'mod-modId',
@@ -276,7 +276,7 @@ function handleViewFeedback(feedbackId: string) {
           class="font-medium text-gray-900 hover:underline dark:text-gray-200"
         >
           {{ comment.CommentAuthor?.displayName }}
-        </NuxtLink>
+        </nuxt-link>
         <span v-else>[Deleted User]</span>
       </span>
       <span v-if="loggedInModName === comment?.CommentAuthor?.displayName">

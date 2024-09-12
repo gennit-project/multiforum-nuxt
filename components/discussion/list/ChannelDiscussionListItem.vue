@@ -117,7 +117,7 @@ const filteredQuery = computed(() => {
             💬
           </div>
           <div class="w-full flex-col">
-            <NuxtLink
+            <nuxt-link
               :to="{
                 name: 'forums-forumId-discussions-discussionId',
                 params: {
@@ -137,7 +137,7 @@ const filteredQuery = computed(() => {
                   :classes="'font-medium text-md'"
                 />
               </span>
-            </NuxtLink>
+            </nuxt-link>
             <div
               class="font-medium py-1 text-xs text-gray-600 no-underline dark:text-gray-300"
             >
@@ -190,7 +190,7 @@ const filteredQuery = computed(() => {
             :show-downvote="false"
           />
           <div class="flex items-center justify-start gap-6">
-            <NuxtLink
+            <nuxt-link
               :to="{
                 name: 'forums-forumId-discussions-discussionId',
                 params: {
@@ -205,7 +205,7 @@ const filteredQuery = computed(() => {
               <span class="text-md">{{
                 `${commentCount} comment${commentCount === 1 ? "" : "s"}`
               }}</span>
-            </NuxtLink>
+            </nuxt-link>
           </div>
         </div>
       </div>

@@ -31,7 +31,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <NuxtLink
+  <nuxt-link
     :to="{
       name: 'forums-forumId-events-eventId',
       params: {
@@ -64,5 +64,5 @@ export default defineComponent({
         </div>
       </div>
     </li>
-  </NuxtLink>
+  </nuxt-link>
 </template>

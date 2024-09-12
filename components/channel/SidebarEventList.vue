@@ -175,7 +175,7 @@ export default defineComponent({
       :key="event?.id"
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
-      <NuxtLink
+      <nuxt-link
         :to="{
           name: 'forums-forumId-events-eventId',
           params: {
@@ -190,8 +190,8 @@ export default defineComponent({
         >
           {{ event?.title }}
         </span>
-      </NuxtLink>
-      <NuxtLink
+      </nuxt-link>
+      <nuxt-link
         v-if="event?.virtualEventUrl"
         target="_blank"
         :to="event?.virtualEventUrl"
@@ -199,7 +199,7 @@ export default defineComponent({
       >
         Go to online event
         <i class="fa-solid fa-arrow-up-right-from-square" />
-      </NuxtLink>
+      </nuxt-link>
     </div>
   </div>
 
@@ -217,7 +217,7 @@ export default defineComponent({
       :key="event?.id"
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
-      <NuxtLink
+      <nuxt-link
         :to="
          {
           name: 'forums-forumId-events-eventId',
@@ -234,7 +234,7 @@ export default defineComponent({
         >
           {{ getSidebarLinkText(event) }}
         </span>
-      </NuxtLink>
+      </nuxt-link>
     </div>
   </div>
 
@@ -252,7 +252,7 @@ export default defineComponent({
       :key="event?.id"
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
-      <NuxtLink
+      <nuxt-link
         :to="
           {
             name: 'forums-forumId-events-eventId',
@@ -268,7 +268,7 @@ export default defineComponent({
         >
           {{ getSidebarLinkText(event) }}
         </span>
-      </NuxtLink>
+      </nuxt-link>
     </div>
   </div>
 
@@ -288,7 +288,7 @@ export default defineComponent({
         :key="event?.id"
         class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm leading-6 text-gray-500 dark:text-gray-300"
       >
-        <NuxtLink
+        <nuxt-link
           :to="
             {
               name: 'forums-forumId-events-eventId',
@@ -304,7 +304,7 @@ export default defineComponent({
           >
             {{ getSidebarLinkText(event) }}
           </span>
-        </NuxtLink>
+        </nuxt-link>
       </div>
     </div>
   </div>
@@ -315,7 +315,7 @@ export default defineComponent({
         eventChannelsAggregate > soonestEventsInChannel.length
     "
   >
-    <NuxtLink
+    <nuxt-link
       :to="
         {
           name: 'forums-forumId-events-search',
@@ -324,6 +324,6 @@ export default defineComponent({
       class="flex items-center underline"
     >
       <span class="text-sm font-bold leading-6"> View all events </span>
-    </NuxtLink>
+    </nuxt-link>
   </div>
 </template>

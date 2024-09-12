@@ -85,7 +85,7 @@ const tags = props.event.Tags.map((tag: TagData) => tag.text);
       :key="i"
       class="my-2 space-x-2 text-sm"
     >
-      <NuxtLink
+      <nuxt-link
         v-if="ec.Channel"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
         :to="{
@@ -97,7 +97,7 @@ const tags = props.event.Tags.map((tag: TagData) => tag.text);
         }"
       >
         {{ `c/${ec.Channel.uniqueName}` }}
-      </NuxtLink>
+      </nuxt-link>
     </div>
   </li>
 </template>

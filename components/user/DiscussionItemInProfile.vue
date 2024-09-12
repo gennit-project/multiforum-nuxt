@@ -81,7 +81,7 @@ const tags = props.discussion.Tags.map((tag) => tag.text);
       {{ `Posted ${relativeTimeText} by ${authorUsername}` }}
     </p>
     <div class="my-2 space-x-2 text-sm">
-      <NuxtLink
+      <nuxt-link
         v-for="(discussionChannel, i) in discussion.DiscussionChannels"
         :key="i"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
@@ -94,7 +94,7 @@ const tags = props.discussion.Tags.map((tag) => tag.text);
         }"
       >
         View this post in {{ `c/${discussionChannel.Channel?.uniqueName}` }}
-      </NuxtLink>
+      </nuxt-link>
     </div>
   </li>
 </template>

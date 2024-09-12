@@ -10,19 +10,19 @@ export default defineComponent({
     <div
       class="flex w-full items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
     >
-      <NuxtLink
+      <nuxt-link
         :to="`/privacy-policy`"
         class="flex cursor-pointer underline"
       >
         Privacy Policy
-      </NuxtLink>
+      </nuxt-link>
 
-      <NuxtLink
+      <nuxt-link
         :to="`/terms-of-use`"
         class="flex cursor-pointer underline"
       >
         Terms of Use
-      </NuxtLink>
+      </nuxt-link>
     </div>
     <div
       class="w-full items-center justify-center text-wrap bg-gray-800 p-4 text-white"

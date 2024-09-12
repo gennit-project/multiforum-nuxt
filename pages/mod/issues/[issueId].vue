@@ -484,7 +484,7 @@ const toggleCloseOpenIssue = () => {
 
       <p v-if="activeIssue?.relatedDiscussionId || activeIssue?.relatedEventId">
         Original post (
-        <NuxtLink
+        <nuxt-link
           v-if="activeIssue?.relatedDiscussionId"
           class="text-blue-500 hover:underline"
           :to="{
@@ -496,8 +496,8 @@ const toggleCloseOpenIssue = () => {
           }"
         >
           link
-        </NuxtLink>
-        <NuxtLink
+        </nuxt-link>
+        <nuxt-link
           v-else-if="activeIssue?.relatedEventId"
           class="text-blue-500 hover:underline"
           :to="{
@@ -506,7 +506,7 @@ const toggleCloseOpenIssue = () => {
           }"
         >
           link
-        </NuxtLink>
+        </nuxt-link>
         <span>):</span>
       </p>
 

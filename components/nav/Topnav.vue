@@ -58,11 +58,11 @@ function getLabel() {
           @click="$emit('toggleDropdown')"
         />
         <div class="flex items-center space-x-1 ml-12 text-sm text-gray-500 dark:text-white">
-          <NuxtLink to="/" class="flex gap-2 items-center">
+          <nuxt-link to="/" class="flex gap-2 items-center">
             <ArrowUpBoldBox :size="38" class="text-black dark:text-blue-500" />
             <span class="font-bold text-black dark:text-white">Topical</span>
             <span class="text-blue-500 text-xs py-0.5 px-1 border rounded-md border-blue-500 dark:text-blue-500">ALPHA</span>
-          </NuxtLink>
+          </nuxt-link>
           <div v-if="shouldShowChannelId" class="hidden sm:flex items-center gap-1">
             <span>•</span>
             <span class="font-mono text-gray-800 dark:text-gray-300">{{ channelId }}</span>

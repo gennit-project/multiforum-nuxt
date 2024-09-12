@@ -65,7 +65,7 @@ export default defineComponent({
       <button v-bind="props">
         <slot>
           <div class="flex flex-row items-center gap-1">
-            <NuxtLink
+            <nuxt-link
               :to="{
                 name: 'u-username',
                 params: { username },
@@ -86,7 +86,7 @@ export default defineComponent({
                 v-if="displayName"
                 class="text-gray-500 dark:text-gray-300"
               >{{ `(u/${username})` }}</span>
-            </NuxtLink>
+            </nuxt-link>
             <span
               v-if="isAdmin"
               class="rounded-md border border-blue-500 px-1 py-0.5 text-xs text-blue-500"
