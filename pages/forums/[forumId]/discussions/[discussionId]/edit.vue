@@ -223,7 +223,7 @@ export default defineComponent({
 
     onDone(() => {
       router.push({
-        name: "DiscussionDetail",
+        name: "forums-forumId-discussions-discussionId",
         params: {
           forumId: formValues.value.selectedChannels[0],
           discussionId: discussionId.value,

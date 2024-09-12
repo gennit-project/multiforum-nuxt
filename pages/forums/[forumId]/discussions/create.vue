@@ -187,7 +187,7 @@ export default defineComponent({
 
       if (channelId) {
         router.push({
-          name: "DiscussionDetail",
+          name: "forums-forumId-discussions-discussionId",
           params: {
             forumId: channelId,
             discussionId: newDiscussionId,
@@ -201,7 +201,7 @@ export default defineComponent({
           channel that the discussion was submitted to.
         */
         router.push({
-          name: "DiscussionDetail",
+          name: "forums-forumId-discussions-discussionId",
           params: {
             forumId: formValues.value.selectedChannels[0],
             discussionId: newDiscussionId,

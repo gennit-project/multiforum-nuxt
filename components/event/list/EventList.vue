@@ -94,7 +94,7 @@ const handleClickEventListItem = (event: Event) => {
   } else {
     if (channelId.value) {
       return router.push({
-        name: 'EventDetail',
+        name: 'forums-forumId-events-eventId',
         params: {
           eventId: event.id,
           forumId: channelId.value,
@@ -102,7 +102,7 @@ const handleClickEventListItem = (event: Event) => {
       });
     }
     return router.push({
-      name: 'EventDetail',
+      name: 'forums-forumId-events-eventId',
       params: {
         eventId: event.id,
         forumId: event.EventChannels[0].channelUniqueName,

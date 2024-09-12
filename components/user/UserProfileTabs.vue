@@ -1,128 +1,95 @@
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from "vue";
-import TabButton from "@/components/channel/TabButton.vue";
-import { useDisplay } from "vuetify/lib/framework.mjs";
-import { useRoute } from "vue-router";
-import type { User } from "@/__generated__/graphql"
-import { useAuth0 } from '@/hooks/useAuth0';
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
+<script lang="ts" setup>
+import { computed, ref, watch } from "vue";
+import { useAuth0 } from "@/hooks/useAuth0";
 import { useQuery } from "@vue/apollo-composable";
+import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
+import TabButton from "@/components/channel/TabButton.vue";
+import { useDisplay } from "vuetify/lib/framework.mjs"; // Ensure Vuetify is set up
+import { useRoute, useRouter } from "#imports"; // Nuxt 3 routing
 
 type TabData = {
   name: string;
   href: string;
   current: boolean;
   count?: number | null;
-}
+};
 
-export default defineComponent({
-  name: "ChannelTabs",
-  components: {
-    TabButton,
+const props = defineProps({
+  route: {
+    type: Object,
+    required: true,
   },
-  props: {
-    route: {
-      type: Object,
-      required: true,
-    },
-    vertical: {
-      type: Boolean,
-      default: false,
-    },
-    user: {
-      type: Object as () => User,
-      required: true,
-    },
-    showCounts: {
-      type: Boolean,
-      default: false,
-    },
+  vertical: {
+    type: Boolean,
+    default: false,
   },
-  setup(props) {
-    const channelId = ref(props.route.params.forumId);
-    const { isAuthenticated } = useAuth0();
-    
-    const { mdAndDown } = useDisplay();
-    const route = useRoute();
-
-    const usernameInParams = computed(() => {
-      if (typeof route.params.username === "string") {
-        return route.params.username;
-      }
-      return "";
-    });
-
-    watch(
-      () => props.route,
-      (to) => {
-        channelId.value = to.params.channelId;
-      },
-    );
-
-    const { result } = useQuery(GET_LOCAL_USERNAME);
-    const username = computed(() => {
-      const username = result.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
-    });
-
-    const tabs = computed(() => {
-      const tabList: TabData[] = [
-        { 
-          name: "Comments", 
-          href: `/u/${usernameInParams.value}`, 
-          current: true,
-          count: props.user?.CommentsAggregate?.count,
-        },
-        { name: 
-          "Discussions", 
-          href: `/u/${usernameInParams.value}/discussions`, 
-          current: false,
-          count: props.user?.DiscussionsAggregate?.count,
-        },
-        { 
-          name: "Events", 
-          href: `/u/${usernameInParams.value}/events`, 
-          current: false,
-          count: props.user?.EventsAggregate?.count,
-        },
-        
-      ]
-
-      if (isAuthenticated && username.value === usernameInParams.value) {
-        tabList.push({
-          name: "Settings",
-          href: `/u/${usernameInParams.value}/settings`,
-          current: false,
-          count: null
-        })
-      }
-      return tabList
-    })
-
-    return {
-      channelId,
-      mdAndDown,
-      tabs,
-      username: usernameInParams,
-    };
+  user: {
+    type: Object as () => User,
+    required: true,
   },
-  data() {
-    return {
-      selectedTab: "about",
-    };
-  },
-  methods: {
-    redirect(e: any): void {
-      const selectedTab = e.target.value;
-      this.$router.push(this.tabRoutes[selectedTab]);
-    },
+  showCounts: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const channelId = ref(props.route.params.forumId);
+const { isAuthenticated } = useAuth0();
+
+const usernameInParams = computed(() => {
+  return typeof props.route.params.username === "string" ? props.route.params.username : "";
+});
+
+// Watch for route changes to update the `channelId`
+watch(
+  () => props.route,
+  (to) => {
+    channelId.value = to.params.channelId;
+  }
+);
+
+// Fetch the local username
+const { result } = useQuery(GET_LOCAL_USERNAME);
+const username = computed(() => {
+  return result.value?.username || "";
+});
+
+// Define the tabs based on the user data and authentication status
+const tabs = computed(() => {
+  const tabList: TabData[] = [
+    {
+      name: "Comments",
+      href: `/u/${usernameInParams.value}`,
+      current: true,
+      count: props.user?.CommentsAggregate?.count,
+    },
+    {
+      name: "Discussions",
+      href: `/u/${usernameInParams.value}/discussions`,
+      current: false,
+      count: props.user?.DiscussionsAggregate?.count,
+    },
+    {
+      name: "Events",
+      href: `/u/${usernameInParams.value}/events`,
+      current: false,
+      count: props.user?.EventsAggregate?.count,
+    },
+  ];
+
+  if (isAuthenticated && username.value === usernameInParams.value) {
+    tabList.push({
+      name: "Settings",
+      href: `/u/${usernameInParams.value}/settings`,
+      current: false,
+      count: null,
+    });
+  }
+  return tabList;
+});
+
+
 </script>
->
 
 <template>
   <div>
@@ -131,7 +98,6 @@ export default defineComponent({
       class="text-md flex max-w-7xl flex-col"
       aria-label="Tabs"
     >
-      q
       <TabButton
         v-for="tab in tabs"
         :key="tab.name"
@@ -139,7 +105,7 @@ export default defineComponent({
         :label="tab.name"
         :is-active="route.name.includes(tab.name)"
         :vertical="true"
-        :count="tab.count"
+        :count="tab.count || undefined"
         :show-count="showCounts && !!tab.count"
       />
     </nav>
@@ -154,7 +120,7 @@ export default defineComponent({
         :to="tab.href"
         :label="tab.name"
         :is-active="route.name.includes(tab.name)"
-        :count="tab.count"
+        :count="tab.count || undefined"
         :show-count="showCounts && !!tab.count"
       />
     </nav>

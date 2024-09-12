@@ -93,7 +93,7 @@ function handleClickUndoFeedback() {
 }
 
 function handleClickViewFeedback() {
-  router.push({ name: "DiscussionFeedback", params: { discussionId: discussionIdInParams.value } });
+  router.push({ name: "forums-forumId-discussions-discussionId-feedback", params: { discussionId: discussionIdInParams.value } });
 }
 
 function handleSubmitFeedback() {

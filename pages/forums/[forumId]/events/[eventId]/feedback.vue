@@ -1,131 +1,104 @@
-<script lang="ts">
+<script lang="ts" setup>
 import type { Event } from "@/__generated__/graphql";
 import BackLink from "@/components/BackLink.vue";
 import { GET_EVENT_FEEDBACK } from "@/graphQLData/event/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { computed, defineComponent } from "vue";
-import { useRoute } from "vue-router";
-import EventHeader from "./EventHeader.vue";
+import { computed } from "vue";
+import EventHeader from "@/components/event/detail/EventHeader.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
 import InfoBanner from "@/components/InfoBanner.vue";
-import EventBody from "./EventBody.vue";
+import EventBody from "@/components/event/detail/EventBody.vue";
 import LoadMore from "@/components/LoadMore.vue";
 
 const PAGE_LIMIT = 10;
 
-export default defineComponent({
-  components: {
-    BackLink,
-    EventBody,
-    EventHeader,
-    ErrorBanner,
-    InfoBanner,
-    LoadMore,
-    MarkdownPreview,
-    PageNotFound,
-  },
-  setup: () => {
-    const route = useRoute();
+const route = useRoute();
 
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-      return "";
-    });
+const channelId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
 
-    const eventId = computed(() => {
-      if (typeof route.params.eventId === "string") {
-        return route.params.eventId;
-      }
-      return "";
-    });
+const eventId = computed(() => {
+  if (typeof route.params.eventId === "string") {
+    return route.params.eventId;
+  }
+  return "";
+});
 
-    const {
-      result: getEventResult,
-      error: getEventError,
-      loading: getEventLoading,
-      fetchMore,
-    } = useQuery(GET_EVENT_FEEDBACK, {
-      id: eventId,
-      limit: PAGE_LIMIT,
-      offset: 0,
-    });
+const {
+  result: getEventResult,
+  error: getEventError,
+  loading: getEventLoading,
+  fetchMore,
+} = useQuery(GET_EVENT_FEEDBACK, {
+  id: eventId,
+  limit: PAGE_LIMIT,
+  offset: 0,
+});
 
-    const event = computed<Event>(() => {
-      if (getEventError.value) {
-        return null;
-      }
-      return getEventResult.value?.events[0] || null;
-    });
+const event = computed<Event>(() => {
+  if (getEventError.value) {
+    return null;
+  }
+  return getEventResult.value?.events[0] || null;
+});
 
-    const feedbackComments = computed(() => {
-      if (event.value) {
-        return event.value.FeedbackComments;
-      }
-      return [];
-    });
+const feedbackComments = computed(() => {
+  if (event.value) {
+    return event.value.FeedbackComments;
+  }
+  return [];
+});
 
-    const feedbackCommentsAggregate = computed(() => {
-      if (event.value) {
-        return event.value.FeedbackCommentsAggregate?.count || 0;
-      }
-      return 0;
-    });
+const feedbackCommentsAggregate = computed(() => {
+  if (event.value) {
+    return event.value.FeedbackCommentsAggregate?.count || 0;
+  }
+  return 0;
+});
 
-    const loadMore = () => {
-      fetchMore({
-        variables: {
-          offset: feedbackComments.value.length,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
+const loadMore = () => {
+  fetchMore({
+    variables: {
+      offset: feedbackComments.value.length,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult;
 
-          const prevFeedbackComments =
-            previousResult.events[0].FeedbackComments;
-          const newFeedbackComments =
-            fetchMoreResult.events[0].FeedbackComments;
+      const prevFeedbackComments =
+        previousResult.events[0].FeedbackComments;
+      const newFeedbackComments =
+        fetchMoreResult.events[0].FeedbackComments;
 
-          return {
-            ...previousResult,
-            events: [
-              {
-                ...previousResult.events[0],
-                FeedbackComments: [
-                  ...prevFeedbackComments,
-                  ...newFeedbackComments,
-                ],
-              },
+      return {
+        ...previousResult,
+        events: [
+          {
+            ...previousResult.events[0],
+            FeedbackComments: [
+              ...prevFeedbackComments,
+              ...newFeedbackComments,
             ],
-          };
-        },
-      });
-    };
+          },
+        ],
+      };
+    },
+  });
+};
 
-    const reachedEndOfResults = computed(() => {
-      if (getEventLoading.value || getEventError.value) {
-        return false;
-      }
-      return feedbackComments.value.length === feedbackCommentsAggregate.value;
-    });
-
-    return {
-      channelId,
-      event,
-      getEventLoading,
-      getEventError,
-      feedbackComments,
-      feedbackCommentsAggregate,
-      loadMore,
-      reachedEndOfResults,
-      route,
-      timeAgo,
-    };
-  },
+const reachedEndOfResults = computed(() => {
+  if (getEventLoading.value || getEventError.value) {
+    return false;
+  }
+  return feedbackComments.value.length === feedbackCommentsAggregate.value;
 });
 </script>
+
 <template>
   <div
     class="w-full max-w-7xl space-y-4 rounded-lg bg-white py-2 dark:bg-gray-800 sm:px-2 md:px-5"

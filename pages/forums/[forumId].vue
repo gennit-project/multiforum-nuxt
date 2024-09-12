@@ -94,7 +94,7 @@ const { smAndDown, mdAndDown } = useDisplay();
 if (!channelId.value) {
   if (import.meta.client) {
     router.push({
-      name: "ChannelDiscussions",
+      name: "forums-forumId-discussions",
       params: {
         forumId: channelId.value,
       },

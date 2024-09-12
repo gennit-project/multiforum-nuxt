@@ -80,7 +80,7 @@ const {
 onDoneDeleting(() => {
   if (props.channelId) {
     router.push({
-      name: "SearchDiscussionsInChannel",
+      name: "forums-forumId-discussions",
       params: { forumId: props.channelId },
     });
   }
@@ -249,7 +249,7 @@ const authorIsMod = computed(
         @handle-feedback="emit('handleClickGiveFeedback')"
         @handle-view-feedback="
           router.push({
-            name: 'DiscussionFeedback',
+            name: 'forums-forumId-discussions-discussionId-feedback',
             params: { discussionId: discussion.id },
           })
         "

@@ -9,7 +9,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
-import getDefaultEventFormValues from "@/components/event/form/getDefaultEventFormValues";
+import getDefaultEventFormValues from "@/components/event/form/defaultEventFormValues";
 import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {
@@ -260,7 +260,7 @@ export default defineComponent({
         channel that the event was submitted to.
       */
       router.push({
-        name: "EventDetail",
+        name: "forums-forumId-events-eventId",
         params: {
           forumId: formValues.value.selectedChannels[0].channelUniqueName,
           eventId,

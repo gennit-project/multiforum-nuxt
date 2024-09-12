@@ -61,7 +61,7 @@ onMounted(() => {
 // Method for filtering discussions by tag
 const filterByTag = (tag: string) => {
   router.push({
-    name: "SearchDiscussionsInChannel",
+    name: "forums-forumId-discussions",
     params: {
       forumId: props.channelId,
     },

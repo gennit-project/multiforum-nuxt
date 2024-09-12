@@ -1,7 +1,6 @@
-<script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent, computed, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+<script lang="ts" setup>
+import { computed, ref } from "vue";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import type { Event } from "@/__generated__/graphql";
 import {
   CANCEL_EVENT,
@@ -16,7 +15,6 @@ import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
 import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
   GET_LOCAL_USERNAME,
@@ -28,380 +26,245 @@ import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 
-export default defineComponent({
-  name: "EventHeader",
-  components: {
-    CalendarIcon,
-    ClipboardIcon,
-    EllipsisHorizontal,
-    LinkIcon,
-    LocationIcon,
-    MenuButton,
-    Notification,
-    OpenIssueModal,
-    WarningModal,
-    ErrorBanner,
-    UsernameWithTooltip,
-    GenericFeedbackFormModal,
+const props = defineProps({
+  eventData: {
+    type: Object as PropType<Event>,
+    required: true,
   },
-  props: {
-    eventData: {
-      type: Object as PropType<Event>,
-      required: true,
-    },
-    showMenuButtons: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  setup(props: any) {
-    const route = useRoute();
-    const router = useRouter();
-
-    const showAddressCopiedNotification = ref(false);
-
-    const eventId = computed(() => {
-      if (typeof route.params.eventId === "string") {
-        return route.params.eventId;
-      }
-      return "";
-    });
-
-    const {
-      mutate: addFeedbackCommentToEvent,
-      loading: addFeedbackCommentToEventLoading,
-      error: addFeedbackCommentToEventError,
-      onDone: onAddFeedbackCommentToEventDone,
-    } = useMutation(ADD_FEEDBACK_COMMENT_TO_EVENT);
-
-    const showFeedbackFormModal = ref(false);
-    const showFeedbackSubmittedSuccessfully = ref(false);
-
-    onAddFeedbackCommentToEventDone(() => {
-      showFeedbackFormModal.value = false;
-      showFeedbackSubmittedSuccessfully.value = true;
-    });
-
-    const {
-      result: localModProfileNameResult,
-      loading: localModProfileNameLoading,
-      error: localModProfileNameError,
-    } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
-    const loggedInUserModName = computed(() => {
-      if (localModProfileNameLoading.value || localModProfileNameError.value) {
-        return "";
-      }
-      return localModProfileNameResult.value?.modProfileName || "";
-    });
-
-    const {
-      mutate: deleteEvent,
-      error: deleteEventError,
-      onDone: onDoneDeleting,
-    } = useMutation(DELETE_EVENT, {
-      variables: {
-        id: eventId.value,
-      },
-      update: (cache: any) => {
-        cache.modify({
-          fields: {
-            events(existingEventRefs = [], fieldInfo: any) {
-              const readField = fieldInfo.readField;
-
-              return existingEventRefs.filter((ref) => {
-                return readField("id", ref) !== eventId.value;
-              });
-            },
-          },
-        });
-      },
-    });
-
-    onDoneDeleting(() => {
-      if (channelId.value) {
-        router.push({
-          name: "SearchEventsInChannel",
-          params: {
-            forumId: channelId.value,
-          },
-        });
-      }
-    });
-
-    const copyAddress = async () => {
-      try {
-        const address = props.eventData.address ? props.eventData.address : "";
-
-        const clipboard = new ClipboardJS(".copy-btn", {
-          text: () => address,
-        });
-
-        clipboard.on("success", () => {
-          showAddressCopiedNotification.value = true;
-          clipboard.destroy();
-        });
-
-        clipboard.on("error", (e) => {
-          console.error(e);
-          clipboard.destroy();
-        });
-      } catch (e: any) {
-        throw new Error(e);
-      }
-      setTimeout(() => {
-        showAddressCopiedNotification.value = false;
-      }, 2000);
-    };
-
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-
-      const defaultChannelId =
-        props.eventData?.EventChannels?.[0]?.channelUniqueName;
-
-      if (typeof defaultChannelId === "string") {
-        return defaultChannelId;
-      }
-      return "";
-    });
-
-    const showCopiedLinkNotification = ref(false);
-
-    const permalinkObject = computed(() => {
-      if (!eventId.value) {
-        return {};
-      }
-      return {
-        name: "EventDetail",
-        params: {
-          eventId: eventId.value,
-          forumId: channelId.value,
-        },
-      };
-    });
-
-    const copyLink = async (event: any) => {
-      try {
-        let basePath = "";
-        if (import.meta.client) {
-          basePath = window.location.origin;
-        } else {
-          basePath = process.env.BASE_URL || "";
-        }
-        const permalink = `${basePath}${
-          router.resolve(permalinkObject.value).href
-        }`;
-        await navigator.clipboard.writeText(permalink);
-        showCopiedLinkNotification.value = event;
-      } catch (e: any) {
-        throw new Error(e);
-      }
-      setTimeout(() => {
-        showCopiedLinkNotification.value = false;
-      }, 2000);
-    };
-
-    const {
-      result: localUsernameResult,
-      loading: localUsernameLoading,
-      error: localUsernameError,
-    } = useQuery(GET_LOCAL_USERNAME);
-
-    const username = computed(() => {
-      if (localUsernameLoading.value || localUsernameError.value) {
-        return "";
-      }
-      return localUsernameResult.value.username;
-    });
-
-    const menuItems = computed(() => {
-      let out = [];
-      if (props.eventData && route.name !== "EventFeedback") {
-        out.push({
-          label: "Copy Link",
-          value: "",
-          event: "copyLink",
-          icon: ALLOWED_ICONS.COPY_LINK,
-        });
-      }
-
-      if (props.eventData?.Poster?.username === username.value) {
-        out = out.concat([
-          {
-            label: "Edit",
-            value: "",
-            event: "handleEdit",
-            icon: ALLOWED_ICONS.EDIT,
-          },
-          {
-            label: "Delete",
-            value: "",
-            event: "handleDelete",
-            icon: ALLOWED_ICONS.DELETE,
-          },
-        ]);
-
-        if (route.name !== "EventFeedback") {
-          out = out.concat([
-            {
-              label: "View Feedback",
-              value: "",
-              event: "handleViewFeedback",
-              icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-            },
-          ]);
-        }
-
-        if (!props.eventData.canceled) {
-          out.push({
-            label: "Cancel",
-            value: "",
-            event: "handleCancel",
-            icon: ALLOWED_ICONS.CANCEL,
-          });
-        }
-      } else {
-        out = out.concat([
-          {
-            label: "Report",
-            value: "",
-            event: "handleReport",
-            icon: ALLOWED_ICONS.REPORT,
-          },
-        ]);
-
-        if (route.name !== "EventFeedback") {
-          out = out.concat([
-            {
-              label: "Give Feedback",
-              value: "",
-              event: "handleFeedback",
-              icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-            },
-            {
-              label: "View Feedback",
-              value: "",
-              event: "handleViewFeedback",
-              icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-            },
-          ]);
-        }
-      }
-
-      return out;
-    });
-
-    const {
-      mutate: cancelEvent,
-      error: cancelEventError,
-      loading: cancelEventLoading,
-      onDone: onDoneCanceling,
-    } = useMutation(CANCEL_EVENT, {
-      variables: {
-        id: eventId.value,
-        updateEventInput: {
-          canceled: true,
-        },
-        eventWhere: {
-          id: eventId.value,
-        },
-      },
-    });
-
-    const isAdmin = computed(() => {
-      const serverRoles = props.eventData.Poster?.ServerRoles;
-      if (!serverRoles) {
-        return false;
-      }
-      if (serverRoles.length === 0) {
-        return false;
-      }
-      const serverRole = serverRoles[0];
-      if (serverRole.showAdminTag) {
-        return true;
-      }
-      return false;
-    });
-
-    const confirmDeleteIsOpen = ref(false);
-    const confirmCancelIsOpen = ref(false);
-
-    onDoneCanceling(() => {
-      // Close cancel event modal when finished.
-      confirmCancelIsOpen.value = false;
-    });
-
-    return {
-      addFeedbackCommentToEvent,
-      addFeedbackCommentToEventLoading,
-      addFeedbackCommentToEventError,
-      cancelEvent,
-      cancelEventError,
-      cancelEventLoading,
-      confirmCancelIsOpen,
-      confirmDeleteIsOpen,
-      channelId,
-      copyAddress,
-      copyLink,
-      deleteEvent,
-      deleteEventError,
-      eventId,
-      getDuration,
-      feedbackText: ref(""),
-      isAdmin,
-      loggedInUserModName,
-      menuItems,
-      reportModalIsOpen: ref(false),
-      route,
-      router,
-      showFeedbackFormModal,
-      showFeedbackSubmittedSuccessfully,
-      showReportEventModal: ref(false),
-      showSuccessfullyReported: ref(false),
-      showAddressCopiedNotification,
-      showCopiedLinkNotification,
-    };
-  },
-  methods: {
-    getFormattedDateString(startTime: string) {
-      const startTimeObj = DateTime.fromISO(startTime);
-
-      return startTimeObj.toFormat("cccc LLLL d yyyy h:mm a");
-    },
-    handleSubmitFeedback() {
-      this.addFeedbackCommentToEvent({
-        eventId: this.eventId,
-        text: this.feedbackText,
-        channelId: this.channelId,
-        modProfileName: this.loggedInUserModName,
-      });
-    },
-    handleFeedbackInput(event: any) {
-      this.feedbackText = event.target.value;
-    },
-    handleReportEvent() {
-      this.showReportEventModal = false;
-    },
-    handleClickReport() {
-      this.showReportEventModal = true;
-    },
-    handleClickGiveFeedback() {
-      this.showFeedbackFormModal = true;
-    },
-    handleViewFeedback() {
-      this.$router.push({
-        name: "EventFeedback",
-        params: {
-          eventId: this.eventId,
-          forumId: this.channelId,
-        },
-      });
-    },
+  showMenuButtons: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const route = useRoute();
+const router = useRouter();
+
+const showAddressCopiedNotification = ref(false);
+const showCopiedLinkNotification = ref(false);
+const showFeedbackFormModal = ref(false);
+const showFeedbackSubmittedSuccessfully = ref(false);
+const confirmDeleteIsOpen = ref(false);
+const confirmCancelIsOpen = ref(false);
+const showReportEventModal = ref(false);
+const showSuccessfullyReported = ref(false);
+
+const eventId = computed(() => {
+  return typeof route.params.eventId === "string" ? route.params.eventId : "";
+});
+
+const channelId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return props.eventData?.EventChannels?.[0]?.channelUniqueName || "";
+});
+
+const permalinkObject = computed(() => {
+  if (!eventId.value) return {};
+  return {
+    name: "EventDetail",
+    params: {
+      eventId: eventId.value,
+      forumId: channelId.value,
+    },
+  };
+});
+
+const {
+  result: localModProfileNameResult,
+  loading: localModProfileNameLoading,
+  error: localModProfileNameError,
+} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+const loggedInUserModName = computed(() => {
+  if (localModProfileNameLoading.value || localModProfileNameError.value)
+    return "";
+  return localModProfileNameResult.value?.modProfileName || "";
+});
+
+const {
+  result: localUsernameResult,
+  loading: localUsernameLoading,
+  error: localUsernameError,
+} = useQuery(GET_LOCAL_USERNAME);
+const username = computed(() => {
+  if (localUsernameLoading.value || localUsernameError.value) return "";
+  return localUsernameResult.value.username;
+});
+
+const {
+  mutate: deleteEvent,
+  error: deleteEventError,
+  onDone: onDoneDeleting,
+} = useMutation(DELETE_EVENT, {
+  variables: { id: eventId.value },
+  update: (cache) => {
+    cache.modify({
+      fields: {
+        events(existingEventRefs = [], { readField }) {
+          return existingEventRefs.filter(
+            (ref) => readField("id", ref) !== eventId.value
+          );
+        },
+      },
+    });
+  },
+});
+
+onDoneDeleting(() => {
+  if (channelId.value) {
+    router.push({
+      name: "forums-forumId-events",
+      params: { forumId: channelId.value },
+    });
+  }
+});
+
+const {
+  mutate: cancelEvent,
+  error: cancelEventError,
+  loading: cancelEventLoading,
+  onDone: onDoneCanceling,
+} = useMutation(CANCEL_EVENT, {
+  variables: {
+    id: eventId.value,
+    updateEventInput: { canceled: true },
+    eventWhere: { id: eventId.value },
+  },
+});
+
+onDoneCanceling(() => {
+  confirmCancelIsOpen.value = false;
+});
+
+const {
+  mutate: addFeedbackCommentToEvent,
+  loading: addFeedbackCommentToEventLoading,
+  error: addFeedbackCommentToEventError,
+  onDone: onAddFeedbackCommentToEventDone,
+} = useMutation(ADD_FEEDBACK_COMMENT_TO_EVENT);
+
+onAddFeedbackCommentToEventDone(() => {
+  showFeedbackFormModal.value = false;
+  showFeedbackSubmittedSuccessfully.value = true;
+});
+
+const copyAddress = async () => {
+  try {
+    const address = props.eventData.address || "";
+    await navigator.clipboard.writeText(address);
+    showAddressCopiedNotification.value = true;
+    setTimeout(() => {
+      showAddressCopiedNotification.value = false;
+    }, 2000);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const copyLink = async () => {
+  try {
+    const basePath = window.location.origin;
+    const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
+    await navigator.clipboard.writeText(permalink);
+    showCopiedLinkNotification.value = true;
+    setTimeout(() => {
+      showCopiedLinkNotification.value = false;
+    }, 2000);
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const isAdmin = computed(() => {
+  const serverRoles = props.eventData.Poster?.ServerRoles;
+  return serverRoles?.length > 0 && serverRoles[0].showAdminTag;
+});
+
+const menuItems = computed(() => {
+  const items = [];
+  if (props.eventData && route.name !== "EventFeedback") {
+    items.push({
+      label: "Copy Link",
+      event: "copyLink",
+      icon: ALLOWED_ICONS.COPY_LINK,
+    });
+  }
+  if (props.eventData?.Poster?.username === username.value) {
+    items.push({
+      label: "Edit",
+      event: "handleEdit",
+      icon: ALLOWED_ICONS.EDIT,
+    });
+    items.push({
+      label: "Delete",
+      event: "handleDelete",
+      icon: ALLOWED_ICONS.DELETE,
+    });
+    if (route.name !== "EventFeedback") {
+      items.push({
+        label: "View Feedback",
+        event: "handleViewFeedback",
+        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+      });
+    }
+    if (!props.eventData.canceled) {
+      items.push({
+        label: "Cancel",
+        event: "handleCancel",
+        icon: ALLOWED_ICONS.CANCEL,
+      });
+    }
+  } else {
+    items.push({
+      label: "Report",
+      event: "handleReport",
+      icon: ALLOWED_ICONS.REPORT,
+    });
+    if (route.name !== "EventFeedback") {
+      items.push({
+        label: "Give Feedback",
+        event: "handleFeedback",
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+      });
+      items.push({
+        label: "View Feedback",
+        event: "handleViewFeedback",
+        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+      });
+    }
+  }
+  return items;
+});
+
+function getFormattedDateString(startTime: string) {
+  return DateTime.fromISO(startTime).toFormat("cccc LLLL d yyyy h:mm a");
+}
+
+const feedbackText = ref("");
+
+function handleSubmitFeedback() {
+  addFeedbackCommentToEvent({
+    eventId: eventId.value,
+    text: feedbackText.value,
+    channelId: channelId.value,
+    modProfileName: loggedInUserModName.value,
+  });
+}
+
+function handleViewFeedback() {
+  router.push({
+    name: "forums-forumId-events-eventId-feedback",
+    params: {
+      eventId: this.eventId,
+      forumId: this.channelId,
+    },
+  });
+}
+
+function handleFeedbackInput(event: any) {
+  feedbackText.value = event.target.value;
+}
 </script>
 
 <template>
@@ -454,15 +317,12 @@ export default defineComponent({
           <LocationIcon />
         </div>
         <div class="flex">
-          <span>
-            {{ eventData.address }}
-          </span>
+          <span>{{ eventData.address }}</span>
           <span>
             <ClipboardIcon
               class="ml-1 h-4 w-4 cursor-pointer"
               @click="copyAddress"
             />
-            <v-tooltip activator="parent" location="top"> Copy </v-tooltip>
           </span>
         </div>
       </li>
@@ -491,7 +351,7 @@ export default defineComponent({
           Hosted by
           <UsernameWithTooltip
             v-if="eventData.Poster.username"
-            :is-admin="isAdmin"
+            :is-admin="isAdmin || false"
             :username="eventData.Poster.username"
             :src="eventData.Poster.profilePicURL ?? ''"
             :display-name="eventData.Poster.displayName || ''"
@@ -513,8 +373,8 @@ export default defineComponent({
         "
         @handle-delete="confirmDeleteIsOpen = true"
         @handle-cancel="confirmCancelIsOpen = true"
-        @handle-report="handleClickReport"
-        @handle-feedback="handleClickGiveFeedback"
+        @handle-report="showReportEventModal = true"
+        @handle-feedback="showFeedbackFormModal = true"
         @handle-view-feedback="handleViewFeedback"
       >
         <EllipsisHorizontal
@@ -539,7 +399,6 @@ export default defineComponent({
       @close="confirmDeleteIsOpen = false"
       @primary-button-click="deleteEvent"
     />
-
     <WarningModal
       v-if="confirmCancelIsOpen"
       :title="'Cancel Event'"
@@ -548,7 +407,7 @@ export default defineComponent({
       :primary-button-text="'Yes, cancel the event'"
       :secondary-button-text="'No'"
       :loading="cancelEventLoading"
-      :error="cancelEventError"
+      :error="cancelEventError?.message"
       @close="confirmCancelIsOpen = false"
       @primary-button-click="cancelEvent"
     />

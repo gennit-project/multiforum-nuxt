@@ -28,7 +28,7 @@ import type { Event as EventData } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
 import type { Ref, PropType } from "vue";
 
-defineProps({
+const props = defineProps({
   selectedTags: {
     type: Array as PropType<Array<string>>,
     default: () => [],
@@ -65,7 +65,7 @@ const showInPersonOnly =
 const filterValues: Ref<SearchEventValues> = ref(
   getFilterValuesFromParams({
     route: route,
-    channelId: channelId.value,
+    channelId: props.channelId,
     showOnlineOnly,
     showInPersonOnly,
   })
@@ -81,7 +81,7 @@ const eventWhere = computed(() => {
   return getEventWhere({
     filterValues: filterValues.value,
     showMap: false,
-    channelId: channelId.value,
+    channelId: props.channelId,
     onlineOnly: false,
   });
 });
@@ -111,22 +111,12 @@ const sendToPreview = (eventId: string, eventLocationId: string) => {
     const escapedEventLocationId = eventLocationId
       ? CSS.escape(eventLocationId)
       : "";
-
-    if (!channelId.value) {
-      router.push({
-        name: "MapEventPreview",
-        params: { eventId },
-        hash: `#${escapedEventLocationId}`,
-        query: route.query,
-      });
-    } else {
-      router.push({
-        name: "SearchEventPreview",
-        params: { eventId },
-        hash: `#${escapedEventLocationId}`,
-        query: route.query,
-      });
-    }
+    router.push({
+      name: "map-search-eventId",
+      params: { eventId },
+      hash: `#${escapedEventLocationId}`,
+      query: route.query,
+    });
   }
 };
 
