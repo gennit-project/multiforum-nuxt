@@ -9,7 +9,6 @@ import SearchableTagList from "@/components/SearchableTagList.vue";
 import SortButtons from "@/components/SortButtons.vue";
 import { getTagLabel, getChannelLabel } from "@/utils";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
-import { useDisplay } from "vuetify";
 import type { SearchDiscussionValues } from "@/types/Discussion";
 
 defineProps({
@@ -54,16 +53,8 @@ const filterValues = ref<SearchDiscussionValues>(
 );
 
 // Computed properties for labels
-const channelLabel = computed(() => {
-  return getChannelLabel(filterValues.value.channels);
-});
-
-const tagLabel = computed(() => {
-  return getTagLabel(filterValues.value.tags);
-});
-
-// Vuetify display helper for responsive design
-const { smAndDown } = useDisplay();
+const channelLabel = computed(() => getChannelLabel(filterValues.value.channels));
+const tagLabel = computed(() => getTagLabel(filterValues.value.tags));
 
 // Watch for route query changes to update filter values
 watch(
@@ -80,7 +71,6 @@ watch(
 
 const updateFilters = (params: SearchDiscussionValues) => {
   const existingQuery = route.query;
-  // Updating the URL params causes the discussions to be refetched by the discussion list components.
   router.replace({
     query: {
       ...existingQuery,
@@ -90,7 +80,6 @@ const updateFilters = (params: SearchDiscussionValues) => {
 };
 
 const updateLocalState = (params: SearchDiscussionValues) => {
-  // Updating filterValues updates local state
   filterValues.value = {
     ...filterValues.value,
     ...params,
@@ -135,9 +124,8 @@ const toggleSelectedTag = (tag: string) => {
 
 <template>
   <div>
-    <div class="mb-4 mt-3 flex items-center justify-between">
+    <div class="mb-4 mt-3 flex flex-col md:flex-row md:items-center md:justify-between">
       <SearchBar
-        v-if="smAndDown"
         class="flex flex-grow px-1"
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
@@ -146,16 +134,7 @@ const toggleSelectedTag = (tag: string) => {
         @update-search-input="updateSearchInput"
       />
     </div>
-    <div class="mb-4 mt-3 flex items-center justify-end">
-      <SearchBar
-        v-if="!smAndDown"
-        class="mr-2 flex flex-grow"
-        data-testid="discussion-filter-search-bar"
-        :initial-value="filterValues.searchInput"
-        :search-placeholder="'Search...'"
-        :small="true"
-        @update-search-input="updateSearchInput"
-      />
+    <div class="mb-4 mt-3 flex flex-col md:flex-row md:items-center md:justify-end space-y-2 md:space-y-0 md:space-x-2">
       <FilterChip
         v-if="!channelId"
         class="align-middle"

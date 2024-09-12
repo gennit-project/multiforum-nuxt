@@ -7,7 +7,6 @@ import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import { useDisplay } from "vuetify";
 import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import type { Channel } from "@/__generated__/graphql";
 
@@ -44,7 +43,6 @@ const props = defineProps({
 
 const route = useRoute();
 const channelId = ref(route.params.forumId);
-const { mdAndDown } = useDisplay();
 
 watch(
   () => route.params,
@@ -54,13 +52,9 @@ watch(
 );
 
 const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => {
-  return localUsernameResult.value?.username || "";
-});
+const username = computed(() => localUsernameResult.value?.username || "");
 
-const loggedInUsername = computed(() => {
-  return localUsernameResult.value?.username || "";
-});
+const loggedInUsername = computed(() => localUsernameResult.value?.username || "");
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
@@ -70,13 +64,10 @@ const tabRoutes = computed(() => {
     settings: `/forums/${channelId.value}/edit`,
     moderation: `/forums/${channelId.value}/issues`,
   };
-
   return routes;
 });
 
-const iconSize = computed(() => {
-  return props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0";
-});
+const iconSize = computed(() => (props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"));
 
 const tabs: Tab[] = [
   {
@@ -94,19 +85,11 @@ const tabs: Tab[] = [
     countProperty: "EventChannelsAggregate",
   },
 ];
-const adminList = props.channel.Admins.map((user) => {
-  return user.username || "";
-});
+const adminList = props.channel.Admins.map((user) => user.username || "");
 
-const modList = props.channel.Moderators.map((modProfile) => {
-  return modProfile.displayName;
-});
+const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+const { result: localModProfileNameResult, loading: localModProfileNameLoading, error: localModProfileNameError } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
 
 const loggedInUserModName = computed(() => {
   if (localModProfileNameLoading.value || localModProfileNameError.value) {
@@ -138,24 +121,20 @@ if (isAdmin || isMod) {
   });
 }
 
-if (mdAndDown) {
-  tabs.push({
-    name: "about",
-    routeSuffix: "about",
-    label: "About",
-    icon: InfoIcon,
-    countProperty: null,
-  });
-}
+// Tailwind CSS replaces the use of `mdAndDown`
+tabs.push({
+  name: "about",
+  routeSuffix: "about",
+  label: "About",
+  icon: InfoIcon,
+  countProperty: null,
+});
 </script>
 
 <template>
   <div>
     <nav
-      :class="{
-        'text-md flex max-w-7xl flex-col': vertical,
-        'max-w-7xl space-x-2 pt-1 text-sm': !vertical,
-      }"
+      :class="vertical ? 'text-md flex flex-col' : 'flex space-x-2 pt-1 text-sm'"
       aria-label="Tabs"
     >
       <TabButton

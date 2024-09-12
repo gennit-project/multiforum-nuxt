@@ -10,21 +10,19 @@ import { computed } from "vue";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import { useRoute } from "vue-router";
 import { useQuery } from "@vue/apollo-composable";
-import { useDisplay } from "vuetify";
 
 const route = useRoute();
 const router = useRouter();
 
 // Determine if the current route is for a discussion or event detail page
-const isDiscussionDetailPage = computed(
-  () => route.name === "DiscussionDetail"
-);
-const isEventDetailPage = computed(() => route.name === "EventDetail");
+const isDiscussionDetailPage = computed(() => route.name === "forums-forumId-discussions-discussionId");
+const isEventDetailPage = computed(() => route.name === "forums-forumId-events-eventId");
 
 // Extract the channel ID from the route parameters
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
+
 // Query for the channel using Apollo client
 const {
   result: getChannelResult,
@@ -49,8 +47,7 @@ const addForumToLocalStorage = (channel: Channel) => {
   if (!import.meta.client) {
     return;
   }
-  let recentForums =
-    JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
+  let recentForums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
 
   const sideNavItem = {
     uniqueName: channelId.value,
@@ -84,11 +81,8 @@ onGetChannelResult((result) => {
 
 // Get admin list from the channel
 const adminList = computed(() => {
-  return channel.value
-    ? channel.value.Admins.map((user: User) => user?.username)
-    : [];
+  return channel.value ? channel.value.Admins.map((user: User) => user?.username) : [];
 });
-const { smAndDown, mdAndDown } = useDisplay();
 
 // If we are at forums/[channelId], redirect to forums/[channelId]/discussions
 if (!channelId.value) {
@@ -105,21 +99,20 @@ if (!channelId.value) {
 
 <template>
   <NuxtLayout>
-    <div class="flex-col justify-center dark:bg-black">
+    <div class="flex flex-col justify-center dark:bg-black">
       <!-- Mobile Header -->
       <ChannelHeaderMobile
-        v-if="smAndDown && channel"
+        v-if="channel"
+        class="block md:hidden"
         :channel="channel"
         :channel-id="channelId"
         :show-create-button="true"
       />
-      <div v-if="smAndDown" class="w-full">
-        <article
-          class="relative h-full max-w-7xl rounded-lg bg-gray-100 dark:bg-black focus:outline-none xl:order-last"
-        >
+      <div v-if="channel" class="w-full">
+        <article class="relative h-full max-w-7xl rounded-lg bg-gray-100 dark:bg-black focus:outline-none">
           <ChannelTabs
-            v-if="channel && smAndDown"
-            class="mb-2 block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
+            v-if="channel"
+            class="mb-2 block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
@@ -137,36 +130,26 @@ if (!channelId.value) {
             </div>
           </div>
           <div>
-            <v-container
-              fluid
-              class="relative max-w-7xl flex-1 pt-4 focus:outline-none lg:px-6 xl:order-last"
-            >
-              <v-row class="flex divide-x dark:divide-gray-500">
-                <v-col
-                  :cols="mdAndDown ? 12 : 8"
-                  class="p-0 bg-white dark:bg-gray-800"
-                >
+            <div class="relative max-w-7xl flex-1 pt-4 focus:outline-none lg:px-6">
+              <div class="flex flex-col md:flex-row divide-x dark:divide-gray-500">
+                <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
                   <NuxtPage />
-                </v-col>
-                <v-col
-                  v-if="channelId"
-                  :cols="mdAndDown ? 12 : 4"
-                  class="p-0 bg-white dark:bg-gray-800"
-                >
+                </div>
+                <div v-if="channelId" class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800">
                   <ChannelSidebar
                     v-if="channel"
                     :channel="channel"
                     class="sticky top-0 overflow-auto p-6 pt-8"
                   />
-                </v-col>
-              </v-row>
-            </v-container>
+                </div>
+              </div>
+            </div>
           </div>
         </article>
       </div>
 
       <!-- Desktop Header -->
-      <article v-if="!smAndDown && channel" class="w-full">
+      <article v-if="channel" class="hidden md:block w-full">
         <ChannelHeaderDesktop
           :channel="channel"
           :channel-id="channelId"
@@ -194,30 +177,20 @@ if (!channelId.value) {
             <EventTitleEditForm />
           </div>
         </div>
-        <v-container
-          fluid
-          class="relative max-w-7xl flex-1 pt-4 focus:outline-none lg:px-6 xl:order-last"
-        >
-          <v-row class="flex divide-x dark:divide-gray-500">
-            <v-col
-              :cols="mdAndDown ? 12 : 8"
-              class="p-0 bg-white dark:bg-gray-800"
-            >
+        <div class="relative max-w-7xl flex-1 pt-4 focus:outline-none lg:px-6">
+          <div class="flex flex-col md:flex-row divide-x dark:divide-gray-500">
+            <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
               <NuxtPage />
-            </v-col>
-            <v-col
-              v-if="channelId"
-              :cols="mdAndDown ? 12 : 4"
-              class="p-0 bg-white dark:bg-gray-800"
-            >
+            </div>
+            <div v-if="channelId" class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800">
               <ChannelSidebar
                 v-if="channel"
                 :channel="channel"
                 class="sticky top-0 overflow-auto p-6 pt-8"
               />
-            </v-col>
-          </v-row>
-        </v-container>
+            </div>
+          </div>
+        </div>
       </article>
     </div>
   </NuxtLayout>

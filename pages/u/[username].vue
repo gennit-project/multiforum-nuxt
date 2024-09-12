@@ -1,132 +1,79 @@
-<script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useRoute } from "vue-router";
-import { GET_USER , GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
-import { relativeTime } from "@/utils";
+import { GET_USER } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
-import { useDisplay } from "vuetify";
 import UserProfileTabs from "@/components/user/UserProfileTabs.vue";
 import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
-import type { User } from "@/__generated__/graphql";
 
-export default defineComponent({
-  components: {
-    UserProfileSidebar,
-    UserProfileTabs,
+// Route handling
+const route = useRoute();
+
+// Fetch theme
+const GET_THEME = gql`
+  query getTheme {
+    theme @client
+  }
+`;
+
+const {
+  result: themeResult,
+  loading: themeLoading,
+  error: themeError,
+} = useQuery(GET_THEME);
+
+const theme = computed(() => {
+  if (themeLoading.value || themeError.value) return "";
+  return themeResult.value?.theme || "";
+});
+
+// Get the username from the route parameters
+const username = computed(() => {
+  return typeof route.params.username === "string" ? route.params.username : "";
+});
+
+// Fetch user profile data
+const {
+  result: userResult,
+  loading: userLoading,
+  error: userError,
+} = useQuery(
+  GET_USER,
+  {
+    username: username.value,
   },
-  setup() {
-    const route = useRoute();
+  {
+    fetchPolicy: "network-only",
+  }
+);
 
-    const {
-      result: localModProfileNameResult,
-      loading: localModProfileNameLoading,
-      error: localModProfileNameError,
-    } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+// Compute the user data
+const user = computed(() => {
+  if (userLoading.value || userError.value) return null;
+  if (userResult.value && userResult.value.users.length > 0) {
+    return userResult.value.users[0];
+  }
+  return null;
+});
 
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
-
-    const {
-      result: themeResult,
-      loading: themeLoading,
-      error: themeError,
-    } = useQuery(GET_THEME);
-
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return "";
-      }
-      return themeResult.value.theme;
-    });
-
-    const loggedInUserModName = computed(() => {
-      if (localModProfileNameLoading.value || localModProfileNameError.value) {
-        return "";
-      }
-      return localModProfileNameResult.value?.modProfileName || "";
-    });
-
-    const username = computed(() => {
-      if (typeof route.params.username === "string") {
-        return route.params.username;
-      }
-      return "";
-    });
-
-    const { result, loading, error } = useQuery(GET_USER, {
-      username: username.value,
-    },{
-      // Prevents 'user not found' if new user looks at their profile
-      // in the first session.
-      fetchPolicy: "network-only",
-    });
-
-    // Returns type User or null
-    const user = computed<User | null>(() => {
-      if (loading.value || error.value) {
-        return null;
-      }
-      if (result.value && result.value.users.length > 0) {
-        return result.value.users[0];
-      }
-      return null;
-    });
-
-    const isAdmin = computed(() => {
-      if (user.value) {
-        const serverRole = user.value.ServerRoles?.[0];
-        return serverRole?.showAdminTag;
-      }
-      return false;
-    });
-
-    const links = computed(() => {
-      return [
-        {
-          label: username.value,
-          path: `u/${username.value}`,
-        },
-      ];
-    });
-
-    const { smAndDown } = useDisplay();
-
-    return {
-      error,
-      isAdmin,
-      links,
-      loading,
-      loggedInUserModName,
-      relativeTime,
-      result,
-      route,
-      theme,
-      smAndDown,
-      user,
-      username,
-    };
-  },
+// Check if the user is an admin
+const isAdmin = computed(() => {
+  if (user.value) {
+    const serverRole = user.value.ServerRoles?.[0];
+    return serverRole?.showAdminTag;
+  }
+  return false;
 });
 </script>
 
 <template>
-  <v-container class="max-w-7xl dark:bg-black">
+  <div class="max-w-7xl mx-auto dark:bg-black">
+    <!-- Small screen layout -->
     <div
-      v-if="smAndDown"
-      :class="[
-        theme === 'dark' ? 'channel-background-dark' : 'channel-background',
-      ]"
+      :class="theme === 'dark' ? 'bg-gray-900' : 'bg-white'"
       class="h-24 w-full object-cover lg:h-28"
-      alt="background pattern"
     />
-    <div
-      v-if="smAndDown"
-      class="flex flex-col justify-center"
-    >
+    <div class="flex flex-col justify-center md:hidden">
       <AvatarComponent
         class="-mt-24 mb-4 h-24 w-24 shadow-sm border"
         :text="username"
@@ -134,49 +81,32 @@ export default defineComponent({
         :is-medium="true"
       />
       <div class="mb-6">
-        <div v-if="user?.displayName">
-          {{ user.displayName }} 
-        </div>
+        <div v-if="user?.displayName">{{ user.displayName }}</div>
         <div
           :class="[
-            user?.displayName ? 'text-sm' : 'text-lg',
             user?.displayName
-              ? 'text-gray-500 dark:text-gray-300'
-              : 'text-gray-700 dark:text-gray-200',
+              ? 'text-sm text-gray-500 dark:text-gray-300'
+              : 'text-lg text-gray-700 dark:text-gray-200',
           ]"
         >
           {{ `u/${username}` }}
         </div>
       </div>
-      <!-- <NuxtLink
-        v-if="loggedInUserModName"
-        class="text-sm text-gray-500 underline dark:text-gray-300"
-        :to="{
-          name: 'mod-profile',
-          params: { modProfileName: loggedInUserModName },
-        }"
-      >
-        Go to mod profile
-      </NuxtLink> -->
+      <!-- Mod profile link can be enabled if needed -->
     </div>
+
+    <!-- Main content area -->
     <div class="dark:bg-gray-950">
       <article class="relative z-0 flex-1 focus:outline-none xl:order-last">
-        <v-container
-          fluid
-          class="p-0"
-        >
-          <v-row class="flex flex-row gap-3">
-            <v-col
-              v-if="!smAndDown"
-              cols="3"
-              class="p-0"
-            >
+        <div class="p-0">
+          <div class="flex flex-col md:flex-row gap-3">
+            <!-- Sidebar for larger screens -->
+            <div class="hidden md:block md:w-1/4">
               <UserProfileSidebar :is-admin="isAdmin" />
-            </v-col>
-            <v-col
-              :class="[!smAndDown ? 'pt-6' : '']"
-              :cols="!smAndDown ? 8 : 12"
-              class="rounded-lg bg-gray-100 dark:bg-gray-900"
+            </div>
+            <!-- User profile content -->
+            <div
+              class="w-full md:w-3/4 pt-6 rounded-lg bg-gray-100 dark:bg-gray-900"
             >
               <UserProfileTabs
                 v-if="user"
@@ -187,13 +117,14 @@ export default defineComponent({
                 :route="route"
               />
               <NuxtPage />
-            </v-col>
-          </v-row>
-        </v-container>
+            </div>
+          </div>
+        </div>
       </article>
     </div>
-  </v-container>
+  </div>
 </template>
+
 <style lang="scss">
 .user-background {
   background-color: #4474c0;

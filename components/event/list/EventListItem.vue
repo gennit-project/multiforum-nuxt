@@ -7,7 +7,6 @@ import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import MenuButton from "@/components/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { useDisplay } from "vuetify";
 import type { PropType } from "vue";
 import type { Event } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
@@ -69,12 +68,10 @@ const detailLink = computed(() => {
   return `/forums/${defaultUniqueName.value}/events/${props.event.id}`;
 });
 
-const submittedToMultipleChannels = computed(() => {
-  return props.event.EventChannels.length > 1;
-});
+const submittedToMultipleChannels = computed(() => props.event.EventChannels.length > 1);
 
 const eventDetailOptions = computed(() => {
-  if (!event) {
+  if (!props.event) {
     return [];
   }
   return props.event.EventChannels.map((dc) => {
@@ -98,7 +95,6 @@ const truncatedDescription = computed(() => {
   return props.event.description;
 });
 
-const { smAndDown } = useDisplay();
 const isWithinChannel = props.currentChannelId ? true : false;
 
 const handleClickTag = (tagText: string) => {
@@ -128,6 +124,7 @@ const handleClickTag = (tagText: string) => {
     updateFilters({ tags: [tagText] });
   }
 };
+
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
   router.replace({
@@ -137,7 +134,6 @@ const updateFilters = (params: SearchEventValues) => {
 
 const handleClick = () => {
   if (
-    smAndDown ||
     props.currentChannelId ||
     route.name === "SearchEventsList"
   ) {
@@ -187,10 +183,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 
       <div class="flex-1 min-w-0">
         <img
-          v-if="smAndDown && event.coverImageURL"
+          v-if="event.coverImageURL"
           :src="event.coverImageURL"
           alt="Event cover image"
-          class="mb-4 max-h-48 rounded-lg"
+          class="mb-4 max-h-48 rounded-lg block md:hidden"
         >
         <div>
           <span
@@ -210,9 +206,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         </div>
 
         <div class="flex gap-1 flex-wrap">
-          <span
-            class="mt-2 flex flex-wrap text-sm text-gray-500 dark:text-gray-200"
-          >
+          <span class="mt-2 flex flex-wrap text-sm text-gray-500 dark:text-gray-200">
             {{
               `${event.locationName || ""}${event.locationName ? " at " : ""}${timeOfDay}`
             }}
@@ -232,9 +226,8 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             class="ml-2"
           />
         </div>
-        <p
-          class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
-        >
+
+        <p class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline">
           <Tag
             v-for="tag in event.Tags"
             :key="`tag-${tag.text}`"
@@ -294,8 +287,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
       </div>
 
       <div
-        v-if="!smAndDown"
-        class="flex-shrink-0 items-center justify-center rounded-lg"
+        class="flex-shrink-0 hidden md:flex items-center justify-center rounded-lg"
       >
         <img
           v-if="event.coverImageURL"

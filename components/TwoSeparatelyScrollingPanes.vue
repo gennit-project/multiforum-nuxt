@@ -1,67 +1,33 @@
-<script lang="ts">
-import { defineComponent } from "vue";
-import { useDisplay } from "vuetify";
-import { useRoute } from "vue-router";
-
-export default defineComponent({
-  components: {},
-  props: {
-    showRightPaneAtMediumScreenWidth: {
-      type: Boolean,
-      default: false,
-    }
-  },
-  setup() {
-    const { lgAndDown, lgAndUp, smAndDown, mdAndDown, mdAndUp, xlAndUp } = useDisplay();
-    const route = useRoute();
-
-    return {
-      lgAndDown,
-      lgAndUp,
-      mdAndDown,
-      mdAndUp,
-      smAndDown,
-      xlAndUp,
-      route,
-    };
+<script lang="ts" setup>
+defineProps({
+  showRightPaneAtMediumScreenWidth: {
+    type: Boolean,
+    default: false,
   },
 });
 </script>
 
 <template>
-  <v-container
-    fluid
-    class="w-full p-0"
-  >
-    <v-row class="w-full">
-      <v-col
-        :cols="6"
-        :class="[
-          lgAndUp ? 'constrain-height' : '',
-        ]"
-        class="w-full"
+  <div class="w-full p-0">
+    <div class="flex flex-wrap w-full">
+      <div
+        class="w-full lg:w-1/2 constrain-height"
       >
         <slot name="leftpane" />
-      </v-col>
-      <v-col
-        v-if="mdAndUp"
-        :cols="6"
-        :class="[
-          'p-0',
-          lgAndUp ? 'constrain-height' : '',
-          'lg:max-h-screen',
-          'lg:overflow-y-auto',
-        ]"
+      </div>
+      <div
+        v-if="showRightPaneAtMediumScreenWidth"
+        class="w-full md:w-1/2 p-0 lg:max-h-screen lg:overflow-y-auto"
       >
         <slot name="rightpane" />
-      </v-col>
-    </v-row>
-  </v-container>
+      </div>
+    </div>
+  </div>
 </template>
-  
-<style>
+
+<style scoped>
 .constrain-height {
   max-height: 90vh;
-  height: 100% - 200px;
+  height: calc(100% - 200px); /* Corrected the height calculation */
 }
 </style>

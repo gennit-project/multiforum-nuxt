@@ -4,7 +4,6 @@ import { useRoute, useRouter } from "vue-router";
 import { useQuery } from "@vue/apollo-composable";
 import EventList from "./EventList.vue";
 import "md-editor-v3/lib/style.css";
-import { useDisplay } from "vuetify";
 import { GET_EVENTS } from "@/graphQLData/event/queries";
 import getEventWhere from "@/components/event/list/filters/getEventWhere";
 import type { SearchEventValues } from "@/types/Event";
@@ -20,16 +19,12 @@ import TimeShortcuts from "./filters/TimeShortcuts.vue";
 import OnlineInPersonShortcuts from "./filters/OnlineInPersonShortcuts.vue";
 import LocationFilterTypes from "./filters/locationFilterTypes";
 
-// Setup function
 const route = useRoute();
 const router = useRouter();
-const { mdAndDown } = useDisplay();
 const emit = defineEmits(["updateLoadedEventCount", "updateResultCount"]);
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string"
-    ? route.params.forumId
-    : "";
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
 const filterValues = ref(
@@ -112,15 +107,12 @@ watch(
 );
 
 const openPreview = () => {
-  if (mdAndDown.value) {
-    previewIsOpen.value = true;
-  }
+  previewIsOpen.value = true;
 };
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
   router.replace({
-    // @ts-ignore
     query: {
       ...existingQuery,
       ...params,
@@ -167,9 +159,7 @@ onEventResult((value) => {
 </script>
 
 <template>
-  <v-container
-    class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 md:p-8"
-  >
+  <div class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 p-4 md:p-8">
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
@@ -200,5 +190,5 @@ onEventResult((value) => {
       @load-more="loadMore"
       @open-preview="openPreview"
     />
-  </v-container>
+  </div>
 </template>

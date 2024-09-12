@@ -1,115 +1,38 @@
-<script lang="ts">
-import { defineComponent, computed, ref } from "vue";
+<script lang="ts" setup>
+import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { useRoute, useRouter } from "vue-router";
-import RequireAuth from "../auth/RequireAuth.vue";
-import "md-editor-v3/lib/style.css";
-import { useDisplay } from "vuetify";
-import gql from "graphql-tag";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 
-export default defineComponent({
-  name: "AboutPage",
-  components: {
-    ChannelSidebar,
-    RequireAuth,
-  },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-      return "";
-    });
-
-    const {
-      error: getChannelError,
-      result: getChannelResult,
-      loading: getChannelLoading,
-    } = useQuery(GET_CHANNEL, {
-      uniqueName: channelId.value,
-      now: new Date().toISOString(),
-    });
-
-    const channel = computed(() => {
-      if (getChannelLoading.value || getChannelError.value) {
-        return null;
-      }
-      return getChannelResult.value.channels[0];
-    });
-
-    const tags = computed(() => {
-      if (channel.value) {
-        return channel.value.Tags;
-      }
-      return [];
-    });
-
-    const admins = computed(() => {
-      if (channel.value) {
-        return channel.value.Admins;
-      }
-      return [];
-    });
-
-    const ownerList = computed(() => {
-      // Used to determine whether the logged in
-      // user should be able to see the buttons for
-      // admin actions
-      return admins.value.map((adminData: any) => adminData?.username);
-    });
-
-    const { mdAndDown, smAndDown } = useDisplay();
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
-
-    const {
-      result: themeResult,
-      loading: themeLoading,
-      error: themeError,
-    } = useQuery(GET_THEME);
-
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return "";
-      }
-      return themeResult.value.theme;
-    });
-
-    return {
-      admins,
-      channel,
-      channelId,
-      confirmDeleteIsOpen: ref(false),
-      getChannelLoading,
-      getChannelError,
-      mdAndDown,
-      smAndDown,
-      ownerList,
-      router,
-      tags,
-      theme,
-    };
-  },
-
-  methods: {
-    filterChannelsByTag(tag: string) {
-      this.router.push({
-        name: "forums",
-        query: {
-          tag,
-        },
-      });
-    },
-  },
+const route = useRoute();
+const channelId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
 });
+const {
+  error: getChannelError,
+  result: getChannelResult,
+  loading: getChannelLoading,
+} = useQuery(GET_CHANNEL, {
+  uniqueName: channelId.value,
+  now: new Date().toISOString(),
+});
+
+const channel = computed(() => {
+  if (getChannelLoading.value || getChannelError.value) {
+    return null;
+  }
+  return getChannelResult.value.channels[0];
+});
+
+const admins = computed(() => channel.value?.Admins ?? []);
+
+const ownerList = computed(() =>
+  admins.value.map((adminData: any) => adminData?.username)
+);
 </script>
 
 <template>
@@ -134,7 +57,7 @@ export default defineComponent({
               Admin Actions
             </span>
           </div>
-          <NuxtLink
+          <nuxt-link
             class="my-3 text-sm underline dark:text-gray-200"
             :to="{
               name: 'forums-forumid-edit',
@@ -142,12 +65,13 @@ export default defineComponent({
             }"
           >
             Edit
-          </NuxtLink>
+          </nuxt-link>
         </template>
       </RequireAuth>
     </div>
   </v-container>
 </template>
+
 <style lang="scss" scoped>
 /* Apply the user's preferred color scheme by default */
 @media (prefers-color-scheme: dark) {

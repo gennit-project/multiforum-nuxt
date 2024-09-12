@@ -1,185 +1,73 @@
-<script lang="ts">
+<script lang="ts" setup>
+import {  computed } from "vue";
 import type { PropType } from "vue";
-import { defineComponent, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "vue-router";
 import Tag from "@/components/TagComponent.vue";
-import "md-editor-v3/lib/style.css";
-import { useDisplay } from "vuetify";
-import gql from "graphql-tag";
-import UsernameWithTooltip from "../UsernameWithTooltip.vue";
+import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import type { Channel } from "@/__generated__/graphql";
-import ChannelRules from "./Rules.vue";
-import SidebarEventList from "./SidebarEventList.vue";
-import MarkdownPreview from '@/components/MarkdownPreview.vue'
-
-export default defineComponent({
-  name: "ChannelSidebar",
-  components: {
-    Tag,
-    ChannelRules,
-    MarkdownPreview,
-    SidebarEventList,
-    UsernameWithTooltip,
+import ChannelRules from "@/components/channel/Rules.vue";
+import SidebarEventList from "@/components/channel/SidebarEventList.vue";
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+const props = defineProps({
+  channel: {
+    type: Object as PropType<Channel>,
+    required: true,
   },
-  props: {
-    channel: {
-      type: Object as PropType<Channel>,
-      required: true,
-    },
-    useScrollbar: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  setup(props) {
-    const route = useRoute();
-    const router = useRouter();
-    const eventChannelsAggregate = computed(() => {
-      if (props.channel) {
-        return props.channel?.EventChannelsAggregate?.count ?? 0;
-      }
-      return 0;
-    });
-
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-      return "";
-    });
-
-    const tags = computed(() => {
-      if (props.channel) {
-        return props.channel.Tags;
-      }
-      return [];
-    });
-
-    const admins = computed(() => {
-      if (props.channel) {
-        return props.channel.Admins;
-      }
-      return [];
-    });
-
-    const ownerList = computed(() => {
-      // Used to determine whether the logged in
-      // user should be able to see the buttons for
-      // admin actions
-      return admins.value.map((adminData: any) => adminData?.username);
-    });
-
-    const { mdAndDown } = useDisplay();
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
-
-    const {
-      result: themeResult,
-      loading: themeLoading,
-      error: themeError,
-    } = useQuery(GET_THEME);
-
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return "";
-      }
-      return themeResult.value.theme;
-    });
-
-    const channelRules = computed(() => {
-      if (props.channel) {
-        return props.channel.rules;
-      }
-      return "";
-    });
-
-    return {
-      admins,
-      channelId,
-      channelRules,
-      eventChannelsAggregate,
-      mdAndDown,
-      ownerList,
-      router,
-      tags,
-      theme,
-    };
-  },
-
-  methods: {
-    filterChannelsByTag(tag: string) {
-      this.router.push({
-        name: "forums",
-        query: {
-          tag,
-        },
-      });
-    },
+  useScrollbar: {
+    type: Boolean,
+    default: true,
   },
 });
+
+const route = useRoute();
+const router = useRouter();
+const eventChannelsAggregate = computed(() => {
+  return props.channel?.EventChannelsAggregate?.count ?? 0;
+});
+
+const channelId = computed(() => {
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+});
+
+const channelRules = computed(() => props.channel?.rules ?? "");
+const filterChannelsByTag = (tag: string) => {
+  router.push({
+    name: "forums",
+    query: { tag },
+  });
+};
 </script>
 
 <template>
-  <div
-    :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
-    class="bg-white pb-8 pt-4 dark:bg-gray-800"
-  >
-    <div
-      v-if="channelId && channel"
-      class="items-center gap-2"
-    />
+  <div :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']" class="bg-white pb-8 pt-4 dark:bg-gray-800">
+    <div v-if="channelId && channel" class="items-center gap-2" />
+    
     <div>
-      <h2 class="mt-2 px-6 text-xl font-bold">
-        Forum Intro
-      </h2>
+      <h2 class="mt-2 px-6 text-xl font-bold">Forum Intro</h2>
       <MarkdownPreview
         v-if="channel?.description"
         :text="channel?.description"
         :word-limit="1000"
         class="ml-2"
       />
-      <p
-        v-else
-        class="p-6 text-xs"
-      >
-        Welcome to {{ channelId }}!
-      </p>
+      <p v-else class="p-6 text-xs">Welcome to {{ channelId }}!</p>
     </div>
+    
     <slot />
 
     <div class="w-full px-6">
       <div v-if="channel">
         <div class="mt-6 flex w-full flex-col gap-6">
-          <div
-            v-if="channelRules && channelRules !== '[]'"
-            :key="channelRules"
-          >
-            <span
-              class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-            >
-              Rules
-            </span>
-            <ChannelRules
-              :key="channelRules"
-              :rules="channelRules"
-            />
+          <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
+            <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Rules</span>
+            <ChannelRules :rules="channelRules" />
           </div>
-          <SidebarEventList
-            :event-channels-aggregate="eventChannelsAggregate"
-          />
+          
+          <SidebarEventList :event-channels-aggregate="eventChannelsAggregate" />
+
           <div v-if="channel.Tags.length > 0">
             <div class="flex justify-between border-gray-300">
-              <span
-                class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-              >
-                Tags
-              </span>
+              <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Tags</span>
             </div>
-
             <div class="mb-6 mt-2 flex flex-wrap gap-2">
               <Tag
                 v-for="tag in channel.Tags"
@@ -190,34 +78,18 @@ export default defineComponent({
               />
             </div>
           </div>
+
           <div class="flex justify-between">
-            <span
-              class="my-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-            >
-              Admins
-            </span>
+            <span class="my-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Admins</span>
           </div>
-          <div
-            v-if="channel.Admins.length > 0"
-            class="flex-col text-sm font-bold"
-          >
-            <div
-              v-for="admin in channel.Admins"
-              :key="admin.username"
-            >
-              <NuxtLink
-                :key="admin.username"
-                :to="{
-                  name: 'u-username',
-                  params: { username: admin.username },
-                }"
+          
+          <div v-if="channel.Admins.length > 0" class="flex-col text-sm font-bold">
+            <div v-for="admin in channel.Admins" :key="admin.username">
+              <nuxt-link
+                :to="{ name: 'u-username', params: { username: admin.username } }"
                 class="flex items-center"
               >
-                <AvatarComponent
-                  :text="admin.username"
-                  :src="admin.profilePicURL ?? ''"
-                  class="mr-2 h-6 w-6"
-                />
+                <AvatarComponent :text="admin.username" :src="admin.profilePicURL ?? ''" class="mr-2 h-6 w-6" />
                 <UsernameWithTooltip
                   v-if="admin.username"
                   :username="admin.username"
@@ -227,13 +99,11 @@ export default defineComponent({
                   :discussion-karma="admin.discussionKarma ?? 0"
                   :account-created="admin.createdAt ?? ''"
                 />
-              </NuxtLink>
+              </nuxt-link>
             </div>
           </div>
-          <p
-            v-else
-            class="my-3 mb-6 text-sm dark:text-gray-400"
-          >
+          
+          <p v-else class="my-3 mb-6 text-sm dark:text-gray-400">
             This forum does not have any admins.
           </p>
         </div>
@@ -241,6 +111,7 @@ export default defineComponent({
     </div>
   </div>
 </template>
+
 <style lang="scss" scoped>
 /* Apply the user's preferred color scheme by default */
 @media (prefers-color-scheme: dark) {

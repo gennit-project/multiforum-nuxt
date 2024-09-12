@@ -10,7 +10,6 @@ import {
   getUploadFileName,
 } from "@/utils";
 import ErrorBanner from "./ErrorBanner.vue";
-import { useDisplay } from "vuetify";
 
 // Props
 const props = defineProps({
@@ -102,8 +101,6 @@ const formatText = (format: string) => {
   textarea.setRangeText(formattedText, start, end, "end");
   updateText(textarea.value);
 };
-
-const { smAndDown } = useDisplay();
 
 const handlePaste = async (event: ClipboardEvent) => {
   if (!props.allowImageUpload) return;
@@ -250,8 +247,7 @@ const handleDrop = async (event: any) => {
     />
     <TabGroup>
       <TabList
-        :class="[smAndDown ? 'flex-wrap' : 'flex justify-between']"
-        class="border-b pb-2 dark:border-gray-600"
+        class="border-b pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
       >
         <div class="flex items-center">
           <Tab v-slot="{ selected }" as="template">

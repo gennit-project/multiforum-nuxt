@@ -1,7 +1,6 @@
-<script lang="ts">
-import { defineComponent, ref, nextTick, computed } from "vue";
+<script lang="ts" setup>
+import { ref, nextTick, computed } from "vue";
 import type { Discussion } from "@/__generated__/graphql";
-import { useDisplay } from "vuetify";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import CreateButton from "@/components/CreateButton.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -10,167 +9,106 @@ import TextInput from "@/components/TextInput.vue";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { useRoute } from "vue-router";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
+import {
+  GET_LOCAL_MOD_PROFILE_NAME,
+  GET_LOCAL_USERNAME,
+} from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
 
-export default defineComponent({
-  name: "DiscussionTitleEditForm",
-  components: {
-    CreateButton,
-    ErrorBanner,
-    GenericButton,
-    PrimaryButton,
-    RequireAuth,
-    TextInput,
-  },
-  setup() {
-    const route = useRoute();
-    const { smAndDown } = useDisplay();
-    const titleEditMode = ref(false);
+const route = useRoute();
+const titleEditMode = ref(false);
 
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
+const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
+const username = computed(() => localUsernameResult.value?.username || "");
 
-    const username = computed(() => {
-      const username = localUsernameResult.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
-    });
+const channelId = computed(() =>
+  typeof route.params.forumId === "string" ? route.params.forumId : ""
+);
+const discussionId = computed(() =>
+  typeof route.params.discussionId === "string" ? route.params.discussionId : ""
+);
 
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-      return "";
-    });
+const {
+  result: localModProfileNameResult,
+  loading: localModProfileNameLoading,
+  error: localModProfileNameError,
+} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+const loggedInUserModName = computed(() =>
+  !localModProfileNameLoading.value && !localModProfileNameError.value
+    ? localModProfileNameResult.value?.modProfileName || ""
+    : ""
+);
 
-    const discussionId = computed(() => {
-      if (typeof route.params.discussionId === "string") {
-        return route.params.discussionId;
-      }
-      return "";
-    });
-
-    const {
-      result: localModProfileNameResult,
-      loading: localModProfileNameLoading,
-      error: localModProfileNameError,
-    } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
-    const loggedInUserModName = computed(() => {
-      if (localModProfileNameLoading.value || localModProfileNameError.value) {
-        return "";
-      }
-      return localModProfileNameResult.value?.modProfileName || "";
-    });
-
-    const {
-      result: getDiscussionResult,
-      error: getDiscussionError,
-      loading: getDiscussionLoading,
-      onResult: onGetDiscussionResult,
-    } = useQuery(GET_DISCUSSION, {
-      id: discussionId,
-      loggedInModName: loggedInUserModName.value,
-      channelUniqueName: channelId.value,
-    });
-
-    const discussion = computed<Discussion>(() => {
-      if (getDiscussionLoading.value || getDiscussionError.value) {
-        return null;
-      }
-      return getDiscussionResult.value.discussions[0];
-    });
-
-    const authorIsLoggedInUser = computed(() => {
-      if (discussion.value?.Author?.username === username.value) {
-        return true;
-      }
-      return false;
-    });
-
-    const titleInputRef = ref(null);
-
-    const formValues = ref({
-      title: getDiscussionResult.value?.discussion?.title,
-    });
-
-    onGetDiscussionResult((result) => {
-      formValues.value.title = result?.data?.discussions[0]?.title || "";
-    });
-
-    const {
-      mutate: updateDiscussion,
-      error: updateDiscussionError,
-      loading: updateDiscussionLoading,
-      onDone,
-    } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
-      variables: {
-        discussionWhere: {
-          id: discussionId.value,
-        },
-        updateDiscussionInput: formValues.value,
-      },
-    }));
-
-    onDone(() => {
-      titleEditMode.value = false;
-    });
-
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
-    
-    const {
-      result: themeResult,
-      loading: themeLoading,
-      error: themeError,
-    } = useQuery(GET_THEME);
-
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return "";
-      }
-      return themeResult.value.theme;
-    });
-    
-    return {
-      authorIsLoggedInUser,
-      channelId,
-      discussion,
-      formValues,
-      getDiscussionError,
-      getDiscussionLoading,
-      smAndDown,
-      theme,
-      titleEditMode,
-      titleInputRef,
-      updateDiscussion,
-      updateDiscussionError,
-      updateDiscussionLoading,
-    };
-  },
-  methods: {
-    onClickEdit() {
-      this.titleEditMode = true;
-      nextTick(() => {
-        (this.$refs.titleInputRef as any).focus();
-      });
-    },
-  },
+const {
+  result: getDiscussionResult,
+  error: getDiscussionError,
+  loading: getDiscussionLoading,
+  onResult: onGetDiscussionResult,
+} = useQuery(GET_DISCUSSION, {
+  id: discussionId,
+  loggedInModName: loggedInUserModName.value,
+  channelUniqueName: channelId.value,
 });
+
+const discussion = computed<Discussion | null>(() =>
+  !getDiscussionLoading.value && !getDiscussionError.value
+    ? getDiscussionResult.value?.discussions[0]
+    : null
+);
+const authorIsLoggedInUser = computed(
+  () => discussion.value?.Author?.username === username.value
+);
+
+const titleInputRef = ref(null);
+const formValues = ref({
+  title: getDiscussionResult.value?.discussion?.title || "",
+});
+onGetDiscussionResult(
+  (result) =>
+    (formValues.value.title = result?.data?.discussions[0]?.title || "")
+);
+
+const {
+  mutate: updateDiscussion,
+  error: updateDiscussionError,
+  loading: updateDiscussionLoading,
+  onDone,
+} = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+  variables: {
+    discussionWhere: { id: discussionId.value },
+    updateDiscussionInput: formValues.value,
+  },
+}));
+onDone(() => (titleEditMode.value = false));
+
+const GET_THEME = gql`
+  query getTheme {
+    theme @client
+  }
+`;
+const {
+  result: themeResult,
+  loading: themeLoading,
+  error: themeError,
+} = useQuery(GET_THEME);
+const theme = computed(() =>
+  themeLoading.value || themeError.value ? "" : themeResult.value.theme
+);
+
+const onClickEdit = () => {
+  titleEditMode.value = true;
+  nextTick(() => {
+    if (!titleEditMode.value) return;
+    titleInputRef.value?.focus();
+  });
+};
 </script>
 
 <template>
   <div class="w-full">
     <div
-      class="mb-2 flex w-full space-x-2 space-y-1"
-      :class="!smAndDown ? 'items-center justify-between' : 'flex-col'"
+      class="mb-2 w-full flex flex-col md:flex-row md:items-center md:justify-between space-y-1 md:space-x-2"
     >
       <v-skeleton-loader
         v-if="getDiscussionLoading"
@@ -178,12 +116,7 @@ export default defineComponent({
         type="text"
         :theme="theme"
       />
-
-      <div
-        v-else
-        ref="discussionDetail"
-        class="flex-1"
-      >
+      <div v-else ref="discussionDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
           class="text-wrap px-1 text-xl md:text-2xl font-medium sm:tracking-tight"
@@ -199,10 +132,7 @@ export default defineComponent({
           @update="formValues.title = $event"
         />
       </div>
-      <RequireAuth
-        :full-width="false"
-        class="flex max-w-sm justify-end"
-      >
+      <RequireAuth class="flex max-w-sm justify-end">
         <template #has-auth>
           <GenericButton
             v-if="!titleEditMode && authorIsLoggedInUser"
@@ -229,10 +159,7 @@ export default defineComponent({
           />
         </template>
         <template #does-not-have-auth>
-          <PrimaryButton
-            class="ml-2"
-            :label="'New Discussion'"
-          />
+          <PrimaryButton class="ml-2" :label="'New Discussion'" />
         </template>
       </RequireAuth>
     </div>
