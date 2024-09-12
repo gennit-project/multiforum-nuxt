@@ -1,43 +1,73 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from "@/hooks/useAuth0";
-import TopNav from "@/components/nav/Topnav.vue";
+import { GET_EMAIL } from "@/graphQLData/email/queries";
+import { usernameVar, modProfileNameVar } from "@/cache";
+import type { User, ModerationProfile } from "@/__generated__/graphql";
+import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
-import WithAuth from "@/components/layout/WithAuth.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
-import { computed, ref } from "vue";
+import WithAuth from "@/components/layout/WithAuth.vue";
 
-const { isAuthenticated, user, isLoading } = useAuth0();
-const route = useRoute();
+const { isLoading, user } = useAuth0();
 
-const showDropdown = ref(false);
-const showUserProfileDropdown = ref(false);
-
-const emailFromAuth0 = computed(() => {
-  // The reason why we get the email in this parent
-  // component is because we need to look up the username
-  // by email. But we cannot call the query to get the
-  // username from the email until the email exists,
-  // and we can't lazily wait to do the query until
-  // we have the email because the useAuth0 hook does
-  // not have an "onResult" type of callback like Apollo does.
-  // So to get around this limitation, we put that call
-  // in the WithAuth component and just don't render that
-  // component until we have the email.
-  if (isAuthenticated && user.email) {
-    return user.email;
-  }
-  return "";
+const { result: emailResult, onResult: onEmailResult } = useQuery(GET_EMAIL, {
+  emailAddress: user?.email,
 });
+
+// Reactive variable to track if the email is not in the system
+const emailNotInSystem = ref(false);
+
+// Handle email query result
+onEmailResult(() => {
+  let user: User | null = null;
+  let modProfile: ModerationProfile | null = null;
+  let username = "";
+  let modProfileName = "";
+  const emailData = emailResult.value?.emails[0];
+
+  user = emailData?.User;
+
+  if (!user) {
+    emailNotInSystem.value = true;
+  } else {
+    username = user.username;
+    modProfile = user.ModerationProfile;
+
+    if (username) {
+      // Store the authenticated user's username in the app state
+      usernameVar(username);
+    }
+
+    if (modProfile) {
+      modProfileName = modProfile.displayName;
+      modProfileNameVar(modProfileName);
+    }
+
+    emailNotInSystem.value = false;
+  }
+});
+
+const showUserProfileDropdown = ref(false);
+const showDropdown = ref(false);
+
+const toggleDropdown = () => {
+  showDropdown.value = !showDropdown.value;
+};
 
 const closeUserProfileDropdown = () => {
   showUserProfileDropdown.value = false;
 };
-const toggleDropdown = () => {
-  showDropdown.value = !showDropdown.value;
-};
+
 const toggleUserProfileDropdown = () => {
   showUserProfileDropdown.value = !showUserProfileDropdown.value;
 };
+
+const emailFromAuth0 = emailResult.value?.emails[0]?.emailAddress;
+
+const route = useRoute();
+const showFooter = !route.name?.includes("map");
 </script>
 
 <template>
@@ -60,35 +90,26 @@ const toggleUserProfileDropdown = () => {
             @close="showDropdown = false"
           />
           <div class="w-full">
+            <!-- Move loading state up -->
             <div v-if="isLoading" class="flex justify-center">Loading...</div>
+
+            <!-- Remove duplicate layout structures -->
             <WithAuth
               v-else-if="emailFromAuth0"
               :email-from-auth0="emailFromAuth0"
             >
-            <div class="flex min-h-screen flex-col">
-              <div class="flex-grow">
-                <slot/>
+              <div class="flex min-h-screen flex-col">
+                <div class="flex-grow">
+                  <slot />
+                </div>
+                <SiteFooter v-if="showFooter" />
               </div>
-              <SiteFooter
-                v-if="
-                  route.name &&
-                  route.name !== 'MapView' &&
-                  route.name !== 'MapEventPreview'
-                "
-              />
-            </div>
             </WithAuth>
             <div v-else class="flex min-h-screen flex-col">
               <div class="flex-grow">
-                <slot/>
+                <slot />
               </div>
-              <SiteFooter
-                v-if="
-                  route.name &&
-                  route.name !== 'MapView' &&
-                  route.name !== 'MapEventPreview'
-                "
-              />
+              <SiteFooter v-if="showFooter" />
             </div>
           </div>
         </div>
@@ -96,6 +117,7 @@ const toggleUserProfileDropdown = () => {
     </main>
   </v-app>
 </template>
+
 <style lang="scss">
 body {
   @media (prefers-color-scheme: dark) {
