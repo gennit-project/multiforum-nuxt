@@ -6,8 +6,8 @@ import { useQuery } from "@vue/apollo-composable";
 import { relativeTime } from "@/utils";
 import gql from "graphql-tag";
 import { useDisplay } from "vuetify";
-import UserProfileTabs from "./UserProfileTabs.vue";
-import UserProfileSidebar from "./UserProfileSidebar.vue";
+import UserProfileTabs from "@/components/user/UserProfileTabs.vue";
+import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
 import type { User } from "@/__generated__/graphql";
 
 export default defineComponent({
