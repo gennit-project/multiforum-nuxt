@@ -4,8 +4,6 @@ import { useAuth0 } from "@/hooks/useAuth0";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import TabButton from "@/components/channel/TabButton.vue";
-import { useDisplay } from "vuetify/lib/framework.mjs"; // Ensure Vuetify is set up
-import { useRoute, useRouter } from "#imports"; // Nuxt 3 routing
 
 type TabData = {
   name: string;

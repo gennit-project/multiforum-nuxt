@@ -158,7 +158,7 @@ const filteredQuery = computed(() => {
             </div>
           </div>
         </div>
-        <hr class="dark:border-gray-600" />
+        <hr class="dark:border-gray-600" >
         <div
           v-if="discussion?.body"
           class="my-2 border-gray-400 dark:bg-gray-700"
