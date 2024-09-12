@@ -1,7 +1,7 @@
 <script lang="ts">
 import type { PropType } from "vue";
 import { defineComponent } from "vue";
-import type { ChannelData } from "@/types/Channel";
+import type { Channel as ChannelData } from "@/__generated__/graphql";
 import Tag from "../../TagComponent.vue";
 
 export default defineComponent({
@@ -42,10 +42,10 @@ export default defineComponent({
         v-for="channel in channelLinks"
         :key="channel.uniqueName"
       >
-        <router-link
+        <NuxtLink
           class="mr-1 underline"
           :to="{
-            name: 'DiscussionDetail',
+            name: 'forums-forumId-discussions-discussionId',
             params: {
               discussionId,
               forumId: channel.uniqueName,
@@ -53,11 +53,11 @@ export default defineComponent({
           }"
         >
           {{ `${getCommentCount(channel.uniqueName)} comments` }}
-        </router-link>
+        </NuxtLink>
         in
-        <router-link
+        <NuxtLink
           :to="{
-            name: 'DiscussionDetail',
+            name: 'forums-forumId-discussions-discussionId',
             params: {
               discussionId,
               forumId: channel.uniqueName,
@@ -69,7 +69,7 @@ export default defineComponent({
             :tag="channel.uniqueName"
             :channel-mode="true"
           />
-        </router-link>
+        </NuxtLink>
       </li>
     </ul>
   </div>

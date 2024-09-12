@@ -26,11 +26,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <router-link
+  <NuxtLink
     :to="link"
     :data-testid="dataTestid"
     class="inline-flex items-center text-xs gap-2 text-blue-500 hover:underline"
   >
     <LeftArrowIcon class="h-4 w-4" /> {{ text }}
-  </router-link>
+  </NuxtLink>
 </template>

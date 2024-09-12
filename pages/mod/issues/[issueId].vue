@@ -631,11 +631,11 @@ export default defineComponent({
 
       <p v-if="activeIssue?.relatedDiscussionId || activeIssue?.relatedEventId">
         Original post (
-        <router-link
+        <NuxtLink
           v-if="activeIssue?.relatedDiscussionId"
           class="text-blue-500 hover:underline"
           :to="{
-            name: 'DiscussionDetail',
+            name: 'forums-forumId-discussions-discussionId',
             params: {
               discussionId: activeIssue.relatedDiscussionId,
               forumId: channelId,
@@ -643,12 +643,12 @@ export default defineComponent({
           }"
         >
           link
-        </router-link>
-        <router-link
+        </NuxtLink>
+        <NuxtLink
           v-else-if="activeIssue?.relatedEventId"
           class="text-blue-500 hover:underline"
           :to="{
-            name: 'EventDetail',
+            name: 'forums-forumId-events-eventId',
             params: {
               eventId: activeIssue.relatedEventId,
               forumId: channelId,
@@ -656,7 +656,7 @@ export default defineComponent({
           }"
         >
           link
-        </router-link>
+        </NuxtLink>
         <span>):</span>
       </p>
       <p

@@ -54,7 +54,7 @@ export default defineComponent({
 
       if (discussionIdInLink) {
         return {
-          name: "DiscussionCommentPermalink",
+          name: 'forums-forumId-discussion-discussionId-comment-commentId',
           params: {
             discussionId: discussionIdInLink,
             commentId: props.commentId,
@@ -66,7 +66,7 @@ export default defineComponent({
       // if discussionId is not present, assume it is an event comment
       if (eventIdInLink) {
         return {
-          name: "EventCommentPermalink",
+          name: 'forums-forumId-event-eventId-comment-commentId',
           params: {
             eventId: eventIdInLink,
             commentId: props.commentId,
@@ -107,12 +107,12 @@ export default defineComponent({
         :show-context-link="true"
         :show-channel="false"
       />
-      <router-link
+      <NuxtLink
         :to="permalinkObject"
         class="text-blue-500 underline"
       >
         Context
-      </router-link>
+      </NuxtLink>
     </div>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
       <MarkdownPreview

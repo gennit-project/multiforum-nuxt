@@ -174,7 +174,7 @@ const permalinkObject = computed(() => {
 
   if (discussionIdInLink) {
     return {
-      name: "DiscussionCommentPermalink",
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
       params: {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
@@ -185,7 +185,7 @@ const permalinkObject = computed(() => {
   }
 
   return {
-    name: "EventCommentPermalink",
+    name: 'forums-forumId-events-eventId-comments-commentId',
     params: {
       eventId: props.commentData.Event?.id,
       commentId: props.commentData.id,
@@ -543,7 +543,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
             </div>
           </div>
         </div>
-        <router-link
+        <NuxtLink
           v-if="
             canShowPermalink &&
             replyCount > 0 &&
@@ -555,7 +555,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
         >
           Continue thread
           <RightArrowIcon class="h-4 w-4" />
-        </router-link>
+        </NuxtLink>
         <div
           v-else-if="replyCount > 0 && showReplies"
           id="childComments"

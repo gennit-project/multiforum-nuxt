@@ -212,10 +212,13 @@ const authorIsMod = computed(
           :src="discussion?.Author?.profilePicURL ?? ''"
           :is-small="true"
         />
-        <router-link
+        <NuxtLink
           v-if="discussion?.Author"
           class="cursor-pointer font-bold text-black hover:underline dark:text-white"
-          :to="`/u/${discussion.Author.username}`"
+          :to="{
+            name: 'u-username',
+            params: { username: discussion.Author.username },
+          }"
         >
           <UsernameWithTooltip
             :is-admin="authorIsAdmin"
@@ -227,7 +230,7 @@ const authorIsMod = computed(
             :discussion-karma="discussion.Author.discussionKarma ?? 0"
             :account-created="discussion.Author.createdAt"
           />
-        </router-link>
+        </NuxtLink>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
         <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
@@ -239,9 +242,7 @@ const authorIsMod = computed(
         data-testid="discussion-menu-button"
         @copy-link="copyLink"
         @handle-edit="
-          router.push(
-            `/forums/${channelId}/discussions/${discussion.id}/edit`
-          )
+          router.push(`/forums/${channelId}/discussions/${discussion.id}/edit`)
         "
         @handle-delete="deleteModalIsOpen = true"
         @handle-click-report="showOpenIssueModal = true"

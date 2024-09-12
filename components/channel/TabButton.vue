@@ -69,7 +69,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <router-link
+  <NuxtLink
     :to="to"
     class="border-transparent link font-medium group inline-flex items-center gap-1 hover:text-gray-600 dark:text-gray-400"
     :class="classes"
@@ -96,7 +96,7 @@ export default defineComponent({
       >{{ count }}
       </span>
     </div>
-  </router-link>
+  </NuxtLink>
 </template>
 <style>
 .link.currentPage {

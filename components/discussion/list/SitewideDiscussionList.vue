@@ -162,12 +162,12 @@ const filterByChannel = (channel: string) => {
 
       <RequireAuth :full-width="false">
         <template #has-auth>
-          <router-link
-            :to="{ name: 'CreateDiscussion' }"
+          <NuxtLink
+            :to="{ name: 'discussions-create' }"
             class="text-blue-500 underline"
           >
             Create one?
-          </router-link>
+          </NuxtLink>
         </template>
         <template #does-not-have-auth>
           <span class="cursor-pointer text-blue-500 underline">Create one?</span>

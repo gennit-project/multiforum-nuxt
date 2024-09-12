@@ -31,9 +31,9 @@ export default defineComponent({
 });
 </script>
 <template>
-  <router-link
+  <NuxtLink
     :to="{
-      name: 'EventDetail',
+      name: 'forums-forumId-events-eventId',
       params: {
         eventId,
         channelId,
@@ -64,5 +64,5 @@ export default defineComponent({
         </div>
       </div>
     </li>
-  </router-link>
+  </NuxtLink>
 </template>

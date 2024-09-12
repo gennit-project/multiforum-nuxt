@@ -81,13 +81,19 @@ export default defineComponent({
       <p>This is the original discussion:</p>
       <div class="border-l border-l-2 pl-6">
         <h3 v-if="discussion?.title">
-          <router-link
-            :to="`/forums/${channelId}/discussions/${discussion.id}`"
+          <NuxtLink
+            :to="{
+              name: 'forums-forumId-discussion-discussionId',
+              params: {
+                forumId: channelId,
+                discussionId: discussion.id,
+              },
+            }"
             class="text-blue-500 dark:text-blue-400"
             rel="noopener noreferrer"
           >
             {{ discussion.title }}
-          </router-link>
+          </NuxtLink>
         </h3>
         <MarkdownPreview
           v-if="discussion?.body"

@@ -4,7 +4,6 @@ import { useRouter, useRoute } from "vue-router";
 import {
   useMutation,
   useQuery,
-  provideApolloClient,
 } from "@vue/apollo-composable";
 import type { DiscussionChannel , DiscussionCreateInput } from "@/__generated__/graphql";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";

@@ -50,14 +50,14 @@ export default defineComponent({
               clip-rule="evenodd"
             />
           </svg>
-          <router-link
+          <NuxtLink
             v-if="link.path"
             :to="`/${link.path}/`"
             class="text-xs text-gray-500 underline hover:text-gray-700"
             active-class="text-gray-700"
           >
             {{ link.label }}
-          </router-link>
+          </NuxtLink>
         </div>
       </li>
     </ol>

@@ -17,7 +17,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <router-link
+  <NuxtLink
     :to="to"
     class="
       group 
@@ -53,5 +53,5 @@ export default defineComponent({
       <slot />
     </div>
     {{ label }}
-  </router-link>
+  </NuxtLink>
 </template>

@@ -148,13 +148,16 @@ export default defineComponent({
           {{ `u/${username}` }}
         </div>
       </div>
-      <!-- <router-link
+      <!-- <NuxtLink
         v-if="loggedInUserModName"
         class="text-sm text-gray-500 underline dark:text-gray-300"
-        :to="`/mod/${loggedInUserModName}`"
+        :to="{
+          name: 'mod-profile',
+          params: { modProfileName: loggedInUserModName },
+        }"
       >
         Go to mod profile
-      </router-link> -->
+      </NuxtLink> -->
     </div>
     <div class="dark:bg-gray-950">
       <article class="relative z-0 flex-1 focus:outline-none xl:order-last">

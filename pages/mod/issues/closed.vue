@@ -66,9 +66,9 @@ export default defineComponent({
       <div class="text-md flex items-center gap-2">
         <i class="fa-solid fa-circle-check text-purple-500" />
 
-        <router-link
+        <NuxtLink
           :to="{
-            name: 'IssueDetail',
+            name: 'mod-issues-issueId',
             params: {
               issueId: issue.id,
               forumId: channelId,
@@ -76,7 +76,7 @@ export default defineComponent({
           }"
         >
           {{ issue.title }}
-        </router-link>
+        </NuxtLink>
       </div>
       <div class="ml-6 text-xs text-gray-500 dark:text-gray-400">
         {{

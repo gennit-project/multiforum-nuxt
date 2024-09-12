@@ -102,8 +102,8 @@ export default defineComponent({
   methods: {
     filterChannelsByTag(tag: string) {
       this.router.push({
-        name: "FilterChannelsByTag",
-        params: {
+        name: "forums",
+        query: {
           tag,
         },
       });
@@ -134,12 +134,15 @@ export default defineComponent({
               Admin Actions
             </span>
           </div>
-          <router-link
+          <NuxtLink
             class="my-3 text-sm underline dark:text-gray-200"
-            :to="`/forums/${channelId}/edit`"
+            :to="{
+              name: 'forums-forumid-edit',
+              params: { forumId: channelId },
+            }"
           >
             Edit
-          </router-link>
+          </NuxtLink>
         </template>
       </RequireAuth>
     </div>

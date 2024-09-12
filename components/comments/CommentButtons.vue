@@ -163,7 +163,7 @@ function toggleEmojiPicker() {
         class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
         @click="
           router.push({
-            name: 'DiscussionCommentPermalink',
+            name: 'forums-forumId-discussions-discussionId-comment-commentId',
             params: {
               forumId: commentData.DiscussionChannel?.channelUniqueName,
               discussionId: commentData.DiscussionChannel?.discussionId,

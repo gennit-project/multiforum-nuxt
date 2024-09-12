@@ -10,9 +10,8 @@ import type { TagData } from "@/types/Tag";
 import type { UserData } from "@/types/User";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { UPDATE_CHANNEL } from "@/graphQLData/channel/mutations";
-import { apolloClient } from "@/main";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
-import CreateEditChannelFields from "./CreateEditChannelFields.vue";
+import CreateEditChannelFields from "@/components/channel/form/CreateEditChannelFields.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {

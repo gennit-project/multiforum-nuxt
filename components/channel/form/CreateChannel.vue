@@ -142,7 +142,7 @@ export default defineComponent({
       createChannelLoading.value = false;
 
       router.push({
-        name: "SearchDiscussionsInChannel",
+        name: "forms-forumId-discussions",
         params: {
           forumId: newChannelId,
         },

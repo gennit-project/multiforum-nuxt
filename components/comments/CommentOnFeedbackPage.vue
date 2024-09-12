@@ -242,7 +242,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
 
 function handleViewFeedback(feedbackId: string) {
   router.push({
-    name: "FeedbackOnCommentFeedback",
+    name: 'forums-forumId-discussions-discussionId-commentFeedback-commentId',
     params: {
       forumId: route.params.forumId,
       discussionId: route.params.discussionId,
@@ -265,10 +265,10 @@ function handleViewFeedback(feedbackId: string) {
         :is-square="false"
       />
       <span class="mr-0.5">
-        <router-link
+        <NuxtLink
           v-if="comment.CommentAuthor?.displayName"
           :to="{
-            name: 'ModProfile',
+            name: 'mod-modId',
             params: {
               modId: comment.CommentAuthor.displayName,
             },
@@ -276,7 +276,7 @@ function handleViewFeedback(feedbackId: string) {
           class="font-medium text-gray-900 hover:underline dark:text-gray-200"
         >
           {{ comment.CommentAuthor?.displayName }}
-        </router-link>
+        </NuxtLink>
         <span v-else>[Deleted User]</span>
       </span>
       <span v-if="loggedInModName === comment?.CommentAuthor?.displayName">

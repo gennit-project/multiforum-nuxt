@@ -56,11 +56,11 @@ export default defineComponent({
         commentResult && commentResult.comments && commentResult.comments[0]
       "
     >
-      <router-link
+      <NuxtLink
         v-if="parentCommentId"
         class="text-xs underline"
         :to="{
-          name: 'DiscussionCommentPermalink',
+          name: 'forums-forumId-discussions-discussionId-comments-commentId',
           params: {
             forumId: route.params.forumId,
             discussionId: route.params.discussionId,
@@ -69,7 +69,7 @@ export default defineComponent({
         }"
       >
         View Context
-      </router-link>
+      </NuxtLink>
       <slot
         name="comment"
         :comment-data="commentResult.comments[0]"

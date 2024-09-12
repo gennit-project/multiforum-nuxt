@@ -29,7 +29,10 @@ defineEmits(["filterByTag"]);
 const router = useRouter();
 
 const defaultUniqueName = computed(() => {
-  if (!props.discussion.DiscussionChannels || !props.discussion.DiscussionChannels[0]) {
+  if (
+    !props.discussion.DiscussionChannels ||
+    !props.discussion.DiscussionChannels[0]
+  ) {
     return "";
   }
   return props.discussion.DiscussionChannels[0].Channel?.uniqueName;
@@ -37,8 +40,10 @@ const defaultUniqueName = computed(() => {
 
 const title = props.discussion.title;
 const relativeTimeText = relativeTime(props.discussion.createdAt);
-const authorUsername = props.discussion.Author ? props.discussion.Author.username : "Deleted";
-const tags = props.discussion.Tags.map(tag => tag.text);
+const authorUsername = props.discussion.Author
+  ? props.discussion.Author.username
+  : "Deleted";
+const tags = props.discussion.Tags.map((tag) => tag.text);
 </script>
 
 <template>
@@ -48,20 +53,19 @@ const tags = props.discussion.Tags.map(tag => tag.text);
       () => {
         if (defaultUniqueName) {
           router.push(
-            `/forums/${defaultUniqueName}/discussions/${discussion.id}`,
+            `/forums/${defaultUniqueName}/discussions/${discussion.id}`
           );
         }
       }
     "
   >
     <p class="cursor-pointer text-lg font-bold">
-      <HighlightedSearchTerms
-        :text="title"
-        :search-input="searchInput"
-      />
+      <HighlightedSearchTerms :text="title" :search-input="searchInput" />
     </p>
 
-    <p class="font-medium mt-1 space-x-1 flex text-sm text-gray-600 hover:no-underline">
+    <p
+      class="font-medium mt-1 space-x-1 flex text-sm text-gray-600 hover:no-underline"
+    >
       <Tag
         v-for="tag in tags"
         :key="tag"
@@ -77,14 +81,20 @@ const tags = props.discussion.Tags.map(tag => tag.text);
       {{ `Posted ${relativeTimeText} by ${authorUsername}` }}
     </p>
     <div class="my-2 space-x-2 text-sm">
-      <router-link
+      <NuxtLink
         v-for="(discussionChannel, i) in discussion.DiscussionChannels"
         :key="i"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
-        :to="`/forums/${discussionChannel.Channel?.uniqueName}/discussions/${discussion.id}`"
+        :to="{
+          name: 'forums-forumId-discussions-discussionId',
+          params: {
+            forumId: discussionChannel.Channel?.uniqueName,
+            discussionId: discussion.id,
+          },
+        }"
       >
         View this post in {{ `c/${discussionChannel.Channel?.uniqueName}` }}
-      </router-link>
+      </NuxtLink>
     </div>
   </li>
 </template>

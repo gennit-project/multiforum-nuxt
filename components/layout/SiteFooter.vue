@@ -10,19 +10,19 @@ export default defineComponent({
     <div
       class="flex w-full items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
     >
-      <router-link
+      <NuxtLink
         :to="`/privacy-policy`"
         class="flex cursor-pointer underline"
       >
         Privacy Policy
-      </router-link>
+      </NuxtLink>
 
-      <router-link
+      <NuxtLink
         :to="`/terms-of-use`"
         class="flex cursor-pointer underline"
       >
         Terms of Use
-      </router-link>
+      </NuxtLink>
     </div>
     <div
       class="w-full items-center justify-center text-wrap bg-gray-800 p-4 text-white"

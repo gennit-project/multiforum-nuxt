@@ -21,7 +21,8 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["click"]);
+// Allow emitting any string event
+const emit = defineEmits<(event: string, ...args: any[]) => void>();
 const router = useRouter();
 
 const handleItemClick = (item: MenuItemType) => {

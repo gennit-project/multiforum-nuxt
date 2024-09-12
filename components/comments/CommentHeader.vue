@@ -1,5 +1,5 @@
 <script lang="ts">
-import type { PropType} from "vue";
+import type { PropType } from "vue";
 import { defineComponent, computed } from "vue";
 import type { Comment } from "@/__generated__/graphql";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
@@ -102,9 +102,7 @@ export default defineComponent({
 
 <template>
   <div class="flex w-full">
-    <p v-if="!commentData">
-      [Deleted]
-    </p>
+    <p v-if="!commentData">[Deleted]</p>
     <AvatarComponent
       v-else-if="commentData.CommentAuthor?.username"
       class="z-10"
@@ -130,10 +128,10 @@ export default defineComponent({
           showContextLink && parentCommentId && commentData.DiscussionChannel
         "
       >
-        <router-link
+        <NuxtLink
           class="px-2 text-xs underline"
           :to="{
-            name: 'DiscussionCommentPermalink',
+            name: 'forums-forumId-discussions-discussionId-comment-commentId',
             params: {
               discussionId: commentData.DiscussionChannel.discussionId,
               commentId: parentCommentId,
@@ -142,16 +140,19 @@ export default defineComponent({
           }"
         >
           View Context
-        </router-link>
+        </NuxtLink>
       </div>
       <div class="mt-2 flex flex-wrap items-center">
         <div
           class="ml-1 flex flex-wrap items-center space-x-2 text-xs dark:text-gray-300"
         >
-          <router-link
+          <NuxtLink
             v-if="commentData.CommentAuthor?.username"
             class="mx-1 font-bold hover:underline dark:text-gray-200"
-            :to="`/u/${commentData.CommentAuthor.username}`"
+            :to="{
+              name: 'u-username',
+              params: { username: commentData.CommentAuthor.username },
+            }"
           >
             <UsernameWithTooltip
               v-if="commentData.CommentAuthor.username"
@@ -167,18 +168,18 @@ export default defineComponent({
                 commentData.CommentAuthor.username === originalPoster
               "
             />
-          </router-link>
-          <router-link
+          </NuxtLink>
+          <NuxtLink
             v-else-if="commentData.CommentAuthor?.displayName"
             class="mx-1 font-bold hover:underline dark:text-gray-200"
-            :to="`/u/${commentData.CommentAuthor.displayName}`"
+            :to="{
+              name: 'u-username',
+              params: { username: commentData.CommentAuthor.displayName },
+            }"
           >
             {{ commentData.CommentAuthor.displayName }}
-          </router-link>
-          <span
-            v-else
-            class="flex items-center font-bold"
-          >
+          </NuxtLink>
+          <span v-else class="flex items-center font-bold">
             <div
               class="mr-2 h-8 w-8 rounded-full border dark:border-gray-500"
             />
@@ -186,15 +187,12 @@ export default defineComponent({
           </span>
           <span class="mx-2">&middot;</span>
           <span>{{ createdAtFormatted }}</span>
-          <span
-            v-if="commentData.updatedAt"
-            class="mx-2"
-          > &middot; </span>
+          <span v-if="commentData.updatedAt" class="mx-2"> &middot; </span>
           <span>{{ editedAtFormatted }}</span>
           <span
             v-if="isHighlighted"
             class="rounded-lg bg-blue-500 px-2 py-1 text-black"
-          >Permalinked
+            >Permalinked
           </span>
         </div>
       </div>

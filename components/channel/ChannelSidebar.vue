@@ -113,8 +113,8 @@ export default defineComponent({
   methods: {
     filterChannelsByTag(tag: string) {
       this.router.push({
-        name: "FilterChannelsByTag",
-        params: {
+        name: "forums",
+        query: {
           tag,
         },
       });
@@ -205,9 +205,12 @@ export default defineComponent({
               v-for="admin in channel.Admins"
               :key="admin.username"
             >
-              <router-link
+              <NuxtLink
                 :key="admin.username"
-                :to="`/u/${admin.username}`"
+                :to="{
+                  name: 'u-username',
+                  params: { username: admin.username },
+                }"
                 class="flex items-center"
               >
                 <AvatarComponent
@@ -224,7 +227,7 @@ export default defineComponent({
                   :discussion-karma="admin.discussionKarma ?? 0"
                   :account-created="admin.createdAt ?? ''"
                 />
-              </router-link>
+              </NuxtLink>
             </div>
           </div>
           <p

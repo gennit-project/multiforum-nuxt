@@ -5,7 +5,6 @@ import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
 import ErrorBanner from '../ErrorBanner.vue';
 import WarningModal from '../WarningModal.vue';
-import PermalinkedComment from './PermalinkedComment.vue';
 import OpenIssueModal from '@/components/mod/OpenIssueModal.vue';
 import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
 import SortButtons from '@/components/SortButtons.vue';
@@ -116,7 +115,6 @@ const router = useRouter();
 // Computed properties
 const channelId = computed(() => (typeof route.params.forumId === 'string' ? route.params.forumId : ''));
 const activeSort = computed(() => getSortFromQuery(route.query));
-const isPermalinkPage = computed(() => !!route.params.commentId);
 const permalinkedCommentId = ref(`${route.params.commentId}`);
 
 // Comment form state

@@ -38,11 +38,11 @@ export default defineComponent({
 <template>
   <li>
     <div class="flex items-center space-x-1">
-      <router-link
+      <NuxtLink
         :data-testid="`comments-in-${channelId}`"
         class="mr-1 underline"
         :to="{
-          name: 'DiscussionDetail',
+          name: 'forums-forumId-discussions-discussionId',
           params: {
             discussionId,
             forumId: channelId,
@@ -50,13 +50,12 @@ export default defineComponent({
         }"
       >
         {{ `${commentCount} comments` }}
-      </router-link>
+      </NuxtLink>
       and {{ upvoteCount || 0 }}
       {{ upvoteCount === 1 ? "upvote" : "upvotes" }} in
-
-      <router-link
+      <NuxtLink
         :to="{
-          name: 'DiscussionDetail',
+          name: 'forums-forumId-discussions-discussionId',
           params: {
             discussionId,
             forumId: channelId,
@@ -89,7 +88,7 @@ export default defineComponent({
             </div>
           </div>
         </div>
-      </router-link>
+      </NuxtLink>
     </div>
   </li>
 </template>

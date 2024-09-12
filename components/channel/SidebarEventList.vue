@@ -175,8 +175,14 @@ export default defineComponent({
       :key="event?.id"
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
-      <router-link
-        :to="`/forums/${channelId}/events/${event?.id}`"
+      <NuxtLink
+        :to="{
+          name: 'forums-forumId-events-eventId',
+          params: {
+            forumId: channelId,
+            eventId: event?.id,
+          }
+        }"
         class="flex items-center"
       >
         <span
@@ -184,16 +190,16 @@ export default defineComponent({
         >
           {{ event?.title }}
         </span>
-      </router-link>
-      <a
+      </NuxtLink>
+      <NuxtLink
         v-if="event?.virtualEventUrl"
         target="_blank"
-        :href="event?.virtualEventUrl"
+        :to="event?.virtualEventUrl"
         class="w-fit rounded-md bg-blue-600 px-4 py-2 text-blue-100"
       >
         Go to online event
         <i class="fa-solid fa-arrow-up-right-from-square" />
-      </a>
+      </NuxtLink>
     </div>
   </div>
 
@@ -211,8 +217,16 @@ export default defineComponent({
       :key="event?.id"
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
-      <router-link
-        :to="`/forums/${channelId}/events/${event?.id}`"
+      <NuxtLink
+        :to="
+         {
+          name: 'forums-forumId-events-eventId',
+          params: {
+            forumId: channelId,
+            eventId: event?.id,
+          }
+         }
+        "
         class="flex items-center"
       >
         <span
@@ -220,7 +234,7 @@ export default defineComponent({
         >
           {{ getSidebarLinkText(event) }}
         </span>
-      </router-link>
+      </NuxtLink>
     </div>
   </div>
 
@@ -238,8 +252,15 @@ export default defineComponent({
       :key="event?.id"
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
-      <router-link
-        :to="`/forums/${channelId}/events/${event?.id}`"
+      <NuxtLink
+        :to="
+          {
+            name: 'forums-forumId-events-eventId',
+            params: {
+              forumId: channelId,
+              eventId: event?.id,
+            }
+          }"
         class="flex items-center"
       >
         <span
@@ -247,7 +268,7 @@ export default defineComponent({
         >
           {{ getSidebarLinkText(event) }}
         </span>
-      </router-link>
+      </NuxtLink>
     </div>
   </div>
 
@@ -267,8 +288,15 @@ export default defineComponent({
         :key="event?.id"
         class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm leading-6 text-gray-500 dark:text-gray-300"
       >
-        <router-link
-          :to="`/forums/${channelId}/events/${event?.id}`"
+        <NuxtLink
+          :to="
+            {
+              name: 'forums-forumId-events-eventId',
+              params: {
+                forumId: channelId,
+                eventId: event?.id,
+              }
+            }"
           class="flex items-center"
         >
           <span
@@ -276,7 +304,7 @@ export default defineComponent({
           >
             {{ getSidebarLinkText(event) }}
           </span>
-        </router-link>
+        </NuxtLink>
       </div>
     </div>
   </div>
@@ -287,11 +315,15 @@ export default defineComponent({
         eventChannelsAggregate > soonestEventsInChannel.length
     "
   >
-    <router-link
-      :to="`/forums/${channelId}/events/search`"
+    <NuxtLink
+      :to="
+        {
+          name: 'forums-forumId-events-search',
+          params: { forumId: channelId },
+        }"
       class="flex items-center underline"
     >
       <span class="text-sm font-bold leading-6"> View all events </span>
-    </router-link>
+    </NuxtLink>
   </div>
 </template>

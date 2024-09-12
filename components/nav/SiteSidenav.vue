@@ -102,7 +102,7 @@ const outside = () => {
         <nav class="mt-4">
           <ul role="list">
             <li v-for="item in navigation" :key="item.name" class="px-6 list-none">
-              <router-link
+              <NuxtLink
                 :to="item.href"
                 :data-testid="`nav-link-${item.name}`"
                 class="font-semibold group flex gap-x-3 rounded-md py-1 pl-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
@@ -110,7 +110,7 @@ const outside = () => {
               >
                 <component :is="item.icon" class="list-item-icon h-6 w-6 shrink-0 dark:text-blue-500" aria-hidden="true" />
                 {{ item.name }}
-              </router-link>
+              </NuxtLink>
             </li>
           </ul>
         </nav>
@@ -122,8 +122,8 @@ const outside = () => {
         <div class="px-6">
           <ul class="mb-6">
             <li v-for="forum in visibleRecentForums" :key="forum.uniqueName" class="list-none">
-              <router-link
-                :to="{ name: 'SearchDiscussionsInChannel', params: { forumId: forum.uniqueName } }"
+              <NuxtLink
+                :to="{ name: 'forums-forumId-discussions', params: { forumId: forum.uniqueName } }"
                 class="font-semibold group flex items-center gap-x-3 rounded-md py-1 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
                 @click="outside"
               >
@@ -144,7 +144,7 @@ const outside = () => {
                   :is-square="false"
                 />
                 {{ forum.uniqueName }}
-              </router-link>
+              </NuxtLink>
             </li>
           </ul>
           <div v-if="recentForums.length > DEFAULT_LIMIT">
@@ -154,23 +154,29 @@ const outside = () => {
         </div>
       </div>
       <ul class="mb-6 border-t">
-        <router-link
+        <NuxtLink
           v-if="isAuthenticated && username"
-          :to="`/u/${username}`"
+          :to="{
+            name: 'user-username',
+            params: { username },
+          }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="outside"
         >
           <AvatarComponent v-if="profilePicURL" :text="username" :src="profilePicURL" :is-small="true" />
           My Profile
-        </router-link>
-        <router-link
+        </NuxtLink>
+        <NuxtLink
           v-if="isAuthenticated"
-          :to="`/u/${username}/settings`"
+          :to="{
+            name: 'u-username-settings',
+            params: { username },
+          }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="outside"
         >
           Account Settings
-        </router-link>
+        </NuxtLink>
         <button
           v-if="!isAuthenticated"
           class="font-semibold group flex gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
@@ -178,15 +184,15 @@ const outside = () => {
         >
           Log In
         </button>
-        <router-link
+        <NuxtLink
           v-if="isAuthenticated"
           data-testid="sign-out-link"
-          to="/logout"
+          to="/"
           class="font-semibold group flex gap-x-3 rounded-md py-2 pl-6 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="handleLogout"
         >
           Sign Out
-        </router-link>
+        </NuxtLink>
       </ul>
     </div>
   </div>

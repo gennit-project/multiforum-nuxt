@@ -11,7 +11,7 @@ import { useRoute } from "vue-router";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
-import CommentHeader from "./CommentHeader.vue";
+import CommentHeader from "@/components/comments/CommentHeader.vue";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import FeedbackSection from '@/components/comments/FeedbackSection.vue'
 
@@ -350,11 +350,11 @@ export default defineComponent({
       />
       <div v-else>
         <div v-if="originalComment">
-          <router-link
+          <NuxtLink
             v-if="parentCommentId"
             class="text-xs underline"
             :to="{
-              name: 'DiscussionCommentPermalink',
+              name: 'forums-forumId-discussions-discussionId-comments-commentId',
               params: {
                 discussionId: route.params.discussionId,
                 commentId: parentCommentId,
@@ -362,7 +362,7 @@ export default defineComponent({
             }"
           >
             View Context
-          </router-link>
+          </NuxtLink>
           <div
             class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5"
           >
@@ -401,12 +401,12 @@ export default defineComponent({
               :disable-gallery="true"
             />
           </div>
-          <router-link
+          <NuxtLink
             :to="contextLink"
             class="text-blue-500 underline"
           >
             View original context
-          </router-link>
+          </NuxtLink>
         </div>
         <FeedbackSection
           :add-feedback-comment-to-comment-error="

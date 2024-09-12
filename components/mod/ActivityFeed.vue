@@ -113,10 +113,10 @@ export default defineComponent({
               <div class="min-w-0 flex-1">
                 <div class="flex align-items gap-2">
                   <span class="text-sm">
-                    <router-link
+                    <NuxtLink
                       v-if="activityItem.ModerationProfile?.displayName"
                       :to="{
-                        name: 'ModProfile',
+                        name: 'mod-modId',
                         params: {
                           modId: activityItem.ModerationProfile.displayName,
                         },
@@ -124,7 +124,7 @@ export default defineComponent({
                       class="font-medium text-gray-900 hover:underline dark:text-gray-200"
                     >
                       {{ activityItem.ModerationProfile?.displayName }}
-                    </router-link>
+                    </NuxtLink>
                   </span>
                   <span class="text-sm text-gray-500 dark:text-gray-300">
                     Commented
@@ -164,10 +164,10 @@ export default defineComponent({
               <div class="min-w-0 flex-1 py-0">
                 <div class="text-sm leading-8 text-gray-500 dark:text-gray-300">
                   <span class="mr-0.5">
-                    <router-link
+                    <NuxtLink
                       v-if="activityItem.ModerationProfile?.displayName"
                       :to="{
-                        name: 'ModProfile',
+                        name: 'mod-modId',
                         params: {
                           modId: activityItem.ModerationProfile.displayName,
                         },
@@ -175,7 +175,7 @@ export default defineComponent({
                       class="font-medium text-gray-900 hover:underline dark:text-gray-200"
                     >{{
                       activityItem.ModerationProfile?.displayName
-                    }}</router-link>
+                    }}</NuxtLink>
                     {{ activityItem.actionDescription }}
                   </span>
                   {{ " " }}

@@ -74,10 +74,9 @@ export default defineComponent({
 <template>
   <div class="bg-white dark:bg-gray-900 rounded-t-lg border border-b border-gray-200 dark:border-gray-600">
     <div class="flex items-center rounded-t-lg gap-4 py-3 pl-8">
-      <!-- Use router-link for navigating to open issues -->
-      <router-link
+      <NuxtLink
         :to="{
-          name: 'OpenIssues',
+          name: 'mod-issues',
           params: {
             forumId: channelId,
           },
@@ -88,10 +87,10 @@ export default defineComponent({
         }"
       >
         <i class="far fa-dot-circle" />{{ openCount }} Open
-      </router-link>
-      <router-link
+      </NuxtLink>
+      <NuxtLink
         :to="{
-          name: 'ClosedIssues',
+          name: 'mod-issues-closed',
           params: {
             forumId: channelId,
           },
@@ -102,7 +101,7 @@ export default defineComponent({
         }"
       >
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
-      </router-link>
+      </NuxtLink>
     </div>
     <NuxtPage />
   </div>

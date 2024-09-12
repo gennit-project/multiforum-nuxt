@@ -129,9 +129,9 @@ const onMouseLeaveEventListItem = () => {
     <div v-if="events.length === 0">
       <p v-if="!showMap" class="mt-3 px-4 dark:text-gray-200">
         Could not find any events.
-        <router-link :to="createEventLink" class="text-blue-500 underline">
+        <NuxtLink :to="createEventLink" class="text-blue-500 underline">
           Create one?
-        </router-link>
+        </NuxtLink>
       </p>
       <p v-else class="p-8 dark:text-gray-200">
         Could not find any events that can be shown on a map.

@@ -65,8 +65,11 @@ export default defineComponent({
       <button v-bind="props">
         <slot>
           <div class="flex flex-row items-center gap-1">
-            <router-link
-              :to="`/u/${username}`"
+            <NuxtLink
+              :to="{
+                name: 'u-username',
+                params: { username },
+              }"
               class="flex flex-row items-center gap-1 hover:underline"
             >
               <span
@@ -83,7 +86,7 @@ export default defineComponent({
                 v-if="displayName"
                 class="text-gray-500 dark:text-gray-300"
               >{{ `(u/${username})` }}</span>
-            </router-link>
+            </NuxtLink>
             <span
               v-if="isAdmin"
               class="rounded-md border border-blue-500 px-1 py-0.5 text-xs text-blue-500"

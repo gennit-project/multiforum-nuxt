@@ -1,15 +1,15 @@
-<script lang="ts">
-import { defineComponent, computed, ref, watch } from "vue";
+<script lang="ts" setup>
+import { computed, ref, watch } from "vue";
+import { useQuery } from "@vue/apollo-composable";
 import TabButton from "@/components/channel/TabButton.vue";
-import { useDisplay } from "vuetify/lib/framework.mjs";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import type { Channel } from "@/__generated__/graphql";
+import { useDisplay } from "vuetify";
 import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
-import { useQuery } from "@vue/apollo-composable";
+import type { Channel } from "@/__generated__/graphql";
 
 type Tab = {
   name: string;
@@ -23,160 +23,132 @@ type TabRoutes = {
   [key: string]: string;
 };
 
-export default defineComponent({
-  name: "ChannelTabs",
-  components: {
-    CogIcon,
-    TabButton,
-    InfoIcon,
-    CalendarIcon,
-    DiscussionIcon,
+const props = defineProps({
+  adminList: {
+    type: Array,
+    default: () => [],
   },
-  props: {
-    adminList: {
-      type: Array,
-      default: () => [],
-    },
-    channel: {
-      type: Object as () => Channel,
-      required: true,
-    },
-    route: {
-      type: Object,
-      required: true,
-    },
-    vertical: {
-      type: Boolean,
-      default: false,
-    },
-    showCounts: {
-      type: Boolean,
-      default: false,
-    },
+  channel: {
+    type: Object as () => Channel,
+    required: true,
   },
-  setup(props) {
-    const channelId = ref(props.route.params.forumId);
-    const { mdAndDown } = useDisplay();
-    watch(
-      () => props.route,
-      (to) => {
-        channelId.value = to.params.channelId;
-      },
-    );
-
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-    const username = computed(() => {
-      return localUsernameResult.value?.username || "";
-    });
-
-    const loggedInUsername = computed(() => {
-      return localUsernameResult.value?.username || "";
-    });
-
-    const tabRoutes = computed(() => {
-      const routes: TabRoutes = {
-        discussions: `/forums/${channelId.value}/discussions`,
-        events: `/forums/${channelId.value}/events/search`,
-        about: `/forums/${channelId.value}/about`,
-        settings: `/forums/${channelId.value}/edit`,
-        moderation: `/forums/${channelId.value}/issues`,
-      };
-
-      return routes;
-    });
-
-    const iconSize = computed(() => {
-      return props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0";
-    });
-
-    const tabs: Tab[] = [
-      {
-        name: "discussions",
-        routeSuffix: "discussions",
-        label: "Discussions",
-        icon: DiscussionIcon,
-        countProperty: "DiscussionChannelsAggregate",
-      },
-      {
-        name: "events",
-        routeSuffix: "events/search",
-        label: "Events",
-        icon: CalendarIcon,
-        countProperty: "EventChannelsAggregate",
-      },
-    ];
-    const adminList = props.channel.Admins.map((user) => {
-      return user.username || "";
-    });
-
-    const modList = props.channel.Moderators.map((modProfile) => {
-      return modProfile.displayName;
-    });
-
-    const {
-      result: localModProfileNameResult,
-      loading: localModProfileNameLoading,
-      error: localModProfileNameError,
-    } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
-    const loggedInUserModName = computed(() => {
-      if (localModProfileNameLoading.value || localModProfileNameError.value) {
-        return "";
-      }
-      return localModProfileNameResult.value?.modProfileName || "";
-    });
-
-    if (username.value && adminList.includes(username.value)) {
-      tabs.push({
-        name: "settings",
-        routeSuffix: "edit",
-        label: "Settings",
-        icon: CogIcon,
-        countProperty: null,
-      });
-    }
-
-    const isAdmin = adminList.includes(loggedInUsername.value);
-    const isMod = modList.includes(loggedInUserModName.value);
-
-    if (isAdmin || isMod) {
-      tabs.push({
-        name: "moderation",
-        routeSuffix: "issues",
-        label: "Issues",
-        icon: FlagIcon,
-        countProperty: "IssuesAggregate",
-      });
-    }
-
-    if (mdAndDown) {
-      tabs.push({
-        name: "about",
-        routeSuffix: "about",
-        label: "About",
-        icon: InfoIcon,
-        countProperty: null,
-      });
-    }
-
-    return {
-      channelId,
-      iconSize,
-      mdAndDown,
-      tabRoutes,
-      username,
-      tabs,
-      selectedTab: "about",
-    };
+  vertical: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    redirect(e: any): void {
-      const selectedTab = e.target.value;
-      this.$router.push(this.tabRoutes[selectedTab]);
-    },
+  showCounts: {
+    type: Boolean,
+    default: false,
   },
 });
+
+const route = useRoute();
+const channelId = ref(route.params.forumId);
+const { mdAndDown } = useDisplay();
+
+watch(
+  () => route.params,
+  (to) => {
+    channelId.value = to.channelId;
+  },
+);
+
+const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
+const username = computed(() => {
+  return localUsernameResult.value?.username || "";
+});
+
+const loggedInUsername = computed(() => {
+  return localUsernameResult.value?.username || "";
+});
+
+const tabRoutes = computed(() => {
+  const routes: TabRoutes = {
+    discussions: `/forums/${channelId.value}/discussions`,
+    events: `/forums/${channelId.value}/events/search`,
+    about: `/forums/${channelId.value}/about`,
+    settings: `/forums/${channelId.value}/edit`,
+    moderation: `/forums/${channelId.value}/issues`,
+  };
+
+  return routes;
+});
+
+const iconSize = computed(() => {
+  return props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0";
+});
+
+const tabs: Tab[] = [
+  {
+    name: "discussions",
+    routeSuffix: "discussions",
+    label: "Discussions",
+    icon: DiscussionIcon,
+    countProperty: "DiscussionChannelsAggregate",
+  },
+  {
+    name: "events",
+    routeSuffix: "events/search",
+    label: "Events",
+    icon: CalendarIcon,
+    countProperty: "EventChannelsAggregate",
+  },
+];
+const adminList = props.channel.Admins.map((user) => {
+  return user.username || "";
+});
+
+const modList = props.channel.Moderators.map((modProfile) => {
+  return modProfile.displayName;
+});
+
+const {
+  result: localModProfileNameResult,
+  loading: localModProfileNameLoading,
+  error: localModProfileNameError,
+} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+
+const loggedInUserModName = computed(() => {
+  if (localModProfileNameLoading.value || localModProfileNameError.value) {
+    return "";
+  }
+  return localModProfileNameResult.value?.modProfileName || "";
+});
+
+if (username.value && adminList.includes(username.value)) {
+  tabs.push({
+    name: "settings",
+    routeSuffix: "edit",
+    label: "Settings",
+    icon: CogIcon,
+    countProperty: null,
+  });
+}
+
+const isAdmin = adminList.includes(loggedInUsername.value);
+const isMod = modList.includes(loggedInUserModName.value);
+
+if (isAdmin || isMod) {
+  tabs.push({
+    name: "moderation",
+    routeSuffix: "issues",
+    label: "Issues",
+    icon: FlagIcon,
+    countProperty: "IssuesAggregate",
+  });
+}
+
+if (mdAndDown) {
+  tabs.push({
+    name: "about",
+    routeSuffix: "about",
+    label: "About",
+    icon: InfoIcon,
+    countProperty: null,
+  });
+}
 </script>
+
 <template>
   <div>
     <nav

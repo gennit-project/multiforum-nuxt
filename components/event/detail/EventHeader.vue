@@ -482,7 +482,12 @@ export default defineComponent({
         <div class="mr-3 h-5 w-5">
           <i class="fa-regular fa-user h-5" />
         </div>
-        <router-link :to="`/u/${eventData.Poster.username}`">
+        <NuxtLink
+          :to="{
+            name: 'u-username',
+            params: { username: eventData.Poster.username },
+          }"
+        >
           Hosted by
           <UsernameWithTooltip
             v-if="eventData.Poster.username"
@@ -494,7 +499,7 @@ export default defineComponent({
             :discussion-karma="eventData.Poster.discussionKarma ?? 0"
             :account-created="eventData.Poster.createdAt"
           />
-        </router-link>
+        </NuxtLink>
       </li>
     </ul>
     <div>

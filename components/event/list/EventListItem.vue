@@ -249,7 +249,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           />
         </p>
 
-        <router-link
+        <NuxtLink
           v-if="
             showDetailLink &&
             event &&
@@ -271,7 +271,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
                `in c/${event.EventChannels[0].channelUniqueName}`
             }}</span>
           </button>
-        </router-link>
+        </NuxtLink>
 
         <MenuButton
           v-else-if="showDetailLink && event"

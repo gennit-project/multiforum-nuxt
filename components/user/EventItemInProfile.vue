@@ -85,13 +85,19 @@ const tags = props.event.Tags.map((tag: TagData) => tag.text);
       :key="i"
       class="my-2 space-x-2 text-sm"
     >
-      <router-link
+      <NuxtLink
         v-if="ec.Channel"
         class="text-gray-500 underline hover:text-gray-700 dark:text-gray-300 hover:dark:text-gray-200"
-        :to="`/forums/${ec.Channel.uniqueName}/events/${event.id}`"
+        :to="{
+          name: 'forums-forumId-events-eventId',
+          params: {
+            forumId: ec.Channel.uniqueName,
+            eventId: event.id,
+          },
+        }"
       >
         {{ `c/${ec.Channel.uniqueName}` }}
-      </router-link>
+      </NuxtLink>
     </div>
   </li>
 </template>
