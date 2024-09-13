@@ -106,7 +106,6 @@ if (!channelId.value) {
         class="block md:hidden"
         :channel="channel"
         :channel-id="channelId"
-        :show-create-button="true"
       />
       <div v-if="channel" class="w-full">
         <article class="relative h-full max-w-7xl rounded-lg bg-gray-100 dark:bg-black focus:outline-none">

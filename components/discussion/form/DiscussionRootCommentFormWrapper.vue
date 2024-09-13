@@ -7,10 +7,11 @@ import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
-import { COMMENT_LIMIT } from "@/components/discussion/detail/DiscussionDetailContent.vue"
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { useRoute } from "vue-router";
+
+const COMMENT_LIMIT = 50;
 
 // The purpose of this component is to wrap the CreateRootCommentForm component
 // and put the discussion-specific logic in here. This is because the CreateRootCommentForm

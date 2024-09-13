@@ -15,6 +15,7 @@ import {
   GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
+import cache from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -82,20 +83,14 @@ const {
 }));
 onDone(() => (titleEditMode.value = false));
 
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-const {
-  result: themeResult,
-  loading: themeLoading,
-  error: themeError,
-} = useQuery(GET_THEME);
-const theme = computed(() =>
-  themeLoading.value || themeError.value ? "" : themeResult.value.theme
-);
-
+const theme = cache.readQuery({
+  query: gql`
+    query getTheme {
+      theme @client
+    }
+  `,
+});
+console.log(theme);
 const onClickEdit = () => {
   titleEditMode.value = true;
   nextTick(() => {

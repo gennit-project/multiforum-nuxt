@@ -13,7 +13,6 @@ import type {
   CommentCreateInput,
   Comment as CommentType,
 } from "@/__generated__/graphql";
-import { COMMENT_LIMIT } from "@/components/discussion/detail/DiscussionDetailContent.vue";
 import { useRoute } from "vue-router";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
@@ -21,6 +20,8 @@ import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import { useQuery } from "@vue/apollo-composable";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
+
+const COMMENT_LIMIT = 50;
 
 type CommentSectionQueryUpdateInput = {
   cache: any;

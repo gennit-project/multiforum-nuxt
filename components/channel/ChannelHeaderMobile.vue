@@ -16,10 +16,6 @@ export default defineComponent({
       type: Object,
       required: true,
     },
-    showCreateButton: {
-      type: Boolean,
-      required: true,
-    },
   },
   setup() {
     return {};
@@ -59,7 +55,6 @@ export default defineComponent({
       </h1>
     </div>
     <CreateAnythingButton
-      v-if="showCreateButton"
       class="mb-4"
       :use-primary-button="true"
     />

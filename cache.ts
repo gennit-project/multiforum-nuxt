@@ -117,6 +117,9 @@ const cache = new InMemoryCache({
         },
       },
     },
+    User: {
+      keyFields: ["username"],
+    },
     Query: {
       fields: {
         theme: {
