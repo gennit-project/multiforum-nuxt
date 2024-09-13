@@ -32,6 +32,7 @@ const emit = defineEmits(["close", "primaryButtonClick", "secondaryButtonClick"]
 </script>
 
 <template>
+  <client-only>
   <TransitionRoot as="template" :show="props.show" @click="emit('close')">
     <Dialog as="div" class="relative z-10" @close="emit('close')">
       <TransitionChild
@@ -187,4 +188,5 @@ const emit = defineEmits(["close", "primaryButtonClick", "secondaryButtonClick"]
       </div>
     </Dialog>
   </TransitionRoot>
+</client-only>
 </template>

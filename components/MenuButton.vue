@@ -44,6 +44,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <client-only>
   <Menu as="div" class="relative inline-block text-left">
     <MenuButton
       :id="`menu-button-${uniqueID}`"
@@ -109,4 +110,5 @@ onMounted(() => {
       </MenuItems>
     </transition>
   </Menu>
+</client-only>
 </template>

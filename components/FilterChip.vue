@@ -49,6 +49,7 @@ export default defineComponent({
 </script>
 
 <template>
+  <client-only>
   <div class="inline-flex">
     <Popper
       :close-on-content-click="false"
@@ -76,4 +77,5 @@ export default defineComponent({
       </template>
     </Popper>
   </div>
+</client-only>
 </template>

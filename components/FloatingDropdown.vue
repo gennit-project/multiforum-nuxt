@@ -33,6 +33,7 @@ function close() {
 </script>
 
 <template>
+  <client-only>
   <div>
     <v-menu 
       :model-value="props.modelValue"  
@@ -50,4 +51,5 @@ function close() {
       </v-card>
     </v-menu>
   </div>
+</client-only>
 </template>

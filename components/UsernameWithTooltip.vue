@@ -57,6 +57,7 @@ export default defineComponent({
 });
 </script>
 <template>
+  <client-only>
   <v-tooltip
     location="bottom"
     content-class="custom-tooltip"
@@ -143,4 +144,5 @@ export default defineComponent({
       </div>
     </template>
   </v-tooltip>
+</client-only>
 </template>

@@ -36,6 +36,7 @@ function closePreview() {
 </script>
 
 <template>
+  <client-only>
   <TransitionRoot as="template" :show="props.isOpen">
     <Dialog
       as="div"
@@ -105,4 +106,5 @@ function closePreview() {
       </div>
     </Dialog>
   </TransitionRoot>
+</client-only>
 </template>

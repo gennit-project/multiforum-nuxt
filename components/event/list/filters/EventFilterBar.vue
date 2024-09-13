@@ -310,6 +310,7 @@ const toggleSelectedTag = (tag: string) => {
             :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
             @update-search-input="updateSearchInput"
           >
+          <client-only>
             <Popper v-if="!showLocationSearchBarAndDistanceButtons">
               <button
                 data-testid="more-filters-button"
@@ -360,6 +361,7 @@ const toggleSelectedTag = (tag: string) => {
                 </div>
               </template>
             </Popper>
+          </client-only>
           </SearchBar>
           <LocationSearchBar
             v-if="showLocationSearchBarAndDistanceButtons"

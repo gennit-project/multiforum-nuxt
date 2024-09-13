@@ -23,6 +23,7 @@ defineEmits(["closePreview"]);
 </script>
 
 <template>
+  <client-only>
   <TransitionRoot as="template" :show="isOpen">
     <TailwindDialog
       as="div"
@@ -84,4 +85,5 @@ defineEmits(["closePreview"]);
       </div>
     </TailwindDialog>
   </TransitionRoot>
+</client-only>
 </template>

@@ -27,6 +27,7 @@ defineEmits(["closePreview"]);
 </script>
 
 <template>
+  <client-only>
   <TransitionRoot as="template" :show="isOpen">
     <DialogComponent
       as="div"
@@ -82,4 +83,5 @@ defineEmits(["closePreview"]);
       </div>
     </DialogComponent>
   </TransitionRoot>
+</client-only>
 </template>

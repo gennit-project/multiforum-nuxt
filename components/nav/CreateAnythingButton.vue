@@ -2,7 +2,12 @@
 import { computed, ref } from "vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { MenuButton, MenuItem, MenuItems, Menu as MenuComponent } from "@headlessui/vue";
+import {
+  MenuButton,
+  MenuItem,
+  MenuItems,
+  Menu as MenuComponent,
+} from "@headlessui/vue";
 
 defineProps({
   usePrimaryButton: {
@@ -52,9 +57,17 @@ const menuItems = [
 
 // Tooltip visibility state
 const showTooltip = ref(false);
+
+// Computed property to control footer visibility
+const showFooter = computed(() => {
+  return (
+    route.name && typeof route.name === 'string' && !route.name.includes("map")
+  );
+});
 </script>
 
 <template>
+  <client-only>
   <RequireAuth class="align-middle" :full-width="false">
     <template #has-auth>
       <MenuComponent as="div" class="relative inline-block text-left">
@@ -72,7 +85,11 @@ const showTooltip = ref(false);
           <span class="flex items-center text-md">
             + {{ usePrimaryButton ? "Create" : "" }}
           </span>
-          <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
+          <ChevronDownIcon
+            class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+            aria-hidden="true"
+          />
+          <!-- Tooltip rendering only on the client-side -->
           <v-tooltip
             v-if="showTooltip && !usePrimaryButton"
             location="bottom"
@@ -129,9 +146,11 @@ const showTooltip = ref(false);
       >
         + {{ usePrimaryButton ? "Create" : "" }}
       </button>
-      <v-tooltip v-if="!usePrimaryButton" activator="parent" location="bottom">
+      <!-- Tooltip rendering only on the client-side -->
+      <v-tooltip v-if="showFooter" activator="parent" location="bottom">
         Create new...
       </v-tooltip>
     </template>
   </RequireAuth>
+</client-only>
 </template>

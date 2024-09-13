@@ -53,6 +53,7 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
 </script>
 
 <template>
+  <client-only>
   <TransitionRoot as="template" :show="props.open">
     <Dialog
       as="div"
@@ -159,4 +160,5 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
       </div>
     </Dialog>
   </TransitionRoot>
+</client-only>
 </template>

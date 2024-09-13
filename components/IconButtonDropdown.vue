@@ -34,6 +34,7 @@ const handleItemClick = (item: MenuItemType) => {
 </script>
 
 <template>
+  <client-only>
   <Menu as="div" class="relative text-left flex items-center">
     <MenuButton
       class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-white"
@@ -78,4 +79,5 @@ const handleItemClick = (item: MenuItemType) => {
       </MenuItems>
     </transition>
   </Menu>
+</client-only>
 </template>
