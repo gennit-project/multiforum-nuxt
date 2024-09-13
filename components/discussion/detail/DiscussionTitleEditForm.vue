@@ -89,8 +89,7 @@ const theme = cache.readQuery({
       theme @client
     }
   `,
-});
-console.log(theme);
+})?.theme;
 const onClickEdit = () => {
   titleEditMode.value = true;
   nextTick(() => {

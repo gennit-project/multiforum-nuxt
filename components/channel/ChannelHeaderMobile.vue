@@ -32,10 +32,10 @@ export default defineComponent({
       :is-medium="true"
       :is-square="false"
     />
-    <div v-if="channel?.displayName && channel?.uniqueName">
+    <div v-if="channel.displayName && channel.uniqueName">
       <div>
         <h1
-          v-if="channel?.displayName"
+          v-if="channel.displayName"
           class="flex border-gray-700 text-2xl font-bold leading-6 text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
         >
           {{ channel.displayName }}
