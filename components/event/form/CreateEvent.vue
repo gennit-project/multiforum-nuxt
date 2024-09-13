@@ -9,7 +9,7 @@ import CreateEditEventFields from "./CreateEditEventFields.vue";
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { getTimePieces } from "@/utils";
-import getDefaultEventFormValues from "./defaultEventFormValues";
+import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import type { EventCreateInput, EventTagsConnectOrCreateFieldInput, Event } from "@/__generated__/graphql";
 

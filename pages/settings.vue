@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import Breadcrumbs from "../nav/Breadcrumbs.vue";
+import Breadcrumbs from "@/components/nav/Breadcrumbs.vue";
 
 export default defineComponent({
   components: {

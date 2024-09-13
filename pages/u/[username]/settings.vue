@@ -8,18 +8,17 @@ import {
 } from "@vue/apollo-composable";
 import { GET_USER , GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { UPDATE_USER } from "@/graphQLData/user/mutations";
-import { apolloClient } from "@/main";
-import EditAccountSettingsFields from "./EditAccountSettingsFields.vue";
+import EditAccountSettingsFields from "@/components/user/EditAccountSettingsFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type { UserUpdateInput } from "@/__generated__/graphql";
 import type { EditAccountSettingsFormValues } from "@/types/User";
-import Notification from "../NotificationComponent.vue";
+import NotificationComponent from "@/components/NotificationComponent.vue";
 
 export default defineComponent({
   name: "EditAccountSettings",
   components: {
     EditAccountSettingsFields,
-    Notification,
+    NotificationComponent,
     RequireAuth,
   },
   apollo: {},
@@ -186,7 +185,7 @@ export default defineComponent({
         @submit="submit"
         @update-form-values="updateFormValues"
       />
-      <Notification
+      <NotificationComponent
         v-if="showSavedChangesNotification"
         :title="'Your changes have been saved.'"
         @close-notification="showSavedChangesNotification = false"

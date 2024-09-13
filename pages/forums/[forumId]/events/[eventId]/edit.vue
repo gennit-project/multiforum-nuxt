@@ -9,7 +9,7 @@ import {
 import { useRoute, useRouter } from "vue-router";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
-import getDefaultEventFormValues from "@/components/event/form/defaultEventFormValues";
+import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
 import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {
