@@ -7,13 +7,10 @@ import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
-import { GET_LOCAL_USERNAME, GET_USER } from '@/graphQLData/user/queries';
+import { GET_USER } from '@/graphQLData/user/queries';
 import { useDisplay } from 'vuetify';
 import CreateAnythingButton from './CreateAnythingButton.vue';
-import config from '@/config';
 import { usernameVar } from '@/cache';
-
-console.log('site side nav');
 
 const DEFAULT_LIMIT = 5;
 

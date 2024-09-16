@@ -52,7 +52,6 @@ const loggedInUsername = computed(() => {
   if (!isAuthenticated) {
     return "";
   }
-  console.log(usernameVar())
   return usernameVar();
 });
 
