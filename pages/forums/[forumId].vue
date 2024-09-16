@@ -15,8 +15,12 @@ const route = useRoute();
 const router = useRouter();
 
 // Determine if the current route is for a discussion or event detail page
-const isDiscussionDetailPage = computed(() => route.name === "forums-forumId-discussions-discussionId");
-const isEventDetailPage = computed(() => route.name === "forums-forumId-events-eventId");
+const isDiscussionDetailPage = computed(
+  () => route.name === "forums-forumId-discussions-discussionId"
+);
+const isEventDetailPage = computed(
+  () => route.name === "forums-forumId-events-eventId"
+);
 
 // Extract the channel ID from the route parameters
 const channelId = computed(() => {
@@ -47,7 +51,8 @@ const addForumToLocalStorage = (channel: Channel) => {
   if (!import.meta.client) {
     return;
   }
-  let recentForums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
+  let recentForums =
+    JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
 
   const sideNavItem = {
     uniqueName: channelId.value,
@@ -81,7 +86,9 @@ onGetChannelResult((result) => {
 
 // Get admin list from the channel
 const adminList = computed(() => {
-  return channel.value ? channel.value.Admins.map((user: User) => user?.username) : [];
+  return channel.value
+    ? channel.value.Admins.map((user: User) => user?.username)
+    : [];
 });
 
 // If we are at forums/[channelId], redirect to forums/[channelId]/discussions
@@ -99,7 +106,7 @@ if (!channelId.value) {
 
 <template>
   <NuxtLayout>
-    <div class="flex flex-col justify-center dark:bg-black">
+    <div class="flex flex-col justify-center dark:bg-black bg-gray-100">
       <!-- Mobile Header -->
       <ChannelHeaderMobile
         v-if="channel"
@@ -107,17 +114,42 @@ if (!channelId.value) {
         :channel="channel"
         :channel-id="channelId"
       />
-      <div v-if="channel" class="w-full">
-        <article class="relative h-full max-w-7xl rounded-lg bg-gray-100 dark:bg-black focus:outline-none">
+
+      <!-- Desktop Header -->
+
+      <ChannelHeaderDesktop
+        v-if="channel"
+        class="hidden w-full"
+        :channel="channel"
+        :channel-id="channelId"
+        :admin-list="adminList"
+        :route="route"
+        :show-create-button="true"
+      >
+        <ChannelTabs
+          class="block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
+          :vertical="false"
+          :show-counts="true"
+          :admin-list="adminList"
+          :route="route"
+          :channel="channel"
+      /></ChannelHeaderDesktop>
+      <!-- Main Content -->
+      <div v-if="channel" class="w-full flex justify-center">
+        <article
+          class="relative h-full max-w-7xl rounded-lg dark:bg-black focus:outline-none"
+        >
+          <!-- ChannelTabs for Mobile -->
           <ChannelTabs
-            v-if="channel"
-            class="mb-2 block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            class="mb-2 block md:hidden w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
             :route="route"
             :channel="channel"
           />
+
+          <!-- Conditional Components -->
           <div v-if="isDiscussionDetailPage" class="flex w-full justify-center">
             <div class="max-w-7xl flex-1 px-3 md:px-6">
               <DiscussionTitleEditForm />
@@ -128,13 +160,20 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
+
+          <!-- Main Content and Sidebar -->
           <div>
-            <div class="relative max-w-7xl flex-1 pt-4 focus:outline-none lg:px-6">
-              <div class="flex flex-col md:flex-row divide-x dark:divide-gray-500">
+            <div class="relative max-w-7xl flex-1 pt-4 focus:outline-none">
+              <div
+                class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
+              >
                 <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
                   <NuxtPage />
                 </div>
-                <div v-if="channelId" class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800">
+                <div
+                  v-if="channelId"
+                  class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800"
+                >
                   <ChannelSidebar
                     v-if="channel"
                     :channel="channel"
@@ -146,51 +185,6 @@ if (!channelId.value) {
           </div>
         </article>
       </div>
-
-      <!-- Desktop Header -->
-      <article v-if="channel" class="hidden md:block w-full">
-        <ChannelHeaderDesktop
-          :channel="channel"
-          :channel-id="channelId"
-          :admin-list="adminList"
-          :route="route"
-          :show-create-button="true"
-        >
-          <ChannelTabs
-            v-if="channel"
-            class="mb-6 block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
-            :vertical="false"
-            :show-counts="true"
-            :admin-list="adminList"
-            :route="route"
-            :channel="channel"
-          />
-        </ChannelHeaderDesktop>
-        <div v-if="isDiscussionDetailPage" class="flex w-full justify-center">
-          <div class="max-w-7xl flex-1 px-6">
-            <DiscussionTitleEditForm />
-          </div>
-        </div>
-        <div v-else-if="isEventDetailPage" class="flex w-full justify-center">
-          <div class="max-w-7xl flex-1 px-6">
-            <EventTitleEditForm />
-          </div>
-        </div>
-        <div class="relative max-w-7xl flex-1 pt-4 focus:outline-none lg:px-6">
-          <div class="flex flex-col md:flex-row divide-x dark:divide-gray-500">
-            <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
-              <NuxtPage />
-            </div>
-            <div v-if="channelId" class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800">
-              <ChannelSidebar
-                v-if="channel"
-                :channel="channel"
-                class="sticky top-0 overflow-auto p-6 pt-8"
-              />
-            </div>
-          </div>
-        </div>
-      </article>
     </div>
   </NuxtLayout>
 </template>
