@@ -32,6 +32,7 @@ const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
 const { 
   // loginWithPopup, 
+  login,
   loginWithRedirect, 
   isLoading: authLoading, 
   isAuthenticated, 
@@ -49,11 +50,12 @@ const storeToken = async () => {
 };
 
 // Login function that either uses Cypress for testing or shows a popup
-const login = async () => {
+const handleLogin = async () => {
   if (window.parent.Cypress) {
     await loginWithRedirect();
   } else {
     // await loginWithPopup();
+    await login()
   }
   storeToken();
 };

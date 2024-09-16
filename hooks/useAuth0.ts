@@ -1,10 +1,11 @@
 // Placeholder Auth0 Hooks
+import config from "@/config";
 export const useAuth0 = () => {
   return {
     isAuthenticated: true, // Placeholder value
     user: { 
       name: "Alice", 
-      email: process.env.VITE_AUTH0_USERNAME,
+      email: config.auth0username,
       username: 'alice'
     }, // Placeholder value
     loginWithRedirect: () => console.log("Mock login"),

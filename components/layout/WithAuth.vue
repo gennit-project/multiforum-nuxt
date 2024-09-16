@@ -8,6 +8,7 @@ import CreateUsernamePage from '@/components/auth/CreateUsernamePage.vue';
 import { usernameVar, modProfileNameVar } from '@/cache';
 
 const { isLoading, user } = useAuth0();
+console.log('user', user);
 
 const {
   result: emailResult,

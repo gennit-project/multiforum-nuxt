@@ -10,7 +10,11 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import WithAuth from "@/components/layout/WithAuth.vue";
 
+console.log('default layout', useAuth0);
+
 const { isLoading, user } = useAuth0();
+
+console.log('default layout user', user);
 
 const { result: emailResult, onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,

@@ -13,6 +13,7 @@ const config = {
     "logoutUrl": import.meta.env.VITE_LOGOUT_URL,
     "openCageApiKey": import.meta.env.VITE_OPEN_CAGE_API_KEY,
     "lightgalleryLicenseKey": import.meta.env.VITE_LIGHTGALLERY_LICENSE_KEY,
+    "auth0username": import.meta.env.VITE_AUTH0_USERNAME,
  }
 
  export default config;

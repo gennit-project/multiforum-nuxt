@@ -64,6 +64,11 @@ const showFooter = computed(() => {
     route.name && typeof route.name === 'string' && !route.name.includes("map")
   );
 });
+
+const handleClick = () => {
+  console.log("clicked");
+  showTooltip.value = false;
+};
 </script>
 
 <template>
@@ -79,7 +84,7 @@ const showFooter = computed(() => {
               : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-black dark:text-white dark:hover:bg-gray-600',
           ]"
           class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
-          @click="showTooltip = false"
+          @click="handleClick"
           @mouseover="showTooltip = true"
         >
           <span class="flex items-center text-md">
@@ -89,7 +94,6 @@ const showFooter = computed(() => {
             class="-mr-1 ml-1 mt-0.5 h-3 w-3"
             aria-hidden="true"
           />
-          <!-- Tooltip rendering only on the client-side -->
           <v-tooltip
             v-if="showTooltip && !usePrimaryButton"
             location="bottom"
@@ -146,7 +150,6 @@ const showFooter = computed(() => {
       >
         + {{ usePrimaryButton ? "Create" : "" }}
       </button>
-      <!-- Tooltip rendering only on the client-side -->
       <v-tooltip v-if="showFooter" activator="parent" location="bottom">
         Create new...
       </v-tooltip>
