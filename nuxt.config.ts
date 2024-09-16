@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     "@nuxtjs/apollo",
     "@nuxtjs/eslint-module",
     "@nuxtjs/tailwindcss",
-    "nuxtjs/device",
+    // "nuxtjs/device",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error
