@@ -10,26 +10,26 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import WithAuth from "@/components/layout/WithAuth.vue";
 
-console.log('default layout', useAuth0);
 
 const { isLoading, user } = useAuth0();
 
-console.log('default layout user', user);
 
-const { result: emailResult, onResult: onEmailResult } = useQuery(GET_EMAIL, {
+const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,
 });
+
 
 // Reactive variable to track if the email is not in the system
 const emailNotInSystem = ref(false);
 
 // Handle email query result
-onEmailResult(() => {
+onEmailResult((result: any) => {
+  if (!import.meta.client) return;
   let user: User | null = null;
   let modProfile: ModerationProfile | null = null;
   let username = "";
   let modProfileName = "";
-  const emailData = emailResult.value?.emails[0];
+  const emailData = result.data?.emails[0];
 
   user = emailData?.User;
 
@@ -68,8 +68,7 @@ const toggleUserProfileDropdown = () => {
   showUserProfileDropdown.value = !showUserProfileDropdown.value;
 };
 
-const emailFromAuth0 = emailResult.value?.emails[0]?.emailAddress;
-
+const emailFromAuth0 = user.email // emailResult.value?.emails[0]?.emailAddress;
 const route = useRoute();
 const showFooter = !route.name?.includes("map");
 </script>

@@ -66,7 +66,6 @@ const showFooter = computed(() => {
 });
 
 const handleClick = () => {
-  console.log("clicked");
   showTooltip.value = false;
 };
 </script>

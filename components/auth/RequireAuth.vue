@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
-import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from '@/hooks/useAuth0';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { usernameVar } from "@/cache";
 
 // Props definition using defineProps
 const props = defineProps({
@@ -28,7 +27,6 @@ const props = defineProps({
     default: false,
   },
 });
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
 const { 
   // loginWithPopup, 
@@ -49,6 +47,8 @@ const storeToken = async () => {
   }
 };
 
+const loggedInUsername = usernameVar()
+
 // Login function that either uses Cypress for testing or shows a popup
 const handleLogin = async () => {
   if (window.parent.Cypress) {
@@ -66,13 +66,12 @@ onMounted(() => {
     storeToken();
   }
 });
-
 // Computed properties for username and ownership
 const username = computed(() => {
-  if (!localUsernameResult.value) {
+  if (!loggedInUsername) {
     return "";
   }
-  return localUsernameResult.value?.username || "";
+  return loggedInUsername;
 });
 
 const isOwner = computed(() => {
@@ -96,7 +95,7 @@ const isOwner = computed(() => {
     <div
       v-else
       :class="[fullWidth ? 'w-full' : '']"
-      @click="login"
+      @click="handleLogin"
     >
       <slot name="does-not-have-auth" />
     </div>
