@@ -124,8 +124,7 @@ watch(
       });
     }
     if (
-      discussionResult?.value.getDiscussionsInChannel.discussionChannels
-        .length === 0
+      discussionResult?.value.getDiscussionsInChannel?.discussionChannels?.length === 0
     ) {
       refetchDiscussions();
     }

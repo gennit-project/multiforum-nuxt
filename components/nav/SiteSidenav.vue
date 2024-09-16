@@ -11,6 +11,9 @@ import { GET_LOCAL_USERNAME, GET_USER } from '@/graphQLData/user/queries';
 import { useDisplay } from 'vuetify';
 import CreateAnythingButton from './CreateAnythingButton.vue';
 import config from '@/config';
+import { usernameVar } from '@/cache';
+
+console.log('site side nav');
 
 const DEFAULT_LIMIT = 5;
 
@@ -51,9 +54,7 @@ const visibleRecentForums = computed(() => {
   return showAllForums.value ? recentForums.value : recentForums.value.slice(0, DEFAULT_LIMIT);
 });
 
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-
-const username = computed(() => localUsernameResult.value?.username || '');
+const username = computed(() => usernameVar());
 
 const { result: getUserResult } = useQuery(GET_USER, {
   username: username.value || '',
@@ -66,7 +67,7 @@ const profilePicURL = computed(() => user.value?.profilePicURL || '');
 const { smAndDown } = useDisplay();
 
 const login = () => loginWithRedirect();
-const handleLogout = () => logout({ returnTo: config.baseUrl });
+const handleLogout = () => logout() //logout({ returnTo: config.baseUrl });
 
 const outside = () => {
   emit('close');
@@ -157,7 +158,7 @@ const outside = () => {
         <nuxt-link
           v-if="isAuthenticated && username"
           :to="{
-            name: 'user-username',
+            name: 'u-username',
             params: { username },
           }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
