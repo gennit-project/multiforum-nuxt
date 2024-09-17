@@ -17,7 +17,7 @@ const props = defineProps<{
   formValues: CreateEditDiscussionFormValues | null;
   getDiscussionError?: ApolloError | null;
   updateDiscussionError?: ApolloError | null;
-  discussionLoading: boolean;
+  discussionLoading?: boolean;
   createDiscussionLoading?: boolean;
   updateDiscussionLoading?: boolean;
 }>();
