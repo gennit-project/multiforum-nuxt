@@ -94,7 +94,7 @@ const isOwner = computed(() => {
   >
     <div
       v-if="loggedInUsername && (!requireOwnership || isOwner)"
-      class="w-full flex justify-center"
+      :class="[fullWidth ? 'w-full flex justify-center' :'w-full flex justify-end']"
     >
       <slot name="has-auth" />
     </div>

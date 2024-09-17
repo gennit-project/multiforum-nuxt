@@ -102,7 +102,7 @@ const onClickEdit = () => {
 <template>
   <div class="w-full">
     <div
-      class="mb-2 w-full flex flex-col md:flex-row md:items-center md:justify-between space-y-1 md:space-x-2"
+      class="mb-2 mt-4 w-full flex flex-col md:flex-row md:items-center md:justify-between space-y-1 md:space-x-2"
     >
       <v-skeleton-loader
         v-if="getDiscussionLoading"
@@ -126,7 +126,7 @@ const onClickEdit = () => {
           @update="formValues.title = $event"
         />
       </div>
-      <RequireAuth class="flex max-w-sm justify-end">
+      <RequireAuth class="flex max-w-sm justify-end" :full-width="false">
         <template #has-auth>
           <GenericButton
             v-if="!titleEditMode && authorIsLoggedInUser"
