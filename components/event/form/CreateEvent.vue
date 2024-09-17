@@ -5,7 +5,7 @@ import { useRoute, useRouter } from "vue-router";
 import { DateTime } from "luxon";
 import { gql } from "@apollo/client/core";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import CreateEditEventFields from "./CreateEditEventFields.vue";
+import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { getTimePieces } from "@/utils";

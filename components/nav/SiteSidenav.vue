@@ -22,7 +22,7 @@ type NavigationItem = {
 
 const navigation: NavigationItem[] = [
   { name: 'Online Events', href: '/events/list/search', icon: CalendarIcon },
-  { name: 'In-person Events', href: '/map', icon: LocationIcon },
+  { name: 'In-person Events', href: '/map/search', icon: LocationIcon },
   { name: 'Discussions', href: '/discussions', icon: DiscussionIcon },
   { name: 'All Forums', href: '/forums', icon: ChannelIcon },
 ];

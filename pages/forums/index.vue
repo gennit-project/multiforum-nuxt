@@ -61,7 +61,12 @@ const channelWhere = computed(() => {
 const now = new Date().toISOString();
 
 // Fetch channels using Apollo query
-const { result: channelResult, loading: channelLoading, fetchMore, error: channelError } = useQuery(GET_CHANNELS, {
+const {
+  result: channelResult,
+  loading: channelLoading,
+  fetchMore,
+  error: channelError,
+} = useQuery(GET_CHANNELS, {
   channelWhere: channelWhere,
   eventChannelWhere: {
     Event: {
@@ -101,45 +106,49 @@ const defaultLabels = {
 </script>
 
 <template>
-  <div class="bg-gray-200 dark:bg-black">
-    <div class="py-6">
-      <div class="mx-auto flex max-w-3xl items-center justify-between px-4 py-2">
-        <SearchBar
-          class="mr-2 w-full align-middle"
-          :search-placeholder="'Search forums'"
-          @update-search-input="setSearchInput"
-        />
-        <FilterChip
-          :label="tagLabel"
-          :highlighted="tagLabel !== defaultLabels.tags"
+  <NuxtLayout>
+    <div class="bg-gray-200 dark:bg-black">
+      <div class="py-6">
+        <div
+          class="mx-auto flex max-w-3xl items-center justify-between px-4 py-2"
         >
-          <template #icon>
-            <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
-          </template>
-          <template #content>
-            <!-- Uncomment the TagPicker component when needed -->
-            <!-- <TagPicker :selected-tags="selectedTags" @setSelectedTags="setSelectedTags" /> -->
-          </template>
-        </FilterChip>
-      </div>
-      <ErrorBanner
-        v-if="channelError"
-        class="mx-auto max-w-5xl"
-        :text="channelError.message"
-      />
-      <ChannelList
-        v-if="channelResult && channelResult.channels"
-        class="mx-auto max-w-3xl flex-1 rounded-lg bg-gray-100 md:p-6 text-xl font-bold dark:bg-gray-900"
-        :channels="channelResult.channels"
-        :result-count="channelResult.channelsAggregate?.count || 0"
-        :search-input="searchInput"
-        :selected-tags="selectedTags"
-        @filter-by-tag="setSelectedTags"
-        @load-more="loadMore"
-      />
-      <div v-if="channelLoading" class="mx-auto max-w-5xl flex-1">
-        Loading...
+          <SearchBar
+            class="mr-2 w-full align-middle"
+            :search-placeholder="'Search forums'"
+            @update-search-input="setSearchInput"
+          />
+          <FilterChip
+            :label="tagLabel"
+            :highlighted="tagLabel !== defaultLabels.tags"
+          >
+            <template #icon>
+              <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            </template>
+            <template #content>
+              <!-- Uncomment the TagPicker component when needed -->
+              <!-- <TagPicker :selected-tags="selectedTags" @setSelectedTags="setSelectedTags" /> -->
+            </template>
+          </FilterChip>
+        </div>
+        <ErrorBanner
+          v-if="channelError"
+          class="mx-auto max-w-5xl"
+          :text="channelError.message"
+        />
+        <ChannelList
+          v-if="channelResult && channelResult.channels"
+          class="mx-auto max-w-3xl flex-1 rounded-lg bg-gray-100 md:p-6 text-xl font-bold dark:bg-gray-900"
+          :channels="channelResult.channels"
+          :result-count="channelResult.channelsAggregate?.count || 0"
+          :search-input="searchInput"
+          :selected-tags="selectedTags"
+          @filter-by-tag="setSelectedTags"
+          @load-more="loadMore"
+        />
+        <div v-if="channelLoading" class="mx-auto max-w-5xl flex-1">
+          Loading...
+        </div>
       </div>
     </div>
-  </div>
+  </NuxtLayout>
 </template>

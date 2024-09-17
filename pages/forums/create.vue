@@ -3,10 +3,9 @@ import { defineComponent, ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
 import { CREATE_CHANNEL } from "@/graphQLData/channel/mutations";
-import { useMutation, provideApolloClient , useQuery } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import { gql } from "@apollo/client/core";
-import { apolloClient } from "@/main";
-import CreateEditChannelFields from "./CreateEditChannelFields.vue";
+import CreateEditChannelFields from "@/components/channel/form/CreateEditChannelFields.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {
@@ -23,7 +22,6 @@ export default defineComponent({
   },
   apollo: {},
   setup() {
-    provideApolloClient(apolloClient);
     const route = useRoute();
     const router = useRouter();
 
@@ -46,7 +44,7 @@ export default defineComponent({
       channelIconURL: "",
       channelBannerURL: "",
       selectedTags: [],
-      rules: []
+      rules: [],
     };
 
     const formValues = ref(createChannelDefaultValues);
@@ -125,7 +123,7 @@ export default defineComponent({
               if (
                 existingChannelRefs.some(
                   (ref: any) =>
-                    readField("uniqueName", ref) === newChannel.uniqueName,
+                    readField("uniqueName", ref) === newChannel.uniqueName
                 )
               ) {
                 return existingChannelRefs;
@@ -176,21 +174,30 @@ export default defineComponent({
 });
 </script>
 <template>
-  <RequireAuth>
-    <template #has-auth>
-      <CreateEditChannelFields
-        :create-channel-error="createChannelError"
-        :edit-mode="false"
-        :form-values="formValues"
-        :create-channel-loading="createChannelLoading"
-        @submit="submit"
-        @update-form-values="updateFormValues"
-      />
-    </template>
-    <template #does-not-have-auth>
-      <div class="flex justify-center p-8">
-        You don't have permission to see this page
-      </div>
-    </template>
-  </RequireAuth>
+  <NuxtLayout>
+    <div class="max-w-4xl mx-auto p-4 bg-white dark:bg-black">
+      <h1 class="text-2xl font-bold">Create a Forum</h1>
+      <p>
+        Forums are a way to organize discussions. You can create a forum
+        for a specific topic, project, or category of discussions.
+      </p>
+      <RequireAuth>
+        <template #has-auth>
+          <CreateEditChannelFields
+            :create-channel-error="createChannelError"
+            :edit-mode="false"
+            :form-values="formValues"
+            :create-channel-loading="createChannelLoading"
+            @submit="submit"
+            @update-form-values="updateFormValues"
+          />
+        </template>
+        <template #does-not-have-auth>
+          <div class="flex justify-center p-8">
+            You don't have permission to see this page
+          </div>
+        </template>
+      </RequireAuth>
+    </div>
+  </NuxtLayout>
 </template>

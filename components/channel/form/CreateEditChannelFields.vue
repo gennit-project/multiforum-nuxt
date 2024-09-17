@@ -13,6 +13,7 @@ import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
+import TailwindForm from "@/components/FormComponent.vue";
 
 const props = defineProps({
   editMode: {
