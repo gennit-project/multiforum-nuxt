@@ -137,7 +137,7 @@ if (!channelId.value) {
       <!-- Main Content -->
       <div v-if="channel" class="w-full flex justify-center">
         <article
-          class="relative h-full max-w-7xl rounded-lg dark:bg-black focus:outline-none"
+          class="relative h-full max-w-7xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <!-- ChannelTabs for Mobile -->
           <ChannelTabs
@@ -162,10 +162,9 @@ if (!channelId.value) {
           </div>
 
           <!-- Main Content and Sidebar -->
-          <div>
-            <div class="relative max-w-7xl flex-1 pt-4 focus:outline-none">
+            <div class="w-full relative max-w-7xl flex-1 pt-4 focus:outline-none">
               <div
-                class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
+                class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
               >
                 <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
                   <NuxtPage />
@@ -182,7 +181,6 @@ if (!channelId.value) {
                 </div>
               </div>
             </div>
-          </div>
         </article>
       </div>
     </div>
