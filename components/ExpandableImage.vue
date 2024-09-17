@@ -29,18 +29,20 @@ const handleImageClick = () => {
 </script>
 
 <template>
-  <img
-    :src="src"
-    :alt="alt"
-    class="cursor-pointer"
-    :class="{ 'rounded-full': rounded }"
-    @click="handleImageClick"
-  >
-  <vue-easy-lightbox
-    v-if="visible"
-    :visible="visible"
-    :imgs="images"
-    :index="index"
-    @hide="visible = false"
-  />
+  <div>
+    <img
+      :src="src"
+      :alt="alt"
+      class="cursor-pointer"
+      :class="{ 'rounded-full': rounded }"
+      @click="handleImageClick"
+    >
+    <vue-easy-lightbox
+      v-if="visible"
+      :visible="visible"
+      :imgs="images"
+      :index="index"
+      @hide="visible = false"
+    />
+  </div>
 </template>

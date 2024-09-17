@@ -31,11 +31,17 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  showBodyByDefault: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 defineEmits(["filterByTag"]);
 
 const route = useRoute();
+
+const showBody = ref(props.showBodyByDefault);
 
 const commentCount = computed(() => {
   let count = 0;
@@ -99,7 +105,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
             >
               <span
                 :class="discussionIdInParams === discussionId ? 'text-black' : ''"
-                class="cursor-pointer hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                class="cursor-pointer text-blue-600 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -125,7 +131,7 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
             </div>
           </div>
         </div>
-        <div v-if="discussion && discussion.body" class="border-l-2 border-gray-300">
+        <div v-if="discussion && discussion.body && showBody" class="border-l-2 border-gray-300">
           <MarkdownPreview :text="discussion.body" :word-limit="50" :disable-gallery="false" class="-ml-2" />
         </div>
         <div class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline">

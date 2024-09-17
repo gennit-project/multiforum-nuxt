@@ -42,7 +42,7 @@ export default defineComponent({
     :src="channel?.channelBannerURL"
     :alt="'channel banner'"
     class="max-h-36 w-full"
-  />
+  >
   <div class="bg-white dark:bg-gray-800 flex justify-center">
     <div class="max-w-7xl w-full">
       <div
@@ -52,7 +52,7 @@ export default defineComponent({
         <div class="align-items flex w-full gap-4">
           <ExpandableImage
             v-if="channel?.channelIconURL"
-            class="ml-6 h-24 w-24 border-2 shadow-sm dark:border-gray-800"
+            class="ml-6 h-24 w-24 shadow-sm dark:border-gray-800"
             :rounded="true"
             :is-medium="true"
             :alt="channelId"
@@ -91,9 +91,7 @@ export default defineComponent({
           :use-primary-button="true"
         />
       </div>
-
       <slot />
     </div>
-    <div></div>
   </div>
 </template>
