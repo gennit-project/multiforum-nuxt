@@ -245,7 +245,7 @@ const selectedTab = ref(0);
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
     />
-    <TabGroup>
+    <TabGroup as="div">
       <TabList
         class="border-b pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
       >
@@ -261,7 +261,6 @@ const selectedTab = ref(0);
             @click="
               () => {
                 showFormatted = false;
-
                 selectedTab = 0;
               }
             "
@@ -338,6 +337,7 @@ const selectedTab = ref(0);
     </TabGroup>
   </form>
 </template>
+
 
 <style lang="scss">
 @media (prefers-color-scheme: dark) {
