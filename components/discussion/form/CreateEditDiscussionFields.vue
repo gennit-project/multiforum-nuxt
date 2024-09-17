@@ -8,17 +8,18 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import TextInput from "@/components/TextInput.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
+import TailwindForm from "@/components/FormComponent.vue";
 
 // Props
 const props = defineProps<{
   editMode: boolean;
-  createDiscussionError: ApolloError | null;
+  createDiscussionError?: ApolloError | null;
   formValues: CreateEditDiscussionFormValues | null;
-  getDiscussionError: ApolloError | null;
-  updateDiscussionError: ApolloError | null;
+  getDiscussionError?: ApolloError | null;
+  updateDiscussionError?: ApolloError | null;
   discussionLoading: boolean;
-  createDiscussionLoading: boolean;
-  updateDiscussionLoading: boolean;
+  createDiscussionLoading?: boolean;
+  updateDiscussionLoading?: boolean;
 }>();
 
 defineEmits(["submit", "updateFormValues"]);

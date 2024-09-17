@@ -5,10 +5,7 @@ import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import AddImage from "@/components/AddImage.vue";
-import {
-  uploadAndGetEmbeddedLink,
-  getUploadFileName,
-} from "@/utils";
+import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import ErrorBanner from "./ErrorBanner.vue";
 
 // Props
@@ -172,6 +169,7 @@ const upload = async (file: File) => {
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
       filename,
+      fileType: file.type,
       signedStorageURL,
     });
     return embeddedLink;
@@ -237,6 +235,8 @@ const handleDrop = async (event: any) => {
   const file = files[0];
   handleFormStateDuringUpload(file);
 };
+
+const selectedTab = ref(0);
 </script>
 
 <template>
@@ -250,31 +250,40 @@ const handleDrop = async (event: any) => {
         class="border-b pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
       >
         <div class="flex items-center">
-          <Tab v-slot="{ selected }" as="template">
-            <button
-              :class="[
-                selected
-                  ? 'bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-gray-100'
-                  : 'bg-white text-gray-500 dark:bg-gray-900 dark:text-gray-300',
-                'border-transparent mr-2 rounded-md px-3 py-1.5 text-sm font-medium',
-              ]"
-              @click="showFormatted = false"
-            >
-              Write
-            </button>
+          <Tab
+            as="button"
+            :class="[
+              selectedTab === 0
+                ? 'bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-gray-100'
+                : 'bg-white text-gray-500 dark:bg-gray-900 dark:text-gray-300',
+              'border-transparent mr-2 rounded-md px-3 py-1.5 text-sm font-medium',
+            ]"
+            @click="
+              () => {
+                showFormatted = false;
+
+                selectedTab = 0;
+              }
+            "
+          >
+            Write
           </Tab>
-          <Tab v-slot="{ selected }" as="template">
-            <button
-              :class="[
-                selected
-                  ? 'bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-gray-100'
-                  : 'bg-white text-gray-500 dark:bg-gray-900 dark:text-gray-300',
-                'border-transparent rounded-md px-3 py-1.5 text-sm font-medium',
-              ]"
-              @click="showFormatted = true"
-            >
-              Preview
-            </button>
+          <Tab
+            as="button"
+            :class="[
+              selectedTab === 1
+                ? 'bg-gray-200 text-gray-900 dark:bg-gray-600 dark:text-gray-100'
+                : 'bg-white text-gray-500 dark:bg-gray-900 dark:text-gray-300',
+              'border-transparent rounded-md px-3 py-1.5 text-sm font-medium',
+            ]"
+            @click="
+              () => {
+                showFormatted = true;
+                selectedTab === 1;
+              }
+            "
+          >
+            Preview
           </Tab>
         </div>
         <div v-if="!showFormatted" class="flex items-center space-x-1">
@@ -332,7 +341,6 @@ const handleDrop = async (event: any) => {
 
 <style lang="scss">
 @media (prefers-color-scheme: dark) {
-
   .dark {
     table,
     thead,

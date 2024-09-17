@@ -1,39 +1,39 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-import Identicon from 'identicon.js';
-import sha256 from 'crypto-js/sha256';
+import Identicon from "identicon.js";
+import sha256 from "crypto-js/sha256";
 import gql from "graphql-tag";
 
 const props = defineProps({
   text: {
     type: String,
-    required: true
+    required: true,
   },
   isSquare: {
     type: Boolean,
     required: false,
-    default: false
+    default: false,
   },
   src: {
     type: String,
     required: false,
-    default: ""
+    default: "",
   },
   isLarge: {
     type: Boolean,
     required: false,
-    default: false
+    default: false,
   },
   isMedium: {
     type: Boolean,
     required: false,
-    default: false
+    default: false,
   },
   isSmall: {
     type: Boolean,
     required: false,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const GET_THEME = gql`
@@ -50,7 +50,7 @@ const theme = computed(() => {
   if (themeError.value || !themeResult.value) {
     return "light"; // Default to light theme
   }
-  return themeResult.value
+  return themeResult.value;
 });
 
 // Generate Identicon based on text and theme
@@ -61,37 +61,41 @@ const identiconData = computed(() => {
   // Generate the identicon and get the data for the img src
   const data = new Identicon(hash, {
     // If theme is dark, use a dark background
-    background: theme.value === 'dark' ? [0, 0, 0, 255] : [255, 255, 255, 255],
+    background: theme.value === "dark" ? [0, 0, 0, 255] : [255, 255, 255, 255],
     margin: 0.2,
     size: 420,
-    format: 'svg'
+    format: "svg",
   }).toString();
 
   // Return the data as a base64 SVG for the src of the img
-  return 'data:image/svg+xml;base64,' + data;
+  return "data:image/svg+xml;base64," + data;
 });
 </script>
 
 <template>
-  <img 
-    v-if="src" 
-    :src="src" 
-    :alt="text"
-    :class="[
-      isLarge ? 'h-48 w-48' : '',
-      isMedium ? 'h-20 w-20' : '',
-      isSmall ? 'h-7 w-7' : '', 
-      isSquare ? 'rounded-lg' : 'rounded-full']"
-  >
-  <img 
-    v-else
-    class="border dark:border-gray-600"
-    :class="[
-      isLarge ? 'h-72 w-72' : '',
-      isMedium ? 'h-20 w-20' : '',
-      isSmall ? 'h-7 w-7' : '', 
-      isSquare ? 'rounded-lg' : 'rounded-full']"
-    :src="identiconData" 
-    :alt="text"
-  >
+  <div>
+    <img
+      v-if="src"
+      :src="src"
+      :alt="text"
+      :class="[
+        isLarge ? 'h-48 w-48' : '',
+        isMedium ? 'h-20 w-20' : '',
+        isSmall ? 'h-7 w-7' : '',
+        isSquare ? 'rounded-lg' : 'rounded-full',
+      ]"
+    >
+    <img
+      v-else
+      class="border dark:border-gray-600"
+      :class="[
+        isLarge ? 'h-72 w-72' : '',
+        isMedium ? 'h-20 w-20' : '',
+        isSmall ? 'h-7 w-7' : '',
+        isSquare ? 'rounded-lg' : 'rounded-full',
+      ]"
+      :src="identiconData"
+      :alt="text"
+    >
+  </div>
 </template>

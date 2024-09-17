@@ -3,12 +3,10 @@ import { defineComponent, ref, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import {
   useMutation,
-  useQuery,
 } from "@vue/apollo-composable";
 import type { DiscussionChannel , DiscussionCreateInput } from "@/__generated__/graphql";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
 import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
@@ -17,6 +15,7 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from "@/components/comments/getSortFromQuery";
+import { usernameVar } from "@/cache";
 
 const DISCUSSION_PAGE_LIMIT = 10;
 
@@ -28,17 +27,7 @@ export default defineComponent({
   },
   apollo: {},
   setup() {
-
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-
-    const username = computed(() => {
-      const username = localUsernameResult.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
-    });
-
+    const username = usernameVar();
     const route = useRoute();
     const router = useRouter();
 
@@ -51,7 +40,7 @@ export default defineComponent({
       body: "",
       selectedChannels: channelId ? [channelId] : [],
       selectedTags: [],
-      author: username.value,
+      author: username
     };
 
     const formValues = ref(createDiscussionDefaultValues);
@@ -84,7 +73,7 @@ export default defineComponent({
           connect: {
             where: {
               node: {
-                username: username.value,
+                username,
               },
             },
           },

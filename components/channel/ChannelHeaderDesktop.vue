@@ -60,7 +60,7 @@ export default defineComponent({
           />
           <AvatarComponent
             v-if="!channel?.channelIconURL"
-            class="h-24 w-24 border-2 shadow-sm dark:border-gray-800"
+            class="h-24 w-24 shadow-sm dark:border-gray-800"
             :text="channelId"
             :src="channel?.channelIconURL ?? ''"
             :is-medium="true"
@@ -68,7 +68,7 @@ export default defineComponent({
           />
           <div>
             <div>
-              <div class="mt-10 mb-2">
+              <div class="mt-6 mb-2">
                 <h1
                   v-if="channelId"
                   class="flex rounded-full border-gray-700 bg-white px-4 pt-1 text-2xl font-bold leading-6 text-black dark:bg-gray-900 dark:text-gray-200"

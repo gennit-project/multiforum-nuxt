@@ -106,7 +106,7 @@ const filteredQuery = computed(() => {
 
 <template>
   <li
-    class="relative my-1 flex md:rounded-lg border dark:border-gray-700 bg-white p-2 dark:bg-gray-800"
+    class="relative my-1 flex md:rounded-lg border border-gray-800 bg-white p-2 dark:bg-gray-800"
   >
     <div class="flex w-full flex-row justify-start gap-4 rounded-lg p-1">
       <div v-if="discussion" class="w-full flex-col">

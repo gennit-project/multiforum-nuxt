@@ -129,6 +129,28 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
                 />
               </span>
             </div>
+            <button
+              v-if="discussion && discussion.body && !showBody"
+              @click="showBody = true"
+              class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+            >
+              <i
+                @click="showBody = true"
+                class="mr-1 fa-solid fa-expand text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              />
+            Expand</button>
+            <button
+              v-if="discussion && discussion.body && showBody"
+              @click="showBody = false"
+              class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+            >
+              <i
+                
+                @click="showBody = false"
+                class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              />
+              Collapse
+            </button>
           </div>
         </div>
         <div v-if="discussion && discussion.body && showBody" class="border-l-2 border-gray-300">
