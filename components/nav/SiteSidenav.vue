@@ -24,7 +24,7 @@ const navigation: NavigationItem[] = [
   { name: 'Online Events', href: '/events/list/search', icon: CalendarIcon },
   { name: 'In-person Events', href: '/map', icon: LocationIcon },
   { name: 'Discussions', href: '/discussions', icon: DiscussionIcon },
-  { name: 'All Forums', href: '/channels', icon: ChannelIcon },
+  { name: 'All Forums', href: '/forums', icon: ChannelIcon },
 ];
 
  defineProps({
