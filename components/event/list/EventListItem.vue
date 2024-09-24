@@ -135,7 +135,7 @@ const updateFilters = (params: SearchEventValues) => {
 const handleClick = () => {
   if (
     props.currentChannelId ||
-    route.name === "SearchEventsList"
+    route.name === "events-list-search"
   ) {
     router.push(detailLink.value);
   } else {
