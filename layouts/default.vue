@@ -93,7 +93,6 @@ const showFooter = !route.name?.includes("map");
             @close="showDropdown = false"
           />
           <div class="w-full">
-            <!-- Remove duplicate layout structures -->
             <WithAuth
               v-if="emailFromAuth0"
               :email-from-auth0="emailFromAuth0"

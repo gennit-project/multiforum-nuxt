@@ -77,7 +77,7 @@ const filterByTag = (tag: string) => {
     <div v-if="discussion?.body" class="-ml-2 md:-ml-4 -mt-4 max-w-none">
       <MarkdownPreview
         :text="bodyText"
-        :disable-gallery="route.name !== 'DiscussionDetail'"
+        :disable-gallery="false"
         :word-limit="wordLimit"
       />
     </div>
