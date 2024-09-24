@@ -37,6 +37,7 @@ export default defineComponent({
 });
 </script>
 <template>
+  <div class="hidden md:block w-full">
   <img
     v-if="channel?.channelBannerURL"
     :src="channel?.channelBannerURL"
@@ -94,4 +95,5 @@ export default defineComponent({
       <slot />
     </div>
   </div>
+</div>
 </template>

@@ -107,19 +107,13 @@ if (!channelId.value) {
 <template>
   <NuxtLayout>
     <div class="flex flex-col justify-center dark:bg-black bg-gray-100">
-      <!-- Mobile Header -->
       <ChannelHeaderMobile
         v-if="channel"
-        class="block md:hidden"
         :channel="channel"
         :channel-id="channelId"
       />
-
-      <!-- Desktop Header -->
-
       <ChannelHeaderDesktop
         v-if="channel"
-        class="hidden w-full"
         :channel="channel"
         :channel-id="channelId"
         :admin-list="adminList"
@@ -134,7 +128,6 @@ if (!channelId.value) {
           :route="route"
           :channel="channel"
       /></ChannelHeaderDesktop>
-      <!-- Main Content -->
       <div v-if="channel" class="w-full flex justify-center">
         <article
           class="relative h-full max-w-7xl w-full rounded-lg dark:bg-black focus:outline-none"
@@ -160,27 +153,25 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
-
-          <!-- Main Content and Sidebar -->
-            <div class="w-full relative max-w-7xl flex-1 pt-4 focus:outline-none">
+          <div class="w-full relative max-w-7xl flex-1 pt-4 focus:outline-none">
+            <div
+              class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
+            >
+              <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
+                <NuxtPage />
+              </div>
               <div
-                class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
+                v-if="channelId"
+                class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800"
               >
-                <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
-                  <NuxtPage />
-                </div>
-                <div
-                  v-if="channelId"
-                  class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800"
-                >
-                  <ChannelSidebar
-                    v-if="channel"
-                    :channel="channel"
-                    class="sticky top-0 overflow-auto p-6 pt-8"
-                  />
-                </div>
+                <ChannelSidebar
+                  v-if="channel"
+                  :channel="channel"
+                  class="sticky top-0 overflow-auto p-6 pt-8"
+                />
               </div>
             </div>
+          </div>
         </article>
       </div>
     </div>

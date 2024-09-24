@@ -93,12 +93,9 @@ const showFooter = !route.name?.includes("map");
             @close="showDropdown = false"
           />
           <div class="w-full">
-            <!-- Move loading state up -->
-            <div v-if="isLoading" class="flex justify-center">Loading...</div>
-
             <!-- Remove duplicate layout structures -->
             <WithAuth
-              v-else-if="emailFromAuth0"
+              v-if="emailFromAuth0"
               :email-from-auth0="emailFromAuth0"
             >
               <div class="flex min-h-screen flex-col">
