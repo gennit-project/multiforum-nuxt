@@ -1,5 +1,6 @@
 <script setup>
-import { computed, ref } from "vue";
+import { computed, ref } from 'vue';
+import { useRoute } from 'vue-router';
 
 const props = defineProps({
   count: {
@@ -14,10 +15,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  isActive: {
-    type: Boolean,
-    required: true,
-  },
   vertical: {
     type: Boolean,
     default: false,
@@ -28,32 +25,21 @@ const props = defineProps({
   },
 });
 
-const classes = computed(() => {
-  const classArray = [];
-  if (props.isActive) {
-    classArray.push(`border-black dark:border-blue-500 dark:text-gray-100`);
+const route = useRoute(); // Access the current route
 
-    if (props.vertical) {
-      classArray.push(
-        "bg-gray-100 dark:bg-gray-700 pr-2 px-4 bg-gray-100 text-gray-700 dark:bg-gray-700 ",
-      );
-    } else {
-      classArray.push(
-        "border-b-2 dark:text-gray-400 dark:border-blue-500 dark:text-gray-400",
-      );
-    }
-  } else {
-    classArray.push("text-gray-500 border-white dark:border-gray-800");
-
-    if (props.vertical) {
-      classArray.push("pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700");
-    } else {
-      classArray.push("border-b-2 border-transparent");
-    }
-  }
-
-  return classArray;
+// Compute active state based on the current route
+const isActive = computed(() => {
+  return route.path === props.to;
 });
+
+const classes = computed(() => ({
+  'border-black dark:border-blue-500 dark:text-gray-100': isActive.value,
+  'bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700': isActive.value && props.vertical,
+  'border-b-2 dark:text-gray-400 dark:border-blue-500': isActive.value && !props.vertical,
+  'text-gray-500 border-white dark:border-gray-800': !isActive.value,
+  'pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700': !isActive.value && props.vertical,
+  'border-b-2 border-transparent': !isActive.value && !props.vertical,
+}));
 
 const isHovered = ref(false);
 </script>
@@ -81,7 +67,8 @@ const isHovered = ref(false);
       <span
         v-if="showCount && count !== null"
         class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
-      >{{ count }}
+      >
+        {{ count }}
       </span>
     </div>
   </nuxt-link>

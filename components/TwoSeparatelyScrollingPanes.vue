@@ -11,13 +11,13 @@ defineProps({
   <div class="w-full p-0">
     <div class="flex flex-wrap w-full">
       <div
-        class="w-full lg:w-1/2 constrain-height"
+        class="w-full lg:w-1/3 constrain-height lg:sticky lg:top-0"
       >
         <slot name="leftpane" />
       </div>
       <div
         v-if="showRightPaneAtMediumScreenWidth"
-        class="w-full md:w-1/2 p-0 lg:max-h-screen lg:overflow-y-auto"
+        class="w-full md:w-2/3 p-0"
       >
         <slot name="rightpane" />
       </div>

@@ -3,8 +3,8 @@ import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
-import UserProfileTabs from "@/components/user/UserProfileTabs.vue";
 import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
+import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
 
 // Route handling
 const route = useRoute();
@@ -67,62 +67,31 @@ const isAdmin = computed(() => {
 </script>
 
 <template>
-  <div class="max-w-7xl mx-auto dark:bg-black">
-    <!-- Small screen layout -->
-    <div
-      :class="theme === 'dark' ? 'bg-gray-900' : 'bg-white'"
-      class="h-24 w-full object-cover lg:h-28"
-    />
-    <div class="flex flex-col justify-center md:hidden">
-      <AvatarComponent
-        class="-mt-24 mb-4 h-24 w-24 shadow-sm border"
-        :text="username"
-        :src="user?.profilePicURL"
-        :is-medium="true"
-      />
-      <div class="mb-6">
-        <div v-if="user?.displayName">{{ user.displayName }}</div>
-        <div
-          :class="[
-            user?.displayName
-              ? 'text-sm text-gray-500 dark:text-gray-300'
-              : 'text-lg text-gray-700 dark:text-gray-200',
-          ]"
-        >
-          {{ `u/${username}` }}
-        </div>
-      </div>
-      <!-- Mod profile link can be enabled if needed -->
-    </div>
-
-    <!-- Main content area -->
-    <div class="dark:bg-gray-950">
-      <article class="relative z-0 flex-1 focus:outline-none xl:order-last">
-        <div class="p-0">
-          <div class="flex flex-col md:flex-row gap-3">
-            <!-- Sidebar for larger screens -->
-            <div class="hidden md:block md:w-1/4">
-              <UserProfileSidebar :is-admin="isAdmin" />
-            </div>
-            <!-- User profile content -->
-            <div
-              class="w-full md:w-3/4 pt-6 rounded-lg bg-gray-100 dark:bg-gray-900"
-            >
-              <UserProfileTabs
-                v-if="user"
-                :show-counts="true"
-                :vertical="false"
-                :user="user"
-                class="block border-b border-gray-200 dark:border-gray-600"
-                :route="route"
-              />
-              <NuxtPage />
-            </div>
+  <NuxtLayout>
+    <div class="max-w-7xl mx-auto dark:bg-black">
+      <TwoSeparatelyScrollingPanes
+        :show-right-pane-at-medium-screen-width="true"
+      >
+        <template #leftpane>
+          <UserProfileSidebar :is-admin="isAdmin" />
+        </template>
+        <template #rightpane>
+          <div class="hidden md:block">
+            <UserProfileTabs
+              v-if="user"
+              :show-counts="true"
+              :vertical="false"
+              :user="user"
+              class="block border-b border-gray-200 dark:border-gray-600"
+              :route="route"
+            />
           </div>
-        </div>
-      </article>
+          <NuxtPage />
+        </template>
+       
+      </TwoSeparatelyScrollingPanes>
     </div>
-  </div>
+  </NuxtLayout>
 </template>
 
 <style lang="scss">

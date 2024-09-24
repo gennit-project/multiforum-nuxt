@@ -45,13 +45,12 @@ const user = computed(() => {
 
 <template>
   <div class="sticky top-0 max-h-screen overflow-auto rounded-lg pt-6">
-    <div class="mb-4 mt-6 p-4 flex flex-col gap-2">
+    <div class="mb-4 mt-6 p-2 flex flex-col gap-2">
       <AvatarComponent
-        class="shadow-sm"
         :src="user?.profilePicURL"
         :text="username"
         :is-square="false"
-        :is-large="true"
+        :is-medium="true"
       />
       <h1
         v-if="username && !user?.displayName"

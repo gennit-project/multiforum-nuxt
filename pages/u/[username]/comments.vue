@@ -8,10 +8,8 @@ import { useRoute } from "vue-router";
 const PAGE_LIMIT = 25;
 
 export default defineComponent({
-  name: "DownvotedComments",
   components: {
     Comment,
-    LoadMore,
   },
   setup() {
     const route = useRoute();

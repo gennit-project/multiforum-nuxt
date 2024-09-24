@@ -188,6 +188,7 @@ const permalinkObject = computed(() => {
     name: 'forums-forumId-events-eventId-comments-commentId',
     params: {
       eventId: props.commentData.Event?.id,
+      forumId: channelId,
       commentId: props.commentData.id,
     },
   };

@@ -131,11 +131,11 @@ export default defineComponent({
         <nuxt-link
           class="px-2 text-xs underline"
           :to="{
-            name: 'forums-forumId-discussions-discussionId-comment-commentId',
+            name: 'forums-forumId-discussions-discussionId-comments-commentId',
             params: {
               discussionId: commentData.DiscussionChannel.discussionId,
               commentId: parentCommentId,
-              channelId: commentData.DiscussionChannel.channelUniqueName,
+              forumId: commentData.DiscussionChannel.channelUniqueName,
             },
           }"
         >

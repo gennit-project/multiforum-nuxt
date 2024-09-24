@@ -4,6 +4,7 @@ import { useAuth0 } from "@/hooks/useAuth0";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import TabButton from "@/components/channel/TabButton.vue";
+import type { User } from "@/__generated__/graphql";
 
 type TabData = {
   name: string;
@@ -57,7 +58,7 @@ const tabs = computed(() => {
   const tabList: TabData[] = [
     {
       name: "Comments",
-      href: `/u/${usernameInParams.value}`,
+      href: `/u/${usernameInParams.value}/comments`,
       current: true,
       count: props.user?.CommentsAggregate?.count,
     },
@@ -86,7 +87,6 @@ const tabs = computed(() => {
   return tabList;
 });
 
-
 </script>
 
 <template>
@@ -101,7 +101,6 @@ const tabs = computed(() => {
         :key="tab.name"
         :to="tab.href"
         :label="tab.name"
-        :is-active="route.name.includes(tab.name)"
         :vertical="true"
         :count="tab.count || undefined"
         :show-count="showCounts && !!tab.count"
