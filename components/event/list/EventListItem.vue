@@ -150,7 +150,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 <template>
   <li
     :ref="`#${event.id}`"
-    class="relative pt-4 pr-4 dark:bg-gray-800"
+    class="relative pt-4 pr-4 dark:bg-gray-800 list-none"
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
