@@ -37,7 +37,7 @@ export default defineComponent({
       if (themeLoading.value || themeError.value) {
         return "";
       }
-      return themeResult.value.theme;
+      return themeResult.value?.theme;
     });
 
     return {

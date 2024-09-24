@@ -89,7 +89,7 @@ const GET_THEME = gql`
 `;
 
 const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
-const theme = computed(() => (themeLoading.value || themeError.value ? "" : themeResult.value.theme));
+const theme = computed(() => (themeLoading.value || themeError.value ? "" : themeResult.value?.theme));
 
 const onClickEdit = () => {
   titleEditMode.value = true;
