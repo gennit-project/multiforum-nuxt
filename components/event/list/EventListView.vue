@@ -21,7 +21,6 @@ import LocationFilterTypes from "./filters/locationFilterTypes";
 
 const route = useRoute();
 const router = useRouter();
-const emit = defineEmits(["updateLoadedEventCount", "updateResultCount"]);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
@@ -56,7 +55,6 @@ const {
   error: eventError,
   result: eventResult,
   loading: eventLoading,
-  onResult: onEventResult,
   fetchMore,
 } = useQuery(
   GET_EVENTS,
@@ -72,8 +70,6 @@ const {
     fetchPolicy: "network-only",
   }
 );
-
-const selectedEventId = ref("");
 const previewIsOpen = ref(false);
 
 const loadMore = () => {
@@ -146,16 +142,7 @@ const filterByChannel = (channel: string) => {
   updateFilters({ channels: channel });
 };
 
-// Emit event when the query result is updated
-onEventResult((value) => {
-  if (!value.data || value.data.events.length === 0) {
-    return;
-  }
-  selectedEventId.value = value.data.events[0]?.id;
 
-  emit("updateLoadedEventCount", value.data.events.length);
-  emit("updateResultCount", value.data.eventsAggregate?.count);
-});
 </script>
 
 <template>

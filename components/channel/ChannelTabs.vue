@@ -59,7 +59,7 @@ const loggedInUsername = computed(() => localUsernameResult.value?.username || "
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
     discussions: `/forums/${channelId.value}/discussions`,
-    events: `/forums/${channelId.value}/events/search`,
+    events: `/forums/${channelId.value}/events`,
     about: `/forums/${channelId.value}/about`,
     settings: `/forums/${channelId.value}/edit`,
     moderation: `/forums/${channelId.value}/issues`,
@@ -79,7 +79,7 @@ const tabs: Tab[] = [
   },
   {
     name: "events",
-    routeSuffix: "events/search",
+    routeSuffix: "events",
     label: "Events",
     icon: CalendarIcon,
     countProperty: "EventChannelsAggregate",
