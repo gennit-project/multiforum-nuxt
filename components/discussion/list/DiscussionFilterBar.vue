@@ -124,7 +124,7 @@ const toggleSelectedTag = (tag: string) => {
 
 <template>
   <div>
-    <div class="mb-4 mt-3 flex flex-col md:flex-row md:items-center md:justify-between">
+    <div class="my-2 flex items-center space-y-2 space-x-2">
       <SearchBar
         class="flex flex-grow px-1"
         data-testid="discussion-filter-search-bar"
@@ -133,8 +133,6 @@ const toggleSelectedTag = (tag: string) => {
         :small="true"
         @update-search-input="updateSearchInput"
       />
-    </div>
-    <div class="mb-4 mt-3 flex flex-col md:flex-row md:items-center md:justify-end space-y-2 md:space-y-0 md:space-x-2">
       <FilterChip
         v-if="!channelId"
         class="align-middle"

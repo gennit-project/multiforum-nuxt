@@ -3,5 +3,5 @@ import SearchDiscussions from "@/components/discussion/list/SearchDiscussions.vu
 </script>
 
 <template>
-  <SearchDiscussions />
+  <SearchDiscussions :is-forum-scoped="true" />
 </template>

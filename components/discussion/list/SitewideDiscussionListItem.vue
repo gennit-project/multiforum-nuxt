@@ -2,7 +2,11 @@
 import { computed } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "vue-router";
-import type { Discussion, DiscussionChannel, Tag } from "@/__generated__/graphql";
+import type {
+  Discussion,
+  DiscussionChannel,
+  Tag,
+} from "@/__generated__/graphql";
 import TagComponent from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
@@ -53,9 +57,13 @@ const commentCount = computed(() => {
   return count;
 });
 
-const submittedToMultipleChannels = computed(() => props.discussion?.DiscussionChannels?.length > 1);
+const submittedToMultipleChannels = computed(
+  () => props.discussion?.DiscussionChannels?.length > 1
+);
 
-const channelCount = computed(() => props.discussion?.DiscussionChannels.length || 0);
+const channelCount = computed(
+  () => props.discussion?.DiscussionChannels.length || 0
+);
 
 const discussionDetailOptions = computed(() => {
   if (!props.discussion) return [];
@@ -82,39 +90,59 @@ const getDetailLink = (channelId: string) => {
   return `/forums/${channelId}/discussions/${props.discussion.id}`;
 };
 
-const discussionIdInParams = computed(() => (typeof route.params.discussionId === "string" ? route.params.discussionId : ""));
+const discussionIdInParams = computed(() =>
+  typeof route.params.discussionId === "string" ? route.params.discussionId : ""
+);
 const discussionId = computed(() => props.discussion?.id || "");
 const title = computed(() => props.discussion?.title || "[Deleted]");
-const tags = computed(() => props.discussion?.Tags.map((tag: Tag) => tag.text) || []);
-const authorUsername = computed(() => props.discussion?.Author?.username || "Deleted");
-const relative = computed(() => props.discussion ? relativeTime(props.discussion.createdAt) : "");
+const tags = computed(
+  () => props.discussion?.Tags.map((tag: Tag) => tag.text) || []
+);
+const authorUsername = computed(
+  () => props.discussion?.Author?.username || "Deleted"
+);
+const relative = computed(() =>
+  props.discussion ? relativeTime(props.discussion.createdAt) : ""
+);
 </script>
 
 <template>
-  <li class="relative flex gap-3 space-x-2 md:rounded-lg bg-white border dark:border-gray-700 px-2 md:px-6 py-2 md:py-4 dark:bg-gray-800">
+  <li
+    class="relative flex gap-3 space-x-2 bg-white border dark:border-gray-700 px-2 py-2 dark:bg-gray-800"
+  >
     <div class="flex w-full justify-between">
       <div class="w-full">
         <div class="flex border-b pb-2 dark:border-b-gray-600">
-          <div class="mr-2 flex items-center justify-center flex-start w-6 md:w-10 h-6 md:h-10 rounded-md bg-gray-100 p-1 text-sm md:text-xl dark:bg-gray-600">
+          <div
+            class="mr-2 flex items-center justify-center flex-start w-6 h-6 rounded-md bg-gray-100 p-1 text-md dark:bg-gray-600"
+          >
             💬
           </div>
           <div>
             <nuxt-link
               v-if="discussion"
-              :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
+              :to="
+                getDetailLink(
+                  discussion.DiscussionChannels[0].channelUniqueName
+                )
+              "
             >
               <span
-                :class="discussionIdInParams === discussionId ? 'text-black' : ''"
+                :class="
+                  discussionIdInParams === discussionId ? 'text-black' : ''
+                "
                 class="cursor-pointer text-blue-600 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
               >
                 <HighlightedSearchTerms
                   :text="title"
                   :search-input="searchInput"
-                  :classes="'font-medium text-sm md:text-md lg:text-lg'"
+                  :classes="'font-medium text-lg'"
                 />
               </span>
             </nuxt-link>
-            <div class="font-medium flex flex-wrap items-center gap-1 text-xs text-gray-600 no-underline dark:text-gray-300">
+            <div
+              class="font-medium flex flex-wrap items-center gap-1 text-sm text-gray-600 no-underline dark:text-gray-300"
+            >
               <span>
                 {{ `Posted ${relative} by ` }}
                 <UsernameWithTooltip
@@ -131,32 +159,42 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
             </div>
             <button
               v-if="discussion && discussion.body && !showBody"
-              @click="showBody = true"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              @click="showBody = true"
             >
               <i
-                @click="showBody = true"
                 class="mr-1 fa-solid fa-expand text-xs text-gray-600 dark:text-gray-300 hover:underline"
+                @click="showBody = true"
               />
-            Expand</button>
+              Expand
+            </button>
             <button
               v-if="discussion && discussion.body && showBody"
-              @click="showBody = false"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              @click="showBody = false"
             >
               <i
-                
-                @click="showBody = false"
                 class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
+                @click="showBody = false"
               />
               Collapse
             </button>
           </div>
         </div>
-        <div v-if="discussion && discussion.body && showBody" class="border-l-2 border-gray-300">
-          <MarkdownPreview :text="discussion.body" :word-limit="50" :disable-gallery="false" class="-ml-2" />
+        <div
+          v-if="discussion && discussion.body && showBody"
+          class="border-l-2 border-gray-300"
+        >
+          <MarkdownPreview
+            :text="discussion.body"
+            :word-limit="50"
+            :disable-gallery="false"
+            class="-ml-2"
+          />
         </div>
-        <div class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline">
+        <div
+          class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline"
+        >
           <TagComponent
             v-for="tag in tags"
             :key="tag"
@@ -169,7 +207,9 @@ const relative = computed(() => props.discussion ? relativeTime(props.discussion
 
         <nuxt-link
           v-if="discussion && !submittedToMultipleChannels"
-          :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
+          :to="
+            getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
+          "
           class="mt-1 flex cursor-pointer items-center justify-start gap-1 text-xs text-gray-400 dark:text-gray-100"
         >
           <span class="font-bold underline">{{

@@ -2,30 +2,11 @@
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
-import gql from "graphql-tag";
 import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
 import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
 
 // Route handling
 const route = useRoute();
-
-// Fetch theme
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-
-const {
-  result: themeResult,
-  loading: themeLoading,
-  error: themeError,
-} = useQuery(GET_THEME);
-
-const theme = computed(() => {
-  if (themeLoading.value || themeError.value) return "";
-  return themeResult.value?.theme || "";
-});
 
 // Get the username from the route parameters
 const username = computed(() => {

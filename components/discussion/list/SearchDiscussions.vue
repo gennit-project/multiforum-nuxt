@@ -10,6 +10,13 @@ import type { SearchDiscussionValues } from "@/types/Discussion";
 // Props and Emits
 defineEmits(["filterByTag", "filterByChannel"]);
 
+defineProps({
+  isForumScoped: {
+    type: Boolean,
+    default: false,
+  },
+});
+
 // Setup function
 const route = useRoute();
 const router = useRouter();
@@ -145,12 +152,11 @@ const handleClickChannel = (uniqueName: string) => {
 </script>
 
 <template>
-  <v-container
-    :class="[channelId ? '' : 'max-w-4xl']"
-    class="justify-center rounded-lg p-0"
+  <div
+    class="justify-center rounded-lg p-0 max-w-5xl mx-auto" 
   >
     <SitewideDiscussionList
-      v-if="!channelId"
+      v-if="!isForumScoped"
       @filter-by-tag="handleClickTag"
       @filter-by-channel="handleClickChannel"
     >
@@ -167,7 +173,7 @@ const handleClickChannel = (uniqueName: string) => {
     >
       <DiscussionFilterBar />
     </ChannelDiscussionList>
-  </v-container>
+  </div>
 </template>
 
 <style>

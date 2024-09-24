@@ -103,7 +103,7 @@ nextTick(() => {
 </script>
 
 <template>
-  <v-container fluid class="max-w-4xl p-0">
+  <div class="max-w-4xl p-0">
     <div v-if="userLoading">Loading...</div>
     <div v-else-if="getUserError">
       <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
@@ -178,5 +178,5 @@ nextTick(() => {
     <div v-for="(error, i) of updateUserError?.graphQLErrors" :key="i">
       {{ error.message }}
     </div>
-  </v-container>
+  </div>
 </template>

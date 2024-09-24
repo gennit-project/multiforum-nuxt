@@ -10,9 +10,7 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import WithAuth from "@/components/layout/WithAuth.vue";
 
-
-const { isLoading, user } = useAuth0();
-
+const { user } = useAuth0();
 
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,
@@ -76,8 +74,8 @@ const showFooter = !route.name?.includes("map");
 <template>
   <v-app>
     <main>
-      <div class="h-screen dark:text-gray-200 list-disc">
-        <nav>
+      <div class="bg-gray-100 dark:text-gray-200 list-disc">
+        <nav class="bg-white">
           <TopNav
             :show-user-profile-dropdown="showUserProfileDropdown"
             :side-nav-is-open="showDropdown"

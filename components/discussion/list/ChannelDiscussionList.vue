@@ -172,7 +172,7 @@ const handleCreateModProfileClick = async () => {
 </script>
 
 <template>
-  <div class="md:px-6">
+  <div>
     <slot />
     <p v-if="!discussionChannelResult && discussionLoading">
       Loading...

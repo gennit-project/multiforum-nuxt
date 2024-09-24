@@ -151,7 +151,7 @@ const deleteRule = (index: number) => {
 </script>
 
 <template>
-  <v-container fluid class="mt-4 max-w-3xl pt-0 px-0">
+  <div class="mt-4 max-w-3xl pt-0 px-0">
     <div v-if="channelLoading">Loading...</div>
 
     <TailwindForm
@@ -322,5 +322,5 @@ const deleteRule = (index: number) => {
     <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
       {{ error.message }}
     </div>
-  </v-container>
+  </div>
 </template>

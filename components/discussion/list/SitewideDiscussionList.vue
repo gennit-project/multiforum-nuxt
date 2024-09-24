@@ -124,7 +124,7 @@ watch(
       });
     }
     if (
-      discussionResult?.value.getDiscussionsInChannel?.discussionChannels?.length === 0
+      discussionResult?.value?.getDiscussionsInChannel?.discussionChannels?.length === 0
     ) {
       refetchDiscussions();
     }
@@ -143,7 +143,7 @@ const filterByChannel = (channel: string) => {
 </script>
 
 <template>
-  <div class="w-full md:rounded-lg md:px-2">
+  <div>
     <slot />
     <p v-if="discussionLoading">
       Loading...
@@ -173,10 +173,10 @@ const filterByChannel = (channel: string) => {
         </template>
       </RequireAuth>
     </p>
-    <div v-if="discussions && discussions.length > 0">
+    <div v-if="discussions && discussions.length > 0" class="p-0">
       <ul
         role="list"
-        class="my-6 flex flex-col gap-1"
+        class="flex flex-col"
         data-testid="sitewide-discussion-list"
       >
         <SitewideDiscussionListItem

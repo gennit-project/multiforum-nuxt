@@ -8,7 +8,6 @@ import "md-editor-v3/lib/preview.css";
 import type { PropType } from "vue";
 import type { Discussion } from "@/__generated__/graphql";
 
-const route = useRoute();
 const router = useRouter();
 
 const props = defineProps({
@@ -73,8 +72,8 @@ const filterByTag = (tag: string) => {
 </script>
 
 <template>
-  <div class="md:px-2">
-    <div v-if="discussion?.body" class="-ml-2 md:-ml-4 -mt-4 max-w-none">
+  <div>
+    <div v-if="discussion?.body" class="-ml-2 -mt-4">
       <MarkdownPreview
         :text="bodyText"
         :disable-gallery="false"

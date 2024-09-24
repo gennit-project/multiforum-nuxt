@@ -52,7 +52,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="flex max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="flex max-w-5xl mx-auto px-4 py-12">
     <MarkdownPreview
       :text="content"
       :disable-gallery="true"

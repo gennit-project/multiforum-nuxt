@@ -36,7 +36,7 @@ const ownerList = computed(() =>
 </script>
 
 <template>
-  <v-container class="max-w-4xl justify-center p-8 dark:bg-gray-900">
+  <div class="max-w-4xl justify-center p-8 dark:bg-gray-900">
     <div class="w-full py-3">
       <ChannelSidebar
         v-if="channel"
@@ -69,7 +69,7 @@ const ownerList = computed(() =>
         </template>
       </RequireAuth>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <style lang="scss" scoped>

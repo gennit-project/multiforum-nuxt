@@ -279,7 +279,7 @@ const touched = ref(false);
 </script>
 
 <template>
-  <v-container class="max-w-3xl pt-0 px-0">
+  <div class="max-w-3xl pt-0 px-0">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">
@@ -505,7 +505,7 @@ const touched = ref(false);
       <ErrorBanner v-if="createEventError" :text="createEventError.message" />
       <ErrorBanner v-if="updateEventError" :text="updateEventError.message" />
     </TailwindForm>
-  </v-container>
+  </div>
 </template>
 
 <style lang="scss">

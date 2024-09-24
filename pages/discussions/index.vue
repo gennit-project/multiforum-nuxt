@@ -4,7 +4,7 @@ import SearchDiscussions from '@/components/discussion/list/SearchDiscussions.vu
 
 <template>
   <NuxtLayout>
-    <SearchDiscussions />
+    <SearchDiscussions :is-forum-scoped="false" />
   </NuxtLayout>
 </template>
 
