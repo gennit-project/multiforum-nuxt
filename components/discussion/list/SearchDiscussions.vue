@@ -160,7 +160,7 @@ const handleClickChannel = (uniqueName: string) => {
       @filter-by-tag="handleClickTag"
       @filter-by-channel="handleClickChannel"
     >
-      <DiscussionFilterBar />
+      <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
     </SitewideDiscussionList>
     <ChannelDiscussionList
       v-else
@@ -171,7 +171,7 @@ const handleClickChannel = (uniqueName: string) => {
       @filter-by-tag="handleClickTag"
       @filter-by-channel="handleClickChannel"
     >
-      <DiscussionFilterBar />
+      <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
     </ChannelDiscussionList>
   </div>
 </template>

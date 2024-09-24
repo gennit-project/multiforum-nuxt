@@ -136,7 +136,7 @@ const relative = computed(() =>
                 <HighlightedSearchTerms
                   :text="title"
                   :search-input="searchInput"
-                  :classes="'font-medium text-lg'"
+                  :classes="'font-medium sm:text-sm md:text-md lg:text-lg'"
                 />
               </span>
             </nuxt-link>
@@ -159,11 +159,11 @@ const relative = computed(() =>
             </div>
             <button
               v-if="discussion && discussion.body && !showBody"
-              class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              class="text-md text-gray-600 dark:text-gray-300 hover:underline"
               @click="showBody = true"
             >
               <i
-                class="mr-1 fa-solid fa-expand text-xs text-gray-600 dark:text-gray-300 hover:underline"
+                class="mr-1 fa-solid fa-expand text-md text-gray-600 dark:text-gray-300 hover:underline"
                 @click="showBody = true"
               />
               Expand

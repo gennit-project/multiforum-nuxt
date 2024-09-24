@@ -24,6 +24,10 @@ defineProps({
     type: Number,
     default: 0,
   },
+  isForumScoped: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Nuxt route and router
@@ -134,7 +138,7 @@ const toggleSelectedTag = (tag: string) => {
         @update-search-input="updateSearchInput"
       />
       <FilterChip
-        v-if="!channelId"
+        v-if="!isForumScoped"
         class="align-middle"
         data-testid="channel-filter-button"
         :label="channelLabel"
