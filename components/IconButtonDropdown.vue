@@ -2,7 +2,7 @@
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import type { PropType } from "vue";
 
-type MenuItemType = {
+export type MenuItemType = {
   value: string;
   icon: string;
   label: string;
