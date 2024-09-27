@@ -134,10 +134,17 @@ const emit = defineEmits([
   "openModProfile",
   "scrollToTop",
 ]);
-
+console.log('props', {
+  showCommentButtons: props.showCommentButtons, 
+  commentData: props.commentData,
+})
 const route = useRoute();
 const router = useRouter();
-const { discussionId, channelId } = route.params;
+const { discussionId, forumId } = route.params;
+console.log('route', {
+  discussionId: discussionId,
+  forumId: forumId,
+})
 
 const isHighlighted = computed(() => {
   return (
@@ -163,7 +170,7 @@ const {
 } = useQuery(GET_LOCAL_USERNAME);
 
 const canShowPermalink =
-  props.commentData.DiscussionChannel || (discussionId && channelId);
+  props.commentData.DiscussionChannel || (discussionId && forumId);
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink) {
@@ -179,7 +186,7 @@ const permalinkObject = computed(() => {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
         forumId:
-          channelId || props.commentData?.DiscussionChannel?.channelUniqueName,
+          forumId || props.commentData?.DiscussionChannel?.channelUniqueName,
       },
     };
   }
@@ -188,7 +195,7 @@ const permalinkObject = computed(() => {
     name: 'forums-forumId-events-eventId-comments-commentId',
     params: {
       eventId: props.commentData.Event?.id,
-      forumId: channelId,
+      forumId: forumId,
       commentId: props.commentData.id,
     },
   };
@@ -433,7 +440,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                 </div>
                 <div class="flex items-center">
                   <CommentButtons
-                    v-if="channelId && props.showCommentButtons"
+                    v-if="forumId && props.showCommentButtons"
                     class="mb-1 ml-1"
                     :class="[
                       props.editFormOpenAtCommentID === props.commentData.id

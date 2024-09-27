@@ -77,7 +77,7 @@ const route = useRoute();
 const router = useRouter();
 const { result: localUsernameResult, loading: localUsernameLoading, error: localUsernameError } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => {
-  if (localUsernameLoading.value || localUsernameError.value) {
+  if (localUsernameLoading.value || localUsernameError.value || !localUsernameResult.value) {
     return "";
   }
   return localUsernameResult.value.username;
