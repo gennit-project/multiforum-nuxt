@@ -42,12 +42,12 @@ const props = defineProps({
 });
 
 const route = useRoute();
-const channelId = ref(route.params.forumId);
+const forumId = ref(route.params.forumId);
 
 watch(
   () => route.params,
   (to) => {
-    channelId.value = to.channelId;
+    forumId.value = to.forumId;
   },
 );
 
@@ -58,11 +58,11 @@ const loggedInUsername = computed(() => localUsernameResult.value?.username || "
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
-    discussions: `/forums/${channelId.value}/discussions`,
-    events: `/forums/${channelId.value}/events`,
-    about: `/forums/${channelId.value}/about`,
-    settings: `/forums/${channelId.value}/edit`,
-    moderation: `/forums/${channelId.value}/issues`,
+    discussions: `/forums/${forumId.value}/discussions`,
+    events: `/forums/${forumId.value}/events`,
+    about: `/forums/${forumId.value}/about`,
+    settings: `/forums/${forumId.value}/edit`,
+    moderation: `/forums/${forumId.value}/issues`,
   };
   return routes;
 });
