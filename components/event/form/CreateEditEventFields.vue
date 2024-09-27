@@ -286,7 +286,7 @@ const touched = ref(false);
         {{ error.message }}
       </div>
     </div>
-    <TailwindForm
+    <FormComponent
       v-else-if="formValues"
       class="w-full"
       data-testid="event-form"
@@ -504,7 +504,7 @@ const touched = ref(false);
       />
       <ErrorBanner v-if="createEventError" :text="createEventError.message" />
       <ErrorBanner v-if="updateEventError" :text="updateEventError.message" />
-    </TailwindForm>
+    </FormComponent>
   </div>
 </template>
 

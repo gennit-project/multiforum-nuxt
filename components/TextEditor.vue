@@ -328,7 +328,7 @@ const selectedTab = ref(0);
           </div>
         </TabPanel>
         <TabPanel class="-m-0.5 overflow-auto rounded-md p-0.5">
-          <v-md-preview
+          <MarkdownRenderer
             :text="text"
             class="block w-full max-w-2xl rounded-md border-gray-300 text-xs shadow-sm dark:border-gray-800 dark:bg-gray-700 dark:text-gray-100"
           />
@@ -337,7 +337,6 @@ const selectedTab = ref(0);
     </TabGroup>
   </form>
 </template>
-
 
 <style lang="scss">
 @media (prefers-color-scheme: dark) {
