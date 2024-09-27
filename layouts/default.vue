@@ -97,7 +97,9 @@ const showFooter = !route.name?.includes("map");
             >
               <div class="flex min-h-screen flex-col">
                 <div class="flex-grow">
+                  <client-only>
                   <slot />
+                </client-only>
                 </div>
                 <SiteFooter v-if="showFooter" />
               </div>

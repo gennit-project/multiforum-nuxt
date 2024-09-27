@@ -106,14 +106,14 @@ if (!channelId.value) {
 
 <template>
   <NuxtLayout>
-    <div class="flex flex-col justify-center dark:bg-black bg-gray-100">
+    <div v-if="channel" class="flex flex-col justify-center dark:bg-black bg-gray-100">
       <ChannelHeaderMobile
-        v-if="channel"
+        class="block md:hidden"
         :channel="channel"
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
-        v-if="channel"
+        class="hidden md:block"
         :channel="channel"
         :channel-id="channelId"
         :admin-list="adminList"
