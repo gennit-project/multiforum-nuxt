@@ -99,7 +99,7 @@ const defaultChannel = computed(() => {
 const permalinkObject = computed(() => {
   if (!props.discussion) return {};
   return {
-    name: "DiscussionDetail",
+    name: "forums-forumId-discussions-discussionId",
     params: {
       discussionId: props.discussion.id,
       forumId: defaultChannel.value,

@@ -16,7 +16,6 @@ const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,
 });
 
-
 // Reactive variable to track if the email is not in the system
 const emailNotInSystem = ref(false);
 
@@ -98,8 +97,8 @@ const showFooter = !route.name?.includes("map");
               <div class="flex min-h-screen flex-col">
                 <div class="flex-grow">
                   <client-only>
-                  <slot />
-                </client-only>
+                    <slot />
+                  </client-only>
                 </div>
                 <SiteFooter v-if="showFooter" />
               </div>
