@@ -63,7 +63,7 @@ const channelId = computed(() => {
 const permalinkObject = computed(() => {
   if (!eventId.value) return {};
   return {
-    name: "EventDetail",
+    name: "forums-forumId-events-eventId",
     params: {
       eventId: eventId.value,
       forumId: channelId.value,
@@ -88,7 +88,7 @@ const {
   error: localUsernameError,
 } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => {
-  if (localUsernameLoading.value || localUsernameError.value) return "";
+  if (localUsernameLoading.value || localUsernameError.value || !localUsernameResult.value) return "";
   return localUsernameResult.value.username;
 });
 

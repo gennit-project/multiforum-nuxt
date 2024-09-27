@@ -118,7 +118,6 @@ const copyLink = async (event: any) => {
       basePath = process.env.BASE_URL || "";
     }
     const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
-    console.log(permalink);
     await navigator.clipboard.writeText(permalink);
     showCopiedLinkNotification.value = event;
   } catch (e) {

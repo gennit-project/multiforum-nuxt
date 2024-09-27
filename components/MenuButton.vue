@@ -6,20 +6,16 @@ import { actionIconMap } from "@/utils";
 import type { MenuItemType } from "./IconButtonDropdown.vue";
 
 // Props
-const props = defineProps({
+defineProps({
   items: {
     type: Array as PropType<MenuItemType[]>,
     default: () => [],
   },
 });
 
-console.log("IconButtonDropdown.vue items", props.items);
-console.log("client", import.meta.client);
-
 const emits = defineEmits<(e: string) => void>(); // Accept any event type
 
 const emitEvent = (eventName: string) => {
-  console.log(`Emitting event: ${eventName}`);
   emits(eventName);
 };
 
