@@ -117,7 +117,7 @@ const outside = () => {
         <div class="text-bold mt-3 px-6 uppercase leading-6 text-gray-400 dark:text-gray-100">
           Recent Forums
         </div>
-        <div class="px-6">
+        <div class="px-3">
           <ul class="mb-6">
             <li v-for="forum in visibleRecentForums" :key="forum.uniqueName" class="list-none">
               <nuxt-link
@@ -130,7 +130,7 @@ const outside = () => {
                   class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
                   :text="forum.uniqueName || ''"
                   :src="forum?.channelIconURL ?? ''"
-                  :is-medium="true"
+                  :is-small="true"
                   :is-square="false"
                 />
                 <AvatarComponent
@@ -138,7 +138,7 @@ const outside = () => {
                   class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
                   :text="forum.uniqueName || ''"
                   :src="forum?.channelIconURL ?? ''"
-                  :is-medium="true"
+                  :is-small="true"
                   :is-square="false"
                 />
                 {{ forum.uniqueName }}

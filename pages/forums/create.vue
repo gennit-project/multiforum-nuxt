@@ -1,208 +1,172 @@
-<script lang="ts">
-import { defineComponent, ref, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
-import type { CreateEditChannelFormValues } from "@/types/Channel";
-import { CREATE_CHANNEL } from "@/graphQLData/channel/mutations";
+<script lang="ts" setup>
+import { ref, computed } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { gql } from "@apollo/client/core";
 import CreateEditChannelFields from "@/components/channel/form/CreateEditChannelFields.vue";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
+import { CREATE_CHANNEL } from "@/graphQLData/channel/mutations";
 import type {
   Channel,
   ChannelCreateInput,
   ChannelTagsConnectOrCreateFieldInput,
 } from "@/__generated__/graphql";
 
-export default defineComponent({
-  name: "CreateChannel",
-  components: {
-    CreateEditChannelFields,
-    RequireAuth,
-  },
-  apollo: {},
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
+const router = useRouter();
 
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
+const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
-    const username = computed(() => {
-      const username = localUsernameResult.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
+const username = computed(() => {
+  const username = localUsernameResult.value?.username;
+  if (username) {
+    return username;
+  }
+  return "";
+});
+
+const createChannelDefaultValues = {
+  uniqueName: "",
+  displayName: "",
+  description: "",
+  channelIconURL: "",
+  channelBannerURL: "",
+  selectedTags: [],
+  rules: [],
+};
+
+const formValues = ref(createChannelDefaultValues);
+
+const createChannelInput = computed(() => {
+  const tagConnections: ChannelTagsConnectOrCreateFieldInput[] =
+    formValues.value.selectedTags.map((tag: string) => {
+      return {
+        onCreate: {
+          node: {
+            text: tag,
+          },
+        },
+        where: {
+          node: {
+            text: tag,
+          },
+        },
+      };
     });
 
-    const channelId: string | string[] = route.params.forumId;
-
-    const createChannelDefaultValues: CreateEditChannelFormValues = {
-      uniqueName: "",
-      displayName: "",
-      description: "",
-      channelIconURL: "",
-      channelBannerURL: "",
-      selectedTags: [],
-      rules: [],
-    };
-
-    const formValues = ref(createChannelDefaultValues);
-
-    const createChannelInput = computed(() => {
-      const tagConnections: ChannelTagsConnectOrCreateFieldInput[] =
-        formValues.value.selectedTags.map((tag: string) => {
-          return {
-            onCreate: {
-              node: {
-                text: tag,
-              },
-            },
+  const result: ChannelCreateInput[] = [
+    {
+      uniqueName: formValues.value.uniqueName,
+      description: formValues.value.description,
+      displayName: formValues.value.displayName,
+      channelIconURL: formValues.value.channelIconURL,
+      channelBannerURL: formValues.value.channelBannerURL,
+      Tags: {
+        connectOrCreate: tagConnections,
+      },
+      Admins: {
+        connect: [
+          {
             where: {
               node: {
-                text: tag,
+                username: username.value,
               },
             },
-          };
-        });
-
-      const result: ChannelCreateInput[] = [
-        {
-          uniqueName: formValues.value.uniqueName,
-          description: formValues.value.description,
-          displayName: formValues.value.displayName,
-          channelIconURL: formValues.value.channelIconURL,
-          channelBannerURL: formValues.value.channelBannerURL,
-          Tags: {
-            connectOrCreate: tagConnections,
           },
-          Admins: {
-            connect: [
-              {
-                where: {
-                  node: {
-                    username: username.value,
-                  },
-                },
-              },
-            ],
-          },
-        },
-      ];
-      return result;
-    });
-
-    const createChannelLoading = ref(false);
-
-    const {
-      mutate: createChannel,
-      error: createChannelError,
-      onDone,
-    } = useMutation(CREATE_CHANNEL, () => ({
-      variables: {
-        createChannelInput: createChannelInput.value,
+        ],
       },
-      update: (cache: any, result: any) => {
-        const newChannel: Channel = result.data?.createChannels?.channels[0];
+    },
+  ];
+  return result;
+});
 
-        cache.modify({
-          fields: {
-            channels(existingChannelRefs = [], fieldInfo: any) {
-              const readField = fieldInfo.readField;
-              const newChannelRef = cache.writeFragment({
-                data: newChannel,
-                fragment: gql`
-                  fragment NewChannel on Channels {
-                    uniqueName
-                  }
-                `,
-              });
+const createChannelLoading = ref(false);
 
-              // Quick safety check - if the new channel is already
-              // present in the cache, we don't need to add it again.
-              if (
-                existingChannelRefs.some(
-                  (ref: any) =>
-                    readField("uniqueName", ref) === newChannel.uniqueName
-                )
-              ) {
-                return existingChannelRefs;
-              }
-              return [newChannelRef, ...existingChannelRefs];
-            },
+const { mutate: createChannel, error: createChannelError, onDone } = useMutation(
+  CREATE_CHANNEL,
+  () => ({
+    variables: {
+      createChannelInput: createChannelInput.value,
+    },
+    update: (cache, result) => {
+      const newChannel: Channel = result.data?.createChannels?.channels[0];
+
+      cache.modify({
+        fields: {
+          channels(existingChannels = []) {
+            const newChannelRef = cache.writeFragment({
+              data: newChannel,
+              fragment: gql`
+                fragment NewChannel on Channel {
+                  uniqueName
+                  description
+                  channelIconURL
+                  channelBannerURL
+                  Admins
+                  Tags
+                }
+              `,
+            });
+            return [...existingChannels, newChannelRef];
           },
-        });
-      },
-    }));
-
-    onDone((response: any) => {
-      const newChannelId = response.data.createChannels.channels[0].uniqueName;
-      createChannelLoading.value = false;
-
-      router.push({
-        name: "forms-forumId-discussions",
-        params: {
-          forumId: newChannelId,
         },
       });
-    });
-
-    return {
-      channelId,
-      createChannel,
-      createChannelError,
-      createChannelLoading,
-      createChannelInput,
-      formValues,
-      router,
-    };
-  },
-  methods: {
-    async submit() {
-      this.createChannelLoading = true;
-      this.createChannel();
     },
-    updateFormValues(data: CreateEditChannelFormValues) {
-      const existingValues = this.formValues;
+  })
+);
 
-      this.formValues = {
-        ...existingValues,
-        ...data,
-      };
+onDone((response) => {
+  const newChannelId = response.data.createChannels.channels[0].uniqueName;
+  createChannelLoading.value = false;
+
+  router.push({
+    name: "forums-forumId-discussions",
+    params: {
+      forumId: newChannelId,
     },
-  },
+  });
 });
-</script>
-<template>
-  <NuxtLayout>
-    <div class="flex justify-center">
-      <div class="max-w-3xl w-full bg-white dark:bg-black">
-        <RequireAuth>
-          <template #has-auth>
-            <div class="w-full">
-              <h1 class="ml-6 text-2xl mt-6 font-bold">Create a Channel</h1>
-              <p class="text-gray-500 dark:text-gray-300 ml-6">
-                Channels are where you can create discussions and share content
-                with others.
-              </p>
 
-              <CreateEditChannelFields
-                :create-channel-error="createChannelError"
-                :edit-mode="false"
-                :form-values="formValues"
-                :create-channel-loading="createChannelLoading"
-                @submit="submit"
-                @update-form-values="updateFormValues"
-              />
-            </div>
-          </template>
-          <template #does-not-have-auth>
-            <div class="flex justify-center p-8">
-              You don't have permission to see this page
-            </div>
-          </template>
-        </RequireAuth>
-      </div>
+const submit = async () => {
+  createChannelLoading.value = true;
+  createChannel();
+};
+
+const updateFormValues = (data) => {
+  formValues.value = {
+    ...formValues.value,
+    ...data,
+  };
+};
+</script>
+
+<template>
+  <div class="flex justify-center">
+    <div class="max-w-3xl w-full bg-white dark:bg-black">
+      <RequireAuth>
+        <template #has-auth>
+          <div class="w-full">
+            <h1 class="ml-6 text-2xl mt-6 font-bold">Create a Forum</h1>
+            <p class="text-gray-500 dark:text-gray-300 ml-6">
+              Channels are where you can create discussions and share content
+              with others.
+            </p>
+
+            <CreateEditChannelFields
+              :create-channel-error="createChannelError"
+              :edit-mode="false"
+              :form-values="formValues"
+              :create-channel-loading="createChannelLoading"
+              @submit="submit"
+              @update-form-values="updateFormValues"
+            />
+          </div>
+        </template>
+        <template #does-not-have-auth>
+          <div class="flex justify-center p-8">
+            You don't have permission to see this page
+          </div>
+        </template>
+      </RequireAuth>
     </div>
-  </NuxtLayout>
+  </div>
 </template>

@@ -13,7 +13,6 @@ import LocationIcon from "@/components/icons/LocationIcon.vue";
 import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
-import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,

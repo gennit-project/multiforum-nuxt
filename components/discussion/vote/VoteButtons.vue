@@ -3,7 +3,6 @@ import { computed } from 'vue';
 import VoteButton from '@/components/VoteButton.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
-import MenuButton from '@/components/MenuButton.vue';
 import type { SelectOptionData } from '@/types/GenericFormTypes';
 import { ALLOWED_ICONS } from '@/utils';
 

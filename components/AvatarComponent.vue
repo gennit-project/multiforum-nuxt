@@ -81,7 +81,7 @@ const identiconData = computed(() => {
       :class="[
         isLarge ? 'h-48 w-48' : '',
         isMedium ? 'h-20 w-20' : '',
-        isSmall ? 'h-7 w-7' : '',
+        isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
     >
@@ -91,7 +91,7 @@ const identiconData = computed(() => {
       :class="[
         isLarge ? 'h-72 w-72' : '',
         isMedium ? 'h-20 w-20' : '',
-        isSmall ? 'h-7 w-7' : '',
+        isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
       :src="identiconData"

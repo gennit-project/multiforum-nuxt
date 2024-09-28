@@ -10,7 +10,6 @@ import TextEditor from "../TextEditor.vue";
 import ChildComments from "./ChildComments.vue";
 import CommentButtons from "./CommentButtons.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import MenuButton from "@/components/MenuButton.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";

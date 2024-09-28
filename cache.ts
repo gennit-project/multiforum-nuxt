@@ -32,6 +32,9 @@ const cache = new InMemoryCache({
         Tags: {
           merge: false,
         },
+        Admins: {
+          merge: false,
+        },
       },
     },
     Discussion: {

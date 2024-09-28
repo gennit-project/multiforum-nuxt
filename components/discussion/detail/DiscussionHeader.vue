@@ -7,7 +7,6 @@ import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import MenuButton from "@/components/MenuButton.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";

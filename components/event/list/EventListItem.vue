@@ -5,7 +5,6 @@ import { getDatePieces } from "@/utils";
 import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import MenuButton from "@/components/MenuButton.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import type { PropType } from "vue";
 import type { Event } from "@/__generated__/graphql";
