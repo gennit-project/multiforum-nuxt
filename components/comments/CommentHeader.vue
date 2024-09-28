@@ -5,7 +5,6 @@ import type { Comment } from "@/__generated__/graphql";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
 import clickOutside from "vue-click-outside";
 import { relativeTime } from "@/utils";
-console.log('comment header')
 
 export default defineComponent({
   components: {

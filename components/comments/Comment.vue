@@ -134,17 +134,10 @@ const emit = defineEmits([
   "openModProfile",
   "scrollToTop",
 ]);
-console.log('props', {
-  showCommentButtons: props.showCommentButtons, 
-  commentData: props.commentData,
-})
+
 const route = useRoute();
 const router = useRouter();
 const { discussionId, forumId } = route.params;
-console.log('route', {
-  discussionId: discussionId,
-  forumId: forumId,
-})
 
 const isHighlighted = computed(() => {
   return (
