@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { DateTime } from "luxon";
 import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
@@ -8,14 +8,11 @@ import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import MenuButton from "@/components/MenuButton.vue";
-import {
-  GET_LOCAL_MOD_PROFILE_NAME,
-  GET_LOCAL_USERNAME,
-} from "@/graphQLData/user/queries";
 import Notification from "@/components/NotificationComponent.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { ALLOWED_ICONS } from "@/utils";
+import { usernameVar, modProfileNameVar } from "@/cache";
 
 type MenuItem = {
   label: string;
@@ -131,15 +128,8 @@ const deleteModalIsOpen = ref(false);
 const showOpenIssueModal = ref(false);
 const showSuccessfullyReported = ref(false);
 
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => localUsernameResult.value?.username || "");
-
-const { result: localModProfileNameResult } = useQuery(
-  GET_LOCAL_MOD_PROFILE_NAME
-);
-const loggedInUserModName = computed(
-  () => localModProfileNameResult.value?.modProfileName || ""
-);
+const username = usernameVar();
+const loggedInUserModName = modProfileNameVar()
 
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
@@ -162,7 +152,7 @@ const menuItems = computed(() => {
       ]);
     }
 
-    if (props.discussion?.Author?.username === username.value) {
+    if (props.discussion?.Author?.username === username) {
       out.push({
         label: "Edit",
         event: "handleEdit",
@@ -175,7 +165,7 @@ const menuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
         value: props.discussion.id,
       });
-    } else if (username.value && loggedInUserModName.value) {
+    } else if (username && loggedInUserModName) {
       out.push({
         label: "Report",
         event: "handleClickReport",
@@ -242,7 +232,7 @@ const authorIsMod = computed(
         data-testid="discussion-menu-button"
         @copy-link="copyLink"
         @handle-edit="
-          router.push(`/forums/${channelId}/discussions/${discussion.id}/edit`)
+          router.push(`/forums/${channelId}/discussions/edit/${discussion.id}`)
         "
         @handle-delete="deleteModalIsOpen = true"
         @handle-click-report="showOpenIssueModal = true"
@@ -250,7 +240,10 @@ const authorIsMod = computed(
         @handle-view-feedback="
           router.push({
             name: 'forums-forumId-discussions-discussionId-feedback',
-            params: { discussionId: discussion.id },
+            params: { 
+              forumId: defaultChannel,
+              discussionId: discussion.id 
+            },
           })
         "
       >

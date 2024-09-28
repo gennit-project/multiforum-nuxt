@@ -73,7 +73,7 @@ export default defineComponent({
     >
       <div
         v-if="rule.summary"
-        class="flex items-center"
+        class="flex items-center text-sm"
       >
         <span class="mr-2 dark:text-gray-400">{{ `${i + 1}.` }}</span>{{ rule.summary }}
         <i
@@ -90,7 +90,7 @@ export default defineComponent({
       </div>
       <div
         v-if="isOpen(rule.summary)"
-        class="mt-2 text-sm text-gray-600 dark:text-gray-300"
+        class="text-sm text-gray-600 dark:text-gray-300"
       >
         <MarkdownPreview :text="rule.detail" />
       </div>

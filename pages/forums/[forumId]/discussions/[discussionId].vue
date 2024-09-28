@@ -44,23 +44,24 @@ onMounted(() => {
     window.scrollTo(0, 0);
   });
 });
+
 </script>
 
 <template>
   <div class="relative max-w-7xl p-0 flex-1 focus:outline-none xl:order-last">
     <div class="flex w-full justify-center space-y-4">
-      <!-- Loading Spinner -->
       <LoadingSpinner v-if="localModProfileNameLoading" class="h-12 w-12" />
-
-      <!-- Error Banner for local mod profile name error -->
-      <ErrorBanner v-else-if="localModProfileNameError" :text="localModProfileNameError.message" />
-
-      <!-- Error Banner if discussion is not found -->
+      <ErrorBanner
+        v-else-if="localModProfileNameError"
+        :text="localModProfileNameError.message"
+      />
       <ErrorBanner v-else-if="!discussionId" text="Discussion not found" />
-
-      <!-- Discussion Detail Content -->
       <DiscussionDetailContent
-        v-else-if="discussionId && !localModProfileNameError && !localModProfileNameLoading"
+        v-else-if="
+          discussionId &&
+          !localModProfileNameError &&
+          !localModProfileNameLoading
+        "
         :key="discussionId"
         :discussion-id="discussionId"
         :logged-in-user-mod-name="loggedInUserModName"

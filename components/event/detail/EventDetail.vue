@@ -252,7 +252,7 @@ const addToOutlook = () => {
 
               <div class="p-4">
                 <h2 class="text-md mt-4">Add to Calendar</h2>
-                <hr />
+                <hr>
                 <div class="mt-4 flex">
                   <div class="flex flex-row gap-2 text-sm">
                     <div class="flex justify-start">
