@@ -6,9 +6,10 @@ import TextEditor from "@/components/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import ErrorBanner from "../ErrorBanner.vue";
-import { GET_LOCAL_USERNAME, GET_USER } from "@/graphQLData/user/queries";
+import { GET_USER } from "@/graphQLData/user/queries";
 import type { ApolloError } from "@apollo/client/errors";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
+import { usernameVar } from "@/cache";
 
 defineProps({
   createCommentError: {
@@ -37,10 +38,9 @@ const emit = defineEmits([
   "handleCreateComment",
 ]);
 
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
 const username = computed(() => {
-  return localUsernameResult.value?.username || "";
+  return usernameVar();
 });
 
 const { result: getUserResult } = useQuery(GET_USER, {
