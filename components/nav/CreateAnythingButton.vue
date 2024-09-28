@@ -122,8 +122,8 @@ const handleItemClick = (item: any) => {
             <v-list-item
               v-for="(item, index) in menuItems"
               :key="index"
-              @click="() => handleItemClick(item)"
               :data-testid="item.testId"
+              @click="() => handleItemClick(item)"
             >
               <span class="block px-4 py-2 text-sm" :class="[ 'text-gray-700 dark:text-white' ]">
                 {{ item.text }}

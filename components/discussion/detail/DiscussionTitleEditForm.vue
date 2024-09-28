@@ -97,6 +97,16 @@ const onClickEdit = () => {
     titleInputRef.value?.focus();
   });
 };
+
+const formattedDate = computed(() => {
+  if (!discussion.value?.createdAt) return "";
+  // Date should be in this format: Mar 30, 2023
+  return new Date(discussion.value.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+});
 </script>
 
 <template>
@@ -117,8 +127,16 @@ const onClickEdit = () => {
         >
           {{ discussion && discussion.title ? discussion.title : "[Deleted]" }}
         </h2>
+        <p
+          v-if="!titleEditMode"
+          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
+        >
+          {{
+            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion on ${formattedDate}`
+          }}
+        </p>
         <TextInput
-          v-else
+          v-if="titleEditMode"
           ref="titleInputRef"
           :test-id="'title-input'"
           :value="formValues.title"

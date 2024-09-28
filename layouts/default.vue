@@ -8,8 +8,7 @@ import type { User, ModerationProfile } from "@/__generated__/graphql";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
-import WithAuth from "@/components/layout/WithAuth.vue";
-
+import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 const { user } = useAuth0();
 
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
@@ -36,7 +35,7 @@ onEmailResult((result: any) => {
     username = user.username;
     modProfile = user.ModerationProfile;
 
-    if (username) {
+    if (username && username !== usernameVar()) {
       // Store the authenticated user's username in the app state
       usernameVar(username);
     }
@@ -65,9 +64,11 @@ const toggleUserProfileDropdown = () => {
   showUserProfileDropdown.value = !showUserProfileDropdown.value;
 };
 
-const emailFromAuth0 = user.email // emailResult.value?.emails[0]?.emailAddress;
+const emailFromAuth0 = user.email; // emailResult.value?.emails[0]?.emailAddress;
 const route = useRoute();
 const showFooter = !route.name?.includes("map");
+const { isLoading, error: emailError } = useAuth0();
+const loggedInUser = computed(() => usernameVar());
 </script>
 
 <template>
@@ -90,19 +91,25 @@ const showFooter = !route.name?.includes("map");
             @close="showDropdown = false"
           />
           <div class="w-full">
-            <WithAuth
-              v-if="emailFromAuth0"
-              :email-from-auth0="emailFromAuth0"
-            >
-              <div class="flex min-h-screen flex-col">
-                <div class="flex-grow">
-                  <client-only>
-                    <slot />
-                  </client-only>
-                </div>
-                <SiteFooter v-if="showFooter" />
+            <div v-if="emailFromAuth0" :email-from-auth0="emailFromAuth0">
+              <div v-if="isLoading">Loading...</div>
+              <ErrorBanner v-else-if="emailError" :text="emailError?.message" />
+              <div v-else-if="emailNotInSystem">
+                <CreateUsernamePage
+                  @email-and-user-created="emailNotInSystem = false"
+                />
               </div>
-            </WithAuth>
+              <div v-else :key="loggedInUser">
+                <div class="flex min-h-screen flex-col">
+                  <div class="flex-grow">
+                    <client-only>
+                      <slot />
+                    </client-only>
+                  </div>
+                  <SiteFooter v-if="showFooter" />
+                </div>
+              </div>
+            </div>
             <div v-else class="flex min-h-screen flex-col">
               <div class="flex-grow">
                 <slot />

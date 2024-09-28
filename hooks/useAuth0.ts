@@ -12,6 +12,7 @@ export const useAuth0 = () => {
     login: () => console.log("Mock login"),
     logout: () => console.log("Mock logout"),
     isLoading: false, // Placeholder value
+    error: null, // Placeholder value
   };
 };
 

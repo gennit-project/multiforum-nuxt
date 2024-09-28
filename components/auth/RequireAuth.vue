@@ -48,13 +48,6 @@ const storeToken = async () => {
   }
 };
 
-const loggedInUsername = computed(() => {
-  if (!isAuthenticated) {
-    return "";
-  }
-  return usernameVar();
-});
-
 // Login function that either uses Cypress for testing or shows a popup
 const handleLogin = async () => {
   if (window.parent.Cypress) {
@@ -74,10 +67,8 @@ onMounted(() => {
 });
 // Computed properties for username and ownership
 const username = computed(() => {
-  if (!loggedInUsername.value) {
-    return "";
-  }
-  return loggedInUsername.value;
+  console.log('usernameVar()', usernameVar())
+  return usernameVar()
 });
 
 const isOwner = computed(() => {
@@ -93,7 +84,7 @@ const isOwner = computed(() => {
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
     <div
-      v-if="loggedInUsername && (!requireOwnership || isOwner)"
+      v-if="username && (!requireOwnership || isOwner)"
       :class="[fullWidth ? 'w-full flex justify-center' :'w-full flex justify-end']"
     >
       <slot name="has-auth" />

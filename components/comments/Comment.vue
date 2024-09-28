@@ -236,7 +236,7 @@ const commentMenuItems = computed(() => {
     ]);
   }
 
-  if (props.commentData?.CommentAuthor?.username === username.value.username) {
+  if (props.commentData?.CommentAuthor?.username === username.value?.username) {
     out = out.concat([
       {
         label: "Edit",
