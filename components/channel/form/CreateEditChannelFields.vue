@@ -151,7 +151,7 @@ const deleteRule = (index: number) => {
 </script>
 
 <template>
-  <div class="mt-4 max-w-3xl pt-0 px-0">
+  <div class="mt-4 w-full pt-0 px-0">
     <div v-if="channelLoading">Loading...</div>
 
     <TailwindForm

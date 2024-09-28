@@ -175,29 +175,34 @@ export default defineComponent({
 </script>
 <template>
   <NuxtLayout>
-    <div class="max-w-4xl mx-auto p-4 bg-white dark:bg-black">
-      <h1 class="text-2xl font-bold">Create a Forum</h1>
-      <p>
-        Forums are a way to organize discussions. You can create a forum
-        for a specific topic, project, or category of discussions.
-      </p>
-      <RequireAuth>
-        <template #has-auth>
-          <CreateEditChannelFields
-            :create-channel-error="createChannelError"
-            :edit-mode="false"
-            :form-values="formValues"
-            :create-channel-loading="createChannelLoading"
-            @submit="submit"
-            @update-form-values="updateFormValues"
-          />
-        </template>
-        <template #does-not-have-auth>
-          <div class="flex justify-center p-8">
-            You don't have permission to see this page
-          </div>
-        </template>
-      </RequireAuth>
+    <div class="flex justify-center">
+      <div class="max-w-3xl w-full bg-white dark:bg-black">
+        <RequireAuth>
+          <template #has-auth>
+            <div class="w-full">
+              <h1 class="ml-6 text-2xl mt-6 font-bold">Create a Channel</h1>
+              <p class="text-gray-500 dark:text-gray-300 ml-6">
+                Channels are where you can create discussions and share content
+                with others.
+              </p>
+
+              <CreateEditChannelFields
+                :create-channel-error="createChannelError"
+                :edit-mode="false"
+                :form-values="formValues"
+                :create-channel-loading="createChannelLoading"
+                @submit="submit"
+                @update-form-values="updateFormValues"
+              />
+            </div>
+          </template>
+          <template #does-not-have-auth>
+            <div class="flex justify-center p-8">
+              You don't have permission to see this page
+            </div>
+          </template>
+        </RequireAuth>
+      </div>
     </div>
   </NuxtLayout>
 </template>
