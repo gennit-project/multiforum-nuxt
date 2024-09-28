@@ -130,7 +130,7 @@ const toggleSelectedTag = (tag: string) => {
   <div>
     <div class="my-2 flex items-center space-y-2 space-x-2">
       <SearchBar
-        class="flex flex-grow px-1"
+        class="flex flex-grow"
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search...'"

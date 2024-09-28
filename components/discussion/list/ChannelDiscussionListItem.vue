@@ -106,7 +106,7 @@ const filteredQuery = computed(() => {
 
 <template>
   <li
-    class="relative my-1 mr-2 flex md:rounded-lg border shadow border-gray-800 bg-white p-2 dark:bg-gray-800"
+    class="mb-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800"
   >
     <div class="flex w-full flex-row justify-start gap-4 rounded-lg p-1">
       <div v-if="discussion" class="w-full flex-col">
@@ -134,7 +134,7 @@ const filteredQuery = computed(() => {
                 <HighlightedSearchTerms
                   :text="title"
                   :search-input="searchInput"
-                  :classes="'font-medium text-md'"
+                  :classes="'font-medium text-md text-blue-600'"
                 />
               </span>
             </nuxt-link>
@@ -158,10 +158,9 @@ const filteredQuery = computed(() => {
             </div>
           </div>
         </div>
-        <hr class="dark:border-gray-600" >
         <div
           v-if="discussion?.body"
-          class="my-2 border-gray-400 dark:bg-gray-700"
+          class="my-2 dark:bg-gray-700"
         >
           <MarkdownPreview
             :text="discussion.body"

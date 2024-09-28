@@ -19,7 +19,7 @@ import {
 } from "@/components/comments/getSortFromQuery";
 const DISCUSSION_PAGE_LIMIT = 25;
 
-const emit = defineEmits(['filterByTag', 'filterByChannel']);
+const emit = defineEmits(["filterByTag", "filterByChannel"]);
 
 const route = useRoute();
 
@@ -31,7 +31,7 @@ const filterValues = ref(
   getFilterValuesFromParams({
     route,
     channelId: channelId.value,
-  }),
+  })
 );
 
 const activeSort = computed(() => {
@@ -80,7 +80,7 @@ const loadMore = () => {
         offset:
           discussionChannelResult.value?.getDiscussionsInChannel
             .discussionChannels.length,
-            // @ts-ignore
+        // @ts-ignore
         sort: activeSort.value,
         // @ts-ignore
         timeFrame: activeTimeFrame.value,
@@ -119,12 +119,13 @@ const username = computed(() => {
 
 const randomWords = generateSlug(4, { format: "camel" });
 
-const { mutate: createModProfile, onDone: onDoneCreateModProfile } = useMutation(CREATE_MOD_PROFILE, {
-  variables: {
-    displayName: randomWords,
-    username: username.value?.username,
-  },
-});
+const { mutate: createModProfile, onDone: onDoneCreateModProfile } =
+  useMutation(CREATE_MOD_PROFILE, {
+    variables: {
+      displayName: randomWords,
+      username: username.value?.username,
+    },
+  });
 
 onDoneCreateModProfile(({ data }) => {
   const updatedUser = data.updateUsers.users[0];
@@ -157,11 +158,11 @@ watch(
 
 // Methods
 const filterByTag = (tag: string) => {
-  emit('filterByTag', tag);
+  emit("filterByTag", tag);
 };
 
 const filterByChannel = (channel: string) => {
-  emit('filterByChannel', channel);
+  emit("filterByChannel", channel);
 };
 
 const handleCreateModProfileClick = async () => {
@@ -172,11 +173,9 @@ const handleCreateModProfileClick = async () => {
 </script>
 
 <template>
-  <div>
+  <div class="px-2">
     <slot />
-    <p v-if="!discussionChannelResult && discussionLoading">
-      Loading...
-    </p>
+    <p v-if="!discussionChannelResult && discussionLoading">Loading...</p>
     <ErrorBanner
       v-else-if="discussionError"
       class="max-w-5xl"
@@ -185,8 +184,8 @@ const handleCreateModProfileClick = async () => {
     <p
       v-else-if="
         discussionChannelResult &&
-          discussionChannelResult.getDiscussionsInChannel.discussionChannels
-            .length === 0
+        discussionChannelResult.getDiscussionsInChannel.discussionChannels
+          .length === 0
       "
       class="flex gap-2 p-4"
     >
@@ -208,50 +207,49 @@ const handleCreateModProfileClick = async () => {
           </nuxt-link>
         </template>
         <template #does-not-have-auth>
-          <span class="cursor-pointer text-blue-500 underline">Create one?</span>
+          <span class="cursor-pointer text-blue-500 underline"
+            >Create one?</span
+          >
         </template>
       </RequireAuth>
     </p>
-    <div v-else>
-      <div>
-        <ul
-          role="list"
-          class="relative flex flex-col rounded  dark:divide-gray-700 divide-gray-200"
-          data-testid="channel-discussion-list"
-        >
-          <ChannelDiscussionListItem
-            v-for="discussionChannel in discussionChannelResult
-              .getDiscussionsInChannel.discussionChannels"
-            :key="discussionChannel.id"
-            :discussion="discussionChannel.Discussion"
-            :discussion-channel="discussionChannel"
-            :search-input="searchInput"
-            :selected-tags="selectedTags"
-            :selected-channels="selectedChannels"
-            @open-mod-profile="showModProfileModal = true"
-            @filter-by-tag="filterByTag"
-            @filter-by-channel="filterByChannel"
-          />
-        </ul>
-        <div
-          v-if="
-            discussionChannelResult.getDiscussionsInChannel.discussionChannels
-              .length > 0
-          "
-        >
-          <LoadMore
-            class="justify-self-center mb-6"
-            :loading="discussionLoading"
-            :reached-end-of-results="
-              discussionChannelResult.getDiscussionsInChannel
-                .aggregateDiscussionChannelsCount ===
-                discussionChannelResult.getDiscussionsInChannel.discussionChannels
-                  .length
-            "
-            @load-more="loadMore"
-          />
-        </div>
-      </div>
+
+    <div
+      v-else
+      class="dark:divide-gray-700 divide-gray-200 flex flex-col divide-y"
+      data-testid="channel-discussion-list"
+    >
+      <ChannelDiscussionListItem
+        v-for="discussionChannel in discussionChannelResult
+          .getDiscussionsInChannel.discussionChannels"
+        :key="discussionChannel.id"
+        :discussion="discussionChannel.Discussion"
+        :discussion-channel="discussionChannel"
+        :search-input="searchInput"
+        :selected-tags="selectedTags"
+        :selected-channels="selectedChannels"
+        @open-mod-profile="showModProfileModal = true"
+        @filter-by-tag="filterByTag"
+        @filter-by-channel="filterByChannel"
+      />
+    </div>
+    <div
+      v-if="
+        discussionChannelResult.getDiscussionsInChannel.discussionChannels
+          .length > 0
+      "
+    >
+      <LoadMore
+        class="justify-self-center mb-6"
+        :loading="discussionLoading"
+        :reached-end-of-results="
+          discussionChannelResult.getDiscussionsInChannel
+            .aggregateDiscussionChannelsCount ===
+          discussionChannelResult.getDiscussionsInChannel.discussionChannels
+            .length
+        "
+        @load-more="loadMore"
+      />
     </div>
     <WarningModal
       :title="'Create Mod Profile'"
