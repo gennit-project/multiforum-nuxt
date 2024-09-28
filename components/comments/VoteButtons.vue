@@ -6,6 +6,7 @@ import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from '@/graphQLData/us
 import { UPVOTE_COMMENT, UNDO_UPVOTE_COMMENT } from '@/graphQLData/comment/mutations';
 import type { PropType } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
+import VotesComponent from './Votes.vue';
 
 const props = defineProps({
   commentData: {

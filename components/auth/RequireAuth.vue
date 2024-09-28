@@ -67,7 +67,6 @@ onMounted(() => {
 });
 // Computed properties for username and ownership
 const username = computed(() => {
-  console.log('usernameVar()', usernameVar())
   return usernameVar()
 });
 

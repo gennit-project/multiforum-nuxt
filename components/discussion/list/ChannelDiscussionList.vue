@@ -182,11 +182,7 @@ const handleCreateModProfileClick = async () => {
       :text="discussionError.message"
     />
     <p
-      v-else-if="
-        discussionChannelResult &&
-        discussionChannelResult.getDiscussionsInChannel.discussionChannels
-          .length === 0
-      "
+      v-else-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length === 0"
       class="flex gap-2 p-4"
     >
       <span>There are no discussions to show.</span>
@@ -215,7 +211,7 @@ const handleCreateModProfileClick = async () => {
     </p>
 
     <div
-      v-else
+      v-else-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
       class="dark:divide-gray-700 divide-gray-200 flex flex-col divide-y"
       data-testid="channel-discussion-list"
     >
@@ -234,10 +230,7 @@ const handleCreateModProfileClick = async () => {
       />
     </div>
     <div
-      v-if="
-        discussionChannelResult.getDiscussionsInChannel.discussionChannels
-          .length > 0
-      "
+      v-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
     >
       <LoadMore
         class="justify-self-center mb-6"
@@ -245,7 +238,7 @@ const handleCreateModProfileClick = async () => {
         :reached-end-of-results="
           discussionChannelResult.getDiscussionsInChannel
             .aggregateDiscussionChannelsCount ===
-          discussionChannelResult.getDiscussionsInChannel.discussionChannels
+          discussionChannelResult.getDiscussionsInChannel?.discussionChannels
             .length
         "
         @load-more="loadMore"
