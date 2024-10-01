@@ -48,7 +48,6 @@ const createCommentDefaultValues = {
 const createFormValues = ref(createCommentDefaultValues);
 
 const username = computed(() => {
-  console.log("usernameVar", usernameVar());
   return usernameVar() || "";
 });
 

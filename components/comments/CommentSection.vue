@@ -1,37 +1,37 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect } from 'vue';
-import { useQuery, useMutation } from '@vue/apollo-composable';
-import Comment from './Comment.vue';
-import LoadMore from '../LoadMore.vue';
-import ErrorBanner from '../ErrorBanner.vue';
-import WarningModal from '../WarningModal.vue';
-import OpenIssueModal from '@/components/mod/OpenIssueModal.vue';
-import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
-import SortButtons from '@/components/SortButtons.vue';
-import Notification from '@/components/NotificationComponent.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
-import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
-import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
-import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
+import { ref, computed, watchEffect } from "vue";
+import { useQuery, useMutation } from "@vue/apollo-composable";
+import Comment from "./Comment.vue";
+import LoadMore from "../LoadMore.vue";
+import ErrorBanner from "../ErrorBanner.vue";
+import WarningModal from "../WarningModal.vue";
+import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
+import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
+import SortButtons from "@/components/SortButtons.vue";
+import Notification from "@/components/NotificationComponent.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
+import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
+import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
 import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
   SOFT_DELETE_COMMENT,
   CREATE_COMMENT,
   ADD_FEEDBACK_COMMENT_TO_COMMENT,
-} from '@/graphQLData/comment/mutations';
-import { GET_LOCAL_MOD_PROFILE_NAME } from '@/graphQLData/user/queries';
-import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+} from "@/graphQLData/comment/mutations";
+import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
+import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import type {
   CommentCreateInput,
   Comment as CommentType,
-} from '@/__generated__/graphql';
+} from "@/__generated__/graphql";
 import type {
   CreateEditCommentFormValues,
   CreateReplyInputData,
   DeleteCommentInputData,
-} from '@/types/Comment';
-import type { Ref, PropType } from 'vue';
+} from "@/types/Comment";
+import type { Ref, PropType } from "vue";
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -101,11 +101,11 @@ const props = defineProps({
 
 // Emits
 const emit = defineEmits([
-  'updateCommentSectionQueryResult',
-  'decrementCommentCount',
-  'incrementCommentCount',
-  'updateCreateReplyCommentInput',
-  'loadMore',
+  "updateCommentSectionQueryResult",
+  "decrementCommentCount",
+  "incrementCommentCount",
+  "updateCreateReplyCommentInput",
+  "loadMore",
 ]);
 
 // Route and router
@@ -113,12 +113,14 @@ const route = useRoute();
 const router = useRouter();
 
 // Computed properties
-const channelId = computed(() => (typeof route.params.forumId === 'string' ? route.params.forumId : ''));
+const channelId = computed(() =>
+  typeof route.params.forumId === "string" ? route.params.forumId : ""
+);
 const activeSort = computed(() => getSortFromQuery(route.query));
 const permalinkedCommentId = ref(`${route.params.commentId}`);
 
 // Comment form state
-const commentToDeleteId = ref('');
+const commentToDeleteId = ref("");
 const commentToDeleteReplyCount = ref(0);
 const commentToEdit: Ref<CommentType | null> = ref(null);
 const showFeedbackSubmittedSuccessfully = ref(false);
@@ -129,11 +131,11 @@ const commentToReport: Ref<CommentType | null> = ref(null);
 const showDeleteCommentModal = ref(false);
 const showConfirmUndoFeedbackModal = ref(false);
 const showEditCommentFeedbackModal = ref(false);
-const parentOfCommentToDelete = ref('');
-const parentIdOfCommentToGiveFeedbackOn = ref('');
+const parentOfCommentToDelete = ref("");
+const parentIdOfCommentToGiveFeedbackOn = ref("");
 const commentInProcess = ref(false);
-const replyFormOpenAtCommentID = ref('');
-const editFormOpenAtCommentID = ref('');
+const replyFormOpenAtCommentID = ref("");
+const editFormOpenAtCommentID = ref("");
 const showCopiedLinkNotification = ref(false);
 const showModProfileModal = ref(false);
 const showOpenIssueModal = ref(false);
@@ -141,13 +143,13 @@ const showSuccessfullyReported = ref(false);
 const locked = ref(false);
 
 const editFormValues = ref<CreateEditCommentFormValues>({
-  text: commentToEdit.value?.text || '',
+  text: commentToEdit.value?.text || "",
   isRootComment: true,
   depth: 1,
 });
 
 const updateCommentInput = computed(() => ({
-  text: editFormValues.value?.text || '',
+  text: editFormValues.value?.text || "",
   isRootComment: editFormValues.value?.isRootComment,
 }));
 
@@ -159,9 +161,9 @@ const {
 
 const loggedInUserModName = computed(() => {
   if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return '';
+    return "";
   }
-  return localModProfileNameResult.value?.modProfileName || '';
+  return localModProfileNameResult.value?.modProfileName || "";
 });
 
 const getCommentRepliesVariables = {
@@ -179,7 +181,9 @@ const {
   onDone: onAddFeedbackCommentToCommentDone,
 } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
   update: (cache, result) => {
-    const parentId = JSON.parse(JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value));
+    const parentId = JSON.parse(
+      JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
+    );
     const newFeedbackComment = result.data.createComments.comments[0];
 
     if (parentId) {
@@ -192,7 +196,8 @@ const {
       });
 
       if (readQueryResult) {
-        const existingReplies = readQueryResult?.getCommentReplies?.ChildComments;
+        const existingReplies =
+          readQueryResult?.getCommentReplies?.ChildComments;
 
         const newChildComments = existingReplies.map((comment: CommentType) => {
           const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
@@ -200,7 +205,10 @@ const {
           if (comment.id === commentWeGaveFeedbackOn?.id) {
             const updatedComment = {
               ...commentWeGaveFeedbackOn,
-              FeedbackComments: [...comment.FeedbackComments, newFeedbackComment],
+              FeedbackComments: [
+                ...comment.FeedbackComments,
+                newFeedbackComment,
+              ],
             };
             return updatedComment;
           }
@@ -225,7 +233,7 @@ const {
         });
       }
     } else {
-      emit('updateCommentSectionQueryResult', {
+      emit("updateCommentSectionQueryResult", {
         cache,
         commentToAddFeedbackTo: commentToGiveFeedbackOn.value,
         newFeedbackComment,
@@ -239,156 +247,166 @@ onAddFeedbackCommentToCommentDone(() => {
   showFeedbackSubmittedSuccessfully.value = true;
 });
 
-const { mutate: editComment, error: editCommentError, onDone: onDoneUpdatingComment } = useMutation(UPDATE_COMMENT, {
-  variables: {
-    commentWhere: {
-      id: commentToEdit.value?.id || '',
-    },
-    updateCommentInput: updateCommentInput.value,
-  },
-});
+const {
+  mutate: editComment,
+  error: editCommentError,
+  onDone: onDoneUpdatingComment,
+} = useMutation(UPDATE_COMMENT);
 
-const { mutate: deleteComment, onDone: onDoneDeletingComment } = useMutation(DELETE_COMMENT, {
-  update: (cache) => {
-    if (parentOfCommentToDelete.value) {
-      const readQueryResult = cache.readQuery({
-        query: GET_COMMENT_REPLIES,
-        variables: {
-          ...getCommentRepliesVariables,
-          commentId: parentOfCommentToDelete.value,
-        },
-      });
-
-      if (readQueryResult) {
-        const existingReplies = readQueryResult?.getCommentReplies?.ChildComments;
-        const filteredReplies = existingReplies.filter(
-          (reply: CommentType) => reply.id !== commentToDeleteId.value
-        );
-
-        const existingChildCommentAggregate = readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
-        const newChildCommentAggregate = Math.max(0, existingChildCommentAggregate - 1);
-
-        const writeQueryData = {
-          ...readQueryResult,
-          getCommentReplies: {
-            ...readQueryResult.getCommentReplies,
-            ChildComments: filteredReplies,
-            aggregateChildCommentCount: newChildCommentAggregate,
-          },
-        };
-
-        cache.writeQuery({
+const { mutate: deleteComment, onDone: onDoneDeletingComment } = useMutation(
+  DELETE_COMMENT,
+  {
+    update: (cache) => {
+      if (parentOfCommentToDelete.value) {
+        const readQueryResult = cache.readQuery({
           query: GET_COMMENT_REPLIES,
-          data: writeQueryData,
           variables: {
             ...getCommentRepliesVariables,
             commentId: parentOfCommentToDelete.value,
           },
         });
 
-        emit('decrementCommentCount', cache);
+        if (readQueryResult) {
+          const existingReplies =
+            readQueryResult?.getCommentReplies?.ChildComments;
+          const filteredReplies = existingReplies.filter(
+            (reply: CommentType) => reply.id !== commentToDeleteId.value
+          );
+
+          const existingChildCommentAggregate =
+            readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
+          const newChildCommentAggregate = Math.max(
+            0,
+            existingChildCommentAggregate - 1
+          );
+
+          const writeQueryData = {
+            ...readQueryResult,
+            getCommentReplies: {
+              ...readQueryResult.getCommentReplies,
+              ChildComments: filteredReplies,
+              aggregateChildCommentCount: newChildCommentAggregate,
+            },
+          };
+
+          cache.writeQuery({
+            query: GET_COMMENT_REPLIES,
+            data: writeQueryData,
+            variables: {
+              ...getCommentRepliesVariables,
+              commentId: parentOfCommentToDelete.value,
+            },
+          });
+
+          emit("decrementCommentCount", cache);
+        }
+      } else {
+        emit("updateCommentSectionQueryResult", {
+          cache,
+          commentToDeleteId: commentToDeleteId.value,
+        });
       }
-    } else {
-      emit('updateCommentSectionQueryResult', {
-        cache,
-        commentToDeleteId: commentToDeleteId.value,
-      });
-    }
-    emit('decrementCommentCount', cache);
-  },
-});
+      emit("decrementCommentCount", cache);
+    },
+  }
+);
 
 onDoneDeletingComment(() => {
-  commentToDeleteId.value = '';
+  commentToDeleteId.value = "";
   showDeleteCommentModal.value = false;
 });
 
-const { mutate: softDeleteComment, onDone: onDoneSoftDeletingComment } = useMutation(SOFT_DELETE_COMMENT);
+const { mutate: softDeleteComment, onDone: onDoneSoftDeletingComment } =
+  useMutation(SOFT_DELETE_COMMENT);
 
 onDoneSoftDeletingComment(() => {
-  commentToDeleteId.value = '';
+  commentToDeleteId.value = "";
   showDeleteCommentModal.value = false;
 });
 
-const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(CREATE_COMMENT, {
-  errorPolicy: 'all',
-  variables: {
-    createCommentInput: props.createCommentInput,
-  },
-  update: (cache, result) => {
-    const newComment: CommentType = result.data?.createComments?.comments[0];
+const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
+  CREATE_COMMENT,
+  {
+    errorPolicy: "all",
+    variables: {
+      createCommentInput: props.createCommentInput,
+    },
+    update: (cache, result) => {
+      const newComment: CommentType = result.data?.createComments?.comments[0];
 
-    const newCommentParentId = newComment?.ParentComment?.id;
-    if (!newCommentParentId) {
-      throw new Error('newCommentParentId is required');
-    }
+      const newCommentParentId = newComment?.ParentComment?.id;
+      if (!newCommentParentId) {
+        throw new Error("newCommentParentId is required");
+      }
 
-    const readQueryResult = cache.readQuery({
-      query: GET_COMMENT_REPLIES,
-      variables: {
-        ...getCommentRepliesVariables,
-        commentId: newCommentParentId,
-      },
-    });
-
-    if (!readQueryResult) {
-      cache.modify({
-        id: cache.identify({
-          __typename: 'Comment',
-          id: props.createFormValues.parentCommentId,
-        }),
-        fields: {
-          ChildCommentsAggregate(existingValue: any) {
-            return {
-              ...existingValue,
-              count: existingValue.count + 1,
-            };
-          },
-        },
-      });
-    }
-
-    if (readQueryResult) {
-      const existingReplies = readQueryResult?.getCommentReplies?.ChildComments;
-      const existingChildCommentAggregate =
-        readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
-      const newChildCommentAggregate = existingChildCommentAggregate + 1;
-
-      const newGetRepliesData = {
-        ...readQueryResult,
-        getCommentReplies: {
-          ...readQueryResult?.getCommentReplies,
-          ChildComments: [newComment, ...existingReplies],
-          aggregateChildCommentCount: newChildCommentAggregate,
-        },
-      };
-
-      cache.writeQuery({
+      const readQueryResult = cache.readQuery({
         query: GET_COMMENT_REPLIES,
-        data: newGetRepliesData,
         variables: {
           ...getCommentRepliesVariables,
           commentId: newCommentParentId,
         },
       });
-    }
 
-    emit('incrementCommentCount', cache);
-  },
-});
+      if (!readQueryResult) {
+        cache.modify({
+          id: cache.identify({
+            __typename: "Comment",
+            id: props.createFormValues.parentCommentId,
+          }),
+          fields: {
+            ChildCommentsAggregate(existingValue: any) {
+              return {
+                ...existingValue,
+                count: existingValue.count + 1,
+              };
+            },
+          },
+        });
+      }
+
+      if (readQueryResult) {
+        const existingReplies =
+          readQueryResult?.getCommentReplies?.ChildComments;
+        const existingChildCommentAggregate =
+          readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
+        const newChildCommentAggregate = existingChildCommentAggregate + 1;
+
+        const newGetRepliesData = {
+          ...readQueryResult,
+          getCommentReplies: {
+            ...readQueryResult?.getCommentReplies,
+            ChildComments: [newComment, ...existingReplies],
+            aggregateChildCommentCount: newChildCommentAggregate,
+          },
+        };
+
+        cache.writeQuery({
+          query: GET_COMMENT_REPLIES,
+          data: newGetRepliesData,
+          variables: {
+            ...getCommentRepliesVariables,
+            commentId: newCommentParentId,
+          },
+        });
+      }
+
+      emit("incrementCommentCount", cache);
+    },
+  }
+);
 
 onDoneCreatingComment(() => {
   commentInProcess.value = false;
-  replyFormOpenAtCommentID.value = '';
+  replyFormOpenAtCommentID.value = "";
 });
 
 onDoneUpdatingComment(() => {
   commentInProcess.value = false;
-  editFormOpenAtCommentID.value = '';
+  editFormOpenAtCommentID.value = "";
 });
 
 watchEffect(() => {
-  if (typeof route.params.commentId === 'string') {
+  if (typeof route.params.commentId === "string") {
     permalinkedCommentId.value = route.params.commentId;
   }
 });
@@ -396,7 +414,7 @@ watchEffect(() => {
 function updateCreateInputValuesForReply(input: CreateReplyInputData) {
   const { text, parentCommentId, depth } = input;
   if (!parentCommentId) {
-    throw new Error('parentCommentId is required to reply to a comment');
+    throw new Error("parentCommentId is required to reply to a comment");
   }
   const updatedCreateFormValues = {
     ...props.createFormValues,
@@ -404,7 +422,7 @@ function updateCreateInputValuesForReply(input: CreateReplyInputData) {
     parentCommentId,
     depth,
   };
-  emit('updateCreateReplyCommentInput', updatedCreateFormValues);
+  emit("updateCreateReplyCommentInput", updatedCreateFormValues);
 }
 
 function updateEditInputValues(text: string, isRootComment: boolean) {
@@ -429,12 +447,17 @@ function handleClickDelete(input: DeleteCommentInputData) {
 }
 
 function handleSaveEdit() {
-  editComment();
+  editComment({
+    commentWhere: {
+      id: commentToEdit.value?.id || "",
+    },
+    updateCommentInput: updateCommentInput.value,
+  });
 }
 
 function handleDeleteComment() {
   if (!commentToDeleteId.value) {
-    throw new Error('commentId is required to delete a comment');
+    throw new Error("commentId is required to delete a comment");
   }
   if (commentToDeleteReplyCount.value > 0) {
     softDeleteComment({ id: commentToDeleteId.value });
@@ -452,7 +475,7 @@ function openReplyEditor(commentId: string) {
 }
 
 function hideReplyEditor() {
-  replyFormOpenAtCommentID.value = '';
+  replyFormOpenAtCommentID.value = "";
 }
 
 function openEditCommentEditor(commentId: string) {
@@ -460,7 +483,7 @@ function openEditCommentEditor(commentId: string) {
 }
 
 function hideEditCommentEditor() {
-  editFormOpenAtCommentID.value = '';
+  editFormOpenAtCommentID.value = "";
 }
 
 function handleClickGiveFeedback(input: GiveFeedbackInput) {
@@ -473,7 +496,7 @@ function handleClickGiveFeedback(input: GiveFeedbackInput) {
 function handleClickUndoFeedback(input: GiveFeedbackInput) {
   const { commentData, parentCommentId } = input;
   showConfirmUndoFeedbackModal.value = true;
-  parentIdOfCommentToGiveFeedbackOn.value = parentCommentId
+  parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
   commentToRemoveFeedbackFrom.value = commentData;
 }
 
@@ -490,11 +513,11 @@ function handleClickReport(commentData: CommentType) {
 
 function handleSubmitFeedback() {
   if (!commentToGiveFeedbackOn.value?.id) {
-    console.error('commentId is required to submit feedback');
+    console.error("commentId is required to submit feedback");
     return;
   }
   if (!loggedInUserModName.value) {
-    console.error('modName is required to submit feedback');
+    console.error("modName is required to submit feedback");
     return;
   }
   const feedbackInput = {
@@ -512,7 +535,7 @@ function updateFeedback(text: string) {
 
 function handleViewFeedback(commentId: string) {
   router.push({
-    name: 'forums-forumId-discussions-discussionId-comments-commentId-feedback',
+    name: "forums-forumId-discussions-discussionId-comments-commentId-feedback",
     params: {
       forumId: channelId.value,
       discussionId: route.params.discussionId,
@@ -537,7 +560,7 @@ function handleViewFeedback(commentId: string) {
         :text="'This comment section is locked because the post was removed from the channel.'"
       />
       <LoadingSpinner v-if="loading" class="ml-2" />
-      <NuxtPage 
+      <NuxtPage
         @start-comment-save="commentInProcess = true"
         @open-reply-editor="openReplyEditor"
         @hide-reply-editor="hideReplyEditor"
@@ -585,10 +608,14 @@ function handleViewFeedback(commentId: string) {
               @click-edit-comment="handleClickEdit"
               @delete-comment="handleClickDelete"
               @create-comment="handleClickCreate"
-              @update-create-reply-comment-input="updateCreateInputValuesForReply"
+              @update-create-reply-comment-input="
+                updateCreateInputValuesForReply
+              "
               @update-edit-comment-input="updateEditInputValues"
               @save-edit="handleSaveEdit"
-              @show-copied-link-notification="showCopiedLinkNotification = $event"
+              @show-copied-link-notification="
+                showCopiedLinkNotification = $event
+              "
               @open-mod-profile-modal="showModProfileModal = true"
               @scroll-to-top="scrollToTop"
               @click-report="handleClickReport"
@@ -621,10 +648,12 @@ function handleViewFeedback(commentId: string) {
       :comment-id="commentToReport?.id"
       :comment="commentToReport"
       @close="showOpenIssueModal = false"
-      @report-submitted-successfully="() => {
-        showSuccessfullyReported = true;
-        showOpenIssueModal = false;
-      }"
+      @report-submitted-successfully="
+        () => {
+          showSuccessfullyReported = true;
+          showOpenIssueModal = false;
+        }
+      "
     />
     <Notification
       :show="showSuccessfullyReported"

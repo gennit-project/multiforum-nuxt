@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/core";
@@ -14,8 +13,8 @@ import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import CommentHeader from "./CommentHeader.vue";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { ALLOWED_ICONS } from "@/utils";
+import { usernameVar } from "@/cache";
 
 const MAX_COMMENT_DEPTH = 5;
 
@@ -155,12 +154,6 @@ const replyCount = computed(() => {
 
 const textCopy = computed(() => props.commentData.text);
 
-const {
-  result: localUsernameResult,
-  loading: localUsernameLoading,
-  error: localUsernameError,
-} = useQuery(GET_LOCAL_USERNAME);
-
 const canShowPermalink =
   props.commentData.DiscussionChannel || (discussionId && forumId);
 
@@ -215,10 +208,7 @@ const copyLink = async () => {
 };
 
 const username = computed(() => {
-  if (localUsernameLoading.value || localUsernameError.value) {
-    return "";
-  }
-  return localUsernameResult.value;
+  return usernameVar() || "";
 });
 
 const commentMenuItems = computed(() => {
@@ -235,7 +225,7 @@ const commentMenuItems = computed(() => {
     ]);
   }
 
-  if (props.commentData?.CommentAuthor?.username === username.value?.username) {
+  if (props.commentData?.CommentAuthor?.username === username.value) {
     out = out.concat([
       {
         label: "Edit",
