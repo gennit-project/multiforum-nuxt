@@ -174,9 +174,9 @@ const filterByChannel = (channel: string) => {
       </RequireAuth>
     </p>
     <div v-if="discussions && discussions.length > 0" class="p-0">
-      <ul
+      <div
         role="list"
-        class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 shadow sm:rounded-lg"
+        class="flex flex-col -ml-4 divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 shadow sm:rounded-lg"
         data-testid="sitewide-discussion-list"
       >
         <SitewideDiscussionListItem
@@ -190,7 +190,7 @@ const filterByChannel = (channel: string) => {
           @filter-by-tag="filterByTag"
           @filter-by-channel="filterByChannel"
         />
-      </ul>
+      </div>
       <div
         v-if="discussionResult.getSiteWideDiscussionList.discussions.length > 0"
       >

@@ -213,13 +213,25 @@ const relative = computed(() =>
             :to="
               getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
             "
-            class="rounded-md bg-gray-100 flex px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
+            class="rounded-md bg-gray-100 flex items-center gap-2 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
           >
             <span>{{
               `${commentCount} ${
                 commentCount === 1 ? "comment" : "comments"
-              } in c/${discussion.DiscussionChannels[0].channelUniqueName}`
+              } in `
             }}</span>
+
+            <div
+              class="mr-2 flex items-center rounded-full bg-blue-100 pr-2 text-blue-700 dark:bg-gray-600 dark:text-white"
+            >
+              <AvatarComponent
+                :text="discussion.DiscussionChannels[0].channelUniqueName || ''"
+                class="mr-1 h-8 w-8"
+              />
+              <span>{{
+                discussion.DiscussionChannels[0].channelUniqueName || ""
+              }}</span>
+            </div>
           </nuxt-link>
 
           <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
