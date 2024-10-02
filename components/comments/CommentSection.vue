@@ -328,9 +328,6 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
   CREATE_COMMENT,
   {
     errorPolicy: "all",
-    variables: {
-      createCommentInput: props.createCommentInput,
-    },
     update: (cache, result) => {
       const newComment: CommentType = result.data?.createComments?.comments[0];
 
@@ -431,7 +428,9 @@ function updateEditInputValues(text: string, isRootComment: boolean) {
 }
 
 function handleClickCreate() {
-  createComment();
+  createComment({
+    createCommentInput: props.createCommentInput,
+  });
 }
 
 function handleClickEdit(commentData: CommentType) {

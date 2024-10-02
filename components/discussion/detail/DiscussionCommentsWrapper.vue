@@ -20,6 +20,7 @@ import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import { useQuery } from "@vue/apollo-composable";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
+import { usernameVar } from "@/cache";
 
 const COMMENT_LIMIT = 50;
 
@@ -78,14 +79,10 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
     const username = computed(() => {
-      const username = localUsernameResult.value?.username;
-      if (username) {
-        return username;
-      }
-      return "";
+      const username = usernameVar();
+      return username || "";
     });
     const aggregateCommentCount = computed(() => {
       if (
@@ -172,6 +169,10 @@ export default defineComponent({
   },
   methods: {
     updateCreateReplyCommentInput(event: CreateEditCommentFormValues) {
+      if (!event.parentCommentId) {
+        console.error("Parent comment id is required to create a reply comment");
+        return;
+      }
       this.createFormValues = event;
     },
     updateCommentSectionQueryResult(input: CommentSectionQueryUpdateInput) {
