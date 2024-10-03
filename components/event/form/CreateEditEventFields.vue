@@ -11,7 +11,12 @@ import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
-import { getDuration , getUploadFileName, uploadAndGetEmbeddedLink, checkUrl } from "@/utils";
+import {
+  getDuration,
+  getUploadFileName,
+  uploadAndGetEmbeddedLink,
+  checkUrl,
+} from "@/utils";
 import AddImage from "@/components/AddImage.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
@@ -279,7 +284,7 @@ const touched = ref(false);
 </script>
 
 <template>
-  <div class="max-w-3xl pt-0 px-0">
+  <div class="pt-0 px-0">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">
@@ -296,6 +301,9 @@ const touched = ref(false);
       @input="touched = true"
       @submit="emit('submit')"
     >
+      <div class="mt-4 text-sm text-gray-600 dark:text-gray-400">
+        Share an event with your community.
+      </div>
       <div class="w-full space-y-5">
         <FormRow section-title="Title" :required="true" class="mt-6">
           <template #content>
@@ -330,16 +338,26 @@ const touched = ref(false);
                     class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
                     type="date"
                     :value="formattedStartTimeDate"
-                    @input="(event) => handleStartTimeDateChange((event.target as HTMLInputElement).value)"
-                  >
+                    @input="
+                      (event) =>
+                        handleStartTimeDateChange(
+                          (event.target as HTMLInputElement).value
+                        )
+                    "
+                  />
                   <input
                     v-if="!formValues.isAllDay"
                     data-testid="start-time-time-input"
                     class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
                     type="time"
                     :value="formattedStartTimeTime"
-                    @input="(event) => handleStartTimeTimeChange((event.target as HTMLInputElement).value)"
-                  >
+                    @input="
+                      (event) =>
+                        handleStartTimeTimeChange(
+                          (event.target as HTMLInputElement).value
+                        )
+                    "
+                  />
                 </div>
                 <span class="px-1">to</span>
                 <div class="flex flex-wrap items-center gap-2 xl:flex">
@@ -348,16 +366,26 @@ const touched = ref(false);
                     class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
                     type="date"
                     :value="formattedEndTimeDate"
-                    @input="(event) => handleEndTimeDateChange((event.target as HTMLInputElement).value)"
-                  >
+                    @input="
+                      (event) =>
+                        handleEndTimeDateChange(
+                          (event.target as HTMLInputElement).value
+                        )
+                    "
+                  />
                   <input
                     v-if="!formValues.isAllDay"
                     data-testid="end-time-time-input"
                     class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
                     type="time"
                     :value="formattedEndTimeTime"
-                    @input="(event) => handleEndTimeTimeChange((event.target as HTMLInputElement).value)"
-                  >
+                    @input="
+                      (event) =>
+                        handleEndTimeTimeChange(
+                          (event.target as HTMLInputElement).value
+                        )
+                    "
+                  />
                 </div>
                 <div class="pl-2">
                   {{ duration }}
@@ -398,7 +426,7 @@ const touched = ref(false);
                     virtualEventUrl: `https://${$event.target.value}`,
                   })
                 "
-              >
+              />
             </div>
             <ErrorMessage
               :text="
@@ -442,11 +470,11 @@ const touched = ref(false);
         <FormRow section-title="Cover Image">
           <template #content>
             <div v-if="formValues.coverImageURL">
-              <img 
+              <img
                 alt="Cover Image"
-                :src="formValues.coverImageURL" 
-                class="shadow-sm" 
-                >
+                :src="formValues.coverImageURL"
+                class="shadow-sm"
+              />
             </div>
             <div v-else>
               <span class="text-sm text-gray-500 dark:text-gray-400">

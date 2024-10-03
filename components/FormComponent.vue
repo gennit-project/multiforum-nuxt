@@ -36,7 +36,7 @@ function handleCancel() {
     class="rounded-lg space-y-3 divide-y divide-gray-200 border-gray-200 bg-white py-6 lg:py-12 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800"
     autocomplete="off"
   >
-    <div class="px-6 lg:px-14">
+    <div>
       <div class="flex justify-between">
         <h2 class="font-semibold pt-3 text-base leading-7 text-gray-900 dark:text-gray-100">
           {{ props.formTitle }}

@@ -4,7 +4,6 @@ import { useRouter, useRoute } from "vue-router";
 import {
   useQuery,
   useMutation,
-  provideApolloClient,
 } from "@vue/apollo-composable";
 import type { TagData } from "@/types/Tag";
 import type { UserData } from "@/types/User";
@@ -19,7 +18,7 @@ import type {
   ChannelTagsDisconnectFieldInput,
   ChannelUpdateInput,
 } from "@/__generated__/graphql";
-import Notification from '@/components/NotificationComponent.vue'
+import Notification from "@/components/NotificationComponent.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({
@@ -28,10 +27,9 @@ export default defineComponent({
     CreateEditChannelFields,
     Notification,
     RequireAuth,
-    LoadingSpinner
+    LoadingSpinner,
   },
   setup() {
-    provideApolloClient(apolloClient);
     const route = useRoute();
     const router = useRouter();
 
@@ -75,7 +73,7 @@ export default defineComponent({
           }),
           channelIconURL: channel.value.channelIconURL,
           channelBannerURL: channel.value.channelBannerURL,
-          rules: channel.value.rules || []
+          rules: channel.value.rules || [],
         };
       }
 
@@ -91,7 +89,7 @@ export default defineComponent({
     };
 
     const formValues = ref<CreateEditChannelFormValues>(
-      getDefaultChannelValues(),
+      getDefaultChannelValues()
     );
 
     const username = computed(() => {
@@ -110,18 +108,14 @@ export default defineComponent({
     const dataLoaded = ref(false);
 
     onGetChannelResult((value) => {
-      if (value.loading) {
-        return;
-      }
-
       const channel = value.data.channels[0];
-      let rules = []
+      let rules = [];
 
       // Try to deserialize channel.rules JSON into an array.
       try {
         rules = JSON.parse(channel.rules) || [];
       } catch (e) {
-        console.error('Error parsing channel rules', e)
+        console.error("Error parsing channel rules", e);
       }
 
       formValues.value = {
@@ -133,7 +127,7 @@ export default defineComponent({
         }),
         channelIconURL: channel.channelIconURL,
         channelBannerURL: channel.channelBannerURL,
-        rules
+        rules,
       };
 
       dataLoaded.value = true;
@@ -227,7 +221,7 @@ export default defineComponent({
       router,
       updateChannelError,
       updateChannel,
-      showSavedChangesNotification
+      showSavedChangesNotification,
     };
   },
   methods: {
@@ -253,39 +247,33 @@ export default defineComponent({
 });
 </script>
 <template>
-  <LoadingSpinner
-    v-if="getChannelLoading"
-  />
-  <RequireAuth
-    v-else
-    :require-ownership="true"
-    :owners="ownerList"
-  >
-    <template #has-auth>
-      <CreateEditChannelFields
-        :key="dataLoaded.toString()"
-        :edit-mode="true"
-        :channel-loading="getChannelLoading"
-        :get-channel-error="getChannelError"
-        :update-channel-error="updateChannelError"
-        :edit-channel-loading="editChannelLoading"
-        :form-values="formValues"
-        :owner-list="ownerList"
-        @submit="submit"
-        @update-form-values="updateFormValues"
-      />
-      <Notification
-        v-if="showSavedChangesNotification"
-        :title="'Your changes have been saved.'"
-        @close-notification="showSavedChangesNotification = false"
-      />
-    </template>
-    <template #does-not-have-auth>
-      <div class="p-8">
-        You don't have permission to see this page.
-      </div>
-    </template>
-  </RequireAuth>
+  <div class="px-8">
+    <LoadingSpinner v-if="getChannelLoading" />
+    <RequireAuth v-else :require-ownership="true" :owners="ownerList">
+      <template #has-auth>
+        <CreateEditChannelFields
+          :key="dataLoaded.toString()"
+          :edit-mode="true"
+          :channel-loading="getChannelLoading"
+          :get-channel-error="getChannelError"
+          :update-channel-error="updateChannelError"
+          :edit-channel-loading="editChannelLoading"
+          :form-values="formValues"
+          :owner-list="ownerList"
+          @submit="submit"
+          @update-form-values="updateFormValues"
+        />
+        <Notification
+          v-if="showSavedChangesNotification"
+          :title="'Your changes have been saved.'"
+          @close-notification="showSavedChangesNotification = false"
+        />
+      </template>
+      <template #does-not-have-auth>
+        <div class="p-8">You don't have permission to see this page.</div>
+      </template>
+    </RequireAuth>
+  </div>
 </template>
 
 <style></style>

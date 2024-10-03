@@ -7,8 +7,9 @@ import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
+import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import type { Channel } from "@/__generated__/graphql";
+import { usernameVar } from "@/cache";
 
 type Tab = {
   name: string;
@@ -51,10 +52,9 @@ watch(
   },
 );
 
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => localUsernameResult.value?.username || "");
-
-const loggedInUsername = computed(() => localUsernameResult.value?.username || "");
+const loggedInUsername = computed(() => {
+  return usernameVar() || '';
+});
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
@@ -98,7 +98,7 @@ const loggedInUserModName = computed(() => {
   return localModProfileNameResult.value?.modProfileName || "";
 });
 
-if (username.value && adminList.includes(username.value)) {
+if (loggedInUsername.value && adminList.includes(loggedInUsername.value)) {
   tabs.push({
     name: "settings",
     routeSuffix: "edit",
