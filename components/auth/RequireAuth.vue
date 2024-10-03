@@ -4,7 +4,7 @@ import { useAuth0 } from '@/hooks/useAuth0';
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { usernameVar } from "@/cache";
 
-// Props definition using defineProps
+// Define Props
 const props = defineProps({
   requireOwnership: {
     type: Boolean,
@@ -28,47 +28,31 @@ const props = defineProps({
   },
 });
 
-
+// Apollo authentication
 const { 
-  // loginWithPopup, 
-  login,
+  login, 
   loginWithRedirect, 
   isLoading: authLoading, 
-  isAuthenticated, 
-  // idTokenClaims 
+  isAuthenticated 
 } = useAuth0();
 
-// Function to store token in localStorage (client-side only)
 const storeToken = async () => {
   if (isAuthenticated) {
-    // const token = await idTokenClaims?.value?.__raw;
-    // if (import.meta.client) {
-    //   localStorage.setItem("token", token || "");
-    // }
+    // Store token logic here
   }
 };
-
-// Login function that either uses Cypress for testing or shows a popup
 const handleLogin = async () => {
-  if (window.parent.Cypress) {
-    await loginWithRedirect();
-  } else {
-    // await loginWithPopup();
-    await login()
-  }
+  await login();
   storeToken();
 };
 
-// Ensure token is stored on the client-side when mounted
 onMounted(() => {
   if (import.meta.client) {
     storeToken();
   }
 });
-// Computed properties for username and ownership
-const username = computed(() => {
-  return usernameVar()
-});
+
+const username = computed(() => usernameVar());
 
 const isOwner = computed(() => {
   return props.owners.includes(username.value);

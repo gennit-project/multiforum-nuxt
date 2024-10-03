@@ -10,7 +10,7 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 const { user } = useAuth0();
-
+usernameVar(user?.username);
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,
 });

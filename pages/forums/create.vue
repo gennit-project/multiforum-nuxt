@@ -140,6 +140,7 @@ const updateFormValues = (data) => {
 </script>
 
 <template>
+  <NuxtLayout>
   <div class="flex justify-center">
     <div class="max-w-3xl w-full bg-white dark:bg-black">
       <RequireAuth>
@@ -169,4 +170,5 @@ const updateFormValues = (data) => {
       </RequireAuth>
     </div>
   </div>
+</NuxtLayout>
 </template>
