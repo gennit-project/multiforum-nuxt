@@ -12,12 +12,8 @@ import {
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "vue-router";
-import { usernameVar } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
-
-
-console.log("Topnav.vue");
 
 const { isAuthenticated, login } = useAuth0();
 

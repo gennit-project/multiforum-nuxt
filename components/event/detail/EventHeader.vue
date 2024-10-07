@@ -16,7 +16,6 @@ import { DateTime } from "luxon";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
-  GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
@@ -24,6 +23,7 @@ import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   eventData: {
@@ -79,16 +79,6 @@ const loggedInUserModName = computed(() => {
   if (localModProfileNameLoading.value || localModProfileNameError.value)
     return "";
   return localModProfileNameResult.value?.modProfileName || "";
-});
-
-const {
-  result: localUsernameResult,
-  loading: localUsernameLoading,
-  error: localUsernameError,
-} = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => {
-  if (localUsernameLoading.value || localUsernameError.value || !localUsernameResult.value) return "";
-  return localUsernameResult.value.username;
 });
 
 const {
@@ -189,7 +179,7 @@ const menuItems = computed(() => {
       icon: ALLOWED_ICONS.COPY_LINK,
     });
   }
-  if (props.eventData?.Poster?.username === username.value) {
+  if (props.eventData?.Poster?.username === usernameVar()) {
     items.push({
       label: "Edit",
       event: "handleEdit",
@@ -368,7 +358,7 @@ function handleFeedbackInput(event: any) {
         :items="menuItems"
         @copy-link="copyLink"
         @handle-edit="
-          router.push(`/forums/${channelId}/events/${eventId}/edit`)
+          router.push(`/forums/${channelId}/events/edit/${eventId}`)
         "
         @handle-delete="confirmDeleteIsOpen = true"
         @handle-cancel="confirmCancelIsOpen = true"

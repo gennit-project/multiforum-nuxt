@@ -1,24 +1,23 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import { DateTime } from "luxon";
 import { gql } from "@apollo/client/core";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { getTimePieces } from "@/utils";
 import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import type { EventCreateInput, EventTagsConnectOrCreateFieldInput, Event } from "@/__generated__/graphql";
+import { usernameVar } from "@/cache";
 
 const now = DateTime.now();
 const route = useRoute();
 const router = useRouter();
 
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => localUsernameResult.value?.username || "");
+const username = computed(() => usernameVar() || "");
 
 const channelId = computed(() => (route.params.forumId ? String(route.params.forumId) : ""));
 const createEventDefaultValues = getDefaultEventFormValues(channelId.value);
@@ -67,10 +66,6 @@ const channelConnections = computed(() => formValues.value.selectedChannels);
 
 const createEventLoading = ref(false);
 const { mutate: createEvent, error: createEventError, onDone } = useMutation(CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, {
-  variables: {
-    eventCreateInput: eventCreateInput.value,
-    channelConnections: channelConnections.value,
-  },
   update(cache, result) {
     const newEvent: Event = result.data?.createEventWithChannelConnections;
     cache.modify({
@@ -100,7 +95,22 @@ onDone(response => {
 
 function submit() {
   createEventLoading.value = true;
-  createEvent();
+  if (!eventCreateInput.value?.title) {
+    console.error("Title is required");
+    return
+  }
+  if (!channelConnections.value?.length) {
+    console.error("Channel is required");
+    return
+  }
+  if (username.value === "") {
+    console.error("Username is required");
+    return
+  }
+  createEvent({
+    eventCreateInput: eventCreateInput.value,
+    channelConnections: channelConnections.value,
+  });
 }
 
 function updateFormValues(data: CreateEditEventFormValues) {

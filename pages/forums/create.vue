@@ -124,7 +124,6 @@ onDone((response) => {
 
 const submit = async () => {
   createChannelLoading.value = true;
-  console.log("createChannelInput", createChannelInput.value);
   if (!username.value) {
     console.error("No username found");
     return;
