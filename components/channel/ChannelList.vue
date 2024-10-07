@@ -36,16 +36,26 @@ function filterByTag(tag: string) {
     <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
       There are no results.
     </p>
-    <div class="grid gap-4 md:grid-cols-1">
-      <ChannelListItem
-        v-for="channel in channels"
-        :key="channel.uniqueName"
-        :channel="channel"
-        :search-input="searchInput"
-        :selected-tags="selectedTags"
-        @filter-by-tag="filterByTag"
-      />
-    </div>
+    <table class="min-w-full table-auto border-collapse">
+      <thead>
+        <tr>
+          <th class="px-4 py-2">Channel</th>
+          <th class="px-4 py-2">Discussions</th>
+          <th class="px-4 py-2">Events</th>
+          <th class="px-4 py-2">Tags</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ChannelListItem
+          v-for="channel in channels"
+          :key="channel.uniqueName"
+          :channel="channel"
+          :search-input="searchInput"
+          :selected-tags="selectedTags"
+          @filter-by-tag="filterByTag"
+        />
+      </tbody>
+    </table>
     <div class="m-10 grid justify-items-stretch">
       <LoadMore
         class="justify-self-center font-normal"

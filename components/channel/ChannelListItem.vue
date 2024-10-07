@@ -30,111 +30,56 @@ defineEmits(["filterByTag"]);
 </script>
 
 <template>
-  <div>
-    <div
-      class="border py-2 md:px-4 border-gray-500 dark:border-gray-600 shadow md:rounded-t-lg bg-white p-2 dark:bg-gray-800 dark:text-gray-200"
-    >
-      <div class="flex flex-row">
-        <nuxt-link
-          :to="`/forums/${channel.uniqueName}/discussions`"
-          class="flex cursor-pointer"
-        >
-          <AvatarComponent
-            :text="channel.uniqueName"
-            :src="channel?.channelIconURL || ''"
-            :is-medium="true"
-            :square="true"
-          />
-        </nuxt-link>
-
-        <div class="flex flex-col px-2">
-          <nuxt-link
-            :to="`/forums/${channel.uniqueName}/discussions`"
-            class="mt-1 flex cursor-pointer items-center gap-2"
-          >
-            <h3
-              v-if="channel.uniqueName && !channel?.displayName"
-              class="mb-1 mt-2 text-xl font-bold text-gray-500 dark:text-gray-200"
-            >
-              <HighlightedSearchTerms
-                :text="channel.uniqueName"
-                :search-input="searchInput"
-              />
-            </h3>
-            <div v-if="channel?.displayName">
-              <h3
-                class="mb-1 text-xl font-bold text-gray-500 dark:text-gray-200"
-              >
-                <HighlightedSearchTerms
-                  :text="channel.displayName"
-                  :search-input="searchInput"
-                />
-              </h3>
-              <span
-                class="text-xs font-mono font-bold text-gray-500 dark:text-gray-300"
-              >
-                <HighlightedSearchTerms
-                  :text="channel.uniqueName"
-                  :search-input="searchInput"
-                />
-              </span>
-            </div>
-          </nuxt-link>
-
-          <div>
-            <div
-              v-if="channel.description"
-              class="my-1 text-xs text-gray-600 dark:text-gray-200"
-            >
-              <HighlightedSearchTerms
-                :text="channel.description"
-                :search-input="searchInput"
-              />
-            </div>
-
-            <div class="flex gap-1">
-              <Tag
-                v-for="tag in tags"
-                :key="tag"
-                :active="selectedTags.includes(tag)"
-                :tag="tag"
-                @click="$emit('filterByTag', tag)"
-              />
-            </div>
+  <tr class="border-b dark:border-gray-600">
+    <td class="px-4 py-2">
+      <nuxt-link :to="`/forums/${channel.uniqueName}/discussions`" class="flex items-center gap-2">
+        <AvatarComponent
+          :text="channel.uniqueName"
+          :src="channel?.channelIconURL || ''"
+          :is-small="true"
+          :square="true"
+        />
+        <div>
+          <div v-if="channel?.displayName" class="font-bold text-wrap text-gray-700 dark:text-gray-200">
+            <HighlightedSearchTerms :text="channel.displayName" :search-input="searchInput" />
           </div>
+          <span class="text-gray-400 dark:text-gray-300 text-wrap font-xs font-mono">
+            <HighlightedSearchTerms :text="channel.uniqueName" :search-input="searchInput" />
+          </span>
         </div>
+      </nuxt-link>
+    </td>
+    <td class="px-4 py-2 text-center">
+      <nuxt-link
+        :to="`/forums/${channel.uniqueName}/discussions`"
+        class="flex items-center justify-center gap-1"
+      >
+        <DiscussionIcon class="h-4 w-4" />
+        {{ channel?.DiscussionChannelsAggregate?.count || 0 }}
+      </nuxt-link>
+    </td>
+    <td class="px-4 py-2 text-center">
+      <nuxt-link
+        v-if="channel?.EventChannelsAggregate?.count"
+        :to="`/forums/${channel.uniqueName}/events/search`"
+        class="flex items-center justify-center gap-1"
+      >
+        <CalendarIcon class="h-4 w-4" />
+        {{ channel?.EventChannelsAggregate?.count || 0 }}
+      </nuxt-link>
+    </td>
+    <td class="px-4 py-2">
+      <div class="flex gap-1">
+        <Tag
+          v-for="tag in tags"
+          :key="tag"
+          :active="selectedTags.includes(tag)"
+          :tag="tag"
+          @click="$emit('filterByTag', tag)"
+        />
       </div>
-    </div>
-
-    <div class="md:rounded-b-lg bg-gray-500 text-white">
-      <div class="flex w-full py-1 px-1">
-        <div class="truncate text-xs">
-          <nuxt-link
-            class="flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-gray-700"
-            :to="`/forums/${channel.uniqueName}/discussions`"
-          >
-            <DiscussionIcon class="h-3 w-3" />
-            {{ channel?.DiscussionChannelsAggregate?.count }}
-            {{
-              channel?.DiscussionChannelsAggregate?.count === 1
-                ? "Discussion"
-                : "Discussions"
-            }}
-          </nuxt-link>
-        </div>
-        <div
-          v-if="channel?.EventChannelsAggregate?.count"
-          class="truncate text-xs"
-        >
-          <nuxt-link
-            class="flex items-center gap-1 rounded-lg px-2 py-1 hover:bg-gray-700"
-            :to="`/forums/${channel.uniqueName}/events/search`"
-          >
-            <CalendarIcon class="h-3 w-3" />
-            {{ channel?.EventChannelsAggregate?.count || 0 }} Upcoming Events
-          </nuxt-link>
-        </div>
-      </div>
-    </div>
-  </div>
+    </td>
+  </tr>
 </template>
+
+<style scoped></style>
