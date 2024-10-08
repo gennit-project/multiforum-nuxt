@@ -13,7 +13,7 @@ import type {
 } from "@/types/Discussion";
 import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import type { DiscussionChannel ,
+import type { Discussion, DiscussionChannel ,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
