@@ -10,7 +10,8 @@ import AddImage from '@/components/AddImage.vue';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
 import { GET_LOCAL_USERNAME } from '@/graphQLData/user/queries';
-import type { EditAccountSettingsFormValues } from '@/src/types/userTypes';
+import type { EditAccountSettingsFormValues } from '@/types/User';
+import FormComponent from '../FormComponent.vue';
 
 // Props
 defineProps({
@@ -25,6 +26,10 @@ defineProps({
   updateUserError: {
     type: Object as PropType<ApolloError | null>,
     default: null,
+  },
+  updateUserLoading: {
+    type: Boolean,
+    default: false,
   },
   userLoading: {
     type: Boolean,
@@ -70,6 +75,7 @@ const upload = async (file: any) => {
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
       filename,
+      fileType: file.type,
       signedStorageURL,
     });
 
@@ -103,18 +109,19 @@ nextTick(() => {
 </script>
 
 <template>
-  <div class="max-w-4xl p-0">
-    <div v-if="userLoading">Loading...</div>
+  <div>
+    <div v-if="userLoading && !formValues">Loading...</div>
     <div v-else-if="getUserError">
       <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
     </div>
-    <TailwindForm
+    <FormComponent
       v-else-if="formValues"
       :form-title="'Edit Account Settings'"
       :needs-changes="false"
       :show-cancel-button="false"
+      :loading="updateUserLoading"
       @input="touched = true"
       @submit="emit('submit')"
     >
@@ -171,7 +178,7 @@ nextTick(() => {
           </FormRow>
         </div>
       </div>
-    </TailwindForm>
+    </FormComponent>
     <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
       {{ error.message }}
     </div>

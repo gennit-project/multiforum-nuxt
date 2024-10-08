@@ -11,7 +11,7 @@ defineProps({
   <div class="w-full p-0">
     <div class="flex flex-wrap w-full">
       <div
-        class="w-full lg:w-1/3 constrain-height lg:sticky lg:top-0"
+        class="w-full md:w-1/3 constrain-height lg:sticky lg:top-0"
       >
         <slot name="leftpane" />
       </div>

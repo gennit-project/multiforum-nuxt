@@ -5,6 +5,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import TabButton from "@/components/channel/TabButton.vue";
 import type { User } from "@/__generated__/graphql";
+import { usernameVar } from "@/cache";
 
 type TabData = {
   name: string;
@@ -47,10 +48,8 @@ watch(
   }
 );
 
-// Fetch the local username
-const { result } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => {
-  return result.value?.username || "";
+  return usernameVar() || "";
 });
 
 // Define the tabs based on the user data and authentication status
