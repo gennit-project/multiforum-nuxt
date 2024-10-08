@@ -106,11 +106,11 @@ const filteredQuery = computed(() => {
 
 <template>
   <li
-    class="mb-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800"
+    class="m-2 pt-5 flex md:rounded-lg border-gray-800 dark:bg-gray-800"
   >
-    <div class="flex w-full flex-row justify-start gap-4 rounded-lg p-1">
+    <div class="flex w-full flex-row justify-start gap-4 rounded-lg">
       <div v-if="discussion" class="w-full flex-col">
-        <div class="flex">
+        <div class="flex gap-1">
           <div
             class="mr-2 flex h-10 w-10 justify-center items-center rounded-md bg-gray-100 p-1 text-xl dark:bg-gray-600"
           >
@@ -134,14 +134,14 @@ const filteredQuery = computed(() => {
                 <HighlightedSearchTerms
                   :text="title"
                   :search-input="searchInput"
-                  :classes="'font-medium text-md text-blue-600 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300'"
+                  :classes="'font-medium text-base hover:underline dark:text-gray-100 dark:hover:text-gray-300'"
                 />
               </span>
             </nuxt-link>
             <div
-              class="font-medium py-1 text-xs text-gray-600 no-underline dark:text-gray-300"
+              class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"
             >
-              <span class="mr-1 text-xs">{{
+              <span class="mr-1 text-xs text-gray-500">{{
                 `Posted ${relativeTimeAgo} by`
               }}</span>
               <UsernameWithTooltip
@@ -160,7 +160,7 @@ const filteredQuery = computed(() => {
         </div>
         <div
           v-if="discussion?.body"
-          class="my-2 dark:bg-gray-700"
+          class="my-2 dark:bg-gray-700 bg-gray-100 rounded"
         >
           <MarkdownPreview
             :text="discussion.body"

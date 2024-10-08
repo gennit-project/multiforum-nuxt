@@ -31,7 +31,7 @@ const props = defineProps({
 // Apollo authentication
 const { 
   login, 
-  loginWithRedirect, 
+  // loginWithRedirect, 
   isLoading: authLoading, 
   isAuthenticated 
 } = useAuth0();

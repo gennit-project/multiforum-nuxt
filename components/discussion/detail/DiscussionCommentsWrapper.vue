@@ -15,9 +15,7 @@ import type {
 } from "@/__generated__/graphql";
 import { useRoute } from "vue-router";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
-import { useQuery } from "@vue/apollo-composable";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import { usernameVar } from "@/cache";
