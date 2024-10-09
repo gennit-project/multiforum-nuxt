@@ -25,7 +25,7 @@ defineProps({
 
 const emit = defineEmits(['toggleShowReplyEditor']);
 
-const buttonClasses = "inline-flex gap-1 h-6 cursor-pointer items-center hover:bg-gray-200 border-gray-100 dark:border-gray-600 bg-gray-100 hover:border-gray-400 dark:bg-gray-700 rounded-full border px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500";
+const buttonClasses = "inline-flex gap-1 h-6 cursor-pointer items-center hover:bg-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1 hover:dark:text-blue-500";
 
 </script>
 

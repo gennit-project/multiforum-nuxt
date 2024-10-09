@@ -108,7 +108,7 @@ const filteredQuery = computed(() => {
   <li class="m-2 pt-5 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
     <div class="flex w-full flex-row justify-start gap-4 rounded-lg">
       <div v-if="discussion" class="w-full flex-col">
-        <div class="flex gap-4">
+        <div class="flex gap-3">
           <div class="flex flex-col gap-2">
             <DiscussionVotes
               v-if="discussionChannel"

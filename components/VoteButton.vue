@@ -43,7 +43,7 @@ const emit = defineEmits(['vote']);
           <button
             v-bind="props"
             :data-testid="testId"
-            class="inline-flex max-h-6 cursor-pointer items-center rounded-full border px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500"
+            class="inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500"
             :class="[
               active
                 ? 'border-blue-500 bg-blue-100 text-black dark:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-600'
