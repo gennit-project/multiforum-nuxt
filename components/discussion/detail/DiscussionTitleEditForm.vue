@@ -132,7 +132,7 @@ const formattedDate = computed(() => {
           @update="formValues.title = $event"
         />
       </div>
-      <RequireAuth class="flex max-w-sm justify-end" :full-width="false">
+      <RequireAuth class="flex justify-end" :full-width="false">
         <template #has-auth>
           <GenericButton
             v-if="!titleEditMode && authorIsLoggedInUser"

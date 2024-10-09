@@ -47,13 +47,13 @@ export default defineComponent({
   <div class="bg-white dark:bg-gray-800 flex justify-center">
     <div class="max-w-7xl w-full">
       <div
-        class="flex justify-between border-b border-gray-200 dark:border-gray-600"
-        :class="[channel?.channelBannerURL ? '-mt-8' : 'pt-2']"
+        class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600"
+        :class="[channel?.channelBannerURL ? '' : 'pt-2']"
       >
-        <div class="align-items flex w-full gap-4">
+        <div class="flex items-center w-full gap-4">
           <ExpandableImage
             v-if="channel?.channelIconURL"
-            class="ml-6 h-20 w-20 shadow-sm dark:border-gray-800"
+            class="ml-6 h-16 w-16 shadow-sm dark:border-gray-800"
             :rounded="true"
             :is-medium="true"
             :alt="channelId"
@@ -61,7 +61,7 @@ export default defineComponent({
           />
           <AvatarComponent
             v-if="!channel?.channelIconURL"
-            class="h-20 w-20 mb-2 shadow-sm dark:border-gray-800"
+            class="h-16 w-16 mb-2 shadow-sm dark:border-gray-800"
             :text="channelId"
             :src="channel?.channelIconURL ?? ''"
             :is-medium="true"
@@ -88,7 +88,7 @@ export default defineComponent({
         </div>
         <CreateAnythingButton
           v-if="showCreateButton"
-          class="mr-6 mt-14 lg:mr-0"
+          class="mr-6 lg:mr-0"
           :use-primary-button="true"
         />
       </div>
