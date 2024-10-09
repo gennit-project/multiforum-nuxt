@@ -99,7 +99,7 @@ const outside = () => {
         </div>
         <nav class="mt-4">
           <ul role="list">
-            <li v-for="item in navigation" :key="item.name" class="px-6 list-none">
+            <li v-for="item in navigation" :key="item.name" class="list-none">
               <nuxt-link
                 :to="item.href"
                 :data-testid="`nav-link-${item.name}`"
