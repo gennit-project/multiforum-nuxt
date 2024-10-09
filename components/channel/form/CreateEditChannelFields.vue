@@ -153,7 +153,8 @@ const deleteRule = (index: number) => {
 
     <TailwindForm
       v-else-if="formValues"
-      :form-title="editMode ? 'Forum Settings' : 'Create Forum'"
+      :form-title="editMode ? 'Forum Settings' : 'Create a Forum'"
+      :description="'Forums are where you can start discussions and share content with others.'"
       :needs-changes="titleIsInvalid"
       :loading="createChannelLoading || editChannelLoading"
       @input="touched = true"
@@ -178,14 +179,14 @@ const deleteRule = (index: number) => {
 
         <!-- Form Fields -->
         <div class="mt-5 space-y-4 sm:space-y-5">
-          <FormRow section-title="Title" :required="!editMode">
+          <FormRow section-title="Unique Name" :required="!editMode">
             <template #content>
               <TextInput
                 ref="titleInputRef"
                 :test-id="'title-input'"
                 :disabled="editMode"
                 :value="formValues.uniqueName"
-                :placeholder="'Add unique name'"
+                :placeholder="'Add unique name with no spaces, such as forum_name'"
                 :full-width="true"
                 @update="$emit('updateFormValues', { uniqueName: $event })"
               />

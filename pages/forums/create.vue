@@ -148,12 +148,6 @@ const updateFormValues = (data) => {
         <RequireAuth>
           <template #has-auth>
             <div class="w-full px-6">
-              <h1 class="text-2xl mt-6 font-bold">Create a Forum</h1>
-              <p class="text-gray-500 dark:text-gray-300">
-                Forums are where you can start discussions and share content
-                with others.
-              </p>
-
               <CreateEditChannelFields
                 :create-channel-error="createChannelError"
                 :edit-mode="false"

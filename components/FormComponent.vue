@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from "vue-router";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import FormRow from "@/components/FormRow.vue";
 
 const props = defineProps({
   formTitle: {
+    type: String,
+    default: "",
+  },
+  description: {
     type: String,
     default: "",
   },
@@ -38,9 +42,12 @@ function handleCancel() {
   >
     <div>
       <div class="flex justify-between">
-        <h2 class="font-semibold pt-3 text-base leading-7 text-gray-900 dark:text-gray-100">
+        <h2
+          class="font-bold text-xl pt-3 leading-7 text-gray-900 dark:text-gray-100"
+        >
           {{ props.formTitle }}
         </h2>
+
         <div class="float-right">
           <CancelButton
             v-if="!props.loading && props.showCancelButton"
@@ -53,6 +60,12 @@ function handleCancel() {
           />
         </div>
       </div>
+      <p
+        v-if="description"
+        class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+      >
+        {{ props.description }}
+      </p>
       <slot />
       <FormRow>
         <template #content>
