@@ -111,7 +111,7 @@ const clickUp = () => {
 <template>
   <RequireAuth :full-width="false">
     <template #has-auth>
-      <div class="flex gap-1">
+      <div class="flex items-center gap-1">
         <VoteButton
           :test-id="'upvote-discussion-button'"
           :count="upvoteCount"

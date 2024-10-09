@@ -423,7 +423,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                 <div class="flex items-center">
                   <CommentButtons
                     v-if="forumId && props.showCommentButtons"
-                    class="mb-1 ml-1"
+                    class="-mt-3 mb-1 ml-1"
                     :class="[
                       props.editFormOpenAtCommentID === props.commentData.id
                         ? 'ml-1'

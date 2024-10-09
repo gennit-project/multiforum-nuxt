@@ -109,7 +109,6 @@ function handleSubmitFeedback() {
     :text="upvoteDiscussionChannelError?.message || undoUpvoteDiscussionChannelError?.message || ''"
   />
   <VoteButtons
-    class="my-1"
     :downvote-count="downvoteCount"
     :upvote-count="upvoteCount"
     :upvote-active="loggedInUserUpvoted"
