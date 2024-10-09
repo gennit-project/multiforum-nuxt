@@ -119,7 +119,7 @@ function updateFormValues(data: CreateEditEventFormValues) {
 </script>
 
 <template>
-  <RequireAuth>
+  <RequireAuth :full-width="true">
     <template #has-auth>
       <CreateEditEventFields
         :create-event-error="createEventError"
