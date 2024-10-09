@@ -1,12 +1,5 @@
 import { gql } from "@apollo/client/core";
 
-// This gets a reactive variable in the Apollo cache.
-export const GET_LOCAL_USERNAME = gql`
-  query getLocalUsername {
-    username @client
-  }
-`;
-
 export const GET_LOCAL_MOD_PROFILE_NAME = gql`
   query getLocalModProfileName {
     modProfileName @client

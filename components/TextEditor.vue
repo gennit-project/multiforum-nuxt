@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import AddImage from "@/components/AddImage.vue";
 import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import ErrorBanner from "./ErrorBanner.vue";
+import { usernameVar } from "@/cache";
 
 // Props
 const props = defineProps({
@@ -37,10 +37,9 @@ const props = defineProps({
 });
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
 // Computed properties
-const username = computed(() => localUsernameResult.value?.username || "");
+const username = computed(() => usernameVar() || "");
 
 // Refs
 const editorRef = ref<HTMLTextAreaElement | null>(null);

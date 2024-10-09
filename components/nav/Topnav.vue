@@ -6,21 +6,19 @@ import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import { useAuth0 } from '@/hooks/useAuth0';
 import { useQuery } from "@vue/apollo-composable";
 import {
-  GET_LOCAL_USERNAME,
   GET_LOCAL_MOD_PROFILE_NAME,
 } from "@/graphQLData/user/queries";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "vue-router";
+import { usernameVar } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
 
 const { isAuthenticated, login } = useAuth0();
 
 const route = useRoute();
-
-const { result } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => result.value?.username || "");
+const username = computed(() => usernameVar() || "");
 
 const channelId = computed(() => (typeof route.params.forumId === "string" ? route.params.forumId : ""));
 

@@ -4,7 +4,6 @@ import { useRoute, useRouter } from "vue-router";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
-  GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
 import {
   UPVOTE_DISCUSSION_CHANNEL,
@@ -13,6 +12,7 @@ import {
 import VoteButtons from "@/components/discussion/vote/VoteButtons.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   discussionChannel: {
@@ -40,19 +40,20 @@ const discussionIdInParams = computed(() => {
 
 const discussionChannelId = computed(() => props.discussionChannel.id || "");
 
-const { result: localUsernameResult, loading: localUsernameLoading } = useQuery(GET_LOCAL_USERNAME);
 const { result: localModProfileNameResult, loading: localModProfileNameLoading, error: localModProfileNameError } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
 
-const username = computed(() => (localUsernameLoading.value ? "" : localUsernameResult.value?.username || ""));
+const username = computed(() => {
+  return usernameVar() || "";
+});
 const loggedInUserModName = computed(() => (localModProfileNameLoading.value || localModProfileNameError.value ? "" : localModProfileNameResult.value?.modProfileName));
 
 const { mutate: upvoteDiscussionChannel, error: upvoteDiscussionChannelError, loading: upvoteDiscussionChannelLoading } = useMutation(UPVOTE_DISCUSSION_CHANNEL);
 const { mutate: undoUpvoteDiscussionChannel, error: undoUpvoteDiscussionChannelError, loading: undoUpvoteDiscussionChannelLoading } = useMutation(UNDO_UPVOTE_DISCUSSION_CHANNEL);
 
 const loggedInUserUpvoted = computed(() => {
-  if (localUsernameLoading.value || !localUsernameResult.value) return false;
+  if (!username.value) return false;
   const users = props.discussionChannel?.UpvotedByUsers || [];
-  return users.some((user: any) => user.username === localUsernameResult.value.username);
+  return users.some((user: any) => user.username === username.value);
 });
 
 const loggedInUserDownvoted = computed(() => props.discussion?.FeedbackComments?.length > 0 || false);

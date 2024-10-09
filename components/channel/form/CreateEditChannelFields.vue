@@ -8,12 +8,12 @@ import TextEditor from "@/components/TextEditor.vue";
 import AddImage from "@/components/AddImage.vue";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import { useQuery, useMutation } from "@vue/apollo-composable";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
 import TailwindForm from "@/components/FormComponent.vue";
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   editMode: {
@@ -53,11 +53,8 @@ const props = defineProps({
 
 const emit = defineEmits(["submit", "updateFormValues"]);
 
-// Query for the local username
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-
 const username = computed(() => {
-  return localUsernameResult.value?.username || "";
+  return usernameVar() || "";
 });
 
 // Mutation to create a signed storage URL

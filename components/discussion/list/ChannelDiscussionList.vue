@@ -9,9 +9,8 @@ import WarningModal from "../../WarningModal.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { generateSlug } from "random-word-slugs";
 import { CREATE_MOD_PROFILE } from "@/graphQLData/user/mutations";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
-import { modProfileNameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import {
   getSortFromQuery,
@@ -103,18 +102,8 @@ const loadMore = () => {
     },
   });
 };
-
-const {
-  result: localUsernameResult,
-  loading: localUsernameLoading,
-  error: localUsernameError,
-} = useQuery(GET_LOCAL_USERNAME);
-
 const username = computed(() => {
-  if (localUsernameLoading.value || localUsernameError.value) {
-    return "";
-  }
-  return localUsernameResult.value;
+  return usernameVar() || "";
 });
 
 const randomWords = generateSlug(4, { format: "camel" });
@@ -123,7 +112,7 @@ const { mutate: createModProfile, onDone: onDoneCreateModProfile } =
   useMutation(CREATE_MOD_PROFILE, {
     variables: {
       displayName: randomWords,
-      username: username.value?.username,
+      username: username.value,
     },
   });
 

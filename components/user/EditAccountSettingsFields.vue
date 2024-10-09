@@ -9,9 +9,9 @@ import TextEditor from '@/components/TextEditor.vue';
 import AddImage from '@/components/AddImage.vue';
 import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
 import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
-import { GET_LOCAL_USERNAME } from '@/graphQLData/user/queries';
 import type { EditAccountSettingsFormValues } from '@/types/User';
 import FormComponent from '../FormComponent.vue';
+import { usernameVar } from '@/cache';
 
 // Props
 defineProps({
@@ -50,10 +50,9 @@ const usernameInParams = computed(() => {
 });
 
 const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL);
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
 const username = computed(() => {
-  return localUsernameResult.value?.username || '';
+  return usernameVar() || '';
 });
 
 // Methods

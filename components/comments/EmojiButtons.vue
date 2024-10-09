@@ -6,11 +6,11 @@ import {
   REMOVE_EMOJI_FROM_COMMENT,
 } from "@/graphQLData/comment/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import {
   ADD_EMOJI_TO_DISCUSSION_CHANNEL,
   REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
 } from "@/graphQLData/discussion/mutations";
+import { usernameVar } from "@/cache";
 
 type EmojiVoteInput = {
   commentId?: string;
@@ -48,9 +48,8 @@ export default defineComponent({
     if (props.emojiJson) {
       emojiObject = JSON.parse(props.emojiJson);
     }
-    const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
     const username = computed(() => {
-      return localUsernameResult.value?.username || "";
+      return usernameVar() || "";
     });
 
     // If a comment is being updated, use these mutations.

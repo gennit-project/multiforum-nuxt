@@ -20,9 +20,9 @@ import {
 import AddImage from "@/components/AddImage.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TagPicker from "@/components/TagPicker.vue";
+import { usernameVar } from "@/cache";
 
 export type UpdateLocationInput = {
   name: string;
@@ -99,10 +99,9 @@ const formattedEndTimeTime = computed(() => {
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
 );
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
 
 const username = computed(() => {
-  return localUsernameResult.value?.username || "";
+  return usernameVar() || "";
 });
 
 // Computed Properties

@@ -11,7 +11,6 @@ import type {
   DiscussionChannel,
   Comment,
 } from "@/__generated__/graphql";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import DiscussionBody from "@/components/discussion/detail/DiscussionBody.vue";
@@ -27,6 +26,7 @@ import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.
 import Notification from "@/components/NotificationComponent.vue";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
+import { usernameVar } from "@/cache";
 
 const COMMENT_LIMIT = 50;
 
@@ -51,17 +51,9 @@ const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
 
-const {
-  result: localUsernameResult,
-  loading: localUsernameLoading,
-  error: localUsernameError,
-} = useQuery(GET_LOCAL_USERNAME);
-
-const username = computed(() =>
-  localUsernameLoading.value || localUsernameError.value
-    ? ""
-    : localUsernameResult.value?.username || ""
-);
+const username = computed(() => {
+  return usernameVar() || ""
+});
 
 const {
   result: getDiscussionResult,

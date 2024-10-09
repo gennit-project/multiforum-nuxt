@@ -4,7 +4,6 @@ import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import VoteButtons from "./VoteButtons.vue";
 import ReplyButton from "./ReplyButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
@@ -12,6 +11,7 @@ import TextEditor from "@/components/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import EmojiButtons from "./EmojiButtons.vue";
 import NewEmojiButton from "./NewEmojiButton.vue";
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   commentData: {
@@ -75,19 +75,15 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { result: localUsernameResult, loading: localUsernameLoading, error: localUsernameError } = useQuery(GET_LOCAL_USERNAME);
 const username = computed(() => {
-  if (localUsernameLoading.value || localUsernameError.value || !localUsernameResult.value) {
-    return "";
-  }
-  return localUsernameResult.value.username;
+  return usernameVar() || "";
 });
 
 const loggedInUserIsAuthor = computed(() => {
   if (!props.commentData) {
     return false;
   }
-  return props.commentData.CommentAuthor?.username === username.value;
+  return usernameVar() === username.value;
 });
 
 const showEmojiPicker = ref(false);

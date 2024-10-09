@@ -12,16 +12,13 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import {
   GET_LOCAL_MOD_PROFILE_NAME,
-  GET_LOCAL_USERNAME,
 } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
-import cache from "@/cache";
+import cache, { usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
-
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => localUsernameResult.value?.username || "");
+const username = computed(() => usernameVar() || "");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""

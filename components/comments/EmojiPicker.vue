@@ -3,9 +3,9 @@ import { computed, onMounted, ref } from "vue";
 import { VuemojiPicker } from "vuemoji-picker";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { ADD_EMOJI_TO_COMMENT } from "@/graphQLData/comment/mutations";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from "@/graphQLData/discussion/mutations";
 import gql from "graphql-tag";
+import { usernameVar } from "@/cache";
 
 // Query to get the theme from the local state
 const GET_THEME = gql`
@@ -13,10 +13,7 @@ const GET_THEME = gql`
     theme @client
   }
 `;
-
-// Get the local username
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => localUsernameResult.value?.username || "");
+const username = computed(() => usernameVar() || "");
 
 // Mutation to add emoji to comment
 const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);

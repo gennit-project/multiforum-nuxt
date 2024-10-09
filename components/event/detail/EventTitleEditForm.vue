@@ -10,14 +10,13 @@ import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutat
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_EVENT } from "@/graphQLData/event/queries";
-import { GET_LOCAL_MOD_PROFILE_NAME, GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
+import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
+import { usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
-
-const { result: localUsernameResult } = useQuery(GET_LOCAL_USERNAME);
-const username = computed(() => localUsernameResult.value?.username || "");
+const username = computed(() => usernameVar() || "");
 
 const channelId = computed(() => (typeof route.params.forumId === "string" ? route.params.forumId : ""));
 const eventId = computed(() => (typeof route.params.eventId === "string" ? route.params.eventId : ""));
