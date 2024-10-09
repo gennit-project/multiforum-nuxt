@@ -107,7 +107,7 @@ const relative = computed(() =>
 
 <template>
   <li
-    class="pt-2 px-4 list-none"
+    class="pt-4 px-4 list-none"
     :class="{
       'bg-gray-100 dark:bg-gray-700': discussionIdInParams === discussionId,
     }"
@@ -116,7 +116,7 @@ const relative = computed(() =>
       <div class="w-full">
         <div class="flex">
           <div
-            class="mr-2 flex items-center justify-center flex-start w-6 h-6 rounded-md bg-gray-100 dark:bg-gray-600"
+            class="mr-2 flex items-center justify-center flex-start w-8 h-8 text-xl rounded-md bg-gray-100 dark:bg-gray-600"
           >
             💬
           </div>
@@ -133,7 +133,7 @@ const relative = computed(() =>
                 :class="
                   discussionIdInParams === discussionId ? 'text-black' : ''
                 "
-                class="cursor-pointer text-base hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                class="cursor-pointer text-sm md:text-base lg:text-base hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
               >
                 <HighlightedSearchTerms
                   :text="title"
@@ -213,7 +213,7 @@ const relative = computed(() =>
             :to="
               getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
             "
-            class="flex items-center gap-2 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
+            class="flex items-center gap-2 px-4 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
           >
             <span>{{
               `${commentCount} ${
