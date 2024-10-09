@@ -10,9 +10,7 @@ import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discus
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import {
-  GET_LOCAL_MOD_PROFILE_NAME,
-} from "@/graphQLData/user/queries";
+import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
 import cache, { usernameVar } from "@/cache";
 
@@ -109,7 +107,7 @@ const formattedDate = computed(() => {
 <template>
   <div class="w-full">
     <div
-      class="mb-2 mt-4 w-full flex flex-col md:flex-row md:items-center md:justify-between space-y-1 md:space-x-2"
+      class="mb-2 mt-4 w-full flex flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <v-skeleton-loader
         v-if="getDiscussionLoading"
@@ -124,14 +122,7 @@ const formattedDate = computed(() => {
         >
           {{ discussion && discussion.title ? discussion.title : "[Deleted]" }}
         </h2>
-        <p
-          v-if="!titleEditMode"
-          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
-        >
-          {{
-            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion on ${formattedDate}`
-          }}
-        </p>
+
         <TextInput
           v-if="titleEditMode"
           ref="titleInputRef"
@@ -172,6 +163,14 @@ const formattedDate = computed(() => {
         </template>
       </RequireAuth>
     </div>
+    <p
+      v-if="!titleEditMode"
+      class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
+    >
+      {{
+        `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion on ${formattedDate}`
+      }}
+    </p>
     <ErrorBanner
       v-if="getDiscussionError"
       class="mx-auto my-3 max-w-5xl"

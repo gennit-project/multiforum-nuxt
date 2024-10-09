@@ -34,6 +34,7 @@ const emojiPickerRef = ref(null);
 // Handle focusing on the emoji picker search input when mounted
 onMounted(() => {
   const rootElement = emojiPickerRef.value?.$el;
+  console.log('rootElement', rootElement);
 
   if (rootElement && rootElement.children.length > 0) {
     const emojiPickerElement = rootElement.children[0];
@@ -79,6 +80,11 @@ const props = defineProps({
 function handleEmojiClick(event: any) {
   const unicode = event.unicode;
   const emojiLabel = event.emoji.annotation;
+
+  if (!username.value) {
+    console.error("Username not found");
+    return;
+  }
 
   if (props.commentId) {
     addEmojiToComment({

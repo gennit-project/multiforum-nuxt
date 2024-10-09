@@ -18,8 +18,12 @@ const route = useRoute();
 const titleEditMode = ref(false);
 const username = computed(() => usernameVar() || "");
 
-const channelId = computed(() => (typeof route.params.forumId === "string" ? route.params.forumId : ""));
-const eventId = computed(() => (typeof route.params.eventId === "string" ? route.params.eventId : ""));
+const channelId = computed(() =>
+  typeof route.params.forumId === "string" ? route.params.forumId : ""
+);
+const eventId = computed(() =>
+  typeof route.params.eventId === "string" ? route.params.eventId : ""
+);
 
 const {
   result: localModProfileNameResult,
@@ -50,7 +54,9 @@ const event = computed<Event | null>(() => {
   return getEventResult.value?.events?.[0] || null;
 });
 
-const authorIsLoggedInUser = computed(() => event.value?.Poster?.username === username.value);
+const authorIsLoggedInUser = computed(
+  () => event.value?.Poster?.username === username.value
+);
 
 const titleInputRef = ref(null);
 const formValues = ref({
@@ -87,8 +93,14 @@ const GET_THEME = gql`
   }
 `;
 
-const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
-const theme = computed(() => (themeLoading.value || themeError.value ? "" : themeResult.value?.theme));
+const {
+  result: themeResult,
+  loading: themeLoading,
+  error: themeError,
+} = useQuery(GET_THEME);
+const theme = computed(() =>
+  themeLoading.value || themeError.value ? "" : themeResult.value?.theme
+);
 
 const onClickEdit = () => {
   titleEditMode.value = true;
@@ -97,14 +109,33 @@ const onClickEdit = () => {
     (titleInputRef.value as HTMLInputElement)?.focus();
   });
 };
+const formattedDate = computed(() => {
+  if (!event.value?.createdAt) return "";
+  // Date should be in this format: Mar 30, 2023
+  return new Date(event.value.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+});
 </script>
 
 <template>
-  <div class="w-full">
-    <div class="mb-2 flex flex-col md:flex-row md:items-center md:justify-between space-x-0 md:space-x-2">
-      <v-skeleton-loader v-if="getEventLoading" class="flex-1" type="text" :theme="theme" />
+  <div class="w-full mt-4">
+    <div
+      class="mb-2 flex flex-col md:flex-row md:items-center md:justify-between space-x-0 md:space-x-2"
+    >
+      <v-skeleton-loader
+        v-if="getEventLoading"
+        class="flex-1"
+        type="text"
+        :theme="theme"
+      />
       <div v-else ref="eventDetail" class="flex-1">
-        <h2 v-if="!titleEditMode" class="text-wrap px-1 text-2xl font-medium sm:tracking-tight">
+        <h2
+          v-if="!titleEditMode"
+          class="text-wrap px-1 text-2xl font-medium sm:tracking-tight"
+        >
           {{ event?.title || "[Deleted]" }}
         </h2>
         <TextInput
@@ -116,19 +147,54 @@ const onClickEdit = () => {
           @update="formValues.title = $event"
         />
       </div>
-      <RequireAuth class="flex max-w-sm justify-end">
+      <RequireAuth class="flex max-w-sm justify-end" :full-width="false">
         <template #has-auth>
-          <GenericButton v-if="!titleEditMode && authorIsLoggedInUser" :text="'Edit'" @click="onClickEdit" />
-          <CreateButton v-if="!titleEditMode" class="ml-2" :to="`/forums/${channelId}/events/create`" :label="'New Event'" />
-          <PrimaryButton v-if="titleEditMode" :label="'Save'" :loading="updateEventLoading" @click="updateEvent" />
-          <GenericButton v-if="titleEditMode" :text="'Cancel'" class="ml-2" @click="titleEditMode = false" />
+          <GenericButton
+            v-if="!titleEditMode && authorIsLoggedInUser"
+            :text="'Edit'"
+            @click="onClickEdit"
+          />
+          <CreateButton
+            v-if="!titleEditMode"
+            class="ml-2"
+            :to="`/forums/${channelId}/events/create`"
+            :label="'New Event'"
+          />
+          <PrimaryButton
+            v-if="titleEditMode"
+            :label="'Save'"
+            :loading="updateEventLoading"
+            @click="updateEvent"
+          />
+          <GenericButton
+            v-if="titleEditMode"
+            :text="'Cancel'"
+            class="ml-2"
+            @click="titleEditMode = false"
+          />
         </template>
         <template #does-not-have-auth>
           <PrimaryButton class="ml-2" :label="'New Event'" />
         </template>
       </RequireAuth>
     </div>
-    <ErrorBanner v-if="getEventError" class="mx-auto my-3 max-w-5xl" :text="getEventError.message" />
-    <ErrorBanner v-if="updateEventError" class="mx-auto my-3 max-w-5xl" :text="updateEventError.message" />
+    <p
+      v-if="!titleEditMode"
+      class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
+    >
+      {{
+        `${event?.Poster ? event.Poster.username : "[Deleted]"} posted this event on ${formattedDate}`
+      }}
+    </p>
+    <ErrorBanner
+      v-if="getEventError"
+      class="mx-auto my-3 max-w-5xl"
+      :text="getEventError.message"
+    />
+    <ErrorBanner
+      v-if="updateEventError"
+      class="mx-auto my-3 max-w-5xl"
+      :text="updateEventError.message"
+    />
   </div>
 </template>
