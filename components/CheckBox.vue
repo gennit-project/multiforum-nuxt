@@ -20,7 +20,7 @@ export default defineComponent({
   <input
     type="checkbox"
     :class="[disabled ? 'text-blue-200' : 'text-blue-600']"
-    class="focus:ring-blue-500 h-4 w-4 border-gray-400 rounded"
+    class="focus:ring-blue-500 h-4 w-4 border border-gray-500 rounded"
     :checked="checked"
     :disabled="disabled"
   >
