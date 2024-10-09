@@ -83,7 +83,7 @@ const renderedMarkdown = computed(() => {
 
   img {
     max-width: 100%;
-    max-height: 350px;
+    max-height: 500px;
     height: auto;
   }
 

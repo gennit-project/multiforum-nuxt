@@ -26,8 +26,9 @@ import ConfirmUndoDiscussionFeedbackModal from "@/components/discussion/detail/C
 import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
-import { COMMENT_LIMIT } from "@/components/event/detail/EventRootCommentFormWrapper.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
+
+const COMMENT_LIMIT = 50;
 
 const props = defineProps({
   discussionId: {

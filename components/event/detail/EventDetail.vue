@@ -16,11 +16,11 @@ import GenericButton from "@/components/GenericButton.vue";
 import EventBody from "@/components/event/detail/EventBody.vue";
 import ExpandableImage from "@/components/ExpandableImage.vue";
 import EventCommentsWrapper from "@/components/event/detail/EventCommentsWrapper.vue";
-import EventRootCommentFormWrapper, {
-  COMMENT_LIMIT,
-} from "@/components/event/detail/EventRootCommentFormWrapper.vue";
+import EventRootCommentFormWrapper from "@/components/event/detail/EventRootCommentFormWrapper.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
+
+const COMMENT_LIMIT = 50;
 
 const props = defineProps({
   compactMode: {

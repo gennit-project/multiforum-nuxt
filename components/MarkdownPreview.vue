@@ -250,6 +250,9 @@ export default defineComponent({
 <style lang="scss">
 .markdown-body img {
   max-height: 350px !important;
+  // width should be proportionate to height
+  max-width: 100% !important;
+  height: auto !important;
   cursor: pointer !important;
   // center images
   display: block !important;
