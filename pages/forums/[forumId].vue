@@ -14,7 +14,6 @@ import { useQuery } from "@vue/apollo-composable";
 const route = useRoute();
 const router = useRouter();
 
-// Determine if the current route is for a discussion or event detail page
 const isDiscussionDetailPage = computed(
   () => route.name?.toString().includes("forums-forumId-discussions-discussionId")
 );
@@ -22,12 +21,10 @@ const isEventDetailPage = computed(
   () => route.name === "forums-forumId-events-eventId"
 );
 
-// Extract the channel ID from the route parameters
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
-// Query for the channel using Apollo client
 const {
   result: getChannelResult,
   loading: getChannelLoading,
@@ -38,7 +35,6 @@ const {
   now: new Date().toISOString(),
 });
 
-// Extract channel information from the query result
 const channel = computed(() => {
   if (getChannelLoading.value || getChannelError.value) {
     return null;
@@ -46,7 +42,6 @@ const channel = computed(() => {
   return getChannelResult.value?.channels?.[0] ?? null;
 });
 
-// Utility to add the forum to local storage
 const addForumToLocalStorage = (channel: Channel) => {
   if (!import.meta.client) {
     return;
@@ -59,15 +54,9 @@ const addForumToLocalStorage = (channel: Channel) => {
     displayName: channel.displayName,
     channelIconURL: channel.channelIconURL,
   };
-
-  // Save the most recent 20
   recentForums = recentForums.slice(0, 20);
   recentForums.push(sideNavItem);
-
-  // Filter out any values that are strings instead of objects
   recentForums = recentForums.filter((forum: any) => typeof forum === "object");
-
-  // Deduplicate the array
   recentForums = recentForums.filter(
     (forum: any, index: number, self: any) =>
       index === self.findIndex((t: any) => t.uniqueName === forum.uniqueName)
@@ -75,23 +64,26 @@ const addForumToLocalStorage = (channel: Channel) => {
 
   localStorage.setItem("recentForums", JSON.stringify(recentForums));
 };
-
-// React to channel query results and update local storage
 onGetChannelResult((result) => {
   const channel = result.data?.channels[0];
   if (channel) {
     addForumToLocalStorage(channel);
   }
+  // redirect to /discussions if we are at the channel root
+  if (route.name === "forums-forumId") {
+    router.push({
+      name: "forums-forumId-discussions",
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
 });
-
-// Get admin list from the channel
 const adminList = computed(() => {
   return channel.value
     ? channel.value.Admins.map((user: User) => user?.username)
     : [];
 });
-
-// If we are at forums/[channelId], redirect to forums/[channelId]/discussions
 if (!channelId.value) {
   if (import.meta.client) {
     router.push({
@@ -132,7 +124,6 @@ if (!channelId.value) {
         <article
           class="relative h-full max-w-7xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
-          <!-- ChannelTabs for Mobile -->
           <ChannelTabs
             class="mb-2 block md:hidden w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
@@ -141,8 +132,6 @@ if (!channelId.value) {
             :route="route"
             :channel="channel"
           />
-
-          <!-- Conditional Components -->
           <div v-if="isDiscussionDetailPage" class="flex w-full justify-center">
             <div class="max-w-7xl flex-1 px-3 md:px-6">
               <DiscussionTitleEditForm />
