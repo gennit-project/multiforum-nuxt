@@ -131,6 +131,14 @@ const formattedDate = computed(() => {
           :full-width="true"
           @update="formValues.title = $event"
         />
+        <p
+          v-if="!titleEditMode"
+          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
+        >
+          {{
+            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion on ${formattedDate}`
+          }}
+        </p>
       </div>
       <RequireAuth class="flex justify-end" :full-width="false">
         <template #has-auth>
@@ -163,14 +171,7 @@ const formattedDate = computed(() => {
         </template>
       </RequireAuth>
     </div>
-    <p
-      v-if="!titleEditMode"
-      class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
-    >
-      {{
-        `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion on ${formattedDate}`
-      }}
-    </p>
+
     <ErrorBanner
       v-if="getDiscussionError"
       class="mx-auto my-3 max-w-5xl"
