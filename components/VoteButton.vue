@@ -84,7 +84,7 @@ const emit = defineEmits(['vote']);
       </RequireAuth>
     </template>
     <template #default>
-      <div v-if="tooltipUnicode" class="flex h-16 justify-center text-6xl">
+      <div v-if="tooltipUnicode" class="flex h-16 justify-center text-6xl mb-6">
         {{ tooltipUnicode }}
       </div>
       <p class="min-w-sm text-sm">
