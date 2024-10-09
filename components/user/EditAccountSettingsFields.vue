@@ -2,7 +2,7 @@
 import { ref, computed, nextTick } from 'vue';
 import type { ApolloError } from '@apollo/client/errors';
 import { useRoute } from 'vue-router';
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useMutation } from '@vue/apollo-composable';
 import TextInput from '@/components/TextInput.vue';
 import FormRow from '@/components/FormRow.vue';
 import TextEditor from '@/components/TextEditor.vue';
