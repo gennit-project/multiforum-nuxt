@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, nextTick } from "vue";
 import { VuemojiPicker } from "vuemoji-picker";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { ADD_EMOJI_TO_COMMENT } from "@/graphQLData/comment/mutations";
@@ -28,33 +28,33 @@ const theme = computed(() => {
   return themeResult.value?.theme;
 });
 
-// Ref for the emoji picker
 const emojiPickerRef = ref(null);
 
-// Handle focusing on the emoji picker search input when mounted
 onMounted(() => {
-  const rootElement = emojiPickerRef.value?.$el;
-  console.log('rootElement', rootElement);
+  nextTick(() => {
+    const rootElement = emojiPickerRef.value?.$el;
 
-  if (rootElement && rootElement.children.length > 0) {
-    const emojiPickerElement = rootElement.children[0];
+    if (rootElement && rootElement.children.length > 0) {
+      const emojiPickerElement = rootElement.children[0];
 
-    if (emojiPickerElement.shadowRoot) {
-      const inputElement = emojiPickerElement.shadowRoot.querySelector("#search");
+      if (emojiPickerElement.shadowRoot) {
+        const inputElement = emojiPickerElement.shadowRoot.querySelector("#search");
+        console.log('inputElement', inputElement);
 
-      if (inputElement) {
-        setTimeout(() => {
-          inputElement.focus();
-        }, 300); // Delay focus to ensure the element is ready
+        if (inputElement) {
+          setTimeout(() => {
+            inputElement.focus();
+          }, 300);
+        } else {
+          console.error("Input element not found in shadow DOM");
+        }
       } else {
-        console.error("Input element not found in shadow DOM");
+        console.error("Shadow root not found on emoji-picker element");
       }
     } else {
-      console.error("Shadow root not found on emoji-picker element");
+      console.error("emoji-picker child element not found");
     }
-  } else {
-    console.error("emoji-picker child element not found");
-  }
+  });
 });
 
 // Props for the component
