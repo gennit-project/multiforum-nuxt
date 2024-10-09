@@ -67,6 +67,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isPermalinked: {
+    type: Boolean,
+    default: false,
+  },
   locked: {
     type: Boolean,
     default: false,
@@ -138,11 +142,7 @@ const router = useRouter();
 const { discussionId, forumId } = route.params;
 
 const isHighlighted = computed(() => {
-  return (
-    (route.name === "DiscussionCommentPermalink" ||
-      route.name === "EventCommentPermalink") &&
-    props.commentData?.id === route.params.commentId
-  );
+  return props.isPermalinked || permalinkedCommentId === props.commentData.id;
 });
 
 const replyCount = computed(() => {
@@ -354,7 +354,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
         <div
           :class="[
             isHighlighted
-              ? 'rounded-md border border-blue-500'
+              ? 'rounded-md bg-blue-100 border-2 border-blue-600 p-2'
               : 'dark:bg-gray-950 ',
           ]"
           class="flex w-full"

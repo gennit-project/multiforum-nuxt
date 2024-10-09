@@ -1,8 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import { useAuth0 } from "@/hooks/useAuth0";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_LOCAL_USERNAME } from "@/graphQLData/user/queries";
 import TabButton from "@/components/channel/TabButton.vue";
 import type { User } from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";

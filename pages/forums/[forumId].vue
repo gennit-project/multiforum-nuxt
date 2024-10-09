@@ -16,7 +16,7 @@ const router = useRouter();
 
 // Determine if the current route is for a discussion or event detail page
 const isDiscussionDetailPage = computed(
-  () => route.name === "forums-forumId-discussions-discussionId"
+  () => route.name?.toString().includes("forums-forumId-discussions-discussionId")
 );
 const isEventDetailPage = computed(
   () => route.name === "forums-forumId-events-eventId"

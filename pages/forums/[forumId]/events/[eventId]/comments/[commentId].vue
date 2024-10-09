@@ -48,6 +48,7 @@ defineProps<{
         :edit-comment-error="editCommentError"
         :mod-profile-name="loggedInUserModName"
         :original-poster="originalPoster"
+        :is-permalinked="true"
         @start-comment-save="$emit('startCommentSave')"
         @open-reply-editor="$emit('openReplyEditor')"
         @hide-reply-editor="$emit('hideReplyEditor')"

@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { ref} from "vue";
 import { useRoute } from "vue-router";
+import PermalinkedComment from "@/components/comments/PermalinkedComment.vue";
+import Comment from "@/components/comments/Comment.vue";
+import type { ApolloError } from "@apollo/client";
 
 const route = useRoute();
 const permalinkedCommentId = ref(route.params.commentId);
@@ -33,7 +36,7 @@ defineProps<{
   loggedInUserModName: string;
   replyFormOpenAtCommentID: string;
   editFormOpenAtCommentID: string;
-  editCommentError: string;
+  editCommentError: ApolloError | null | undefined;
   originalPoster: string;
 }>();
 </script>
@@ -54,6 +57,7 @@ defineProps<{
         :edit-comment-error="editCommentError"
         :mod-profile-name="loggedInUserModName"
         :original-poster="originalPoster"
+        :is-permalinked="true"
         @start-comment-save="$emit('startCommentSave')"
         @open-reply-editor="$emit('openReplyEditor')"
         @hide-reply-editor="$emit('hideReplyEditor')"

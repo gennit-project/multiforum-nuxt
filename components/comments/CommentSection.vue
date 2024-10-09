@@ -560,6 +560,15 @@ function handleViewFeedback(commentId: string) {
       />
       <LoadingSpinner v-if="loading" class="ml-2" />
       <NuxtPage
+        :aggregate-comment-count="aggregateCommentCount"
+        :enable-feedback="enableFeedback"
+        :locked="locked"
+        :comment-in-process="commentInProcess"
+        :logged-in-user-mod-name="loggedInUserModName"
+        :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
+        :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
+        :edit-comment-error="editCommentError"
+        :original-poster="originalPoster"
         @start-comment-save="commentInProcess = true"
         @open-reply-editor="openReplyEditor"
         @hide-reply-editor="hideReplyEditor"
