@@ -142,7 +142,7 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
-          <div class="w-full relative max-w-7xl flex-1 pt-4 focus:outline-none">
+          <div class="w-full relative max-w-7xl flex-1 focus:outline-none">
             <div
               class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
