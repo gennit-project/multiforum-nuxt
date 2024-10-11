@@ -589,7 +589,7 @@ function handleViewFeedback(commentId: string) {
         @handle-view-feedback="handleViewFeedback"
       />
       <div class="my-4">
-        <div v-if="!loading && aggregateCommentCount === 0">
+        <div v-if="!loading && aggregateCommentCount === 0" class="dark:text-white">
           There are no comments yet.
         </div>
         <div :key="activeSort">

@@ -77,7 +77,6 @@ const removeSelection = (tag: string) => {
           </div>
         </div>
         <SearchableTagList
-          v-if="isDropdownOpen"
           v-click-outside="outside"
           :selected-tags="selected"
           @toggle-selection="toggleSelectedTag"

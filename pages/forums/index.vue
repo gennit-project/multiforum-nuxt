@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
+import type { LocationQueryValue } from "vue-router";
 import { useQuery } from "@vue/apollo-composable";
 import ChannelList from "@/components/channel/ChannelList.vue";
 import { GET_CHANNELS } from "@/graphQLData/channel/queries";
@@ -9,6 +10,7 @@ import SearchBar from "@/components/SearchBar.vue";
 import { getTagLabel } from "@/utils";
 
 const route = useRoute();
+const router = useRouter();
 
 const selectedTags = ref<Array<string>>(
   route.query.tag && typeof route.query.tag === "string"
@@ -21,9 +23,39 @@ const setSearchInput = (input: string) => {
   searchInput.value = input;
 };
 
-const setSelectedTags = (tag: Array<string>) => {
-  selectedTags.value = tag;
+const setSelectedTags = (tag: string) => {
+  // Check if the tag is already selected
+  if (selectedTags.value.includes(tag)) {
+    // If it is, remove it (deselect)
+    selectedTags.value = selectedTags.value.filter((t) => t !== tag);
+  } else {
+    // If it's not, add it (select)
+    selectedTags.value.push(tag);
+  }
+
+  // Update query params in URL to reflect selected tags
+  router.push({
+    query: {
+      tag: selectedTags.value.length > 0 ? selectedTags.value : undefined,
+    },
+  });
 };
+
+// update the selected tags whenever query params change in the URL
+watchEffect(() => {
+  if (route.query.tag) {
+    if (typeof route.query.tag === "string") {
+      selectedTags.value = [route.query.tag];
+    } else {
+      selectedTags.value = route.query.tag.map((tag: LocationQueryValue) => {
+        // convert to string
+        return tag?.toString() || "";
+      });
+    }
+  } else {
+    selectedTags.value = [];
+  }
+});
 
 // Construct the query conditionally based on tags and search input
 const channelWhere = computed(() => {
@@ -117,7 +149,10 @@ const defaultLabels = {
             :search-placeholder="'Search forums'"
             @update-search-input="setSearchInput"
           />
+
           <FilterChip
+            class="align-middle"
+            data-testid="tag-filter-button"
             :label="tagLabel"
             :highlighted="tagLabel !== defaultLabels.tags"
           >
@@ -125,8 +160,12 @@ const defaultLabels = {
               <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
             </template>
             <template #content>
-              <!-- Uncomment the TagPicker component when needed -->
-              <!-- <TagPicker :selected-tags="selectedTags" @setSelectedTags="setSelectedTags" /> -->
+              <div class="relative w-96">
+                <SearchableTagList
+                  :selected-tags="selectedTags"
+                  @toggle-selection="setSelectedTags"
+                />
+              </div>
             </template>
           </FilterChip>
         </div>
