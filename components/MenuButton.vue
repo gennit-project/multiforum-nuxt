@@ -77,10 +77,11 @@ const menuStyles = {
       </v-btn>
     </template>
 
-    <v-list :style="menuStyles">
+    <v-list :style="menuStyles" class="dark:bg-gray-700">
       <v-list-item
         v-for="item in items"
         :key="item.label"
+        class="dark:hover:bg-gray-600"
         @click="
           () => {
             handleItemClick(item);

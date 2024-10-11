@@ -146,7 +146,7 @@ const outside = () => {
             </li>
           </ul>
           <div v-if="recentForums.length > DEFAULT_LIMIT">
-            <button v-if="!showAllForums" @click="showAllForums = true">Show All</button>
+            <button v-if="!showAllForums" class="dark:text-white" @click="showAllForums = true" >Show All</button>
             <button v-else @click="showAllForums = false">Show Less</button>
           </div>
         </div>

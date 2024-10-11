@@ -3,8 +3,10 @@ import CreateEvent from "@/components/event/form/CreateEvent.vue";
 </script>
 <template>
   <NuxtLayout>
-    <div class="bg-white dark:bg-black max-w-4xl mx-auto mt-6">
-      <CreateEvent />
+    <div class="flex justify-center">
+      <div class="max-w-3xl w-full px-8 bg-white dark:bg-gray-800">
+        <CreateEvent />
+      </div>
     </div>
   </NuxtLayout>
 </template>

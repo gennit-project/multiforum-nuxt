@@ -3,14 +3,17 @@ import { ref } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from "@/hooks/useAuth0";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { usernameVar, modProfileNameVar } from "@/cache";
+import { usernameVar, themeVar, modProfileNameVar } from "@/cache";
 import type { User, ModerationProfile } from "@/__generated__/graphql";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
+
 const { user } = useAuth0();
 usernameVar(user?.username);
+
+
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,
 });
@@ -127,6 +130,7 @@ const loggedInUser = computed(() => usernameVar());
 body {
   @media (prefers-color-scheme: dark) {
     @apply bg-black;
+    @apply text-white;
     color-scheme: dark;
   }
 
@@ -137,6 +141,7 @@ body {
 
   &.dark {
     @apply bg-black;
+    @apply text-white;
     color-scheme: dark;
   }
 

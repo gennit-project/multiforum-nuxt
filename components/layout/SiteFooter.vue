@@ -25,7 +25,7 @@ export default defineComponent({
       </nuxt-link>
     </div>
     <div
-      class="w-full items-center justify-center text-wrap bg-gray-800 p-4 text-white"
+      class="w-full text-xs items-center justify-center text-wrap bg-gray-800 p-4 text-white"
     >
       This project is in alpha. I have hosted it publicly so that others can
       help me test the app. If you have feedback or technical problems, please

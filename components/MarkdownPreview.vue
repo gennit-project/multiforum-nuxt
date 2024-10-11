@@ -225,7 +225,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-full dark:text-white">
     <MarkdownRenderer
       :text="`${shownText}${!showFullText ? '...' : ''}`"
       :class="[ { clickable: !disableGallery }]"

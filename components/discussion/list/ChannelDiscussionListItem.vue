@@ -143,7 +143,7 @@ const filteredQuery = computed(() => {
               <div
                 class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"
               >
-                <span class="mr-1 text-xs text-gray-500">{{
+                <span class="mr-1 text-xs text-gray-500 dark:text-gray-300">{{
                   `Posted ${relativeTimeAgo} by`
                 }}</span>
                 <UsernameWithTooltip
@@ -183,7 +183,7 @@ const filteredQuery = computed(() => {
                 @click="$emit('filterByTag', tag)"
               />
             </div>
-            <div class="flex items-center">
+            <div class="flex items-center dark:text-white">
               <div class="flex items-center justify-start gap-6">
                 <nuxt-link
                   :to="{

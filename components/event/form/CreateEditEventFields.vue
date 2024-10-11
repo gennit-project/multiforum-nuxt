@@ -398,7 +398,7 @@ const touched = ref(false);
                   :checked="formValues.isAllDay"
                   @input="toggleIsAllDayField"
                 />
-                <span class="ml-2 align-middle">All day</span>
+                <span class="ml-2 align-middle dark:text-white">All day</span>
               </div>
               <ErrorMessage :text="datePickerErrorMessage" />
             </div>
@@ -502,7 +502,7 @@ const touched = ref(false);
               :checked="formValues.free"
               @input="toggleCostField"
             />
-            <span class="ml-2 align-middle">This event is free</span>
+            <span class="ml-2 align-middle text-white">This event is free</span>
             <TextInput
               v-show="!formValues.free"
               data-testid="cost-input"
@@ -521,7 +521,7 @@ const touched = ref(false);
               :checked="formValues.isHostedByOP"
               @input="toggleHostedByOPField"
             />
-            <span class="ml-2 align-middle">I am hosting this event</span>
+            <span class="ml-2 align-middle dark:text-white">I am hosting this event</span>
           </template>
         </FormRow>
       </div>

@@ -79,7 +79,7 @@ const truncate = (description: string) => {
 
 <template>
   <div
-    class="absolute z-10 w-full rounded-md max-h-96 overflow-y-auto border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+    class="absolute z-10 w-full rounded-md max-h-96 overflow-y-auto border-gray-200 bg-white dark:text-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
   >
     <SearchBar
       class="w-full p-1 align-middle"
@@ -115,18 +115,18 @@ const truncate = (description: string) => {
         <div class="flex items-center space-x-2">
           <AvatarComponent
             v-if="channel.icon"
-            class="z-10"
+            class="z-10 w-10"
             :is-small="true"
             :text="channel.uniqueName"
             :src="channel.icon"
           />
           <AvatarComponent
             v-else
-            class="z-10"
+            class="z-10 w-10"
             :is-small="true"
             :text="channel.uniqueName"
           />
-          <div class="flex-col">
+          <div class="flex-col text-sm flex-1">
             <span v-if="!channel.displayName" class="font-mono font-bold">
               {{ channel.uniqueName }}
             </span>

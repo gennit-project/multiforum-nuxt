@@ -213,7 +213,7 @@ const relative = computed(() =>
             :to="
               getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
             "
-            class="flex items-center gap-2 px-4 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
+            class="flex items-center gap-2 px-4 pt-2 dark:text-white"
           >
             <span>{{
               `${commentCount} ${

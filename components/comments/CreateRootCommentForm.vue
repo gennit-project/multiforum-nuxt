@@ -64,13 +64,13 @@ const writeReplyStyle =
     <div class="flex gap-2">
       <AvatarComponent
         v-if="username"
-        class="h-5 w-5"
+        class="h-8 w-8"
         :text="username"
         :src="profilePicURL"
         :is-small="true"
       />
 
-      <RequireAuth v-if="!commentEditorOpen" class="w-full">
+      <RequireAuth v-if="!commentEditorOpen" class="flex-1">
         <template #has-auth>
           <textarea
             id="addComment"
@@ -93,7 +93,7 @@ const writeReplyStyle =
         </template>
       </RequireAuth>
 
-      <div v-else class="flex w-full flex-col">
+      <div v-else class="flex-1 w-full flex-col">
         <TextEditor
           :test-id="'texteditor-textarea'"
           :placeholder="'Please be kind'"

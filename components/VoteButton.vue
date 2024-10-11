@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import RequireAuth from '@/components/auth/RequireAuth.vue';
-import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import RequireAuth from "@/components/auth/RequireAuth.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 defineProps({
   active: {
     type: Boolean,
@@ -20,19 +20,19 @@ defineProps({
   },
   testId: {
     type: String,
-    default: '',
+    default: "",
   },
   tooltipText: {
     type: String,
-    default: '',
+    default: "",
   },
   tooltipUnicode: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
-const emit = defineEmits(['vote']);
+const emit = defineEmits(["vote"]);
 </script>
 
 <template>
@@ -46,8 +46,8 @@ const emit = defineEmits(['vote']);
             class="inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500"
             :class="[
               active
-                ? 'border-blue-500 bg-blue-100 text-black dark:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-600'
-                : ' border-gray-100 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700  dark:hover:bg-gray-700',
+                ? 'border-blue-500 bg-blue-100 text-black dark:text-white dark:border-blue-600 dark:bg-blue-600  dark:hover:bg-blue-600'
+                : 'border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700',
             ]"
             @click="emit('vote')"
           >
@@ -70,7 +70,7 @@ const emit = defineEmits(['vote']);
             :class="[
               active
                 ? 'border-blue-500 bg-blue-100 text-black dark:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-600'
-                : ' border-gray-100 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700  dark:hover:bg-gray-700',
+                : 'border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700',
             ]"
           >
             <span class="justify-center">
@@ -99,8 +99,8 @@ const emit = defineEmits(['vote']);
         class="inline-flex max-h-6 cursor-pointer items-center rounded-full border px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500"
         :class="[
           active
-            ? 'border-blue-500 bg-blue-100 text-black dark:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-600'
-            : ' border-gray-100 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700  dark:hover:bg-gray-700',
+            ? 'border-blue-500 bg-blue-100 text-black dark:text-white dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-600'
+            : 'border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700',
         ]"
         @click="emit('vote')"
       >
@@ -122,7 +122,7 @@ const emit = defineEmits(['vote']);
         :class="[
           active
             ? 'border-blue-500 bg-blue-100 text-black dark:border-blue-600 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-600'
-            : ' border-gray-100 bg-gray-100 hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700  dark:hover:bg-gray-700',
+            : 'border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700',
         ]"
       >
         <span class="justify-center">
@@ -135,3 +135,4 @@ const emit = defineEmits(['vote']);
     </template>
   </RequireAuth>
 </template>
+

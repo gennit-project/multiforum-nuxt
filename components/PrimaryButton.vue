@@ -27,8 +27,8 @@ export default defineComponent({
     :disabled="disabled"
     :class="[
       disabled
-        ? 'cursor-default bg-gray-200 text-gray-300 dark:bg-gray-500 dark:text-gray-400'
-        : ' bg-blue-300 text-black hover:bg-gray-200 dark:border dark:border-blue-500 dark:bg-black dark:text-blue-500 dark:hover:bg-blue-900',
+        ? 'cursor-default bg-gray-200 text-gray-300 dark:bg-gray-800 dark:text-gray-300'
+        : ' bg-blue-300 text-black hover:bg-gray-200 dark:border dark:border-blue-500 dark:bg-blue-600 dark:text-white dark:hover:bg-blue-700',
       '', // class for controlling the background opacity in dark mode
     ]"
     class="max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-100"

@@ -548,7 +548,7 @@ function handleViewFeedback(commentId: string) {
   <div class="bg-white dark:bg-gray-800">
     <div>
       <div class="align-items flex justify-between">
-        <h2 id="comments" class="px-1 text-lg">
+        <h2 id="comments" class="px-1 text-lg dark:text-white">
           {{ `Comments (${aggregateCommentCount})` }}
         </h2>
         <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />

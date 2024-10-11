@@ -58,7 +58,7 @@ function updateSearchResult(input: string) {
 
 <template>
   <div
-    class="absolute z-10 mt-1 max-h-96 w-full overflow-y-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white shadow-lg dark:bg-gray-800"
+    class="absolute z-10 mt-1 max-h-96 w-full overflow-y-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:text-white shadow-lg dark:bg-gray-800"
   >
     <SearchBar
       class="w-full align-middle"

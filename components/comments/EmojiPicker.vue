@@ -114,6 +114,7 @@ const emit = defineEmits(["close", "emojiClick"]);
 function outside() {
   emit("close");
 }
+
 </script>
 
 <template>
@@ -122,11 +123,11 @@ function outside() {
       ref="emojiPickerRef"
       v-click-outside="outside"
       :picker-style="{
-        background: theme === 'dark' ? '#171c28' : '#fff',
-        inputBorderRadius: '0.25rem',
-        borderColor: theme === 'dark' ? '#1d2433' : '#e2e8f0',
-        buttonHoverBackground: theme === 'dark' ? '#2d3748' : '#edf2f7',
+        inputBorderRadius: '0',
+        borderColor: 'transparent',
+        buttonHoverBackground: 'transparent',
       }"
+      class="!bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-800 rounded-lg shadow-lg"
       @emoji-click="handleEmojiClick"
     />
   </client-only>

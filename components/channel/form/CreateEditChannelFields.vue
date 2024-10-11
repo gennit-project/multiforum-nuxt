@@ -186,7 +186,7 @@ const deleteRule = (index: number) => {
                 :test-id="'title-input'"
                 :disabled="editMode"
                 :value="formValues.uniqueName"
-                :placeholder="'Add unique name with no spaces, such as forum_name'"
+                :placeholder="'Add unique name with no spaces. Ex. forum_name'"
                 :full-width="true"
                 @update="$emit('updateFormValues', { uniqueName: $event })"
               />

@@ -42,7 +42,7 @@ const filterChannelsByTag = (tag: string) => {
     <div v-if="channelId && channel" class="items-center gap-2" />
     
     <div>
-      <h2 class="mt-2 px-6 text-xl font-bold">Forum Intro</h2>
+      <h2 class="mt-2 px-6 text-xl font-bold dark:text-white">Forum Intro</h2>
       <MarkdownPreview
         v-if="channel?.description"
         :text="channel?.description"
@@ -87,7 +87,7 @@ const filterChannelsByTag = (tag: string) => {
             <div v-for="admin in channel.Admins" :key="admin.username">
               <nuxt-link
                 :to="{ name: 'u-username', params: { username: admin.username } }"
-                class="flex items-center"
+                class="flex items-center dark:text-white"
               >
                 <AvatarComponent :text="admin.username" :src="admin.profilePicURL ?? ''" class="mr-2 h-6 w-6" />
                 <UsernameWithTooltip

@@ -15,7 +15,7 @@ import { usernameVar } from "@/cache";
 const router = useRouter();
 
 const username = computed(() => {
-  const username = usernameVar()
+  const username = usernameVar();
   if (username) {
     return username;
   }
@@ -144,10 +144,10 @@ const updateFormValues = (data) => {
 <template>
   <NuxtLayout>
     <div class="flex justify-center">
-      <div class="max-w-3xl w-full bg-white dark:bg-black">
+      <div class="max-w-3xl w-full px-8 bg-white dark:bg-gray-800">
         <RequireAuth>
           <template #has-auth>
-            <div class="w-full px-6">
+            <div class="w-full px-8">
               <CreateEditChannelFields
                 :create-channel-error="createChannelError"
                 :edit-mode="false"

@@ -81,14 +81,15 @@ onMounted(() => {
 const isMenuOpen = ref(false);
 const showTooltip = ref(false);
 const showFooter = computed(() => {
-  return route.name && typeof route.name === 'string' && !route.name.includes("map");
+  return (
+    route.name && typeof route.name === "string" && !route.name.includes("map")
+  );
 });
 
 const handleItemClick = (item: any) => {
   item.action();
   isMenuOpen.value = false;
 };
-
 </script>
 
 <template>
@@ -103,29 +104,47 @@ const handleItemClick = (item: any) => {
               :class="[
                 usePrimaryButton
                   ? 'bg-blue-500 dark:bg-blue-600'
-                  : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-black  dark:hover:bg-gray-600',
+                  : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
               ]"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span class="flex items-center text-md">
+              <span class="flex items-center text-md dark:text-white">
                 + {{ usePrimaryButton ? "Create" : "" }}
               </span>
-              <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
-              <v-tooltip v-if="showTooltip && !usePrimaryButton" location="bottom" activator="parent">
+              <ChevronDownIcon
+                class="-mr-1 ml-1 mt-0.5 h-3 w-3 dark:text-white"
+                aria-hidden="true"
+              />
+              <v-tooltip
+                v-if="showTooltip && !usePrimaryButton"
+                location="bottom"
+                activator="parent"
+              >
                 Create new...
               </v-tooltip>
             </v-btn>
           </template>
 
-          <v-list :style="{ top: shouldOpenUpwards ? 'auto' : '100%', right: shouldOpenLeftwards ? 0 : 'auto', bottom: shouldOpenUpwards ? '100%' : 'auto', zIndex: 10000 }">
+          <v-list
+            class="dark:bg-gray-700 dark:text-white"
+            :style="{
+              top: shouldOpenUpwards ? 'auto' : '100%',
+              right: shouldOpenLeftwards ? 0 : 'auto',
+              bottom: shouldOpenUpwards ? '100%' : 'auto',
+              zIndex: 10000,
+            }"
+          >
             <v-list-item
               v-for="(item, index) in menuItems"
               :key="index"
               :data-testid="item.testId"
               @click="() => handleItemClick(item)"
             >
-              <span class="block px-4 py-2 text-sm" :class="[ 'text-gray-700 dark:text-white' ]">
+              <span
+                class="block px-4 py-2 text-sm"
+                :class="['text-gray-700 dark:text-white']"
+              >
                 {{ item.text }}
               </span>
             </v-list-item>

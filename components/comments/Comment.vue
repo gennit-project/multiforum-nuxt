@@ -354,7 +354,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
         <div
           :class="[
             isHighlighted
-              ? 'rounded-md bg-blue-100 border-2 border-blue-600 p-2'
+              ? 'rounded-md bg-blue-100 dark:bg-blue-900 border-2 border-blue-600 p-2'
               : 'dark:bg-gray-950 ',
           ]"
           class="flex w-full"
