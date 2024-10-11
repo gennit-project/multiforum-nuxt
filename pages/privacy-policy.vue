@@ -13,5 +13,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <MarkdownLoader slug="terms/privacy-policy" />
+  <NuxtLayout>
+    <MarkdownLoader slug="terms/privacy-policy" />
+  </NuxtLayout>
 </template>

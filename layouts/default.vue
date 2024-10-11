@@ -74,7 +74,7 @@ const loggedInUser = computed(() => usernameVar());
 <template>
   <v-app>
     <main>
-      <div class="bg-gray-100 dark:text-gray-200 list-disc">
+      <div class="bg-gray-100 dark:bg-black dark:text-gray-200 list-disc">
         <nav class="bg-white">
           <TopNav
             :show-user-profile-dropdown="showUserProfileDropdown"

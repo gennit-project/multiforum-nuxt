@@ -24,11 +24,7 @@ const channelId = computed(() => (typeof route.params.forumId === "string" ? rou
 
 const { result: modNameResult } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
 const modName = computed(() => modNameResult.value?.modProfileName || "");
-
-// Component state
 const sideNavIsOpen = ref(false);
-
-// Computed properties
 const shouldShowChannelId = computed(() => channelId.value);
 const shouldShowRouteInfo = computed(() => route.name === "MapView" || route.name === "SearchChannels");
 const routeInfoLabel = computed(() => {
@@ -37,7 +33,6 @@ const routeInfoLabel = computed(() => {
   return "";
 });
 
-// Methods
 function getLabel() {
   if (route.name === "SitewideSearchDiscussionPreview") return "• discussions";
   if (route.name === "SearchEventsList") return "• online events";
@@ -46,21 +41,23 @@ function getLabel() {
 </script>
 
 <template>
-  <div class="z-10 w-full bg-gray-100 border-b dark:bg-black dark:border-b-gray-600">
+  <div class="z-10 w-full bg-gray-100 border-b dark:bg-gray-900">
     <div class="flex items-center justify-between px-2 py-2 lg:px-4 lg:py-1">
       <div class="flex items-center">
         <HamburgerMenuButton
-          v-if="!sideNavIsOpen"
+          v-if="!sideNavIsOpen" 
           data-testid="menu-button"
           class="cursor-pointer fixed-menu-button"
           @click="$emit('toggleDropdown')"
         />
-        <div class="flex items-center space-x-1 ml-12 text-sm text-gray-500 dark:text-white">
-          <nuxt-link to="/" class="flex gap-2 items-center">
-            <ArrowUpBoldBox :size="38" class="text-black dark:text-blue-500" />
-            <span class="font-bold text-black dark:text-white">Topical</span>
-            <span class="text-blue-500 text-xs py-0.5 px-1 border rounded-md border-blue-500 dark:text-blue-500">ALPHA</span>
+    
+        <div class="ml-12 flex items-center space-x-1 text-sm ">
+          <nuxt-link to="/" class="flex items-center gap-2">
+            <ArrowUpBoldBox :size="38" class="text-blue dark:text-blue-500" />
+            <span class="font-bold dark:text-white">Topical</span>
+            <div class="text-xs py-0.5 px-1 border border-blue-500 text-blue-500 rounded-md">ALPHA</div>
           </nuxt-link>
+ 
           <div v-if="shouldShowChannelId" class="hidden sm:flex items-center gap-1">
             <span>•</span>
             <span class="font-mono text-gray-800 dark:text-gray-300">{{ channelId }}</span>
@@ -78,7 +75,7 @@ function getLabel() {
         <button
           v-if="!isAuthenticated"
           data-testid="login-button"
-          class="font-medium mr-2 inline-flex items-center rounded-full px-3 py-1 text-xs text-gray-400 hover:dark:text-white hover:text-black"
+          class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-400 rounded-full hover:text-black hover:dark:text-white mr-2"
           @click="login"
         >
           Log In
@@ -98,6 +95,7 @@ function getLabel() {
     </div>
   </div>
 </template>
+
 
 <style scoped>
 .fixed-menu-button {

@@ -16,7 +16,11 @@ export default defineNuxtConfig({
   },
   compatibilityDate: "2024-04-03",
   components: true,
-  css: ["@/assets/css/index.css", "@fortawesome/fontawesome-free/css/all.css"],
+  css: [
+    "vuetify/styles",
+    "@/assets/css/index.css",
+    "@fortawesome/fontawesome-free/css/all.css",
+  ],
   devtools: { enabled: true },
   imports: {
     autoImport: true,
@@ -25,7 +29,7 @@ export default defineNuxtConfig({
     "@nuxtjs/apollo",
     "@nuxtjs/eslint-module",
     "@nuxtjs/tailwindcss",
-    // "nuxtjs/device",
+    "@nuxtjs/color-mode",
     (_options, nuxt) => {
       nuxt.hooks.hook("vite:extendConfig", (config) => {
         // @ts-expect-error

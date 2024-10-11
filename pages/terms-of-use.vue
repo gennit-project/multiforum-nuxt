@@ -13,5 +13,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <MarkdownLoader slug="terms/terms-of-use" />
+  <NuxtLayout>
+    <MarkdownLoader slug="terms/terms-of-use" />
+  </NuxtLayout>
 </template>

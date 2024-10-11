@@ -3,6 +3,7 @@ const svgToDataUri = require("mini-svg-data-uri");
 module.exports = {
   content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   darkMode: "class",
+  important: true,
   theme: {
     fontWeight: {
       thin: '100',
