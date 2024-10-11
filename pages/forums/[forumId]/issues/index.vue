@@ -6,10 +6,12 @@ import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from "@/graphQLData/mod/queries";
+import IssueList from "@/components/mod/IssueList.vue";
 
 export default defineComponent({
-  name: "BackLink",
-
+  components: {
+    IssueList,
+  },
   props: {
     link: {
       type: String,
@@ -72,38 +74,44 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-900 rounded-t-lg border border-b border-gray-200 dark:border-gray-600">
+  <div
+    class="bg-white dark:bg-gray-900 rounded-t-lg border border-b border-gray-200 dark:border-gray-600"
+  >
     <div class="flex items-center rounded-t-lg gap-4 py-3 pl-8">
       <nuxt-link
         :to="{
-          name: 'mod-issues',
+          name: 'forums-forumId-issues',
           params: {
             forumId: channelId,
           },
         }"
         class="flex flex-row items-center gap-2"
         :class="{
-          'text-gray-500 dark:text-gray-400': $route.name === 'ClosedIssues',
+          'text-gray-500 dark:text-gray-200':
+            $route.name === 'forums-forumId-issues',
+          'dark:text-gray-400': $route.name === 'OpenIssues',
         }"
       >
         <i class="far fa-dot-circle" />{{ openCount }} Open
       </nuxt-link>
       <nuxt-link
         :to="{
-          name: 'mod-issues-closed',
+          name: 'forums-forumId-issues',
           params: {
             forumId: channelId,
           },
         }"
-        class="flex flex-row items-center gap-1 whitespace-nowrap"
+        class="flex flex-row items-center gap-1 whitespace-nowrap dark:text-gray-400"
         :class="{
-          'text-gray-500 dark:text-gray-400': $route.name === 'OpenIssues',
+          'text-gray-500 dark:text-gray-400':
+            $route.name === 'forums-forumId-issues-closed',
+          'dark:text-gray-200': $route.name === 'ClosedIssues',
         }"
       >
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
       </nuxt-link>
     </div>
-    <NuxtPage />
+    <IssueList />
   </div>
 </template>
 

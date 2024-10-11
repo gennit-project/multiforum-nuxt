@@ -6,7 +6,7 @@ export const useAuth0 = () => {
     user: { 
       name: "Alice", 
       email: config.auth0username,
-      username: 'alice'
+      username: 'cluse'
     }, // Placeholder value
     loginWithRedirect: () => console.log("Mock login"),
     login: () => console.log("Mock login"),

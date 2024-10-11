@@ -187,7 +187,7 @@ const relative = computed(() =>
         <div class="ml-6 flex-col gap-1">
           <div
             v-if="discussion && discussion.body && showBody"
-            class="w-full border-l-2 border-gray-300 bg-gray-100 rounded"
+            class="w-full border-l-2 border-gray-300 bg-gray-100 dark:bg-gray-800 rounded"
           >
             <MarkdownPreview
               :text="discussion.body"

@@ -73,7 +73,7 @@ const filterByTag = (tag: string) => {
 
 <template>
   <div>
-    <div v-if="discussion?.body" class="-ml-2 -mt-4">
+    <div v-if="discussion?.body" class="-ml-2 -mt-4 bg-gray-100 dark:bg-gray-700 rounded">
       <MarkdownPreview
         :text="bodyText"
         :disable-gallery="false"

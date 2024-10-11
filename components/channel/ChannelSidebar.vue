@@ -49,7 +49,7 @@ const filterChannelsByTag = (tag: string) => {
         :word-limit="1000"
         class="ml-2"
       />
-      <p v-else class="p-6 text-xs">Welcome to {{ channelId }}!</p>
+      <p v-else class="p-6 text-xs dark:text-white">Welcome to {{ channelId }}!</p>
     </div>
     
     <slot />

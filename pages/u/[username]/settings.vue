@@ -92,7 +92,7 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
 <template>
   <RequireAuth :require-ownership="true" :owners="[usernameInParams]">
     <template #has-auth>
-      <div class="bg-white w-full px-6 lg:px-12">
+      <div class="bg-white dark:text-white w-full px-6 lg:px-12">
         <EditAccountSettingsFields
           :key="dataLoaded.toString()"
           :edit-mode="true"
@@ -112,7 +112,7 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
       </div>
     </template>
     <template #does-not-have-auth>
-      <div>You don't have permission to see this page.</div>
+      <p class="dark:text-white">You don't have permission to see this page.</p>
     </template>
   </RequireAuth>
 </template>

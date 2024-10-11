@@ -79,7 +79,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="px-4">
+  <div class="px-4 dark:text-white">
     <div
       v-if="!channelId"
       class="my-4"
