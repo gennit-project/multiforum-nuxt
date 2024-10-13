@@ -243,7 +243,7 @@ function handleSubmitFeedback() {
 
 function handleViewFeedback() {
   router.push({
-    name: "forums-forumId-events-eventId-feedback",
+    name: "forums-forumId-events-feedback-eventId",
     params: {
       eventId: this.eventId,
       forumId: this.channelId,

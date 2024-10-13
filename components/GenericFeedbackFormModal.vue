@@ -24,7 +24,7 @@ const emit = defineEmits(['updateFeedback']);
 const title = "Give Semi-anonymous Feedback";
 const body = "Do you have any actionable feedback for the author?";
 
-function updateFeedback(text: string) {
+function update(text: string) {
   emit('updateFeedback', text);
 }
 </script>

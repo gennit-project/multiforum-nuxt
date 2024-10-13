@@ -238,7 +238,7 @@ const authorIsMod = computed(
         @handle-feedback="emit('handleClickGiveFeedback')"
         @handle-view-feedback="
           router.push({
-            name: 'forums-forumId-discussions-discussionId-feedback',
+            name: 'forums-forumId-discussions-feedback-discussionId',
             params: { 
               forumId: defaultChannel,
               discussionId: discussion.id 

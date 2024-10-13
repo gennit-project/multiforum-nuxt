@@ -534,7 +534,7 @@ function updateFeedback(text: string) {
 
 function handleViewFeedback(commentId: string) {
   router.push({
-    name: "forums-forumId-discussions-discussionId-comments-commentId-feedback",
+    name: "forums-forumId-discussions-discussionId-comments-feedback-commentId",
     params: {
       forumId: channelId.value,
       discussionId: route.params.discussionId,

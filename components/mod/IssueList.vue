@@ -8,7 +8,6 @@ import { DateTime } from "luxon";
 
 export default defineComponent({
   setup() {
-    console.log('issue list')
     const route = useRoute();
 
     const channelId = computed(() => {

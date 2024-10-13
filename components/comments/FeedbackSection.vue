@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useRoute } from 'vue-router';
-import InfoBanner from '@/components/InfoBanner.vue';
-import LoadMore from '@/components/LoadMore.vue';
-import CommentOnFeedbackPage from './CommentOnFeedbackPage.vue';
-import Notification from '../NotificationComponent.vue';
-import PermalinkedFeedbackComment from '@/components/comments/PermalinkedFeedbackComment.vue';
-import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
-import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
-import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
-import type { Comment } from '@/__generated__/graphql';
-import type { PropType } from 'vue';
+import { ref, computed } from "vue";
+import { useRoute } from "vue-router";
+import InfoBanner from "@/components/InfoBanner.vue";
+import LoadMore from "@/components/LoadMore.vue";
+import CommentOnFeedbackPage from "./CommentOnFeedbackPage.vue";
+import Notification from "../NotificationComponent.vue";
+import PermalinkedFeedbackComment from "@/components/comments/PermalinkedFeedbackComment.vue";
+import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
+import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
+import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
+import type { Comment } from "@/__generated__/graphql";
+import type { PropType } from "vue";
 
 type GiveFeedbackInput = {
   commentData: Comment;
@@ -31,11 +31,13 @@ const props = defineProps({
     required: true,
   },
   commentToGiveFeedbackOn: {
-    type: Object as PropType<Comment>,
+    type: Object as PropType<Comment | null | undefined>,
+    required: false,
     default: null,
   },
   commentToRemoveFeedbackFrom: {
-    type: Object as PropType<Comment>,
+    type: Object as PropType<Comment | null | undefined>,
+    required: false,
     default: null,
   },
   feedbackCommentsAggregate: {
@@ -56,7 +58,7 @@ const props = defineProps({
   },
   loggedInUserModName: {
     type: String,
-    default: '',
+    default: "",
   },
   reachedEndOfResults: {
     type: Boolean,
@@ -77,16 +79,20 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  'openFeedbackFormModal',
-  'updateCommentToGiveFeedbackOn',
-  'updateCommentToRemoveFeedbackFrom',
-  'addFeedbackCommentToComment',
-  'closeFeedbackFormModal',
+  "openFeedbackFormModal",
+  "updateCommentToGiveFeedbackOn",
+  "updateCommentToRemoveFeedbackFrom",
+  "addFeedbackCommentToComment",
+  "closeFeedbackFormModal",
 ]);
 
 const route = useRoute();
-const channelId = computed(() => (typeof route.params.forumId === 'string' ? route.params.forumId : ''));
-const feedbackId = computed(() => (typeof route.params.feedbackId === 'string' ? route.params.feedbackId : ''));
+const channelId = computed(() =>
+  typeof route.params.forumId === "string" ? route.params.forumId : ""
+);
+const feedbackId = computed(() =>
+  typeof route.params.feedbackId === "string" ? route.params.feedbackId : ""
+);
 
 const showConfirmUndoFeedbackModal = ref(false);
 const showEditCommentFeedbackModal = ref(false);
@@ -94,19 +100,19 @@ const showCopiedLinkNotification = ref(false);
 
 function handleClickGiveFeedback(input: GiveFeedbackInput) {
   const { commentData, parentCommentId } = input;
-  emit('openFeedbackFormModal', { commentData, parentCommentId });
-  emit('updateCommentToGiveFeedbackOn', commentData);
+  emit("openFeedbackFormModal", { commentData, parentCommentId });
+  emit("updateCommentToGiveFeedbackOn", commentData);
 }
 
 function handleClickUndoFeedback(input: GiveFeedbackInput) {
   const { commentData } = input;
   showConfirmUndoFeedbackModal.value = true;
-  emit('updateCommentToRemoveFeedbackFrom', commentData);
+  emit("updateCommentToRemoveFeedbackFrom", commentData);
 }
 
 function handleClickEditFeedback(input: EditFeedbackInput) {
   const { commentData } = input;
-  emit('updateCommentToGiveFeedbackOn', commentData);
+  emit("updateCommentToGiveFeedbackOn", commentData);
   showEditCommentFeedbackModal.value = true;
 }
 
@@ -116,11 +122,11 @@ function updateFeedback(text: string) {
 
 function handleSubmitFeedback() {
   if (!props.commentToGiveFeedbackOn?.id) {
-    console.error('commentId is required to submit feedback');
+    console.error("commentId is required to submit feedback");
     return;
   }
   if (!props.loggedInUserModName) {
-    console.error('modName is required to submit feedback');
+    console.error("modName is required to submit feedback");
     return;
   }
   const feedbackInput = {
@@ -129,7 +135,7 @@ function handleSubmitFeedback() {
     modProfileName: props.loggedInUserModName,
     channelId: channelId.value,
   };
-  emit('addFeedbackCommentToComment', feedbackInput);
+  emit("addFeedbackCommentToComment", feedbackInput);
 }
 </script>
 
@@ -165,14 +171,11 @@ function handleSubmitFeedback() {
         />
       </template>
     </PermalinkedFeedbackComment>
-    <div
-      v-for="comment in feedbackComments"
-      :key="comment.id"
-    >
+    <div v-for="comment in feedbackComments" :key="comment.id">
       <CommentOnFeedbackPage
         v-if="
           !showPermalinkedFeedback ||
-            (showPermalinkedFeedback && comment.id !== feedbackId)
+          (showPermalinkedFeedback && comment.id !== feedbackId)
         "
         :comment="comment"
         @show-copied-link-notification="showCopiedLinkNotification = true"
@@ -186,9 +189,7 @@ function handleSubmitFeedback() {
       :reached-end-of-results="reachedEndOfResults"
       @load-more="() => loadMore()"
     />
-    <div v-if="loading">
-      Loading...
-    </div>
+    <div v-if="loading">Loading...</div>
     <Notification
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"

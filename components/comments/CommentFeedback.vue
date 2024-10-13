@@ -72,10 +72,10 @@ const contextOfFeedbackComment = computed(() => {
   }
   return null;
 });
-const feedbackOnComment = "forums-forumId-discussions-discussionId-comments-commentId-feedback";
+const feedbackOnComment = "forums-forumId-discussions-discussionId-comments-feedback-commentId";
 const feedbackOnCommentFeedback= "forums-forumId-discussions-discussionId-commentFeedback-commentId";
 const commentPermalinkRoute = "forums-forumId-discussions-discussionId-comments-commentId"
-const feedbackOnDiscussionPermalink = "forums-forumId-discussions-discussionId-feedback-feedbackId";
+const feedbackOnDiscussionPermalink = "forums-forumId-discussions-feedback-discussionId-feedbackId";
 
 const updateContextLink = () => {
   if (originalComment.value) {
@@ -289,7 +289,7 @@ onAddFeedbackCommentToCommentDone(() => {
 </script>
 
 <template>
-  <div class="flex justify-center">
+  <div class="flex justify-center dark:text-white">
     <div class="w-full max-w-4xl space-y-4 rounded-lg bg-white p-4 dark:bg-gray-800 sm:px-2 md:px-5">
       <div v-if="getCommentLoading && !getCommentResult">
         Loading...

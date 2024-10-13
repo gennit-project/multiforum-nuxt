@@ -49,10 +49,16 @@ const loggedInUserUpvoted = computed(() => {
   if (!usernameVar()) {
     return false;
   }
+  if (!props.commentData.UpvotedByUsers) {
+    return false;
+  }
   return props.commentData.UpvotedByUsers.some(user => user.username === usernameVar());
 });
 
 const upvoteCount = computed(() => {
+  if (!props.commentData.UpvotedByUsersAggregate) {
+    return 0;
+  }
   return props.commentData.UpvotedByUsersAggregate?.count || 0;
 });
 

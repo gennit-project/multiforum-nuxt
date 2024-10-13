@@ -22,6 +22,7 @@ import type {
   HandleFeedbackInput,
 } from "./Comment.vue";
 import { timeAgo, ALLOWED_ICONS } from "@/utils";
+import { modProfileNameVar } from "@/cache";
 
 const props = defineProps({
   comment: {
@@ -46,18 +47,13 @@ const emit = defineEmits([
 const route = useRoute();
 const router = useRouter();
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
 
 const loggedInModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    console.error("Error fetching mod profile name");
-    return "";
+  const modName = modProfileNameVar();
+  if (!modName) {
+    console.error("Error fetching mod profile name")
   }
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modName;
 });
 
 const updateCommentInput = ref({
@@ -255,11 +251,11 @@ function handleViewFeedback(feedbackId: string) {
 <template>
   <div>
     <div
-      class="flex flex-wrap items-center gap-x-1 text-sm leading-8 text-gray-500 dark:text-gray-300"
+      class="flex flex-wrap items-center gap-x-1 text-sm text-gray-500 dark:text-gray-300"
     >
       <AvatarComponent
         v-if="comment.CommentAuthor?.displayName"
-        class="mr-1 h-36 w-36 border-2 shadow-sm dark:border-gray-800"
+        class="mr-1 border-2 shadow-sm dark:border-gray-800"
         :text="comment.CommentAuthor.displayName"
         :is-small="true"
         :is-square="false"

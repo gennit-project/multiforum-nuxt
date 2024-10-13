@@ -12,6 +12,7 @@ import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 
 const { user } = useAuth0();
 usernameVar(user?.username);
+modProfileNameVar(user?.ModerationProfile?.displayName || "");
 
 
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
@@ -25,10 +26,10 @@ const emailNotInSystem = ref(false);
 onEmailResult((result: any) => {
   if (!import.meta.client) return;
   let user: User | null = null;
-  let modProfile: ModerationProfile | null = null;
   let username = "";
   let modProfileName = "";
   const emailData = result.data?.emails[0];
+  console.log("emailData", emailData);
 
   user = emailData?.User;
 
@@ -36,15 +37,14 @@ onEmailResult((result: any) => {
     emailNotInSystem.value = true;
   } else {
     username = user.username;
-    modProfile = user.ModerationProfile;
+    modProfileName = user.ModerationProfile?.displayName || "";
 
     if (username && username !== usernameVar()) {
       // Store the authenticated user's username in the app state
       usernameVar(username);
     }
 
-    if (modProfile) {
-      modProfileName = modProfile.displayName;
+    if (modProfileName && modProfileName !== modProfileNameVar()) {
       modProfileNameVar(modProfileName);
     }
 
