@@ -20,24 +20,56 @@ const comment = computed(() => {
 const parentCommentId = computed(() => {
   return comment.value?.ParentComment?.id || "";
 });
+
+const discussionId = computed(() => {
+  return route.params.discussionId;
+});
+
+const eventId = computed(() => {
+  return route.params.eventId;
+});
+
+const parentCommentPermalink = computed(() => {
+  if (parentCommentId.value) {
+    if (discussionId.value) {
+      return {
+        name: "forums-forumId-discussions-discussionId-comments-commentId",
+        params: {
+          forumId: route.params.forumId,
+          discussionId: route.params.discussionId,
+          commentId: parentCommentId.value,
+        },
+      };
+    }
+
+    if (eventId.value) {
+      return {
+        name: "forums-forumId-events-eventId-comments-commentId",
+        params: {
+          forumId: route.params.forumId,
+          eventId: route.params.eventId,
+          commentId: parentCommentId.value,
+        },
+      };
+    }
+  }
+  return null;
+});
 </script>
 
 <template>
   <div>
     <div v-if="commentLoading">Loading...</div>
     <ErrorBanner v-else-if="commentError" :text="commentError.message" />
-    <div v-else-if="commentResult && commentResult.comments && commentResult.comments[0]">
+    <div
+      v-else-if="
+        commentResult && commentResult.comments && commentResult.comments[0]
+      "
+    >
       <nuxt-link
-        v-if="parentCommentId"
-        class="text-xs underline px-2 py-1"
-        :to="{
-          name: 'forums-forumId-discussions-discussionId-comments-commentId',
-          params: {
-            forumId: route.params.forumId,
-            discussionId: route.params.discussionId,
-            commentId: parentCommentId,
-          },
-        }"
+        v-if="parentCommentId && parentCommentPermalink"
+        class="text-xs underline px-2 py-1 dark:text-white"
+        :to="parentCommentPermalink"
       >
         View Context
       </nuxt-link>
