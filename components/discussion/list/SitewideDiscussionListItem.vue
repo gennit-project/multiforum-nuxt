@@ -236,7 +236,7 @@ const relative = computed(() =>
 
           <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
             <button
-              class="-ml-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500"
+              class="-ml-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
             >
               <i class="fa-regular fa-comment mr-2 h-4 w-4" />
               {{

@@ -295,7 +295,7 @@ export const getLinksInText = (text: string) => {
 
 export const getChannelLabel = (selectedChannels: Array<string>) => {
   if (selectedChannels.length === 0) {
-    return "Forums";
+    return "All Forums";
   }
   return `Forums (${selectedChannels.length})`;
 };

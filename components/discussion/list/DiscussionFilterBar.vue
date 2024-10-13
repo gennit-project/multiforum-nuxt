@@ -36,7 +36,7 @@ const router = useRouter();
 
 // Default filter labels
 const defaultFilterLabels = {
-  channels: "Forums",
+  channels: "All Forums",
   tags: "Tags",
 };
 
@@ -57,7 +57,9 @@ const filterValues = ref<SearchDiscussionValues>(
 );
 
 // Computed properties for labels
-const channelLabel = computed(() => getChannelLabel(filterValues.value.channels));
+const channelLabel = computed(() =>
+  getChannelLabel(filterValues.value.channels)
+);
 const tagLabel = computed(() => getTagLabel(filterValues.value.tags));
 
 // Watch for route query changes to update filter values
@@ -128,15 +130,7 @@ const toggleSelectedTag = (tag: string) => {
 
 <template>
   <div>
-    <div class="my-2 flex items-center space-y-2 space-x-2">
-      <SearchBar
-        class="flex flex-grow"
-        data-testid="discussion-filter-search-bar"
-        :initial-value="filterValues.searchInput"
-        :search-placeholder="'Search...'"
-        :small="true"
-        @update-search-input="updateSearchInput"
-      />
+    <div class="flex items-center space-x-2 py-2">
       <FilterChip
         v-if="!isForumScoped"
         class="align-middle"
@@ -156,6 +150,13 @@ const toggleSelectedTag = (tag: string) => {
           </div>
         </template>
       </FilterChip>
+      <SearchBar
+        data-testid="discussion-filter-search-bar"
+        :initial-value="filterValues.searchInput"
+        :search-placeholder="'Search...'"
+        :small="true"
+        @update-search-input="updateSearchInput"
+      />
       <FilterChip
         class="align-middle"
         data-testid="tag-filter-button"
