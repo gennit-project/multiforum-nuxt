@@ -153,7 +153,7 @@ const handleClickChannel = (uniqueName: string) => {
 
 <template>
   <div
-    class="justify-center rounded-lg p-0 max-w-5xl mx-auto" 
+    class="justify-center rounded-lg p-0 max-w-5xl mx-auto dark:text-white" 
   >
     <SitewideDiscussionList
       v-if="!isForumScoped"

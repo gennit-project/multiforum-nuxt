@@ -100,7 +100,7 @@ if (!channelId.value) {
   <NuxtLayout>
     <div
       v-if="channel"
-      class="flex flex-col justify-center dark:bg-black bg-gray-100"
+      class="flex flex-col justify-center dark:bg-black bg-gray-100 dark:text-white"
     >
       <ChannelHeaderMobile
         class="block md:hidden"
