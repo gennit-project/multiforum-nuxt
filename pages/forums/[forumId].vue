@@ -14,11 +14,11 @@ import { useQuery } from "@vue/apollo-composable";
 const route = useRoute();
 const router = useRouter();
 
-const isDiscussionDetailPage = computed(
-  () => route.name?.toString().includes("forums-forumId-discussions-discussionId")
+const showDiscussionTitle = computed(() =>
+  route.name?.toString().includes("forums-forumId-discussions-discussionId")
 );
-const isEventDetailPage = computed(
-  () => route.name === "forums-forumId-events-eventId"
+const showEventTitle = computed(() =>
+  route.name?.toString().includes("forums-forumId-events-eventId")
 );
 
 const channelId = computed(() => {
@@ -98,7 +98,10 @@ if (!channelId.value) {
 
 <template>
   <NuxtLayout>
-    <div v-if="channel" class="flex flex-col justify-center dark:bg-black bg-gray-100">
+    <div
+      v-if="channel"
+      class="flex flex-col justify-center dark:bg-black bg-gray-100"
+    >
       <ChannelHeaderMobile
         class="block md:hidden"
         :channel="channel"
@@ -132,12 +135,12 @@ if (!channelId.value) {
             :route="route"
             :channel="channel"
           />
-          <div v-if="isDiscussionDetailPage" class="flex w-full justify-center">
+          <div v-if="showDiscussionTitle" class="flex w-full justify-center">
             <div class="max-w-7xl flex-1 px-3 md:px-6">
               <DiscussionTitleEditForm />
             </div>
           </div>
-          <div v-else-if="isEventDetailPage" class="flex w-full justify-center">
+          <div v-else-if="showEventTitle" class="flex w-full justify-center">
             <div class="max-w-7xl flex-1 px-3 md:px-6">
               <EventTitleEditForm />
             </div>

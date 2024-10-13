@@ -1,9 +1,12 @@
 <script setup lang="ts">
 import { ref} from "vue";
 import { useRoute } from "vue-router";
+import Comment from "@/components/comments/Comment.vue";
+import PermalinkedComment from "@/components/comments/PermalinkedComment.vue";
 
 const route = useRoute();
 const permalinkedCommentId = ref(route.params.commentId);
+
 defineEmits([
   "clickEditComment",
   "clickReport",
@@ -27,7 +30,7 @@ defineProps<{
   loggedInUserModName: string;
   replyFormOpenAtCommentID: string;
   editFormOpenAtCommentID: string;
-  editCommentError: string;
+  editCommentError: ApolloError | null | undefined;
   originalPoster: string;
 }>();
 </script>

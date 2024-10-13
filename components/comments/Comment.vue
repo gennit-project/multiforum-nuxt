@@ -139,7 +139,7 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { discussionId, forumId } = route.params;
+const { discussionId, eventId, forumId } = route.params;
 
 const isHighlighted = computed(() => {
   return props.isPermalinked || permalinkedCommentId === props.commentData.id;
@@ -155,7 +155,7 @@ const replyCount = computed(() => {
 const textCopy = computed(() => props.commentData.text);
 
 const canShowPermalink =
-  props.commentData.DiscussionChannel || (discussionId && forumId);
+  props.commentData.DiscussionChannel || props.commentData.Event || (discussionId && forumId) || (eventId && forumId);
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink) {

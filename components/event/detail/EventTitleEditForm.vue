@@ -127,7 +127,7 @@ const formattedDate = computed(() => {
     >
       <v-skeleton-loader
         v-if="getEventLoading"
-        class="flex-1"
+        class="flex-1 dark:bg-gray-800"
         type="text"
         :theme="theme"
       />
