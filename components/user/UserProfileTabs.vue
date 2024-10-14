@@ -90,7 +90,7 @@ const tabs = computed(() => {
   <div>
     <nav
       v-if="vertical"
-      class="text-md flex max-w-7xl flex-col"
+      class="text-md flex max-w-screen-2xl flex-col"
       aria-label="Tabs"
     >
       <TabButton
@@ -105,7 +105,7 @@ const tabs = computed(() => {
     </nav>
     <nav
       v-else
-      class="max-w-7xl space-x-2 pt-1 text-sm"
+      class="max-w-screen-2xl space-x-2 pt-1 text-sm"
       aria-label="Tabs"
     >
       <TabButton

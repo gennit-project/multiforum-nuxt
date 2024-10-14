@@ -452,7 +452,7 @@ const toggleCloseOpenIssue = () => {
   <PageNotFound v-if="!getIssueLoading && !getIssueLoading && !activeIssue" />
   <div
     v-else
-    class="w-full max-w-7xl space-y-2 rounded-lg bg-white py-2 dark:bg-gray-800 dark:text-white sm:px-2 md:px-4 lg:px-6"
+    class="w-full max-w-screen-2xl space-y-2 rounded-lg bg-white py-2 dark:bg-gray-800 dark:text-white sm:px-2 md:px-4 lg:px-6"
   >
     <div
       v-if="route.name === 'IssueDetail'"

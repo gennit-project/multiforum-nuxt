@@ -49,7 +49,7 @@ const isAdmin = computed(() => {
 
 <template>
   <NuxtLayout>
-    <div class="max-w-7xl mx-auto dark:bg-black">
+    <div class="max-w-screen-2xl mx-auto dark:bg-black">
       <TwoSeparatelyScrollingPanes
         :show-right-pane-at-medium-screen-width="true"
       >

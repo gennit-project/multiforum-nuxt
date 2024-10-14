@@ -185,7 +185,7 @@ watch(() => route.params, updateParams, { immediate: true });
 </script>
 
 <template>
-  <div class="w-full max-w-7xl space-y-4 rounded-lg bg-white dark:text-white py-2 dark:bg-gray-800 sm:px-2 md:px-5">
+  <div class="w-full max-w-screen-2xl space-y-4 rounded-lg bg-white dark:text-white py-2 dark:bg-gray-800 sm:px-2 md:px-5">
     <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
       <BackLink :link="`/forums/${channelId}/discussions/${discussion?.id}`" :data-testid="'discussion-detail-back-link'" />
     </div>

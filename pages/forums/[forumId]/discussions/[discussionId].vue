@@ -48,7 +48,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="relative max-w-7xl p-0 flex-1 focus:outline-none xl:order-last">
+  <div class="relative max-w-screen-2xl p-0 flex-1 focus:outline-none xl:order-last">
     <div class="flex w-full justify-center space-y-4">
       <LoadingSpinner v-if="localModProfileNameLoading" class="h-12 w-12" />
       <ErrorBanner

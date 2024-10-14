@@ -45,7 +45,7 @@ export default defineComponent({
     class="max-h-36 w-full"
   >
   <div class="bg-white dark:bg-gray-800 flex justify-center">
-    <div class="max-w-7xl w-full">
+    <div class="max-w-screen-2xl w-full">
       <div
         class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600"
         :class="[channel?.channelBannerURL ? '' : 'pt-2']"

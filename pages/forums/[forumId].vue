@@ -125,7 +125,7 @@ if (!channelId.value) {
       /></ChannelHeaderDesktop>
       <div v-if="channel" class="w-full flex justify-center">
         <article
-          class="relative h-full max-w-7xl w-full rounded-lg dark:bg-black focus:outline-none"
+          class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
             class="mb-2 block md:hidden w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
@@ -136,16 +136,16 @@ if (!channelId.value) {
             :channel="channel"
           />
           <div v-if="showDiscussionTitle" class="flex w-full justify-center">
-            <div class="max-w-7xl flex-1 px-3 md:px-6">
+            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
               <DiscussionTitleEditForm />
             </div>
           </div>
           <div v-else-if="showEventTitle" class="flex w-full justify-center">
-            <div class="max-w-7xl flex-1 px-3 md:px-6">
+            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
               <EventTitleEditForm />
             </div>
           </div>
-          <div class="w-full relative max-w-7xl flex-1 focus:outline-none">
+          <div class="w-full relative max-w-screen-2xl flex-1 focus:outline-none">
             <div
               class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
