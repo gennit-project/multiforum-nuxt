@@ -47,7 +47,7 @@ export default defineComponent({
   <div class="bg-white dark:bg-gray-800 flex justify-center">
     <div class="max-w-screen-2xl w-full">
       <div
-        class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600"
+        class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pr-6"
         :class="[channel?.channelBannerURL ? '' : 'pt-2']"
       >
         <div class="flex items-center w-full gap-4">
@@ -88,7 +88,6 @@ export default defineComponent({
         </div>
         <CreateAnythingButton
           v-if="showCreateButton"
-          class="mr-6 lg:mr-0"
           :use-primary-button="true"
         />
       </div>
