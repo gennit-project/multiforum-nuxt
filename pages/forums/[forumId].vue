@@ -149,12 +149,12 @@ if (!channelId.value) {
             <div
               class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
-              <div class="w-full md:w-8/12 p-0 bg-white dark:bg-gray-800">
+              <div class="w-full md:w-9/12 p-0 bg-white dark:bg-gray-800">
                 <NuxtPage />
               </div>
               <div
                 v-if="channelId"
-                class="w-full md:w-4/12 p-0 bg-white dark:bg-gray-800"
+                class="w-full md:w-3/12 p-0 bg-white dark:bg-gray-800"
               >
                 <ChannelSidebar
                   v-if="channel"

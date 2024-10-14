@@ -42,19 +42,19 @@ const filterChannelsByTag = (tag: string) => {
     <div v-if="channelId && channel" class="items-center gap-2" />
     
     <div>
-      <h2 class="mt-2 px-6 text-xl font-bold dark:text-white">Forum Intro</h2>
+      <h2 class="mt-2 text-xl font-bold dark:text-white">Forum Intro</h2>
       <MarkdownPreview
         v-if="channel?.description"
         :text="channel?.description"
         :word-limit="1000"
-        class="ml-2"
+        class="-ml-4"
       />
-      <p v-else class="p-6 text-xs dark:text-white">Welcome to {{ channelId }}!</p>
+      <p v-else class="text-xs dark:text-white">Welcome to {{ channelId }}!</p>
     </div>
     
     <slot />
 
-    <div class="w-full px-6">
+    <div class="w-full">
       <div v-if="channel">
         <div class="mt-6 flex w-full flex-col gap-6">
           <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
