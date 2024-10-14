@@ -27,7 +27,7 @@ export default defineComponent({
   <div>
   <div class="flex flex-row md:hidden pb-4 items-center justify-center gap-4 bg-black">
     <AvatarComponent
-      class="h-16 w-16 flex justify-center align-items shadow-sm dark:border-gray-800 pt-2"
+      class="flex justify-center align-items shadow-sm dark:border-gray-800 pt-2"
       :text="channelId"
       :src="channel?.channelIconURL ?? ''"
       :is-medium="true"
