@@ -14,16 +14,13 @@ import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { DateTime } from "luxon";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import {
-  GET_LOCAL_MOD_PROFILE_NAME,
-} from "@/graphQLData/user/queries";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import { usernameVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 
 const props = defineProps({
   eventData: {
@@ -70,15 +67,9 @@ const permalinkObject = computed(() => {
   };
 });
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
+
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value)
-    return "";
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || "";
 });
 
 const {
@@ -233,6 +224,14 @@ function getFormattedDateString(startTime: string) {
 const feedbackText = ref("");
 
 function handleSubmitFeedback() {
+  if (!feedbackText.value) {
+    console.error("Feedback text is required");
+    return;
+  }
+  if (!loggedInUserModName.value) {
+    console.error("Mod profile name is required to submit feedback");
+    return;
+  }
   addFeedbackCommentToEvent({
     eventId: eventId.value,
     text: feedbackText.value,
@@ -251,8 +250,8 @@ function handleViewFeedback() {
   });
 }
 
-function handleFeedbackInput(event: any) {
-  feedbackText.value = event.target.value;
+function handleFeedbackInput(event: string) {
+  feedbackText.value = event;
 }
 </script>
 
@@ -404,7 +403,7 @@ function handleFeedbackInput(event: any) {
       :open="showFeedbackFormModal"
       :error="addFeedbackCommentToEventError?.message"
       :loading="addFeedbackCommentToEventLoading"
-      @input="handleFeedbackInput"
+      @update-feedback="handleFeedbackInput"
       @close="showFeedbackFormModal = false"
       @primary-button-click="handleSubmitFeedback"
     />

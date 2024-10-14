@@ -164,7 +164,7 @@ const reachedEndOfResults = computed(() => {
       >
         <AvatarComponent
           v-if="comment.CommentAuthor?.displayName"
-          class="h-36 w-36 border-2 shadow-sm dark:border-gray-800"
+          class="border-2 shadow-sm dark:border-gray-800"
           :text="comment.CommentAuthor.displayName"
           :is-small="true"
           :is-square="false"
@@ -189,7 +189,6 @@ const reachedEndOfResults = computed(() => {
       <div class="ml-12 border-l-2 border-gray-200 dark:border-gray-500">
         <MarkdownPreview
           v-if="comment.text"
-          class="-ml-4"
           :text="comment.text"
           :disable-gallery="true"
         />

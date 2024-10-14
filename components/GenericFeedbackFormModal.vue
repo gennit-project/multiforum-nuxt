@@ -24,7 +24,7 @@ const emit = defineEmits(['updateFeedback']);
 const title = "Give Semi-anonymous Feedback";
 const body = "Do you have any actionable feedback for the author?";
 
-function update(text: string) {
+function updateFeedback(text: string) {
   emit('updateFeedback', text);
 }
 </script>
@@ -38,6 +38,7 @@ function update(text: string) {
     :loading="props.loading"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
+    :primary-button-disabled="props.loading"
   >
     <template #icon>
       <HandThumbDownIcon
