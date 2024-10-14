@@ -35,6 +35,11 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  shaded: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   wordLimit: {
     type: Number,
     required: false,
@@ -73,7 +78,7 @@ const filterByTag = (tag: string) => {
 
 <template>
   <div>
-    <div v-if="discussion?.body" class="-ml-2 -mt-4 bg-gray-100 dark:bg-gray-700 rounded">
+    <div v-if="discussion?.body" class="-ml-2 -mt-4rounded" :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ': '']">
       <MarkdownPreview
         :text="bodyText"
         :disable-gallery="false"
