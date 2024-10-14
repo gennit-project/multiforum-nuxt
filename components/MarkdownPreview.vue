@@ -261,22 +261,21 @@ export default defineComponent({
 }
 
 p,
-ul,
 li {
   font-size: 0.9rem !important;
   font-weight: 400 !important;
   line-height: 1.5 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+p {
   margin-bottom: 1rem !important;
 }
 
-ul {
+ul, ol {
   list-style-type: disc !important;
   margin-left: 1rem !important;
-}
-
-ol {
-  list-style-type: decimal !important;
-  margin-left: 1rem !important;
+  margin-bottom: 1rem !important;
 }
 
 </style>
