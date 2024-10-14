@@ -105,34 +105,31 @@ const contextOfFeedbackComment = computed(() => {
 
 const updateContextLink = () => {
   if (discussion.value) {
-    if (route.name === "DiscussionFeedback") {
-      return { name: "DiscussionPermalink", params: { discussionId: route.params.discussionId } };
+    if (route.name === "forums-forumId-discussions-feedback-discussionId") {
+      // If we are on the page that collects feedback on a discussion, go to the 
+      // discussion page for the original context.
+      return { 
+        name: "forums-forumId-discussions-discussionId",
+         params: { 
+          discussionId: route.params.discussionId,
+          forumId: route.params.forumId,
+        } 
+      };
     }
-    if (route.name === "FeedbackOnDiscussionFeedback") {
+    if (route.name === "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId") {
+      // If we are on a page that collects feedback on a feedback comment,
+      // go to the original feedback comment's permalink.
+      // (It's the same route with different params.)
       if (!contextOfFeedbackComment.value) {
         console.warn("No context of feedback comment found");
         return "";
       }
       return {
-        name: "DiscussionCommentFeedbackPermalink",
+        name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
         params: {
           discussionId: route.params.discussionId,
           forumId: route.params.forumId,
           feedbackId: contextOfFeedbackComment.value.id,
-        },
-      };
-    }
-    if (route.name === "DiscussionFeedbackPermalink") {
-      if (!contextOfFeedbackComment.value) {
-        return { name: "DiscussionCommentPermalink", params: { discussionId: route.params.discussionId, commentId: route.params.commentId } };
-      }
-      return {
-        name: "DiscussionCommentFeedbackPermalink",
-        params: {
-          discussionId: route.params.discussionId,
-          commentId: contextOfFeedbackComment.value?.id || "",
-          forumId: route.params.forumId,
-          feedbackId: originalComment.value.id || "",
         },
       };
     }

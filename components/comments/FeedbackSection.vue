@@ -5,7 +5,6 @@ import InfoBanner from "@/components/InfoBanner.vue";
 import LoadMore from "@/components/LoadMore.vue";
 import CommentOnFeedbackPage from "./CommentOnFeedbackPage.vue";
 import Notification from "../NotificationComponent.vue";
-import PermalinkedFeedbackComment from "@/components/comments/PermalinkedFeedbackComment.vue";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
 import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
@@ -137,6 +136,7 @@ function handleSubmitFeedback() {
   };
   emit("addFeedbackCommentToComment", feedbackInput);
 }
+
 </script>
 
 <template>
@@ -154,23 +154,12 @@ function handleSubmitFeedback() {
     >
       No feedback yet.
     </div>
-    <PermalinkedFeedbackComment
-      v-if="showPermalinkedFeedback && feedbackId"
-      :key="feedbackId"
-      class="mt-2"
-      :comment-id="feedbackId"
-    >
-      <template #comment="{ commentData }">
-        <CommentOnFeedbackPage
-          :comment="commentData"
-          :is-highlighted="true"
-          @show-copied-link-notification="showCopiedLinkNotification = true"
-          @click-feedback="handleClickGiveFeedback"
-          @click-undo-feedback="handleClickUndoFeedback"
-          @click-edit-feedback="handleClickEditFeedback"
-        />
-      </template>
-    </PermalinkedFeedbackComment>
+    <NuxtPage
+      @show-copied-link-notification="showCopiedLinkNotification = true"
+      @click-feedback="handleClickGiveFeedback"
+      @click-undo-feedback="handleClickUndoFeedback"
+      @click-edit-feedback="handleClickEditFeedback"
+    />
     <div v-for="comment in feedbackComments" :key="comment.id">
       <CommentOnFeedbackPage
         v-if="

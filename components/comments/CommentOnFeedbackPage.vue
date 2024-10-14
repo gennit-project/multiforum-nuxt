@@ -161,13 +161,12 @@ const commentMenuItems = computed(() => {
 });
 
 const getPermalinkObject = () => {
-  const { discussionId, channelId, commentId } = route.params;
+  const { discussionId, channelId } = route.params;
 
   return {
-    name: "DiscussionCommentFeedbackPermalink",
+    name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
     params: {
       discussionId,
-      commentId,
       forumId: channelId,
       feedbackId: props.comment.id,
     },

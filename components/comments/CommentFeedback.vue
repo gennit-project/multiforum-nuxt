@@ -17,7 +17,7 @@ const PAGE_LIMIT = 10;
 const route = useRoute();
 
 const updateShowPermalinkedFeedback = () => {
-  return route.name === "DiscussionCommentFeedbackPermalink";
+  return route.name === "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId";
 };
 
 const channelId = ref("");

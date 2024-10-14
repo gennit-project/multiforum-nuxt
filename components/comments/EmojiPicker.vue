@@ -39,7 +39,6 @@ onMounted(() => {
 
       if (emojiPickerElement.shadowRoot) {
         const inputElement = emojiPickerElement.shadowRoot.querySelector("#search");
-        console.log('inputElement', inputElement);
 
         if (inputElement) {
           setTimeout(() => {

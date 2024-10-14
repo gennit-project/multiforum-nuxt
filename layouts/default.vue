@@ -29,7 +29,6 @@ onEmailResult((result: any) => {
   let username = "";
   let modProfileName = "";
   const emailData = result.data?.emails[0];
-  console.log("emailData", emailData);
 
   user = emailData?.User;
 
