@@ -245,8 +245,8 @@ function handleViewFeedback() {
   router.push({
     name: "forums-forumId-events-feedback-eventId",
     params: {
-      eventId: this.eventId,
-      forumId: this.channelId,
+      eventId: eventId.value,
+      forumId: channelId.value
     },
   });
 }
@@ -268,7 +268,7 @@ function handleFeedbackInput(event: any) {
       class="mb-2"
       :text="cancelEventError.message"
     />
-  </div>
+  
   <div
     class="flex justify-between px-4 text-sm text-gray-700 dark:text-gray-200"
   >
@@ -429,5 +429,6 @@ function handleFeedbackInput(event: any) {
       :title="'Your report was submitted successfully.'"
       @close-notification="showSuccessfullyReported = false"
     />
+  </div>
   </div>
 </template>
