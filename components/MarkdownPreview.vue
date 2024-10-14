@@ -263,10 +263,10 @@ export default defineComponent({
 p,
 ul,
 li {
-  font-size: 0.85rem !important;
+  font-size: 0.9rem !important;
   font-weight: 400 !important;
   line-height: 1.5 !important;
-  margin-bottom: 0.5rem !important;
+  margin-bottom: 1rem !important;
 }
 
 ul {
