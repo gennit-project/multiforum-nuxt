@@ -20,6 +20,7 @@ import {
 import { GET_LOCAL_MOD_PROFILE_NAME } from '@/graphQLData/user/queries';
 import { COUNT_OPEN_ISSUES } from '@/graphQLData/mod/queries';
 import type { IssueCreateInput, Comment } from '@/__generated__/graphql';
+import { modProfileNameVar } from '@/cache';
 
 type UpdateIssueInCacheInput = {
   cache: any;
@@ -126,16 +127,8 @@ const eventId = computed(() => {
   return typeof route.params.eventId === 'string' ? route.params.eventId : '';
 });
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  return localModProfileNameLoading.value || localModProfileNameError.value
-    ? ''
-    : localModProfileNameResult.value?.modProfileName || '';
+  return modProfileNameVar() || '';
 });
 
 const {

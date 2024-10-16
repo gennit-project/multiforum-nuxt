@@ -31,6 +31,7 @@ import ModerationWizard from "@/components/mod/ModerationWizard.vue";
 import IssueBadge from "@/components/mod/IssueBadge.vue";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
 import { DateTime } from "luxon";
+import { modProfileNameVar } from "@/cache";
 
 // Setup
 const route = useRoute();
@@ -379,17 +380,8 @@ const {
   },
 });
 
-// Local mod profile and username
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value)
-    return "";
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || "";
 });
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)

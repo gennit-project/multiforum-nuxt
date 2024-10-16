@@ -9,7 +9,7 @@ import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
 import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import type { Channel } from "@/__generated__/graphql";
-import { usernameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 
 type Tab = {
   name: string;
@@ -89,13 +89,8 @@ const adminList = props.channel.Admins.map((user) => user.username || "");
 
 const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
 
-const { result: localModProfileNameResult, loading: localModProfileNameLoading, error: localModProfileNameError } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return "";
-  }
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || '';
 });
 
 if (loggedInUsername.value && adminList.includes(loggedInUsername.value)) {

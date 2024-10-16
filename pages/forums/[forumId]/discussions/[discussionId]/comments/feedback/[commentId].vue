@@ -9,8 +9,8 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import FeedbackSection from "@/components/comments/FeedbackSection.vue";
+import { modProfileNameVar } from "@/cache";
 
 const PAGE_LIMIT = 10;
 
@@ -27,17 +27,8 @@ const offset = ref(0);
 const feedbackId = ref("");
 const showPermalinkedFeedback = ref(updateShowPermalinkedFeedback());
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return "";
-  }
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || "";
 });
 
 const {

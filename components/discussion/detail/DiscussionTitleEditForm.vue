@@ -10,9 +10,8 @@ import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discus
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
-import cache, { usernameVar } from "@/cache";
+import cache, { modProfileNameVar, usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -24,17 +23,9 @@ const channelId = computed(() =>
 const discussionId = computed(() =>
   typeof route.params.discussionId === "string" ? route.params.discussionId : ""
 );
-
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-const loggedInUserModName = computed(() =>
-  !localModProfileNameLoading.value && !localModProfileNameError.value
-    ? localModProfileNameResult.value?.modProfileName || ""
-    : ""
-);
+const loggedInUserModName = computed(() => {
+  return modProfileNameVar() || "";
+});
 
 const {
   result: getDiscussionResult,

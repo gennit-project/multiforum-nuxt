@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
-import { useQuery, useMutation } from '@vue/apollo-composable';
+import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '../ErrorBanner.vue';
-import { GET_LOCAL_MOD_PROFILE_NAME } from '@/graphQLData/user/queries';
 import { UPVOTE_COMMENT, UNDO_UPVOTE_COMMENT } from '@/graphQLData/comment/mutations';
 import type { PropType } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
 import VotesComponent from './Votes.vue';
-import { usernameVar } from '@/cache';
+import { modProfileNameVar, usernameVar } from '@/cache';
 
 const props = defineProps({
   commentData: {
@@ -32,17 +31,13 @@ const emit = defineEmits([
   'viewFeedback',
   'clickFeedback',
 ]);
-const { result: localModProfileNameResult, loading: localModProfileNameLoading, error: localModProfileNameError } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
 
 const username = computed(() => {
   return usernameVar() || '';
 });
 
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return '';
-  }
-  return localModProfileNameResult.value?.modProfileName || '';
+  return modProfileNameVar() || '';
 });
 
 const loggedInUserUpvoted = computed(() => {

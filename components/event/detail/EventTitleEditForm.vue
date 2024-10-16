@@ -10,9 +10,8 @@ import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutat
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_EVENT } from "@/graphQLData/event/queries";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import gql from "graphql-tag";
-import { usernameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -25,17 +24,8 @@ const eventId = computed(() =>
   typeof route.params.eventId === "string" ? route.params.eventId : ""
 );
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return "";
-  }
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || "";
 });
 
 const {
