@@ -27,12 +27,7 @@ const loggedInUserModName = computed(() => {
   return modProfileNameVar() || "";
 });
 
-// Scroll to top on component mount
-onMounted(() => {
-  nextTick(() => {
-    window.scrollTo(0, 0);
-  });
-});
+
 </script>
 
 <template>
