@@ -253,8 +253,7 @@ const commentMenuItems = computed(() => {
     }
 
     if (props.enableFeedback) {
-      if (props.commentData.FeedbackComments?.length === 0) {
-        if (props.modProfileName) {
+      if (props.modProfileName) {
           out.push({
             label: "Give Feedback",
             value: "",
@@ -262,7 +261,7 @@ const commentMenuItems = computed(() => {
             icon: ALLOWED_ICONS.GIVE_FEEDBACK,
           });
         }
-      } else {
+      if (props.commentData.FeedbackComments?.length > 0) {
         out.push({
           label: "Undo Feedback",
           value: "",

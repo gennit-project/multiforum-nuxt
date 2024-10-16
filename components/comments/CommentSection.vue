@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed, watchEffect } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import Comment from "./Comment.vue";
 import LoadMore from "../LoadMore.vue";
 import ErrorBanner from "../ErrorBanner.vue";
@@ -20,7 +20,6 @@ import {
   CREATE_COMMENT,
   ADD_FEEDBACK_COMMENT_TO_COMMENT,
 } from "@/graphQLData/comment/mutations";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import type {
   CommentCreateInput,
@@ -32,6 +31,7 @@ import type {
   DeleteCommentInputData,
 } from "@/types/Comment";
 import type { Ref, PropType } from "vue";
+import { modProfileNameVar } from "@/cache";
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -153,17 +153,8 @@ const updateCommentInput = computed(() => ({
   isRootComment: editFormValues.value?.isRootComment,
 }));
 
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return "";
-  }
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || "";
 });
 
 const getCommentRepliesVariables = {

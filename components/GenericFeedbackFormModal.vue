@@ -17,6 +17,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  primaryButtonDisabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['updateFeedback']);
@@ -34,11 +38,11 @@ function updateFeedback(text: string) {
     :highlight-color="'yellow'"
     :title="title"
     :body="body"
+    :primary-button-disabled="props.loading || props.primaryButtonDisabled"
     :open="props.open"
     :loading="props.loading"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
-    :primary-button-disabled="props.loading"
   >
     <template #icon>
       <HandThumbDownIcon

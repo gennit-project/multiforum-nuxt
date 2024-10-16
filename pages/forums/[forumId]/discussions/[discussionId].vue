@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { ref, computed, watchEffect, onMounted, nextTick } from "vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { useQuery } from "@vue/apollo-composable";
 import DiscussionDetailContent from "@/components/discussion/detail/DiscussionDetailContent.vue";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
+import { modProfileNameVar } from "@/cache";
 
 // Route setup
 const route = useRoute();
@@ -24,18 +23,8 @@ watchEffect(() => {
   discussionId.value = updateDiscussionId();
 });
 
-// Query for local mod profile name
-const {
-  result: localModProfileNameResult,
-  loading: localModProfileNameLoading,
-  error: localModProfileNameError,
-} = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-
 const loggedInUserModName = computed(() => {
-  if (localModProfileNameLoading.value || localModProfileNameError.value) {
-    return "";
-  }
-  return localModProfileNameResult.value?.modProfileName || "";
+  return modProfileNameVar() || "";
 });
 
 // Scroll to top on component mount

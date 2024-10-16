@@ -207,6 +207,14 @@ const feedbackText = ref("");
 const previousOffset = ref(0);
 
 const handleSubmitFeedback = async () => {
+  if (!feedbackText.value) {
+    console.error("No feedback text found.");
+    return;
+  }
+  if (!props.loggedInUserModName) {
+    console.error("No mod name found.");
+    return;
+  }
   if (!activeDiscussionChannel.value?.channelUniqueName) {
     console.error("No active discussion channel found.");
     return;
@@ -221,8 +229,8 @@ const handleSubmitFeedback = async () => {
   // that it's active, meaning the user has given feedback.
   refetchDiscussion();
 };
-const handleFeedbackInput = (event: any) => {
-  feedbackText.value = event.target.value;
+const handleFeedbackInput = (event: string) => {
+  feedbackText.value = event;
 };
 const handleClickUndoFeedback = () => {
   showConfirmUndoFeedbackModal.value = true;
@@ -327,8 +335,9 @@ const handleClickEditFeedback = () => {
       v-if="showFeedbackFormModal"
       :open="showFeedbackFormModal"
       :loading="addFeedbackCommentToDiscussionLoading"
+      :primary-button-disabled="!feedbackText"
       @close="showFeedbackFormModal = false"
-      @input="handleFeedbackInput"
+      @update-feedback="handleFeedbackInput"
       @primary-button-click="handleSubmitFeedback"
     />
     <ConfirmUndoDiscussionFeedbackModal

@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
@@ -254,7 +253,7 @@ function handleViewFeedback(feedbackId: string) {
     >
       <AvatarComponent
         v-if="comment.CommentAuthor?.displayName"
-        class="mr-1 border-2 shadow-sm dark:border-gray-800"
+        class="mr-1 shadow-sm dark:border-gray-800"
         :text="comment.CommentAuthor.displayName"
         :is-small="true"
         :is-square="false"
