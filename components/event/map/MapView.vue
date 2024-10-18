@@ -409,8 +409,10 @@ const isClientSide = typeof window !== "undefined";
       </div>
     </div>
 
-    <div class="flex flex-grow mt-46 bg-white dark:bg-black">
-      <!-- Left Pane: Scrollable Content -->
+    <div
+      v-if="clientSide && mdAndUp"
+      class="flex flex-grow mt-46 bg-white dark:bg-black"
+    >
       <div class="w-1/2">
         <div class="space-y-4">
           <div v-if="eventLoading">Loading...</div>
@@ -466,9 +468,7 @@ const isClientSide = typeof window !== "undefined";
         />
       </div>
     </div>
-
-    <!-- Mobile layout (if applicable) -->
-    <!-- <div
+    <div
       v-else-if="eventResult && eventResult.events"
       id="mapViewMobileWidth"
       class="p-4"
@@ -508,7 +508,7 @@ const isClientSide = typeof window !== "undefined";
           />
         </div>
       </div>
-    </div> -->
+    </div>
 
     <EventPreview
       :top-layer="true"
