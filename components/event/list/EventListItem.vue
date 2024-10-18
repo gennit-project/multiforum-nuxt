@@ -61,6 +61,7 @@ const defaultUniqueName = computed(() => {
 });
 
 const detailLink = computed(() => {
+  console.log("defaultUniqueName", defaultUniqueName.value);
   if (!defaultUniqueName.value) {
     return "";
   }
@@ -165,7 +166,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               })
             }}
           </div>
-          <div class="text-2xl font-bold dark:text-white">
+          <div class="text-2xl font-bold text-black dark:text-white">
             {{ new Date(event.startTime).getDate() }}
           </div>
           <div
@@ -211,7 +212,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             }}
           </span>
         </div>
-        <p v-if="event.virtualEventUrl" class="dark:text-white">Online event</p>
+        <p v-if="event.virtualEventUrl" class="text-black dark:text-white">Online event</p>
         <p v-if="event.free" class="text-sm font-medium text-gray-600">Free</p>
 
         <div
@@ -251,10 +252,10 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           class="flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
         >
           <button
-            class="rounded-md bg-gray-100 px-4 pt-1 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+            class="rounded-md bg-gray-100 px-4 pt-1 hover:bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
           >
             <i class="fa-regular fa-comment mt-1 h-6 w-6" />
-            <span class="text-white">{{
+            <span class="text black dark:text-white">{{
               `View ${commentCount} ${
                 commentCount === 1 ? "comment " : "comments"
               }`

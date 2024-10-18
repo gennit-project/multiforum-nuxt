@@ -66,7 +66,7 @@ defineEmits(["closePreview"]);
                     </div>
                   </div>
                   <div class="relative flex-1" data-testid="event-preview">
-                    <EventDetail :compact-mode="true" />
+                    <EventDetail :compact-mode="true" :show-comments="false" />
                   </div>
                 </div>
                 <div class="flex-shrink-0 px-4 py-4 flex justify-end">

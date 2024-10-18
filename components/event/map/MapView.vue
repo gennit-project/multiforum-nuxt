@@ -387,11 +387,13 @@ const openPreview = (event: EventData, openedFromMap = false) => {
   selectedEvent.value = event;
   colorLocked.value = true;
 };
+
+const isClientSide = typeof window !== "undefined";
 </script>
 
 <template>
   <div class="h-full bg-gray-100 dark:bg-gray-900">
-    <div v-if="mdAndUp" id="mapViewFullScreen">
+    <div v-if="isClientSide && mdAndUp" id="mapViewFullScreen">
       <TwoSeparatelyScrollingPanes
         class="mt-3"
         :show-right-pane-at-medium-screen-width="true"
@@ -436,7 +438,7 @@ const openPreview = (event: EventData, openedFromMap = false) => {
           </div>
         </template>
         <template #rightpane>
-          <div style="right: 0; width: 50vw">
+          <div style="border: 1px solid red;" class="flex-1">
             <div class="event-map-container">
               <div v-if="eventLoading">Loading...</div>
               <ErrorBanner

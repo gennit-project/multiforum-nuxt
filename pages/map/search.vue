@@ -2,5 +2,7 @@
 import MapView from "@/components/event/map/MapView.vue";
 </script>
 <template>
-  <MapView />
+  <NuxtLayout>
+    <MapView />
+  </NuxtLayout>
 </template>

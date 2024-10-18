@@ -36,7 +36,7 @@ export default defineComponent({
       name: 'forums-forumId-events-eventId',
       params: {
         eventId,
-        channelId,
+        forumId: channelId,
       },
     }"
   >

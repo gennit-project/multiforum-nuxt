@@ -205,6 +205,7 @@ watch(
 </script>
 
 <template>
+  <client-only>
   <div class="text-black">
     <p v-if="events.length === 0" class="mx-3">
       Could not find any events with a location.
@@ -220,6 +221,7 @@ watch(
       style="position: fixed; width: 50vw; height: 94vh"
     />
   </div>
+</client-only>
 </template>
 
 <style>
