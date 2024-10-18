@@ -471,7 +471,7 @@ const isClientSide = typeof window !== "undefined";
     <div
       v-else-if="eventResult && eventResult.events"
       id="mapViewMobileWidth"
-      class="p-4"
+      class="p-4 mt-52"
     >
       <div class="event-map-container">
         <EventMap
