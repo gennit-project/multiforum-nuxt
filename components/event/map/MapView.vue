@@ -410,7 +410,7 @@ const isClientSide = typeof window !== "undefined";
     </div>
 
     <div
-      v-if="clientSide && mdAndUp"
+      v-if="isClientSide && mdAndUp"
       class="flex flex-grow mt-46 bg-white dark:bg-black"
     >
       <div class="w-1/2">
