@@ -27,7 +27,7 @@ defineEmits(["closePreview"]);
   <TransitionRoot as="template" :show="isOpen">
     <TailwindDialog
       as="div"
-      :class="[topLayer ? 'z-30' : 'z-20']"
+      :class="[topLayer ? 'z-50' : 'z-40']"
       class="fixed inset-0 overflow-hidden z-20"
       @close="$emit('closePreview')"
     >

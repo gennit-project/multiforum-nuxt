@@ -14,7 +14,6 @@ const { user } = useAuth0();
 usernameVar(user?.username);
 modProfileNameVar(user?.ModerationProfile?.displayName || "");
 
-
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
   emailAddress: user?.email,
 });
@@ -75,17 +74,15 @@ const loggedInUser = computed(() => usernameVar());
 
 <template>
   <v-app>
-    <main>
+    <main class="h-screen overflow-auto">
       <div class="bg-gray-100 dark:bg-black dark:text-gray-200 list-disc">
-        <nav class="bg-white">
-          <TopNav
-            :show-user-profile-dropdown="showUserProfileDropdown"
-            :side-nav-is-open="showDropdown"
-            @toggle-dropdown="toggleDropdown"
-            @close-user-profile-dropdown="closeUserProfileDropdown"
-            @toggle-user-profile-dropdown="toggleUserProfileDropdown"
-          />
-        </nav>
+        <TopNav
+          :show-user-profile-dropdown="showUserProfileDropdown"
+          :side-nav-is-open="showDropdown"
+          @toggle-dropdown="toggleDropdown"
+          @close-user-profile-dropdown="closeUserProfileDropdown"
+          @toggle-user-profile-dropdown="toggleUserProfileDropdown"
+        />
         <div class="flex relative">
           <SiteSidenav
             :key="`${showDropdown}`"

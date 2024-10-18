@@ -392,8 +392,8 @@ const isClientSide = typeof window !== "undefined";
 </script>
 
 <template>
-  <div class="h-full bg-gray-100 dark:bg-gray-900">
-    <div class="w-full flex justify-center">
+  <div class="bg-gray-100 dark:bg-gray-900">
+    <div class="fixed top-12 w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900">
       <div class="flex max-w-7xl my-4">
         <EventFilterBar
           :show-map="true"
@@ -404,8 +404,9 @@ const isClientSide = typeof window !== "undefined";
         </EventFilterBar>
       </div>
     </div>
-    <div v-if="isClientSide && mdAndUp" id="mapViewFullScreen" class="flex">
-      <div class="w-1/2 h-screen overflow-auto p-4 bg-white">
+
+    <div v-if="isClientSide && mdAndUp" id="mapViewFullScreen" class="flex relative">
+      <div class="w-1/2 overflow-auto p-4 bg-white" >
         <div v-if="eventLoading">Loading...</div>
         <ErrorBanner
           v-else-if="eventError"
@@ -432,7 +433,7 @@ const isClientSide = typeof window !== "undefined";
           @unhighlight="unhighlight"
         />
       </div>
-      <div class="flex-1 relative h-fit">
+      <div class="w-1/2 h-full fixed right-0">
         <div v-if="eventLoading">Loading...</div>
         <ErrorBanner
           v-else-if="eventError"
@@ -535,7 +536,9 @@ const isClientSide = typeof window !== "undefined";
   </div>
 </template>
 
+
 <style>
+
 .event-map-container {
   position: relative;
   width: 50vw;
