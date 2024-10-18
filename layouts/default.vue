@@ -74,7 +74,7 @@ const loggedInUser = computed(() => usernameVar());
 
 <template>
   <v-app>
-    <main class="h-screen overflow-auto">
+    <main>
       <div class="bg-gray-100 dark:bg-black dark:text-gray-200 list-disc">
         <TopNav
           :show-user-profile-dropdown="showUserProfileDropdown"
@@ -123,6 +123,11 @@ const loggedInUser = computed(() => usernameVar());
 </template>
 
 <style lang="scss">
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
 body {
   @media (prefers-color-scheme: dark) {
     @apply bg-black;

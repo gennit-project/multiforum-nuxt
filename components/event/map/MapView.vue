@@ -392,54 +392,56 @@ const isClientSide = typeof window !== "undefined";
 </script>
 
 <template>
-  <div class="bg-gray-100 dark:bg-gray-900">
+  <div class="flex flex-col">
     <div
-      class="fixed top-12 w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900"
+      class="fixed top-0 w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
     >
-      <div class="flex max-w-7xl my-4">
-        <EventFilterBar
-          :show-map="true"
-          :allow-hiding-main-filters="false"
-          :show-main-filters-by-default="true"
-        >
-          <TimeShortcuts />
-        </EventFilterBar>
+      <div class="w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900">
+        <div class="flex max-w-7xl my-4">
+          <EventFilterBar
+            :show-map="true"
+            :allow-hiding-main-filters="false"
+            :show-main-filters-by-default="true"
+          >
+            <TimeShortcuts />
+          </EventFilterBar>
+        </div>
       </div>
     </div>
 
-    <div
-      v-if="isClientSide && mdAndUp"
-      id="mapViewFullScreen"
-      class="flex relative"
-    >
-      <div class="w-1/2 overflow-auto p-4 bg-white">
-        <div v-if="eventLoading">Loading...</div>
-        <ErrorBanner
-          v-else-if="eventError"
-          class="block"
-          :text="eventError.message"
-        />
-        <EventList
-          v-else-if="eventResult && eventResult.events"
-          key="highlightedEventId"
-          :events="eventResult.events"
-          :channel-id="channelId"
-          :highlighted-event-location-id="highlightedEventLocationId"
-          :highlighted-event-id="highlightedEventId"
-          :search-input="filterValues.searchInput"
-          :selected-tags="filterValues.tags"
-          :selected-channels="filterValues.channels"
-          :loaded-event-count="eventResult.events.length"
-          :result-count="eventResult.eventsAggregate?.count"
-          :show-map="true"
-          @filter-by-tag="filterByTag"
-          @filter-by-channel="filterByChannel"
-          @highlight-event="highlightEvent"
-          @open-preview="openPreview"
-          @unhighlight="unhighlight"
-        />
+    <div class="flex flex-grow mt-46 bg-white dark:bg-black">
+      <!-- Left Pane: Scrollable Content -->
+      <div class="w-1/2">
+        <div class="space-y-4">
+          <div v-if="eventLoading">Loading...</div>
+          <ErrorBanner
+            v-else-if="eventError"
+            class="block"
+            :text="eventError.message"
+          />
+          <EventList
+            v-else-if="eventResult && eventResult.events"
+            key="highlightedEventId"
+            :events="eventResult.events"
+            :channel-id="channelId"
+            :highlighted-event-location-id="highlightedEventLocationId"
+            :highlighted-event-id="highlightedEventId"
+            :search-input="filterValues.searchInput"
+            :selected-tags="filterValues.tags"
+            :selected-channels="filterValues.channels"
+            :loaded-event-count="eventResult.events.length"
+            :result-count="eventResult.eventsAggregate?.count"
+            :show-map="true"
+            @filter-by-tag="filterByTag"
+            @filter-by-channel="filterByChannel"
+            @highlight-event="highlightEvent"
+            @open-preview="openPreview"
+            @unhighlight="unhighlight"
+          />
+        </div>
       </div>
-      <div class="w-1/2 h-full fixed right-0">
+
+      <div class="w-1/2 h-screen bg-gray-300 p-4">
         <div v-if="eventLoading">Loading...</div>
         <ErrorBanner
           v-else-if="eventError"
@@ -465,7 +467,8 @@ const isClientSide = typeof window !== "undefined";
       </div>
     </div>
 
-    <div
+    <!-- Mobile layout (if applicable) -->
+    <!-- <div
       v-else-if="eventResult && eventResult.events"
       id="mapViewMobileWidth"
       class="p-4"
@@ -505,7 +508,7 @@ const isClientSide = typeof window !== "undefined";
           />
         </div>
       </div>
-    </div>
+    </div> -->
 
     <EventPreview
       :top-layer="true"
