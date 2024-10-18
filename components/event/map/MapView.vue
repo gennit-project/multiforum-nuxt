@@ -443,7 +443,7 @@ const isClientSide = typeof window !== "undefined";
         </div>
       </div>
 
-      <div class="w-1/2 h-screen bg-gray-300 p-4">
+      <div class="w-1/2 h-screen bg-gray-300 p-4 fixed right-0">
         <div v-if="eventLoading">Loading...</div>
         <ErrorBanner
           v-else-if="eventError"
