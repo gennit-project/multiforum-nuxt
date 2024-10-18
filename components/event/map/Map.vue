@@ -218,7 +218,7 @@ watch(
     <div
       v-else-if="!useMobileStyles"
       ref="desktopMapDiv"
-      style="position: fixed; width: 50vw; height: 94vh"
+      style="position: fixed; width: 50vw; height: 75vh;"
     />
   </div>
 </client-only>

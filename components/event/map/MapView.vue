@@ -393,83 +393,69 @@ const isClientSide = typeof window !== "undefined";
 
 <template>
   <div class="h-full bg-gray-100 dark:bg-gray-900">
-    <div v-if="isClientSide && mdAndUp" id="mapViewFullScreen">
-      <TwoSeparatelyScrollingPanes
-        class="mt-3"
-        :show-right-pane-at-medium-screen-width="true"
-      >
-        <template #leftpane>
-          <div class="flex justify-center rounded-lg">
-            <div class="h-screen overflow-auto p-4">
-              <EventFilterBar
-                :show-map="true"
-                :allow-hiding-main-filters="true"
-                :show-main-filters-by-default="true"
-              >
-                <TimeShortcuts />
-              </EventFilterBar>
-
-              <div v-if="eventLoading">Loading...</div>
-              <ErrorBanner
-                v-else-if="eventError"
-                class="block"
-                :text="eventError.message"
-              />
-              <EventList
-                v-else-if="eventResult && eventResult.events"
-                key="highlightedEventId"
-                :events="eventResult.events"
-                :channel-id="channelId"
-                :highlighted-event-location-id="highlightedEventLocationId"
-                :highlighted-event-id="highlightedEventId"
-                :search-input="filterValues.searchInput"
-                :selected-tags="filterValues.tags"
-                :selected-channels="filterValues.channels"
-                :loaded-event-count="eventResult.events.length"
-                :result-count="eventResult.eventsAggregate?.count"
-                :show-map="true"
-                @filter-by-tag="filterByTag"
-                @filter-by-channel="filterByChannel"
-                @highlight-event="highlightEvent"
-                @open-preview="openPreview"
-                @unhighlight="unhighlight"
-              />
-            </div>
-          </div>
-        </template>
-        <template #rightpane>
-          <div style="border: 1px solid red;" class="flex-1">
-            <div class="event-map-container">
-              <div v-if="eventLoading">Loading...</div>
-              <ErrorBanner
-                v-else-if="eventError"
-                class="block"
-                :text="eventError.message"
-              />
-              <EventMap
-                v-else-if="
-                  eventResult &&
-                  eventResult.events &&
-                  eventResult.events.length > 0
-                "
-                :key="eventResult.events.length"
-                class="fixed"
-                :events="eventResult.events"
-                :preview-is-open="
-                  eventPreviewIsOpen || multipleEventPreviewIsOpen
-                "
-                :color-locked="colorLocked"
-                :use-mobile-styles="false"
-                :theme="theme"
-                @highlight-event="highlightEvent"
-                @open-preview="openPreview"
-                @lock-colors="colorLocked = true"
-                @set-marker-data="setMarkerData"
-              />
-            </div>
-          </div>
-        </template>
-      </TwoSeparatelyScrollingPanes>
+    <div class="w-full flex justify-center">
+      <div class="flex max-w-7xl my-4">
+        <EventFilterBar
+          :show-map="true"
+          :allow-hiding-main-filters="false"
+          :show-main-filters-by-default="true"
+        >
+          <TimeShortcuts />
+        </EventFilterBar>
+      </div>
+    </div>
+    <div v-if="isClientSide && mdAndUp" id="mapViewFullScreen" class="flex">
+      <div class="w-1/2 h-screen overflow-auto p-4 bg-white">
+        <div v-if="eventLoading">Loading...</div>
+        <ErrorBanner
+          v-else-if="eventError"
+          class="block"
+          :text="eventError.message"
+        />
+        <EventList
+          v-else-if="eventResult && eventResult.events"
+          key="highlightedEventId"
+          :events="eventResult.events"
+          :channel-id="channelId"
+          :highlighted-event-location-id="highlightedEventLocationId"
+          :highlighted-event-id="highlightedEventId"
+          :search-input="filterValues.searchInput"
+          :selected-tags="filterValues.tags"
+          :selected-channels="filterValues.channels"
+          :loaded-event-count="eventResult.events.length"
+          :result-count="eventResult.eventsAggregate?.count"
+          :show-map="true"
+          @filter-by-tag="filterByTag"
+          @filter-by-channel="filterByChannel"
+          @highlight-event="highlightEvent"
+          @open-preview="openPreview"
+          @unhighlight="unhighlight"
+        />
+      </div>
+      <div class="flex-1 relative h-fit">
+        <div v-if="eventLoading">Loading...</div>
+        <ErrorBanner
+          v-else-if="eventError"
+          class="block"
+          :text="eventError.message"
+        />
+        <EventMap
+          v-else-if="
+            eventResult && eventResult.events && eventResult.events.length > 0
+          "
+          :key="eventResult.events.length"
+          class="absolute inset-0"
+          :events="eventResult.events"
+          :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
+          :color-locked="colorLocked"
+          :use-mobile-styles="false"
+          :theme="theme"
+          @highlight-event="highlightEvent"
+          @open-preview="openPreview"
+          @lock-colors="colorLocked = true"
+          @set-marker-data="setMarkerData"
+        />
+      </div>
     </div>
 
     <div
@@ -477,11 +463,7 @@ const isClientSide = typeof window !== "undefined";
       id="mapViewMobileWidth"
       class="p-4"
     >
-      <div>
-        <div>
-          <TimeShortcuts />
-        </div>
-        <div class="event-map-container" />
+      <div class="event-map-container">
         <EventMap
           v-if="eventResult.events.length > 0"
           :events="eventResult.events"
@@ -497,12 +479,6 @@ const isClientSide = typeof window !== "undefined";
       </div>
       <div class="h-1/3 w-full">
         <div class="mx-auto">
-          <EventFilterBar
-            class="mt-6 w-full"
-            :show-map="true"
-            :allow-hiding-main-filters="true"
-            :show-main-filters-by-default="true"
-          />
           <EventList
             key="highlightedEventId"
             :events="eventResult.events"
@@ -562,6 +538,7 @@ const isClientSide = typeof window !== "undefined";
 <style>
 .event-map-container {
   position: relative;
+  width: 50vw;
 }
 
 .shortcut-buttons-wrapper {
