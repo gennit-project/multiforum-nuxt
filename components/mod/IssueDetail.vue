@@ -16,9 +16,6 @@ import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from "@/graphQLData/mod/queries";
-import {
-  GET_LOCAL_MOD_PROFILE_NAME,
-} from "@/graphQLData/user/queries";
 import type { Issue } from "@/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";

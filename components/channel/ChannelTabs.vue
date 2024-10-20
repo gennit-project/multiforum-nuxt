@@ -1,13 +1,11 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import { useQuery } from "@vue/apollo-composable";
 import TabButton from "@/components/channel/TabButton.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import type { Channel } from "@/__generated__/graphql";
 import { modProfileNameVar, usernameVar } from "@/cache";
 

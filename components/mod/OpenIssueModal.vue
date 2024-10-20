@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
-import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useMutation } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';
 import ErrorBanner from '@/components/ErrorBanner.vue';
@@ -17,7 +17,6 @@ import {
   CHECK_COMMENT_ISSUE_EXISTENCE,
   GET_ISSUES_BY_CHANNEL,
 } from '@/graphQLData/issue/queries';
-import { GET_LOCAL_MOD_PROFILE_NAME } from '@/graphQLData/user/queries';
 import { COUNT_OPEN_ISSUES } from '@/graphQLData/mod/queries';
 import type { IssueCreateInput, Comment } from '@/__generated__/graphql';
 import { modProfileNameVar } from '@/cache';

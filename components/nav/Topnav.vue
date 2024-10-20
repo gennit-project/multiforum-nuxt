@@ -4,12 +4,10 @@ import HamburgerMenuButton from "@/components/nav/MenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import { useAuth0 } from "@/hooks/useAuth0";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_LOCAL_MOD_PROFILE_NAME } from "@/graphQLData/user/queries";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "vue-router";
-import { usernameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
 
@@ -21,9 +19,7 @@ const username = computed(() => usernameVar() || "");
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
-
-const { result: modNameResult } = useQuery(GET_LOCAL_MOD_PROFILE_NAME);
-const modName = computed(() => modNameResult.value?.modProfileName || "");
+const modName = computed(() => modProfileNameVar() || "");
 const sideNavIsOpen = ref(false);
 const shouldShowChannelId = computed(() => channelId.value);
 const shouldShowRouteInfo = computed(
@@ -52,7 +48,8 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 w-full fixed bg-gray-100 border-b dark:bg-gray-900"
+    class="z-20 w-full bg-gray-100 border-b dark:bg-gray-900"
+    :class="[isOnMapPage ? 'fixed' : '']"
   >
     <div class="flex items-center justify-between px-2 py-2 lg:px-4 lg:py-1">
       <div class="flex items-center">
