@@ -198,7 +198,7 @@ const addToOutlook = () => {
 </script>
 
 <template>
-  <div class="w-full space-y-4 bg-white dark:bg-gray-800 md:px-6">
+  <div class="w-full space-y-4 bg-white dark:bg-gray-800 md:px-6 dark:text-white">
     <div class="mb-10 flex w-full justify-center rounded-lg">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
@@ -227,7 +227,7 @@ const addToOutlook = () => {
             />
 
             <div
-              v-if="route.name === 'MapEventPreview' && !eventLoading && event"
+              v-if="route.name === 'map-search-eventId' && !eventLoading && event"
               class="dark:text-gray-100 md:flex md:items-center md:justify-between"
             >
               <div class="min-w-0 flex-1">
