@@ -57,9 +57,9 @@ defineEmits([
 const { mdAndUp } = useDisplay();
 const route = useRoute();
 const router = useRouter();
-const showOnlineOnly = route.name === "SearchEventsList";
+const showOnlineOnly = route.name === "events-list-search";
 const showInPersonOnly =
-  route.name === "MapEventPreview" || route.name === "MapView";
+  route.name === "map-search-eventId" || route.name === "map-search";
 
 const filterValues: Ref<SearchEventValues> = ref(
   getFilterValuesFromParams({
