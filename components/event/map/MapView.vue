@@ -12,8 +12,6 @@ import CloseButton from "../../CloseButton.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
 import EventFilterBar from "../list/filters/EventFilterBar.vue";
 import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
-import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
-import gql from "graphql-tag";
 import { GET_EVENTS } from "@/graphQLData/event/queries";
 import getEventWhere from "../list/filters/getEventWhere";
 import { getFilterValuesFromParams } from "../list/filters/getFilterValuesFromParams";
@@ -27,6 +25,7 @@ import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg";
 import type { Event as EventData } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
 import type { Ref, PropType } from "vue";
+import { themeVar } from "@/cache";
 
 const props = defineProps({
   selectedTags: {
@@ -120,16 +119,8 @@ const sendToPreview = (eventId: string, eventLocationId: string) => {
   }
 };
 
-const GET_THEME = gql`
-  query GetTheme {
-    theme @client
-  }
-`;
-
-const { result } = useQuery(GET_THEME);
-
 const theme = computed(() => {
-  return result.value?.theme || "light";
+  return themeVar() || "light";
 });
 
 // Data functions and properties from `data` and `methods` section
