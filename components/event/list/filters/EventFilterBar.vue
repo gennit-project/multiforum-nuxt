@@ -249,7 +249,7 @@ const toggleSelectedTag = (tag: string) => {
 </script>
 
 <template>
-  <div class="w-full flex-col space-y-1">
+  <div class="w-full flex-col space-y-1 dark:text-white">
     <div v-if="showMainFilters" class="flex flex-col gap-2">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 align-items">
@@ -287,7 +287,7 @@ const toggleSelectedTag = (tag: string) => {
               <Popper v-if="!showLocationSearchBarAndDistanceButtons">
                 <button
                   data-testid="more-filters-button"
-                  class="absolute inset-y-0 right-2 flex rounded-full cursor-pointer items-center bg-white dark:bg-gray-700 pr-3"
+                  class="absolute inset-y-0 right-2 flex rounded-full cursor-pointer items-center bg-white dark:text-white dark:bg-gray-700 pr-3"
                 >
                   <FilterIcon class="h-4 w-4" />
                 </button>

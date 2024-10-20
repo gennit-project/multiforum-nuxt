@@ -29,7 +29,7 @@ const toggleShowOnlyFree = () => {
             :checked="copyOfShowOnlyFree"
             @input="() => toggleShowOnlyFree()"
           >
-          <span class="ml-2 text-sm font-medium whitespace-nowrap"
+          <span class="ml-2 text-sm font-medium whitespace-nowrap dark:text-white"
             >Show only free events</span
           >
         </label>

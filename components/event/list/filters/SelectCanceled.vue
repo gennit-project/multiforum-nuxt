@@ -29,7 +29,7 @@ const toggleCanceled = () => {
             :checked="copyOfShowCanceled"
             @input="() => toggleCanceled()"
           >
-          <span class="ml-2 text-sm font-medium whitespace-nowrap"
+          <span class="ml-2 text-sm font-medium whitespace-nowrap dark:text-white"
             >Include canceled events</span
           >
         </label>

@@ -83,7 +83,7 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
 </script>
 
 <template>
-  <div class="flex-1">
+  <div class="flex-1 dark:text-white">
     <label for="search" class="sr-only">Search Location</label>
     <div class="relative flex items-center">
       <div class="pointer-events-none absolute left-0 flex items-center py-2.5 pl-3">
