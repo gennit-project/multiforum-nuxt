@@ -402,7 +402,7 @@ const isClientSide = typeof window !== "undefined";
 
     <div
       v-if="isClientSide && mdAndUp"
-      class="flex flex-grow mt-46 bg-white dark:bg-black"
+      class="flex flex-grow bg-white dark:bg-black"
     >
       <div class="w-1/2">
         <div class="space-y-4">
@@ -415,6 +415,7 @@ const isClientSide = typeof window !== "undefined";
           <EventList
             v-else-if="eventResult && eventResult.events"
             key="highlightedEventId"
+            class="mt-48 pt-0"
             :events="eventResult.events"
             :channel-id="channelId"
             :highlighted-event-location-id="highlightedEventLocationId"
