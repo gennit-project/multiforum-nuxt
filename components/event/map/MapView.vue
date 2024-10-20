@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRouter, useRoute } from "vue-router";
 import { useDisplay } from "vuetify";
@@ -68,6 +68,19 @@ const filterValues: Ref<SearchEventValues> = ref(
     showOnlineOnly,
     showInPersonOnly,
   })
+);
+
+// Watch route to update filter values when route changes
+watch(
+  () => route.query,
+  (query) => {
+    filterValues.value = getFilterValuesFromParams({
+      route,
+      channelId: props.channelId,
+      showOnlineOnly,
+      showInPersonOnly,
+    });
+  }
 );
 
 const resultsOrder = computed(() => {
