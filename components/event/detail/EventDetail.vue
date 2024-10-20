@@ -198,7 +198,9 @@ const addToOutlook = () => {
 </script>
 
 <template>
-  <div class="w-full space-y-4 bg-white dark:bg-gray-800 md:px-6 dark:text-white">
+  <div
+    class="w-full space-y-4 bg-white dark:bg-gray-800 md:px-6 dark:text-white"
+  >
     <div class="mb-10 flex w-full justify-center rounded-lg">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
@@ -227,7 +229,9 @@ const addToOutlook = () => {
             />
 
             <div
-              v-if="route.name === 'map-search-eventId' && !eventLoading && event"
+              v-if="
+                route.name === 'map-search-eventId' && !eventLoading && event
+              "
               class="dark:text-gray-100 md:flex md:items-center md:justify-between"
             >
               <div class="min-w-0 flex-1">
@@ -252,7 +256,7 @@ const addToOutlook = () => {
 
               <div class="p-4">
                 <h2 class="text-md mt-4">Add to Calendar</h2>
-                <hr>
+                <hr />
                 <div class="mt-4 flex">
                   <div class="flex flex-row gap-2 text-sm">
                     <div class="flex justify-start">
@@ -316,14 +320,13 @@ const addToOutlook = () => {
                   @load-more="loadMore"
                 />
               </div>
-
-              <EventChannelLinks
-                v-if="event && event.EventChannels"
-                class="my-4"
-                :event-channels="event.EventChannels"
-                :channel-id="channelId"
-              />
             </div>
+            <EventChannelLinks
+              v-if="event && event.EventChannels"
+              class="my-4"
+              :event-channels="event.EventChannels"
+              :channel-id="channelId"
+            />
           </div>
         </div>
       </div>

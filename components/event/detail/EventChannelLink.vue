@@ -44,7 +44,7 @@ export default defineComponent({
       class="flex items-center gap-3 rounded-md bg-gray-100 px-4 py-2 dark:bg-gray-700"
     >
       <AvatarComponent
-        class="h-24 w-24 border-2 shadow-sm dark:border-gray-800"
+        class="shadow-sm"
         :text="channelId"
         :src="channelIcon ?? ''"
         :is-small="true"
