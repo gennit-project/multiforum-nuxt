@@ -115,8 +115,6 @@ watch(
 );
 
 const updateFilters = (params: any) => {
-  console.log('params', params)
-  console.log('route.query', route.query)
   const isEmpty = (val: any) => val === "" || val === "[]" || val === undefined;
 
   const paramsWithoutEmptyValues = Object.keys(params).reduce(

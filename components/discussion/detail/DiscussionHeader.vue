@@ -129,8 +129,6 @@ const showSuccessfullyReported = ref(false);
 
 const username = usernameVar();
 const loggedInUserModName = modProfileNameVar()
-console.log('username', username)
-console.log('author', props.discussion?.Author?.username)
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
 

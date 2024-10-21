@@ -61,7 +61,6 @@ const defaultUniqueName = computed(() => {
 });
 
 const detailLink = computed(() => {
-  console.log("defaultUniqueName", defaultUniqueName.value);
   if (!defaultUniqueName.value) {
     return "";
   }

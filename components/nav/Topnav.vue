@@ -38,7 +38,6 @@ function getLabel() {
 }
 
 const isOnMapPage = computed(() => {
-  console.log('route.name', route.name);
   if (route.name && typeof route.name === "string") {
     return route.name.includes("map");
   }
