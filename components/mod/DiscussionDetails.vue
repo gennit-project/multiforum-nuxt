@@ -83,7 +83,7 @@ export default defineComponent({
         <h3 v-if="discussion?.title">
           <nuxt-link
             :to="{
-              name: 'forums-forumId-discussion-discussionId',
+              name: 'forums-forumId-discussions-discussionId',
               params: {
                 forumId: channelId,
                 discussionId: discussion.id,

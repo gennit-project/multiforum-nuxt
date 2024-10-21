@@ -84,6 +84,7 @@ export default defineComponent({
       <li
         v-for="(activityItem, activityItemIdx) in reversedFeedItems"
         :key="activityItem.id"
+        class="list-none"
       >
         <div class="relative pb-8">
           <span

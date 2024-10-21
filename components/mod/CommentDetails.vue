@@ -54,7 +54,7 @@ export default defineComponent({
 
       if (discussionIdInLink) {
         return {
-          name: 'forums-forumId-discussion-discussionId-comments-commentId',
+          name: 'forums-forumId-discussions-discussionId-comments-commentId',
           params: {
             discussionId: discussionIdInLink,
             commentId: props.commentId,
