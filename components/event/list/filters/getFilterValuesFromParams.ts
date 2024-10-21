@@ -35,7 +35,7 @@ const getFilterValuesFromParams = function (
 
   // For the online events list, only include
   // events with a virtual event URL.
-  if (route?.name === "SitewideSearchEventPreview") {
+  if (route?.name === "events-list-search") {
     cleanedValues.hasVirtualEventUrl = true;
   }
 

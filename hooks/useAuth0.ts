@@ -1,10 +1,11 @@
 // Placeholder Auth0 Hooks
 import config from "@/config";
 export const useAuth0 = () => {
+  console.log('config.auth0username', config.auth0username);
   return {
     isAuthenticated: true, // Placeholder value
     user: { 
-      name: "Alice", 
+      name: "Catherine", 
       email: config.auth0username,
       username: 'cluse',
       ModerationProfile: {

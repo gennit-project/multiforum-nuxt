@@ -115,17 +115,9 @@ watch(
 );
 
 const updateFilters = (params: any) => {
+  console.log('params', params)
+  console.log('route.query', route.query)
   const isEmpty = (val: any) => val === "" || val === "[]" || val === undefined;
-
-  const paramsWithEmptyValues = Object.keys(params).reduce(
-    (acc: any, key: string) => {
-      if (isEmpty(params[key])) {
-        acc[key] = "";
-      }
-      return acc;
-    },
-    {}
-  );
 
   const paramsWithoutEmptyValues = Object.keys(params).reduce(
     (acc: any, key: string) => {
@@ -137,13 +129,7 @@ const updateFilters = (params: any) => {
     {}
   );
 
-  const existingQueryCopy: { [key: string]: any } = {};
-
-  Object.keys(route.query).forEach((key: string) => {
-    if (!isEmpty(paramsWithEmptyValues[key])) {
-      existingQueryCopy[key] = route.query[key];
-    }
-  });
+  const existingQueryCopy: { [key: string]: any } = { ...route.query };
 
   router.replace({
     ...route,
