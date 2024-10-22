@@ -16,15 +16,12 @@ const PAGE_LIMIT = 10;
 
 const route = useRoute();
 
-const updateShowPermalinkedFeedback = () => route.name === "DiscussionFeedbackPermalink";
-
 const contextLink = ref("");
 const channelId = ref("");
 const discussionId = ref("");
 const commentId = ref("");
 const offset = ref(0);
 const feedbackId = ref("");
-const showPermalinkedFeedback = ref(updateShowPermalinkedFeedback());
 
 const loggedInUserModName = computed(() => {
   return modProfileNameVar() || "";
@@ -168,7 +165,6 @@ const updateParams = () => {
   commentId.value = typeof route.params.commentId === "string" ? route.params.commentId : "";
   feedbackId.value = typeof route.params.feedbackId === "string" ? route.params.feedbackId : "";
   contextLink.value = updateContextLink();
-  showPermalinkedFeedback.value = updateShowPermalinkedFeedback();
 };
 
 watch(() => route.params, updateParams, { immediate: true });
@@ -203,7 +199,6 @@ watch(() => route.params, updateParams, { immediate: true });
         :comment-to-remove-feedback-from="commentToRemoveFeedbackFrom"
         :feedback-comments="feedbackComments"
         :feedback-comments-aggregate="feedbackCommentsAggregate"
-        :show-permalinked-feedback="showPermalinkedFeedback"
         :loading="getDiscussionLoading"
         :logged-in-user-mod-name="loggedInUserModName"
         :reached-end-of-results="reachedEndOfResults"

@@ -46,11 +46,10 @@ const emit = defineEmits([
 const route = useRoute();
 const router = useRouter();
 
-
 const loggedInModName = computed(() => {
   const modName = modProfileNameVar();
   if (!modName) {
-    console.error("Error fetching mod profile name")
+    console.error("Error fetching mod profile name");
   }
   return modName;
 });
@@ -86,17 +85,21 @@ const {
   },
 });
 
+const { discussionId, eventId, forumId, feedbackId } = route.params;
+
 const commentMenuItems = computed(() => {
   let out: any[] = [];
 
-  out = out.concat([
-    {
-      label: "View Feedback",
-      value: "",
-      event: "handleViewFeedback",
-      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-    },
-  ]);
+  if (discussionId) {
+    out = out.concat([
+      {
+        label: "View Feedback",
+        value: "",
+        event: "handleViewFeedback",
+        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+      },
+    ]);
+  }
   const loggedInUserAuthoredComment =
     props.comment?.CommentAuthor?.displayName === loggedInModName.value;
 
@@ -125,27 +128,29 @@ const commentMenuItems = computed(() => {
       },
     ]);
 
-    if (props.comment.FeedbackCommentsAggregate?.count === 0) {
-      if (!loggedInUserAuthoredComment)
+    if (discussionId) {
+      if (props.comment.FeedbackCommentsAggregate?.count === 0) {
+        if (!loggedInUserAuthoredComment)
+          out.push({
+            label: "Give Feedback",
+            value: "",
+            event: "clickFeedback",
+            icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+          });
+      } else {
         out.push({
-          label: "Give Feedback",
+          label: "Undo Feedback",
           value: "",
-          event: "clickFeedback",
-          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+          event: "clickUndoFeedback",
+          icon: ALLOWED_ICONS.UNDO,
         });
-    } else {
-      out.push({
-        label: "Undo Feedback",
-        value: "",
-        event: "clickUndoFeedback",
-        icon: ALLOWED_ICONS.UNDO,
-      });
-      out.push({
-        label: "Edit Feedback",
-        value: "",
-        event: "clickEditFeedback",
-        icon: ALLOWED_ICONS.EDIT,
-      });
+        out.push({
+          label: "Edit Feedback",
+          value: "",
+          event: "clickEditFeedback",
+          icon: ALLOWED_ICONS.EDIT,
+        });
+      }
     }
   }
 
@@ -160,13 +165,37 @@ const commentMenuItems = computed(() => {
 });
 
 const getPermalinkObject = () => {
-  const { discussionId, channelId } = route.params;
+  // If this is feedback on a discussion, give the discussion feedback permalink
+  if (route.name === "forums-forumId-discussions-feedback-discussionId") {
+    return {
+      name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
+      params: {
+        forumId,
+        discussionId,
+        feedbackId: props.comment.id,
+      },
+    };
+  }
 
+  // If this is feedback on an event, give the event feedback permalink
+  if (route.name === "forums-forumId-events-feedback-eventId") {
+    return {
+      name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
+      params: {
+        forumId,
+        eventId,
+        feedbackId: props.comment.id,
+      },
+    };
+  }
+
+  // If this is feedback on a comment, give the comment feedback permalink
   return {
-    name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
+    name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
     params: {
+      forumId,
       discussionId,
-      forumId: channelId,
+      commentId: feedbackId,
       feedbackId: props.comment.id,
     },
   };
@@ -236,7 +265,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
 
 function handleViewFeedback(feedbackId: string) {
   router.push({
-    name: 'forums-forumId-discussions-discussionId-commentFeedback-commentId',
+    name: "forums-forumId-discussions-discussionId-commentFeedback-commentId",
     params: {
       forumId: route.params.forumId,
       discussionId: route.params.discussionId,

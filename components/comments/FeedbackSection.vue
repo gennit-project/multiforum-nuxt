@@ -71,10 +71,6 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
-  showPermalinkedFeedback: {
-    type: Boolean,
-    required: true,
-  },
 });
 
 const emit = defineEmits([
@@ -162,10 +158,7 @@ function handleSubmitFeedback() {
     />
     <div v-for="comment in feedbackComments" :key="comment.id">
       <CommentOnFeedbackPage
-        v-if="
-          !showPermalinkedFeedback ||
-          (showPermalinkedFeedback && comment.id !== feedbackId)
-        "
+        v-if="!feedbackId || comment.id !== feedbackId"
         :comment="comment"
         @show-copied-link-notification="showCopiedLinkNotification = true"
         @click-feedback="handleClickGiveFeedback"

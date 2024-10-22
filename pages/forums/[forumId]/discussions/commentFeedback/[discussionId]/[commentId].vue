@@ -15,17 +15,11 @@ import { modProfileNameVar } from "@/cache";
 const PAGE_LIMIT = 10;
 
 const route = useRoute();
-
-const updateShowPermalinkedFeedback = () => {
-  return route.name === "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId";
-};
-
 const channelId = ref("");
 const discussionId = ref("");
 const commentId = ref("");
 const offset = ref(0);
 const feedbackId = ref("");
-const showPermalinkedFeedback = ref(updateShowPermalinkedFeedback());
 
 const loggedInUserModName = computed(() => {
   return modProfileNameVar() || "";
@@ -140,7 +134,6 @@ const updateParams = () => {
   feedbackId.value =
     typeof route.params.feedbackId === "string" ? route.params.feedbackId : "";
   contextLink.value = updateContextLink();
-  showPermalinkedFeedback.value = updateShowPermalinkedFeedback();
 };
 
 watch(
@@ -318,7 +311,7 @@ onAddFeedbackCommentToCommentDone(() => {
           <PageNotFound
             v-if="!getCommentLoading && !getCommentError && !originalComment"
           />
-          <p class="px-2">
+          <p class="px-2 dark:text-white">
             This page collects feedback on this comment:
           </p>
           <CommentHeader
@@ -350,7 +343,6 @@ onAddFeedbackCommentToCommentDone(() => {
           :comment-to-remove-feedback-from="commentToRemoveFeedbackFrom"
           :feedback-comments="feedbackComments"
           :feedback-comments-aggregate="feedbackCommentsAggregate"
-          :show-permalinked-feedback="showPermalinkedFeedback"
           :loading="getCommentLoading"
           :logged-in-user-mod-name="loggedInUserModName"
           :reached-end-of-results="reachedEndOfResults"

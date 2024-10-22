@@ -5,12 +5,10 @@ import { GET_EVENT_FEEDBACK } from "@/graphQLData/event/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { computed } from "vue";
 import EventHeader from "@/components/event/detail/EventHeader.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
-import InfoBanner from "@/components/InfoBanner.vue";
 import EventBody from "@/components/event/detail/EventBody.vue";
-import LoadMore from "@/components/LoadMore.vue";
+import FeedbackSection from "@/components/comments/FeedbackSection.vue";
 
 const PAGE_LIMIT = 10;
 
@@ -70,20 +68,15 @@ const loadMore = () => {
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
 
-      const prevFeedbackComments =
-        previousResult.events[0].FeedbackComments;
-      const newFeedbackComments =
-        fetchMoreResult.events[0].FeedbackComments;
+      const prevFeedbackComments = previousResult.events[0].FeedbackComments;
+      const newFeedbackComments = fetchMoreResult.events[0].FeedbackComments;
 
       return {
         ...previousResult,
         events: [
           {
             ...previousResult.events[0],
-            FeedbackComments: [
-              ...prevFeedbackComments,
-              ...newFeedbackComments,
-            ],
+            FeedbackComments: [...prevFeedbackComments, ...newFeedbackComments],
           },
         ],
       };
@@ -118,9 +111,7 @@ const reachedEndOfResults = computed(() => {
       :text="getEventError.message"
     />
     <PageNotFound v-if="!getEventLoading && !getEventError && !event" />
-    <p class="px-2">
-      This page collects feedback on this event:
-    </p>
+    <p class="px-2">This page collects feedback on this event:</p>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
       <h3 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">
         {{ event && event.title ? event.title : "[Deleted]" }}
@@ -135,72 +126,22 @@ const reachedEndOfResults = computed(() => {
             :event-data="event"
             :channel-id="channelId"
           />
-          <EventBody
-            v-if="event?.description"
-            :event="event"
-          />
+          <EventBody v-if="event?.description" :event="event" />
         </div>
       </div>
     </div>
-    <h2 class="text-wrap text-center text-xl font-bold dark:text-gray-200">
-      Feedback Comments ({{ feedbackCommentsAggregate }})
-    </h2>
-    <InfoBanner
+    <FeedbackSection
       v-if="feedbackCommentsAggregate > 0"
-      :text="'Feedback should be respectful and constructive. If the feedback is rude or non-actionable, please report it.'"
-    />
-    <div
-      v-if="feedbackCommentsAggregate === 0"
-      class="text-center text-gray-500 dark:text-gray-300"
-    >
-      No feedback yet.
-    </div>
-    <div
-      v-for="comment in feedbackComments"
-      :key="comment.id"
-    >
-      <div
-        class="flex gap-2 text-sm leading-8 text-gray-500 dark:text-gray-300"
-      >
-        <AvatarComponent
-          v-if="comment.CommentAuthor?.displayName"
-          class="border-2 shadow-sm dark:border-gray-800"
-          :text="comment.CommentAuthor.displayName"
-          :is-small="true"
-          :is-square="false"
-        />
-        <span class="mr-0.5">
-          <nuxt-link
-            v-if="comment.CommentAuthor?.displayName"
-            :to="{
-              name: 'mod-modId',
-              params: {
-                modId: comment.CommentAuthor.displayName,
-              },
-            }"
-            class="font-medium text-gray-900 hover:underline dark:text-gray-200"
-          >{{ comment.CommentAuthor?.displayName }}</nuxt-link>
-        </span>
-        <span class="whitespace-nowrap">{{
-          `gave feedback in ${comment.Channel?.uniqueName} ${timeAgo(new Date(comment.createdAt))}`
-        }}</span>
-      </div>
-
-      <div class="ml-12 border-l-2 border-gray-200 dark:border-gray-500">
-        <MarkdownPreview
-          v-if="comment.text"
-          :text="comment.text"
-          :disable-gallery="true"
-        />
-      </div>
-    </div>
-    <LoadMore
-      v-if="!getEventLoading && !reachedEndOfResults"
+      :loading="getEventLoading"
+      :feedback-comments="feedbackComments"
+      :feedback-comments-aggregate="feedbackCommentsAggregate"
       :reached-end-of-results="reachedEndOfResults"
-      @load-more="loadMore"
+      :load-more="loadMore"
+      :show-feedback-submitted-successfully="false"
+      :add-feedback-comment-to-comment="() => {}"
+      :add-feedback-comment-to-comment-loading="false"
+      :add-feedback-comment-to-comment-error="''"
+      :show-feedback-form-modal="false"
     />
-    <div v-if="getEventLoading">
-      Loading...
-    </div>
   </div>
 </template>
