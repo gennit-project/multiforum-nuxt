@@ -90,7 +90,7 @@ const getFilterValuesFromParams = function (
         break;
       case "tags":
         if (typeof val === "string") {
-          cleanedValues.tags = [val];
+          cleanedValues.tags = val.split(",");
         }
         if (typeof val === "object") {
           // If it is an array of strings, which

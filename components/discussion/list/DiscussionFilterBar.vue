@@ -76,12 +76,24 @@ watch(
 );
 
 const updateFilters = (params: SearchDiscussionValues) => {
-  const existingQuery = route.query;
+  const existingQuery = { ...route.query };
+
+  // Remove tags if the array is empty, otherwise serialize the tags as a comma-separated string
+  const updatedQuery = {
+    ...existingQuery,
+    ...params,
+    tags:
+      params.tags && params.tags.length > 0
+        ? params.tags
+            .filter((tag: string) => {
+              return !!tag;
+            })
+            .join(",")
+        : undefined, // undefined will remove the key from the query
+  };
+
   router.replace({
-    query: {
-      ...existingQuery,
-      ...params,
-    },
+    query: updatedQuery,
   });
 };
 

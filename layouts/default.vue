@@ -4,7 +4,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { useAuth0 } from "@/hooks/useAuth0";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
 import { usernameVar, modProfileNameVar } from "@/cache";
-import type { User, ModerationProfile } from "@/__generated__/graphql";
+import type { User } from "@/__generated__/graphql";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";

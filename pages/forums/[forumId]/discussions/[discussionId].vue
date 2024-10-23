@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect, onMounted, nextTick } from "vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { ref, computed, watchEffect } from "vue";
 import DiscussionDetailContent from "@/components/discussion/detail/DiscussionDetailContent.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
