@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
+import { useRoute } from "#imports";
 import { COUNT_CLOSED_ISSUES, COUNT_OPEN_ISSUES } from "@/graphQLData/mod/queries";
 
 const route = useRoute();
@@ -33,41 +34,37 @@ const closedCount = computed(() => {
   }
   return closedIssuesResult.value?.issuesAggregate?.count || 0;
 });
-
 </script>
 
 <template>
   <div class="bg-white dark:bg-gray-900 dark:text-white rounded-t-lg border border-b border-gray-200 dark:border-gray-600">
-    <div class="flex items-center rounded-t-lg gap-4 py-3 pl-8">
+    <nav class="flex items-center rounded-t-lg gap-4 py-3 pl-8">
       <nuxt-link
         :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
-        class="flex flex-row items-center gap-2"
+        class="px-4 py-2 border-b-2"
         :class="{
-          'text-gray-500 dark:text-gray-200': $route.name === 'forums-forumId-issues',
-          'dark:text-gray-400': $route.name === 'forums-forumId-issues',
+          'border-black text-black dark:border-white dark:text-white': $route.name === 'forums-forumId-issues',
+          'border-gray-500 text-gray-500 dark:text-gray-400': $route.name !== 'forums-forumId-issues',
         }"
       >
         <i class="far fa-dot-circle" /> {{ openCount }} Open
       </nuxt-link>
-
       <nuxt-link
         :to="{ name: 'forums-forumId-issues-closed', params: { forumId: channelId } }"
-        class="flex flex-row items-center gap-1 whitespace-nowrap dark:text-gray-400"
+        class="px-4 py-2 border-b-2"
         :class="{
-          'text-gray-500 dark:text-gray-400': $route.name === 'forums-forumId-issues-closed',
-          'dark:text-gray-200': $route.name === 'forums-forumId-issues-closed',
+          'border-black text-black dark:border-white dark:text-white': $route.name === 'forums-forumId-issues-closed',
+          'border-gray-500 text-gray-500 dark:text-gray-400': $route.name !== 'forums-forumId-issues-closed',
         }"
       >
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
       </nuxt-link>
-    </div>
-
+    </nav>
     <NuxtPage />
   </div>
 </template>
 
 <style>
-/* Add your table styling here */
 table {
   width: 100%;
   border-collapse: collapse;
