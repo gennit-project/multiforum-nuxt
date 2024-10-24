@@ -5,8 +5,12 @@ import { GET_ISSUES_BY_CHANNEL } from "@/graphQLData/issue/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";
 import { DateTime } from "luxon";
+import IssueListItem from "./IssueListItem.vue";
 
 export default defineComponent({
+  components: {
+    IssueListItem,
+  },
   setup() {
     const route = useRoute();
 
@@ -16,7 +20,7 @@ export default defineComponent({
       }
       return route.params.forumId;
     });
-    
+
     const {
       result: getIssuesByChannelResult,
       error: getIssuesByChannelError,
@@ -42,11 +46,6 @@ export default defineComponent({
       issues,
     };
   },
-  methods: {
-    formatDate(date: string) {
-      return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
-    },
-  },
 });
 </script>
 
@@ -55,34 +54,7 @@ export default defineComponent({
     class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
     data-testid="issue-list"
   >
-    <li
-      v-for="(issue, index) in issues"
-      :key="index"
-      class="border-bottom flex flex-col border-gray-200 p-3 pl-8 dark:border-gray-800"
-    >
-      <div class="text-md flex items-center font-bold text-base">
-        <i class="far fa-dot-circle list-item-icon" />
-
-        <nuxt-link
-          :to="{
-            name: 'forums-forumId-issues-issueId',
-            params: {
-              issueId: issue.id,
-              forumId: channelId,
-            },
-          }"
-        >
-          {{ issue.title }}
-        </nuxt-link>
-      </div>
-      <div class="ml-6 text-xs text-gray-500 dark:text-gray-200">
-        {{
-          `Opened on ${formatDate(issue.createdAt)} by ${
-            issue.Author?.displayName || "[Deleted]"
-          }`
-        }}
-      </div>
-    </li>
+    <IssueListItem v-for="issue in issues" :key="issue.id" :issue="issue" :channel-id="channelId" />
   </ul>
 </template>
 
