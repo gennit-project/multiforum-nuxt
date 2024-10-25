@@ -477,6 +477,7 @@ function hideEditCommentEditor() {
 }
 
 function handleClickGiveFeedback(input: GiveFeedbackInput) {
+  console.log('handle click give feedback');
   const { commentData, parentCommentId } = input;
   showFeedbackFormModal.value = true;
   parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
@@ -578,9 +579,13 @@ function handleViewFeedback(commentId: string) {
         @click-edit-feedback="handleClickEditFeedback"
         @update-feedback="updateFeedback"
         @handle-view-feedback="handleViewFeedback"
+        @show-copied-link-notification="showCopiedLinkNotification = $event"
       />
       <div class="my-4">
-        <div v-if="!loading && aggregateCommentCount === 0" class="dark:text-white">
+        <div
+          v-if="!loading && aggregateCommentCount === 0"
+          class="dark:text-white"
+        >
           There are no comments yet.
         </div>
         <div :key="activeSort">

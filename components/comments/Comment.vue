@@ -155,7 +155,10 @@ const replyCount = computed(() => {
 const textCopy = computed(() => props.commentData.text);
 
 const canShowPermalink =
-  props.commentData.DiscussionChannel || props.commentData.Event || (discussionId && forumId) || (eventId && forumId);
+  props.commentData.DiscussionChannel ||
+  props.commentData.Event ||
+  (discussionId && forumId) ||
+  (eventId && forumId);
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink) {
@@ -166,7 +169,7 @@ const permalinkObject = computed(() => {
 
   if (discussionIdInLink) {
     return {
-      name: 'forums-forumId-discussions-discussionId-comments-commentId',
+      name: "forums-forumId-discussions-discussionId-comments-commentId",
       params: {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
@@ -177,7 +180,7 @@ const permalinkObject = computed(() => {
   }
 
   return {
-    name: 'forums-forumId-events-eventId-comments-commentId',
+    name: "forums-forumId-events-eventId-comments-commentId",
     params: {
       eventId: props.commentData.Event?.id,
       forumId: forumId,
@@ -196,6 +199,7 @@ if (import.meta.client) {
 const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
 
 const copyLink = async () => {
+  console.log("copying link");
   try {
     await navigator.clipboard.writeText(permalink);
     emit("showCopiedLinkNotification", true);
@@ -254,13 +258,13 @@ const commentMenuItems = computed(() => {
 
     if (props.enableFeedback) {
       if (props.modProfileName) {
-          out.push({
-            label: "Give Feedback",
-            value: "",
-            event: "clickFeedback",
-            icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-          });
-        }
+        out.push({
+          label: "Give Feedback",
+          value: "",
+          event: "clickFeedback",
+          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+        });
+      }
       if (props.commentData.FeedbackComments?.length > 0) {
         out.push({
           label: "Undo Feedback",
@@ -327,6 +331,7 @@ function handleReport() {
 }
 
 function handleFeedback(input: HandleFeedbackInput) {
+  console.log("handleFeedback", input);
   emit("clickFeedback", input);
 }
 
@@ -422,12 +427,8 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                 <div class="flex items-center">
                   <CommentButtons
                     v-if="forumId && props.showCommentButtons"
-                    class="-mt-6 mb-1 ml-1"
-                    :class="[
-                      props.editFormOpenAtCommentID === props.commentData.id
-                        ? 'ml-1'
-                        : '',
-                    ]"
+                    class="mb-1 ml-1"
+                    :class="[props.commentData.text ? '-mt6' : '']"
                     :comment-data="props.commentData"
                     :enable-feedback="props.enableFeedback"
                     :depth="props.depth"
@@ -491,11 +492,16 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                       @handle-edit="() => handleEdit(props.commentData)"
                       @click-report="handleReport"
                       @click-feedback="
-                        () =>
+                        () => {
+                          console.log('click feedback in menu button', {
+                            commentData: props.commentData,
+                            parentCommentId: props.parentCommentId,
+                          });
                           handleFeedback({
                             commentData: props.commentData,
                             parentCommentId: props.parentCommentId,
-                          })
+                          });
+                        }
                       "
                       @click-undo-feedback="
                         () =>

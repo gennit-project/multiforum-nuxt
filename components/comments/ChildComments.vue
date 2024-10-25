@@ -5,11 +5,13 @@ import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
 import LoadMore from "../LoadMore.vue";
 import { getSortFromQuery } from "./getSortFromQuery";
 import { useRoute } from "vue-router";
+import ErrorBanner from "../ErrorBanner.vue";
 
 const PAGE_LIMIT = 5;
 
 export default defineComponent({
   components: {
+    ErrorBanner,
     LoadMore,
   },
   props: {
@@ -106,10 +108,8 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div>
-    <div v-if="commentError">
-      {{ commentError.message }}
-    </div>
+  <div class="dark:text-white">
+    <ErrorBanner v-if="commentError" :text="commentError.message" />
     <div v-else>
       <slot :comments="comments" />
       <LoadMore

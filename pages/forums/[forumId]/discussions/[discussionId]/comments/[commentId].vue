@@ -26,6 +26,7 @@ defineEmits([
   "updateCreateReplyCommentInput",
   "updateEditCommentInput",
   "updateFeedback",
+  "showCopiedLinkNotification",
 ]);
 
 defineProps<{
@@ -58,26 +59,27 @@ defineProps<{
         :mod-profile-name="loggedInUserModName"
         :original-poster="originalPoster"
         :is-permalinked="true"
-        @start-comment-save="$emit('startCommentSave')"
-        @open-reply-editor="$emit('openReplyEditor')"
-        @hide-reply-editor="$emit('hideReplyEditor')"
-        @open-edit-comment-editor="$emit('openEditCommentEditor')"
-        @hide-edit-comment-editor="$emit('hideEditCommentEditor')"
-        @click-edit-comment="$emit('clickEditComment')"
-        @delete-comment="$emit('deleteComment')"
-        @create-comment="$emit('createComment')"
+        @start-comment-save="$emit('startCommentSave', $event)"
+        @open-reply-editor="$emit('openReplyEditor', $event)"
+        @hide-reply-editor="$emit('hideReplyEditor', $event)"
+        @open-edit-comment-editor="$emit('openEditCommentEditor', $event)"
+        @hide-edit-comment-editor="$emit('hideEditCommentEditor', $event)"
+        @click-edit-comment="$emit('clickEditComment', $event)"
+        @delete-comment="$emit('deleteComment', $event)"
+        @create-comment="$emit('createComment', $event)"
         @update-create-reply-comment-input="
-          $emit('updateCreateReplyCommentInput')
+          $emit('updateCreateReplyCommentInput', $event)
         "
         @update-edit-comment-input="$emit('updateEditCommentInput')"
-        @save-edit="$emit('saveEdit')"
+        @save-edit="$emit('saveEdit', $event)"
         @scroll-to-top="$emit('scrollToTop')"
-        @click-report="$emit('clickReport')"
-        @click-feedback="$emit('clickFeedback')"
-        @click-undo-feedback="$emit('clickUndoFeedback')"
-        @click-edit-feedback="$emit('clickEditFeedback')"
-        @update-feedback="$emit('updateFeedback')"
-        @handle-view-feedback="$emit('handleViewFeedback')"
+        @click-report="$emit('clickReport', $event)"
+        @click-feedback="$emit('clickFeedback', $event)"
+        @click-undo-feedback="$emit('clickUndoFeedback', $event)"
+        @click-edit-feedback="$emit('clickEditFeedback', $event)"
+        @update-feedback="$emit('updateFeedback', $event)"
+        @handle-view-feedback="$emit('handleViewFeedback', $event)"
+        @show-copied-link-notification="$emit('showCopiedLinkNotification', $event)"
       />
     </template>
   </PermalinkedComment>
