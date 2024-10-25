@@ -70,7 +70,7 @@ defineProps<{
         @update-create-reply-comment-input="
           $emit('updateCreateReplyCommentInput', $event)
         "
-        @update-edit-comment-input="$emit('updateEditCommentInput')"
+        @update-edit-comment-input="$emit('updateEditCommentInput', $event)"
         @save-edit="$emit('saveEdit', $event)"
         @scroll-to-top="$emit('scrollToTop')"
         @click-report="$emit('clickReport', $event)"

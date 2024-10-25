@@ -428,7 +428,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                   <CommentButtons
                     v-if="forumId && props.showCommentButtons"
                     class="mb-1 ml-1"
-                    :class="[props.commentData.text ? '-mt6' : '']"
+                    :class="[props.commentData.text ? '-mt-6' : '']"
                     :comment-data="props.commentData"
                     :enable-feedback="props.enableFeedback"
                     :depth="props.depth"
