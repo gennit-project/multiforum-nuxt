@@ -92,7 +92,7 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
 <template>
   <RequireAuth :require-ownership="true" :owners="[usernameInParams]">
     <template #has-auth>
-      <div class="bg-white dark:text-white w-full px-6 lg:px-12">
+      <div class="bg-white dark:bg-gray-900 dark:text-white w-full px-6 lg:px-12">
         <EditAccountSettingsFields
           :key="dataLoaded.toString()"
           :edit-mode="true"

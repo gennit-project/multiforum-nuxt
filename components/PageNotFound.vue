@@ -1,5 +1,5 @@
 <template>
-  <div class="flex justify-center mx-auto m-8">
+  <div class="flex justify-center mx-auto m-8 dark:text-white">
     <div class="block">
       <span class="text-md flex text-gray-500 dark:text-gray-300">404</span>
       <h1 class="text-xl my-2">
