@@ -477,7 +477,6 @@ function hideEditCommentEditor() {
 }
 
 function handleClickGiveFeedback(input: GiveFeedbackInput) {
-  console.log('handle click give feedback');
   const { commentData, parentCommentId } = input;
   showFeedbackFormModal.value = true;
   parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;

@@ -199,7 +199,6 @@ if (import.meta.client) {
 const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
 
 const copyLink = async () => {
-  console.log("copying link");
   try {
     await navigator.clipboard.writeText(permalink);
     emit("showCopiedLinkNotification", true);
@@ -331,7 +330,6 @@ function handleReport() {
 }
 
 function handleFeedback(input: HandleFeedbackInput) {
-  console.log("handleFeedback", input);
   emit("clickFeedback", input);
 }
 
@@ -444,7 +442,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                     :comment-in-process="
                       props.commentInProcess && !props.editCommentError
                     "
-                    @start-comment-save="emit('startCommentSave')"
+                    @start-comment-save="emit('startCommentSave', $event)"
                     @click-edit-comment="handleEdit"
                     @create-comment="createComment"
                     @open-reply-editor="
@@ -493,10 +491,6 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                       @click-report="handleReport"
                       @click-feedback="
                         () => {
-                          console.log('click feedback in menu button', {
-                            commentData: props.commentData,
-                            parentCommentId: props.parentCommentId,
-                          });
                           handleFeedback({
                             commentData: props.commentData,
                             parentCommentId: props.parentCommentId,

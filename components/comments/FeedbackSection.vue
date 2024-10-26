@@ -136,7 +136,7 @@ function handleSubmitFeedback() {
 </script>
 
 <template>
-  <div>
+  <div class="dark:text-white">
     <h2 class="mt-4 text-wrap text-center text-xl font-bold dark:text-gray-200">
       Feedback Comments ({{ feedbackCommentsAggregate }})
     </h2>

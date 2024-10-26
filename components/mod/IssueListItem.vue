@@ -2,7 +2,7 @@
 import type { Issue } from "@/__generated__/graphql";
 import { DateTime } from "luxon";
 
-defineProps({
+const props = defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,

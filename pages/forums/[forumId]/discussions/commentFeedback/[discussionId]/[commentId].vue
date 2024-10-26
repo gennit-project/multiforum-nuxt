@@ -57,7 +57,7 @@ const contextOfFeedbackComment = computed(() => {
   }
   return null;
 });
-const feedbackOnComment = "forums-forumId-discussions-discussionId-comments-feedback-commentId";
+const feedbackOnComment = "forums-forumId-discussions-commentFeedback-discussionId-commentId";
 const feedbackOnCommentFeedback= "forums-forumId-discussions-discussionId-commentFeedback-commentId";
 const commentPermalinkRoute = "forums-forumId-discussions-discussionId-comments-commentId"
 const feedbackOnDiscussionPermalink = "forums-forumId-discussions-feedback-discussionId-feedbackId";
