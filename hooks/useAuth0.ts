@@ -6,7 +6,7 @@ export const useAuth0 = () => {
     user: { 
       name: "Catherine", 
       email: config.auth0username,
-      username: 'alice',
+      username: 'cluse',
       ModerationProfile: {
         displayName: "miniatureDeafeningMysteriousTeacher"
       }

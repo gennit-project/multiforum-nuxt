@@ -39,12 +39,16 @@ const user = computed(() => {
 <template>
   <div class="w-full md:w-3/4 pt-6 rounded-lg bg-gray-100 dark:bg-gray-900">
     <UserProfileTabs
+      v-if="user"
       :show-counts="true"
       :vertical="false"
       :user="user"
       class="block border-b border-gray-200 dark:border-gray-600"
       :route="route"
     />
+    <div v-else>
+      Loading...
+    </div>
     <NuxtPage />
   </div>
 </template>

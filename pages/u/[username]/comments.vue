@@ -85,7 +85,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="py-3">
+  <div class="py-3 dark:text-white">
     <div v-if="error">
       Error
     </div>

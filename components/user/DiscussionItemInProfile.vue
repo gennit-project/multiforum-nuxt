@@ -48,7 +48,7 @@ const tags = props.discussion.Tags.map((tag) => tag.text);
 
 <template>
   <li
-    class="relative cursor-pointer list-none rounded-lg bg-white p-4 dark:bg-gray-800"
+    class="relative cursor-pointer list-none rounded-lg bg-white p-4 dark:bg-gray-800 dark:text-white"
     @click="
       () => {
         if (defaultUniqueName) {
@@ -59,9 +59,7 @@ const tags = props.discussion.Tags.map((tag) => tag.text);
       }
     "
   >
-    <p class="cursor-pointer text-lg font-bold">
-      <HighlightedSearchTerms :text="title" :search-input="searchInput" />
-    </p>
+    <HighlightedSearchTerms :text="title" :search-input="searchInput" />
 
     <p
       class="font-medium mt-1 space-x-1 flex text-sm text-gray-600 hover:no-underline"
