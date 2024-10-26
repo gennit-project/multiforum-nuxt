@@ -33,7 +33,7 @@ export default defineComponent({
       <a
         class="ml-1 text-blue-500 underline"
         target="_blank"
-        href="https://github.com/gennit-project/multiforum-frontend/issues"
+        href="https://github.com/gennit-project/multiforum-nuxt/issues"
       >GitHub repo</a>, or email me at
       <a
         class="ml-1 text-blue-500"
