@@ -35,6 +35,11 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  showActionMenu: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
 });
 
 const emit = defineEmits(["handleClickGiveFeedback"]);
@@ -225,7 +230,7 @@ const authorIsMod = computed(
         <div>{{ editedAt }}</div>
       </div>
       <MenuButton
-        v-if="discussion && menuItems.length > 0"
+        v-if="showActionMenu && discussion && menuItems.length > 0"
         :items="menuItems"
         data-testid="discussion-menu-button"
         @copy-link="copyLink"

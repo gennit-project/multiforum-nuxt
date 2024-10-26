@@ -186,7 +186,7 @@ watch(() => route.params, updateParams, { immediate: true });
         <h3 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">{{ discussion && discussion.title ? discussion.title : "[Deleted]" }}</h3>
         <div class="space-y-3 px-2">
           <div class="dark:bg-gray-950 rounded-lg border px-4 pb-2 dark:border-gray-700 dark:bg-gray-700">
-            <DiscussionHeader :discussion="discussion" :channel-id="channelId" />
+            <DiscussionHeader :discussion="discussion" :channel-id="channelId" :show-action-menu="false" />
             <DiscussionBody :discussion="discussion" :channel-id="channelId" :show-emoji-button="false" :word-limit="100" />
           </div>
         </div>

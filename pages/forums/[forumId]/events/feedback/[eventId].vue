@@ -125,6 +125,7 @@ const reachedEndOfResults = computed(() => {
             v-if="event"
             :event-data="event"
             :channel-id="channelId"
+            :show-menu-buttons="false"
           />
           <EventBody v-if="event?.description" :event="event" />
         </div>
