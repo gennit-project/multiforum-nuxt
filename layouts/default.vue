@@ -11,7 +11,8 @@ const auth0user = ref();
 
 onMounted(() => {
   if (!import.meta.client) return;
-  auth0user.value = useAuth0().user;
+  const { user } = useAuth0();
+  auth0user.value = user.value;
 });
 const showUserProfileDropdown = ref(false);
 const showDropdown = ref(false);

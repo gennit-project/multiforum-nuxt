@@ -49,10 +49,9 @@ const handleLogin = async () => {
   }
 };
 
-storeToken();
-
-// Computed properties for username and ownership check
-const username = computed(() => usernameVar());
+const username = computed(() => {
+  return usernameVar() || ""
+});
 const isOwner = computed(() => props.owners.includes(username.value));
 </script>
 
