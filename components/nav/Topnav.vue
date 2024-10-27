@@ -6,6 +6,7 @@ import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "vue-router";
+import LoginButton from "./LoginButton.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
@@ -88,9 +89,13 @@ const isOnMapPage = computed(() => {
           </div>
         </div>
       </div>
-      <div class="hidden sm:flex items-center justify-end space-x-2 md:flex-1">
-        <LoginButton />
-      </div>
+      <client-only>
+        <div
+          class="hidden sm:flex items-center justify-end space-x-2 md:flex-1"
+        >
+          <LoginButton />
+        </div>
+      </client-only>
       <div class="flex items-center space-x-2">
         <CreateAnythingButton />
         <ThemeSwitcher />
