@@ -65,9 +65,19 @@ const user = computed(() => getUserResult.value?.users[0] || null);
 const profilePicURL = computed(() => user.value?.profilePicURL || "");
 
 const { smAndDown } = useDisplay();
+const route = useRoute();
 
 const login = () => loginWithRedirect();
-const handleLogout = () => logout({ returnTo: config.baseUrl });
+const handleLogout = () => {
+  // Store the current path in local storage
+  localStorage.setItem("postLogoutRedirect", route.fullPath);
+  // Redirect to the fixed logout route
+  logout({
+    logoutParams: {
+      returnTo: `${config.baseUrl}/logout`
+    }
+  });
+};
 
 const outside = () => {
   emit("close");
@@ -130,7 +140,7 @@ const outside = () => {
           Recent Forums
         </div>
         <div class="px-3">
-          <ul class="mb-6">
+          <ul>
             <li
               v-for="forum in visibleRecentForums"
               :key="forum.uniqueName"
@@ -167,7 +177,7 @@ const outside = () => {
           <div v-if="recentForums.length > DEFAULT_LIMIT">
             <button
               v-if="!showAllForums"
-              class="dark:text-white"
+              class="dark:text-white text-sm px-4"
               @click="showAllForums = true"
             >
               Show All
@@ -216,7 +226,7 @@ const outside = () => {
           v-if="isAuthenticated"
           data-testid="sign-out-link"
           to="/"
-          class="font-semibold group flex gap-x-3 rounded-md py-2 pl-6 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+          class="font-semibold group flex gap-x-3 rounded-md py-2 pl-3 mt-4 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="handleLogout"
         >
           Sign Out

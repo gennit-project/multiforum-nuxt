@@ -35,23 +35,32 @@ const menuItems = [
   {
     label: "My Profile",
     value: `/u/${props.username}`,
-    icon: ''
+    icon: "",
   },
   {
     label: "Account Settings",
     value: `/u/${props.username}/settings`,
-    icon: ''
+    icon: "",
   },
   {
     label: "Sign out",
     value: "",
     event: "logout",
-    icon: ''
+    icon: "",
   },
 ];
 
+const route = useRoute();
+
 const handleLogout = () => {
-  logout({ returnTo: config.logoutUrl });
+  // Store the current path in local storage
+  localStorage.setItem("postLogoutRedirect", route.fullPath);
+  // Redirect to the fixed logout route
+  logout({
+    logoutParams: {
+      returnTo: `${config.baseUrl}/logout`,
+    },
+  });
 };
 
 const goToModProfile = () => {
