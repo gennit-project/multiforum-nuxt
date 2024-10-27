@@ -1,13 +1,14 @@
 // plugins/auth0.client.ts
 import { createAuth0 } from "@auth0/auth0-vue";
-import { defineNuxtPlugin } from "#app";
 
 export default defineNuxtPlugin((nuxtApp) => {
+  const config = useRuntimeConfig().public;
+  
   const auth0 = createAuth0({
-    domain: process.env.VITE_AUTH0_DOMAIN,
-    clientId: process.env.VITE_AUTH0_CLIENT_ID,
+    domain: config.auth0Domain,
+    clientId: config.auth0ClientId,
     authorizationParams: {
-      redirect_uri: process.env.VITE_AUTH0_CALLBACK_URL,
+      redirect_uri: config.auth0CallbackUrl,
     },
   });
 

@@ -133,7 +133,7 @@ const sendToPreview = (eventId: string, eventLocationId: string) => {
 };
 
 const theme = computed(() => {
-  return themeVar() || "light";
+  return themeVar() || "dark";
 });
 
 // Data functions and properties from `data` and `methods` section

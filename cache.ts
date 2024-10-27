@@ -6,7 +6,7 @@ export const usernameVar: ReactiveVar<string> = makeVar<string>("");
 export const modProfileIdVar: ReactiveVar<string> = makeVar<string>("");
 export const modProfileNameVar: ReactiveVar<string> = makeVar<string>("");
 export const themeVar: ReactiveVar<string> = makeVar<string>(
-  import.meta.client ? localStorage.getItem("theme") || "light" : "light"
+  import.meta.client ? localStorage.getItem("theme") || "dark" : "dark"
 );
 
 const standardMerge = (existing: any, incoming: any, args: any) => {

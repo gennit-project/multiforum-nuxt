@@ -136,7 +136,7 @@ function updateFormValues(data: CreateEditChannelFormValues) {
         />
       </template>
       <template #does-not-have-auth>
-        <div class="p-8 text-white">You don't have permission to see this page.</div>
+        <div class="p-8 dark:text-white">You don't have permission to see this page.</div>
       </template>
     </RequireAuth>
   </div>

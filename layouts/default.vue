@@ -1,55 +1,18 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useAuth0 } from "@/hooks/useAuth0";
-import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { usernameVar, modProfileNameVar } from "@/cache";
-import type { User } from "@/__generated__/graphql";
+import { ref, computed, onMounted } from "vue";
+import { useAuth0 } from "@auth0/auth0-vue";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
-import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
+import FetchUserData from "@/components/auth/FetchUserData.vue";
+import { usernameVar } from "@/cache";
 
-const { user } = useAuth0();
-usernameVar(user?.username);
-modProfileNameVar(user?.ModerationProfile?.displayName || "");
+const auth0user = ref();
 
-const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
-  emailAddress: user?.email,
-});
-
-// Reactive variable to track if the email is not in the system
-const emailNotInSystem = ref(false);
-
-// Handle email query result
-onEmailResult((result: any) => {
+onMounted(() => {
   if (!import.meta.client) return;
-  let user: User | null = null;
-  let username = "";
-  let modProfileName = "";
-  const emailData = result.data?.emails[0];
-
-  user = emailData?.User;
-
-  if (!user) {
-    emailNotInSystem.value = true;
-  } else {
-    username = user.username;
-    modProfileName = user.ModerationProfile?.displayName || "";
-
-    if (username && username !== usernameVar()) {
-      // Store the authenticated user's username in the app state
-      usernameVar(username);
-    }
-
-    if (modProfileName && modProfileName !== modProfileNameVar()) {
-      modProfileNameVar(modProfileName);
-    }
-
-    emailNotInSystem.value = false;
-  }
+  auth0user.value = useAuth0().user;
 });
-
 const showUserProfileDropdown = ref(false);
 const showDropdown = ref(false);
 
@@ -65,10 +28,8 @@ const toggleUserProfileDropdown = () => {
   showUserProfileDropdown.value = !showUserProfileDropdown.value;
 };
 
-const emailFromAuth0 = user.email; // emailResult.value?.emails[0]?.emailAddress;
 const route = useRoute();
 const showFooter = !route.name?.includes("map");
-const { isLoading, error: emailError } = useAuth0();
 const loggedInUser = computed(() => usernameVar());
 </script>
 
@@ -90,23 +51,15 @@ const loggedInUser = computed(() => usernameVar());
             @close="showDropdown = false"
           />
           <div class="w-full">
-            <div v-if="emailFromAuth0" :email-from-auth0="emailFromAuth0">
-              <div v-if="isLoading">Loading...</div>
-              <ErrorBanner v-else-if="emailError" :text="emailError?.message" />
-              <div v-else-if="emailNotInSystem">
-                <CreateUsernamePage
-                  @email-and-user-created="emailNotInSystem = false"
-                />
-              </div>
-              <div v-else :key="loggedInUser">
-                <div class="flex min-h-screen flex-col">
-                  <div class="flex-grow">
-                    <client-only>
-                      <slot />
-                    </client-only>
-                  </div>
-                  <SiteFooter v-if="showFooter" />
+            <client-only>
+              <FetchUserData v-if="auth0user.email" />
+            </client-only>
+            <div v-if="auth0user?.email" :key="loggedInUser">
+              <div class="flex min-h-screen flex-col">
+                <div class="flex-grow">
+                  <slot />
                 </div>
+                <SiteFooter v-if="showFooter" />
               </div>
             </div>
             <div v-else class="flex min-h-screen flex-col">
@@ -121,34 +74,3 @@ const loggedInUser = computed(() => usernameVar());
     </main>
   </v-app>
 </template>
-
-<style lang="scss">
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-}
-body {
-  @media (prefers-color-scheme: dark) {
-    @apply bg-black;
-    @apply text-white;
-    color-scheme: dark;
-  }
-
-  @media (prefers-color-scheme: light) {
-    @apply bg-gray-100;
-    color-scheme: light;
-  }
-
-  &.dark {
-    @apply bg-black;
-    @apply text-white;
-    color-scheme: dark;
-  }
-
-  &.light {
-    @apply bg-gray-100;
-    color-scheme: light;
-  }
-}
-</style>

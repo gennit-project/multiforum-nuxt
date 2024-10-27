@@ -44,15 +44,16 @@ export default defineNuxtConfig({
     { src: "@/plugins/vuetify", mode: "all" },
   ],
   runtimeConfig: {
-    auth0: {
-      clientId: config.clientId,
-      clientSecret: config.clientSecret,
-      domain: config.domain,
-    },
     // Public config, available on both client and server
     public: {
       googleMapsApiKey: config.googleMapsApiKey,
       auth0Domain: config.domain,
+      auth0ClientId: config.clientId,
+      auth0ClientSecret: config.clientSecret,
+      auth0CallbackUrl: config.callbackUrl,
+      auth0Url: config.auth0Url,
+      auth0Audience: config.auth0Audience,
+      auth0Scope: config.auth0Scope,
     },
   },
   ssr: true,

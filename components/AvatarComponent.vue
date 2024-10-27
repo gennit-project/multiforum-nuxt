@@ -48,7 +48,7 @@ const { data: themeResult, error: themeError } = useAsyncQuery(GET_THEME);
 // Computed property to return the theme or a default value if there's an error or it's still loading
 const theme = computed(() => {
   if (themeError.value || !themeResult.value) {
-    return "light"; // Default to light theme
+    return "dark";
   }
   return themeResult.value;
 });

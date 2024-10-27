@@ -131,7 +131,7 @@ function updateFormValues(data: CreateEditEventFormValues) {
       />
     </template>
     <template #does-not-have-auth>
-      <div class="flex justify-center p-8">
+      <div class="flex justify-center p-8 dark:text-white">
         You don't have permission to see this page.
       </div>
     </template>
