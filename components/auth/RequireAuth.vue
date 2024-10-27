@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { usernameVar } from "@/cache";
@@ -28,48 +28,28 @@ const props = defineProps({
   },
 });
 
-// Ref variables for auth0 (only needed client-side)
-const loginWithPopupRef = ref();
-const loginWithRedirectRef = ref();
-const isAuthenticatedRef = ref(false);
-const idTokenClaimsRef = ref();
-const authLoadingRef = ref(false);
+const { 
+  loginWithPopup, 
+  isAuthenticated, 
+  idTokenClaims,
+  isLoading: auth0isLoading,
+} = useAuth0();
 
 const storeToken = async () => {
-  if (isAuthenticatedRef.value && idTokenClaimsRef.value) {
-    const token = await idTokenClaimsRef.value.__raw;
+  if (isAuthenticated.value && idTokenClaims.value) {
+    const token = await idTokenClaims.value.__raw;
     localStorage.setItem("token", token);
   }
 };
 
 const handleLogin = async () => {
-  if (import.meta.client && loginWithPopupRef.value) {
-    await loginWithPopupRef.value();
+  if (import.meta.client) {
+    await loginWithPopup();
     await storeToken();
   }
 };
 
-onMounted(() => {
-  if (import.meta.client) {
-    // Client-only code for Auth0
-    const {
-      loginWithPopup,
-      loginWithRedirect,
-      isLoading: authLoading,
-      isAuthenticated,
-      idTokenClaims,
-    } = useAuth0();
-
-    // Assign to refs
-    loginWithPopupRef.value = loginWithPopup;
-    loginWithRedirectRef.value = loginWithRedirect;
-    isAuthenticatedRef.value = isAuthenticated.value;
-    authLoadingRef.value = authLoading.value;
-    idTokenClaimsRef.value = idTokenClaims.value;
-
-    storeToken();
-  }
-});
+storeToken();
 
 // Computed properties for username and ownership check
 const username = computed(() => usernameVar());
@@ -77,7 +57,7 @@ const isOwner = computed(() => props.owners.includes(username.value));
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading || authLoadingRef" />
+  <LoadingSpinner v-if="loading || auth0isLoading" />
   <div
     v-else
     class="flex align-middle"

@@ -30,7 +30,7 @@ const toggleUserProfileDropdown = () => {
 
 const route = useRoute();
 const showFooter = !route.name?.includes("map");
-const loggedInUser = computed(() => usernameVar());
+const loggedInUser = computed(() => usernameVar() || "");
 </script>
 
 <template>
@@ -52,9 +52,7 @@ const loggedInUser = computed(() => usernameVar());
               @close="showDropdown = false"
             />
             <div class="w-full">
-              <client-only>
-                <FetchUserData v-if="auth0user.email" />
-              </client-only>
+              <FetchUserData v-if="auth0user.email" />
               <div v-if="auth0user?.email" :key="loggedInUser">
                 <div class="flex min-h-screen flex-col">
                   <div class="flex-grow">

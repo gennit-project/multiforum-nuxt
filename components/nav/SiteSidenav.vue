@@ -11,6 +11,7 @@ import { GET_USER } from "@/graphQLData/user/queries";
 import { useDisplay } from "vuetify";
 import CreateAnythingButton from "./CreateAnythingButton.vue";
 import { usernameVar } from "@/cache";
+import config from "@/config";
 
 const DEFAULT_LIMIT = 5;
 
@@ -66,7 +67,7 @@ const profilePicURL = computed(() => user.value?.profilePicURL || "");
 const { smAndDown } = useDisplay();
 
 const login = () => loginWithRedirect();
-const handleLogout = () => logout(); //logout({ returnTo: config.baseUrl });
+const handleLogout = () => logout({ returnTo: config.baseUrl });
 
 const outside = () => {
   emit("close");
@@ -194,7 +195,7 @@ const outside = () => {
           My Profile
         </nuxt-link>
         <nuxt-link
-          v-if="isAuthenticated"
+          v-if="isAuthenticated && username"
           :to="{
             name: 'u-username-settings',
             params: { username },
