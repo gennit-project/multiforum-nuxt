@@ -44,32 +44,34 @@ const loggedInUser = computed(() => usernameVar());
           @close-user-profile-dropdown="closeUserProfileDropdown"
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
-        <div class="flex relative">
-          <SiteSidenav
-            :key="`${showDropdown}`"
-            :show-dropdown="showDropdown"
-            @close="showDropdown = false"
-          />
-          <div class="w-full">
-            <client-only>
-              <FetchUserData v-if="auth0user.email" />
-            </client-only>
-            <div v-if="auth0user?.email" :key="loggedInUser">
-              <div class="flex min-h-screen flex-col">
+        <client-only>
+          <div class="flex relative">
+            <SiteSidenav
+              :key="`${showDropdown}`"
+              :show-dropdown="showDropdown"
+              @close="showDropdown = false"
+            />
+            <div class="w-full">
+              <client-only>
+                <FetchUserData v-if="auth0user.email" />
+              </client-only>
+              <div v-if="auth0user?.email" :key="loggedInUser">
+                <div class="flex min-h-screen flex-col">
+                  <div class="flex-grow">
+                    <slot />
+                  </div>
+                  <SiteFooter v-if="showFooter" />
+                </div>
+              </div>
+              <div v-else class="flex min-h-screen flex-col">
                 <div class="flex-grow">
                   <slot />
                 </div>
                 <SiteFooter v-if="showFooter" />
               </div>
             </div>
-            <div v-else class="flex min-h-screen flex-col">
-              <div class="flex-grow">
-                <slot />
-              </div>
-              <SiteFooter v-if="showFooter" />
-            </div>
           </div>
-        </div>
+        </client-only>
       </div>
     </main>
   </v-app>

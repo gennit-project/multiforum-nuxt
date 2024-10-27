@@ -3,15 +3,12 @@ import { computed, ref } from "vue";
 import HamburgerMenuButton from "@/components/nav/MenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
-import { useAuth0 } from "@/hooks/useAuth0";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "vue-router";
 import { modProfileNameVar, usernameVar } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
-
-const { isAuthenticated, login } = useAuth0();
 
 const route = useRoute();
 const username = computed(() => usernameVar() || "");
@@ -92,19 +89,12 @@ const isOnMapPage = computed(() => {
         </div>
       </div>
       <div class="hidden sm:flex items-center justify-end space-x-2 md:flex-1">
-        <button
-          v-if="!isAuthenticated"
-          data-testid="login-button"
-          class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-400 rounded-full hover:text-black hover:dark:text-white mr-2"
-          @click="login"
-        >
-          Log In
-        </button>
+        <LoginButton />
       </div>
       <div class="flex items-center space-x-2">
         <CreateAnythingButton />
         <ThemeSwitcher />
-        <div v-if="isAuthenticated && username" class="hidden lg:block">
+        <div v-if="username" class="hidden lg:block">
           <div class="flex items-center">
             <div class="relative flex-shrink-0">
               <UserProfileDropdownMenu

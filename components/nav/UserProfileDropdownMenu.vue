@@ -1,9 +1,9 @@
 <script lang="ts" setup>
 import { computed } from "vue";
-// import { useAuth0 } from "@/hooks/useAuth0"; 
+import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
-// import config from "@/config"; 
+import config from "@/config";
 
 const props = defineProps({
   modName: {
@@ -15,11 +15,7 @@ const props = defineProps({
     required: true,
   },
 });
-
-// Get Auth0 details (this assumes you've configured Auth0 in Nuxt)
-// const { isAuthenticated, logout } = useAuth0();
-
-// Use Apollo query to fetch user details
+const { logout } = useAuth0();
 const { result: getUserResult } = useQuery(GET_USER, {
   username: props.username || "",
 });
@@ -33,7 +29,6 @@ const profilePicURL = computed(() => {
   return user.value?.profilePicURL || "";
 });
 
-// Router for navigation
 const router = useRouter();
 
 const menuItems = [
@@ -55,11 +50,8 @@ const menuItems = [
   },
 ];
 
-// Logout function with a mock logout for now
 const handleLogout = () => {
-  console.log("Mock logout");
-  // Uncomment the following line once Auth0 is configured
-  // logout({ returnTo: config.logoutUrl });
+  logout({ returnTo: config.logoutUrl });
 };
 
 const goToModProfile = () => {

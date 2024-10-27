@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { useAuth0 } from '@/hooks/useAuth0';
-import { useQuery } from '@vue/apollo-composable';
-import CalendarIcon from '@/components/icons/CalendarIcon.vue';
-import LocationIcon from '@/components/icons/LocationIcon.vue';
-import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
-import ChannelIcon from '@/components/icons/ChannelIcon.vue';
-import XIcon from '@/components/icons/XmarkIcon.vue';
-import { GET_USER } from '@/graphQLData/user/queries';
-import { useDisplay } from 'vuetify';
-import CreateAnythingButton from './CreateAnythingButton.vue';
-import { usernameVar } from '@/cache';
+import { ref, computed } from "vue";
+import { useAuth0 } from "@auth0/auth0-vue";
+import { useQuery } from "@vue/apollo-composable";
+import CalendarIcon from "@/components/icons/CalendarIcon.vue";
+import LocationIcon from "@/components/icons/LocationIcon.vue";
+import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
+import ChannelIcon from "@/components/icons/ChannelIcon.vue";
+import XIcon from "@/components/icons/XmarkIcon.vue";
+import { GET_USER } from "@/graphQLData/user/queries";
+import { useDisplay } from "vuetify";
+import CreateAnythingButton from "./CreateAnythingButton.vue";
+import { usernameVar } from "@/cache";
 
 const DEFAULT_LIMIT = 5;
 
@@ -21,20 +21,20 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
-  { name: 'Online Events', href: '/events/list/search', icon: CalendarIcon },
-  { name: 'In-person Events', href: '/map/search', icon: LocationIcon },
-  { name: 'Discussions', href: '/discussions', icon: DiscussionIcon },
-  { name: 'All Forums', href: '/forums', icon: ChannelIcon },
+  { name: "Online Events", href: "/events/list/search", icon: CalendarIcon },
+  { name: "In-person Events", href: "/map/search", icon: LocationIcon },
+  { name: "Discussions", href: "/discussions", icon: DiscussionIcon },
+  { name: "All Forums", href: "/forums", icon: ChannelIcon },
 ];
 
- defineProps({
+defineProps({
   showDropdown: {
     type: Boolean,
     required: true,
   },
 });
 
-const emit = defineEmits(['close']);
+const emit = defineEmits(["close"]);
 
 const showAllForums = ref(false);
 const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
@@ -43,31 +43,33 @@ const recentForums = computed(() => {
   if (!import.meta.client) {
     return [];
   }
-  const forums = JSON.parse(localStorage.getItem('recentForums') || '""') || [];
+  const forums = JSON.parse(localStorage.getItem("recentForums") || '""') || [];
   return forums.sort((a: any, b: any) => b.timestamp - a.timestamp);
 });
 
 const visibleRecentForums = computed(() => {
-  return showAllForums.value ? recentForums.value : recentForums.value.slice(0, DEFAULT_LIMIT);
+  return showAllForums.value
+    ? recentForums.value
+    : recentForums.value.slice(0, DEFAULT_LIMIT);
 });
 
 const username = computed(() => usernameVar());
 
 const { result: getUserResult } = useQuery(GET_USER, {
-  username: username.value || '',
+  username: username.value || "",
 });
 
 const user = computed(() => getUserResult.value?.users[0] || null);
 
-const profilePicURL = computed(() => user.value?.profilePicURL || '');
+const profilePicURL = computed(() => user.value?.profilePicURL || "");
 
 const { smAndDown } = useDisplay();
 
 const login = () => loginWithRedirect();
-const handleLogout = () => logout() //logout({ returnTo: config.baseUrl });
+const handleLogout = () => logout(); //logout({ returnTo: config.baseUrl });
 
 const outside = () => {
-  emit('close');
+  emit("close");
 };
 </script>
 
@@ -106,22 +108,38 @@ const outside = () => {
                 class="font-semibold group flex gap-x-3 rounded-md py-1 pl-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
                 @click="outside"
               >
-                <component :is="item.icon" class="list-item-icon h-6 w-6 shrink-0 dark:text-blue-500" aria-hidden="true" />
+                <component
+                  :is="item.icon"
+                  class="list-item-icon h-6 w-6 shrink-0 dark:text-blue-500"
+                  aria-hidden="true"
+                />
                 {{ item.name }}
               </nuxt-link>
             </li>
           </ul>
         </nav>
       </div>
-      <div v-if="recentForums.length > 0" class="border-t border-gray-200 dark:border-gray-600">
-        <div class="text-bold mt-3 px-6 uppercase leading-6 text-gray-400 dark:text-gray-100">
+      <div
+        v-if="recentForums.length > 0"
+        class="border-t border-gray-200 dark:border-gray-600"
+      >
+        <div
+          class="text-bold mt-3 px-6 uppercase leading-6 text-gray-400 dark:text-gray-100"
+        >
           Recent Forums
         </div>
         <div class="px-3">
           <ul class="mb-6">
-            <li v-for="forum in visibleRecentForums" :key="forum.uniqueName" class="list-none">
+            <li
+              v-for="forum in visibleRecentForums"
+              :key="forum.uniqueName"
+              class="list-none"
+            >
               <nuxt-link
-                :to="{ name: 'forums-forumId-discussions', params: { forumId: forum.uniqueName } }"
+                :to="{
+                  name: 'forums-forumId-discussions',
+                  params: { forumId: forum.uniqueName },
+                }"
                 class="font-semibold group flex items-center gap-x-3 rounded-md py-1 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
                 @click="outside"
               >
@@ -146,7 +164,13 @@ const outside = () => {
             </li>
           </ul>
           <div v-if="recentForums.length > DEFAULT_LIMIT">
-            <button v-if="!showAllForums" class="dark:text-white" @click="showAllForums = true" >Show All</button>
+            <button
+              v-if="!showAllForums"
+              class="dark:text-white"
+              @click="showAllForums = true"
+            >
+              Show All
+            </button>
             <button v-else @click="showAllForums = false">Show Less</button>
           </div>
         </div>
@@ -161,7 +185,12 @@ const outside = () => {
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="outside"
         >
-          <AvatarComponent v-if="profilePicURL" :text="username" :src="profilePicURL" :is-small="true" />
+          <AvatarComponent
+            v-if="profilePicURL"
+            :text="username"
+            :src="profilePicURL"
+            :is-small="true"
+          />
           My Profile
         </nuxt-link>
         <nuxt-link

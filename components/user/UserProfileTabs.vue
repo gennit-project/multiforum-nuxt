@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import { useAuth0 } from "@/hooks/useAuth0";
+import { useAuth0 } from "@auth0/auth0-vue";
 import TabButton from "@/components/channel/TabButton.vue";
 import type { User } from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";
