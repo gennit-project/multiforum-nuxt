@@ -2,15 +2,35 @@
 import { ref, watch, defineExpose } from "vue";
 import ExclamationTriangleIcon from "@/components/icons/ExclamationIcon.vue";
 
-// Define props
 const props = defineProps({
-  disabled: Boolean,
-  errorMessage: String,
-  value: String, // Initial value from parent
-  invalid: Boolean,
-  placeholder: String,
-  rows: Number,
-  testId: String,
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  errorMessage: {
+    type: String,
+    default: "",
+  },
+  value: {
+    type: String,
+    default: "",
+  },
+  invalid: {
+    type: Boolean,
+    default: false,
+  },
+  placeholder: {
+    type: String,
+    default: "",
+  },
+  rows: {
+    type: Number,
+    default: 1,
+  },
+  testId: {
+    type: String,
+    default: "",
+  },
 });
 const emit = defineEmits(["update:modelValue"]);
 const text = ref(props.value);
@@ -22,14 +42,12 @@ watch(
   }
 );
 
-// Expose a focus function if needed
 const inputRef = ref<HTMLInputElement | HTMLTextAreaElement | null>(null);
 const focus = () => {
   inputRef.value?.focus();
 };
 defineExpose({ focus });
 
-// Emit `update:modelValue` when `text` changes
 const handleInput = (value: string) => {
   text.value = value;
   emit("update:modelValue", value);

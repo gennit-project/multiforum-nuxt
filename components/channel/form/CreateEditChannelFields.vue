@@ -71,7 +71,7 @@ const touched = ref(false);
 
 nextTick(() => {
   if (titleInputRef.value) {
-    titleInputRef.value?.$el?.children[0].childNodes[0].focus();
+    titleInputRef.value?.focus();
   }
 });
 
