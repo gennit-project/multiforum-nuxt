@@ -377,9 +377,6 @@ const {
   },
 });
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
-});
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)
     return createFormValues.value.text ? "Close with comment" : "Close issue";
@@ -403,25 +400,25 @@ const updateComment = (text: string) => {
 };
 
 const handleCreateComment = async () => {
-  if (!activeIssue.value || !loggedInUserModName.value) return;
+  if (!activeIssue.value || !modProfileNameVar.value) return;
   await createComment({
     issueId: activeIssue.value.id,
     commentText: createFormValues.value.text,
-    displayName: loggedInUserModName.value,
+    displayName: modProfileNameVar.value,
     actionDescription: "commented on the issue",
     actionType: "comment",
   });
-  createFormValues.value.text = ""; // Reset form values
+  createFormValues.value.text = "";
 };
 
 const toggleCloseOpenIssue = () => {
-  if (!activeIssue.value || !loggedInUserModName.value) return;
+  if (!activeIssue.value || !modProfileNameVar.value) return;
   if (createFormValues.value.text) handleCreateComment();
   if (activeIssue.value.isOpen) {
     closeIssue();
     addIssueActivityFeedItem({
       issueId: activeIssue.value.id,
-      displayName: loggedInUserModName.value,
+      displayName: modProfileNameVar.value,
       actionDescription: "closed the issue",
       actionType: "close",
     });
@@ -429,7 +426,7 @@ const toggleCloseOpenIssue = () => {
     reopenIssue();
     addIssueActivityFeedItem({
       issueId: activeIssue.value.id,
-      displayName: loggedInUserModName.value,
+      displayName: modProfileNameVar.value,
       actionDescription: "reopened the issue",
       actionType: "reopen",
     });

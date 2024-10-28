@@ -23,9 +23,6 @@ const channelId = computed(() =>
 const discussionId = computed(() =>
   typeof route.params.discussionId === "string" ? route.params.discussionId : ""
 );
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
-});
 
 const {
   result: getDiscussionResult,
@@ -34,7 +31,7 @@ const {
   onResult: onGetDiscussionResult,
 } = useQuery(GET_DISCUSSION, {
   id: discussionId,
-  loggedInModName: loggedInUserModName.value,
+  loggedInModName: modProfileNameVar.value,
   channelUniqueName: channelId.value,
 });
 

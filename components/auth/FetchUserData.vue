@@ -7,8 +7,6 @@ import { setUsername, setModProfileName } from "@/cache";
 import type { User } from "@/__generated__/graphql";
 import CreateUsernamePage from "./CreateUsernamePage.vue";
 
-console.log("Fetching user data");
-
 const { user, isAuthenticated } = useAuth0();
 const emailNotInSystem = ref(false);
 
@@ -25,7 +23,6 @@ onEmailResult((result: any) => {
   if (!user) {
     emailNotInSystem.value = true;
   } else {
-    console.log("User exists. setting on cache", user.username);
     setUsername(user.username);
     setModProfileName(user.ModerationProfile?.displayName || "");
     emailNotInSystem.value = false;

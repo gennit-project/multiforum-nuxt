@@ -153,10 +153,6 @@ const updateCommentInput = computed(() => ({
   isRootComment: editFormValues.value?.isRootComment,
 }));
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
-});
-
 const getCommentRepliesVariables = {
   commentId: props.createFormValues.parentCommentId,
   modName: loggedInUserModName.value,
@@ -506,14 +502,14 @@ function handleSubmitFeedback() {
     console.error("commentId is required to submit feedback");
     return;
   }
-  if (!loggedInUserModName.value) {
+  if (!modProfileNameVar.value) {
     console.error("modName is required to submit feedback");
     return;
   }
   const feedbackInput = {
     commentId: commentToGiveFeedbackOn.value?.id,
     text: editFormValues.value.text,
-    modProfileName: loggedInUserModName.value,
+    modProfileName: modProfileNameVar.value,
     channelId: channelId.value,
   };
   addFeedbackCommentToComment(feedbackInput);
@@ -555,7 +551,7 @@ function handleViewFeedback(commentId: string) {
         :enable-feedback="enableFeedback"
         :locked="locked"
         :comment-in-process="commentInProcess"
-        :logged-in-user-mod-name="loggedInUserModName"
+        :logged-in-user-mod-name="modProfileNameVar"
         :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
         :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
         :edit-comment-error="editCommentError"
@@ -678,18 +674,18 @@ function handleViewFeedback(commentId: string) {
     />
     <ConfirmUndoCommentFeedbackModal
       v-if="showConfirmUndoFeedbackModal && commentToRemoveFeedbackFrom"
-      :key="loggedInUserModName"
+      :key="modProfileNameVar"
       :open="showConfirmUndoFeedbackModal"
       :comment-id="commentToRemoveFeedbackFrom.id"
       :comment-to-remove-feedback-from="commentToRemoveFeedbackFrom"
-      :mod-name="loggedInUserModName"
+      :mod-name="modProfileNameVar"
       @close="showConfirmUndoFeedbackModal = false"
     />
     <EditCommentFeedbackModal
       v-if="showEditCommentFeedbackModal"
       :open="showEditCommentFeedbackModal"
       :comment-id="commentToGiveFeedbackOn?.id || ''"
-      :mod-name="loggedInUserModName"
+      :mod-name="modProfileNameVar"
       @close="showEditCommentFeedbackModal = false"
     />
     <Notification

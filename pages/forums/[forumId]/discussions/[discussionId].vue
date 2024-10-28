@@ -22,11 +22,6 @@ watchEffect(() => {
   discussionId.value = updateDiscussionId();
 });
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
-});
-
-
 </script>
 
 <template>
@@ -39,7 +34,7 @@ const loggedInUserModName = computed(() => {
         v-else
         :key="discussionId"
         :discussion-id="discussionId"
-        :logged-in-user-mod-name="loggedInUserModName"
+        :logged-in-user-mod-name="modProfileNameVar"
       />
     </div>
   </div>

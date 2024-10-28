@@ -126,10 +126,6 @@ const eventId = computed(() => {
   return typeof route.params.eventId === 'string' ? route.params.eventId : '';
 });
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || '';
-});
-
 const {
   load: checkDiscussionIssueExistence,
   result: discussionIssueExistenceResult,
@@ -294,13 +290,13 @@ const submit = async () => {
   const issueCreateInput: IssueCreateInput = {
     title: getIssueTitle(),
     isOpen: true,
-    authorName: loggedInUserModName.value,
+    authorName: modProfileNameVar.value,
     Author: {
       ModerationProfile: {
         connect: {
           where: {
             node: {
-              displayName: loggedInUserModName.value,
+              displayName: modProfileNameVar.value,
             },
           },
         },
@@ -323,7 +319,7 @@ const submit = async () => {
             connect: {
               where: {
                 node: {
-                  displayName: loggedInUserModName.value,
+                  displayName: modProfileNameVar.value,
                 },
               },
             },
@@ -340,7 +336,7 @@ const submit = async () => {
                     connect: {
                       where: {
                         node: {
-                          displayName: loggedInUserModName.value,
+                          displayName: modProfileNameVar.value,
                         },
                       },
                     },

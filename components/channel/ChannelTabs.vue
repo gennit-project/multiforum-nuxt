@@ -7,7 +7,7 @@ import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
 import type { Channel } from "@/__generated__/graphql";
-import { usernameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 
 type Tab = {
   name: string;
@@ -87,10 +87,6 @@ const adminList = props.channel.Admins.map((user) => user.username || "");
 
 const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || '';
-});
-
 if (loggedInUsername.value && adminList.includes(loggedInUsername.value)) {
   tabs.push({
     name: "settings",
@@ -102,7 +98,7 @@ if (loggedInUsername.value && adminList.includes(loggedInUsername.value)) {
 }
 
 const isAdmin = adminList.includes(loggedInUsername.value);
-const isMod = modList.includes(loggedInUserModName.value);
+const isMod = modList.includes(modProfileNameVar.value);
 
 if (isAdmin || isMod) {
   tabs.push({

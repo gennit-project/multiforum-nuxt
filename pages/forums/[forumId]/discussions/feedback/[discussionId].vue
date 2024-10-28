@@ -23,10 +23,6 @@ const commentId = ref("");
 const offset = ref(0);
 const feedbackId = ref("");
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
-});
-
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
@@ -36,7 +32,7 @@ const {
   id: discussionId,
   limit: PAGE_LIMIT,
   offset: offset,
-  loggedInModName: loggedInUserModName,
+  loggedInModName: modProfileNameVar.value,
 });
 
 const commentToRemoveFeedbackFrom = ref(null);

@@ -21,10 +21,6 @@ const commentId = ref("");
 const offset = ref(0);
 const feedbackId = ref("");
 
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
-});
-
 const {
   result: getCommentResult,
   error: getCommentError,
@@ -35,7 +31,7 @@ const {
   commentId: commentId,
   limit: PAGE_LIMIT,
   offset: offset,
-  loggedInModName: loggedInUserModName,
+  loggedInModName: modProfileNameVar.value,
 });
 
 const originalComment = computed<Comment>(() => {

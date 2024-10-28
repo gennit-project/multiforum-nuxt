@@ -20,7 +20,7 @@ import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import { usernameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 
 const props = defineProps({
   eventData: {
@@ -65,11 +65,6 @@ const permalinkObject = computed(() => {
       forumId: channelId.value,
     },
   };
-});
-
-
-const loggedInUserModName = computed(() => {
-  return modProfileName || "";
 });
 
 const {
@@ -228,7 +223,7 @@ function handleSubmitFeedback() {
     console.error("Feedback text is required");
     return;
   }
-  if (!loggedInUserModName.value) {
+  if (!modProfileNameVar.value) {
     console.error("Mod profile name is required to submit feedback");
     return;
   }
@@ -236,7 +231,7 @@ function handleSubmitFeedback() {
     eventId: eventId.value,
     text: feedbackText.value,
     channelId: channelId.value,
-    modProfileName: loggedInUserModName.value,
+    modProfileName: modProfileNameVar.value,
   });
 }
 
