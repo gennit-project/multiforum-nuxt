@@ -1,5 +1,5 @@
 <script lang="ts">
-import { computed, defineComponent } from "vue";
+import { defineComponent } from "vue";
 import VoteButton from "@/components/VoteButton.vue";
 import {
   ADD_EMOJI_TO_COMMENT,
@@ -69,7 +69,7 @@ export default defineComponent({
       emojiObject,
       removeEmojiFromComment,
       removeEmojiFromDiscussionChannel,
-      username: usernameVar.value,
+      usernameVar,
     };
   },
   methods: {
@@ -175,7 +175,7 @@ export default defineComponent({
               toggleCommentEmoji({
                 emojiLabel,
                 unicode: getDefaultVariant(emojiLabel),
-                username: username,
+                username: usernameVar,
                 commentId: commentId,
               });
             }
@@ -184,7 +184,7 @@ export default defineComponent({
                 discussionChannelId: discussionChannelId,
                 emojiLabel,
                 unicode: getDefaultVariant(emojiLabel),
-                username: username,
+                username: usernameVar,
               });
             }
           }

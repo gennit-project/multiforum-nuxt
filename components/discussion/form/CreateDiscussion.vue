@@ -40,7 +40,7 @@ export default defineComponent({
       body: "",
       selectedChannels: channelId ? [channelId] : [],
       selectedTags: [],
-      author: username
+      author: username.value
     };
 
     const formValues = ref(createDiscussionDefaultValues);
@@ -73,7 +73,7 @@ export default defineComponent({
           connect: {
             where: {
               node: {
-                username,
+                username: usernameVar.value,
               },
             },
           },
