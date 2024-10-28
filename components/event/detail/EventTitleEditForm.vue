@@ -15,7 +15,7 @@ import { modProfileNameVar, usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
-const username = computed(() => usernameVar() || "");
+const username = computed(() => usernameVar || "");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -24,10 +24,6 @@ const eventId = computed(() =>
   typeof route.params.eventId === "string" ? route.params.eventId : ""
 );
 
-const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
-});
-
 const {
   result: getEventResult,
   error: getEventError,
@@ -35,7 +31,7 @@ const {
   onResult: onGetEventResult,
 } = useQuery(GET_EVENT, {
   id: eventId,
-  loggedInModName: loggedInUserModName.value,
+  loggedInModName: modProfileNameVar.value,
   channelUniqueName: channelId.value,
 });
 
@@ -45,7 +41,7 @@ const event = computed<Event | null>(() => {
 });
 
 const authorIsLoggedInUser = computed(
-  () => event.value?.Poster?.username === username.value
+  () => event.value?.Poster?.username === usernameVar.value
 );
 
 const titleInputRef = ref(null);

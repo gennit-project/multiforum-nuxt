@@ -52,7 +52,7 @@ const channelId = computed(() =>
 );
 
 const username = computed(() => {
-  return usernameVar() || ""
+  return usernameVar || ""
 });
 
 const {

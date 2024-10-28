@@ -210,10 +210,6 @@ const copyLink = async () => {
   }, 2000);
 };
 
-const username = computed(() => {
-  return usernameVar() || "";
-});
-
 const commentMenuItems = computed(() => {
   let out: any[] = [];
 
@@ -228,7 +224,7 @@ const commentMenuItems = computed(() => {
     ]);
   }
 
-  if (props.commentData?.CommentAuthor?.username === username.value) {
+  if (props.commentData?.CommentAuthor?.username === usernameVar.value) {
     out = out.concat([
       {
         label: "Edit",

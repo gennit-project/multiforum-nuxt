@@ -54,10 +54,8 @@ const visibleRecentForums = computed(() => {
     : recentForums.value.slice(0, DEFAULT_LIMIT);
 });
 
-const username = computed(() => usernameVar());
-
 const { result: getUserResult } = useQuery(GET_USER, {
-  username: username.value || "",
+  username: usernameVar.value || "",
 });
 
 const user = computed(() => getUserResult.value?.users[0] || null);
@@ -188,27 +186,27 @@ const outside = () => {
       </div>
       <ul class="mb-6 border-t">
         <nuxt-link
-          v-if="isAuthenticated && username"
+          v-if="isAuthenticated && usernameVar"
           :to="{
             name: 'u-username',
-            params: { username },
+            params: { usernameVar },
           }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="outside"
         >
           <AvatarComponent
             v-if="profilePicURL"
-            :text="username"
+            :text="usernameVar"
             :src="profilePicURL"
             :is-small="true"
           />
           My Profile
         </nuxt-link>
         <nuxt-link
-          v-if="isAuthenticated && username"
+          v-if="isAuthenticated && usernameVar"
           :to="{
             name: 'u-username-settings',
-            params: { username },
+            params: { username: usernameVar },
           }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="outside"

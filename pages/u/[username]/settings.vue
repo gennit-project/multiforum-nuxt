@@ -12,10 +12,6 @@ import { usernameVar } from "@/cache";
 
 const route = useRoute();
 
-const username = computed(() => {
-  return usernameVar() || "";
-});
-
 const usernameInParams = computed(() => {
   return typeof route.params.username === "string" ? route.params.username : "";
 });
@@ -77,11 +73,11 @@ onDone(() => {
 
 async function submit() {
   await updateUser({
-    where: { username: username.value },
+    where: { username: usernameVar.value },
     update: userUpdateInput.value,
   });
   await refetchUser({
-    username: username.value,
+    username: usernameVar.value,
   });
 }
 function updateFormValues(data: EditAccountSettingsFormValues) {

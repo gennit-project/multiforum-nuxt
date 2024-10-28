@@ -79,7 +79,7 @@ export default defineComponent({
     const route = useRoute();
 
     const username = computed(() => {
-      const username = usernameVar();
+      const username = usernameVar;
       return username || "";
     });
     const aggregateCommentCount = computed(() => {

@@ -127,7 +127,7 @@ const eventId = computed(() => {
 });
 
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || '';
+  return modProfileName || '';
 });
 
 const {

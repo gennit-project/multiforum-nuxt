@@ -27,7 +27,7 @@ export default defineComponent({
   },
   apollo: {},
   setup() {
-    const username = usernameVar();
+    const username = usernameVar;
     const route = useRoute();
     const router = useRouter();
 

@@ -5,7 +5,7 @@ import {
   ADD_EMOJI_TO_COMMENT,
   REMOVE_EMOJI_FROM_COMMENT,
 } from "@/graphQLData/comment/mutations";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import {
   ADD_EMOJI_TO_DISCUSSION_CHANNEL,
   REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
@@ -48,9 +48,6 @@ export default defineComponent({
     if (props.emojiJson) {
       emojiObject = JSON.parse(props.emojiJson);
     }
-    const username = computed(() => {
-      return usernameVar() || "";
-    });
 
     // If a comment is being updated, use these mutations.
     const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
@@ -72,7 +69,7 @@ export default defineComponent({
       emojiObject,
       removeEmojiFromComment,
       removeEmojiFromDiscussionChannel,
-      username,
+      username: usernameVar.value,
     };
   },
   methods: {

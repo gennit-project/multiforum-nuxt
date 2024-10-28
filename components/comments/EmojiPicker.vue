@@ -1,32 +1,17 @@
 <script lang="ts" setup>
-import { computed, onMounted, ref, nextTick } from "vue";
+import { onMounted, ref, nextTick } from "vue";
 import { VuemojiPicker } from "vuemoji-picker";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { ADD_EMOJI_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from "@/graphQLData/discussion/mutations";
 import gql from "graphql-tag";
 import { usernameVar } from "@/cache";
-
-// Query to get the theme from the local state
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-const username = computed(() => usernameVar() || "");
 
 // Mutation to add emoji to comment
 const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
 
 // Mutation to add emoji to discussion channel
 const { mutate: addEmojiToDiscussionChannel } = useMutation(ADD_EMOJI_TO_DISCUSSION_CHANNEL);
-
-// Get the theme (light or dark mode)
-const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
-const theme = computed(() => {
-  if (themeLoading.value || themeError.value) return "";
-  return themeResult.value?.theme;
-});
 
 const emojiPickerRef = ref(null);
 
@@ -80,7 +65,7 @@ function handleEmojiClick(event: any) {
   const unicode = event.unicode;
   const emojiLabel = event.emoji.annotation;
 
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.error("Username not found");
     return;
   }
@@ -90,7 +75,7 @@ function handleEmojiClick(event: any) {
       commentId: props.commentId,
       emojiLabel,
       unicode,
-      username: username.value,
+      username: usernameVar.value,
     });
     return;
   }
@@ -100,7 +85,7 @@ function handleEmojiClick(event: any) {
       discussionChannelId: props.discussionChannelId,
       emojiLabel,
       unicode,
-      username: username.value,
+      username: usernameVar.value,
     });
   }
 

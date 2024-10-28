@@ -23,7 +23,7 @@ watchEffect(() => {
 });
 
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
+  return modProfileName || "";
 });
 
 

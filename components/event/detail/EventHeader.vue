@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import type { Event } from "@/__generated__/graphql";
 import {
   CANCEL_EVENT,
@@ -20,7 +20,7 @@ import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import { usernameVar, modProfileNameVar } from "@/cache";
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   eventData: {
@@ -69,7 +69,7 @@ const permalinkObject = computed(() => {
 
 
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
+  return modProfileName || "";
 });
 
 const {
@@ -170,7 +170,7 @@ const menuItems = computed(() => {
       icon: ALLOWED_ICONS.COPY_LINK,
     });
   }
-  if (props.eventData?.Poster?.username === usernameVar()) {
+  if (props.eventData?.Poster?.username === usernameVar.value) {
     items.push({
       label: "Edit",
       event: "handleEdit",

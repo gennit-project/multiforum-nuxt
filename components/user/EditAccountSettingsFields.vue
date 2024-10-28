@@ -51,10 +51,6 @@ const usernameInParams = computed(() => {
 
 const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL);
 
-const username = computed(() => {
-  return usernameVar() || '';
-});
-
 // Methods
 const upload = async (file: any) => {
   if (!username.value) {
@@ -63,7 +59,7 @@ const upload = async (file: any) => {
   }
 
   try {
-    const filename = getUploadFileName({ username: username.value, file });
+    const filename = getUploadFileName({ username: usernameVar.value, file });
     const signedUrlResult = await createSignedStorageUrl({
       filename,
       contentType: file.type,
@@ -168,7 +164,7 @@ nextTick(() => {
               <AvatarComponent
                 class="shadow-sm"
                 :src="formValues.profilePicURL"
-                :text="username"
+                :text="usernameVar"
                 :is-square="false"
                 :is-large="true"
               />

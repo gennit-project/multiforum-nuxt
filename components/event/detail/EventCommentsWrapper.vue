@@ -45,7 +45,6 @@ const props = defineProps({
 });
 
 const route = useRoute()
-const username = computed(() => usernameVar() || "");
 
 const eventId = computed(() => props.event?.id);
 
@@ -94,7 +93,7 @@ const createCommentInput = computed(() => ({
       connect: {
         where: {
           node: {
-            username: username.value,
+            username: usernameVar.value,
           },
         },
       },
@@ -105,7 +104,7 @@ const createCommentInput = computed(() => ({
       {
         where: {
           node: {
-            username: username.value,
+            username: usernameVar.value,
           },
         },
       },

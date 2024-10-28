@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "vue-router";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
@@ -75,15 +74,12 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const username = computed(() => {
-  return usernameVar() || "";
-});
 
 const loggedInUserIsAuthor = computed(() => {
   if (!props.commentData) {
     return false;
   }
-  return usernameVar() === username.value;
+  return usernameVar.value === props.commentData.CommentAuthor?.username;
 });
 
 const showEmojiPicker = ref(false);

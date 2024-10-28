@@ -47,7 +47,7 @@ const route = useRoute();
 const router = useRouter();
 
 const loggedInModName = computed(() => {
-  const modName = modProfileNameVar();
+  const modName = modProfileName;
   if (!modName) {
     console.error("Error fetching mod profile name");
   }

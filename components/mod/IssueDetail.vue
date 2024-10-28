@@ -378,7 +378,7 @@ const {
 });
 
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
+  return modProfileName || "";
 });
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)

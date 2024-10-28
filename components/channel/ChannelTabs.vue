@@ -7,7 +7,7 @@ import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
 import type { Channel } from "@/__generated__/graphql";
-import { modProfileNameVar, usernameVar } from "@/cache";
+import { usernameVar } from "@/cache";
 
 type Tab = {
   name: string;
@@ -51,7 +51,7 @@ watch(
 );
 
 const loggedInUsername = computed(() => {
-  return usernameVar() || '';
+  return usernameVar.value || '';
 });
 
 const tabRoutes = computed(() => {
@@ -88,7 +88,7 @@ const adminList = props.channel.Admins.map((user) => user.username || "");
 const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
 
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || '';
+  return modProfileName || '';
 });
 
 if (loggedInUsername.value && adminList.includes(loggedInUsername.value)) {

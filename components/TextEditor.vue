@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, nextTick, onMounted, onBeforeUnmount } from "vue";
+import { ref, nextTick, onMounted, onBeforeUnmount } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
@@ -37,9 +37,6 @@ const props = defineProps({
 });
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
-
-// Computed properties
-const username = computed(() => usernameVar() || "");
 
 // Refs
 const editorRef = ref<HTMLTextAreaElement | null>(null);
@@ -159,7 +156,7 @@ const upload = async (file: File) => {
   }
 
   try {
-    const filename = getUploadFileName({ username: username.value, file });
+    const filename = getUploadFileName({ username: usernameVar.value, file });
     const signedStorageURLInput = { filename, contentType: file.type };
 
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);

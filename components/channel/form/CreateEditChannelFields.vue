@@ -52,11 +52,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["submit", "updateFormValues"]);
-
-const username = computed(() => {
-  return 'cluse' //usernameVar() || "";
-});
-
 // Mutation to create a signed storage URL
 const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL);
 
@@ -77,14 +72,14 @@ nextTick(() => {
 
 // File upload handler
 const upload = async (file: File) => {
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.error("No username found");
     return;
   }
 
   try {
     const filename = getUploadFileName({
-      username: username.value,
+      username: usernameVar.value,
       file,
     });
 

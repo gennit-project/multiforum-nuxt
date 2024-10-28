@@ -1,10 +1,15 @@
 import type { ReactiveVar } from "@apollo/client/core";
 import { InMemoryCache, makeVar } from "@apollo/client/core";
+import { ref } from 'vue';
 
-// Ensure localStorage is accessed only on the client side
-export const usernameVar: ReactiveVar<string> = makeVar<string>("");
-export const modProfileIdVar: ReactiveVar<string> = makeVar<string>("");
-export const modProfileNameVar: ReactiveVar<string> = makeVar<string>("");
+export const usernameVar = ref();
+export const setUsername = (username: string) => {
+  usernameVar.value = username;
+};
+export const modProfileNameVar = ref();
+export const setModProfileName = (modProfileName: string) => {
+  modProfileNameVar.value = modProfileName;
+};
 export const themeVar: ReactiveVar<string> = makeVar<string>(
   import.meta.client ? localStorage.getItem("theme") || "dark" : "dark"
 );
@@ -156,18 +161,13 @@ const cache = new InMemoryCache({
         username: {
           read() {
             // Store the username of the logged in user
-            return usernameVar();
-          },
-        },
-        modProfileId: {
-          read() {
-            return modProfileIdVar();
+            return usernameVar.value;
           },
         },
         modProfileName: {
           read() {
             // Store the mod profile name of the logged in user
-            return modProfileNameVar();
+            return modProfileNameVar.value;
           },
         },
       },

@@ -18,7 +18,7 @@ import {
   checkUrl,
 } from "@/utils";
 import AddImage from "@/components/AddImage.vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TagPicker from "@/components/TagPicker.vue";
@@ -99,10 +99,6 @@ const formattedEndTimeTime = computed(() => {
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
 );
-
-const username = computed(() => {
-  return usernameVar() || "";
-});
 
 // Computed Properties
 const datePickerErrorMessage = computed(() => {
@@ -240,12 +236,12 @@ const handleUpdateLocation = (event: UpdateLocationInput) => {
 };
 
 const upload = async (file: any) => {
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.error("No username found");
     return;
   }
   try {
-    const filename = getUploadFileName({ username: username.value, file });
+    const filename = getUploadFileName({ username: usernameVar.value, file });
     const signedUrlResult = await createSignedStorageUrl({
       filename,
       contentType: file.type,

@@ -1,31 +1,15 @@
 <script setup lang="ts">
-import { computed, unref } from "vue";
+import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { usernameVar } from "@/cache";
 
-// Define Props
 const props = defineProps({
-  requireOwnership: {
-    type: Boolean,
-    default: false,
-  },
-  owners: {
-    type: Array as () => string[],
-    default: () => [],
-  },
-  justifyLeft: {
-    type: Boolean,
-    default: false,
-  },
-  fullWidth: {
-    type: Boolean,
-    default: true,
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
+  requireOwnership: Boolean,
+  owners: Array as () => string[],
+  justifyLeft: Boolean,
+  fullWidth: Boolean,
+  loading: Boolean,
 });
 
 const { 
@@ -34,6 +18,8 @@ const {
   idTokenClaims,
   isLoading: auth0isLoading,
 } = useAuth0();
+
+const usernameLoaded = computed(() => !!usernameVar.value);
 
 const storeToken = async () => {
   if (isAuthenticated.value && idTokenClaims.value) {
@@ -49,7 +35,7 @@ const handleLogin = async () => {
   }
 };
 
-const isOwner = computed(() => props.owners.includes(usernameVar()));
+const isOwner = computed(() => props.owners.includes(usernameVar.value));
 </script>
 
 <template>
@@ -60,7 +46,7 @@ const isOwner = computed(() => props.owners.includes(usernameVar()));
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
     <div
-      v-if="isAuthenticated && (!requireOwnership || isOwner)"
+      v-if="isAuthenticated && usernameLoaded && (!requireOwnership || isOwner)"
       :class="[
         fullWidth ? 'w-full flex justify-center' : 'w-full flex justify-end',
       ]"

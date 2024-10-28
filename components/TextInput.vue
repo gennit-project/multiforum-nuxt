@@ -32,7 +32,7 @@ const props = defineProps({
     default: "",
   },
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(["update"]);
 const text = ref(props.value);
 
 watch(
@@ -50,7 +50,7 @@ defineExpose({ focus });
 
 const handleInput = (value: string) => {
   text.value = value;
-  emit("update:modelValue", value);
+  emit("update", value);
 };
 </script>
 

@@ -3,9 +3,11 @@ import { ref } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { usernameVar, modProfileNameVar } from "@/cache";
+import { setUsername, setModProfileName } from "@/cache";
 import type { User } from "@/__generated__/graphql";
 import CreateUsernamePage from "./CreateUsernamePage.vue";
+
+console.log("Fetching user data");
 
 const { user, isAuthenticated } = useAuth0();
 const emailNotInSystem = ref(false);
@@ -23,8 +25,9 @@ onEmailResult((result: any) => {
   if (!user) {
     emailNotInSystem.value = true;
   } else {
-    usernameVar(user.username);
-    modProfileNameVar(user.ModerationProfile?.displayName || "");
+    console.log("User exists. setting on cache", user.username);
+    setUsername(user.username);
+    setModProfileName(user.ModerationProfile?.displayName || "");
     emailNotInSystem.value = false;
   }
 });

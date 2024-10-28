@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
@@ -9,11 +9,15 @@ import { usernameVar } from "@/cache";
 
 const auth0user = ref();
 
+const usernameLoaded = ref(false);
+
 onMounted(() => {
   if (!import.meta.client) return;
   const { user } = useAuth0();
+  console.log('user', user.value) 
   auth0user.value = user.value;
 });
+
 const showUserProfileDropdown = ref(false);
 const showDropdown = ref(false);
 
@@ -31,7 +35,15 @@ const toggleUserProfileDropdown = () => {
 
 const route = useRoute();
 const showFooter = !route.name?.includes("map");
-const loggedInUser = computed(() => usernameVar() || "");
+
+watch(
+  () => usernameVar.value,
+  (newUsername) => {
+    usernameLoaded.value = !!newUsername;
+  }
+);
+console.log('auth0 user', auth0user.value)
+console.log('usernamevar', usernameVar.value)
 </script>
 
 <template>
@@ -54,7 +66,7 @@ const loggedInUser = computed(() => usernameVar() || "");
             />
             <div class="w-full">
               <FetchUserData v-if="auth0user.email" />
-              <div v-if="auth0user?.email" :key="loggedInUser">
+              <div v-if="auth0user?.email && usernameLoaded" >
                 <div class="flex min-h-screen flex-col">
                   <div class="flex-grow">
                     <slot />

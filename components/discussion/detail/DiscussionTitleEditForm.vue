@@ -15,7 +15,7 @@ import cache, { modProfileNameVar, usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
-const username = computed(() => usernameVar() || "");
+const username = computed(() => usernameVar || "");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -24,7 +24,7 @@ const discussionId = computed(() =>
   typeof route.params.discussionId === "string" ? route.params.discussionId : ""
 );
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
+  return modProfileName || "";
 });
 
 const {

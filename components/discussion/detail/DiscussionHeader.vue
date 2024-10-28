@@ -132,8 +132,8 @@ const deleteModalIsOpen = ref(false);
 const showOpenIssueModal = ref(false);
 const showSuccessfullyReported = ref(false);
 
-const username = usernameVar();
-const loggedInUserModName = modProfileNameVar()
+const username = usernameVar;
+const loggedInUserModName = modProfileName
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
 

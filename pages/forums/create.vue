@@ -14,14 +14,6 @@ import { usernameVar } from "@/cache";
 
 const router = useRouter();
 
-const username = computed(() => {
-  const username = usernameVar();
-  if (username) {
-    return username;
-  }
-  return "";
-});
-
 const createChannelDefaultValues = {
   uniqueName: "",
   displayName: "",
@@ -66,7 +58,7 @@ const createChannelInput = computed(() => {
           {
             where: {
               node: {
-                username: username.value,
+                username: usernameVar.value,
               },
             },
           },
@@ -124,7 +116,7 @@ onDone((response) => {
 
 const submit = async () => {
   createChannelLoading.value = true;
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.error("No username found");
     return;
   }

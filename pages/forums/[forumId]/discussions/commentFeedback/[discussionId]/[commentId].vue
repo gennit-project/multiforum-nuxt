@@ -22,7 +22,7 @@ const offset = ref(0);
 const feedbackId = ref("");
 
 const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
+  return modProfileName || "";
 });
 
 const {

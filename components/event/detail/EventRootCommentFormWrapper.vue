@@ -32,8 +32,6 @@ const createCommentDefaultValues: CreateEditCommentFormValues = {
 
 const createFormValues = ref<CreateEditCommentFormValues>(createCommentDefaultValues);
 
-const username = computed(() => usernameVar() || "");
-
 const createCommentInput = computed(() => [{
   isRootComment: true,
   text: createFormValues.value.text || "",
@@ -41,7 +39,7 @@ const createCommentInput = computed(() => [{
     User: {
       connect: {
         where: {
-          node: { username: username.value },
+          node: { username: usernameVar.value },
         },
       },
     },
@@ -55,7 +53,7 @@ const createCommentInput = computed(() => [{
   },
   UpvotedByUsers: {
     connect: {
-      where: { node: { username: username.value } },
+      where: { node: { username: usernameVar.value } },
     },
   },
 }]);

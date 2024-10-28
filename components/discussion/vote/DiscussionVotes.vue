@@ -43,13 +43,6 @@ const discussionIdInParams = computed(() => {
 
 const discussionChannelId = computed(() => props.discussionChannel.id || "");
 
-const username = computed(() => {
-  return usernameVar() || "";
-});
-const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || "";
-});
-
 const {
   mutate: upvoteDiscussionChannel,
   error: upvoteDiscussionChannelError,
@@ -62,9 +55,9 @@ const {
 } = useMutation(UNDO_UPVOTE_DISCUSSION_CHANNEL);
 
 const loggedInUserUpvoted = computed(() => {
-  if (!username.value) return false;
+  if (!usernameVar.value) return false;
   const users = props.discussionChannel?.UpvotedByUsers || [];
-  return users.some((user: any) => user.username === username.value);
+  return users.some((user: any) => user.username === usernameVar.value);
 });
 
 const loggedInUserDownvoted = computed(
@@ -86,22 +79,22 @@ async function handleClickUp() {
 }
 
 async function upvote() {
-  if (!username.value) throw new Error("Username is required to upvote");
+  if (!usernameVar.value) throw new Error("Username is required to upvote");
   await upvoteDiscussionChannel({
     id: discussionChannelId.value,
-    username: username.value,
+    username: usernameVar.value,
   });
 }
 
 async function undoUpvote() {
   await undoUpvoteDiscussionChannel({
     id: discussionChannelId.value,
-    username: username.value,
+    username: usernameVar.value,
   });
 }
 
 function handleClickGiveFeedback() {
-  if (loggedInUserModName.value) {
+  if (modProfileNameVar.value) {
     if (!loggedInUserDownvoted.value) emit("handleClickGiveFeedback");
   } else {
     console.error("User is not a mod");
@@ -109,11 +102,11 @@ function handleClickGiveFeedback() {
 }
 
 function handleClickEditFeedback() {
-  if (loggedInUserModName.value) emit("handleClickEditFeedback");
+  if (modProfileNameVar.value) emit("handleClickEditFeedback");
 }
 
 function handleClickUndoFeedback() {
-  if (loggedInUserModName.value) emit("handleClickUndoFeedback");
+  if (modProfileNameVar.value) emit("handleClickUndoFeedback");
 }
 
 function handleClickViewFeedback() {
@@ -142,7 +135,7 @@ function handleSubmitFeedback() {
     :upvote-count="upvoteCount"
     :upvote-active="loggedInUserUpvoted"
     :downvote-active="loggedInUserDownvoted"
-    :has-mod-profile="!!loggedInUserModName"
+    :has-mod-profile="!!modProfileNameVar"
     :show-downvote="showDownvote"
     :upvote-loading="
       upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading

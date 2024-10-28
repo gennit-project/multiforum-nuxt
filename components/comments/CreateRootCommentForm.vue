@@ -38,13 +38,8 @@ const emit = defineEmits([
   "handleCreateComment",
 ]);
 
-
-const username = computed(() => {
-  return usernameVar();
-});
-
 const { result: getUserResult } = useQuery(GET_USER, {
-  username: username.value,
+  username: usernameVar.value,
 });
 
 const profilePicURL = computed(() => {

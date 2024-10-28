@@ -8,7 +8,7 @@ import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
 import { useAuth0 } from "@auth0/auth0-vue";
-import { usernameVar, modProfileNameVar } from "@/cache";
+import { setUsername, setModProfileName } from "@/cache";
 
 const props = defineProps({
   email: {
@@ -70,11 +70,11 @@ onEmailAndUserCreated((result) => {
     const modProfileName = user?.ModerationProfile?.displayName;
 
     if (username) {
-      usernameVar(username);
+      setUsername(username);
     }
 
     if (modProfileName) {
-      modProfileNameVar(modProfileName);
+      setModProfileName(modProfileName);
     }
 
     emit("emailAndUserCreated");

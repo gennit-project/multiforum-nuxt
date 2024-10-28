@@ -47,7 +47,7 @@ watch(
 );
 
 const username = computed(() => {
-  return usernameVar() || "";
+  return usernameVar || "";
 });
 
 // Define the tabs based on the user data and authentication status

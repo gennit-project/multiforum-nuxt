@@ -17,7 +17,7 @@ const now = DateTime.now();
 const route = useRoute();
 const router = useRouter();
 
-const username = computed(() => usernameVar() || "");
+const username = computed(() => usernameVar || "");
 
 const channelId = computed(() => (route.params.forumId ? String(route.params.forumId) : ""));
 const createEventDefaultValues = getDefaultEventFormValues(channelId.value);

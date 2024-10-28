@@ -60,7 +60,6 @@ watch(getChannelResult, (newVal) => {
   }
 }, { immediate: true });
 
-const username = computed(() => usernameVar() || "");
 
 const existingTags = computed(() => {
   return channel.value?.Tags?.map((tag: TagData) => tag.text) || [];
@@ -89,7 +88,7 @@ const channelUpdateInput = computed(() => {
     channelBannerURL: formValues.value.channelBannerURL,
     rules: JSON.stringify(formValues.value.rules),
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
-    Admins: [{ connect: [{ where: { node: { username: username.value } } }] }],
+    Admins: [{ connect: [{ where: { node: { username: usernameVar.value } } }] }],
   };
 });
 

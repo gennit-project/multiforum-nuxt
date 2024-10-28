@@ -47,9 +47,6 @@ const createCommentDefaultValues = {
 
 const createFormValues = ref(createCommentDefaultValues);
 
-const username = computed(() => {
-  return usernameVar() || "";
-});
 
 const createCommentInput = computed(() => {
   const input = {
@@ -60,7 +57,7 @@ const createCommentInput = computed(() => {
         connect: {
           where: {
             node: {
-              username: username.value,
+              username: usernameVar.value,
             },
           },
         },
@@ -79,7 +76,7 @@ const createCommentInput = computed(() => {
       connect: {
         where: {
           node: {
-            username: username.value,
+            username: usernameVar.value,
           },
         },
       },
@@ -161,7 +158,7 @@ const handleCreateComment = async () => {
     );
     return;
   }
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.warn(
       "Could not create the comment because there is no username in the create root comment form"
     );

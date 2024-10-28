@@ -12,12 +12,10 @@ import { modProfileNameVar, usernameVar } from "@/cache";
 defineEmits(["toggleDropdown"]);
 
 const route = useRoute();
-const username = computed(() => usernameVar() || "");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
-const modName = computed(() => modProfileNameVar() || "");
 const sideNavIsOpen = ref(false);
 const shouldShowChannelId = computed(() => channelId.value);
 const shouldShowRouteInfo = computed(
@@ -99,12 +97,12 @@ const isOnMapPage = computed(() => {
       <div class="flex items-center space-x-2">
         <CreateAnythingButton />
         <ThemeSwitcher />
-        <div v-if="username" class="hidden lg:block">
+        <div v-if="usernameVar" class="hidden lg:block">
           <div class="flex items-center">
             <div class="relative flex-shrink-0">
               <UserProfileDropdownMenu
-                :username="username"
-                :mod-name="modName"
+                :username="usernameVar"
+                :mod-name="modProfileNameVar"
               />
             </div>
           </div>

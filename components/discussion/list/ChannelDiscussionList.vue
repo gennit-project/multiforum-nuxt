@@ -10,7 +10,7 @@ import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { generateSlug } from "random-word-slugs";
 import { CREATE_MOD_PROFILE } from "@/graphQLData/user/mutations";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
-import { modProfileNameVar, usernameVar } from "@/cache";
+import { modProfileNameVar, setModProfileName, usernameVar } from "@/cache";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import {
   getSortFromQuery,
@@ -102,9 +102,6 @@ const loadMore = () => {
     },
   });
 };
-const username = computed(() => {
-  return usernameVar() || "";
-});
 
 const randomWords = generateSlug(4, { format: "camel" });
 
@@ -112,14 +109,14 @@ const { mutate: createModProfile, onDone: onDoneCreateModProfile } =
   useMutation(CREATE_MOD_PROFILE, {
     variables: {
       displayName: randomWords,
-      username: username.value,
+      username: usernameVar.value,
     },
   });
 
 onDoneCreateModProfile(({ data }) => {
   const updatedUser = data.updateUsers.users[0];
   const newModProfileName = updatedUser.ModerationProfile.displayName;
-  modProfileNameVar(newModProfileName);
+  setModProfileName(newModProfileName);
 });
 
 const showModProfileModal = ref(false);
@@ -156,7 +153,7 @@ const filterByChannel = (channel: string) => {
 
 const handleCreateModProfileClick = async () => {
   await createModProfile();
-  modProfileNameVar();
+  modProfileName;
   showModProfileModal.value = false;
 };
 </script>

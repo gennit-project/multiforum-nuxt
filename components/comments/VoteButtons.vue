@@ -32,22 +32,15 @@ const emit = defineEmits([
   'clickFeedback',
 ]);
 
-const username = computed(() => {
-  return usernameVar() || '';
-});
-
-const loggedInUserModName = computed(() => {
-  return modProfileNameVar() || '';
-});
 
 const loggedInUserUpvoted = computed(() => {
-  if (!usernameVar()) {
+  if (!usernameVar) {
     return false;
   }
   if (!props.commentData.UpvotedByUsers) {
     return false;
   }
-  return props.commentData.UpvotedByUsers.some(user => user.username === usernameVar());
+  return props.commentData.UpvotedByUsers.some(user => user.username === usernameVar.value);
 });
 
 const upvoteCount = computed(() => {
@@ -68,14 +61,14 @@ const loggedInUserDownvoted = computed(() => {
 const { mutate: upvoteComment, error: upvoteCommentError, loading: upvoteCommentLoading } = useMutation(UPVOTE_COMMENT, () => ({
   variables: {
     id: props.commentData.id,
-    username: username.value,
+    username: usernameVar.value,
   },
 }));
 
 const { mutate: undoUpvoteComment, error: undoUpvoteError, loading: undoUpvoteLoading } = useMutation(UNDO_UPVOTE_COMMENT, () => ({
   variables: {
     id: props.commentData.id,
-    username: username.value,
+    username: usernameVar.value,
   },
 }));
 </script>
@@ -91,7 +84,7 @@ const { mutate: undoUpvoteComment, error: undoUpvoteError, loading: undoUpvoteLo
       :upvote-count="upvoteCount"
       :upvote-active="loggedInUserUpvoted"
       :downvote-active="loggedInUserDownvoted"
-      :has-mod-profile="!!loggedInUserModName"
+      :has-mod-profile="!!modProfileNameVar"
       :upvote-loading="upvoteCommentLoading || undoUpvoteLoading"
       :show-downvote="showDownvote"
       :show-upvote="showUpvote"
