@@ -8,6 +8,7 @@ import { DateTime } from "luxon";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import { useRoute } from "vue-router";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { modProfileNameVar } from "@/cache";
 
 export default defineComponent({
   components: {
@@ -41,7 +42,7 @@ export default defineComponent({
       loading: getDiscussionLoading,
     } = useQuery(GET_DISCUSSION, { 
       id: discussionId, 
-      loggedInModName: "placeholder",
+      loggedInModName: modProfileNameVar.value,
       channelUniqueName: channelId.value
     });
 

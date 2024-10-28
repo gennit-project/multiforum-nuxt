@@ -17,8 +17,6 @@ const now = DateTime.now();
 const route = useRoute();
 const router = useRouter();
 
-const username = computed(() => usernameVar || "");
-
 const channelId = computed(() => (route.params.forumId ? String(route.params.forumId) : ""));
 const createEventDefaultValues = getDefaultEventFormValues(channelId.value);
 const formValues = ref<CreateEditEventFormValues>(createEventDefaultValues);
@@ -26,7 +24,7 @@ const defaultStartTimeObj = now.startOf("hour").plus({ hours: 1 });
 const startTimePieces = ref(getTimePieces(defaultStartTimeObj));
 
 const eventCreateInput = computed<EventCreateInput>(() => {
-  const tagConnections: EventTagsConnectOrCreateFieldInput[] = formValues.value.selectedTags.map(tag => ({
+  const tagConnections: EventTagsConnectOrCreateFieldInput[] = formValues.value.selectedTags.map((tag: string) => ({
     onCreate: { node: { text: tag } },
     where: { node: { text: tag } },
   }));
@@ -47,7 +45,7 @@ const eventCreateInput = computed<EventCreateInput>(() => {
     isHostedByOP: formValues.value.isHostedByOP || false,
     coverImageURL: formValues.value.coverImageURL || null,
     Tags: { connectOrCreate: tagConnections },
-    Poster: { connect: { where: { node: { username: username.value } } } },
+    Poster: { connect: { where: { node: { username: usernameVar.value } } } },
   };
 
   if (formValues.value.latitude && formValues.value.longitude) {

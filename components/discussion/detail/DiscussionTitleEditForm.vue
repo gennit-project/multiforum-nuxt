@@ -15,7 +15,6 @@ import cache, { modProfileNameVar, usernameVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
-const username = computed(() => usernameVar || "");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -41,7 +40,7 @@ const discussion = computed<Discussion | null>(() =>
     : null
 );
 const authorIsLoggedInUser = computed(
-  () => discussion.value?.Author?.username === username.value
+  () => discussion.value?.Author?.username === usernameVar.value
 );
 
 const titleInputRef = ref(null);

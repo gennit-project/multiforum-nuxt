@@ -18,6 +18,7 @@ import type { Discussion, DiscussionChannel ,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
 } from "@/__generated__/graphql";
+import { modProfileNameVar } from "@/cache";
 
 export default defineComponent({
   name: "EditDiscussion",
@@ -52,7 +53,7 @@ export default defineComponent({
       error: getDiscussionError,
     } = useQuery(GET_DISCUSSION, {
       id: discussionId,
-      loggedInModName: "placeholder",
+      loggedInModName: modProfileNameVar.value,
       channelUniqueName: channelId.value
     });
 
