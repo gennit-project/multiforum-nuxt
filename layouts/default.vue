@@ -6,17 +6,32 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import FetchUserData from "@/components/auth/FetchUserData.vue";
 import { usernameVar } from "@/cache";
+import type { User } from "@/__generated__/graphql";
 
-const auth0user = ref();
-
+const auth0user = ref<User | null>(null);
 const usernameLoaded = ref(false);
 
 onMounted(() => {
-  if (!import.meta.client) return;
+  // Client-side only logic
   const { user } = useAuth0();
-  console.log('user', user.value) 
-  auth0user.value = user.value;
+
+  watch(
+    () => user.value,
+    (newUser) => {
+      if (newUser && Object.keys(newUser).length > 0) {
+        auth0user.value = newUser;
+      }
+    },
+    { immediate: true }
+  );
 });
+
+watch(
+  () => usernameVar.value,
+  (newUsername) => {
+    usernameLoaded.value = !!newUsername;
+  }
+);
 
 const showUserProfileDropdown = ref(false);
 const showDropdown = ref(false);
@@ -35,15 +50,6 @@ const toggleUserProfileDropdown = () => {
 
 const route = useRoute();
 const showFooter = !route.name?.includes("map");
-
-watch(
-  () => usernameVar.value,
-  (newUsername) => {
-    usernameLoaded.value = !!newUsername;
-  }
-);
-console.log('auth0 user', auth0user.value)
-console.log('usernamevar', usernameVar.value)
 </script>
 
 <template>
@@ -65,7 +71,7 @@ console.log('usernamevar', usernameVar.value)
               @close="showDropdown = false"
             />
             <div class="w-full">
-              <FetchUserData v-if="auth0user.email" />
+              <FetchUserData v-if="auth0user?.email" />
               <div v-if="auth0user?.email && usernameLoaded" >
                 <div class="flex min-h-screen flex-col">
                   <div class="flex-grow">
