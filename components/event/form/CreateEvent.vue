@@ -103,7 +103,7 @@ function submit() {
     console.error("Channel is required");
     return
   }
-  if (username.value === "") {
+  if (usernameVar.value === "") {
     console.error("Username is required");
     return
   }

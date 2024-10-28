@@ -86,7 +86,7 @@ export default defineComponent({
               return discussionChannel?.Channel?.uniqueName || ''
             },
           ),
-          author: discussion.value.Author.username,
+          author: discussion.value.Author?.username || '',
         };
       }
       // If the discussion data is loading, start with empty values. These

@@ -46,10 +46,6 @@ watch(
   }
 );
 
-const username = computed(() => {
-  return usernameVar || "";
-});
-
 // Define the tabs based on the user data and authentication status
 const tabs = computed(() => {
   const tabList: TabData[] = [
@@ -73,7 +69,7 @@ const tabs = computed(() => {
     },
   ];
 
-  if (isAuthenticated && username.value === usernameInParams.value) {
+  if (isAuthenticated && usernameVar.value === usernameInParams.value) {
     tabList.push({
       name: "Settings",
       href: `/u/${usernameInParams.value}/settings`,

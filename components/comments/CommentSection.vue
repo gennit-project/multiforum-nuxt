@@ -155,7 +155,7 @@ const updateCommentInput = computed(() => ({
 
 const getCommentRepliesVariables = {
   commentId: props.createFormValues.parentCommentId,
-  modName: loggedInUserModName.value,
+  modName: modProfileNameVar.value,
   limit: 5,
   offset: 0,
   sort: getSortFromQuery(route.query),
@@ -597,7 +597,7 @@ function handleViewFeedback(commentId: string) {
               :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
               :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
               :edit-comment-error="editCommentError"
-              :mod-profile-name="loggedInUserModName"
+              :mod-profile-name="modProfileNameVar"
               :original-poster="originalPoster"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"

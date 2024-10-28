@@ -58,9 +58,9 @@ const writeReplyStyle =
     />
     <div class="flex gap-2">
       <AvatarComponent
-        v-if="username"
+        v-if="usernameVar"
         class="h-8 w-8"
-        :text="username"
+        :text="usernameVar"
         :src="profilePicURL"
         :is-small="true"
       />

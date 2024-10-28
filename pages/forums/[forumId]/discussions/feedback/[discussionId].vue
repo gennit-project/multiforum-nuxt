@@ -74,7 +74,7 @@ const { result: getCommentResult, error: getCommentError, loading: getCommentLoa
   commentId: commentId,
   limit: PAGE_LIMIT,
   offset: offset,
-  loggedInModName: loggedInUserModName,
+  loggedInModName: modProfileNameVar.value,
 });
 
 const originalComment = computed(() => {
@@ -131,7 +131,7 @@ const { mutate: addFeedbackCommentToComment, loading: addFeedbackCommentToCommen
     const newFeedbackComment = result.data.createComments.comments[0];
     const prevQueryResult = cache.readQuery({
       query: GET_DISCUSSION_FEEDBACK,
-      variables: { id: discussionId.value, limit: PAGE_LIMIT, offset: offset.value, loggedInModName: loggedInUserModName.value },
+      variables: { id: discussionId.value, limit: PAGE_LIMIT, offset: offset.value, loggedInModName: modProfileNameVar.value },
     });
     const prevOriginalFeedbackList = discussion.value.FeedbackComments;
     const prevFeedbackComments = commentToGiveFeedbackOn.value?.FeedbackComments || [];
@@ -141,7 +141,7 @@ const { mutate: addFeedbackCommentToComment, loading: addFeedbackCommentToCommen
     };
     cache.writeQuery({
       query: GET_DISCUSSION_FEEDBACK,
-      variables: { commentId: commentId.value, limit: PAGE_LIMIT, offset: 0, loggedInModName: loggedInUserModName.value },
+      variables: { commentId: commentId.value, limit: PAGE_LIMIT, offset: 0, loggedInModName: modProfileNameVar.value },
       data: { discussions: [updatedDiscussion] },
     });
   },
@@ -196,7 +196,7 @@ watch(() => route.params, updateParams, { immediate: true });
         :feedback-comments="feedbackComments"
         :feedback-comments-aggregate="feedbackCommentsAggregate"
         :loading="getDiscussionLoading"
-        :logged-in-user-mod-name="loggedInUserModName"
+        :logged-in-user-mod-name="modProfileNameVar"
         :reached-end-of-results="reachedEndOfResults"
         :load-more="loadMore"
         :show-feedback-form-modal="showFeedbackFormModal"

@@ -150,7 +150,7 @@ const handleFormStateDuringUpload = async (file: File) => {
 };
 
 const upload = async (file: File) => {
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.error("No username found");
     return;
   }

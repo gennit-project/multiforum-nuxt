@@ -53,7 +53,7 @@ const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL
 
 // Methods
 const upload = async (file: any) => {
-  if (!username.value) {
+  if (!usernameVar.value) {
     console.error('No username found');
     return;
   }

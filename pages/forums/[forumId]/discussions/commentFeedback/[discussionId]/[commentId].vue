@@ -216,7 +216,7 @@ const {
           commentId: commentId.value,
           limit: PAGE_LIMIT,
           offset: 0,
-          loggedInModName: loggedInUserModName.value,
+          loggedInModName: modProfileNameVar.value,
         },
       });
 
@@ -250,7 +250,7 @@ const {
           commentId: commentId.value,
           limit: PAGE_LIMIT,
           offset: 0,
-          loggedInModName: loggedInUserModName.value,
+          loggedInModName: modProfileNameVar.value,
         },
         data: {
           comments: [updatedComment],
@@ -340,7 +340,7 @@ onAddFeedbackCommentToCommentDone(() => {
           :feedback-comments="feedbackComments"
           :feedback-comments-aggregate="feedbackCommentsAggregate"
           :loading="getCommentLoading"
-          :logged-in-user-mod-name="loggedInUserModName"
+          :logged-in-user-mod-name="modProfileNameVar"
           :reached-end-of-results="reachedEndOfResults"
           :load-more="loadMore"
           :show-feedback-form-modal="showFeedbackFormModal"

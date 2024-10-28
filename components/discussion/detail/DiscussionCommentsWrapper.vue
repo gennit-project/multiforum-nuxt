@@ -137,7 +137,7 @@ export default defineComponent({
             connect: {
               where: {
                 node: {
-                  username: username.value,
+                  username: usernameVar.value,
                 },
               },
             },
@@ -148,7 +148,7 @@ export default defineComponent({
             {
               where: {
                 node: {
-                  username: username.value,
+                  username: usernameVar.value,
                 },
               },
             },

@@ -132,8 +132,6 @@ const deleteModalIsOpen = ref(false);
 const showOpenIssueModal = ref(false);
 const showSuccessfullyReported = ref(false);
 
-const username = usernameVar;
-const loggedInUserModName = modProfileName
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
 
@@ -155,7 +153,7 @@ const menuItems = computed(() => {
       ]);
     }
 
-    if (props.discussion?.Author?.username === username) {
+    if (props.discussion?.Author?.username === usernameVar.value) {
       out.push({
         label: "Edit",
         event: "handleEdit",
@@ -168,7 +166,7 @@ const menuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
         value: props.discussion.id,
       });
-    } else if (username && loggedInUserModName) {
+    } else if (usernameVar.value && modProfileNameVar.value) {
       out.push({
         label: "Report",
         event: "handleClickReport",

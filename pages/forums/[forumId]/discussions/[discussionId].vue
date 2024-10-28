@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import DiscussionDetailContent from "@/components/discussion/detail/DiscussionDetailContent.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
@@ -34,7 +34,7 @@ watchEffect(() => {
         v-else
         :key="discussionId"
         :discussion-id="discussionId"
-        :logged-in-user-mod-name="modProfileNameVar"
+        :logged-in-user-mod-name="modProfileNameVar || ''"
       />
     </div>
   </div>

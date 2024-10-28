@@ -272,7 +272,7 @@ const submit = async () => {
   if (existingIssueId) {
     addIssueActivityFeedItem({
       issueId: existingIssueId,
-      displayName: loggedInUserModName.value,
+      displayName: modProfileNameVar.value,
       actionDescription: 'reported the discussion',
       actionType: 'report',
       commentText: reportText.value,
