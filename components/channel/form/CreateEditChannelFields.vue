@@ -7,7 +7,7 @@ import FormRow from "@/components/FormRow.vue";
 import TextEditor from "@/components/TextEditor.vue";
 import AddImage from "@/components/AddImage.vue";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
@@ -54,7 +54,7 @@ const props = defineProps({
 const emit = defineEmits(["submit", "updateFormValues"]);
 
 const username = computed(() => {
-  return usernameVar() || "";
+  return 'cluse' //usernameVar() || "";
 });
 
 // Mutation to create a signed storage URL
@@ -161,7 +161,6 @@ const deleteRule = (index: number) => {
       @submit="emit('submit')"
     >
       <div>
-        <!-- Error Banners -->
         <div v-if="getChannelError">
           <ErrorBanner
             v-for="(error, i) in getChannelError?.graphQLErrors"
@@ -177,7 +176,6 @@ const deleteRule = (index: number) => {
           />
         </div>
 
-        <!-- Form Fields -->
         <div class="mt-5 space-y-4 sm:space-y-5">
           <FormRow section-title="Unique Name" :required="!editMode">
             <template #content>

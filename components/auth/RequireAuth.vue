@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, unref } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { usernameVar } from "@/cache";
@@ -49,10 +49,7 @@ const handleLogin = async () => {
   }
 };
 
-const username = computed(() => {
-  return usernameVar() || ""
-});
-const isOwner = computed(() => props.owners.includes(username.value));
+const isOwner = computed(() => props.owners.includes(usernameVar()));
 </script>
 
 <template>
@@ -63,7 +60,7 @@ const isOwner = computed(() => props.owners.includes(username.value));
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
     <div
-      v-if="username && (!requireOwnership || isOwner)"
+      v-if="isAuthenticated && (!requireOwnership || isOwner)"
       :class="[
         fullWidth ? 'w-full flex justify-center' : 'w-full flex justify-end',
       ]"
