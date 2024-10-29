@@ -265,7 +265,7 @@ export default defineComponent({
         data: {
           ...readDiscussionChannelQueryResult,
           getCommentSection: {
-            ...readDiscussionChannelQueryResult.getCommentSection,
+            ...readDiscussionChannelQueryResult?.getCommentSection,
             DiscussionChannel: {
               ...existingDiscussionChannelData,
               CommentsAggregate: {

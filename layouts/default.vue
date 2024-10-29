@@ -18,11 +18,10 @@ const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
 const showFooter = !useRoute().name?.includes("map");
 
 const userEmail = ref("");
-
 // Lazy query to fetch user email data from GraphQL
-const { load: loadUserData, onResult, onError } = useLazyQuery(GET_EMAIL, () => ({
-  emailAddress: userEmail.value || "",
-}));
+const { load: loadUserData, onResult, onError } = useLazyQuery(GET_EMAIL, {
+  emailAddress: userEmail,
+});
 
 onError((error) => {
   console.error("GraphQL query error:", error);
@@ -32,13 +31,13 @@ onMounted(() => {
   const { user, isAuthenticated } = useAuth0();
   isAuthenticatedVar.value = isAuthenticated;
   isLoadingAuthVar.value = false;
-  userEmail.value = user?.value?.email || "";
 
   watch(
-    userEmail,
-    (email) => {
-      if (email) {
-        loadUserData().then(() => console.log("loadUserData executed"));
+    user,
+    (user) => {
+      if (user?.email) {
+        userEmail.value = user.email;
+        loadUserData();
       }
     },
     { immediate: true }
@@ -50,7 +49,7 @@ onMounted(() => {
 onResult((newResult) => {
   const userData = newResult?.data?.emails?.[0]?.User;
 
-  if (userData) {
+  if (userData && !userData.loading) {
     setUsername(userData.username);
   }
 });
