@@ -20,6 +20,9 @@ const {
 } = useAuth0();
 
 const usernameLoaded = computed(() => !!usernameVar.value);
+const isComponentLoading = computed(() => {
+  return props.loading || auth0isLoading.value;
+});
 
 const storeToken = async () => {
   if (isAuthenticated.value && idTokenClaims.value) {
@@ -35,11 +38,11 @@ const handleLogin = async () => {
   }
 };
 
-const isOwner = computed(() => props.owners.includes(usernameVar.value));
+const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 </script>
 
 <template>
-  <LoadingSpinner v-if="loading || auth0isLoading" />
+  <LoadingSpinner v-if="isComponentLoading" />
   <div
     v-else
     class="flex align-middle"

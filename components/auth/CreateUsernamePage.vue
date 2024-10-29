@@ -1,38 +1,35 @@
-<script lang="ts" setup>
+<script setup lang="ts">
+import { ref,  } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
-import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
-import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
+import { useQuery } from "@vue/apollo-composable";
+import { GET_EMAIL } from "@/graphQLData/email/queries";
+import { setUsername, usernameVar, setModProfileName } from "@/cache";
 
-const { user } = useAuth0();
+const { user, isAuthenticated } = useAuth0();
+const emailNotInSystem = ref(true);
 
-const emit = defineEmits(['emailAndUserCreated']);
+const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
+  emailAddress: user.value?.email,
+});
 
+onEmailResult((result: any) => {
+  if (!import.meta.client) return;
+
+  const emailData = result.data?.emails[0];
+  if (emailData?.User) {
+    const user = emailData.User;
+    setUsername(user.username);
+    setModProfileName(user.ModerationProfile?.displayName || "");
+    emailNotInSystem.value = false;
+  } else {
+    emailNotInSystem.value = true;
+  }
+});
 </script>
 
 <template>
-  <div class="flex justify-center mx-auto m-8">
-    <div class="block w-96">
-      <div class="flex items-start">
-        <div class="flex-shrink-0">
-          <CheckCircleIcon class="h-6 w-6 text-green-400" aria-hidden="true" />
-        </div>
-        <div class="ml-3 w-0 flex-1 pt-0.5">
-          <p class="text-sm font-medium text-gray-900 dark:text-gray-100">
-            Success
-          </p>
-          <p class="mt-1 text-sm text-gray-500 dark:text-gray-200">
-            Authenticated as <span>{{ user?.email }}</span>
-          </p>
-        </div>
-      </div>
-
-      <CreateUsernameForm
-        v-if="user && user.email"
-        :email="user.email"
-        @email-and-user-created="emit('emailAndUserCreated')"
-      />
-    </div>
-  </div>
+  <CreateUsernamePage
+    v-if="isAuthenticated && !usernameVar && emailNotInSystem"
+    @email-and-user-created="emailNotInSystem = false"
+  />
 </template>
-
-<style scoped></style>

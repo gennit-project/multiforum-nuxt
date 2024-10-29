@@ -65,7 +65,7 @@ const writeReplyStyle =
         :is-small="true"
       />
 
-      <RequireAuth v-if="!commentEditorOpen" class="flex-1">
+      <RequireAuth v-if="!commentEditorOpen" :justify-left="true" :full-width="true" class="flex-1">
         <template #has-auth>
           <textarea
             id="addComment"
