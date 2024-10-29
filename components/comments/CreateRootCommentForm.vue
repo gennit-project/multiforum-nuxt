@@ -38,7 +38,6 @@ const emit = defineEmits([
 
 const writeReplyStyle =
   "block h-10 w-full rounded-lg border-gray-300 dark:bg-gray-700 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-800 dark:placeholder-gray-400 dark:focus:ring-gray-9";
-
 </script>
 
 <template>
@@ -52,13 +51,13 @@ const writeReplyStyle =
         v-if="!commentEditorOpen"
         :justify-left="true"
         :full-width="true"
-        class="flex-1"
       >
         <template #has-auth>
-          <div class="flex gap-2">
+          <div class="flex w-full gap-2">
             <LoggedInUserAvatar v-if="usernameVar" />
             <textarea
               id="addComment"
+              class="flex-1"
               data-testid="addComment"
               name="addcomment"
               rows="1"
