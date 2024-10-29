@@ -17,62 +17,43 @@ const toggleUserProfileDropdown = () =>
 const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
 const showFooter = !useRoute().name?.includes("map");
 
-// Auth and user data states
-const isAuthenticated = ref(false);
-const isLoadingAuth = ref(true);
 const userEmail = ref("");
 
 // Lazy query to fetch user email data from GraphQL
-const { load: loadUserData, result, error } = useLazyQuery(GET_EMAIL, () => ({
+const {
+  load: loadUserData,
+  onResult,
+} = useLazyQuery(GET_EMAIL, () => ({
   emailAddress: userEmail.value || "",
 }));
 
-// Watch for query results and set the username in the cache when the query completes
-watch(
-  result,
-  (queryResult) => {
-    const userData = queryResult?.data?.emails?.[0]?.User;
-    if (userData) {
-      setUsername(userData.username);  // Cache the username once the query completes
-      console.log("Username set in cache:", userData.username);
-    }
-  }
-);
+/*
 
-// Initialize Auth0 inside onMounted to ensure client-side execution only
+here are the requirements for the default layout.
+
+1. auth0 code MUST be inside an onMounted hook because it cannot run on the server side.
+2. because the email fetch must be in setup, it is not in the onMounted hook. we can call it lazily after the email is retrieved from auth0.
+3. after the graphql query is done we must set the username on the cache with setUsername.
+*/
+
 onMounted(() => {
-  console.log("Initializing Auth0 on client-side");
-  const { isAuthenticated: auth0Authenticated, isLoading: auth0Loading, user } = useAuth0();
-
-  watch(
-    [auth0Loading, auth0Authenticated, user],
-    ([loading, authenticated, userInfo]) => {
-      isAuthenticated.value = authenticated;
-      isLoadingAuth.value = loading;
-      userEmail.value = userInfo?.email || ""; // Set user email once available from Auth0
-
-      // Update cache variables
-      isAuthenticatedVar.value = authenticated;
-      isLoadingAuthVar.value = loading;
-
-      // Call the GraphQL query lazily once the email is retrieved
-      if (userEmail.value) {
-        console.log("User email retrieved from Auth0:", userEmail.value);
-        loadUserData();
-      }
-    }
-  );
+  const { user, isAuthenticated } = useAuth0();
+  isAuthenticatedVar.value = isAuthenticated;
+  isLoadingAuthVar.value = false;
+  userEmail.value = user?.email || "";
+  
+  // Make sure that loadUserData is called AFTER email is retrieved from auth0
+  watch(userEmail, () => {
+    loadUserData();
+  });
 });
 
-// Watch for any GraphQL query errors
-watch(
-  error,
-  (errorValue) => {
-    if (errorValue) {
-      console.error("Error fetching user data:", errorValue);
-    }
+onResult((newResult) => {
+  if (newResult?.data?.emails[0]?.User) {
+    const user = newResult.data.emails[0].User;
+    setUsername(user.username);
   }
-);
+});
 </script>
 
 <template>
