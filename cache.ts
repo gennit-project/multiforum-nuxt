@@ -10,6 +10,15 @@ export const modProfileNameVar = ref();
 export const setModProfileName = (modProfileName: string) => {
   modProfileNameVar.value = modProfileName;
 };
+export const isAuthenticatedVar = ref(false);
+export const setIsAuthenticated = (status: boolean) => {
+  isAuthenticatedVar.value = status;
+};
+
+export const isLoadingAuthVar = ref(true);
+export const setIsLoadingAuth = (status: boolean) => {
+  isLoadingAuthVar.value = status;
+};
 export const themeVar: ReactiveVar<string> = makeVar<string>(
   import.meta.client ? localStorage.getItem("theme") || "dark" : "dark"
 );

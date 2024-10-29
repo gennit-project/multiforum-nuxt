@@ -2,30 +2,19 @@
 import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { usernameVar } from "@/cache";
+import { isAuthenticatedVar, isLoadingAuthVar, usernameVar } from '@/cache';
 
 const props = defineProps({
   requireOwnership: Boolean,
   owners: Array as () => string[],
   justifyLeft: Boolean,
   fullWidth: Boolean,
-  loading: Boolean,
 });
 
-const { 
-  loginWithPopup, 
-  isAuthenticated, 
-  idTokenClaims,
-  isLoading: auth0isLoading,
-} = useAuth0();
-
-const usernameLoaded = computed(() => !!usernameVar.value);
-const isComponentLoading = computed(() => {
-  return props.loading || auth0isLoading.value;
-});
+const { loginWithPopup, idTokenClaims } = useAuth0();
 
 const storeToken = async () => {
-  if (isAuthenticated.value && idTokenClaims.value) {
+  if (isAuthenticatedVar.value && idTokenClaims.value) {
     const token = await idTokenClaims.value.__raw;
     localStorage.setItem("token", token);
   }
@@ -39,17 +28,18 @@ const handleLogin = async () => {
 };
 
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
+const showAuthContent = computed(() => isAuthenticatedVar.value && !!usernameVar.value);
 </script>
 
 <template>
-  <LoadingSpinner v-if="isComponentLoading" />
+  <LoadingSpinner v-if="isLoadingAuthVar" />
   <div
     v-else
     class="flex align-middle"
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
     <div
-      v-if="isAuthenticated && usernameLoaded && (!requireOwnership || isOwner)"
+      v-if="showAuthContent && (!requireOwnership || isOwner)"
       :class="[
         fullWidth ? 'w-full flex justify-center' : 'w-full flex justify-end',
       ]"

@@ -1,37 +1,19 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
+import { ref, onMounted } from "vue";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
-import FetchUserData from "@/components/auth/FetchUserData.vue";
-import { usernameVar } from "@/cache";
-import type { User } from "@/__generated__/graphql";
+import { useAuthStatus } from '@/composables/useAuthStatus';
+import { setIsAuthenticated, setIsLoadingAuth, usernameVar, isAuthenticatedVar, isLoadingAuthVar } from '@/cache';
+const { loadUserData } = useAuthStatus();
 
-const auth0user = ref<User | null>(null);
-const usernameLoaded = ref(false);
-
-onMounted(() => {
-  // Client-side only logic
-  const { user } = useAuth0();
-
-  watch(
-    () => user.value,
-    (newUser) => {
-      if (newUser && Object.keys(newUser).length > 0) {
-        auth0user.value = newUser;
-      }
-    },
-    { immediate: true }
-  );
+// Initialize loading and authentication status when component mounts
+onMounted(async () => {
+  setIsLoadingAuth(true);
+  await loadUserData();
+  setIsAuthenticated(isAuthenticatedVar.value); // Sets based on actual auth status
+  setIsLoadingAuth(false);
 });
-
-watch(
-  () => usernameVar.value,
-  (newUsername) => {
-    usernameLoaded.value = !!newUsername;
-  }
-);
 
 const showUserProfileDropdown = ref(false);
 const showDropdown = ref(false);
@@ -71,14 +53,11 @@ const showFooter = !route.name?.includes("map");
               @close="showDropdown = false"
             />
             <div class="w-full">
-              <FetchUserData v-if="auth0user?.email" />
-              <div v-if="auth0user?.email && usernameLoaded" >
-                <div class="flex min-h-screen flex-col">
-                  <div class="flex-grow">
-                    <slot />
-                  </div>
-                  <SiteFooter v-if="showFooter" />
+              <div v-if="!isLoadingAuthVar && isAuthenticatedVar && usernameVar" class="flex min-h-screen flex-col">
+                <div class="flex-grow">
+                  <slot />
                 </div>
+                <SiteFooter v-if="showFooter" />
               </div>
               <div v-else class="flex min-h-screen flex-col">
                 <div class="flex-grow">
