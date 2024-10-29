@@ -43,7 +43,7 @@ const md = new MarkdownIt({
   highlight: (str, lang) => {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return `<pre class="hljs p-4"><code>${hljs.highlight(lang, str, true).value}</code></pre>`;
+        return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(lang, str, true).value}</code></pre>`;
       } catch {
         console.warn("Failed to highlight code block");
       }
