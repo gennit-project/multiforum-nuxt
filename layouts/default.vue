@@ -6,7 +6,7 @@ import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { setUsername, usernameVar, isAuthenticatedVar, isLoadingAuthVar } from "@/cache";
+import { setUsername, setModProfileName, usernameVar, isAuthenticatedVar, isLoadingAuthVar } from "@/cache";
 
 // UI states
 const showUserProfileDropdown = ref(false);
@@ -48,9 +48,11 @@ onMounted(() => {
 // Set `username` in the cache upon GraphQL query result
 onResult((newResult) => {
   const userData = newResult?.data?.emails?.[0]?.User;
+  const modProfileData = userData?.ModerationProfile;
 
   if (userData && !userData.loading) {
     setUsername(userData.username);
+    setModProfileName(modProfileData?.displayName || "");
   }
 });
 </script>
