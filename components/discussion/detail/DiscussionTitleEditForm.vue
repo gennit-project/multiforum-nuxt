@@ -30,7 +30,7 @@ const {
   onResult: onGetDiscussionResult,
 } = useQuery(GET_DISCUSSION, {
   id: discussionId,
-  loggedInModName: modProfileNameVar.value,
+  loggedInModName: modProfileNameVar.value || "",
   channelUniqueName: channelId.value,
 });
 

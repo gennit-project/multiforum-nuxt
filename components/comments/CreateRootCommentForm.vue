@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import TextEditor from "@/components/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import ErrorBanner from "../ErrorBanner.vue";
-import { GET_USER } from "@/graphQLData/user/queries";
 import type { ApolloError } from "@apollo/client/errors";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
+import LoggedInUserAvatar from "./LoggedInUserAvatar.vue";
 
 defineProps({
   createCommentError: {
@@ -38,16 +36,9 @@ const emit = defineEmits([
   "handleCreateComment",
 ]);
 
-const { result: getUserResult } = useQuery(GET_USER, {
-  username: usernameVar.value,
-});
-
-const profilePicURL = computed(() => {
-  return getUserResult.value?.users[0]?.profilePicURL || "";
-});
-
 const writeReplyStyle =
   "block h-10 w-full rounded-lg border-gray-300 dark:bg-gray-700 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-800 dark:placeholder-gray-400 dark:focus:ring-gray-9";
+
 </script>
 
 <template>
@@ -57,25 +48,25 @@ const writeReplyStyle =
       :text="createCommentError?.message"
     />
     <div class="flex gap-2">
-      <AvatarComponent
-        v-if="usernameVar"
-        class="h-8 w-8"
-        :text="usernameVar"
-        :src="profilePicURL"
-        :is-small="true"
-      />
-
-      <RequireAuth v-if="!commentEditorOpen" :justify-left="true" :full-width="true" class="flex-1">
+      <RequireAuth
+        v-if="!commentEditorOpen"
+        :justify-left="true"
+        :full-width="true"
+        class="flex-1"
+      >
         <template #has-auth>
-          <textarea
-            id="addComment"
-            data-testid="addComment"
-            name="addcomment"
-            rows="1"
-            placeholder="Write a comment"
-            :class="writeReplyStyle"
-            @click="emit('openCommentEditor')"
-          />
+          <div class="flex gap-2">
+            <LoggedInUserAvatar v-if="usernameVar" />
+            <textarea
+              id="addComment"
+              data-testid="addComment"
+              name="addcomment"
+              rows="1"
+              placeholder="Write a comment"
+              :class="writeReplyStyle"
+              @click="emit('openCommentEditor')"
+            />
+          </div>
         </template>
         <template #does-not-have-auth>
           <textarea

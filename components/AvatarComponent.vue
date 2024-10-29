@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import Identicon from "identicon.js";
 import sha256 from "crypto-js/sha256";
-import gql from "graphql-tag";
+import { themeVar } from "@/cache";
 
 const props = defineProps({
   text: {
@@ -36,23 +36,6 @@ const props = defineProps({
   },
 });
 
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-
-// Use Nuxt 3’s useLazyAsyncQuery to fetch the theme
-const { data: themeResult, error: themeError } = useAsyncQuery(GET_THEME);
-
-// Computed property to return the theme or a default value if there's an error or it's still loading
-const theme = computed(() => {
-  if (themeError.value || !themeResult.value) {
-    return "dark";
-  }
-  return themeResult.value;
-});
-
 // Generate Identicon based on text and theme
 const identiconData = computed(() => {
   // Hash the text
@@ -61,7 +44,7 @@ const identiconData = computed(() => {
   // Generate the identicon and get the data for the img src
   const data = new Identicon(hash, {
     // If theme is dark, use a dark background
-    background: theme.value === "dark" ? [0, 0, 0, 255] : [255, 255, 255, 255],
+    background: themeVar() === "dark" ? [0, 0, 0, 255] : [255, 255, 255, 255],
     margin: 0.2,
     size: 420,
     format: "svg",
