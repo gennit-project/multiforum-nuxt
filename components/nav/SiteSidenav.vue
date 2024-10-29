@@ -189,7 +189,7 @@ const outside = () => {
           v-if="isAuthenticated && usernameVar"
           :to="{
             name: 'u-username',
-            params: { usernameVar },
+            params: { username: usernameVar },
           }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
           @click="outside"
