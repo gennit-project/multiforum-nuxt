@@ -5,10 +5,12 @@ import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import { useAuthStatus } from '@/composables/useAuthStatus';
 import { setIsAuthenticated, setIsLoadingAuth, usernameVar, isAuthenticatedVar, isLoadingAuthVar } from '@/cache';
+
 const { loadUserData } = useAuthStatus();
 
 // Initialize loading and authentication status when component mounts
 onMounted(async () => {
+  console.log('Default layout mounted');
   setIsLoadingAuth(true);
   await loadUserData();
   setIsAuthenticated(isAuthenticatedVar.value); // Sets based on actual auth status
