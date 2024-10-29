@@ -1,16 +1,40 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
+import { useMutation } from "@vue/apollo-composable";
 import VoteButton from "@/components/VoteButton.vue";
 import {
   ADD_EMOJI_TO_COMMENT,
   REMOVE_EMOJI_FROM_COMMENT,
 } from "@/graphQLData/comment/mutations";
-import { useMutation } from "@vue/apollo-composable";
 import {
   ADD_EMOJI_TO_DISCUSSION_CHANNEL,
   REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
 } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
+import { ref } from "vue";
+
+// Props
+const props = defineProps({
+  commentId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  emojiJson: {
+    type: String,
+    required: false,
+    default: "",
+  },
+});
+
+const emojiObject = ref<Record<string, Record<string, string[]>>>({});
+if (props.emojiJson) {
+  emojiObject.value = JSON.parse(props.emojiJson);
+}
 
 type EmojiVoteInput = {
   commentId?: string;
@@ -19,148 +43,76 @@ type EmojiVoteInput = {
   unicode: string;
   username: string;
 };
+const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
+const { mutate: removeEmojiFromComment } = useMutation(
+  REMOVE_EMOJI_FROM_COMMENT
+);
+const { mutate: addEmojiToDiscussionChannel } = useMutation(
+  ADD_EMOJI_TO_DISCUSSION_CHANNEL
+);
+const { mutate: removeEmojiFromDiscussionChannel } = useMutation(
+  REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL
+);
 
-export default defineComponent({
-  name: "EmojiButtons",
-  components: {
-    VoteButton,
-  },
-  props: {
-    commentId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    discussionChannelId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    emojiJson: {
-      type: String,
-      required: false,
-      default: "",
-    },
-  },
-  setup(props) {
-    let emojiObject = {};
-
-    if (props.emojiJson) {
-      emojiObject = JSON.parse(props.emojiJson);
+// Helper methods
+function isActive(emojiLabel: string) {
+  let active = false;
+  const variants = emojiObject.value[emojiLabel] || {};
+  for (const unicode in variants) {
+    const usernames = variants[unicode];
+    if (usernames.includes(usernameVar.value)) {
+      active = true;
     }
+  }
+  return active;
+}
 
-    // If a comment is being updated, use these mutations.
-    const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
-    const { mutate: removeEmojiFromComment } = useMutation(
-      REMOVE_EMOJI_FROM_COMMENT,
-    );
+function toggleCommentEmoji(emojiVoteInput: EmojiVoteInput) {
+  if (isActive(emojiVoteInput.emojiLabel)) {
+    removeEmojiFromComment(emojiVoteInput);
+  } else {
+    addEmojiToComment(emojiVoteInput);
+  }
+}
 
-    // If a discussionChannel is being updated, use these mutations.
-    const { mutate: addEmojiToDiscussionChannel } = useMutation(
-      ADD_EMOJI_TO_DISCUSSION_CHANNEL,
-    );
-    const { mutate: removeEmojiFromDiscussionChannel } = useMutation(
-      REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
-    );
+function toggleDiscussionChannelEmoji(emojiVoteInput: EmojiVoteInput) {
+  if (isActive(emojiVoteInput.emojiLabel)) {
+    removeEmojiFromDiscussionChannel(emojiVoteInput);
+  } else {
+    addEmojiToDiscussionChannel(emojiVoteInput);
+  }
+}
 
-    return {
-      addEmojiToComment,
-      addEmojiToDiscussionChannel,
-      emojiObject,
-      removeEmojiFromComment,
-      removeEmojiFromDiscussionChannel,
-      usernameVar,
-    };
-  },
-  methods: {
-    isActive(emojiLabel: string) {
-      let active = false;
+function getCount(emojiLabel: string) {
+  let sumUsernames = 0;
+  for (const unicode in emojiObject.value[emojiLabel]) {
+    sumUsernames += emojiObject.value[emojiLabel][unicode].length;
+  }
+  return sumUsernames;
+}
 
-      // @ts-ignore
-      const variants = this.emojiObject[emojiLabel];
-      for (const unicode in variants) {
-        const usernames = variants[unicode];
-        if (usernames.includes(this.username)) {
-          active = true;
-        }
-      }
+function getTooltipText(emojiLabel: string) {
+  const count = getCount(emojiLabel);
+  const usernames = Object.values(emojiObject.value[emojiLabel] || {}).flat();
+  let tooltipText = usernames.slice(0, 5).join(", ");
+  if (usernames.length > 5) {
+    tooltipText += ` and ${count - 5} more`;
+  }
+  return `${tooltipText} reacted with :${emojiLabel}:`;
+}
 
-      return active;
-    },
-    toggleCommentEmoji(emojiVoteInput: EmojiVoteInput) {
-      if (this.isActive(emojiVoteInput.emojiLabel)) {
-        this.removeEmojiFromComment(emojiVoteInput);
-        return;
-      }
-      this.addEmojiToComment(emojiVoteInput);
-    },
-    toggleDiscussionChannelEmoji(emojiVoteInput: EmojiVoteInput) {
-      if (this.isActive(emojiVoteInput.emojiLabel)) {
-        this.removeEmojiFromDiscussionChannel(emojiVoteInput);
-        return;
-      }
-      this.addEmojiToDiscussionChannel(emojiVoteInput);
-    },
-    getCount(emojiLabel: string) {
-      let sumUsernames = 0;
-      for (const unicode in this.emojiObject[emojiLabel]) {
-        const usernames = this.emojiObject[emojiLabel][unicode];
-        // Key is a unicode variant. For example,
-        // for a wave emoji, there could be several
-        // variants, one for each skin tone.
-        // The value should be an array of usernames.
-        // For each variant, increment the sum by
-        // the number of usernames.
-        sumUsernames += usernames.length;
-      }
-      return sumUsernames;
-    },
-    getTooltipText(emojiLabel: any) {
-      const count = this.getCount(emojiLabel);
-      let tooltipText = "";
-      let numListedNames = 0;
-      let usernames: string[] = [];
+function getVariants(emojiLabel: string) {
+  return emojiObject.value[emojiLabel] || {};
+}
 
-      for (const unicode in this.emojiObject[emojiLabel]) {
-        usernames = usernames.concat(this.emojiObject[emojiLabel][unicode]);
-        tooltipText = usernames.slice(0, 5).join(", ");
-        numListedNames = usernames.length;
-
-        // If there's a lot of usernames, we don't want to list
-        // all of them.
-        // The count is the total number of usernames.
-        // If there are more than 5 usernames, we'll list
-        // the first 5, then say "and x more".
-        if (numListedNames >= 5 && count > 5) {
-          tooltipText += ` and ${count - 5} more`;
-        }
-      }
-      tooltipText += ` reacted with :${emojiLabel}:
-      `;
-      return tooltipText;
-    },
-    getVariants(emojiLabel: string) {
-      let variants = this.emojiObject[emojiLabel];
-
-      if (!variants) {
-        variants = {};
-      }
-      return variants;
-    },
-    getDefaultVariant(emojiLabel: string) {
-      const variants = this.getVariants(emojiLabel);
-      const defaultVariant = Object.keys(variants)[0];
-      return defaultVariant;
-    },
-  },
-});
+function getDefaultVariant(emojiLabel: string) {
+  return Object.keys(getVariants(emojiLabel))[0];
+}
 </script>
+
 <template>
   <div class="flex flex-wrap gap-1">
-    <div
-      v-for="emojiLabel in Object.keys(emojiObject)"
-      :key="emojiLabel"
-    >
+    <div v-for="emojiLabel in Object.keys(emojiObject)" :key="emojiLabel">
       <VoteButton
         class="space-x-2"
         :active="isActive(emojiLabel)"
