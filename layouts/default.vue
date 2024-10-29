@@ -20,38 +20,38 @@ const showFooter = !useRoute().name?.includes("map");
 const userEmail = ref("");
 
 // Lazy query to fetch user email data from GraphQL
-const {
-  load: loadUserData,
-  onResult,
-} = useLazyQuery(GET_EMAIL, () => ({
+const { load: loadUserData, onResult, onError } = useLazyQuery(GET_EMAIL, () => ({
   emailAddress: userEmail.value || "",
 }));
 
-/*
-
-here are the requirements for the default layout.
-
-1. auth0 code MUST be inside an onMounted hook because it cannot run on the server side.
-2. because the email fetch must be in setup, it is not in the onMounted hook. we can call it lazily after the email is retrieved from auth0.
-3. after the graphql query is done we must set the username on the cache with setUsername.
-*/
+onError((error) => {
+  console.error("GraphQL query error:", error);
+});
 
 onMounted(() => {
   const { user, isAuthenticated } = useAuth0();
   isAuthenticatedVar.value = isAuthenticated;
   isLoadingAuthVar.value = false;
-  userEmail.value = user?.email || "";
-  
-  // Make sure that loadUserData is called AFTER email is retrieved from auth0
-  watch(userEmail, () => {
-    loadUserData();
-  });
+  userEmail.value = user?.value?.email || "";
+
+  watch(
+    userEmail,
+    (email) => {
+      if (email) {
+        loadUserData().then(() => console.log("loadUserData executed"));
+      }
+    },
+    { immediate: true }
+  );
 });
 
+
+// Set `username` in the cache upon GraphQL query result
 onResult((newResult) => {
-  if (newResult?.data?.emails[0]?.User) {
-    const user = newResult.data.emails[0].User;
-    setUsername(user.username);
+  const userData = newResult?.data?.emails?.[0]?.User;
+
+  if (userData) {
+    setUsername(userData.username);
   }
 });
 </script>
