@@ -12,5 +12,5 @@
         "dest": "/"
       }
     ],
-    "buildCommand": "NITRO_PRESET=vercel nuxt build --verbose"
+    "buildCommand": "yarn build"
   }
