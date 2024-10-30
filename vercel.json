@@ -3,31 +3,14 @@
     "builds": [
       {
         "src": "nuxt.config.ts",
-        "use": "@vercel/node",
-        "config": {
-          "serverFiles": [
-            ".nuxt/dist/server/**/*",
-            ".output/**/*"
-          ]
-        }
+        "use": "@vercel/node"
       }
     ],
-    "buildCommand": "NITRO_PRESET=vercel nuxt build",
-    "outputDirectory": ".output",
     "routes": [
       {
-        "src": "/_nuxt/(.*)",
-        "headers": {
-          "Cache-Control": "public,max-age=31536000,immutable"
-        },
-        "continue": true
-      },
-      {
         "src": "/(.*)",
-        "headers": {
-          "Cache-Control": "s-maxage=1, stale-while-revalidate"
-        },
-        "dest": ".output/server/index.mjs"
+        "dest": "/"
       }
-    ]
+    ],
+    "buildCommand": "NITRO_PRESET=vercel nuxt build --verbose"
   }
