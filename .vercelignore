@@ -1,0 +1,4 @@
+cypress/
+tests/
+**/*.spec.js
+**/*.test.js

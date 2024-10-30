@@ -2,11 +2,6 @@ import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import path from "path";
-import fs from "fs";
-
-// Log the directory contents of components/nav
-console.log('Nav folder contents:', fs.readdirSync(path.resolve(__dirname, 'components/nav')));
-
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
