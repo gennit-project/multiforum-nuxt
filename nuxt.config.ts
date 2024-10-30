@@ -64,7 +64,6 @@ export default defineNuxtConfig({
       googleMapsApiKey: config.googleMapsApiKey,
       auth0Domain: config.domain,
       auth0ClientId: config.clientId,
-      auth0ClientSecret: config.clientSecret,
       auth0CallbackUrl: config.callbackUrl,
       auth0Url: config.auth0Url,
       auth0Audience: config.auth0Audience,
