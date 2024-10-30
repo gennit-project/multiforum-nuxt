@@ -1,6 +1,7 @@
 import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import { fileURLToPath } from "url";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
@@ -75,14 +76,21 @@ export default defineNuxtConfig({
   },
   vite: {
     resolve: {
-      alias: {
-        "fast-deep-equal": "fast-deep-equal/index.js",
-      },
+      alias: [
+        {
+          find: '@',
+          replacement: fileURLToPath(new URL('./', import.meta.url))
+        },
+        {
+          find: 'fast-deep-equal',
+          replacement: 'fast-deep-equal/index.js'
+        }
+      ]
     },
     vue: {
       template: {
         transformAssetUrls,
       },
     },
-  },
+},
 });
