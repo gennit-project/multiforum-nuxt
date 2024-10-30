@@ -1,20 +1,3 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "nuxt.config.ts",
-        "use": "@vercel/node",
-        "config": {
-          "build": {
-            "command": "yarn build"
-          }
-        }
-      }
-    ],
-    "routes": [
-      {
-        "src": "/(.*)",
-        "dest": "/"
-      }
-    ]
+    "framework": "nuxtjs"
   }
