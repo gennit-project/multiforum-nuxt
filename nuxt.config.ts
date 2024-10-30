@@ -44,7 +44,7 @@ export default defineNuxtConfig({
     },
   ],
   nitro: {
-    preset: "vercel",
+    preset: "node",
   },
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
