@@ -2,8 +2,27 @@ import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 
+declare module '@nuxt/schema' {
+  interface NuxtConfig {
+    apollo?: {
+      clients?: {
+        default: {
+          httpEndpoint: string
+        }
+      }
+    }
+  }
+}
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  apollo: {
+    clients: {
+      default: {
+        httpEndpoint: config.graphqlUrl,
+      },
+    },
+  },
   build: {
     transpile: ["vuetify"],
   },
@@ -41,13 +60,6 @@ export default defineNuxtConfig({
   ],
   runtimeConfig: {
     // Public config, available on both client and server
-    apollo: {
-      clients: {
-        default: {
-          httpEndpoint: config.graphqlUrl,
-        },
-      },
-    },
     public: {
       googleMapsApiKey: config.googleMapsApiKey,
       auth0Domain: config.domain,
