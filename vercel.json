@@ -1,5 +1,6 @@
 {
     "version": 2,
+    "buildCommand": "nuxt build",
     "builds": [
       {
         "src": "./.output/server/index.mjs",
