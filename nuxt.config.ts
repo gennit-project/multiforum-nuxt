@@ -68,6 +68,11 @@ export default defineNuxtConfig({
     },
   },
   ssr: true,
+  typescript: {
+    strict: true,
+    shim: false,
+    typeCheck: true
+  },
   vite: {
     resolve: {
       alias: {

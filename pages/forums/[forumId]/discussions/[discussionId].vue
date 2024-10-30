@@ -5,7 +5,6 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
 import { modProfileNameVar } from "@/cache";
 
-// Route setup
 const route = useRoute();
 
 const updateDiscussionId = () => {
@@ -14,8 +13,6 @@ const updateDiscussionId = () => {
   }
   return "";
 };
-
-// Reactive state
 const discussionId = ref(updateDiscussionId());
 
 watchEffect(() => {
