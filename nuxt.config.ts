@@ -1,12 +1,12 @@
 import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
-import { fileURLToPath } from "url";
+import path from "path";
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   alias: {
-    "@": fileURLToPath(new URL('./', import.meta.url)),
+    "@": path.resolve(__dirname),
   },
   build: {
     transpile: ["vuetify"],
@@ -23,13 +23,16 @@ export default defineNuxtConfig({
     autoImport: true,
   },
   modules: [
-    ["@nuxtjs/apollo", {
-      clients: {
-        default: {
-          httpEndpoint: config.graphqlUrl || ''
-        }
-      }
-    }],
+    [
+      "@nuxtjs/apollo",
+      {
+        clients: {
+          default: {
+            httpEndpoint: config.graphqlUrl || "",
+          },
+        },
+      },
+    ],
     "@nuxtjs/eslint-module",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
@@ -41,7 +44,7 @@ export default defineNuxtConfig({
     },
   ],
   nitro: {
-    preset: 'vercel'
+    preset: "vercel",
   },
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
@@ -55,9 +58,9 @@ export default defineNuxtConfig({
       apollo: {
         clients: {
           default: {
-            httpEndpoint: config.graphqlUrl || ''
-          }
-        }
+            httpEndpoint: config.graphqlUrl || "",
+          },
+        },
       },
       googleMapsApiKey: config.googleMapsApiKey,
       auth0Domain: config.domain,
@@ -72,25 +75,19 @@ export default defineNuxtConfig({
   typescript: {
     strict: true,
     shim: false,
-    typeCheck: true
+    typeCheck: true,
   },
   vite: {
     resolve: {
-      alias: [
-        {
-          find: '@',
-          replacement: fileURLToPath(new URL('./', import.meta.url))
-        },
-        {
-          find: 'fast-deep-equal',
-          replacement: 'fast-deep-equal/index.js'
-        }
-      ]
+      alias: {
+        "@": path.resolve(__dirname),
+        "@/components": path.resolve(__dirname, "components"),
+      },
     },
     vue: {
       template: {
         transformAssetUrls,
       },
     },
-},
+  },
 });
