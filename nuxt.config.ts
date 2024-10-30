@@ -1,7 +1,6 @@
 import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
-
 declare module '@nuxt/schema' {
   interface NuxtConfig {
     apollo?: {
@@ -19,9 +18,9 @@ export default defineNuxtConfig({
   apollo: {
     clients: {
       default: {
-        httpEndpoint: config.graphqlUrl,
-      },
-    },
+        httpEndpoint: config.graphqlUrl || ''
+      }
+    }
   },
   build: {
     transpile: ["vuetify"],
