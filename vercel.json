@@ -3,7 +3,12 @@
     "builds": [
       {
         "src": "nuxt.config.ts",
-        "use": "@vercel/node"
+        "use": "@vercel/node",
+        "config": {
+          "build": {
+            "command": "yarn build"
+          }
+        }
       }
     ],
     "routes": [
@@ -11,6 +16,5 @@
         "src": "/(.*)",
         "dest": "/"
       }
-    ],
-    "buildCommand": "yarn build"
+    ]
   }
