@@ -1,27 +1,10 @@
 import { defineNuxtConfig } from "nuxt/config";
 import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
-declare module '@nuxt/schema' {
-  interface NuxtConfig {
-    apollo?: {
-      clients?: {
-        default: {
-          httpEndpoint: string
-        }
-      }
-    }
-  }
-}
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  apollo: {
-    clients: {
-      default: {
-        httpEndpoint: config.graphqlUrl || ''
-      }
-    }
-  },
+  
   build: {
     transpile: ["vuetify"],
   },
@@ -37,7 +20,13 @@ export default defineNuxtConfig({
     autoImport: true,
   },
   modules: [
-    "@nuxtjs/apollo",
+    ["@nuxtjs/apollo", {
+      clients: {
+        default: {
+          httpEndpoint: config.graphqlUrl || ''
+        }
+      }
+    }],
     "@nuxtjs/eslint-module",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
@@ -60,6 +49,13 @@ export default defineNuxtConfig({
   runtimeConfig: {
     // Public config, available on both client and server
     public: {
+      apollo: {
+        clients: {
+          default: {
+            httpEndpoint: config.graphqlUrl || ''
+          }
+        }
+      },
       googleMapsApiKey: config.googleMapsApiKey,
       auth0Domain: config.domain,
       auth0ClientId: config.clientId,
