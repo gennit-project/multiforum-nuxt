@@ -3,12 +3,7 @@
     "builds": [
       {
         "src": "nuxt.config.ts",
-        "use": "@vercel/node",
-        "config": {
-          "commands": {
-            "build": "nuxt build"
-          }
-        }
+        "use": "@vercel/node"
       }
     ],
     "routes": [
@@ -16,5 +11,6 @@
         "src": "/(.*)",
         "dest": "/"
       }
-    ]
+    ],
+    "buildCommand": "NITRO_PRESET=vercel nuxt build"
   }
