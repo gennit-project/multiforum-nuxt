@@ -23,7 +23,10 @@ import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TagPicker from "@/components/TagPicker.vue";
 import { usernameVar } from "@/cache";
-import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
+import {
+  EVENT_TITLE_CHAR_LIMIT,
+  MAX_CHARS_IN_EVENT_DESCRIPTION,
+} from "@/utils/characterLimits";
 
 export type UpdateLocationInput = {
   name: string;
@@ -124,7 +127,8 @@ const needsChanges = computed(() => {
     props.formValues.selectedChannels.length > 0 &&
     props.formValues.title.length > 0 &&
     startTime.value < endTime.value &&
-    props.formValues.title.length <= EVENT_TITLE_CHAR_LIMIT
+    props.formValues.title.length <= EVENT_TITLE_CHAR_LIMIT &&
+    props.formValues.description.length <= MAX_CHARS_IN_EVENT_DESCRIPTION
   );
 });
 
@@ -137,6 +141,9 @@ const changesRequiredMessage = computed(() => {
   }
   if (props.formValues.title.length > EVENT_TITLE_CHAR_LIMIT) {
     return `Title cannot exceed ${EVENT_TITLE_CHAR_LIMIT} characters.`;
+  }
+  if (props.formValues.description.length > MAX_CHARS_IN_EVENT_DESCRIPTION) {
+    return `Description cannot exceed ${MAX_CHARS_IN_EVENT_DESCRIPTION} characters.`;
   }
   return "";
 });
@@ -469,6 +476,10 @@ const touched = ref(false);
               :rows="10"
               @update="emit('updateFormValues', { description: $event })"
             />
+            <CharCounter
+              :current="formValues.description?.length || 0"
+              :max="MAX_CHARS_IN_EVENT_DESCRIPTION"
+            />
           </template>
         </FormRow>
         <FormRow section-title="Cover Image">
@@ -526,7 +537,9 @@ const touched = ref(false);
               :checked="formValues.isHostedByOP"
               @input="toggleHostedByOPField"
             />
-            <span class="ml-2 align-middle dark:text-white">I am hosting this event</span>
+            <span class="ml-2 align-middle dark:text-white"
+              >I am hosting this event</span
+            >
           </template>
         </FormRow>
       </div>
