@@ -6,7 +6,7 @@ export const usernameVar = ref();
 export const setUsername = (username: string) => {
   usernameVar.value = username;
 };
-export const modProfileNameVar = ref();
+export const modProfileNameVar = ref("default");
 export const setModProfileName = (modProfileName: string) => {
   modProfileNameVar.value = modProfileName;
 };
@@ -61,7 +61,10 @@ const cache = new InMemoryCache({
           merge: false,
         },
         Author: {
-          merge: true,
+          merge: true
+        },
+        Channel: {
+          merge: true
         },
       },
     },
@@ -129,8 +132,11 @@ const cache = new InMemoryCache({
             return incoming;
           },
         },
+        Channel: {
+          merge: true,
+        },
         Comments: {
-          merge: false,
+          merge: true,
         },
       },
     },

@@ -10,7 +10,8 @@ import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
 
-// Props
+const MAX_CHARS_IN_DISCUSSION_BODY = 18000;
+
 const props = defineProps<{
   editMode: boolean;
   createDiscussionError?: ApolloError | null;
@@ -34,7 +35,7 @@ const titleInputRef = ref<HTMLElement | null>(null);
 // Computed properties
 const needsChanges = computed(() => {
   return !(
-    props.formValues?.selectedChannels.length > 0 && props.formValues?.title
+    props.formValues?.selectedChannels.length > 0 && props.formValues?.title && props.formValues?.body.length <= MAX_CHARS_IN_DISCUSSION_BODY
   );
 });
 
@@ -43,6 +44,8 @@ const changesRequiredMessage = computed(() => {
     return "A title is required.";
   } else if (props.formValues?.selectedChannels.length === 0) {
     return "Must select at least one channel.";
+  } else if (props.formValues?.body.length > MAX_CHARS_IN_DISCUSSION_BODY) {
+    return "Body cannot exceed 18000 characters.";
   }
   return "";
 });
@@ -54,6 +57,10 @@ onMounted(() => {
       titleInputRef.value?.focus();
     });
   }
+});
+
+const charactersRemaining = computed(() => {
+  return MAX_CHARS_IN_DISCUSSION_BODY - (props.formValues?.body?.length || 0);
 });
 </script>
 
@@ -127,6 +134,18 @@ onMounted(() => {
                   :rows="10"
                   @update="$emit('updateFormValues', { body: $event })"
                 />
+                <div
+                  v-if="formValues.body.length < MAX_CHARS_IN_DISCUSSION_BODY && charactersRemaining < 5000"
+                  class="text-right text-gray-500 dark:text-gray-300 text-sm font-medium mt-2 mb-4"
+                >
+                  {{ `${charactersRemaining}/${MAX_CHARS_IN_DISCUSSION_BODY}` }} characters remaining
+                </div>
+                <div
+                  v-else-if="charactersRemaining < 0"
+                  class="text-right text-red-500 text-sm font-medium mt-2 mb-4"
+                >
+                  {{ `${charactersRemaining}/${MAX_CHARS_IN_DISCUSSION_BODY}` }} characters remaining
+                </div>
               </template>
             </FormRow>
 
