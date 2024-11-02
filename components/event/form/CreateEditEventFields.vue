@@ -23,6 +23,7 @@ import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TagPicker from "@/components/TagPicker.vue";
 import { usernameVar } from "@/cache";
+import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
 
 export type UpdateLocationInput = {
   name: string;
@@ -122,7 +123,8 @@ const needsChanges = computed(() => {
   return !(
     props.formValues.selectedChannels.length > 0 &&
     props.formValues.title.length > 0 &&
-    startTime.value < endTime.value
+    startTime.value < endTime.value &&
+    props.formValues.title.length <= EVENT_TITLE_CHAR_LIMIT
   );
 });
 
@@ -132,6 +134,9 @@ const changesRequiredMessage = computed(() => {
   }
   if (!props.formValues.title) {
     return "A title is required.";
+  }
+  if (props.formValues.title.length > EVENT_TITLE_CHAR_LIMIT) {
+    return `Title cannot exceed ${EVENT_TITLE_CHAR_LIMIT} characters.`;
   }
   return "";
 });
@@ -279,7 +284,7 @@ const touched = ref(false);
 </script>
 
 <template>
-  <div class="pt-0 px-6 w-full">
+  <div class="pt-0 px-6 w-full dark:text-white">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">
@@ -310,6 +315,10 @@ const touched = ref(false);
               :placeholder="'Add title'"
               @update="emit('updateFormValues', { title: $event })"
             />
+            <CharCounter
+              :current="formValues.title?.length || 0"
+              :max="EVENT_TITLE_CHAR_LIMIT"
+            />
           </template>
         </FormRow>
         <FormRow section-title="Forum(s)" :required="true">
@@ -327,7 +336,7 @@ const touched = ref(false);
           <template #content>
             <div class="flex flex-col gap-1">
               <div class="flex flex-wrap items-center">
-                <div class="flex flex-wrap items-center gap-2">
+                <div class="flex flex-wrap items-center gap-2 dark:text-white">
                   <input
                     data-testid="start-time-date-input"
                     class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"

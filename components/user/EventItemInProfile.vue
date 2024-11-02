@@ -45,7 +45,7 @@ const tags = props.event.Tags.map((tag: TagData) => tag.text);
 
 <template>
   <li
-    class="relative cursor-pointer list-none rounded-lg bg-white p-4 dark:bg-gray-800"
+    class="relative cursor-pointer list-none rounded-lg bg-white dark:text-white p-4 dark:bg-gray-800"
     @click="
       () => {
         if (defaultUniqueName) {

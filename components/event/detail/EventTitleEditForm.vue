@@ -12,10 +12,10 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import gql from "graphql-tag";
 import { modProfileNameVar, usernameVar } from "@/cache";
+import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
 
 const route = useRoute();
 const titleEditMode = ref(false);
-const username = computed(() => usernameVar || "");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -132,6 +132,11 @@ const formattedDate = computed(() => {
           :full-width="true"
           @update="formValues.title = $event"
         />
+        <CharCounter
+          v-if="titleEditMode"
+          :current="formValues.title?.length || 0"
+          :max="EVENT_TITLE_CHAR_LIMIT"
+        />
       </div>
       <RequireAuth class="flex max-w-sm justify-end" :full-width="false">
         <template #has-auth>
@@ -148,6 +153,7 @@ const formattedDate = computed(() => {
           />
           <PrimaryButton
             v-if="titleEditMode"
+            :disabled="!formValues.title?.length || formValues.title?.length > EVENT_TITLE_CHAR_LIMIT"
             :label="'Save'"
             :loading="updateEventLoading"
             @click="updateEvent"
