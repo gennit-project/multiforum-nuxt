@@ -25,13 +25,17 @@ const props = defineProps<{
 defineEmits(["submit", "updateFormValues"]);
 
 // Setup reactive variables
-const formTitle = computed(() => props.editMode ? "Edit Discussion" : "Start Discussion");
+const formTitle = computed(() =>
+  props.editMode ? "Edit Discussion" : "Start Discussion"
+);
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
 
 // Computed properties
 const needsChanges = computed(() => {
-  return !(props.formValues?.selectedChannels.length > 0 && props.formValues?.title);
+  return !(
+    props.formValues?.selectedChannels.length > 0 && props.formValues?.title
+  );
 });
 
 const changesRequiredMessage = computed(() => {
@@ -56,24 +60,8 @@ onMounted(() => {
 <template>
   <div class="flex w-full flex-col items-center justify-center">
     <div class="mx-auto w-full max-w-3xl">
-      <div v-if="discussionLoading">
-        Loading...
-      </div>
-      <div v-if="getDiscussionError">
-        <ErrorBanner
-          v-for="(error, i) of getDiscussionError?.graphQLErrors"
-          :key="i"
-          :text="error.message"
-        />
-      </div>
-      <ErrorBanner
-        v-else-if="createDiscussionError"
-        :text="createDiscussionError.message"
-      />
-      <ErrorBanner
-        v-else-if="updateDiscussionError"
-        :text="updateDiscussionError.message"
-      />
+      <div v-if="discussionLoading">Loading...</div>
+
       <TailwindForm
         v-if="formValues"
         :form-title="formTitle"
@@ -82,6 +70,13 @@ onMounted(() => {
         @input="touched = true"
         @submit="$emit('submit')"
       >
+        <div v-if="getDiscussionError">
+          <ErrorBanner
+            v-for="(error, i) of getDiscussionError?.graphQLErrors"
+            :key="i"
+            :text="error.message"
+          />
+        </div>
         <ErrorBanner
           v-if="needsChanges && touched"
           :text="changesRequiredMessage"
@@ -96,10 +91,7 @@ onMounted(() => {
         />
         <div class="divide-y divide-gray-200">
           <div class="mt-6 space-y-4">
-            <FormRow
-              section-title="Title"
-              :required="true"
-            >
+            <FormRow section-title="Title" :required="true">
               <template #content>
                 <TextInput
                   ref="titleInputRef"
@@ -112,10 +104,7 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow
-              section-title="Forums"
-              :required="true"
-            >
+            <FormRow section-title="Forums" :required="true">
               <template #content>
                 <ForumPicker
                   :test-id="'channel-input'"
