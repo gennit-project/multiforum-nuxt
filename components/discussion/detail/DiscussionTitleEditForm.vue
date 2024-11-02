@@ -12,6 +12,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import gql from "graphql-tag";
 import cache, { modProfileNameVar, usernameVar } from "@/cache";
+import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -72,6 +73,7 @@ const theme = cache.readQuery({
     }
   `,
 })?.theme;
+
 const onClickEdit = () => {
   titleEditMode.value = true;
   nextTick(() => {
@@ -118,6 +120,11 @@ const formattedDate = computed(() => {
           :full-width="true"
           @update="formValues.title = $event"
         />
+        <CharCounter
+          v-if="titleEditMode"
+          :current="formValues.title?.length || 0"
+          :max="DISCUSSION_TITLE_CHAR_LIMIT"
+        />
         <p
           v-if="!titleEditMode"
           class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
@@ -142,6 +149,7 @@ const formattedDate = computed(() => {
           />
           <PrimaryButton
             v-if="titleEditMode"
+            :disabled="formValues.title.length === 0 || formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT"
             :label="'Save'"
             :loading="updateDiscussionLoading"
             @click="updateDiscussion"

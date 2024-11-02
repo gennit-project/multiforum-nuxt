@@ -9,8 +9,7 @@ import TextInput from "@/components/TextInput.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
-
-const MAX_CHARS_IN_DISCUSSION_BODY = 18000;
+import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
 
 const props = defineProps<{
   editMode: boolean;
@@ -25,17 +24,18 @@ const props = defineProps<{
 
 defineEmits(["submit", "updateFormValues"]);
 
-// Setup reactive variables
 const formTitle = computed(() =>
   props.editMode ? "Edit Discussion" : "Start Discussion"
 );
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
 
-// Computed properties
 const needsChanges = computed(() => {
   return !(
-    props.formValues?.selectedChannels.length > 0 && props.formValues?.title && props.formValues?.body.length <= MAX_CHARS_IN_DISCUSSION_BODY
+    props.formValues?.selectedChannels.length > 0 &&
+    props.formValues?.title &&
+    props.formValues?.body.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
+    props.formValues?.title.length <= DISCUSSION_TITLE_CHAR_LIMIT
   );
 });
 
@@ -45,22 +45,19 @@ const changesRequiredMessage = computed(() => {
   } else if (props.formValues?.selectedChannels.length === 0) {
     return "Must select at least one channel.";
   } else if (props.formValues?.body.length > MAX_CHARS_IN_DISCUSSION_BODY) {
-    return "Body cannot exceed 18000 characters.";
+    return `Body cannot exceed ${MAX_CHARS_IN_DISCUSSION_BODY} characters.`;
+  } else if (props.formValues?.title.length > DISCUSSION_TITLE_CHAR_LIMIT) {
+    return `Title cannot exceed ${DISCUSSION_TITLE_CHAR_LIMIT} characters.`;
   }
   return "";
 });
 
-// Lifecycle hooks
 onMounted(() => {
   if (titleInputRef.value) {
     nextTick(() => {
       titleInputRef.value?.focus();
     });
   }
-});
-
-const charactersRemaining = computed(() => {
-  return MAX_CHARS_IN_DISCUSSION_BODY - (props.formValues?.body?.length || 0);
 });
 </script>
 
@@ -108,6 +105,10 @@ const charactersRemaining = computed(() => {
                   :full-width="true"
                   @update="$emit('updateFormValues', { title: $event })"
                 />
+                <CharCounter
+                  :current="formValues.title?.length || 0"
+                  :max="DISCUSSION_TITLE_CHAR_LIMIT"
+                />
               </template>
             </FormRow>
 
@@ -134,18 +135,10 @@ const charactersRemaining = computed(() => {
                   :rows="10"
                   @update="$emit('updateFormValues', { body: $event })"
                 />
-                <div
-                  v-if="formValues.body.length < MAX_CHARS_IN_DISCUSSION_BODY && charactersRemaining < 5000"
-                  class="text-right text-gray-500 dark:text-gray-300 text-sm font-medium mt-2 mb-4"
-                >
-                  {{ `${charactersRemaining}/${MAX_CHARS_IN_DISCUSSION_BODY}` }} characters remaining
-                </div>
-                <div
-                  v-else-if="charactersRemaining < 0"
-                  class="text-right text-red-500 text-sm font-medium mt-2 mb-4"
-                >
-                  {{ `${charactersRemaining}/${MAX_CHARS_IN_DISCUSSION_BODY}` }} characters remaining
-                </div>
+                <CharCounter
+                  :current="formValues.body?.length || 0"
+                  :max="MAX_CHARS_IN_DISCUSSION_BODY"
+                />
               </template>
             </FormRow>
 
