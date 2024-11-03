@@ -85,6 +85,8 @@ const renderedMarkdown = computed(() => {
     max-width: 100%;
     max-height: 500px;
     height: auto;
+    width: auto; 
+    object-fit: contain;
   }
 
   a {
