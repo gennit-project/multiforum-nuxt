@@ -348,7 +348,9 @@ const selectedTab = ref(0);
 }
 
 img {
-  object-fit: cover;
-  width: fit-content;
+  max-width: 100% !important;
+  height: auto !important;
+  width: auto !important;
+  object-fit: contain !important;
 }
 </style>
