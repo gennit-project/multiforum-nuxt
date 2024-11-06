@@ -22,7 +22,7 @@ const charactersRemaining = computed(() => props.max - props.current);
   </div>
   <div
     v-else-if="charactersRemaining < 0"
-    class="text-right text-red-500 text-sm font-medium mt-2 mb-4"
+    class="text-right text-red-400 dark:text-red-500 text-sm font-medium mt-2 mb-4"
   >
     {{ `${charactersRemaining}/${max}` }} characters remaining
   </div>

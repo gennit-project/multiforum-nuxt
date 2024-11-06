@@ -7,6 +7,7 @@ import AddImage from "@/components/AddImage.vue";
 import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import ErrorBanner from "./ErrorBanner.vue";
 import { usernameVar } from "@/cache";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
 
 // Props
 const props = defineProps({
@@ -34,7 +35,16 @@ const props = defineProps({
     type: Number,
     default: 4,
   },
+  showCharCounter: {
+    type: Boolean,
+    default: false,
+  },
+  maxChars: {
+    type: Number,
+    default: MAX_CHARS_IN_COMMENT,
+  },
 });
+console.log('text editor props',props);
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
 
@@ -331,6 +341,12 @@ const selectedTab = ref(0);
         </TabPanel>
       </TabPanels>
     </TabGroup>
+    <CharCounter
+      v-if="showCharCounter"
+      :key="text.length"
+      :current="text.length || 0"
+      :max="maxChars"
+    />
   </form>
 </template>
 

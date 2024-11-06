@@ -263,8 +263,6 @@ p,
 li {
   font-size: 0.9rem !important;
   font-weight: 400 !important;
-  line-height: 1.5 !important;
-  margin-bottom: 0.25rem !important;
 }
 
 p {
@@ -274,6 +272,20 @@ p {
 ul, ol {
   list-style-type: disc !important;
   margin-left: 1rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+h1 {
+  font-size: 1.25rem !important;
+  font-weight: 600 !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+h2 {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  margin-top: 1.5rem !important;
   margin-bottom: 1rem !important;
 }
 

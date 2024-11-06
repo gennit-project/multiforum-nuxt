@@ -11,6 +11,7 @@ import CancelButton from "@/components/CancelButton.vue";
 import EmojiButtons from "./EmojiButtons.vue";
 import NewEmojiButton from "./NewEmojiButton.vue";
 import { usernameVar } from "@/cache";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
 
 const props = defineProps({
   commentData: {
@@ -24,6 +25,10 @@ const props = defineProps({
   depth: {
     type: Number,
     required: true,
+  },
+  lengthOfCommentInProgress: {
+    type: Number,
+    default: 1,
   },
   locked: {
     type: Boolean,
@@ -52,6 +57,10 @@ const props = defineProps({
   replyFormOpenAtCommentID: {
     type: String,
     default: "",
+  },
+  saveDisabled: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -102,7 +111,9 @@ function toggleEmojiPicker() {
       :emoji-json="commentData.emoji"
       @toggle-emoji-picker="toggleEmojiPicker"
     />
-    <div class="flex flex-wrap items-center gap-1 text-xs text-gray-400 dark:text-gray-300">
+    <div
+      class="flex flex-wrap items-center gap-1 text-xs text-gray-400 dark:text-gray-300"
+    >
       <VoteButtons
         v-if="!locked"
         :comment-data="commentData"
@@ -126,16 +137,24 @@ function toggleEmojiPicker() {
       />
       <span
         v-if="showEditCommentField"
-        class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
+        class="cursor-pointer hover:text-black dark:hover:text-white text-white bg-gray-700 rounded-full dark:text-gray-300 px-2 py-1"
         @click="emit('hideEditCommentEditor')"
       >
         Cancel
       </span>
       <span
         v-if="showEditCommentField && !commentInProcess"
-        class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
+        :class="[
+          saveDisabled
+            ? 'text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 rounded-lg'
+            : 'cursor-pointer text-white hover:text-black dark:hover:text-white rounded-full bg-blue-500 dark:text-gray-300',
+        ]"
+        class="px-2 py-1"
         @click="
           () => {
+            if (saveDisabled) {
+              return;
+            }
             emit('saveEdit');
             emit('startCommentSave');
           }
@@ -189,6 +208,8 @@ function toggleEmojiPicker() {
     >
       <TextEditor
         :placeholder="'Please be kind'"
+        :show-char-counter="true"
+        :max-chars="MAX_CHARS_IN_COMMENT"
         @update="
           emit('updateNewComment', {
             text: $event,
@@ -201,7 +222,7 @@ function toggleEmojiPicker() {
         <CancelButton @click="emit('hideReplyEditor')" />
         <SaveButton
           :loading="commentInProcess"
-          :disabled="commentData?.text?.length === 0"
+          :disabled="!lengthOfCommentInProgress || lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT"
           @click.prevent="
             () => {
               emit('createComment', parentCommentId);

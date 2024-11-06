@@ -15,8 +15,9 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
-
+import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
 const MAX_COMMENT_DEPTH = 5;
+const SHOW_MORE_THRESHOLD = 1000;
 
 type DeleteCommentInputData = {
   commentId: string;
@@ -112,6 +113,10 @@ const props = defineProps({
     type: String,
     required: false,
     default: "",
+  },
+  lengthOfCommentInProgress: {
+    type: Number,
+    default: 1,
   },
 });
 
@@ -336,6 +341,17 @@ function handleUndoFeedback(input: HandleFeedbackInput) {
 function handleEditFeedback(input: HandleEditFeedbackInput) {
   emit("clickEditFeedback", input);
 }
+
+const showEditCommentForm = computed(() => {
+  return (
+    !props.readonly && props.editFormOpenAtCommentID === props.commentData.id
+  );
+});
+
+const saveDisabled = computed(() => {
+  return props.lengthOfCommentInProgress === 0 ||
+    props.lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
+});
 </script>
 
 <template>
@@ -385,7 +401,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                     <MarkdownPreview
                       :key="textCopy || ''"
                       :text="textCopy || ''"
-                      :word-limit="1000"
+                      :word-limit="SHOW_MORE_THRESHOLD"
                       :disable-gallery="props.goToPermalinkOnClick"
                       @click="
                         () => {
@@ -397,14 +413,13 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                     />
                   </div>
                   <TextEditor
-                    v-if="
-                      !props.readonly &&
-                      props.editFormOpenAtCommentID === props.commentData.id
-                    "
+                    v-if="showEditCommentForm"
                     id="editExistingComment"
                     class="mb-2 mt-3 p-1"
                     :initial-value="props.commentData.text || ''"
                     :editor-id="editorId"
+                    :show-char-counter="true"
+                    :max-chars="MAX_CHARS_IN_COMMENT"
                     @update="updateExistingComment($event, props.depth)"
                   />
                   <ErrorBanner
@@ -422,7 +437,14 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                   <CommentButtons
                     v-if="forumId && props.showCommentButtons"
                     class="mb-1 ml-1"
-                    :class="[props.commentData.text ? '-mt-6' : '']"
+                    :class="[
+                      props.commentData.text &&
+                      !props.editCommentError &&
+                      !showEditCommentForm &&
+                      SHOW_MORE_THRESHOLD > (textCopy?.length || 0)
+                        ? '-mt-6'
+                        : '',
+                    ]"
                     :comment-data="props.commentData"
                     :enable-feedback="props.enableFeedback"
                     :depth="props.depth"
@@ -438,6 +460,8 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                     :comment-in-process="
                       props.commentInProcess && !props.editCommentError
                     "
+                    :save-disabled="saveDisabled"
+                    :length-of-comment-in-progress="lengthOfCommentInProgress"
                     @start-comment-save="emit('startCommentSave', $event)"
                     @click-edit-comment="handleEdit"
                     @create-comment="createComment"
@@ -569,6 +593,7 @@ function handleEditFeedback(input: HandleEditFeedbackInput) {
                 :reply-form-open-at-comment-i-d="props.replyFormOpenAtCommentID"
                 :mod-profile-name="props.modProfileName"
                 :original-poster="props.originalPoster"
+                :length-of-comment-in-progress="props.lengthOfCommentInProgress"
                 @start-comment-save="emit('startCommentSave')"
                 @click-edit-comment="emit('clickEditComment', $event)"
                 @delete-comment="handleDelete"

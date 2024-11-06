@@ -8,6 +8,7 @@ import type { ApolloError } from "@apollo/client/errors";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
 import LoggedInUserAvatar from "./LoggedInUserAvatar.vue";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
 
 defineProps({
   createCommentError: {
@@ -82,13 +83,15 @@ const writeReplyStyle =
         <TextEditor
           :test-id="'texteditor-textarea'"
           :placeholder="'Please be kind'"
+          :show-char-counter="true"
+          :max-chars="MAX_CHARS_IN_COMMENT"
           @update="emit('handleUpdateComment', $event)"
         />
         <div class="mt-3 flex justify-start">
           <CancelButton @click="emit('closeCommentEditor')" />
           <SaveButton
             data-testid="createCommentButton"
-            :disabled="createFormValues.text.length === 0"
+            :disabled="createFormValues.text.length === 0 || createFormValues.text.length > MAX_CHARS_IN_COMMENT"
             :loading="createCommentLoading && !createCommentError"
             @click.prevent="emit('handleCreateComment')"
           />

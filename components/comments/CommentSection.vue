@@ -529,6 +529,19 @@ function handleViewFeedback(commentId: string) {
     },
   });
 }
+
+const lengthOfCommentInProgress = computed(() => {
+  // if edit form is open, return the edit form value length
+  if (editFormOpenAtCommentID.value) {
+    return editFormValues.value.text.length;
+  }
+  // if the reply-to-comment form is open,
+  // return the create form value length
+  if (replyFormOpenAtCommentID.value) {
+    return props.createFormValues.text.length;
+  }
+  return 0;
+});
 </script>
 
 <template>
@@ -556,6 +569,7 @@ function handleViewFeedback(commentId: string) {
         :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
         :edit-comment-error="editCommentError"
         :original-poster="originalPoster"
+        :length-of-comment-in-progress="lengthOfCommentInProgress"
         @start-comment-save="commentInProcess = true"
         @open-reply-editor="openReplyEditor"
         @hide-reply-editor="hideReplyEditor"
@@ -599,6 +613,7 @@ function handleViewFeedback(commentId: string) {
               :edit-comment-error="editCommentError"
               :mod-profile-name="modProfileNameVar"
               :original-poster="originalPoster"
+              :length-of-comment-in-progress="lengthOfCommentInProgress"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"
               @hide-reply-editor="hideReplyEditor"

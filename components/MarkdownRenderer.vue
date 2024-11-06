@@ -68,7 +68,8 @@ const renderedMarkdown = computed(() => {
 
 <style lang="scss">
 .markdown-body {
-  padding: 16px;
+  padding-left: 20px;
+  padding-top: 1px;
   overflow-x: auto;
 
   .dark {
