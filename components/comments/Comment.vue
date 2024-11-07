@@ -454,6 +454,7 @@ const saveDisabled = computed(() => {
                     "
                     :save-disabled="saveDisabled"
                     :length-of-comment-in-progress="lengthOfCommentInProgress"
+                    :is-permalinked="props.isPermalinked"
                     @start-comment-save="emit('startCommentSave', $event)"
                     @click-edit-comment="handleEdit"
                     @create-comment="createComment"

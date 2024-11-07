@@ -29,6 +29,11 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  isPermalinked: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const emojiObject = ref<Record<string, Record<string, string[]>>>({});
@@ -121,6 +126,7 @@ function getDefaultVariant(emojiLabel: string) {
         :count="getCount(emojiLabel)"
         :tooltip-unicode="getDefaultVariant(emojiLabel)"
         :tooltip-text="getTooltipText(emojiLabel)"
+        :is-permalinked="isPermalinked"
         @vote="
           () => {
             if (commentId) {

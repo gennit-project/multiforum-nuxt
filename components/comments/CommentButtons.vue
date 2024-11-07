@@ -62,6 +62,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isPermalinked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -109,6 +113,7 @@ function toggleEmojiPicker() {
       class="mb-1"
       :comment-id="commentData.id"
       :emoji-json="commentData.emoji"
+      :is-permalinked="isPermalinked"
       @toggle-emoji-picker="toggleEmojiPicker"
     />
     <div
