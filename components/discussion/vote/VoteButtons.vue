@@ -111,7 +111,7 @@ const clickUp = () => {
 <template>
   <RequireAuth :full-width="false">
     <template #has-auth>
-      <div class="flex items-center gap-1">
+      <div class="flex items-center gap-2 text-sm">
         <VoteButton
           :test-id="'upvote-discussion-button'"
           :count="upvoteCount"
@@ -124,7 +124,8 @@ const clickUp = () => {
           "
           @vote="clickUp"
         >
-          <i class="fa-solid fa-arrow-up mr-1 w-3" />
+          <i class="fa-solid fa-arrow-up mr-1" />
+          <span class="text-sm">{{upvoteCount}}</span>
         </VoteButton>
 
         <MenuButton
