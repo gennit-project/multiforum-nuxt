@@ -107,7 +107,7 @@ const relative = computed(() =>
 
 <template>
   <li
-    class="pt-4 px-4 list-none"
+    class="pt-4 pb-2 px-4 list-none"
     :class="{
       'bg-gray-100 dark:bg-gray-700': discussionIdInParams === discussionId,
     }"
@@ -181,72 +181,76 @@ const relative = computed(() =>
               />
               Collapse
             </button>
-          </div>
-        </div>
-
-        <div class="ml-6 flex-col gap-1">
-          <div
-            v-if="discussion && discussion.body && showBody"
-            class="w-full border-l-2 border-gray-300 bg-gray-100 dark:bg-gray-800 rounded"
-          >
-            <MarkdownPreview
-              :text="discussion.body"
-              :word-limit="50"
-              :disable-gallery="false"
-              class="-ml-2"
-            />
-          </div>
-          <div
-            class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline"
-          >
-            <TagComponent
-              v-for="tag in tags"
-              :key="tag"
-              class="my-1"
-              :active="selectedTags.includes(tag)"
-              :tag="tag"
-              @click="$emit('filterByTag', tag)"
-            />
-          </div>
-          <nuxt-link
-            v-if="discussion && !submittedToMultipleChannels"
-            :to="
-              getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
-            "
-            class="flex items-center gap-2 px-4 pt-2 dark:text-white"
-          >
-            <span>{{
-              `${commentCount} ${
-                commentCount === 1 ? "comment" : "comments"
-              } in `
-            }}</span>
-
             <div
-              class="mr-2 flex items-center rounded-full bg-blue-100 pr-2 text-blue-700 dark:bg-gray-600 dark:text-white"
+              v-if="discussion && discussion.body && showBody"
+              class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-gray-800"
             >
-              <AvatarComponent
-                :text="discussion.DiscussionChannels[0].channelUniqueName || ''"
-                class="mr-1 h-8 w-8"
+              <MarkdownPreview
+                :text="discussion.body"
+                :word-limit="50"
+                :disable-gallery="false"
+                class="-ml-2"
               />
-              <span>{{
-                discussion.DiscussionChannels[0].channelUniqueName || ""
-              }}</span>
             </div>
-          </nuxt-link>
-
-          <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
-            <button
-              class="-ml-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+            <div
+              class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline"
             >
-              <i class="fa-regular fa-comment mr-2 h-4 w-4" />
-              {{
+              <TagComponent
+                v-for="tag in tags"
+                :key="tag"
+                class="my-1"
+                :active="selectedTags.includes(tag)"
+                :tag="tag"
+                @click="$emit('filterByTag', tag)"
+              />
+            </div>
+            <nuxt-link
+              v-if="discussion && !submittedToMultipleChannels"
+              :to="
+                getDetailLink(
+                  discussion.DiscussionChannels[0].channelUniqueName
+                )
+              "
+              class="flex items-center gap-2 pt-2 dark:text-white"
+            >
+              <span>{{
                 `${commentCount} ${
                   commentCount === 1 ? "comment" : "comments"
-                } in ${channelCount} ${channelCount === 1 ? "forum" : "forums"}`
-              }}
-              <ChevronDownIcon class="-mr-1 ml-2 h-4 w-4" aria-hidden="true" />
-            </button>
-          </MenuButton>
+                } in `
+              }}</span>
+
+              <div
+                class="mr-2 flex items-center rounded-full bg-blue-100 pr-2 text-blue-700 dark:bg-gray-600 dark:text-white"
+              >
+                <AvatarComponent
+                  :text="
+                    discussion.DiscussionChannels[0].channelUniqueName || ''
+                  "
+                  class="mr-1 h-8 w-8"
+                />
+                <span>{{
+                  discussion.DiscussionChannels[0].channelUniqueName || ""
+                }}</span>
+              </div>
+            </nuxt-link>
+
+            <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
+              <button
+                class="flex items-center rounded-md bg-gray-100 pb-2 px-4 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+              >
+                <i class="fa-regular fa-comment mr-2 h-4 w-4" />
+                {{
+                  `${commentCount} ${
+                    commentCount === 1 ? "comment" : "comments"
+                  } in ${channelCount} ${channelCount === 1 ? "forum" : "forums"}`
+                }}
+                <ChevronDownIcon
+                  class="-mr-1 ml-2 h-4 w-4"
+                  aria-hidden="true"
+                />
+              </button>
+            </MenuButton>
+          </div>
         </div>
       </div>
     </div>
