@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-
 const properties = defineProps({
   active: Boolean,
   count: {
@@ -25,12 +24,22 @@ const properties = defineProps({
 
 const emit = defineEmits(["vote"]);
 
-const buttonClasses = computed(() => [
-  "inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1 hover:dark:border-blue-500 hover:dark:text-blue-500",
-  properties.active
-    ? "border-blue-500 bg-blue-100 text-black dark:text-white dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-600"
-    : "border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700",
-]);
+const buttonClasses = computed(() => {
+  const baseClasses = [
+    "inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1",
+  ];
+
+  const defaultClasses = properties.active
+    ? "border-blue-500 bg-blue-300 text-black dark:text-white dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-600"
+    : "border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700";
+  return [
+    ...baseClasses,
+    ...defaultClasses,
+    properties.isPermalinked
+      ? "border border-blue-500 hover:bg-blue-300"
+      : "border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700",
+  ];
+});
 </script>
 
 <template>

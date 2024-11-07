@@ -117,12 +117,13 @@ function toggleEmojiPicker() {
       @toggle-emoji-picker="toggleEmojiPicker"
     />
     <div
-      class="flex flex-wrap items-center gap-1 text-xs text-gray-400 dark:text-gray-300"
+      class="flex flex-wrap items-center gap-1 text-xs"
     >
       <VoteButtons
         v-if="!locked"
         :comment-data="commentData"
         :show-downvote="enableFeedback && !loggedInUserIsAuthor"
+        :is-permalinked="isPermalinked"
         @open-mod-profile="emit('openModProfile')"
         @click-feedback="emit('clickFeedback')"
         @click-undo-feedback="emit('clickUndoFeedback')"
@@ -131,6 +132,7 @@ function toggleEmojiPicker() {
       />
       <NewEmojiButton
         :comment-id="commentData.id"
+        :is-permalinked="isPermalinked"
         @toggle-emoji-picker="toggleEmojiPicker"
       />
       <ReplyButton
@@ -138,6 +140,7 @@ function toggleEmojiPicker() {
         :comment-data="commentData"
         :parent-comment-id="parentCommentId"
         :depth="depth"
+        :is-permalinked="isPermalinked"
         @click="emit('openReplyEditor', commentData.id)"
       />
       <span
@@ -227,7 +230,10 @@ function toggleEmojiPicker() {
         <CancelButton @click="emit('hideReplyEditor')" />
         <SaveButton
           :loading="commentInProcess"
-          :disabled="!lengthOfCommentInProgress || lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT"
+          :disabled="
+            !lengthOfCommentInProgress ||
+            lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
+          "
           @click.prevent="
             () => {
               emit('createComment', parentCommentId);

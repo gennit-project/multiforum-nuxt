@@ -44,7 +44,6 @@ const props = defineProps({
     default: MAX_CHARS_IN_COMMENT,
   },
 });
-console.log('text editor props',props);
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
 

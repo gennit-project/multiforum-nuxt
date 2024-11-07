@@ -42,6 +42,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isPermalinked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -129,6 +133,7 @@ function viewFeedback() {
           ? 'Undo upvote'
           : 'Upvote to make this comment more visible'
       "
+      :is-permalinked="isPermalinked"
       @vote="clickUpvote"
     >
       <i class="fa-solid fa-arrow-up mr-1 w-3" />
@@ -150,6 +155,7 @@ function viewFeedback() {
         :show-count="showDownvoteCount"
         :loading="false"
         :active="downvoteActive"
+        :is-permalinked="isPermalinked"
       >
         <HandThumbDownIcon class="h-4 w-4" />
       </VoteButton>

@@ -145,7 +145,7 @@ const emit = defineEmits([
 const route = useRoute();
 const router = useRouter();
 const { discussionId, eventId, forumId } = route.params;
-
+const permalinkedCommentId = route.params.commentId;
 const isHighlighted = computed(() => {
   return props.isPermalinked || permalinkedCommentId === props.commentData.id;
 });
@@ -295,7 +295,7 @@ const commentMenuItems = computed(() => {
 const showReplies = ref(true);
 const highlight = ref(false);
 const editorId = "texteditor";
-const permalinkedCommentId = route.params.commentId;
+
 const maxCommentDepth = MAX_COMMENT_DEPTH;
 
 function createComment(parentCommentId: string) {
@@ -454,7 +454,7 @@ const saveDisabled = computed(() => {
                     "
                     :save-disabled="saveDisabled"
                     :length-of-comment-in-progress="lengthOfCommentInProgress"
-                    :is-permalinked="props.isPermalinked"
+                    :is-permalinked="isHighlighted"
                     @start-comment-save="emit('startCommentSave', $event)"
                     @click-edit-comment="handleEdit"
                     @create-comment="createComment"

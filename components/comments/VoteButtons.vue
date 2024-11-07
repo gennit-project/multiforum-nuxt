@@ -21,6 +21,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  isPermalinked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -88,6 +92,7 @@ const { mutate: undoUpvoteComment, error: undoUpvoteError, loading: undoUpvoteLo
       :upvote-loading="upvoteCommentLoading || undoUpvoteLoading"
       :show-downvote="showDownvote"
       :show-upvote="showUpvote"
+      :is-permalinked="isPermalinked"
       @upvote="upvoteComment"
       @undo-upvote="undoUpvoteComment"
       @undo-downvote="emit('clickUndoFeedback')"

@@ -3,8 +3,7 @@ import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 
-// Define props
-defineProps({
+const props = defineProps({
   showReplyEditor: {
     type: Boolean,
     default: false,
@@ -21,18 +20,36 @@ defineProps({
     type: Number,
     default: 0,
   },
+  isPermalinked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['toggleShowReplyEditor']);
 
-const buttonClasses = "inline-flex gap-1 cursor-pointer items-center hover:bg-gray-200 dark:border-gray-600 bg-gray-100 dark:bg-gray-700 rounded-full px-2 py-1 hover:dark:text-blue-500";
+
+const buttonClasses = computed(() => {
+  const baseClasses = [
+    "flex gap-1 max-h-6 cursor-pointer items-center rounded-full px-2 py-1",
+  ];
+
+  const defaultClasses = "border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700";
+  return [
+    ...baseClasses,
+    ...defaultClasses,
+    props.isPermalinked
+      ? "border border-blue-500 hover:bg-blue-300"
+      : "border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700",
+  ];
+});
 
 </script>
 
 <template>
   <RequireAuth :full-width="false">
     <template #has-auth>
-      <div class="flex items-center">
+      <div class="flex items-center gap-1">
         <div
           data-testid="reply-comment-button"
           :class="[buttonClasses, showReplyEditor ? 'text-black dark:text-gray-100' : '']"
@@ -43,7 +60,7 @@ const buttonClasses = "inline-flex gap-1 cursor-pointer items-center hover:bg-gr
       </div>
     </template>
     <template #does-not-have-auth>
-      <div class="flex items-center">
+      <div class="flex items-center gap-1">
         <button
           data-testid="reply-comment-button"
           :class="[buttonClasses]"

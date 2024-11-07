@@ -39,8 +39,11 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isPermalinked: {
+    type: Boolean,
+    default: false,
+  },
 });
-
 const emit = defineEmits([
   "editFeedback",
   "undoFeedback",
@@ -122,6 +125,7 @@ const clickUp = () => {
               ? 'Undo upvote'
               : 'Upvote to make this discussion more visible'
           "
+          :is-permalinked="isPermalinked"
           @vote="clickUp"
         >
           <span class="flex items-center gap-1">
@@ -145,6 +149,7 @@ const clickUp = () => {
             :show-count="false"
             :active="downvoteActive"
             :loading="downvoteLoading"
+            :is-permalinked="isPermalinked"
           >
             <div>
               <HandThumbDownIcon class="h-4 w-4" />
@@ -160,6 +165,7 @@ const clickUp = () => {
           :count="upvoteCount"
           :active="upvoteActive"
           :tooltip-text="'Make this discussion more visible to others'"
+          :is-permalinked="isPermalinked"
         >
           <span class="flex items-center gap-1">
             <i class="fa-solid fa-arrow-up mr-1" />
@@ -172,6 +178,7 @@ const clickUp = () => {
           :show-count="false"
           :active="downvoteActive"
           :tooltip-text="'Give semi-anonymous feedback'"
+          :is-permalinked="isPermalinked"
         >
           <HandThumbDownIcon class="h-4 w-4" />
         </VoteButton>

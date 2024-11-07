@@ -20,6 +20,11 @@ defineProps({
     required: false,
     default: "",
   },
+  isPermalinked: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const showMenu = ref(false);
@@ -41,6 +46,7 @@ function handleClick() {
           :test-id="'emoji-button'"
           :show-count="false"
           :tooltip-text="'Add reaction...'"
+          :is-permalinked="isPermalinked"
           @vote="handleClick"
         >
           <i class="fa-regular fa-face-smile" />
