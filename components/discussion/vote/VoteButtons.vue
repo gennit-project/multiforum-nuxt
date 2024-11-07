@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import VoteButton from '@/components/VoteButton.vue';
-import RequireAuth from '@/components/auth/RequireAuth.vue';
-import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
-import type { SelectOptionData } from '@/types/GenericFormTypes';
-import { ALLOWED_ICONS } from '@/utils';
+import { computed } from "vue";
+import VoteButton from "@/components/VoteButton.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
+import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
+import type { SelectOptionData } from "@/types/GenericFormTypes";
+import { ALLOWED_ICONS } from "@/utils";
 
 const props = defineProps({
   downvoteActive: {
@@ -42,45 +42,45 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  'editFeedback',
-  'undoFeedback',
-  'giveFeedback',
-  'viewFeedback',
-  'clickUp',
+  "editFeedback",
+  "undoFeedback",
+  "giveFeedback",
+  "viewFeedback",
+  "clickUp",
 ]);
 
 const thumbsDownMenuItems = computed(() => {
   let items: SelectOptionData[] = [
     {
-      label: 'View Feedback',
+      label: "View Feedback",
       icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-      value: '',
-      event: 'viewFeedback',
+      value: "",
+      event: "viewFeedback",
     },
   ];
 
   if (props.downvoteActive) {
     items = items.concat([
       {
-        label: 'Undo feedback',
+        label: "Undo feedback",
         icon: ALLOWED_ICONS.UNDO,
-        value: '',
-        event: 'undoFeedback',
+        value: "",
+        event: "undoFeedback",
       },
       {
-        label: 'Edit feedback',
+        label: "Edit feedback",
         icon: ALLOWED_ICONS.EDIT,
-        value: '',
-        event: 'editFeedback',
+        value: "",
+        event: "editFeedback",
       },
     ]);
   } else {
     items = items.concat([
       {
-        label: 'Give feedback',
+        label: "Give feedback",
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-        value: '',
-        event: 'giveFeedback',
+        value: "",
+        event: "giveFeedback",
       },
     ]);
   }
@@ -88,23 +88,23 @@ const thumbsDownMenuItems = computed(() => {
 });
 
 const editFeedback = () => {
-  emit('editFeedback');
+  emit("editFeedback");
 };
 
 const undoFeedback = () => {
-  emit('undoFeedback');
+  emit("undoFeedback");
 };
 
 const giveFeedback = () => {
-  emit('giveFeedback');
+  emit("giveFeedback");
 };
 
 const viewFeedback = () => {
-  emit('viewFeedback');
+  emit("viewFeedback");
 };
 
 const clickUp = () => {
-  emit('clickUp');
+  emit("clickUp");
 };
 </script>
 
@@ -124,8 +124,10 @@ const clickUp = () => {
           "
           @vote="clickUp"
         >
-          <i class="fa-solid fa-arrow-up mr-1" />
-          <span class="text-sm">{{upvoteCount}}</span>
+          <span class="flex items-center gap-1">
+            <i class="fa-solid fa-arrow-up mr-1" />
+            <span class="text-sm">{{ upvoteCount }}</span>
+          </span>
         </VoteButton>
 
         <MenuButton
@@ -159,7 +161,10 @@ const clickUp = () => {
           :active="upvoteActive"
           :tooltip-text="'Make this discussion more visible to others'"
         >
-          <i class="fa-solid fa-arrow-up mr-1 w-3" />
+          <span class="flex items-center gap-1">
+            <i class="fa-solid fa-arrow-up mr-1" />
+            <span class="text-sm">{{ upvoteCount }}</span>
+          </span>
         </VoteButton>
         <VoteButton
           v-if="showDownvote"

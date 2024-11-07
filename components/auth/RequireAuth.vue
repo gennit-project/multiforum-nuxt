@@ -51,7 +51,7 @@ const showAuthContent = computed(
     <div
       v-else
       :class="[
-        fullWidth ? 'w-full flex align-items justify-center ' : 'w-full border border-blue-500 flex align-items justify-end',
+        fullWidth ? 'w-full flex align-items justify-center ' : 'w-full flex align-items justify-end',
       ]"
       @click="handleLogin"
     >
