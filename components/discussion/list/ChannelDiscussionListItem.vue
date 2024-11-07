@@ -162,7 +162,7 @@ const filteredQuery = computed(() => {
 
             <div
               v-if="discussion?.body"
-              class="my-2 dark:bg-gray-700 bg-gray-100 rounded"
+              class="my-2 dark:bg-gray-700 bg-gray-100 pl-2 pt-4 pb-4 rounded"
             >
               <MarkdownPreview
                 :text="discussion.body"
