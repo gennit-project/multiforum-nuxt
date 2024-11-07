@@ -117,7 +117,7 @@ function viewFeedback() {
 </script>
 
 <template>
-  <div class="flex flex-row space-x-1">
+  <div class="flex flex-row items-center">
     <VoteButton
       v-if="showUpvote"
       :test-id="'upvote-comment-button'"

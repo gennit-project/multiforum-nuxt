@@ -42,7 +42,7 @@ export default defineComponent({
     v-if="channel?.channelBannerURL"
     :src="channel?.channelBannerURL"
     :alt="'channel banner'"
-    class="max-h-36 w-full"
+    class="max-h-36 object-cover w-full"
   >
   <div class="bg-white dark:bg-gray-800 flex justify-center">
     <div class="max-w-screen-2xl w-full">
