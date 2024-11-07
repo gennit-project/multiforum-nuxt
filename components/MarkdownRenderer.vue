@@ -71,6 +71,7 @@ const renderedMarkdown = computed(() => {
   padding-left: 20px;
   padding-top: 1px;
   overflow-x: auto;
+  padding-bottom: 0.25rem !important;
 
   .dark {
     background-color: transparent;
@@ -80,6 +81,7 @@ const renderedMarkdown = computed(() => {
   code {
     border-radius: 5px;
     overflow-x: auto;
+    padding-bottom: 0.25rem !important;
   }
 
   img {

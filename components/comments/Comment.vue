@@ -436,15 +436,7 @@ const saveDisabled = computed(() => {
                 <div class="flex items-center">
                   <CommentButtons
                     v-if="forumId && props.showCommentButtons"
-                    class="mb-1 ml-1"
-                    :class="[
-                      props.commentData.text &&
-                      !props.editCommentError &&
-                      !showEditCommentForm &&
-                      SHOW_MORE_THRESHOLD > (textCopy?.length || 0)
-                        ? '-mt-6'
-                        : '',
-                    ]"
+                    class="mb-1 ml-2"
                     :comment-data="props.commentData"
                     :enable-feedback="props.enableFeedback"
                     :depth="props.depth"

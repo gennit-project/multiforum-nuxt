@@ -266,7 +266,7 @@ li {
 }
 
 p {
-  margin-bottom: 1rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
 ul, ol {
