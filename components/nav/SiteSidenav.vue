@@ -72,14 +72,17 @@ const handleLogout = () => {
   // Redirect to the fixed logout route
   logout({
     logoutParams: {
-      returnTo: `${config.baseUrl}/logout`
-    }
+      returnTo: `${config.baseUrl}/logout`,
+    },
   });
 };
 
 const outside = () => {
   emit("close");
 };
+
+const navLinkClasses =
+  "pl-6 font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700";
 </script>
 
 <template>
@@ -109,12 +112,16 @@ const outside = () => {
           <CreateAnythingButton v-if="smAndDown" class="mb-4 px-6" />
         </div>
         <nav class="mt-4">
-          <ul role="list">
-            <li v-for="item in navigation" :key="item.name" class="list-none">
+          <ul role="list" class="p-0 m-0">
+            <li
+              v-for="item in navigation"
+              :key="item.name"
+              class="list-none m-0"
+            >
               <nuxt-link
                 :to="item.href"
                 :data-testid="`nav-link-${item.name}`"
-                class="font-semibold group flex gap-x-3 rounded-md py-1 pl-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+                :class="navLinkClasses"
                 @click="outside"
               >
                 <component
@@ -133,23 +140,23 @@ const outside = () => {
         class="border-t border-gray-200 dark:border-gray-600"
       >
         <div
-          class="text-bold mt-3 px-6 uppercase leading-6 text-gray-400 dark:text-gray-100"
+          class="text-bold text-sm mb-2 mt-3 px-6 uppercase leading-6 text-gray-400 dark:text-gray-100"
         >
           Recent Forums
         </div>
-        <div class="px-3">
-          <ul>
+        <nav>
+          <ul role="list" class="p-0 m-0">
             <li
               v-for="forum in visibleRecentForums"
               :key="forum.uniqueName"
-              class="list-none"
+              class="list-none m-0"
             >
               <nuxt-link
                 :to="{
                   name: 'forums-forumId-discussions',
                   params: { forumId: forum.uniqueName },
                 }"
-                class="font-semibold group flex items-center gap-x-3 rounded-md py-1 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+                :class="navLinkClasses"
                 @click="outside"
               >
                 <AvatarComponent
@@ -175,16 +182,22 @@ const outside = () => {
           <div v-if="recentForums.length > DEFAULT_LIMIT">
             <button
               v-if="!showAllForums"
-              class="dark:text-white text-sm px-4"
+              class="text-gray-500 dark:text-white text-sm px-4 underline"
               @click="showAllForums = true"
             >
               Show All
             </button>
-            <button v-else @click="showAllForums = false">Show Less</button>
+            <button
+              v-else
+              class="text-gray-500 dark:text-white text-sm px-4 underline"
+              @click="showAllForums = false"
+            >
+              Show Less
+            </button>
           </div>
-        </div>
+        </nav>
       </div>
-      <ul class="mb-6 border-t">
+      <ul role="list" class="border-t mb-6 mt-6 pt-4 p-0 m-0">
         <nuxt-link
           v-if="isAuthenticated && usernameVar"
           :to="{
@@ -208,23 +221,19 @@ const outside = () => {
             name: 'u-username-settings',
             params: { username: usernameVar },
           }"
-          class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+          :class="navLinkClasses"
           @click="outside"
         >
           Account Settings
         </nuxt-link>
-        <button
-          v-if="!isAuthenticated"
-          class="font-semibold group flex gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
-          @click="login"
-        >
+        <button v-if="!isAuthenticated" :class="navLinkClasses" @click="login">
           Log In
         </button>
         <nuxt-link
           v-if="isAuthenticated"
           data-testid="sign-out-link"
           to="/"
-          class="font-semibold group flex gap-x-3 rounded-md py-2 pl-3 mt-4 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
+          :class="navLinkClasses"
           @click="handleLogout"
         >
           Sign Out
