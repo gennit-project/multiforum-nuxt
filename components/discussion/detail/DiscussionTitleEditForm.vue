@@ -12,7 +12,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import gql from "graphql-tag";
 import cache, { modProfileNameVar, usernameVar } from "@/cache";
-import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
+import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 
 const route = useRoute();
 const titleEditMode = ref(false);

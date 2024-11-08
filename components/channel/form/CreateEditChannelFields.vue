@@ -14,6 +14,11 @@ import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
 import TailwindForm from "@/components/FormComponent.vue";
 import { usernameVar } from "@/cache";
+import {
+  MAX_CHARS_IN_CHANNEL_DESCRIPTION,
+  MAX_CHARS_IN_CHANNEL_NAME,
+  MAX_CHARS_IN_CHANNEL_DISPLAY_NAME
+} from "@/utils/constants"; 
 
 const props = defineProps({
   editMode: {
@@ -53,12 +58,16 @@ const props = defineProps({
 
 const emit = defineEmits(["submit", "updateFormValues"]);
 // Mutation to create a signed storage URL
-const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL);
+const { mutate: createSignedStorageUrl } = useMutation(
+  CREATE_SIGNED_STORAGE_URL
+);
 
 // Validation function for the title
 const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
 
-const titleIsInvalid = computed(() => !isValidTitle(props.formValues?.uniqueName || ""));
+const titleIsInvalid = computed(
+  () => !isValidTitle(props.formValues?.uniqueName || "")
+);
 
 const titleInputRef = ref(null);
 
@@ -88,7 +97,9 @@ const upload = async (file: File) => {
       contentType: file.type,
     };
 
-    const signedUrlResult = await createSignedStorageUrl(getSignedStorageURLInput);
+    const signedUrlResult = await createSignedStorageUrl(
+      getSignedStorageURLInput
+    );
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
 
     const embeddedLink = uploadAndGetEmbeddedLink({
@@ -139,7 +150,6 @@ const deleteRule = (index: number) => {
   updatedRules.splice(index, 1);
   emit("updateFormValues", { rules: updatedRules });
 };
-
 </script>
 
 <template>
@@ -183,7 +193,14 @@ const deleteRule = (index: number) => {
                 :full-width="true"
                 @update="$emit('updateFormValues', { uniqueName: $event })"
               />
-              <p v-if="titleIsInvalid && touched" class="text-red-500 text-sm mt-2">
+              <CharCounter
+                :current="formValues.uniqueName?.length || 0"
+                :max="MAX_CHARS_IN_CHANNEL_NAME"
+              />
+              <p
+                v-if="titleIsInvalid && touched"
+                class="text-red-500 text-sm mt-2"
+              >
                 Title can only contain letters, numbers, and underscores.
               </p>
             </template>
@@ -199,6 +216,10 @@ const deleteRule = (index: number) => {
                 :full-width="true"
                 @update="$emit('updateFormValues', { displayName: $event })"
               />
+              <CharCounter
+                :current="formValues.displayName?.length || 0"
+                :max="MAX_CHARS_IN_CHANNEL_DISPLAY_NAME"
+              />
             </template>
           </FormRow>
 
@@ -207,7 +228,9 @@ const deleteRule = (index: number) => {
               <TagPicker
                 data-testid="tag-input"
                 :selected-tags="formValues.selectedTags"
-                @set-selected-tags="$emit('updateFormValues', { selectedTags: $event })"
+                @set-selected-tags="
+                  $emit('updateFormValues', { selectedTags: $event })
+                "
               />
             </template>
           </FormRow>
@@ -222,6 +245,10 @@ const deleteRule = (index: number) => {
                 :disable-auto-focus="true"
                 :allow-image-upload="false"
                 @update="$emit('updateFormValues', { description: $event })"
+              />
+              <CharCounter
+                :current="formValues.description?.length || 0"
+                :max="MAX_CHARS_IN_CHANNEL_DESCRIPTION"
               />
             </template>
           </FormRow>
@@ -252,7 +279,7 @@ const deleteRule = (index: number) => {
                 class="w-full shadow-sm"
                 :src="formValues.channelBannerURL"
                 :alt="formValues.uniqueName"
-              >
+              />
               <AddImage
                 key="channel-banner-url"
                 :field-name="'channelBannerURL'"

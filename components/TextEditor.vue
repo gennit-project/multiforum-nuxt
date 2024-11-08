@@ -7,7 +7,7 @@ import AddImage from "@/components/AddImage.vue";
 import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import ErrorBanner from "./ErrorBanner.vue";
 import { usernameVar } from "@/cache";
-import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 
 // Props
 const props = defineProps({

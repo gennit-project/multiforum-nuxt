@@ -12,7 +12,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import gql from "graphql-tag";
 import { modProfileNameVar, usernameVar } from "@/cache";
-import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
+import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
 
 const route = useRoute();
 const titleEditMode = ref(false);

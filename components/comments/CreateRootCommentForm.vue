@@ -8,7 +8,7 @@ import type { ApolloError } from "@apollo/client/errors";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
 import LoggedInUserAvatar from "./LoggedInUserAvatar.vue";
-import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 
 defineProps({
   createCommentError: {

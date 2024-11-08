@@ -15,7 +15,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
-import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
 

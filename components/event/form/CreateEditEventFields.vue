@@ -26,7 +26,7 @@ import { usernameVar } from "@/cache";
 import {
   EVENT_TITLE_CHAR_LIMIT,
   MAX_CHARS_IN_EVENT_DESCRIPTION,
-} from "@/utils/characterLimits";
+} from "@/utils/constants";
 
 export type UpdateLocationInput = {
   name: string;

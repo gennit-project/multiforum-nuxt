@@ -11,7 +11,7 @@ import CancelButton from "@/components/CancelButton.vue";
 import EmojiButtons from "./EmojiButtons.vue";
 import NewEmojiButton from "./NewEmojiButton.vue";
 import { usernameVar } from "@/cache";
-import { MAX_CHARS_IN_COMMENT } from "@/utils/characterLimits";
+import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 
 const props = defineProps({
   commentData: {

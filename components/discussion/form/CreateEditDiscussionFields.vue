@@ -9,7 +9,7 @@ import TextInput from "@/components/TextInput.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
-import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/characterLimits";
+import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 
 const props = defineProps<{
   editMode: boolean;
