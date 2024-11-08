@@ -150,6 +150,8 @@ const deleteRule = (index: number) => {
   updatedRules.splice(index, 1);
   emit("updateFormValues", { rules: updatedRules });
 };
+
+const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed"
 </script>
 
 <template>
@@ -177,7 +179,7 @@ const deleteRule = (index: number) => {
           <ErrorBanner
             v-for="(error, i) in createChannelError?.graphQLErrors"
             :key="i"
-            :text="error.message"
+            :text="`${error.message.split(CHANNEL_ALREADY_EXISTS_ERROR).join('Channel name is already taken')}`"
           />
         </div>
 
