@@ -3,7 +3,7 @@ import { ref } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { setUsername, usernameVar, setModProfileName } from "@/cache";
+import { setUsername, usernameVar, setIsLoadingAuth, setModProfileName } from "@/cache";
 import type { User } from "@/__generated__/graphql";
 import CreateUsernamePage from "./CreateUsernamePage.vue";
 
@@ -25,6 +25,7 @@ onEmailResult((result: any) => {
   } else {
     setUsername(user.username);
     setModProfileName(user.ModerationProfile?.displayName || "");
+    setIsLoadingAuth(false);
     emailNotInSystem.value = false;
   }
 });

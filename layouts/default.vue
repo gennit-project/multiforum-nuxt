@@ -64,12 +64,7 @@ onResult((newResult) => {
     setModProfileName(modProfileData?.displayName || "");
   }
 });
-const renderAuthenticatedContent = computed(() => {
-  if (!import.meta.client) {
-    return false;
-  }
-  return !isLoadingAuthVar && isAuthenticatedVar && usernameVar;
-});
+
 </script>
 
 <template>
@@ -92,16 +87,7 @@ const renderAuthenticatedContent = computed(() => {
             />
           </client-only>
           <div class="w-full">
-            <div
-              v-if="renderAuthenticatedContent"
-              class="flex min-h-screen flex-col"
-            >
-              <div class="flex-grow">
-                <slot />
-              </div>
-              <SiteFooter v-if="showFooter" />
-            </div>
-            <div v-else class="flex min-h-screen flex-col">
+            <div class="flex min-h-screen flex-col">
               <div class="flex-grow">
                 <slot />
               </div>
