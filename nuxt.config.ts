@@ -3,7 +3,6 @@ import config from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import path from "path";
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   alias: {
     "@": path.resolve(__dirname),
@@ -36,12 +35,6 @@ export default defineNuxtConfig({
     "@nuxtjs/eslint-module",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
-    (_options, nuxt) => {
-      nuxt.hooks.hook("vite:extendConfig", (config) => {
-        // @ts-expect-error
-        config.plugins.push(vuetify({ autoImport: true }));
-      });
-    },
   ],
   nitro: {
     preset: "node",
@@ -53,7 +46,6 @@ export default defineNuxtConfig({
     { src: "@/plugins/vuetify", mode: "all" },
   ],
   runtimeConfig: {
-    // Public config, available on both client and server
     public: {
       apollo: {
         clients: {
@@ -78,12 +70,14 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
   vite: {
+    plugins: [
+      vuetify({ autoImport: true }),
+    ],
     resolve: {
       alias: {
         "@": path.resolve(__dirname),
         "@/components": path.resolve(__dirname, "components"),
-        "fast-deep-equal": "fast-deep-equal/es6/index.js", 
-        
+        "fast-deep-equal": "fast-deep-equal/es6/index.js",
       },
     },
     vue: {

@@ -8,7 +8,7 @@ export default defineComponent({
 <template>
   <div>
     <div
-      class="flex w-full items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
+      class="flex text-xs w-full items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
     >
       <nuxt-link
         :to="`/privacy-policy`"

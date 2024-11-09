@@ -17,8 +17,8 @@ import { usernameVar } from "@/cache";
 import {
   MAX_CHARS_IN_CHANNEL_DESCRIPTION,
   MAX_CHARS_IN_CHANNEL_NAME,
-  MAX_CHARS_IN_CHANNEL_DISPLAY_NAME
-} from "@/utils/constants"; 
+  MAX_CHARS_IN_CHANNEL_DISPLAY_NAME,
+} from "@/utils/constants";
 
 const props = defineProps({
   editMode: {
@@ -151,7 +151,7 @@ const deleteRule = (index: number) => {
   emit("updateFormValues", { rules: updatedRules });
 };
 
-const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed"
+const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
 </script>
 
 <template>
@@ -173,6 +173,10 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed"
             v-for="(error, i) in getChannelError?.graphQLErrors"
             :key="i"
             :text="error.message"
+          />
+          <ErrorBanner
+            v-if="updateChannelError"
+            :text="updateChannelError.message"
           />
         </div>
         <div v-if="createChannelError">
