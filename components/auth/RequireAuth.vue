@@ -53,7 +53,7 @@ const showAuthContent = computed(
       <slot name="has-auth" />
     </div>
     <div
-      v-else-if="!isAuthenticatedVar && !loading && !authIsLoading"
+      v-else
       :class="[
         fullWidth ? 'w-full flex align-items justify-center ' : 'w-full flex align-items justify-end',
       ]"
