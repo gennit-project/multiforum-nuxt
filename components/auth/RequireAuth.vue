@@ -2,21 +2,21 @@
 import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { isAuthenticatedVar, isLoadingAuthVar, usernameVar } from "@/cache";
+import { isAuthenticatedVar, usernameVar } from "@/cache";
 
 const props = defineProps({
   requireOwnership: Boolean,
-  owners: Array as () => string[],
+  owners: {
+    type: Array,
+    default: () => [],
+  },
   justifyLeft: Boolean,
   fullWidth: Boolean,
   loading: Boolean,
 });
 
 const { loginWithPopup, idTokenClaims, isLoading: authIsLoading } = useAuth0();
-console.log({
-  loading: props.loading,
-  authIsLoading: authIsLoading.value
-})
+
 const storeToken = async () => {
   if (isAuthenticatedVar.value && idTokenClaims.value) {
     const token = await idTokenClaims.value.__raw;

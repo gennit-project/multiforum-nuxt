@@ -50,6 +50,7 @@ const createChannelInput = computed(() => {
       displayName: formValues.value.displayName,
       channelIconURL: formValues.value.channelIconURL,
       channelBannerURL: formValues.value.channelBannerURL,
+      rules: JSON.stringify(formValues.value.rules),
       Tags: {
         connectOrCreate: tagConnections,
       },
@@ -125,7 +126,7 @@ const submit = async () => {
   });
 };
 
-const updateFormValues = (data) => {
+const updateFormValues = (data: any) => {
   formValues.value = {
     ...formValues.value,
     ...data,
