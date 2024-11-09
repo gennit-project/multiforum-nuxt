@@ -9,15 +9,18 @@ const props = defineProps({
   owners: Array as () => string[],
   justifyLeft: Boolean,
   fullWidth: Boolean,
+  loading: Boolean,
 });
 
-const { loginWithPopup, idTokenClaims } = useAuth0();
-
+const { loginWithPopup, idTokenClaims, isLoading: authIsLoading } = useAuth0();
+console.log({
+  loading: props.loading,
+  authIsLoading: authIsLoading.value
+})
 const storeToken = async () => {
   if (isAuthenticatedVar.value && idTokenClaims.value) {
     const token = await idTokenClaims.value.__raw;
     localStorage.setItem("token", token);
-    console.log("Token stored:", token); // Add this line
   }
 };
 
@@ -35,7 +38,7 @@ const showAuthContent = computed(
 </script>
 
 <template>
-  <LoadingSpinner v-if="isLoadingAuthVar" />
+  <LoadingSpinner v-if="loading || authIsLoading" />
   <div
     v-else
     class="flex align-items"
@@ -50,7 +53,7 @@ const showAuthContent = computed(
       <slot name="has-auth" />
     </div>
     <div
-      v-else
+      v-else-if="!isAuthenticatedVar && !loading && !authIsLoading"
       :class="[
         fullWidth ? 'w-full flex align-items justify-center ' : 'w-full flex align-items justify-end',
       ]"

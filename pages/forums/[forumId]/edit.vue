@@ -1,7 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { useRoute } from "#app"; // Nuxt's useRoute composable
 import type { TagData } from "@/types/Tag";
 import type { UserData } from "@/types/User";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
@@ -10,7 +8,6 @@ import type { CreateEditChannelFormValues } from "@/types/Channel";
 import CreateEditChannelFields from "@/components/channel/form/CreateEditChannelFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import Notification from "@/components/NotificationComponent.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { usernameVar } from "@/cache";
 import type { Tag } from "@/__generated__/graphql";
 
@@ -113,8 +110,7 @@ function updateFormValues(data: CreateEditChannelFormValues) {
 
 <template>
   <div class="px-8">
-    <LoadingSpinner v-if="getChannelLoading" />
-    <RequireAuth v-else :require-ownership="true" :owners="ownerList">
+    <RequireAuth :require-ownership="true" :owners="ownerList" :loading="!dataLoaded || getChannelLoading">
       <template #has-auth>
         <CreateEditChannelFields
           :key="dataLoaded.toString()"

@@ -393,7 +393,7 @@ const saveDisabled = computed(() => {
                       props.commentData.text &&
                       props.editFormOpenAtCommentID !== props.commentData.id
                     "
-                    class="-ml-2"
+                    class="-ml-2 mt-2"
                     :class="[
                       props.goToPermalinkOnClick ? 'cursor-pointer' : '',
                     ]"
