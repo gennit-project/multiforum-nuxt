@@ -28,6 +28,8 @@ export default defineNuxtConfig({
         clients: {
           default: {
             httpEndpoint: config.graphqlUrl || "",
+            tokenName: "token",
+            tokenStorage: "localStorage",
           },
         },
       },
@@ -42,7 +44,6 @@ export default defineNuxtConfig({
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
-    { src: "@/plugins/apollo", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },
   ],
   runtimeConfig: {
@@ -70,9 +71,7 @@ export default defineNuxtConfig({
     typeCheck: true,
   },
   vite: {
-    plugins: [
-      vuetify({ autoImport: true }),
-    ],
+    plugins: [vuetify({ autoImport: true })],
     resolve: {
       alias: {
         "@": path.resolve(__dirname),

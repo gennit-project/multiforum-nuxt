@@ -17,6 +17,7 @@ const storeToken = async () => {
   if (isAuthenticatedVar.value && idTokenClaims.value) {
     const token = await idTokenClaims.value.__raw;
     localStorage.setItem("token", token);
+    console.log("Token stored:", token); // Add this line
   }
 };
 
