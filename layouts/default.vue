@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { useLazyQuery } from "@vue/apollo-composable";
 import TopNav from "@/components/nav/TopNav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { setUsername, setModProfileName, usernameVar, isAuthenticatedVar, isLoadingAuthVar } from "@/cache";
+import {
+  setUsername,
+  setModProfileName,
+  usernameVar,
+  isAuthenticatedVar,
+  isLoadingAuthVar,
+} from "@/cache";
 
 // UI states
 const showUserProfileDropdown = ref(false);
@@ -19,7 +25,11 @@ const showFooter = !useRoute().name?.includes("map");
 
 const userEmail = ref("");
 // Lazy query to fetch user email data from GraphQL
-const { load: loadUserData, onResult, onError } = useLazyQuery(GET_EMAIL, {
+const {
+  load: loadUserData,
+  onResult,
+  onError,
+} = useLazyQuery(GET_EMAIL, {
   emailAddress: userEmail,
 });
 
@@ -44,7 +54,6 @@ onMounted(() => {
   );
 });
 
-
 // Set `username` in the cache upon GraphQL query result
 onResult((newResult) => {
   const userData = newResult?.data?.emails?.[0]?.User;
@@ -54,6 +63,12 @@ onResult((newResult) => {
     setUsername(userData.username);
     setModProfileName(modProfileData?.displayName || "");
   }
+});
+const renderAuthenticatedContent = computed(() => {
+  if (!import.meta.client) {
+    return false;
+  }
+  return !isLoadingAuthVar && isAuthenticatedVar && usernameVar;
 });
 </script>
 
@@ -68,32 +83,32 @@ onResult((newResult) => {
           @close-user-profile-dropdown="closeUserProfileDropdown"
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
-        <client-only>
-          <div class="flex relative">
+        <div class="flex relative">
+          <client-only>
             <SiteSidenav
               :key="`${showDropdown}`"
               :show-dropdown="showDropdown"
               @close="showDropdown = false"
             />
-            <div class="w-full">
-              <div
-                v-if="!isLoadingAuthVar && isAuthenticatedVar && usernameVar"
-                class="flex min-h-screen flex-col"
-              >
-                <div class="flex-grow">
-                  <slot />
-                </div>
-                <SiteFooter v-if="showFooter" />
+          </client-only>
+          <div class="w-full">
+            <div
+              v-if="renderAuthenticatedContent"
+              class="flex min-h-screen flex-col"
+            >
+              <div class="flex-grow">
+                <slot />
               </div>
-              <div v-else class="flex min-h-screen flex-col">
-                <div class="flex-grow">
-                  <slot />
-                </div>
-                <SiteFooter v-if="showFooter" />
+              <SiteFooter v-if="showFooter" />
+            </div>
+            <div v-else class="flex min-h-screen flex-col">
+              <div class="flex-grow">
+                <slot />
               </div>
+              <SiteFooter v-if="showFooter" />
             </div>
           </div>
-        </client-only>
+        </div>
       </div>
     </main>
   </v-app>
