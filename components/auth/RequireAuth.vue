@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { isAuthenticatedVar, usernameVar } from "@/cache";
 
+// Define props for the component
 const props = defineProps({
   requireOwnership: Boolean,
   owners: {
@@ -15,26 +16,29 @@ const props = defineProps({
   loading: Boolean,
 });
 
-const { loginWithPopup, idTokenClaims, isLoading: authIsLoading } = useAuth0();
+let handleLogin = () => {};
 
-const storeToken = async () => {
-  if (isAuthenticatedVar.value && idTokenClaims.value) {
-    const token = await idTokenClaims.value.__raw;
-    localStorage.setItem("token", token);
-  }
-};
-
-const handleLogin = async () => {
-  if (import.meta.client) {
-    await loginWithPopup();
-    await storeToken();
-  }
-};
-
-const isOwner = computed(() => props.owners?.includes(usernameVar.value));
+const authIsLoading = ref(true);
 const showAuthContent = computed(
   () => isAuthenticatedVar.value && !!usernameVar.value
 );
+const isOwner = computed(() => props.owners?.includes(usernameVar.value));
+
+if (import.meta.env.SSR === false) {
+  const { loginWithPopup, idTokenClaims, isLoading } = useAuth0();
+  authIsLoading.value = isLoading.value
+
+  const storeToken = async () => {
+    if (isAuthenticatedVar.value && idTokenClaims.value) {
+      const token = await idTokenClaims.value.__raw;
+      localStorage.setItem("token", token);
+    }
+  };
+  handleLogin = async () => {
+    await loginWithPopup();
+    await storeToken();
+  };
+}
 </script>
 
 <template>
@@ -47,7 +51,9 @@ const showAuthContent = computed(
     <div
       v-if="showAuthContent && (!requireOwnership || isOwner)"
       :class="[
-        fullWidth ? 'w-full flex align-items justify-center' : 'w-full flex align-items justify-end',
+        fullWidth
+          ? 'w-full flex align-items justify-center'
+          : 'w-full flex align-items justify-end',
       ]"
     >
       <slot name="has-auth" />
@@ -55,7 +61,9 @@ const showAuthContent = computed(
     <div
       v-else
       :class="[
-        fullWidth ? 'w-full flex align-items justify-center ' : 'w-full flex align-items justify-end',
+        fullWidth
+          ? 'w-full flex align-items justify-center '
+          : 'w-full flex align-items justify-end',
       ]"
       @click="handleLogin"
     >
