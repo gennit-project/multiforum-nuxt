@@ -42,7 +42,7 @@ onError((error) => {
 
 onMounted(() => {
   const { user, isAuthenticated } = useAuth0();
-  isAuthenticatedVar.value = isAuthenticated;
+  isAuthenticatedVar.value = isAuthenticated.value;
   isLoadingAuthVar.value = false;
 
   watch(
