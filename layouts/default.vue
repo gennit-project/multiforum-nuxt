@@ -69,12 +69,15 @@ onResult((newResult) => {
     setModProfileName(modProfileData?.displayName || "");
   }
 });
-
 const emailDoesNotHaveUsernameAttached = computed(() => {
   return (
-    !usernameVar.value && isAuthenticatedVar.value
+    !usernameVar.value && isAuthenticatedVar.value && !isLoadingAuthVar.value
   );
 });
+
+const showMainContent = computed(() => {
+  return !isAuthenticatedVar || (isAuthenticatedVar && usernameVar)
+})
 </script>
 
 <template>
@@ -89,19 +92,9 @@ const emailDoesNotHaveUsernameAttached = computed(() => {
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
         <div class="flex-col relative">
-          <client-only>
-            <CreateUsernamePage
-              v-if="emailDoesNotHaveUsernameAttached"
-              @email-and-user-created="!usernameVar"
-            />
-            <SiteSidenav
-              :key="`${showDropdown}`"
-              :show-dropdown="showDropdown"
-              @close="showDropdown = false"
-            />
-          </client-only>
+          
           <div
-            v-if="!isAuthenticatedVar || (isAuthenticatedVar && usernameVar)"
+            v-if="showMainContent"
             class="w-full"
           >
             <div class="flex min-h-screen flex-col">
@@ -110,6 +103,19 @@ const emailDoesNotHaveUsernameAttached = computed(() => {
               </div>
             </div>
             <SiteFooter v-if="showFooter" />
+          </div>
+          <div v-else >
+            <client-only>
+              <CreateUsernamePage
+                v-if="emailDoesNotHaveUsernameAttached"
+                @email-and-user-created="!usernameVar"
+              />
+              <SiteSidenav
+                :key="`${showDropdown}`"
+                :show-dropdown="showDropdown"
+                @close="showDropdown = false"
+              />
+            </client-only>
           </div>
         </div>
       </div>

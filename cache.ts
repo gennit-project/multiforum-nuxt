@@ -2,7 +2,7 @@ import type { ReactiveVar } from "@apollo/client/core";
 import { InMemoryCache, makeVar } from "@apollo/client/core";
 import { ref } from 'vue';
 
-export const usernameVar = ref();
+export const usernameVar = ref('');
 export const setUsername = (username: string) => {
   usernameVar.value = username;
 };
@@ -15,7 +15,7 @@ export const setIsAuthenticated = (status: boolean) => {
   isAuthenticatedVar.value = status;
 };
 
-export const isLoadingAuthVar = ref(true);
+export const isLoadingAuthVar = ref(false);
 export const setIsLoadingAuth = (status: boolean) => {
   isLoadingAuthVar.value = status;
 };
