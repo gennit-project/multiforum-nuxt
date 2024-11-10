@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
-import type { ApolloError } from '@apollo/client/errors';
-import { useRoute } from 'vue-router';
-import { useMutation } from '@vue/apollo-composable';
-import TextInput from '@/components/TextInput.vue';
-import FormRow from '@/components/FormRow.vue';
-import TextEditor from '@/components/TextEditor.vue';
-import AddImage from '@/components/AddImage.vue';
-import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
-import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
-import type { EditAccountSettingsFormValues } from '@/types/User';
-import FormComponent from '../FormComponent.vue';
-import { usernameVar } from '@/cache';
+import { ref, computed, nextTick } from "vue";
+import type { ApolloError } from "@apollo/client/errors";
+import { useRoute } from "vue-router";
+import { useMutation } from "@vue/apollo-composable";
+import TextInput from "@/components/TextInput.vue";
+import FormRow from "@/components/FormRow.vue";
+import TextEditor from "@/components/TextEditor.vue";
+import AddImage from "@/components/AddImage.vue";
+import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
+import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import type { EditAccountSettingsFormValues } from "@/types/User";
+import FormComponent from "../FormComponent.vue";
+import { usernameVar } from "@/cache";
+import { MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
 
-// Props
-defineProps({
+const props = defineProps({
   formValues: {
     type: Object as PropType<EditAccountSettingsFormValues | null>,
     required: true,
@@ -38,7 +38,7 @@ defineProps({
 });
 
 // Emit
-const emit = defineEmits(['updateFormValues', 'submit']);
+const emit = defineEmits(["updateFormValues", "submit"]);
 
 // Data and Setup
 const route = useRoute();
@@ -46,15 +46,17 @@ const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 const touched = ref(false);
 
 const usernameInParams = computed(() => {
-  return typeof route.params.username === 'string' ? route.params.username : '';
+  return typeof route.params.username === "string" ? route.params.username : "";
 });
 
-const { mutate: createSignedStorageUrl } = useMutation(CREATE_SIGNED_STORAGE_URL);
+const { mutate: createSignedStorageUrl } = useMutation(
+  CREATE_SIGNED_STORAGE_URL
+);
 
 // Methods
 const upload = async (file: any) => {
   if (!usernameVar.value) {
-    console.error('No username found');
+    console.error("No username found");
     return;
   }
 
@@ -76,7 +78,7 @@ const upload = async (file: any) => {
 
     return embeddedLink;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    console.error("Error uploading file:", error);
   }
 };
 
@@ -90,8 +92,8 @@ const handleProfilePicChange = async (event: any) => {
       return;
     }
 
-    emit('updateFormValues', { profilePicURL: embeddedLink });
-    emit('submit');
+    emit("updateFormValues", { profilePicURL: embeddedLink });
+    emit("submit");
   }
 };
 
@@ -101,6 +103,13 @@ nextTick(() => {
     titleInputRef.value?.$el?.children[0].childNodes[0].focus();
   }
 });
+
+const needsChanges = computed(() => {
+  if (props.formValues?.bio && props.formValues.bio.length > MAX_CHARS_IN_USER_BIO) {
+    return true;
+  }
+  return false
+})
 </script>
 
 <template>
@@ -114,7 +123,7 @@ nextTick(() => {
     <FormComponent
       v-else-if="formValues"
       :form-title="'Edit Account Settings'"
-      :needs-changes="false"
+      :needs-changes="needsChanges"
       :show-cancel-button="false"
       :loading="updateUserLoading"
       @input="touched = true"
@@ -156,6 +165,11 @@ nextTick(() => {
                 :rows="6"
                 :allow-image-upload="false"
                 @update="emit('updateFormValues', { bio: $event })"
+              />
+              <CharCounter
+                :key="formValues.bio"
+                :current="formValues.bio.length || 0"
+                :max="MAX_CHARS_IN_USER_BIO"
               />
             </template>
           </FormRow>
