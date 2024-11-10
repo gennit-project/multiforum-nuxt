@@ -44,7 +44,6 @@ onMounted(() => {
   const { user, isAuthenticated } = useAuth0();
   isAuthenticatedVar.value = isAuthenticated;
   isLoadingAuthVar.value = false;
-  console.log('setting user data')
 
   watch(
     user,
@@ -64,10 +63,6 @@ onResult((newResult) => {
   const modProfileData = userData?.ModerationProfile;
 
   if (userData && !userData.loading) {
-    console.log({
-      username: userData.username,
-      modProfileData: modProfileData,
-    });
     setUsername(userData.username);
     setIsLoadingAuth(false);
     setIsAuthenticated(true);

@@ -115,6 +115,23 @@ nextTick(() => {
   usernameInput.value?.focus();
 });
 
+const canSave = computed(() => {
+  if (usernameIsTaken.value) {
+    return false;
+  }
+  if (usernameIsEmpty.value) {
+    return false;
+  }
+  if (usernameIsInvalid.value) {
+    return false;
+  }
+  if (newUsername.value.length > MAX_CHARS_IN_USERNAME) {
+    return false;
+  }
+
+  return true
+});
+
 
 </script>
 
@@ -145,7 +162,7 @@ nextTick(() => {
         </div>
       </div>
 
-      <div class="h-6">
+      <div>
         <p class="my-1 text-xs text-red-500">
           {{ validationErrorMessage }}
         </p>
@@ -167,7 +184,7 @@ nextTick(() => {
       <PrimaryButton
         class="float-right my-4"
         :label="'Save'"
-        :disabled="!confirmedAvailable"
+        :disabled="!canSave"
         :loading="createEmailAndUserLoading"
         @click="createEmailAndUser"
       />
