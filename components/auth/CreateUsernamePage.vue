@@ -4,6 +4,7 @@ import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
 import { setUsername, usernameVar, setModProfileName } from "@/cache";
+import CreateUsernameForm from "@/components/auth/CreateUsernameForm.vue";
 console.log('create username page is rendering')
 
 const { user } = useAuth0();
