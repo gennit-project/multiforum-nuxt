@@ -18,7 +18,7 @@ const props = defineProps({
 let handleLogin = () => {};
 
 const showAuthContent = computed(
-  () => isAuthenticatedVar.value && !!usernameVar.value
+  () => isAuthenticatedVar.value && !!usernameVar.value && !props.loading && !isLoadingAuthVar.value
 );
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 
@@ -45,7 +45,7 @@ if (import.meta.env.SSR === false) {
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
     <div
-      v-if="!loading && !isLoadingAuthVar && showAuthContent && (!requireOwnership || isOwner)"
+      v-if="showAuthContent && (!requireOwnership || isOwner)"
       :class="[
         fullWidth
           ? 'w-full flex align-items justify-center'
@@ -55,7 +55,7 @@ if (import.meta.env.SSR === false) {
       <slot name="has-auth" />
     </div>
     <div
-      v-else
+      v-else-if="showAuthContent"
       :class="[
         fullWidth
           ? 'w-full flex align-items justify-center '
