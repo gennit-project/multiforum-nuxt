@@ -76,8 +76,8 @@ const emailDoesNotHaveUsernameAttached = computed(() => {
 });
 
 const showMainContent = computed(() => {
-  return !isAuthenticatedVar || (isAuthenticatedVar && usernameVar)
-})
+  return !isAuthenticatedVar || (isAuthenticatedVar && usernameVar);
+});
 </script>
 
 <template>
@@ -92,11 +92,14 @@ const showMainContent = computed(() => {
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
         <div class="flex-col relative">
-          
-          <div
-            v-if="showMainContent"
-            class="w-full"
-          >
+          <client-only>
+            <SiteSidenav
+              :key="`${showDropdown}`"
+              :show-dropdown="showDropdown"
+              @close="showDropdown = false"
+            />
+          </client-only>
+          <div v-if="showMainContent" class="w-full">
             <div class="flex min-h-screen flex-col">
               <div class="flex-grow">
                 <slot />
@@ -104,16 +107,11 @@ const showMainContent = computed(() => {
             </div>
             <SiteFooter v-if="showFooter" />
           </div>
-          <div v-else >
+          <div v-else>
             <client-only>
               <CreateUsernamePage
                 v-if="emailDoesNotHaveUsernameAttached"
                 @email-and-user-created="!usernameVar"
-              />
-              <SiteSidenav
-                :key="`${showDropdown}`"
-                :show-dropdown="showDropdown"
-                @close="showDropdown = false"
               />
             </client-only>
           </div>
