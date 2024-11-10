@@ -8,6 +8,7 @@ import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
 import { setUsername, setModProfileName, setIsAuthenticated, setIsLoadingAuth } from "@/cache";
+import { MAX_CHARS_IN_USERNAME, MAX_CHARS_IN_USER_DISPLAY_NAME, MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
 
 const props = defineProps({
   email: {
@@ -54,7 +55,25 @@ const usernameIsEmpty = computed(() => {
   return newUsername.value.length === 0
 });
 
-const isValidUsername = (username: string) => /^[a-zA-Z0-9_]+$/.test(username);
+const isValidUsername = (username: string) => {
+  return /^[a-zA-Z0-9_]+$/.test(username)
+}
+
+const validationErrorMessage = computed(() => {
+  if (usernameIsEmpty.value) {
+    return "Username cannot be empty.";
+  }
+  if (usernameIsTaken.value) {
+    return "The username is already taken.";
+  }
+  if (usernameIsInvalid.value) {
+    return "Username can only contain letters, numbers, and underscores.";
+  }
+  if (newUsername.value.length > MAX_CHARS_IN_USERNAME) {
+    return `Username must be less than ${MAX_CHARS_IN_USERNAME} characters.`;
+  }
+  return "";
+});
 
 const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value));
 
@@ -127,10 +146,14 @@ nextTick(() => {
       </div>
 
       <div class="h-6">
-        <p class="my-1 text-xs">
-          {{ usernameIsTaken ? "The username is already taken." : "" }}
-          {{ usernameIsInvalid ? "Username can only contain letters, numbers, and underscores." : "" }}
+        <p class="my-1 text-xs text-red-500">
+          {{ validationErrorMessage }}
         </p>
+        <CharCounter
+          :current="newUsername.length"
+          :max="MAX_CHARS_IN_USERNAME"
+          class="text-xs"
+        />
         <div v-if="confirmedAvailable" class="flex items-start">
           <div class="flex-shrink-0">
             <CheckCircleIcon class="mr-2 h-6 w-6 text-green-400" aria-hidden="true" />
