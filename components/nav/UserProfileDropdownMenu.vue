@@ -50,6 +50,7 @@ const menuItems = [
 const route = useRoute();
 
 const handleLogout = () => {
+  console.log('base url', config.baseUrl);
   // Store the current path in local storage
   localStorage.setItem("postLogoutRedirect", route.fullPath);
   // Redirect to the fixed logout route

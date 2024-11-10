@@ -55,7 +55,7 @@ if (import.meta.env.SSR === false) {
       <slot name="has-auth" />
     </div>
     <div
-      v-else-if="showAuthContent"
+      v-else-if="!isLoadingAuthVar"
       :class="[
         fullWidth
           ? 'w-full flex align-items justify-center '
