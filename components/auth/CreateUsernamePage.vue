@@ -4,8 +4,9 @@ import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
 import { setUsername, usernameVar, setModProfileName } from "@/cache";
+console.log('create username page is rendering')
 
-const { user, isAuthenticated } = useAuth0();
+const { user } = useAuth0();
 const emailNotInSystem = ref(true);
 
 const { onResult: onEmailResult } = useQuery(GET_EMAIL, {
@@ -28,8 +29,9 @@ onEmailResult((result: any) => {
 </script>
 
 <template>
-  <CreateUsernamePage
-    v-if="isAuthenticated && !usernameVar && emailNotInSystem"
+  <CreateUsernameForm
+    v-if="user?.email && !usernameVar && emailNotInSystem"
+    :email="user.email"
     @email-and-user-created="emailNotInSystem = false"
   />
 </template>

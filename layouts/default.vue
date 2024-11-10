@@ -11,8 +11,11 @@ import {
   setModProfileName,
   usernameVar,
   isAuthenticatedVar,
+  setIsAuthenticated,
   isLoadingAuthVar,
+  setIsLoadingAuth,
 } from "@/cache";
+import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 
 // UI states
 const showUserProfileDropdown = ref(false);
@@ -41,6 +44,7 @@ onMounted(() => {
   const { user, isAuthenticated } = useAuth0();
   isAuthenticatedVar.value = isAuthenticated;
   isLoadingAuthVar.value = false;
+  console.log('setting user data')
 
   watch(
     user,
@@ -60,11 +64,22 @@ onResult((newResult) => {
   const modProfileData = userData?.ModerationProfile;
 
   if (userData && !userData.loading) {
+    console.log({
+      username: userData.username,
+      modProfileData: modProfileData,
+    });
     setUsername(userData.username);
+    setIsLoadingAuth(false);
+    setIsAuthenticated(true);
     setModProfileName(modProfileData?.displayName || "");
   }
 });
 
+const emailDoesNotHaveUsernameAttached = computed(() => {
+  return (
+    !usernameVar.value && isAuthenticatedVar.value
+  );
+});
 </script>
 
 <template>
@@ -78,21 +93,28 @@ onResult((newResult) => {
           @close-user-profile-dropdown="closeUserProfileDropdown"
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
-        <div class="flex relative">
+        <div class="flex-col relative">
           <client-only>
+            <CreateUsernamePage
+              v-if="emailDoesNotHaveUsernameAttached"
+              @email-and-user-created="!usernameVar"
+            />
             <SiteSidenav
               :key="`${showDropdown}`"
               :show-dropdown="showDropdown"
               @close="showDropdown = false"
             />
           </client-only>
-          <div class="w-full">
+          <div
+            v-if="!isAuthenticatedVar || (isAuthenticatedVar && usernameVar)"
+            class="w-full"
+          >
             <div class="flex min-h-screen flex-col">
               <div class="flex-grow">
                 <slot />
               </div>
-              <SiteFooter v-if="showFooter" />
             </div>
+            <SiteFooter v-if="showFooter" />
           </div>
         </div>
       </div>

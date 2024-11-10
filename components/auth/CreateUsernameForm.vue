@@ -7,8 +7,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
-import { useAuth0 } from "@auth0/auth0-vue";
-import { setUsername, setModProfileName } from "@/cache";
+import { setUsername, setModProfileName, setIsAuthenticated, setIsLoadingAuth } from "@/cache";
 
 const props = defineProps({
   email: {
@@ -16,8 +15,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const { user } = useAuth0();
 const newUsername = ref(props.email?.split("@")[0]);
 
 const {
@@ -35,7 +32,7 @@ const {
   onDone: onEmailAndUserCreated,
 } = useMutation(CREATE_EMAIL_AND_USER, () => ({
   variables: {
-    emailAddress: user.value.email,
+    emailAddress: props.email,
     username: newUsername.value,
   },
 }));
@@ -50,7 +47,12 @@ const usernameIsTaken = computed(() => {
   return false;
 });
 
-const usernameIsEmpty = computed(() => newUsername.value.length === 0);
+const usernameIsEmpty = computed(() => {
+  if (!newUsername.value) {
+    return true;
+  }
+  return newUsername.value.length === 0
+});
 
 const isValidUsername = (username: string) => /^[a-zA-Z0-9_]+$/.test(username);
 
@@ -76,6 +78,9 @@ onEmailAndUserCreated((result) => {
     if (modProfileName) {
       setModProfileName(modProfileName);
     }
+
+    setIsAuthenticated(true);
+    setIsLoadingAuth(false);
 
     emit("emailAndUserCreated");
   }

@@ -35,11 +35,16 @@ const {
   channelUniqueName: channelId.value,
 });
 
-const discussion = computed<Discussion | null>(() =>
-  !getDiscussionLoading.value && !getDiscussionError.value
-    ? getDiscussionResult.value?.discussions[0]
-    : null
-);
+const discussion = computed<Discussion | null>(() =>{
+  const discussion = getDiscussionResult.value?.discussions[0];
+  if (getDiscussionLoading.value && !discussion) {
+    return null
+  } 
+  if (getDiscussionError.value){
+    return null
+  }
+  return discussion || null
+});
 const authorIsLoggedInUser = computed(
   () => discussion.value?.Author?.username === usernameVar.value
 );

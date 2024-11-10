@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_USER } from "@/graphQLData/user/queries";
+import { usernameVar } from "@/cache";
 import config from "@/config";
 
 const props = defineProps({
@@ -16,12 +15,10 @@ const props = defineProps({
   },
 });
 const { logout } = useAuth0();
-const { result: getUserResult } = useQuery(GET_USER, {
-  username: props.username || "",
-});
+
 
 const user = computed(() => {
-  const fetchedUser = getUserResult.value?.users[0];
+  const fetchedUser = usernameVar.value;
   return fetchedUser || null;
 });
 

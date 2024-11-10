@@ -36,10 +36,11 @@ const {
 });
 
 const channel = computed(() => {
-  if (getChannelLoading.value || getChannelError.value) {
+  const channel = getChannelResult.value?.channels?.[0]
+  if ((getChannelLoading.value && !channel) || getChannelError.value) {
     return null;
   }
-  return getChannelResult.value?.channels?.[0] ?? null;
+  return channel ?? null;
 });
 
 const addForumToLocalStorage = (channel: Channel) => {

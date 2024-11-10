@@ -1,9 +1,8 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
 import TabButton from "@/components/channel/TabButton.vue";
 import type { User } from "@/__generated__/graphql";
-import { usernameVar } from "@/cache";
+import { usernameVar, isAuthenticatedVar } from "@/cache";
 
 type TabData = {
   name: string;
@@ -32,7 +31,6 @@ const props = defineProps({
 });
 
 const channelId = ref(props.route.params.forumId);
-const { isAuthenticated } = useAuth0();
 
 const usernameInParams = computed(() => {
   return typeof props.route.params.username === "string" ? props.route.params.username : "";
@@ -69,7 +67,7 @@ const tabs = computed(() => {
     },
   ];
 
-  if (isAuthenticated && usernameVar.value === usernameInParams.value) {
+  if (isAuthenticatedVar.value && usernameVar.value === usernameInParams.value) {
     tabList.push({
       name: "Settings",
       href: `/u/${usernameInParams.value}/settings`,

@@ -10,7 +10,7 @@ import XIcon from "@/components/icons/XmarkIcon.vue";
 import { GET_USER } from "@/graphQLData/user/queries";
 import { useDisplay } from "vuetify";
 import CreateAnythingButton from "./CreateAnythingButton.vue";
-import { usernameVar } from "@/cache";
+import { usernameVar, isAuthenticatedVar } from "@/cache";
 import config from "@/config";
 
 const DEFAULT_LIMIT = 5;
@@ -38,7 +38,7 @@ defineProps({
 const emit = defineEmits(["close"]);
 
 const showAllForums = ref(false);
-const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
+const { logout, loginWithRedirect } = useAuth0();
 
 const recentForums = computed(() => {
   if (!import.meta.client) {
@@ -199,7 +199,7 @@ const navLinkClasses =
       </div>
       <ul role="list" class="border-t mb-6 mt-6 pt-4 p-0 m-0">
         <nuxt-link
-          v-if="isAuthenticated && usernameVar"
+          v-if="isAuthenticatedVar && usernameVar"
           :to="{
             name: 'u-username',
             params: { username: usernameVar },
@@ -216,7 +216,7 @@ const navLinkClasses =
           My Profile
         </nuxt-link>
         <nuxt-link
-          v-if="isAuthenticated && usernameVar"
+          v-if="isAuthenticatedVar && usernameVar"
           :to="{
             name: 'u-username-settings',
             params: { username: usernameVar },
@@ -226,11 +226,11 @@ const navLinkClasses =
         >
           Account Settings
         </nuxt-link>
-        <button v-if="!isAuthenticated" :class="navLinkClasses" @click="login">
+        <button v-if="!isAuthenticatedVar" :class="navLinkClasses" @click="login">
           Log In
         </button>
         <nuxt-link
-          v-if="isAuthenticated"
+          v-if="isAuthenticatedVar"
           data-testid="sign-out-link"
           to="/"
           :class="navLinkClasses"
