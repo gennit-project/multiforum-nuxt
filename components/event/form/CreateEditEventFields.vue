@@ -518,7 +518,7 @@ const touched = ref(false);
               :checked="formValues.free"
               @input="toggleCostField"
             />
-            <span class="ml-2 align-middle text-white">This event is free</span>
+            <span class="ml-2 align-middle dark:text-white">This event is free</span>
             <TextInput
               v-show="!formValues.free"
               data-testid="cost-input"

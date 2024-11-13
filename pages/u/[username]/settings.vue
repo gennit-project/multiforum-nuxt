@@ -90,6 +90,7 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
     :require-ownership="true"
     :owners="[usernameInParams]"
     :loading="getUserLoading"
+    :full-width="true"
   >
     <template #has-auth>
       <div
@@ -114,7 +115,7 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
       </div>
     </template>
     <template #does-not-have-auth>
-      <p class="dark:text-white">You don't have permission to see this page.</p>
+      <p class="dark:text-white mt-6">You don't have permission to see this page.</p>
     </template>
   </RequireAuth>
 </template>

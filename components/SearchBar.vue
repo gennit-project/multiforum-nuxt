@@ -48,12 +48,12 @@ onMounted(() => {
   }
 });
 
-// Methods
 const removeQuotationMarks = (input: string) => {
   return input.split("'").join("").split('"').join("");
 };
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
+
 const updateSearchInput = (e: any) => {
   if (timeout) clearTimeout(timeout);
   timeout = setTimeout(() => {
@@ -88,8 +88,8 @@ const clear = () => {
         class="w-full border border-gray-200 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
         :placeholder="searchPlaceholder"
         type="text"
-        @keyup="updateSearchInput"
-      />
+        @input="updateSearchInput"
+      >
       <slot>
         <div
           class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3"
