@@ -56,7 +56,7 @@ const handleInput = (value: string) => {
 
 <template>
   <div>
-    <div class="relative mt-1 flex rounded-lg shadow-sm">
+    <div class="relative mt-1 flex rounded-lg">
       <input
         v-if="rows === 1"
         ref="inputRef"
@@ -71,7 +71,7 @@ const handleInput = (value: string) => {
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
             : 'focus:border-blue-500 focus:ring-blue-500',
         ]"
-        class="block min-w-0 flex-1 rounded-lg border-gray-200 pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 sm:text-sm"
+        class="border border-gray-200 block min-w-0 flex-1 rounded-lg pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 sm:text-sm"
         @input="handleInput($event.target.value)"
       >
       <textarea
