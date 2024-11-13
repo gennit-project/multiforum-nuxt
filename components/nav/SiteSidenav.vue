@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useQuery } from "@vue/apollo-composable";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
@@ -11,7 +11,7 @@ import { GET_USER } from "@/graphQLData/user/queries";
 import { useDisplay } from "vuetify";
 import CreateAnythingButton from "./CreateAnythingButton.vue";
 import { usernameVar, isAuthenticatedVar } from "@/cache";
-import config from "@/config";
+import SiteSidenavLogout from "./SiteSidenavLogout.vue";
 
 const DEFAULT_LIMIT = 5;
 
@@ -38,7 +38,6 @@ defineProps({
 const emit = defineEmits(["close"]);
 
 const showAllForums = ref(false);
-const { logout, loginWithRedirect } = useAuth0();
 
 const recentForums = computed(() => {
   if (!import.meta.client) {
@@ -63,19 +62,6 @@ const user = computed(() => getUserResult.value?.users[0] || null);
 const profilePicURL = computed(() => user.value?.profilePicURL || "");
 
 const { smAndDown } = useDisplay();
-const route = useRoute();
-
-const login = () => loginWithRedirect();
-const handleLogout = () => {
-  // Store the current path in local storage
-  localStorage.setItem("postLogoutRedirect", route.fullPath);
-  // Redirect to the fixed logout route
-  logout({
-    logoutParams: {
-      returnTo: `${config.baseUrl}/logout`,
-    },
-  });
-};
 
 const outside = () => {
   emit("close");
@@ -226,18 +212,20 @@ const navLinkClasses =
         >
           Account Settings
         </nuxt-link>
-        <button v-if="!isAuthenticatedVar" :class="navLinkClasses" @click="login">
-          Log In
-        </button>
-        <nuxt-link
-          v-if="isAuthenticatedVar"
-          data-testid="sign-out-link"
-          to="/"
-          :class="navLinkClasses"
-          @click="handleLogout"
-        >
-          Sign Out
-        </nuxt-link>
+
+        <RequireAuth :require-ownership="false" :full-width="true">
+          <template #has-auth>
+            <SiteSidenavLogout :nav-link-classes="`w-full ${navLinkClasses}`" />
+          </template>
+          <template #does-not-have-auth>
+            <button
+              v-if="!isAuthenticatedVar"
+              :class="`w-full ${navLinkClasses}`"
+            >
+              Log In
+            </button>
+          </template>
+        </RequireAuth>
       </ul>
     </div>
   </div>

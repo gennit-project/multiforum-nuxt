@@ -92,13 +92,11 @@ const showMainContent = computed(() => {
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
         <div class="flex-col relative">
-          <client-only>
-            <SiteSidenav
-              :key="`${showDropdown}`"
-              :show-dropdown="showDropdown"
-              @close="showDropdown = false"
-            />
-          </client-only>
+          <SiteSidenav
+            :key="`${showDropdown}`"
+            :show-dropdown="showDropdown"
+            @close="showDropdown = false"
+          />
           <div v-if="showMainContent" class="w-full">
             <div class="flex min-h-screen flex-col">
               <div class="flex-grow">
