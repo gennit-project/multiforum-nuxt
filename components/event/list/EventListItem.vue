@@ -221,7 +221,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           <MarkdownPreview
             :text="truncatedDescription || ''"
             :disable-gallery="true"
-            :word-limit="20"
+            :word-limit="10"
             class="ml-2"
           />
         </div>

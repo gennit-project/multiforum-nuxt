@@ -18,13 +18,22 @@ const channelId = computed(() =>
 );
 const sideNavIsOpen = ref(false);
 const shouldShowChannelId = computed(() => channelId.value);
-const shouldShowRouteInfo = computed(
-  () => route.name === "MapView" || route.name === "SearchChannels"
-);
+
 const routeInfoLabel = computed(() => {
-  if (route.name === "MapView") return "events map";
-  if (route.name === "SearchChannels") return "Forums";
-  return "";
+  if (typeof route.name === 'string' && route.name.indexOf("map-search") !== -1) {
+    return "in-person events";
+  }
+ 
+  switch (route.name) {
+    case "discussions":
+      return "discussions";
+    case "events-list-search":
+      return "online events";
+    case "forums":
+      return "forums";
+    default:
+      return "";
+  }
 });
 
 function getLabel() {
@@ -76,7 +85,7 @@ const isOnMapPage = computed(() => {
             }}</span>
           </div>
           <div
-            v-else-if="shouldShowRouteInfo"
+            v-else-if="routeInfoLabel"
             class="hidden sm:flex items-center gap-1"
           >
             <span>•</span>

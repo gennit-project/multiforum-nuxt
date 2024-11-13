@@ -204,7 +204,7 @@ const addToOutlook = () => {
     <div class="mb-10 flex w-full justify-center rounded-lg">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
-          <p v-if="eventLoading" class="px-4 lg:px-10">Loading...</p>
+          <p v-if="(eventLoading && !event)" class="px-4 lg:px-10">Loading...</p>
           <ErrorBanner
             v-else-if="eventError"
             class="px-4 lg:px-10"
@@ -213,7 +213,7 @@ const addToOutlook = () => {
           <div v-else-if="!event">Could not find the event.</div>
 
           <div
-            v-else-if="eventResult && eventResult.events && event"
+            v-else-if="event"
             class="dark:bg-dark-700 mx-auto flex flex-col gap-4 pt-8"
           >
             <ErrorBanner
@@ -230,7 +230,7 @@ const addToOutlook = () => {
 
             <div
               v-if="
-                route.name === 'map-search-eventId' && !eventLoading && event
+                route.name === 'map-search-eventId' && event
               "
               class="dark:text-gray-100 md:flex md:items-center md:justify-between"
             >
@@ -335,7 +335,6 @@ const addToOutlook = () => {
 </template>
 
 <style lang="scss">
-/* Styles remain unchanged */
 @media (prefers-color-scheme: dark) {
   #texteditor-textarea {
     @apply bg-dark text-dark;
