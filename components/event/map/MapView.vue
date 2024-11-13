@@ -401,7 +401,7 @@ const isClientSide = typeof window !== "undefined";
       class="fixed top-0 w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
     >
       <div class="w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900">
-        <div class="flex max-w-7xl my-4">
+        <div class="flex max-w-7xl mt-2">
           <EventFilterBar
             :show-map="true"
             :allow-hiding-main-filters="false"

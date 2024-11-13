@@ -25,7 +25,7 @@ const toggleShowOnlyFree = () => {
           <input
             type="checkbox"
             :data-testid="'free-checkbox'"
-            class="text-blue-600 focus:ring-blue-500 h-4 w-4 mr-1 border-gray-400 rounded"
+            class="border text-blue-600 focus:ring-blue-500 h-4 w-4 mr-1 border-gray-400 rounded"
             :checked="copyOfShowOnlyFree"
             @input="() => toggleShowOnlyFree()"
           >

@@ -25,7 +25,7 @@ const toggleCanceled = () => {
           <input
             type="checkbox"
             :data-testid="'canceled-checkbox'"
-            class="text-blue-600 focus:ring-blue-500 h-4 w-4 mr-1 border-gray-400 rounded"
+            class="text-blue-600 border focus:ring-blue-500 h-4 w-4 mr-1 border-gray-400 rounded"
             :checked="copyOfShowCanceled"
             @input="() => toggleCanceled()"
           >

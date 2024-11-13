@@ -405,7 +405,7 @@ const toggleSelectedTag = (tag: string) => {
       <slot />
     </div>
 
-    <div class="mb-2 flex items-center justify-end">
+    <div class="flex items-center justify-end">
       <button
         v-if="allowHidingMainFilters"
         class="mr-4 text-blue-500"
