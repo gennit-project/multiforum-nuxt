@@ -288,6 +288,9 @@ const handleCoverImageChange = async (event: any) => {
 };
 
 const touched = ref(false);
+
+const inputStyles =
+  "border mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600 dark:[color-scheme:dark]";
 </script>
 
 <template>
@@ -341,12 +344,12 @@ const touched = ref(false);
         </FormRow>
         <FormRow section-title="Time">
           <template #content>
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-1 dark:text-white">
               <div class="flex flex-wrap items-center">
                 <div class="flex flex-wrap items-center gap-2 dark:text-white">
                   <input
                     data-testid="start-time-date-input"
-                    class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
+                    :class="inputStyles"
                     type="date"
                     :value="formattedStartTimeDate"
                     @input="
@@ -355,11 +358,11 @@ const touched = ref(false);
                           (event.target as HTMLInputElement).value
                         )
                     "
-                  />
+                  >
                   <input
                     v-if="!formValues.isAllDay"
                     data-testid="start-time-time-input"
-                    class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
+                    :class="inputStyles"
                     type="time"
                     :value="formattedStartTimeTime"
                     @input="
@@ -368,13 +371,13 @@ const touched = ref(false);
                           (event.target as HTMLInputElement).value
                         )
                     "
-                  />
+                  >
                 </div>
                 <span class="px-1">to</span>
                 <div class="flex flex-wrap items-center gap-2 xl:flex">
                   <input
                     data-testid="end-time-date-input"
-                    class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
+                    :class="inputStyles"
                     type="date"
                     :value="formattedEndTimeDate"
                     @input="
@@ -383,11 +386,11 @@ const touched = ref(false);
                           (event.target as HTMLInputElement).value
                         )
                     "
-                  />
+                  >
                   <input
                     v-if="!formValues.isAllDay"
                     data-testid="end-time-time-input"
-                    class="mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600"
+                    :class="inputStyles"
                     type="time"
                     :value="formattedEndTimeTime"
                     @input="
@@ -396,7 +399,7 @@ const touched = ref(false);
                           (event.target as HTMLInputElement).value
                         )
                     "
-                  />
+                  >
                 </div>
                 <div class="pl-2">
                   {{ duration }}
@@ -518,7 +521,9 @@ const touched = ref(false);
               :checked="formValues.free"
               @input="toggleCostField"
             />
-            <span class="ml-2 align-middle dark:text-white">This event is free</span>
+            <span class="ml-2 align-middle dark:text-white"
+              >This event is free</span
+            >
             <TextInput
               v-show="!formValues.free"
               data-testid="cost-input"
