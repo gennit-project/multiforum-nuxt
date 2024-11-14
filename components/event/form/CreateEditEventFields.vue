@@ -154,54 +154,100 @@ const urlIsValid = computed(() => {
 
 const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 
-// Lifecycle Hooks
+
 nextTick(() => {
   if (titleInputRef.value) {
     titleInputRef.value?.$el?.children[0].childNodes[0].focus();
   }
 });
 
-// Methods
-const handleStartTimeDateChange = (dateTimeValue: string) => {
-  const inputDateTime = DateTime.fromISO(dateTimeValue);
-  let startTimeObject = DateTime.fromJSDate(startTime.value);
-  startTimeObject = startTimeObject.set({
-    year: inputDateTime.year,
-    month: inputDateTime.month,
-    day: inputDateTime.day,
-  });
-  emit("updateFormValues", { startTime: startTimeObject.toISO() });
-};
-
 const handleStartTimeTimeChange = (dateTimeValue: string) => {
-  const inputDateTime = DateTime.fromISO(dateTimeValue);
-  let startTimeObject = DateTime.fromJSDate(startTime.value);
-  startTimeObject = startTimeObject.set({
-    hour: inputDateTime.hour,
-    minute: inputDateTime.minute,
-  });
-  emit("updateFormValues", { startTime: startTimeObject.toISO() });
-};
+  if (!dateTimeValue) return;
+  
+  try {
+    // Create DateTime object directly from the time string
+    const currentDate = DateTime.fromJSDate(startTime.value);
+    const startTimeObject = DateTime.fromFormat(dateTimeValue, "HH:mm", { 
+      zone: currentDate.zone 
+    }).set({
+      year: currentDate.year,
+      month: currentDate.month,
+      day: currentDate.day
+    });
 
-const handleEndTimeDateChange = (dateTimeValue: string) => {
-  const inputDateTime = DateTime.fromISO(dateTimeValue);
-  let endTimeObject = DateTime.fromJSDate(endTime.value);
-  endTimeObject = endTimeObject.set({
-    year: inputDateTime.year,
-    month: inputDateTime.month,
-    day: inputDateTime.day,
-  });
-  emit("updateFormValues", { endTime: endTimeObject.toISO() });
+    if (startTimeObject.isValid) {
+      emit("updateFormValues", { startTime: startTimeObject.toISO() });
+    }
+  } catch (error) {
+    console.warn("Invalid time input:", dateTimeValue, error);
+  }
 };
 
 const handleEndTimeTimeChange = (dateTimeValue: string) => {
-  const inputDateTime = DateTime.fromISO(dateTimeValue);
-  let endTimeObject = DateTime.fromJSDate(endTime.value);
-  endTimeObject = endTimeObject.set({
-    hour: inputDateTime.hour,
-    minute: inputDateTime.minute,
-  });
-  emit("updateFormValues", { endTime: endTimeObject.toISO() });
+  if (!dateTimeValue) return;
+  
+  try {
+    const currentDate = DateTime.fromJSDate(endTime.value);
+    const endTimeObject = DateTime.fromFormat(dateTimeValue, "HH:mm", { 
+      zone: currentDate.zone 
+    }).set({
+      year: currentDate.year,
+      month: currentDate.month,
+      day: currentDate.day
+    });
+
+    if (endTimeObject.isValid) {
+      emit("updateFormValues", { endTime: endTimeObject.toISO() });
+    }
+  } catch (error) {
+    console.warn("Invalid time input:", dateTimeValue, error);
+  }
+};
+
+const handleStartTimeDateChange = (dateTimeValue: string) => {
+  if (!dateTimeValue) return;
+  
+  try {
+    const currentDate = DateTime.fromJSDate(startTime.value);
+    const inputDateTime = DateTime.fromISO(dateTimeValue);
+    
+    if (!inputDateTime.isValid) return;
+    
+    const startTimeObject = currentDate.set({
+      year: inputDateTime.year,
+      month: inputDateTime.month,
+      day: inputDateTime.day,
+    });
+
+    if (startTimeObject.isValid) {
+      emit("updateFormValues", { startTime: startTimeObject.toISO() });
+    }
+  } catch (error) {
+    console.warn("Invalid date input:", dateTimeValue, error);
+  }
+};
+
+const handleEndTimeDateChange = (dateTimeValue: string) => {
+  if (!dateTimeValue) return;
+  
+  try {
+    const currentDate = DateTime.fromJSDate(endTime.value);
+    const inputDateTime = DateTime.fromISO(dateTimeValue);
+    
+    if (!inputDateTime.isValid) return;
+    
+    const endTimeObject = currentDate.set({
+      year: inputDateTime.year,
+      month: inputDateTime.month,
+      day: inputDateTime.day,
+    });
+
+    if (endTimeObject.isValid) {
+      emit("updateFormValues", { endTime: endTimeObject.toISO() });
+    }
+  } catch (error) {
+    console.warn("Invalid date input:", dateTimeValue, error);
+  }
 };
 
 const toggleCostField = () => {
