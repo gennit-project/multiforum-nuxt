@@ -216,6 +216,7 @@ watch(
       <div
         v-else-if="useMobileStyles"
         ref="mobileMapDiv"
+        class="mt-8"
         style="width: 95vw; height: 50vw"
       />
       <div
