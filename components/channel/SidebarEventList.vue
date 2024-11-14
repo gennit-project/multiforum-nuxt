@@ -318,12 +318,12 @@ export default defineComponent({
     <nuxt-link
       :to="
         {
-          name: 'forums-forumId-events-search',
+          name: 'forums-forumId-events',
           params: { forumId: channelId },
         }"
       class="flex items-center underline"
     >
-      <span class="text-sm font-bold leading-6"> View all events </span>
+      <span class="text-sm font-bold leading-6 dark:text-white"> View all events </span>
     </nuxt-link>
   </div>
 </template>

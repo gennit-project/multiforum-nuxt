@@ -421,34 +421,24 @@ const inputStyles =
         </FormRow>
         <FormRow section-title="Virtual Event URL">
           <template #content>
-            <div
-              class="focus-within:ring-indigo-600 flex w-full rounded-md shadow-sm ring-1 ring-inset focus-within:ring-2 focus-within:ring-inset dark:border-none"
-            >
-              <span
-                class="flex select-none items-center rounded-l-md bg-gray-100 py-3 pl-3 pr-1 text-gray-500 dark:bg-gray-700 dark:text-gray-200 sm:text-sm"
-                >https://</span
-              >
-              <input
-                id="virtualEventUrl"
-                data-testid="link-input"
-                type="text"
-                name="virtualEventUrl"
-                class="bg-transparent block w-full flex-1 rounded-r-md border-0 py-1.5 pl-1 text-gray-900 placeholder:text-gray-400 focus:ring-0 dark:bg-gray-600 dark:text-gray-200 sm:text-sm sm:leading-6"
-                :value="formValues.virtualEventUrl?.split('https://').join('')"
-                @input="
-                  emit('updateFormValues', {
-                    virtualEventUrl: `https://${$event.target.value}`,
-                  })
-                "
-              />
-            </div>
+            <TextInput
+              id="virtualEventUrl"
+              :test-id="'link-input'"
+              :full-width="true"
+              :value="formValues.virtualEventUrl"
+              @update="
+                emit('updateFormValues', {
+                  virtualEventUrl: $event,
+                })
+              "
+            />
             <ErrorMessage
               :text="
                 touched &&
                 formValues.virtualEventUrl &&
                 formValues.virtualEventUrl.length > 0 &&
                 !urlIsValid
-                  ? 'Must be a valid URL'
+                  ? 'Must be a valid URL that starts with https'
                   : ''
               "
             />
