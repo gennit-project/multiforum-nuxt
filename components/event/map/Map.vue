@@ -96,6 +96,10 @@ const renderMap = async () => {
     zoom: 7,
     mapTypeId: "terrain",
     styles: props.theme === "dark" ? nightModeMapStyles : [],
+    zoomControl: true,
+    zoomControlOptions: {
+      position: google.maps.ControlPosition.RIGHT_TOP,
+    },
   };
 
   map.value = new google.maps.Map(
@@ -201,34 +205,30 @@ watch(
   },
   { immediate: true }
 );
-
 </script>
 
 <template>
   <client-only>
-  <div class="text-black">
-    <p v-if="events.length === 0" class="mx-3">
-      Could not find any events with a location.
-    </p>
-    <div
-      v-else-if="useMobileStyles"
-      ref="mobileMapDiv"
-      style="width: 95vw; height: 50vw"
-    />
-    <div
-      v-else-if="!useMobileStyles"
-      ref="desktopMapDiv"
-      style="position: fixed; width: 50vw; height: 82vh; top: 170px; right: 0"
-    />
-  </div>
-</client-only>
+    <div class="text-black">
+      <p v-if="events.length === 0" class="mx-3">
+        Could not find any events with a location.
+      </p>
+      <div
+        v-else-if="useMobileStyles"
+        ref="mobileMapDiv"
+        style="width: 95vw; height: 50vw"
+      />
+      <div
+        v-else-if="!useMobileStyles"
+        ref="desktopMapDiv"
+        style="position: fixed; width: 50vw; height: 82vh; top: 170px; right: 0"
+      />
+    </div>
+  </client-only>
 </template>
 
 <style>
 .gm-style-iw > button {
-  display: none !important;
-}
-.gmnoprint {
   display: none !important;
 }
 </style>

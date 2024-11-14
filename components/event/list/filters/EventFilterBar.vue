@@ -233,7 +233,7 @@ const toggleSelectedTag = (tag: string) => {
 </script>
 
 <template>
-  <div class="w-full flex-col space-y-1 dark:text-white">
+  <div class="w-full flex-col space-y-1 dark:text-white mt-2">
     <div v-if="showMainFilters" class="flex flex-col gap-2">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 align-items">
