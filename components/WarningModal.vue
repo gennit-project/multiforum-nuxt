@@ -61,7 +61,7 @@ export default defineComponent({
     <template #icon>
       <i
         v-if="icon === 'trash'"
-        class="fas fa-trash-alt"
+        class="fas fa-trash-alt dark:text-gray-100"
       />
       <ExclamationIcon
         v-else

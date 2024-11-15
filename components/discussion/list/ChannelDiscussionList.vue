@@ -10,7 +10,7 @@ import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { generateSlug } from "random-word-slugs";
 import { CREATE_MOD_PROFILE } from "@/graphQLData/user/mutations";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
-import { modProfileNameVar, setModProfileName, usernameVar } from "@/cache";
+import { setModProfileName, usernameVar } from "@/cache";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
 import {
   getSortFromQuery,
@@ -70,6 +70,7 @@ const {
     timeFrame: activeTimeFrame,
   },
 });
+console.log(discussionChannelResult.value);
 
 const loadMore = () => {
   fetchMore({
