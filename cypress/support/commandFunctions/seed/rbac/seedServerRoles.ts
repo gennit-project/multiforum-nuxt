@@ -1,4 +1,4 @@
-import serverRoles from "../../seedData/serverRoles";
+import serverRoles from "../../../seedData/rbac/serverRoles.js";
 
 const seedServerRoles = () => {
   cy.request({
@@ -9,14 +9,14 @@ const seedServerRoles = () => {
     },
     body: {
       query: `
-              mutation createServerRole (
+              mutation createServerRoles (
                   $input: [ServerRoleCreateInput!]!
               ){
               createServerRoles (
                   input: $input
               ) {
                   serverRoles {
-                    name
+                  name
                   }
                 }
               }

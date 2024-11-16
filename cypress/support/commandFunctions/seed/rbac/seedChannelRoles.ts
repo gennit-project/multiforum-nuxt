@@ -1,6 +1,6 @@
-import serverRoles from "../../seedData/serverRoles.js";
+import channelRoles from "../../../seedData/rbac/channelRoles.js";
 
-const seedServerRoles = () => {
+const seedChannelRoles = () => {
   cy.request({
     url: "http://localhost:4000/graphql",
     method: "POST",
@@ -9,23 +9,23 @@ const seedServerRoles = () => {
     },
     body: {
       query: `
-              mutation createServerRoles (
-                  $input: [ServerRoleCreateInput!]!
+              mutation createChannelRoles (
+                  $input: [ChannelRoleCreateInput!]!
               ){
-              createServerRoles (
+              createChannelRoles (
                   input: $input
               ) {
-                  serverRoles {
-                  name
+                  channelRoles {
+                    name
                   }
                 }
               }
               `,
       variables: {
-        input: serverRoles,
+        input: channelRoles,
       },
     },
   });
 };
 
-export default seedServerRoles;
+export default seedChannelRoles;

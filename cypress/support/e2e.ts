@@ -13,6 +13,11 @@ declare global {
         seedUsers(): Chainable<Element>;
         seedChannels(): Chainable<Element>;
         seedTags(): Chainable<Element>;
+        seedModChannelRoles(): Chainable<Element>;
+        seedChannelRoles(): Chainable<Element>;
+        seedModServerRoles(): Chainable<Element>;
+        seedServerRoles(): Chainable<Element>;
+        seedServerConfig(): Chainable<Element>;
         createEvents(events: EventCreateInputWithChannels[]): Chainable<Element>;
         createDiscussions(discussions: DiscussionCreateInputWithChannels[]): Chainable<Element>;
         deleteEvents(): Chainable<Element>;

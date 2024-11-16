@@ -12,6 +12,11 @@ import deleteTags from "./commandFunctions/delete/deleteTags";
 import deleteDiscussions from "./commandFunctions/delete/deleteDiscussions";
 import createEvents from "./commandFunctions/createEvents";
 import createDiscussions from "./commandFunctions/createDiscussions";
+import seedModChannelRoles from "./commandFunctions/seed/rbac/seedModChannelRole";
+import seedChannelRoles from "./commandFunctions/seed/rbac/seedChannelRoles";
+import seedModServerRoles from "./commandFunctions/seed/rbac/seedModServerRoles";
+import seedServerRoles from "./commandFunctions/seed/rbac/seedServerRoles";
+import seedServerConfig from "./commandFunctions/seed/rbac/seedServerConfig";
 
 // LOGIN AND AUTH
 Cypress.Commands.add("loginWithCreateEventButton", loginWithButtonClick);
@@ -22,6 +27,11 @@ Cypress.Commands.add("seedEvents", seedEvents);
 Cypress.Commands.add("seedUsers", seedUsers);
 Cypress.Commands.add("seedChannels", seedChannels);
 Cypress.Commands.add("seedTags", seedTags);
+Cypress.Commands.add("seedModChannelRoles", seedModChannelRoles);
+Cypress.Commands.add("seedChannelRoles", seedChannelRoles);
+Cypress.Commands.add("seedModServerRoles", seedModServerRoles);
+Cypress.Commands.add("seedServerRoles", seedServerRoles);
+Cypress.Commands.add("seedServerConfig", seedServerConfig);
 
 // createEvents takes an array of events and creates them
 Cypress.Commands.add("createEvents", createEvents);

@@ -1,4 +1,4 @@
-import type { ModServerRoleCreateInput } from "../../../__generated__/graphql";
+import type { ModServerRoleCreateInput } from "../../../../__generated__/graphql";
 
 const serveConfigs: ModServerRoleCreateInput[] = [
   {

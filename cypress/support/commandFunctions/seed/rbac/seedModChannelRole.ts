@@ -1,4 +1,4 @@
-import modChannelRoles from "../../seedData/modChannelRoles.js";
+import modChannelRoles from "../../../seedData/rbac/modChannelRoles.js";
 
 const seedModChannelRoles = () => {
   cy.request({

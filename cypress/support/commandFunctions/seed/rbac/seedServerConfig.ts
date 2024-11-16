@@ -1,4 +1,4 @@
-import serverConfigs from '../../seedData/serverConfigs';
+import serverConfigs from '../../../seedData/rbac/serverConfigs';
 
 const seedServerConfig = () => {
   cy.request({

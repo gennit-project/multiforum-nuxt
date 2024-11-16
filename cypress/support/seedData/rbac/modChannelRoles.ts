@@ -1,4 +1,4 @@
-import type { ModChannelRoleCreateInput } from "../../../__generated__/graphql";
+import type { ModChannelRoleCreateInput } from "../../../../__generated__/graphql";
 
 const modChannelRoles: ModChannelRoleCreateInput[] = [
   {

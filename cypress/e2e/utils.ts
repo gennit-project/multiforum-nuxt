@@ -1,10 +1,11 @@
 export const deleteAll = () => {
-  cy.deleteEvents();
-  cy.deleteEmails();
-  cy.deleteUsers();
-  cy.deleteChannels();
-  cy.deleteTags();
-  cy.deleteDiscussions();
+
+  // cy.deleteEvents();
+  // cy.deleteEmails();
+  // cy.deleteUsers();
+  // cy.deleteChannels();
+  // cy.deleteTags();
+  // cy.deleteDiscussions();
 };
 
 export const seedAll = () => {
@@ -15,4 +16,9 @@ export const seedAll = () => {
   cy.seedTags();
   cy.seedEvents();
   cy.seedDiscussions();
+  cy.seedModChannelRoles();
+  cy.seedChannelRoles();
+  cy.seedModServerRoles()
+  cy.seedServerRoles()
+  cy.seedServerConfig()
 };
