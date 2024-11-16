@@ -16,6 +16,7 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from "@/components/comments/getSortFromQuery";
+
 const DISCUSSION_PAGE_LIMIT = 25;
 
 const emit = defineEmits(["filterByTag", "filterByChannel"]);
@@ -70,6 +71,17 @@ const {
     timeFrame: activeTimeFrame,
   },
 });
+watch(
+  () => usernameVar.value,
+  (newValue) => {
+    if (newValue) {
+      // This makes it so that items upvoted by the logged
+      // in user show the blue active upvote button.
+      refetchDiscussions();
+    }
+  }
+);
+
 console.log(discussionChannelResult.value);
 
 const loadMore = () => {

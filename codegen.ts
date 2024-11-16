@@ -1,11 +1,13 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
-import config from './config';
+import * as dotenv from 'dotenv'
+dotenv.config()
 
+console.log('codegen', process.env.GRAPHQL_URL)
 const codegenConfig: CodegenConfig = {
-  schema: config.graphqlUrl,
+  schema: process.env.GRAPHQL_URL,
   documents: ['src/**/*.tsx'],
   generates: {
-    './src/__generated__/': {
+    './__generated__/': {
       preset: 'client',
       plugins: [],
       presetConfig: {

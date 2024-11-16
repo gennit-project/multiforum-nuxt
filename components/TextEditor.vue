@@ -294,7 +294,7 @@ const selectedTab = ref(0);
           <button
             v-for="button in formatButtons"
             :key="button.label"
-            class="border-transparent rounded-md px-2 py-1 text-sm font-medium hover:bg-gray-100 dark:text-gray-300"
+            class="border-transparent rounded-md px-2 py-1 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
             @click.prevent="formatText(button.format)"
           >
             {{ button.label }}
