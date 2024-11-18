@@ -26,6 +26,9 @@ declare global {
         deleteChannels(): Chainable<Element>;
         deleteTags(): Chainable<Element>;
         deleteDiscussions(): Chainable<Element>;
+        loginAsAdmin(): Chainable<Element>;
+        authenticatedGraphQL(query: string, variables?: Record<string, unknown>): Chainable<Element>;
+        ensureAuth0Login(): Chainable<Element>;
       }
     }
   }

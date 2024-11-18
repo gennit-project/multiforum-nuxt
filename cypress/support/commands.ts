@@ -18,8 +18,51 @@ import seedModServerRoles from "./commandFunctions/seed/rbac/seedModServerRoles"
 import seedServerRoles from "./commandFunctions/seed/rbac/seedServerRoles";
 import seedServerConfig from "./commandFunctions/seed/rbac/seedServerConfig";
 
-// LOGIN AND AUTH
+const AUTH_TOKEN_NAME = "authToken";
+
 Cypress.Commands.add("loginWithCreateEventButton", loginWithButtonClick);
+
+Cypress.Commands.add("loginAsAdmin", () => {
+  const options = {
+    method: "POST",
+    url: `https://${Cypress.env("auth0Domain")}/oauth/token`,
+    body: {
+      grant_type: "password",
+      username: Cypress.env("email"),
+      password: Cypress.env("password"),
+      audience: Cypress.env("auth0Audience"),
+      scope: "openid profile email",
+      client_id: Cypress.env("auth0ClientId"),
+      client_secret: Cypress.env("auth0ClientSecret"),
+    },
+  };
+
+  cy.request(options).then((response) => {
+    cy.window().then((window) => {
+      window.localStorage.setItem(AUTH_TOKEN_NAME, response.body.access_token);
+    });
+  });
+});
+
+Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
+  // Get token using window() instead of custom getLocalStorage command
+  cy.window().then((window) => {
+    const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
+
+    cy.request({
+      method: "POST",
+      url: Cypress.env("graphqlUrl"),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: {
+        query,
+        variables,
+      },
+    });
+  });
+});
 
 // ADDING SEED DATA
 Cypress.Commands.add("seedDiscussions", seedDiscussions);

@@ -1,5 +1,7 @@
 export const deleteAll = () => {
+  cy.loginAsAdmin();
 
+  console.log('deleteAll')
   // cy.deleteEvents();
   // cy.deleteEmails();
   // cy.deleteUsers();
