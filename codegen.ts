@@ -2,9 +2,8 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-console.log('codegen', process.env.GRAPHQL_URL)
 const codegenConfig: CodegenConfig = {
-  schema: process.env.GRAPHQL_URL,
+  schema: process.env.GRAPHQL_URL_FOR_TYPES,
   documents: ['src/**/*.tsx'],
   generates: {
     './__generated__/': {

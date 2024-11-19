@@ -6301,6 +6301,12 @@ export type CreateEmojisMutationResponse = {
   info: CreateInfo;
 };
 
+export type CreateEnvironmentInfosMutationResponse = {
+  __typename?: 'CreateEnvironmentInfosMutationResponse';
+  environmentInfos: Array<EnvironmentInfo>;
+  info: CreateInfo;
+};
+
 export type CreateEventChannelsMutationResponse = {
   __typename?: 'CreateEventChannelsMutationResponse';
   eventChannels: Array<EventChannel>;
@@ -6322,12 +6328,6 @@ export type CreateEventsMutationResponse = {
 export type CreateFeedsMutationResponse = {
   __typename?: 'CreateFeedsMutationResponse';
   feeds: Array<Feed>;
-  info: CreateInfo;
-};
-
-export type CreateGetSubredditResponsesMutationResponse = {
-  __typename?: 'CreateGetSubredditResponsesMutationResponse';
-  getSubredditResponses: Array<GetSubredditResponse>;
   info: CreateInfo;
 };
 
@@ -6388,12 +6388,6 @@ export type CreateRecurringEventsMutationResponse = {
   recurringEvents: Array<RecurringEvent>;
 };
 
-export type CreateRedditSubmissionsMutationResponse = {
-  __typename?: 'CreateRedditSubmissionsMutationResponse';
-  info: CreateInfo;
-  redditSubmissions: Array<RedditSubmission>;
-};
-
 export type CreateRepeatEndsMutationResponse = {
   __typename?: 'CreateRepeatEndsMutationResponse';
   info: CreateInfo;
@@ -6404,6 +6398,12 @@ export type CreateRepeatEveriesMutationResponse = {
   __typename?: 'CreateRepeatEveriesMutationResponse';
   info: CreateInfo;
   repeatEveries: Array<RepeatEvery>;
+};
+
+export type CreateSafetyCheckResponsesMutationResponse = {
+  __typename?: 'CreateSafetyCheckResponsesMutationResponse';
+  info: CreateInfo;
+  safetyCheckResponses: Array<SafetyCheckResponse>;
 };
 
 export type CreateServerConfigsMutationResponse = {
@@ -6428,12 +6428,6 @@ export type CreateSiteWideDiscussionListFormatsMutationResponse = {
   __typename?: 'CreateSiteWideDiscussionListFormatsMutationResponse';
   info: CreateInfo;
   siteWideDiscussionListFormats: Array<SiteWideDiscussionListFormat>;
-};
-
-export type CreateSubredditSidebarsMutationResponse = {
-  __typename?: 'CreateSubredditSidebarsMutationResponse';
-  info: CreateInfo;
-  subredditSidebars: Array<SubredditSidebar>;
 };
 
 export type CreateTagsMutationResponse = {
@@ -9834,6 +9828,67 @@ export type EmojisConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type EnvironmentInfo = {
+  __typename?: 'EnvironmentInfo';
+  currentDatabase?: Maybe<Scalars['String']['output']>;
+  isTestEnvironment?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type EnvironmentInfoAggregateSelection = {
+  __typename?: 'EnvironmentInfoAggregateSelection';
+  count: Scalars['Int']['output'];
+  currentDatabase: StringAggregateSelectionNullable;
+};
+
+export type EnvironmentInfoCreateInput = {
+  currentDatabase?: InputMaybe<Scalars['String']['input']>;
+  isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type EnvironmentInfoEdge = {
+  __typename?: 'EnvironmentInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: EnvironmentInfo;
+};
+
+export type EnvironmentInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more EnvironmentInfoSort objects to sort EnvironmentInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<EnvironmentInfoSort>>;
+};
+
+/** Fields to sort EnvironmentInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one EnvironmentInfoSort object. */
+export type EnvironmentInfoSort = {
+  currentDatabase?: InputMaybe<SortDirection>;
+  isTestEnvironment?: InputMaybe<SortDirection>;
+};
+
+export type EnvironmentInfoUpdateInput = {
+  currentDatabase?: InputMaybe<Scalars['String']['input']>;
+  isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type EnvironmentInfoWhere = {
+  AND?: InputMaybe<Array<EnvironmentInfoWhere>>;
+  NOT?: InputMaybe<EnvironmentInfoWhere>;
+  OR?: InputMaybe<Array<EnvironmentInfoWhere>>;
+  currentDatabase?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  currentDatabase_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type EnvironmentInfosConnection = {
+  __typename?: 'EnvironmentInfosConnection';
+  edges: Array<EnvironmentInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type Event = {
   __typename?: 'Event';
   Comments: Array<Comment>;
@@ -13056,63 +13111,6 @@ export type FloatAggregateSelectionNullable = {
   max?: Maybe<Scalars['Float']['output']>;
   min?: Maybe<Scalars['Float']['output']>;
   sum?: Maybe<Scalars['Float']['output']>;
-};
-
-export type GetSubredditResponse = {
-  __typename?: 'GetSubredditResponse';
-  after?: Maybe<Scalars['String']['output']>;
-  posts?: Maybe<Array<Maybe<RedditSubmission>>>;
-};
-
-export type GetSubredditResponseAggregateSelection = {
-  __typename?: 'GetSubredditResponseAggregateSelection';
-  after: StringAggregateSelectionNullable;
-  count: Scalars['Int']['output'];
-};
-
-export type GetSubredditResponseCreateInput = {
-  after?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type GetSubredditResponseEdge = {
-  __typename?: 'GetSubredditResponseEdge';
-  cursor: Scalars['String']['output'];
-  node: GetSubredditResponse;
-};
-
-export type GetSubredditResponseOptions = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  /** Specify one or more GetSubredditResponseSort objects to sort GetSubredditResponses by. The sorts will be applied in the order in which they are arranged in the array. */
-  sort?: InputMaybe<Array<GetSubredditResponseSort>>;
-};
-
-/** Fields to sort GetSubredditResponses by. The order in which sorts are applied is not guaranteed when specifying many fields in one GetSubredditResponseSort object. */
-export type GetSubredditResponseSort = {
-  after?: InputMaybe<SortDirection>;
-};
-
-export type GetSubredditResponseUpdateInput = {
-  after?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type GetSubredditResponseWhere = {
-  AND?: InputMaybe<Array<GetSubredditResponseWhere>>;
-  NOT?: InputMaybe<GetSubredditResponseWhere>;
-  OR?: InputMaybe<Array<GetSubredditResponseWhere>>;
-  after?: InputMaybe<Scalars['String']['input']>;
-  after_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  after_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  after_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  after_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  after_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type GetSubredditResponsesConnection = {
-  __typename?: 'GetSubredditResponsesConnection';
-  edges: Array<GetSubredditResponseEdge>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type IdAggregateSelectionNonNullable = {
@@ -16378,12 +16376,12 @@ export type Mutation = {
   createEmailAndUser?: Maybe<User>;
   createEmails: CreateEmailsMutationResponse;
   createEmojis: CreateEmojisMutationResponse;
+  createEnvironmentInfos: CreateEnvironmentInfosMutationResponse;
   createEventChannels: CreateEventChannelsMutationResponse;
   createEventCommentsFormats: CreateEventCommentsFormatsMutationResponse;
   createEventWithChannelConnections?: Maybe<Event>;
   createEvents: CreateEventsMutationResponse;
   createFeeds: CreateFeedsMutationResponse;
-  createGetSubredditResponses: CreateGetSubredditResponsesMutationResponse;
   createImages: CreateImagesMutationResponse;
   createIssues: CreateIssuesMutationResponse;
   createLinkFlairs: CreateLinkFlairsMutationResponse;
@@ -16392,15 +16390,14 @@ export type Mutation = {
   createModerationActions: CreateModerationActionsMutationResponse;
   createModerationProfiles: CreateModerationProfilesMutationResponse;
   createRecurringEvents: CreateRecurringEventsMutationResponse;
-  createRedditSubmissions: CreateRedditSubmissionsMutationResponse;
   createRepeatEnds: CreateRepeatEndsMutationResponse;
   createRepeatEveries: CreateRepeatEveriesMutationResponse;
+  createSafetyCheckResponses: CreateSafetyCheckResponsesMutationResponse;
   createServerConfigs: CreateServerConfigsMutationResponse;
   createServerRoles: CreateServerRolesMutationResponse;
   createSignedStorageURL?: Maybe<SignedUrl>;
   createSignedUrls: CreateSignedUrlsMutationResponse;
   createSiteWideDiscussionListFormats: CreateSiteWideDiscussionListFormatsMutationResponse;
-  createSubredditSidebars: CreateSubredditSidebarsMutationResponse;
   createTags: CreateTagsMutationResponse;
   createUsers: CreateUsersMutationResponse;
   deleteAlbums: DeleteInfo;
@@ -16414,11 +16411,11 @@ export type Mutation = {
   deleteDiscussions: DeleteInfo;
   deleteEmails: DeleteInfo;
   deleteEmojis: DeleteInfo;
+  deleteEnvironmentInfos: DeleteInfo;
   deleteEventChannels: DeleteInfo;
   deleteEventCommentsFormats: DeleteInfo;
   deleteEvents: DeleteInfo;
   deleteFeeds: DeleteInfo;
-  deleteGetSubredditResponses: DeleteInfo;
   deleteImages: DeleteInfo;
   deleteIssues: DeleteInfo;
   deleteLinkFlairs: DeleteInfo;
@@ -16427,14 +16424,13 @@ export type Mutation = {
   deleteModerationActions: DeleteInfo;
   deleteModerationProfiles: DeleteInfo;
   deleteRecurringEvents: DeleteInfo;
-  deleteRedditSubmissions: DeleteInfo;
   deleteRepeatEnds: DeleteInfo;
   deleteRepeatEveries: DeleteInfo;
+  deleteSafetyCheckResponses: DeleteInfo;
   deleteServerConfigs: DeleteInfo;
   deleteServerRoles: DeleteInfo;
   deleteSignedUrls: DeleteInfo;
   deleteSiteWideDiscussionListFormats: DeleteInfo;
-  deleteSubredditSidebars: DeleteInfo;
   deleteTags: DeleteInfo;
   deleteUsers: DeleteInfo;
   removeEmojiFromComment?: Maybe<Comment>;
@@ -16453,12 +16449,12 @@ export type Mutation = {
   updateDiscussions: UpdateDiscussionsMutationResponse;
   updateEmails: UpdateEmailsMutationResponse;
   updateEmojis: UpdateEmojisMutationResponse;
+  updateEnvironmentInfos: UpdateEnvironmentInfosMutationResponse;
   updateEventChannels: UpdateEventChannelsMutationResponse;
   updateEventCommentsFormats: UpdateEventCommentsFormatsMutationResponse;
   updateEventWithChannelConnections?: Maybe<Event>;
   updateEvents: UpdateEventsMutationResponse;
   updateFeeds: UpdateFeedsMutationResponse;
-  updateGetSubredditResponses: UpdateGetSubredditResponsesMutationResponse;
   updateImages: UpdateImagesMutationResponse;
   updateIssues: UpdateIssuesMutationResponse;
   updateLinkFlairs: UpdateLinkFlairsMutationResponse;
@@ -16467,14 +16463,13 @@ export type Mutation = {
   updateModerationActions: UpdateModerationActionsMutationResponse;
   updateModerationProfiles: UpdateModerationProfilesMutationResponse;
   updateRecurringEvents: UpdateRecurringEventsMutationResponse;
-  updateRedditSubmissions: UpdateRedditSubmissionsMutationResponse;
   updateRepeatEnds: UpdateRepeatEndsMutationResponse;
   updateRepeatEveries: UpdateRepeatEveriesMutationResponse;
+  updateSafetyCheckResponses: UpdateSafetyCheckResponsesMutationResponse;
   updateServerConfigs: UpdateServerConfigsMutationResponse;
   updateServerRoles: UpdateServerRolesMutationResponse;
   updateSignedUrls: UpdateSignedUrlsMutationResponse;
   updateSiteWideDiscussionListFormats: UpdateSiteWideDiscussionListFormatsMutationResponse;
-  updateSubredditSidebars: UpdateSubredditSidebarsMutationResponse;
   updateTags: UpdateTagsMutationResponse;
   updateUsers: UpdateUsersMutationResponse;
   upvoteComment?: Maybe<Comment>;
@@ -16565,6 +16560,11 @@ export type MutationCreateEmojisArgs = {
 };
 
 
+export type MutationCreateEnvironmentInfosArgs = {
+  input: Array<EnvironmentInfoCreateInput>;
+};
+
+
 export type MutationCreateEventChannelsArgs = {
   input: Array<EventChannelCreateInput>;
 };
@@ -16588,11 +16588,6 @@ export type MutationCreateEventsArgs = {
 
 export type MutationCreateFeedsArgs = {
   input: Array<FeedCreateInput>;
-};
-
-
-export type MutationCreateGetSubredditResponsesArgs = {
-  input: Array<GetSubredditResponseCreateInput>;
 };
 
 
@@ -16636,11 +16631,6 @@ export type MutationCreateRecurringEventsArgs = {
 };
 
 
-export type MutationCreateRedditSubmissionsArgs = {
-  input: Array<RedditSubmissionCreateInput>;
-};
-
-
 export type MutationCreateRepeatEndsArgs = {
   input: Array<RepeatEndsCreateInput>;
 };
@@ -16648,6 +16638,11 @@ export type MutationCreateRepeatEndsArgs = {
 
 export type MutationCreateRepeatEveriesArgs = {
   input: Array<RepeatEveryCreateInput>;
+};
+
+
+export type MutationCreateSafetyCheckResponsesArgs = {
+  input: Array<SafetyCheckResponseCreateInput>;
 };
 
 
@@ -16674,11 +16669,6 @@ export type MutationCreateSignedUrlsArgs = {
 
 export type MutationCreateSiteWideDiscussionListFormatsArgs = {
   input: Array<SiteWideDiscussionListFormatCreateInput>;
-};
-
-
-export type MutationCreateSubredditSidebarsArgs = {
-  input: Array<SubredditSidebarCreateInput>;
 };
 
 
@@ -16754,6 +16744,11 @@ export type MutationDeleteEmojisArgs = {
 };
 
 
+export type MutationDeleteEnvironmentInfosArgs = {
+  where?: InputMaybe<EnvironmentInfoWhere>;
+};
+
+
 export type MutationDeleteEventChannelsArgs = {
   delete?: InputMaybe<EventChannelDeleteInput>;
   where?: InputMaybe<EventChannelWhere>;
@@ -16774,11 +16769,6 @@ export type MutationDeleteEventsArgs = {
 export type MutationDeleteFeedsArgs = {
   delete?: InputMaybe<FeedDeleteInput>;
   where?: InputMaybe<FeedWhere>;
-};
-
-
-export type MutationDeleteGetSubredditResponsesArgs = {
-  where?: InputMaybe<GetSubredditResponseWhere>;
 };
 
 
@@ -16827,11 +16817,6 @@ export type MutationDeleteRecurringEventsArgs = {
 };
 
 
-export type MutationDeleteRedditSubmissionsArgs = {
-  where?: InputMaybe<RedditSubmissionWhere>;
-};
-
-
 export type MutationDeleteRepeatEndsArgs = {
   where?: InputMaybe<RepeatEndsWhere>;
 };
@@ -16839,6 +16824,11 @@ export type MutationDeleteRepeatEndsArgs = {
 
 export type MutationDeleteRepeatEveriesArgs = {
   where?: InputMaybe<RepeatEveryWhere>;
+};
+
+
+export type MutationDeleteSafetyCheckResponsesArgs = {
+  where?: InputMaybe<SafetyCheckResponseWhere>;
 };
 
 
@@ -16860,11 +16850,6 @@ export type MutationDeleteSignedUrlsArgs = {
 
 export type MutationDeleteSiteWideDiscussionListFormatsArgs = {
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
-};
-
-
-export type MutationDeleteSubredditSidebarsArgs = {
-  where?: InputMaybe<SubredditSidebarWhere>;
 };
 
 
@@ -17015,6 +17000,12 @@ export type MutationUpdateEmojisArgs = {
 };
 
 
+export type MutationUpdateEnvironmentInfosArgs = {
+  update?: InputMaybe<EnvironmentInfoUpdateInput>;
+  where?: InputMaybe<EnvironmentInfoWhere>;
+};
+
+
 export type MutationUpdateEventChannelsArgs = {
   connect?: InputMaybe<EventChannelConnectInput>;
   connectOrCreate?: InputMaybe<EventChannelConnectOrCreateInput>;
@@ -17059,12 +17050,6 @@ export type MutationUpdateFeedsArgs = {
   disconnect?: InputMaybe<FeedDisconnectInput>;
   update?: InputMaybe<FeedUpdateInput>;
   where?: InputMaybe<FeedWhere>;
-};
-
-
-export type MutationUpdateGetSubredditResponsesArgs = {
-  update?: InputMaybe<GetSubredditResponseUpdateInput>;
-  where?: InputMaybe<GetSubredditResponseWhere>;
 };
 
 
@@ -17139,12 +17124,6 @@ export type MutationUpdateRecurringEventsArgs = {
 };
 
 
-export type MutationUpdateRedditSubmissionsArgs = {
-  update?: InputMaybe<RedditSubmissionUpdateInput>;
-  where?: InputMaybe<RedditSubmissionWhere>;
-};
-
-
 export type MutationUpdateRepeatEndsArgs = {
   update?: InputMaybe<RepeatEndsUpdateInput>;
   where?: InputMaybe<RepeatEndsWhere>;
@@ -17154,6 +17133,12 @@ export type MutationUpdateRepeatEndsArgs = {
 export type MutationUpdateRepeatEveriesArgs = {
   update?: InputMaybe<RepeatEveryUpdateInput>;
   where?: InputMaybe<RepeatEveryWhere>;
+};
+
+
+export type MutationUpdateSafetyCheckResponsesArgs = {
+  update?: InputMaybe<SafetyCheckResponseUpdateInput>;
+  where?: InputMaybe<SafetyCheckResponseWhere>;
 };
 
 
@@ -17183,12 +17168,6 @@ export type MutationUpdateSignedUrlsArgs = {
 export type MutationUpdateSiteWideDiscussionListFormatsArgs = {
   update?: InputMaybe<SiteWideDiscussionListFormatUpdateInput>;
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
-};
-
-
-export type MutationUpdateSubredditSidebarsArgs = {
-  update?: InputMaybe<SubredditSidebarUpdateInput>;
-  where?: InputMaybe<SubredditSidebarWhere>;
 };
 
 
@@ -17293,6 +17272,9 @@ export type Query = {
   emojis: Array<Emoji>;
   emojisAggregate: EmojiAggregateSelection;
   emojisConnection: EmojisConnection;
+  environmentInfos: Array<EnvironmentInfo>;
+  environmentInfosAggregate: EnvironmentInfoAggregateSelection;
+  environmentInfosConnection: EnvironmentInfosConnection;
   eventChannels: Array<EventChannel>;
   eventChannelsAggregate: EventChannelAggregateSelection;
   eventChannelsConnection: EventChannelsConnection;
@@ -17310,11 +17292,6 @@ export type Query = {
   getDiscussionsInChannel?: Maybe<DiscussionChannelListFormat>;
   getEventComments?: Maybe<EventCommentsFormat>;
   getSiteWideDiscussionList?: Maybe<SiteWideDiscussionListFormat>;
-  getSubreddit?: Maybe<GetSubredditResponse>;
-  getSubredditResponses: Array<GetSubredditResponse>;
-  getSubredditResponsesAggregate: GetSubredditResponseAggregateSelection;
-  getSubredditResponsesConnection: GetSubredditResponsesConnection;
-  getSubredditSidebar?: Maybe<SubredditSidebar>;
   images: Array<Image>;
   imagesAggregate: ImageAggregateSelection;
   imagesConnection: ImagesConnection;
@@ -17339,15 +17316,16 @@ export type Query = {
   recurringEvents: Array<RecurringEvent>;
   recurringEventsAggregate: RecurringEventAggregateSelection;
   recurringEventsConnection: RecurringEventsConnection;
-  redditSubmissions: Array<RedditSubmission>;
-  redditSubmissionsAggregate: RedditSubmissionAggregateSelection;
-  redditSubmissionsConnection: RedditSubmissionsConnection;
   repeatEnds: Array<RepeatEnds>;
   repeatEndsAggregate: RepeatEndsAggregateSelection;
   repeatEndsConnection: RepeatEndsConnection;
   repeatEveries: Array<RepeatEvery>;
   repeatEveriesAggregate: RepeatEveryAggregateSelection;
   repeatEveriesConnection: RepeatEveriesConnection;
+  safetyCheck?: Maybe<SafetyCheckResponse>;
+  safetyCheckResponses: Array<SafetyCheckResponse>;
+  safetyCheckResponsesAggregate: SafetyCheckResponseAggregateSelection;
+  safetyCheckResponsesConnection: SafetyCheckResponsesConnection;
   serverConfigs: Array<ServerConfig>;
   serverConfigsAggregate: ServerConfigAggregateSelection;
   serverConfigsConnection: ServerConfigsConnection;
@@ -17360,9 +17338,6 @@ export type Query = {
   siteWideDiscussionListFormats: Array<SiteWideDiscussionListFormat>;
   siteWideDiscussionListFormatsAggregate: SiteWideDiscussionListFormatAggregateSelection;
   siteWideDiscussionListFormatsConnection: SiteWideDiscussionListFormatsConnection;
-  subredditSidebars: Array<SubredditSidebar>;
-  subredditSidebarsAggregate: SubredditSidebarAggregateSelection;
-  subredditSidebarsConnection: SubredditSidebarsConnection;
   tags: Array<Tag>;
   tagsAggregate: TagAggregateSelection;
   tagsConnection: TagsConnection;
@@ -17580,6 +17555,25 @@ export type QueryEmojisConnectionArgs = {
 };
 
 
+export type QueryEnvironmentInfosArgs = {
+  options?: InputMaybe<EnvironmentInfoOptions>;
+  where?: InputMaybe<EnvironmentInfoWhere>;
+};
+
+
+export type QueryEnvironmentInfosAggregateArgs = {
+  where?: InputMaybe<EnvironmentInfoWhere>;
+};
+
+
+export type QueryEnvironmentInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<EnvironmentInfoSort>>>;
+  where?: InputMaybe<EnvironmentInfoWhere>;
+};
+
+
 export type QueryEventChannelsArgs = {
   options?: InputMaybe<EventChannelOptions>;
   where?: InputMaybe<EventChannelWhere>;
@@ -17695,38 +17689,6 @@ export type QueryGetSiteWideDiscussionListArgs = {
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedChannels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-};
-
-
-export type QueryGetSubredditArgs = {
-  flair?: InputMaybe<Scalars['String']['input']>;
-  options?: InputMaybe<RedditPostOptions>;
-  subredditName: Scalars['String']['input'];
-};
-
-
-export type QueryGetSubredditResponsesArgs = {
-  options?: InputMaybe<GetSubredditResponseOptions>;
-  where?: InputMaybe<GetSubredditResponseWhere>;
-};
-
-
-export type QueryGetSubredditResponsesAggregateArgs = {
-  where?: InputMaybe<GetSubredditResponseWhere>;
-};
-
-
-export type QueryGetSubredditResponsesConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<InputMaybe<GetSubredditResponseSort>>>;
-  where?: InputMaybe<GetSubredditResponseWhere>;
-};
-
-
-export type QueryGetSubredditSidebarArgs = {
-  options?: InputMaybe<Scalars['JSON']['input']>;
-  subredditName: Scalars['String']['input'];
 };
 
 
@@ -17882,25 +17844,6 @@ export type QueryRecurringEventsConnectionArgs = {
 };
 
 
-export type QueryRedditSubmissionsArgs = {
-  options?: InputMaybe<RedditSubmissionOptions>;
-  where?: InputMaybe<RedditSubmissionWhere>;
-};
-
-
-export type QueryRedditSubmissionsAggregateArgs = {
-  where?: InputMaybe<RedditSubmissionWhere>;
-};
-
-
-export type QueryRedditSubmissionsConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<InputMaybe<RedditSubmissionSort>>>;
-  where?: InputMaybe<RedditSubmissionWhere>;
-};
-
-
 export type QueryRepeatEndsArgs = {
   options?: InputMaybe<RepeatEndsOptions>;
   where?: InputMaybe<RepeatEndsWhere>;
@@ -17936,6 +17879,24 @@ export type QueryRepeatEveriesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<RepeatEverySort>>>;
   where?: InputMaybe<RepeatEveryWhere>;
+};
+
+
+export type QuerySafetyCheckResponsesArgs = {
+  options?: InputMaybe<SafetyCheckResponseOptions>;
+  where?: InputMaybe<SafetyCheckResponseWhere>;
+};
+
+
+export type QuerySafetyCheckResponsesAggregateArgs = {
+  where?: InputMaybe<SafetyCheckResponseWhere>;
+};
+
+
+export type QuerySafetyCheckResponsesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  where?: InputMaybe<SafetyCheckResponseWhere>;
 };
 
 
@@ -18012,25 +17973,6 @@ export type QuerySiteWideDiscussionListFormatsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<SiteWideDiscussionListFormatSort>>>;
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
-};
-
-
-export type QuerySubredditSidebarsArgs = {
-  options?: InputMaybe<SubredditSidebarOptions>;
-  where?: InputMaybe<SubredditSidebarWhere>;
-};
-
-
-export type QuerySubredditSidebarsAggregateArgs = {
-  where?: InputMaybe<SubredditSidebarWhere>;
-};
-
-
-export type QuerySubredditSidebarsConnectionArgs = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<InputMaybe<SubredditSidebarSort>>>;
-  where?: InputMaybe<SubredditSidebarWhere>;
 };
 
 
@@ -18497,219 +18439,6 @@ export type RecurringEventsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
-export type RedditPostOptions = {
-  after?: InputMaybe<Scalars['String']['input']>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type RedditSubmission = {
-  __typename?: 'RedditSubmission';
-  author: Scalars['String']['output'];
-  commentCount: Scalars['Int']['output'];
-  createdUTC: Scalars['Int']['output'];
-  flair?: Maybe<Scalars['JSON']['output']>;
-  id: Scalars['ID']['output'];
-  media?: Maybe<Scalars['JSON']['output']>;
-  numCrossposts: Scalars['Int']['output'];
-  permalink: Scalars['String']['output'];
-  preview?: Maybe<Scalars['JSON']['output']>;
-  stickied: Scalars['Boolean']['output'];
-  subreddit: Scalars['String']['output'];
-  text: Scalars['String']['output'];
-  thumbnail: Scalars['String']['output'];
-  title: Scalars['String']['output'];
-  upvoteCount: Scalars['Int']['output'];
-  url?: Maybe<Scalars['String']['output']>;
-};
-
-export type RedditSubmissionAggregateSelection = {
-  __typename?: 'RedditSubmissionAggregateSelection';
-  author: StringAggregateSelectionNonNullable;
-  commentCount: IntAggregateSelectionNonNullable;
-  count: Scalars['Int']['output'];
-  createdUTC: IntAggregateSelectionNonNullable;
-  id: IdAggregateSelectionNonNullable;
-  numCrossposts: IntAggregateSelectionNonNullable;
-  permalink: StringAggregateSelectionNonNullable;
-  subreddit: StringAggregateSelectionNonNullable;
-  text: StringAggregateSelectionNonNullable;
-  thumbnail: StringAggregateSelectionNonNullable;
-  title: StringAggregateSelectionNonNullable;
-  upvoteCount: IntAggregateSelectionNonNullable;
-  url: StringAggregateSelectionNullable;
-};
-
-export type RedditSubmissionCreateInput = {
-  author: Scalars['String']['input'];
-  commentCount: Scalars['Int']['input'];
-  createdUTC: Scalars['Int']['input'];
-  flair?: InputMaybe<Scalars['JSON']['input']>;
-  id: Scalars['ID']['input'];
-  media?: InputMaybe<Scalars['JSON']['input']>;
-  numCrossposts: Scalars['Int']['input'];
-  permalink: Scalars['String']['input'];
-  preview?: InputMaybe<Scalars['JSON']['input']>;
-  stickied: Scalars['Boolean']['input'];
-  subreddit: Scalars['String']['input'];
-  text: Scalars['String']['input'];
-  thumbnail: Scalars['String']['input'];
-  title: Scalars['String']['input'];
-  upvoteCount: Scalars['Int']['input'];
-  url?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type RedditSubmissionEdge = {
-  __typename?: 'RedditSubmissionEdge';
-  cursor: Scalars['String']['output'];
-  node: RedditSubmission;
-};
-
-export type RedditSubmissionOptions = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  /** Specify one or more RedditSubmissionSort objects to sort RedditSubmissions by. The sorts will be applied in the order in which they are arranged in the array. */
-  sort?: InputMaybe<Array<RedditSubmissionSort>>;
-};
-
-/** Fields to sort RedditSubmissions by. The order in which sorts are applied is not guaranteed when specifying many fields in one RedditSubmissionSort object. */
-export type RedditSubmissionSort = {
-  author?: InputMaybe<SortDirection>;
-  commentCount?: InputMaybe<SortDirection>;
-  createdUTC?: InputMaybe<SortDirection>;
-  flair?: InputMaybe<SortDirection>;
-  id?: InputMaybe<SortDirection>;
-  media?: InputMaybe<SortDirection>;
-  numCrossposts?: InputMaybe<SortDirection>;
-  permalink?: InputMaybe<SortDirection>;
-  preview?: InputMaybe<SortDirection>;
-  stickied?: InputMaybe<SortDirection>;
-  subreddit?: InputMaybe<SortDirection>;
-  text?: InputMaybe<SortDirection>;
-  thumbnail?: InputMaybe<SortDirection>;
-  title?: InputMaybe<SortDirection>;
-  upvoteCount?: InputMaybe<SortDirection>;
-  url?: InputMaybe<SortDirection>;
-};
-
-export type RedditSubmissionUpdateInput = {
-  author?: InputMaybe<Scalars['String']['input']>;
-  commentCount?: InputMaybe<Scalars['Int']['input']>;
-  commentCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
-  commentCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  flair?: InputMaybe<Scalars['JSON']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  media?: InputMaybe<Scalars['JSON']['input']>;
-  numCrossposts?: InputMaybe<Scalars['Int']['input']>;
-  numCrossposts_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
-  numCrossposts_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  permalink?: InputMaybe<Scalars['String']['input']>;
-  preview?: InputMaybe<Scalars['JSON']['input']>;
-  stickied?: InputMaybe<Scalars['Boolean']['input']>;
-  subreddit?: InputMaybe<Scalars['String']['input']>;
-  text?: InputMaybe<Scalars['String']['input']>;
-  thumbnail?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  upvoteCount?: InputMaybe<Scalars['Int']['input']>;
-  upvoteCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
-  upvoteCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  url?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type RedditSubmissionWhere = {
-  AND?: InputMaybe<Array<RedditSubmissionWhere>>;
-  NOT?: InputMaybe<RedditSubmissionWhere>;
-  OR?: InputMaybe<Array<RedditSubmissionWhere>>;
-  author?: InputMaybe<Scalars['String']['input']>;
-  author_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  author_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  author_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  author_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  author_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  commentCount?: InputMaybe<Scalars['Int']['input']>;
-  commentCount_GT?: InputMaybe<Scalars['Int']['input']>;
-  commentCount_GTE?: InputMaybe<Scalars['Int']['input']>;
-  commentCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
-  commentCount_LT?: InputMaybe<Scalars['Int']['input']>;
-  commentCount_LTE?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC_GT?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC_GTE?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
-  createdUTC_LT?: InputMaybe<Scalars['Int']['input']>;
-  createdUTC_LTE?: InputMaybe<Scalars['Int']['input']>;
-  flair?: InputMaybe<Scalars['JSON']['input']>;
-  flair_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
-  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
-  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  media?: InputMaybe<Scalars['JSON']['input']>;
-  media_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
-  numCrossposts?: InputMaybe<Scalars['Int']['input']>;
-  numCrossposts_GT?: InputMaybe<Scalars['Int']['input']>;
-  numCrossposts_GTE?: InputMaybe<Scalars['Int']['input']>;
-  numCrossposts_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
-  numCrossposts_LT?: InputMaybe<Scalars['Int']['input']>;
-  numCrossposts_LTE?: InputMaybe<Scalars['Int']['input']>;
-  permalink?: InputMaybe<Scalars['String']['input']>;
-  permalink_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  permalink_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  permalink_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  permalink_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  permalink_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  preview?: InputMaybe<Scalars['JSON']['input']>;
-  preview_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
-  stickied?: InputMaybe<Scalars['Boolean']['input']>;
-  subreddit?: InputMaybe<Scalars['String']['input']>;
-  subreddit_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  subreddit_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  subreddit_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  subreddit_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  subreddit_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  text?: InputMaybe<Scalars['String']['input']>;
-  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  text_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  thumbnail?: InputMaybe<Scalars['String']['input']>;
-  thumbnail_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  thumbnail_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  thumbnail_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  thumbnail_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  thumbnail_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  upvoteCount?: InputMaybe<Scalars['Int']['input']>;
-  upvoteCount_GT?: InputMaybe<Scalars['Int']['input']>;
-  upvoteCount_GTE?: InputMaybe<Scalars['Int']['input']>;
-  upvoteCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
-  upvoteCount_LT?: InputMaybe<Scalars['Int']['input']>;
-  upvoteCount_LTE?: InputMaybe<Scalars['Int']['input']>;
-  url?: InputMaybe<Scalars['String']['input']>;
-  url_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  url_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  url_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  url_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  url_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type RedditSubmissionsConnection = {
-  __typename?: 'RedditSubmissionsConnection';
-  edges: Array<RedditSubmissionEdge>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
-};
-
 export type RepeatEnds = {
   __typename?: 'RepeatEnds';
   count?: Maybe<Scalars['Int']['output']>;
@@ -18864,6 +18593,50 @@ export enum RepeatUnit {
   Week = 'WEEK',
   Year = 'YEAR'
 }
+
+export type SafetyCheckResponse = {
+  __typename?: 'SafetyCheckResponse';
+  environment?: Maybe<EnvironmentInfo>;
+};
+
+export type SafetyCheckResponseAggregateSelection = {
+  __typename?: 'SafetyCheckResponseAggregateSelection';
+  count: Scalars['Int']['output'];
+};
+
+export type SafetyCheckResponseCreateInput = {
+  /** Appears because this input type would be empty otherwise because this type is composed of just generated and/or relationship properties. See https://neo4j.com/docs/graphql-manual/current/troubleshooting/faqs/ */
+  _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SafetyCheckResponseEdge = {
+  __typename?: 'SafetyCheckResponseEdge';
+  cursor: Scalars['String']['output'];
+  node: SafetyCheckResponse;
+};
+
+export type SafetyCheckResponseOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type SafetyCheckResponseUpdateInput = {
+  /** Appears because this input type would be empty otherwise because this type is composed of just generated and/or relationship properties. See https://neo4j.com/docs/graphql-manual/current/troubleshooting/faqs/ */
+  _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SafetyCheckResponseWhere = {
+  AND?: InputMaybe<Array<SafetyCheckResponseWhere>>;
+  NOT?: InputMaybe<SafetyCheckResponseWhere>;
+  OR?: InputMaybe<Array<SafetyCheckResponseWhere>>;
+};
+
+export type SafetyCheckResponsesConnection = {
+  __typename?: 'SafetyCheckResponsesConnection';
+  edges: Array<SafetyCheckResponseEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
 
 export type ServerConfig = {
   __typename?: 'ServerConfig';
@@ -19939,139 +19712,6 @@ export type StringAggregateSelectionNullable = {
   __typename?: 'StringAggregateSelectionNullable';
   longest?: Maybe<Scalars['String']['output']>;
   shortest?: Maybe<Scalars['String']['output']>;
-};
-
-export type SubredditSidebar = {
-  __typename?: 'SubredditSidebar';
-  allowGalleries?: Maybe<Scalars['Boolean']['output']>;
-  allowImages?: Maybe<Scalars['Boolean']['output']>;
-  bannerImg?: Maybe<Scalars['String']['output']>;
-  communityIcon?: Maybe<Scalars['String']['output']>;
-  displayName: Scalars['String']['output'];
-  linkFlairs?: Maybe<Array<Maybe<LinkFlair>>>;
-  longDescription?: Maybe<Scalars['String']['output']>;
-  rules?: Maybe<Scalars['JSON']['output']>;
-  shortDescription?: Maybe<Scalars['String']['output']>;
-  showMediaPreview?: Maybe<Scalars['Boolean']['output']>;
-  title: Scalars['String']['output'];
-};
-
-export type SubredditSidebarAggregateSelection = {
-  __typename?: 'SubredditSidebarAggregateSelection';
-  bannerImg: StringAggregateSelectionNullable;
-  communityIcon: StringAggregateSelectionNullable;
-  count: Scalars['Int']['output'];
-  displayName: StringAggregateSelectionNonNullable;
-  longDescription: StringAggregateSelectionNullable;
-  shortDescription: StringAggregateSelectionNullable;
-  title: StringAggregateSelectionNonNullable;
-};
-
-export type SubredditSidebarCreateInput = {
-  allowGalleries?: InputMaybe<Scalars['Boolean']['input']>;
-  allowImages?: InputMaybe<Scalars['Boolean']['input']>;
-  bannerImg?: InputMaybe<Scalars['String']['input']>;
-  communityIcon?: InputMaybe<Scalars['String']['input']>;
-  displayName: Scalars['String']['input'];
-  longDescription?: InputMaybe<Scalars['String']['input']>;
-  rules?: InputMaybe<Scalars['JSON']['input']>;
-  shortDescription?: InputMaybe<Scalars['String']['input']>;
-  showMediaPreview?: InputMaybe<Scalars['Boolean']['input']>;
-  title: Scalars['String']['input'];
-};
-
-export type SubredditSidebarEdge = {
-  __typename?: 'SubredditSidebarEdge';
-  cursor: Scalars['String']['output'];
-  node: SubredditSidebar;
-};
-
-export type SubredditSidebarOptions = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  /** Specify one or more SubredditSidebarSort objects to sort SubredditSidebars by. The sorts will be applied in the order in which they are arranged in the array. */
-  sort?: InputMaybe<Array<SubredditSidebarSort>>;
-};
-
-/** Fields to sort SubredditSidebars by. The order in which sorts are applied is not guaranteed when specifying many fields in one SubredditSidebarSort object. */
-export type SubredditSidebarSort = {
-  allowGalleries?: InputMaybe<SortDirection>;
-  allowImages?: InputMaybe<SortDirection>;
-  bannerImg?: InputMaybe<SortDirection>;
-  communityIcon?: InputMaybe<SortDirection>;
-  displayName?: InputMaybe<SortDirection>;
-  longDescription?: InputMaybe<SortDirection>;
-  rules?: InputMaybe<SortDirection>;
-  shortDescription?: InputMaybe<SortDirection>;
-  showMediaPreview?: InputMaybe<SortDirection>;
-  title?: InputMaybe<SortDirection>;
-};
-
-export type SubredditSidebarUpdateInput = {
-  allowGalleries?: InputMaybe<Scalars['Boolean']['input']>;
-  allowImages?: InputMaybe<Scalars['Boolean']['input']>;
-  bannerImg?: InputMaybe<Scalars['String']['input']>;
-  communityIcon?: InputMaybe<Scalars['String']['input']>;
-  displayName?: InputMaybe<Scalars['String']['input']>;
-  longDescription?: InputMaybe<Scalars['String']['input']>;
-  rules?: InputMaybe<Scalars['JSON']['input']>;
-  shortDescription?: InputMaybe<Scalars['String']['input']>;
-  showMediaPreview?: InputMaybe<Scalars['Boolean']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type SubredditSidebarWhere = {
-  AND?: InputMaybe<Array<SubredditSidebarWhere>>;
-  NOT?: InputMaybe<SubredditSidebarWhere>;
-  OR?: InputMaybe<Array<SubredditSidebarWhere>>;
-  allowGalleries?: InputMaybe<Scalars['Boolean']['input']>;
-  allowImages?: InputMaybe<Scalars['Boolean']['input']>;
-  bannerImg?: InputMaybe<Scalars['String']['input']>;
-  bannerImg_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  bannerImg_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  bannerImg_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  bannerImg_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  bannerImg_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  communityIcon?: InputMaybe<Scalars['String']['input']>;
-  communityIcon_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  communityIcon_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  communityIcon_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  communityIcon_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  communityIcon_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  displayName?: InputMaybe<Scalars['String']['input']>;
-  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  displayName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  longDescription?: InputMaybe<Scalars['String']['input']>;
-  longDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  longDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  longDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  longDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  longDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  rules?: InputMaybe<Scalars['JSON']['input']>;
-  rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
-  shortDescription?: InputMaybe<Scalars['String']['input']>;
-  shortDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  shortDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  shortDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  shortDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  shortDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showMediaPreview?: InputMaybe<Scalars['Boolean']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
-  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type SubredditSidebarsConnection = {
-  __typename?: 'SubredditSidebarsConnection';
-  edges: Array<SubredditSidebarEdge>;
-  pageInfo: PageInfo;
-  totalCount: Scalars['Int']['output'];
 };
 
 export type Tag = {
@@ -21391,6 +21031,12 @@ export type UpdateEmojisMutationResponse = {
   info: UpdateInfo;
 };
 
+export type UpdateEnvironmentInfosMutationResponse = {
+  __typename?: 'UpdateEnvironmentInfosMutationResponse';
+  environmentInfos: Array<EnvironmentInfo>;
+  info: UpdateInfo;
+};
+
 export type UpdateEventChannelsMutationResponse = {
   __typename?: 'UpdateEventChannelsMutationResponse';
   eventChannels: Array<EventChannel>;
@@ -21412,12 +21058,6 @@ export type UpdateEventsMutationResponse = {
 export type UpdateFeedsMutationResponse = {
   __typename?: 'UpdateFeedsMutationResponse';
   feeds: Array<Feed>;
-  info: UpdateInfo;
-};
-
-export type UpdateGetSubredditResponsesMutationResponse = {
-  __typename?: 'UpdateGetSubredditResponsesMutationResponse';
-  getSubredditResponses: Array<GetSubredditResponse>;
   info: UpdateInfo;
 };
 
@@ -21480,12 +21120,6 @@ export type UpdateRecurringEventsMutationResponse = {
   recurringEvents: Array<RecurringEvent>;
 };
 
-export type UpdateRedditSubmissionsMutationResponse = {
-  __typename?: 'UpdateRedditSubmissionsMutationResponse';
-  info: UpdateInfo;
-  redditSubmissions: Array<RedditSubmission>;
-};
-
 export type UpdateRepeatEndsMutationResponse = {
   __typename?: 'UpdateRepeatEndsMutationResponse';
   info: UpdateInfo;
@@ -21496,6 +21130,12 @@ export type UpdateRepeatEveriesMutationResponse = {
   __typename?: 'UpdateRepeatEveriesMutationResponse';
   info: UpdateInfo;
   repeatEveries: Array<RepeatEvery>;
+};
+
+export type UpdateSafetyCheckResponsesMutationResponse = {
+  __typename?: 'UpdateSafetyCheckResponsesMutationResponse';
+  info: UpdateInfo;
+  safetyCheckResponses: Array<SafetyCheckResponse>;
 };
 
 export type UpdateServerConfigsMutationResponse = {
@@ -21520,12 +21160,6 @@ export type UpdateSiteWideDiscussionListFormatsMutationResponse = {
   __typename?: 'UpdateSiteWideDiscussionListFormatsMutationResponse';
   info: UpdateInfo;
   siteWideDiscussionListFormats: Array<SiteWideDiscussionListFormat>;
-};
-
-export type UpdateSubredditSidebarsMutationResponse = {
-  __typename?: 'UpdateSubredditSidebarsMutationResponse';
-  info: UpdateInfo;
-  subredditSidebars: Array<SubredditSidebar>;
 };
 
 export type UpdateTagsMutationResponse = {
