@@ -64,6 +64,28 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
   });
 });
 
+Cypress.Commands.add("safetyCheck", () => {
+  return cy
+    .authenticatedGraphQL(
+      `
+    query safetyCheck {
+        safetyCheck {
+            environment {
+            currentDatabase
+            isTestEnvironment
+            }
+        }
+    }`
+    )
+    .then((response) => {
+      const env = response?.body?.data?.safetyCheck?.environment;
+      throw new Error(
+        `🚨 SAFETY CHECK FAILED: Not in test environment! ` +
+          `Current database: ${env.currentDatabase}`
+      );
+    });
+});
+
 // ADDING SEED DATA
 Cypress.Commands.add("seedDiscussions", seedDiscussions);
 Cypress.Commands.add("seedEvents", seedEvents);

@@ -29,6 +29,7 @@ declare global {
         loginAsAdmin(): Chainable<Element>;
         authenticatedGraphQL(query: string, variables?: Record<string, unknown>): Chainable<Element>;
         ensureAuth0Login(): Chainable<Element>;
+        safetyCheck(): Chainable<Element>;
       }
     }
   }

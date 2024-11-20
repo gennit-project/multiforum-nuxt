@@ -70,6 +70,7 @@ const event = computed(() => eventResult.value?.events?.[0] || null);
 const commentSort = computed(() => getSortFromQuery(route.query));
 const {
   result: getEventCommentsResult,
+  loading: getEventCommentsLoading,
   fetchMore: fetchMoreComments,
 } = useQuery(GET_EVENT_COMMENTS, {
   eventId: eventId.value,
@@ -301,7 +302,25 @@ const addToOutlook = () => {
               :channels-except-current="channelsExceptCurrent"
             />
 
-           
+            <div v-if="showComments">
+              <EventRootCommentFormWrapper
+                :key="`${eventId}`"
+                :event="event"
+                :previous-offset="previousOffset"
+              />
+              <div class="my-6 mb-2 ml-2 rounded-lg">
+                <EventCommentsWrapper
+                  :key="event?.id"
+                  :loading="getEventCommentsLoading"
+                  :event="event"
+                  :comments="comments"
+                  :reached-end-of-results="reachedEndOfResults"
+                  :previous-offset="previousOffset"
+                  :original-poster="originalPoster"
+                  @load-more="loadMore"
+                />
+              </div>
+            </div>
             <EventChannelLinks
               v-if="event && event.EventChannels"
               class="my-4"

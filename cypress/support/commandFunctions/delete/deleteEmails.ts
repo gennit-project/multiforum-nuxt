@@ -1,10 +1,12 @@
 const deleteEmails = () => {
-  cy.authenticatedGraphQL(`
+  cy.safetyCheck().then(() => {
+    cy.authenticatedGraphQL(`
      mutation deleteEmail {
         deleteEmails {
           nodesDeleted
         }
       }
   `);
+  });
 };
 export default deleteEmails;
