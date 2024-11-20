@@ -1,7 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
-import { isAuthenticatedVar, isLoadingAuthVar, setIsLoadingAuth, usernameVar } from "@/cache";
+import {
+  isAuthenticatedVar,
+  isLoadingAuthVar,
+  setIsLoadingAuth,
+  usernameVar,
+} from "@/cache";
 
 // Define props for the component
 const props = defineProps({
@@ -18,12 +23,23 @@ const props = defineProps({
 let handleLogin = () => {};
 
 const showAuthContent = computed(
-  () => isAuthenticatedVar.value && !!usernameVar.value && !props.loading && !isLoadingAuthVar.value
+  () =>
+    isAuthenticatedVar.value &&
+    !!usernameVar.value &&
+    !props.loading &&
+    !isLoadingAuthVar.value
 );
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 
 if (import.meta.env.SSR === false) {
-  const { loginWithPopup, idTokenClaims, isLoading } = useAuth0();
+
+  const { 
+    loginWithPopup, 
+    idTokenClaims, 
+    isLoading, 
+    loginWithRedirect 
+  } = useAuth0();
+
   setIsLoadingAuth(isLoading.value);
 
   const storeToken = async () => {
@@ -32,8 +48,13 @@ if (import.meta.env.SSR === false) {
       localStorage.setItem("token", token);
     }
   };
+  
   handleLogin = async () => {
-    await loginWithPopup();
+    if (window?.parent?.Cypress) {
+      await loginWithRedirect();
+    } else {
+      await loginWithPopup();
+    }
     await storeToken();
   };
 }
