@@ -1,11 +1,9 @@
 import { defineConfig } from "cypress";
-// Populate process.env with values from .env file
- 
 import dotenv from "dotenv";
 
 dotenv.config({ path: ".env" });
 
-module.exports = defineConfig({
+export default defineConfig({
   env: {
     auth0_username: process.env.VITE_AUTH0_USERNAME,
     auth0_password: process.env.VITE_AUTH0_PASSWORD,
@@ -18,11 +16,15 @@ module.exports = defineConfig({
     auth0_client_id: process.env.VITE_AUTH0_CLIENT_ID,
     auth0_client_secret: process.env.VITE_AUTH0_CLIENT_SECRET,
   },
-  "includeShadowDom": true,
+  includeShadowDom: true,
   e2e: {
-    setupNodeEvents(/*on, config*/) {
-      // implement node event listeners here
+    experimentalRunAllSpecs: true,
+    setupNodeEvents(on, config) {
+      on('before:run', async () => {
+        console.log('🔍 Initializing test environment checks...');
+      });
     },
+    supportFile: 'cypress/support/e2e.ts'
   },
   video: false,
 });

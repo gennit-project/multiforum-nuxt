@@ -1,6 +1,4 @@
 const deleteDiscussions = () => {
-  cy.safetyCheck();
-  
   cy.authenticatedGraphQL(`
     mutation deleteDiscussion {
       deleteDiscussions {

@@ -1,4 +1,4 @@
-import serverRoles from "../../../seedData/rbac/serverRoles.js";
+import serverRoles from "../../../seedData/rbac/serverRoles";
 
 const seedServerRoles = () => {
   cy.request({

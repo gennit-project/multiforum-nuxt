@@ -1,6 +1,4 @@
 const deleteChannels = () => {
-  cy.safetyCheck();
-
   cy.authenticatedGraphQL(`
     mutation deleteChannel {
       deleteChannels {
