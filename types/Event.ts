@@ -5,8 +5,8 @@ export type Point = {
 export interface CreateEditEventFormValues {
   title: string;
   description: string;
-  selectedTags: Array[string];
-  selectedChannels: Array[string];
+  selectedTags: Array<string>
+  selectedChannels: Array<string>
   address?: string;
   latitude?: number;
   longitude?: number;
@@ -81,11 +81,11 @@ export type SearchEventValues = {
   placeAddress?: string;
   latitude?: number;
   longitude?: number;
-  tags?: Array[string];
-  channels?: Array[string];
-  weekdays?: Array[SelectedWeekdays];
-  hourRanges?: Array[SelectedHourRanges];
-  weeklyHourRanges?: Array[SelectedWeeklyHourRanges];
+  tags?: Array<string>
+  channels?: Array<string>
+  weekdays?: Array<SelectedWeekdays>;
+  hourRanges?: Array<SelectedHourRanges>;
+  weeklyHourRanges?: Array<SelectedWeeklyHourRanges>;
   locationFilter?: string;
   searchInput?: string;
   showCanceledEvents?: boolean;

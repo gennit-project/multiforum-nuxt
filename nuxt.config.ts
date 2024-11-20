@@ -34,7 +34,6 @@ export default defineNuxtConfig({
         },
       },
     ],
-    "@nuxtjs/eslint-module",
     "@nuxtjs/tailwindcss",
     "@nuxtjs/color-mode",
   ],
