@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import type { TagData } from "@/types/Tag";
 import type { UserData } from "@/types/User";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { UPDATE_CHANNEL } from "@/graphQLData/channel/mutations";
@@ -9,7 +8,7 @@ import CreateEditChannelFields from "@/components/channel/form/CreateEditChannel
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { usernameVar } from "@/cache";
-import type { Tag } from "@/__generated__/graphql";
+import type { Tag as TagData } from "@/__generated__/graphql";
 
 const route = useRoute();
 const channelId = route.params.forumId as string;
@@ -73,8 +72,8 @@ const channelUpdateInput = computed(() => {
   }));
 
   const tagDisconnections = existingTags.value
-    .filter((tag: Tag) => !formValues.value.selectedTags.includes(tag))
-    .map((tag: Tag) => ({
+    .filter((tag: string) => !formValues.value.selectedTags.includes(tag))
+    .map((tag: TagData) => ({
       where: { node: { text: tag } },
     }));
 

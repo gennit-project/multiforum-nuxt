@@ -43,8 +43,8 @@ const closedCount = computed(() => {
         :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
         class="px-4 py-2 border-b-2"
         :class="{
-          'border-black text-black dark:border-white dark:text-white': $route.name === 'forums-forumId-issues',
-          'border-gray-500 text-gray-500 dark:text-gray-400': $route.name !== 'forums-forumId-issues',
+          'border-black text-black dark:border-white dark:text-white': route.name === 'forums-forumId-issues',
+          'border-gray-500 text-gray-500 dark:text-gray-400': route.name !== 'forums-forumId-issues',
         }"
       >
         <i class="far fa-dot-circle" /> {{ openCount }} Open
@@ -53,8 +53,8 @@ const closedCount = computed(() => {
         :to="{ name: 'forums-forumId-issues-closed', params: { forumId: channelId } }"
         class="px-4 py-2 border-b-2"
         :class="{
-          'border-black text-black dark:border-white dark:text-white': $route.name === 'forums-forumId-issues-closed',
-          'border-gray-500 text-gray-500 dark:text-gray-400': $route.name !== 'forums-forumId-issues-closed',
+          'border-black text-black dark:border-white dark:text-white': route.name === 'forums-forumId-issues-closed',
+          'border-gray-500 text-gray-500 dark:text-gray-400': route.name !== 'forums-forumId-issues-closed',
         }"
       >
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed

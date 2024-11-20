@@ -7,13 +7,12 @@ import {
   useQuery,
   useMutation,
 } from "@vue/apollo-composable";
-import type { TagData } from "@/types/Tag";
 import type {
   CreateEditDiscussionFormValues,
 } from "@/types/Discussion";
 import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import type { Discussion, DiscussionChannel ,
+import type { Discussion, DiscussionChannel, Tag as TagData,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
@@ -78,7 +77,7 @@ export default defineComponent({
       if (discussion.value) {
         return {
           title: discussion.value.title,
-          body: discussion.value.body,
+          body: discussion.value?.body || "",
           selectedTags: discussion.value.Tags.map((tag: TagData) => {
             return tag.text;
           }),
@@ -214,7 +213,7 @@ export default defineComponent({
         channelConnections: channelConnections.value,
         channelDisconnections: discussion.value.DiscussionChannels.filter(
           (dc) => {
-            return !channelConnections.value.includes(dc.Channel.uniqueName);
+            return !channelConnections.value.includes(dc.Channel?.uniqueName || '');
           },
         ).map((dc) => {
           return dc.Channel.uniqueName;

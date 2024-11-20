@@ -1,11 +1,11 @@
-// import this after installing `@mdi/font` package
+
 import '@mdi/font/css/materialdesignicons.css'
 import 'vuetify/styles'
-import { createVuetify } from 'vuetify'
+import createVuetify from 'vuetify'
 import { aliases, mdi } from 'vuetify/iconsets/mdi'
-import { defineNuxtPlugin } from '#app' // Ensure this is imported
+import { defineNuxtPlugin } from 'nuxt/app'
 
-export default defineNuxtPlugin((nuxtApp) => {
+export default defineNuxtPlugin((nuxtApp: any) => {
   const vuetify = createVuetify({
     icons: {
       defaultSet: 'mdi',

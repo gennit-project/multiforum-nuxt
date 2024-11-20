@@ -27,7 +27,7 @@ const {
   loading: getCommentLoading,
   fetchMore,
   onResult: onGetCommentDone,
-} = useQuery(GET_FEEDBACK_ON_COMMENT, {
+} = useQuery<{ comments: Comment[] }, { message: string }>(GET_FEEDBACK_ON_COMMENT, {
   commentId: commentId,
   limit: PAGE_LIMIT,
   offset: offset,

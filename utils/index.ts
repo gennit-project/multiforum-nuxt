@@ -1,4 +1,3 @@
-import type { TagData } from "@/types/tagTypes";
 import { gql } from "@apollo/client/core";
 import config from "@/config";
 import type { Duration } from "luxon";
@@ -10,7 +9,7 @@ import EyeIcon from '@/components/icons/EyeIcon.vue'
 import PencilIcon from '@/components/icons/PencilIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import XmarkIcon from '@/components/icons/XmarkIcon.vue'
-import type { EventData } from "@/types/Event";
+import type { Event, Tag as TagData } from "@/__generated__/graphql"
 
 const getTimePieces = (timeObj: DateTime) => {
   const { year, month, day, weekday, hour } = timeObj;
@@ -127,7 +126,7 @@ const getDurationObj = (startTime: string, endTime: string) => {
 
 // This function allows events to be
 // sorted in chronological order.
-const compareDate = (e1: EventData, e2: EventData) => {
+const compareDate = (e1: Event, e2: Event) => {
   const start1 = DateTime.fromISO(e1.startTime);
   const start2 = DateTime.fromISO(e2.startTime);
   if (start1 < start2) {

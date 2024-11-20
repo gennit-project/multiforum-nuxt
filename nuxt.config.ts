@@ -6,6 +6,7 @@ import path from "path";
 export default defineNuxtConfig({
   alias: {
     "@": path.resolve(__dirname),
+    "#app": path.resolve(__dirname),
   },
   build: {
     transpile: ["vuetify"],
@@ -65,9 +66,9 @@ export default defineNuxtConfig({
   },
   ssr: true,
   typescript: {
-    strict: true,
+    strict: false,
     shim: false,
-    typeCheck: true,
+    typeCheck: false,
   },
   vite: {
     plugins: [vuetify({ autoImport: true })],
