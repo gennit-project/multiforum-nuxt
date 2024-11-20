@@ -1,5 +1,8 @@
-import { CHANNEL_CREATION_FORM } from "../constants";
+import { getConstantsForCypress } from "../constants";
 import { deleteAll, seedAll } from "../utils";
+
+const constants = getConstantsForCypress(Cypress.env("baseUrl"));
+const { CHANNEL_CREATION_FORM } = constants;
 
 describe("Basic channel operations", () => {
   beforeEach(function () {
@@ -16,9 +19,10 @@ describe("Basic channel operations", () => {
 
     // Test creating a channel
     cy.visit(CHANNEL_CREATION_FORM);
-   
-    cy.get('textarea[data-testid="description-input"]')
-      .type(TEST_DESCRIPTION, { force: true })
+
+    cy.get('textarea[data-testid="description-input"]').type(TEST_DESCRIPTION, {
+      force: true,
+    });
 
     cy.get('input[data-testid="title-input"]').type(TEST_CHANNEL);
 
