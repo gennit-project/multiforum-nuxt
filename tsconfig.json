@@ -9,7 +9,7 @@
     "allowJs": true,
     "jsx": "preserve",
     "importHelpers": true,
-    "moduleResolution": "Bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "experimentalDecorators": true,
     "skipLibCheck": true,
