@@ -32,9 +32,17 @@ declare global {
       authenticatedGraphQL(
         query: string,
         variables?: Record<string, unknown>
-      ): Chainable<Cypress.Response<any>>
+      ): Chainable<Cypress.Response<any>>;
       ensureAuth0Login(): Chainable<Element>;
       safetyCheck(): Chainable<Element>;
+      deleteChannelRoles(): Chainable<Element>;
+      deleteModChannelRoles(): Chainable<Element>;
+      deleteServerRoles(): Chainable<Element>;
+      deleteModServerRoles(): Chainable<Element>;
+      deleteServerConfigs(): Chainable<Element>;
+      deleteEventChannels(): Chainable<Element>;
+      deleteDiscussionChannels(): Chainable<Element>;
+      deleteComments(): Chainable<Element>;
     }
   }
 }

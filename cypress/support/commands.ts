@@ -17,6 +17,14 @@ import seedChannelRoles from "./commandFunctions/seed/rbac/seedChannelRoles";
 import seedModServerRoles from "./commandFunctions/seed/rbac/seedModServerRoles";
 import seedServerRoles from "./commandFunctions/seed/rbac/seedServerRoles";
 import seedServerConfig from "./commandFunctions/seed/rbac/seedServerConfig";
+import {
+  deleteChannelRoles,
+  deleteModChannelRoles,
+  deleteServerRoles,
+  deleteModServerRoles,
+  deleteServerConfigs,
+} from "./commandFunctions/delete/deleteRBAC";
+import { deleteComments, deleteDiscussionChannels, deleteEventChannels } from "./commandFunctions/delete/deleteComments";
 
 const AUTH_TOKEN_NAME = "authToken";
 
@@ -45,26 +53,26 @@ Cypress.Commands.add("loginAsAdmin", () => {
 });
 
 Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
-    cy.window().then((window) => {
-      const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
-      // Set the token for use in the next command
-      Cypress.env('tempAuthToken', token);
-    });
-  
-    // Return the request directly
-    return cy.request({
-      method: "POST",
-      url: Cypress.env("graphqlUrl"),
-      headers: {
-        Authorization: `Bearer ${Cypress.env('tempAuthToken')}`,
-        "Content-Type": "application/json",
-      },
-      body: {
-        query,
-        variables,
-      },
-    });
+  cy.window().then((window) => {
+    const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
+    // Set the token for use in the next command
+    Cypress.env("tempAuthToken", token);
   });
+
+  // Return the request directly
+  return cy.request({
+    method: "POST",
+    url: Cypress.env("graphqlUrl"),
+    headers: {
+      Authorization: `Bearer ${Cypress.env("tempAuthToken")}`,
+      "Content-Type": "application/json",
+    },
+    body: {
+      query,
+      variables,
+    },
+  });
+});
 
 Cypress.Commands.add("safetyCheck", () => {
   return cy
@@ -99,8 +107,6 @@ Cypress.Commands.add("seedChannelRoles", seedChannelRoles);
 Cypress.Commands.add("seedModServerRoles", seedModServerRoles);
 Cypress.Commands.add("seedServerRoles", seedServerRoles);
 Cypress.Commands.add("seedServerConfig", seedServerConfig);
-
-// createEvents takes an array of events and creates them
 Cypress.Commands.add("createEvents", createEvents);
 Cypress.Commands.add("createDiscussions", createDiscussions);
 
@@ -111,3 +117,13 @@ Cypress.Commands.add("deleteUsers", deleteUsers);
 Cypress.Commands.add("deleteChannels", deleteChannels);
 Cypress.Commands.add("deleteTags", deleteTags);
 Cypress.Commands.add("deleteDiscussions", deleteDiscussions);
+Cypress.Commands.add("deleteComments", deleteComments);
+Cypress.Commands.add("deleteEventChannels", deleteEventChannels);
+Cypress.Commands.add("deleteDiscussionChannels", deleteDiscussionChannels);
+
+// DELETE RBAC DATA
+Cypress.Commands.add("deleteChannelRoles", deleteChannelRoles);
+Cypress.Commands.add("deleteModChannelRoles", deleteModChannelRoles);
+Cypress.Commands.add("deleteServerRoles", deleteServerRoles);
+Cypress.Commands.add("deleteModServerRoles", deleteModServerRoles);
+Cypress.Commands.add("deleteServerConfigs", deleteServerConfigs);

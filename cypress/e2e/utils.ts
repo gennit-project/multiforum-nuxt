@@ -1,13 +1,22 @@
 export const deleteAll = () => {
   cy.loginAsAdmin();
 
-  console.log('deleteAll command ran')
-  // cy.deleteEvents();
-  // cy.deleteEmails();
-  // cy.deleteUsers();
-  // cy.deleteChannels();
-  // cy.deleteTags();
-  // cy.deleteDiscussions();
+  cy.deleteEvents();
+  cy.deleteEmails();
+  cy.deleteUsers();
+  cy.deleteChannels();
+  cy.deleteTags();
+  cy.deleteDiscussions();
+  cy.deleteComments();
+  cy.deleteEventChannels();
+  cy.deleteDiscussionChannels();
+
+  // RBAC
+  cy.deleteChannelRoles();
+  cy.deleteModChannelRoles();
+  cy.deleteServerRoles();
+  cy.deleteModServerRoles();
+  cy.deleteServerConfigs();
 };
 
 export const seedAll = () => {
@@ -18,6 +27,8 @@ export const seedAll = () => {
   cy.seedTags();
   cy.seedEvents();
   cy.seedDiscussions();
+
+  // RBAC
   cy.seedModChannelRoles();
   cy.seedChannelRoles();
   cy.seedModServerRoles()

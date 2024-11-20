@@ -1,9 +1,7 @@
 import './commands';
 
 Cypress.on('fail', (error) => {
-  // Check if it's our safety check error
   if (error.message.includes('SAFETY CHECK FAILED')) {
-    // Log in red with emphasis
     Cypress.log({
       name: '🚨 SAFETY CHECK FAILED',
       message: error.message,
@@ -11,12 +9,8 @@ Cypress.on('fail', (error) => {
         Error: error.message,
       }),
     });
-    
-    // Ensure the error appears in the console
     console.error('\n\n🚨 SAFETY CHECK FAILED 🚨');
     console.error(error.message);
-    
-    // Exit the test run by throwing a fatal error
     throw new Error(`FATAL: ${error.message}`);
   }
   throw error;
@@ -66,8 +60,7 @@ const performSafetyCheck = () => {
 
 
 before(function () {
-  // Increase the timeout for the safety check
-  this.timeout(30000); // 30 seconds
+  this.timeout(30000);
   
   cy.log('🔍 Starting global safety check...');
   performSafetyCheck();
@@ -75,7 +68,6 @@ before(function () {
 
 
 beforeEach(() => {
-  // Check if safety check passed
   if (!Cypress.env('safetyCheckPassed')) {
     throw new Error(
       `🚨 Safety check has not completed successfully.\n` +
