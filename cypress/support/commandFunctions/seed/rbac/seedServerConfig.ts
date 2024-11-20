@@ -16,7 +16,7 @@ const seedServerConfig = () => {
                   input: $input
               ) {
                   serverConfigs {
-                    name
+                    serverName
                   }
                 }
               }
