@@ -45,15 +45,18 @@ Cypress.Commands.add("loginAsAdmin", () => {
 });
 
 Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
-  // Get token using window() instead of custom getLocalStorage command
-  cy.window().then((window) => {
-    const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
-
-    cy.request({
+    cy.window().then((window) => {
+      const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
+      // Set the token for use in the next command
+      Cypress.env('tempAuthToken', token);
+    });
+  
+    // Return the request directly
+    return cy.request({
       method: "POST",
       url: Cypress.env("graphqlUrl"),
       headers: {
-        Authorization: `Bearer ${token}`,
+        Authorization: `Bearer ${Cypress.env('tempAuthToken')}`,
         "Content-Type": "application/json",
       },
       body: {
@@ -62,7 +65,6 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
       },
     });
   });
-});
 
 Cypress.Commands.add("safetyCheck", () => {
   return cy

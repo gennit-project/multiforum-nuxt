@@ -1,9 +1,33 @@
+import './commands';
 
-// Create a separate function for the safety check
+Cypress.on('fail', (error) => {
+  // Check if it's our safety check error
+  if (error.message.includes('SAFETY CHECK FAILED')) {
+    // Log in red with emphasis
+    Cypress.log({
+      name: '🚨 SAFETY CHECK FAILED',
+      message: error.message,
+      consoleProps: () => ({
+        Error: error.message,
+      }),
+    });
+    
+    // Ensure the error appears in the console
+    console.error('\n\n🚨 SAFETY CHECK FAILED 🚨');
+    console.error(error.message);
+    
+    // Exit the test run by throwing a fatal error
+    throw new Error(`FATAL: ${error.message}`);
+  }
+  throw error;
+});
+
 const performSafetyCheck = () => {
-  cy.loginAsAdmin();
-  return cy.authenticatedGraphQL(`
-    query safetyCheck {
+  cy.loginAsAdmin(); // Ensure the admin login runs before the query
+
+  // Chainable Cypress flow
+  cy.authenticatedGraphQL(`
+    query SafetyCheck {
       safetyCheck {
         environment {
           currentDatabase
@@ -14,33 +38,52 @@ const performSafetyCheck = () => {
   `).then((response) => {
     const env = response?.body?.data?.safetyCheck?.environment;
 
-    if (!env?.isTestEnvironment) {
+    if (!env) {
       throw new Error(
-        `🚨 SAFETY CHECK FAILED: Attempted to run tests in wrong environment!\n` +
-          `Current database: ${env?.currentDatabase}\n` +
-          `❌ ALL TESTS BLOCKED FOR SAFETY`
+        `🚨 SAFETY CHECK FAILED: Could not retrieve environment information.\n` +
+        `Response received: ${JSON.stringify(response?.body, null, 2)}\n` +
+        `❌ ALL TESTS BLOCKED FOR SAFETY`
       );
     }
 
+    if (!env.isTestEnvironment) {
+      throw new Error(
+        `🚨 SAFETY CHECK FAILED: Attempted to run tests in wrong environment!\n` +
+        `Current database: ${env.currentDatabase}\n` +
+        `❌ ALL TESTS BLOCKED FOR SAFETY\n\n` +
+        `To fix this:\n` +
+        `1. Make sure you're running against your test database\n` +
+        `2. Check your environment variables\n` +
+        `3. Verify your GraphQL endpoint is correct`
+      );
+    }
+
+    Cypress.env('safetyCheckPassed', true);
     cy.log("✅ Safety check passed - running in test environment");
-    return true;
   });
 };
 
-// Add more visible logging
-before(() => {
+
+
+before(function () {
+  // Increase the timeout for the safety check
+  this.timeout(30000); // 30 seconds
+  
   cy.log('🔍 Starting global safety check...');
-  performSafetyCheck().then((passed) => {
-    if (passed) {
-      cy.log('🚀 All systems go - tests can proceed');
-    } 
-  });
+  performSafetyCheck();
 });
 
-// Optional: Add extra protection for test files
+
 beforeEach(() => {
-  cy.log('Verifying safety check completed...');
+  // Check if safety check passed
   if (!Cypress.env('safetyCheckPassed')) {
-    throw new Error('Tests attempted to run before safety check completed');
+    throw new Error(
+      `🚨 Safety check has not completed successfully.\n` +
+      `This might mean:\n` +
+      `1. The before() hook failed\n` +
+      `2. The safety check was bypassed\n` +
+      `3. There's an issue with test setup\n\n` +
+      `Please check the test output above for more details.`
+    );
   }
 });

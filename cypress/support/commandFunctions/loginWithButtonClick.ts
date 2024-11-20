@@ -1,6 +1,6 @@
-import config from "../../../config";
 
-const ONLINE_EVENT_LIST = `${config.baseUrl}/events/list/search`
+const baseUrl = Cypress.env("baseUrl");
+const ONLINE_EVENT_LIST = `${baseUrl}/events/list/search`
 
 export type LoginInput = {
   username: string;
