@@ -14,10 +14,21 @@ import seedServerConfig from "./commandFunctions/seed/rbac/seedServerConfig";
 import dropDataForCypressTests from "./commandFunctions/dropDataForCypressTests";
 
 const AUTH_TOKEN_NAME = "authToken";
+const AUTH_TOKEN_CACHE_KEY = "auth_token_cache";
 
 Cypress.Commands.add("loginWithCreateEventButton", loginWithButtonClick);
 
 Cypress.Commands.add("loginAsAdmin", () => {
+  const cachedTokenData = JSON.parse(localStorage.getItem(AUTH_TOKEN_CACHE_KEY));
+
+  if (cachedTokenData && cachedTokenData.expiresAt > Date.now()) {
+    // If possible, use cached token to avoid rate limiting problems with the Auth0 API
+    cy.window().then((window) => {
+      window.localStorage.setItem(AUTH_TOKEN_NAME, cachedTokenData.accessToken);
+    });
+    return;
+  }
+
   const options = {
     method: "POST",
     url: `https://${Cypress.env("auth0Domain")}/oauth/token`,
@@ -33,33 +44,56 @@ Cypress.Commands.add("loginAsAdmin", () => {
   };
 
   cy.request(options).then((response) => {
-    console.log("let's see what we got from auth0", JSON.stringify(response));
+    const accessToken = response.body.access_token;
+    const expiresIn = response.body.expires_in; // Token expiry in seconds
+
+    // Cache the token with its expiry time
+    const tokenData = {
+      accessToken,
+      expiresAt: Date.now() + expiresIn * 1000, // Convert to milliseconds
+    };
+    localStorage.setItem(AUTH_TOKEN_CACHE_KEY, JSON.stringify(tokenData));
+
+    // Set the token in localStorage for the app
     cy.window().then((window) => {
-      window.localStorage.setItem(AUTH_TOKEN_NAME, response.body.access_token);
+      window.localStorage.setItem(AUTH_TOKEN_NAME, accessToken);
     });
   });
 });
 
+
 Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
   cy.window().then((window) => {
     const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
-    // Set the token for use in the next command
     Cypress.env("tempAuthToken", token);
-    // Return the request directly
 
-    console.log("token in authenticated graphql", token);
-    return cy.request({
-      method: "POST",
-      url: Cypress.env("graphqlUrl"),
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: {
-        query,
-        variables,
-      },
-    });
+    return cy
+      .request({
+        method: "POST",
+        url: Cypress.env("graphqlUrl"),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: {
+          query,
+          variables,
+        },
+        failOnStatusCode: false
+      })
+      .then((response) => {
+        // If we got a response with errors, log them
+        if (response.body.errors) {
+          console.error('GraphQL Error Response:', {
+            errors: response.body.errors,
+            status: response.status,
+            statusText: response.statusText
+          });
+        }
+        
+        // Return the full response to maintain backward compatibility
+        return response;
+      });
   });
 });
 

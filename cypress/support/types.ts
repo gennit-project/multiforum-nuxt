@@ -26,7 +26,7 @@ declare global {
       authenticatedGraphQL(
         query: string,
         variables?: Record<string, unknown>
-      ): Chainable<Cypress.Response<any>>;
+      ): Chainable<any>;
       ensureAuth0Login(): Chainable<Element>;
       safetyCheck(): Chainable<Element>;
       dropDataForCypressTests(): Chainable<Element>;

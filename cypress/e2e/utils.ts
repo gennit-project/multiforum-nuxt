@@ -7,8 +7,6 @@ export const deleteAll = () => {
 
 // Helper function to validate the response
 const validateResponse = (response, commandName) => {
-  // Log the entire response for debugging purposes
-  cy.log(`Response for ${commandName}: ${JSON.stringify(response)}`);
 
   if (
     !response ||
