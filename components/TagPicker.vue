@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ref, watch } from 'vue';
-import SearchableTagList from '@/components/SearchableTagList.vue';
+import { ref, watch } from "vue";
+import SearchableTagList from "@/components/SearchableTagList.vue";
 
 const props = defineProps({
   hideSelected: {
@@ -13,11 +13,11 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
-const emit = defineEmits(['setSelectedTags']);
+const emit = defineEmits(["setSelectedTags"]);
 
 const isDropdownOpen = ref(false);
 const selected = ref([...props.selectedTags]);
@@ -33,7 +33,7 @@ const toggleSelectedTag = (tag: string) => {
   } else {
     selected.value.splice(index, 1);
   }
-  emit('setSelectedTags', selected.value);
+  emit("setSelectedTags", selected.value);
 };
 
 watch(
@@ -49,7 +49,7 @@ const outside = () => {
 
 const removeSelection = (tag: string) => {
   selected.value = selected.value.filter((c) => c !== tag);
-  emit('setSelectedTags', selected.value);
+  emit("setSelectedTags", selected.value);
 };
 </script>
 
@@ -60,21 +60,21 @@ const removeSelection = (tag: string) => {
         {{ description }}
       </div>
       <div class="relative">
-        <div
+        <input
+          data-testid="tags-input"
           class="flex min-h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
           @click="toggleDropdown"
         >
-          <div
-            v-for="(tag, index) in selected"
-            :key="index"
-            class="mr-2 mt-1 flex items-center rounded-full bg-blue-100 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
-            @click="removeSelection(tag)"
-          >
-            <span>{{ tag }}</span>
-            <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
-              &times;
-            </span>
-          </div>
+        <div
+          v-for="(tag, index) in selected"
+          :key="index"
+          class="mr-2 mt-1 flex items-center rounded-full bg-blue-100 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
+          @click="removeSelection(tag)"
+        >
+          <span>{{ tag }}</span>
+          <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
+            &times;
+          </span>
         </div>
         <SearchableTagList
           v-if="isDropdownOpen"

@@ -119,7 +119,7 @@ const events: EventCreateInputWithChannels[] = [
         connect: [
           {
             where: {
-              node: { text: "trivia " },
+              node: { text: "trivia" },
             },
           },
         ],

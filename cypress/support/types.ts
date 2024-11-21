@@ -22,12 +22,6 @@ declare global {
       createDiscussions(
         discussions: DiscussionCreateInputWithChannels[]
       ): Chainable<Element>;
-      deleteEvents(): Chainable<Element>;
-      deleteEmails(): Chainable<Element>;
-      deleteUsers(): Chainable<Element>;
-      deleteChannels(): Chainable<Element>;
-      deleteTags(): Chainable<Element>;
-      deleteDiscussions(): Chainable<Element>;
       loginAsAdmin(): Chainable<Element>;
       authenticatedGraphQL(
         query: string,
@@ -35,14 +29,7 @@ declare global {
       ): Chainable<Cypress.Response<any>>;
       ensureAuth0Login(): Chainable<Element>;
       safetyCheck(): Chainable<Element>;
-      deleteChannelRoles(): Chainable<Element>;
-      deleteModChannelRoles(): Chainable<Element>;
-      deleteServerRoles(): Chainable<Element>;
-      deleteModServerRoles(): Chainable<Element>;
-      deleteServerConfigs(): Chainable<Element>;
-      deleteEventChannels(): Chainable<Element>;
-      deleteDiscussionChannels(): Chainable<Element>;
-      deleteComments(): Chainable<Element>;
+      dropDataForCypressTests(): Chainable<Element>;
     }
   }
 }

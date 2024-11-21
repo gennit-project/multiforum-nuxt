@@ -96,7 +96,7 @@ function updateSearchResult(input: string) {
         >
         <div class="flex items-center space-x-2">
           <div class="flex-col">
-            <span class="font-bold">{{ tag.text }}</span>
+            <span :data-testid="`tag-picker-${tag.text}`" class="font-bold">{{ tag.text }}</span>
           </div>
         </div>
       </label>

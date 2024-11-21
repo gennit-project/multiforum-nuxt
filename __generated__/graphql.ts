@@ -6289,6 +6289,12 @@ export type CreateDiscussionsMutationResponse = {
   info: CreateInfo;
 };
 
+export type CreateDropDataResponsesMutationResponse = {
+  __typename?: 'CreateDropDataResponsesMutationResponse';
+  dropDataResponses: Array<DropDataResponse>;
+  info: CreateInfo;
+};
+
 export type CreateEmailsMutationResponse = {
   __typename?: 'CreateEmailsMutationResponse';
   emails: Array<Email>;
@@ -8977,6 +8983,67 @@ export type DiscussionWhere = {
 export type DiscussionsConnection = {
   __typename?: 'DiscussionsConnection';
   edges: Array<DiscussionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DropDataResponse = {
+  __typename?: 'DropDataResponse';
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type DropDataResponseAggregateSelection = {
+  __typename?: 'DropDataResponseAggregateSelection';
+  count: Scalars['Int']['output'];
+  message: StringAggregateSelectionNullable;
+};
+
+export type DropDataResponseCreateInput = {
+  message?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type DropDataResponseEdge = {
+  __typename?: 'DropDataResponseEdge';
+  cursor: Scalars['String']['output'];
+  node: DropDataResponse;
+};
+
+export type DropDataResponseOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more DropDataResponseSort objects to sort DropDataResponses by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<DropDataResponseSort>>;
+};
+
+/** Fields to sort DropDataResponses by. The order in which sorts are applied is not guaranteed when specifying many fields in one DropDataResponseSort object. */
+export type DropDataResponseSort = {
+  message?: InputMaybe<SortDirection>;
+  success?: InputMaybe<SortDirection>;
+};
+
+export type DropDataResponseUpdateInput = {
+  message?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type DropDataResponseWhere = {
+  AND?: InputMaybe<Array<DropDataResponseWhere>>;
+  NOT?: InputMaybe<DropDataResponseWhere>;
+  OR?: InputMaybe<Array<DropDataResponseWhere>>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  message_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type DropDataResponsesConnection = {
+  __typename?: 'DropDataResponsesConnection';
+  edges: Array<DropDataResponseEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -16373,6 +16440,7 @@ export type Mutation = {
   createDiscussionChannels: CreateDiscussionChannelsMutationResponse;
   createDiscussionWithChannelConnections?: Maybe<Discussion>;
   createDiscussions: CreateDiscussionsMutationResponse;
+  createDropDataResponses: CreateDropDataResponsesMutationResponse;
   createEmailAndUser?: Maybe<User>;
   createEmails: CreateEmailsMutationResponse;
   createEmojis: CreateEmojisMutationResponse;
@@ -16409,6 +16477,7 @@ export type Mutation = {
   deleteDiscussionChannelListFormats: DeleteInfo;
   deleteDiscussionChannels: DeleteInfo;
   deleteDiscussions: DeleteInfo;
+  deleteDropDataResponses: DeleteInfo;
   deleteEmails: DeleteInfo;
   deleteEmojis: DeleteInfo;
   deleteEnvironmentInfos: DeleteInfo;
@@ -16433,6 +16502,7 @@ export type Mutation = {
   deleteSiteWideDiscussionListFormats: DeleteInfo;
   deleteTags: DeleteInfo;
   deleteUsers: DeleteInfo;
+  dropDataForCypressTests?: Maybe<DropDataResponse>;
   removeEmojiFromComment?: Maybe<Comment>;
   removeEmojiFromDiscussionChannel?: Maybe<DiscussionChannel>;
   undoUpvoteComment?: Maybe<Comment>;
@@ -16447,6 +16517,7 @@ export type Mutation = {
   updateDiscussionChannels: UpdateDiscussionChannelsMutationResponse;
   updateDiscussionWithChannelConnections?: Maybe<Discussion>;
   updateDiscussions: UpdateDiscussionsMutationResponse;
+  updateDropDataResponses: UpdateDropDataResponsesMutationResponse;
   updateEmails: UpdateEmailsMutationResponse;
   updateEmojis: UpdateEmojisMutationResponse;
   updateEnvironmentInfos: UpdateEnvironmentInfosMutationResponse;
@@ -16541,6 +16612,11 @@ export type MutationCreateDiscussionWithChannelConnectionsArgs = {
 
 export type MutationCreateDiscussionsArgs = {
   input: Array<DiscussionCreateInput>;
+};
+
+
+export type MutationCreateDropDataResponsesArgs = {
+  input: Array<DropDataResponseCreateInput>;
 };
 
 
@@ -16729,6 +16805,11 @@ export type MutationDeleteDiscussionChannelsArgs = {
 export type MutationDeleteDiscussionsArgs = {
   delete?: InputMaybe<DiscussionDeleteInput>;
   where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type MutationDeleteDropDataResponsesArgs = {
+  where?: InputMaybe<DropDataResponseWhere>;
 };
 
 
@@ -16975,6 +17056,12 @@ export type MutationUpdateDiscussionsArgs = {
   disconnect?: InputMaybe<DiscussionDisconnectInput>;
   update?: InputMaybe<DiscussionUpdateInput>;
   where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type MutationUpdateDropDataResponsesArgs = {
+  update?: InputMaybe<DropDataResponseUpdateInput>;
+  where?: InputMaybe<DropDataResponseWhere>;
 };
 
 
@@ -17266,6 +17353,9 @@ export type Query = {
   discussions: Array<Discussion>;
   discussionsAggregate: DiscussionAggregateSelection;
   discussionsConnection: DiscussionsConnection;
+  dropDataResponses: Array<DropDataResponse>;
+  dropDataResponsesAggregate: DropDataResponseAggregateSelection;
+  dropDataResponsesConnection: DropDataResponsesConnection;
   emails: Array<Email>;
   emailsAggregate: EmailAggregateSelection;
   emailsConnection: EmailsConnection;
@@ -17514,6 +17604,25 @@ export type QueryDiscussionsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<DiscussionSort>>>;
   where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type QueryDropDataResponsesArgs = {
+  options?: InputMaybe<DropDataResponseOptions>;
+  where?: InputMaybe<DropDataResponseWhere>;
+};
+
+
+export type QueryDropDataResponsesAggregateArgs = {
+  where?: InputMaybe<DropDataResponseWhere>;
+};
+
+
+export type QueryDropDataResponsesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<DropDataResponseSort>>>;
+  where?: InputMaybe<DropDataResponseWhere>;
 };
 
 
@@ -21016,6 +21125,12 @@ export type UpdateDiscussionChannelsMutationResponse = {
 export type UpdateDiscussionsMutationResponse = {
   __typename?: 'UpdateDiscussionsMutationResponse';
   discussions: Array<Discussion>;
+  info: UpdateInfo;
+};
+
+export type UpdateDropDataResponsesMutationResponse = {
+  __typename?: 'UpdateDropDataResponsesMutationResponse';
+  dropDataResponses: Array<DropDataResponse>;
   info: UpdateInfo;
 };
 

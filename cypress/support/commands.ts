@@ -4,12 +4,6 @@ import seedUsers from "./commandFunctions/seed/seedUsers";
 import seedChannels from "./commandFunctions/seed/seedChannels";
 import seedDiscussions from "./commandFunctions/seed/seedDiscussions";
 import seedTags from "./commandFunctions/seed/seedTags";
-import deleteEvents from "./commandFunctions/delete/deleteEvents";
-import deleteEmails from "./commandFunctions/delete/deleteEmails";
-import deleteUsers from "./commandFunctions/delete/deleteUsers";
-import deleteChannels from "./commandFunctions/delete/deleteChannels";
-import deleteTags from "./commandFunctions/delete/deleteTags";
-import deleteDiscussions from "./commandFunctions/delete/deleteDiscussions";
 import createEvents from "./commandFunctions/createEvents";
 import createDiscussions from "./commandFunctions/createDiscussions";
 import seedModChannelRoles from "./commandFunctions/seed/rbac/seedModChannelRole";
@@ -17,14 +11,7 @@ import seedChannelRoles from "./commandFunctions/seed/rbac/seedChannelRoles";
 import seedModServerRoles from "./commandFunctions/seed/rbac/seedModServerRoles";
 import seedServerRoles from "./commandFunctions/seed/rbac/seedServerRoles";
 import seedServerConfig from "./commandFunctions/seed/rbac/seedServerConfig";
-import {
-  deleteChannelRoles,
-  deleteModChannelRoles,
-  deleteServerRoles,
-  deleteModServerRoles,
-  deleteServerConfigs,
-} from "./commandFunctions/delete/deleteRBAC";
-import { deleteComments, deleteDiscussionChannels, deleteEventChannels } from "./commandFunctions/delete/deleteComments";
+import dropDataForCypressTests from "./commandFunctions/dropDataForCypressTests";
 
 const AUTH_TOKEN_NAME = "authToken";
 
@@ -46,6 +33,7 @@ Cypress.Commands.add("loginAsAdmin", () => {
   };
 
   cy.request(options).then((response) => {
+    console.log("let's see what we got from auth0", JSON.stringify(response));
     cy.window().then((window) => {
       window.localStorage.setItem(AUTH_TOKEN_NAME, response.body.access_token);
     });
@@ -57,20 +45,21 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
     const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
     // Set the token for use in the next command
     Cypress.env("tempAuthToken", token);
-  });
+    // Return the request directly
 
-  // Return the request directly
-  return cy.request({
-    method: "POST",
-    url: Cypress.env("graphqlUrl"),
-    headers: {
-      Authorization: `Bearer ${Cypress.env("tempAuthToken")}`,
-      "Content-Type": "application/json",
-    },
-    body: {
-      query,
-      variables,
-    },
+    console.log("token in authenticated graphql", token);
+    return cy.request({
+      method: "POST",
+      url: Cypress.env("graphqlUrl"),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: {
+        query,
+        variables,
+      },
+    });
   });
 });
 
@@ -111,19 +100,4 @@ Cypress.Commands.add("createEvents", createEvents);
 Cypress.Commands.add("createDiscussions", createDiscussions);
 
 // DELETING SEED DATA
-Cypress.Commands.add("deleteEvents", deleteEvents);
-Cypress.Commands.add("deleteEmails", deleteEmails);
-Cypress.Commands.add("deleteUsers", deleteUsers);
-Cypress.Commands.add("deleteChannels", deleteChannels);
-Cypress.Commands.add("deleteTags", deleteTags);
-Cypress.Commands.add("deleteDiscussions", deleteDiscussions);
-Cypress.Commands.add("deleteComments", deleteComments);
-Cypress.Commands.add("deleteEventChannels", deleteEventChannels);
-Cypress.Commands.add("deleteDiscussionChannels", deleteDiscussionChannels);
-
-// DELETE RBAC DATA
-Cypress.Commands.add("deleteChannelRoles", deleteChannelRoles);
-Cypress.Commands.add("deleteModChannelRoles", deleteModChannelRoles);
-Cypress.Commands.add("deleteServerRoles", deleteServerRoles);
-Cypress.Commands.add("deleteModServerRoles", deleteModServerRoles);
-Cypress.Commands.add("deleteServerConfigs", deleteServerConfigs);
+Cypress.Commands.add("dropDataForCypressTests", dropDataForCypressTests);

@@ -1,9 +1,12 @@
 import type { DiscussionCreateInputWithChannels } from "../seedData/discussions";
 
-const createDiscussions = (discussions: DiscussionCreateInputWithChannels[]) => {
-  const getOperation = (discussion: DiscussionCreateInputWithChannels) => {
-    return {
-      query: `
+const createDiscussions = (
+  discussions: DiscussionCreateInputWithChannels[]
+) => {
+  for (let i = 0; i < discussions.length; i++) {
+    const discussion = discussions[i];
+    cy.authenticatedGraphQL(
+      `
           mutation createDiscussion(
             $discussionCreateInput: DiscussionCreateInput
             $channelConnections: [String]
@@ -41,23 +44,11 @@ const createDiscussions = (discussions: DiscussionCreateInputWithChannels[]) => 
             }
           }
         `,
-      variables: {
+      {
         discussionCreateInput: discussion.discussionCreateInput,
         channelConnections: discussion.channelConnections,
-      },
-    };
-  };
-
-  for (let i = 0; i < discussions.length; i++) {
-    const discussion = discussions[i];
-    cy.request({
-      url: "http://localhost:4000/graphql",
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: getOperation(discussion),
-    });
+      }
+    );
   }
 };
 
