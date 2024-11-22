@@ -1,48 +1,36 @@
 import type { ChannelCreateInput } from "../../../__generated__/graphql";
 
-const channels: ChannelCreateInput[] = [
+type BaseChannel = {
+  uniqueName: string;
+  admins: string[];
+};
+
+const baseChannels: BaseChannel[] = [
   {
     uniqueName: "cats",
-    Admins: {
-      connect: [
-        {
-          where: {
-            node: {
-              username: "cluse",
-            },
-          },
-        },
-      ],
-    },
+    admins: ["cluse"],
   },
   {
     uniqueName: "phx_music",
-    Admins: {
-      connect: [
-        {
-          where: {
-            node: {
-              username: "alice",
-            },
-          },
-        },
-      ],
-    },
+    admins: ["alice"],
   },
   {
     uniqueName: "phx_concerts",
-    Admins: {
-      connect: [
-        {
-          where: {
-            node: {
-              username: "alice",
-            },
-          },
-        },
-      ],
-    },
+    admins: ["alice"],
   },
 ];
+
+const channels: ChannelCreateInput[] = baseChannels.map(({ uniqueName, admins }) => ({
+  uniqueName,
+  Admins: {
+    connect: admins.map((admin) => ({
+      where: {
+        node: {
+          username_EQ: admin,
+        },
+      },
+    })),
+  },
+}));
 
 export default channels;

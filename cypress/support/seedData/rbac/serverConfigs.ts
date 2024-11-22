@@ -9,7 +9,7 @@ const serverConfigs: ServerConfigCreateInput[] = [
       connect: {
         where: {
           node: {
-            name: "CanCreateAnything",
+            name_EQ: "CanCreateAnything",
           },
         },
       },
@@ -18,7 +18,7 @@ const serverConfigs: ServerConfigCreateInput[] = [
       connect: {
         where: {
           node: {
-            name: "BasicModRole",
+            name_EQ: "BasicModRole",
           },
         },
       },

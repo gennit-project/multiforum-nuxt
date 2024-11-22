@@ -5,107 +5,119 @@ export type EventCreateInputWithChannels = {
   channelConnections: string[];
 };
 
-const events: EventCreateInputWithChannels[] = [
+type BaseEvent = {
+  title: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  virtualEventUrl: string;
+  poster: string;
+  cost: string;
+  canceled: boolean;
+  startTimeDayOfWeek: string;
+  startTimeHourOfDay: number;
+  tags: string[];
+  channels: string[];
+};
+
+const baseEvents: BaseEvent[] = [
   {
-    eventCreateInput: {
-      title: "Test free/virtual event",
-      startTime: "2024-04-21T02:21:37.146Z",
-      endTime: "2024-04-21T02:21:37.146Z",
-      virtualEventUrl: "https://example.com",
-      Poster: {
-        connect: {
-          where: {
-            node: {
-              username: "cluse",
-            },
-          },
-        },
-      },
-      cost: "0",
-      canceled: false,
-      startTimeDayOfWeek: "Wednesday",
-      startTimeHourOfDay: 20,
-    },
-    channelConnections: ["cats"],
+    title: "Test free/virtual event",
+    description: undefined,
+    startTime: "2024-04-21T02:21:37.146Z",
+    endTime: "2024-04-21T02:21:37.146Z",
+    virtualEventUrl: "https://example.com",
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    startTimeDayOfWeek: "Wednesday",
+    startTimeHourOfDay: 20,
+    tags: [],
+    channels: ["cats"],
   },
   {
-    eventCreateInput: {
-      title: "Test online event in phx_music",
-      description: undefined, 
-      startTime: "2024-04-21T02:21:37.146Z",
-      endTime: "2024-04-21T02:21:37.146Z",
-      virtualEventUrl: "https://example.com",
-      Poster: {
-        connect: {
-          where: {
-            node: {
-              username: "cluse",
-            },
-          },
-        },
-      },
-      cost: "0",
-      canceled: false,
-      startTimeDayOfWeek: "Wednesday",
-      startTimeHourOfDay: 20,
-      Tags: {
-        "connectOrCreate": [
-          {
-            "onCreate": {
-              "node": {
-                "text": "newYears"
-              }
-            },
-            "where": {
-              "node": {
-                "text": "newYears"
-              }
-            }
-          }
-        ]
-      },
-    },
-    channelConnections: ["phx_music"],
+    title: "Test online event in phx_music",
+    description: undefined,
+    startTime: "2024-04-21T02:21:37.146Z",
+    endTime: "2024-04-21T02:21:37.146Z",
+    virtualEventUrl: "https://example.com",
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    startTimeDayOfWeek: "Wednesday",
+    startTimeHourOfDay: 20,
+    tags: ["newYears"],
+    channels: ["phx_music"],
   },
   {
-    eventCreateInput: {
-      title: "Test event with a trivia tag",
-      description: undefined, 
-      startTime: "2024-04-21T02:21:37.146Z",
-      endTime: "2024-04-21T02:21:37.146Z",
-      virtualEventUrl: "https://example.com",
-      Poster: {
-        connect: {
-          where: {
-            node: {
-              username: "cluse",
-            },
-          },
-        },
-      },
-      cost: "0",
-      canceled: false,
-      startTimeDayOfWeek: "Wednesday",
-      startTimeHourOfDay: 20,
-      Tags: {
-        "connectOrCreate": [
-          {
-            "onCreate": {
-              "node": {
-                "text": "trivia"
-              }
-            },
-            "where": {
-              "node": {
-                "text": "trivia"
-              }
-            }
-          }
-        ]
-      },
-    },
-    channelConnections: ["phx_music"],
+    title: "Test event with a trivia tag",
+    description: undefined,
+    startTime: "2024-04-21T02:21:37.146Z",
+    endTime: "2024-04-21T02:21:37.146Z",
+    virtualEventUrl: "https://example.com",
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    startTimeDayOfWeek: "Wednesday",
+    startTimeHourOfDay: 20,
+    tags: ["trivia"],
+    channels: ["phx_music"],
   },
 ];
+
+export const events: EventCreateInputWithChannels[] = baseEvents.map(
+  ({
+    title,
+    description,
+    startTime,
+    endTime,
+    virtualEventUrl,
+    poster,
+    cost,
+    canceled,
+    startTimeDayOfWeek,
+    startTimeHourOfDay,
+    tags,
+    channels,
+  }) => ({
+    eventCreateInput: {
+      title,
+      ...(description && { description }),
+      startTime,
+      endTime,
+      virtualEventUrl,
+      Poster: {
+        connect: {
+          where: {
+            node: {
+              username_EQ: poster,
+            },
+          },
+        },
+      },
+      cost,
+      canceled,
+      startTimeDayOfWeek,
+      startTimeHourOfDay,
+      ...(tags.length > 0 && {
+        Tags: {
+          connect: tags.map((tag) => ({
+            where: {
+              node: {
+                text_EQ: tag,
+              },
+            },
+          })),
+          create: tags.map((tag) => ({
+            node: {
+              text: tag,
+            },
+          })),
+        },
+      }),
+    },
+    channelConnections: channels,
+  })
+);
 
 export default events;

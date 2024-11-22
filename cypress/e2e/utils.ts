@@ -32,22 +32,31 @@ export const seedAll = () => {
 
   cy.seedModChannelRoles()
     .then((response) => validateResponse(response, "seedModChannelRoles"))
+
     .then(() => cy.seedChannelRoles())
     .then((response) => validateResponse(response, "seedChannelRoles"))
+
     .then(() => cy.seedModServerRoles())
     .then((response) => validateResponse(response, "seedModServerRoles"))
+
     .then(() => cy.seedServerRoles())
     .then((response) => validateResponse(response, "seedServerRoles"))
+
     .then(() => cy.seedServerConfig())
     .then((response) => validateResponse(response, "seedServerConfig"))
+
     .then(() => cy.seedUsers())
     .then((response) => validateResponse(response, "seedUsers"))
+
     .then(() => cy.seedChannels())
     .then((response) => validateResponse(response, "seedChannels"))
+
     .then(() => cy.seedTags())
     .then((response) => validateResponse(response, "seedTags"))
+
     .then(() => cy.seedEvents())
     .then((response) => validateResponse(response, "seedEvents"))
+    
     .then(() => cy.seedDiscussions())
     .then((response) => validateResponse(response, "seedDiscussions"));
 };

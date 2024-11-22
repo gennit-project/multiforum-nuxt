@@ -12,7 +12,7 @@ const serverRoles: ServerRoleCreateInput[] = [
     canUploadFile: true,
     canUpvoteComment: true,
     canUpvoteDiscussion: true,
-    showAdminTag: null,
+    showAdminTag: false,
   },
   {
     name: "Admin Role",
