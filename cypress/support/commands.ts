@@ -63,39 +63,53 @@ Cypress.Commands.add("loginAsAdmin", () => {
 
 
 Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
-  cy.window().then((window) => {
-    const token = window.localStorage.getItem(AUTH_TOKEN_NAME);
-    Cypress.env("tempAuthToken", token);
+  // Ensure the token is up-to-date before making the GraphQL request
+  const getToken = () => {
+    return cy.window().then((window) => {
+      const cachedTokenData = JSON.parse(window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY));
+      if (cachedTokenData && cachedTokenData.expiresAt > Date.now()) {
+        // Return the valid cached token
+        return cachedTokenData.accessToken;
+      }
 
-    return cy
-      .request({
-        method: "POST",
-        url: Cypress.env("graphqlUrl"),
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "content-type": "application/json",
-        },
-        body: {
-          query,
-          variables,
-        },
-        failOnStatusCode: false
-      })
-      .then((response) => {
-        // If we got a response with errors, log them
-        if (response.body.errors) {
-          console.error('GraphQL Error Response:', {
-            errors: response.body.errors,
-            status: response.status,
-            statusText: response.statusText
-          });
-        }
-        
-        // Return the full response to maintain backward compatibility
-        return response;
+      // If no valid cached token, refresh it using the login command
+      return cy.loginAsAdmin().then(() => {
+        const newTokenData = JSON.parse(window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY));
+        return newTokenData.accessToken;
       });
+    });
+  };
+
+  // Retrieve the token and use it in the GraphQL request
+  return getToken().then((token) => {
+    return cy.request({
+      method: "POST",
+      url: Cypress.env("graphqlUrl"),
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "content-type": "application/json",
+      },
+      body: {
+        query,
+        variables,
+      },
+      failOnStatusCode: false,
+    }).then((response) => {
+      // Log GraphQL errors if present
+      if (response.body.errors) {
+        console.error("GraphQL Error Response:", {
+          errors: response.body.errors,
+          status: response.status,
+          statusText: response.statusText,
+        });
+      }
+
+      // Return the full response for backward compatibility
+      return response;
+    });
   });
 });
+
 
 Cypress.Commands.add("safetyCheck", () => {
   return cy

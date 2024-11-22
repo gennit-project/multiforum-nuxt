@@ -1,31 +1,23 @@
 import channelRoles from "../../../seedData/rbac/channelRoles";
 
-const seedChannelRoles = () => {
-  cy.request({
-    url: "http://localhost:4000/graphql",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: {
-      query: `
-              mutation createChannelRoles (
-                  $input: [ChannelRoleCreateInput!]!
-              ){
-              createChannelRoles (
-                  input: $input
-              ) {
-                  channelRoles {
-                    name
-                  }
-                }
-              }
-              `,
-      variables: {
-        input: channelRoles,
-      },
-    },
-  });
+const seedChannels = () => {
+  cy.authenticatedGraphQL(
+    `
+      mutation createChannelRoles (
+          $input: [ChannelRoleCreateInput!]!
+      ){
+      createChannelRoles (
+          input: $input
+      ) {
+          channelRoles {
+            name
+          }
+        }
+      }
+      `,
+    {
+      input: channelRoles,
+    }
+  );
 };
-
-export default seedChannelRoles;
+export default seedChannels;

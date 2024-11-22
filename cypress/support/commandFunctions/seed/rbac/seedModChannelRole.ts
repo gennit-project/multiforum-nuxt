@@ -1,31 +1,24 @@
 import modChannelRoles from "../../../seedData/rbac/modChannelRoles";
 
 const seedModChannelRoles = () => {
-  cy.request({
-    url: "http://localhost:4000/graphql",
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: {
-      query: `
-              mutation createModChannelRoles (
-                  $input: [ModChannelRoleCreateInput!]!
-              ){
-              createModChannelRoles (
-                  input: $input
-              ) {
-                  modChannelRoles {
-                    name
-                  }
-                }
-              }
-              `,
-      variables: {
-        input: modChannelRoles,
-      },
-    },
-  });
+  cy.authenticatedGraphQL(
+    `
+      mutation createModChannelRoles (
+          $input: [ModChannelRoleCreateInput!]!
+      ){
+      createModChannelRoles (
+          input: $input
+      ) {
+          modChannelRoles {
+            name
+          }
+        }
+      }
+      `,
+    {
+      input: modChannelRoles,
+    }
+  );
 };
 
 export default seedModChannelRoles;

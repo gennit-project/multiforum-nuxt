@@ -7,7 +7,6 @@ export const deleteAll = () => {
 
 // Helper function to validate the response
 const validateResponse = (response, commandName) => {
-
   if (
     !response ||
     response.status >= 400 ||
@@ -28,20 +27,10 @@ const validateResponse = (response, commandName) => {
 };
 
 export const seedAll = () => {
-  // The order is important here because each
-  // has a dependency on the previous.
-  cy.seedUsers()
-    .then((response) => validateResponse(response, "seedUsers"))
-    .then(() => cy.seedChannels())
-    .then((response) => validateResponse(response, "seedChannels"))
-    .then(() => cy.seedTags())
-    .then((response) => validateResponse(response, "seedTags"))
-    .then(() => cy.seedEvents())
-    .then((response) => validateResponse(response, "seedEvents"))
-    .then(() => cy.seedDiscussions())
-    .then((response) => validateResponse(response, "seedDiscussions"))
-    // RBAC
-    .then(() => cy.seedModChannelRoles())
+  // The order is important here because some
+  // have a dependency on the previous seed data.
+
+  cy.seedModChannelRoles()
     .then((response) => validateResponse(response, "seedModChannelRoles"))
     .then(() => cy.seedChannelRoles())
     .then((response) => validateResponse(response, "seedChannelRoles"))
@@ -50,5 +39,15 @@ export const seedAll = () => {
     .then(() => cy.seedServerRoles())
     .then((response) => validateResponse(response, "seedServerRoles"))
     .then(() => cy.seedServerConfig())
-    .then((response) => validateResponse(response, "seedServerConfig"));
+    .then((response) => validateResponse(response, "seedServerConfig"))
+    .then(() => cy.seedUsers())
+    .then((response) => validateResponse(response, "seedUsers"))
+    .then(() => cy.seedChannels())
+    .then((response) => validateResponse(response, "seedChannels"))
+    .then(() => cy.seedTags())
+    .then((response) => validateResponse(response, "seedTags"))
+    .then(() => cy.seedEvents())
+    .then((response) => validateResponse(response, "seedEvents"))
+    .then(() => cy.seedDiscussions())
+    .then((response) => validateResponse(response, "seedDiscussions"));
 };
