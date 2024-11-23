@@ -37,7 +37,6 @@ if (import.meta.env.SSR === false) {
     idTokenClaims, 
     isLoading, 
     loginWithRedirect,
-    isAuthenticated 
   } = useAuth0();
 
   setIsLoadingAuth(isLoading.value);
@@ -51,24 +50,22 @@ if (import.meta.env.SSR === false) {
   };
 
   // Watch for authentication state changes
-  watch([isAuthenticated, idTokenClaims], async ([isAuth, claims]) => {
+  watch([isAuthenticatedVar.value, idTokenClaims], async ([isAuth, claims]) => {
     if (isAuth && claims) {
       await storeToken();
     }
   });
 
-  // Also check on mount in case we're returning from a redirect
-  onMounted(async () => {
-    if (isAuthenticated.value && idTokenClaims.value) {
-      await storeToken();
-    }
-  });
+  // // Also check on mount in case we're returning from a redirect
+  // onMounted(async () => {
+  //   if (isAuthenticated.value && idTokenClaims.value) {
+  //     await storeToken();
+  //   }
+  // });
   
   handleLogin = async () => {
     if (window?.parent?.Cypress) {
-      await loginWithRedirect({
-        appState: { returnTo: window.location.pathname }
-      });
+      await loginWithRedirect();
     } else {
       await loginWithPopup();
       await storeToken();

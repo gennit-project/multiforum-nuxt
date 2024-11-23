@@ -67,56 +67,57 @@ const tabRoutes = computed(() => {
 
 const iconSize = computed(() => (props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"));
 
-const tabs: Tab[] = [
-  {
-    name: "discussions",
-    routeSuffix: "discussions",
-    label: "Discussions",
-    icon: DiscussionIcon,
-    countProperty: "DiscussionChannelsAggregate",
-  },
-  {
-    name: "events",
-    routeSuffix: "events",
-    label: "Events",
-    icon: CalendarIcon,
-    countProperty: "EventChannelsAggregate",
-  },
-];
-const adminList = props.channel.Admins.map((user) => user.username || "");
+const tabs = computed((): Tab[] => {
+  const baseTabs: Tab[] = [
+    {
+      name: "discussions",
+      routeSuffix: "discussions",
+      label: "Discussions",
+      icon: DiscussionIcon,
+      countProperty: "DiscussionChannelsAggregate",
+    },
+    {
+      name: "events",
+      routeSuffix: "events",
+      label: "Events",
+      icon: CalendarIcon,
+      countProperty: "EventChannelsAggregate",
+    },
+    {
+      name: "about",
+      routeSuffix: "about",
+      label: "About",
+      icon: InfoIcon,
+      countProperty: null,
+    },
+  ];
 
-const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
+  const adminList = props.channel.Admins.map((user) => user.username || "");
+  const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
+  const isAdmin = adminList.includes(loggedInUsername.value);
+  const isMod = modList.includes(modProfileNameVar.value);
 
-if (loggedInUsername.value && adminList.includes(loggedInUsername.value)) {
-  tabs.push({
-    name: "settings",
-    routeSuffix: "edit",
-    label: "Settings",
-    icon: CogIcon,
-    countProperty: null,
-  });
-}
+  if (isAdmin) {
+    baseTabs.push({
+      name: "settings",
+      routeSuffix: "edit",
+      label: "Settings",
+      icon: CogIcon,
+      countProperty: null,
+    });
+  }
 
-const isAdmin = adminList.includes(loggedInUsername.value);
-const isMod = modList.includes(modProfileNameVar.value);
+  if (isAdmin || isMod) {
+    baseTabs.push({
+      name: "moderation",
+      routeSuffix: "issues",
+      label: "Issues",
+      icon: FlagIcon,
+      countProperty: "IssuesAggregate",
+    });
+  }
 
-if (isAdmin || isMod) {
-  tabs.push({
-    name: "moderation",
-    routeSuffix: "issues",
-    label: "Issues",
-    icon: FlagIcon,
-    countProperty: "IssuesAggregate",
-  });
-}
-
-// Tailwind CSS replaces the use of `mdAndDown`
-tabs.push({
-  name: "about",
-  routeSuffix: "about",
-  label: "About",
-  icon: InfoIcon,
-  countProperty: null,
+  return baseTabs;
 });
 </script>
 
