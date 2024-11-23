@@ -1,4 +1,4 @@
-import type { EventCreateInput } from "../../../__generated__/graphql";
+import type { EventCreateInput } from "../../../../../__generated__/graphql";
 
 export type EventCreateInputWithChannels = {
   eventCreateInput: EventCreateInput;
@@ -206,7 +206,6 @@ const baseEvents: BaseEvent[] = [
     channels: ["phx_concerts"],
   },
 ];
-
 export const events: EventCreateInputWithChannels[] = baseEvents.map(
   ({
     title,
@@ -236,7 +235,7 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
         connect: {
           where: {
             node: {
-              username_EQ: poster,
+              username: poster,
             },
           },
         },
@@ -249,7 +248,7 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
         tags.length > 0 && {
           Tags: {
             connect: tags.map((tag) => ({
-              where: { node: { text_EQ: tag } },
+              where: { node: { text: tag } },
             })),
           },
         }),

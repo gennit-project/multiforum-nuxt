@@ -1,6 +1,6 @@
 import "./commands";
-import type { EventCreateInputWithChannels } from "./seedData/events";
-import type { DiscussionCreateInputWithChannels } from "./seedData/discussions";
+import type { EventCreateInputWithChannels } from "./commandFunctions/seed/events/events";
+import type { DiscussionCreateInputWithChannels } from "./commandFunctions/seed/discussions/discussions";
 import type { LoginInput } from "../support/commandFunctions/loginWithButtonClick";
 /* eslint-disable @typescript-eslint/no-namespace */
 

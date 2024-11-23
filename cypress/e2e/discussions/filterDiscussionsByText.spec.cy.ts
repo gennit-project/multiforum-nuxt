@@ -1,6 +1,6 @@
 import { DISCUSSION_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import { discussionsForFilteringTests } from "../../support/seedData/discussionsForFilteringTests";
+import { discussionsForFilteringTests } from "../../support/commandFunctions/seed/discussions/discussionsForFilteringTests";
 import config from "../../../config";
 
 describe("Filter discussions by text", () => {

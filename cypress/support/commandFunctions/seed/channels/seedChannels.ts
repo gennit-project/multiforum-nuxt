@@ -1,4 +1,4 @@
-import type { ChannelCreateInput } from "../../../__generated__/graphql";
+import type { ChannelCreateInput } from "../../../../../__generated__/graphql";
 
 type BaseChannel = {
   uniqueName: string;
@@ -26,11 +26,28 @@ const channels: ChannelCreateInput[] = baseChannels.map(({ uniqueName, admins })
     connect: admins.map((admin) => ({
       where: {
         node: {
-          username_EQ: admin,
+          username: admin,
         },
       },
     })),
   },
 }));
 
-export default channels;
+
+const seedChannels = () => {
+  cy.authenticatedGraphQL(
+    `
+        mutation CreateChannels($input: [ChannelCreateInput!]!) {
+          createChannels(input: $input) {
+            channels {
+              uniqueName
+            }
+          }
+        }
+      `,
+    {
+      input: channels,
+    }
+  );
+};
+export default seedChannels;

@@ -1,4 +1,4 @@
-import type { TagCreateInput } from "../../../__generated__/graphql";
+import type { TagCreateInput } from "../../../../../__generated__/graphql";
 
 const baseTags: string[] = [
   "trivia",

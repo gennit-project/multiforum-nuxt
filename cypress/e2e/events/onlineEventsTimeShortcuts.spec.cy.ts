@@ -2,7 +2,7 @@ import { timeShortcutValues } from "../../../src/components/event/list/filters/e
 import { DateTime } from "luxon";
 import { deleteAll } from "../utils";
 import { ONLINE_EVENT_LIST } from "../constants";
-import type { EventCreateInputWithChannels } from "../../support/seedData/events";
+import type { EventCreateInputWithChannels } from "../../support/commandFunctions/seed/events/events";
 
 // For each time shortcut, we want to test that the correct events are shown.
 // First generate test events for each time shortcut.

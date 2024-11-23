@@ -1,6 +1,6 @@
 import { DISCUSSION_LIST } from "../constants";
 import { deleteAll } from "../utils";
-import { discussionsForFilteringTests } from "../../support/seedData/discussionsForFilteringTests";
+import { discussionsForFilteringTests } from "../../support/commandFunctions/seed/discussions/discussionsForFilteringTests";
 
 describe("Filter discussions by channel", () => {
   beforeEach(function () {

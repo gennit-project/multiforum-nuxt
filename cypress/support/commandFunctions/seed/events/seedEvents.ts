@@ -1,4 +1,5 @@
-import type { EventCreateInputWithChannels } from "../seedData/events";
+import type { EventCreateInputWithChannels } from "./events";
+import events from "./events";
 
 const createEvents = (events: EventCreateInputWithChannels[]) => {
   for (let i = 0; i < events.length; i++) {
@@ -59,4 +60,9 @@ const createEvents = (events: EventCreateInputWithChannels[]) => {
   }
 };
 
-export default createEvents;
+
+const seedEvents = () => {
+  createEvents(events)
+};
+
+export default seedEvents;

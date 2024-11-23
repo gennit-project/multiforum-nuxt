@@ -35,20 +35,21 @@ export type Album = {
 
 
 export type AlbumDiscussionsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type AlbumDiscussionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type AlbumDiscussionsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AlbumDiscussionsConnectionSort>>;
   where?: InputMaybe<AlbumDiscussionsConnectionWhere>;
@@ -56,20 +57,21 @@ export type AlbumDiscussionsConnectionArgs = {
 
 
 export type AlbumImagesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ImageSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ImageOptions>;
   where?: InputMaybe<ImageWhere>;
 };
 
 
 export type AlbumImagesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ImageWhere>;
 };
 
 
 export type AlbumImagesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AlbumImagesConnectionSort>>;
   where?: InputMaybe<AlbumImagesConnectionWhere>;
@@ -77,20 +79,21 @@ export type AlbumImagesConnectionArgs = {
 
 
 export type AlbumOwnerArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type AlbumOwnerAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type AlbumOwnerConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<AlbumOwnerConnectionSort>>;
   where?: InputMaybe<AlbumOwnerConnectionWhere>;
@@ -106,6 +109,10 @@ export type AlbumConnectInput = {
   Discussions?: InputMaybe<Array<AlbumDiscussionsConnectFieldInput>>;
   Images?: InputMaybe<Array<AlbumImagesConnectFieldInput>>;
   Owner?: InputMaybe<AlbumOwnerConnectFieldInput>;
+};
+
+export type AlbumConnectOrCreateInput = {
+  Owner?: InputMaybe<AlbumOwnerConnectOrCreateFieldInput>;
 };
 
 export type AlbumConnectWhere = {
@@ -149,7 +156,7 @@ export type AlbumDiscussionsAggregateInput = {
   AND?: InputMaybe<Array<AlbumDiscussionsAggregateInput>>;
   NOT?: InputMaybe<AlbumDiscussionsAggregateInput>;
   OR?: InputMaybe<Array<AlbumDiscussionsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -159,6 +166,8 @@ export type AlbumDiscussionsAggregateInput = {
 
 export type AlbumDiscussionsConnectFieldInput = {
   connect?: InputMaybe<Array<DiscussionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
 };
 
@@ -228,16 +237,6 @@ export type AlbumDiscussionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -309,7 +308,7 @@ export type AlbumImagesAggregateInput = {
   AND?: InputMaybe<Array<AlbumImagesAggregateInput>>;
   NOT?: InputMaybe<AlbumImagesAggregateInput>;
   OR?: InputMaybe<Array<AlbumImagesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -319,6 +318,8 @@ export type AlbumImagesAggregateInput = {
 
 export type AlbumImagesConnectFieldInput = {
   connect?: InputMaybe<Array<ImageConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ImageConnectWhere>;
 };
 
@@ -408,16 +409,6 @@ export type AlbumImagesNodeAggregationWhereInput = {
   copyright_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   copyright_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   copyright_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   url_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   url_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   url_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -465,7 +456,7 @@ export type AlbumOwnerAggregateInput = {
   AND?: InputMaybe<Array<AlbumOwnerAggregateInput>>;
   NOT?: InputMaybe<AlbumOwnerAggregateInput>;
   OR?: InputMaybe<Array<AlbumOwnerAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -475,6 +466,8 @@ export type AlbumOwnerAggregateInput = {
 
 export type AlbumOwnerConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -521,6 +514,7 @@ export type AlbumOwnerDisconnectFieldInput = {
 
 export type AlbumOwnerFieldInput = {
   connect?: InputMaybe<AlbumOwnerConnectFieldInput>;
+  connectOrCreate?: InputMaybe<AlbumOwnerConnectOrCreateFieldInput>;
   create?: InputMaybe<AlbumOwnerCreateFieldInput>;
 };
 
@@ -735,6 +729,12 @@ export type AlbumOwnerUpdateFieldInput = {
   where?: InputMaybe<AlbumOwnerConnectionWhere>;
 };
 
+export type AlbumRelationInput = {
+  Discussions?: InputMaybe<Array<AlbumDiscussionsCreateFieldInput>>;
+  Images?: InputMaybe<Array<AlbumImagesCreateFieldInput>>;
+  Owner?: InputMaybe<AlbumOwnerCreateFieldInput>;
+};
+
 /** Fields to sort Albums by. The order in which sorts are applied is not guaranteed when specifying many fields in one AlbumSort object. */
 export type AlbumSort = {
   id?: InputMaybe<SortDirection>;
@@ -809,9 +809,11 @@ export type AlbumWhere = {
   Owner?: InputMaybe<UserWhere>;
   OwnerAggregate?: InputMaybe<AlbumOwnerAggregateInput>;
   OwnerConnection?: InputMaybe<AlbumOwnerConnectionWhere>;
+  OwnerConnection_NOT?: InputMaybe<AlbumOwnerConnectionWhere>;
+  Owner_NOT?: InputMaybe<UserWhere>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -865,20 +867,21 @@ export type Channel = {
 
 
 export type ChannelAdminsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type ChannelAdminsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type ChannelAdminsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelAdminsConnectionSort>>;
   where?: InputMaybe<ChannelAdminsConnectionWhere>;
@@ -886,20 +889,21 @@ export type ChannelAdminsConnectionArgs = {
 
 
 export type ChannelCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type ChannelCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type ChannelCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelCommentsConnectionSort>>;
   where?: InputMaybe<ChannelCommentsConnectionWhere>;
@@ -907,20 +911,21 @@ export type ChannelCommentsConnectionArgs = {
 
 
 export type ChannelDefaultChannelRoleArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelRoleOptions>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type ChannelDefaultChannelRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type ChannelDefaultChannelRoleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelDefaultChannelRoleConnectionSort>>;
   where?: InputMaybe<ChannelDefaultChannelRoleConnectionWhere>;
@@ -928,20 +933,21 @@ export type ChannelDefaultChannelRoleConnectionArgs = {
 
 
 export type ChannelDiscussionChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionChannelOptions>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type ChannelDiscussionChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type ChannelDiscussionChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelDiscussionChannelsConnectionSort>>;
   where?: InputMaybe<ChannelDiscussionChannelsConnectionWhere>;
@@ -949,20 +955,21 @@ export type ChannelDiscussionChannelsConnectionArgs = {
 
 
 export type ChannelEventChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventChannelOptions>;
   where?: InputMaybe<EventChannelWhere>;
 };
 
 
 export type ChannelEventChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventChannelWhere>;
 };
 
 
 export type ChannelEventChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelEventChannelsConnectionSort>>;
   where?: InputMaybe<ChannelEventChannelsConnectionWhere>;
@@ -970,20 +977,21 @@ export type ChannelEventChannelsConnectionArgs = {
 
 
 export type ChannelIssuesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type ChannelIssuesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type ChannelIssuesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelIssuesConnectionSort>>;
   where?: InputMaybe<ChannelIssuesConnectionWhere>;
@@ -991,20 +999,21 @@ export type ChannelIssuesConnectionArgs = {
 
 
 export type ChannelModeratorsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationProfileSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationProfileOptions>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type ChannelModeratorsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type ChannelModeratorsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelModeratorsConnectionSort>>;
   where?: InputMaybe<ChannelModeratorsConnectionWhere>;
@@ -1012,20 +1021,21 @@ export type ChannelModeratorsConnectionArgs = {
 
 
 export type ChannelRelatedChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type ChannelRelatedChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type ChannelRelatedChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelRelatedChannelsConnectionSort>>;
   where?: InputMaybe<ChannelRelatedChannelsConnectionWhere>;
@@ -1033,20 +1043,21 @@ export type ChannelRelatedChannelsConnectionArgs = {
 
 
 export type ChannelTagsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TagOptions>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type ChannelTagsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type ChannelTagsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelTagsConnectionSort>>;
   where?: InputMaybe<ChannelTagsConnectionWhere>;
@@ -1056,7 +1067,7 @@ export type ChannelAdminsAggregateInput = {
   AND?: InputMaybe<Array<ChannelAdminsAggregateInput>>;
   NOT?: InputMaybe<ChannelAdminsAggregateInput>;
   OR?: InputMaybe<Array<ChannelAdminsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -1066,6 +1077,8 @@ export type ChannelAdminsAggregateInput = {
 
 export type ChannelAdminsConnectFieldInput = {
   connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -1112,6 +1125,7 @@ export type ChannelAdminsDisconnectFieldInput = {
 
 export type ChannelAdminsFieldInput = {
   connect?: InputMaybe<Array<ChannelAdminsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelAdminsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<ChannelAdminsCreateFieldInput>>;
 };
 
@@ -1385,7 +1399,7 @@ export type ChannelCommentsAggregateInput = {
   AND?: InputMaybe<Array<ChannelCommentsAggregateInput>>;
   NOT?: InputMaybe<ChannelCommentsAggregateInput>;
   OR?: InputMaybe<Array<ChannelCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -1395,6 +1409,8 @@ export type ChannelCommentsAggregateInput = {
 
 export type ChannelCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -1449,16 +1465,6 @@ export type ChannelCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -1537,6 +1543,14 @@ export type ChannelConnectInput = {
   Tags?: InputMaybe<Array<ChannelTagsConnectFieldInput>>;
 };
 
+export type ChannelConnectOrCreateInput = {
+  Admins?: InputMaybe<Array<ChannelAdminsConnectOrCreateFieldInput>>;
+  DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleConnectOrCreateFieldInput>;
+  Moderators?: InputMaybe<Array<ChannelModeratorsConnectOrCreateFieldInput>>;
+  RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsConnectOrCreateFieldInput>>;
+  Tags?: InputMaybe<Array<ChannelTagsConnectOrCreateFieldInput>>;
+};
+
 export type ChannelConnectOrCreateWhere = {
   node: ChannelUniqueWhere;
 };
@@ -1569,7 +1583,7 @@ export type ChannelDefaultChannelRoleAggregateInput = {
   AND?: InputMaybe<Array<ChannelDefaultChannelRoleAggregateInput>>;
   NOT?: InputMaybe<ChannelDefaultChannelRoleAggregateInput>;
   OR?: InputMaybe<Array<ChannelDefaultChannelRoleAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -1578,6 +1592,8 @@ export type ChannelDefaultChannelRoleAggregateInput = {
 };
 
 export type ChannelDefaultChannelRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelRoleConnectWhere>;
 };
 
@@ -1622,6 +1638,7 @@ export type ChannelDefaultChannelRoleDisconnectFieldInput = {
 
 export type ChannelDefaultChannelRoleFieldInput = {
   connect?: InputMaybe<ChannelDefaultChannelRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ChannelDefaultChannelRoleConnectOrCreateFieldInput>;
   create?: InputMaybe<ChannelDefaultChannelRoleCreateFieldInput>;
 };
 
@@ -1739,7 +1756,7 @@ export type ChannelDiscussionChannelsAggregateInput = {
   AND?: InputMaybe<Array<ChannelDiscussionChannelsAggregateInput>>;
   NOT?: InputMaybe<ChannelDiscussionChannelsAggregateInput>;
   OR?: InputMaybe<Array<ChannelDiscussionChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -1749,6 +1766,8 @@ export type ChannelDiscussionChannelsAggregateInput = {
 
 export type ChannelDiscussionChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<DiscussionChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
 };
 
@@ -1818,26 +1837,6 @@ export type ChannelDiscussionChannelsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  discussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -1903,7 +1902,7 @@ export type ChannelEventChannelsAggregateInput = {
   AND?: InputMaybe<Array<ChannelEventChannelsAggregateInput>>;
   NOT?: InputMaybe<ChannelEventChannelsAggregateInput>;
   OR?: InputMaybe<Array<ChannelEventChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -1913,6 +1912,8 @@ export type ChannelEventChannelsAggregateInput = {
 
 export type ChannelEventChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<EventChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventChannelConnectWhere>;
 };
 
@@ -1982,26 +1983,6 @@ export type ChannelEventChannelsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  eventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type ChannelEventChannelsRelationship = {
@@ -2047,7 +2028,7 @@ export type ChannelIssuesAggregateInput = {
   AND?: InputMaybe<Array<ChannelIssuesAggregateInput>>;
   NOT?: InputMaybe<ChannelIssuesAggregateInput>;
   OR?: InputMaybe<Array<ChannelIssuesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -2057,6 +2038,8 @@ export type ChannelIssuesAggregateInput = {
 
 export type ChannelIssuesConnectFieldInput = {
   connect?: InputMaybe<Array<IssueConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
 };
 
@@ -2156,46 +2139,6 @@ export type ChannelIssuesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -2258,7 +2201,7 @@ export type ChannelModeratorsAggregateInput = {
   AND?: InputMaybe<Array<ChannelModeratorsAggregateInput>>;
   NOT?: InputMaybe<ChannelModeratorsAggregateInput>;
   OR?: InputMaybe<Array<ChannelModeratorsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -2268,6 +2211,8 @@ export type ChannelModeratorsAggregateInput = {
 
 export type ChannelModeratorsConnectFieldInput = {
   connect?: InputMaybe<Array<ModerationProfileConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModerationProfileConnectWhere>;
 };
 
@@ -2314,6 +2259,7 @@ export type ChannelModeratorsDisconnectFieldInput = {
 
 export type ChannelModeratorsFieldInput = {
   connect?: InputMaybe<Array<ChannelModeratorsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelModeratorsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<ChannelModeratorsCreateFieldInput>>;
 };
 
@@ -2390,7 +2336,7 @@ export type ChannelRelatedChannelsAggregateInput = {
   AND?: InputMaybe<Array<ChannelRelatedChannelsAggregateInput>>;
   NOT?: InputMaybe<ChannelRelatedChannelsAggregateInput>;
   OR?: InputMaybe<Array<ChannelRelatedChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -2400,6 +2346,8 @@ export type ChannelRelatedChannelsAggregateInput = {
 
 export type ChannelRelatedChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -2446,6 +2394,7 @@ export type ChannelRelatedChannelsDisconnectFieldInput = {
 
 export type ChannelRelatedChannelsFieldInput = {
   connect?: InputMaybe<Array<ChannelRelatedChannelsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelRelatedChannelsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<ChannelRelatedChannelsCreateFieldInput>>;
 };
 
@@ -2560,6 +2509,18 @@ export type ChannelRelatedChannelsUpdateFieldInput = {
   where?: InputMaybe<ChannelRelatedChannelsConnectionWhere>;
 };
 
+export type ChannelRelationInput = {
+  Admins?: InputMaybe<Array<ChannelAdminsCreateFieldInput>>;
+  Comments?: InputMaybe<Array<ChannelCommentsCreateFieldInput>>;
+  DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleCreateFieldInput>;
+  DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsCreateFieldInput>>;
+  EventChannels?: InputMaybe<Array<ChannelEventChannelsCreateFieldInput>>;
+  Issues?: InputMaybe<Array<ChannelIssuesCreateFieldInput>>;
+  Moderators?: InputMaybe<Array<ChannelModeratorsCreateFieldInput>>;
+  RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsCreateFieldInput>>;
+  Tags?: InputMaybe<Array<ChannelTagsCreateFieldInput>>;
+};
+
 export type ChannelRole = {
   __typename?: 'ChannelRole';
   canCreateComment?: Maybe<Scalars['Boolean']['output']>;
@@ -2648,53 +2609,53 @@ export type ChannelRoleSort = {
 };
 
 export type ChannelRoleUniqueWhere = {
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ChannelRoleUpdateInput = {
-  canCreateComment_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateDiscussion_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateEvent_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpdateChannel_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUploadFile_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteComment_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteDiscussion_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  channelUniqueName_SET?: InputMaybe<Scalars['String']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  name_SET?: InputMaybe<Scalars['String']['input']>;
-  showModTag_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpdateChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRoleWhere = {
   AND?: InputMaybe<Array<ChannelRoleWhere>>;
   NOT?: InputMaybe<ChannelRoleWhere>;
   OR?: InputMaybe<Array<ChannelRoleWhere>>;
-  canCreateComment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateDiscussion_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateEvent_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpdateChannel_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUploadFile_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteComment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteDiscussion_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpdateChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelUniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showModTag_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ChannelRolesConnection = {
@@ -2732,7 +2693,7 @@ export type ChannelTagsAggregateInput = {
   AND?: InputMaybe<Array<ChannelTagsAggregateInput>>;
   NOT?: InputMaybe<ChannelTagsAggregateInput>;
   OR?: InputMaybe<Array<ChannelTagsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -2742,6 +2703,8 @@ export type ChannelTagsAggregateInput = {
 
 export type ChannelTagsConnectFieldInput = {
   connect?: InputMaybe<Array<TagConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TagConnectWhere>;
 };
 
@@ -2788,6 +2751,7 @@ export type ChannelTagsDisconnectFieldInput = {
 
 export type ChannelTagsFieldInput = {
   connect?: InputMaybe<Array<ChannelTagsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelTagsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<ChannelTagsCreateFieldInput>>;
 };
 
@@ -2833,7 +2797,7 @@ export type ChannelTagsUpdateFieldInput = {
 };
 
 export type ChannelUniqueWhere = {
-  uniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ChannelUpdateInput = {
@@ -2846,15 +2810,15 @@ export type ChannelUpdateInput = {
   Moderators?: InputMaybe<Array<ChannelModeratorsUpdateFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsUpdateFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsUpdateFieldInput>>;
-  channelBannerURL_SET?: InputMaybe<Scalars['String']['input']>;
-  channelIconURL_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  displayName_SET?: InputMaybe<Scalars['String']['input']>;
-  locked_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  rules_SET?: InputMaybe<Scalars['JSON']['input']>;
-  uniqueName_SET?: InputMaybe<Scalars['String']['input']>;
+  channelBannerURL?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ChannelUserAdminsAggregationSelection = {
@@ -2918,6 +2882,8 @@ export type ChannelWhere = {
   DefaultChannelRole?: InputMaybe<ChannelRoleWhere>;
   DefaultChannelRoleAggregate?: InputMaybe<ChannelDefaultChannelRoleAggregateInput>;
   DefaultChannelRoleConnection?: InputMaybe<ChannelDefaultChannelRoleConnectionWhere>;
+  DefaultChannelRoleConnection_NOT?: InputMaybe<ChannelDefaultChannelRoleConnectionWhere>;
+  DefaultChannelRole_NOT?: InputMaybe<ChannelRoleWhere>;
   DiscussionChannelsAggregate?: InputMaybe<ChannelDiscussionChannelsAggregateInput>;
   /** Return Channels where all of the related ChannelDiscussionChannelsConnections match this filter */
   DiscussionChannelsConnection_ALL?: InputMaybe<ChannelDiscussionChannelsConnectionWhere>;
@@ -3022,43 +2988,43 @@ export type ChannelWhere = {
   Tags_SINGLE?: InputMaybe<TagWhere>;
   /** Return Channels where some of the related Tags match this filter */
   Tags_SOME?: InputMaybe<TagWhere>;
+  channelBannerURL?: InputMaybe<Scalars['String']['input']>;
   channelBannerURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelBannerURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelBannerURL_EQ?: InputMaybe<Scalars['String']['input']>;
   channelBannerURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelBannerURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelBannerURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
   channelIconURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelIconURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelIconURL_EQ?: InputMaybe<Scalars['String']['input']>;
   channelIconURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelIconURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelIconURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
   displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  displayName_EQ?: InputMaybe<Scalars['String']['input']>;
   displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  locked_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  rules_EQ?: InputMaybe<Scalars['JSON']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
   rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
   uniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   uniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  uniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
   uniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   uniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   uniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -3123,20 +3089,21 @@ export type Comment = {
 
 
 export type CommentChannelArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type CommentChannelAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type CommentChannelConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentChannelConnectionSort>>;
   where?: InputMaybe<CommentChannelConnectionWhere>;
@@ -3144,20 +3111,21 @@ export type CommentChannelConnectionArgs = {
 
 
 export type CommentChildCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentChildCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentChildCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentChildCommentsConnectionSort>>;
   where?: InputMaybe<CommentChildCommentsConnectionWhere>;
@@ -3165,34 +3133,36 @@ export type CommentChildCommentsConnectionArgs = {
 
 
 export type CommentCommentAuthorArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<QueryOptions>;
   where?: InputMaybe<CommentAuthorWhere>;
 };
 
 
 export type CommentCommentAuthorConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<CommentCommentAuthorConnectionWhere>;
 };
 
 
 export type CommentDiscussionChannelArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionChannelOptions>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type CommentDiscussionChannelAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type CommentDiscussionChannelConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentDiscussionChannelConnectionSort>>;
   where?: InputMaybe<CommentDiscussionChannelConnectionWhere>;
@@ -3200,20 +3170,21 @@ export type CommentDiscussionChannelConnectionArgs = {
 
 
 export type CommentEventArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type CommentEventAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type CommentEventConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentEventConnectionSort>>;
   where?: InputMaybe<CommentEventConnectionWhere>;
@@ -3221,20 +3192,21 @@ export type CommentEventConnectionArgs = {
 
 
 export type CommentFeedbackCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentFeedbackCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentFeedbackCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentFeedbackCommentsConnectionSort>>;
   where?: InputMaybe<CommentFeedbackCommentsConnectionWhere>;
@@ -3242,20 +3214,21 @@ export type CommentFeedbackCommentsConnectionArgs = {
 
 
 export type CommentGivesFeedbackOnCommentArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentGivesFeedbackOnCommentAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentGivesFeedbackOnCommentConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentGivesFeedbackOnCommentConnectionSort>>;
   where?: InputMaybe<CommentGivesFeedbackOnCommentConnectionWhere>;
@@ -3263,20 +3236,21 @@ export type CommentGivesFeedbackOnCommentConnectionArgs = {
 
 
 export type CommentGivesFeedbackOnDiscussionArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type CommentGivesFeedbackOnDiscussionAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type CommentGivesFeedbackOnDiscussionConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentGivesFeedbackOnDiscussionConnectionSort>>;
   where?: InputMaybe<CommentGivesFeedbackOnDiscussionConnectionWhere>;
@@ -3284,20 +3258,21 @@ export type CommentGivesFeedbackOnDiscussionConnectionArgs = {
 
 
 export type CommentGivesFeedbackOnEventArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type CommentGivesFeedbackOnEventAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type CommentGivesFeedbackOnEventConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentGivesFeedbackOnEventConnectionSort>>;
   where?: InputMaybe<CommentGivesFeedbackOnEventConnectionWhere>;
@@ -3305,20 +3280,21 @@ export type CommentGivesFeedbackOnEventConnectionArgs = {
 
 
 export type CommentIssueArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type CommentIssueAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type CommentIssueConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentIssueConnectionSort>>;
   where?: InputMaybe<CommentIssueConnectionWhere>;
@@ -3326,20 +3302,21 @@ export type CommentIssueConnectionArgs = {
 
 
 export type CommentParentCommentArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentParentCommentAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type CommentParentCommentConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentParentCommentConnectionSort>>;
   where?: InputMaybe<CommentParentCommentConnectionWhere>;
@@ -3347,20 +3324,21 @@ export type CommentParentCommentConnectionArgs = {
 
 
 export type CommentTagsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TagOptions>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type CommentTagsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type CommentTagsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentTagsConnectionSort>>;
   where?: InputMaybe<CommentTagsConnectionWhere>;
@@ -3368,20 +3346,21 @@ export type CommentTagsConnectionArgs = {
 
 
 export type CommentUpvotedByUsersArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type CommentUpvotedByUsersAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type CommentUpvotedByUsersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentUpvotedByUsersConnectionSort>>;
   where?: InputMaybe<CommentUpvotedByUsersConnectionWhere>;
@@ -3408,7 +3387,7 @@ export type CommentChannelAggregateInput = {
   AND?: InputMaybe<Array<CommentChannelAggregateInput>>;
   NOT?: InputMaybe<CommentChannelAggregateInput>;
   OR?: InputMaybe<Array<CommentChannelAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -3434,6 +3413,8 @@ export type CommentChannelChannelNodeAggregateSelection = {
 
 export type CommentChannelConnectFieldInput = {
   connect?: InputMaybe<ChannelConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -3480,6 +3461,7 @@ export type CommentChannelDisconnectFieldInput = {
 
 export type CommentChannelFieldInput = {
   connect?: InputMaybe<CommentChannelConnectFieldInput>;
+  connectOrCreate?: InputMaybe<CommentChannelConnectOrCreateFieldInput>;
   create?: InputMaybe<CommentChannelCreateFieldInput>;
 };
 
@@ -3598,7 +3580,7 @@ export type CommentChildCommentsAggregateInput = {
   AND?: InputMaybe<Array<CommentChildCommentsAggregateInput>>;
   NOT?: InputMaybe<CommentChildCommentsAggregateInput>;
   OR?: InputMaybe<Array<CommentChildCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -3608,6 +3590,8 @@ export type CommentChildCommentsAggregateInput = {
 
 export type CommentChildCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -3662,16 +3646,6 @@ export type CommentChildCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -3743,6 +3717,11 @@ export type CommentCommentAuthorConnectInput = {
   User?: InputMaybe<CommentCommentAuthorUserConnectFieldInput>;
 };
 
+export type CommentCommentAuthorConnectOrCreateInput = {
+  ModerationProfile?: InputMaybe<CommentCommentAuthorModerationProfileConnectOrCreateFieldInput>;
+  User?: InputMaybe<CommentCommentAuthorUserConnectOrCreateFieldInput>;
+};
+
 export type CommentCommentAuthorConnection = {
   __typename?: 'CommentCommentAuthorConnection';
   edges: Array<CommentCommentAuthorRelationship>;
@@ -3753,6 +3732,11 @@ export type CommentCommentAuthorConnection = {
 export type CommentCommentAuthorConnectionWhere = {
   ModerationProfile?: InputMaybe<CommentCommentAuthorModerationProfileConnectionWhere>;
   User?: InputMaybe<CommentCommentAuthorUserConnectionWhere>;
+};
+
+export type CommentCommentAuthorCreateFieldInput = {
+  ModerationProfile?: InputMaybe<CommentCommentAuthorModerationProfileCreateFieldInput>;
+  User?: InputMaybe<CommentCommentAuthorUserCreateFieldInput>;
 };
 
 export type CommentCommentAuthorCreateInput = {
@@ -3807,6 +3791,7 @@ export type CommentCommentAuthorModerationProfileDisconnectFieldInput = {
 
 export type CommentCommentAuthorModerationProfileFieldInput = {
   connect?: InputMaybe<CommentCommentAuthorModerationProfileConnectFieldInput>;
+  connectOrCreate?: InputMaybe<CommentCommentAuthorModerationProfileConnectOrCreateFieldInput>;
   create?: InputMaybe<CommentCommentAuthorModerationProfileCreateFieldInput>;
 };
 
@@ -3872,6 +3857,7 @@ export type CommentCommentAuthorUserDisconnectFieldInput = {
 
 export type CommentCommentAuthorUserFieldInput = {
   connect?: InputMaybe<CommentCommentAuthorUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<CommentCommentAuthorUserConnectOrCreateFieldInput>;
   create?: InputMaybe<CommentCommentAuthorUserCreateFieldInput>;
 };
 
@@ -3965,6 +3951,13 @@ export type CommentConnectInput = {
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersConnectFieldInput>>;
 };
 
+export type CommentConnectOrCreateInput = {
+  Channel?: InputMaybe<CommentChannelConnectOrCreateFieldInput>;
+  CommentAuthor?: InputMaybe<CommentCommentAuthorConnectOrCreateInput>;
+  Tags?: InputMaybe<Array<CommentTagsConnectOrCreateFieldInput>>;
+  UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersConnectOrCreateFieldInput>>;
+};
+
 export type CommentConnectWhere = {
   node: CommentWhere;
 };
@@ -4027,7 +4020,7 @@ export type CommentDiscussionChannelAggregateInput = {
   AND?: InputMaybe<Array<CommentDiscussionChannelAggregateInput>>;
   NOT?: InputMaybe<CommentDiscussionChannelAggregateInput>;
   OR?: InputMaybe<Array<CommentDiscussionChannelAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -4037,6 +4030,8 @@ export type CommentDiscussionChannelAggregateInput = {
 
 export type CommentDiscussionChannelConnectFieldInput = {
   connect?: InputMaybe<DiscussionChannelConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
 };
 
@@ -4121,26 +4116,6 @@ export type CommentDiscussionChannelNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  discussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -4207,7 +4182,7 @@ export type CommentEventAggregateInput = {
   AND?: InputMaybe<Array<CommentEventAggregateInput>>;
   NOT?: InputMaybe<CommentEventAggregateInput>;
   OR?: InputMaybe<Array<CommentEventAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -4217,6 +4192,8 @@ export type CommentEventAggregateInput = {
 
 export type CommentEventConnectFieldInput = {
   connect?: InputMaybe<EventConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
 };
 
@@ -4391,16 +4368,6 @@ export type CommentEventNodeAggregationWhereInput = {
   endTime_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   locationName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -4541,7 +4508,7 @@ export type CommentFeedbackCommentsAggregateInput = {
   AND?: InputMaybe<Array<CommentFeedbackCommentsAggregateInput>>;
   NOT?: InputMaybe<CommentFeedbackCommentsAggregateInput>;
   OR?: InputMaybe<Array<CommentFeedbackCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -4551,6 +4518,8 @@ export type CommentFeedbackCommentsAggregateInput = {
 
 export type CommentFeedbackCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -4605,16 +4574,6 @@ export type CommentFeedbackCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -4685,7 +4644,7 @@ export type CommentGivesFeedbackOnCommentAggregateInput = {
   AND?: InputMaybe<Array<CommentGivesFeedbackOnCommentAggregateInput>>;
   NOT?: InputMaybe<CommentGivesFeedbackOnCommentAggregateInput>;
   OR?: InputMaybe<Array<CommentGivesFeedbackOnCommentAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -4695,6 +4654,8 @@ export type CommentGivesFeedbackOnCommentAggregateInput = {
 
 export type CommentGivesFeedbackOnCommentConnectFieldInput = {
   connect?: InputMaybe<CommentConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -4749,16 +4710,6 @@ export type CommentGivesFeedbackOnCommentNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -4829,7 +4780,7 @@ export type CommentGivesFeedbackOnDiscussionAggregateInput = {
   AND?: InputMaybe<Array<CommentGivesFeedbackOnDiscussionAggregateInput>>;
   NOT?: InputMaybe<CommentGivesFeedbackOnDiscussionAggregateInput>;
   OR?: InputMaybe<Array<CommentGivesFeedbackOnDiscussionAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -4839,6 +4790,8 @@ export type CommentGivesFeedbackOnDiscussionAggregateInput = {
 
 export type CommentGivesFeedbackOnDiscussionConnectFieldInput = {
   connect?: InputMaybe<DiscussionConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
 };
 
@@ -4908,16 +4861,6 @@ export type CommentGivesFeedbackOnDiscussionNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -4968,7 +4911,7 @@ export type CommentGivesFeedbackOnEventAggregateInput = {
   AND?: InputMaybe<Array<CommentGivesFeedbackOnEventAggregateInput>>;
   NOT?: InputMaybe<CommentGivesFeedbackOnEventAggregateInput>;
   OR?: InputMaybe<Array<CommentGivesFeedbackOnEventAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -4978,6 +4921,8 @@ export type CommentGivesFeedbackOnEventAggregateInput = {
 
 export type CommentGivesFeedbackOnEventConnectFieldInput = {
   connect?: InputMaybe<EventConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
 };
 
@@ -5102,16 +5047,6 @@ export type CommentGivesFeedbackOnEventNodeAggregationWhereInput = {
   endTime_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   locationName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -5252,7 +5187,7 @@ export type CommentIssueAggregateInput = {
   AND?: InputMaybe<Array<CommentIssueAggregateInput>>;
   NOT?: InputMaybe<CommentIssueAggregateInput>;
   OR?: InputMaybe<Array<CommentIssueAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -5262,6 +5197,8 @@ export type CommentIssueAggregateInput = {
 
 export type CommentIssueConnectFieldInput = {
   connect?: InputMaybe<IssueConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
 };
 
@@ -5381,46 +5318,6 @@ export type CommentIssueNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -5478,7 +5375,7 @@ export type CommentParentCommentAggregateInput = {
   AND?: InputMaybe<Array<CommentParentCommentAggregateInput>>;
   NOT?: InputMaybe<CommentParentCommentAggregateInput>;
   OR?: InputMaybe<Array<CommentParentCommentAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -5488,6 +5385,8 @@ export type CommentParentCommentAggregateInput = {
 
 export type CommentParentCommentConnectFieldInput = {
   connect?: InputMaybe<CommentConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -5542,16 +5441,6 @@ export type CommentParentCommentNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -5618,6 +5507,22 @@ export type CommentParentCommentUpdateFieldInput = {
   where?: InputMaybe<CommentParentCommentConnectionWhere>;
 };
 
+export type CommentRelationInput = {
+  Channel?: InputMaybe<CommentChannelCreateFieldInput>;
+  ChildComments?: InputMaybe<Array<CommentChildCommentsCreateFieldInput>>;
+  CommentAuthor?: InputMaybe<CommentCommentAuthorCreateFieldInput>;
+  DiscussionChannel?: InputMaybe<CommentDiscussionChannelCreateFieldInput>;
+  Event?: InputMaybe<CommentEventCreateFieldInput>;
+  FeedbackComments?: InputMaybe<Array<CommentFeedbackCommentsCreateFieldInput>>;
+  GivesFeedbackOnComment?: InputMaybe<CommentGivesFeedbackOnCommentCreateFieldInput>;
+  GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionCreateFieldInput>;
+  GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventCreateFieldInput>;
+  Issue?: InputMaybe<CommentIssueCreateFieldInput>;
+  ParentComment?: InputMaybe<CommentParentCommentCreateFieldInput>;
+  Tags?: InputMaybe<Array<CommentTagsCreateFieldInput>>;
+  UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersCreateFieldInput>>;
+};
+
 export type CommentRepliesFormat = {
   __typename?: 'CommentRepliesFormat';
   ChildComments: Array<Comment>;
@@ -5653,16 +5558,16 @@ export type CommentRepliesFormatSort = {
 };
 
 export type CommentRepliesFormatUpdateInput = {
+  aggregateChildCommentCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  aggregateChildCommentCount_SET?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type CommentRepliesFormatWhere = {
   AND?: InputMaybe<Array<CommentRepliesFormatWhere>>;
   NOT?: InputMaybe<CommentRepliesFormatWhere>;
   OR?: InputMaybe<Array<CommentRepliesFormatWhere>>;
-  aggregateChildCommentCount_EQ?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChildCommentCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_GT?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_GTE?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
@@ -5749,7 +5654,7 @@ export type CommentTagsAggregateInput = {
   AND?: InputMaybe<Array<CommentTagsAggregateInput>>;
   NOT?: InputMaybe<CommentTagsAggregateInput>;
   OR?: InputMaybe<Array<CommentTagsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -5759,6 +5664,8 @@ export type CommentTagsAggregateInput = {
 
 export type CommentTagsConnectFieldInput = {
   connect?: InputMaybe<Array<TagConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TagConnectWhere>;
 };
 
@@ -5805,6 +5712,7 @@ export type CommentTagsDisconnectFieldInput = {
 
 export type CommentTagsFieldInput = {
   connect?: InputMaybe<Array<CommentTagsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<CommentTagsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<CommentTagsCreateFieldInput>>;
 };
 
@@ -5863,15 +5771,15 @@ export type CommentUpdateInput = {
   ParentComment?: InputMaybe<CommentParentCommentUpdateFieldInput>;
   Tags?: InputMaybe<Array<CommentTagsUpdateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersUpdateFieldInput>>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  emoji_SET?: InputMaybe<Scalars['JSON']['input']>;
-  isRootComment_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  text_SET?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  emoji?: InputMaybe<Scalars['JSON']['input']>;
+  isRootComment?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_ADD?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_DIVIDE?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_MULTIPLY?: InputMaybe<Scalars['Float']['input']>;
-  weightedVotesCount_SET?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_SUBTRACT?: InputMaybe<Scalars['Float']['input']>;
 };
 
@@ -5879,7 +5787,7 @@ export type CommentUpvotedByUsersAggregateInput = {
   AND?: InputMaybe<Array<CommentUpvotedByUsersAggregateInput>>;
   NOT?: InputMaybe<CommentUpvotedByUsersAggregateInput>;
   OR?: InputMaybe<Array<CommentUpvotedByUsersAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -5889,6 +5797,8 @@ export type CommentUpvotedByUsersAggregateInput = {
 
 export type CommentUpvotedByUsersConnectFieldInput = {
   connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -5935,6 +5845,7 @@ export type CommentUpvotedByUsersDisconnectFieldInput = {
 
 export type CommentUpvotedByUsersFieldInput = {
   connect?: InputMaybe<Array<CommentUpvotedByUsersConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<CommentUpvotedByUsersConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<CommentUpvotedByUsersCreateFieldInput>>;
 };
 
@@ -6176,6 +6087,8 @@ export type CommentWhere = {
   Channel?: InputMaybe<ChannelWhere>;
   ChannelAggregate?: InputMaybe<CommentChannelAggregateInput>;
   ChannelConnection?: InputMaybe<CommentChannelConnectionWhere>;
+  ChannelConnection_NOT?: InputMaybe<CommentChannelConnectionWhere>;
+  Channel_NOT?: InputMaybe<ChannelWhere>;
   ChildCommentsAggregate?: InputMaybe<CommentChildCommentsAggregateInput>;
   /** Return Comments where all of the related CommentChildCommentsConnections match this filter */
   ChildCommentsConnection_ALL?: InputMaybe<CommentChildCommentsConnectionWhere>;
@@ -6195,12 +6108,18 @@ export type CommentWhere = {
   ChildComments_SOME?: InputMaybe<CommentWhere>;
   CommentAuthor?: InputMaybe<CommentAuthorWhere>;
   CommentAuthorConnection?: InputMaybe<CommentCommentAuthorConnectionWhere>;
+  CommentAuthorConnection_NOT?: InputMaybe<CommentCommentAuthorConnectionWhere>;
+  CommentAuthor_NOT?: InputMaybe<CommentAuthorWhere>;
   DiscussionChannel?: InputMaybe<DiscussionChannelWhere>;
   DiscussionChannelAggregate?: InputMaybe<CommentDiscussionChannelAggregateInput>;
   DiscussionChannelConnection?: InputMaybe<CommentDiscussionChannelConnectionWhere>;
+  DiscussionChannelConnection_NOT?: InputMaybe<CommentDiscussionChannelConnectionWhere>;
+  DiscussionChannel_NOT?: InputMaybe<DiscussionChannelWhere>;
   Event?: InputMaybe<EventWhere>;
   EventAggregate?: InputMaybe<CommentEventAggregateInput>;
   EventConnection?: InputMaybe<CommentEventConnectionWhere>;
+  EventConnection_NOT?: InputMaybe<CommentEventConnectionWhere>;
+  Event_NOT?: InputMaybe<EventWhere>;
   FeedbackCommentsAggregate?: InputMaybe<CommentFeedbackCommentsAggregateInput>;
   /** Return Comments where all of the related CommentFeedbackCommentsConnections match this filter */
   FeedbackCommentsConnection_ALL?: InputMaybe<CommentFeedbackCommentsConnectionWhere>;
@@ -6221,20 +6140,30 @@ export type CommentWhere = {
   GivesFeedbackOnComment?: InputMaybe<CommentWhere>;
   GivesFeedbackOnCommentAggregate?: InputMaybe<CommentGivesFeedbackOnCommentAggregateInput>;
   GivesFeedbackOnCommentConnection?: InputMaybe<CommentGivesFeedbackOnCommentConnectionWhere>;
+  GivesFeedbackOnCommentConnection_NOT?: InputMaybe<CommentGivesFeedbackOnCommentConnectionWhere>;
+  GivesFeedbackOnComment_NOT?: InputMaybe<CommentWhere>;
   GivesFeedbackOnDiscussion?: InputMaybe<DiscussionWhere>;
   GivesFeedbackOnDiscussionAggregate?: InputMaybe<CommentGivesFeedbackOnDiscussionAggregateInput>;
   GivesFeedbackOnDiscussionConnection?: InputMaybe<CommentGivesFeedbackOnDiscussionConnectionWhere>;
+  GivesFeedbackOnDiscussionConnection_NOT?: InputMaybe<CommentGivesFeedbackOnDiscussionConnectionWhere>;
+  GivesFeedbackOnDiscussion_NOT?: InputMaybe<DiscussionWhere>;
   GivesFeedbackOnEvent?: InputMaybe<EventWhere>;
   GivesFeedbackOnEventAggregate?: InputMaybe<CommentGivesFeedbackOnEventAggregateInput>;
   GivesFeedbackOnEventConnection?: InputMaybe<CommentGivesFeedbackOnEventConnectionWhere>;
+  GivesFeedbackOnEventConnection_NOT?: InputMaybe<CommentGivesFeedbackOnEventConnectionWhere>;
+  GivesFeedbackOnEvent_NOT?: InputMaybe<EventWhere>;
   Issue?: InputMaybe<IssueWhere>;
   IssueAggregate?: InputMaybe<CommentIssueAggregateInput>;
   IssueConnection?: InputMaybe<CommentIssueConnectionWhere>;
+  IssueConnection_NOT?: InputMaybe<CommentIssueConnectionWhere>;
+  Issue_NOT?: InputMaybe<IssueWhere>;
   NOT?: InputMaybe<CommentWhere>;
   OR?: InputMaybe<Array<CommentWhere>>;
   ParentComment?: InputMaybe<CommentWhere>;
   ParentCommentAggregate?: InputMaybe<CommentParentCommentAggregateInput>;
   ParentCommentConnection?: InputMaybe<CommentParentCommentConnectionWhere>;
+  ParentCommentConnection_NOT?: InputMaybe<CommentParentCommentConnectionWhere>;
+  ParentComment_NOT?: InputMaybe<CommentWhere>;
   TagsAggregate?: InputMaybe<CommentTagsAggregateInput>;
   /** Return Comments where all of the related CommentTagsConnections match this filter */
   TagsConnection_ALL?: InputMaybe<CommentTagsConnectionWhere>;
@@ -6269,34 +6198,34 @@ export type CommentWhere = {
   UpvotedByUsers_SINGLE?: InputMaybe<UserWhere>;
   /** Return Comments where some of the related Users match this filter */
   UpvotedByUsers_SOME?: InputMaybe<UserWhere>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  emoji_EQ?: InputMaybe<Scalars['JSON']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  emoji?: InputMaybe<Scalars['JSON']['input']>;
   emoji_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  isRootComment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  isRootComment?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
   text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  text_EQ?: InputMaybe<Scalars['String']['input']>;
   text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   text_MATCHES?: InputMaybe<Scalars['String']['input']>;
   text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  updatedAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
   updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  weightedVotesCount_EQ?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_GT?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_GTE?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
@@ -6422,6 +6351,8 @@ export type CreateImagesMutationResponse = {
 /** Information about the number of nodes and relationships created during a create mutation */
 export type CreateInfo = {
   __typename?: 'CreateInfo';
+  /** @deprecated This field has been deprecated because bookmarks are now handled by the driver. */
+  bookmark?: Maybe<Scalars['String']['output']>;
   nodesCreated: Scalars['Int']['output'];
   relationshipsCreated: Scalars['Int']['output'];
 };
@@ -6531,6 +6462,8 @@ export type DateTimeAggregateSelection = {
 /** Information about the number of nodes and relationships deleted during a delete mutation */
 export type DeleteInfo = {
   __typename?: 'DeleteInfo';
+  /** @deprecated This field has been deprecated because bookmarks are now handled by the driver. */
+  bookmark?: Maybe<Scalars['String']['output']>;
   nodesDeleted: Scalars['Int']['output'];
   relationshipsDeleted: Scalars['Int']['output'];
 };
@@ -6565,20 +6498,21 @@ export type Discussion = {
 
 
 export type DiscussionAlbumArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AlbumSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<AlbumOptions>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type DiscussionAlbumAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type DiscussionAlbumConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionAlbumConnectionSort>>;
   where?: InputMaybe<DiscussionAlbumConnectionWhere>;
@@ -6586,20 +6520,21 @@ export type DiscussionAlbumConnectionArgs = {
 
 
 export type DiscussionAuthorArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type DiscussionAuthorAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type DiscussionAuthorConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionAuthorConnectionSort>>;
   where?: InputMaybe<DiscussionAuthorConnectionWhere>;
@@ -6607,20 +6542,21 @@ export type DiscussionAuthorConnectionArgs = {
 
 
 export type DiscussionDiscussionChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionChannelOptions>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type DiscussionDiscussionChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type DiscussionDiscussionChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionDiscussionChannelsConnectionSort>>;
   where?: InputMaybe<DiscussionDiscussionChannelsConnectionWhere>;
@@ -6628,20 +6564,21 @@ export type DiscussionDiscussionChannelsConnectionArgs = {
 
 
 export type DiscussionFeedbackCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type DiscussionFeedbackCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type DiscussionFeedbackCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionFeedbackCommentsConnectionSort>>;
   where?: InputMaybe<DiscussionFeedbackCommentsConnectionWhere>;
@@ -6649,20 +6586,21 @@ export type DiscussionFeedbackCommentsConnectionArgs = {
 
 
 export type DiscussionRelatedIssuesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type DiscussionRelatedIssuesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type DiscussionRelatedIssuesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionRelatedIssuesConnectionSort>>;
   where?: InputMaybe<DiscussionRelatedIssuesConnectionWhere>;
@@ -6670,20 +6608,21 @@ export type DiscussionRelatedIssuesConnectionArgs = {
 
 
 export type DiscussionTagsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TagOptions>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type DiscussionTagsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type DiscussionTagsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionTagsConnectionSort>>;
   where?: InputMaybe<DiscussionTagsConnectionWhere>;
@@ -6703,7 +6642,7 @@ export type DiscussionAlbumAggregateInput = {
   AND?: InputMaybe<Array<DiscussionAlbumAggregateInput>>;
   NOT?: InputMaybe<DiscussionAlbumAggregateInput>;
   OR?: InputMaybe<Array<DiscussionAlbumAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -6724,6 +6663,8 @@ export type DiscussionAlbumAlbumNodeAggregateSelection = {
 
 export type DiscussionAlbumConnectFieldInput = {
   connect?: InputMaybe<AlbumConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<AlbumConnectWhere>;
 };
 
@@ -6768,16 +6709,6 @@ export type DiscussionAlbumNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<DiscussionAlbumNodeAggregationWhereInput>>;
   NOT?: InputMaybe<DiscussionAlbumNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<DiscussionAlbumNodeAggregationWhereInput>>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type DiscussionAlbumRelationship = {
@@ -6803,7 +6734,7 @@ export type DiscussionAuthorAggregateInput = {
   AND?: InputMaybe<Array<DiscussionAuthorAggregateInput>>;
   NOT?: InputMaybe<DiscussionAuthorAggregateInput>;
   OR?: InputMaybe<Array<DiscussionAuthorAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -6813,6 +6744,8 @@ export type DiscussionAuthorAggregateInput = {
 
 export type DiscussionAuthorConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -6859,6 +6792,7 @@ export type DiscussionAuthorDisconnectFieldInput = {
 
 export type DiscussionAuthorFieldInput = {
   connect?: InputMaybe<DiscussionAuthorConnectFieldInput>;
+  connectOrCreate?: InputMaybe<DiscussionAuthorConnectOrCreateFieldInput>;
   create?: InputMaybe<DiscussionAuthorCreateFieldInput>;
 };
 
@@ -7098,20 +7032,21 @@ export type DiscussionChannel = {
 
 
 export type DiscussionChannelChannelArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type DiscussionChannelChannelAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type DiscussionChannelChannelConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionChannelChannelConnectionSort>>;
   where?: InputMaybe<DiscussionChannelChannelConnectionWhere>;
@@ -7119,20 +7054,21 @@ export type DiscussionChannelChannelConnectionArgs = {
 
 
 export type DiscussionChannelCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type DiscussionChannelCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type DiscussionChannelCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionChannelCommentsConnectionSort>>;
   where?: InputMaybe<DiscussionChannelCommentsConnectionWhere>;
@@ -7140,20 +7076,21 @@ export type DiscussionChannelCommentsConnectionArgs = {
 
 
 export type DiscussionChannelDiscussionArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type DiscussionChannelDiscussionAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type DiscussionChannelDiscussionConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionChannelDiscussionConnectionSort>>;
   where?: InputMaybe<DiscussionChannelDiscussionConnectionWhere>;
@@ -7161,20 +7098,21 @@ export type DiscussionChannelDiscussionConnectionArgs = {
 
 
 export type DiscussionChannelUpvotedByUsersArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type DiscussionChannelUpvotedByUsersAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type DiscussionChannelUpvotedByUsersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectionSort>>;
   where?: InputMaybe<DiscussionChannelUpvotedByUsersConnectionWhere>;
@@ -7194,7 +7132,7 @@ export type DiscussionChannelChannelAggregateInput = {
   AND?: InputMaybe<Array<DiscussionChannelChannelAggregateInput>>;
   NOT?: InputMaybe<DiscussionChannelChannelAggregateInput>;
   OR?: InputMaybe<Array<DiscussionChannelChannelAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -7220,6 +7158,8 @@ export type DiscussionChannelChannelChannelNodeAggregateSelection = {
 
 export type DiscussionChannelChannelConnectFieldInput = {
   connect?: InputMaybe<ChannelConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -7266,6 +7206,7 @@ export type DiscussionChannelChannelDisconnectFieldInput = {
 
 export type DiscussionChannelChannelFieldInput = {
   connect?: InputMaybe<DiscussionChannelChannelConnectFieldInput>;
+  connectOrCreate?: InputMaybe<DiscussionChannelChannelConnectOrCreateFieldInput>;
   create?: InputMaybe<DiscussionChannelChannelCreateFieldInput>;
 };
 
@@ -7399,7 +7340,7 @@ export type DiscussionChannelCommentsAggregateInput = {
   AND?: InputMaybe<Array<DiscussionChannelCommentsAggregateInput>>;
   NOT?: InputMaybe<DiscussionChannelCommentsAggregateInput>;
   OR?: InputMaybe<Array<DiscussionChannelCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -7409,6 +7350,8 @@ export type DiscussionChannelCommentsAggregateInput = {
 
 export type DiscussionChannelCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -7463,16 +7406,6 @@ export type DiscussionChannelCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -7546,6 +7479,11 @@ export type DiscussionChannelConnectInput = {
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectFieldInput>>;
 };
 
+export type DiscussionChannelConnectOrCreateInput = {
+  Channel?: InputMaybe<DiscussionChannelChannelConnectOrCreateFieldInput>;
+  UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectOrCreateFieldInput>>;
+};
+
 export type DiscussionChannelConnectWhere = {
   node: DiscussionChannelWhere;
 };
@@ -7580,7 +7518,7 @@ export type DiscussionChannelDiscussionAggregateInput = {
   AND?: InputMaybe<Array<DiscussionChannelDiscussionAggregateInput>>;
   NOT?: InputMaybe<DiscussionChannelDiscussionAggregateInput>;
   OR?: InputMaybe<Array<DiscussionChannelDiscussionAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -7590,6 +7528,8 @@ export type DiscussionChannelDiscussionAggregateInput = {
 
 export type DiscussionChannelDiscussionConnectFieldInput = {
   connect?: InputMaybe<DiscussionConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
 };
 
@@ -7674,16 +7614,6 @@ export type DiscussionChannelDiscussionNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -7771,16 +7701,16 @@ export type DiscussionChannelListFormatSort = {
 };
 
 export type DiscussionChannelListFormatUpdateInput = {
+  aggregateDiscussionChannelsCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  aggregateDiscussionChannelsCount_SET?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type DiscussionChannelListFormatWhere = {
   AND?: InputMaybe<Array<DiscussionChannelListFormatWhere>>;
   NOT?: InputMaybe<DiscussionChannelListFormatWhere>;
   OR?: InputMaybe<Array<DiscussionChannelListFormatWhere>>;
-  aggregateDiscussionChannelsCount_EQ?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionChannelsCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_GT?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_GTE?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
@@ -7802,6 +7732,13 @@ export type DiscussionChannelOptions = {
   sort?: InputMaybe<Array<DiscussionChannelSort>>;
 };
 
+export type DiscussionChannelRelationInput = {
+  Channel?: InputMaybe<DiscussionChannelChannelCreateFieldInput>;
+  Comments?: InputMaybe<Array<DiscussionChannelCommentsCreateFieldInput>>;
+  Discussion?: InputMaybe<DiscussionChannelDiscussionCreateFieldInput>;
+  UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersCreateFieldInput>>;
+};
+
 /** Fields to sort DiscussionChannels by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionChannelSort object. */
 export type DiscussionChannelSort = {
   channelUniqueName?: InputMaybe<SortDirection>;
@@ -7818,15 +7755,15 @@ export type DiscussionChannelUpdateInput = {
   Comments?: InputMaybe<Array<DiscussionChannelCommentsUpdateFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionUpdateFieldInput>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersUpdateFieldInput>>;
-  channelUniqueName_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  discussionId_SET?: InputMaybe<Scalars['ID']['input']>;
-  emoji_SET?: InputMaybe<Scalars['JSON']['input']>;
-  locked_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionId?: InputMaybe<Scalars['ID']['input']>;
+  emoji?: InputMaybe<Scalars['JSON']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_ADD?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_DIVIDE?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_MULTIPLY?: InputMaybe<Scalars['Float']['input']>;
-  weightedVotesCount_SET?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_SUBTRACT?: InputMaybe<Scalars['Float']['input']>;
 };
 
@@ -7834,7 +7771,7 @@ export type DiscussionChannelUpvotedByUsersAggregateInput = {
   AND?: InputMaybe<Array<DiscussionChannelUpvotedByUsersAggregateInput>>;
   NOT?: InputMaybe<DiscussionChannelUpvotedByUsersAggregateInput>;
   OR?: InputMaybe<Array<DiscussionChannelUpvotedByUsersAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -7844,6 +7781,8 @@ export type DiscussionChannelUpvotedByUsersAggregateInput = {
 
 export type DiscussionChannelUpvotedByUsersConnectFieldInput = {
   connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -7890,6 +7829,7 @@ export type DiscussionChannelUpvotedByUsersDisconnectFieldInput = {
 
 export type DiscussionChannelUpvotedByUsersFieldInput = {
   connect?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<DiscussionChannelUpvotedByUsersConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<DiscussionChannelUpvotedByUsersCreateFieldInput>>;
 };
 
@@ -8131,6 +8071,8 @@ export type DiscussionChannelWhere = {
   Channel?: InputMaybe<ChannelWhere>;
   ChannelAggregate?: InputMaybe<DiscussionChannelChannelAggregateInput>;
   ChannelConnection?: InputMaybe<DiscussionChannelChannelConnectionWhere>;
+  ChannelConnection_NOT?: InputMaybe<DiscussionChannelChannelConnectionWhere>;
+  Channel_NOT?: InputMaybe<ChannelWhere>;
   CommentsAggregate?: InputMaybe<DiscussionChannelCommentsAggregateInput>;
   /** Return DiscussionChannels where all of the related DiscussionChannelCommentsConnections match this filter */
   CommentsConnection_ALL?: InputMaybe<DiscussionChannelCommentsConnectionWhere>;
@@ -8151,6 +8093,8 @@ export type DiscussionChannelWhere = {
   Discussion?: InputMaybe<DiscussionWhere>;
   DiscussionAggregate?: InputMaybe<DiscussionChannelDiscussionAggregateInput>;
   DiscussionConnection?: InputMaybe<DiscussionChannelDiscussionConnectionWhere>;
+  DiscussionConnection_NOT?: InputMaybe<DiscussionChannelDiscussionConnectionWhere>;
+  Discussion_NOT?: InputMaybe<DiscussionWhere>;
   NOT?: InputMaybe<DiscussionChannelWhere>;
   OR?: InputMaybe<Array<DiscussionChannelWhere>>;
   UpvotedByUsersAggregate?: InputMaybe<DiscussionChannelUpvotedByUsersAggregateInput>;
@@ -8170,32 +8114,32 @@ export type DiscussionChannelWhere = {
   UpvotedByUsers_SINGLE?: InputMaybe<UserWhere>;
   /** Return DiscussionChannels where some of the related Users match this filter */
   UpvotedByUsers_SOME?: InputMaybe<UserWhere>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelUniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionId?: InputMaybe<Scalars['ID']['input']>;
   discussionId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   discussionId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_EQ?: InputMaybe<Scalars['ID']['input']>;
   discussionId_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   discussionId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  emoji_EQ?: InputMaybe<Scalars['JSON']['input']>;
+  emoji?: InputMaybe<Scalars['JSON']['input']>;
   emoji_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  locked_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  weightedVotesCount_EQ?: InputMaybe<Scalars['Float']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_GT?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_GTE?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
@@ -8232,6 +8176,11 @@ export type DiscussionConnectInput = {
   FeedbackComments?: InputMaybe<Array<DiscussionFeedbackCommentsConnectFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionRelatedIssuesConnectFieldInput>>;
   Tags?: InputMaybe<Array<DiscussionTagsConnectFieldInput>>;
+};
+
+export type DiscussionConnectOrCreateInput = {
+  Author?: InputMaybe<DiscussionAuthorConnectOrCreateFieldInput>;
+  Tags?: InputMaybe<Array<DiscussionTagsConnectOrCreateFieldInput>>;
 };
 
 export type DiscussionConnectWhere = {
@@ -8288,7 +8237,7 @@ export type DiscussionDiscussionChannelsAggregateInput = {
   AND?: InputMaybe<Array<DiscussionDiscussionChannelsAggregateInput>>;
   NOT?: InputMaybe<DiscussionDiscussionChannelsAggregateInput>;
   OR?: InputMaybe<Array<DiscussionDiscussionChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -8298,6 +8247,8 @@ export type DiscussionDiscussionChannelsAggregateInput = {
 
 export type DiscussionDiscussionChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<DiscussionChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
 };
 
@@ -8367,26 +8318,6 @@ export type DiscussionDiscussionChannelsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  discussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -8438,7 +8369,7 @@ export type DiscussionFeedbackCommentsAggregateInput = {
   AND?: InputMaybe<Array<DiscussionFeedbackCommentsAggregateInput>>;
   NOT?: InputMaybe<DiscussionFeedbackCommentsAggregateInput>;
   OR?: InputMaybe<Array<DiscussionFeedbackCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -8448,6 +8379,8 @@ export type DiscussionFeedbackCommentsAggregateInput = {
 
 export type DiscussionFeedbackCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -8502,16 +8435,6 @@ export type DiscussionFeedbackCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -8616,7 +8539,7 @@ export type DiscussionRelatedIssuesAggregateInput = {
   AND?: InputMaybe<Array<DiscussionRelatedIssuesAggregateInput>>;
   NOT?: InputMaybe<DiscussionRelatedIssuesAggregateInput>;
   OR?: InputMaybe<Array<DiscussionRelatedIssuesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -8626,6 +8549,8 @@ export type DiscussionRelatedIssuesAggregateInput = {
 
 export type DiscussionRelatedIssuesConnectFieldInput = {
   connect?: InputMaybe<Array<IssueConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
 };
 
@@ -8725,46 +8650,6 @@ export type DiscussionRelatedIssuesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -8811,6 +8696,15 @@ export type DiscussionRelatedIssuesUpdateFieldInput = {
   where?: InputMaybe<DiscussionRelatedIssuesConnectionWhere>;
 };
 
+export type DiscussionRelationInput = {
+  Album?: InputMaybe<DiscussionAlbumCreateFieldInput>;
+  Author?: InputMaybe<DiscussionAuthorCreateFieldInput>;
+  DiscussionChannels?: InputMaybe<Array<DiscussionDiscussionChannelsCreateFieldInput>>;
+  FeedbackComments?: InputMaybe<Array<DiscussionFeedbackCommentsCreateFieldInput>>;
+  RelatedIssues?: InputMaybe<Array<DiscussionRelatedIssuesCreateFieldInput>>;
+  Tags?: InputMaybe<Array<DiscussionTagsCreateFieldInput>>;
+};
+
 /** Fields to sort Discussions by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionSort object. */
 export type DiscussionSort = {
   body?: InputMaybe<SortDirection>;
@@ -8836,7 +8730,7 @@ export type DiscussionTagsAggregateInput = {
   AND?: InputMaybe<Array<DiscussionTagsAggregateInput>>;
   NOT?: InputMaybe<DiscussionTagsAggregateInput>;
   OR?: InputMaybe<Array<DiscussionTagsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -8846,6 +8740,8 @@ export type DiscussionTagsAggregateInput = {
 
 export type DiscussionTagsConnectFieldInput = {
   connect?: InputMaybe<Array<TagConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TagConnectWhere>;
 };
 
@@ -8892,6 +8788,7 @@ export type DiscussionTagsDisconnectFieldInput = {
 
 export type DiscussionTagsFieldInput = {
   connect?: InputMaybe<Array<DiscussionTagsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<DiscussionTagsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<DiscussionTagsCreateFieldInput>>;
 };
 
@@ -8943,10 +8840,10 @@ export type DiscussionUpdateInput = {
   FeedbackComments?: InputMaybe<Array<DiscussionFeedbackCommentsUpdateFieldInput>>;
   RelatedIssues?: InputMaybe<Array<DiscussionRelatedIssuesUpdateFieldInput>>;
   Tags?: InputMaybe<Array<DiscussionTagsUpdateFieldInput>>;
-  body_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  title_SET?: InputMaybe<Scalars['String']['input']>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type DiscussionUserAuthorAggregationSelection = {
@@ -8976,9 +8873,13 @@ export type DiscussionWhere = {
   Album?: InputMaybe<AlbumWhere>;
   AlbumAggregate?: InputMaybe<DiscussionAlbumAggregateInput>;
   AlbumConnection?: InputMaybe<DiscussionAlbumConnectionWhere>;
+  AlbumConnection_NOT?: InputMaybe<DiscussionAlbumConnectionWhere>;
+  Album_NOT?: InputMaybe<AlbumWhere>;
   Author?: InputMaybe<UserWhere>;
   AuthorAggregate?: InputMaybe<DiscussionAuthorAggregateInput>;
   AuthorConnection?: InputMaybe<DiscussionAuthorConnectionWhere>;
+  AuthorConnection_NOT?: InputMaybe<DiscussionAuthorConnectionWhere>;
+  Author_NOT?: InputMaybe<UserWhere>;
   DiscussionChannelsAggregate?: InputMaybe<DiscussionDiscussionChannelsAggregateInput>;
   /** Return Discussions where all of the related DiscussionDiscussionChannelsConnections match this filter */
   DiscussionChannelsConnection_ALL?: InputMaybe<DiscussionDiscussionChannelsConnectionWhere>;
@@ -9049,31 +8950,31 @@ export type DiscussionWhere = {
   Tags_SINGLE?: InputMaybe<TagWhere>;
   /** Return Discussions where some of the related Tags match this filter */
   Tags_SOME?: InputMaybe<TagWhere>;
+  body?: InputMaybe<Scalars['String']['input']>;
   body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  body_EQ?: InputMaybe<Scalars['String']['input']>;
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   body_MATCHES?: InputMaybe<Scalars['String']['input']>;
   body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
   title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title_EQ?: InputMaybe<Scalars['String']['input']>;
   title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   title_MATCHES?: InputMaybe<Scalars['String']['input']>;
   title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  updatedAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
@@ -9125,21 +9026,21 @@ export type DropDataResponseSort = {
 };
 
 export type DropDataResponseUpdateInput = {
-  message_SET?: InputMaybe<Scalars['String']['input']>;
-  success_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type DropDataResponseWhere = {
   AND?: InputMaybe<Array<DropDataResponseWhere>>;
   NOT?: InputMaybe<DropDataResponseWhere>;
   OR?: InputMaybe<Array<DropDataResponseWhere>>;
+  message?: InputMaybe<Scalars['String']['input']>;
   message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  message_EQ?: InputMaybe<Scalars['String']['input']>;
   message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   message_MATCHES?: InputMaybe<Scalars['String']['input']>;
   message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  success_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type DropDataResponsesConnection = {
@@ -9159,20 +9060,21 @@ export type Email = {
 
 
 export type EmailUserArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type EmailUserAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type EmailUserConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EmailUserConnectionSort>>;
   where?: InputMaybe<EmailUserConnectionWhere>;
@@ -9186,6 +9088,10 @@ export type EmailAggregateSelection = {
 
 export type EmailConnectInput = {
   User?: InputMaybe<EmailUserConnectFieldInput>;
+};
+
+export type EmailConnectOrCreateInput = {
+  User?: InputMaybe<EmailUserConnectOrCreateFieldInput>;
 };
 
 export type EmailConnectOrCreateWhere = {
@@ -9226,25 +9132,29 @@ export type EmailOptions = {
   sort?: InputMaybe<Array<EmailSort>>;
 };
 
+export type EmailRelationInput = {
+  User?: InputMaybe<EmailUserCreateFieldInput>;
+};
+
 /** Fields to sort Emails by. The order in which sorts are applied is not guaranteed when specifying many fields in one EmailSort object. */
 export type EmailSort = {
   address?: InputMaybe<SortDirection>;
 };
 
 export type EmailUniqueWhere = {
-  address_EQ?: InputMaybe<Scalars['String']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EmailUpdateInput = {
   User?: InputMaybe<EmailUserUpdateFieldInput>;
-  address_SET?: InputMaybe<Scalars['String']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EmailUserAggregateInput = {
   AND?: InputMaybe<Array<EmailUserAggregateInput>>;
   NOT?: InputMaybe<EmailUserAggregateInput>;
   OR?: InputMaybe<Array<EmailUserAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -9254,6 +9164,8 @@ export type EmailUserAggregateInput = {
 
 export type EmailUserConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -9300,6 +9212,7 @@ export type EmailUserDisconnectFieldInput = {
 
 export type EmailUserFieldInput = {
   connect?: InputMaybe<EmailUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<EmailUserConnectOrCreateFieldInput>;
   create?: InputMaybe<EmailUserCreateFieldInput>;
 };
 
@@ -9543,9 +9456,11 @@ export type EmailWhere = {
   User?: InputMaybe<UserWhere>;
   UserAggregate?: InputMaybe<EmailUserAggregateInput>;
   UserConnection?: InputMaybe<EmailUserConnectionWhere>;
+  UserConnection_NOT?: InputMaybe<EmailUserConnectionWhere>;
+  User_NOT?: InputMaybe<UserWhere>;
+  address?: InputMaybe<Scalars['String']['input']>;
   address_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   address_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  address_EQ?: InputMaybe<Scalars['String']['input']>;
   address_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   address_MATCHES?: InputMaybe<Scalars['String']['input']>;
   address_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -9570,20 +9485,21 @@ export type Emoji = {
 
 
 export type EmojiPostedByUserArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type EmojiPostedByUserAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type EmojiPostedByUserConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EmojiPostedByUserConnectionSort>>;
   where?: InputMaybe<EmojiPostedByUserConnectionWhere>;
@@ -9597,6 +9513,14 @@ export type EmojiAggregateSelection = {
   name: StringAggregateSelection;
 };
 
+export type EmojiConnectInput = {
+  PostedByUser?: InputMaybe<EmojiPostedByUserConnectFieldInput>;
+};
+
+export type EmojiConnectOrCreateInput = {
+  PostedByUser?: InputMaybe<EmojiPostedByUserConnectOrCreateFieldInput>;
+};
+
 export type EmojiCreateInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserFieldInput>;
   name: Scalars['String']['input'];
@@ -9604,6 +9528,10 @@ export type EmojiCreateInput = {
 
 export type EmojiDeleteInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserDeleteFieldInput>;
+};
+
+export type EmojiDisconnectInput = {
+  PostedByUser?: InputMaybe<EmojiPostedByUserDisconnectFieldInput>;
 };
 
 export type EmojiEdge = {
@@ -9623,7 +9551,7 @@ export type EmojiPostedByUserAggregateInput = {
   AND?: InputMaybe<Array<EmojiPostedByUserAggregateInput>>;
   NOT?: InputMaybe<EmojiPostedByUserAggregateInput>;
   OR?: InputMaybe<Array<EmojiPostedByUserAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -9633,6 +9561,8 @@ export type EmojiPostedByUserAggregateInput = {
 
 export type EmojiPostedByUserConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -9679,6 +9609,7 @@ export type EmojiPostedByUserDisconnectFieldInput = {
 
 export type EmojiPostedByUserFieldInput = {
   connect?: InputMaybe<EmojiPostedByUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<EmojiPostedByUserConnectOrCreateFieldInput>;
   create?: InputMaybe<EmojiPostedByUserCreateFieldInput>;
 };
 
@@ -9893,6 +9824,10 @@ export type EmojiPostedByUserUpdateFieldInput = {
   where?: InputMaybe<EmojiPostedByUserConnectionWhere>;
 };
 
+export type EmojiRelationInput = {
+  PostedByUser?: InputMaybe<EmojiPostedByUserCreateFieldInput>;
+};
+
 /** Fields to sort Emojis by. The order in which sorts are applied is not guaranteed when specifying many fields in one EmojiSort object. */
 export type EmojiSort = {
   createdAt?: InputMaybe<SortDirection>;
@@ -9902,8 +9837,8 @@ export type EmojiSort = {
 
 export type EmojiUpdateInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserUpdateFieldInput>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  name_SET?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EmojiUserPostedByUserAggregationSelection = {
@@ -9935,20 +9870,22 @@ export type EmojiWhere = {
   PostedByUser?: InputMaybe<UserWhere>;
   PostedByUserAggregate?: InputMaybe<EmojiPostedByUserAggregateInput>;
   PostedByUserConnection?: InputMaybe<EmojiPostedByUserConnectionWhere>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  PostedByUserConnection_NOT?: InputMaybe<EmojiPostedByUserConnectionWhere>;
+  PostedByUser_NOT?: InputMaybe<UserWhere>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
   name_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -9998,21 +9935,21 @@ export type EnvironmentInfoSort = {
 };
 
 export type EnvironmentInfoUpdateInput = {
-  currentDatabase_SET?: InputMaybe<Scalars['String']['input']>;
-  isTestEnvironment_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  currentDatabase?: InputMaybe<Scalars['String']['input']>;
+  isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EnvironmentInfoWhere = {
   AND?: InputMaybe<Array<EnvironmentInfoWhere>>;
   NOT?: InputMaybe<EnvironmentInfoWhere>;
   OR?: InputMaybe<Array<EnvironmentInfoWhere>>;
+  currentDatabase?: InputMaybe<Scalars['String']['input']>;
   currentDatabase_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   currentDatabase_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  currentDatabase_EQ?: InputMaybe<Scalars['String']['input']>;
   currentDatabase_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   currentDatabase_MATCHES?: InputMaybe<Scalars['String']['input']>;
   currentDatabase_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  isTestEnvironment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EnvironmentInfosConnection = {
@@ -10072,20 +10009,21 @@ export type Event = {
 
 
 export type EventCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type EventCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type EventCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventCommentsConnectionSort>>;
   where?: InputMaybe<EventCommentsConnectionWhere>;
@@ -10093,20 +10031,21 @@ export type EventCommentsConnectionArgs = {
 
 
 export type EventEventChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventChannelOptions>;
   where?: InputMaybe<EventChannelWhere>;
 };
 
 
 export type EventEventChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventChannelWhere>;
 };
 
 
 export type EventEventChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventEventChannelsConnectionSort>>;
   where?: InputMaybe<EventEventChannelsConnectionWhere>;
@@ -10114,20 +10053,21 @@ export type EventEventChannelsConnectionArgs = {
 
 
 export type EventFeedbackCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type EventFeedbackCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type EventFeedbackCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventFeedbackCommentsConnectionSort>>;
   where?: InputMaybe<EventFeedbackCommentsConnectionWhere>;
@@ -10135,20 +10075,21 @@ export type EventFeedbackCommentsConnectionArgs = {
 
 
 export type EventPosterArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type EventPosterAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type EventPosterConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventPosterConnectionSort>>;
   where?: InputMaybe<EventPosterConnectionWhere>;
@@ -10156,20 +10097,21 @@ export type EventPosterConnectionArgs = {
 
 
 export type EventRecurringEventArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RecurringEventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<RecurringEventOptions>;
   where?: InputMaybe<RecurringEventWhere>;
 };
 
 
 export type EventRecurringEventAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<RecurringEventWhere>;
 };
 
 
 export type EventRecurringEventConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventRecurringEventConnectionSort>>;
   where?: InputMaybe<EventRecurringEventConnectionWhere>;
@@ -10177,20 +10119,21 @@ export type EventRecurringEventConnectionArgs = {
 
 
 export type EventRelatedIssuesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type EventRelatedIssuesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type EventRelatedIssuesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventRelatedIssuesConnectionSort>>;
   where?: InputMaybe<EventRelatedIssuesConnectionWhere>;
@@ -10198,20 +10141,21 @@ export type EventRelatedIssuesConnectionArgs = {
 
 
 export type EventTagsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TagOptions>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type EventTagsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type EventTagsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventTagsConnectionSort>>;
   where?: InputMaybe<EventTagsConnectionWhere>;
@@ -10257,20 +10201,21 @@ export type EventChannel = {
 
 
 export type EventChannelChannelArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type EventChannelChannelAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type EventChannelChannelConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventChannelChannelConnectionSort>>;
   where?: InputMaybe<EventChannelChannelConnectionWhere>;
@@ -10278,20 +10223,21 @@ export type EventChannelChannelConnectionArgs = {
 
 
 export type EventChannelCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type EventChannelCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type EventChannelCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventChannelCommentsConnectionSort>>;
   where?: InputMaybe<EventChannelCommentsConnectionWhere>;
@@ -10299,20 +10245,21 @@ export type EventChannelCommentsConnectionArgs = {
 
 
 export type EventChannelEventArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type EventChannelEventAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type EventChannelEventConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<EventChannelEventConnectionSort>>;
   where?: InputMaybe<EventChannelEventConnectionWhere>;
@@ -10331,7 +10278,7 @@ export type EventChannelChannelAggregateInput = {
   AND?: InputMaybe<Array<EventChannelChannelAggregateInput>>;
   NOT?: InputMaybe<EventChannelChannelAggregateInput>;
   OR?: InputMaybe<Array<EventChannelChannelAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -10357,6 +10304,8 @@ export type EventChannelChannelChannelNodeAggregateSelection = {
 
 export type EventChannelChannelConnectFieldInput = {
   connect?: InputMaybe<ChannelConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -10403,6 +10352,7 @@ export type EventChannelChannelDisconnectFieldInput = {
 
 export type EventChannelChannelFieldInput = {
   connect?: InputMaybe<EventChannelChannelConnectFieldInput>;
+  connectOrCreate?: InputMaybe<EventChannelChannelConnectOrCreateFieldInput>;
   create?: InputMaybe<EventChannelChannelCreateFieldInput>;
 };
 
@@ -10536,7 +10486,7 @@ export type EventChannelCommentsAggregateInput = {
   AND?: InputMaybe<Array<EventChannelCommentsAggregateInput>>;
   NOT?: InputMaybe<EventChannelCommentsAggregateInput>;
   OR?: InputMaybe<Array<EventChannelCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -10546,6 +10496,8 @@ export type EventChannelCommentsAggregateInput = {
 
 export type EventChannelCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -10600,16 +10552,6 @@ export type EventChannelCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -10682,6 +10624,10 @@ export type EventChannelConnectInput = {
   Event?: InputMaybe<EventChannelEventConnectFieldInput>;
 };
 
+export type EventChannelConnectOrCreateInput = {
+  Channel?: InputMaybe<EventChannelChannelConnectOrCreateFieldInput>;
+};
+
 export type EventChannelConnectWhere = {
   node: EventChannelWhere;
 };
@@ -10717,7 +10663,7 @@ export type EventChannelEventAggregateInput = {
   AND?: InputMaybe<Array<EventChannelEventAggregateInput>>;
   NOT?: InputMaybe<EventChannelEventAggregateInput>;
   OR?: InputMaybe<Array<EventChannelEventAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -10727,6 +10673,8 @@ export type EventChannelEventAggregateInput = {
 
 export type EventChannelEventConnectFieldInput = {
   connect?: InputMaybe<EventConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
 };
 
@@ -10876,16 +10824,6 @@ export type EventChannelEventNodeAggregationWhereInput = {
   endTime_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   locationName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -11029,6 +10967,12 @@ export type EventChannelOptions = {
   sort?: InputMaybe<Array<EventChannelSort>>;
 };
 
+export type EventChannelRelationInput = {
+  Channel?: InputMaybe<EventChannelChannelCreateFieldInput>;
+  Comments?: InputMaybe<Array<EventChannelCommentsCreateFieldInput>>;
+  Event?: InputMaybe<EventChannelEventCreateFieldInput>;
+};
+
 /** Fields to sort EventChannels by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventChannelSort object. */
 export type EventChannelSort = {
   channelUniqueName?: InputMaybe<SortDirection>;
@@ -11042,10 +10986,10 @@ export type EventChannelUpdateInput = {
   Channel?: InputMaybe<EventChannelChannelUpdateFieldInput>;
   Comments?: InputMaybe<Array<EventChannelCommentsUpdateFieldInput>>;
   Event?: InputMaybe<EventChannelEventUpdateFieldInput>;
-  channelUniqueName_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  eventId_SET?: InputMaybe<Scalars['ID']['input']>;
-  locked_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  eventId?: InputMaybe<Scalars['ID']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChannelWhere = {
@@ -11053,6 +10997,8 @@ export type EventChannelWhere = {
   Channel?: InputMaybe<ChannelWhere>;
   ChannelAggregate?: InputMaybe<EventChannelChannelAggregateInput>;
   ChannelConnection?: InputMaybe<EventChannelChannelConnectionWhere>;
+  ChannelConnection_NOT?: InputMaybe<EventChannelChannelConnectionWhere>;
+  Channel_NOT?: InputMaybe<ChannelWhere>;
   CommentsAggregate?: InputMaybe<EventChannelCommentsAggregateInput>;
   /** Return EventChannels where all of the related EventChannelCommentsConnections match this filter */
   CommentsConnection_ALL?: InputMaybe<EventChannelCommentsConnectionWhere>;
@@ -11073,31 +11019,33 @@ export type EventChannelWhere = {
   Event?: InputMaybe<EventWhere>;
   EventAggregate?: InputMaybe<EventChannelEventAggregateInput>;
   EventConnection?: InputMaybe<EventChannelEventConnectionWhere>;
+  EventConnection_NOT?: InputMaybe<EventChannelEventConnectionWhere>;
+  Event_NOT?: InputMaybe<EventWhere>;
   NOT?: InputMaybe<EventChannelWhere>;
   OR?: InputMaybe<Array<EventChannelWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelUniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  eventId?: InputMaybe<Scalars['ID']['input']>;
   eventId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   eventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  eventId_EQ?: InputMaybe<Scalars['ID']['input']>;
   eventId_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   eventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  locked_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChannelsConnection = {
@@ -11141,7 +11089,7 @@ export type EventCommentsAggregateInput = {
   AND?: InputMaybe<Array<EventCommentsAggregateInput>>;
   NOT?: InputMaybe<EventCommentsAggregateInput>;
   OR?: InputMaybe<Array<EventCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -11151,6 +11099,8 @@ export type EventCommentsAggregateInput = {
 
 export type EventCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -11250,16 +11200,6 @@ export type EventCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -11334,6 +11274,11 @@ export type EventConnectInput = {
   RecurringEvent?: InputMaybe<EventRecurringEventConnectFieldInput>;
   RelatedIssues?: InputMaybe<Array<EventRelatedIssuesConnectFieldInput>>;
   Tags?: InputMaybe<Array<EventTagsConnectFieldInput>>;
+};
+
+export type EventConnectOrCreateInput = {
+  Poster?: InputMaybe<EventPosterConnectOrCreateFieldInput>;
+  Tags?: InputMaybe<Array<EventTagsConnectOrCreateFieldInput>>;
 };
 
 export type EventConnectWhere = {
@@ -11415,7 +11360,7 @@ export type EventEventChannelsAggregateInput = {
   AND?: InputMaybe<Array<EventEventChannelsAggregateInput>>;
   NOT?: InputMaybe<EventEventChannelsAggregateInput>;
   OR?: InputMaybe<Array<EventEventChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -11425,6 +11370,8 @@ export type EventEventChannelsAggregateInput = {
 
 export type EventEventChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<EventChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventChannelConnectWhere>;
 };
 
@@ -11494,26 +11441,6 @@ export type EventEventChannelsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  eventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  eventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type EventEventChannelsRelationship = {
@@ -11539,7 +11466,7 @@ export type EventFeedbackCommentsAggregateInput = {
   AND?: InputMaybe<Array<EventFeedbackCommentsAggregateInput>>;
   NOT?: InputMaybe<EventFeedbackCommentsAggregateInput>;
   OR?: InputMaybe<Array<EventFeedbackCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -11549,6 +11476,8 @@ export type EventFeedbackCommentsAggregateInput = {
 
 export type EventFeedbackCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -11603,16 +11532,6 @@ export type EventFeedbackCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -11710,7 +11629,7 @@ export type EventPosterAggregateInput = {
   AND?: InputMaybe<Array<EventPosterAggregateInput>>;
   NOT?: InputMaybe<EventPosterAggregateInput>;
   OR?: InputMaybe<Array<EventPosterAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -11720,6 +11639,8 @@ export type EventPosterAggregateInput = {
 
 export type EventPosterConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -11766,6 +11687,7 @@ export type EventPosterDisconnectFieldInput = {
 
 export type EventPosterFieldInput = {
   connect?: InputMaybe<EventPosterConnectFieldInput>;
+  connectOrCreate?: InputMaybe<EventPosterConnectOrCreateFieldInput>;
   create?: InputMaybe<EventPosterCreateFieldInput>;
 };
 
@@ -11984,7 +11906,7 @@ export type EventRecurringEventAggregateInput = {
   AND?: InputMaybe<Array<EventRecurringEventAggregateInput>>;
   NOT?: InputMaybe<EventRecurringEventAggregateInput>;
   OR?: InputMaybe<Array<EventRecurringEventAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -11994,6 +11916,8 @@ export type EventRecurringEventAggregateInput = {
 
 export type EventRecurringEventConnectFieldInput = {
   connect?: InputMaybe<RecurringEventConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<RecurringEventConnectWhere>;
 };
 
@@ -12038,16 +11962,6 @@ export type EventRecurringEventNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<EventRecurringEventNodeAggregationWhereInput>>;
   NOT?: InputMaybe<EventRecurringEventNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<EventRecurringEventNodeAggregationWhereInput>>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type EventRecurringEventRecurringEventAggregationSelection = {
@@ -12084,7 +11998,7 @@ export type EventRelatedIssuesAggregateInput = {
   AND?: InputMaybe<Array<EventRelatedIssuesAggregateInput>>;
   NOT?: InputMaybe<EventRelatedIssuesAggregateInput>;
   OR?: InputMaybe<Array<EventRelatedIssuesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -12094,6 +12008,8 @@ export type EventRelatedIssuesAggregateInput = {
 
 export type EventRelatedIssuesConnectFieldInput = {
   connect?: InputMaybe<Array<IssueConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
 };
 
@@ -12193,46 +12109,6 @@ export type EventRelatedIssuesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -12279,6 +12155,16 @@ export type EventRelatedIssuesUpdateFieldInput = {
   where?: InputMaybe<EventRelatedIssuesConnectionWhere>;
 };
 
+export type EventRelationInput = {
+  Comments?: InputMaybe<Array<EventCommentsCreateFieldInput>>;
+  EventChannels?: InputMaybe<Array<EventEventChannelsCreateFieldInput>>;
+  FeedbackComments?: InputMaybe<Array<EventFeedbackCommentsCreateFieldInput>>;
+  Poster?: InputMaybe<EventPosterCreateFieldInput>;
+  RecurringEvent?: InputMaybe<EventRecurringEventCreateFieldInput>;
+  RelatedIssues?: InputMaybe<Array<EventRelatedIssuesCreateFieldInput>>;
+  Tags?: InputMaybe<Array<EventTagsCreateFieldInput>>;
+};
+
 /** Fields to sort Events by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventSort object. */
 export type EventSort = {
   address?: InputMaybe<SortDirection>;
@@ -12321,7 +12207,7 @@ export type EventTagsAggregateInput = {
   AND?: InputMaybe<Array<EventTagsAggregateInput>>;
   NOT?: InputMaybe<EventTagsAggregateInput>;
   OR?: InputMaybe<Array<EventTagsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -12331,6 +12217,8 @@ export type EventTagsAggregateInput = {
 
 export type EventTagsConnectFieldInput = {
   connect?: InputMaybe<Array<TagConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TagConnectWhere>;
 };
 
@@ -12377,6 +12265,7 @@ export type EventTagsDisconnectFieldInput = {
 
 export type EventTagsFieldInput = {
   connect?: InputMaybe<Array<EventTagsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<EventTagsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<EventTagsCreateFieldInput>>;
 };
 
@@ -12429,29 +12318,29 @@ export type EventUpdateInput = {
   RecurringEvent?: InputMaybe<EventRecurringEventUpdateFieldInput>;
   RelatedIssues?: InputMaybe<Array<EventRelatedIssuesUpdateFieldInput>>;
   Tags?: InputMaybe<Array<EventTagsUpdateFieldInput>>;
-  address_SET?: InputMaybe<Scalars['String']['input']>;
-  canceled_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  cost_SET?: InputMaybe<Scalars['String']['input']>;
-  coverImageURL_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  endTime_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  free_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  isAllDay_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  isHostedByOP_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  isInPrivateResidence_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  locationName_SET?: InputMaybe<Scalars['String']['input']>;
-  location_SET?: InputMaybe<PointInput>;
-  locked_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  placeId_SET?: InputMaybe<Scalars['String']['input']>;
-  startTimeDayOfWeek_SET?: InputMaybe<Scalars['String']['input']>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  canceled?: InputMaybe<Scalars['Boolean']['input']>;
+  cost?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  endTime?: InputMaybe<Scalars['DateTime']['input']>;
+  free?: InputMaybe<Scalars['Boolean']['input']>;
+  isAllDay?: InputMaybe<Scalars['Boolean']['input']>;
+  isHostedByOP?: InputMaybe<Scalars['Boolean']['input']>;
+  isInPrivateResidence?: InputMaybe<Scalars['Boolean']['input']>;
+  location?: InputMaybe<PointInput>;
+  locationName?: InputMaybe<Scalars['String']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  placeId?: InputMaybe<Scalars['String']['input']>;
+  startTime?: InputMaybe<Scalars['DateTime']['input']>;
+  startTimeDayOfWeek?: InputMaybe<Scalars['String']['input']>;
+  startTimeHourOfDay?: InputMaybe<Scalars['Int']['input']>;
   startTimeHourOfDay_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   startTimeHourOfDay_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  startTimeHourOfDay_SET?: InputMaybe<Scalars['Int']['input']>;
-  startTime_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  title_SET?: InputMaybe<Scalars['String']['input']>;
-  virtualEventUrl_SET?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  virtualEventUrl?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventUserPosterAggregationSelection = {
@@ -12534,9 +12423,13 @@ export type EventWhere = {
   Poster?: InputMaybe<UserWhere>;
   PosterAggregate?: InputMaybe<EventPosterAggregateInput>;
   PosterConnection?: InputMaybe<EventPosterConnectionWhere>;
+  PosterConnection_NOT?: InputMaybe<EventPosterConnectionWhere>;
+  Poster_NOT?: InputMaybe<UserWhere>;
   RecurringEvent?: InputMaybe<RecurringEventWhere>;
   RecurringEventAggregate?: InputMaybe<EventRecurringEventAggregateInput>;
   RecurringEventConnection?: InputMaybe<EventRecurringEventConnectionWhere>;
+  RecurringEventConnection_NOT?: InputMaybe<EventRecurringEventConnectionWhere>;
+  RecurringEvent_NOT?: InputMaybe<RecurringEventWhere>;
   RelatedIssuesAggregate?: InputMaybe<EventRelatedIssuesAggregateInput>;
   /** Return Events where all of the related EventRelatedIssuesConnections match this filter */
   RelatedIssuesConnection_ALL?: InputMaybe<EventRelatedIssuesConnectionWhere>;
@@ -12571,106 +12464,106 @@ export type EventWhere = {
   Tags_SINGLE?: InputMaybe<TagWhere>;
   /** Return Events where some of the related Tags match this filter */
   Tags_SOME?: InputMaybe<TagWhere>;
+  address?: InputMaybe<Scalars['String']['input']>;
   address_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   address_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  address_EQ?: InputMaybe<Scalars['String']['input']>;
   address_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   address_MATCHES?: InputMaybe<Scalars['String']['input']>;
   address_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  canceled_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  canceled?: InputMaybe<Scalars['Boolean']['input']>;
+  cost?: InputMaybe<Scalars['String']['input']>;
   cost_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   cost_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  cost_EQ?: InputMaybe<Scalars['String']['input']>;
   cost_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   cost_MATCHES?: InputMaybe<Scalars['String']['input']>;
   cost_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL?: InputMaybe<Scalars['String']['input']>;
   coverImageURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   coverImageURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  coverImageURL_EQ?: InputMaybe<Scalars['String']['input']>;
   coverImageURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   coverImageURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
   coverImageURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  endTime_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  endTime?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_GT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   endTime_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  free_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  free?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  isAllDay_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  isHostedByOP_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  isInPrivateResidence_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  isAllDay?: InputMaybe<Scalars['Boolean']['input']>;
+  isHostedByOP?: InputMaybe<Scalars['Boolean']['input']>;
+  isInPrivateResidence?: InputMaybe<Scalars['Boolean']['input']>;
+  location?: InputMaybe<PointInput>;
+  locationName?: InputMaybe<Scalars['String']['input']>;
   locationName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   locationName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  locationName_EQ?: InputMaybe<Scalars['String']['input']>;
   locationName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   locationName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   locationName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   location_DISTANCE?: InputMaybe<PointDistance>;
-  location_EQ?: InputMaybe<PointInput>;
   location_GT?: InputMaybe<PointDistance>;
   location_GTE?: InputMaybe<PointDistance>;
   location_IN?: InputMaybe<Array<InputMaybe<PointInput>>>;
   location_LT?: InputMaybe<PointDistance>;
   location_LTE?: InputMaybe<PointDistance>;
-  locked_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  placeId?: InputMaybe<Scalars['String']['input']>;
   placeId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   placeId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  placeId_EQ?: InputMaybe<Scalars['String']['input']>;
   placeId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   placeId_MATCHES?: InputMaybe<Scalars['String']['input']>;
   placeId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  startTime?: InputMaybe<Scalars['DateTime']['input']>;
+  startTimeDayOfWeek?: InputMaybe<Scalars['String']['input']>;
   startTimeDayOfWeek_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   startTimeDayOfWeek_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  startTimeDayOfWeek_EQ?: InputMaybe<Scalars['String']['input']>;
   startTimeDayOfWeek_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   startTimeDayOfWeek_MATCHES?: InputMaybe<Scalars['String']['input']>;
   startTimeDayOfWeek_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  startTimeHourOfDay_EQ?: InputMaybe<Scalars['Int']['input']>;
+  startTimeHourOfDay?: InputMaybe<Scalars['Int']['input']>;
   startTimeHourOfDay_GT?: InputMaybe<Scalars['Int']['input']>;
   startTimeHourOfDay_GTE?: InputMaybe<Scalars['Int']['input']>;
   startTimeHourOfDay_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   startTimeHourOfDay_LT?: InputMaybe<Scalars['Int']['input']>;
   startTimeHourOfDay_LTE?: InputMaybe<Scalars['Int']['input']>;
-  startTime_EQ?: InputMaybe<Scalars['DateTime']['input']>;
   startTime_GT?: InputMaybe<Scalars['DateTime']['input']>;
   startTime_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   startTime_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   startTime_LT?: InputMaybe<Scalars['DateTime']['input']>;
   startTime_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
   title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title_EQ?: InputMaybe<Scalars['String']['input']>;
   title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   title_MATCHES?: InputMaybe<Scalars['String']['input']>;
   title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  updatedAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
   updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  virtualEventUrl?: InputMaybe<Scalars['String']['input']>;
   virtualEventUrl_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   virtualEventUrl_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  virtualEventUrl_EQ?: InputMaybe<Scalars['String']['input']>;
   virtualEventUrl_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   virtualEventUrl_MATCHES?: InputMaybe<Scalars['String']['input']>;
   virtualEventUrl_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -12699,20 +12592,21 @@ export type Feed = {
 
 
 export type FeedOwnerArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type FeedOwnerAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type FeedOwnerConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<FeedOwnerConnectionSort>>;
   where?: InputMaybe<FeedOwnerConnectionWhere>;
@@ -12720,20 +12614,21 @@ export type FeedOwnerConnectionArgs = {
 
 
 export type FeedTagsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TagOptions>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type FeedTagsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type FeedTagsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<FeedTagsConnectionSort>>;
   where?: InputMaybe<FeedTagsConnectionWhere>;
@@ -12750,6 +12645,11 @@ export type FeedAggregateSelection = {
 export type FeedConnectInput = {
   Owner?: InputMaybe<FeedOwnerConnectFieldInput>;
   Tags?: InputMaybe<Array<FeedTagsConnectFieldInput>>;
+};
+
+export type FeedConnectOrCreateInput = {
+  Owner?: InputMaybe<FeedOwnerConnectOrCreateFieldInput>;
+  Tags?: InputMaybe<Array<FeedTagsConnectOrCreateFieldInput>>;
 };
 
 export type FeedConnectWhere = {
@@ -12791,7 +12691,7 @@ export type FeedOwnerAggregateInput = {
   AND?: InputMaybe<Array<FeedOwnerAggregateInput>>;
   NOT?: InputMaybe<FeedOwnerAggregateInput>;
   OR?: InputMaybe<Array<FeedOwnerAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -12801,6 +12701,8 @@ export type FeedOwnerAggregateInput = {
 
 export type FeedOwnerConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -12847,6 +12749,7 @@ export type FeedOwnerDisconnectFieldInput = {
 
 export type FeedOwnerFieldInput = {
   connect?: InputMaybe<FeedOwnerConnectFieldInput>;
+  connectOrCreate?: InputMaybe<FeedOwnerConnectOrCreateFieldInput>;
   create?: InputMaybe<FeedOwnerCreateFieldInput>;
 };
 
@@ -13061,6 +12964,11 @@ export type FeedOwnerUpdateFieldInput = {
   where?: InputMaybe<FeedOwnerConnectionWhere>;
 };
 
+export type FeedRelationInput = {
+  Owner?: InputMaybe<FeedOwnerCreateFieldInput>;
+  Tags?: InputMaybe<Array<FeedTagsCreateFieldInput>>;
+};
+
 /** Fields to sort Feeds by. The order in which sorts are applied is not guaranteed when specifying many fields in one FeedSort object. */
 export type FeedSort = {
   deleted?: InputMaybe<SortDirection>;
@@ -13084,7 +12992,7 @@ export type FeedTagsAggregateInput = {
   AND?: InputMaybe<Array<FeedTagsAggregateInput>>;
   NOT?: InputMaybe<FeedTagsAggregateInput>;
   OR?: InputMaybe<Array<FeedTagsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -13094,6 +13002,8 @@ export type FeedTagsAggregateInput = {
 
 export type FeedTagsConnectFieldInput = {
   connect?: InputMaybe<Array<TagConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TagConnectWhere>;
 };
 
@@ -13140,6 +13050,7 @@ export type FeedTagsDisconnectFieldInput = {
 
 export type FeedTagsFieldInput = {
   connect?: InputMaybe<Array<FeedTagsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<FeedTagsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<FeedTagsCreateFieldInput>>;
 };
 
@@ -13187,9 +13098,9 @@ export type FeedTagsUpdateFieldInput = {
 export type FeedUpdateInput = {
   Owner?: InputMaybe<FeedOwnerUpdateFieldInput>;
   Tags?: InputMaybe<Array<FeedTagsUpdateFieldInput>>;
-  deleted_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  title_SET?: InputMaybe<Scalars['String']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FeedUserOwnerAggregationSelection = {
@@ -13221,6 +13132,8 @@ export type FeedWhere = {
   Owner?: InputMaybe<UserWhere>;
   OwnerAggregate?: InputMaybe<FeedOwnerAggregateInput>;
   OwnerConnection?: InputMaybe<FeedOwnerConnectionWhere>;
+  OwnerConnection_NOT?: InputMaybe<FeedOwnerConnectionWhere>;
+  Owner_NOT?: InputMaybe<UserWhere>;
   TagsAggregate?: InputMaybe<FeedTagsAggregateInput>;
   /** Return Feeds where all of the related FeedTagsConnections match this filter */
   TagsConnection_ALL?: InputMaybe<FeedTagsConnectionWhere>;
@@ -13238,21 +13151,21 @@ export type FeedWhere = {
   Tags_SINGLE?: InputMaybe<TagWhere>;
   /** Return Feeds where some of the related Tags match this filter */
   Tags_SOME?: InputMaybe<TagWhere>;
-  deleted_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
   title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title_EQ?: InputMaybe<Scalars['String']['input']>;
   title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   title_MATCHES?: InputMaybe<Scalars['String']['input']>;
   title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -13293,20 +13206,21 @@ export type Image = {
 
 
 export type ImageAlbumArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AlbumSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<AlbumOptions>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type ImageAlbumAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type ImageAlbumConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ImageAlbumConnectionSort>>;
   where?: InputMaybe<ImageAlbumConnectionWhere>;
@@ -13326,7 +13240,7 @@ export type ImageAlbumAggregateInput = {
   AND?: InputMaybe<Array<ImageAlbumAggregateInput>>;
   NOT?: InputMaybe<ImageAlbumAggregateInput>;
   OR?: InputMaybe<Array<ImageAlbumAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -13347,6 +13261,8 @@ export type ImageAlbumAlbumNodeAggregateSelection = {
 
 export type ImageAlbumConnectFieldInput = {
   connect?: InputMaybe<AlbumConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<AlbumConnectWhere>;
 };
 
@@ -13391,16 +13307,6 @@ export type ImageAlbumNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<ImageAlbumNodeAggregationWhereInput>>;
   NOT?: InputMaybe<ImageAlbumNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<ImageAlbumNodeAggregationWhereInput>>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type ImageAlbumRelationship = {
@@ -13459,6 +13365,10 @@ export type ImageOptions = {
   sort?: InputMaybe<Array<ImageSort>>;
 };
 
+export type ImageRelationInput = {
+  Album?: InputMaybe<ImageAlbumCreateFieldInput>;
+};
+
 /** Fields to sort Images by. The order in which sorts are applied is not guaranteed when specifying many fields in one ImageSort object. */
 export type ImageSort = {
   alt?: InputMaybe<SortDirection>;
@@ -13470,10 +13380,10 @@ export type ImageSort = {
 
 export type ImageUpdateInput = {
   Album?: InputMaybe<ImageAlbumUpdateFieldInput>;
-  alt_SET?: InputMaybe<Scalars['String']['input']>;
-  caption_SET?: InputMaybe<Scalars['String']['input']>;
-  copyright_SET?: InputMaybe<Scalars['String']['input']>;
-  url_SET?: InputMaybe<Scalars['String']['input']>;
+  alt?: InputMaybe<Scalars['String']['input']>;
+  caption?: InputMaybe<Scalars['String']['input']>;
+  copyright?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ImageWhere = {
@@ -13481,34 +13391,36 @@ export type ImageWhere = {
   Album?: InputMaybe<AlbumWhere>;
   AlbumAggregate?: InputMaybe<ImageAlbumAggregateInput>;
   AlbumConnection?: InputMaybe<ImageAlbumConnectionWhere>;
+  AlbumConnection_NOT?: InputMaybe<ImageAlbumConnectionWhere>;
+  Album_NOT?: InputMaybe<AlbumWhere>;
   NOT?: InputMaybe<ImageWhere>;
   OR?: InputMaybe<Array<ImageWhere>>;
+  alt?: InputMaybe<Scalars['String']['input']>;
   alt_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   alt_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  alt_EQ?: InputMaybe<Scalars['String']['input']>;
   alt_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   alt_MATCHES?: InputMaybe<Scalars['String']['input']>;
   alt_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  caption?: InputMaybe<Scalars['String']['input']>;
   caption_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   caption_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  caption_EQ?: InputMaybe<Scalars['String']['input']>;
   caption_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   caption_MATCHES?: InputMaybe<Scalars['String']['input']>;
   caption_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  copyright?: InputMaybe<Scalars['String']['input']>;
   copyright_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   copyright_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  copyright_EQ?: InputMaybe<Scalars['String']['input']>;
   copyright_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   copyright_MATCHES?: InputMaybe<Scalars['String']['input']>;
   copyright_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
   url_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   url_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  url_EQ?: InputMaybe<Scalars['String']['input']>;
   url_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   url_MATCHES?: InputMaybe<Scalars['String']['input']>;
   url_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -13554,20 +13466,21 @@ export type Issue = {
 
 
 export type IssueActivityFeedArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationActionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationActionOptions>;
   where?: InputMaybe<ModerationActionWhere>;
 };
 
 
 export type IssueActivityFeedAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModerationActionWhere>;
 };
 
 
 export type IssueActivityFeedConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<IssueActivityFeedConnectionSort>>;
   where?: InputMaybe<IssueActivityFeedConnectionWhere>;
@@ -13575,34 +13488,36 @@ export type IssueActivityFeedConnectionArgs = {
 
 
 export type IssueAuthorArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<QueryOptions>;
   where?: InputMaybe<IssueAuthorWhere>;
 };
 
 
 export type IssueAuthorConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<IssueAuthorConnectionWhere>;
 };
 
 
 export type IssueChannelArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type IssueChannelAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type IssueChannelConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<IssueChannelConnectionSort>>;
   where?: InputMaybe<IssueChannelConnectionWhere>;
@@ -13612,7 +13527,7 @@ export type IssueActivityFeedAggregateInput = {
   AND?: InputMaybe<Array<IssueActivityFeedAggregateInput>>;
   NOT?: InputMaybe<IssueActivityFeedAggregateInput>;
   OR?: InputMaybe<Array<IssueActivityFeedAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -13622,6 +13537,8 @@ export type IssueActivityFeedAggregateInput = {
 
 export type IssueActivityFeedConnectFieldInput = {
   connect?: InputMaybe<Array<ModerationActionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModerationActionConnectWhere>;
 };
 
@@ -13706,16 +13623,6 @@ export type IssueActivityFeedNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type IssueActivityFeedRelationship = {
@@ -13759,6 +13666,11 @@ export type IssueAuthorConnectInput = {
   User?: InputMaybe<IssueAuthorUserConnectFieldInput>;
 };
 
+export type IssueAuthorConnectOrCreateInput = {
+  ModerationProfile?: InputMaybe<IssueAuthorModerationProfileConnectOrCreateFieldInput>;
+  User?: InputMaybe<IssueAuthorUserConnectOrCreateFieldInput>;
+};
+
 export type IssueAuthorConnection = {
   __typename?: 'IssueAuthorConnection';
   edges: Array<IssueAuthorRelationship>;
@@ -13769,6 +13681,11 @@ export type IssueAuthorConnection = {
 export type IssueAuthorConnectionWhere = {
   ModerationProfile?: InputMaybe<IssueAuthorModerationProfileConnectionWhere>;
   User?: InputMaybe<IssueAuthorUserConnectionWhere>;
+};
+
+export type IssueAuthorCreateFieldInput = {
+  ModerationProfile?: InputMaybe<IssueAuthorModerationProfileCreateFieldInput>;
+  User?: InputMaybe<IssueAuthorUserCreateFieldInput>;
 };
 
 export type IssueAuthorCreateInput = {
@@ -13823,6 +13740,7 @@ export type IssueAuthorModerationProfileDisconnectFieldInput = {
 
 export type IssueAuthorModerationProfileFieldInput = {
   connect?: InputMaybe<IssueAuthorModerationProfileConnectFieldInput>;
+  connectOrCreate?: InputMaybe<IssueAuthorModerationProfileConnectOrCreateFieldInput>;
   create?: InputMaybe<IssueAuthorModerationProfileCreateFieldInput>;
 };
 
@@ -13888,6 +13806,7 @@ export type IssueAuthorUserDisconnectFieldInput = {
 
 export type IssueAuthorUserFieldInput = {
   connect?: InputMaybe<IssueAuthorUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<IssueAuthorUserConnectOrCreateFieldInput>;
   create?: InputMaybe<IssueAuthorUserCreateFieldInput>;
 };
 
@@ -13914,7 +13833,7 @@ export type IssueChannelAggregateInput = {
   AND?: InputMaybe<Array<IssueChannelAggregateInput>>;
   NOT?: InputMaybe<IssueChannelAggregateInput>;
   OR?: InputMaybe<Array<IssueChannelAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -13940,6 +13859,8 @@ export type IssueChannelChannelNodeAggregateSelection = {
 
 export type IssueChannelConnectFieldInput = {
   connect?: InputMaybe<ChannelConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -13986,6 +13907,7 @@ export type IssueChannelDisconnectFieldInput = {
 
 export type IssueChannelFieldInput = {
   connect?: InputMaybe<IssueChannelConnectFieldInput>;
+  connectOrCreate?: InputMaybe<IssueChannelConnectOrCreateFieldInput>;
   create?: InputMaybe<IssueChannelCreateFieldInput>;
 };
 
@@ -14113,6 +14035,11 @@ export type IssueConnectInput = {
   Channel?: InputMaybe<IssueChannelConnectFieldInput>;
 };
 
+export type IssueConnectOrCreateInput = {
+  Author?: InputMaybe<IssueAuthorConnectOrCreateInput>;
+  Channel?: InputMaybe<IssueChannelConnectOrCreateFieldInput>;
+};
+
 export type IssueConnectWhere = {
   node: IssueWhere;
 };
@@ -14171,6 +14098,12 @@ export type IssueOptions = {
   sort?: InputMaybe<Array<IssueSort>>;
 };
 
+export type IssueRelationInput = {
+  ActivityFeed?: InputMaybe<Array<IssueActivityFeedCreateFieldInput>>;
+  Author?: InputMaybe<IssueAuthorCreateFieldInput>;
+  Channel?: InputMaybe<IssueChannelCreateFieldInput>;
+};
+
 /** Fields to sort Issues by. The order in which sorts are applied is not guaranteed when specifying many fields in one IssueSort object. */
 export type IssueSort = {
   authorName?: InputMaybe<SortDirection>;
@@ -14190,15 +14123,15 @@ export type IssueUpdateInput = {
   ActivityFeed?: InputMaybe<Array<IssueActivityFeedUpdateFieldInput>>;
   Author?: InputMaybe<IssueAuthorUpdateInput>;
   Channel?: InputMaybe<IssueChannelUpdateFieldInput>;
-  authorName_SET?: InputMaybe<Scalars['String']['input']>;
-  body_SET?: InputMaybe<Scalars['String']['input']>;
-  channelUniqueName_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  isOpen_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  relatedCommentId_SET?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_SET?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_SET?: InputMaybe<Scalars['ID']['input']>;
-  title_SET?: InputMaybe<Scalars['String']['input']>;
+  authorName?: InputMaybe<Scalars['String']['input']>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type IssueWhere = {
@@ -14222,63 +14155,67 @@ export type IssueWhere = {
   ActivityFeed_SOME?: InputMaybe<ModerationActionWhere>;
   Author?: InputMaybe<IssueAuthorWhere>;
   AuthorConnection?: InputMaybe<IssueAuthorConnectionWhere>;
+  AuthorConnection_NOT?: InputMaybe<IssueAuthorConnectionWhere>;
+  Author_NOT?: InputMaybe<IssueAuthorWhere>;
   Channel?: InputMaybe<ChannelWhere>;
   ChannelAggregate?: InputMaybe<IssueChannelAggregateInput>;
   ChannelConnection?: InputMaybe<IssueChannelConnectionWhere>;
+  ChannelConnection_NOT?: InputMaybe<IssueChannelConnectionWhere>;
+  Channel_NOT?: InputMaybe<ChannelWhere>;
   NOT?: InputMaybe<IssueWhere>;
   OR?: InputMaybe<Array<IssueWhere>>;
+  authorName?: InputMaybe<Scalars['String']['input']>;
   authorName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   authorName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  authorName_EQ?: InputMaybe<Scalars['String']['input']>;
   authorName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   authorName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   authorName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body?: InputMaybe<Scalars['String']['input']>;
   body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  body_EQ?: InputMaybe<Scalars['String']['input']>;
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   body_MATCHES?: InputMaybe<Scalars['String']['input']>;
   body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelUniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  isOpen_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_EQ?: InputMaybe<Scalars['ID']['input']>;
   relatedCommentId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   relatedCommentId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_EQ?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   relatedDiscussionId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
   relatedEventId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   relatedEventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_EQ?: InputMaybe<Scalars['ID']['input']>;
   relatedEventId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
   relatedEventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
   title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  title_EQ?: InputMaybe<Scalars['String']['input']>;
   title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   title_MATCHES?: InputMaybe<Scalars['String']['input']>;
   title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  updatedAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
@@ -14335,30 +14272,30 @@ export type LinkFlairSort = {
 };
 
 export type LinkFlairUpdateInput = {
-  cssClass_SET?: InputMaybe<Scalars['String']['input']>;
-  id_SET?: InputMaybe<Scalars['String']['input']>;
-  text_SET?: InputMaybe<Scalars['String']['input']>;
+  cssClass?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type LinkFlairWhere = {
   AND?: InputMaybe<Array<LinkFlairWhere>>;
   NOT?: InputMaybe<LinkFlairWhere>;
   OR?: InputMaybe<Array<LinkFlairWhere>>;
+  cssClass?: InputMaybe<Scalars['String']['input']>;
   cssClass_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   cssClass_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  cssClass_EQ?: InputMaybe<Scalars['String']['input']>;
   cssClass_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   cssClass_MATCHES?: InputMaybe<Scalars['String']['input']>;
   cssClass_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  id_EQ?: InputMaybe<Scalars['String']['input']>;
   id_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   id_MATCHES?: InputMaybe<Scalars['String']['input']>;
   id_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
   text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  text_EQ?: InputMaybe<Scalars['String']['input']>;
   text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   text_MATCHES?: InputMaybe<Scalars['String']['input']>;
   text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -14455,48 +14392,48 @@ export type ModChannelRoleSort = {
 };
 
 export type ModChannelRoleUniqueWhere = {
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModChannelRoleUpdateInput = {
-  canCloseSupportTickets_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canGiveFeedback_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canHideComment_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canHideDiscussion_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canHideEvent_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canOpenSupportTickets_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canReport_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  channelUniqueName_SET?: InputMaybe<Scalars['String']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  name_SET?: InputMaybe<Scalars['String']['input']>;
+  canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canReport?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModChannelRoleWhere = {
   AND?: InputMaybe<Array<ModChannelRoleWhere>>;
   NOT?: InputMaybe<ModChannelRoleWhere>;
   OR?: InputMaybe<Array<ModChannelRoleWhere>>;
-  canCloseSupportTickets_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canGiveFeedback_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canHideComment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canHideDiscussion_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canHideEvent_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canOpenSupportTickets_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canReport_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canReport?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  channelUniqueName_EQ?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -14576,35 +14513,35 @@ export type ModServerRoleSort = {
 };
 
 export type ModServerRoleUniqueWhere = {
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModServerRoleUpdateInput = {
-  canCloseSupportTickets_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canGiveFeedback_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canLockChannel_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canOpenSupportTickets_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  name_SET?: InputMaybe<Scalars['String']['input']>;
+  canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModServerRoleWhere = {
   AND?: InputMaybe<Array<ModServerRoleWhere>>;
   NOT?: InputMaybe<ModServerRoleWhere>;
   OR?: InputMaybe<Array<ModServerRoleWhere>>;
-  canCloseSupportTickets_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canGiveFeedback_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canLockChannel_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canOpenSupportTickets_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -14633,20 +14570,21 @@ export type ModerationAction = {
 
 
 export type ModerationActionCommentArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type ModerationActionCommentAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type ModerationActionCommentConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationActionCommentConnectionSort>>;
   where?: InputMaybe<ModerationActionCommentConnectionWhere>;
@@ -14654,20 +14592,21 @@ export type ModerationActionCommentConnectionArgs = {
 
 
 export type ModerationActionModerationProfileArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationProfileSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationProfileOptions>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type ModerationActionModerationProfileAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type ModerationActionModerationProfileConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationActionModerationProfileConnectionSort>>;
   where?: InputMaybe<ModerationActionModerationProfileConnectionWhere>;
@@ -14686,7 +14625,7 @@ export type ModerationActionCommentAggregateInput = {
   AND?: InputMaybe<Array<ModerationActionCommentAggregateInput>>;
   NOT?: InputMaybe<ModerationActionCommentAggregateInput>;
   OR?: InputMaybe<Array<ModerationActionCommentAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -14711,6 +14650,8 @@ export type ModerationActionCommentCommentNodeAggregateSelection = {
 
 export type ModerationActionCommentConnectFieldInput = {
   connect?: InputMaybe<CommentConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -14765,16 +14706,6 @@ export type ModerationActionCommentNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -14846,6 +14777,10 @@ export type ModerationActionConnectInput = {
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileConnectFieldInput>;
 };
 
+export type ModerationActionConnectOrCreateInput = {
+  ModerationProfile?: InputMaybe<ModerationActionModerationProfileConnectOrCreateFieldInput>;
+};
+
 export type ModerationActionConnectWhere = {
   node: ModerationActionWhere;
 };
@@ -14877,7 +14812,7 @@ export type ModerationActionModerationProfileAggregateInput = {
   AND?: InputMaybe<Array<ModerationActionModerationProfileAggregateInput>>;
   NOT?: InputMaybe<ModerationActionModerationProfileAggregateInput>;
   OR?: InputMaybe<Array<ModerationActionModerationProfileAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -14887,6 +14822,8 @@ export type ModerationActionModerationProfileAggregateInput = {
 
 export type ModerationActionModerationProfileConnectFieldInput = {
   connect?: InputMaybe<ModerationProfileConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModerationProfileConnectWhere>;
 };
 
@@ -14933,6 +14870,7 @@ export type ModerationActionModerationProfileDisconnectFieldInput = {
 
 export type ModerationActionModerationProfileFieldInput = {
   connect?: InputMaybe<ModerationActionModerationProfileConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ModerationActionModerationProfileConnectOrCreateFieldInput>;
   create?: InputMaybe<ModerationActionModerationProfileCreateFieldInput>;
 };
 
@@ -15006,6 +14944,11 @@ export type ModerationActionOptions = {
   sort?: InputMaybe<Array<ModerationActionSort>>;
 };
 
+export type ModerationActionRelationInput = {
+  Comment?: InputMaybe<ModerationActionCommentCreateFieldInput>;
+  ModerationProfile?: InputMaybe<ModerationActionModerationProfileCreateFieldInput>;
+};
+
 /** Fields to sort ModerationActions by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModerationActionSort object. */
 export type ModerationActionSort = {
   actionDescription?: InputMaybe<SortDirection>;
@@ -15017,9 +14960,9 @@ export type ModerationActionSort = {
 export type ModerationActionUpdateInput = {
   Comment?: InputMaybe<ModerationActionCommentUpdateFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileUpdateFieldInput>;
-  actionDescription_SET?: InputMaybe<Scalars['String']['input']>;
-  actionType_SET?: InputMaybe<Scalars['String']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type ModerationActionWhere = {
@@ -15027,32 +14970,36 @@ export type ModerationActionWhere = {
   Comment?: InputMaybe<CommentWhere>;
   CommentAggregate?: InputMaybe<ModerationActionCommentAggregateInput>;
   CommentConnection?: InputMaybe<ModerationActionCommentConnectionWhere>;
+  CommentConnection_NOT?: InputMaybe<ModerationActionCommentConnectionWhere>;
+  Comment_NOT?: InputMaybe<CommentWhere>;
   ModerationProfile?: InputMaybe<ModerationProfileWhere>;
   ModerationProfileAggregate?: InputMaybe<ModerationActionModerationProfileAggregateInput>;
   ModerationProfileConnection?: InputMaybe<ModerationActionModerationProfileConnectionWhere>;
+  ModerationProfileConnection_NOT?: InputMaybe<ModerationActionModerationProfileConnectionWhere>;
+  ModerationProfile_NOT?: InputMaybe<ModerationProfileWhere>;
   NOT?: InputMaybe<ModerationActionWhere>;
   OR?: InputMaybe<Array<ModerationActionWhere>>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
   actionDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   actionDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  actionDescription_EQ?: InputMaybe<Scalars['String']['input']>;
   actionDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   actionDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
   actionDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
   actionType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   actionType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  actionType_EQ?: InputMaybe<Scalars['String']['input']>;
   actionType_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   actionType_MATCHES?: InputMaybe<Scalars['String']['input']>;
   actionType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -15090,20 +15037,21 @@ export type ModerationProfile = {
 
 
 export type ModerationProfileActivityFeedArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationActionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationActionOptions>;
   where?: InputMaybe<ModerationActionWhere>;
 };
 
 
 export type ModerationProfileActivityFeedAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModerationActionWhere>;
 };
 
 
 export type ModerationProfileActivityFeedConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationProfileActivityFeedConnectionSort>>;
   where?: InputMaybe<ModerationProfileActivityFeedConnectionWhere>;
@@ -15111,20 +15059,21 @@ export type ModerationProfileActivityFeedConnectionArgs = {
 
 
 export type ModerationProfileAuthoredCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type ModerationProfileAuthoredCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type ModerationProfileAuthoredCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationProfileAuthoredCommentsConnectionSort>>;
   where?: InputMaybe<ModerationProfileAuthoredCommentsConnectionWhere>;
@@ -15132,20 +15081,21 @@ export type ModerationProfileAuthoredCommentsConnectionArgs = {
 
 
 export type ModerationProfileAuthoredIssuesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type ModerationProfileAuthoredIssuesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type ModerationProfileAuthoredIssuesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationProfileAuthoredIssuesConnectionSort>>;
   where?: InputMaybe<ModerationProfileAuthoredIssuesConnectionWhere>;
@@ -15153,20 +15103,21 @@ export type ModerationProfileAuthoredIssuesConnectionArgs = {
 
 
 export type ModerationProfileModChannelRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModChannelRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModChannelRoleOptions>;
   where?: InputMaybe<ModChannelRoleWhere>;
 };
 
 
 export type ModerationProfileModChannelRolesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModChannelRoleWhere>;
 };
 
 
 export type ModerationProfileModChannelRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationProfileModChannelRolesConnectionSort>>;
   where?: InputMaybe<ModerationProfileModChannelRolesConnectionWhere>;
@@ -15174,20 +15125,21 @@ export type ModerationProfileModChannelRolesConnectionArgs = {
 
 
 export type ModerationProfileModServerRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModServerRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModServerRoleOptions>;
   where?: InputMaybe<ModServerRoleWhere>;
 };
 
 
 export type ModerationProfileModServerRolesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModServerRoleWhere>;
 };
 
 
 export type ModerationProfileModServerRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationProfileModServerRolesConnectionSort>>;
   where?: InputMaybe<ModerationProfileModServerRolesConnectionWhere>;
@@ -15195,20 +15147,21 @@ export type ModerationProfileModServerRolesConnectionArgs = {
 
 
 export type ModerationProfileUserArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type ModerationProfileUserAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type ModerationProfileUserConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ModerationProfileUserConnectionSort>>;
   where?: InputMaybe<ModerationProfileUserConnectionWhere>;
@@ -15218,7 +15171,7 @@ export type ModerationProfileActivityFeedAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileActivityFeedAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileActivityFeedAggregateInput>;
   OR?: InputMaybe<Array<ModerationProfileActivityFeedAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -15228,6 +15181,8 @@ export type ModerationProfileActivityFeedAggregateInput = {
 
 export type ModerationProfileActivityFeedConnectFieldInput = {
   connect?: InputMaybe<Array<ModerationActionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModerationActionConnectWhere>;
 };
 
@@ -15312,16 +15267,6 @@ export type ModerationProfileActivityFeedNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type ModerationProfileActivityFeedRelationship = {
@@ -15354,7 +15299,7 @@ export type ModerationProfileAuthoredCommentsAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileAuthoredCommentsAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileAuthoredCommentsAggregateInput>;
   OR?: InputMaybe<Array<ModerationProfileAuthoredCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -15364,6 +15309,8 @@ export type ModerationProfileAuthoredCommentsAggregateInput = {
 
 export type ModerationProfileAuthoredCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -15418,16 +15365,6 @@ export type ModerationProfileAuthoredCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -15498,7 +15435,7 @@ export type ModerationProfileAuthoredIssuesAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileAuthoredIssuesAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileAuthoredIssuesAggregateInput>;
   OR?: InputMaybe<Array<ModerationProfileAuthoredIssuesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -15508,6 +15445,8 @@ export type ModerationProfileAuthoredIssuesAggregateInput = {
 
 export type ModerationProfileAuthoredIssuesConnectFieldInput = {
   connect?: InputMaybe<Array<IssueConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
 };
 
@@ -15607,46 +15546,6 @@ export type ModerationProfileAuthoredIssuesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -15715,6 +15614,12 @@ export type ModerationProfileConnectInput = {
   ModChannelRoles?: InputMaybe<Array<ModerationProfileModChannelRolesConnectFieldInput>>;
   ModServerRoles?: InputMaybe<Array<ModerationProfileModServerRolesConnectFieldInput>>;
   User?: InputMaybe<ModerationProfileUserConnectFieldInput>;
+};
+
+export type ModerationProfileConnectOrCreateInput = {
+  ModChannelRoles?: InputMaybe<Array<ModerationProfileModChannelRolesConnectOrCreateFieldInput>>;
+  ModServerRoles?: InputMaybe<Array<ModerationProfileModServerRolesConnectOrCreateFieldInput>>;
+  User?: InputMaybe<ModerationProfileUserConnectOrCreateFieldInput>;
 };
 
 export type ModerationProfileConnectOrCreateWhere = {
@@ -15796,7 +15701,7 @@ export type ModerationProfileModChannelRolesAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileModChannelRolesAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileModChannelRolesAggregateInput>;
   OR?: InputMaybe<Array<ModerationProfileModChannelRolesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -15805,6 +15710,8 @@ export type ModerationProfileModChannelRolesAggregateInput = {
 };
 
 export type ModerationProfileModChannelRolesConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModChannelRoleConnectWhere>;
 };
 
@@ -15849,6 +15756,7 @@ export type ModerationProfileModChannelRolesDisconnectFieldInput = {
 
 export type ModerationProfileModChannelRolesFieldInput = {
   connect?: InputMaybe<Array<ModerationProfileModChannelRolesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ModerationProfileModChannelRolesConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<ModerationProfileModChannelRolesCreateFieldInput>>;
 };
 
@@ -15939,7 +15847,7 @@ export type ModerationProfileModServerRolesAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileModServerRolesAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileModServerRolesAggregateInput>;
   OR?: InputMaybe<Array<ModerationProfileModServerRolesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -15948,6 +15856,8 @@ export type ModerationProfileModServerRolesAggregateInput = {
 };
 
 export type ModerationProfileModServerRolesConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModServerRoleConnectWhere>;
 };
 
@@ -15992,6 +15902,7 @@ export type ModerationProfileModServerRolesDisconnectFieldInput = {
 
 export type ModerationProfileModServerRolesFieldInput = {
   connect?: InputMaybe<Array<ModerationProfileModServerRolesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ModerationProfileModServerRolesConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<ModerationProfileModServerRolesCreateFieldInput>>;
 };
 
@@ -16076,6 +15987,15 @@ export type ModerationProfileOptions = {
   sort?: InputMaybe<Array<ModerationProfileSort>>;
 };
 
+export type ModerationProfileRelationInput = {
+  ActivityFeed?: InputMaybe<Array<ModerationProfileActivityFeedCreateFieldInput>>;
+  AuthoredComments?: InputMaybe<Array<ModerationProfileAuthoredCommentsCreateFieldInput>>;
+  AuthoredIssues?: InputMaybe<Array<ModerationProfileAuthoredIssuesCreateFieldInput>>;
+  ModChannelRoles?: InputMaybe<Array<ModerationProfileModChannelRolesCreateFieldInput>>;
+  ModServerRoles?: InputMaybe<Array<ModerationProfileModServerRolesCreateFieldInput>>;
+  User?: InputMaybe<ModerationProfileUserCreateFieldInput>;
+};
+
 /** Fields to sort ModerationProfiles by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModerationProfileSort object. */
 export type ModerationProfileSort = {
   createdAt?: InputMaybe<SortDirection>;
@@ -16083,7 +16003,7 @@ export type ModerationProfileSort = {
 };
 
 export type ModerationProfileUniqueWhere = {
-  displayName_EQ?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModerationProfileUpdateInput = {
@@ -16093,15 +16013,15 @@ export type ModerationProfileUpdateInput = {
   ModChannelRoles?: InputMaybe<Array<ModerationProfileModChannelRolesUpdateFieldInput>>;
   ModServerRoles?: InputMaybe<Array<ModerationProfileModServerRolesUpdateFieldInput>>;
   User?: InputMaybe<ModerationProfileUserUpdateFieldInput>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  displayName_SET?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModerationProfileUserAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileUserAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileUserAggregateInput>;
   OR?: InputMaybe<Array<ModerationProfileUserAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -16111,6 +16031,8 @@ export type ModerationProfileUserAggregateInput = {
 
 export type ModerationProfileUserConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -16157,6 +16079,7 @@ export type ModerationProfileUserDisconnectFieldInput = {
 
 export type ModerationProfileUserFieldInput = {
   connect?: InputMaybe<ModerationProfileUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ModerationProfileUserConnectOrCreateFieldInput>;
   create?: InputMaybe<ModerationProfileUserCreateFieldInput>;
 };
 
@@ -16485,15 +16408,17 @@ export type ModerationProfileWhere = {
   User?: InputMaybe<UserWhere>;
   UserAggregate?: InputMaybe<ModerationProfileUserAggregateInput>;
   UserConnection?: InputMaybe<ModerationProfileUserConnectionWhere>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  UserConnection_NOT?: InputMaybe<ModerationProfileUserConnectionWhere>;
+  User_NOT?: InputMaybe<UserWhere>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
   displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  displayName_EQ?: InputMaybe<Scalars['String']['input']>;
   displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -17433,9 +17358,7 @@ export type Query = {
 
 
 export type QueryAlbumsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AlbumSort>>;
+  options?: InputMaybe<AlbumOptions>;
   where?: InputMaybe<AlbumWhere>;
 };
 
@@ -17448,15 +17371,13 @@ export type QueryAlbumsAggregateArgs = {
 export type QueryAlbumsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AlbumSort>>;
+  sort?: InputMaybe<Array<InputMaybe<AlbumSort>>>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type QueryChannelRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelRoleSort>>;
+  options?: InputMaybe<ChannelRoleOptions>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
@@ -17469,15 +17390,13 @@ export type QueryChannelRolesAggregateArgs = {
 export type QueryChannelRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelRoleSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ChannelRoleSort>>>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type QueryChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
@@ -17490,22 +17409,19 @@ export type QueryChannelsAggregateArgs = {
 export type QueryChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ChannelSort>>>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type QueryCommentAuthorsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<QueryOptions>;
   where?: InputMaybe<CommentAuthorWhere>;
 };
 
 
 export type QueryCommentRepliesFormatsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentRepliesFormatSort>>;
+  options?: InputMaybe<CommentRepliesFormatOptions>;
   where?: InputMaybe<CommentRepliesFormatWhere>;
 };
 
@@ -17518,14 +17434,13 @@ export type QueryCommentRepliesFormatsAggregateArgs = {
 export type QueryCommentRepliesFormatsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentRepliesFormatSort>>;
+  sort?: InputMaybe<Array<InputMaybe<CommentRepliesFormatSort>>>;
   where?: InputMaybe<CommentRepliesFormatWhere>;
 };
 
 
 export type QueryCommentSectionFormatsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<CommentSectionFormatOptions>;
   where?: InputMaybe<CommentSectionFormatWhere>;
 };
 
@@ -17543,9 +17458,7 @@ export type QueryCommentSectionFormatsConnectionArgs = {
 
 
 export type QueryCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
@@ -17558,15 +17471,13 @@ export type QueryCommentsAggregateArgs = {
 export type QueryCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  sort?: InputMaybe<Array<InputMaybe<CommentSort>>>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type QueryDiscussionChannelListFormatsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelListFormatSort>>;
+  options?: InputMaybe<DiscussionChannelListFormatOptions>;
   where?: InputMaybe<DiscussionChannelListFormatWhere>;
 };
 
@@ -17579,15 +17490,13 @@ export type QueryDiscussionChannelListFormatsAggregateArgs = {
 export type QueryDiscussionChannelListFormatsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelListFormatSort>>;
+  sort?: InputMaybe<Array<InputMaybe<DiscussionChannelListFormatSort>>>;
   where?: InputMaybe<DiscussionChannelListFormatWhere>;
 };
 
 
 export type QueryDiscussionChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelSort>>;
+  options?: InputMaybe<DiscussionChannelOptions>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
@@ -17600,15 +17509,13 @@ export type QueryDiscussionChannelsAggregateArgs = {
 export type QueryDiscussionChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelSort>>;
+  sort?: InputMaybe<Array<InputMaybe<DiscussionChannelSort>>>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type QueryDiscussionsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  options?: InputMaybe<DiscussionOptions>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
@@ -17621,15 +17528,13 @@ export type QueryDiscussionsAggregateArgs = {
 export type QueryDiscussionsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  sort?: InputMaybe<Array<InputMaybe<DiscussionSort>>>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type QueryDropDataResponsesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DropDataResponseSort>>;
+  options?: InputMaybe<DropDataResponseOptions>;
   where?: InputMaybe<DropDataResponseWhere>;
 };
 
@@ -17642,15 +17547,13 @@ export type QueryDropDataResponsesAggregateArgs = {
 export type QueryDropDataResponsesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DropDataResponseSort>>;
+  sort?: InputMaybe<Array<InputMaybe<DropDataResponseSort>>>;
   where?: InputMaybe<DropDataResponseWhere>;
 };
 
 
 export type QueryEmailsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EmailSort>>;
+  options?: InputMaybe<EmailOptions>;
   where?: InputMaybe<EmailWhere>;
 };
 
@@ -17663,15 +17566,13 @@ export type QueryEmailsAggregateArgs = {
 export type QueryEmailsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EmailSort>>;
+  sort?: InputMaybe<Array<InputMaybe<EmailSort>>>;
   where?: InputMaybe<EmailWhere>;
 };
 
 
 export type QueryEmojisArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EmojiSort>>;
+  options?: InputMaybe<EmojiOptions>;
   where?: InputMaybe<EmojiWhere>;
 };
 
@@ -17684,15 +17585,13 @@ export type QueryEmojisAggregateArgs = {
 export type QueryEmojisConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EmojiSort>>;
+  sort?: InputMaybe<Array<InputMaybe<EmojiSort>>>;
   where?: InputMaybe<EmojiWhere>;
 };
 
 
 export type QueryEnvironmentInfosArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EnvironmentInfoSort>>;
+  options?: InputMaybe<EnvironmentInfoOptions>;
   where?: InputMaybe<EnvironmentInfoWhere>;
 };
 
@@ -17705,15 +17604,13 @@ export type QueryEnvironmentInfosAggregateArgs = {
 export type QueryEnvironmentInfosConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EnvironmentInfoSort>>;
+  sort?: InputMaybe<Array<InputMaybe<EnvironmentInfoSort>>>;
   where?: InputMaybe<EnvironmentInfoWhere>;
 };
 
 
 export type QueryEventChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventChannelSort>>;
+  options?: InputMaybe<EventChannelOptions>;
   where?: InputMaybe<EventChannelWhere>;
 };
 
@@ -17726,14 +17623,13 @@ export type QueryEventChannelsAggregateArgs = {
 export type QueryEventChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventChannelSort>>;
+  sort?: InputMaybe<Array<InputMaybe<EventChannelSort>>>;
   where?: InputMaybe<EventChannelWhere>;
 };
 
 
 export type QueryEventCommentsFormatsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<EventCommentsFormatOptions>;
   where?: InputMaybe<EventCommentsFormatWhere>;
 };
 
@@ -17751,9 +17647,7 @@ export type QueryEventCommentsFormatsConnectionArgs = {
 
 
 export type QueryEventsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
@@ -17766,15 +17660,13 @@ export type QueryEventsAggregateArgs = {
 export type QueryEventsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  sort?: InputMaybe<Array<InputMaybe<EventSort>>>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type QueryFeedsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<FeedSort>>;
+  options?: InputMaybe<FeedOptions>;
   where?: InputMaybe<FeedWhere>;
 };
 
@@ -17787,7 +17679,7 @@ export type QueryFeedsAggregateArgs = {
 export type QueryFeedsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<FeedSort>>;
+  sort?: InputMaybe<Array<InputMaybe<FeedSort>>>;
   where?: InputMaybe<FeedWhere>;
 };
 
@@ -17836,9 +17728,7 @@ export type QueryGetSiteWideDiscussionListArgs = {
 
 
 export type QueryImagesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ImageSort>>;
+  options?: InputMaybe<ImageOptions>;
   where?: InputMaybe<ImageWhere>;
 };
 
@@ -17851,29 +17741,25 @@ export type QueryImagesAggregateArgs = {
 export type QueryImagesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ImageSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ImageSort>>>;
   where?: InputMaybe<ImageWhere>;
 };
 
 
 export type QueryIssueAuthorsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<QueryOptions>;
   where?: InputMaybe<IssueAuthorWhere>;
 };
 
 
 export type QueryIssueCommentAuthorsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<QueryOptions>;
   where?: InputMaybe<IssueCommentAuthorWhere>;
 };
 
 
 export type QueryIssuesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
@@ -17886,15 +17772,13 @@ export type QueryIssuesAggregateArgs = {
 export type QueryIssuesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  sort?: InputMaybe<Array<InputMaybe<IssueSort>>>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type QueryLinkFlairsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<LinkFlairSort>>;
+  options?: InputMaybe<LinkFlairOptions>;
   where?: InputMaybe<LinkFlairWhere>;
 };
 
@@ -17907,15 +17791,13 @@ export type QueryLinkFlairsAggregateArgs = {
 export type QueryLinkFlairsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<LinkFlairSort>>;
+  sort?: InputMaybe<Array<InputMaybe<LinkFlairSort>>>;
   where?: InputMaybe<LinkFlairWhere>;
 };
 
 
 export type QueryModChannelRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModChannelRoleSort>>;
+  options?: InputMaybe<ModChannelRoleOptions>;
   where?: InputMaybe<ModChannelRoleWhere>;
 };
 
@@ -17928,15 +17810,13 @@ export type QueryModChannelRolesAggregateArgs = {
 export type QueryModChannelRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModChannelRoleSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ModChannelRoleSort>>>;
   where?: InputMaybe<ModChannelRoleWhere>;
 };
 
 
 export type QueryModServerRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModServerRoleSort>>;
+  options?: InputMaybe<ModServerRoleOptions>;
   where?: InputMaybe<ModServerRoleWhere>;
 };
 
@@ -17949,15 +17829,13 @@ export type QueryModServerRolesAggregateArgs = {
 export type QueryModServerRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModServerRoleSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ModServerRoleSort>>>;
   where?: InputMaybe<ModServerRoleWhere>;
 };
 
 
 export type QueryModerationActionsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationActionSort>>;
+  options?: InputMaybe<ModerationActionOptions>;
   where?: InputMaybe<ModerationActionWhere>;
 };
 
@@ -17970,15 +17848,13 @@ export type QueryModerationActionsAggregateArgs = {
 export type QueryModerationActionsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationActionSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ModerationActionSort>>>;
   where?: InputMaybe<ModerationActionWhere>;
 };
 
 
 export type QueryModerationProfilesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationProfileSort>>;
+  options?: InputMaybe<ModerationProfileOptions>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
@@ -17991,15 +17867,13 @@ export type QueryModerationProfilesAggregateArgs = {
 export type QueryModerationProfilesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationProfileSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ModerationProfileSort>>>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type QueryRecurringEventsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RecurringEventSort>>;
+  options?: InputMaybe<RecurringEventOptions>;
   where?: InputMaybe<RecurringEventWhere>;
 };
 
@@ -18012,15 +17886,13 @@ export type QueryRecurringEventsAggregateArgs = {
 export type QueryRecurringEventsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RecurringEventSort>>;
+  sort?: InputMaybe<Array<InputMaybe<RecurringEventSort>>>;
   where?: InputMaybe<RecurringEventWhere>;
 };
 
 
 export type QueryRepeatEndsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RepeatEndsSort>>;
+  options?: InputMaybe<RepeatEndsOptions>;
   where?: InputMaybe<RepeatEndsWhere>;
 };
 
@@ -18033,15 +17905,13 @@ export type QueryRepeatEndsAggregateArgs = {
 export type QueryRepeatEndsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RepeatEndsSort>>;
+  sort?: InputMaybe<Array<InputMaybe<RepeatEndsSort>>>;
   where?: InputMaybe<RepeatEndsWhere>;
 };
 
 
 export type QueryRepeatEveriesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RepeatEverySort>>;
+  options?: InputMaybe<RepeatEveryOptions>;
   where?: InputMaybe<RepeatEveryWhere>;
 };
 
@@ -18054,14 +17924,13 @@ export type QueryRepeatEveriesAggregateArgs = {
 export type QueryRepeatEveriesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<RepeatEverySort>>;
+  sort?: InputMaybe<Array<InputMaybe<RepeatEverySort>>>;
   where?: InputMaybe<RepeatEveryWhere>;
 };
 
 
 export type QuerySafetyCheckResponsesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  options?: InputMaybe<SafetyCheckResponseOptions>;
   where?: InputMaybe<SafetyCheckResponseWhere>;
 };
 
@@ -18079,9 +17948,7 @@ export type QuerySafetyCheckResponsesConnectionArgs = {
 
 
 export type QueryServerConfigsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ServerConfigSort>>;
+  options?: InputMaybe<ServerConfigOptions>;
   where?: InputMaybe<ServerConfigWhere>;
 };
 
@@ -18094,15 +17961,13 @@ export type QueryServerConfigsAggregateArgs = {
 export type QueryServerConfigsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ServerConfigSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ServerConfigSort>>>;
   where?: InputMaybe<ServerConfigWhere>;
 };
 
 
 export type QueryServerRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ServerRoleSort>>;
+  options?: InputMaybe<ServerRoleOptions>;
   where?: InputMaybe<ServerRoleWhere>;
 };
 
@@ -18115,15 +17980,13 @@ export type QueryServerRolesAggregateArgs = {
 export type QueryServerRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ServerRoleSort>>;
+  sort?: InputMaybe<Array<InputMaybe<ServerRoleSort>>>;
   where?: InputMaybe<ServerRoleWhere>;
 };
 
 
 export type QuerySignedUrlsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SignedUrlSort>>;
+  options?: InputMaybe<SignedUrlOptions>;
   where?: InputMaybe<SignedUrlWhere>;
 };
 
@@ -18136,15 +17999,13 @@ export type QuerySignedUrlsAggregateArgs = {
 export type QuerySignedUrlsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SignedUrlSort>>;
+  sort?: InputMaybe<Array<InputMaybe<SignedUrlSort>>>;
   where?: InputMaybe<SignedUrlWhere>;
 };
 
 
 export type QuerySiteWideDiscussionListFormatsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SiteWideDiscussionListFormatSort>>;
+  options?: InputMaybe<SiteWideDiscussionListFormatOptions>;
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
 };
 
@@ -18157,15 +18018,13 @@ export type QuerySiteWideDiscussionListFormatsAggregateArgs = {
 export type QuerySiteWideDiscussionListFormatsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<SiteWideDiscussionListFormatSort>>;
+  sort?: InputMaybe<Array<InputMaybe<SiteWideDiscussionListFormatSort>>>;
   where?: InputMaybe<SiteWideDiscussionListFormatWhere>;
 };
 
 
 export type QueryTagsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  options?: InputMaybe<TagOptions>;
   where?: InputMaybe<TagWhere>;
 };
 
@@ -18178,15 +18037,13 @@ export type QueryTagsAggregateArgs = {
 export type QueryTagsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<TagSort>>;
+  sort?: InputMaybe<Array<InputMaybe<TagSort>>>;
   where?: InputMaybe<TagWhere>;
 };
 
 
 export type QueryUsersArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
@@ -18199,7 +18056,7 @@ export type QueryUsersAggregateArgs = {
 export type QueryUsersConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  sort?: InputMaybe<Array<InputMaybe<UserSort>>>;
   where?: InputMaybe<UserWhere>;
 };
 
@@ -18221,20 +18078,21 @@ export type RecurringEvent = {
 
 
 export type RecurringEventEventsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type RecurringEventEventsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type RecurringEventEventsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<RecurringEventEventsConnectionSort>>;
   where?: InputMaybe<RecurringEventEventsConnectionWhere>;
@@ -18301,7 +18159,7 @@ export type RecurringEventEventsAggregateInput = {
   AND?: InputMaybe<Array<RecurringEventEventsAggregateInput>>;
   NOT?: InputMaybe<RecurringEventEventsAggregateInput>;
   OR?: InputMaybe<Array<RecurringEventEventsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -18311,6 +18169,8 @@ export type RecurringEventEventsAggregateInput = {
 
 export type RecurringEventEventsConnectFieldInput = {
   connect?: InputMaybe<Array<EventConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
 };
 
@@ -18435,16 +18295,6 @@ export type RecurringEventEventsNodeAggregationWhereInput = {
   endTime_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   locationName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -18588,6 +18438,10 @@ export type RecurringEventOptions = {
   sort?: InputMaybe<Array<RecurringEventSort>>;
 };
 
+export type RecurringEventRelationInput = {
+  Events?: InputMaybe<Array<RecurringEventEventsCreateFieldInput>>;
+};
+
 /** Fields to sort RecurringEvents by. The order in which sorts are applied is not guaranteed when specifying many fields in one RecurringEventSort object. */
 export type RecurringEventSort = {
   id?: InputMaybe<SortDirection>;
@@ -18618,9 +18472,9 @@ export type RecurringEventWhere = {
   Events_SOME?: InputMaybe<EventWhere>;
   NOT?: InputMaybe<RecurringEventWhere>;
   OR?: InputMaybe<Array<RecurringEventWhere>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  id_EQ?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
 };
@@ -18683,33 +18537,33 @@ export type RepeatEndsSort = {
 };
 
 export type RepeatEndsUpdateInput = {
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   count_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  count_SET?: InputMaybe<Scalars['Int']['input']>;
-  type_SET?: InputMaybe<Scalars['String']['input']>;
-  unit_SET?: InputMaybe<RepeatUnit>;
-  until_SET?: InputMaybe<Scalars['DateTime']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+  unit?: InputMaybe<RepeatUnit>;
+  until?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type RepeatEndsWhere = {
   AND?: InputMaybe<Array<RepeatEndsWhere>>;
   NOT?: InputMaybe<RepeatEndsWhere>;
   OR?: InputMaybe<Array<RepeatEndsWhere>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
   type_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   type_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  type_EQ?: InputMaybe<Scalars['String']['input']>;
   type_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   type_MATCHES?: InputMaybe<Scalars['String']['input']>;
   type_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  unit_EQ?: InputMaybe<RepeatUnit>;
+  unit?: InputMaybe<RepeatUnit>;
   unit_IN?: InputMaybe<Array<InputMaybe<RepeatUnit>>>;
-  until_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  until?: InputMaybe<Scalars['DateTime']['input']>;
   until_GT?: InputMaybe<Scalars['DateTime']['input']>;
   until_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   until_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
@@ -18760,23 +18614,23 @@ export type RepeatEverySort = {
 };
 
 export type RepeatEveryUpdateInput = {
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   count_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  count_SET?: InputMaybe<Scalars['Int']['input']>;
-  unit_SET?: InputMaybe<RepeatUnit>;
+  unit?: InputMaybe<RepeatUnit>;
 };
 
 export type RepeatEveryWhere = {
   AND?: InputMaybe<Array<RepeatEveryWhere>>;
   NOT?: InputMaybe<RepeatEveryWhere>;
   OR?: InputMaybe<Array<RepeatEveryWhere>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  unit_EQ?: InputMaybe<RepeatUnit>;
+  unit?: InputMaybe<RepeatUnit>;
   unit_IN?: InputMaybe<Array<InputMaybe<RepeatUnit>>>;
 };
 
@@ -18852,20 +18706,21 @@ export type ServerConfig = {
 
 
 export type ServerConfigDefaultChannelRoleArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelRoleOptions>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type ServerConfigDefaultChannelRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type ServerConfigDefaultChannelRoleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigDefaultChannelRoleConnectionSort>>;
   where?: InputMaybe<ServerConfigDefaultChannelRoleConnectionWhere>;
@@ -18873,20 +18728,21 @@ export type ServerConfigDefaultChannelRoleConnectionArgs = {
 
 
 export type ServerConfigDefaultModChannelRoleArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModChannelRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModChannelRoleOptions>;
   where?: InputMaybe<ModChannelRoleWhere>;
 };
 
 
 export type ServerConfigDefaultModChannelRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModChannelRoleWhere>;
 };
 
 
 export type ServerConfigDefaultModChannelRoleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigDefaultModChannelRoleConnectionSort>>;
   where?: InputMaybe<ServerConfigDefaultModChannelRoleConnectionWhere>;
@@ -18894,20 +18750,21 @@ export type ServerConfigDefaultModChannelRoleConnectionArgs = {
 
 
 export type ServerConfigDefaultModRoleArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModServerRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModServerRoleOptions>;
   where?: InputMaybe<ModServerRoleWhere>;
 };
 
 
 export type ServerConfigDefaultModRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModServerRoleWhere>;
 };
 
 
 export type ServerConfigDefaultModRoleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigDefaultModRoleConnectionSort>>;
   where?: InputMaybe<ServerConfigDefaultModRoleConnectionWhere>;
@@ -18915,20 +18772,21 @@ export type ServerConfigDefaultModRoleConnectionArgs = {
 
 
 export type ServerConfigDefaultServerRoleArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ServerRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ServerRoleOptions>;
   where?: InputMaybe<ServerRoleWhere>;
 };
 
 
 export type ServerConfigDefaultServerRoleAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ServerRoleWhere>;
 };
 
 
 export type ServerConfigDefaultServerRoleConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ServerConfigDefaultServerRoleConnectionSort>>;
   where?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
@@ -18955,6 +18813,20 @@ export type ServerConfigChannelRoleDefaultChannelRoleNodeAggregateSelection = {
   name: StringAggregateSelection;
 };
 
+export type ServerConfigConnectInput = {
+  DefaultChannelRole?: InputMaybe<ServerConfigDefaultChannelRoleConnectFieldInput>;
+  DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleConnectFieldInput>;
+  DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleConnectFieldInput>;
+  DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleConnectFieldInput>;
+};
+
+export type ServerConfigConnectOrCreateInput = {
+  DefaultChannelRole?: InputMaybe<ServerConfigDefaultChannelRoleConnectOrCreateFieldInput>;
+  DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleConnectOrCreateFieldInput>;
+  DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleConnectOrCreateFieldInput>;
+  DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleConnectOrCreateFieldInput>;
+};
+
 export type ServerConfigCreateInput = {
   DefaultChannelRole?: InputMaybe<ServerConfigDefaultChannelRoleFieldInput>;
   DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleFieldInput>;
@@ -18969,7 +18841,7 @@ export type ServerConfigDefaultChannelRoleAggregateInput = {
   AND?: InputMaybe<Array<ServerConfigDefaultChannelRoleAggregateInput>>;
   NOT?: InputMaybe<ServerConfigDefaultChannelRoleAggregateInput>;
   OR?: InputMaybe<Array<ServerConfigDefaultChannelRoleAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -18978,6 +18850,8 @@ export type ServerConfigDefaultChannelRoleAggregateInput = {
 };
 
 export type ServerConfigDefaultChannelRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelRoleConnectWhere>;
 };
 
@@ -19022,6 +18896,7 @@ export type ServerConfigDefaultChannelRoleDisconnectFieldInput = {
 
 export type ServerConfigDefaultChannelRoleFieldInput = {
   connect?: InputMaybe<ServerConfigDefaultChannelRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultChannelRoleConnectOrCreateFieldInput>;
   create?: InputMaybe<ServerConfigDefaultChannelRoleCreateFieldInput>;
 };
 
@@ -19100,7 +18975,7 @@ export type ServerConfigDefaultModChannelRoleAggregateInput = {
   AND?: InputMaybe<Array<ServerConfigDefaultModChannelRoleAggregateInput>>;
   NOT?: InputMaybe<ServerConfigDefaultModChannelRoleAggregateInput>;
   OR?: InputMaybe<Array<ServerConfigDefaultModChannelRoleAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -19109,6 +18984,8 @@ export type ServerConfigDefaultModChannelRoleAggregateInput = {
 };
 
 export type ServerConfigDefaultModChannelRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModChannelRoleConnectWhere>;
 };
 
@@ -19153,6 +19030,7 @@ export type ServerConfigDefaultModChannelRoleDisconnectFieldInput = {
 
 export type ServerConfigDefaultModChannelRoleFieldInput = {
   connect?: InputMaybe<ServerConfigDefaultModChannelRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultModChannelRoleConnectOrCreateFieldInput>;
   create?: InputMaybe<ServerConfigDefaultModChannelRoleCreateFieldInput>;
 };
 
@@ -19231,7 +19109,7 @@ export type ServerConfigDefaultModRoleAggregateInput = {
   AND?: InputMaybe<Array<ServerConfigDefaultModRoleAggregateInput>>;
   NOT?: InputMaybe<ServerConfigDefaultModRoleAggregateInput>;
   OR?: InputMaybe<Array<ServerConfigDefaultModRoleAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -19240,6 +19118,8 @@ export type ServerConfigDefaultModRoleAggregateInput = {
 };
 
 export type ServerConfigDefaultModRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModServerRoleConnectWhere>;
 };
 
@@ -19284,6 +19164,7 @@ export type ServerConfigDefaultModRoleDisconnectFieldInput = {
 
 export type ServerConfigDefaultModRoleFieldInput = {
   connect?: InputMaybe<ServerConfigDefaultModRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultModRoleConnectOrCreateFieldInput>;
   create?: InputMaybe<ServerConfigDefaultModRoleCreateFieldInput>;
 };
 
@@ -19347,7 +19228,7 @@ export type ServerConfigDefaultServerRoleAggregateInput = {
   AND?: InputMaybe<Array<ServerConfigDefaultServerRoleAggregateInput>>;
   NOT?: InputMaybe<ServerConfigDefaultServerRoleAggregateInput>;
   OR?: InputMaybe<Array<ServerConfigDefaultServerRoleAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -19356,6 +19237,8 @@ export type ServerConfigDefaultServerRoleAggregateInput = {
 };
 
 export type ServerConfigDefaultServerRoleConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ServerRoleConnectWhere>;
 };
 
@@ -19400,6 +19283,7 @@ export type ServerConfigDefaultServerRoleDisconnectFieldInput = {
 
 export type ServerConfigDefaultServerRoleFieldInput = {
   connect?: InputMaybe<ServerConfigDefaultServerRoleConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ServerConfigDefaultServerRoleConnectOrCreateFieldInput>;
   create?: InputMaybe<ServerConfigDefaultServerRoleCreateFieldInput>;
 };
 
@@ -19466,6 +19350,13 @@ export type ServerConfigDeleteInput = {
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleDeleteFieldInput>;
 };
 
+export type ServerConfigDisconnectInput = {
+  DefaultChannelRole?: InputMaybe<ServerConfigDefaultChannelRoleDisconnectFieldInput>;
+  DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleDisconnectFieldInput>;
+  DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleDisconnectFieldInput>;
+  DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleDisconnectFieldInput>;
+};
+
 export type ServerConfigEdge = {
   __typename?: 'ServerConfigEdge';
   cursor: Scalars['String']['output'];
@@ -19504,6 +19395,13 @@ export type ServerConfigOptions = {
   sort?: InputMaybe<Array<ServerConfigSort>>;
 };
 
+export type ServerConfigRelationInput = {
+  DefaultChannelRole?: InputMaybe<ServerConfigDefaultChannelRoleCreateFieldInput>;
+  DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleCreateFieldInput>;
+  DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleCreateFieldInput>;
+  DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleCreateFieldInput>;
+};
+
 export type ServerConfigServerRoleDefaultServerRoleAggregationSelection = {
   __typename?: 'ServerConfigServerRoleDefaultServerRoleAggregationSelection';
   count: Scalars['Int']['output'];
@@ -19528,9 +19426,9 @@ export type ServerConfigUpdateInput = {
   DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleUpdateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleUpdateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleUpdateFieldInput>;
-  serverDescription_SET?: InputMaybe<Scalars['String']['input']>;
-  serverIconURL_SET?: InputMaybe<Scalars['String']['input']>;
-  serverName_SET?: InputMaybe<Scalars['String']['input']>;
+  serverDescription?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL?: InputMaybe<Scalars['String']['input']>;
+  serverName?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ServerConfigWhere = {
@@ -19538,32 +19436,40 @@ export type ServerConfigWhere = {
   DefaultChannelRole?: InputMaybe<ChannelRoleWhere>;
   DefaultChannelRoleAggregate?: InputMaybe<ServerConfigDefaultChannelRoleAggregateInput>;
   DefaultChannelRoleConnection?: InputMaybe<ServerConfigDefaultChannelRoleConnectionWhere>;
+  DefaultChannelRoleConnection_NOT?: InputMaybe<ServerConfigDefaultChannelRoleConnectionWhere>;
+  DefaultChannelRole_NOT?: InputMaybe<ChannelRoleWhere>;
   DefaultModChannelRole?: InputMaybe<ModChannelRoleWhere>;
   DefaultModChannelRoleAggregate?: InputMaybe<ServerConfigDefaultModChannelRoleAggregateInput>;
   DefaultModChannelRoleConnection?: InputMaybe<ServerConfigDefaultModChannelRoleConnectionWhere>;
+  DefaultModChannelRoleConnection_NOT?: InputMaybe<ServerConfigDefaultModChannelRoleConnectionWhere>;
+  DefaultModChannelRole_NOT?: InputMaybe<ModChannelRoleWhere>;
   DefaultModRole?: InputMaybe<ModServerRoleWhere>;
   DefaultModRoleAggregate?: InputMaybe<ServerConfigDefaultModRoleAggregateInput>;
   DefaultModRoleConnection?: InputMaybe<ServerConfigDefaultModRoleConnectionWhere>;
+  DefaultModRoleConnection_NOT?: InputMaybe<ServerConfigDefaultModRoleConnectionWhere>;
+  DefaultModRole_NOT?: InputMaybe<ModServerRoleWhere>;
   DefaultServerRole?: InputMaybe<ServerRoleWhere>;
   DefaultServerRoleAggregate?: InputMaybe<ServerConfigDefaultServerRoleAggregateInput>;
   DefaultServerRoleConnection?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
+  DefaultServerRoleConnection_NOT?: InputMaybe<ServerConfigDefaultServerRoleConnectionWhere>;
+  DefaultServerRole_NOT?: InputMaybe<ServerRoleWhere>;
   NOT?: InputMaybe<ServerConfigWhere>;
   OR?: InputMaybe<Array<ServerConfigWhere>>;
+  serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   serverDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  serverDescription_EQ?: InputMaybe<Scalars['String']['input']>;
   serverDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   serverDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
   serverDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverIconURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   serverIconURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  serverIconURL_EQ?: InputMaybe<Scalars['String']['input']>;
   serverIconURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   serverIconURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
   serverIconURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverName?: InputMaybe<Scalars['String']['input']>;
   serverName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   serverName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  serverName_EQ?: InputMaybe<Scalars['String']['input']>;
   serverName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   serverName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   serverName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -19663,48 +19569,48 @@ export type ServerRoleSort = {
 };
 
 export type ServerRoleUniqueWhere = {
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ServerRoleUpdateInput = {
-  canCreateChannel_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateComment_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateDiscussion_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateEvent_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canGiveFeedback_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUploadFile_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteComment_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteDiscussion_SET?: InputMaybe<Scalars['Boolean']['input']>;
-  description_SET?: InputMaybe<Scalars['String']['input']>;
-  name_SET?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRoleWhere = {
   AND?: InputMaybe<Array<ServerRoleWhere>>;
   NOT?: InputMaybe<ServerRoleWhere>;
   OR?: InputMaybe<Array<ServerRoleWhere>>;
-  canCreateChannel_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateComment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateDiscussion_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canCreateEvent_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canGiveFeedback_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUploadFile_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteComment_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  canUpvoteDiscussion_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
   description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  description_EQ?: InputMaybe<Scalars['String']['input']>;
   description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   description_MATCHES?: InputMaybe<Scalars['String']['input']>;
   description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
   name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  name_EQ?: InputMaybe<Scalars['String']['input']>;
   name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   name_MATCHES?: InputMaybe<Scalars['String']['input']>;
   name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  showAdminTag_EQ?: InputMaybe<Scalars['Boolean']['input']>;
+  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type ServerRolesConnection = {
@@ -19748,16 +19654,16 @@ export type SignedUrlSort = {
 };
 
 export type SignedUrlUpdateInput = {
-  url_SET?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SignedUrlWhere = {
   AND?: InputMaybe<Array<SignedUrlWhere>>;
   NOT?: InputMaybe<SignedUrlWhere>;
   OR?: InputMaybe<Array<SignedUrlWhere>>;
+  url?: InputMaybe<Scalars['String']['input']>;
   url_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   url_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  url_EQ?: InputMaybe<Scalars['String']['input']>;
   url_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   url_MATCHES?: InputMaybe<Scalars['String']['input']>;
   url_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -19805,16 +19711,16 @@ export type SiteWideDiscussionListFormatSort = {
 };
 
 export type SiteWideDiscussionListFormatUpdateInput = {
+  aggregateDiscussionCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  aggregateDiscussionCount_SET?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type SiteWideDiscussionListFormatWhere = {
   AND?: InputMaybe<Array<SiteWideDiscussionListFormatWhere>>;
   NOT?: InputMaybe<SiteWideDiscussionListFormatWhere>;
   OR?: InputMaybe<Array<SiteWideDiscussionListFormatWhere>>;
-  aggregateDiscussionCount_EQ?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_GT?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_GTE?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
@@ -19871,20 +19777,21 @@ export type Tag = {
 
 
 export type TagChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type TagChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type TagChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<TagChannelsConnectionSort>>;
   where?: InputMaybe<TagChannelsConnectionWhere>;
@@ -19892,20 +19799,21 @@ export type TagChannelsConnectionArgs = {
 
 
 export type TagCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type TagCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type TagCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<TagCommentsConnectionSort>>;
   where?: InputMaybe<TagCommentsConnectionWhere>;
@@ -19913,20 +19821,21 @@ export type TagCommentsConnectionArgs = {
 
 
 export type TagDiscussionsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type TagDiscussionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type TagDiscussionsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<TagDiscussionsConnectionSort>>;
   where?: InputMaybe<TagDiscussionsConnectionWhere>;
@@ -19934,20 +19843,21 @@ export type TagDiscussionsConnectionArgs = {
 
 
 export type TagEventsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type TagEventsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type TagEventsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<TagEventsConnectionSort>>;
   where?: InputMaybe<TagEventsConnectionWhere>;
@@ -19955,20 +19865,21 @@ export type TagEventsConnectionArgs = {
 
 
 export type TagFeedsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<FeedSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<FeedOptions>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type TagFeedsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type TagFeedsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<TagFeedsConnectionSort>>;
   where?: InputMaybe<TagFeedsConnectionWhere>;
@@ -20000,7 +19911,7 @@ export type TagChannelsAggregateInput = {
   AND?: InputMaybe<Array<TagChannelsAggregateInput>>;
   NOT?: InputMaybe<TagChannelsAggregateInput>;
   OR?: InputMaybe<Array<TagChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -20010,6 +19921,8 @@ export type TagChannelsAggregateInput = {
 
 export type TagChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -20056,6 +19969,7 @@ export type TagChannelsDisconnectFieldInput = {
 
 export type TagChannelsFieldInput = {
   connect?: InputMaybe<Array<TagChannelsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<TagChannelsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<TagChannelsCreateFieldInput>>;
 };
 
@@ -20189,7 +20103,7 @@ export type TagCommentsAggregateInput = {
   AND?: InputMaybe<Array<TagCommentsAggregateInput>>;
   NOT?: InputMaybe<TagCommentsAggregateInput>;
   OR?: InputMaybe<Array<TagCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -20199,6 +20113,8 @@ export type TagCommentsAggregateInput = {
 
 export type TagCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -20253,16 +20169,6 @@ export type TagCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -20337,6 +20243,10 @@ export type TagConnectInput = {
   Feeds?: InputMaybe<Array<TagFeedsConnectFieldInput>>;
 };
 
+export type TagConnectOrCreateInput = {
+  Channels?: InputMaybe<Array<TagChannelsConnectOrCreateFieldInput>>;
+};
+
 export type TagConnectOrCreateWhere = {
   node: TagUniqueWhere;
 };
@@ -20389,7 +20299,7 @@ export type TagDiscussionsAggregateInput = {
   AND?: InputMaybe<Array<TagDiscussionsAggregateInput>>;
   NOT?: InputMaybe<TagDiscussionsAggregateInput>;
   OR?: InputMaybe<Array<TagDiscussionsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -20399,6 +20309,8 @@ export type TagDiscussionsAggregateInput = {
 
 export type TagDiscussionsConnectFieldInput = {
   connect?: InputMaybe<Array<DiscussionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
 };
 
@@ -20468,16 +20380,6 @@ export type TagDiscussionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -20559,7 +20461,7 @@ export type TagEventsAggregateInput = {
   AND?: InputMaybe<Array<TagEventsAggregateInput>>;
   NOT?: InputMaybe<TagEventsAggregateInput>;
   OR?: InputMaybe<Array<TagEventsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -20569,6 +20471,8 @@ export type TagEventsAggregateInput = {
 
 export type TagEventsConnectFieldInput = {
   connect?: InputMaybe<Array<EventConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
 };
 
@@ -20693,16 +20597,6 @@ export type TagEventsNodeAggregationWhereInput = {
   endTime_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   locationName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -20856,7 +20750,7 @@ export type TagFeedsAggregateInput = {
   AND?: InputMaybe<Array<TagFeedsAggregateInput>>;
   NOT?: InputMaybe<TagFeedsAggregateInput>;
   OR?: InputMaybe<Array<TagFeedsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -20866,6 +20760,8 @@ export type TagFeedsAggregateInput = {
 
 export type TagFeedsConnectFieldInput = {
   connect?: InputMaybe<Array<FeedConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
 };
 
@@ -20925,16 +20821,6 @@ export type TagFeedsNodeAggregationWhereInput = {
   description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -20982,13 +20868,21 @@ export type TagOptions = {
   sort?: InputMaybe<Array<TagSort>>;
 };
 
+export type TagRelationInput = {
+  Channels?: InputMaybe<Array<TagChannelsCreateFieldInput>>;
+  Comments?: InputMaybe<Array<TagCommentsCreateFieldInput>>;
+  Discussions?: InputMaybe<Array<TagDiscussionsCreateFieldInput>>;
+  Events?: InputMaybe<Array<TagEventsCreateFieldInput>>;
+  Feeds?: InputMaybe<Array<TagFeedsCreateFieldInput>>;
+};
+
 /** Fields to sort Tags by. The order in which sorts are applied is not guaranteed when specifying many fields in one TagSort object. */
 export type TagSort = {
   text?: InputMaybe<SortDirection>;
 };
 
 export type TagUniqueWhere = {
-  text_EQ?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type TagUpdateInput = {
@@ -20997,7 +20891,7 @@ export type TagUpdateInput = {
   Discussions?: InputMaybe<Array<TagDiscussionsUpdateFieldInput>>;
   Events?: InputMaybe<Array<TagEventsUpdateFieldInput>>;
   Feeds?: InputMaybe<Array<TagFeedsUpdateFieldInput>>;
-  text_SET?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type TagWhere = {
@@ -21089,9 +20983,9 @@ export type TagWhere = {
   Feeds_SOME?: InputMaybe<FeedWhere>;
   NOT?: InputMaybe<TagWhere>;
   OR?: InputMaybe<Array<TagWhere>>;
+  text?: InputMaybe<Scalars['String']['input']>;
   text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  text_EQ?: InputMaybe<Scalars['String']['input']>;
   text_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   text_MATCHES?: InputMaybe<Scalars['String']['input']>;
   text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -21223,6 +21117,8 @@ export type UpdateImagesMutationResponse = {
 /** Information about the number of nodes and relationships created and deleted during an update mutation */
 export type UpdateInfo = {
   __typename?: 'UpdateInfo';
+  /** @deprecated This field has been deprecated because bookmarks are now handled by the driver. */
+  bookmark?: Maybe<Scalars['String']['output']>;
   nodesCreated: Scalars['Int']['output'];
   nodesDeleted: Scalars['Int']['output'];
   relationshipsCreated: Scalars['Int']['output'];
@@ -21404,20 +21300,21 @@ export type User = {
 
 
 export type UserAdminOfChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type UserAdminOfChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type UserAdminOfChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserAdminOfChannelsConnectionSort>>;
   where?: InputMaybe<UserAdminOfChannelsConnectionWhere>;
@@ -21425,20 +21322,21 @@ export type UserAdminOfChannelsConnectionArgs = {
 
 
 export type UserAlbumsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<AlbumSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<AlbumOptions>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type UserAlbumsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<AlbumWhere>;
 };
 
 
 export type UserAlbumsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserAlbumsConnectionSort>>;
   where?: InputMaybe<UserAlbumsConnectionWhere>;
@@ -21446,20 +21344,21 @@ export type UserAlbumsConnectionArgs = {
 
 
 export type UserBlockedArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type UserBlockedAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type UserBlockedConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserBlockedConnectionSort>>;
   where?: InputMaybe<UserBlockedConnectionWhere>;
@@ -21467,20 +21366,21 @@ export type UserBlockedConnectionArgs = {
 
 
 export type UserChannelRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelRoleOptions>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type UserChannelRolesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelRoleWhere>;
 };
 
 
 export type UserChannelRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserChannelRolesConnectionSort>>;
   where?: InputMaybe<UserChannelRolesConnectionWhere>;
@@ -21488,20 +21388,21 @@ export type UserChannelRolesConnectionArgs = {
 
 
 export type UserCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type UserCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type UserCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserCommentsConnectionSort>>;
   where?: InputMaybe<UserCommentsConnectionWhere>;
@@ -21509,20 +21410,21 @@ export type UserCommentsConnectionArgs = {
 
 
 export type UserCreatedFeedsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<FeedSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<FeedOptions>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type UserCreatedFeedsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type UserCreatedFeedsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserCreatedFeedsConnectionSort>>;
   where?: InputMaybe<UserCreatedFeedsConnectionWhere>;
@@ -21530,20 +21432,21 @@ export type UserCreatedFeedsConnectionArgs = {
 
 
 export type UserDefaultFeedArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<FeedSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<FeedOptions>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type UserDefaultFeedAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type UserDefaultFeedConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserDefaultFeedConnectionSort>>;
   where?: InputMaybe<UserDefaultFeedConnectionWhere>;
@@ -21551,20 +21454,21 @@ export type UserDefaultFeedConnectionArgs = {
 
 
 export type UserDiscussionsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type UserDiscussionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type UserDiscussionsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserDiscussionsConnectionSort>>;
   where?: InputMaybe<UserDiscussionsConnectionWhere>;
@@ -21572,20 +21476,21 @@ export type UserDiscussionsConnectionArgs = {
 
 
 export type UserEmailArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EmailSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EmailOptions>;
   where?: InputMaybe<EmailWhere>;
 };
 
 
 export type UserEmailAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EmailWhere>;
 };
 
 
 export type UserEmailConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserEmailConnectionSort>>;
   where?: InputMaybe<UserEmailConnectionWhere>;
@@ -21593,20 +21498,21 @@ export type UserEmailConnectionArgs = {
 
 
 export type UserEventsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<EventSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<EventOptions>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type UserEventsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<EventWhere>;
 };
 
 
 export type UserEventsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserEventsConnectionSort>>;
   where?: InputMaybe<UserEventsConnectionWhere>;
@@ -21614,20 +21520,21 @@ export type UserEventsConnectionArgs = {
 
 
 export type UserFavoriteChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type UserFavoriteChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type UserFavoriteChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserFavoriteChannelsConnectionSort>>;
   where?: InputMaybe<UserFavoriteChannelsConnectionWhere>;
@@ -21635,20 +21542,21 @@ export type UserFavoriteChannelsConnectionArgs = {
 
 
 export type UserFeedsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<FeedSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<FeedOptions>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type UserFeedsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<FeedWhere>;
 };
 
 
 export type UserFeedsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserFeedsConnectionSort>>;
   where?: InputMaybe<UserFeedsConnectionWhere>;
@@ -21656,20 +21564,21 @@ export type UserFeedsConnectionArgs = {
 
 
 export type UserIsBlockedByArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type UserIsBlockedByAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<UserWhere>;
 };
 
 
 export type UserIsBlockedByConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserIsBlockedByConnectionSort>>;
   where?: InputMaybe<UserIsBlockedByConnectionWhere>;
@@ -21677,20 +21586,21 @@ export type UserIsBlockedByConnectionArgs = {
 
 
 export type UserIssueCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type UserIssueCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type UserIssueCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserIssueCommentsConnectionSort>>;
   where?: InputMaybe<UserIssueCommentsConnectionWhere>;
@@ -21698,20 +21608,21 @@ export type UserIssueCommentsConnectionArgs = {
 
 
 export type UserIssuesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<IssueSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<IssueOptions>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type UserIssuesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<IssueWhere>;
 };
 
 
 export type UserIssuesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserIssuesConnectionSort>>;
   where?: InputMaybe<UserIssuesConnectionWhere>;
@@ -21719,20 +21630,21 @@ export type UserIssuesConnectionArgs = {
 
 
 export type UserModerationProfileArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ModerationProfileSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationProfileOptions>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type UserModerationProfileAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ModerationProfileWhere>;
 };
 
 
 export type UserModerationProfileConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserModerationProfileConnectionSort>>;
   where?: InputMaybe<UserModerationProfileConnectionWhere>;
@@ -21740,20 +21652,21 @@ export type UserModerationProfileConnectionArgs = {
 
 
 export type UserRecentlyVisitedChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type UserRecentlyVisitedChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ChannelWhere>;
 };
 
 
 export type UserRecentlyVisitedChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectionSort>>;
   where?: InputMaybe<UserRecentlyVisitedChannelsConnectionWhere>;
@@ -21761,20 +21674,21 @@ export type UserRecentlyVisitedChannelsConnectionArgs = {
 
 
 export type UserServerRolesArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<ServerRoleSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ServerRoleOptions>;
   where?: InputMaybe<ServerRoleWhere>;
 };
 
 
 export type UserServerRolesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<ServerRoleWhere>;
 };
 
 
 export type UserServerRolesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserServerRolesConnectionSort>>;
   where?: InputMaybe<UserServerRolesConnectionWhere>;
@@ -21782,20 +21696,21 @@ export type UserServerRolesConnectionArgs = {
 
 
 export type UserUpvotedCommentsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<CommentSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type UserUpvotedCommentsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<CommentWhere>;
 };
 
 
 export type UserUpvotedCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserUpvotedCommentsConnectionSort>>;
   where?: InputMaybe<UserUpvotedCommentsConnectionWhere>;
@@ -21803,20 +21718,21 @@ export type UserUpvotedCommentsConnectionArgs = {
 
 
 export type UserUpvotedDiscussionChannelsArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<DiscussionChannelSort>>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionChannelOptions>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type UserUpvotedDiscussionChannelsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   where?: InputMaybe<DiscussionChannelWhere>;
 };
 
 
 export type UserUpvotedDiscussionChannelsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserUpvotedDiscussionChannelsConnectionSort>>;
   where?: InputMaybe<UserUpvotedDiscussionChannelsConnectionWhere>;
@@ -21826,7 +21742,7 @@ export type UserAdminOfChannelsAggregateInput = {
   AND?: InputMaybe<Array<UserAdminOfChannelsAggregateInput>>;
   NOT?: InputMaybe<UserAdminOfChannelsAggregateInput>;
   OR?: InputMaybe<Array<UserAdminOfChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -21836,6 +21752,8 @@ export type UserAdminOfChannelsAggregateInput = {
 
 export type UserAdminOfChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -21882,6 +21800,7 @@ export type UserAdminOfChannelsDisconnectFieldInput = {
 
 export type UserAdminOfChannelsFieldInput = {
   connect?: InputMaybe<Array<UserAdminOfChannelsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserAdminOfChannelsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<UserAdminOfChannelsCreateFieldInput>>;
 };
 
@@ -22028,7 +21947,7 @@ export type UserAlbumsAggregateInput = {
   AND?: InputMaybe<Array<UserAlbumsAggregateInput>>;
   NOT?: InputMaybe<UserAlbumsAggregateInput>;
   OR?: InputMaybe<Array<UserAlbumsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -22038,6 +21957,8 @@ export type UserAlbumsAggregateInput = {
 
 export type UserAlbumsConnectFieldInput = {
   connect?: InputMaybe<Array<AlbumConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<AlbumConnectWhere>;
 };
 
@@ -22082,16 +22003,6 @@ export type UserAlbumsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<UserAlbumsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<UserAlbumsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<UserAlbumsNodeAggregationWhereInput>>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
 };
 
 export type UserAlbumsRelationship = {
@@ -22117,7 +22028,7 @@ export type UserBlockedAggregateInput = {
   AND?: InputMaybe<Array<UserBlockedAggregateInput>>;
   NOT?: InputMaybe<UserBlockedAggregateInput>;
   OR?: InputMaybe<Array<UserBlockedAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -22127,6 +22038,8 @@ export type UserBlockedAggregateInput = {
 
 export type UserBlockedConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -22173,6 +22086,7 @@ export type UserBlockedDisconnectFieldInput = {
 
 export type UserBlockedFieldInput = {
   connect?: InputMaybe<UserBlockedConnectFieldInput>;
+  connectOrCreate?: InputMaybe<UserBlockedConnectOrCreateFieldInput>;
   create?: InputMaybe<UserBlockedCreateFieldInput>;
 };
 
@@ -22452,7 +22366,7 @@ export type UserChannelRolesAggregateInput = {
   AND?: InputMaybe<Array<UserChannelRolesAggregateInput>>;
   NOT?: InputMaybe<UserChannelRolesAggregateInput>;
   OR?: InputMaybe<Array<UserChannelRolesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -22461,6 +22375,8 @@ export type UserChannelRolesAggregateInput = {
 };
 
 export type UserChannelRolesConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelRoleConnectWhere>;
 };
 
@@ -22505,6 +22421,7 @@ export type UserChannelRolesDisconnectFieldInput = {
 
 export type UserChannelRolesFieldInput = {
   connect?: InputMaybe<Array<UserChannelRolesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserChannelRolesConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<UserChannelRolesCreateFieldInput>>;
 };
 
@@ -22628,7 +22545,7 @@ export type UserCommentsAggregateInput = {
   AND?: InputMaybe<Array<UserCommentsAggregateInput>>;
   NOT?: InputMaybe<UserCommentsAggregateInput>;
   OR?: InputMaybe<Array<UserCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -22638,6 +22555,8 @@ export type UserCommentsAggregateInput = {
 
 export type UserCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -22692,16 +22611,6 @@ export type UserCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -22791,6 +22700,18 @@ export type UserConnectInput = {
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsConnectFieldInput>>;
 };
 
+export type UserConnectOrCreateInput = {
+  AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsConnectOrCreateFieldInput>>;
+  Blocked?: InputMaybe<UserBlockedConnectOrCreateFieldInput>;
+  ChannelRoles?: InputMaybe<Array<UserChannelRolesConnectOrCreateFieldInput>>;
+  Email?: InputMaybe<UserEmailConnectOrCreateFieldInput>;
+  FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsConnectOrCreateFieldInput>>;
+  IsBlockedBy?: InputMaybe<UserIsBlockedByConnectOrCreateFieldInput>;
+  ModerationProfile?: InputMaybe<UserModerationProfileConnectOrCreateFieldInput>;
+  RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectOrCreateFieldInput>>;
+  ServerRoles?: InputMaybe<Array<UserServerRolesConnectOrCreateFieldInput>>;
+};
+
 export type UserConnectOrCreateWhere = {
   node: UserUniqueWhere;
 };
@@ -22838,7 +22759,7 @@ export type UserCreatedFeedsAggregateInput = {
   AND?: InputMaybe<Array<UserCreatedFeedsAggregateInput>>;
   NOT?: InputMaybe<UserCreatedFeedsAggregateInput>;
   OR?: InputMaybe<Array<UserCreatedFeedsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -22848,6 +22769,8 @@ export type UserCreatedFeedsAggregateInput = {
 
 export type UserCreatedFeedsConnectFieldInput = {
   connect?: InputMaybe<Array<FeedConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
 };
 
@@ -22907,16 +22830,6 @@ export type UserCreatedFeedsNodeAggregationWhereInput = {
   description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -22957,7 +22870,7 @@ export type UserDefaultFeedAggregateInput = {
   AND?: InputMaybe<Array<UserDefaultFeedAggregateInput>>;
   NOT?: InputMaybe<UserDefaultFeedAggregateInput>;
   OR?: InputMaybe<Array<UserDefaultFeedAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -22967,6 +22880,8 @@ export type UserDefaultFeedAggregateInput = {
 
 export type UserDefaultFeedConnectFieldInput = {
   connect?: InputMaybe<FeedConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
 };
 
@@ -23026,16 +22941,6 @@ export type UserDefaultFeedNodeAggregationWhereInput = {
   description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -23152,7 +23057,7 @@ export type UserDiscussionsAggregateInput = {
   AND?: InputMaybe<Array<UserDiscussionsAggregateInput>>;
   NOT?: InputMaybe<UserDiscussionsAggregateInput>;
   OR?: InputMaybe<Array<UserDiscussionsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -23162,6 +23067,8 @@ export type UserDiscussionsAggregateInput = {
 
 export type UserDiscussionsConnectFieldInput = {
   connect?: InputMaybe<Array<DiscussionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
 };
 
@@ -23231,16 +23138,6 @@ export type UserDiscussionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -23297,7 +23194,7 @@ export type UserEmailAggregateInput = {
   AND?: InputMaybe<Array<UserEmailAggregateInput>>;
   NOT?: InputMaybe<UserEmailAggregateInput>;
   OR?: InputMaybe<Array<UserEmailAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -23307,6 +23204,8 @@ export type UserEmailAggregateInput = {
 
 export type UserEmailConnectFieldInput = {
   connect?: InputMaybe<EmailConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EmailConnectWhere>;
 };
 
@@ -23364,6 +23263,7 @@ export type UserEmailEmailNodeAggregateSelection = {
 
 export type UserEmailFieldInput = {
   connect?: InputMaybe<UserEmailConnectFieldInput>;
+  connectOrCreate?: InputMaybe<UserEmailConnectOrCreateFieldInput>;
   create?: InputMaybe<UserEmailCreateFieldInput>;
 };
 
@@ -23437,7 +23337,7 @@ export type UserEventsAggregateInput = {
   AND?: InputMaybe<Array<UserEventsAggregateInput>>;
   NOT?: InputMaybe<UserEventsAggregateInput>;
   OR?: InputMaybe<Array<UserEventsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -23447,6 +23347,8 @@ export type UserEventsAggregateInput = {
 
 export type UserEventsConnectFieldInput = {
   connect?: InputMaybe<Array<EventConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
 };
 
@@ -23571,16 +23473,6 @@ export type UserEventsNodeAggregationWhereInput = {
   endTime_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   endTime_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   locationName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   locationName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -23721,7 +23613,7 @@ export type UserFavoriteChannelsAggregateInput = {
   AND?: InputMaybe<Array<UserFavoriteChannelsAggregateInput>>;
   NOT?: InputMaybe<UserFavoriteChannelsAggregateInput>;
   OR?: InputMaybe<Array<UserFavoriteChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -23731,6 +23623,8 @@ export type UserFavoriteChannelsAggregateInput = {
 
 export type UserFavoriteChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -23777,6 +23671,7 @@ export type UserFavoriteChannelsDisconnectFieldInput = {
 
 export type UserFavoriteChannelsFieldInput = {
   connect?: InputMaybe<Array<UserFavoriteChannelsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserFavoriteChannelsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<UserFavoriteChannelsCreateFieldInput>>;
 };
 
@@ -23934,7 +23829,7 @@ export type UserFeedsAggregateInput = {
   AND?: InputMaybe<Array<UserFeedsAggregateInput>>;
   NOT?: InputMaybe<UserFeedsAggregateInput>;
   OR?: InputMaybe<Array<UserFeedsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -23944,6 +23839,8 @@ export type UserFeedsAggregateInput = {
 
 export type UserFeedsConnectFieldInput = {
   connect?: InputMaybe<Array<FeedConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
 };
 
@@ -24003,16 +23900,6 @@ export type UserFeedsNodeAggregationWhereInput = {
   description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -24053,7 +23940,7 @@ export type UserIsBlockedByAggregateInput = {
   AND?: InputMaybe<Array<UserIsBlockedByAggregateInput>>;
   NOT?: InputMaybe<UserIsBlockedByAggregateInput>;
   OR?: InputMaybe<Array<UserIsBlockedByAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -24063,6 +23950,8 @@ export type UserIsBlockedByAggregateInput = {
 
 export type UserIsBlockedByConnectFieldInput = {
   connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<UserConnectWhere>;
 };
 
@@ -24109,6 +23998,7 @@ export type UserIsBlockedByDisconnectFieldInput = {
 
 export type UserIsBlockedByFieldInput = {
   connect?: InputMaybe<UserIsBlockedByConnectFieldInput>;
+  connectOrCreate?: InputMaybe<UserIsBlockedByConnectOrCreateFieldInput>;
   create?: InputMaybe<UserIsBlockedByCreateFieldInput>;
 };
 
@@ -24327,7 +24217,7 @@ export type UserIssueCommentsAggregateInput = {
   AND?: InputMaybe<Array<UserIssueCommentsAggregateInput>>;
   NOT?: InputMaybe<UserIssueCommentsAggregateInput>;
   OR?: InputMaybe<Array<UserIssueCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -24337,6 +24227,8 @@ export type UserIssueCommentsAggregateInput = {
 
 export type UserIssueCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -24391,16 +24283,6 @@ export type UserIssueCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -24491,7 +24373,7 @@ export type UserIssuesAggregateInput = {
   AND?: InputMaybe<Array<UserIssuesAggregateInput>>;
   NOT?: InputMaybe<UserIssuesAggregateInput>;
   OR?: InputMaybe<Array<UserIssuesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -24501,6 +24383,8 @@ export type UserIssuesAggregateInput = {
 
 export type UserIssuesConnectFieldInput = {
   connect?: InputMaybe<Array<IssueConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
 };
 
@@ -24600,46 +24484,6 @@ export type UserIssuesNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedCommentId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedDiscussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  relatedEventId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -24690,7 +24534,7 @@ export type UserModerationProfileAggregateInput = {
   AND?: InputMaybe<Array<UserModerationProfileAggregateInput>>;
   NOT?: InputMaybe<UserModerationProfileAggregateInput>;
   OR?: InputMaybe<Array<UserModerationProfileAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -24700,6 +24544,8 @@ export type UserModerationProfileAggregateInput = {
 
 export type UserModerationProfileConnectFieldInput = {
   connect?: InputMaybe<ModerationProfileConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModerationProfileConnectWhere>;
 };
 
@@ -24746,6 +24592,7 @@ export type UserModerationProfileDisconnectFieldInput = {
 
 export type UserModerationProfileFieldInput = {
   connect?: InputMaybe<UserModerationProfileConnectFieldInput>;
+  connectOrCreate?: InputMaybe<UserModerationProfileConnectOrCreateFieldInput>;
   create?: InputMaybe<UserModerationProfileCreateFieldInput>;
 };
 
@@ -24838,7 +24685,7 @@ export type UserRecentlyVisitedChannelsAggregateInput = {
   AND?: InputMaybe<Array<UserRecentlyVisitedChannelsAggregateInput>>;
   NOT?: InputMaybe<UserRecentlyVisitedChannelsAggregateInput>;
   OR?: InputMaybe<Array<UserRecentlyVisitedChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -24848,6 +24695,8 @@ export type UserRecentlyVisitedChannelsAggregateInput = {
 
 export type UserRecentlyVisitedChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ChannelConnectWhere>;
 };
 
@@ -24894,6 +24743,7 @@ export type UserRecentlyVisitedChannelsDisconnectFieldInput = {
 
 export type UserRecentlyVisitedChannelsFieldInput = {
   connect?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<UserRecentlyVisitedChannelsCreateFieldInput>>;
 };
 
@@ -25008,6 +24858,29 @@ export type UserRecentlyVisitedChannelsUpdateFieldInput = {
   where?: InputMaybe<UserRecentlyVisitedChannelsConnectionWhere>;
 };
 
+export type UserRelationInput = {
+  AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsCreateFieldInput>>;
+  Albums?: InputMaybe<Array<UserAlbumsCreateFieldInput>>;
+  Blocked?: InputMaybe<UserBlockedCreateFieldInput>;
+  ChannelRoles?: InputMaybe<Array<UserChannelRolesCreateFieldInput>>;
+  Comments?: InputMaybe<Array<UserCommentsCreateFieldInput>>;
+  CreatedFeeds?: InputMaybe<Array<UserCreatedFeedsCreateFieldInput>>;
+  DefaultFeed?: InputMaybe<UserDefaultFeedCreateFieldInput>;
+  Discussions?: InputMaybe<Array<UserDiscussionsCreateFieldInput>>;
+  Email?: InputMaybe<UserEmailCreateFieldInput>;
+  Events?: InputMaybe<Array<UserEventsCreateFieldInput>>;
+  FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsCreateFieldInput>>;
+  Feeds?: InputMaybe<Array<UserFeedsCreateFieldInput>>;
+  IsBlockedBy?: InputMaybe<UserIsBlockedByCreateFieldInput>;
+  IssueComments?: InputMaybe<Array<UserIssueCommentsCreateFieldInput>>;
+  Issues?: InputMaybe<Array<UserIssuesCreateFieldInput>>;
+  ModerationProfile?: InputMaybe<UserModerationProfileCreateFieldInput>;
+  RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsCreateFieldInput>>;
+  ServerRoles?: InputMaybe<Array<UserServerRolesCreateFieldInput>>;
+  UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsCreateFieldInput>>;
+  UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsCreateFieldInput>>;
+};
+
 export type UserServerRoleServerRolesAggregationSelection = {
   __typename?: 'UserServerRoleServerRolesAggregationSelection';
   count: Scalars['Int']['output'];
@@ -25024,7 +24897,7 @@ export type UserServerRolesAggregateInput = {
   AND?: InputMaybe<Array<UserServerRolesAggregateInput>>;
   NOT?: InputMaybe<UserServerRolesAggregateInput>;
   OR?: InputMaybe<Array<UserServerRolesAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -25033,6 +24906,8 @@ export type UserServerRolesAggregateInput = {
 };
 
 export type UserServerRolesConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ServerRoleConnectWhere>;
 };
 
@@ -25077,6 +24952,7 @@ export type UserServerRolesDisconnectFieldInput = {
 
 export type UserServerRolesFieldInput = {
   connect?: InputMaybe<Array<UserServerRolesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserServerRolesConnectOrCreateFieldInput>>;
   create?: InputMaybe<Array<UserServerRolesCreateFieldInput>>;
 };
 
@@ -25154,7 +25030,7 @@ export type UserSort = {
 };
 
 export type UserUniqueWhere = {
-  username_EQ?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserUpdateInput = {
@@ -25164,7 +25040,7 @@ export type UserUpdateInput = {
   ChannelRoles?: InputMaybe<Array<UserChannelRolesUpdateFieldInput>>;
   Comments?: InputMaybe<Array<UserCommentsUpdateFieldInput>>;
   CreatedFeeds?: InputMaybe<Array<UserCreatedFeedsUpdateFieldInput>>;
-  DefaultEmojiSkinTone_SET?: InputMaybe<Scalars['String']['input']>;
+  DefaultEmojiSkinTone?: InputMaybe<Scalars['String']['input']>;
   DefaultFeed?: InputMaybe<UserDefaultFeedUpdateFieldInput>;
   Discussions?: InputMaybe<Array<UserDiscussionsUpdateFieldInput>>;
   Email?: InputMaybe<UserEmailUpdateFieldInput>;
@@ -25175,33 +25051,33 @@ export type UserUpdateInput = {
   IssueComments?: InputMaybe<Array<UserIssueCommentsUpdateFieldInput>>;
   Issues?: InputMaybe<Array<UserIssuesUpdateFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileUpdateFieldInput>;
-  NotificationBundleInterval_SET?: InputMaybe<Scalars['String']['input']>;
-  PreferredTimeZone_SET?: InputMaybe<Scalars['String']['input']>;
+  NotificationBundleInterval?: InputMaybe<Scalars['String']['input']>;
+  PreferredTimeZone?: InputMaybe<Scalars['String']['input']>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsUpdateFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesUpdateFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsUpdateFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsUpdateFieldInput>>;
-  bio_SET?: InputMaybe<Scalars['String']['input']>;
+  bio?: InputMaybe<Scalars['String']['input']>;
+  commentKarma?: InputMaybe<Scalars['Int']['input']>;
   commentKarma_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   commentKarma_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  commentKarma_SET?: InputMaybe<Scalars['Int']['input']>;
-  createdAt_SET?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_SET?: InputMaybe<Scalars['Boolean']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  discussionKarma?: InputMaybe<Scalars['Int']['input']>;
   discussionKarma_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   discussionKarma_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
-  discussionKarma_SET?: InputMaybe<Scalars['Int']['input']>;
-  displayName_SET?: InputMaybe<Scalars['String']['input']>;
-  location_SET?: InputMaybe<Scalars['String']['input']>;
-  profilePicURL_SET?: InputMaybe<Scalars['String']['input']>;
-  pronouns_SET?: InputMaybe<Scalars['String']['input']>;
-  username_SET?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  pronouns?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserUpvotedCommentsAggregateInput = {
   AND?: InputMaybe<Array<UserUpvotedCommentsAggregateInput>>;
   NOT?: InputMaybe<UserUpvotedCommentsAggregateInput>;
   OR?: InputMaybe<Array<UserUpvotedCommentsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -25211,6 +25087,8 @@ export type UserUpvotedCommentsAggregateInput = {
 
 export type UserUpvotedCommentsConnectFieldInput = {
   connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
 };
 
@@ -25265,16 +25143,6 @@ export type UserUpvotedCommentsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -25345,7 +25213,7 @@ export type UserUpvotedDiscussionChannelsAggregateInput = {
   AND?: InputMaybe<Array<UserUpvotedDiscussionChannelsAggregateInput>>;
   NOT?: InputMaybe<UserUpvotedDiscussionChannelsAggregateInput>;
   OR?: InputMaybe<Array<UserUpvotedDiscussionChannelsAggregateInput>>;
-  count_EQ?: InputMaybe<Scalars['Int']['input']>;
+  count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
@@ -25355,6 +25223,8 @@ export type UserUpvotedDiscussionChannelsAggregateInput = {
 
 export type UserUpvotedDiscussionChannelsConnectFieldInput = {
   connect?: InputMaybe<Array<DiscussionChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
 };
 
@@ -25424,26 +25294,6 @@ export type UserUpvotedDiscussionChannelsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  discussionId_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  discussionId_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MAX_LTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_EQUAL?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_GTE?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LT?: InputMaybe<Scalars['ID']['input']>;
-  id_MIN_LTE?: InputMaybe<Scalars['ID']['input']>;
   weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -25568,6 +25418,8 @@ export type UserWhere = {
   Blocked?: InputMaybe<UserWhere>;
   BlockedAggregate?: InputMaybe<UserBlockedAggregateInput>;
   BlockedConnection?: InputMaybe<UserBlockedConnectionWhere>;
+  BlockedConnection_NOT?: InputMaybe<UserBlockedConnectionWhere>;
+  Blocked_NOT?: InputMaybe<UserWhere>;
   ChannelRolesAggregate?: InputMaybe<UserChannelRolesAggregateInput>;
   /** Return Users where all of the related UserChannelRolesConnections match this filter */
   ChannelRolesConnection_ALL?: InputMaybe<UserChannelRolesConnectionWhere>;
@@ -25619,15 +25471,17 @@ export type UserWhere = {
   CreatedFeeds_SINGLE?: InputMaybe<FeedWhere>;
   /** Return Users where some of the related Feeds match this filter */
   CreatedFeeds_SOME?: InputMaybe<FeedWhere>;
+  DefaultEmojiSkinTone?: InputMaybe<Scalars['String']['input']>;
   DefaultEmojiSkinTone_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   DefaultEmojiSkinTone_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  DefaultEmojiSkinTone_EQ?: InputMaybe<Scalars['String']['input']>;
   DefaultEmojiSkinTone_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   DefaultEmojiSkinTone_MATCHES?: InputMaybe<Scalars['String']['input']>;
   DefaultEmojiSkinTone_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   DefaultFeed?: InputMaybe<FeedWhere>;
   DefaultFeedAggregate?: InputMaybe<UserDefaultFeedAggregateInput>;
   DefaultFeedConnection?: InputMaybe<UserDefaultFeedConnectionWhere>;
+  DefaultFeedConnection_NOT?: InputMaybe<UserDefaultFeedConnectionWhere>;
+  DefaultFeed_NOT?: InputMaybe<FeedWhere>;
   DiscussionsAggregate?: InputMaybe<UserDiscussionsAggregateInput>;
   /** Return Users where all of the related UserDiscussionsConnections match this filter */
   DiscussionsConnection_ALL?: InputMaybe<UserDiscussionsConnectionWhere>;
@@ -25648,6 +25502,8 @@ export type UserWhere = {
   Email?: InputMaybe<EmailWhere>;
   EmailAggregate?: InputMaybe<UserEmailAggregateInput>;
   EmailConnection?: InputMaybe<UserEmailConnectionWhere>;
+  EmailConnection_NOT?: InputMaybe<UserEmailConnectionWhere>;
+  Email_NOT?: InputMaybe<EmailWhere>;
   EventsAggregate?: InputMaybe<UserEventsAggregateInput>;
   /** Return Users where all of the related UserEventsConnections match this filter */
   EventsConnection_ALL?: InputMaybe<UserEventsConnectionWhere>;
@@ -25702,6 +25558,8 @@ export type UserWhere = {
   IsBlockedBy?: InputMaybe<UserWhere>;
   IsBlockedByAggregate?: InputMaybe<UserIsBlockedByAggregateInput>;
   IsBlockedByConnection?: InputMaybe<UserIsBlockedByConnectionWhere>;
+  IsBlockedByConnection_NOT?: InputMaybe<UserIsBlockedByConnectionWhere>;
+  IsBlockedBy_NOT?: InputMaybe<UserWhere>;
   IssueCommentsAggregate?: InputMaybe<UserIssueCommentsAggregateInput>;
   /** Return Users where all of the related UserIssueCommentsConnections match this filter */
   IssueCommentsConnection_ALL?: InputMaybe<UserIssueCommentsConnectionWhere>;
@@ -25739,17 +25597,19 @@ export type UserWhere = {
   ModerationProfile?: InputMaybe<ModerationProfileWhere>;
   ModerationProfileAggregate?: InputMaybe<UserModerationProfileAggregateInput>;
   ModerationProfileConnection?: InputMaybe<UserModerationProfileConnectionWhere>;
+  ModerationProfileConnection_NOT?: InputMaybe<UserModerationProfileConnectionWhere>;
+  ModerationProfile_NOT?: InputMaybe<ModerationProfileWhere>;
   NOT?: InputMaybe<UserWhere>;
+  NotificationBundleInterval?: InputMaybe<Scalars['String']['input']>;
   NotificationBundleInterval_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   NotificationBundleInterval_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  NotificationBundleInterval_EQ?: InputMaybe<Scalars['String']['input']>;
   NotificationBundleInterval_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   NotificationBundleInterval_MATCHES?: InputMaybe<Scalars['String']['input']>;
   NotificationBundleInterval_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   OR?: InputMaybe<Array<UserWhere>>;
+  PreferredTimeZone?: InputMaybe<Scalars['String']['input']>;
   PreferredTimeZone_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   PreferredTimeZone_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  PreferredTimeZone_EQ?: InputMaybe<Scalars['String']['input']>;
   PreferredTimeZone_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   PreferredTimeZone_MATCHES?: InputMaybe<Scalars['String']['input']>;
   PreferredTimeZone_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -25821,58 +25681,58 @@ export type UserWhere = {
   UpvotedDiscussionChannels_SINGLE?: InputMaybe<DiscussionChannelWhere>;
   /** Return Users where some of the related DiscussionChannels match this filter */
   UpvotedDiscussionChannels_SOME?: InputMaybe<DiscussionChannelWhere>;
+  bio?: InputMaybe<Scalars['String']['input']>;
   bio_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   bio_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  bio_EQ?: InputMaybe<Scalars['String']['input']>;
   bio_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   bio_MATCHES?: InputMaybe<Scalars['String']['input']>;
   bio_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  commentKarma_EQ?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma?: InputMaybe<Scalars['Int']['input']>;
   commentKarma_GT?: InputMaybe<Scalars['Int']['input']>;
   commentKarma_GTE?: InputMaybe<Scalars['Int']['input']>;
   commentKarma_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   commentKarma_LT?: InputMaybe<Scalars['Int']['input']>;
   commentKarma_LTE?: InputMaybe<Scalars['Int']['input']>;
-  createdAt_EQ?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  deleted_EQ?: InputMaybe<Scalars['Boolean']['input']>;
-  discussionKarma_EQ?: InputMaybe<Scalars['Int']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  discussionKarma?: InputMaybe<Scalars['Int']['input']>;
   discussionKarma_GT?: InputMaybe<Scalars['Int']['input']>;
   discussionKarma_GTE?: InputMaybe<Scalars['Int']['input']>;
   discussionKarma_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
   discussionKarma_LT?: InputMaybe<Scalars['Int']['input']>;
   discussionKarma_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
   displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  displayName_EQ?: InputMaybe<Scalars['String']['input']>;
   displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
   location_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   location_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  location_EQ?: InputMaybe<Scalars['String']['input']>;
   location_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   location_MATCHES?: InputMaybe<Scalars['String']['input']>;
   location_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
   profilePicURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   profilePicURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  profilePicURL_EQ?: InputMaybe<Scalars['String']['input']>;
   profilePicURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   profilePicURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
   profilePicURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pronouns?: InputMaybe<Scalars['String']['input']>;
   pronouns_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   pronouns_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  pronouns_EQ?: InputMaybe<Scalars['String']['input']>;
   pronouns_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   pronouns_MATCHES?: InputMaybe<Scalars['String']['input']>;
   pronouns_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
   username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  username_EQ?: InputMaybe<Scalars['String']['input']>;
   username_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   username_MATCHES?: InputMaybe<Scalars['String']['input']>;
   username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;

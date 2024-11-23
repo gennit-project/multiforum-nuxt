@@ -1,4 +1,4 @@
-import tags from "../../seedData/tags";
+import tags from "./tags";
 
 const seedTags = () => {
   cy.authenticatedGraphQL(

@@ -1,4 +1,4 @@
-import type { ServerRoleCreateInput } from "../../../../__generated__/graphql";
+import type { ServerRoleCreateInput } from "../../../../../../__generated__/graphql";
 
 const serverRoles: ServerRoleCreateInput[] = [
   {
@@ -42,4 +42,25 @@ const serverRoles: ServerRoleCreateInput[] = [
   }
 ];
 
-export default serverRoles;
+const seedServerConfig = () => {
+  cy.authenticatedGraphQL(
+    `
+      mutation createServerRoles (
+          $input: [ServerRoleCreateInput!]!
+      ){
+      createServerRoles (
+          input: $input
+      ) {
+          serverRoles {
+          name
+          }
+        }
+      }
+      `,
+    {
+      input: serverRoles,
+    }
+  );
+};
+
+export default seedServerConfig;

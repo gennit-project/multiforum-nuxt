@@ -1,4 +1,4 @@
-import users from "../../seedData/users";
+import users from "./users";
 
 const seedUsers = () => {
   for (let i = 0; i < users.length; i++) {

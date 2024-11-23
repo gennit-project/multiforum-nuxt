@@ -1,6 +1,6 @@
 import { ONLINE_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import eventsForFilteringTests from "../../support/seedData/eventsForFilteringTests";
+import eventsForFilteringTests from "../../support/commandFunctions/seed/events/eventsForFilteringTests";
 import config from "../../../config";
 
 describe("Filter events by text", () => {

@@ -1,16 +1,14 @@
 import loginWithButtonClick from "./commandFunctions/loginWithButtonClick";
-import seedEvents from "./commandFunctions/seed/seedEvents";
-import seedUsers from "./commandFunctions/seed/seedUsers";
-import seedChannels from "./commandFunctions/seed/seedChannels";
-import seedDiscussions from "./commandFunctions/seed/seedDiscussions";
-import seedTags from "./commandFunctions/seed/seedTags";
-import createEvents from "./commandFunctions/createEvents";
-import createDiscussions from "./commandFunctions/createDiscussions";
-import seedModChannelRoles from "./commandFunctions/seed/rbac/seedModChannelRole";
-import seedChannelRoles from "./commandFunctions/seed/rbac/seedChannelRoles";
-import seedModServerRoles from "./commandFunctions/seed/rbac/seedModServerRoles";
-import seedServerRoles from "./commandFunctions/seed/rbac/seedServerRoles";
-import seedServerConfig from "./commandFunctions/seed/rbac/seedServerConfig";
+import seedUsers from "./commandFunctions/seed/users/seedUsers";
+import seedChannels from "./commandFunctions/seed/channels/seedChannels";
+import seedTags from "./commandFunctions/seed/tags/seedTags";
+import seedEvents from "./commandFunctions/seed/events/seedEvents";
+import seedDiscussions from "./commandFunctions/seed/discussions/seedDiscussions";
+import seedModChannelRoles from "./commandFunctions/seed/rbac/modChannelRoles/seedModChannelRole";
+import seedChannelRoles from "./commandFunctions/seed/rbac/channelRoles/seedChannelRoles";
+import seedModServerRoles from "./commandFunctions/seed/rbac/modServerRoles/seedModServerRoles";
+import seedServerRoles from "./commandFunctions/seed/rbac/serverRoles/seedServerRoles";
+import seedServerConfig from "./commandFunctions/seed/rbac/serverConfigs/seedServerConfig";
 import dropDataForCypressTests from "./commandFunctions/dropDataForCypressTests";
 
 const AUTH_TOKEN_NAME = "authToken";
@@ -144,8 +142,6 @@ Cypress.Commands.add("seedChannelRoles", seedChannelRoles);
 Cypress.Commands.add("seedModServerRoles", seedModServerRoles);
 Cypress.Commands.add("seedServerRoles", seedServerRoles);
 Cypress.Commands.add("seedServerConfig", seedServerConfig);
-Cypress.Commands.add("createEvents", createEvents);
-Cypress.Commands.add("createDiscussions", createDiscussions);
 
 // DELETING SEED DATA
 Cypress.Commands.add("dropDataForCypressTests", dropDataForCypressTests);

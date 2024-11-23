@@ -1,6 +1,6 @@
 import type { ChannelRoleCreateInput } from "../../../../__generated__/graphql";
 
-const serverRoles: ChannelRoleCreateInput[] = [
+const channelRoles: ChannelRoleCreateInput[] = [
   {
     name: "Basic mod role for /cats",
     description: "Standard mod permissions",
@@ -16,4 +16,24 @@ const serverRoles: ChannelRoleCreateInput[] = [
   },
 ];
 
-export default serverRoles;
+const seedChannels = () => {
+  cy.authenticatedGraphQL(
+    `
+      mutation createChannelRoles (
+          $input: [ChannelRoleCreateInput!]!
+      ){
+      createChannelRoles (
+          input: $input
+      ) {
+          channelRoles {
+            name
+          }
+        }
+      }
+      `,
+    {
+      input: channelRoles,
+    }
+  );
+};
+export default seedChannels;
