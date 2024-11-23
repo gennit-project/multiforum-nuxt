@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted, watch } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import {
   isAuthenticatedVar,
@@ -32,12 +32,12 @@ const showAuthContent = computed(
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 
 if (import.meta.env.SSR === false) {
-
   const { 
     loginWithPopup, 
     idTokenClaims, 
     isLoading, 
-    loginWithRedirect 
+    loginWithRedirect,
+    isAuthenticated 
   } = useAuth0();
 
   setIsLoadingAuth(isLoading.value);
@@ -46,16 +46,33 @@ if (import.meta.env.SSR === false) {
     if (isAuthenticatedVar.value && idTokenClaims.value) {
       const token = await idTokenClaims.value.__raw;
       localStorage.setItem("token", token);
+      console.log('the token has been stored successfully ', !!window.localStorage.getItem('token'));
     }
   };
+
+  // Watch for authentication state changes
+  watch([isAuthenticated, idTokenClaims], async ([isAuth, claims]) => {
+    if (isAuth && claims) {
+      await storeToken();
+    }
+  });
+
+  // Also check on mount in case we're returning from a redirect
+  onMounted(async () => {
+    if (isAuthenticated.value && idTokenClaims.value) {
+      await storeToken();
+    }
+  });
   
   handleLogin = async () => {
     if (window?.parent?.Cypress) {
-      await loginWithRedirect();
+      await loginWithRedirect({
+        appState: { returnTo: window.location.pathname }
+      });
     } else {
       await loginWithPopup();
+      await storeToken();
     }
-    await storeToken();
   };
 }
 </script>

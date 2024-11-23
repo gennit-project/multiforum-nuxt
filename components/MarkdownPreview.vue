@@ -2,7 +2,7 @@
 import { computed, defineComponent, ref, watchEffect } from "vue";
 import VueEasyLightbox from "vue-easy-lightbox";
 import MarkdownIt from "markdown-it";
-import config from "@/config";
+import { config } from "@/config";
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
 
 function linkifyUsernames(markdownString: string) {

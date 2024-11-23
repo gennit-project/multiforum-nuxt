@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useAuth0 } from "@auth0/auth0-vue";
-import config from "@/config";
+import { config } from "@/config";
 import { isAuthenticatedVar } from "@/cache";
 
 defineProps({

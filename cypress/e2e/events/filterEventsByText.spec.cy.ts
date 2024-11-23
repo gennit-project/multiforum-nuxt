@@ -1,7 +1,6 @@
 import { ONLINE_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
 import eventsForFilteringTests from "../../support/commandFunctions/seed/events/eventsForFilteringTests";
-import config from "../../../config";
 
 describe("Filter events by text", () => {
   beforeEach(function () {
@@ -28,7 +27,7 @@ describe("Filter events by text", () => {
 
   it("in a channel view, filters events by text", () => {
     const CHANNEL_VIEW =
-      `${config.baseUrl}/forums/phx_music/events/search/`;
+      `${Cypress.env("baseUrl")}/forums/phx_music/events/search/`;
     const searchTerm = "trivia";
 
     cy.visit(CHANNEL_VIEW);

@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { usernameVar } from "@/cache";
-import config from "@/config";
+import { config } from "@/config";
 
 const props = defineProps({
   modName: {

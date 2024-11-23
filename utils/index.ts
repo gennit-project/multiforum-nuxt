@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client/core";
-import config from "@/config";
+import { config } from "@/config";
 import type { Duration } from "luxon";
 import { DateTime, Interval } from "luxon";
 import LinkIcon from '@/components/icons/LinkIcon.vue'

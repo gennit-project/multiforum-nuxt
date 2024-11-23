@@ -4,7 +4,7 @@ import { ref } from "vue";
 import Lightgallery from "lightgallery/vue";
 import lgThumbnail from "lightgallery/plugins/thumbnail";
 import lgZoom from "lightgallery/plugins/zoom";
-import config from "@/config";
+import { config } from "@/config";
 import "lightgallery/css/lightgallery.css";
 import "lightgallery/css/lg-thumbnail.css";
 import "lightgallery/css/lg-zoom.css";

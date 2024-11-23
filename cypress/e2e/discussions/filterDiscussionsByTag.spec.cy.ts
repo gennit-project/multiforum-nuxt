@@ -1,7 +1,7 @@
 import { DISCUSSION_LIST } from "../constants";
 import { deleteAll } from "../utils";
 import { discussionsForFilteringTests } from "../../support/commandFunctions/seed/discussions/discussionsForFilteringTests";
-import config from "../../../config";
+
 
 describe("Filter discussions by tag", () => {
   beforeEach(function () {
@@ -71,7 +71,7 @@ describe("Filter discussions by tag", () => {
   });
 
   const CHANNEL_VIEW =
-    `${config.baseUrl}/forums/phx_music/discussions/`;
+    `${Cypress.env("baseUrl")}/forums/phx_music/discussions/`;
 
   it("in a channel view, filters discussions by tag", () => {
     const searchTerm = "trivia";

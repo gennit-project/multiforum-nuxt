@@ -2,7 +2,7 @@
 import { ref } from "vue";
 import axios from "axios";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
-import config from "@/config";
+import { config } from "@/config";
 
 // Props
 const props = defineProps({

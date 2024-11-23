@@ -1,5 +1,4 @@
-import config from "../../config";
-const baseUrl = config.baseUrl;
+const baseUrl = Cypress.env("baseUrl")
 
 export const EVENT_CREATION_FORM = `${baseUrl}/events/create`;
 export const IN_PERSON_EVENT_LIST = `${baseUrl}/map`;

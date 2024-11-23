@@ -1,5 +1,5 @@
 import { defineNuxtConfig } from "nuxt/config";
-import config from "./config";
+import { config } from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import path from "path";
 
@@ -28,7 +28,7 @@ export default defineNuxtConfig({
       {
         clients: {
           default: {
-            httpEndpoint: config.graphqlUrl || "",
+            httpEndpoint: config?.graphqlUrl || "",
             tokenName: "token",
             tokenStorage: "localStorage",
           },
@@ -51,17 +51,17 @@ export default defineNuxtConfig({
       apollo: {
         clients: {
           default: {
-            httpEndpoint: config.graphqlUrl || "",
+            httpEndpoint: config?.graphqlUrl || "",
           },
         },
       },
-      googleMapsApiKey: config.googleMapsApiKey,
-      auth0Domain: config.domain,
-      auth0ClientId: config.clientId,
-      auth0CallbackUrl: config.callbackUrl,
-      auth0Url: config.auth0Url,
-      auth0Audience: config.auth0Audience,
-      auth0Scope: config.auth0Scope,
+      googleMapsApiKey: config?.googleMapsApiKey,
+      auth0Domain: config?.domain,
+      auth0ClientId: config?.clientId,
+      auth0CallbackUrl: config?.callbackUrl,
+      auth0Url: config?.auth0Url,
+      auth0Audience: config?.auth0Audience,
+      auth0Scope: config?.auth0Scope,
     },
   },
   ssr: true,

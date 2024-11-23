@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useAuth0 } from "@auth0/auth0-vue";
-import config from "@/config";
+import { config } from "@/config";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useRoute } from "vue-router";
+console.log('config.baseUrl', config.baseUrl);  
 
 const { logout } = useAuth0();
 

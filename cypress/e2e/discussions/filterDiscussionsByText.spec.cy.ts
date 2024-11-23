@@ -1,13 +1,12 @@
+import seedDiscussions from "../../support/commandFunctions/seed/discussions/seedDiscussions";
 import { DISCUSSION_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import { discussionsForFilteringTests } from "../../support/commandFunctions/seed/discussions/discussionsForFilteringTests";
-import config from "../../../config";
 
 describe("Filter discussions by text", () => {
   beforeEach(function () {
     deleteAll();
     seedAll();
-    cy.createDiscussions(discussionsForFilteringTests);
+    seedDiscussions();
   });
 
   it("in the sitewide online discussions list, filters discussions by text", () => {
@@ -26,7 +25,7 @@ describe("Filter discussions by text", () => {
   });
 
   it("in a channel view, filters discussions by text", () => {
-    const CHANNEL_VIEW = `${config.baseUrl}/forums/phx_music/discussions/`
+    const CHANNEL_VIEW = `${Cypress.env("baseUrl")}/forums/phx_music/discussions/`
     const searchTerm = "discussion 3";
 
     cy.visit(CHANNEL_VIEW);

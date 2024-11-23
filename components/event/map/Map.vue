@@ -2,7 +2,7 @@
 import { ref, onMounted, watch, computed } from "vue";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useRouter } from "vue-router";
-import config from "@/config";
+import { config } from "@/config";
 import nightModeMapStyles from "@/components/event/map/nightModeMapStyles";
 import placeIcon from "@/assets/images/place-icon.svg";
 // The Google map requires that the styles have to be set
