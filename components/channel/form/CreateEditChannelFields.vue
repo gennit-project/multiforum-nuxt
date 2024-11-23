@@ -55,6 +55,7 @@ const props = defineProps({
     default: false,
   },
 });
+console.log("updateChannelError", props.updateChannelError);
 
 const emit = defineEmits(["submit", "updateFormValues"]);
 // Mutation to create a signed storage URL
@@ -168,15 +169,15 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
       @submit="emit('submit')"
     >
       <div>
+        <ErrorBanner
+          v-if="updateChannelError"
+          :text="updateChannelError.message"
+        />
         <div v-if="getChannelError">
           <ErrorBanner
             v-for="(error, i) in getChannelError?.graphQLErrors"
             :key="i"
             :text="error.message"
-          />
-          <ErrorBanner
-            v-if="updateChannelError"
-            :text="updateChannelError.message"
           />
         </div>
         <div v-if="createChannelError">

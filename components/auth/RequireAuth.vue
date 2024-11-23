@@ -45,16 +45,16 @@ if (import.meta.env.SSR === false) {
     if (isAuthenticatedVar.value && idTokenClaims.value) {
       const token = await idTokenClaims.value.__raw;
       localStorage.setItem("token", token);
-      console.log('the token has been stored successfully ', !!window.localStorage.getItem('token'));
+      console.log('the token has been stored successfully ', window.localStorage.getItem('token'));
     }
   };
 
   // Watch for authentication state changes
-  watch([isAuthenticatedVar.value, idTokenClaims], async ([isAuth, claims]) => {
-    if (isAuth && claims) {
-      await storeToken();
-    }
-  });
+  // watch([isAuthenticatedVar.value, idTokenClaims], async ([isAuth, claims]) => {
+  //   if (isAuth && claims) {
+  //     await storeToken();
+  //   }
+  // });
 
   // // Also check on mount in case we're returning from a redirect
   // onMounted(async () => {
@@ -65,8 +65,10 @@ if (import.meta.env.SSR === false) {
   
   handleLogin = async () => {
     if (window?.parent?.Cypress) {
+      console.log('logging in with cypress');
       await loginWithRedirect();
     } else {
+      console.log('logging in with popup');
       await loginWithPopup();
       await storeToken();
     }
