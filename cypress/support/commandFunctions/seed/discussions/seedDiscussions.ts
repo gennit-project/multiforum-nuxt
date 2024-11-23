@@ -53,16 +53,16 @@ export const discussions: DiscussionCreateInputWithChannels[] =
       },
       ...(tags.length > 0 && {
         Tags: {
-          connect: tags.map((tag) => ({
-            where: {
+          connectOrCreate: tags.map((tag) => ({
+            onCreate: {
               node: {
                 text: tag,
               },
             },
-          })),
-          create: tags.map((tag) => ({
-            node: {
-              text: tag,
+            where: {
+              node: {
+                text: tag,
+              },
             },
           })),
         },
@@ -71,7 +71,6 @@ export const discussions: DiscussionCreateInputWithChannels[] =
     channelConnections: channels,
   }));
 
-  
 const createDiscussions = (
   discussions: DiscussionCreateInputWithChannels[]
 ) => {
@@ -127,7 +126,6 @@ const createDiscussions = (
     }
   }
 };
-
 
 const seedDiscussions = () => {
   createDiscussions(discussions);
