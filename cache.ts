@@ -1,4 +1,4 @@
-import type { ReactiveVar } from "@apollo/client/core";
+import type { InMemoryCacheConfig, ReactiveVar } from "@apollo/client/core";
 import { InMemoryCache, makeVar } from "@apollo/client/core";
 import { ref } from 'vue';
 
@@ -35,7 +35,7 @@ const standardMerge = (existing: any, incoming: any, args: any) => {
   return merged;
 };
 
-const cache = new InMemoryCache({
+export const inMemoryCacheOptions: InMemoryCacheConfig = {
   typePolicies: {
     Tag: {
       keyFields: ["text"],
@@ -188,6 +188,4 @@ const cache = new InMemoryCache({
       },
     },
   },
-});
-
-export default cache;
+}
