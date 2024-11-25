@@ -240,7 +240,11 @@ const {
   onDone: onDoneUpdatingComment,
 } = useMutation(UPDATE_COMMENT);
 
-const { mutate: deleteComment, onDone: onDoneDeletingComment } = useMutation(
+const { 
+  mutate: deleteComment, 
+  onDone: onDoneDeletingComment,
+  loading: deleteCommentLoading,
+} = useMutation(
   DELETE_COMMENT,
   {
     update: (cache) => {
@@ -653,6 +657,7 @@ const lengthOfCommentInProgress = computed(() => {
       :title="'Delete Comment'"
       :body="'Are you sure you want to delete this comment?'"
       :open="showDeleteCommentModal"
+      :loading="deleteCommentLoading"
       @close="showDeleteCommentModal = false"
       @primary-button-click="handleDeleteComment"
     />

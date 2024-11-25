@@ -89,6 +89,9 @@ export const CREATE_COMMENT = gql`
             discussionKarma
             profilePicURL
             commentKarma
+            ChannelRoles {
+              name
+            }
           }
         }
         ParentComment {

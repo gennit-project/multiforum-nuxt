@@ -47,7 +47,6 @@ const createCommentDefaultValues = {
 
 const createFormValues = ref(createCommentDefaultValues);
 
-
 const createCommentInput = computed(() => {
   const input = {
     isRootComment: true,
@@ -88,62 +87,64 @@ const createCommentInput = computed(() => {
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
 
-const { mutate: createComment, error: createCommentError, onDone } = useMutation(
-  CREATE_COMMENT,
-  () => ({
-    errorPolicy: "all",
-    variables: {
-      createCommentInput: createCommentInput.value,
-    },
-    update: (cache, result) => {
-      const newComment: Comment = result.data?.createComments?.comments[0];
+const {
+  mutate: createComment,
+  error: createCommentError,
+  onDone,
+} = useMutation(CREATE_COMMENT, () => ({
+  errorPolicy: "all",
+  variables: {
+    createCommentInput: createCommentInput.value,
+  },
+  update: (cache, result) => {
+    const newComment: Comment = result.data?.createComments?.comments[0];
 
-      const commentSectionQueryVariables = {
-        discussionId: props.discussionChannel?.discussionId,
-        channelUniqueName: props.discussionChannel?.channelUniqueName,
-        modName: props.modName,
-        limit: COMMENT_LIMIT,
-        offset: props.previousOffset,
-        sort: getSortFromQuery(route.query),
-      };
+    const commentSectionQueryVariables = {
+      discussionId: props.discussionChannel?.discussionId,
+      channelUniqueName: props.discussionChannel?.channelUniqueName,
+      modName: props.modName,
+      limit: COMMENT_LIMIT,
+      offset: props.previousOffset,
+      sort: getSortFromQuery(route.query),
+    };
 
-      const readQueryResult = cache.readQuery({
-        query: GET_DISCUSSION_COMMENTS,
-        variables: commentSectionQueryVariables,
-      });
+    const readQueryResult = cache.readQuery({
+      query: GET_DISCUSSION_COMMENTS,
+      variables: commentSectionQueryVariables,
+    });
 
-      const existingDiscussionChannelData: DiscussionChannel =
-        readQueryResult?.getCommentSection?.DiscussionChannel;
+    const existingDiscussionChannelData: DiscussionChannel =
+      readQueryResult?.getCommentSection?.DiscussionChannel;
 
-      const newRootComments: Comment[] = [
-        newComment,
-        ...(readQueryResult?.getCommentSection?.Comments || []),
-      ];
+    const newRootComments: Comment[] = [
+      newComment,
+      ...(readQueryResult?.getCommentSection?.Comments || []),
+    ];
 
-      const existingCount =
-        existingDiscussionChannelData?.CommentsAggregate?.count || 0;
+    const existingCount =
+      existingDiscussionChannelData?.CommentsAggregate?.count || 0;
 
-      cache.writeQuery({
-        query: GET_DISCUSSION_COMMENTS,
-        variables: commentSectionQueryVariables,
-        data: {
-          ...readQueryResult,
-          getCommentSection: {
-            ...readQueryResult?.getCommentSection,
-            DiscussionChannel: {
-              ...existingDiscussionChannelData,
-              CommentsAggregate: {
-                ...existingDiscussionChannelData?.CommentsAggregate,
-                count: existingCount + 1,
-              },
+    cache.writeQuery({
+      query: GET_DISCUSSION_COMMENTS,
+      variables: commentSectionQueryVariables,
+      data: {
+        ...readQueryResult,
+        getCommentSection: {
+          ...readQueryResult?.getCommentSection,
+          DiscussionChannel: {
+            ...existingDiscussionChannelData,
+            ChannelRoles: existingDiscussionChannelData?.ChannelRoles || [], // Include ChannelRoles explicitly
+            CommentsAggregate: {
+              ...existingDiscussionChannelData?.CommentsAggregate,
+              count: existingCount + 1,
             },
-            Comments: newRootComments,
           },
+          Comments: newRootComments,
         },
-      });
-    },
-  })
-);
+      },
+    });
+  },
+}));
 
 onDone(() => {
   createFormValues.value = createCommentDefaultValues;
