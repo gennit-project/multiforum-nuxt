@@ -39,10 +39,6 @@ if (import.meta.env.SSR === false) {
     if (isAuthenticatedVar.value && idTokenClaims.value) {
       const token = await idTokenClaims.value.__raw;
       localStorage.setItem("token", token);
-      console.log(
-        "the token has been stored successfully ",
-        window.localStorage.getItem("token")
-      );
     }
   };
 
@@ -67,10 +63,8 @@ if (import.meta.env.SSR === false) {
 
   handleLogin = async () => {
     if (window?.parent?.Cypress) {
-      console.log("logging in with cypress");
       await loginWithRedirect();
     } else {
-      console.log("logging in with popup");
       await loginWithPopup();
       await storeToken();
     }

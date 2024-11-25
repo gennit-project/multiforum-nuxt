@@ -1,6 +1,5 @@
 
 const baseUrl = Cypress.env("baseUrl");
-console.log("baseUrl", baseUrl);
 const ONLINE_EVENT_LIST = `${baseUrl}/events/list/search`
 
 export type LoginInput = {

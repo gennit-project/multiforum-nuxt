@@ -82,8 +82,6 @@ watch(
   }
 );
 
-console.log(discussionChannelResult.value);
-
 const loadMore = () => {
   fetchMore({
     variables: {
