@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from "vue";
+import { computed, watch } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import {
   isAuthenticatedVar,
@@ -32,12 +32,8 @@ const showAuthContent = computed(
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 
 if (import.meta.env.SSR === false) {
-  const { 
-    loginWithPopup, 
-    idTokenClaims, 
-    isLoading, 
-    loginWithRedirect,
-  } = useAuth0();
+  const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect } =
+    useAuth0();
 
   setIsLoadingAuth(isLoading.value);
 
@@ -45,30 +41,38 @@ if (import.meta.env.SSR === false) {
     if (isAuthenticatedVar.value && idTokenClaims.value) {
       const token = await idTokenClaims.value.__raw;
       localStorage.setItem("token", token);
-      console.log('the token has been stored successfully ', window.localStorage.getItem('token'));
+      console.log(
+        "the token has been stored successfully ",
+        window.localStorage.getItem("token")
+      );
     }
   };
 
   // Watch for authentication state changes
-  // watch([isAuthenticatedVar.value, idTokenClaims], async ([isAuth, claims]) => {
-  //   if (isAuth && claims) {
-  //     await storeToken();
-  //   }
-  // });
+  watch([isAuthenticatedVar, idTokenClaims], async ([isAuth, claims]) => {
+    if (isAuth && claims) {
+      await storeToken();
+    }
+  });
+
 
   // // Also check on mount in case we're returning from a redirect
-  // onMounted(async () => {
-  //   if (isAuthenticated.value && idTokenClaims.value) {
-  //     await storeToken();
-  //   }
-  // });
-  
+  onMounted(async () => {
+    if (isAuthenticatedVar.value && idTokenClaims.value) {
+      // Only store the token if it's different from what's already stored
+
+      if (localStorage.getItem("token") !== idTokenClaims.value.__raw) {
+        await storeToken();
+      }
+    }
+  });
+
   handleLogin = async () => {
     if (window?.parent?.Cypress) {
-      console.log('logging in with cypress');
+      console.log("logging in with cypress");
       await loginWithRedirect();
     } else {
-      console.log('logging in with popup');
+      console.log("logging in with popup");
       await loginWithPopup();
       await storeToken();
     }

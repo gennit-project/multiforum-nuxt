@@ -55,7 +55,6 @@ const props = defineProps({
     default: false,
   },
 });
-console.log("updateChannelError", props.updateChannelError);
 
 const emit = defineEmits(["submit", "updateFormValues"]);
 // Mutation to create a signed storage URL

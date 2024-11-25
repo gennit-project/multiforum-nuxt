@@ -48,7 +48,6 @@ export default defineComponent({
       <div class="max-w-screen-2xl w-full">
         <div
           class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pr-6"
-          :class="[channel?.channelBannerURL ? '' : 'pt-2']"
         >
           <div class="flex items-center w-full gap-4">
             <ExpandableImage
