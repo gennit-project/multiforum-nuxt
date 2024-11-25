@@ -25,9 +25,7 @@ let handleLogin = () => {};
 const showAuthContent = computed(
   () =>
     isAuthenticatedVar.value &&
-    !!usernameVar.value &&
-    !props.loading &&
-    !isLoadingAuthVar.value
+    usernameVar.value
 );
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 
