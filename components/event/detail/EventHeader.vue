@@ -70,6 +70,7 @@ const permalinkObject = computed(() => {
 const {
   mutate: deleteEvent,
   error: deleteEventError,
+  loading: deleteEventLoading,
   onDone: onDoneDeleting,
 } = useMutation(DELETE_EVENT, {
   variables: { id: eventId.value },
@@ -379,6 +380,7 @@ function handleFeedbackInput(event: string) {
       :title="'Delete Event'"
       :body="'Are you sure you want to delete this event?'"
       :open="confirmDeleteIsOpen"
+      :loading="deleteEventLoading"
       @close="confirmDeleteIsOpen = false"
       @primary-button-click="deleteEvent"
     />
