@@ -10,9 +10,8 @@ import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discus
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import gql from "graphql-tag";
-import cache, { modProfileNameVar, usernameVar } from "@/cache";
 import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+import { modProfileNameVar, usernameVar, themeVar } from "@/cache";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -71,13 +70,7 @@ const {
 }));
 onDone(() => (titleEditMode.value = false));
 
-const theme = cache.readQuery({
-  query: gql`
-    query getTheme {
-      theme @client
-    }
-  `,
-})?.theme;
+const theme = themeVar()
 
 const onClickEdit = () => {
   titleEditMode.value = true;

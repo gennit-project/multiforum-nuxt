@@ -2,6 +2,7 @@ import { defineNuxtConfig } from "nuxt/config";
 import { config } from "./config";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import path from "path";
+import { inMemoryCacheOptions } from "./cache";
 
 export default defineNuxtConfig({
   alias: {
@@ -31,6 +32,7 @@ export default defineNuxtConfig({
             httpEndpoint: config?.graphqlUrl || "",
             tokenName: "token",
             tokenStorage: "localStorage",
+            inMemoryCacheOptions,
           },
         },
       },
