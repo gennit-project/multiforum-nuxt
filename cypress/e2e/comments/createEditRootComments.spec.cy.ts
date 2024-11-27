@@ -22,7 +22,7 @@ describe("Basic root comment operations", () => {
 
     // Type a comment
     cy.get("textarea[data-testid='texteditor-textarea']").type(
-      TEST_COMMENT_TEXT,
+      TEST_COMMENT_TEXT
     );
 
     // Save the comment
@@ -32,12 +32,15 @@ describe("Basic root comment operations", () => {
     cy.get("p").contains(TEST_COMMENT_TEXT);
 
     // Now edit the comment
-    cy.contains('[data-testid="comment"]', TEST_COMMENT_TEXT)
-      // Find the button where the id is commentMenu
-      .find('[id="commentMenu"]')
-      .click();
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        // Look for the EllipsisHorizontal icon which is inside the MenuButton
+        cy.get('button[data-testid="commentMenu"').should("be.visible").click();
+      });
 
-    cy.get("div").contains("Edit").click();
+    cy.get(".v-list-item").contains("div", "Edit").should("be.visible").click();
 
     // Type a new comment
     const updatedCommentText = "This is my updated comment";
@@ -48,14 +51,21 @@ describe("Basic root comment operations", () => {
     // Save the comment
     cy.get("span").contains("Save").click();
     // Check for paragraph with comment text
-    cy.get("p").contains(TEST_COMMENT_TEXT);
+    cy.get("p").contains(updatedCommentText);
 
     // Now delete the comment
-    cy.contains('[data-testid="comment"]', updatedCommentText)
-      .find('[id="commentMenu"]')
-      .click();
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", updatedCommentText)
+      .within(() => {
+        // Look for the EllipsisHorizontal icon which is inside the MenuButton
+        cy.get('button[data-testid="commentMenu"').should("be.visible").click();
+      });
 
-    cy.get("div").contains("Delete").click();
+    cy.get(".v-list-item")
+      .contains("div", "Delete")
+      .should("be.visible")
+      .click();
 
     // Confirm deletion
     cy.get("button").contains("Delete").click();

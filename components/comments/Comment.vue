@@ -497,7 +497,7 @@ const saveDisabled = computed(() => {
                   >
                     <MenuButton
                       v-if="commentMenuItems.length > 0"
-                      id="commentMenu"
+                      :data-testid="'commentMenu'"
                       :items="commentMenuItems"
                       @copy-link="copyLink"
                       @handle-edit="() => handleEdit(props.commentData)"

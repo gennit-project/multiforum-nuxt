@@ -7,6 +7,10 @@ import type { MenuItemType } from "./IconButtonDropdown.vue";
 
 // Props
 defineProps({
+  dataTestid: {
+    type: String,
+    default: "",
+  },
   items: {
     type: Array as PropType<MenuItemType[]>,
     default: () => [],
@@ -65,6 +69,7 @@ const menuStyles = {
   <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
     <template #activator="{ props }">
       <v-btn
+        :data-testid="dataTestid"
         variant="text"
         v-bind="props"
         class="shadow-none focus:ring-indigo-500 inline-flex justify-center rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100"

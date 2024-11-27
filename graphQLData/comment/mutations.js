@@ -92,6 +92,9 @@ export const CREATE_COMMENT = gql`
             ChannelRoles {
               name
             }
+            ServerRoles {
+              name
+            }
           }
         }
         ParentComment {
