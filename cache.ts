@@ -33,78 +33,117 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       keyFields: ["uniqueName"],
       merge: true,
       fields: {
-        Tags: { merge: true },
-        Admins: { merge: true },
-      },
+        Tags: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        Admins: {
+          merge: (existing = [], incoming) => [...incoming]
+        }
+      }
     },
     Discussion: {
       keyFields: ["id"],
       merge: true,
       fields: {
-        Tags: { merge: true },
-        DiscussionChannels: { merge: true },
-        Author: { merge: true },
-        Channel: { merge: true },
-      },
+        Tags: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        DiscussionChannels: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        Author: {
+          merge: true
+        },
+        Channel: {
+          merge: true
+        }
+      }
     },
     Comment: {
       keyFields: ["id"],
       merge: true,
       fields: {
-        CommentAuthor: { merge: true },
-        UpvotedByUsers: { merge: true },
-        FeedbackComments: { merge: true },
-      },
+        CommentAuthor: {
+          merge: true
+        },
+        UpvotedByUsers: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        FeedbackComments: {
+          merge: (existing = [], incoming) => [...incoming]
+        }
+      }
     },
     Event: {
       keyFields: ["id"],
       merge: true,
       fields: {
-        Tags: { merge: true },
-        Channels: { merge: true },
-        Poster: { merge: true },
-      },
+        Tags: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        Channels: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        Poster: {
+          merge: true
+        }
+      }
     },
     DiscussionChannel: {
       keyFields: ["discussionId", "channelUniqueName"],
       merge: true,
       fields: {
-        UpvotedByUsers: { merge: true },
-        Channel: { merge: true },
-        Comments: { merge: true },
-        CommentsAggregate: {
-          // Treat CommentsAggregate as a non-normalized object
-          merge(existing, incoming) {
-            return incoming; // Always overwrite with the new aggregate count
-          },
+        UpvotedByUsers: {
+          merge: (existing = [], incoming) => [...incoming]
         },
-      },
+        Channel: {
+          merge: true
+        },
+        Comments: {
+          merge: (existing = [], incoming) => [...incoming]
+        }
+      }
     },
     User: {
       keyFields: ["username"],
       merge: true,
       fields: {
-        Discussions: { merge: true },
-        Comments: { merge: true },
-        Events: { merge: true },
-        UpvotedComments: { merge: true },
-        UpvotedDiscussions: { merge: true },
-        UpvotedEvents: { merge: true },
-        SubscribedChannels: { merge: true },
-        SubscribedTags: { merge: true },
-        ModProfiles: { merge: true },
-        ChannelRoles: {
-          merge(existing = [], incoming = []) {
-            // Merge existing roles with incoming roles
-            return incoming.length ? incoming : existing;
-          },
+        Discussions: {
+          merge: (existing = [], incoming) => [...incoming]
         },
-      },
+        Comments: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        Events: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        UpvotedComments: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        UpvotedDiscussions: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        UpvotedEvents: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        SubscribedChannels: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        SubscribedTags: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        ModProfiles: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        ChannelRoles: {
+          merge: (existing = [], incoming) => [...incoming]
+        }
+      }
     },
     ChannelRole: {
       keyFields: ["channelUniqueName"],
-      merge: true,
+      merge: true
     },
-    Query: {},
-  },
+    Query: {}
+  }
 };

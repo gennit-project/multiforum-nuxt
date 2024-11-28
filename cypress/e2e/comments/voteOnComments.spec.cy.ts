@@ -18,6 +18,8 @@ describe("Basic root comment operations", () => {
     cy.get("span").contains("Example topic 1").click();
 
     // Click the 'write a reply' textarea
+
+    // cannot find element with data-testid="addComment"
     cy.get("textarea[data-testid='addComment']").click();
 
     // Type a comment
