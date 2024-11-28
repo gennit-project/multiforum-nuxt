@@ -90,7 +90,6 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       }
     },
     DiscussionChannel: {
-      keyFields: ["discussionId", "channelUniqueName"],
       merge: true,
       fields: {
         UpvotedByUsers: {

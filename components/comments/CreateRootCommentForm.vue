@@ -57,10 +57,9 @@ const writeReplyStyle =
           <div class="flex w-full gap-2">
             <LoggedInUserAvatar v-if="usernameVar" />
             <textarea
-              id="addComment"
-              class="flex-1"
               data-testid="addComment"
-              name="addcomment"
+              class="flex-1"
+              name="addComment"
               rows="1"
               placeholder="Write a comment"
               :class="writeReplyStyle"
