@@ -8,6 +8,7 @@ import modChannelRoles from "../support/commandFunctions/seedData/rbac/seedModCh
 import serverRoles from "../support/commandFunctions/seedData/rbac/seedServerRoles";
 import modServerRoles from "../support/commandFunctions/seedData/rbac/seedModServerRoles";
 import serverConfigs from "../support/commandFunctions/seedData/rbac/seedServerConfig";
+import users from "../support/commandFunctions/seedData/seedUsers";
 
 export const deleteAll = () => {
   cy.loginAsAdmin();
@@ -47,6 +48,7 @@ export const seedAll = () => {
       discussions,
       events: events.concat(eventsForFilterTests),
       tags,
+      users,
       channelRoles,
       modChannelRoles,
       serverRoles,

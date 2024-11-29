@@ -16994,12 +16994,17 @@ export type MutationRemoveEmojiFromDiscussionChannelArgs = {
 
 
 export type MutationSeedDataForCypressTestsArgs = {
+  channelRoles: Array<ChannelRoleCreateInput>;
   channels: Array<ChannelCreateInput>;
   comments: Array<CommentCreateInput>;
-  discussions: Array<DiscussionCreateInput>;
-  events: Array<EventCreateInput>;
+  discussions: Array<DiscussionCreateInputWithChannels>;
+  events: Array<EventCreateInputWithChannels>;
+  modChannelRoles: Array<ModChannelRoleCreateInput>;
+  modServerRoles: Array<ModServerRoleCreateInput>;
+  serverConfigs: Array<ServerConfigCreateInput>;
+  serverRoles: Array<ServerRoleCreateInput>;
   tags: Array<TagCreateInput>;
-  users: Array<UserCreateInput>;
+  users: Array<NewUserInput>;
 };
 
 
@@ -17249,6 +17254,11 @@ export type MutationUpvoteCommentArgs = {
 
 export type MutationUpvoteDiscussionChannelArgs = {
   discussionChannelId: Scalars['ID']['input'];
+  username: Scalars['String']['input'];
+};
+
+export type NewUserInput = {
+  emailAddress: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
 
