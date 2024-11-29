@@ -9,12 +9,14 @@ import type {
   ModServerRoleCreateInput,
   ServerConfigCreateInput,
   ModChannelRoleCreateInput,
+  CommentCreateInput
 } from "../../__generated__/graphql";
 import type { LoginInput } from "../support/commandFunctions/loginWithButtonClick";
 /* eslint-disable @typescript-eslint/no-namespace */
 
 export type SeedDataInput = {
   channels: ChannelCreateInput[];
+  comments: CommentCreateInput[];
   discussions: DiscussionCreateInputWithChannels[];
   events: EventCreateInputWithChannels[];
   tags: TagCreateInput[];

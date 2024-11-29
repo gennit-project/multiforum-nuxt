@@ -5,6 +5,7 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
     channels,
     discussions,
     events,
+    comments,
     tags,
     channelRoles,
     modChannelRoles,
@@ -17,11 +18,16 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
     `
     mutation seedDataForCypress(
       $channels: [ChannelCreateInput!]!, 
-      $users: [UserCreateInput!]!, 
-      $tags: [TagCreateInput!]!, 
       $discussions: [DiscussionCreateInput!]!, 
       $events: [EventCreateInput!]!, 
+      $users: [UserCreateInput!]!, 
+      $tags: [TagCreateInput!]!, 
       $comments: [CommentCreateInput!]!
+      $channelRoles: [ChannelRoleCreateInput!]!
+      $modChannelRoles: [ModChannelRoleCreateInput!]!
+      $serverRoles: [ServerRoleCreateInput!]!
+      $modServerRoles: [ModServerRoleCreateInput!]!
+      $serverConfigs: [ServerConfigCreateInput!]!
     ) {
         seedDataForCypressTests(
           channels: $channels, 
@@ -30,6 +36,11 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
           discussions: $discussions, 
           events: $events, 
           comments: $comments
+          channelRoles: $channelRoles
+          modChannelRoles: $modChannelRoles
+          serverRoles: $serverRoles
+          modServerRoles: $modServerRoles
+          serverConfigs: $serverConfigs
         ) {
             message
             success
@@ -40,6 +51,7 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
       channels,
       discussions,
       events,
+      comments,
       tags,
       channelRoles,
       modChannelRoles,

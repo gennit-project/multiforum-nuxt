@@ -43,6 +43,7 @@ export const seedAll = () => {
 
   cy.seedDataForCypressTests({
       channels,
+      comments: [], // May add some seed comments later if needed.
       discussions,
       events: events.concat(eventsForFilterTests),
       tags,
