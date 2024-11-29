@@ -6417,6 +6417,12 @@ export type CreateSafetyCheckResponsesMutationResponse = {
   safetyCheckResponses: Array<SafetyCheckResponse>;
 };
 
+export type CreateSeedDataResponsesMutationResponse = {
+  __typename?: 'CreateSeedDataResponsesMutationResponse';
+  info: CreateInfo;
+  seedDataResponses: Array<SeedDataResponse>;
+};
+
 export type CreateServerConfigsMutationResponse = {
   __typename?: 'CreateServerConfigsMutationResponse';
   info: CreateInfo;
@@ -8198,6 +8204,11 @@ export type DiscussionCreateInput = {
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type DiscussionCreateInputWithChannels = {
+  channelConnections: Array<Scalars['String']['input']>;
+  discussionCreateInput: DiscussionCreateInput;
 };
 
 export type DiscussionDeleteInput = {
@@ -11314,6 +11325,11 @@ export type EventCreateInput = {
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
   virtualEventUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventCreateInputWithChannels = {
+  channelConnections: Array<Scalars['String']['input']>;
+  eventCreateInput: EventCreateInput;
 };
 
 export type EventDeleteInput = {
@@ -16466,6 +16482,7 @@ export type Mutation = {
   createRepeatEnds: CreateRepeatEndsMutationResponse;
   createRepeatEveries: CreateRepeatEveriesMutationResponse;
   createSafetyCheckResponses: CreateSafetyCheckResponsesMutationResponse;
+  createSeedDataResponses: CreateSeedDataResponsesMutationResponse;
   createServerConfigs: CreateServerConfigsMutationResponse;
   createServerRoles: CreateServerRolesMutationResponse;
   createSignedStorageURL?: Maybe<SignedUrl>;
@@ -16501,6 +16518,7 @@ export type Mutation = {
   deleteRepeatEnds: DeleteInfo;
   deleteRepeatEveries: DeleteInfo;
   deleteSafetyCheckResponses: DeleteInfo;
+  deleteSeedDataResponses: DeleteInfo;
   deleteServerConfigs: DeleteInfo;
   deleteServerRoles: DeleteInfo;
   deleteSignedUrls: DeleteInfo;
@@ -16510,6 +16528,7 @@ export type Mutation = {
   dropDataForCypressTests?: Maybe<DropDataResponse>;
   removeEmojiFromComment?: Maybe<Comment>;
   removeEmojiFromDiscussionChannel?: Maybe<DiscussionChannel>;
+  seedDataForCypressTests?: Maybe<SeedDataResponse>;
   undoUpvoteComment?: Maybe<Comment>;
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
   updateAlbums: UpdateAlbumsMutationResponse;
@@ -16542,6 +16561,7 @@ export type Mutation = {
   updateRepeatEnds: UpdateRepeatEndsMutationResponse;
   updateRepeatEveries: UpdateRepeatEveriesMutationResponse;
   updateSafetyCheckResponses: UpdateSafetyCheckResponsesMutationResponse;
+  updateSeedDataResponses: UpdateSeedDataResponsesMutationResponse;
   updateServerConfigs: UpdateServerConfigsMutationResponse;
   updateServerRoles: UpdateServerRolesMutationResponse;
   updateSignedUrls: UpdateSignedUrlsMutationResponse;
@@ -16610,8 +16630,7 @@ export type MutationCreateDiscussionChannelsArgs = {
 
 
 export type MutationCreateDiscussionWithChannelConnectionsArgs = {
-  channelConnections?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  discussionCreateInput?: InputMaybe<DiscussionCreateInput>;
+  input: Array<DiscussionCreateInputWithChannels>;
 };
 
 
@@ -16657,8 +16676,7 @@ export type MutationCreateEventCommentsFormatsArgs = {
 
 
 export type MutationCreateEventWithChannelConnectionsArgs = {
-  channelConnections?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  eventCreateInput?: InputMaybe<EventCreateInput>;
+  input: Array<EventCreateInputWithChannels>;
 };
 
 
@@ -16724,6 +16742,11 @@ export type MutationCreateRepeatEveriesArgs = {
 
 export type MutationCreateSafetyCheckResponsesArgs = {
   input: Array<SafetyCheckResponseCreateInput>;
+};
+
+
+export type MutationCreateSeedDataResponsesArgs = {
+  input: Array<SeedDataResponseCreateInput>;
 };
 
 
@@ -16918,6 +16941,11 @@ export type MutationDeleteSafetyCheckResponsesArgs = {
 };
 
 
+export type MutationDeleteSeedDataResponsesArgs = {
+  where?: InputMaybe<SeedDataResponseWhere>;
+};
+
+
 export type MutationDeleteServerConfigsArgs = {
   delete?: InputMaybe<ServerConfigDeleteInput>;
   where?: InputMaybe<ServerConfigWhere>;
@@ -16962,6 +16990,16 @@ export type MutationRemoveEmojiFromDiscussionChannelArgs = {
   discussionChannelId: Scalars['ID']['input'];
   emojiLabel: Scalars['String']['input'];
   username: Scalars['String']['input'];
+};
+
+
+export type MutationSeedDataForCypressTestsArgs = {
+  channels: Array<ChannelCreateInput>;
+  comments: Array<CommentCreateInput>;
+  discussions: Array<DiscussionCreateInput>;
+  events: Array<EventCreateInput>;
+  tags: Array<TagCreateInput>;
+  users: Array<UserCreateInput>;
 };
 
 
@@ -17161,6 +17199,12 @@ export type MutationUpdateSafetyCheckResponsesArgs = {
 };
 
 
+export type MutationUpdateSeedDataResponsesArgs = {
+  update?: InputMaybe<SeedDataResponseUpdateInput>;
+  where?: InputMaybe<SeedDataResponseWhere>;
+};
+
+
 export type MutationUpdateServerConfigsArgs = {
   update?: InputMaybe<ServerConfigUpdateInput>;
   where?: InputMaybe<ServerConfigWhere>;
@@ -17336,6 +17380,9 @@ export type Query = {
   safetyCheckResponses: Array<SafetyCheckResponse>;
   safetyCheckResponsesAggregate: SafetyCheckResponseAggregateSelection;
   safetyCheckResponsesConnection: SafetyCheckResponsesConnection;
+  seedDataResponses: Array<SeedDataResponse>;
+  seedDataResponsesAggregate: SeedDataResponseAggregateSelection;
+  seedDataResponsesConnection: SeedDataResponsesConnection;
   serverConfigs: Array<ServerConfig>;
   serverConfigsAggregate: ServerConfigAggregateSelection;
   serverConfigsConnection: ServerConfigsConnection;
@@ -17944,6 +17991,25 @@ export type QuerySafetyCheckResponsesConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<SafetyCheckResponseWhere>;
+};
+
+
+export type QuerySeedDataResponsesArgs = {
+  options?: InputMaybe<SeedDataResponseOptions>;
+  where?: InputMaybe<SeedDataResponseWhere>;
+};
+
+
+export type QuerySeedDataResponsesAggregateArgs = {
+  where?: InputMaybe<SeedDataResponseWhere>;
+};
+
+
+export type QuerySeedDataResponsesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<SeedDataResponseSort>>>;
+  where?: InputMaybe<SeedDataResponseWhere>;
 };
 
 
@@ -18681,6 +18747,67 @@ export type SafetyCheckResponseWhere = {
 export type SafetyCheckResponsesConnection = {
   __typename?: 'SafetyCheckResponsesConnection';
   edges: Array<SafetyCheckResponseEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type SeedDataResponse = {
+  __typename?: 'SeedDataResponse';
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type SeedDataResponseAggregateSelection = {
+  __typename?: 'SeedDataResponseAggregateSelection';
+  count: Scalars['Int']['output'];
+  message: StringAggregateSelection;
+};
+
+export type SeedDataResponseCreateInput = {
+  message?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SeedDataResponseEdge = {
+  __typename?: 'SeedDataResponseEdge';
+  cursor: Scalars['String']['output'];
+  node: SeedDataResponse;
+};
+
+export type SeedDataResponseOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more SeedDataResponseSort objects to sort SeedDataResponses by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<SeedDataResponseSort>>;
+};
+
+/** Fields to sort SeedDataResponses by. The order in which sorts are applied is not guaranteed when specifying many fields in one SeedDataResponseSort object. */
+export type SeedDataResponseSort = {
+  message?: InputMaybe<SortDirection>;
+  success?: InputMaybe<SortDirection>;
+};
+
+export type SeedDataResponseUpdateInput = {
+  message?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SeedDataResponseWhere = {
+  AND?: InputMaybe<Array<SeedDataResponseWhere>>;
+  NOT?: InputMaybe<SeedDataResponseWhere>;
+  OR?: InputMaybe<Array<SeedDataResponseWhere>>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  message_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SeedDataResponsesConnection = {
+  __typename?: 'SeedDataResponsesConnection';
+  edges: Array<SeedDataResponseEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -21183,6 +21310,12 @@ export type UpdateSafetyCheckResponsesMutationResponse = {
   __typename?: 'UpdateSafetyCheckResponsesMutationResponse';
   info: UpdateInfo;
   safetyCheckResponses: Array<SafetyCheckResponse>;
+};
+
+export type UpdateSeedDataResponsesMutationResponse = {
+  __typename?: 'UpdateSeedDataResponsesMutationResponse';
+  info: UpdateInfo;
+  seedDataResponses: Array<SeedDataResponse>;
 };
 
 export type UpdateServerConfigsMutationResponse = {

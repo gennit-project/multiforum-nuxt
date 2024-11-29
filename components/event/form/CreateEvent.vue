@@ -105,10 +105,10 @@ function submit() {
     console.error("Username is required");
     return
   }
-  createEvent({
+  createEvent([{
     eventCreateInput: eventCreateInput.value,
     channelConnections: channelConnections.value,
-  });
+  }]);
 }
 
 function updateFormValues(data: CreateEditEventFormValues) {

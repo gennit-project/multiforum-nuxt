@@ -46,12 +46,10 @@ export const REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL = gql`
 
 export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
   mutation createDiscussion(
-    $discussionCreateInput: DiscussionCreateInput
-    $channelConnections: [String]
+    $input: [DiscussionCreateInputWithChannels!]!
   ) {
     createDiscussionWithChannelConnections(
-      discussionCreateInput: $discussionCreateInput
-      channelConnections: $channelConnections
+      input: $input
     ) {
       id
       title

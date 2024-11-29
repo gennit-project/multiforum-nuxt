@@ -1,15 +1,6 @@
 import loginWithButtonClick from "./commandFunctions/loginWithButtonClick";
-import seedUsers from "./commandFunctions/seed/users/seedUsers";
-import seedChannels from "./commandFunctions/seed/channels/seedChannels";
-import seedTags from "./commandFunctions/seed/tags/seedTags";
-import seedEvents from "./commandFunctions/seed/events/seedEvents";
-import seedDiscussions from "./commandFunctions/seed/discussions/seedDiscussions";
-import seedModChannelRoles from "./commandFunctions/seed/rbac/modChannelRoles/seedModChannelRole";
-import seedChannelRoles from "./commandFunctions/seed/rbac/channelRoles/seedChannelRoles";
-import seedModServerRoles from "./commandFunctions/seed/rbac/modServerRoles/seedModServerRoles";
-import seedServerRoles from "./commandFunctions/seed/rbac/serverRoles/seedServerRoles";
-import seedServerConfig from "./commandFunctions/seed/rbac/serverConfigs/seedServerConfig";
 import dropDataForCypressTests from "./commandFunctions/dropDataForCypressTests";
+import seedDataForCypressTests from "./commandFunctions/seedDataForCypressTests";
 
 const AUTH_TOKEN_NAME = "authToken";
 const AUTH_TOKEN_CACHE_KEY = "auth_token_cache";
@@ -132,16 +123,7 @@ Cypress.Commands.add("safetyCheck", () => {
 });
 
 // ADDING SEED DATA
-Cypress.Commands.add("seedDiscussions", seedDiscussions);
-Cypress.Commands.add("seedEvents", seedEvents);
-Cypress.Commands.add("seedUsers", seedUsers);
-Cypress.Commands.add("seedChannels", seedChannels);
-Cypress.Commands.add("seedTags", seedTags);
-Cypress.Commands.add("seedModChannelRoles", seedModChannelRoles);
-Cypress.Commands.add("seedChannelRoles", seedChannelRoles);
-Cypress.Commands.add("seedModServerRoles", seedModServerRoles);
-Cypress.Commands.add("seedServerRoles", seedServerRoles);
-Cypress.Commands.add("seedServerConfig", seedServerConfig);
+Cypress.Commands.add("seedDataForCypressTests", seedDataForCypressTests);
 
 // DELETING SEED DATA
 Cypress.Commands.add("dropDataForCypressTests", dropDataForCypressTests);

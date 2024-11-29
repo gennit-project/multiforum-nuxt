@@ -3,12 +3,10 @@ import { EVENT_FIELDS } from "./queries";
 
 export const CREATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
   mutation createEvent(
-    $eventCreateInput: EventCreateInput
-    $channelConnections: [String]
+    $input: [EventCreateInputWithChannels!]!
   ) {
     createEventWithChannelConnections(
-      eventCreateInput: $eventCreateInput
-      channelConnections: $channelConnections
+      input: $input
     ) {
       ...EventFields
       EventChannels {

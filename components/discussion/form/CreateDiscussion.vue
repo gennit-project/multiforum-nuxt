@@ -2,28 +2,36 @@
 import { ref, computed } from "vue";
 import { useRouter, useRoute } from "#app";
 import { useMutation } from "@vue/apollo-composable";
-import type { DiscussionChannel, DiscussionCreateInput } from "@/__generated__/graphql";
+import type {
+  DiscussionChannel,
+  DiscussionCreateInput,
+} from "@/__generated__/graphql";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
 import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import "md-editor-v3/lib/style.css";
-import { getSortFromQuery, getTimeFrameFromQuery } from "@/components/comments/getSortFromQuery";
+import {
+  getSortFromQuery,
+  getTimeFrameFromQuery,
+} from "@/components/comments/getSortFromQuery";
 import { usernameVar } from "@/cache";
 
 const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();
 const router = useRouter();
 
-const channelId: string = route.params.forumId ? String(route.params.forumId) : "";
+const channelId: string = route.params.forumId
+  ? String(route.params.forumId)
+  : "";
 
 const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
   title: "",
   body: "",
   selectedChannels: channelId ? [channelId] : [],
   selectedTags: [],
-  author: usernameVar.value
+  author: usernameVar.value,
 };
 
 const formValues = ref(createDiscussionDefaultValues);
@@ -31,11 +39,11 @@ const formValues = ref(createDiscussionDefaultValues);
 const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     onCreate: {
-      node: { text: tag }
+      node: { text: tag },
     },
     where: {
-      node: { text: tag }
-    }
+      node: { text: tag },
+    },
   }));
 
   return {
@@ -45,86 +53,96 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
     Author: {
       connect: {
         where: {
-          node: { username: usernameVar.value }
-        }
-      }
-    }
+          node: { username: usernameVar.value },
+        },
+      },
+    },
   };
 });
 
 const channelConnections = computed(() => formValues.value.selectedChannels);
 const createDiscussionLoading = ref(false);
 
-const { mutate: createDiscussion, error: createDiscussionError, onDone } = useMutation(
-  CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
-  () => ({
-    errorPolicy: "all",
-    variables: {
-      discussionCreateInput: discussionCreateInput.value,
-      channelConnections: channelConnections.value
-    },
-    update: (cache, result) => {
-      const discussionChannels =
-        result.data?.createDiscussionWithChannelConnections?.DiscussionChannels || [];
-      const discussionChannelInCurrentChannel = discussionChannels.filter(
-        (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId
-      );
+const {
+  mutate: createDiscussion,
+  error: createDiscussionError,
+  onDone,
+} = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+  errorPolicy: "all",
+  variables: {
+    input: [
+      {
+        discussionCreateInput: discussionCreateInput.value,
+        channelConnections: channelConnections.value,
+      },
+    ],
+  },
+  update: (cache, result) => {
+    const discussionChannels =
+      result.data?.createDiscussionWithChannelConnections?.DiscussionChannels ||
+      [];
+    const discussionChannelInCurrentChannel = discussionChannels.filter(
+      (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId
+    );
 
-      const existingData = cache.readQuery({
-        query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-        variables: {
-          channelUniqueName: channelId,
-          searchInput: "",
-          selectedTags: [],
-          options: {
-            limit: DISCUSSION_PAGE_LIMIT,
-            offset: 0,
-            sort: getSortFromQuery(route.query),
-            timeFrame: getTimeFrameFromQuery(route.query)
-          }
-        }
-      });
-
-      const existingNumberOfDiscussionChannels =
-        existingData?.getDiscussionsInChannel?.aggregateDiscussionChannelsCount || 0;
-
-      cache.writeQuery({
-        query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-        variables: {
-          channelUniqueName: channelId,
-          searchInput: "",
-          selectedTags: [],
-          options: {
-            limit: DISCUSSION_PAGE_LIMIT,
-            offset: 0,
-            sort: getSortFromQuery(route.query),
-            timeFrame: getTimeFrameFromQuery(route.query)
-          }
+    const existingData = cache.readQuery({
+      query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
+      variables: {
+        channelUniqueName: channelId,
+        searchInput: "",
+        selectedTags: [],
+        options: {
+          limit: DISCUSSION_PAGE_LIMIT,
+          offset: 0,
+          sort: getSortFromQuery(route.query),
+          timeFrame: getTimeFrameFromQuery(route.query),
         },
-        data: {
-          getDiscussionsInChannel: {
-            aggregateDiscussionChannelsCount: existingNumberOfDiscussionChannels + 1,
-            discussionChannels: [
-              ...discussionChannelInCurrentChannel,
-              ...(existingData?.getDiscussionsInChannel?.discussionChannels || [])
-            ]
-          }
-        }
-      });
-    }
-  })
-);
+      },
+    });
+
+    const existingNumberOfDiscussionChannels =
+      existingData?.getDiscussionsInChannel?.aggregateDiscussionChannelsCount ||
+      0;
+
+    cache.writeQuery({
+      query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
+      variables: {
+        channelUniqueName: channelId,
+        searchInput: "",
+        selectedTags: [],
+        options: {
+          limit: DISCUSSION_PAGE_LIMIT,
+          offset: 0,
+          sort: getSortFromQuery(route.query),
+          timeFrame: getTimeFrameFromQuery(route.query),
+        },
+      },
+      data: {
+        getDiscussionsInChannel: {
+          aggregateDiscussionChannelsCount:
+            existingNumberOfDiscussionChannels + 1,
+          discussionChannels: [
+            ...discussionChannelInCurrentChannel,
+            ...(existingData?.getDiscussionsInChannel?.discussionChannels ||
+              []),
+          ],
+        },
+      },
+    });
+  },
+}));
 
 onDone((response) => {
-  const newDiscussionId = response.data?.createDiscussionWithChannelConnections.id;
+  const newDiscussionId =
+    response.data?.createDiscussionWithChannelConnections.id;
   createDiscussionLoading.value = false;
 
   router.push({
     name: "forums-forumId-discussions-discussionId",
     params: {
       forumId: channelId || formValues.value.selectedChannels[0],
-      discussionId: newDiscussionId
-    }
+      discussionId: newDiscussionId,
+    },
   });
 });
 
@@ -140,7 +158,7 @@ function submit() {
 function updateFormValues(data: CreateEditDiscussionFormValues) {
   formValues.value = {
     ...formValues.value,
-    ...data
+    ...data,
   };
 }
 </script>

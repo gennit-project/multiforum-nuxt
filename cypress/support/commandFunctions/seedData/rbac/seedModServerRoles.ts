@@ -1,4 +1,4 @@
-import type { ModServerRoleCreateInput } from "../../../../__generated__/graphql";
+import type { ModServerRoleCreateInput } from "../../../../../__generated__/graphql";
 
 const modServerRoles: ModServerRoleCreateInput[] = [
   {
@@ -20,25 +20,5 @@ const modServerRoles: ModServerRoleCreateInput[] = [
 ];
 
 
-const seedModServerRoles = () => {
-  cy.authenticatedGraphQL(
-    `
-    mutation createModServerRole (
-        $input: [ModServerRoleCreateInput!]!
-    ){
-    createModServerRoles (
-        input: $input
-    ) {
-        modServerRoles {
-          name
-        }
-      }
-    }
-    `,
-    {
-      input: modServerRoles,
-    }
-  );
-};
 
-export default seedModServerRoles;
+export default modServerRoles;

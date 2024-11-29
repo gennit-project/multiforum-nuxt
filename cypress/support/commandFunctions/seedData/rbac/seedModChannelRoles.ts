@@ -1,4 +1,4 @@
-import type { ModChannelRoleCreateInput } from "../../../../__generated__/graphql";
+import type { ModChannelRoleCreateInput } from "../../../../../__generated__/graphql";
 
 const modChannelRoles: ModChannelRoleCreateInput[] = [
   {
@@ -27,25 +27,6 @@ const modChannelRoles: ModChannelRoleCreateInput[] = [
   },
 ];
 
-const seedModChannelRoles = () => {
-  cy.authenticatedGraphQL(
-    `
-      mutation createModChannelRoles (
-          $input: [ModChannelRoleCreateInput!]!
-      ){
-      createModChannelRoles (
-          input: $input
-      ) {
-          modChannelRoles {
-            name
-          }
-        }
-      }
-      `,
-    {
-      input: modChannelRoles,
-    }
-  );
-};
 
-export default seedModChannelRoles;
+
+export default modChannelRoles;

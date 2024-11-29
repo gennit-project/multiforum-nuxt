@@ -1,6 +1,6 @@
 import { IN_PERSON_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import eventsForFilteringTests from "../../support/commandFunctions/seed/events/eventsForFilteringTests";
+import eventsForFilteringTests from "../../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
 
 describe("Filter events by distance", () => {
   beforeEach(function () {

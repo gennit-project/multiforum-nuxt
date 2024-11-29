@@ -1,3 +1,14 @@
+import channels from "../support/commandFunctions/seedData/seedChannels";
+import discussions from "../support/commandFunctions/seedData/seedDiscussions";
+import events from "../support/commandFunctions/seedData/seedEvents";
+import eventsForFilterTests from "../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
+import tags from "../support/commandFunctions/seedData/seedTags";
+import channelRoles from "../support/commandFunctions/seedData/rbac/seedChannelRoles";
+import modChannelRoles from "../support/commandFunctions/seedData/rbac/seedModChannelRoles"
+import serverRoles from "../support/commandFunctions/seedData/rbac/seedServerRoles";
+import modServerRoles from "../support/commandFunctions/seedData/rbac/seedModServerRoles";
+import serverConfigs from "../support/commandFunctions/seedData/rbac/seedServerConfig";
+
 export const deleteAll = () => {
   cy.loginAsAdmin();
   cy.dropDataForCypressTests().then((response) =>
@@ -30,33 +41,16 @@ export const seedAll = () => {
   // The order is important here because some
   // have a dependency on the previous seed data.
 
-  cy.seedModChannelRoles()
-    .then((response) => validateResponse(response, "seedModChannelRoles"))
-
-    .then(() => cy.seedChannelRoles())
-    .then((response) => validateResponse(response, "seedChannelRoles"))
-
-    .then(() => cy.seedModServerRoles())
-    .then((response) => validateResponse(response, "seedModServerRoles"))
-
-    .then(() => cy.seedServerRoles())
-    .then((response) => validateResponse(response, "seedServerRoles"))
-
-    .then(() => cy.seedServerConfig())
-    .then((response) => validateResponse(response, "seedServerConfig"))
-
-    .then(() => cy.seedUsers())
-    .then((response) => validateResponse(response, "seedUsers"))
-
-    .then(() => cy.seedChannels())
-    .then((response) => validateResponse(response, "seedChannels"))
-
-    .then(() => cy.seedTags())
-    .then((response) => validateResponse(response, "seedTags"))
-
-    .then(() => cy.seedEvents())
-    .then((response) => validateResponse(response, "seedEvents"))
-    
-    .then(() => cy.seedDiscussions())
-    .then((response) => validateResponse(response, "seedDiscussions"));
+  cy.seedDataForCypressTests({
+      channels,
+      discussions,
+      events: events.concat(eventsForFilterTests),
+      tags,
+      channelRoles,
+      modChannelRoles,
+      serverRoles,
+      modServerRoles,
+      serverConfigs
+  })
+    .then((response) => validateResponse(response, "seedDataForCypressTests"))
 };
