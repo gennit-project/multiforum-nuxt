@@ -70,7 +70,7 @@ const writeReplyStyle =
         <template #does-not-have-auth>
           <textarea
             id="addCommentLoginPrompt"
-            name="addcomment"
+            name="addComment"
             rows="1"
             placeholder="Write a comment"
             :class="writeReplyStyle"

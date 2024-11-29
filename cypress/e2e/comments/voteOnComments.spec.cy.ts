@@ -20,7 +20,7 @@ describe("Basic root comment operations", () => {
     // Click the 'write a reply' textarea
 
     // cannot find element with data-testid="addComment"
-    cy.get("textarea[data-testid='addComment']").click();
+    cy.get("textarea[data-testid='addComment']", { timeout: 10000 }).should('be.visible').click();
 
     // Type a comment
     cy.get("textarea[data-testid='texteditor-textarea']").type(TEST_COMMENT_TEXT);

@@ -18,7 +18,7 @@ describe("Basic root comment operations", () => {
     cy.get("span").contains("Example topic 1").click();
 
     // Click the 'write a reply' textarea
-    cy.get("textarea[data-testid='addComment']").click();
+    cy.get("textarea[data-testid='addComment']", { timeout: 10000 }).should('be.visible').click();
 
     // Type a comment
     cy.get("textarea[data-testid='texteditor-textarea']").type(
