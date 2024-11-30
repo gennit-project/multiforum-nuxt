@@ -82,6 +82,7 @@ if (import.meta.env.SSR === false) {
           ? 'w-full flex align-items justify-center'
           : 'w-full flex align-items justify-end',
       ]"
+      data-auth-state="authenticated"
     >
       <client-only>
         <slot name="has-auth" />
@@ -94,6 +95,7 @@ if (import.meta.env.SSR === false) {
           ? 'w-full flex align-items justify-center '
           : 'w-full flex align-items justify-end',
       ]"
+      data-auth-state="unauthenticated"
       @click="handleLogin"
     >
       <slot name="does-not-have-auth" />
