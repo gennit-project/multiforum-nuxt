@@ -22,7 +22,6 @@ const properties = defineProps({
   isPermalinked: Boolean,
 });
 
-console.log('vote button logged in user upvoted ', properties.active);
 const emit = defineEmits(["vote"]);
 
 const buttonClasses = computed(() => {

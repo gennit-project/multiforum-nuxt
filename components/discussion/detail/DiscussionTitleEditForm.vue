@@ -107,7 +107,7 @@ const formattedDate = computed(() => {
           v-if="!titleEditMode"
           class="text-wrap px-1 text-xl md:text-2xl font-medium sm:tracking-tight"
         >
-          {{ discussion && discussion.title ? discussion.title : "Page not found" }}
+          {{ discussion && discussion.title ? discussion.title : "Couldn't find the discussion" }}
         </h2>
 
         <TextInput

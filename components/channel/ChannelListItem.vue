@@ -29,8 +29,8 @@ defineEmits(["filterByTag"]);
 </script>
 
 <template>
-  <tr class="border-b dark:border-gray-600">
-    <td class="px-4 py-2">
+  <tr class="border border-gray-300 dark:border-gray-800">
+    <td class="px-4 py-2 border border-gray-300 dark:border-gray-800">
       <nuxt-link :to="`/forums/${channel.uniqueName}/discussions`" class="flex items-center gap-2">
         <AvatarComponent
           :text="channel.uniqueName"
@@ -48,7 +48,7 @@ defineEmits(["filterByTag"]);
         </div>
       </nuxt-link>
     </td>
-    <td class="px-4 py-2 text-center">
+    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800">
       <nuxt-link
         :to="`/forums/${channel.uniqueName}/discussions`"
         class="flex items-center justify-center gap-1"
@@ -57,7 +57,7 @@ defineEmits(["filterByTag"]);
         {{ channel?.DiscussionChannelsAggregate?.count || 0 }}
       </nuxt-link>
     </td>
-    <td class="px-4 py-2 text-center">
+    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800">
       <nuxt-link
         v-if="channel?.EventChannelsAggregate?.count"
         :to="`/forums/${channel.uniqueName}/events/search`"
@@ -67,7 +67,7 @@ defineEmits(["filterByTag"]);
         {{ channel?.EventChannelsAggregate?.count || 0 }}
       </nuxt-link>
     </td>
-    <td class="px-4 py-2">
+    <td class="px-4 py-2 border border-gray-300 dark:border-gray-800">
       <div class="flex gap-1">
         <Tag
           v-for="tag in tags"

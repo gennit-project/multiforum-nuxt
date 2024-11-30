@@ -36,13 +36,13 @@ function filterByTag(tag: string) {
     <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
       There are no results.
     </p>
-    <table class="min-w-full table-auto border-collapse">
-      <thead>
-        <tr>
-          <th class="px-4 py-2">Channel</th>
-          <th class="px-4 py-2">Discussions</th>
-          <th class="px-4 py-2">Events</th>
-          <th class="px-4 py-2">Tags</th>
+    <table class="min-w-full table-auto border-collapse border border-gray-300 dark:border-gray-800">
+      <thead class="border border-gray-300 dark:border-gray-800">
+        <tr class="border-b border border-gray-300 dark:border-gray-800">
+          <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Channel</th>
+          <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Discussions</th>
+          <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Events</th>
+          <th class="px-4 py-2 border border-gray-300 dark:border-gray-800">Tags</th>
         </tr>
       </thead>
       <tbody>
@@ -52,6 +52,7 @@ function filterByTag(tag: string) {
           :channel="channel"
           :search-input="searchInput"
           :selected-tags="selectedTags"
+          class="border-b border border-gray-300 dark:border-gray-800"
           @filter-by-tag="filterByTag"
         />
       </tbody>
@@ -60,7 +61,7 @@ function filterByTag(tag: string) {
       <LoadMore
         class="justify-self-center font-normal"
         :reached-end-of-results="resultCount === channels.length"
-        @load-more="emit('loadMore')"
+        @load-more="$emit('loadMore')"
       />
     </div>
   </div>
