@@ -288,7 +288,7 @@ function handleFeedbackInput(event: string) {
           <LinkIcon />
         </div>
         <a
-          class="cursor-pointer underline"
+          class="cursor-pointer underline break-all flex-1"
           target="_blank"
           rel="noreferrer"
           :href="eventData.virtualEventUrl"
