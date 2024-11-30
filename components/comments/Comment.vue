@@ -119,6 +119,7 @@ const props = defineProps({
     default: 1,
   },
 });
+console.log('comment data',props.commentData);
 
 const emit = defineEmits([
   "createComment",

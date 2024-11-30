@@ -22,6 +22,7 @@ const properties = defineProps({
   isPermalinked: Boolean,
 });
 
+console.log('vote button logged in user upvoted ', properties.active);
 const emit = defineEmits(["vote"]);
 
 const buttonClasses = computed(() => {
@@ -32,14 +33,14 @@ const buttonClasses = computed(() => {
   const defaultClasses = properties.active
     ? "border-blue-500 bg-blue-300 text-black dark:text-white dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-600"
     : "border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700";
-  return [
-    ...baseClasses,
-    ...defaultClasses,
-    properties.isPermalinked
-      ? "border border-blue-500 hover:bg-blue-300"
-      : "border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700",
-  ];
+
+  const permalinkClasses = properties.isPermalinked
+    ? "border border-blue-500 hover:bg-blue-300"
+    : "border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700";
+
+  return [...baseClasses, defaultClasses, permalinkClasses];
 });
+
 </script>
 
 <template>

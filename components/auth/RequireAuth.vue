@@ -7,6 +7,7 @@ import {
   setIsLoadingAuth,
   usernameVar,
 } from "@/cache";
+import { client } from "process";
 
 // Define props for the component
 const props = defineProps({
@@ -23,9 +24,7 @@ const props = defineProps({
 let handleLogin = () => {};
 
 const showAuthContent = computed(
-  () =>
-    isAuthenticatedVar.value &&
-    usernameVar.value
+  () => isAuthenticatedVar.value && usernameVar.value
 );
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
 
@@ -48,7 +47,6 @@ if (import.meta.env.SSR === false) {
       await storeToken();
     }
   });
-
 
   // // Also check on mount in case we're returning from a redirect
   onMounted(async () => {
@@ -85,7 +83,9 @@ if (import.meta.env.SSR === false) {
           : 'w-full flex align-items justify-end',
       ]"
     >
-      <slot name="has-auth" />
+      <client-only>
+        <slot name="has-auth" />
+      </client-only>
     </div>
     <div
       v-else-if="!isLoadingAuthVar"
