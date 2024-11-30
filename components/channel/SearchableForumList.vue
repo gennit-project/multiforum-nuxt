@@ -109,7 +109,7 @@ const truncate = (description: string) => {
           type="checkbox"
           :value="channel.uniqueName"
           :checked="selected.includes(channel.uniqueName)"
-          class="form-checkbox"
+          class="border border-gray-300 text-blue-600  dark:border-gray-600"
           @change="() => emit('toggleSelection', channel.uniqueName)"
         >
         <div class="flex items-center space-x-2">

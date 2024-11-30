@@ -18,6 +18,10 @@ const props = defineProps({
     type: String,
     default: 'Select your intended audience',
   },
+  testId: {
+    type: String,
+    default: '',
+  },
 });
 
 // Emits definition
@@ -69,6 +73,7 @@ watch(
       </div>
       <div class="relative">
         <div
+          :data-testid="testId"
           class="flex h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700"
           @click="toggleDropdown"
         >

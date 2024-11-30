@@ -28,7 +28,7 @@ describe("Basic discussion operations", () => {
       .type(TEST_BODY);
 
     // Add channel
-    cy.get('input[data-testid="channel-input"]').type(`${TEST_CHANNEL}{enter}`);
+    cy.get('div[data-testid="channel-input"]').type(`${TEST_CHANNEL}{enter}`);
 
     // Add two tags
     cy.get('input[data-testid="tags-input"]').click();

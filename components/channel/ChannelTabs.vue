@@ -79,7 +79,7 @@ const tabs = computed((): Tab[] => {
     {
       name: "events",
       routeSuffix: "events",
-      label: "Events",
+      label: "Calendar",
       icon: CalendarIcon,
       countProperty: "EventChannelsAggregate",
     },

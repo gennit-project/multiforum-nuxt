@@ -135,7 +135,7 @@ export default defineComponent({
       class="xs"
     >
       This event won't show in site-wide search results because it doesn't have
-      a location or a virtual event URL. It will only appear in channel specific
+      a location or a virtual event URL. It will only appear in forum specific
       search results.
     </p>
   </div>
