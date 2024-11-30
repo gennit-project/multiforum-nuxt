@@ -30,8 +30,11 @@ defineEmits(["filterByTag"]);
 
 <template>
   <tr class="border border-gray-300 dark:border-gray-800">
-    <td class="px-4 py-2 border border-gray-300 dark:border-gray-800">
-      <nuxt-link :to="`/forums/${channel.uniqueName}/discussions`" class="flex items-center gap-2">
+    <td class="flex-col px-4 py-2 border border-gray-300 dark:border-gray-800">
+      <nuxt-link
+        :to="`/forums/${channel.uniqueName}/discussions`"
+        class="flex items-center gap-2"
+      >
         <AvatarComponent
           :text="channel.uniqueName"
           :src="channel?.channelIconURL || ''"
@@ -39,35 +42,35 @@ defineEmits(["filterByTag"]);
           :square="true"
         />
         <div>
-          <div v-if="channel?.displayName" class="font-bold text-wrap text-gray-700 dark:text-gray-200">
-            <HighlightedSearchTerms :text="channel.displayName" :search-input="searchInput" />
+          <div
+            v-if="channel?.displayName"
+            class="font-bold text-wrap text-gray-700 dark:text-gray-200"
+          >
+            <HighlightedSearchTerms
+              :text="channel.displayName"
+              :search-input="searchInput"
+            />
           </div>
-          <span class="text-gray-400 dark:text-gray-300 text-wrap font-xs font-mono">
-            <HighlightedSearchTerms :text="channel.uniqueName" :search-input="searchInput" />
+          <span
+            class="text-gray-400 dark:text-gray-300 text-wrap font-xs font-mono"
+          >
+            <HighlightedSearchTerms
+              :text="channel.uniqueName"
+              :search-input="searchInput"
+            />
           </span>
         </div>
       </nuxt-link>
-    </td>
-    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800">
-      <nuxt-link
-        :to="`/forums/${channel.uniqueName}/discussions`"
-        class="flex items-center justify-center gap-1"
+      <div
+        v-if="channel?.description"
+        class="text-gray-500 dark:text-gray-400 break-all"
       >
-        <DiscussionIcon class="h-4 w-4" />
-        {{ channel?.DiscussionChannelsAggregate?.count || 0 }}
-      </nuxt-link>
-    </td>
-    <td class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800">
-      <nuxt-link
-        v-if="channel?.EventChannelsAggregate?.count"
-        :to="`/forums/${channel.uniqueName}/events/search`"
-        class="flex items-center justify-center gap-1"
-      >
-        <CalendarIcon class="h-4 w-4" />
-        {{ channel?.EventChannelsAggregate?.count || 0 }}
-      </nuxt-link>
-    </td>
-    <td class="px-4 py-2 border border-gray-300 dark:border-gray-800">
+        <HighlightedSearchTerms
+          :text="channel.description"
+          :search-input="searchInput"
+        />
+      </div>
+
       <div class="flex gap-1">
         <Tag
           v-for="tag in tags"
@@ -77,6 +80,29 @@ defineEmits(["filterByTag"]);
           @click="$emit('filterByTag', tag)"
         />
       </div>
+    </td>
+    <td
+      class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800"
+    >
+      <nuxt-link
+        :to="`/forums/${channel.uniqueName}/discussions`"
+        class="flex items-center justify-center gap-1"
+      >
+        <DiscussionIcon class="h-4 w-4" />
+        {{ channel?.DiscussionChannelsAggregate?.count || 0 }}
+      </nuxt-link>
+    </td>
+    <td
+      class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800"
+    >
+      <nuxt-link
+        v-if="channel?.EventChannelsAggregate?.count"
+        :to="`/forums/${channel.uniqueName}/events/search`"
+        class="flex items-center justify-center gap-1"
+      >
+        <CalendarIcon class="h-4 w-4" />
+        {{ channel?.EventChannelsAggregate?.count || 0 }}
+      </nuxt-link>
     </td>
   </tr>
 </template>

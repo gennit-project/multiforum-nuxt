@@ -42,7 +42,6 @@ function filterByTag(tag: string) {
           <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Channel</th>
           <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Discussions</th>
           <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Events</th>
-          <th class="px-4 py-2 border border-gray-300 dark:border-gray-800">Tags</th>
         </tr>
       </thead>
       <tbody>
