@@ -109,7 +109,7 @@ const formattedDate = computed(() => {
 <template>
   <div class="w-full mt-4">
     <div
-      class="mb-2 flex flex-col md:flex-row md:items-center md:justify-between space-x-0 md:space-x-2"
+      class="flex flex-col md:flex-row md:items-center md:justify-between space-x-0 md:space-x-2"
     >
       <v-skeleton-loader
         v-if="getEventLoading"
@@ -120,7 +120,7 @@ const formattedDate = computed(() => {
       <div v-else ref="eventDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-2xl font-medium sm:tracking-tight"
+          class="text-wrap px-1 text-2xl my-1 font-medium sm:tracking-tight"
         >
           {{ event?.title || "[Deleted]" }}
         </h2>
@@ -171,8 +171,7 @@ const formattedDate = computed(() => {
       </RequireAuth>
     </div>
     <p
-      v-if="!titleEditMode"
-      class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
+      class="ml-1 mb-2 text-gray-500 dark:text-gray-400 text-sm"
     >
       {{
         `${event?.Poster ? event.Poster.username : "[Deleted]"} posted this event on ${formattedDate}`
