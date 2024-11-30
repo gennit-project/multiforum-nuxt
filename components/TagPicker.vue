@@ -51,6 +51,18 @@ const removeSelection = (tag: string) => {
   selected.value = selected.value.filter((c) => c !== tag);
   emit("setSelectedTags", selected.value);
 };
+const handleAddTag = (event: KeyboardEvent) => {
+  const input = event.target as HTMLInputElement;
+  const value = input.value.trim();
+  if (value) {
+    if (!selected.value.includes(value)) {
+      selected.value.push(value);
+      emit("setSelectedTags", selected.value);
+    }
+    input.value = "";
+  }
+};
+
 </script>
 
 <template>
@@ -60,21 +72,27 @@ const removeSelection = (tag: string) => {
         {{ description }}
       </div>
       <div class="relative">
-        <input
-          data-testid="tags-input"
-          class="flex min-h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
+        <div
+          class="flex min-h-12 w-full cursor-text flex-wrap items-center rounded-lg border px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
           @click="toggleDropdown"
         >
-        <div
-          v-for="(tag, index) in selected"
-          :key="index"
-          class="mr-2 mt-1 flex items-center rounded-full bg-blue-100 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
-          @click="removeSelection(tag)"
-        >
-          <span>{{ tag }}</span>
-          <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
-            &times;
-          </span>
+          <div
+            v-for="(tag, index) in selected"
+            :key="index"
+            class="mr-2 mt-1 inline-flex items-center rounded-full bg-blue-100 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
+            @click="removeSelection(tag)"
+          >
+            <span>{{ tag }}</span>
+            <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
+              &times;
+            </span>
+          </div>
+          <input
+            data-testid="tags-input"
+            class="flex-1 border-none bg-transparent focus:outline-none"
+            placeholder="Add a tag..."
+            @keydown.enter.prevent="handleAddTag"
+          >
         </div>
         <SearchableTagList
           v-if="isDropdownOpen"
