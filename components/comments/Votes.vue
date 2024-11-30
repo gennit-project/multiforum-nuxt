@@ -47,7 +47,6 @@ const props = defineProps({
     default: false,
   },
 });
-console.log('upvote active ', props.upvoteActive);
 
 const emit = defineEmits([
   'editFeedback',
