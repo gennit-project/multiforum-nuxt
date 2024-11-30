@@ -107,7 +107,7 @@ const formattedDate = computed(() => {
           v-if="!titleEditMode"
           class="text-wrap px-1 text-xl md:text-2xl font-medium sm:tracking-tight"
         >
-          {{ discussion && discussion.title ? discussion.title : "[Deleted]" }}
+          {{ discussion && discussion.title ? discussion.title : "Page not found" }}
         </h2>
 
         <TextInput
@@ -128,7 +128,7 @@ const formattedDate = computed(() => {
           class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
         >
           {{
-            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion on ${formattedDate}`
+            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ''}`
           }}
         </p>
       </div>
