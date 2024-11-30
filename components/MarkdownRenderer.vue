@@ -3,9 +3,8 @@
 import { computed } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
-import { useQuery } from "@vue/apollo-composable";
-import gql from "graphql-tag";
 import 'highlight.js/styles/github-dark.css';
+import { themeVar } from "@/cache";
 
 // Use DOMPurify only in the client environment
 let DOMPurify;
@@ -20,24 +19,9 @@ const props = defineProps({
   },
 });
 
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-
-const {
-  result: themeResult,
-  loading: themeLoading,
-  error: themeError,
-} = useQuery(GET_THEME);
-
 const theme = computed(() => {
-  if (themeLoading.value || themeError.value) {
-    return "";
-  }
-  return themeResult.value?.theme || "";
-});
+  return themeVar() 
+})
 
 const md = new MarkdownIt({
   highlight: (str, lang) => {
@@ -94,6 +78,19 @@ const renderedMarkdown = computed(() => {
 
   a {
     color: #3182ce !important;
+  }
+
+  blockquote {
+    border-left: 4px solid #3182ce;
+    padding-left: 16px;
+    margin: 16px 0;
+    font-style: italic;
+    color: #555;
+
+    .dark & {
+      border-left-color: #63b3ed;
+      color: #ccc;
+    }
   }
 }
 </style>
