@@ -394,6 +394,7 @@ const getIssueTitle = () => {
     :secondary-button-text="'Cancel'"
     :loading="reportContentLoading || addIssueActivityFeedItemLoading"
     :primary-button-disabled="!reportText"
+    :error="reportContentError?.message"
     @primary-button-click="submit"
     @close="close"
   >
