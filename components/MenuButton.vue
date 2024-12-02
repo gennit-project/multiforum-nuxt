@@ -86,6 +86,7 @@ const menuStyles = {
       <v-list-item
         v-for="item in items"
         :key="item.label"
+        :data-testid="`${dataTestid}-item-${item.label}`"
         class="dark:hover:bg-gray-600"
         @click="
           () => {

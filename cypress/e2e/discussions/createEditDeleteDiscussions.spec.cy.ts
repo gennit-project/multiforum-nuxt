@@ -28,23 +28,24 @@ describe("Basic discussion operations", () => {
       .type(TEST_BODY);
 
     // Add channel
-    cy.get('div[data-testid="channel-input"]').type(`${TEST_CHANNEL}{enter}`);
+    cy.get('div[data-testid="channel-input"]')
+      .type(`${TEST_CHANNEL}{enter}`);
+    cy.get(`span[data-testid="forum-picker-${TEST_CHANNEL}"]`).click();
 
     // Add two tags
-    cy.get('input[data-testid="tags-input"]').click();
+    cy.get('input[data-testid="tag-picker"]').click();
     cy.get(`span[data-testid="tag-picker-${TEST_TAG_1}"]`).click();
-    cy.get('input[data-testid="tags-input"]').click();
     cy.get(`span[data-testid="tag-picker-${TEST_TAG_2}"]`).click();
 
-    cy.get("button").contains("Save").click().wait(1000);
+    cy.get("button").contains("Save").click().wait(3000);
     cy.get("h2").contains(TEST_DISCUSSION);
     cy.get("p").contains(TEST_BODY);
 
     // Test editing a discussion.
-    cy.get('div[data-testid="discussion-menu-button')
+    cy.get('button[data-testid="discussion-menu-button')
       .click();
     // Click on the edit button
-    cy.get("div").contains("Edit").click();
+    cy.get("div[data-testid=discussion-menu-button-item-Edit]").click();
 
     // Change body
     cy.get('textarea[data-testid="body-input"]')
@@ -52,14 +53,13 @@ describe("Basic discussion operations", () => {
       .clear()
       .type(TEST_BODY_2);
 
-    cy.get('input[data-testid="tags-input"]').click();
+    cy.get('input[data-testid="tag-picker"]').click();
 
     // Add a new tag
     cy.get(`span[data-testid="tag-picker-${TEST_TAG_3}"]`).click();
 
     // Delete one of the existing tags
-    cy.get(`span[data-testid='tags-input-tag-${TEST_TAG_1}']`)
-        .find("svg[data-testid='tag-delete']")
+    cy.get(`span[data-testid='tag-picker-${TEST_TAG_1}']`)
         .click();
 
     cy.get("button").contains("Save").click();
@@ -71,10 +71,10 @@ describe("Basic discussion operations", () => {
     cy.get("span").should("not.contain", TEST_TAG_1);
 
 
-    cy.get('div[data-testid="discussion-menu-button')
+    cy.get('button[data-testid="discussion-menu-button')
       .click();
     // Click on the delete button
-    cy.get("div").contains("Delete").click()
+    cy.get("div[data-testid=discussion-menu-button-item-Delete]").click();
     cy.get("button").contains("Delete").click()
 
     // After deletion, the user should be redirected to the discussion list

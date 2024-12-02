@@ -127,13 +127,20 @@ const truncate = (description: string) => {
             :text="channel.uniqueName"
           />
           <div class="flex-col text-sm flex-1">
-            <span v-if="!channel.displayName" class="font-mono font-bold">
+            <span 
+              v-if="!channel.displayName" 
+              class="font-mono font-bold"
+              :data-testid="`forum-picker-${channel.uniqueName}`"
+            >
               {{ channel.uniqueName }}
             </span>
             <div v-else>
               <span class="font-bold">{{ channel.displayName }}</span>
               &#8226;
-              <span class="font-mono">{{ channel.uniqueName }}</span>
+              <span 
+                class="font-mono"
+                :data-testid="`forum-picker-${channel.uniqueName}`"
+              >{{ channel.uniqueName }}</span>
             </div>
             <div>{{ truncate(channel.description || "") }}</div>
           </div>

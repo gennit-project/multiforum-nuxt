@@ -230,7 +230,7 @@ const authorIsMod = computed(
       <MenuButton
         v-if="showActionMenu && discussion && menuItems.length > 0"
         :items="menuItems"
-        data-testid="discussion-menu-button"
+        :data-testid="'discussion-menu-button'"
         @copy-link="copyLink"
         @handle-edit="
           router.push(`/forums/${channelId}/discussions/edit/${discussion.id}`)

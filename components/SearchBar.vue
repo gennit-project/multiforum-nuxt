@@ -28,6 +28,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  testId: {
+    type: String,
+    default: "search-bar",
+  },
 });
 
 // Emit event
@@ -79,7 +83,7 @@ const clear = () => {
         ref="searchInputRef"
         v-model="input"
         name="search"
-        data-testid="search-bar"
+        :data-testid="testId"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : '',
           rightSideIsRounded ? 'rounded-r-full' : '',

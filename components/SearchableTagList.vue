@@ -92,6 +92,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
   >
     <SearchBar
       class="w-full align-middle"
+      :test-id="'tags-input'"
       :auto-focus="true"
       :search-placeholder="'Search tags'"
       :initial-value="searchInput"
@@ -124,7 +125,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
           :checked="selected.includes(tag.text)"
           class="border border-gray-300 text-blue-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', tag.text)"
-        />
+        >
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span :data-testid="`tag-picker-${tag.text}`" class="font-bold">{{

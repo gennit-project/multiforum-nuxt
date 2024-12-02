@@ -75,7 +75,7 @@ const removeSelection = (tag: string) => {
             </span>
           </div>
           <input
-            data-testid="tags-input"
+            data-testid="tag-picker"
             class="flex-1 border-none bg-transparent focus:outline-none dark:text-white"
             placeholder="Add a tag..."
           >
