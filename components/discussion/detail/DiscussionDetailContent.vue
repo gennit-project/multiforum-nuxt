@@ -28,6 +28,7 @@ import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue"
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar } from "@/cache";
 
+
 const COMMENT_LIMIT = 50;
 
 const props = defineProps({
@@ -68,6 +69,7 @@ const {
 
 const {
   mutate: addFeedbackCommentToDiscussion,
+  error: addFeedbackCommentToDiscussionError,
   loading: addFeedbackCommentToDiscussionLoading,
   onDone: onAddFeedbackCommentToDiscussionDone,
 } = useMutation(ADD_FEEDBACK_COMMENT_TO_DISCUSSION);
@@ -104,8 +106,6 @@ watch(commentSort, () =>
 
 const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
   if (
-    getDiscussionChannelLoading.value ||
-    getDiscussionChannelError.value ||
     !getDiscussionChannelResult.value
   ) {
     return null;
@@ -228,6 +228,7 @@ const handleSubmitFeedback = async () => {
   // Refetch the discussion so that the thumbs-down shows
   // that it's active, meaning the user has given feedback.
   refetchDiscussion();
+  // showFeedbackFormModal.value = false;
 };
 const handleFeedbackInput = (event: string) => {
   feedbackText.value = event;
@@ -238,6 +239,7 @@ const handleClickUndoFeedback = () => {
 const handleClickEditFeedback = () => {
   showEditFeedbackModal.value = true;
 };
+
 </script>
 
 <template>
@@ -333,6 +335,7 @@ const handleClickEditFeedback = () => {
     </div>
     <GenericFeedbackFormModal
       v-if="showFeedbackFormModal"
+      :error="addFeedbackCommentToDiscussionError?.message"
       :open="showFeedbackFormModal"
       :loading="addFeedbackCommentToDiscussionLoading"
       :primary-button-disabled="!feedbackText"

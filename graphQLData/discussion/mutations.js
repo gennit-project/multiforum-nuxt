@@ -214,9 +214,6 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
             displayName
           }
         }
-        ChannelRoles {
-          name
-        }
         createdAt
         text
         GivesFeedbackOnDiscussion {

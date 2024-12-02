@@ -2,7 +2,6 @@
 import GenericModal from "@/components/GenericModal.vue";
 import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
 import TextEditor from '@/components/TextEditor.vue'
-import ErrorBanner from "@/components/ErrorBanner.vue";
 
 const props = defineProps({
   error: {
@@ -38,11 +37,12 @@ function updateFeedback(text: string) {
     :highlight-color="'yellow'"
     :title="title"
     :body="body"
-    :primary-button-disabled="props.loading || props.primaryButtonDisabled"
+    :primary-button-disabled="props.loading || props.primaryButtonDisabled || !!props.error"
     :open="props.open"
     :loading="props.loading"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
+    :error="props.error"
   >
     <template #icon>
       <HandThumbDownIcon
@@ -58,10 +58,6 @@ function updateFeedback(text: string) {
         :disable-auto-focus="false"
         :allow-image-upload="false"
         @update="updateFeedback"
-      />
-      <ErrorBanner
-        v-if="props.error"
-        :text="props.error"
       />
       <p class="text-gray-600 dark:text-gray-400">
         Feedback is intended to be a helpful tool for the author. If you think

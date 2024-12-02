@@ -8,7 +8,7 @@ import {
 } from "@headlessui/vue";
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
-const props = defineProps({
+defineProps({
   title: {
     type: String,
     required: true,
@@ -54,7 +54,7 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
 
 <template>
   <client-only>
-  <TransitionRoot as="template" :show="props.open">
+  <TransitionRoot as="template" :show="open">
     <Dialog
       as="div"
       class="relative"
@@ -95,7 +95,7 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
                 <div class="flex space-x-2 items-center">
                   <div
                     :class="[
-                      props.highlightColor === 'red'
+                      highlightColor === 'red'
                         ? `bg-red-100 dark:bg-red-transparent`
                         : `bg-yellow-100 dark:bg-yellow-transparent`,
                     ]"
@@ -109,41 +109,41 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
                       as="h3"
                       class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100"
                     >
-                      {{ props.title }}
+                      {{ title }}
                     </DialogTitle>
                   </div>
                 </div>
                 <div
-                  v-if="props.body"
+                  v-if="body"
                   class="mt-2"
                 >
                   <p class="text-sm text-gray-500 dark:text-gray-300">
-                    {{ props.body }}
+                    {{ body }}
                   </p>
                 </div>
               </div>
               <slot name="content" />
               <ErrorBanner
-                v-if="props.error" 
+                v-if="error" 
                 class="mt-5"
-                :text="props.error"
+                :text="error"
               />
               <div
                 class="mt-5 items-center sm:mt-4 sm:flex sm:flex-row-reverse"
               >
                 <button
                   type="button"
-                  :disabled="props.primaryButtonDisabled"
+                  :disabled="primaryButtonDisabled"
                   class="max-h-10"
                   :class="[
-                    !props.primaryButtonDisabled
+                    !primaryButtonDisabled
                       ? `border-transparent border bg-blue-600 text-white hover:bg-blue-500`
                       : 'bg-gray-300 text-black dark:bg-gray-700 dark:text-gray-200',
                     `inline-flex w-full justify-center rounded-full  px-4 py-2 text-base font-medium shadow-sm  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm`,
                   ]"
                   @click="emit('primaryButtonClick')"
                 >
-                  {{ props.loading ? "Saving..." : props.primaryButtonText }}
+                  {{ loading ? "Saving..." : primaryButtonText }}
                 </button>
                 <button
                   ref="cancelButtonRef"
@@ -151,7 +151,7 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
                   class="hover:bg-gray-50 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-gray-200 sm:mt-0 sm:w-auto sm:text-sm"
                   @click="emit('close')"
                 >
-                  {{ props.secondaryButtonText }}
+                  {{ secondaryButtonText }}
                 </button>
               </div>
             </DialogPanel>

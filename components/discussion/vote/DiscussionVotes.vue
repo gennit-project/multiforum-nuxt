@@ -8,7 +8,6 @@ import {
 } from "@/graphQLData/discussion/mutations";
 import VoteButtons from "@/components/discussion/vote/VoteButtons.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import { usernameVar, modProfileNameVar } from "@/cache";
 
 const props = defineProps({
@@ -34,7 +33,6 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const showFeedbackFormModal = ref(false);
 const discussionIdInParams = computed(() => {
   return typeof route.params.discussionId === "string"
     ? route.params.discussionId
@@ -116,9 +114,6 @@ function handleClickViewFeedback() {
   });
 }
 
-function handleSubmitFeedback() {
-  showFeedbackFormModal.value = false;
-}
 </script>
 
 <template>
@@ -145,11 +140,6 @@ function handleSubmitFeedback() {
     @edit-feedback="handleClickEditFeedback"
     @undo-feedback="handleClickUndoFeedback"
     @click-up="handleClickUp"
-  />
-  <GenericFeedbackFormModal
-    :open="showFeedbackFormModal"
-    @close="showFeedbackFormModal = false"
-    @primary-button-click="handleSubmitFeedback"
   />
 </template>
 
