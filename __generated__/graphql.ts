@@ -5585,7 +5585,7 @@ export type CommentRepliesFormatsConnection = {
 export type CommentSectionFormat = {
   __typename?: 'CommentSectionFormat';
   Comments: Array<Comment>;
-  DiscussionChannel: DiscussionChannel;
+  DiscussionChannel?: Maybe<DiscussionChannel>;
 };
 
 export type CommentSectionFormatAggregateSelection = {
@@ -16459,7 +16459,7 @@ export type Mutation = {
   createComments: CreateCommentsMutationResponse;
   createDiscussionChannelListFormats: CreateDiscussionChannelListFormatsMutationResponse;
   createDiscussionChannels: CreateDiscussionChannelsMutationResponse;
-  createDiscussionWithChannelConnections?: Maybe<Discussion>;
+  createDiscussionWithChannelConnections: Array<Discussion>;
   createDiscussions: CreateDiscussionsMutationResponse;
   createDropDataResponses: CreateDropDataResponsesMutationResponse;
   createEmailAndUser?: Maybe<User>;

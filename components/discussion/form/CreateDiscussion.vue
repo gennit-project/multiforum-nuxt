@@ -133,8 +133,9 @@ const {
 }));
 
 onDone((response) => {
-  const newDiscussionId =
-    response.data?.createDiscussionWithChannelConnections.id;
+  const newDiscussionArray =  response.data?.createDiscussionWithChannelConnections
+  const newDiscussion = newDiscussionArray?.[0]?.DiscussionChannels?.[0]
+  const newDiscussionId = newDiscussion?.Discussion?.id;
   createDiscussionLoading.value = false;
 
   router.push({
