@@ -61,14 +61,12 @@ const updateCommentInput = computed(() => ({
   text: editFormValues.value?.text || "",
 }));
 
-const { mutate: editComment, loading: editLoading, error: editCommentError, onDone: onDoneUpdatingComment } = useMutation(UPDATE_COMMENT, {
-  variables: {
-    commentWhere: {
-      id: commentData.value?.id || "",
-    },
-    updateCommentInput: updateCommentInput.value,
-  },
-});
+const {
+  mutate: editComment,
+  loading: editLoading,
+  error: editCommentError,
+  onDone: onDoneUpdatingComment,
+} = useMutation(UPDATE_COMMENT);
 
 onDoneUpdatingComment(() => {
   emit("close");
@@ -76,7 +74,12 @@ onDoneUpdatingComment(() => {
 
 function handleEdit() {
   try {
-    editComment();
+    editComment({
+      commentWhere: {
+        id: commentData.value?.id || "",
+      },
+      updateCommentInput: updateCommentInput.value,
+    });
   } catch (error) {
     console.error("Error updating feedback", error);
   }
