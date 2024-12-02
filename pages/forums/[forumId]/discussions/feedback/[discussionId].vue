@@ -160,7 +160,7 @@ const updateParams = () => {
   discussionId.value = typeof route.params.discussionId === "string" ? route.params.discussionId : "";
   commentId.value = typeof route.params.commentId === "string" ? route.params.commentId : "";
   feedbackId.value = typeof route.params.feedbackId === "string" ? route.params.feedbackId : "";
-  contextLink.value = updateContextLink();
+  contextLink.value = updateContextLink() as string;
 };
 
 watch(() => route.params, updateParams, { immediate: true });
@@ -188,7 +188,6 @@ watch(() => route.params, updateParams, { immediate: true });
         </div>
       </div>
       <FeedbackSection
-        v-if="feedbackCommentsAggregate > 0"
         :add-feedback-comment-to-comment-error="addFeedbackCommentToCommentError?.message || ''"
         :add-feedback-comment-to-comment-loading="addFeedbackCommentToCommentLoading"
         :comment-to-give-feedback-on="commentToGiveFeedbackOn"
