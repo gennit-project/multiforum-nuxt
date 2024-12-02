@@ -185,6 +185,7 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
     $text: String!
     $discussionId: ID!
     $channelId: String!
+    $discussionChannelId: ID!
   ) {
     createComments(
       input: [
@@ -192,6 +193,9 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
           isRootComment: true
           text: $text
           Channel: { connect: { where: { node: { uniqueName: $channelId } } } }
+          DiscussionChannel: {
+            connect: { where: { node: { id: $discussionChannelId } } }
+          }
           CommentAuthor: {
             ModerationProfile: {
               connect: { where: { node: { displayName: $modProfileName } } }
