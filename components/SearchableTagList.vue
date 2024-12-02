@@ -1,9 +1,17 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
-import { useQuery } from "@vue/apollo-composable";
+import { useQuery, useMutation } from "@vue/apollo-composable";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
 import type { Tag } from "@/__generated__/graphql";
 import SearchBar from "@/components/SearchBar.vue";
+import { CREATE_TAG } from "@/graphQLData/tag/mutations";
+import ErrorBanner from "./ErrorBanner.vue";
+
+const {
+  mutate: createTag,
+  error: createTagError,
+  loading: createTagLoading,
+} = useMutation(CREATE_TAG);
 
 const props = defineProps({
   hideSelected: {
@@ -20,13 +28,17 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['toggleSelection']);
+const emit = defineEmits(["toggleSelection"]);
 
 const searchInput: Ref<string> = ref("");
 
 const searchInputComputed = computed(() => searchInput.value);
 
-const { loading: tagsLoading, error: tagsError, result: tagsResult } = useQuery(GET_TAGS, {
+const {
+  loading: tagsLoading,
+  error: tagsError,
+  result: tagsResult,
+} = useQuery(GET_TAGS, {
   where: {
     text_CONTAINS: searchInputComputed,
   },
@@ -53,7 +65,25 @@ function updateSearchResult(input: string) {
   searchInput.value = input;
 }
 
-
+const handleAddTag = async (event: KeyboardEvent) => {
+  const input = event.target as HTMLInputElement;
+  const value = input.value.trim();
+  if (value) {
+    if (!selected.value.includes(value)) {
+      try {
+        const response = await createTag({ input: [{ text: value }] });
+        const createdTag = response?.data?.createTags?.tags?.[0]?.text;
+        if (createdTag) {
+          selected.value.push(createdTag);
+          emit("toggleSelection", createdTag);
+        }
+        input.value = "";
+      } catch (error) {
+        console.error("Error creating tag:", error);
+      }
+    }
+  }
+};
 </script>
 
 <template>
@@ -67,17 +97,18 @@ function updateSearchResult(input: string) {
       :initial-value="searchInput"
       :right-side-is-rounded="false"
       :left-side-is-rounded="false"
-      @keydown.enter.prevent
+      :disabled="createTagLoading"
+      @keydown.enter.prevent="handleAddTag"
       @update-search-input="updateSearchResult"
     />
-    <div v-if="tagsLoading">
-      Loading...
-    </div>
+    <ErrorBanner
+      v-if="createTagError"
+      class="text-red-500 text-sm mt-1"
+      :text="createTagError.message"
+    />
+    <div v-if="tagsLoading">Loading...</div>
     <div v-else-if="tagsError">
-      <div
-        v-for="(error, i) of tagsError?.graphQLErrors"
-        :key="i"
-      >
+      <div v-for="(error, i) of tagsError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
     </div>
@@ -91,12 +122,14 @@ function updateSearchResult(input: string) {
           type="checkbox"
           :value="tag.text"
           :checked="selected.includes(tag.text)"
-          class="border border-gray-300 text-blue-600  dark:border-gray-600"
+          class="border border-gray-300 text-blue-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', tag.text)"
-        >
+        />
         <div class="flex items-center space-x-2">
           <div class="flex-col">
-            <span :data-testid="`tag-picker-${tag.text}`" class="font-bold">{{ tag.text }}</span>
+            <span :data-testid="`tag-picker-${tag.text}`" class="font-bold">{{
+              tag.text
+            }}</span>
           </div>
         </div>
       </label>

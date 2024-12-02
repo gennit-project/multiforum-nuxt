@@ -16,7 +16,6 @@ const props = defineProps({
     default: "",
   },
 });
-
 const emit = defineEmits(["setSelectedTags"]);
 
 const isDropdownOpen = ref(false);
@@ -51,18 +50,6 @@ const removeSelection = (tag: string) => {
   selected.value = selected.value.filter((c) => c !== tag);
   emit("setSelectedTags", selected.value);
 };
-const handleAddTag = (event: KeyboardEvent) => {
-  const input = event.target as HTMLInputElement;
-  const value = input.value.trim();
-  if (value) {
-    if (!selected.value.includes(value)) {
-      selected.value.push(value);
-      emit("setSelectedTags", selected.value);
-    }
-    input.value = "";
-  }
-};
-
 </script>
 
 <template>
@@ -89,9 +76,8 @@ const handleAddTag = (event: KeyboardEvent) => {
           </div>
           <input
             data-testid="tags-input"
-            class="flex-1 border-none bg-transparent focus:outline-none"
+            class="flex-1 border-none bg-transparent focus:outline-none dark:text-white"
             placeholder="Add a tag..."
-            @keydown.enter.prevent="handleAddTag"
           >
         </div>
         <SearchableTagList
