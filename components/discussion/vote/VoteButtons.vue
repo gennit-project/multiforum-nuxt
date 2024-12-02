@@ -56,7 +56,7 @@ const thumbsDownMenuItems = computed(() => {
   let items: SelectOptionData[] = [
     {
       label: "View Feedback",
-      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+      icon: ALLOWED_ICONS.VIEW_FEEDBACK as string,
       value: "",
       event: "viewFeedback",
     },
@@ -66,13 +66,13 @@ const thumbsDownMenuItems = computed(() => {
     items = items.concat([
       {
         label: "Undo feedback",
-        icon: ALLOWED_ICONS.UNDO,
+        icon: ALLOWED_ICONS.UNDO as string,
         value: "",
         event: "undoFeedback",
       },
       {
         label: "Edit feedback",
-        icon: ALLOWED_ICONS.EDIT,
+        icon: ALLOWED_ICONS.EDIT as string,
         value: "",
         event: "editFeedback",
       },
@@ -81,7 +81,7 @@ const thumbsDownMenuItems = computed(() => {
     items = items.concat([
       {
         label: "Give feedback",
-        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK as string,
         value: "",
         event: "giveFeedback",
       },
