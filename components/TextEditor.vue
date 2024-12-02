@@ -315,18 +315,17 @@ const selectedTab = ref(0);
             @drop="handleDrop"
           />
           <div
-            class="mt-2 flex space-x-2 divide-x divide-gray-400 dark:divide-gray-300"
+            class="mt-2 flex-col divide-gray-400 dark:divide-gray-300"
           >
             <a
               target="_blank"
               :href="markdownDocsLink"
-              class="text-gray-400 hover:underline dark:text-gray-300"
+              class="text-gray-400 hover:underline dark:text-gray-300 text-sm"
             >
               Markdown is supported
             </a>
             <AddImage
               v-if="props.allowImageUpload"
-              class="pl-2"
               label="Paste, drop, or click to add files"
               @change="handleFileChange"
             />

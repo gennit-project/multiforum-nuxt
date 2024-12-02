@@ -103,7 +103,7 @@ const body = "Are you sure you want to update your feedback?";
     @secondary-button-click="$emit('close')"
   >
     <template #icon>
-      <i class="fas fa-pencil-alt" />
+      <i class="fas fa-pencil-alt text-white" />
     </template>
     <template #content>
       <CommentHeader
