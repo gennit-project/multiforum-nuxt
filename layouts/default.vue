@@ -97,13 +97,13 @@ const showMainContent = computed(() => {
             :show-dropdown="showDropdown"
             @close="showDropdown = false"
           />
-          <div v-if="showMainContent" class="w-full">
-            <div class="flex min-h-screen flex-col">
+          <div v-if="showMainContent" class="w-full flex-col">
+            <div class="min-h-screen flex-col">
               <div class="flex-grow">
                 <slot />
               </div>
+              <SiteFooter v-if="showFooter" />
             </div>
-            <SiteFooter v-if="showFooter" />
           </div>
           <div v-else>
             <client-only>
