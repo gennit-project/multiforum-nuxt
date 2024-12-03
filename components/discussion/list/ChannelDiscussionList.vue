@@ -207,7 +207,7 @@ const handleCreateModProfileClick = async () => {
       </RequireAuth>
     </p>
 
-    <div
+    <ul
       v-else-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
       class="dark:divide-gray-700 divide-gray-200 flex flex-col divide-y"
       data-testid="channel-discussion-list"
@@ -225,7 +225,7 @@ const handleCreateModProfileClick = async () => {
         @filter-by-tag="filterByTag"
         @filter-by-channel="filterByChannel"
       />
-    </div>
+    </ul>
     <div
       v-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
     >

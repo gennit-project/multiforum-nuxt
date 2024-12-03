@@ -1,24 +1,19 @@
 import { DISCUSSION_LIST } from "../constants";
-import { deleteAll } from "../utils";
-import { discussionsForFilteringTests } from "../../support/commandFunctions/seed/discussions/discussionsForFilteringTests";
-
+import { deleteAll, seedAll } from "../utils";
 
 describe("Filter discussions by tag", () => {
   beforeEach(function () {
     deleteAll();
-    cy.seedUsers();
-    cy.seedChannels();
-    cy.seedTags();
-    // Create discussions with tags referenced in these tests (newYears, trivia)
-    cy.createDiscussions(discussionsForFilteringTests);
+    seedAll();
+    cy.loginWithCreateEventButton();
   });
 
-  const newYearsTagDiscussionTitle = "Test discussion 2";
-  const triviaTaggedDiscussionTitle = "Test discussion 3";
+  const newYearsTagDiscussionTitle = "Example topic 2";
+  const triviaTaggedDiscussionTitle = "Example topic 3";
 
   it("in the sitewide online discussions list, filters discussions by tag", () => {
-    cy.visit(DISCUSSION_LIST);
-    cy.get('div[data-testid="tag-filter-button"]').find("button").click() // open the tag picker
+    cy.visit(DISCUSSION_LIST).wait(3000);
+    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     cy.get('span[data-testid="tag-picker-newYears"]').click(); // click the newYears tag
 
@@ -31,27 +26,6 @@ describe("Filter discussions by tag", () => {
     cy.get('ul[data-testid="sitewide-discussion-list"]')
       .find("li")
       .contains(newYearsTagDiscussionTitle);
-  });
-
-  Cypress.on("uncaught:exception", (err) => {
-    // I don't know what causes this error, but it is only thrown during this test,
-    // not when a human uses the tag picker. So I'm suppressing it.
-    if (
-      err.message.includes(
-        "ResizeObserver loop completed with undelivered notifications.",
-      )
-    ) {
-      return false;
-    }
-    return true; // return true to allow the error to be thrown and fail the test
-  });
-
-  it("in the sitewide online discussions list, when filtering by two tags, shows discussions that have at least one of the tags", () => {
-    cy.visit(DISCUSSION_LIST);
-    cy.get('div[data-testid="tag-filter-button"]').find("button").click(); // open the tag picker
-
-    // click the newYears tag
-    cy.get('span[data-testid="tag-picker-newYears"]').click();
 
     // click the trivia tag
     cy.get('span[data-testid="tag-picker-trivia"]').click();
@@ -70,14 +44,12 @@ describe("Filter discussions by tag", () => {
       .contains(triviaTaggedDiscussionTitle);
   });
 
-  const CHANNEL_VIEW =
-    `${Cypress.env("baseUrl")}/forums/phx_music/discussions/`;
-
   it("in a channel view, filters discussions by tag", () => {
+    const CHANNEL_VIEW = `${Cypress.env("baseUrl")}/forums/phx_music/discussions/`;
     const searchTerm = "trivia";
 
-    cy.visit(CHANNEL_VIEW);
-    cy.get('div[data-testid="tag-filter-button"]').find("button").click(); // open the tag picker
+    cy.visit(CHANNEL_VIEW).wait(3000);
+    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the trivia tag
     cy.get('span[data-testid="tag-picker-trivia"]').click();
@@ -91,17 +63,9 @@ describe("Filter discussions by tag", () => {
     cy.get('ul[data-testid="channel-discussion-list"]')
       .find("li")
       .contains(searchTerm);
-  });
-
-  it("in a channel view, when filtering by two tags, shows discussions that have at least one of the tags", () => {
-    cy.visit(CHANNEL_VIEW);
-    cy.get('div[data-testid="tag-filter-button"]').find("button").click(); // open the tag picker
 
     // click the newYears tag
     cy.get('span[data-testid="tag-picker-newYears"]').click();
-
-    // click the trivia tag
-    cy.get('span[data-testid="tag-picker-trivia"]').click();
 
     // should have two results
     cy.get('ul[data-testid="channel-discussion-list"]')
