@@ -11,6 +11,10 @@ export default defineComponent({
     Popper,
   },
   props: {
+    dataTestid: {
+      type: String,
+      default: "filter-button",
+    },
     label: {
       type: String,
       default: "No label",
@@ -53,7 +57,7 @@ export default defineComponent({
     <div class="flex align-items">
       <Popper :close-on-content-click="false" location="bottom">
         <button
-          id="filter-button"
+          :data-testid="dataTestid"
           :class="[highlighted ? 'border-blue-500 ring-1 ring-blue-500' : '']"
           class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-lg bg-white px-3 py-2.5 text-xs text-gray-700 border hover:bg-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
         >

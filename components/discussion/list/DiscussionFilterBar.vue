@@ -146,7 +146,7 @@ const toggleSelectedTag = (tag: string) => {
       <FilterChip
         v-if="!isForumScoped"
         class="align-middle"
-        data-testid="channel-filter-button"
+        :data-testid="'forum-filter-button'"
         :label="channelLabel"
         :highlighted="channelLabel !== defaultFilterLabels.channels"
       >
@@ -171,7 +171,7 @@ const toggleSelectedTag = (tag: string) => {
       />
       <FilterChip
         class="align-middle"
-        data-testid="tag-filter-button"
+        :data-testid="'tag-filter-button'"
         :label="tagLabel"
         :highlighted="tagLabel !== defaultFilterLabels.tags"
       >

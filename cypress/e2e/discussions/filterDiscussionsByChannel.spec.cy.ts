@@ -1,45 +1,40 @@
 import { DISCUSSION_LIST } from "../constants";
-import { deleteAll } from "../utils";
-import { discussionsForFilteringTests } from "../../support/commandFunctions/seed/discussions/discussionsForFilteringTests";
+import { deleteAll, seedAll } from "../utils";
 
 describe("Filter discussions by channel", () => {
   beforeEach(function () {
     deleteAll();
-    cy.seedUsers();
-    cy.seedChannels();
-    cy.seedTags();
-     // Create discussions with channels referenced in these tests (cats, phx_music)
-     cy.createDiscussions(discussionsForFilteringTests);
+    seedAll();
+    cy.loginWithCreateEventButton();
   });
 
   it("filters discussions by channel", () => {
-    const searchTerm = "Test discussion 1, about cats";
+    const searchTerm = "Example topic 1";
 
-    cy.visit(DISCUSSION_LIST);
-    cy.get('div[data-testid="channel-filter-button"]').find("button").click(); // open the channel picker
+    cy.visit(DISCUSSION_LIST)
+      .wait(3000);
+      
+    cy.get('button[data-testid="forum-filter-button"]')
+      .click(); // open the channel picker
 
-    cy.get('span[data-testid="channel-picker-cats"]').click(); // click the cats channel
+    cy.get('span[data-testid="forum-picker-cats"]').click(); // click the cats channel
 
     // should have one result
     cy.get('ul[data-testid="sitewide-discussion-list"]').find("li").should("have.length", 1);
 
     // top result contains the search term
     cy.get('ul[data-testid="sitewide-discussion-list"]').find("li").contains(searchTerm);
-  });
-
-  it("when filtering by two tags, shows discussions that have at least one of the tags", () => {
-    cy.visit(DISCUSSION_LIST);
-
-    // open the channel picker
-    cy.get('div[data-testid="channel-filter-button"]').find("button").click();
-
-    // click the cats tag
-    cy.get('span[data-testid="channel-picker-cats"]').click();
-
+    
     // click the phx_music tag
-    cy.get('span[data-testid="channel-picker-phx_music"]').click();
-
+    cy.get('span[data-testid="forum-picker-phx_music"]').click();
+    
     // should have three results
     cy.get('ul[data-testid="sitewide-discussion-list"]').find("li").should("have.length", 3);
+
+    // Un-filter by cats
+    cy.get('span[data-testid="forum-picker-cats"]').click();
+
+    // should have two results
+    cy.get('ul[data-testid="sitewide-discussion-list"]').find("li").should("have.length", 2);
   });
 });

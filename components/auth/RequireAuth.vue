@@ -7,7 +7,6 @@ import {
   setIsLoadingAuth,
   usernameVar,
 } from "@/cache";
-import { client } from "process";
 
 // Define props for the component
 const props = defineProps({
@@ -23,10 +22,11 @@ const props = defineProps({
 
 let handleLogin = () => {};
 
-const showAuthContent = computed(
-  () => isAuthenticatedVar.value && usernameVar.value
-);
 const isOwner = computed(() => props.owners?.includes(usernameVar.value));
+
+const showAuthContent = computed(
+  () => isAuthenticatedVar.value && usernameVar.value  && (!props.requireOwnership || isOwner.value)
+);
 
 if (import.meta.env.SSR === false) {
   const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect } =
@@ -76,7 +76,7 @@ if (import.meta.env.SSR === false) {
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
     <div
-      v-if="showAuthContent && (!requireOwnership || isOwner)"
+      v-if="showAuthContent"
       :class="[
         fullWidth
           ? 'w-full flex align-items justify-center'
@@ -89,7 +89,7 @@ if (import.meta.env.SSR === false) {
       </client-only>
     </div>
     <div
-      v-else-if="!isLoadingAuthVar"
+      v-else
       :class="[
         fullWidth
           ? 'w-full flex align-items justify-center '
