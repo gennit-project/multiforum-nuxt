@@ -1,4 +1,3 @@
-import seedDiscussions from "../../support/commandFunctions/seed/discussions/seedDiscussions";
 import { DISCUSSION_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
 
@@ -6,16 +5,17 @@ describe("Filter discussions by text", () => {
   beforeEach(function () {
     deleteAll();
     seedAll();
-    seedDiscussions();
   });
 
   it("in the sitewide online discussions list, filters discussions by text", () => {
-    const searchTerm = "cats";
+    const searchTerm = "topic 1";
 
-    cy.visit(DISCUSSION_LIST);
+    cy.visit(DISCUSSION_LIST)
+      .wait(3000);
     cy.get('div[data-testid="discussion-filter-search-bar"]')
       .find("input")
-      .type(`${searchTerm}{enter}`);
+      .type(`${searchTerm}{enter}`)
+     
 
     // should have one result
     cy.get('ul[data-testid="sitewide-discussion-list"]').find("li").should("have.length", 1);
@@ -26,12 +26,14 @@ describe("Filter discussions by text", () => {
 
   it("in a channel view, filters discussions by text", () => {
     const CHANNEL_VIEW = `${Cypress.env("baseUrl")}/forums/phx_music/discussions/`
-    const searchTerm = "discussion 3";
+    const searchTerm = "topic 3";
 
-    cy.visit(CHANNEL_VIEW);
+    cy.visit(CHANNEL_VIEW)
+      .wait(3000);
+
     cy.get('div[data-testid="discussion-filter-search-bar"]')
       .find("input")
-      .type(`${searchTerm}{enter}`);
+      .type(`${searchTerm}{enter}`)
 
     // should have one result
     cy.get('ul[data-testid="channel-discussion-list"]').find("li").should("have.length", 1);
