@@ -13,13 +13,16 @@ describe("Basic discussion operations", () => {
     const TEST_CHANNEL = "cats";
 
     // Test creating a discussion.
-    cy.visit(DISCUSSION_CREATION_FORM);
+    cy.visit(DISCUSSION_CREATION_FORM)
+      .wait(3000);
 
     // Add title
     cy.get('input[data-testid="title-input"]').type(TEST_DISCUSSION);
 
-    // Add channel
-    cy.get('input[data-testid="channel-input"]').type(`${TEST_CHANNEL}{enter}`);
+     // Add channel
+    cy.get('div[data-testid="channel-input"]')
+      .type(`${TEST_CHANNEL}{enter}`);
+    cy.get(`span[data-testid="forum-picker-${TEST_CHANNEL}"]`).click();
 
     cy.get("button").contains("Save").click().wait(1000);
     cy.get("h2").contains(TEST_DISCUSSION);
