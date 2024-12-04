@@ -101,24 +101,39 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
           useMediumRoundedCorners ? 'rounded-md' : '',
         ]"
         class="h-12 w-full border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-        :placeholder="searchPlaceholder"
+        :placeholder="searchPlaceholder" 
+        autofocus="false"
         @input="searchLocations"
       >
       <slot />
-      <ul
-        v-if="searchResults.length"
-        class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
-        style="top: 100%"
-      >
-        <li
-          v-for="result in searchResults"
-          :key="result?.annotations?.DMS?.lat + result?.annotations?.DMS?.lng"
-          class="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:dark:bg-gray-800"
-          @click="selectLocation(result)"
+      <client-only>
+        <ul
+          v-if="searchResults.length"
+          class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
+          style="top: 100%"
         >
-          {{ result?.formatted }}
-        </li>
-      </ul>
+          <li
+            v-for="result in searchResults"
+            :key="result?.annotations?.DMS?.lat + result?.annotations?.DMS?.lng"
+            class="cursor-pointer px-4 py-2 hover:bg-gray-100 hover:dark:bg-gray-800"
+            @click="selectLocation(result)"
+          >
+            {{ result?.formatted }}
+          </li>
+        </ul>
+
+        <template #fallback>
+          <ul
+            v-if="searchResults.length"
+            class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
+            style="top: 100%"
+          >
+            <li class="cursor-pointer px-4 py-2">
+              Loading...
+            </li>
+          </ul>
+        </template>
+      </client-only>
     </div>
   </div>
 </template>

@@ -26,6 +26,8 @@ import type { Event as EventData } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
 import type { Ref, PropType } from "vue";
 
+const { theme } = useTheme();
+
 const props = defineProps({
   selectedTags: {
     type: Array as PropType<Array<string>>,
@@ -398,156 +400,160 @@ const isClientSide = typeof window !== "undefined";
 
 <template>
   <div class="flex flex-col">
-    <div
-      class="fixed top-0 w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
-    >
-      <div class="w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900">
-        <div class="flex max-w-7xl mt-2">
-          <EventFilterBar
-            :show-map="true"
-            :allow-hiding-main-filters="false"
-            :show-main-filters-by-default="true"
-          >
-            <TimeShortcuts />
-          </EventFilterBar>
+    <client-only>
+      <div
+        class="fixed top-0 w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
+      >
+        <div
+          class="w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900"
+        >
+          <div class="flex max-w-7xl mt-2">
+            <EventFilterBar
+              :show-map="true"
+              :allow-hiding-main-filters="false"
+              :show-main-filters-by-default="true"
+            >
+              <TimeShortcuts />
+            </EventFilterBar>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div
-      v-if="isClientSide && mdAndUp"
-      class="flex flex-grow bg-white dark:bg-black"
-    >
-      <div class="w-1/2">
-        <div class="space-y-4">
+      <div
+        v-if="isClientSide && mdAndUp"
+        class="flex flex-grow bg-white dark:bg-black"
+      >
+        <div class="w-1/2">
+          <div class="space-y-4">
+            <div v-if="eventLoading">Loading...</div>
+            <ErrorBanner
+              v-else-if="eventError"
+              class="block"
+              :text="eventError.message"
+            />
+            <EventList
+              v-else-if="eventResult && eventResult.events"
+              key="highlightedEventId"
+              class="mt-48 pt-0"
+              :events="eventResult.events"
+              :channel-id="channelId"
+              :highlighted-event-location-id="highlightedEventLocationId"
+              :highlighted-event-id="highlightedEventId"
+              :search-input="filterValues.searchInput"
+              :selected-tags="filterValues.tags"
+              :selected-channels="filterValues.channels"
+              :loaded-event-count="eventResult.events.length"
+              :result-count="eventResult.eventsAggregate?.count"
+              :show-map="true"
+              @filter-by-tag="filterByTag"
+              @filter-by-channel="filterByChannel"
+              @highlight-event="highlightEvent"
+              @open-preview="openPreview"
+              @unhighlight="unhighlight"
+            />
+          </div>
+        </div>
+
+        <div class="w-1/2 h-screen bg-gray-300 dark:bg-black fixed right-0">
           <div v-if="eventLoading">Loading...</div>
           <ErrorBanner
             v-else-if="eventError"
             class="block"
             :text="eventError.message"
           />
-          <EventList
-            v-else-if="eventResult && eventResult.events"
-            key="highlightedEventId"
-            class="mt-48 pt-0"
+          <EventMap
+            v-else-if="
+              eventResult && eventResult.events && eventResult.events.length > 0
+            "
+            :key="eventResult.events.length"
+            class="absolute inset-0"
             :events="eventResult.events"
-            :channel-id="channelId"
-            :highlighted-event-location-id="highlightedEventLocationId"
-            :highlighted-event-id="highlightedEventId"
-            :search-input="filterValues.searchInput"
-            :selected-tags="filterValues.tags"
-            :selected-channels="filterValues.channels"
-            :loaded-event-count="eventResult.events.length"
-            :result-count="eventResult.eventsAggregate?.count"
-            :show-map="true"
-            @filter-by-tag="filterByTag"
-            @filter-by-channel="filterByChannel"
+            :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
+            :color-locked="colorLocked"
+            :use-mobile-styles="false"
+            :theme="theme"
             @highlight-event="highlightEvent"
             @open-preview="openPreview"
-            @unhighlight="unhighlight"
+            @lock-colors="colorLocked = true"
+            @set-marker-data="setMarkerData"
           />
         </div>
       </div>
-
-      <div class="w-1/2 h-screen bg-gray-300 dark:bg-black fixed right-0">
-        <div v-if="eventLoading">Loading...</div>
-        <ErrorBanner
-          v-else-if="eventError"
-          class="block"
-          :text="eventError.message"
-        />
-        <EventMap
-          v-else-if="
-            eventResult && eventResult.events && eventResult.events.length > 0
-          "
-          :key="eventResult.events.length"
-          class="absolute inset-0"
-          :events="eventResult.events"
-          :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
-          :color-locked="colorLocked"
-          :use-mobile-styles="false"
-          :theme="theme"
-          @highlight-event="highlightEvent"
-          @open-preview="openPreview"
-          @lock-colors="colorLocked = true"
-          @set-marker-data="setMarkerData"
-        />
-      </div>
-    </div>
-    <div
-      v-else-if="eventResult && eventResult.events"
-      id="mapViewMobileWidth"
-      class="p-4 mt-52"
-    >
-      <div class="event-map-container">
-        <EventMap
-          v-if="eventResult.events.length > 0"
-          :events="eventResult.events"
-          :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
-          :color-locked="colorLocked"
-          :use-mobile-styles="true"
-          :theme="theme"
-          @highlight-event="highlightEvent"
-          @open-preview="openPreview"
-          @lock-colors="colorLocked = true"
-          @set-marker-data="setMarkerData"
-        />
-      </div>
-      <div class="h-1/3 w-full">
-        <div class="mx-auto">
-          <EventList
-            key="highlightedEventId"
-            :events="eventResult.events"
-            :channel-id="channelId"
-            :highlighted-event-location-id="highlightedEventLocationId"
-            :highlighted-event-id="highlightedEventId"
-            :search-input="filterValues.searchInput"
-            :selected-tags="filterValues.tags"
-            :selected-channels="filterValues.channels"
-            :loaded-event-count="eventResult.events.length"
-            :result-count="eventResult.eventsAggregate?.count"
-            @filter-by-tag="filterByTag"
-            @filter-by-channel="filterByChannel"
-            @highlight-event="highlightEvent"
-            @open-preview="openPreview"
-            @unhighlight="unhighlight"
-          />
-        </div>
-      </div>
-    </div>
-
-    <EventPreview
-      :top-layer="true"
-      :is-open="eventPreviewIsOpen && !multipleEventPreviewIsOpen"
-      @close-preview="closeEventPreview"
-    />
-    <PreviewContainer
-      :is-open="multipleEventPreviewIsOpen"
-      :header="'Events at this Location'"
-      @close-preview="closeMultipleEventPreview"
-    >
-      <EventList
-        v-if="selectedEvents"
-        class="overflow-auto overscroll-auto"
-        :events="selectedEvents"
-        :result-count="selectedEvents.length"
-        :channel-id="channelId"
-        :highlighted-event-id="highlightedEventId"
-        :show-map="true"
-        @highlight-event="highlightEvent"
-        @open-preview="openPreview"
-      />
-      <div class="flex flex-shrink-0 justify-end px-4 py-4">
-        <CloseButton @click="closeMultipleEventPreview" />
-      </div>
-      <PreviewContainer
-        :is-open="multipleEventPreviewIsOpen && eventPreviewIsOpen"
-        :top-layer="true"
-        @close-preview="closeEventPreview"
+      <div
+        v-else-if="eventResult && eventResult.events"
+        id="mapViewMobileWidth"
+        class="p-4 mt-52"
       >
-        <NuxtPage />
+        <div class="event-map-container">
+          <EventMap
+            v-if="eventResult.events.length > 0"
+            :events="eventResult.events"
+            :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
+            :color-locked="colorLocked"
+            :use-mobile-styles="true"
+            :theme="theme"
+            @highlight-event="highlightEvent"
+            @open-preview="openPreview"
+            @lock-colors="colorLocked = true"
+            @set-marker-data="setMarkerData"
+          />
+        </div>
+        <div class="h-1/3 w-full">
+          <div class="mx-auto">
+            <EventList
+              key="highlightedEventId"
+              :events="eventResult.events"
+              :channel-id="channelId"
+              :highlighted-event-location-id="highlightedEventLocationId"
+              :highlighted-event-id="highlightedEventId"
+              :search-input="filterValues.searchInput"
+              :selected-tags="filterValues.tags"
+              :selected-channels="filterValues.channels"
+              :loaded-event-count="eventResult.events.length"
+              :result-count="eventResult.eventsAggregate?.count"
+              @filter-by-tag="filterByTag"
+              @filter-by-channel="filterByChannel"
+              @highlight-event="highlightEvent"
+              @open-preview="openPreview"
+              @unhighlight="unhighlight"
+            />
+          </div>
+        </div>
+      </div>
+
+      <EventPreview
+        :top-layer="true"
+        :is-open="eventPreviewIsOpen && !multipleEventPreviewIsOpen"
+        @close-preview="closeEventPreview"
+      />
+      <PreviewContainer
+        :is-open="multipleEventPreviewIsOpen"
+        :header="'Events at this Location'"
+        @close-preview="closeMultipleEventPreview"
+      >
+        <EventList
+          v-if="selectedEvents"
+          class="overflow-auto overscroll-auto"
+          :events="selectedEvents"
+          :result-count="selectedEvents.length"
+          :channel-id="channelId"
+          :highlighted-event-id="highlightedEventId"
+          :show-map="true"
+          @highlight-event="highlightEvent"
+          @open-preview="openPreview"
+        />
+        <div class="flex flex-shrink-0 justify-end px-4 py-4">
+          <CloseButton @click="closeMultipleEventPreview" />
+        </div>
+        <PreviewContainer
+          :is-open="multipleEventPreviewIsOpen && eventPreviewIsOpen"
+          :top-layer="true"
+          @close-preview="closeEventPreview"
+        >
+          <NuxtPage />
+        </PreviewContainer>
       </PreviewContainer>
-    </PreviewContainer>
+    </client-only>
   </div>
 </template>
 
