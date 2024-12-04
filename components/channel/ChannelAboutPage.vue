@@ -60,7 +60,7 @@ const ownerList = computed(() =>
           <nuxt-link
             class="my-3 text-sm underline dark:text-gray-200"
             :to="{
-              name: 'forums-forumid-edit',
+              name: 'forums-forumId-edit',
               params: { forumId: channelId },
             }"
           >
