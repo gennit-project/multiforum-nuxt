@@ -34,7 +34,7 @@ function handleClick(item: MenuItemType) {
 </script>
 
 <template>
-  <client-only>
+ 
   <Menu as="div" class="relative inline-block text-left">
     <div>
       <MenuButton
@@ -80,7 +80,6 @@ function handleClick(item: MenuItemType) {
       </MenuItems>
     </transition>
   </Menu>
-</client-only>
 </template>
 
 <style scoped>
