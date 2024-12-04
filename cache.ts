@@ -1,5 +1,4 @@
-import type { InMemoryCacheConfig, ReactiveVar } from "@apollo/client/core";
-import { makeVar } from "@apollo/client/core";
+import type { InMemoryCacheConfig } from "@apollo/client/core";
 import { ref } from "vue";
 
 export const usernameVar = ref("");
@@ -19,9 +18,6 @@ export const isLoadingAuthVar = ref(false);
 export const setIsLoadingAuth = (status: boolean) => {
   isLoadingAuthVar.value = status;
 };
-export const themeVar: ReactiveVar<string> = makeVar<string>(
-  import.meta.client ? localStorage.getItem("theme") || "dark" : "dark"
-);
 
 export const inMemoryCacheOptions: InMemoryCacheConfig = {
   typePolicies: {

@@ -4,7 +4,7 @@ import { computed } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import 'highlight.js/styles/github-dark.css';
-import { themeVar } from "@/cache";
+const { theme } = useTheme()
 
 // Use DOMPurify only in the client environment
 let DOMPurify;
@@ -18,10 +18,6 @@ const props = defineProps({
     required: true,
   },
 });
-
-const theme = computed(() => {
-  return themeVar() 
-})
 
 const md = new MarkdownIt({
   highlight: (str, lang) => {

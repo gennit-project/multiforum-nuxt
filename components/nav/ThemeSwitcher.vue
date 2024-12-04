@@ -1,50 +1,16 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
-import { themeVar } from '@/cache';
-
-// Function to update the theme
-const updateTheme = () => {
-  if (import.meta.client) {
-    if (
-      localStorage.theme === 'dark' ||
-      (!('theme' in localStorage) &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches)
-    ) {
-      document.body.classList.add('dark');
-      document.body.classList.remove('light');
-      themeVar('dark');
-    } else {
-      document.body.classList.add('light');
-      document.body.classList.remove('dark');
-      themeVar('light');
-    }
-  }
-};
-
-// Update theme on component mount (client-side only)
-onMounted(() => {
-  updateTheme();
-});
+const { setTheme } = useTheme()
 
 const setLightMode = () => {
-  if (import.meta.client) {
-    localStorage.setItem('theme', 'light');
-    updateTheme();
-  }
+  setTheme('light');
 };
 
 const setDarkMode = () => {
-  if (import.meta.client) {
-    localStorage.setItem('theme', 'dark');
-    updateTheme();
-  }
+  setTheme('dark');
 };
 
 const setSystemMode = () => {
-  if (import.meta.client) {
-    localStorage.removeItem('theme');
-    updateTheme();
-  }
+  setTheme('system');
 };
 </script>
 

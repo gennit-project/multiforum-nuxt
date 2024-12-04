@@ -25,7 +25,6 @@ import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg";
 import type { Event as EventData } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
 import type { Ref, PropType } from "vue";
-import { themeVar } from "@/cache";
 
 const props = defineProps({
   selectedTags: {
@@ -137,10 +136,6 @@ const sendToPreview = (eventId: string, eventLocationId: string) => {
     });
   }
 };
-
-const theme = computed(() => {
-  return themeVar() || "dark";
-});
 
 // Data functions and properties from `data` and `methods` section
 // const highlightedMarker = ref(null);

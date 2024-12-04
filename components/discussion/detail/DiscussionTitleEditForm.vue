@@ -11,7 +11,9 @@ import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
-import { modProfileNameVar, usernameVar, themeVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
+
+const { theme } = useTheme()
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -69,8 +71,6 @@ const {
   },
 }));
 onDone(() => (titleEditMode.value = false));
-
-const theme = themeVar()
 
 const onClickEdit = () => {
   titleEditMode.value = true;
