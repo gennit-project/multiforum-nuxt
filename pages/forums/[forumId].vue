@@ -10,6 +10,7 @@ import { computed } from "vue";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import { useRoute } from "vue-router";
 import { useQuery } from "@vue/apollo-composable";
+import { DateTime } from "luxon";
 
 const route = useRoute();
 const router = useRouter();
@@ -30,10 +31,17 @@ const {
   loading: getChannelLoading,
   error: getChannelError,
   onResult: onGetChannelResult,
-} = useQuery(GET_CHANNEL, {
-  uniqueName: channelId,
-  now: new Date().toISOString(),
-});
+} = useQuery(
+  GET_CHANNEL, 
+  {
+    uniqueName: channelId,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: 'cache-first'
+  }
+);
 
 const channel = computed(() => {
   const channel = getChannelResult.value?.channels?.[0]

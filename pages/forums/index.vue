@@ -98,20 +98,26 @@ const {
   loading: channelLoading,
   fetchMore,
   error: channelError,
-} = useQuery(GET_CHANNELS, {
-  channelWhere: channelWhere,
-  eventChannelWhere: {
-    Event: {
-      startTime_GT: now,
-      canceled: false,
+} = useQuery(
+  GET_CHANNELS,
+  {
+    channelWhere: channelWhere,
+    eventChannelWhere: {
+      Event: {
+        startTime_GT: now,
+        canceled: false,
+      },
+    },
+    limit: 25,
+    offset: 0,
+    sort: {
+      createdAt: "ASC",
     },
   },
-  limit: 25,
-  offset: 0,
-  sort: {
-    createdAt: "ASC",
-  },
-});
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 // Function to load more channels
 const loadMore = () => {

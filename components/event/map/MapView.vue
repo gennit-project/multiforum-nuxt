@@ -103,12 +103,18 @@ const {
   result: eventResult,
   loading: eventLoading,
   onResult: onGetEventResult,
-} = useQuery(GET_EVENTS, {
-  limit: 25,
-  offset: 0,
-  where: eventWhere,
-  resultsOrder: resultsOrder,
-});
+} = useQuery(
+  GET_EVENTS,
+  {
+    limit: 25,
+    offset: 0,
+    where: eventWhere,
+    resultsOrder: resultsOrder,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 onGetEventResult((value) => {
   if (!value.data || value.data.events.length === 0) {

@@ -44,9 +44,11 @@ export default defineComponent({
       return themeResult.value?.theme;
     });
 
+    const isOpen = ref(false);
+
     return {
-      showMenu: ref(false),
       theme,
+      isOpen,
     };
   },
 });
@@ -55,7 +57,11 @@ export default defineComponent({
 <template>
   <client-only>
     <div class="flex align-items">
-      <Popper :close-on-content-click="false" location="bottom">
+      <Popper
+        :close-on-content-click="false"
+        location="bottom"
+        v-model="isOpen"
+      >
         <button
           :data-testid="dataTestid"
           :class="[highlighted ? 'border-blue-500 ring-1 ring-blue-500' : '']"
@@ -70,7 +76,7 @@ export default defineComponent({
           />
         </button>
         <template #content>
-          <div class="rounded-lg border bg-white dark:bg-gray-700">
+          <div v-if="isOpen" class="rounded-lg border bg-white dark:bg-gray-700">
             <slot name="content" />
           </div>
         </template>

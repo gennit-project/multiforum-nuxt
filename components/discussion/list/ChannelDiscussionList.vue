@@ -60,17 +60,23 @@ const {
   loading: discussionLoading,
   refetch: refetchDiscussions,
   fetchMore,
-} = useQuery(GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA, {
-  channelUniqueName: channelId,
-  searchInput,
-  selectedTags,
-  options: {
-    limit: DISCUSSION_PAGE_LIMIT,
-    offset: 0,
-    sort: activeSort,
-    timeFrame: activeTimeFrame,
+} = useQuery(
+  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
+  {
+    channelUniqueName: channelId,
+    searchInput,
+    selectedTags,
+    options: {
+      limit: DISCUSSION_PAGE_LIMIT,
+      offset: 0,
+      sort: activeSort,
+      timeFrame: activeTimeFrame,
+    },
   },
-});
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 watch(
   () => usernameVar.value,
   (newValue) => {
@@ -179,7 +185,10 @@ const handleCreateModProfileClick = async () => {
       :text="discussionError.message"
     />
     <p
-      v-else-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length === 0"
+      v-else-if="
+        discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
+          ?.length === 0
+      "
       class="flex gap-2 p-4"
     >
       <span>There are no discussions to show.</span>
@@ -208,7 +217,10 @@ const handleCreateModProfileClick = async () => {
     </p>
 
     <ul
-      v-else-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
+      v-else-if="
+        discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
+          ?.length > 0
+      "
       class="dark:divide-gray-700 divide-gray-200 flex flex-col divide-y"
       data-testid="channel-discussion-list"
     >
@@ -227,7 +239,10 @@ const handleCreateModProfileClick = async () => {
       />
     </ul>
     <div
-      v-if="discussionChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
+      v-if="
+        discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
+          ?.length > 0
+      "
     >
       <LoadMore
         class="justify-self-center mb-6"

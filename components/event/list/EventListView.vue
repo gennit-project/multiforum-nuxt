@@ -67,7 +67,7 @@ const {
     },
   },
   {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-first",
   }
 );
 const previewIsOpen = ref(false);

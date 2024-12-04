@@ -38,10 +38,16 @@ export default defineComponent({
       error: getEventsError,
       result: getEventsResult,
       loading: getEventsLoading,
-    } = useQuery(GET_SOONEST_EVENTS_IN_CHANNEL, {
-      uniqueName: channelId,
-      now: new Date().toISOString(),
-    });
+    } = useQuery(
+      GET_SOONEST_EVENTS_IN_CHANNEL,
+      {
+        uniqueName: channelId,
+        now: DateTime.local().startOf("hour").toISO(),
+      },
+      {
+        fetchPolicy: "cache-first",
+      }
+    );
 
     const soonestEventsInChannel = computed(() => {
       if (getEventsLoading.value || getEventsError.value) {
@@ -161,10 +167,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div
-    v-if="dateObj.happeningNow.length > 0"
-    class="flex flex-col"
-  >
+  <div v-if="dateObj.happeningNow.length > 0" class="flex flex-col">
     <span
       class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -181,7 +184,7 @@ export default defineComponent({
           params: {
             forumId: channelId,
             eventId: event?.id,
-          }
+          },
         }"
         class="flex items-center"
       >
@@ -203,10 +206,7 @@ export default defineComponent({
     </div>
   </div>
 
-  <div
-    v-if="dateObj.happeningToday.length > 0"
-    class="flex flex-col"
-  >
+  <div v-if="dateObj.happeningToday.length > 0" class="flex flex-col">
     <span
       class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -218,15 +218,13 @@ export default defineComponent({
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
-        :to="
-         {
+        :to="{
           name: 'forums-forumId-events-eventId',
           params: {
             forumId: channelId,
             eventId: event?.id,
-          }
-         }
-        "
+          },
+        }"
         class="flex items-center"
       >
         <span
@@ -238,10 +236,7 @@ export default defineComponent({
     </div>
   </div>
 
-  <div
-    v-if="dateObj.happeningTomorrow.length > 0"
-    class="flex flex-col"
-  >
+  <div v-if="dateObj.happeningTomorrow.length > 0" class="flex flex-col">
     <span
       class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -253,14 +248,13 @@ export default defineComponent({
       class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
-        :to="
-          {
-            name: 'forums-forumId-events-eventId',
-            params: {
-              forumId: channelId,
-              eventId: event?.id,
-            }
-          }"
+        :to="{
+          name: 'forums-forumId-events-eventId',
+          params: {
+            forumId: channelId,
+            eventId: event?.id,
+          },
+        }"
         class="flex items-center"
       >
         <span
@@ -289,19 +283,16 @@ export default defineComponent({
         class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm leading-6 text-gray-500 dark:text-gray-300"
       >
         <nuxt-link
-          :to="
-            {
-              name: 'forums-forumId-events-eventId',
-              params: {
-                forumId: channelId,
-                eventId: event?.id,
-              }
-            }"
+          :to="{
+            name: 'forums-forumId-events-eventId',
+            params: {
+              forumId: channelId,
+              eventId: event?.id,
+            },
+          }"
           class="flex items-center"
         >
-          <span
-            class="text-sm leading-6 text-gray-500 dark:text-gray-300"
-          >
+          <span class="text-sm leading-6 text-gray-500 dark:text-gray-300">
             {{ getSidebarLinkText(event) }}
           </span>
         </nuxt-link>
@@ -312,18 +303,19 @@ export default defineComponent({
   <div
     v-if="
       soonestEventsInChannel.length > 0 &&
-        eventChannelsAggregate > soonestEventsInChannel.length
+      eventChannelsAggregate > soonestEventsInChannel.length
     "
   >
     <nuxt-link
-      :to="
-        {
-          name: 'forums-forumId-events',
-          params: { forumId: channelId },
-        }"
+      :to="{
+        name: 'forums-forumId-events',
+        params: { forumId: channelId },
+      }"
       class="flex items-center underline"
     >
-      <span class="text-sm font-bold leading-6 dark:text-white"> View all events </span>
+      <span class="text-sm font-bold leading-6 dark:text-white">
+        View all events
+      </span>
     </nuxt-link>
   </div>
 </template>

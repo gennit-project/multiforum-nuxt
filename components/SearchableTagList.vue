@@ -38,11 +38,17 @@ const {
   loading: tagsLoading,
   error: tagsError,
   result: tagsResult,
-} = useQuery(GET_TAGS, {
-  where: {
-    text_CONTAINS: searchInputComputed,
+} = useQuery(
+  GET_TAGS,
+  {
+    where: {
+      text_CONTAINS: searchInputComputed,
+    },
   },
-});
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 const tagOptions = computed(() => {
   if (!tagsResult.value || !tagsResult.value.tags) {
@@ -125,7 +131,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
           :checked="selected.includes(tag.text)"
           class="border border-gray-300 text-blue-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', tag.text)"
-        >
+        />
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span :data-testid="`tag-picker-${tag.text}`" class="font-bold">{{
