@@ -68,7 +68,7 @@ const menuStyles = {
 <template>
   <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
     <template #activator="{ props }">
-      <v-btn
+      <button
         :data-testid="dataTestid"
         variant="text"
         v-bind="props"
@@ -79,7 +79,7 @@ const menuStyles = {
           Options
           <ChevronDownIcon class="-mr-1 ml-2 h-5 w-5" aria-hidden="true" />
         </slot>
-      </v-btn>
+      </button>
     </template>
 
     <v-list :style="menuStyles" class="dark:bg-gray-700">
