@@ -103,12 +103,12 @@ const formattedDate = computed(() => {
         :theme="theme"
       />
       <div v-else ref="discussionDetail" class="flex-1">
-        <h2
+        <span
           v-if="!titleEditMode"
           class="text-wrap px-1 text-xl md:text-2xl font-medium sm:tracking-tight"
         >
           {{ discussion && discussion.title ? discussion.title : "Couldn't find the discussion" }}
-        </h2>
+        </span>
 
         <TextInput
           v-if="titleEditMode"

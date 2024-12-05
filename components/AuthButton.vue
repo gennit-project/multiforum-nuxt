@@ -11,8 +11,8 @@ const props = defineProps({
     default: "",
   },
   buttonClasses: {
-    type: Array,
-    default: () => [],
+    type: String,
+    default: "",
   },
   loading: Boolean,
   showCount: Boolean,
