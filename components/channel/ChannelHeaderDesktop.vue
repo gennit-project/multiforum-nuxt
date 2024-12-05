@@ -52,7 +52,7 @@ export default defineComponent({
           <div class="flex items-center w-full gap-4">
             <ExpandableImage
               v-if="channel?.channelIconURL"
-              class="ml-6 h-8 w-8 shadow-sm dark:border-gray-800"
+              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
               :rounded="true"
               :full-width="true"
               :alt="channelId"
@@ -60,25 +60,25 @@ export default defineComponent({
             />
             <AvatarComponent
               v-if="!channel?.channelIconURL"
-              class="ml-6 h-8 w-8 shadow-sm dark:border-gray-800"
+              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
               :text="channelId"
               :src="channel?.channelIconURL ?? ''"
               :full-width="true"
               :is-square="false"
             />
             <div v-if="channelId" class="flex items-center">
-              <div>
-                <h1
-                  class="flex rounded-full border-gray-700 bg-white text-2xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
+              <div class="my-2">
+                <span
+                  class="flex space-y-2 rounded-full border-gray-700 bg-white text-2xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
                 >
                   {{ channel?.displayName ? channel.displayName : channelId }}
-                </h1>
-                <h2
+                </span>
+                <span
                   v-if="channel?.uniqueName && channel?.displayName"
-                  class="rounded-full bg-white font-mono text-gray-500 dark:bg-gray-900 dark:text-gray-300"
+                  class="rounded-full bg-white text-sm font-mono text-gray-500 dark:bg-gray-900 dark:text-gray-300"
                 >
                   {{ `${channel.uniqueName}` }}
-                </h2>
+                </span>
               </div>
             </div>
           </div>
