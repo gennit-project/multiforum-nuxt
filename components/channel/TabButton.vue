@@ -23,6 +23,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  dataTestid: {
+    type: String,
+    default: '',
+  },
 });
 
 const route = useRoute(); // Access the current route
@@ -46,6 +50,7 @@ const isHovered = ref(false);
 
 <template>
   <nuxt-link
+    :data-testid="dataTestid"
     :to="to"
     class="border-transparent link font-medium group inline-flex items-center gap-1 hover:text-gray-600 dark:text-gray-400"
     :class="classes"

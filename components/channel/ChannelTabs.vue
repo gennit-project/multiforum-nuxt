@@ -38,6 +38,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  desktop: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const route = useRoute();
@@ -129,6 +133,7 @@ const tabs = computed((): Tab[] => {
     >
       <TabButton
         v-for="tab in tabs"
+        :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
         :key="tab.name"
         :to="tabRoutes[tab.name]"
         :label="tab.label"

@@ -6,6 +6,7 @@ export const CHANNEL_CREATION_FORM = `${baseUrl}/forums/create`;
 export const DISCUSSION_CREATION_FORM = `${baseUrl}/discussions/create`;
 export const ONLINE_EVENT_LIST = `${baseUrl}/events/list/search`;
 export const DISCUSSION_LIST = `${baseUrl}/discussions/`;
+export const CATS_FORUM = `${baseUrl}/forums/cats/discussions`;
 
 export const getConstantsForCypress = (baseUrl: string) => {
   // Cypress can't use the environment variables in the same way,

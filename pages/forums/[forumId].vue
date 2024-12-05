@@ -131,6 +131,7 @@ if (!channelId.value) {
           :admin-list="adminList"
           :route="route"
           :channel="channel"
+          :desktop="true"
       /></ChannelHeaderDesktop>
       <div v-if="channel" class="w-full flex justify-center">
         <article

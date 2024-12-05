@@ -44,7 +44,7 @@ export default defineComponent({
       :alt="'channel banner'"
       class="max-h-36 object-cover w-full"
     >
-    <div class="pbg-white dark:bg-gray-800 flex justify-center">
+    <div class="bg-white dark:bg-gray-800 flex justify-center">
       <div class="max-w-screen-2xl w-full">
         <div
           class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pr-6"
