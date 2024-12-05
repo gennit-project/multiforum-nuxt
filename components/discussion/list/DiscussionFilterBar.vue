@@ -148,7 +148,7 @@ const toggleSelectedTag = (tag: string) => {
         class="align-middle"
         :data-testid="'forum-filter-button'"
         :label="channelLabel"
-        :highlighted="channelLabel !== defaultFilterLabels.channels"
+        :highlighted="filterValues.channels.length > 0"
       >
         <template #icon>
           <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
