@@ -30,7 +30,7 @@ defineEmits(["filterByTag"]);
 
 <template>
   <tr class="border border-gray-300 dark:border-gray-800">
-    <td class="flex-col px-4 py-2 border border-gray-300 dark:border-gray-800">
+    <td class="flex-col px-4 py-4 border border-gray-300 dark:border-gray-800">
       <nuxt-link
         :to="`/forums/${channel.uniqueName}/discussions`"
         class="flex items-center gap-2"
@@ -63,7 +63,7 @@ defineEmits(["filterByTag"]);
       </nuxt-link>
       <div
         v-if="channel?.description"
-        class="text-gray-500 dark:text-gray-400 break-all"
+        class="text-gray-500 dark:text-gray-400 break-all my-2"
       >
         <HighlightedSearchTerms
           :text="channel.description"
