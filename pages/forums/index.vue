@@ -111,7 +111,8 @@ const {
     limit: 25,
     offset: 0,
     sort: {
-      createdAt: "ASC",
+      // sort alphabetically by uniqueName
+      uniqueName: "ASC",
     },
   },
   {
