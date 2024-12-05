@@ -60,7 +60,7 @@ export default defineComponent({
             />
             <AvatarComponent
               v-if="!channel?.channelIconURL"
-              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
+              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800 mt-2"
               :text="channelId"
               :src="channel?.channelIconURL ?? ''"
               :full-width="true"
@@ -69,7 +69,7 @@ export default defineComponent({
             <div v-if="channelId" class="flex items-center">
               <div class="mt-3 mb-1">
                 <span
-                  class="flex space-y-2 rounded-full border-gray-700 bg-white text-2xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
+                  class="flex space-y-2 rounded-full border-gray-700 text-2xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
                 >
                   {{ channel?.displayName ? channel.displayName : channelId }}
                 </span>
