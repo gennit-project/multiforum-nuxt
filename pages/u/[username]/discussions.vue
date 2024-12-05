@@ -25,7 +25,10 @@ export default defineComponent({
       GET_USER_DISCUSSIONS,
       () => ({
         username: username.value,
-      })
+      }),
+      {
+        fetchPolicy: "cache-first",
+      }
     );
 
     return {

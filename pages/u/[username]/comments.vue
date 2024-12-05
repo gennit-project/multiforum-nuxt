@@ -49,6 +49,9 @@ export default defineComponent({
         limit: PAGE_LIMIT,
         offset: 0,
       }),
+      {
+        fetchPolicy: "cache-first",
+      }
     );
 
     const loadMore = () => {

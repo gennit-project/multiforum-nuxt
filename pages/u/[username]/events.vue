@@ -23,7 +23,9 @@ export default defineComponent({
 
     const { result, loading, error } = useQuery(GET_USER_EVENTS, () => ({
       username: username.value,
-    }));
+    }),{
+      fetchPolicy: "cache-first",
+    });
 
     return {
       loading,
