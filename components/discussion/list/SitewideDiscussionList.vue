@@ -11,12 +11,12 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from "@/components/comments/getSortFromQuery";
-import RequireAuth from '@/components/auth/RequireAuth.vue';
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 
 const DISCUSSION_PAGE_LIMIT = 15;
 
 // Props and Emits
-const emit = defineEmits(['filterByTag', 'filterByChannel']);
+const emit = defineEmits(["filterByTag", "filterByChannel"]);
 
 // Setup function
 const route = useRoute();
@@ -26,7 +26,7 @@ const channelId = computed(() => {
 });
 
 const filterValues = ref(
-  getFilterValuesFromParams({ route, channelId: channelId.value }),
+  getFilterValuesFromParams({ route, channelId: channelId.value })
 );
 
 const selectedChannelsComputed = computed(() => {
@@ -83,7 +83,8 @@ const aggregateDiscussionCount = computed(() => {
   if (!discussionResult.value) {
     return 0;
   }
-  return discussionResult.value.getSiteWideDiscussionList.aggregateDiscussionCount;
+  return discussionResult.value.getSiteWideDiscussionList
+    .aggregateDiscussionCount;
 });
 
 const loadMore = () => {
@@ -91,7 +92,8 @@ const loadMore = () => {
     variables: {
       options: {
         limit: DISCUSSION_PAGE_LIMIT,
-        offset: discussionResult.value.getSiteWideDiscussionList.discussions.length,
+        offset:
+          discussionResult.value.getSiteWideDiscussionList.discussions.length,
         sort: activeSort.value,
         timeFrame: activeTimeFrame.value,
       },
@@ -102,7 +104,8 @@ const loadMore = () => {
       return {
         getSiteWideDiscussionList: {
           ...previousResult.getSiteWideDiscussionList,
-          aggregateDiscussionCount: previousResult.getSiteWideDiscussionList.aggregateDiscussionCount,
+          aggregateDiscussionCount:
+            previousResult.getSiteWideDiscussionList.aggregateDiscussionCount,
           discussions: [
             ...previousResult.getSiteWideDiscussionList.discussions,
             ...fetchMoreResult.getSiteWideDiscussionList.discussions,
@@ -124,7 +127,8 @@ watch(
       });
     }
     if (
-      discussionResult?.value?.getDiscussionsInChannel?.discussionChannels?.length === 0
+      discussionResult?.value?.getDiscussionsInChannel?.discussionChannels
+        ?.length === 0
     ) {
       refetchDiscussions();
     }
@@ -133,21 +137,18 @@ watch(
 
 // Methods
 const filterByTag = (tag: string) => {
-  emit('filterByTag', tag);
+  emit("filterByTag", tag);
 };
 
 const filterByChannel = (channel: string) => {
-  emit('filterByChannel', channel);
+  emit("filterByChannel", channel);
 };
-
 </script>
 
 <template>
   <div>
     <slot />
-    <p v-if="discussionLoading">
-      Loading...
-    </p>
+    <p v-if="discussionLoading">Loading...</p>
     <ErrorBanner
       v-else-if="discussionError"
       class="max-w-5xl"
@@ -169,18 +170,21 @@ const filterByChannel = (channel: string) => {
           </nuxt-link>
         </template>
         <template #does-not-have-auth>
-          <span class="cursor-pointer text-blue-500 underline">Create one?</span>
+          <span class="cursor-pointer text-blue-500 underline"
+            >Create one?</span
+          >
         </template>
       </RequireAuth>
     </p>
     <div v-if="discussions && discussions.length > 0" class="p-0">
       <ul
         role="list"
-        class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 shadow sm:rounded-lg"
+        class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 shadow sm:rounded-lg p-0 m-0"
         data-testid="sitewide-discussion-list"
       >
         <SitewideDiscussionListItem
-          v-for="discussion in discussionResult.getSiteWideDiscussionList.discussions"
+          v-for="discussion in discussionResult.getSiteWideDiscussionList
+            .discussions"
           :key="discussion.id"
           :discussion="discussion"
           :score="discussion.score"
