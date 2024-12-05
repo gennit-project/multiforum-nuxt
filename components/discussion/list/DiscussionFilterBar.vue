@@ -166,6 +166,7 @@ const toggleSelectedTag = (tag: string) => {
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search...'"
+        :auto-focus="false"
         :small="true"
         @update-search-input="updateSearchInput"
       />

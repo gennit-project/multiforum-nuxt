@@ -265,6 +265,7 @@ const toggleSelectedTag = (tag: string) => {
             :search-placeholder="'Search'"
             :full-width="true"
             :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
+            :auto-focus="false"
             @update-search-input="updateSearchInput"
           >
             <client-only>
@@ -327,6 +328,7 @@ const toggleSelectedTag = (tag: string) => {
             :reference-point-address-name="referencePointName"
             :left-side-is-rounded="false"
             :radius="radiusLabel"
+            :auto-focus="false"
             @update-location-input="updateLocationInput"
           >
             <client-only>

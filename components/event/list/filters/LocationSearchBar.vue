@@ -6,6 +6,10 @@ import { config } from "@/config";
 
 // Props
 const props = defineProps({
+  autoFocus: {
+    type: Boolean,
+    default: false,
+  },
   compact: {
     type: Boolean,
     default: false,
@@ -102,7 +106,7 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
         ]"
         class="h-12 w-full border border-gray-200 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
         :placeholder="searchPlaceholder" 
-        autofocus="false"
+        :autofocus="autoFocus"
         @input="searchLocations"
       >
       <slot />
