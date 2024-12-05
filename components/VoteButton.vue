@@ -31,13 +31,13 @@ const buttonClasses = computed(() => {
 
   const defaultClasses = properties.active
     ? "border-blue-500 bg-blue-300 text-black dark:text-white dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-600"
-    : "border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700";
+    : "border-gray-200 bg-gray-100 text-black hover:border-blue-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700";
 
   const permalinkClasses = properties.isPermalinked
-    ? "border border-blue-500 hover:bg-blue-300"
-    : "border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700";
+    ? "border-blue-500 hover:bg-blue-300 dark:border-blue-600 dark:hover:bg-blue-600"
+    : "border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700";
 
-  return [...baseClasses, defaultClasses, permalinkClasses];
+  return [...baseClasses, defaultClasses, permalinkClasses].join(" ");
 });
 
 </script>

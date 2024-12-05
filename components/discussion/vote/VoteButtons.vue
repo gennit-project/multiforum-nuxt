@@ -144,7 +144,6 @@ const clickUp = () => {
           @undo-feedback="undoFeedback"
         >
           <VoteButton
-            class="ml-2"
             :test-id="'downvote-discussion-button'"
             :show-count="false"
             :active="downvoteActive"
