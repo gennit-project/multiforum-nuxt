@@ -136,7 +136,6 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       }
     },
     ChannelRole: {
-      keyFields: ["channelUniqueName"],
       merge: true
     },
     Query: {}
