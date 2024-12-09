@@ -6,7 +6,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div>
+  <div class="mt-auto">
     <div
       class="flex text-xs w-full items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
     >

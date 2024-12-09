@@ -82,8 +82,10 @@ const showMainContent = computed(() => {
 
 <template>
   <v-app>
-    <main>
-      <div class="bg-gray-100 dark:bg-black dark:text-gray-200 list-disc">
+    <main class="min-h-screen flex flex-col">
+      <div
+        class="dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col"
+      >
         <TopNav
           :show-user-profile-dropdown="showUserProfileDropdown"
           :side-nav-is-open="showDropdown"
@@ -91,19 +93,15 @@ const showMainContent = computed(() => {
           @close-user-profile-dropdown="closeUserProfileDropdown"
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
-        <div class="flex-col relative">
+        <div class="flex-col relative flex-grow flex">
           <SiteSidenav
             :key="`${showDropdown}`"
             :show-dropdown="showDropdown"
             @close="showDropdown = false"
           />
-          <div v-if="showMainContent" class="w-full flex-col">
-            <div class="min-h-screen flex-col">
-              <div class="flex-grow">
-                <slot />
-              </div>
-              <SiteFooter v-if="showFooter" />
-            </div>
+          <div v-if="showMainContent" class="w-full flex-grow flex flex-col">
+            <slot />
+            <SiteFooter v-if="showFooter" class="mt-auto" />
           </div>
           <div v-else>
             <client-only>
