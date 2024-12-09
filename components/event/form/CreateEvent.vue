@@ -10,24 +10,31 @@ import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutat
 import { getTimePieces } from "@/utils";
 import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
 import type { CreateEditEventFormValues } from "@/types/Event";
-import type { EventCreateInput, EventTagsConnectOrCreateFieldInput, Event } from "@/__generated__/graphql";
+import type {
+  EventCreateInput,
+  EventTagsConnectOrCreateFieldInput,
+  Event,
+} from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";
 
 const now = DateTime.now();
 const route = useRoute();
 const router = useRouter();
 
-const channelId = computed(() => (route.params.forumId ? String(route.params.forumId) : ""));
+const channelId = computed(() =>
+  route.params.forumId ? String(route.params.forumId) : ""
+);
 const createEventDefaultValues = getDefaultEventFormValues(channelId.value);
 const formValues = ref<CreateEditEventFormValues>(createEventDefaultValues);
 const defaultStartTimeObj = now.startOf("hour").plus({ hours: 1 });
 const startTimePieces = ref(getTimePieces(defaultStartTimeObj));
 
 const eventCreateInput = computed<EventCreateInput>(() => {
-  const tagConnections: EventTagsConnectOrCreateFieldInput[] = formValues.value.selectedTags.map((tag: string) => ({
-    onCreate: { node: { text: tag } },
-    where: { node: { text: tag } },
-  }));
+  const tagConnections: EventTagsConnectOrCreateFieldInput[] =
+    formValues.value.selectedTags.map((tag: string) => ({
+      onCreate: { node: { text: tag } },
+      where: { node: { text: tag } },
+    }));
 
   let input: EventCreateInput = {
     title: formValues.value.title || "",
@@ -52,7 +59,10 @@ const eventCreateInput = computed<EventCreateInput>(() => {
     input = {
       ...input,
       locationName: formValues.value.locationName,
-      location: { latitude: formValues.value.latitude, longitude: formValues.value.longitude },
+      location: {
+        latitude: formValues.value.latitude,
+        longitude: formValues.value.longitude,
+      },
       address: formValues.value.address,
     };
   }
@@ -63,7 +73,11 @@ const eventCreateInput = computed<EventCreateInput>(() => {
 const channelConnections = computed(() => formValues.value.selectedChannels);
 
 const createEventLoading = ref(false);
-const { mutate: createEvent, error: createEventError, onDone } = useMutation(CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, {
+const {
+  mutate: createEvent,
+  error: createEventError,
+  onDone,
+} = useMutation(CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, {
   update(cache, result) {
     const newEvent: Event = result.data?.createEventWithChannelConnections;
     cache.modify({
@@ -84,31 +98,40 @@ const { mutate: createEvent, error: createEventError, onDone } = useMutation(CRE
   },
 });
 
-onDone(response => {
+onDone((response) => {
   createEventLoading.value = false;
-  const newEventId = response.data.createEventWithChannelConnections?.id;
-  const redirectChannelId = channelId.value || formValues.value.selectedChannels[0];
-  router.push({ name: "forums-forumId-events-eventId", params: { forumId: redirectChannelId, eventId: newEventId } });
+  const newEventId = response.data?.createEventWithChannelConnections[0]?.id;
+  const redirectChannelId =
+    channelId.value || formValues.value.selectedChannels[0];
+  router.push({
+    name: "forums-forumId-events-eventId",
+    params: { forumId: redirectChannelId, eventId: newEventId },
+  });
 });
 
 function submit() {
   createEventLoading.value = true;
   if (!eventCreateInput.value?.title) {
     console.error("Title is required");
-    return
+    return;
   }
   if (!channelConnections.value?.length) {
     console.error("Channel is required");
-    return
+    return;
   }
   if (usernameVar.value === "") {
     console.error("Username is required");
-    return
+    return;
   }
-  createEvent([{
-    eventCreateInput: eventCreateInput.value,
-    channelConnections: channelConnections.value,
-  }]);
+
+  createEvent({
+    input: [
+      {
+        eventCreateInput: eventCreateInput.value,
+        channelConnections: channelConnections.value,
+      },
+    ],
+  });
 }
 
 function updateFormValues(data: CreateEditEventFormValues) {

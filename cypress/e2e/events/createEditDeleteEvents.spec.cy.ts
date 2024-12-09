@@ -1,4 +1,5 @@
-import { EVENT_CREATION_FORM } from "../constants";
+import { DateTime } from "luxon";
+import { EVENT_CREATION_FORM, baseUrl } from "../constants";
 import { deleteAll, seedAll } from "../utils";
 
 describe("Basic event operations", () => {
@@ -9,20 +10,36 @@ describe("Basic event operations", () => {
   });
 
   it("creates, edits and deletes an online event", () => {
+    // Helper function to format dates for input fields
+    const formatDate = (dt) => dt.toFormat('yyyy-MM-dd');
+    const formatTime = (dt) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
+    const formatDisplayTime = (dt) => dt.toFormat('h:mm');  // 12-hour format for assertions
+
+    // Generate future dates for testing
+    const startDateTime = DateTime.now().plus({ months: 1, hours: 2 }).startOf('hour');
+    const endDateTime = startDateTime.plus({ hours: 1 });
+    const editedStartDateTime = startDateTime.plus({ days: 1, minutes: 15 });
+    const editedEndDateTime = editedStartDateTime.plus({ hours: 1 });
+
     const TEST_TITLE = "Tempe Event Title";
-    const TEST_LINK = "www.test.com";
-    const TEST_LINK_2 = "www.test2.com";
+    const TEST_LINK = "https://www.test.com";
+    const TEST_LINK_2 = "https://www.test2.com";
+    const TEST_CHANNEL = "phx_music"
 
     // Test creating an online event
     cy.visit(EVENT_CREATION_FORM);
     cy.get('input[data-testid="title-input"]').type(TEST_TITLE);
 
-    cy.get('input[data-testid="channel-input"]').type("phx_music{enter}");
+    cy.get('div[data-testid="channel-input"]')
+      .type(`${TEST_CHANNEL}{enter}`);
+    cy.get(`span[data-testid="forum-picker-${TEST_CHANNEL}"]`).click();
+    // click outside to close the picker
+    cy.get('input[data-testid="title-input"]').click();
 
-    cy.get('input[data-testid="start-time-date-input"]').type("2023-12-01");
-    cy.get('input[data-testid="start-time-time-input"]').type("08:30");
-    cy.get('input[data-testid="end-time-date-input"]').type("2023-12-01");
-    cy.get('input[data-testid="end-time-time-input"]').type("09:30");
+    cy.get('input[data-testid="start-time-date-input"]').type(formatDate(startDateTime));
+    cy.get('input[data-testid="start-time-time-input"]').type(formatTime(startDateTime));
+    cy.get('input[data-testid="end-time-date-input"]').type(formatDate(endDateTime));
+    cy.get('input[data-testid="end-time-time-input"]').type(formatTime(endDateTime));
 
     cy.get('input[data-testid="link-input"]').type(TEST_LINK);
 
@@ -35,45 +52,51 @@ describe("Basic event operations", () => {
     cy.get("a").contains(TEST_LINK);
 
     // Test editing an event
-    cy.get("button").contains("Edit").click();
+    cy.get('button[data-testid="event-menu-button')
+      .click();
+    // Click on the edit button
+    cy.get("div[data-testid=event-menu-button-item-Edit]").click();
 
     // Change the link
     cy.get('input[data-testid="link-input"]').focus().clear();
     cy.get('input[data-testid="link-input"]').type(TEST_LINK_2);
 
     // Change the start date
-    cy.get('input[data-testid="start-time-date-input"]').type("2023-12-02");
+    cy.get('input[data-testid="start-time-date-input"]').type(formatDate(editedStartDateTime));
 
     // Change the start time
-    cy.get('input[data-testid="start-time-time-input"]').type("08:45");
+    cy.get('input[data-testid="start-time-time-input"]').type(formatTime(editedStartDateTime));
 
     // Change the end date
-    cy.get('input[data-testid="end-time-date-input"]').type("2023-12-02");
+    cy.get('input[data-testid="end-time-date-input"]').type(formatDate(editedEndDateTime));
 
     // Change the end time
-    cy.get('input[data-testid="end-time-time-input"]').type("09:45");
+    cy.get('input[data-testid="end-time-time-input"]').type(formatTime(editedEndDateTime));
 
     cy.get("button").contains("Save").click();
 
     // Check that the event has been updated
     cy.get("a").contains(TEST_LINK_2);
-    cy.get("span").contains("December 2 2023");
-    cy.get("span").contains("8:45");
+    // Update the assertions to check for the month and time in 12-hour format
+    cy.get("span").contains(editedStartDateTime.toFormat('MMMM d yyyy'));
+    cy.get("span").contains(formatDisplayTime(editedStartDateTime));
 
     // Test canceling an event
-    cy.get('div[data-testid="event-menu-button').find("button").click();
+    cy.get('button[data-testid="event-menu-button')
+      .click();
     // Click on the edit button
     cy.get("div").contains("Cancel").click();
     cy.get("button").contains("Yes").click();
     cy.get("p[data-testid='canceled-event-banner']").should("exist");
 
     // Test deleting an event
-    cy.get('div[data-testid="event-menu-button').find("button").click();
+    cy.get('button[data-testid="event-menu-button')
+      .click();
 
     cy.get("div").contains("Delete").click();
     cy.get("button").contains("Delete").click();
     // After deletion, the user should be redirected to the online event list
     // for the channel view
-    cy.url().should("include", "events/search");
+    cy.url().should("equal", `${baseUrl}/forums/${TEST_CHANNEL}/events`);
   });
 });

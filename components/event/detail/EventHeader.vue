@@ -349,7 +349,7 @@ function handleFeedbackInput(event: string) {
     <div>
       <MenuButton
         v-if="showMenuButtons && eventData && menuItems.length > 0"
-        data-testid="event-menu-button"
+        :data-testid="'event-menu-button'"
         :items="menuItems"
         @copy-link="copyLink"
         @handle-edit="

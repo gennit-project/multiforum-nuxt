@@ -128,7 +128,8 @@ const needsChanges = computed(() => {
     props.formValues.title.length > 0 &&
     startTime.value < endTime.value &&
     props.formValues.title.length <= EVENT_TITLE_CHAR_LIMIT &&
-    props.formValues.description.length <= MAX_CHARS_IN_EVENT_DESCRIPTION
+    props.formValues.description.length <= MAX_CHARS_IN_EVENT_DESCRIPTION &&
+    (urlIsValid.value || !props.formValues.virtualEventUrl)
   );
 });
 
