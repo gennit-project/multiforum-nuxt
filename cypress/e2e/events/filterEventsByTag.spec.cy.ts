@@ -1,14 +1,10 @@
 import { ONLINE_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import eventsForFilteringTests from "../../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
-import { config } from "../../../config";
 
 describe("Filter events by tag", () => {
   beforeEach(function () {
     deleteAll();
     seedAll();
-    // Create events with tags referenced in these tests (newYears, trivia)
-    cy.createEvents(eventsForFilteringTests);
   });
 
   const newYearsTagEventTitle = "Test online event in phx_music";

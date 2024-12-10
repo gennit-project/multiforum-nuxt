@@ -1,20 +1,17 @@
 import { ONLINE_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import eventsForFilteringTests from "../../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
 
 describe("Filter events by channel", () => {
   beforeEach(function () {
     deleteAll();
     seedAll();
-     // Create events with channels referenced in these tests (cats, phx_music)
-     cy.createEvents(eventsForFilteringTests);
   });
 
   it("filters events by channel", () => {
     const searchTerm = "Test free/virtual event";
 
     cy.visit(ONLINE_EVENT_LIST);
-    cy.get('div[data-testid="channel-filter-button"]').find("button").click(); // open the channel picker
+    cy.get('button[data-testid="forum-filter-button"]').click(); // open the channel picker
 
     cy.get('span[data-testid="channel-picker-cats"]').click(); // click the cats channel
 
@@ -29,7 +26,7 @@ describe("Filter events by channel", () => {
     cy.visit(ONLINE_EVENT_LIST);
 
     // open the channel picker
-    cy.get('div[data-testid="channel-filter-button"]').find("button").click();
+    cy.get('button[data-testid="forum-filter-button"]').click();
 
     // click the cats tag
     cy.get('span[data-testid="channel-picker-cats"]').click();

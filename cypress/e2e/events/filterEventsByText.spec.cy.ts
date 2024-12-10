@@ -1,12 +1,10 @@
 import { ONLINE_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import eventsForFilteringTests from "../../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
 
 describe("Filter events by text", () => {
   beforeEach(function () {
     deleteAll();
     seedAll();
-    cy.createEvents(eventsForFilteringTests);
   });
 
   it("in the sitewide online events list, filters events by text", () => {

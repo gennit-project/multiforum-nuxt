@@ -1,7 +1,6 @@
 import channels from "../support/commandFunctions/seedData/seedChannels";
 import discussions from "../support/commandFunctions/seedData/seedDiscussions";
 import events from "../support/commandFunctions/seedData/seedEvents";
-import eventsForFilterTests from "../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
 import tags from "../support/commandFunctions/seedData/seedTags";
 import channelRoles from "../support/commandFunctions/seedData/rbac/seedChannelRoles";
 import modChannelRoles from "../support/commandFunctions/seedData/rbac/seedModChannelRoles"
@@ -46,7 +45,7 @@ export const seedAll = () => {
       channels,
       comments: [], // May add some seed comments later if needed.
       discussions,
-      events: events.concat(eventsForFilterTests),
+      events,
       tags,
       users,
       channelRoles,

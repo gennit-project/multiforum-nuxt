@@ -10,12 +10,12 @@ type BaseEvent = {
   description?: string;
   startTime: string;
   endTime: string;
-  location: {
+  location?: {
     latitude: number;
     longitude: number;
   };
-  locationName: string;
-  address: string;
+  locationName?: string;
+  address?: string;
   poster: string;
   cost: string;
   startTimeDayOfWeek: string;
@@ -23,9 +23,52 @@ type BaseEvent = {
   canceled: boolean;
   tags?: string[];
   channels: string[];
+  virtualEventUrl?: string;
 };
 
 const baseEvents: BaseEvent[] = [
+  {
+    title: "Test free/virtual event",
+    description: undefined,
+    startTime: "2024-04-21T02:21:37.146Z",
+    endTime: "2024-04-21T02:21:37.146Z",
+    virtualEventUrl: "https://example.com",
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    startTimeDayOfWeek: "Wednesday",
+    startTimeHourOfDay: 20,
+    tags: [],
+    channels: ["cats"],
+  },
+  {
+    title: "Test online event in phx_music",
+    description: undefined,
+    startTime: "2024-04-21T02:21:37.146Z",
+    endTime: "2024-04-21T02:21:37.146Z",
+    virtualEventUrl: "https://example.com",
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    startTimeDayOfWeek: "Wednesday",
+    startTimeHourOfDay: 20,
+    tags: ["newYears"],
+    channels: ["phx_music"],
+  },
+  {
+    title: "Test event with a trivia tag",
+    description: undefined,
+    startTime: "2024-04-21T02:21:37.146Z",
+    endTime: "2024-04-21T02:21:37.146Z",
+    virtualEventUrl: "https://example.com",
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    startTimeDayOfWeek: "Wednesday",
+    startTimeHourOfDay: 20,
+    tags: ["trivia"],
+    channels: ["phx_music"],
+  },
   {
     title: "GATHERING OF BONES",
     description: "with Arsenic Kitchen, Commiserate, Killing Sunday",
@@ -222,6 +265,7 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
     canceled,
     tags,
     channels,
+    virtualEventUrl
   }) => ({
     eventCreateInput: {
       title,
@@ -244,14 +288,14 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
       startTimeDayOfWeek,
       startTimeHourOfDay,
       canceled,
-      ...(tags &&
-        tags.length > 0 && {
-          Tags: {
-            connect: tags.map((tag) => ({
+      ...(tags?.length > 0 && {
+        Tags: {
+          connect: tags.map((tag) => ({
               where: { node: { text: tag } },
             })),
           },
         }),
+      virtualEventUrl
     },
     channelConnections: channels,
   })

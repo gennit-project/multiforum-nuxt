@@ -1,12 +1,10 @@
 import { IN_PERSON_EVENT_LIST } from "../constants";
 import { deleteAll, seedAll } from "../utils";
-import eventsForFilteringTests from "../../support/commandFunctions/seedData/rbac/seedEventsForFilteringTests";
 
 describe("Filter events by distance", () => {
   beforeEach(function () {
     deleteAll();
     seedAll();
-    cy.createEvents(eventsForFilteringTests);
   });
 
   it("in the sitewide in-person events list, filters events by distance", () => {
