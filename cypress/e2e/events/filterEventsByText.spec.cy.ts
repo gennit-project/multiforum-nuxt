@@ -10,10 +10,11 @@ describe("Filter events by text", () => {
   it("in the sitewide online events list, filters events by text", () => {
     const searchTerm = "virtual";
 
-    cy.visit(ONLINE_EVENT_LIST);
+    cy.visit(ONLINE_EVENT_LIST)
+      .wait(1500);
+
     cy.get('button[data-testid="more-filters-button"]').click();
-    cy.get('div[data-testid="event-drawer-search-bar"]')
-      .find('input[data-testid="search-bar"]')
+    cy.get('input[data-testid="search-bar"]')
       .type(`${searchTerm}{enter}`);
 
     // should have one result
@@ -25,13 +26,14 @@ describe("Filter events by text", () => {
 
   it("in a channel view, filters events by text", () => {
     const CHANNEL_VIEW =
-      `${Cypress.env("baseUrl")}/forums/phx_music/events/search/`;
+      `${Cypress.env("baseUrl")}/forums/phx_music/events/`;
     const searchTerm = "trivia";
 
-    cy.visit(CHANNEL_VIEW);
+    cy.visit(CHANNEL_VIEW)
+      .wait(1500);
+
     cy.get('button[data-testid="more-filters-button"]').click();
-    cy.get('div[data-testid="event-drawer-search-bar"]')
-      .find('input[data-testid="search-bar"]')
+    cy.get('input[data-testid="search-bar"]')
       .type(`${searchTerm}{enter}`);
 
     // should have one result
