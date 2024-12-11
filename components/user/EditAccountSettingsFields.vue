@@ -168,7 +168,7 @@ const needsChanges = computed(() => {
               />
               <CharCounter
                 :key="formValues.bio"
-                :current="formValues.bio.length || 0"
+                :current="formValues.bio?.length || 0"
                 :max="MAX_CHARS_IN_USER_BIO"
               />
             </template>
