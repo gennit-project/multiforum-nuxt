@@ -9,8 +9,8 @@ export interface CreateEditDiscussionFormValues {
 }
 
 export type SearchDiscussionValues = {
-    tags?: Array<string>
-    channels?: Array<string>
-    searchInput?: string;
+    tags: Array<string>
+    channels: Array<string>
+    searchInput: string;
   };
   

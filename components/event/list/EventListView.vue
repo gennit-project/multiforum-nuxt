@@ -7,7 +7,7 @@ import "md-editor-v3/lib/style.css";
 import { GET_EVENTS } from "@/graphQLData/event/queries";
 import getEventWhere from "@/components/event/list/filters/getEventWhere";
 import type { SearchEventValues } from "@/types/Event";
-import { getFilterValuesFromParams } from "./filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "./filters/getEventFilterValuesFromParams";
 import ErrorBanner from "../../ErrorBanner.vue";
 import { timeShortcutValues } from "./filters/eventSearchOptions";
 import {

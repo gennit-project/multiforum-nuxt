@@ -14,7 +14,7 @@ import {
 } from "@/components/event/list/filters/eventSearchOptions";
 import LocationFilterTypes from "./locationFilterTypes";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import GenericButton from "@/components/GenericButton.vue";
 import FilterChip from "@/components/FilterChip.vue";
 import SelectCanceled from "./SelectCanceled.vue";

@@ -8,7 +8,7 @@ import SearchableForumList from "@/components/channel/SearchableForumList.vue";
 import SearchableTagList from "@/components/SearchableTagList.vue";
 import SortButtons from "@/components/SortButtons.vue";
 import { getTagLabel, getChannelLabel } from "@/utils";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
 import type { SearchDiscussionValues } from "@/types/Discussion";
 
 defineProps({
@@ -74,8 +74,13 @@ watch(
     }
   }
 );
+type UpdateStateInput = {
+  channels?: string[];
+  tags?: string[];
+  searchInput?: string;
+};
 
-const updateFilters = (params: SearchDiscussionValues) => {
+const updateFilters = (params: UpdateStateInput) => {
   const existingQuery = { ...route.query };
 
   // Remove tags if the array is empty, otherwise serialize the tags as a comma-separated string
@@ -97,7 +102,7 @@ const updateFilters = (params: SearchDiscussionValues) => {
   });
 };
 
-const updateLocalState = (params: SearchDiscussionValues) => {
+const updateLocalState = (params: UpdateStateInput) => {
   filterValues.value = {
     ...filterValues.value,
     ...params,

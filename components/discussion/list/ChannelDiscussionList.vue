@@ -11,7 +11,7 @@ import { generateSlug } from "random-word-slugs";
 import { CREATE_MOD_PROFILE } from "@/graphQLData/user/mutations";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
 import { setModProfileName, usernameVar } from "@/cache";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,

@@ -14,7 +14,7 @@ import EventFilterBar from "../list/filters/EventFilterBar.vue";
 import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
 import { GET_EVENTS } from "@/graphQLData/event/queries";
 import getEventWhere from "../list/filters/getEventWhere";
-import { getFilterValuesFromParams } from "../list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "../list/filters/getEventFilterValuesFromParams";
 import {
   chronologicalOrder,
   reverseChronologicalOrder,

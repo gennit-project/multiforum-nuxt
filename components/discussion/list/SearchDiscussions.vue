@@ -4,7 +4,7 @@ import { useRoute, useRouter } from "vue-router";
 import ChannelDiscussionList from "./ChannelDiscussionList.vue";
 import SitewideDiscussionList from "./SitewideDiscussionList.vue";
 import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import type { SearchDiscussionValues } from "@/types/Discussion";
 
 // Props and Emits

@@ -5,7 +5,7 @@ type GetFilterValuesInput = {
   channelId: string;
 };
 
-const getFilterValuesFromParams = function (
+export const getFilterValuesFromParams = function (
   input: GetFilterValuesInput,
 ): SearchDiscussionValues {
   // Need to re-clean data when route values change
@@ -60,4 +60,3 @@ const getFilterValuesFromParams = function (
   return filterValues;
 };
 
-export default { getFilterValuesFromParams };

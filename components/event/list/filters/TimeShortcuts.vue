@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { timeFilterShortcuts, timeShortcutValues } from "./eventSearchOptions";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import type { SearchEventValues } from "@/types/Event";
 import Tag from "@/components/TagComponent.vue";
 

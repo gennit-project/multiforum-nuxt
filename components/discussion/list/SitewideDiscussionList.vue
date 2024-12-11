@@ -6,7 +6,7 @@ import LoadMore from "../../LoadMore.vue";
 import { GET_SITE_WIDE_DISCUSSION_LIST } from "@/graphQLData/discussion/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "vue-router";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getFilterValuesFromParams";
+import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
