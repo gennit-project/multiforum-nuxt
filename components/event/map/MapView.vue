@@ -125,12 +125,12 @@ onGetEventResult((value) => {
   sendToPreview(defaultSelectedEvent.id, "");
 });
 
-const sendToPreview = (eventId: string, eventLocationId: string) => {
+const sendToPreview = async (eventId: string, eventLocationId: string) => {
   if (eventId) {
     const escapedEventLocationId = eventLocationId
       ? CSS.escape(eventLocationId)
       : "";
-    router.push({
+    await router.push({
       name: "map-search-eventId",
       params: { eventId },
       hash: `#${escapedEventLocationId}`,
@@ -322,7 +322,6 @@ const highlightEvent = (
   eventData: EventData,
   clickedMapMarker = false
 ) => {
-  sendToPreview(eventId, eventLocationId);
   highlightedEventLocationId.value = eventLocationId;
 
   highlightEventOnMap({
@@ -341,6 +340,7 @@ const highlightEvent = (
     markerMap: desktopMarkerMap.value,
     map: desktopMap.value,
   });
+  sendToPreview(eventId, eventLocationId);
 };
 
 const unhighlightEventOnMap = (markerMap: any) => {

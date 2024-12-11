@@ -142,7 +142,6 @@ const filterByChannel = (channel: string) => {
   updateFilters({ channels: channel });
 };
 
-
 </script>
 
 <template>
@@ -150,6 +149,7 @@ const filterByChannel = (channel: string) => {
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
+      :show-main-filters-by-default="true"
     >
       <TimeShortcuts :is-list-view="true" />
       <OnlineInPersonShortcuts v-if="channelId" />

@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, onMounted } from "vue";
 import Tag from "@/components/TagComponent.vue";
-import { useQuery } from "@vue/apollo-composable";
+import { useQuery, useLazyQuery } from "@vue/apollo-composable";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import {
   GET_EVENT_COMMENTS,
@@ -45,38 +45,51 @@ const props = defineProps({
 const route = useRoute();
 const offset = ref(0);
 
-const eventId = computed(() => {
-  if (typeof route.params.eventId === "string") {
-    return route.params.eventId;
+// Instead of a computed property, make it a ref
+const eventId = ref(
+  typeof route.params.eventId === "string" 
+    ? route.params.eventId 
+    : props.issueEventId || ""
+);
+
+// Add a watcher for the route params
+watch(
+  () => route.params.eventId,
+  (newEventId) => {
+    eventId.value = typeof newEventId === "string" 
+      ? newEventId 
+      : props.issueEventId || "";
   }
-  return props.issueEventId || "";
-});
+);
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
 
 const {
+  load: loadEvent,
   result: eventResult,
   error: eventError,
   loading: eventLoading,
-} = useQuery(GET_EVENT, {
-  id: eventId.value,
-  channelUniqueName: channelId.value,
+} = useLazyQuery(GET_EVENT, {
+  id: eventId,
+  channelUniqueName: channelId.value 
 });
 
 const event = computed(() => eventResult.value?.events?.[0] || null);
 
 const commentSort = computed(() => getSortFromQuery(route.query));
+
 const {
+  load: loadEventComments,
   result: getEventCommentsResult,
   loading: getEventCommentsLoading,
   fetchMore: fetchMoreComments,
-} = useQuery(GET_EVENT_COMMENTS, {
-  eventId: eventId.value,
+} = useLazyQuery(GET_EVENT_COMMENTS, {
+  eventId: eventId,
   offset: offset.value,
   limit: COMMENT_LIMIT,
-  sort: commentSort.value,
+  sort: commentSort.value
 });
 
 watch(commentSort, () =>
@@ -88,11 +101,28 @@ const comments = computed<Comment[]>(
 );
 
 const {
+  load: loadEventRootCommentAggregate,
   result: getEventRootCommentAggregateResult,
   error: getEventRootCommentAggregateError,
   loading: getEventRootCommentAggregateLoading,
-} = useQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
-  eventId: eventId.value,
+} = useLazyQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
+  eventId: eventId
+})
+
+watch(eventId, (newEventId) => {
+  if (newEventId) {
+    loadEvent();
+    loadEventComments();
+    loadEventRootCommentAggregate();
+  }
+});
+
+onMounted(() => {
+  if (eventId.value) {
+    loadEvent();
+    loadEventComments();
+    loadEventRootCommentAggregate();
+  }
 });
 
 const loadedRootCommentCount = computed(() => comments.value.length);

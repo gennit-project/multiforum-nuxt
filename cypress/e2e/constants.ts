@@ -1,7 +1,7 @@
 export const baseUrl = Cypress.env("baseUrl")
 
 export const EVENT_CREATION_FORM = `${baseUrl}/events/create`;
-export const IN_PERSON_EVENT_LIST = `${baseUrl}/map`;
+export const IN_PERSON_EVENT_LIST = `${baseUrl}/map/search`;
 export const CHANNEL_CREATION_FORM = `${baseUrl}/forums/create`;
 export const DISCUSSION_CREATION_FORM = `${baseUrl}/discussions/create`;
 export const ONLINE_EVENT_LIST = `${baseUrl}/events/list/search`;
@@ -14,7 +14,7 @@ export const getConstantsForCypress = (baseUrl: string) => {
 
   return {
     EVENT_CREATION_FORM: `${baseUrl}/events/create`,
-    IN_PERSON_EVENT_LIST: `${baseUrl}/map`,
+    IN_PERSON_EVENT_LIST: `${baseUrl}/map/search`,
     CHANNEL_CREATION_FORM: `${baseUrl}/forums/create`,
     DISCUSSION_CREATION_FORM: `${baseUrl}/discussions/create`,
     ONLINE_EVENT_LIST: `${baseUrl}/events/list/search`,

@@ -50,6 +50,8 @@ describe("Filter events by distance", () => {
       .click();
 
     // Confirm that the preview drawer opens and it has Selena Night
-    cy.get('div[data-testid="event-preview"]').contains("Selena Night");
+    cy.get('div[data-testid="event-preview"]');
+    // there is an H2 with the event title
+    cy.get("h2").contains("Selena Night");
   });
 });

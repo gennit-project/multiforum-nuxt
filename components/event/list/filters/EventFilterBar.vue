@@ -241,7 +241,7 @@ const toggleSelectedTag = (tag: string) => {
             <FilterChip
               v-if="!channelId"
               class="ml-4 items-center align-middle"
-              data-testid="channel-filter-button"
+              :data-testid="'forum-filter-button'"
               :label="channelLabel"
               :highlighted="channelLabel !== defaultFilterLabels.channels"
             >

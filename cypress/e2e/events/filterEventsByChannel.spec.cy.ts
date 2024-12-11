@@ -10,10 +10,12 @@ describe("Filter events by channel", () => {
   it("filters events by channel", () => {
     const searchTerm = "Test free/virtual event";
 
-    cy.visit(ONLINE_EVENT_LIST);
-    cy.get('button[data-testid="forum-filter-button"]').click(); // open the channel picker
+    cy.visit(ONLINE_EVENT_LIST)
+      .wait(3000);
 
-    cy.get('span[data-testid="channel-picker-cats"]').click(); // click the cats channel
+    cy.get('button[data-testid="forum-filter-button"]').click().wait(1500) // open the channel picker
+
+    cy.get('span[data-testid="forum-picker-cats"]').click(); // click the cats channel
 
     // should have one result
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 1);
@@ -23,16 +25,17 @@ describe("Filter events by channel", () => {
   });
 
   it("when filtering by two tags, shows events that have at least one of the tags", () => {
-    cy.visit(ONLINE_EVENT_LIST);
+    cy.visit(ONLINE_EVENT_LIST)
+    .wait(3000);
 
     // open the channel picker
     cy.get('button[data-testid="forum-filter-button"]').click();
 
     // click the cats tag
-    cy.get('span[data-testid="channel-picker-cats"]').click();
+    cy.get('span[data-testid="forum-picker-cats"]').click();
 
     // click the phx_music tag
-    cy.get('span[data-testid="channel-picker-phx_music"]').click();
+    cy.get('span[data-testid="forum-picker-phx_music"]').click();
 
     // should have three results
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 3);

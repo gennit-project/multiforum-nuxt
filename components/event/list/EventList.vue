@@ -166,7 +166,12 @@ const onMouseLeaveEventListItem = () => {
         @clicked-event-list-item="handleClickEventListItem(event)"
         @filter-by-tag="filterByTag"
         @filter-by-channel="filterByChannel"
-        @open-preview="$emit('openPreview')"
+        @open-preview="() => {
+          emit('highlightEvent', getEventLocationId(event), event.id, event);
+          $nextTick(() => {
+            $emit('openPreview')            
+          });
+        }"
       />
     </ul>
 
