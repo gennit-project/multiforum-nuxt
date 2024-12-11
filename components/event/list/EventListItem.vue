@@ -256,7 +256,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             <i class="fa-regular fa-comment mt-1 h-6 w-6" />
             <span class="text black dark:text-white">{{
               `View ${commentCount} ${
-                commentCount === 1 ? "comment " : "comments"
+                commentCount === 1 ? "comment " : "comments "
               }`
             }}</span>
             <span v-if="!isWithinChannel">{{

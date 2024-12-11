@@ -149,7 +149,7 @@ const filterByChannel = (channel: string) => {
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
-      :show-main-filters-by-default="true"
+      :show-main-filters-by-default="!channelId"
     >
       <TimeShortcuts :is-list-view="true" />
       <OnlineInPersonShortcuts v-if="channelId" />
