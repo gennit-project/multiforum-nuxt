@@ -1,5 +1,6 @@
 import { DateTime } from "luxon";
 import type { EventCreateInput } from "../../../../__generated__/graphql";
+import { timeShortcutValues } from '../../../../components/event/list/filters/eventSearchOptions';
 
 export type EventCreateInputWithChannels = {
   eventCreateInput: EventCreateInput;
@@ -40,7 +41,117 @@ const generateEventDates = (daysFromNow: number) => {
   };
 };
 
-const baseEvents: BaseEvent[] = [
+const timeZone = Cypress.env("TZ");
+const now = DateTime.now().setZone(timeZone);
+
+const getStartOfThisWeekend = () => {
+  const startOfWeek = now.startOf("week");
+  return startOfWeek.plus({ days: 5 });
+};
+
+const getStartOfNextWeek = () => {
+  const startOfThisWeek = now.startOf("week");
+  return startOfThisWeek.plus({ weeks: 1 });
+};
+
+const startOfThisWeekend = getStartOfThisWeekend();
+const startOfNextWeek = getStartOfNextWeek();
+const startOfThisMonth = now.startOf("month");
+
+const timeBasedEvents: BaseEvent[] = [
+  {
+    title: "Today's Test Event",
+    ...generateEventDates(0),
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "Tomorrow's Test Event",
+    ...generateEventDates(1),
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "This Weekend Test Event",
+    startTime: startOfThisWeekend.plus({ minutes: 1 }).toISO(),
+    endTime: startOfThisWeekend.plus({ days: 2 }).toISO(),
+    startTimeDayOfWeek: startOfThisWeekend.weekdayLong,
+    startTimeHourOfDay: startOfThisWeekend.hour,
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "Next Week Test Event",
+    startTime: startOfNextWeek.plus({ minutes: 1 }).toISO(),
+    endTime: startOfNextWeek.plus({ weeks: 1 }).toISO(),
+    startTimeDayOfWeek: startOfNextWeek.weekdayLong,
+    startTimeHourOfDay: startOfNextWeek.hour,
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "Next Weekend Test Event",
+    startTime: startOfNextWeek.plus({ days: 5, minutes: 1 }).toISO(),
+    endTime: startOfNextWeek.plus({ weeks: 1 }).toISO(),
+    startTimeDayOfWeek: startOfNextWeek.plus({ days: 5 }).weekdayLong,
+    startTimeHourOfDay: startOfNextWeek.plus({ days: 5 }).hour,
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "This Month Test Event",
+    startTime: now.toISO(),
+    endTime: startOfThisMonth.plus({ months: 1, minutes: 1 }).toISO(),
+    startTimeDayOfWeek: now.weekdayLong,
+    startTimeHourOfDay: now.hour,
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "Past Test Event",
+    startTime: now.minus({ years: 1 }).toISO(),
+    endTime: now.startOf("day").toISO(),
+    startTimeDayOfWeek: now.minus({ years: 1 }).weekdayLong,
+    startTimeHourOfDay: now.minus({ years: 1 }).hour,
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+  {
+    title: "Next Month Test Event",
+    startTime: startOfThisMonth.plus({ months: 1, minutes: 1 }).toISO(),
+    endTime: startOfThisMonth.plus({ months: 2 }).toISO(),
+    startTimeDayOfWeek: startOfThisMonth.plus({ months: 1 }).weekdayLong,
+    startTimeHourOfDay: startOfThisMonth.plus({ months: 1 }).hour,
+    poster: "cluse",
+    cost: "0",
+    canceled: false,
+    channels: ["phx_music"],
+    virtualEventUrl: "https://example.com",
+  },
+];
+
+const regularEvents: BaseEvent[] = [
   {
     title: "Test free/virtual event",
     description: undefined,
@@ -218,6 +329,8 @@ const baseEvents: BaseEvent[] = [
     channels: ["phx_concerts"],
   },
 ];
+
+const baseEvents = [...timeBasedEvents, ...regularEvents];
 
 export const events: EventCreateInputWithChannels[] = baseEvents.map(
   ({
