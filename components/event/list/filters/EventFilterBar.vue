@@ -23,6 +23,7 @@ import Popper from "vue3-popper";
 import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
 import SearchableTagList from "@/components/SearchableTagList.vue";
+import { useDisplay } from "vuetify";
 
 // Props
 const props = defineProps({
@@ -244,6 +245,8 @@ const toggleSelectedTag = (tag: string) => {
   }
   setSelectedTags(filterValues.value.tags);
 };
+
+const { smAndDown } = useDisplay();
 </script>
 
 <template>
@@ -251,7 +254,10 @@ const toggleSelectedTag = (tag: string) => {
     <div v-if="showMainFilters" class="flex flex-col gap-2">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 align-items">
-          <div class="flex space-x-2 items-center justify-center">
+          <div
+            v-if="!smAndDown"
+            class="flex space-x-2 items-center justify-center"
+          >
             <FilterChip
               v-if="!channelId"
               class="ml-4 items-center align-middle"
@@ -398,7 +404,10 @@ const toggleSelectedTag = (tag: string) => {
               </Popper>
             </client-only>
           </LocationSearchBar>
-          <div class="flex space-x-2 items-center justify-center">
+          <div
+            class="flex space-x-2 items-center justify-center"
+            v-if="!smAndDown"
+          >
             <FilterChip
               class="items-center align-middle"
               data-testid="tag-filter-button"
@@ -418,6 +427,45 @@ const toggleSelectedTag = (tag: string) => {
               </template>
             </FilterChip>
           </div>
+        </div>
+        <div v-if="smAndDown" class="flex items-center mt-4">
+          <FilterChip
+            v-if="!channelId"
+            class="items-center align-middle"
+            :data-testid="'forum-filter-button'"
+            :label="channelLabel"
+            :highlighted="channelLabel !== defaultFilterLabels.channels"
+          >
+            <template #icon>
+              <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            </template>
+            <template #content>
+              <div class="relative bg-white dark:bg-gray-700 w-96">
+                <SearchableForumList
+                  :selected-channels="filterValues.channels"
+                  @toggle-selection="toggleSelectedChannel"
+                />
+              </div>
+            </template>
+          </FilterChip>
+          <FilterChip
+            class="items-center align-middle"
+            data-testid="tag-filter-button"
+            :label="tagLabel"
+            :highlighted="tagLabel !== defaultFilterLabels.tags"
+          >
+            <template #icon>
+              <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+            </template>
+            <template #content>
+              <div class="relative w-96">
+                <SearchableTagList
+                  :selected-tags="filterValues.tags"
+                  @toggle-selection="toggleSelectedTag"
+                />
+              </div>
+            </template>
+          </FilterChip>
         </div>
       </div>
       <slot />

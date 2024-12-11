@@ -10,6 +10,7 @@ import SortButtons from "@/components/SortButtons.vue";
 import { getTagLabel, getChannelLabel } from "@/utils";
 import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
 import type { SearchDiscussionValues } from "@/types/Discussion";
+import { useDisplay } from "vuetify";
 
 defineProps({
   showMap: {
@@ -33,6 +34,7 @@ defineProps({
 // Nuxt route and router
 const route = useRoute();
 const router = useRouter();
+const { smAndDown } = useDisplay();
 
 // Default filter labels
 const defaultFilterLabels = {
@@ -168,13 +170,15 @@ const toggleSelectedTag = (tag: string) => {
         </template>
       </FilterChip>
       <SearchBar
+        v-if="!smAndDown"
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
-        :search-placeholder="'Search...'"
+        :search-placeholder="'Search'"
         :auto-focus="false"
         :small="true"
         @update-search-input="updateSearchInput"
       />
+
       <FilterChip
         class="align-middle"
         :data-testid="'tag-filter-button'"
@@ -195,5 +199,14 @@ const toggleSelectedTag = (tag: string) => {
       </FilterChip>
       <SortButtons />
     </div>
+    <SearchBar
+      v-if="smAndDown"
+      data-testid="discussion-filter-search-bar"
+      :initial-value="filterValues.searchInput"
+      :search-placeholder="'Search'"
+      :auto-focus="false"
+      :small="true"
+      @update-search-input="updateSearchInput"
+    />
   </div>
 </template>
