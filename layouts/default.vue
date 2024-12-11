@@ -16,11 +16,13 @@ import {
   setIsLoadingAuth,
 } from "@/cache";
 import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
+import { sideNavIsOpenVar, setSideNavIsOpenVar } from "@/cache";
 
 // UI states
 const showUserProfileDropdown = ref(false);
-const showDropdown = ref(false);
-const toggleDropdown = () => (showDropdown.value = !showDropdown.value);
+const toggleDropdown = () => {
+  setSideNavIsOpenVar(!sideNavIsOpenVar.value);
+}
 const toggleUserProfileDropdown = () =>
   (showUserProfileDropdown.value = !showUserProfileDropdown.value);
 const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
@@ -88,16 +90,16 @@ const showMainContent = computed(() => {
       >
         <TopNav
           :show-user-profile-dropdown="showUserProfileDropdown"
-          :side-nav-is-open="showDropdown"
+          :side-nav-is-open="sideNavIsOpenVar"
           @toggle-dropdown="toggleDropdown"
           @close-user-profile-dropdown="closeUserProfileDropdown"
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
         <div class="flex-col relative flex-grow flex">
           <SiteSidenav
-            :key="`${showDropdown}`"
-            :show-dropdown="showDropdown"
-            @close="showDropdown = false"
+            :key="`${sideNavIsOpenVar}`"
+            :show-dropdown="sideNavIsOpenVar"
+            @close="setSideNavIsOpenVar(false)"
           />
           <div v-if="showMainContent" class="w-full flex-grow flex flex-col">
             <slot />

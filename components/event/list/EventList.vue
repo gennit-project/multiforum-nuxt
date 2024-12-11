@@ -1,18 +1,19 @@
 <script setup lang="ts">
-import { computed } from 'vue';
-import EventListItem from './EventListItem.vue';
-import LoadMore from '../../LoadMore.vue';
-import { useRoute, useRouter } from 'vue-router';
-import type { Event } from '@/__generated__/graphql';
+import { computed } from "vue";
+import EventListItem from "./EventListItem.vue";
+import LoadMore from "../../LoadMore.vue";
+import { useRoute, useRouter } from "vue-router";
+import type { Event } from "@/__generated__/graphql";
+import { sideNavIsOpenVar } from "@/cache";
 
 const props = defineProps({
   highlightedEventLocationId: {
     type: String,
-    default: '',
+    default: "",
   },
   highlightedEventId: {
     type: String,
-    default: '',
+    default: "",
   },
   events: {
     type: Array as PropType<Event[]>,
@@ -40,61 +41,61 @@ const props = defineProps({
   },
   searchInput: {
     type: String,
-    default: '',
+    default: "",
   },
 });
 
 const emit = defineEmits([
-  'filterByTag',
-  'filterByChannel',
-  'highlightEvent',
-  'unhighlight',
-  'openPreview',
-  'loadMore',
+  "filterByTag",
+  "filterByChannel",
+  "highlightEvent",
+  "unhighlight",
+  "openPreview",
+  "loadMore",
 ]);
 
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId === 'string') {
+  if (typeof route.params.forumId === "string") {
     return route.params.forumId;
   }
-  return '';
+  return "";
 });
 
 const createEventLink = computed(() => {
   if (channelId.value) {
     return `/forums/${channelId.value}/events/create`;
   }
-  return '/events/create';
+  return "/events/create";
 });
 
 const filterByTag = (tag: string) => {
-  emit('filterByTag', tag);
+  emit("filterByTag", tag);
 };
 
 const filterByChannel = (channel: string) => {
-  emit('filterByChannel', channel);
+  emit("filterByChannel", channel);
 };
 
 const getEventLocationId = (event: Event) => {
   if (event.location) {
     return (
-      (event.location.latitude.toString() || '') +
-      (event.location?.longitude.toString() || '')
+      (event.location.latitude.toString() || "") +
+      (event.location?.longitude.toString() || "")
     );
   }
-  return 'no_location';
+  return "no_location";
 };
 
 const handleClickEventListItem = (event: Event) => {
   if (props.showMap) {
-    emit('openPreview', event.id);
+    emit("openPreview", event.id);
   } else {
     if (channelId.value) {
       return router.push({
-        name: 'forums-forumId-events-eventId',
+        name: "forums-forumId-events-eventId",
         params: {
           eventId: event.id,
           forumId: channelId.value,
@@ -102,7 +103,7 @@ const handleClickEventListItem = (event: Event) => {
       });
     }
     return router.push({
-      name: 'forums-forumId-events-eventId',
+      name: "forums-forumId-events-eventId",
       params: {
         eventId: event.id,
         forumId: event.EventChannels[0].channelUniqueName,
@@ -112,14 +113,17 @@ const handleClickEventListItem = (event: Event) => {
 };
 
 const onMouseOverEventListItem = (event: Event) => {
+  console.log("side nav open ", sideNavIsOpenVar.value);
   if (props.showMap) {
-    emit('highlightEvent', getEventLocationId(event), event.id, event);
+    console.log("highlighting event", event.id);
+    emit("highlightEvent", getEventLocationId(event), event.id, event);
   }
 };
 
 const onMouseLeaveEventListItem = () => {
   if (props.showMap) {
-    emit('unhighlight');
+    console.log("unhighlighting event");
+    emit("unhighlight");
   }
 };
 </script>
@@ -141,7 +145,10 @@ const onMouseLeaveEventListItem = () => {
     <ul
       v-if="events.length > 0"
       role="list"
-      class="mb-4 flex flex-col gap-2 divide-y divide-gray-200 dark:divide-gray-600"
+      :class="[
+        'mb-4 flex flex-col gap-2 divide-y divide-gray-200 dark:divide-gray-600',
+        { 'pointer-events-none': sideNavIsOpenVar },
+      ]"
       data-testid="event-list"
     >
       <EventListItem

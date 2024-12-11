@@ -105,7 +105,7 @@ nextTick(() => {
 });
 
 const needsChanges = computed(() => {
-  if (props.formValues?.bio && props.formValues.bio.length > MAX_CHARS_IN_USER_BIO) {
+  if (props.formValues?.bio && props.formValues.bio?.length > MAX_CHARS_IN_USER_BIO) {
     return true;
   }
   return false

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useRouter, type RouteLocationAsRelativeGeneric } from "vue-router";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useQuery } from "@vue/apollo-composable";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
@@ -12,6 +13,8 @@ import { useDisplay } from "vuetify";
 import CreateAnythingButton from "./CreateAnythingButton.vue";
 import { usernameVar, isAuthenticatedVar } from "@/cache";
 import SiteSidenavLogout from "./SiteSidenavLogout.vue";
+import { setSideNavIsOpenVar } from "@/cache";
+import { s } from "vite/dist/node/types.d-aGj9QkWt";
 
 const DEFAULT_LIMIT = 5;
 
@@ -19,13 +22,34 @@ type NavigationItem = {
   name: string;
   href: string;
   icon: any;
+  routerName: string;
 };
 
 const navigation: NavigationItem[] = [
-  { name: "Online Events", href: "/events/list/search", icon: CalendarIcon },
-  { name: "In-person Events", href: "/map/search", icon: LocationIcon },
-  { name: "Discussions", href: "/discussions", icon: DiscussionIcon },
-  { name: "All Forums", href: "/forums", icon: ChannelIcon },
+  { 
+    name: "Online Events", 
+    href: "/events/list/search", 
+    icon: CalendarIcon,
+    routerName: "events-list-search"
+  },
+  { 
+    name: "In-person Events", 
+    href: "/map/search", 
+    icon: LocationIcon,
+    routerName: "map-search"
+  },
+  { 
+    name: "Discussions", 
+    href: "/discussions", 
+    icon: DiscussionIcon,
+    routerName: "discussions"
+  },
+  { 
+    name: "All Forums", 
+    href: "/forums", 
+    icon: ChannelIcon,
+    routerName: "forums"
+  },
 ];
 
 defineProps({
@@ -63,16 +87,28 @@ const profilePicURL = computed(() => user.value?.profilePicURL || "");
 
 const { smAndDown } = useDisplay();
 
+const router = useRouter();
+
+
 const outside = () => {
   emit("close");
 };
 
 const navLinkClasses =
   "pl-6 font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700";
+
+const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
+  try {
+    await router.push(route);
+    setSideNavIsOpenVar(false);
+  } catch (error) {
+    console.error("Navigation error:", error);
+  }
+};
 </script>
 
 <template>
-  <div v-if="showDropdown">
+  <div v-if="showDropdown" class="side-nav-override">
     <div
       class="fixed inset-0 top bg-gray-100 opacity-50 dark:bg-gray-900 dark:text-gray-200"
       @click="outside"
@@ -108,7 +144,11 @@ const navLinkClasses =
                 :to="item.href"
                 :data-testid="`nav-link-${item.name}`"
                 :class="navLinkClasses"
-                @click="outside"
+                @click.prevent="() => {
+                  routeAndClose({
+                    name: item.routerName,
+                  })
+                }"
               >
                 <component
                   :is="item.icon"
@@ -143,7 +183,13 @@ const navLinkClasses =
                   params: { forumId: forum.uniqueName },
                 }"
                 :class="navLinkClasses"
-                @click="outside"
+                @click.prevent="() => {
+                    routeAndClose({
+                      name: 'forums-forumId-discussions',
+                      params: { forumId: forum.uniqueName },
+                    }
+                  )}
+                "
               >
                 <AvatarComponent
                   v-if="forum?.channelIconURL"
@@ -191,7 +237,12 @@ const navLinkClasses =
             params: { username: usernameVar },
           }"
           class="font-semibold group flex items-center gap-x-3 rounded-md px-6 py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700"
-          @click="outside"
+          @click.prevent="() => {
+            routeAndClose({
+              name: 'u-username',
+              params: { username: usernameVar },
+            })
+          }"
         >
           <AvatarComponent
             v-if="profilePicURL"
@@ -208,7 +259,12 @@ const navLinkClasses =
             params: { username: usernameVar },
           }"
           :class="navLinkClasses"
-          @click="outside"
+          @click.prevent="() => {
+            routeAndClose({
+              name: 'u-username-settings',
+              params: { username: usernameVar },
+            })
+          }"
         >
           Account Settings
         </nuxt-link>
@@ -232,6 +288,7 @@ const navLinkClasses =
 </template>
 
 <style lang="scss" scoped>
+
 nav li:hover,
 .list-item-icon {
   color: #9ca3af;

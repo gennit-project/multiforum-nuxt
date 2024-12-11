@@ -7,7 +7,7 @@ import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "vue-router";
 import LoginButton from "./LoginButton.vue";
-import { modProfileNameVar, usernameVar } from "@/cache";
+import { modProfileNameVar, usernameVar, sideNavIsOpenVar, setSideNavIsOpenVar  } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
 
@@ -16,7 +16,7 @@ const route = useRoute();
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
-const sideNavIsOpen = ref(false);
+
 const shouldShowChannelId = computed(() => channelId.value);
 
 const routeInfoLabel = computed(() => {
@@ -58,7 +58,7 @@ const isOnMapPage = computed(() => {
     <div class="flex items-center justify-between px-2 py-2 lg:px-4 lg:py-1">
       <div class="flex items-center">
         <HamburgerMenuButton
-          v-if="!sideNavIsOpen"
+          v-if="!sideNavIsOpenVar"
           data-testid="menu-button"
           class="cursor-pointer fixed-menu-button"
           @click="$emit('toggleDropdown')"
