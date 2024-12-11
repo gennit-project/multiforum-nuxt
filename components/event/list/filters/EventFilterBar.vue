@@ -49,7 +49,7 @@ const route = useRoute();
 const router = useRouter();
 
 const defaultFilterLabels = {
-  channels: "Forums",
+  channels: "All Forums",
   tags: "Tags",
 };
 
