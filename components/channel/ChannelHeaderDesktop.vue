@@ -47,9 +47,9 @@ export default defineComponent({
     <div class="bg-white dark:bg-gray-800 flex justify-center">
       <div class="max-w-screen-2xl w-full">
         <div
-          class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pr-6"
+          class="flex justify-between items-center border-b border-gray-200 py-2 dark:border-gray-600 pr-6"
         >
-          <div class="flex items-center w-full gap-4 mb-2">
+          <div class="flex items-center w-full gap-4">
             <ExpandableImage
               v-if="channel?.channelIconURL"
               class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
@@ -60,7 +60,7 @@ export default defineComponent({
             />
             <AvatarComponent
               v-if="!channel?.channelIconURL"
-              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800 mt-2"
+              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
               :text="channelId"
               :src="channel?.channelIconURL ?? ''"
               :full-width="true"
