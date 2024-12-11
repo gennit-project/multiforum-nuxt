@@ -81,11 +81,8 @@ export type SearchEventValues = {
   placeAddress?: string;
   latitude?: number;
   longitude?: number;
-  tags?: Array<string>
-  channels?: Array<string>
-  weekdays?: Array<SelectedWeekdays>;
-  hourRanges?: Array<SelectedHourRanges>;
-  weeklyHourRanges?: Array<SelectedWeeklyHourRanges>;
+  tags: Array<string>
+  channels: Array<string>
   locationFilter?: string;
   searchInput?: string;
   showCanceledEvents?: boolean;

@@ -60,7 +60,7 @@ const channelId = computed(() => {
 const showOnlineOnly = computed(() => route.name === "SearchEventsList");
 const showInPersonOnly = computed(() => route.name === "MapEventPreview");
 
-const filterValues = ref(
+const filterValues = ref<SearchEventValues>(
   getFilterValuesFromParams({
     route,
     channelId: channelId.value,
@@ -138,7 +138,21 @@ const updateFilters = (params: any) => {
   });
 };
 
-const updateLocalState = (params: SearchEventValues) => {
+type UpdateStateInput = {
+  channels?: string[];
+  tags?: string[];
+  searchInput?: string;
+  latitude?: number;
+  longitude?: number;
+  placeName?: string;
+  placeAddress?: string;
+  radius?: number;
+  showCanceledEvents?: boolean;
+  showOnlyFreeEvents?: boolean;
+  locationFilter?: keyof typeof LocationFilterTypes;
+};
+
+const updateLocalState = (params: UpdateStateInput) => {
   filterValues.value = {
     ...filterValues.value,
     ...params,
