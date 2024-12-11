@@ -12,12 +12,9 @@ describe("Filter events by tag", () => {
 
   // THIS WORKS
   it("in the sitewide online events list, filters events by tag", () => {
-    cy.visit(ONLINE_EVENT_LIST);
-    cy.get('div[data-testid="tag-filter-button"]')
-      .find('button[id="filter-button"]')
-      .click();
-    // open the tag picker and wait for it to load
-    cy.get('div[data-testid="tag-picker"]').should("be.visible");
+    cy.visit(ONLINE_EVENT_LIST).wait(3000);
+
+    cy.get('button[data-testid="tag-filter-button"]').click();
 
     cy.get('span[data-testid="tag-picker-newYears"]').click(); // click the newYears tag
 
@@ -30,41 +27,16 @@ describe("Filter events by tag", () => {
       .contains(newYearsTagEventTitle);
   });
 
-  Cypress.on("uncaught:exception", (err) => {
-    // I don't know what causes this error, but it is only thrown during this test,
-    // not when a human uses the tag picker. So I'm suppressing it.
-    if (
-      err.message.includes(
-        "ResizeObserver loop completed with undelivered notifications.",
-      )
-    ) {
-      return false;
-    }
-    return true; // return true to allow the error to be thrown and fail the test
-  });
-
   it("in the sitewide online events list, when filtering by two tags, shows events that have at least one of the tags", () => {
-    cy.visit(ONLINE_EVENT_LIST);
-    cy.get('div[data-testid="tag-filter-button"]').find("button").click(); // open the tag picker
+    cy.visit(ONLINE_EVENT_LIST).wait(3000);
 
-    // Press shift to allow selecting multiple tags
-    cy.get('div[data-testid="tag-picker"]').trigger("keydown", {
-      key: "Shift",
-    });
+    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the newYears tag
     cy.get('span[data-testid="tag-picker-newYears"]').click();
 
     // click the trivia tag
     cy.get('span[data-testid="tag-picker-trivia"]').click();
-
-    // Release shift
-    cy.get('div[data-testid="tag-picker"]').trigger("keyup", {
-      key: "Shift",
-    });
-
-    // Click outside the menu
-    cy.get('div[data-testid="tag-picker"]').click();
 
     // should have two results
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 2);
@@ -78,19 +50,15 @@ describe("Filter events by tag", () => {
       .contains(triviaTaggedEventTitle);
   });
 
-  const CHANNEL_VIEW =
-    `${Cypress.env("baseUrl")}/forums/phx_music/events/search/`;
+  const CHANNEL_VIEW = `${Cypress.env("baseUrl")}/forums/phx_music/events/`;
 
-  // BROKEN
+
   it("in a channel view, filters events by tag", () => {
     const searchTerm = "trivia";
 
-    cy.visit(CHANNEL_VIEW);
-    cy.get('div[data-testid="tag-filter-button"]')
-      .find('button[id="filter-button"]')
-      .click();
-    // open the tag picker and wait for it to load
-    cy.get('div[data-testid="tag-picker"]').should("be.visible");
+    cy.visit(CHANNEL_VIEW)
+      .wait(1500);
+    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the trivia tag
     cy.get('span[data-testid="tag-picker-trivia"]').click();
@@ -102,14 +70,11 @@ describe("Filter events by tag", () => {
     cy.get('ul[data-testid="event-list"]').find("li").contains(searchTerm);
   });
 
-  /// THIS WORKS
+
   it("in a channel view, when filtering by two tags, shows events that have at least one of the tags", () => {
-    cy.visit(CHANNEL_VIEW);
-    cy.get('div[data-testid="tag-filter-button"]')
-      .find('button[id="filter-button"]')
-      .click();
-    // open the tag picker
-    cy.get('div[data-testid="tag-picker"]').should("be.visible");
+    cy.visit(CHANNEL_VIEW)
+      .wait(1500);
+    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the newYears tag
     cy.get('span[data-testid="tag-picker-newYears"]').click();
