@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch } from "vue";
 import { Loader } from "@googlemaps/js-api-loader";
 import { useRouter } from "vue-router";
 import { config } from "@/config";
@@ -44,14 +44,29 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  theme: {
-    type: String,
-    required: true,
-  },
   useMobileStyles: {
     type: Boolean,
     required: true,
   },
+});
+
+const currentTheme = ref('light');
+onMounted(() => {
+  currentTheme.value = theme.value;
+  
+  const observer = new MutationObserver((mutations) => {
+    mutations.forEach((mutation) => {
+      if (mutation.attributeName === 'class') {
+        const isDark = document.documentElement.classList.contains('dark');
+        currentTheme.value = isDark ? 'dark' : 'light';
+      }
+    });
+  });
+
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['class']
+  });
 });
 
 const emit = defineEmits([
@@ -67,6 +82,8 @@ const loader = new Loader({
   apiKey: config.googleMapsApiKey,
   version: "weekly",
 });
+
+const { theme } = useTheme();
 
 const mobileMapDiv = ref<HTMLElement | null>(null);
 const desktopMapDiv = ref<HTMLElement | null>(null);
@@ -87,15 +104,24 @@ const clearMarkers = () => {
   markerMap = {};
 };
 
+const getMapStyles = () => {
+  return currentTheme.value === 'dark' ? nightModeMapStyles : [];
+}
+
 const renderMap = async () => {
   await loader.load();
   clearMarkers();
+  if (map.value) {
+    map.value = null;
+  }
+
+  const mapStyles = getMapStyles();
 
   const mapConfig = {
     center: { lat: 33.4255, lng: -111.94 },
     zoom: 7,
     mapTypeId: "terrain",
-    styles: props.theme === "dark" ? nightModeMapStyles : [],
+    styles: mapStyles,
     zoomControl: true,
     zoomControlOptions: {
       position: google.maps.ControlPosition.RIGHT_TOP,
@@ -196,14 +222,21 @@ onMounted(async () => {
   renderMap();
 });
 
-const theme = computed(() => props.theme);
-
+// Watch the theme value from the composable
 watch(
-  theme,
+  currentTheme,
+  (newTheme, oldTheme) => {
+    if (newTheme !== oldTheme) {
+      renderMap();
+    }
+  }
+);
+// Watch for mobile/desktop switch
+watch(
+  () => props.useMobileStyles,
   () => {
-    renderMap();
-  },
-  { immediate: true }
+    renderMap(true);
+  }
 );
 </script>
 
