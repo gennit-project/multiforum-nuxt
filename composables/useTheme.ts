@@ -1,28 +1,25 @@
-// composables/useTheme.ts
-import { computed, ref, onMounted, watch } from "vue";
-import { useCookie } from "nuxt/app";
+import { computed, ref, watch } from "vue";
+import { useCookie, useRoute, useRouter } from "nuxt/app";
 
 export const useTheme = () => {
+  const route = useRoute();
+  const router = useRouter();
   const themeCookie = useCookie("theme", {
-    default: () => "system", // Change default to system
+    default: () => "system",
   });
   
   const currentThemeValue = ref(themeCookie.value);
-  const systemThemeIsDark = ref(true); // Default to dark during SSR
+  const systemThemeIsDark = ref(true);
   
-  // Initialize system theme detection
   if (import.meta.client) {
-    // Check localStorage on init
     const localTheme = localStorage.getItem("theme");
     if (localTheme) {
       currentThemeValue.value = localTheme;
       themeCookie.value = localTheme;
     }
 
-    // Initialize system theme detection
     systemThemeIsDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-    // Listen for system theme changes
     window.matchMedia('(prefers-color-scheme: dark)')
       .addEventListener('change', (e) => {
         systemThemeIsDark.value = e.matches;
@@ -30,10 +27,24 @@ export const useTheme = () => {
   }
 
   const setTheme = (newTheme: string) => {
+    // Capture current query params before theme change
+    const currentQuery = { ...route.query };
+    
     currentThemeValue.value = newTheme;
     themeCookie.value = newTheme;
+    
     if (import.meta.client) {
       localStorage.setItem("theme", newTheme);
+      
+      // Use nextTick to ensure query params are preserved after theme update
+      nextTick(() => {
+        if (Object.keys(currentQuery).length) {
+          router.replace({ 
+            path: route.path,
+            query: currentQuery 
+          })
+        }
+      });
     }
   };
 

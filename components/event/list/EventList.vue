@@ -113,16 +113,13 @@ const handleClickEventListItem = (event: Event) => {
 };
 
 const onMouseOverEventListItem = (event: Event) => {
-  console.log("side nav open ", sideNavIsOpenVar.value);
   if (props.showMap) {
-    console.log("highlighting event", event.id);
     emit("highlightEvent", getEventLocationId(event), event.id, event);
   }
 };
 
 const onMouseLeaveEventListItem = () => {
   if (props.showMap) {
-    console.log("unhighlighting event");
     emit("unhighlight");
   }
 };

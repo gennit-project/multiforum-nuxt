@@ -26,7 +26,17 @@ const getFilterValuesFromParams = function (
   // Take the default filter values from the query
   // in the URL if the values exist.
   const { route, channelId } = input;
-  const cleanedValues: SearchEventValues = {};
+  const cleanedValues: SearchEventValues = {
+    timeShortcut: timeShortcutValues.NONE,
+    tags: [],
+    channels: [],
+    searchInput: "",
+    showCanceledEvents: false,
+    free: false,
+    resultsOrder: chronologicalOrder,
+    locationFilter: LocationFilterTypes.NONE,
+    hasVirtualEventUrl: false,
+  };
 
   // For the online events list, only include
   // events with a virtual event URL.
