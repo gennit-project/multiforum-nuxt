@@ -153,8 +153,9 @@ const handleClickChannel = (uniqueName: string) => {
 
 <template>
   <div
-    class="justify-center rounded-lg p-0 max-w-5xl mx-auto dark:text-white" 
+    class="flex justify-center rounded-lg p-0  px-2 dark:text-white" 
   >
+  <div class="flex-grow max-w-5xl">
     <SitewideDiscussionList
       v-if="!isForumScoped"
       @filter-by-tag="handleClickTag"
@@ -173,6 +174,7 @@ const handleClickChannel = (uniqueName: string) => {
     >
       <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
     </ChannelDiscussionList>
+  </div>
   </div>
 </template>
 
