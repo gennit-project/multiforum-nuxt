@@ -77,7 +77,6 @@ export default defineComponent({
         </button>
         <template #content>
           <div
-            v-if="isOpen"
             class="rounded-lg border bg-white dark:bg-gray-700"
           >
             <slot name="content" />

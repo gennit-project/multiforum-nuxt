@@ -11,6 +11,7 @@ import { getTagLabel, getChannelLabel } from "@/utils";
 import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
 import type { SearchDiscussionValues } from "@/types/Discussion";
 import { useDisplay } from "vuetify";
+import type { LocationQuery } from "vue-router";
 
 defineProps({
   showMap: {
@@ -83,24 +84,33 @@ type UpdateStateInput = {
 };
 
 const updateFilters = (params: UpdateStateInput) => {
-  const existingQuery = { ...route.query };
+  const existingQuery: LocationQuery = { ...route.query };
+  let updatedQuery: LocationQuery = { ...existingQuery };
+  
+  Object.entries(params).forEach(([key, value]) => {
+    console.log(`Processing ${key}:`, value);
+    console.log('Is array?', Array.isArray(value));
+    console.log('Length:', value?.length);
+    
+    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
+      console.log(`Deleting ${key}`);
+      delete updatedQuery[key];
+    } else if (Array.isArray(value)) {
+      if (value.length === 1) {
+        updatedQuery[key] = value[0];
+      } else {
+        updatedQuery[key] = value;
+      }
+    } else {
+      updatedQuery[key] = value;
+    }
+  });
 
-  // Remove tags if the array is empty, otherwise serialize the tags as a comma-separated string
-  const updatedQuery = {
-    ...existingQuery,
-    ...params,
-    tags:
-      params.tags && params.tags.length > 0
-        ? params.tags
-            .filter((tag: string) => {
-              return !!tag;
-            })
-            .join(",")
-        : undefined, // undefined will remove the key from the query
-  };
-
+  console.log('Final query:', updatedQuery);
+  
   router.replace({
-    query: updatedQuery,
+    path: route.path,
+    query: { ...updatedQuery }
   });
 };
 
