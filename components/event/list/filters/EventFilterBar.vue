@@ -24,6 +24,7 @@ import type { UpdateLocationInput } from "@/components/event/form/CreateEditEven
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
 import SearchableTagList from "@/components/SearchableTagList.vue";
 import { useDisplay } from "vuetify";
+import { updateFilters } from "@/utils/routerUtils";
 
 // Props
 const props = defineProps({
@@ -115,108 +116,95 @@ watch(
   { immediate: true }
 );
 
-const updateFilters = (params: any) => {
-  const isEmpty = (val: any) => val === "" || val === "[]" || val === undefined;
-
-  const paramsWithoutEmptyValues = Object.keys(params).reduce(
-    (acc: any, key: string) => {
-      if (!isEmpty(params[key])) {
-        acc[key] = params[key];
-      }
-      return acc;
-    },
-    {}
-  );
-
-  const existingQueryCopy: { [key: string]: any } = { ...route.query };
-
-  router.replace({
-    ...route,
-    query: {
-      ...existingQueryCopy,
-      ...paramsWithoutEmptyValues,
-    },
+const setSelectedChannels = (channels: string[]) => {
+  updateFilters({
+    router,
+    route,
+    params: { channels },
   });
 };
 
-type UpdateStateInput = {
-  channels?: string[];
-  tags?: string[];
-  searchInput?: string;
-  latitude?: number;
-  longitude?: number;
-  placeName?: string;
-  placeAddress?: string;
-  radius?: number;
-  showCanceledEvents?: boolean;
-  showOnlyFreeEvents?: boolean;
-  locationFilter?: keyof typeof LocationFilterTypes;
-};
-
-const updateLocalState = (params: UpdateStateInput) => {
-  filterValues.value = {
-    ...filterValues.value,
-    ...params,
-  };
-};
-
-const setSelectedChannels = (channels: string[]) => {
-  updateLocalState({ channels });
-  updateFilters({ channels });
-};
-
 const setSelectedTags = (tags: string[]) => {
-  updateLocalState({ tags });
-  updateFilters({ tags });
+  updateFilters({
+    router,
+    route,
+    params: { tags },
+  });
 };
 
 const updateSearchInput = (searchInput: string) => {
-  updateLocalState({ searchInput });
-  updateFilters({ searchInput });
+  updateFilters({
+    router,
+    route,
+    params: { searchInput },
+  });
 };
 
 const updateLocationInput = (placeData: UpdateLocationInput) => {
   updateFilters({
-    latitude: placeData.lat,
-    longitude: placeData.lng,
-    placeName: placeData.name,
-    placeAddress: placeData.formatted_address,
-  });
-  updateLocalState({
-    latitude: placeData.lat,
-    longitude: placeData.lng,
-    placeName: placeData.name,
-    placeAddress: placeData.formatted_address,
+    router,
+    route,
+    params: {
+      latitude: placeData.lat,
+      longitude: placeData.lng,
+      placeName: placeData.name,
+      placeAddress: placeData.formatted_address,
+    },
   });
 };
 
 const updateShowCanceled = (showCanceledEvents: boolean) => {
   if (showCanceledEvents) {
-    updateFilters({ showCanceledEvents });
+    updateFilters({
+      router,
+      route,
+      params: { showCanceledEvents },
+    });
   } else {
-    updateFilters({ showCanceledEvents: undefined });
+    updateFilters({
+      router,
+      route,
+      params: { showCanceledEvents: undefined },
+    });
   }
 };
 
 const updateShowOnlyFree = (showOnlyFreeEvents: boolean) => {
   if (showOnlyFreeEvents) {
-    updateFilters({ showOnlyFreeEvents });
+    updateFilters({
+      router,
+      route,
+      params: { showOnlyFreeEvents },
+    });
   } else {
-    updateFilters({ showOnlyFreeEvents: undefined });
+    updateFilters({
+      router,
+      route,
+      params: { showOnlyFreeEvents: undefined },
+    });
   }
 };
 
 const updateSelectedDistance = (distance: DistanceUnit) => {
   if (distance.value === 0) {
-    updateFilters({ locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS });
-    updateLocalState({ locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS });
-    updateFilters({ radius: 0 });
+    updateFilters({
+      router,
+      route,
+      params: {
+        locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS,
+        radius: 0,
+      },
+    });
   } else {
     const d =
       typeof distance.value === "string"
         ? parseInt(distance.value, 10)
         : distance.value;
-    updateFilters({ radius: d });
+    updateFilters({
+      route,
+      router,
+      params: { radius: d },
+    });
   }
 };
 

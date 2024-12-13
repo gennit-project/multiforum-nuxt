@@ -78,16 +78,7 @@ watch(
   }
 );
 
-
-const updateLocalState = (params: UpdateStateInput) => {
-  filterValues.value = {
-    ...filterValues.value,
-    ...params,
-  };
-};
-
 const setSelectedChannels = (channels: string[]) => {
-  updateLocalState({ channels });
   updateFilters({
     router,
     route,
@@ -96,7 +87,6 @@ const setSelectedChannels = (channels: string[]) => {
 };
 
 const setSelectedTags = (tags: string[]) => {
-  updateLocalState({ tags });
   updateFilters({
     router,
     route,
@@ -105,7 +95,6 @@ const setSelectedTags = (tags: string[]) => {
 };
 
 const updateSearchInput = (searchInput: string) => {
-  updateLocalState({ searchInput });
   updateFilters({
     router,
     route,

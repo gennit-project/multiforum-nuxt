@@ -1,10 +1,20 @@
+import type LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
 import type { Router, LocationQuery } from "vue-router";
 
 export type UpdateStateInput = {
   channels?: string[];
   tags?: string[];
   searchInput?: string;
+  latitude?: number;
+  longitude?: number;
+  placeName?: string;
+  placeAddress?: string;
+  radius?: number;
+  showCanceledEvents?: boolean;
+  showOnlyFreeEvents?: boolean;
+  locationFilter?: LocationFilterTypes;
 };
+
 type UpdateFiltersInput = {
   params: UpdateStateInput;
   router: Router;
@@ -26,7 +36,7 @@ export const updateFilters = (input: UpdateFiltersInput) => {
     } else if (Array.isArray(value)) {
       updatedQuery[key] = [...value];
     } else {
-      updatedQuery[key] = value;
+      updatedQuery[key] = value as string;
     }
   });
 
