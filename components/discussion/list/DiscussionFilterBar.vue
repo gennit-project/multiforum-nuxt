@@ -11,7 +11,7 @@ import { getTagLabel, getChannelLabel } from "@/utils";
 import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
 import type { SearchDiscussionValues } from "@/types/Discussion";
 import { useDisplay } from "vuetify";
-import type { LocationQuery } from "vue-router";
+import { updateFilters } from "@/utils/routerUtils";
 
 defineProps({
   showMap: {
@@ -77,42 +77,7 @@ watch(
     }
   }
 );
-type UpdateStateInput = {
-  channels?: string[];
-  tags?: string[];
-  searchInput?: string;
-};
 
-const updateFilters = (params: UpdateStateInput) => {
-  const existingQuery: LocationQuery = { ...route.query };
-  let updatedQuery: LocationQuery = { ...existingQuery };
-  
-  Object.entries(params).forEach(([key, value]) => {
-    console.log(`Processing ${key}:`, value);
-    console.log('Is array?', Array.isArray(value));
-    console.log('Length:', value?.length);
-    
-    if (value === undefined || (Array.isArray(value) && value.length === 0)) {
-      console.log(`Deleting ${key}`);
-      delete updatedQuery[key];
-    } else if (Array.isArray(value)) {
-      if (value.length === 1) {
-        updatedQuery[key] = value[0];
-      } else {
-        updatedQuery[key] = value;
-      }
-    } else {
-      updatedQuery[key] = value;
-    }
-  });
-
-  console.log('Final query:', updatedQuery);
-  
-  router.replace({
-    path: route.path,
-    query: { ...updatedQuery }
-  });
-};
 
 const updateLocalState = (params: UpdateStateInput) => {
   filterValues.value = {
@@ -123,17 +88,29 @@ const updateLocalState = (params: UpdateStateInput) => {
 
 const setSelectedChannels = (channels: string[]) => {
   updateLocalState({ channels });
-  updateFilters({ channels });
+  updateFilters({
+    router,
+    route,
+    params: { channels }
+  });
 };
 
 const setSelectedTags = (tags: string[]) => {
   updateLocalState({ tags });
-  updateFilters({ tags });
+  updateFilters({
+    router,
+    route,
+    params: { tags }
+  });
 };
 
 const updateSearchInput = (searchInput: string) => {
   updateLocalState({ searchInput });
-  updateFilters({ searchInput });
+  updateFilters({
+    router,
+    route,
+    params: { searchInput }
+  });
 };
 
 const toggleSelectedChannel = (channel: string) => {
