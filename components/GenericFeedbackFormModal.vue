@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import GenericModal from "@/components/GenericModal.vue";
 import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
-import TextEditor from '@/components/TextEditor.vue'
+import TextEditor from "@/components/TextEditor.vue";
+import CharCounter from "@/components/CharCounter.vue";
+
+const FEEDBACK_MIN_LENGTH = 15;
+const FEEDBACK_MAX_LENGTH = 500;
 
 const props = defineProps({
   error: {
@@ -22,13 +26,15 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(['updateFeedback']);
+const emit = defineEmits(["updateFeedback"]);
 
 const title = "Give Semi-anonymous Feedback";
 const body = "Do you have any actionable feedback for the author?";
+const currentLength = ref(0);
 
 function updateFeedback(text: string) {
-  emit('updateFeedback', text);
+  currentLength.value = text.length;
+  emit("updateFeedback", text);
 }
 </script>
 
@@ -37,7 +43,13 @@ function updateFeedback(text: string) {
     :highlight-color="'yellow'"
     :title="title"
     :body="body"
-    :primary-button-disabled="props.loading || props.primaryButtonDisabled || !!props.error"
+    :primary-button-disabled="
+      props.loading ||
+      props.primaryButtonDisabled ||
+      !!props.error ||
+      currentLength < FEEDBACK_MIN_LENGTH ||
+      currentLength > FEEDBACK_MAX_LENGTH
+    "
     :open="props.open"
     :loading="props.loading"
     :primary-button-text="'Submit'"
@@ -59,7 +71,12 @@ function updateFeedback(text: string) {
         :allow-image-upload="false"
         @update="updateFeedback"
       />
-      <p class="text-gray-600 dark:text-gray-400">
+      <CharCounter
+        :current="currentLength"
+        :max="FEEDBACK_MAX_LENGTH"
+        :min="FEEDBACK_MIN_LENGTH"
+      />
+      <p class="mt-1 text-gray-600 dark:text-gray-400">
         Feedback is intended to be a helpful tool for the author. If you think
         the post should be removed, report it.
       </p>

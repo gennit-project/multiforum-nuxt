@@ -8,6 +8,10 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  min: {
+    type: Number,
+    default: 0,
+  },
 });
 
 const charactersRemaining = computed(() => props.max - props.current);
@@ -19,6 +23,12 @@ const charactersRemaining = computed(() => props.max - props.current);
     class="text-right text-gray-500 dark:text-gray-300 text-sm font-medium mt-2 mb-4"
   >
     {{ `${charactersRemaining}/${max}` }} characters remaining
+  </div>
+  <div
+    v-if="current > 0 && current < min"
+    class="text-right text-gray-500 dark:text-gray-300 text-sm font-medium mt-2 mb-4"
+  >
+    Minimum of {{ min }} characters
   </div>
   <div
     v-else-if="charactersRemaining < 0"

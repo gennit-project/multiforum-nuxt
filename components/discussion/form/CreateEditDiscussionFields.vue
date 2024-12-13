@@ -32,7 +32,7 @@ const titleInputRef = ref<HTMLElement | null>(null);
 
 const needsChanges = computed(() => {
   return !(
-    props.formValues?.selectedChannels.length > 0 &&
+    props.formValues?.selectedChannels && props.formValues.selectedChannels.length > 0 &&
     props.formValues?.title &&
     props.formValues?.body.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
     props.formValues?.title.length <= DISCUSSION_TITLE_CHAR_LIMIT

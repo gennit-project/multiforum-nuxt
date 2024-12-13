@@ -44,7 +44,6 @@ const toggleSelection = (channel: string) => {
   } else {
     selected.value.splice(index, 1);
   }
-  console.log('set selected channels', selected.value);
   emit('setSelectedChannels', selected.value);
 };
 

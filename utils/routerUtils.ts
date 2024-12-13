@@ -31,7 +31,6 @@ export const updateFilters = (input: UpdateFiltersInput) => {
       value === "" ||
       (Array.isArray(value) && value.length === 0)
     ) {
-      console.log(`Deleting ${key}`);
       delete updatedQuery[key];
     } else if (Array.isArray(value)) {
       updatedQuery[key] = [...value];
