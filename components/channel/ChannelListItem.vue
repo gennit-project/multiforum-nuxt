@@ -97,7 +97,7 @@ defineEmits(["filterByTag"]);
     >
       <nuxt-link
         v-if="channel?.EventChannelsAggregate?.count"
-        :to="`/forums/${channel.uniqueName}/events/search`"
+        :to="`/forums/${channel.uniqueName}/events`"
         class="flex items-center justify-center gap-1"
       >
         <CalendarIcon class="h-4 w-4" />
