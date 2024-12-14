@@ -113,7 +113,7 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
       <client-only>
         <ul
           v-if="searchResults.length"
-          class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
+          class="dark:text-white absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
           style="top: 100%"
         >
           <li

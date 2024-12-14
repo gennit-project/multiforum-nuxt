@@ -16468,7 +16468,7 @@ export type Mutation = {
   createEnvironmentInfos: CreateEnvironmentInfosMutationResponse;
   createEventChannels: CreateEventChannelsMutationResponse;
   createEventCommentsFormats: CreateEventCommentsFormatsMutationResponse;
-  createEventWithChannelConnections?: Maybe<Event>;
+  createEventWithChannelConnections: Array<Event>;
   createEvents: CreateEventsMutationResponse;
   createFeeds: CreateFeedsMutationResponse;
   createImages: CreateImagesMutationResponse;

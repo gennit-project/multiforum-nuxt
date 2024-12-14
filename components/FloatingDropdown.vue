@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import gql from "graphql-tag";
-import { useQuery } from "@vue/apollo-composable";
+import { useTheme } from "@/composables/useTheme";
 
+const theme = useTheme();
 const props = defineProps({
   modelValue: {
     type: Boolean,
@@ -11,21 +10,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["update:modelValue"]);
-
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-
-const { result: themeResult, loading: themeLoading, error: themeError } = useQuery(GET_THEME);
-
-const theme = computed(() => {
-  if (themeLoading.value || themeError.value) {
-    return "";
-  }
-  return themeResult.value?.theme;
-});
 
 function close() {
   emit("update:modelValue", false);

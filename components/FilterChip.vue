@@ -1,8 +1,7 @@
 <script>
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref } from "vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import gql from "graphql-tag";
-import { useQuery } from "@vue/apollo-composable";
+import { useTheme } from "@/composables/useTheme";
 import Popper from "vue3-popper";
 
 export default defineComponent({
@@ -25,26 +24,9 @@ export default defineComponent({
     },
   },
   setup() {
-    const GET_THEME = gql`
-      query getTheme {
-        theme @client
-      }
-    `;
-
-    const {
-      result: themeResult,
-      loading: themeLoading,
-      error: themeError,
-    } = useQuery(GET_THEME);
-
-    const theme = computed(() => {
-      if (themeLoading.value || themeError.value) {
-        return "";
-      }
-      return themeResult.value?.theme;
-    });
 
     const isOpen = ref(false);
+    const { theme } = useTheme();
 
     return {
       theme,

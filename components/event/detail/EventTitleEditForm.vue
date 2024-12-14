@@ -10,9 +10,9 @@ import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutat
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_EVENT } from "@/graphQLData/event/queries";
-import gql from "graphql-tag";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
+import { useTheme } from "@/composables/useTheme";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -73,21 +73,6 @@ onDone(() => {
   titleEditMode.value = false;
 });
 
-const GET_THEME = gql`
-  query getTheme {
-    theme @client
-  }
-`;
-
-const {
-  result: themeResult,
-  loading: themeLoading,
-  error: themeError,
-} = useQuery(GET_THEME);
-const theme = computed(() =>
-  themeLoading.value || themeError.value ? "" : themeResult.value?.theme
-);
-
 const onClickEdit = () => {
   titleEditMode.value = true;
   nextTick(() => {
@@ -104,6 +89,7 @@ const formattedDate = computed(() => {
     year: "numeric",
   });
 });
+const theme = useTheme()
 </script>
 
 <template>

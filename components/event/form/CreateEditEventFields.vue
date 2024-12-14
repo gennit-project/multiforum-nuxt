@@ -341,7 +341,7 @@ const inputStyles =
 </script>
 
 <template>
-  <div class="pt-0 px-6 w-full dark:text-white">
+  <div class="pt-0 px-6 max-w-5xl dark:text-white">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">
