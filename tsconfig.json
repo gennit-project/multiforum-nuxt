@@ -62,5 +62,5 @@
     "types/User.ts",
     "types/GenericFormTypes.ts"
 , "cache.ts"  ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", ".nuxt", "dist"]
 }

@@ -1,5 +1,5 @@
 {
     "framework": "nuxtjs",
-    "buildCommand": "nuxt build",
+    "buildCommand": "npx nuxi prepare && npm run build",
     "outputDirectory": ".output"
   }

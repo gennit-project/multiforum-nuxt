@@ -5,10 +5,6 @@ import path from "path";
 import { inMemoryCacheOptions } from "./cache";
 
 export default defineNuxtConfig({
-  alias: {
-    "@": path.resolve(__dirname),
-    "#app": path.resolve(__dirname),
-  },
   build: {
     transpile: ["vuetify"],
   },
@@ -77,6 +73,7 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         "@": path.resolve(__dirname),
+        "#app": path.resolve(__dirname),
         "@/components": path.resolve(__dirname, "components"),
         "fast-deep-equal": "fast-deep-equal/es6/index.js",
       },
