@@ -5,7 +5,7 @@ import { useQuery } from "@vue/apollo-composable";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "../ErrorBanner.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 export default defineComponent({

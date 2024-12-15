@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useRouter } from 'nuxt/app';
+const router = useRouter();
 
 </script>
 
@@ -21,7 +23,7 @@
       focus:outline-none
       focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
     "
-    @click="$router.go(-1)"
+    @click="router.go(-1)"
   >
     ← Back
   </button>

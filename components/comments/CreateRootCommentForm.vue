@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import RequireAuth from "@/components/auth/RequireAuth.vue";
+import type { PropType } from "vue";
 import TextEditor from "@/components/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";

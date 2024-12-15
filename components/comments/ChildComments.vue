@@ -4,7 +4,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
 import LoadMore from "../LoadMore.vue";
 import { getSortFromQuery } from "./getSortFromQuery";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import ErrorBanner from "../ErrorBanner.vue";
 
 const PAGE_LIMIT = 5;

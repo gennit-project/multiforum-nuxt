@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
+import type { PropType, Ref } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { GET_TAGS } from "@/graphQLData/tag/queries";
 import type { Tag } from "@/__generated__/graphql";

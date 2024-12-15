@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
+import { useRoute } from "nuxt/app";
+import type { PropType } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
 import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
@@ -75,7 +77,7 @@ const { mutate: createComment, error: createCommentError, onDone } = useMutation
     };
 
     // Update root comments in the cache
-    const readEventCommentsQueryResult = cache.readQuery({
+    const readEventCommentsQueryResult: any = cache.readQuery({
       query: GET_EVENT_COMMENTS,
       variables: eventCommentsQueryVariables,
     });
@@ -97,7 +99,7 @@ const { mutate: createComment, error: createCommentError, onDone } = useMutation
     });
 
     // Update aggregate count from GET_EVENT
-    const readEventQueryResult = cache.readQuery({
+    const readEventQueryResult: any = cache.readQuery({
       query: GET_EVENT,
       variables: { id: props.event?.id },
     });

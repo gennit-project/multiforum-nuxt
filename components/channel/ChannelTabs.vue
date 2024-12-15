@@ -8,6 +8,7 @@ import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
 import type { Channel } from "@/__generated__/graphql";
 import { modProfileNameVar, usernameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
 
 type Tab = {
   name: string;
@@ -137,7 +138,7 @@ const tabs = computed((): Tab[] => {
         :key="tab.name"
         :to="tabRoutes[tab.name]"
         :label="tab.label"
-        :is-active="$route.path.includes(tab.routeSuffix)"
+        :is-active="route.path.includes(tab.routeSuffix)"
         :vertical="vertical"
         :show-count="showCounts && !!tab.countProperty"
         :count="tab.countProperty ? channel[tab.countProperty]?.count : 0"

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useQuery } from "@vue/apollo-composable";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter, useRoute } from "nuxt/app";
 import { useDisplay } from "vuetify";
-
 import EventPreview from "../list/EventPreview.vue";
 import EventList from "../list/EventList.vue";
 import EventMap from "./Map.vue";
@@ -25,8 +24,6 @@ import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg";
 import type { Event as EventData } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
 import type { Ref, PropType } from "vue";
-
-const { theme } = useTheme();
 
 const props = defineProps({
   selectedTags: {
@@ -155,34 +152,58 @@ const selectedEvents = ref<EventData[]>([]);
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
+  const cleanedParams: Record<string, string> = {};
+
+  for (const key in params) {
+    const value = params[key as keyof SearchEventValues];
+    if (value) {
+      cleanedParams[key] = value as string;
+    }
+  }
   router.replace({
     query: {
       ...existingQuery,
-      ...params,
+      ...cleanedParams,
     },
   });
 };
 
 const filterByChannel = (channel: string) => {
-  const alreadySelected = filterValues.value.channels.includes(channel);
+  const alreadySelected = filterValues.value.channels?.includes(channel);
   if (alreadySelected) {
+    if (!filterValues.value.channels) {
+      // I know we already checked this in the if-statement above, but this
+      // is just to fix a TypeScript error.
+      return;
+    }
     filterValues.value.channels = filterValues.value.channels.filter(
       (c) => c !== channel
     );
   } else {
+    if (!filterValues.value.channels) {
+      filterValues.value.channels = [];
+    }
     filterValues.value.channels.push(channel);
   }
-  updateFilters({ channels: channel });
+  updateFilters({ channels: [channel] });
 };
 
 const filterByTag = (tag: string) => {
-  const alreadySelected = filterValues.value.tags.includes(tag);
+  const alreadySelected = filterValues.value.tags?.includes(tag);
   if (alreadySelected) {
+    if (!filterValues.value.tags) {
+      // I know we already checked this in the if-statement above, but this
+      // is just to fix a TypeScript error.
+      return;
+    }
     filterValues.value.tags = filterValues.value.tags.filter((t) => t !== tag);
   } else {
+    if (!filterValues.value.tags) {
+      filterValues.value.tags = [];
+    }
     filterValues.value.tags.push(tag);
   }
-  updateFilters({ tags: tag });
+  updateFilters({ tags: [tag] });
 };
 
 const setMarkerData = (data: any) => {

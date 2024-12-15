@@ -27,6 +27,7 @@ import {
   EVENT_TITLE_CHAR_LIMIT,
   MAX_CHARS_IN_EVENT_DESCRIPTION,
 } from "@/utils/constants";
+import type { PropType } from "vue";
 
 export type UpdateLocationInput = {
   name: string;
@@ -158,7 +159,7 @@ const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 
 nextTick(() => {
   if (titleInputRef.value) {
-    titleInputRef.value?.$el?.children[0].childNodes[0].focus();
+    (titleInputRef.value?.$el?.children[0].childNodes[0] as HTMLInputElement).focus();
   }
 });
 
@@ -529,7 +530,7 @@ const inputStyles =
                 alt="Cover Image"
                 :src="formValues.coverImageURL"
                 class="shadow-sm"
-              />
+              >
             </div>
             <div v-else>
               <span class="text-sm text-gray-500 dark:text-gray-400">

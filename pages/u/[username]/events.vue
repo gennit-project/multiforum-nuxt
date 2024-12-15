@@ -3,7 +3,7 @@ import { defineComponent, computed } from "vue";
 import { GET_USER_EVENTS } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import EventListItemInProfile from "@/components/user/EventItemInProfile.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 
 export default defineComponent({
   name: "DownvotedEvents",

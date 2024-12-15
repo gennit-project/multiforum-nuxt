@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
+import type { PropType } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import GenericModal from "@/components/GenericModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";

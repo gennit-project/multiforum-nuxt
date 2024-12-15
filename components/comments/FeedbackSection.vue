@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import InfoBanner from "@/components/InfoBanner.vue";
 import LoadMore from "@/components/LoadMore.vue";
 import CommentOnFeedbackPage from "./CommentOnFeedbackPage.vue";

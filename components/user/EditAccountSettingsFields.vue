@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import { useMutation } from "@vue/apollo-composable";
 import TextInput from "@/components/TextInput.vue";
 import FormRow from "@/components/FormRow.vue";
@@ -100,7 +100,7 @@ const handleProfilePicChange = async (event: any) => {
 // Focus the input on creation
 nextTick(() => {
   if (titleInputRef.value) {
-    titleInputRef.value?.$el?.children[0].childNodes[0].focus();
+    (titleInputRef.value?.$el?.children[0].childNodes[0] as HTMLElement).focus();
   }
 });
 

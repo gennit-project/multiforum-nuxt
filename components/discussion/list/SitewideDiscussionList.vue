@@ -5,7 +5,7 @@ import SitewideDiscussionListItem from "./SitewideDiscussionListItem.vue";
 import LoadMore from "../../LoadMore.vue";
 import { GET_SITE_WIDE_DISCUSSION_LIST } from "@/graphQLData/discussion/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import {
   getSortFromQuery,
@@ -94,7 +94,9 @@ const loadMore = () => {
         limit: DISCUSSION_PAGE_LIMIT,
         offset:
           discussionResult.value.getSiteWideDiscussionList.discussions.length,
+        // @ts-ignore 
         sort: activeSort.value,
+        // @ts-ignore
         timeFrame: activeTimeFrame.value,
       },
     },

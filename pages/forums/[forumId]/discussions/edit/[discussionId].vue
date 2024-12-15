@@ -2,7 +2,7 @@
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { defineComponent, computed, ref } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRouter, useRoute } from "nuxt/app";
 import {
   useQuery,
   useMutation,
@@ -216,7 +216,7 @@ export default defineComponent({
             return !channelConnections.value.includes(dc.Channel?.uniqueName || '');
           },
         ).map((dc) => {
-          return dc.Channel.uniqueName;
+          return dc.Channel?.uniqueName;
         }),
       },
     }));

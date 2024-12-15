@@ -3,7 +3,7 @@ import { defineComponent, computed } from "vue";
 import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import Comment from "@/components/comments/Comment.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 
 const PAGE_LIMIT = 25;
 

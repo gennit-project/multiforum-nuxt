@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import ModerationStep from "./ModerationStep.vue";
 import type { Issue } from "@/__generated__/graphql";
+import { useRoute } from "nuxt/app";
 
 // Props definition using defineProps
 defineProps({
@@ -169,7 +170,7 @@ const requestChangeMessage = computed(() => {
         <textarea
           class="h-24 w-full rounded-lg border border-gray-300 p-2 text-black"
           :value="brokenRules"
-          @input="brokenRules = $event?.target?.value || ''"
+          @input="brokenRules = ($event?.target as HTMLTextAreaElement).value || ''"
         />
         <div class="flex justify-center gap-2">
           <PrimaryButton
@@ -241,7 +242,7 @@ const requestChangeMessage = computed(() => {
           class="w-full rounded-lg border border-gray-300 p-2 text-black"
           :rows="10"
           :value="requestChangeMessage"
-          @input="requestChangeMessage = $event?.target?.value || ''"
+          @input="requestChangeMessage = ($event?.target as HTMLTextAreaElement).value || ''"
         />
 
         <div class="flex justify-center gap-2">
@@ -322,7 +323,7 @@ const requestChangeMessage = computed(() => {
           class="w-full rounded-lg border border-gray-300 p-2 text-black"
           :rows="10"
           :value="suspensionMessage"
-          @input="suspensionMessage = $event?.target?.value || ''"
+          @input="suspensionMessage = ($event?.target as HTMLTextAreaElement).value || ''"
         />
         <div class="flex justify-center gap-2">
           <PrimaryButton
@@ -365,7 +366,7 @@ const requestChangeMessage = computed(() => {
         <textarea
           class="w-full rounded-lg border border-gray-300 p-2 text-black"
           :value="explanationComment"
-          @input="explanationComment = $event?.target?.value || ''"
+          @input="explanationComment = ($event?.target as HTMLTextAreaElement).value || ''"
         />
         <div class="flex justify-center gap-2">
           <GenericButton

@@ -2,7 +2,7 @@
 import { ref, nextTick, computed, onMounted } from "vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 
 // Props
 defineProps({

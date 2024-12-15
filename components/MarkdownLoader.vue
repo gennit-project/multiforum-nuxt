@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, watch, onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import MarkdownPreview from '@/components/MarkdownPreview.vue'
 import axios from "axios";
 

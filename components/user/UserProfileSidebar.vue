@@ -5,6 +5,7 @@ import "md-editor-v3/lib/style.css";
 import { GET_USER } from "@/graphQLData/user/queries";
 import { relativeTime } from "@/utils";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
+import { useRoute } from "nuxt/app";
 
 // Define props
 defineProps({

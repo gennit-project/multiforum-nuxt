@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { Loader } from "@googlemaps/js-api-loader";
-import { useRouter } from "vue-router";
+import { useRouter } from "nuxt/app";
 import { config } from "@/config";
 import nightModeMapStyles from "@/components/event/map/nightModeMapStyles";
 import placeIcon from "@/assets/images/place-icon.svg";
+import { useTheme } from "@/composables/useTheme";
+
 // The Google map requires that the styles have to be set
 // when the map is rendered and they can't change based on props.
 // And if we render both mobile and desktop maps with the same map div,
@@ -23,14 +25,16 @@ interface Event {
   id: string;
 }
 
-interface MarkerMap {
-  [key: string]: {
-    marker: google.maps.Marker;
-    events: { [key: string]: Event };
-    numberOfEvents: number;
-  };
+interface MarkerData {
+  marker: google.maps.Marker;
+  events: { [key: string]: Event };
+  numberOfEvents: number;
 }
 
+interface MarkerMap {
+  markers: { [key: string]: MarkerData };
+  infowindow?: google.maps.InfoWindow;
+}
 const props = defineProps({
   colorLocked: {
     type: Boolean,
@@ -89,11 +93,13 @@ const mobileMapDiv = ref<HTMLElement | null>(null);
 const desktopMapDiv = ref<HTMLElement | null>(null);
 const map = ref<google.maps.Map | null>(null);
 
-let markerMap: MarkerMap = {};
+let markerMap: MarkerMap = {
+  markers: {},
+};
 
 const clearMarkers = () => {
-  for (const key in markerMap) {
-    const markerData = markerMap[key];
+  for (const key in markerMap.markers) {
+    const markerData = markerMap.markers[key];
     const marker = markerData.marker;
 
     if (marker && marker.getMap() !== null) {
@@ -101,7 +107,9 @@ const clearMarkers = () => {
       google.maps.event.clearInstanceListeners(marker);
     }
   }
-  markerMap = {};
+  markerMap = {
+    markers: {},
+  };
 };
 
 const getMapStyles = () => {
@@ -179,21 +187,25 @@ const renderMap = async () => {
 
             marker.setIcon({
               url: placeIcon,
-              scaledSize: { width: 20, height: 20 },
+              scaledSize: { 
+                width: 20, 
+                height: 20,
+                equals: () => false
+              },
             });
             infowindow.close();
           }
         };
-        unhighlight(marker);
+        unhighlight();
       });
 
       const updateMarkerMap = () => {
-        if (markerMap[eventLocationId]) {
-          markerMap[eventLocationId].events[event.id] = event;
-          markerMap[eventLocationId].numberOfEvents += 1;
-          markerMap[eventLocationId].marker = marker;
+        if (markerMap.markers[eventLocationId]) {
+          markerMap.markers[eventLocationId].events[event.id] = event;
+          markerMap.markers[eventLocationId].numberOfEvents += 1;
+          markerMap.markers[eventLocationId].marker = marker;
         } else {
-          markerMap[eventLocationId] = {
+          markerMap.markers[eventLocationId] = {
             marker,
             events: { [event.id]: event },
             numberOfEvents: 1,
@@ -208,7 +220,8 @@ const renderMap = async () => {
   markerMap.infowindow = infowindow;
 
   map.value.fitBounds(bounds);
-  if (map.value.getZoom() > 15) {
+  // @ts-ignore
+  if (map.value && map.value.getZoom() > 15) {
     map.value.setZoom(15);
   }
 
@@ -235,7 +248,7 @@ watch(
 watch(
   () => props.useMobileStyles,
   () => {
-    renderMap(true);
+    renderMap();
   }
 );
 </script>

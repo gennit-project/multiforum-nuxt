@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, type VNodeRef } from "vue";
 import {
   Dialog,
   DialogOverlay,
@@ -27,7 +27,7 @@ const props = defineProps({
 
 const emit = defineEmits(["closePreview"]);
 
-const cancelButtonRef = ref<HTMLElement | null>(null);
+const cancelButtonRef = ref<VNodeRef | null>(null);
 const { smAndDown } = useDisplay();
 
 function closePreview() {

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, ref } from "vue";
+import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
 import TagPicker from "@/components/TagPicker.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -75,6 +76,7 @@ const touched = ref(false);
 
 nextTick(() => {
   if (titleInputRef.value) {
+    // @ts-ignore - titleInputRef is not null
     titleInputRef.value?.focus();
   }
 });
@@ -131,9 +133,14 @@ const handleImageChange = async (event: Event, fieldName: string) => {
   }
 };
 
+type RuleInput = {
+  summary: string;
+  detail: string;
+};
+
 // Methods for handling rules
-const updateRule = (index: number, field: string, value: string) => {
-  const updatedRules = [...(props.formValues?.rules || [])];
+const updateRule = (index: number, field: 'summary' | 'detail', value: string) => {
+  const updatedRules: RuleInput[] = [...(props.formValues?.rules || [])];
   updatedRules[index][field] = value;
   emit("updateFormValues", { rules: updatedRules });
 };
@@ -285,7 +292,7 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
                 class="w-full shadow-sm"
                 :src="formValues.channelBannerURL"
                 :alt="formValues.uniqueName"
-              />
+              >
               <AddImage
                 key="channel-banner-url"
                 :field-name="'channelBannerURL'"

@@ -27,7 +27,7 @@ import Notification from "@/components/NotificationComponent.vue";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar } from "@/cache";
-
+import { useRoute } from "nuxt/app";
 
 const COMMENT_LIMIT = 50;
 
@@ -51,10 +51,6 @@ const offset = ref(0);
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
-
-const username = computed(() => {
-  return usernameVar || ""
-});
 
 const {
   result: getDiscussionResult,
@@ -101,6 +97,7 @@ const {
 });
 
 watch(commentSort, () =>
+  // @ts-ignore - the sort is correctly typed.
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
 
@@ -193,7 +190,9 @@ const reachedEndOfResults = computed(
 );
 
 const loggedInUserIsAuthor = computed(
-  () => discussion.value?.Author?.username === username.value
+  () => {
+   return discussion.value?.Author?.username === usernameVar.value
+  }
 );
 const discussionAuthor = computed(
   () => discussion.value?.Author?.username || ""

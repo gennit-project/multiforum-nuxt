@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
@@ -408,7 +408,7 @@ function handleViewFeedback(feedbackId: string) {
       :body="'Are you sure you want to delete this comment?'"
       :open="showDeleteCommentModal"
       :loading="deleteCommentLoading"
-      :error="deleteCommentError"
+      :error="deleteCommentError?.message"
       @close="
         () => {
           showDeleteCommentModal = false;

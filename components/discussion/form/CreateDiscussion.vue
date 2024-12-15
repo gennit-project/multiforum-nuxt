@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { useRouter, useRoute } from "#app";
 import { useMutation } from "@vue/apollo-composable";
 import type {
   DiscussionChannel,
@@ -17,6 +16,7 @@ import {
   getTimeFrameFromQuery,
 } from "@/components/comments/getSortFromQuery";
 import { usernameVar } from "@/cache";
+import { useRouter, useRoute } from "nuxt/app";
 
 const DISCUSSION_PAGE_LIMIT = 10;
 const route = useRoute();
@@ -85,7 +85,7 @@ const {
       (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId
     );
 
-    const existingData = cache.readQuery({
+    const existingData: any = cache.readQuery({
       query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
       variables: {
         channelUniqueName: channelId,

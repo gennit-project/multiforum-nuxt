@@ -4,6 +4,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
+import { useRoute } from "nuxt/app";
 
 const route = useRoute();
 const channelId = computed(() => {

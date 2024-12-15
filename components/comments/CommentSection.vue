@@ -32,6 +32,7 @@ import type {
 } from "@/types/Comment";
 import type { Ref, PropType } from "vue";
 import { modProfileNameVar } from "@/cache";
+import { useRouter, useRoute } from "nuxt/app";
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -174,7 +175,7 @@ const {
     const newFeedbackComment = result.data.createComments.comments[0];
 
     if (parentId) {
-      const readQueryResult = cache.readQuery({
+      const readQueryResult: any = cache.readQuery({
         query: GET_COMMENT_REPLIES,
         variables: {
           ...getCommentRepliesVariables,
@@ -249,7 +250,7 @@ const {
   {
     update: (cache) => {
       if (parentOfCommentToDelete.value) {
-        const readQueryResult = cache.readQuery({
+        const readQueryResult: any = cache.readQuery({
           query: GET_COMMENT_REPLIES,
           variables: {
             ...getCommentRepliesVariables,
@@ -327,7 +328,7 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
         throw new Error("newCommentParentId is required");
       }
 
-      const readQueryResult = cache.readQuery({
+      const readQueryResult: any = cache.readQuery({
         query: GET_COMMENT_REPLIES,
         variables: {
           ...getCommentRepliesVariables,

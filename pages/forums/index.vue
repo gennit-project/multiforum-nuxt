@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import type { LocationQueryValue } from "vue-router";
+import type { LocationQueryValue } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import ChannelList from "@/components/channel/ChannelList.vue";
 import { GET_CHANNELS } from "@/graphQLData/channel/queries";

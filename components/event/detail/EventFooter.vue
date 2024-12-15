@@ -2,9 +2,10 @@
 import type { PropType} from "vue";
 import { defineComponent, computed } from "vue";
 import type { Event as EventData , EventChannel } from "@/__generated__/graphql";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import { DateTime } from "luxon";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
+import { relativeTime } from "@/utils";
 
 export default defineComponent({
   components: {

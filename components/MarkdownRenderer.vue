@@ -4,10 +4,13 @@ import { computed } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import 'highlight.js/styles/github-dark.css';
+import { useTheme } from "@/composables/useTheme";
+
 const { theme } = useTheme()
 
 // Use DOMPurify only in the client environment
-let DOMPurify;
+let DOMPurify: typeof import('dompurify');
+
 if (import.meta.client) {
   DOMPurify = (await import('dompurify')).default;
 }

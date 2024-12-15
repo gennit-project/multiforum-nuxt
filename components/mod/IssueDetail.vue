@@ -29,6 +29,7 @@ import IssueBadge from "@/components/mod/IssueBadge.vue";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
 import { DateTime } from "luxon";
 import { modProfileNameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
 
 // Setup
 const route = useRoute();
@@ -148,7 +149,7 @@ const { mutate: closeIssue } = useMutation(CLOSE_ISSUE, () => ({
 
     // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
     // to add this issue to the list of closed issues
-    const existingClosedIssuesByChannelData = cache.readQuery({
+    const existingClosedIssuesByChannelData: any = cache.readQuery({
       query: GET_CLOSED_ISSUES_BY_CHANNEL,
       variables: { channelUniqueName: channelId.value },
     });
@@ -239,7 +240,7 @@ const { mutate: reopenIssue } = useMutation(REOPEN_ISSUE, () => ({
     // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
     // so that the newly reopened issue is removed from the list
     // of closed issues.
-    const existingClosedIssuesByChannelData = cache.readQuery({
+    const existingClosedIssuesByChannelData: any = cache.readQuery({
       query: GET_CLOSED_ISSUES_BY_CHANNEL,
       variables: { channelUniqueName: channelId.value },
     });
@@ -460,8 +461,8 @@ const toggleCloseOpenIssue = () => {
         {{ issue?.title || "[Deleted]" }}
       </h1>
       <div class="flex items-center gap-2">
-        <IssueBadge :key="issue?.isOpen" :issue="issue" />
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <IssueBadge v-if="issue" :key="issue?.id" :issue="issue" />
+        <div v-if="issue" class="text-sm text-gray-500 dark:text-gray-400">
           {{
             `First reported on ${formatDate(issue.createdAt)} by ${issue?.Author?.displayName || "[Deleted]"}`
           }}

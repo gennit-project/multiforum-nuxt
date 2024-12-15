@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
+import type { PropType } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
 import type { Comment, DiscussionChannel } from "@/__generated__/graphql";
@@ -7,6 +8,7 @@ import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import { usernameVar } from "@/cache";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
+import { useRoute } from "nuxt/app";
 
 // Props
 const props = defineProps({
@@ -108,7 +110,7 @@ const {
       sort: getSortFromQuery(route.query),
     };
 
-    const readQueryResult = cache.readQuery({
+    const readQueryResult: any = cache.readQuery({
       query: GET_DISCUSSION_COMMENTS,
       variables: commentSectionQueryVariables,
     });
@@ -133,7 +135,6 @@ const {
           ...readQueryResult?.getCommentSection,
           DiscussionChannel: {
             ...existingDiscussionChannelData,
-            ChannelRoles: existingDiscussionChannelData?.ChannelRoles || [], // Include ChannelRoles explicitly
             CommentsAggregate: {
               ...existingDiscussionChannelData?.CommentsAggregate,
               count: existingCount + 1,

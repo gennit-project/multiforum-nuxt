@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
+import type { PropType } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import type { Event } from "@/__generated__/graphql";
 import {
@@ -21,6 +22,7 @@ import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
+import { useRoute, useRouter } from "nuxt/app";
 
 const props = defineProps({
   eventData: {
@@ -79,7 +81,7 @@ const {
       fields: {
         events(existingEventRefs = [], { readField }) {
           return existingEventRefs.filter(
-            (ref) => readField("id", ref) !== eventId.value
+            (ref: any) => readField("id", ref) !== eventId.value
           );
         },
       },
@@ -154,7 +156,7 @@ const copyLink = async () => {
 
 const isAdmin = computed(() => {
   const serverRoles = props.eventData.Poster?.ServerRoles;
-  return serverRoles?.length > 0 && serverRoles[0].showAdminTag;
+  return serverRoles && serverRoles?.length > 0 && serverRoles[0].showAdminTag;
 });
 
 const menuItems = computed(() => {

@@ -11,6 +11,7 @@ import PageNotFound from "@/components/PageNotFound.vue";
 import CommentHeader from "@/components/comments/CommentHeader.vue";
 import FeedbackSection from "@/components/comments/FeedbackSection.vue";
 import { modProfileNameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
 
 const PAGE_LIMIT = 10;
 
@@ -27,14 +28,15 @@ const {
   loading: getCommentLoading,
   fetchMore,
   onResult: onGetCommentDone,
-} = useQuery<{ comments: Comment[] }, { message: string }>(GET_FEEDBACK_ON_COMMENT, {
+} = useQuery(GET_FEEDBACK_ON_COMMENT, {
+  // @ts-ignore
   commentId: commentId,
   limit: PAGE_LIMIT,
   offset: offset,
   loggedInModName: modProfileNameVar.value,
 });
 
-const originalComment = computed<Comment>(() => {
+const originalComment = computed<Comment | null>(() => {
   if (!getCommentResult.value || getCommentError.value) {
     return null;
   }
@@ -164,6 +166,7 @@ const feedbackCommentsAggregate = computed(() => {
 const loadMore = () => {
   fetchMore({
     variables: {
+      // @ts-ignore
       offset: feedbackComments.value.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
@@ -210,7 +213,7 @@ const {
     const newFeedbackComment = result.data.createComments.comments[0];
 
     if (commentToGiveFeedbackOn.value) {
-      const prevQueryResult = cache.readQuery({
+      const prevQueryResult: any = cache.readQuery({
         query: GET_FEEDBACK_ON_COMMENT,
         variables: {
           commentId: commentId.value,
@@ -220,7 +223,7 @@ const {
         },
       });
 
-      const prevOriginalFeedbackList = originalComment.value.FeedbackComments;
+      const prevOriginalFeedbackList = originalComment.value?.FeedbackComments || [];
       const prevFeedbackComments =
         commentToGiveFeedbackOn.value.FeedbackComments || [];
 

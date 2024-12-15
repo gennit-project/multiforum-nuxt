@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, defineProps } from "vue";
+import { ref, computed, onMounted, defineProps, nextTick } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
 import TextEditor from "@/components/TextEditor.vue";
 import FormRow from "@/components/FormRow.vue";

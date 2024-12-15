@@ -12,6 +12,7 @@ import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams
 import type { SearchDiscussionValues } from "@/types/Discussion";
 import { useDisplay } from "vuetify";
 import { updateFilters } from "@/utils/routerUtils";
+import { useRoute, useRouter } from "nuxt/app";
 
 defineProps({
   showMap: {
@@ -61,9 +62,9 @@ const filterValues = ref<SearchDiscussionValues>(
 
 // Computed properties for labels
 const channelLabel = computed(() =>
-  getChannelLabel(filterValues.value.channels)
+  getChannelLabel(filterValues.value.channels || [])
 );
-const tagLabel = computed(() => getTagLabel(filterValues.value.tags));
+const tagLabel = computed(() => getTagLabel(filterValues.value.tags || []));
 
 // Watch for route query changes to update filter values
 watch(
@@ -103,6 +104,9 @@ const updateSearchInput = (searchInput: string) => {
 };
 
 const toggleSelectedChannel = (channel: string) => {
+  if (!filterValues.value.channels) {
+    filterValues.value.channels = [];
+  }
   const index = filterValues.value.channels.indexOf(channel);
   if (index === -1) {
     filterValues.value.channels.push(channel);
@@ -113,6 +117,9 @@ const toggleSelectedChannel = (channel: string) => {
 };
 
 const toggleSelectedTag = (tag: string) => {
+  if (!filterValues.value.tags) {
+    filterValues.value.tags = [];
+  }
   const index = filterValues.value.tags.indexOf(tag);
   if (index === -1) {
     filterValues.value.tags.push(tag);
@@ -131,7 +138,7 @@ const toggleSelectedTag = (tag: string) => {
         class="align-middle"
         :data-testid="'forum-filter-button'"
         :label="channelLabel"
-        :highlighted="filterValues.channels.length > 0"
+        :highlighted="filterValues.channels && filterValues.channels.length > 0"
       >
         <template #icon>
           <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />

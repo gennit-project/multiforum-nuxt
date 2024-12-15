@@ -3,6 +3,9 @@ import { computed } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { usernameVar } from "@/cache";
 import { config } from "@/config";
+import { useRouter, useRoute } from "nuxt/app";
+import { useQuery } from "@vue/apollo-composable";
+import { GET_USER } from "@/graphQLData/user/queries";
 
 const props = defineProps({
   modName: {
@@ -16,16 +19,13 @@ const props = defineProps({
 });
 const { logout } = useAuth0();
 
-
-const user = computed(() => {
-  const fetchedUser = usernameVar.value;
-  return fetchedUser || null;
+const { result: getUserResult } = useQuery(GET_USER, {
+  username: usernameVar.value,
 });
 
 const profilePicURL = computed(() => {
-  return user.value?.profilePicURL || "";
+  return getUserResult.value?.users[0]?.profilePicURL || "";
 });
-
 const router = useRouter();
 
 const menuItems = [

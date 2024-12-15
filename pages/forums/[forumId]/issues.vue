@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "#imports";
+import { useRoute } from "nuxt/app";
 import { COUNT_CLOSED_ISSUES, COUNT_OPEN_ISSUES } from "@/graphQLData/mod/queries";
 
 const route = useRoute();

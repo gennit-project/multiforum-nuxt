@@ -1,10 +1,11 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_MOD } from "@/graphQLData/mod/queries";
 import UsernameLabel from "@/components/UsernameLabel.vue";
 import { relativeTime } from "@/utils";
+import ErrorBanner from "@/components/ErrorBanner.vue";
 
 export default defineComponent({
   components: {

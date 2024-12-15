@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_COMMENT_AND_REPLIES } from "@/graphQLData/comment/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import { useRoute } from "nuxt/app";
 
 const route = useRoute();
 const {

@@ -1,8 +1,9 @@
 <script lang="ts">
 import type { PropType } from "vue";
 import { defineComponent, computed } from "vue";
-import type { Comment } from "@/__generated__/graphql";
+import type { Comment, User, ModerationProfile } from "@/__generated__/graphql";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
+// @ts-ignore
 import clickOutside from "vue-click-outside";
 import { relativeTime } from "@/utils";
 
@@ -41,31 +42,47 @@ export default defineComponent({
   },
   setup(props) {
     const isAdmin = computed(() => {
-      const serverRoles = props.commentData.CommentAuthor?.ServerRoles;
-      if (!serverRoles) {
+      const author: User | ModerationProfile | undefined | null =
+        props.commentData.CommentAuthor;
+      if (!author) {
         return false;
       }
-      if (serverRoles.length === 0) {
-        return false;
+      if (author.__typename === "User") {
+        const serverRoles = author.ServerRoles;
+        if (!serverRoles) {
+          return false;
+        }
+        if (serverRoles.length === 0) {
+          return false;
+        }
+        const serverRole = serverRoles[0];
+        if (serverRole.showAdminTag) {
+          return true;
+        }
       }
-      const serverRole = serverRoles[0];
-      if (serverRole.showAdminTag) {
-        return true;
-      }
+
       return false;
     });
 
     const isMod = computed(() => {
-      const channelRoles = props.commentData.CommentAuthor?.ChannelRoles;
-      if (!channelRoles) {
+      const author: User | ModerationProfile | undefined | null =
+        props.commentData.CommentAuthor;
+      if (!author) {
         return false;
       }
-      if (channelRoles.length === 0) {
+      if (author.__typename === "User") {
+        const channelRoles = author.ChannelRoles;
+        if (!channelRoles) {
+          return false;
+        }
+        if (channelRoles.length === 0) {
+          return false;
+        }
+        const channelRole = channelRoles[0];
+        if (channelRole.showModTag) {
+          return true;
+        }
         return false;
-      }
-      const channelRole = channelRoles[0];
-      if (channelRole.showModTag) {
-        return true;
       }
       return false;
     });
@@ -76,6 +93,24 @@ export default defineComponent({
     };
   },
   computed: {
+    commentAuthorUsername() {
+      return this.commentData.CommentAuthor?.username;
+    },
+    commentAuthorProfilePic() {
+      return this.commentData.CommentAuthor?.profilePicURL;
+    },
+    commentAuthorDisplayName() {
+      return this.commentData.CommentAuthor?.displayName;
+    },
+    commentKarma() {
+      return this.commentData.CommentAuthor?.commentKarma ?? 0;
+    },
+    discussionKarma() {
+      return this.commentData.CommentAuthor?.discussionKarma ?? 0;
+    },
+    createdAt() {
+      return this.commentData.createdAt;
+    },
     createdAtFormatted() {
       if (!this.commentData.createdAt) {
         return "";
@@ -103,11 +138,11 @@ export default defineComponent({
   <div class="flex w-full">
     <p v-if="!commentData">[Deleted]</p>
     <AvatarComponent
-      v-else-if="commentData.CommentAuthor?.username"
+      v-else-if="commentAuthorUsername"
       class="z-10"
       :is-small="true"
-      :text="commentData.CommentAuthor.username"
-      :src="commentData.CommentAuthor.profilePicURL || ''"
+      :text="commentAuthorUsername"
+      :src="commentAuthorProfilePic || ''"
     />
     <AvatarComponent
       v-else-if="commentData.CommentAuthor?.displayName"
@@ -117,9 +152,7 @@ export default defineComponent({
     />
 
     <div
-      :class="
-        !commentData.CommentAuthor?.username ? '-ml-5' : '-ml-4 border-l '
-      "
+      :class="!commentAuthorUsername ? '-ml-5' : '-ml-4 border-l '"
       class="flex-grow border-gray-300 pl-4 dark:border-gray-600"
     >
       <div
@@ -146,26 +179,24 @@ export default defineComponent({
           class="ml-1 flex flex-wrap items-center space-x-2 text-xs dark:text-gray-300"
         >
           <nuxt-link
-            v-if="commentData.CommentAuthor?.username"
+            v-if="commentAuthorUsername"
             class="mx-1 font-bold hover:underline dark:text-gray-200"
             :to="{
               name: 'u-username',
-              params: { username: commentData.CommentAuthor.username },
+              params: { username: commentAuthorUsername },
             }"
           >
             <UsernameWithTooltip
-              v-if="commentData.CommentAuthor.username"
-              :username="commentData.CommentAuthor.username"
-              :src="commentData.CommentAuthor.profilePicURL"
-              :display-name="commentData.CommentAuthor.displayName || ''"
-              :comment-karma="commentData.CommentAuthor.commentKarma ?? 0"
-              :discussion-karma="commentData.CommentAuthor.discussionKarma ?? 0"
-              :account-created="commentData.CommentAuthor.createdAt"
+              v-if="commentAuthorUsername"
+              :username="commentAuthorUsername"
+              :src="commentAuthorProfilePic || ''"
+              :display-name="commentAuthorDisplayName || ''"
+              :comment-karma="commentKarma ?? 0"
+              :discussion-karma="discussionKarma ?? 0"
+              :account-created="createdAt"
               :is-admin="isAdmin"
               :is-mod="isMod"
-              :is-original-poster="
-                commentData.CommentAuthor.username === originalPoster
-              "
+              :is-original-poster="commentAuthorUsername === originalPoster"
             />
           </nuxt-link>
           <nuxt-link

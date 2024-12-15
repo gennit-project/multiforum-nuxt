@@ -7,6 +7,7 @@ import Tag from "../../TagComponent.vue";
 import "md-editor-v3/lib/preview.css";
 import type { PropType } from "vue";
 import type { Discussion } from "@/__generated__/graphql";
+import { useRouter } from "nuxt/app";
 
 const router = useRouter();
 

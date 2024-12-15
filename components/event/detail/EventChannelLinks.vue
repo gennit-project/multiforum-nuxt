@@ -2,7 +2,7 @@
 import type { PropType } from "vue";
 import { defineComponent, computed } from "vue";
 import EventChannelLink from "@/components/event/detail/EventChannelLink.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import type { EventChannel } from "@/__generated__/graphql";
 
 export default defineComponent({

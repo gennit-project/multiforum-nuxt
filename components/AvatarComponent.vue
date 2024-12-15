@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import Identicon from "identicon.js";
 import sha256 from "crypto-js/sha256";
+import { useTheme } from "@/composables/useTheme";
 const { theme } = useTheme()
 
 const props = defineProps({
@@ -44,7 +45,7 @@ const identiconData = computed(() => {
   // Generate the identicon and get the data for the img src
   const data = new Identicon(hash, {
     // If theme is dark, use a dark background
-    background: theme === "dark" ? [0, 0, 0, 255] : [255, 255, 255, 255],
+    background: theme.value === "dark" ? [0, 0, 0, 255] : [255, 255, 255, 255],
     margin: 0.2,
     size: 420,
     format: "svg",

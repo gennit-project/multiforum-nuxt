@@ -32,8 +32,8 @@ const lightGalleryLicenseKey = config.lightgalleryLicenseKey;
     }"
     class="grid grid-cols-2 gap-2 dark:text-white"
   >
-    <a v-for="image in album.Images" :key="image.id" :href="image.url">
-      <img :src="image.url" :alt="image.alt" class="shadow-sm" />
+    <a v-for="image in album.Images" :key="image.id" :href="image.url || ''">
+      <img v-if="image" :src="image.url || ''" :alt="image.alt || ''" class="shadow-sm" >
       <span class="text-center">
         {{ image.alt }}
       </span>

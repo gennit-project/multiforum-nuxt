@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { useRouter } from "nuxt/app";
 import CancelButton from "@/components/CancelButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import FormRow from "@/components/FormRow.vue";

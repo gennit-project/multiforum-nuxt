@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, watch } from "vue";
+import { computed, watch, onMounted } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import {
   isAuthenticatedVar,
-  isLoadingAuthVar,
   setIsLoadingAuth,
   usernameVar,
 } from "@/cache";
@@ -60,6 +59,9 @@ if (import.meta.env.SSR === false) {
   });
 
   handleLogin = async () => {
+
+    // ts-ignore because Cypress is not defined in the browser
+    // @ts-ignore
     if (window?.parent?.Cypress) {
       await loginWithRedirect();
     } else {

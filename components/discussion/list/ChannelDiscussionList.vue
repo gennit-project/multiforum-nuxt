@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, watch } from "vue";
-import { useRoute } from "vue-router";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { useRoute } from "nuxt/app";
+import { useQuery } from "@vue/apollo-composable";
 import ChannelDiscussionListItem from "./ChannelDiscussionListItem.vue";
 import LoadMore from "../../LoadMore.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
-import WarningModal from "../../WarningModal.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { generateSlug } from "random-word-slugs";
-import { CREATE_MOD_PROFILE } from "@/graphQLData/user/mutations";
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
-import { setModProfileName, usernameVar } from "@/cache";
+import { usernameVar } from "@/cache";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import {
   getSortFromQuery,
@@ -120,22 +117,6 @@ const loadMore = () => {
   });
 };
 
-const randomWords = generateSlug(4, { format: "camel" });
-
-const { mutate: createModProfile, onDone: onDoneCreateModProfile } =
-  useMutation(CREATE_MOD_PROFILE, {
-    variables: {
-      displayName: randomWords,
-      username: usernameVar.value,
-    },
-  });
-
-onDoneCreateModProfile(({ data }) => {
-  const updatedUser = data.updateUsers.users[0];
-  const newModProfileName = updatedUser.ModerationProfile.displayName;
-  setModProfileName(newModProfileName);
-});
-
 const showModProfileModal = ref(false);
 
 onMounted(() => {
@@ -168,11 +149,7 @@ const filterByChannel = (channel: string) => {
   emit("filterByChannel", channel);
 };
 
-const handleCreateModProfileClick = async () => {
-  await createModProfile();
-  modProfileName;
-  showModProfileModal.value = false;
-};
+
 </script>
 
 <template>
@@ -256,13 +233,5 @@ const handleCreateModProfileClick = async () => {
         @load-more="loadMore"
       />
     </div>
-    <WarningModal
-      :title="'Create Mod Profile'"
-      :body="`Moderation activity is tracked to prevent abuse, therefore you need to create a mod profile in order to downvote this comment. Continue?`"
-      :open="showModProfileModal"
-      :primary-button-text="'Yes, create a mod profile'"
-      @close="showModProfileModal = false"
-      @primary-button-click="handleCreateModProfileClick"
-    />
   </div>
 </template>

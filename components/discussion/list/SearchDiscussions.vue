@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import ChannelDiscussionList from "./ChannelDiscussionList.vue";
 import SitewideDiscussionList from "./SitewideDiscussionList.vue";
 import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
@@ -65,6 +65,9 @@ const handleClickTag = (tagText: string) => {
     const newQuery = { ...route.query };
     delete newQuery["tags"];
     router.replace({ query: { ...newQuery } });
+    if (!filterValues.value.tags) {
+      filterValues.value.tags = [];
+    }
     filterValues.value.tags = filterValues.value.tags.filter(
       (t: string) => t !== tagText
     );
@@ -81,6 +84,9 @@ const handleClickTag = (tagText: string) => {
       newQuery.tags = newQuery.tags.filter((tag: any) => tag !== tagText);
     }
     router.replace({ query: { ...newQuery } });
+    if (!filterValues.value.tags) {
+      filterValues.value.tags = [];
+    }
     filterValues.value.tags.push(tagText);
   };
 
@@ -120,6 +126,9 @@ const handleClickChannel = (uniqueName: string) => {
     const newQuery = { ...route.query };
     delete newQuery["channels"];
     router.replace({ query: { ...newQuery } });
+    if (!filterValues.value.channels) {
+      filterValues.value.channels = [];
+    }
     filterValues.value.channels = filterValues.value.channels.filter(
       (c: string) => c !== uniqueName
     );
@@ -138,6 +147,9 @@ const handleClickChannel = (uniqueName: string) => {
       );
     }
     router.replace({ query: { ...newQuery } });
+    if (!filterValues.value.channels) {
+      filterValues.value.channels = [];
+    }
     filterValues.value.channels.push(uniqueName);
   };
 

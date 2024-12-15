@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import type { ApolloError } from "@apollo/client/core";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import Comment from "@/components/comments/Comment.vue";
 import PermalinkedComment from "@/components/comments/PermalinkedComment.vue";
 

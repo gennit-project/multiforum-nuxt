@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import { useMutation } from "@vue/apollo-composable";
 import {
   UPVOTE_DISCUSSION_CHANNEL,

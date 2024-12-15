@@ -7,6 +7,8 @@ import type { Channel } from "@/__generated__/graphql";
 import ChannelRules from "@/components/channel/Rules.vue";
 import SidebarEventList from "@/components/channel/SidebarEventList.vue";
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import { useRouter, useRoute } from "nuxt/app";
+
 const props = defineProps({
   channel: {
     type: Object as PropType<Channel>,

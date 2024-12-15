@@ -27,8 +27,6 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     radius,
     tags,
     channels,
-    weekdays,
-    hourRanges,
     locationFilter,
     searchInput,
     showCanceledEvents,
@@ -144,7 +142,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   }
 
   // Tag filter
-  if (tags.length > 0) {
+  if (tags && tags.length > 0) {
     const matchTags = tags.reduce((prev: any, curr: any) => {
       return prev.concat({ text_CONTAINS: curr });
     }, []);
@@ -154,11 +152,11 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       },
     });
   }
-  const truthyChannels = channels.filter((channel: string) => {
+  const truthyChannels = channels?.filter((channel: string) => {
     // Don't filter for a channel if a channel is an empty string.
     // This could happen if the query params are `?channels=`.
     return !!channel;
-  });
+  }) || [];
 
   // Channel filter
   if (channelId) {
@@ -186,55 +184,6 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       EventChannels_SOME: {
         OR: matchChannels,
       },
-    });
-  }
-
-  // Weekly time filter
-
-  // The selected weekly time windows are in the
-  // piece of state called selectedWeeklyHourRanges.
-  // That data structure is an object where the keys
-  // are weekdays and the values are objects where the
-  // key is the time slot and the value is a boolean.
-
-  // But to create a GraphQL query filter out of that,
-  // this function flattens the structure.
-
-  // The time filters will be nested under an OR operator
-  // within the overarching AND operator.
-  const flattenedTimeFilters: any[] = [];
-
-  // Add selected weekdays to the list of filter objects.
-  for (const weekday in weekdays) {
-    if (weekdays[weekday]) {
-      flattenedTimeFilters.push({
-        startTimeDayOfWeek: weekday,
-      });
-    }
-  }
-
-  // Add selected hour ranges to the list of filter objects.
-  for (const range in hourRanges) {
-    if (hourRanges[range] === true && hourRangesObject[range] !== undefined) {
-      // Due to the way that Neo4j works, it is faster
-      // to check for specific hours that an event may
-      // begin than it is to check for hour ranges
-      // using greater-than or less-than operators.
-
-      const max = hourRangesObject[range].max;
-      const min = hourRangesObject[range].min;
-
-      for (let i = min; i < max; i++) {
-        flattenedTimeFilters.push({
-          startTimeHourOfDay: i,
-        });
-      }
-    }
-  }
-
-  if (flattenedTimeFilters.length > 0) {
-    conditions.push({
-      OR: flattenedTimeFilters,
     });
   }
 

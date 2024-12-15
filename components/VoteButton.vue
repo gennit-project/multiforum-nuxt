@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { computed } from "vue";
 const properties = defineProps({
   active: Boolean,
   count: {

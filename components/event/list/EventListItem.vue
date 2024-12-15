@@ -9,6 +9,7 @@ import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import type { PropType } from "vue";
 import type { Event } from "@/__generated__/graphql";
 import type { SearchEventValues } from "@/types/Event";
+import { useRoute, useRouter } from "nuxt/app";
 
 const props = defineProps({
   event: {
@@ -113,7 +114,9 @@ const handleClickTag = (tagText: string) => {
       currentQuery.tags.includes(tagText)
     ) {
       const newQuery = { ...route.query };
-      newQuery.tags = (newQuery.tags || []).filter((tag: string) => tag !== tagText);
+      if (Array.isArray(newQuery.tags)) {
+        newQuery.tags = newQuery.tags.filter((tag) => tag !== tagText);
+      }
 
       router.replace({ query: { ...newQuery } });
     } else {
@@ -126,8 +129,19 @@ const handleClickTag = (tagText: string) => {
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
+  const cleanedParams: Record<string, string> = {};
+
+  Object.keys(params).forEach((key) => {
+    const typedKey = key as keyof SearchEventValues;
+    const value = params[typedKey];
+    if (value !== undefined && typeof value !== "string") {
+      cleanedParams[key] = String(value);
+    } else if (value !== undefined) {
+      cleanedParams[key] = value;
+    }
+  });
   router.replace({
-    query: { ...existingQuery, ...params },
+    query: { ...existingQuery, ...cleanedParams },
   });
 };
 

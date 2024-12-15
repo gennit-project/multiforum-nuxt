@@ -1,4 +1,4 @@
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, nextTick } from "vue";
 import { useCookie, useRoute, useRouter } from "nuxt/app";
 
 export const useTheme = () => {

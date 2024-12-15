@@ -8,7 +8,7 @@ import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import type { Channel, User } from "@/__generated__/graphql";
 import { computed } from "vue";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { DateTime } from "luxon";
 

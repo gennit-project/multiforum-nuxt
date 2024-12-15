@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import HamburgerMenuButton from "@/components/nav/MenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
+// @ts-ignore
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
 import {
   modProfileNameVar,
   usernameVar,
   sideNavIsOpenVar,
-  setSideNavIsOpenVar,
 } from "@/cache";
 
 defineEmits(["toggleDropdown"]);

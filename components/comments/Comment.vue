@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/core";
 import type { Comment } from "@/__generated__/graphql";
@@ -16,6 +16,7 @@ import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
+
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
 
@@ -229,7 +230,7 @@ const commentMenuItems = computed(() => {
     ]);
   }
 
-  if (props.commentData?.CommentAuthor?.username === usernameVar.value) {
+  if (props.commentData?.CommentAuthor?.__typename === "User" && props.commentData?.CommentAuthor?.username === usernameVar.value) {
     out = out.concat([
       {
         label: "Edit",

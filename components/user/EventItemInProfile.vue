@@ -5,6 +5,7 @@ import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import type { Event } from "@/__generated__/graphql";
 import type { TagData } from "../../types/Tag";
+import { useRouter } from "nuxt/app";
 
 const props = defineProps({
   event: {

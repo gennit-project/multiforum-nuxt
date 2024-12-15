@@ -1,5 +1,5 @@
 import type LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
-import type { Router, LocationQuery } from "vue-router";
+import type { Router, LocationQuery } from "nuxt/app";
 
 export type UpdateStateInput = {
   channels?: string[];

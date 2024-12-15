@@ -3,7 +3,7 @@ import { defineComponent, computed } from "vue";
 import { GET_USER_DISCUSSIONS } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import DiscussionItemInProfile from "@/components/user/DiscussionItemInProfile.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 
 export default defineComponent({
   name: "UserDiscussions",

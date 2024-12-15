@@ -53,7 +53,7 @@ const props = defineProps({
 });
 
 const searchQuery = ref(props.initialValue);
-const searchResults = ref([]);
+const searchResults: any = ref([]);
 const apiKey = config.openCageApiKey;
 
 const searchLocations = async () => {

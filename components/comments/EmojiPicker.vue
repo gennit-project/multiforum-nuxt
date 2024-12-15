@@ -13,7 +13,7 @@ const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
 // Mutation to add emoji to discussion channel
 const { mutate: addEmojiToDiscussionChannel } = useMutation(ADD_EMOJI_TO_DISCUSSION_CHANNEL);
 
-const emojiPickerRef = ref(null);
+const emojiPickerRef = ref<InstanceType<typeof VuemojiPicker> | null>(null);
 
 onMounted(() => {
   nextTick(() => {

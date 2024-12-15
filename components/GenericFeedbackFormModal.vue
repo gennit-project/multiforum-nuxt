@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { ref } from "vue";
 import GenericModal from "@/components/GenericModal.vue";
 import HandThumbDownIcon from "@/components/icons/HandThumbDownIcon.vue";
 import TextEditor from "@/components/TextEditor.vue";

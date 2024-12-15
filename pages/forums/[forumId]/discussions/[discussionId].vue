@@ -4,6 +4,7 @@ import DiscussionDetailContent from "@/components/discussion/detail/DiscussionDe
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
 import { modProfileNameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
 
 const route = useRoute();
 

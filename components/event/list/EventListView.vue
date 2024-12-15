@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import EventList from "./EventList.vue";
 import "md-editor-v3/lib/style.css";
@@ -75,6 +75,7 @@ const previewIsOpen = ref(false);
 const loadMore = () => {
   fetchMore({
     variables: {
+      // @ts-ignore
       offset: eventResult.value.events.length,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
@@ -108,38 +109,49 @@ const openPreview = () => {
 
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
+  const cleanedParams: Record<string, string> = {};
+  
+  Object.keys(params).forEach((key) => {
+    const typedKey = key as keyof SearchEventValues;
+    const value = params[typedKey];
+    if (value !== undefined && typeof value !== "string") {
+      cleanedParams[key] = String(value);
+    } else if (value !== undefined) {
+      cleanedParams[key] = value;
+    }
+  });
+
   router.replace({
     query: {
       ...existingQuery,
-      ...params,
+      ...cleanedParams,
     },
   });
 };
-
 const filterByTag = (tag: string) => {
-  const alreadySelected = filterValues.value.tags.includes(tag);
+  const alreadySelected = filterValues.value.tags?.includes(tag);
 
   if (alreadySelected) {
-    filterValues.value.tags = filterValues.value.tags.filter(
+    filterValues.value.tags = filterValues.value.tags?.filter(
       (t: string) => t !== tag
     );
   } else {
-    filterValues.value.tags.push(tag);
+    filterValues.value?.tags?.push(tag);
   }
-  updateFilters({ tags: tag });
+  updateFilters({ tags: [tag] });
 };
 
 const filterByChannel = (channel: string) => {
-  const alreadySelected = filterValues.value.channels.includes(channel);
+  const alreadySelected = filterValues.value.channels?.includes(channel);
 
   if (alreadySelected) {
-    filterValues.value.channels = filterValues.value.channels.filter(
+    filterValues.value.channels = filterValues.value.channels?.filter(
       (c: string) => c !== channel
     );
   } else {
-    filterValues.value.channels.push(channel);
+    filterValues.value.channels?.push(channel);
   }
-  updateFilters({ channels: channel });
+  updateFilters({ channels: [channel] });
 };
 
 </script>

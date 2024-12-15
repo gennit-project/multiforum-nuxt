@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
 import type { PropType } from "vue";
+import { useRouter } from "nuxt/app";
 
 export type MenuItemType = {
   value: string;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import type { PropType } from "vue";
-import type { Comment } from "@/__generated__/graphql";
+import type { Comment, ModerationProfile, User } from "@/__generated__/graphql";
 import VoteButtons from "./VoteButtons.vue";
 import ReplyButton from "./ReplyButton.vue";
 import SaveButton from "@/components/SaveButton.vue";
@@ -10,7 +10,7 @@ import TextEditor from "@/components/TextEditor.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import EmojiButtons from "./EmojiButtons.vue";
 import NewEmojiButton from "./NewEmojiButton.vue";
-import { usernameVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 
 const props = defineProps({
@@ -92,7 +92,20 @@ const loggedInUserIsAuthor = computed(() => {
   if (!props.commentData) {
     return false;
   }
-  return usernameVar.value === props.commentData.CommentAuthor?.username;
+  const author: User | ModerationProfile | undefined | null = props.commentData.CommentAuthor;
+  if (!author) {
+    return false;
+  }
+
+  if (author.__typename === "ModerationProfile") {
+    return modProfileNameVar.value === author.displayName;
+  }
+
+  if (author.__typename === "User") {
+    return usernameVar.value === author.username;
+  }
+
+  return false;
 });
 
 const showEmojiPicker = ref(false);

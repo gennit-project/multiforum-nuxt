@@ -6,7 +6,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { Issue } from "@/__generated__/graphql";
 import { DateTime } from "luxon";
 import MarkdownPreview from "../MarkdownPreview.vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { modProfileNameVar } from "@/cache";
 

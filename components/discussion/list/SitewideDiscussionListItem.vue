@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { PropType } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import type {
   Discussion,
   DiscussionChannel,
@@ -12,6 +12,7 @@ import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
+import { relativeTime } from "@/utils";
 
 const props = defineProps({
   discussion: {

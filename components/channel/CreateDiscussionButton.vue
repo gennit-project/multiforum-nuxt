@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, computed } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import RequireAuth from "../auth/RequireAuth.vue";
 import CreateButton from "../CreateButton.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -31,7 +31,7 @@ export default defineComponent({
 
 <template>
   <RequireAuth
-    v-if="$route.name === 'DiscussionDetail'"
+    v-if="route.name === 'DiscussionDetail'"
     class="flex inline-flex"
   >
     <template #has-auth>

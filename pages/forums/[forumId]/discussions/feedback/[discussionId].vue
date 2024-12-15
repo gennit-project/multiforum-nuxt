@@ -11,6 +11,8 @@ import { GET_DISCUSSION_FEEDBACK } from "@/graphQLData/discussion/queries";
 import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_FEEDBACK_ON_COMMENT } from "@/graphQLData/comment/queries";
 import { modProfileNameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
+import type { Comment } from "__generated__/graphql";
 
 const PAGE_LIMIT = 10;
 
@@ -36,7 +38,7 @@ const {
 });
 
 const commentToRemoveFeedbackFrom = ref(null);
-const commentToGiveFeedbackOn = ref(null);
+const commentToGiveFeedbackOn = ref<Comment | null>(null);
 
 const discussion = computed(() => {
   if (getDiscussionError.value) {
@@ -137,7 +139,7 @@ const { mutate: addFeedbackCommentToComment, loading: addFeedbackCommentToCommen
     const prevFeedbackComments = commentToGiveFeedbackOn.value?.FeedbackComments || [];
     const updatedDiscussion = {
       ...discussion.value,
-      FeedbackComments: [...prevOriginalFeedbackList.filter(comment => comment.id !== commentToGiveFeedbackOn.value?.id), { ...commentToGiveFeedbackOn.value, FeedbackComments: [...prevFeedbackComments, newFeedbackComment], FeedbackCommentsAggregate: { count: (prevQueryResult.discussions[0].FeedbackCommentsAggregate?.count || 0) + 1, __typename: "FeedbackCommentsAggregate" } }],
+      FeedbackComments: [...prevOriginalFeedbackList.filter((comment: Comment) => comment.id !== commentToGiveFeedbackOn.value?.id), { ...commentToGiveFeedbackOn.value, FeedbackComments: [...prevFeedbackComments, newFeedbackComment], FeedbackCommentsAggregate: { count: (prevQueryResult.discussions[0].FeedbackCommentsAggregate?.count || 0) + 1, __typename: "FeedbackCommentsAggregate" } }],
     };
     cache.writeQuery({
       query: GET_DISCUSSION_FEEDBACK,

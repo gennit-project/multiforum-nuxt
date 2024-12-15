@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch, onMounted } from "vue";
 import Tag from "@/components/TagComponent.vue";
-import { useQuery, useLazyQuery } from "@vue/apollo-composable";
+import { useLazyQuery } from "@vue/apollo-composable";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import {
   GET_EVENT_COMMENTS,
@@ -19,6 +19,7 @@ import EventCommentsWrapper from "@/components/event/detail/EventCommentsWrapper
 import EventRootCommentFormWrapper from "@/components/event/detail/EventRootCommentFormWrapper.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
+import { useRoute } from "nuxt/app";
 
 const COMMENT_LIMIT = 50;
 

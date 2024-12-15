@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 // redirect to /comments
 import { GET_USER } from "@/graphQLData/user/queries";
-import { useRouter } from "vue-router";
+import { useRouter } from "nuxt/app";
 import UserProfileTabs from "@/components/user/UserProfileTabs.vue";
 
 const router = useRouter();

@@ -6,7 +6,7 @@ import {
   useQuery,
   useMutation,
 } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
@@ -262,7 +262,7 @@ export default defineComponent({
       router.push({
         name: "forums-forumId-events-eventId",
         params: {
-          forumId: formValues.value.selectedChannels[0].channelUniqueName,
+          forumId: formValues.value.selectedChannels[0],
           eventId,
         },
       });

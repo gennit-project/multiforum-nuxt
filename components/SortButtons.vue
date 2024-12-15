@@ -1,6 +1,6 @@
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import TextButtonDropdown from "@/components/TextButtonDropdown.vue";
 import {
   getSortFromQuery,

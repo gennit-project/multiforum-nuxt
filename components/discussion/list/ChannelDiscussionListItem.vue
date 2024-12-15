@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import TagComponent from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";

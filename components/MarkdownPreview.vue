@@ -138,8 +138,8 @@ export default defineComponent({
         const img = new Image();
         img.onload = function () {
           const { width, height } = calculateAspectRatioFit(
-            this.width,
-            this.height,
+            img.width,
+            img.height,
             window.innerWidth,
             window.innerHeight,
           );

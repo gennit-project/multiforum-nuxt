@@ -4,7 +4,7 @@ import { DateTime } from "luxon";
 import type { Event } from "@/__generated__/graphql";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_SOONEST_EVENTS_IN_CHANNEL } from "@/graphQLData/channel/queries";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 
 const getDateSectionFormat = (date: string) => {
   const dateObj = DateTime.fromISO(date);

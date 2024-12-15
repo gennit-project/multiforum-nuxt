@@ -12,6 +12,8 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 import { modProfileNameVar, usernameVar } from "@/cache";
+import { useTheme } from "@/composables/useTheme";
+import { useRoute } from "nuxt/app";
 
 const { theme } = useTheme()
 
@@ -50,7 +52,7 @@ const authorIsLoggedInUser = computed(
   () => discussion.value?.Author?.username === usernameVar.value
 );
 
-const titleInputRef = ref(null);
+const titleInputRef = ref<HTMLElement | null>(null);
 const formValues = ref({
   title: getDiscussionResult.value?.discussion?.title || "",
 });

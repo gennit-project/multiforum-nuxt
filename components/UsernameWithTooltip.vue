@@ -1,5 +1,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
+import { timeAgo } from "@/utils";
 
 export default defineComponent({
   name: "UsernameWithTooltip",

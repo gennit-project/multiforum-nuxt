@@ -2,7 +2,7 @@
 import { computed, defineComponent } from "vue";
 import { GET_ISSUES_BY_DISCUSSION } from "@/graphQLData/issue/queries";
 import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 
 export default defineComponent({
   name: "DiscussionReportList",

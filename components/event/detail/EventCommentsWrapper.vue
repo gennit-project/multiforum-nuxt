@@ -11,6 +11,7 @@ import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
 
 const COMMENT_LIMIT = 50;
 
@@ -63,9 +64,10 @@ const createCommentDefaultValues = {
   text: "",
   isRootComment: false,
   depth: 1,
+  parentCommentId: "",
 };
 
-const createFormValues = ref(createCommentDefaultValues);
+const createFormValues = ref<CreateEditCommentFormValues>(createCommentDefaultValues);
 
 const createCommentInput = computed(() => ({
   isRootComment: false,

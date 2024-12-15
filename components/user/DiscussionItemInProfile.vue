@@ -4,6 +4,7 @@ import { relativeTime } from "@/utils";
 import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import type { Discussion } from "@/__generated__/graphql";
+import { useRouter } from "nuxt/app";
 
 const props = defineProps({
   discussion: {

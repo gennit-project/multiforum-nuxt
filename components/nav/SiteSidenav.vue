@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useRouter, type RouteLocationAsRelativeGeneric } from "vue-router";
+import { useRouter } from "nuxt/app";
+import type { RouteLocationAsRelativeGeneric } from "vue-router";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useQuery } from "@vue/apollo-composable";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
@@ -11,10 +12,8 @@ import XIcon from "@/components/icons/XmarkIcon.vue";
 import { GET_USER } from "@/graphQLData/user/queries";
 import { useDisplay } from "vuetify";
 import CreateAnythingButton from "./CreateAnythingButton.vue";
-import { usernameVar, isAuthenticatedVar } from "@/cache";
+import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from "@/cache";
 import SiteSidenavLogout from "./SiteSidenavLogout.vue";
-import { setSideNavIsOpenVar } from "@/cache";
-import { s } from "vite/dist/node/types.d-aGj9QkWt";
 
 const DEFAULT_LIMIT = 5;
 

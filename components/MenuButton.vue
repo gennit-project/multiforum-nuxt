@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, nextTick, onMounted } from "vue";
+import type { PropType } from "vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import { actionIconMap } from "@/utils";
 

@@ -13,7 +13,7 @@ import type {
   CommentCreateInput,
   Comment as CommentType,
 } from "@/__generated__/graphql";
-import { useRoute } from "vue-router";
+import { useRoute } from "nuxt/app";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import type { CreateEditCommentFormValues } from "@/types/Comment";

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import { timeFilterShortcuts, timeShortcutValues } from "./eventSearchOptions";
 import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
 import type { SearchEventValues } from "@/types/Event";

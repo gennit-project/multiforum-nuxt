@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
+import type { PropType } from "vue";
 import SearchableTagList from "@/components/SearchableTagList.vue";
 
 const props = defineProps({

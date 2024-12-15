@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import { DateTime } from "luxon";
 import { gql } from "@apollo/client/core";
 import RequireAuth from "@/components/auth/RequireAuth.vue";

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRoute, useRouter } from "nuxt/app";
 import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
 import ChannelIcon from "@/components/icons/ChannelIcon.vue";
 import TagIcon from "@/components/icons/TagIcon.vue";
@@ -72,11 +72,11 @@ const filterValues = ref<SearchEventValues>(
 );
 
 const channelLabel = computed(() => {
-  return getChannelLabel(filterValues.value.channels);
+  return getChannelLabel(filterValues.value.channels || []);
 });
 
 const tagLabel = computed(() => {
-  return getTagLabel(filterValues.value.tags);
+  return getTagLabel(filterValues.value.tags || []);
 });
 
 const showLocationSearchBarAndDistanceButtons = computed(() => {
@@ -215,6 +215,9 @@ const toggleShowMainFilters = () => {
 };
 
 const toggleSelectedChannel = (channel: string) => {
+  if (!filterValues.value.channels) {
+    filterValues.value.channels = [];
+  }
   const index = filterValues.value.channels.indexOf(channel);
   if (index === -1) {
     filterValues.value.channels.push(channel);
@@ -225,6 +228,9 @@ const toggleSelectedChannel = (channel: string) => {
 };
 
 const toggleSelectedTag = (tag: string) => {
+  if (!filterValues.value.tags) {
+    filterValues.value.tags = [];
+  }
   const index = filterValues.value.tags.indexOf(tag);
   if (index === -1) {
     filterValues.value.tags.push(tag);

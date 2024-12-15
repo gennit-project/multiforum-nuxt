@@ -9,6 +9,7 @@ import NotificationComponent from "@/components/NotificationComponent.vue";
 import type { EditAccountSettingsFormValues } from "@/types/User";
 import type { UserUpdateInput } from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";
+import { useRoute } from "nuxt/app";
 
 const route = useRoute();
 
@@ -77,6 +78,7 @@ async function submit() {
     update: userUpdateInput.value,
   });
   await refetchUser({
+    // @ts-ignore
     username: usernameVar.value,
   });
 }

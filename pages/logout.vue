@@ -1,5 +1,5 @@
 <script setup>
-import { useRouter } from "vue-router";
+import { useRouter } from "nuxt/app";
 import { onMounted } from "vue";
 
 const router = useRouter();
