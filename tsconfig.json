@@ -27,6 +27,7 @@
       "node",
       "vite/client",
       "@nuxt/types",
+      "@nuxt/typescript-runtime",
       "@types/node",
     ],
     "paths": {

@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
   ],
   nitro: {
-    preset: "node",
+    preset: "vercel",
   },
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
@@ -65,7 +65,7 @@ export default defineNuxtConfig({
   ssr: true,
   typescript: {
     strict: false,
-    shim: false,
+    shim: true,
     typeCheck: false,
   },
   vite: {
@@ -73,7 +73,6 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         "@": path.resolve(__dirname),
-        "#app": path.resolve(__dirname),
         "@/components": path.resolve(__dirname, "components"),
         "fast-deep-equal": "fast-deep-equal/es6/index.js",
       },
@@ -84,4 +83,5 @@ export default defineNuxtConfig({
       },
     },
   },
+  
 });
