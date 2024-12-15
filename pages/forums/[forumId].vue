@@ -15,7 +15,7 @@ import { useIsMobile } from "@/composables/useIsMobile";
 
 const route = useRoute();
 const router = useRouter();
-const isMobile = useIsMobile()
+const isMobile = useIsMobile();
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes("forums-forumId-discussions-discussionId")
@@ -127,7 +127,7 @@ if (!channelId.value) {
         :show-create-button="true"
       >
         <ChannelTabs
-          class="block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
+          class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
           :vertical="false"
           :show-counts="true"
           :admin-list="adminList"
@@ -141,8 +141,7 @@ if (!channelId.value) {
           class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            v-if="isMobile"
-            class="mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            class="md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"

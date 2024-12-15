@@ -2,10 +2,13 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 
 export function useIsMobile() {
-  const isMobile = ref(false)
+  // Start with true if viewport < 768px
+  const isMobile = ref(import.meta.server ? true : window.innerWidth < 768)
 
   function updateWidth() {
-    isMobile.value = import.meta.client ? window.innerWidth < 768 : false
+    if (import.meta.client) {
+      isMobile.value = window.innerWidth < 768
+    }
   }
 
   onMounted(() => {
