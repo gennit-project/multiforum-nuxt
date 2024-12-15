@@ -32,19 +32,19 @@ const {
   error: getChannelError,
   onResult: onGetChannelResult,
 } = useQuery(
-  GET_CHANNEL, 
+  GET_CHANNEL,
   {
     uniqueName: channelId,
     // Using luxon, round down to the nearest hour
     now: DateTime.local().startOf("hour").toISO(),
   },
   {
-    fetchPolicy: 'cache-first'
+    fetchPolicy: "cache-first",
   }
 );
 
 const channel = computed(() => {
-  const channel = getChannelResult.value?.channels?.[0]
+  const channel = getChannelResult.value?.channels?.[0];
   if ((getChannelLoading.value && !channel) || getChannelError.value) {
     return null;
   }
@@ -132,13 +132,14 @@ if (!channelId.value) {
           :route="route"
           :channel="channel"
           :desktop="true"
-      /></ChannelHeaderDesktop>
+        />
+      </ChannelHeaderDesktop>
       <div v-if="channel" class="w-full flex justify-center">
         <article
           class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="mb-2 block md:hidden w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            class="mb-2 block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:hidden !md:hidden"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
@@ -155,7 +156,9 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
-          <div class="w-full relative max-w-screen-2xl flex-1 focus:outline-none">
+          <div
+            class="w-full relative max-w-screen-2xl flex-1 focus:outline-none"
+          >
             <div
               class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
