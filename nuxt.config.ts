@@ -73,7 +73,6 @@ export default defineNuxtConfig({
     resolve: {
       alias: {
         "@": path.resolve(__dirname),
-        "@/components": path.resolve(__dirname, "components"),
         "fast-deep-equal": "fast-deep-equal/es6/index.js",
       },
     },
