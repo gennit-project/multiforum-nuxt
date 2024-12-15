@@ -26,45 +26,67 @@ const props = defineProps({
 });
 const route = useRoute();
 
+const channelId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
+
 const createCommentDefaultValues: CreateEditCommentFormValues = {
   text: "",
   isRootComment: true,
   depth: 1,
 };
 
-const createFormValues = ref<CreateEditCommentFormValues>(createCommentDefaultValues);
+const createFormValues = ref<CreateEditCommentFormValues>(
+  createCommentDefaultValues
+);
 
-const createCommentInput = computed(() => [{
-  isRootComment: true,
-  text: createFormValues.value.text || "",
-  CommentAuthor: {
-    User: {
-      connect: {
-        where: {
-          node: { username: usernameVar.value },
+const createCommentInput = computed(() => [
+  {
+    isRootComment: true,
+    text: createFormValues.value.text || "",
+    CommentAuthor: {
+      User: {
+        connect: {
+          where: {
+            node: { username: usernameVar.value },
+          },
         },
       },
     },
-  },
-  Event: {
-    connect: {
-      where: {
-        node: { id: props.event?.id },
+    Event: {
+      connect: {
+        where: {
+          node: { id: props.event?.id },
+        },
+      },
+    },
+    Channel: {
+      connect: {
+        where: {
+          node: { uniqueName: channelId.value },
+        },
+      },
+    },
+    UpvotedByUsers: {
+      connect: {
+        where: { node: { username: usernameVar.value } },
       },
     },
   },
-  UpvotedByUsers: {
-    connect: {
-      where: { node: { username: usernameVar.value } },
-    },
-  },
-}]);
+]);
 
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
 
 // Mutation for creating a comment
-const { mutate: createComment, error: createCommentError, onDone } = useMutation(CREATE_COMMENT, {
+const {
+  mutate: createComment,
+  error: createCommentError,
+  onDone,
+} = useMutation(CREATE_COMMENT, {
   errorPolicy: "all",
   update(cache, result) {
     const newComment: Comment = result.data?.createComments?.comments[0];
@@ -82,9 +104,13 @@ const { mutate: createComment, error: createCommentError, onDone } = useMutation
       variables: eventCommentsQueryVariables,
     });
 
-    const existingEventCommentsData = readEventCommentsQueryResult?.getEventComments || null;
+    const existingEventCommentsData =
+      readEventCommentsQueryResult?.getEventComments || null;
 
-    const newRootComments = [newComment, ...(existingEventCommentsData?.Comments || [])];
+    const newRootComments = [
+      newComment,
+      ...(existingEventCommentsData?.Comments || []),
+    ];
 
     cache.writeQuery({
       query: GET_EVENT_COMMENTS,
@@ -134,7 +160,9 @@ onDone(() => {
 });
 function handleCreateComment() {
   if (!props.event) {
-    console.warn("Could not create the comment because there is no event in the create root comment form");
+    console.warn(
+      "Could not create the comment because there is no event in the create root comment form"
+    );
     return;
   }
   createCommentLoading.value = true;
@@ -144,8 +172,6 @@ function handleCreateComment() {
 function handleUpdateComment(event: string) {
   createFormValues.value.text = event;
 }
-
-
 </script>
 
 <template>

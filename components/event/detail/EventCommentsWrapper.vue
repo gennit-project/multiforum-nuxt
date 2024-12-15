@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { PropType } from "vue";
-import type {
-  Event,
-  Comment as CommentType,
-} from "@/__generated__/graphql";
+import type { Event, Comment as CommentType } from "@/__generated__/graphql";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
@@ -45,7 +42,7 @@ const props = defineProps({
   },
 });
 
-const route = useRoute()
+const route = useRoute();
 
 const eventId = computed(() => props.event?.id);
 
@@ -67,7 +64,16 @@ const createCommentDefaultValues = {
   parentCommentId: "",
 };
 
-const createFormValues = ref<CreateEditCommentFormValues>(createCommentDefaultValues);
+const createFormValues = ref<CreateEditCommentFormValues>(
+  createCommentDefaultValues
+);
+
+const channelId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
 
 const createCommentInput = computed(() => ({
   isRootComment: false,
@@ -76,6 +82,15 @@ const createCommentInput = computed(() => ({
       where: {
         node: {
           id: props.event?.id,
+        },
+      },
+    },
+  },
+  Channel: {
+    connect: {
+      where: {
+        node: {
+          uniqueName: channelId.value,
         },
       },
     },
@@ -119,7 +134,10 @@ function updateCreateReplyCommentInput(event: CreateEditCommentFormValues) {
   createFormValues.value = event;
 }
 
-function updateCommentSectionQueryResult(input: { cache: any; commentToDeleteId: string }) {
+function updateCommentSectionQueryResult(input: {
+  cache: any;
+  commentToDeleteId: string;
+}) {
   const { cache, commentToDeleteId } = input;
   const readQueryResult = cache.readQuery({
     query: GET_EVENT_COMMENTS,

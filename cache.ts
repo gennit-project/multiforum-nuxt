@@ -79,6 +79,9 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
         }
       }
     },
+    CommentsAggregate: {
+      keyFields: false,
+    },
     Event: {
       keyFields: ["id"],
       merge: true,

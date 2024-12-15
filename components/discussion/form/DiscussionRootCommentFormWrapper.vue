@@ -73,6 +73,15 @@ const createCommentInput = computed(() => {
         },
       },
     },
+    Channel: {
+      connect: {
+        where: {
+          node: {
+            uniqueName: props.discussionChannel?.channelUniqueName,
+          },
+        },
+      },
+    },
     UpvotedByUsers: {
       connect: {
         where: {
