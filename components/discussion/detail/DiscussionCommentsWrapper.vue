@@ -259,11 +259,11 @@ const decrementCommentCount = (cache: any) => {
     data: {
       ...readDiscussionChannelQueryResult,
       getCommentSection: {
-        ...readDiscussionChannelQueryResult.getCommentSection,
+        ...readDiscussionChannelQueryResult?.getCommentSection,
         DiscussionChannel: {
           ...existingDiscussionChannelData,
           CommentsAggregate: {
-            ...existingDiscussionChannelData.CommentsAggregate,
+            ...existingDiscussionChannelData?.CommentsAggregate,
             count: Math.max(0, existingCommentAggregate - 1),
           },
         },

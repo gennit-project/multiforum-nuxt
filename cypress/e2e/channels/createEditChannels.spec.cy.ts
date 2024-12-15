@@ -37,7 +37,7 @@ describe("Basic channel operations", () => {
       .clear()
       .type(TEST_DESCRIPTION_2);
 
-    cy.get('input[data-testid="tags-input"]').click();
+    cy.get('input[data-testid="tag-picker"]').click();
     cy.get(`span[data-testid="tag-picker-${TEST_TAG}"]`).click();
 
     cy.get("button").contains("Save").click();
