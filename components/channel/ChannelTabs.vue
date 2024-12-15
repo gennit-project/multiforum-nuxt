@@ -52,11 +52,11 @@ watch(
   () => route.params,
   (to) => {
     forumId.value = to.forumId;
-  },
+  }
 );
 
 const loggedInUsername = computed(() => {
-  return usernameVar.value || '';
+  return usernameVar.value || "";
 });
 
 const tabRoutes = computed(() => {
@@ -70,7 +70,9 @@ const tabRoutes = computed(() => {
   return routes;
 });
 
-const iconSize = computed(() => (props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"));
+const iconSize = computed(() =>
+  props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"
+);
 
 const tabs = computed((): Tab[] => {
   const baseTabs: Tab[] = [
@@ -98,7 +100,9 @@ const tabs = computed((): Tab[] => {
   ];
 
   const adminList = props.channel.Admins.map((user) => user.username || "");
-  const modList = props.channel.Moderators.map((modProfile) => modProfile.displayName);
+  const modList = props.channel.Moderators.map(
+    (modProfile) => modProfile.displayName
+  );
   const isAdmin = adminList.includes(loggedInUsername.value);
   const isMod = modList.includes(modProfileNameVar.value);
 
@@ -127,9 +131,16 @@ const tabs = computed((): Tab[] => {
 </script>
 
 <template>
-  <div>
+  <div
+    :class="{
+      'hidden md:block': desktop,
+      'block md:hidden': !desktop,
+    }"
+  >
     <nav
-      :class="vertical ? 'text-md flex flex-col' : 'flex space-x-2 pt-1 text-sm'"
+      :class="
+        vertical ? 'text-md flex flex-col' : 'flex space-x-2 pt-1 text-sm'
+      "
       aria-label="Tabs"
     >
       <TabButton
@@ -143,10 +154,7 @@ const tabs = computed((): Tab[] => {
         :show-count="showCounts && !!tab.countProperty"
         :count="tab.countProperty ? channel[tab.countProperty]?.count : 0"
       >
-        <component
-          :is="tab.icon"
-          :class="iconSize"
-        />
+        <component :is="tab.icon" :class="iconSize" />
       </TabButton>
     </nav>
   </div>

@@ -139,12 +139,13 @@ if (!channelId.value) {
           class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="mb-2 block w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:hidden !md:hidden"
+            class="mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
             :route="route"
             :channel="channel"
+            :desktop="false"
           />
           <div v-if="showDiscussionTitle" class="flex w-full justify-center">
             <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
