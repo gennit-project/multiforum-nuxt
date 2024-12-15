@@ -11,11 +11,11 @@ import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import { useRoute, useRouter } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { DateTime } from "luxon";
-import { useDisplay } from "vuetify";
+import { useIsMobile } from "@/composables/useIsMobile";
 
 const route = useRoute();
 const router = useRouter();
-const { smAndDown } = useDisplay();
+const isMobile = useIsMobile()
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes("forums-forumId-discussions-discussionId")
@@ -141,7 +141,7 @@ if (!channelId.value) {
           class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            v-show="smAndDown"
+            v-if="isMobile"
             class="mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
