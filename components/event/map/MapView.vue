@@ -5,7 +5,7 @@ import { useRouter, useRoute } from "nuxt/app";
 import { useDisplay } from "vuetify";
 import EventPreview from "../list/EventPreview.vue";
 import EventList from "../list/EventList.vue";
-import EventMap from "./Map.vue";
+import EventMap, { type MarkerMap } from "./Map.vue";
 import PreviewContainer from "../list/PreviewContainer.vue";
 import CloseButton from "../../CloseButton.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
@@ -71,7 +71,7 @@ const filterValues: Ref<SearchEventValues> = ref(
 // Watch route to update filter values when route changes
 watch(
   () => route.query,
-  (query) => {
+  () => {
     filterValues.value = getFilterValuesFromParams({
       route,
       channelId: props.channelId,
@@ -138,8 +138,8 @@ const sendToPreview = async (eventId: string, eventLocationId: string) => {
 
 // Data functions and properties from `data` and `methods` section
 // const highlightedMarker = ref(null);
-const mobileMarkerMap = ref<any>({});
-const desktopMarkerMap = ref<any>({});
+const mobileMarkerMap = ref<MarkerMap>({ markers: {} });
+const desktopMarkerMap = ref<MarkerMap>({ markers: {} });
 const mobileMap = ref<any>({});
 const desktopMap = ref<any>({});
 const colorLocked = ref(false);
@@ -206,7 +206,12 @@ const filterByTag = (tag: string) => {
   updateFilters({ tags: [tag] });
 };
 
-const setMarkerData = (data: any) => {
+type SetMarkerDataInput = {
+  map: any;
+  markerMap: MarkerMap;
+};
+
+const setMarkerData = (data: SetMarkerDataInput) => {
   mobileMap.value = data.map;
   mobileMarkerMap.value = data.markerMap;
 
@@ -224,20 +229,31 @@ const setMarkerData = (data: any) => {
 //   desktopMap.value.setCenter(coords);
 // };
 
-const highlightEventOnMap = ({
-  eventId,
-  eventLocationId,
-  eventData,
-  clickedMapMarker,
-  markerMap,
-  map,
-}: any) => {
+type HighlightEventInput = {
+  eventId: string;
+  eventLocationId: string;
+  eventData: EventData;
+  clickedMapMarker: boolean;
+  markerMap: MarkerMap;
+  map: any;
+};
+
+const highlightEventOnMap = (input: HighlightEventInput) => {
+  const {
+    eventId,
+    eventLocationId,
+    eventData,
+    clickedMapMarker,
+    markerMap,
+    map,
+  } = input;
   if (eventId) {
     if (
-      markerMap[eventLocationId] &&
-      markerMap[eventLocationId].events[eventId]
+      markerMap.markers[eventLocationId] &&
+      markerMap.markers[eventLocationId].events &&
+      markerMap.markers[eventLocationId].events[eventId]
     ) {
-      selectedEvent.value = markerMap[eventLocationId].events[eventId];
+      selectedEvent.value = markerMap.markers[eventLocationId].events[eventId];
     } else if (eventData) {
       selectedEvent.value = eventData;
     } else {
@@ -245,17 +261,17 @@ const highlightEventOnMap = ({
     }
   }
 
-  if (markerMap[eventLocationId]) {
-    markerMap[eventLocationId].marker.setIcon({
+  if (markerMap.markers[eventLocationId]) {
+    markerMap.markers[eventLocationId].marker.setIcon({
       url: highlightedPlaceIcon,
-      scaledSize: { width: 20, height: 20 },
+      scaledSize: { width: 20, height: 20, equals: () => false },
     });
 
     const openSpecificInfowindow = () => {
       const eventTitle =
-        markerMap[eventLocationId].events[highlightedEventId.value].title;
+        markerMap.markers[eventLocationId].events[highlightedEventId.value].title;
       const eventLocation =
-        markerMap[eventLocationId].events[highlightedEventId.value]
+        markerMap.markers[eventLocationId].events[highlightedEventId.value]
           .locationName;
 
       let infowindowContent = `<b>${eventTitle}</b>`;
@@ -263,29 +279,29 @@ const highlightEventOnMap = ({
       if (eventLocation) {
         infowindowContent = `<div data-testid="infowindow" style="text-align:center"><b>${eventTitle}</b></div></div><div style="text-align:center">at ${eventLocation}</div>`;
       }
-      markerMap.infowindow.setContent(infowindowContent);
-      markerMap.infowindow.open({
-        anchor: markerMap[eventLocationId].marker,
+      markerMap.infowindow?.setContent(infowindowContent);
+      markerMap.infowindow?.open({
+        anchor: markerMap.markers[eventLocationId].marker,
         map,
         shouldFocus: false,
       });
     };
 
-    const numberOfEvents = markerMap[eventLocationId].numberOfEvents;
+    const numberOfEvents = markerMap.markers[eventLocationId].numberOfEvents;
 
     const openGenericInfowindow = () => {
-      markerMap.infowindow.setContent(`${numberOfEvents} events`);
-      markerMap.infowindow.open({
-        anchor: markerMap[eventLocationId].marker,
+      markerMap.infowindow?.setContent(`${numberOfEvents} events`);
+      markerMap.infowindow?.open({
+        anchor: markerMap.markers[eventLocationId].marker,
         map,
         shouldFocus: false,
       });
     };
 
     const eventTitle =
-      markerMap[eventLocationId].events[highlightedEventId.value]?.title;
+      markerMap.markers[eventLocationId].events[highlightedEventId.value]?.title;
     const eventLocation =
-      markerMap[eventLocationId].events[highlightedEventId.value]?.locationName;
+      markerMap.markers[eventLocationId].events[highlightedEventId.value]?.locationName;
 
     if (clickedMapMarker && numberOfEvents > 1) {
       window.dispatchEvent(
@@ -297,7 +313,7 @@ const highlightEventOnMap = ({
       );
       openGenericInfowindow();
     } else if (clickedMapMarker && numberOfEvents === 1) {
-      const defaultEventId = Object.keys(markerMap[eventLocationId].events)[0];
+      const defaultEventId = Object.keys(markerMap.markers[eventLocationId].events)[0];
       highlightedEventId.value = defaultEventId;
 
       window.dispatchEvent(
@@ -324,7 +340,7 @@ const highlightEventOnMap = ({
     }
 
     if (numberOfEvents > 1) {
-      const selectedEventsObject = markerMap[eventLocationId].events;
+      const selectedEventsObject = markerMap.markers[eventLocationId].events;
       const getArrayFromObject = (obj: any) => {
         const ary = [];
         for (const key in obj) {
@@ -364,22 +380,23 @@ const highlightEvent = (
   sendToPreview(eventId, eventLocationId);
 };
 
-const unhighlightEventOnMap = (markerMap: any) => {
+const unhighlightEventOnMap = (markerMap: MarkerMap) => {
   if (!colorLocked.value) {
-    if (markerMap.infowindow) {
-      markerMap.infowindow.close();
-    }
-
-    if (markerMap[highlightedEventLocationId.value]) {
-      markerMap[highlightedEventLocationId.value].marker.setIcon({
+    markerMap.infowindow?.close();
+    const locationId = highlightedEventLocationId.value;
+    const markerData = markerMap.markers[locationId];
+    
+    if (markerData) {
+      markerData.marker?.setIcon({
         url: placeIcon,
-        scaledSize: { width: 20, height: 20 },
+        scaledSize: { width: 20, height: 20, equals: () => false },
       });
     }
     highlightedEventId.value = "";
     highlightedEventLocationId.value = "";
   }
 };
+
 
 const unhighlight = () => {
   unhighlightEventOnMap(mobileMarkerMap.value);
@@ -403,7 +420,7 @@ const closeMultipleEventPreview = () => {
 const openPreview = (event: EventData, openedFromMap = false) => {
   if (openedFromMap) {
     const eventsAtClickedLocation =
-      desktopMarkerMap.value[highlightedEventLocationId.value].numberOfEvents;
+      desktopMarkerMap.value.markers[highlightedEventLocationId.value].numberOfEvents;
     if (eventsAtClickedLocation > 1) {
       multipleEventPreviewIsOpen.value = true;
     } else {

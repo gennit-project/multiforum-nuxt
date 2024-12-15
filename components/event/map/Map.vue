@@ -6,6 +6,7 @@ import { config } from "@/config";
 import nightModeMapStyles from "@/components/event/map/nightModeMapStyles";
 import placeIcon from "@/assets/images/place-icon.svg";
 import { useTheme } from "@/composables/useTheme";
+import type { Event } from "@/__generated__/graphql";
 
 // The Google map requires that the styles have to be set
 // when the map is rendered and they can't change based on props.
@@ -16,22 +17,14 @@ import { useTheme } from "@/composables/useTheme";
 // appear to be un-highlighted due the duplicated and overlapping map
 // markers. So the workaround is to create two different maps
 // for desktop and mobile, which reference two different map divs.
-interface Event {
-  location: {
-    latitude: number;
-    longitude: number;
-  };
-  title: string;
-  id: string;
-}
 
-interface MarkerData {
+export interface MarkerData {
   marker: google.maps.Marker;
   events: { [key: string]: Event };
   numberOfEvents: number;
 }
 
-interface MarkerMap {
+export interface MarkerMap {
   markers: { [key: string]: MarkerData };
   infowindow?: google.maps.InfoWindow;
 }
@@ -226,7 +219,7 @@ const renderMap = async () => {
   }
 
   emit("setMarkerData", {
-    markerMap,
+    markerMap: markerMap,
     map: map.value,
   });
 };
