@@ -52,12 +52,11 @@ describe("Filter events by tag", () => {
 
   const CHANNEL_VIEW = `${Cypress.env("baseUrl")}/forums/phx_music/events/`;
 
-
   it("in a channel view, filters events by tag", () => {
     const searchTerm = "trivia";
 
-    cy.visit(CHANNEL_VIEW)
-      .wait(1500);
+    cy.visit(CHANNEL_VIEW).wait(1500);
+    cy.get('button[data-testid="toggle-main-filters-button"]').click();
     cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the trivia tag
@@ -70,10 +69,9 @@ describe("Filter events by tag", () => {
     cy.get('ul[data-testid="event-list"]').find("li").contains(searchTerm);
   });
 
-
   it("in a channel view, when filtering by two tags, shows events that have at least one of the tags", () => {
-    cy.visit(CHANNEL_VIEW)
-      .wait(1500);
+    cy.visit(CHANNEL_VIEW).wait(1500);
+    cy.get('button[data-testid="toggle-main-filters-button"]').click();
     cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the newYears tag

@@ -274,7 +274,7 @@ const { smAndDown } = useDisplay();
           </div>
           <SearchBar
             class="flex-1"
-            data-testid="event-drawer-search-bar"
+            :test-id="'event-search-bar'"
             :initial-value="filterValues.searchInput"
             :search-placeholder="'Search'"
             :full-width="true"
@@ -468,6 +468,7 @@ const { smAndDown } = useDisplay();
     <div class="flex items-center justify-end">
       <button
         v-if="allowHidingMainFilters"
+        data-testid="toggle-main-filters-button"
         class="mr-4 text-blue-500"
         @click="toggleShowMainFilters"
       >

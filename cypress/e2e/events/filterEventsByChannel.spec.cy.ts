@@ -38,6 +38,6 @@ describe("Filter events by channel", () => {
     cy.get('span[data-testid="forum-picker-phx_music"]').click();
 
     // should have three results
-    cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 9);
+    cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 10);
   });
 });

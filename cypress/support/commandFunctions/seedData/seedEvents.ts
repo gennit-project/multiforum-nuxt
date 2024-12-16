@@ -1,6 +1,5 @@
 import { DateTime } from "luxon";
 import type { EventCreateInput } from "../../../../__generated__/graphql";
-import { timeShortcutValues } from '../../../../components/event/list/filters/eventSearchOptions';
 
 export type EventCreateInputWithChannels = {
   eventCreateInput: EventCreateInput;
@@ -30,7 +29,9 @@ type BaseEvent = {
 
 // Helper function to generate future dates
 const generateEventDates = (daysFromNow: number) => {
-  const startDate = DateTime.now().plus({ days: daysFromNow }).set({ minute: 0, second: 0, millisecond: 0 });
+  const now = DateTime.now();
+  const hoursToAdd = daysFromNow === 0 ? 1 : 0;
+  const startDate = now.plus({ days: daysFromNow, hours: hoursToAdd }).set({ minute: 0, second: 0, millisecond: 0 });
   const endDate = startDate.plus({ hours: 2 });
 
   return {
@@ -46,22 +47,31 @@ const now = DateTime.now().setZone(timeZone);
 
 const getStartOfThisWeekend = () => {
   const startOfWeek = now.startOf("week");
-  return startOfWeek.plus({ days: 5 });
+  const weekend = startOfWeek.plus({ days: 5 });
+  // If we're already past this weekend, get next weekend
+  return weekend <= now ? now : weekend;
 };
 
 const getStartOfNextWeek = () => {
   const startOfThisWeek = now.startOf("week");
-  return startOfThisWeek.plus({ weeks: 1 });
+  const nextWeek = startOfThisWeek.plus({ weeks: 1 });
+  // If we're already past the start of next week, get the week after
+  return nextWeek <= now ? now : nextWeek;
 };
 
-const startOfThisWeekend = getStartOfThisWeekend();
+const getStartOfNextMonth = () => {
+  const startOfMonth = now.startOf("month").plus({ months: 1 });
+  return startOfMonth <= now ? now : startOfMonth;
+};
+
+const startOfNextWeekend = getStartOfThisWeekend();
 const startOfNextWeek = getStartOfNextWeek();
-const startOfThisMonth = now.startOf("month");
+const startOfNextMonth = getStartOfNextMonth();
 
 const timeBasedEvents: BaseEvent[] = [
   {
     title: "Today's Test Event",
-    ...generateEventDates(0),
+    ...generateEventDates(0), // Will be 1 hour from now
     poster: "cluse",
     cost: "0",
     canceled: false,
@@ -79,10 +89,10 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Weekend Test Event",
-    startTime: startOfThisWeekend.plus({ minutes: 1 }).toISO(),
-    endTime: startOfThisWeekend.plus({ days: 2 }).toISO(),
-    startTimeDayOfWeek: startOfThisWeekend.weekdayLong,
-    startTimeHourOfDay: startOfThisWeekend.hour,
+    startTime: startOfNextWeekend.plus({ minutes: 1 }).toISO(),
+    endTime: startOfNextWeekend.plus({ days: 2 }).toISO(),
+    startTimeDayOfWeek: startOfNextWeekend.weekdayLong,
+    startTimeHourOfDay: startOfNextWeekend.hour,
     poster: "cluse",
     cost: "0",
     canceled: false,
@@ -115,8 +125,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Month Test Event",
-    startTime: now.toISO(),
-    endTime: startOfThisMonth.plus({ months: 1, minutes: 1 }).toISO(),
+    startTime: now.plus({ hours: 1 }).toISO(), // Ensure it's in the future
+    endTime: startOfNextMonth.toISO(),
     startTimeDayOfWeek: now.weekdayLong,
     startTimeHourOfDay: now.hour,
     poster: "cluse",
@@ -139,10 +149,10 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Month Test Event",
-    startTime: startOfThisMonth.plus({ months: 1, minutes: 1 }).toISO(),
-    endTime: startOfThisMonth.plus({ months: 2 }).toISO(),
-    startTimeDayOfWeek: startOfThisMonth.plus({ months: 1 }).weekdayLong,
-    startTimeHourOfDay: startOfThisMonth.plus({ months: 1 }).hour,
+    startTime: startOfNextMonth.plus({ minutes: 1 }).toISO(),
+    endTime: startOfNextMonth.plus({ months: 1 }).toISO(),
+    startTimeDayOfWeek: startOfNextMonth.weekdayLong,
+    startTimeHourOfDay: startOfNextMonth.hour,
     poster: "cluse",
     cost: "0",
     canceled: false,

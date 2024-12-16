@@ -30,7 +30,7 @@ const props = defineProps({
   },
   testId: {
     type: String,
-    default: "search-bar",
+    default: "",
   },
 });
 
