@@ -6,20 +6,20 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="mt-auto">
+  <div class="mt-auto w-full">
     <div
-      class="flex text-xs w-full items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
+      class="flex text-xs items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
     >
       <nuxt-link
         :to="`/privacy-policy`"
-        class="flex cursor-pointer underline"
+        class="flex cursor-pointer underline text-white"
       >
         Privacy Policy
       </nuxt-link>
 
       <nuxt-link
         :to="`/terms-of-use`"
-        class="flex cursor-pointer underline"
+        class="flex cursor-pointer underline text-white"
       >
         Terms of Use
       </nuxt-link>

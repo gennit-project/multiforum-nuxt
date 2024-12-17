@@ -16,10 +16,6 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
-import type {
-  HandleEditFeedbackInput,
-  HandleFeedbackInput,
-} from "./Comment.vue";
 import { timeAgo, ALLOWED_ICONS } from "@/utils";
 import { modProfileNameVar } from "@/cache";
 
@@ -37,10 +33,6 @@ const props = defineProps({
 const emit = defineEmits([
   "showCopiedLinkNotification",
   "clickReport",
-  "clickFeedback",
-  "clickUndoFeedback",
-  "clickEditFeedback",
-  "handleViewFeedback",
   "openModProfile",
 ]);
 const route = useRoute();
@@ -89,17 +81,6 @@ const { discussionId, eventId, forumId, feedbackId } = route.params;
 
 const commentMenuItems = computed(() => {
   let out: any[] = [];
-
-  if (discussionId) {
-    out = out.concat([
-      {
-        label: "View Feedback",
-        value: "",
-        event: "handleViewFeedback",
-        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-      },
-    ]);
-  }
   const loggedInUserAuthoredComment =
     props.comment?.CommentAuthor?.displayName === loggedInModName.value;
 
@@ -127,33 +108,7 @@ const commentMenuItems = computed(() => {
         icon: ALLOWED_ICONS.REPORT,
       },
     ]);
-
-    if (discussionId) {
-      if (props.comment.FeedbackCommentsAggregate?.count === 0) {
-        if (!loggedInUserAuthoredComment)
-          out.push({
-            label: "Give Feedback",
-            value: "",
-            event: "clickFeedback",
-            icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-          });
-      } else {
-        out.push({
-          label: "Undo Feedback",
-          value: "",
-          event: "clickUndoFeedback",
-          icon: ALLOWED_ICONS.UNDO,
-        });
-        out.push({
-          label: "Edit Feedback",
-          value: "",
-          event: "clickEditFeedback",
-          icon: ALLOWED_ICONS.EDIT,
-        });
-      }
-    }
   }
-
   out.push({
     label: "Copy Link",
     value: "",
@@ -250,29 +205,6 @@ function updateText(text: string) {
 function handleReport() {
   emit("clickReport", props.comment);
 }
-
-function handleFeedback(input: HandleFeedbackInput) {
-  emit("clickFeedback", input);
-}
-
-function handleUndoFeedback(input: HandleFeedbackInput) {
-  emit("clickUndoFeedback", input);
-}
-
-function handleEditFeedback(input: HandleEditFeedbackInput) {
-  emit("clickEditFeedback", input);
-}
-
-function handleViewFeedback(feedbackId: string) {
-  router.push({
-    name: "forums-forumId-discussions-discussionId-commentFeedback-commentId",
-    params: {
-      forumId: route.params.forumId,
-      discussionId: route.params.discussionId,
-      commentId: feedbackId,
-    },
-  });
-}
 </script>
 
 <template>
@@ -319,30 +251,9 @@ function handleViewFeedback(feedbackId: string) {
         @copy-link="copyLink"
         @handle-edit="handleEdit"
         @click-report="handleReport"
-        @click-feedback="
-          () => {
-            handleFeedback({
-              commentData: comment,
-              parentCommentId: '',
-            });
-          }
-        "
-        @click-undo-feedback="
-          () => {
-            handleUndoFeedback({ commentData: comment, parentCommentId: '' });
-          }
-        "
-        @handle-view-feedback="handleViewFeedback(comment.id)"
         @handle-delete="
           () => {
             showDeleteCommentModal = true;
-          }
-        "
-        @click-edit-feedback="
-          () => {
-            handleEditFeedback({
-              commentData: comment,
-            });
           }
         "
       >
@@ -383,24 +294,9 @@ function handleViewFeedback(feedbackId: string) {
       <VoteButtons
         class="ml-3"
         :comment-data="comment"
-        :show-downvote="comment.CommentAuthor?.displayName !== loggedInModName"
+        :show-downvote="false"
         :show-upvote="false"
         @open-mod-profile="$emit('openModProfile')"
-        @click-feedback="
-          () => {
-            handleFeedback({
-              commentData: comment,
-              parentCommentId: '',
-            });
-          }
-        "
-        @click-undo-feedback="
-          () => {
-            handleUndoFeedback({ commentData: comment, parentCommentId: '' });
-          }
-        "
-        @click-edit-feedback="$emit('clickEditFeedback')"
-        @view-feedback="handleViewFeedback(comment.id)"
       />
     </div>
     <WarningModal

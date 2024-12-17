@@ -56,7 +56,6 @@ const contextOfFeedbackComment = computed(() => {
   return null;
 });
 const feedbackOnComment = "forums-forumId-discussions-commentFeedback-discussionId-commentId";
-const feedbackOnCommentFeedback= "forums-forumId-discussions-discussionId-commentFeedback-commentId";
 const commentPermalinkRoute = "forums-forumId-discussions-discussionId-comments-commentId"
 const feedbackOnDiscussionPermalink = "forums-forumId-discussions-feedback-discussionId-feedbackId";
 
@@ -72,22 +71,6 @@ const updateContextLink = () => {
         },
       };
     }
-    if (route.name === feedbackOnCommentFeedback) {
-        // If the comment is feedback on feedback, link to the original feedback.
-      if (!contextOfFeedbackComment.value) {
-        console.warn("No context of feedback comment found");
-        return "";
-      }
-      return {
-        name: feedbackOnDiscussionPermalink,
-        params: {
-          discussionId: route.params.discussionId,
-          commentId: contextOfFeedbackComment.value?.id || "",
-          forumId: route.params.forumId,
-          feedbackId: originalComment.value.id || "",
-        },
-      };
-    }
     if (route.name === feedbackOnDiscussionPermalink) {
         // If the comment is permalinked feedback on a comment, link to the original comment.
       if (!contextOfFeedbackComment.value) {
@@ -96,17 +79,6 @@ const updateContextLink = () => {
           params: {
             discussionId: route.params.discussionId,
             commentId: route.params.commentId,
-          },
-        };
-      } else {
-        // If the comment is permalinked feedback on feedback, link to the original feedback.
-        return {
-          name: feedbackOnDiscussionPermalink,
-          params: {
-            discussionId: route.params.discussionId,
-            commentId: contextOfFeedbackComment.value?.id || "",
-            forumId: route.params.forumId,
-            feedbackId: originalComment.value.id || "",
           },
         };
       }
