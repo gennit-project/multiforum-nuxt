@@ -170,7 +170,7 @@ if (!channelId.value) {
               </div>
               <div
                 v-if="channelId"
-                class="w-full md:w-3/12 p-0 bg-white dark:bg-gray-800"
+                class="w-full flex-1 p-0 bg-white dark:bg-gray-800"
               >
                 <ChannelSidebar
                   v-if="channel"

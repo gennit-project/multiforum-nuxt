@@ -8,8 +8,9 @@ export default defineComponent({
 <template>
   <div class="mt-auto w-full">
     <div
-      class="flex text-xs items-center justify-center gap-2 text-wrap bg-black p-4 text-white"
+      class="flex text-xs justify-center gap-2 text-wrap bg-black p-4 text-white"
     >
+    <span class="flex items-center gap-2">
       <nuxt-link
         :to="`/privacy-policy`"
         class="flex cursor-pointer underline text-white"
@@ -23,6 +24,7 @@ export default defineComponent({
       >
         Terms of Use
       </nuxt-link>
+    </span>
     </div>
     <div
       class="w-full text-xs items-center justify-center text-wrap bg-gray-800 p-4 text-white"
