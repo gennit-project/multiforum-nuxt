@@ -35,5 +35,8 @@ function close() {
         </v-card>
       </v-menu>
     </div>
+    <template #fallback>
+      <slot name="button" @close="close" />
+    </template>
   </client-only>
 </template>
