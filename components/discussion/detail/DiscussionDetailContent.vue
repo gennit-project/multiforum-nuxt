@@ -225,7 +225,6 @@ const handleSubmitFeedback = async () => {
   // Refetch the discussion so that the thumbs-down shows
   // that it's active, meaning the user has given feedback.
   refetchDiscussion();
-  // showFeedbackFormModal.value = false;
 };
 const handleFeedbackInput = (event: string) => {
   feedbackText.value = event;

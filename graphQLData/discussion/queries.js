@@ -160,7 +160,7 @@ export const GET_DISCUSSION = gql`
         Discussion {
           id
         }
-        CommentsAggregate {
+        CommentsAggregate(where: { isFeedbackComment: false })  {
           count
         }
       }

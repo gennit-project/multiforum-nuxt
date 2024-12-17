@@ -378,7 +378,7 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
           },
         });
       }
-
+      
       emit("incrementCommentCount", cache);
     },
   }
