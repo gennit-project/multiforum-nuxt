@@ -119,6 +119,7 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
       input: [
         {
           isRootComment: true
+          isFeedbackComment: true
           text: $text
           Channel: { connect: { where: { node: { uniqueName: $channelId } } } }
           CommentAuthor: {
@@ -134,6 +135,8 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
     ) {
       comments {
         id
+        isRootComment
+        isFeedbackComment
         createdAt
         Channel {
           uniqueName

@@ -223,7 +223,10 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
       }
     ) {
       id
-      CommentsAggregate(where: { isRootComment: true }) {
+      CommentsAggregate(where: { 
+        isRootComment: true
+        isFeedbackComment: false
+      }) {
         count
       }
     }

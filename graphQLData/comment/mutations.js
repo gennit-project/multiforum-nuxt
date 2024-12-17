@@ -269,6 +269,7 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
       input: [
         {
           isRootComment: true
+          isFeedbackComment: true
           text: $text
           CommentAuthor: {
             ModerationProfile: {
@@ -284,6 +285,8 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
     ) {
       comments {
         id
+        isRootComment
+        isFeedbackComment
         CommentAuthor {
           ... on ModerationProfile {
             displayName

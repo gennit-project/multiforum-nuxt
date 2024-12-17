@@ -26,7 +26,7 @@ import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.
 import Notification from "@/components/NotificationComponent.vue";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { usernameVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 
 const COMMENT_LIMIT = 50;
@@ -40,10 +40,6 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  loggedInUserModName: {
-    type: String,
-    required: true,
-  },
 });
 
 const route = useRoute();
@@ -51,6 +47,7 @@ const offset = ref(0);
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
+const loggedInUserModName = computed(() => modProfileNameVar.value);
 
 const {
   result: getDiscussionResult,
@@ -59,7 +56,7 @@ const {
   refetch: refetchDiscussion,
 } = useQuery(GET_DISCUSSION, {
   id: props.discussionId,
-  loggedInModName: props.loggedInUserModName,
+  loggedInModName: loggedInUserModName,
   channelUniqueName: channelId.value,
 });
 
@@ -90,7 +87,7 @@ const {
 } = useQuery(GET_DISCUSSION_COMMENTS, {
   discussionId: props.discussionId,
   channelUniqueName: channelId,
-  modName: props.loggedInUserModName,
+  modName: loggedInUserModName,
   offset: offset.value,
   limit: COMMENT_LIMIT,
   sort: commentSort,
@@ -210,7 +207,7 @@ const handleSubmitFeedback = async () => {
     console.error("No feedback text found.");
     return;
   }
-  if (!props.loggedInUserModName) {
+  if (!loggedInUserModName.value) {
     console.error("No mod name found.");
     return;
   }
@@ -221,7 +218,7 @@ const handleSubmitFeedback = async () => {
   await addFeedbackCommentToDiscussion({
     discussionId: props.discussionId,
     text: feedbackText.value,
-    modProfileName: props.loggedInUserModName,
+    modProfileName: loggedInUserModName.value,
     channelId: activeDiscussionChannel.value?.channelUniqueName,
     discussionChannelId: activeDiscussionChannel.value?.id,
   });

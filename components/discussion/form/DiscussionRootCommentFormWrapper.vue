@@ -52,6 +52,7 @@ const createFormValues = ref(createCommentDefaultValues);
 const createCommentInput = computed(() => {
   const input = {
     isRootComment: true,
+    isFeedbackComment: false,
     text: createFormValues.value.text || "",
     CommentAuthor: {
       User: {

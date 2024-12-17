@@ -46,6 +46,7 @@ const createFormValues = ref<CreateEditCommentFormValues>(
 const createCommentInput = computed(() => [
   {
     isRootComment: true,
+    isFeedbackComment: false,
     text: createFormValues.value.text || "",
     CommentAuthor: {
       User: {

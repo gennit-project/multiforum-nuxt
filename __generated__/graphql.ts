@@ -3081,6 +3081,7 @@ export type Comment = {
   deleted?: Maybe<Scalars['Boolean']['output']>;
   emoji?: Maybe<Scalars['JSON']['output']>;
   id: Scalars['ID']['output'];
+  isFeedbackComment?: Maybe<Scalars['Boolean']['output']>;
   isRootComment: Scalars['Boolean']['output'];
   text?: Maybe<Scalars['String']['output']>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -3978,6 +3979,7 @@ export type CommentCreateInput = {
   UpvotedByUsers?: InputMaybe<CommentUpvotedByUsersFieldInput>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
   emoji?: InputMaybe<Scalars['JSON']['input']>;
+  isFeedbackComment?: InputMaybe<Scalars['Boolean']['input']>;
   isRootComment: Scalars['Boolean']['input'];
   text?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5633,6 +5635,7 @@ export type CommentSort = {
   deleted?: InputMaybe<SortDirection>;
   emoji?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
+  isFeedbackComment?: InputMaybe<SortDirection>;
   isRootComment?: InputMaybe<SortDirection>;
   text?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
@@ -5774,6 +5777,7 @@ export type CommentUpdateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
   emoji?: InputMaybe<Scalars['JSON']['input']>;
+  isFeedbackComment?: InputMaybe<Scalars['Boolean']['input']>;
   isRootComment?: InputMaybe<Scalars['Boolean']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
   weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
@@ -6212,6 +6216,7 @@ export type CommentWhere = {
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isFeedbackComment?: InputMaybe<Scalars['Boolean']['input']>;
   isRootComment?: InputMaybe<Scalars['Boolean']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
   text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
