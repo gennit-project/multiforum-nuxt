@@ -32,7 +32,7 @@ const {
       <slot name="comment" :comment-data="commentResult.comments[0]" />
     </div>
     <div v-else>
-      <h2 class="mt-4 text-lg text-gray-500">Comment not found</h2>
+      <p class="mt-4 text-lg text-gray-500">Comment not found</p>
     </div>
   </div>
 </template>

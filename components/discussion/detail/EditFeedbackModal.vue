@@ -95,6 +95,7 @@ const body = "Are you sure you want to update your feedback?";
 
 <template>
   <GenericModal
+    :data-testid="'edit-feedback-modal'"
     :highlight-color="'red'"
     :title="title"
     :body="body"
@@ -103,7 +104,7 @@ const body = "Are you sure you want to update your feedback?";
     :primary-button-text="'Update'"
     :secondary-button-text="'Cancel'"
     @primary-button-click="handleEdit"
-    @secondary-button-click="$emit('close')"
+    @close="$emit('close')"
   >
     <template #icon>
       <i class="fas fa-pencil-alt text-white" />

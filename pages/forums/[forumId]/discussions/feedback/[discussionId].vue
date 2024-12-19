@@ -19,11 +19,11 @@ const PAGE_LIMIT = 10;
 const route = useRoute();
 
 const contextLink = ref("");
-const channelId = ref("");
-const discussionId = ref("");
-const commentId = ref("");
+const channelId = ref(typeof route.params.forumId === "string" ? route.params.forumId : "");
+const discussionId = ref(typeof route.params.discussionId === "string" ? route.params.discussionId : "");
+const commentId = ref(typeof route.params.commentId === "string" ? route.params.commentId : "");
 const offset = ref(0);
-const feedbackId = ref("");
+const feedbackId = ref(typeof route.params.feedbackId === "string" ? route.params.feedbackId : "");
 
 const {
   result: getDiscussionResult,
@@ -35,15 +35,15 @@ const {
   limit: PAGE_LIMIT,
   offset: offset,
   loggedInModName: modProfileNameVar.value,
+},
+{
+  fetchPolicy: "cache-first",
 });
 
 const commentToRemoveFeedbackFrom = ref(null);
 const commentToGiveFeedbackOn = ref<Comment | null>(null);
 
 const discussion = computed(() => {
-  if (getDiscussionError.value) {
-    return null;
-  }
   return getDiscussionResult.value?.discussions[0] || null;
 });
 
@@ -77,6 +77,8 @@ const { result: getCommentResult, error: getCommentError, loading: getCommentLoa
   limit: PAGE_LIMIT,
   offset: offset,
   loggedInModName: modProfileNameVar.value,
+},{
+  fetchPolicy: "cache-first",
 });
 
 const originalComment = computed(() => {
@@ -175,10 +177,10 @@ watch(() => route.params, updateParams, { immediate: true });
       <BackLink :link="`/forums/${channelId}/discussions/${discussion?.id}`" :data-testid="'discussion-detail-back-link'" />
     </div>
     <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">Feedback</h1>
-    <div v-if="getDiscussionLoading">Loading...</div>
+    <div v-if="getDiscussionLoading || getCommentLoading">Loading...</div>
     <ErrorBanner v-else-if="getDiscussionError" class="mt-2 px-4" :text="getDiscussionError.message" />
-    <PageNotFound v-else-if="!getDiscussionLoading && !getDiscussionError && !discussion" />
-    <div v-else>
+    <PageNotFound v-else-if="getDiscussionResult && !discussion" />
+    <div v-else-if="discussion">
       <p class="px-2">This page collects feedback on this discussion:</p>
       <div class="ml-2 flex flex-col gap-2 border-l pl-4">
         <h3 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">{{ discussion && discussion.title ? discussion.title : "[Deleted]" }}</h3>
@@ -209,5 +211,6 @@ watch(() => route.params, updateParams, { immediate: true });
         @update-comment-to-remove-feedback-from="commentToRemoveFeedbackFrom = $event"
       />
     </div>
+    
   </div>
 </template>

@@ -43,12 +43,17 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    dataTestid: {
+      type: String,
+      default: "",
+    },
   },
   setup() {},
 });
 </script>
 <template>
   <GenericModal
+    :data-testid="dataTestid"
     :highlight-color="'yellow'"
     :title="title"
     :body="body"

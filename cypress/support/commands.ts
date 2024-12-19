@@ -8,7 +8,9 @@ const AUTH_TOKEN_CACHE_KEY = "auth_token_cache";
 Cypress.Commands.add("loginWithCreateEventButton", loginWithButtonClick);
 
 Cypress.Commands.add("loginAsAdmin", () => {
-  const cachedTokenData = JSON.parse(localStorage.getItem(AUTH_TOKEN_CACHE_KEY));
+  const cachedTokenData = JSON.parse(
+    localStorage.getItem(AUTH_TOKEN_CACHE_KEY)
+  );
 
   if (cachedTokenData && cachedTokenData.expiresAt > Date.now()) {
     // If possible, use cached token to avoid rate limiting problems with the Auth0 API
@@ -50,12 +52,13 @@ Cypress.Commands.add("loginAsAdmin", () => {
   });
 });
 
-
 Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
   // Ensure the token is up-to-date before making the GraphQL request
   const getToken = () => {
     return cy.window().then((window) => {
-      const cachedTokenData = JSON.parse(window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY));
+      const cachedTokenData = JSON.parse(
+        window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY)
+      );
       if (cachedTokenData && cachedTokenData.expiresAt > Date.now()) {
         // Return the valid cached token
         return cachedTokenData.accessToken;
@@ -63,7 +66,9 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
 
       // If no valid cached token, refresh it using the login command
       return cy.loginAsAdmin().then(() => {
-        const newTokenData = JSON.parse(window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY));
+        const newTokenData = JSON.parse(
+          window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY)
+        );
         return newTokenData.accessToken;
       });
     });
@@ -71,34 +76,35 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
 
   // Retrieve the token and use it in the GraphQL request
   return getToken().then((token) => {
-    return cy.request({
-      method: "POST",
-      url: Cypress.env("graphqlUrl"),
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "content-type": "application/json",
-      },
-      body: {
-        query,
-        variables,
-      },
-      failOnStatusCode: false,
-    }).then((response) => {
-      // Log GraphQL errors if present
-      if (response.body.errors) {
-        console.error("GraphQL Error Response:", {
-          errors: response.body.errors,
-          status: response.status,
-          statusText: response.statusText,
-        });
-      }
+    return cy
+      .request({
+        method: "POST",
+        url: Cypress.env("graphqlUrl"),
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: {
+          query,
+          variables,
+        },
+        failOnStatusCode: false,
+      })
+      .then((response) => {
+        // Log GraphQL errors if present
+        if (response.body.errors) {
+          console.error("GraphQL Error Response:", {
+            errors: response.body.errors,
+            status: response.status,
+            statusText: response.statusText,
+          });
+        }
 
-      // Return the full response for backward compatibility
-      return response;
-    });
+        // Return the full response for backward compatibility
+        return response;
+      });
   });
 });
-
 
 Cypress.Commands.add("safetyCheck", () => {
   return cy
@@ -127,3 +133,18 @@ Cypress.Commands.add("seedDataForCypressTests", seedDataForCypressTests);
 
 // DELETING SEED DATA
 Cypress.Commands.add("dropDataForCypressTests", dropDataForCypressTests);
+
+let clipboardText = "";
+Cypress.Commands.add("getClipboardText", () => {
+  // Return a Cypress chainable by wrapping the value
+  return cy.wrap(clipboardText);
+});
+
+Cypress.Commands.add("writeClipboardText", () => {
+  cy.window().then((win) => {
+    win.navigator.clipboard.writeText = (text) => {
+      clipboardText = text;
+      return Promise.resolve();
+    };
+  });
+});

@@ -70,13 +70,13 @@ const thumbsDownMenuItems = computed(() => {
   if (props.downvoteActive) {
     items = items.concat([
       {
-        label: 'Undo feedback',
+        label: 'Undo Feedback',
         icon: ALLOWED_ICONS.UNDO,
         value: '',
         event: 'undoFeedback',
       },
       {
-        label: 'Edit feedback',
+        label: 'Edit Feedback',
         icon: ALLOWED_ICONS.EDIT,
         value: '',
         event: 'editFeedback',
@@ -85,7 +85,7 @@ const thumbsDownMenuItems = computed(() => {
   } else {
     items = items.concat([
       {
-        label: 'Give feedback',
+        label: 'Give Feedback',
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
         value: '',
         event: 'giveFeedback',
@@ -142,7 +142,7 @@ function viewFeedback() {
 
     <MenuButton
       v-if="showDownvote"
-      data-testid="thumbs-down-menu-button"
+      data-testid="comment-thumbs-down-menu-button"
       :items="thumbsDownMenuItems"
       @view-feedback="viewFeedback"
       @give-feedback="giveFeedback"

@@ -41,6 +41,7 @@ function updateFeedback(text: string) {
 
 <template>
   <GenericModal
+    :data-testid="'feedback-form-modal'"
     :highlight-color="'yellow'"
     :title="title"
     :body="body"

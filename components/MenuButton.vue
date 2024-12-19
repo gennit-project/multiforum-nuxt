@@ -107,6 +107,7 @@ const menuStyles = {
         </nuxt-link>
         <div
           v-else-if="item.event"
+          :data-testid="`${dataTestid}-item-${item.label}`"
           class="flex items-center block cursor-pointer px-4 py-2 text-sm"
           :class="['text-gray-700 dark:text-white']"
           @click="emitEvent(item?.event ?? '')"

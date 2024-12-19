@@ -247,6 +247,7 @@ function handleReport() {
         v-if="commentMenuItems.length > 0"
         id="commentMenu"
         class="flex items-center"
+        :data-testid="'feedback-comment-menu'"
         :items="commentMenuItems"
         @copy-link="copyLink"
         @handle-edit="handleEdit"
@@ -300,6 +301,7 @@ function handleReport() {
       />
     </div>
     <WarningModal
+      :data-testid="'delete-comment-modal'"
       :title="'Delete Comment'"
       :body="'Are you sure you want to delete this comment?'"
       :open="showDeleteCommentModal"

@@ -9,6 +9,10 @@ import {
 import ErrorBanner from '@/components/ErrorBanner.vue';
 
 defineProps({
+  dataTestid: {
+    type: String,
+    default: "",
+  },
   title: {
     type: String,
     required: true,
@@ -56,6 +60,7 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
   <client-only>
   <TransitionRoot as="template" :show="open">
     <Dialog
+      :data-testid="dataTestid"
       as="div"
       class="relative"
       style="z-index: 1000"
@@ -133,6 +138,7 @@ const emit = defineEmits(['close', 'primaryButtonClick']);
               >
                 <button
                   type="button"
+                  :data-testid="`${dataTestid}-primary-button`"
                   :disabled="primaryButtonDisabled"
                   class="max-h-10"
                   :class="[

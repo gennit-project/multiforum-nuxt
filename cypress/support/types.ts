@@ -42,6 +42,8 @@ declare global {
       safetyCheck(): Chainable<Element>;
       dropDataForCypressTests(): Chainable<Element>;
       seedDataForCypressTests(input: SeedDataInput): Chainable<Element>;
+      getClipboardText: () => Chainable<string>;
+      writeClipboardText: () => Chainable<Element>;
     }
   }
 }
