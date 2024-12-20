@@ -492,7 +492,9 @@ const inputStyles =
             />
           </template>
         </FormRow>
-        <FormRow section-title="Location">
+        <FormRow section-title="Location"
+         :description="'Events with an address can appear in search results by location.'"
+        >
           <template #icon>
             <LocationIcon class="float-right h-6 w-6" />
           </template>

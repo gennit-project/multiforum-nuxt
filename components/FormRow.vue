@@ -7,6 +7,10 @@ export default defineComponent({
       type: String,
       default: "",
     },
+    description: {
+      type: String,
+      default: "",
+    },
     required: {
       type: Boolean,
       default: false,
@@ -28,6 +32,12 @@ export default defineComponent({
         class="ml-1 text-red-400"
       >*</span>
     </label>
+    <p
+      v-if="description"
+      class="mt-1 text-sm leading-5 text-gray-500 dark:text-gray-400"
+    >
+      {{ description }}
+    </p>
     <div>
       <slot name="content" />
     </div>
