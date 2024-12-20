@@ -250,24 +250,22 @@ export default defineComponent({
       error: updateEventError,
       loading: updateEventLoading,
       onDone,
-    } = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, () => {
-      return {
-        errorPolicy: "all",
-      };
-    });
+    } = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS);
 
     onDone(() => {
       /*
         Redirect to the event detail page in the first
         channel that the event was submitted to.
       */
-      router.push({
-        name: "forums-forumId-events-eventId",
-        params: {
-          forumId: formValues.value.selectedChannels[0],
-          eventId,
-        },
-      });
+     if (!updateEventError.value) {
+        router.push({
+          name: "forums-forumId-events-eventId",
+          params: {
+            forumId: formValues.value.selectedChannels[0],
+            eventId,
+          },
+        });
+      }
     });
 
     return {
@@ -326,7 +324,7 @@ export default defineComponent({
         :event-loading="getEventLoading"
         :update-event-loading="updateEventLoading"
         :get-event-error="getEventError"
-        :update-post-error="updateEventError"
+        :update-event-error="updateEventError"
         :form-values="formValues"
         @submit="submit"
         @update-form-values="updateFormValues"
