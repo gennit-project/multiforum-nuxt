@@ -23,6 +23,7 @@ import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue"
 import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute, useRouter } from "nuxt/app";
+import InfoBanner from "@/components/InfoBanner.vue";
 
 const props = defineProps({
   eventData: {
@@ -243,7 +244,7 @@ function handleViewFeedback() {
     name: "forums-forumId-events-feedback-eventId",
     params: {
       eventId: eventId.value,
-      forumId: channelId.value
+      forumId: channelId.value,
     },
   });
 }
@@ -265,176 +266,175 @@ function handleFeedbackInput(event: string) {
       class="mb-2"
       :text="cancelEventError.message"
     />
-  
-  <div
-    class="flex justify-between px-4 text-sm text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
-  >
-    <ul class="space-y-2">
-      <li class="hanging-indent flex items-start">
-        <div class="mr-3 h-5 w-5">
-          <CalendarIcon />
-        </div>
-        <span>{{
-          `${getFormattedDateString(eventData.startTime)}, ${
-            eventData.isAllDay
-              ? "all day"
-              : getDuration(eventData.startTime, eventData.endTime)
-          }`
-        }}</span>
-      </li>
-      <li
-        v-if="eventData.virtualEventUrl"
-        class="hanging-indent flex items-start"
-      >
-        <div class="mr-3 h-5 w-5">
-          <LinkIcon />
-        </div>
-        <a
-          class="cursor-pointer underline break-all flex-1"
-          target="_blank"
-          rel="noreferrer"
-          :href="eventData.virtualEventUrl"
+
+    <div
+      class="flex justify-between px-4 text-sm text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
+    >
+      <ul class="space-y-2">
+        <li class="hanging-indent flex items-start">
+          <div class="mr-3 h-5 w-5">
+            <CalendarIcon />
+          </div>
+          <span>{{
+            `${getFormattedDateString(eventData.startTime)}, ${
+              eventData.isAllDay
+                ? "all day"
+                : getDuration(eventData.startTime, eventData.endTime)
+            }`
+          }}</span>
+        </li>
+        <li
+          v-if="eventData.virtualEventUrl"
+          class="hanging-indent flex items-start"
         >
-          {{ eventData.virtualEventUrl }}
-        </a>
-      </li>
-      <li v-if="eventData.address" class="hanging-indent flex items-start">
-        <div class="mr-3 h-5 w-5">
-          <LocationIcon />
-        </div>
-        <div class="flex">
-          <span>{{ eventData.address }}</span>
-          <span>
-            <ClipboardIcon
-              class="ml-1 h-4 w-4 cursor-pointer"
-              @click="copyAddress"
+          <div class="mr-3 h-5 w-5">
+            <LinkIcon />
+          </div>
+          <a
+            class="cursor-pointer underline break-all flex-1"
+            target="_blank"
+            rel="noreferrer"
+            :href="eventData.virtualEventUrl"
+          >
+            {{ eventData.virtualEventUrl }}
+          </a>
+        </li>
+        <li v-if="eventData.address" class="hanging-indent flex items-start">
+          <div class="mr-3 h-5 w-5">
+            <LocationIcon />
+          </div>
+          <div class="flex">
+            <span>{{ eventData.address }}</span>
+            <span>
+              <ClipboardIcon
+                class="ml-1 h-4 w-4 cursor-pointer"
+                @click="copyAddress"
+              />
+            </span>
+          </div>
+        </li>
+        <li
+          v-if="!eventData.free && eventData.cost && eventData.cost !== '0'"
+          class="hanging-indent flex items-start"
+        >
+          <div class="mr-3 h-5 w-5">
+            <i class="fa-solid fa-ticket h-5" />
+          </div>
+          <span>{{ eventData.cost }}</span>
+        </li>
+        <li
+          v-if="eventData.isHostedByOP && eventData.Poster"
+          class="hanging-indent flex items-start"
+        >
+          <div class="mr-3 h-5 w-5">
+            <i class="fa-regular fa-user h-5" />
+          </div>
+          <nuxt-link
+            :to="{
+              name: 'u-username',
+              params: { username: eventData.Poster.username },
+            }"
+          >
+            Hosted by
+            <UsernameWithTooltip
+              v-if="eventData.Poster.username"
+              :is-admin="isAdmin || false"
+              :username="eventData.Poster.username"
+              :src="eventData.Poster.profilePicURL ?? ''"
+              :display-name="eventData.Poster.displayName || ''"
+              :comment-karma="eventData.Poster.commentKarma ?? 0"
+              :discussion-karma="eventData.Poster.discussionKarma ?? 0"
+              :account-created="eventData.Poster.createdAt"
             />
-          </span>
-        </div>
-      </li>
-      <li
-        v-if="!eventData.free && eventData.cost && eventData.cost !== '0'"
-        class="hanging-indent flex items-start"
-      >
-        <div class="mr-3 h-5 w-5">
-          <i class="fa-solid fa-ticket h-5" />
-        </div>
-        <span>{{ eventData.cost }}</span>
-      </li>
-      <li
-        v-if="eventData.isHostedByOP && eventData.Poster"
-        class="hanging-indent flex items-start"
-      >
-        <div class="mr-3 h-5 w-5">
-          <i class="fa-regular fa-user h-5" />
-        </div>
-        <nuxt-link
-          :to="{
-            name: 'u-username',
-            params: { username: eventData.Poster.username },
-          }"
+          </nuxt-link>
+        </li>
+      </ul>
+
+      <div>
+        <MenuButton
+          v-if="showMenuButtons && eventData && menuItems.length > 0"
+          :data-testid="'event-menu-button'"
+          :items="menuItems"
+          @copy-link="copyLink"
+          @handle-edit="
+            router.push(`/forums/${channelId}/events/edit/${eventId}`)
+          "
+          @handle-delete="confirmDeleteIsOpen = true"
+          @handle-cancel="confirmCancelIsOpen = true"
+          @handle-report="showReportEventModal = true"
+          @handle-feedback="showFeedbackFormModal = true"
+          @handle-view-feedback="handleViewFeedback"
         >
-          Hosted by
-          <UsernameWithTooltip
-            v-if="eventData.Poster.username"
-            :is-admin="isAdmin || false"
-            :username="eventData.Poster.username"
-            :src="eventData.Poster.profilePicURL ?? ''"
-            :display-name="eventData.Poster.displayName || ''"
-            :comment-karma="eventData.Poster.commentKarma ?? 0"
-            :discussion-karma="eventData.Poster.discussionKarma ?? 0"
-            :account-created="eventData.Poster.createdAt"
+          <EllipsisHorizontal
+            class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
           />
-        </nuxt-link>
-      </li>
-    </ul>
-   
-    <div>
-      <MenuButton
-        v-if="showMenuButtons && eventData && menuItems.length > 0"
-        :data-testid="'event-menu-button'"
-        :items="menuItems"
-        @copy-link="copyLink"
-        @handle-edit="
-          router.push(`/forums/${channelId}/events/edit/${eventId}`)
+        </MenuButton>
+      </div>
+
+      <Notification
+        :show="showAddressCopiedNotification"
+        :title="'Copied to clipboard!'"
+        @close-notification="showAddressCopiedNotification = false"
+      />
+      <Notification
+        :show="showCopiedLinkNotification"
+        :title="'Copied to clipboard!'"
+        @close-notification="showCopiedLinkNotification = false"
+      />
+      <WarningModal
+        :title="'Delete Event'"
+        :body="'Are you sure you want to delete this event?'"
+        :open="confirmDeleteIsOpen"
+        :loading="deleteEventLoading"
+        @close="confirmDeleteIsOpen = false"
+        @primary-button-click="deleteEvent"
+      />
+      <WarningModal
+        v-if="confirmCancelIsOpen"
+        :title="'Cancel Event'"
+        :body="'Are you sure you want to cancel this event? This action cannot be undone.'"
+        :open="confirmCancelIsOpen"
+        :primary-button-text="'Yes, cancel the event'"
+        :secondary-button-text="'No'"
+        :loading="cancelEventLoading"
+        :error="cancelEventError?.message"
+        @close="confirmCancelIsOpen = false"
+        @primary-button-click="cancelEvent"
+      />
+      <GenericFeedbackFormModal
+        :open="showFeedbackFormModal"
+        :error="addFeedbackCommentToEventError?.message"
+        :loading="addFeedbackCommentToEventLoading"
+        @update-feedback="handleFeedbackInput"
+        @close="showFeedbackFormModal = false"
+        @primary-button-click="handleSubmitFeedback"
+      />
+      <Notification
+        :show="showFeedbackSubmittedSuccessfully"
+        :title="'Your feedback has been recorded. Thank you!'"
+        @close-notification="showFeedbackSubmittedSuccessfully = false"
+      />
+      <OpenIssueModal
+        :open="showReportEventModal"
+        :event-title="eventData.title"
+        @close="showReportEventModal = false"
+        @report-submitted-successfully="
+          () => {
+            showSuccessfullyReported = true;
+            showReportEventModal = false;
+          }
         "
-        @handle-delete="confirmDeleteIsOpen = true"
-        @handle-cancel="confirmCancelIsOpen = true"
-        @handle-report="showReportEventModal = true"
-        @handle-feedback="showFeedbackFormModal = true"
-        @handle-view-feedback="handleViewFeedback"
-      >
-        <EllipsisHorizontal
-          class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
-        />
-      </MenuButton>
+      />
+      <Notification
+        :show="showSuccessfullyReported"
+        :title="'Your report was submitted successfully.'"
+        @close-notification="showSuccessfullyReported = false"
+      />
     </div>
-    
-    <Notification
-      :show="showAddressCopiedNotification"
-      :title="'Copied to clipboard!'"
-      @close-notification="showAddressCopiedNotification = false"
+    <InfoBanner
+      class="mx-4"
+      v-if="eventData.virtualEventUrl"
+      :text="'The official event page is on an external website. Refer to the official event page for the most complete, correct and up-to-date information.'"
     />
-    <Notification
-      :show="showCopiedLinkNotification"
-      :title="'Copied to clipboard!'"
-      @close-notification="showCopiedLinkNotification = false"
-    />
-    <WarningModal
-      :title="'Delete Event'"
-      :body="'Are you sure you want to delete this event?'"
-      :open="confirmDeleteIsOpen"
-      :loading="deleteEventLoading"
-      @close="confirmDeleteIsOpen = false"
-      @primary-button-click="deleteEvent"
-    />
-    <WarningModal
-      v-if="confirmCancelIsOpen"
-      :title="'Cancel Event'"
-      :body="'Are you sure you want to cancel this event? This action cannot be undone.'"
-      :open="confirmCancelIsOpen"
-      :primary-button-text="'Yes, cancel the event'"
-      :secondary-button-text="'No'"
-      :loading="cancelEventLoading"
-      :error="cancelEventError?.message"
-      @close="confirmCancelIsOpen = false"
-      @primary-button-click="cancelEvent"
-    />
-    <GenericFeedbackFormModal
-      :open="showFeedbackFormModal"
-      :error="addFeedbackCommentToEventError?.message"
-      :loading="addFeedbackCommentToEventLoading"
-      @update-feedback="handleFeedbackInput"
-      @close="showFeedbackFormModal = false"
-      @primary-button-click="handleSubmitFeedback"
-    />
-    <Notification
-      :show="showFeedbackSubmittedSuccessfully"
-      :title="'Your feedback has been recorded. Thank you!'"
-      @close-notification="showFeedbackSubmittedSuccessfully = false"
-    />
-    <OpenIssueModal
-      :open="showReportEventModal"
-      :event-title="eventData.title"
-      @close="showReportEventModal = false"
-      @report-submitted-successfully="
-        () => {
-          showSuccessfullyReported = true;
-          showReportEventModal = false;
-        }
-      "
-    />
-    <Notification
-      :show="showSuccessfullyReported"
-      :title="'Your report was submitted successfully.'"
-      @close-notification="showSuccessfullyReported = false"
-    />
-  </div>
-  <div id="disclaimer" class="bg-blue-100 mx-4 dark:bg-blue-transparent p-2 rounded border border-blue-300 dark:border-blue-600">
-    <p class="text-xs text-gray-500 dark:text-blue-500">
-      *Disclaimer: This event is not affiliated with the University of
-      Waterloo.
-    </p>
-  </div>
   </div>
 </template>
