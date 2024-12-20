@@ -264,7 +264,7 @@ const addToOutlook = () => {
             />
             <ErrorBanner
               v-if="eventIsInThePast"
-              class="mb-2 mt-2"
+              class="mx-4 mb-2 mt-2"
               :text="'This event is in the past.'"
             />
             <ErrorBanner

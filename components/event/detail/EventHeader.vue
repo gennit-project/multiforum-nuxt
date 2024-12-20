@@ -268,7 +268,7 @@ function handleFeedbackInput(event: string) {
     />
 
     <div
-      class="flex justify-between px-4 text-sm text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
+      class="flex justify-between text-sm text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
     >
       <ul class="space-y-2">
         <li class="hanging-indent flex items-start">
