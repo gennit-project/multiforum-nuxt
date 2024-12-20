@@ -8,11 +8,7 @@ import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
-import {
-  modProfileNameVar,
-  usernameVar,
-  sideNavIsOpenVar,
-} from "@/cache";
+import { modProfileNameVar, usernameVar, sideNavIsOpenVar } from "@/cache";
 
 defineEmits(["toggleDropdown"]);
 
@@ -77,7 +73,8 @@ const isOnMapPage = computed(() => {
             <ArrowUpBoldBox :size="38" class="text-blue dark:text-blue-500" />
             <span class="font-bold dark:text-white">Topical</span>
             <div
-              class="text-xs py-0.5 px-1 border border-blue-500 text-blue-500 rounded-md"
+              class="text-xs py-0.5 px-1 rounded-md"
+              style="border: 1px solid #1d9bd1; color: #1d9bd1"
             >
               ALPHA
             </div>
