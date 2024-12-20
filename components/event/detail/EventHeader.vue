@@ -303,14 +303,12 @@ function handleFeedbackInput(event: string) {
           <div class="mr-3 h-5 w-5">
             <LocationIcon />
           </div>
-          <div class="flex">
-            <span>{{ eventData.address }}</span>
-            <span>
-              <ClipboardIcon
-                class="ml-1 h-4 w-4 cursor-pointer"
-                @click="copyAddress"
-              />
-            </span>
+          <div class="inline">
+            {{ eventData.address }}
+            <ClipboardIcon
+              class="ml-1 h-4 w-4 cursor-pointer inline-block align-text-bottom"
+              @click="copyAddress"
+            />
           </div>
         </li>
         <li
