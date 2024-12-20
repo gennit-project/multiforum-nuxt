@@ -202,14 +202,15 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           class="mb-4 max-h-48 rounded-lg block md:hidden"
         >
         <div>
-          <span
+          <router-link
+            :to="detailLink"
             class="text-md flex-wrap cursor-pointer font-bold text-blue-500 hover:underline"
           >
             <HighlightedSearchTerms
               :text="event.title"
               :search-input="searchInput"
             />
-          </span>
+          </router-link>
 
           <span
             v-if="event.canceled"
