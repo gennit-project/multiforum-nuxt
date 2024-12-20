@@ -434,6 +434,7 @@ const openPreview = (event: EventData, openedFromMap = false) => {
 };
 
 const isClientSide = typeof window !== "undefined";
+
 </script>
 
 <template>
@@ -564,7 +565,7 @@ const isClientSide = typeof window !== "undefined";
       />
       <PreviewContainer
         :is-open="multipleEventPreviewIsOpen"
-        :header="'Events at this Location'"
+        :header="`Events at ${selectedEvent?.locationName || 'this Location'}`"
         @close-preview="closeMultipleEventPreview"
       >
         <EventList
