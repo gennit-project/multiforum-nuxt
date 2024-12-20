@@ -26,7 +26,7 @@ export default defineComponent({
 <template>
   <div>
     <div
-      class="flex flex-row md:hidden pb-4 items-center justify-center gap-4 bg-black"
+      class="flex flex-row md:hidden pb-4 items-center justify-center gap-4 bg-black mb-2"
     >
       <AvatarComponent
         class="flex justify-center align-items shadow-sm dark:border-gray-800 pt-2"

@@ -111,7 +111,7 @@ module.exports = {
       colors: {
         "red-transparent": "rgba(255, 0, 0, 0.1)",
         "green-transparent": "rgba(0, 255, 0, 0.1)",
-        "blue-transparent": "rgba(162, 248, 255, 0.2)",
+        "blue-transparent": "rgba(0, 0, 255, 0.1)",
         "blue-transparent-lighter": "rgba(162, 248, 252, 0.25)",
         "yellow-transparent": "rgba(255, 255, 0, 0.1)",
       },

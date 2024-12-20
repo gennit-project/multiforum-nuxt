@@ -348,6 +348,7 @@ function handleFeedbackInput(event: string) {
         </nuxt-link>
       </li>
     </ul>
+   
     <div>
       <MenuButton
         v-if="showMenuButtons && eventData && menuItems.length > 0"
@@ -368,6 +369,7 @@ function handleFeedbackInput(event: string) {
         />
       </MenuButton>
     </div>
+    
     <Notification
       :show="showAddressCopiedNotification"
       :title="'Copied to clipboard!'"
@@ -427,6 +429,12 @@ function handleFeedbackInput(event: string) {
       :title="'Your report was submitted successfully.'"
       @close-notification="showSuccessfullyReported = false"
     />
+  </div>
+  <div id="disclaimer" class="bg-blue-100 mx-4 dark:bg-blue-transparent p-2 rounded border border-blue-300 dark:border-blue-600">
+    <p class="text-xs text-gray-500 dark:text-blue-500">
+      *Disclaimer: This event is not affiliated with the University of
+      Waterloo.
+    </p>
   </div>
   </div>
 </template>
