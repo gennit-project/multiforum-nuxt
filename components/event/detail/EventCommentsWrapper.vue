@@ -7,7 +7,7 @@ import CommentSection from "@/components/comments/CommentSection.vue";
 import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
-import { usernameVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 
 const COMMENT_LIMIT = 50;
@@ -166,6 +166,8 @@ function incrementCommentCount(cache: any) {
     query: GET_EVENT,
     variables: {
       id: props.event?.id,
+      channelUniqueName: channelId.value,
+      loggedInModName: loggedInUserModName.value,
     },
   });
 
@@ -178,6 +180,8 @@ function incrementCommentCount(cache: any) {
     query: GET_EVENT,
     variables: {
       id: props.event?.id,
+      channelUniqueName: channelId.value,
+      loggedInModName: loggedInUserModName.value,
     },
     data: {
       ...readEventQueryResult,
@@ -192,11 +196,15 @@ function incrementCommentCount(cache: any) {
   });
 }
 
+const loggedInUserModName = computed(() => modProfileNameVar.value);
+
 function decrementCommentCount(cache: any) {
   const readEventQueryResult = cache.readQuery({
     query: GET_EVENT,
     variables: {
       id: props.event?.id,
+      channelUniqueName: channelId.value,
+      loggedInModName: loggedInUserModName.value,
     },
   });
 
@@ -209,6 +217,8 @@ function decrementCommentCount(cache: any) {
     query: GET_EVENT,
     variables: {
       id: props.event?.id,
+      channelUniqueName: channelId.value,
+      loggedInModName: loggedInUserModName.value,
     },
     data: {
       ...readEventQueryResult,

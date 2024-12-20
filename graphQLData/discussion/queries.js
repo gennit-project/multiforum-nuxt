@@ -121,7 +121,7 @@ export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
   query getDiscussion(
     $id: ID!
-    $loggedInModName: String!
+    $loggedInModName: String
     $channelUniqueName: String!
   ) {
     discussions(where: { id: $id }) {

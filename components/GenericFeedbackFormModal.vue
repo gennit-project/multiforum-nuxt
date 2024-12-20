@@ -60,7 +60,7 @@ function updateFeedback(text: string) {
   >
     <template #icon>
       <HandThumbDownIcon
-        class="h-6 w-6 text-yellow-600 opacity-100"
+        class="h-6 w-6 text-yellow-600 dark:text-yellow-400 opacity-100"
         aria-hidden="true"
       />
     </template>

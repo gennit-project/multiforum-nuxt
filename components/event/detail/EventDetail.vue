@@ -20,6 +20,7 @@ import EventRootCommentFormWrapper from "@/components/event/detail/EventRootComm
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
 import { useRoute } from "nuxt/app";
+import { modProfileNameVar } from "@/cache";
 
 const COMMENT_LIMIT = 50;
 
@@ -67,6 +68,8 @@ const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
 
+const loggedInUserModName = computed(() => modProfileNameVar.value);
+
 const {
   load: loadEvent,
   result: eventResult,
@@ -74,7 +77,8 @@ const {
   loading: eventLoading,
 } = useLazyQuery(GET_EVENT, {
   id: eventId,
-  channelUniqueName: channelId.value 
+  channelUniqueName: channelId.value,
+  loggedInModName: loggedInUserModName.value,
 });
 
 const event = computed(() => eventResult.value?.events?.[0] || null);

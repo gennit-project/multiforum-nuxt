@@ -10,7 +10,7 @@ import { GET_EVENT } from "@/graphQLData/event/queries";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import type { Event, Comment } from "@/__generated__/graphql";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
-import { usernameVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 
 const COMMENT_LIMIT = 50;
 const props = defineProps({
@@ -81,6 +81,7 @@ const createCommentInput = computed(() => [
 
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
+const loggedInUserModName = computed(() => modProfileNameVar.value);
 
 // Mutation for creating a comment
 const {
@@ -128,7 +129,11 @@ const {
     // Update aggregate count from GET_EVENT
     const readEventQueryResult: any = cache.readQuery({
       query: GET_EVENT,
-      variables: { id: props.event?.id },
+      variables: { 
+        id: props.event?.id,
+        channelUniqueName: channelId.value,
+        loggedInModName: loggedInUserModName.value,
+      },
     });
 
     const existingEventData = readEventQueryResult?.events[0] || null;
@@ -136,7 +141,11 @@ const {
 
     cache.writeQuery({
       query: GET_EVENT,
-      variables: { id: props.event?.id },
+      variables: { 
+        id: props.event?.id,
+        channelUniqueName: channelId.value,
+        loggedInModName: loggedInUserModName.value,
+      },
       data: {
         ...readEventQueryResult,
         events: [

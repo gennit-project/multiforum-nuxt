@@ -59,9 +59,25 @@ export const EVENT_FIELDS = gql`
 
 // get event by ID
 export const GET_EVENT = gql`
-  query getEvent($id: ID!, $channelUniqueName: String!) {
+  query getEvent(
+    $id: ID!, 
+    $channelUniqueName: String!
+    $loggedInModName: String
+    ) {
     events(where: { id: $id }) {
       ...EventFields
+      FeedbackCommentsAggregate {
+        count
+      }
+      FeedbackComments(
+        where: {
+          CommentAuthorConnection: {
+            ModerationProfile: { node: { displayName: $loggedInModName } }
+          }
+        }
+      ) {
+        id
+      }
       Poster {
         username
         createdAt

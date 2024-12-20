@@ -136,22 +136,20 @@ const menuItems = computed(() => {
   let out: MenuItem[] = [];
 
   if (props.discussion) {
-    if (route.name !== "DiscussionFeedback") {
-      out = out.concat([
-        {
-          label: "View Feedback",
-          event: "handleViewFeedback",
-          icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-          value: props.discussion.id,
-        },
-        {
-          label: "Copy Link",
-          event: "copyLink",
-          icon: ALLOWED_ICONS.COPY_LINK,
-          value: props.discussion.id,
-        },
-      ]);
-    }
+    out = out.concat([
+      {
+        label: "View Feedback",
+        event: "handleViewFeedback",
+        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+        value: props.discussion.id,
+      },
+      {
+        label: "Copy Link",
+        event: "copyLink",
+        icon: ALLOWED_ICONS.COPY_LINK,
+        value: props.discussion.id,
+      },
+    ]);
 
     if (props.discussion?.Author?.username === usernameVar.value) {
       out.push({
@@ -173,14 +171,13 @@ const menuItems = computed(() => {
         icon: ALLOWED_ICONS.REPORT,
         value: props.discussion.id,
       });
-      if (route.name !== "DiscussionFeedback") {
-        out.push({
-          label: "Give Feedback",
-          event: "handleFeedback",
-          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-          value: props.discussion.id,
-        });
-      }
+
+      out.push({
+        label: "Give Feedback",
+        event: "handleFeedback",
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+        value: props.discussion.id,
+      });
     }
   }
   return out;
@@ -197,7 +194,9 @@ const authorIsMod = computed(
 <template>
   <div class="mb-4">
     <div class="mt-2 flex justify-between">
-      <div class="flex flex-wrap items-center space-x-2 text-xs dark:text-white">
+      <div
+        class="flex flex-wrap items-center space-x-2 text-xs dark:text-white"
+      >
         <AvatarComponent
           :text="discussion?.Author?.username ?? '[Deleted]'"
           :src="discussion?.Author?.profilePicURL ?? ''"
@@ -241,9 +240,9 @@ const authorIsMod = computed(
         @handle-view-feedback="
           router.push({
             name: 'forums-forumId-discussions-feedback-discussionId',
-            params: { 
+            params: {
               forumId: defaultChannel,
-              discussionId: discussion.id 
+              discussionId: discussion.id,
             },
           })
         "

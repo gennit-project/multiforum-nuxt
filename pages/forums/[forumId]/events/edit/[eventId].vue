@@ -20,6 +20,7 @@ import type {
   Event,
   Tag as TagData,
 } from "@/__generated__/graphql";
+import { modProfileNameVar } from "@/cache";
 
 export default defineComponent({
   name: "EditEvent",
@@ -41,7 +42,7 @@ export default defineComponent({
     const eventId: string | string[] = route.params.eventId;
 
     const dataLoaded = ref(false);
-
+    const loggedInUserModName = computed(() => modProfileNameVar.value);
     const {
       result: getEventResult,
       loading: getEventLoading,
@@ -50,6 +51,7 @@ export default defineComponent({
     } = useQuery(GET_EVENT, {
       id: eventId,
       channelUniqueName: channelId.value,
+      loggedInModName: loggedInUserModName.value,
     });
 
     const event = computed(() => {
