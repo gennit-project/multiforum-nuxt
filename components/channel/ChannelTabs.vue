@@ -131,12 +131,7 @@ const tabs = computed((): Tab[] => {
 </script>
 
 <template>
-  <div
-    :class="{
-      'hidden md:block': desktop,
-      'block md:hidden': !desktop,
-    }"
-  >
+  <div>
     <nav
       :class="
         vertical ? 'text-md flex flex-col' : 'flex space-x-2 pt-1 text-sm'
