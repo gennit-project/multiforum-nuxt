@@ -49,8 +49,8 @@ const offset = ref(0);
 
 // Instead of a computed property, make it a ref
 const eventId = ref(
-  typeof route.params.eventId === "string" 
-    ? route.params.eventId 
+  typeof route.params.eventId === "string"
+    ? route.params.eventId
     : props.issueEventId || ""
 );
 
@@ -58,9 +58,8 @@ const eventId = ref(
 watch(
   () => route.params.eventId,
   (newEventId) => {
-    eventId.value = typeof newEventId === "string" 
-      ? newEventId 
-      : props.issueEventId || "";
+    eventId.value =
+      typeof newEventId === "string" ? newEventId : props.issueEventId || "";
   }
 );
 
@@ -94,7 +93,7 @@ const {
   eventId: eventId,
   offset: offset.value,
   limit: COMMENT_LIMIT,
-  sort: commentSort.value
+  sort: commentSort.value,
 });
 
 watch(commentSort, () =>
@@ -111,8 +110,8 @@ const {
   error: getEventRootCommentAggregateError,
   loading: getEventRootCommentAggregateLoading,
 } = useLazyQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
-  eventId: eventId
-})
+  eventId: eventId,
+});
 
 watch(eventId, (newEventId) => {
   if (newEventId) {
@@ -178,7 +177,15 @@ const channelsExceptCurrent = computed(() => {
 
 const eventIsInThePast = computed(() => {
   if (!event.value) return false;
-  return DateTime.fromISO(event.value.startTime) < DateTime.now();
+  return DateTime.fromISO(event.value.endTime) < DateTime.now();
+});
+
+const eventHasStarted = computed(() => {
+  if (!event.value) return false;
+  return (
+    DateTime.fromISO(event.value.startTime) < DateTime.now() &&
+    !eventIsInThePast.value
+  );
 });
 
 const originalPoster = computed(() => event.value?.Poster?.username || "");
@@ -239,7 +246,7 @@ const addToOutlook = () => {
     <div class="mb-10 flex w-full justify-center rounded-lg">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
-          <p v-if="(eventLoading && !event)" class="px-4 lg:px-10">Loading...</p>
+          <p v-if="eventLoading && !event" class="px-4 lg:px-10">Loading...</p>
           <ErrorBanner
             v-else-if="eventError"
             class="px-4 lg:px-10"
@@ -251,6 +258,10 @@ const addToOutlook = () => {
             v-else-if="event"
             class="dark:bg-dark-700 mx-auto flex flex-col gap-4 pt-8"
           >
+            <InfoBanner
+              v-if="eventHasStarted"
+              :text="'This event has started.'"
+            />
             <ErrorBanner
               v-if="eventIsInThePast"
               class="mb-2 mt-2"
@@ -264,9 +275,7 @@ const addToOutlook = () => {
             />
 
             <div
-              v-if="
-                route.name === 'map-search-eventId' && event
-              "
+              v-if="route.name === 'map-search-eventId' && event"
               class="dark:text-gray-100 md:flex md:items-center md:justify-between"
             >
               <div class="min-w-0 flex-1">
