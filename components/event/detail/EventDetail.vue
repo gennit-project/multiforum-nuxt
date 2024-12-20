@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch, onMounted } from "vue";
 import Tag from "@/components/TagComponent.vue";
-import { useLazyQuery } from "@vue/apollo-composable";
+import { useLazyQuery, useQuery } from "@vue/apollo-composable";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import {
   GET_EVENT_COMMENTS,
@@ -70,11 +70,11 @@ const channelId = computed(() =>
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 
 const {
-  load: loadEvent,
   result: eventResult,
   error: eventError,
   loading: eventLoading,
-} = useLazyQuery(GET_EVENT, {
+  refetch: loadEvent,
+} = useQuery(GET_EVENT, {
   id: eventId,
   channelUniqueName: channelId.value,
   loggedInModName: loggedInUserModName.value,
@@ -85,11 +85,11 @@ const event = computed(() => eventResult.value?.events?.[0] || null);
 const commentSort = computed(() => getSortFromQuery(route.query));
 
 const {
-  load: loadEventComments,
   result: getEventCommentsResult,
   loading: getEventCommentsLoading,
   fetchMore: fetchMoreComments,
-} = useLazyQuery(GET_EVENT_COMMENTS, {
+  refetch: loadEventComments,
+} = useQuery(GET_EVENT_COMMENTS, {
   eventId: eventId,
   offset: offset.value,
   limit: COMMENT_LIMIT,
@@ -105,24 +105,16 @@ const comments = computed<Comment[]>(
 );
 
 const {
-  load: loadEventRootCommentAggregate,
   result: getEventRootCommentAggregateResult,
   error: getEventRootCommentAggregateError,
   loading: getEventRootCommentAggregateLoading,
-} = useLazyQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
+  refetch: loadEventRootCommentAggregate,
+} = useQuery(GET_EVENT_ROOT_COMMENT_AGGREGATE, {
   eventId: eventId,
 });
 
 watch(eventId, (newEventId) => {
   if (newEventId) {
-    loadEvent();
-    loadEventComments();
-    loadEventRootCommentAggregate();
-  }
-});
-
-onMounted(() => {
-  if (eventId.value) {
     loadEvent();
     loadEventComments();
     loadEventRootCommentAggregate();
