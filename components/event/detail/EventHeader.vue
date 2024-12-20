@@ -315,10 +315,10 @@ function handleFeedbackInput(event: string) {
           v-if="!eventData.free && eventData.cost && eventData.cost !== '0'"
           class="hanging-indent flex items-start"
         >
-          <div class="mr-3 h-5 w-5">
+          <div class="h-5 w-5">
             <i class="fa-solid fa-ticket h-5" />
           </div>
-          <span>{{ eventData.cost }}</span>
+          <MarkdownPreview class="-ml-2" :disable-gallery="true" :text="eventData.cost" />
         </li>
         <li
           v-if="eventData.isHostedByOP && eventData.Poster"

@@ -35,11 +35,24 @@ const md = new MarkdownIt({
   },
 });
 
+// Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
+md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+  const token = tokens[idx];
+  // Add target="_blank" and security attributes to link tokens
+  token.attrPush(['target', '_blank']);
+  token.attrPush(['rel', 'noopener noreferrer']);
+  return self.renderToken(tokens, idx, options);
+};
+
 const renderedMarkdown = computed(() => {
   const rawHTML = md.render(props.text);
 
   if (import.meta.client && DOMPurify) {
-    return DOMPurify.sanitize(rawHTML);
+    // Configure DOMPurify to allow target="_blank" attribute
+    const config = {
+      ADD_ATTR: ['target', 'rel']
+    };
+    return DOMPurify.sanitize(rawHTML, config);
   }
   return rawHTML; // Return the raw HTML if on the server
 });
