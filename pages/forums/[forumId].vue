@@ -114,12 +114,12 @@ if (!channelId.value) {
       class="flex flex-col justify-center dark:bg-black bg-gray-100 dark:text-white"
     >
       <ChannelHeaderMobile
-        class="block md:hidden"
+        v-show="isMobile"
         :channel="channel"
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
-        class="hidden md:block"
+        v-show="!isMobile"
         :channel="channel"
         :channel-id="channelId"
         :admin-list="adminList"
@@ -141,7 +141,8 @@ if (!channelId.value) {
           class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            v-show="isMobile"
+            class="mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
