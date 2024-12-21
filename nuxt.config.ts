@@ -32,9 +32,9 @@ export default defineNuxtConfig({
           },
         },
       },
-    ],
-    "@nuxtjs/tailwindcss",
+    ],    
     "@nuxtjs/color-mode",
+    "@nuxtjs/tailwindcss",
   ],
   nitro: {
     preset: "vercel",

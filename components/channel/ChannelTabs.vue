@@ -154,3 +154,4 @@ const tabs = computed((): Tab[] => {
     </nav>
   </div>
 </template>
+
