@@ -441,7 +441,10 @@ const isClientSide = typeof window !== "undefined";
   <div class="flex flex-col">
     <client-only>
       <div
-        class="fixed top-0 w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
+      :class="[
+        mdAndUp ? 'fixed top-0' : '',
+      ]"
+        class="w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
       >
         <div
           class="w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900"
@@ -520,7 +523,9 @@ const isClientSide = typeof window !== "undefined";
       <div
         v-else-if="eventResult && eventResult.events"
         id="mapViewMobileWidth"
-        class="p-4 mt-52"
+        :class="[
+          mdAndUp ? 'mt-52 p-4' : '',
+        ]"
       >
         <div class="event-map-container">
           <EventMap
