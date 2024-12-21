@@ -165,9 +165,8 @@ const handleClickChannel = (uniqueName: string) => {
 
 <template>
   <div
-    class="flex justify-center rounded-lg p-0  px-2 dark:text-white" 
   >
-  <div class="flex-grow max-w-5xl">
+  <div class="max-w-5xl">
     <SitewideDiscussionList
       v-if="!isForumScoped"
       @filter-by-tag="handleClickTag"

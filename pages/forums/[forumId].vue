@@ -109,7 +109,7 @@ if (!channelId.value) {
   <NuxtLayout>
     <div
       v-if="channel"
-      class="flex flex-col justify-center dark:bg-black bg-gray-100 dark:text-white"
+      class="flex flex-col min-h-screen justify-center dark:bg-black bg-gray-100 dark:text-white"
     >
       <ChannelHeaderMobile
         class="block md:hidden"
@@ -134,9 +134,9 @@ if (!channelId.value) {
           :desktop="true"
         />
       </ChannelHeaderDesktop>
-      <div v-if="channel" class="w-full flex justify-center">
+      <main v-if="channel" class="flex-1 flex justify-center w-full">
         <article
-          class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
+          class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
             class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
@@ -147,6 +147,7 @@ if (!channelId.value) {
             :channel="channel"
             :desktop="false"
           />
+
           <div v-if="showDiscussionTitle" class="flex w-full justify-center">
             <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
               <DiscussionTitleEditForm />
@@ -157,30 +158,30 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
-          <div
-            class="w-full relative max-w-screen-2xl flex-1 focus:outline-none"
-          >
+
+          <div class="relative w-full">
             <div
-              class="w-full flex flex-col md:flex-row divide-x dark:divide-gray-500"
+              class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
-              <div class="w-full md:w-9/12 p-0 bg-white dark:bg-gray-800">
-                <NuxtPage />
+              <div class="flex-1 min-w-0 p-4 md:p-6 bg-white dark:bg-gray-800">
+                <div class="max-w-full">
+                  <NuxtPage />
+                </div>
               </div>
-              <div
+              <aside
                 v-if="channelId"
-                class="w-full md:w-3/12 p-0 bg-white dark:bg-gray-800"
+                class="w-full md:w-80 flex-shrink-0 bg-white dark:bg-gray-800 sticky top-0 overflow-y-auto max-h-screen"
               >
                 <ChannelSidebar
                   v-if="channel"
                   :channel="channel"
-                  class="sticky top-0 overflow-auto p-6 pt-8"
+                  class="p-6 pt-8"
                 />
-              </div>
+              </aside>
             </div>
           </div>
         </article>
-      </div>
+      </main>
     </div>
   </NuxtLayout>
 </template>
-
