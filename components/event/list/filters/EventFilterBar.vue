@@ -60,7 +60,9 @@ const channelId = computed(() => {
 });
 
 const showOnlineOnly = computed(() => route.name === "SearchEventsList");
-const showInPersonOnly = computed(() => route.name === "MapEventPreview");
+const showInPersonOnly = computed(() => {
+  return route.name && typeof route.name === 'string' && route.name.includes('map-search') ? true : undefined;
+});
 
 const filterValues = ref<SearchEventValues>(
   getFilterValuesFromParams({
@@ -241,6 +243,33 @@ const toggleSelectedTag = (tag: string) => {
 };
 
 const { smAndDown } = useDisplay();
+
+type ChannelOption = {
+  uniqueName: string;
+  displayName: string;
+  icon: string;
+  description: string;
+};
+const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
+  {
+    uniqueName: "free_events",
+    displayName: "Free Events",
+    icon: "",
+    description: "",
+  },
+  {
+    uniqueName: "family_friendly_events",
+    displayName: "Family Friendly Events",
+    icon: "",
+    description: "",
+  },
+  {
+    uniqueName: "phx_concerts",
+    displayName: "Live Music in Phoenix",
+    icon: "",
+    description: "",
+  },
+];
 </script>
 
 <template>
@@ -266,6 +295,9 @@ const { smAndDown } = useDisplay();
                 <div class="relative bg-white dark:bg-gray-700 w-96">
                   <SearchableForumList
                     :selected-channels="filterValues.channels"
+                    :featured-forums="showInPersonOnly
+                      ? IN_PERSON_FEATURED_FORUMS
+                      : undefined"
                     @toggle-selection="toggleSelectedChannel"
                   />
                 </div>
@@ -437,6 +469,9 @@ const { smAndDown } = useDisplay();
               <div class="relative bg-white dark:bg-gray-700 w-96">
                 <SearchableForumList
                   :selected-channels="filterValues.channels"
+                  :featured-forums="showInPersonOnly
+                    ? IN_PERSON_FEATURED_FORUMS
+                    : []"
                   @toggle-selection="toggleSelectedChannel"
                 />
               </div>

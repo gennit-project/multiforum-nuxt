@@ -1,10 +1,11 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
-import type { Channel } from '@/__generated__/graphql';
-import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
-import SearchBar from '@/components/SearchBar.vue';
-import type { PropType } from 'vue';
+import { ref, computed, watch } from "vue";
+import { useQuery } from "@vue/apollo-composable";
+import type { Channel } from "@/__generated__/graphql";
+import { GET_CHANNEL_NAMES } from "@/graphQLData/channel/queries";
+import SearchBar from "@/components/SearchBar.vue";
+import type { PropType } from "vue";
+import SearchableForumListItem from "./SearchableForumListItem.vue";
 
 // Define props
 const props = defineProps({
@@ -18,36 +19,62 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: 'Select your intended audience',
+    default: "Select your intended audience",
+  },
+  featuredForums: {
+    type: Array as PropType<ChannelOption[]>,
+    default: () => [],
   },
 });
 
-// Emit function
-const emit = defineEmits(['setChannelNames', 'toggleSelection']);
+type ChannelOption = {
+  uniqueName: string;
+  displayName: string;
+  icon: string;
+  description: string;
+};
 
-// Local state
-const searchInput = ref<string>('');
+const emit = defineEmits(["setChannelNames", "toggleSelection"]);
+const searchInput = ref<string>("");
 const selected = ref([...props.selectedChannels]);
-
-// Computed properties
 const searchInputComputed = computed(() => `(?i).*${searchInput.value}.*`);
 
-const { loading: channelsLoading, error: channelsError, result: channelsResult, onResult: onGetChannelNames } = useQuery(GET_CHANNEL_NAMES, {
+const {
+  loading: channelsLoading,
+  error: channelsError,
+  result: channelsResult,
+  onResult: onGetChannelNames,
+} = useQuery(GET_CHANNEL_NAMES, {
   channelWhere: {
     uniqueName_MATCHES: searchInputComputed,
   },
 });
 
-const channelOptions = computed(() => {
-  if (!channelsResult.value || !channelsResult.value.channels) {
-    return [];
-  }
-  return channelsResult.value.channels.map((channel: Channel) => ({
-    uniqueName: channel.uniqueName,
-    displayName: channel.displayName,
-    icon: channel.channelIconURL,
-    description: channel.description,
-  }));
+// Separate featured and regular channels
+const featuredChannels = computed(() => {
+  return props.featuredForums
+    .filter((channelOption: ChannelOption) => {
+      return props.featuredForums.some(
+        (featuredChannel) => featuredChannel.uniqueName === channelOption.uniqueName
+      );
+    })
+    .sort(
+      (a, b) =>
+        props.featuredForums.findIndex((channel) => channel.uniqueName === a.uniqueName) -
+        props.featuredForums.findIndex((channel) => channel.uniqueName === b.uniqueName)
+    );
+});
+
+const regularChannels = computed(() => {
+  return channelsResult.value?.channels
+    .filter((channel: Channel) => {
+      return !props.featuredForums.some(
+        (featuredChannel) => featuredChannel.uniqueName === channel.uniqueName
+      );
+    })
+    .sort((a: ChannelOption, b: ChannelOption) => {
+      return a.uniqueName.localeCompare(b.uniqueName);
+    });
 });
 
 // Watch the query result
@@ -58,7 +85,7 @@ onGetChannelNames(() => {
     icon: channel.channelIconURL,
     description: channel.description,
   }));
-  emit('setChannelNames', channels);
+  emit("setChannelNames", channels);
 });
 
 watch(
@@ -71,18 +98,14 @@ watch(
 const updateSearchResult = (input: string) => {
   searchInput.value = input;
 };
-
-const truncate = (description: string) => {
-  return description.length > 100 ? description.substring(0, 100) + '...' : description;
-};
 </script>
 
 <template>
   <div
-    class="absolute z-10 w-full rounded-md max-h-96 overflow-y-auto border-gray-200 bg-white dark:text-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+    class="absolute z-10 p-3 w-full rounded-md max-h-96 overflow-y-auto border-gray-200 bg-white dark:text-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
   >
     <SearchBar
-      class="w-full p-1 align-middle"
+      class="w-full align-middle"
       :auto-focus="true"
       :search-placeholder="'Search forums'"
       :initial-value="searchInput"
@@ -91,61 +114,53 @@ const truncate = (description: string) => {
       @keydown.enter.prevent
       @update-search-input="updateSearchResult"
     />
-    <div v-if="channelsLoading">
-      Loading...
-    </div>
+    <div v-if="channelsLoading">Loading...</div>
     <div v-else-if="channelsError">
       <div v-for="(error, i) of channelsError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
     </div>
-    <div
-      v-for="channel in channelOptions"
-      :key="channel.uniqueName"
-      class="border-b p-1 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-    >
-      <label class="flex cursor-pointer items-center space-x-3 p-2">
-        <input
-          type="checkbox"
-          :value="channel.uniqueName"
-          :checked="selected.includes(channel.uniqueName)"
-          class="border border-gray-300 text-blue-600  dark:border-gray-600"
-          @change="() => emit('toggleSelection', channel.uniqueName)"
+    <template v-else>
+      <!-- Featured Forums Section -->
+      <div
+        v-if="featuredChannels.length > 0"
+        class="border-b dark:border-gray-600"
+      >
+        <h3
+          class="pt-3 px-3 uppercase text-sm text-gray-700 dark:text-gray-300"
         >
-        <div class="flex items-center space-x-2">
-          <AvatarComponent
-            v-if="channel.icon"
-            class="z-10 w-10"
-            :is-small="true"
-            :text="channel.uniqueName"
-            :src="channel.icon"
+          Featured Forums
+        </h3>
+        <div
+          v-for="channel in featuredChannels"
+          :key="channel.uniqueName"
+          class="border-b last:border-b-0 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+        >
+          <SearchableForumListItem 
+            :channel="channel" 
+            :selected="selected" 
+            @toggle-selection="() => emit('toggleSelection', channel.uniqueName)"
           />
-          <AvatarComponent
-            v-else
-            class="z-10 w-10"
-            :is-small="true"
-            :text="channel.uniqueName"
-          />
-          <div class="flex-col text-sm flex-1">
-            <span 
-              v-if="!channel.displayName" 
-              class="font-mono font-bold"
-              :data-testid="`forum-picker-${channel.uniqueName}`"
-            >
-              {{ channel.uniqueName }}
-            </span>
-            <div v-else>
-              <span class="font-bold">{{ channel.displayName }}</span>
-              &#8226;
-              <span 
-                class="font-mono"
-                :data-testid="`forum-picker-${channel.uniqueName}`"
-              >{{ channel.uniqueName }}</span>
-            </div>
-            <div>{{ truncate(channel.description || "") }}</div>
-          </div>
         </div>
-      </label>
-    </div>
+      </div>
+
+      <!-- All Forums Section -->
+      <div class="pt-3">
+        <h3 class="px-3 uppercase text-sm text-gray-700 dark:text-gray-300">
+          All Forums
+        </h3>
+        <div
+          v-for="channel in regularChannels"
+          :key="channel.uniqueName"
+          class="border-b last:border-b-0 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+        >
+          <SearchableForumListItem 
+            :channel="channel" 
+            :selected="selected" 
+            @toggle-selection="() => emit('toggleSelection', channel.uniqueName)"
+          />
+        </div>
+      </div>
+    </template>
   </div>
 </template>
