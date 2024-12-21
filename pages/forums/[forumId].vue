@@ -11,11 +11,9 @@ import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import { useRoute, useRouter } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { DateTime } from "luxon";
-import { useIsMobile } from "@/composables/useIsMobile";
 
 const route = useRoute();
 const router = useRouter();
-const isMobile = useIsMobile();
 
 const showDiscussionTitle = computed(() =>
   route.name?.toString().includes("forums-forumId-discussions-discussionId")
@@ -141,7 +139,7 @@ if (!channelId.value) {
           class="relative h-full max-w-screen-2xl w-full rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            class="block md:hidden mobile-only-tabs mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
@@ -185,3 +183,11 @@ if (!channelId.value) {
     </div>
   </NuxtLayout>
 </template>
+
+<style lang="scss">
+@media (min-width: 768px) {
+  .mobile-only-tabs {
+    display: none !important;
+  }
+}
+</style>
