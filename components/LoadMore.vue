@@ -30,7 +30,7 @@ const emit = defineEmits(['loadMore']);
     <button
       v-else
       :class="!props.reachedEndOfResults ? 'underline' : ''"
-      class="cursor-pointer justify-self-center"
+      class="cursor-pointer justify-self-center dark:text-gray-200"
       @click="emit('loadMore')"
     >
       Load more

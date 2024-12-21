@@ -149,9 +149,6 @@ const commentCount = computed(
 );
 
 const aggregateCommentCount = computed(() => {
-  console.log(
-    getDiscussionChannelCommentAggregateResult.value
-  );
   return (
     getDiscussionChannelCommentAggregateResult.value?.discussionChannels[0]
       ?.CommentsAggregate?.count || 0

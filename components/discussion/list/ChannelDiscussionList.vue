@@ -149,7 +149,14 @@ const filterByChannel = (channel: string) => {
   emit("filterByChannel", channel);
 };
 
-
+const reachedEndOfResults = computed(() => {
+  return (
+    discussionChannelResult.value?.getDiscussionsInChannel
+      .aggregateDiscussionChannelsCount ===
+    discussionChannelResult.value?.getDiscussionsInChannel?.discussionChannels
+      .length
+  );
+});
 </script>
 
 <template>
@@ -224,12 +231,7 @@ const filterByChannel = (channel: string) => {
       <LoadMore
         class="justify-self-center mb-6"
         :loading="discussionLoading"
-        :reached-end-of-results="
-          discussionChannelResult.getDiscussionsInChannel
-            .aggregateDiscussionChannelsCount ===
-          discussionChannelResult.getDiscussionsInChannel?.discussionChannels
-            .length
-        "
+        :reached-end-of-results="reachedEndOfResults"
         @load-more="loadMore"
       />
     </div>

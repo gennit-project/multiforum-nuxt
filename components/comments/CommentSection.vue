@@ -420,7 +420,6 @@ function updateEditInputValues(text: string, isRootComment: boolean) {
 }
 
 function handleClickCreate() {
-  console.log('clicked create comment', props.createCommentInput)
   createComment({
     createCommentInput: props.createCommentInput,
   });
