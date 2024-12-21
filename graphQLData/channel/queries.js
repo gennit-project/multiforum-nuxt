@@ -33,14 +33,8 @@ export const GET_CHANNEL = gql`
       Moderators {
         displayName
       }
-      DiscussionChannelsAggregate (
-        where: {
-          Discussion: {
-            NOT: {
-              title: null
-            }
-          }
-        }
+      DiscussionChannelsAggregate(
+        where: { Discussion: { NOT: { title: null } } }
       ) {
         count
       }
@@ -109,7 +103,7 @@ export const GET_CHANNELS = gql`
       EventChannelsAggregate(where: $eventChannelWhere) {
         count
       }
-      DiscussionChannelsAggregate {
+      DiscussionChannelsAggregate(where: { NOT: { Discussion: null } }) {
         count
       }
     }

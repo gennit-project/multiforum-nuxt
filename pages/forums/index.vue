@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
-import type { LocationQueryValue } from "nuxt/app";
+import { computed, ref, watchEffect } from "vue";
+import { useRoute, useRouter } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import ChannelList from "@/components/channel/ChannelList.vue";
 import { GET_CHANNELS } from "@/graphQLData/channel/queries";
@@ -8,6 +8,7 @@ import TagIcon from "@/components/icons/TagIcon.vue";
 import FilterChip from "@/components/FilterChip.vue";
 import SearchBar from "@/components/SearchBar.vue";
 import { getTagLabel } from "@/utils";
+import type { LocationQueryValue } from "vue-router";
 
 const route = useRoute();
 const router = useRouter();
@@ -107,6 +108,9 @@ const {
         startTime_GT: now,
         canceled: false,
       },
+      NOT: {
+        Event: null
+      }
     },
     limit: 25,
     offset: 0,
