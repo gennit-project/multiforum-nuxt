@@ -23,6 +23,10 @@ type CommentSectionQueryUpdateInput = {
 };
 
 const props = defineProps({
+  aggregateCommentCount: {
+    type: Number,
+    required: true,
+  },
   discussionChannel: {
     type: Object as PropType<DiscussionChannel>,
     required: false,
@@ -58,17 +62,6 @@ const props = defineProps({
 });
 
 const route = useRoute();
-
-const aggregateCommentCount = computed(() => {
-  if (
-    props.loading &&
-    props.discussionChannel?.CommentsAggregate?.count === 0
-  ) {
-    return 0;
-  }
-  return props.discussionChannel?.CommentsAggregate?.count;
-});
-
 const commentSectionQueryVariables = computed(() => ({
   discussionId: props.discussionChannel?.discussionId,
   channelUniqueName: props.discussionChannel?.channelUniqueName,

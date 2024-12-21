@@ -23,7 +23,7 @@ export const COMMENT_FIELDS = gql`
     createdAt
     updatedAt
     CommentAuthor {
-      ...AuthorFields,
+      ...AuthorFields
       ... on User {
         ChannelRoles {
           showModTag
@@ -70,7 +70,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
           id
           title
           Author {
-            ...AuthorFields,
+            ...AuthorFields
             ... on User {
               ChannelRoles {
                 showModTag
@@ -212,6 +212,29 @@ export const GET_DISCUSSION_CHANNEL_BY_ID = gql`
 `;
 
 export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
+query getDiscussionChannelRootCommentAggregate(
+    $channelUniqueName: String!
+    $discussionId: ID!
+  ) {
+    discussionChannels(
+      where: {
+        channelUniqueName: $channelUniqueName
+        discussionId: $discussionId
+      }
+    ) {
+      id
+      CommentsAggregate(
+        where: {
+          isRootComment: true
+          OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+        }
+      ) {
+        count
+      }
+    }
+  }
+`;
+export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
   query getDiscussionChannelRootCommentAggregate(
     $channelUniqueName: String!
     $discussionId: ID!
@@ -223,10 +246,11 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
       }
     ) {
       id
-      CommentsAggregate(where: { 
-        isRootComment: true
-        isFeedbackComment: false
-      }) {
+      CommentsAggregate(
+        where: {
+          OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+        }
+      ) {
         count
       }
     }
@@ -323,9 +347,9 @@ export const GET_COMMENT_REPLIES = gql`
 
 export const GET_FEEDBACK_ON_COMMENT = gql`
   query getFeedbackOnComment(
-    $commentId: ID!,
-    $limit: Int, 
-    $offset: Int,
+    $commentId: ID!
+    $limit: Int
+    $offset: Int
     $loggedInModName: String
   ) {
     comments(where: { id: $commentId }) {
@@ -340,8 +364,8 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
           createdAt
         }
         ... on ModerationProfile {
-            displayName
-            createdAt
+          displayName
+          createdAt
         }
       }
       createdAt

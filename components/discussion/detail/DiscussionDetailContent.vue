@@ -4,7 +4,8 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import {
   GET_DISCUSSION_COMMENTS,
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE
 } from "@/graphQLData/comment/queries";
 import type {
   Discussion,
@@ -124,9 +125,14 @@ const loadedRootCommentCount = computed(() => {
 });
 
 const {
+  result: getDiscussionChannelCommentAggregateResult,
+} = useQuery(GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE, {
+  discussionId: props.discussionId,
+  channelUniqueName: channelId,
+});
+
+const {
   result: getDiscussionChannelRootCommentAggregateResult,
-  error: getDiscussionChannelRootCommentAggregateError,
-  loading: getDiscussionChannelRootCommentAggregateLoading,
 } = useQuery(GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE, {
   discussionId: props.discussionId,
   channelUniqueName: channelId,
@@ -142,18 +148,21 @@ const commentCount = computed(
   () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
 );
 
+const aggregateCommentCount = computed(() => {
+  console.log(
+    getDiscussionChannelCommentAggregateResult.value
+  );
+  return (
+    getDiscussionChannelCommentAggregateResult.value?.discussionChannels[0]
+      ?.CommentsAggregate?.count || 0
+  );
+});
+
 const aggregateRootCommentCount = computed(() => {
-  if (
-    getDiscussionChannelRootCommentAggregateLoading.value ||
-    getDiscussionChannelRootCommentAggregateError.value
-  ) {
-    return 0;
-  }
-  const discussionChannels =
-    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels ||
-    [];
-  if (!discussionChannels.length) return 0;
-  return discussionChannels[0].CommentsAggregate?.count || 0;
+  return (
+    getDiscussionChannelRootCommentAggregateResult.value?.discussionChannels[0]
+      ?.CommentsAggregate?.count || 0
+  );
 });
 
 const loadMore = () => {
@@ -305,6 +314,7 @@ const handleClickEditFeedback = () => {
             class="pr-3"
             :channel-id="channelId"
             :discussion-channel="activeDiscussionChannel || undefined"
+           
             :previous-offset="previousOffset"
             :mod-name="loggedInUserModName"
           />
@@ -312,6 +322,7 @@ const handleClickEditFeedback = () => {
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
               :loading="getDiscussionChannelLoading"
+              :aggregate-comment-count="aggregateCommentCount || 0"
               :discussion-channel="activeDiscussionChannel || undefined"
               :discussion-author="discussionAuthor || ''"
               :comments="comments"

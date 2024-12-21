@@ -39,9 +39,6 @@ watchEffect(() => {
 </template>
 
 <style>
-.large-width {
-  width: 900px;
-}
 
 h1 {
   font-size: 2.65em;
