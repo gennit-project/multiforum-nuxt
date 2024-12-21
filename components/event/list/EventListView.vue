@@ -172,6 +172,7 @@ const filterByChannel = (channel: string) => {
       class="mx-auto block"
       :text="eventError.message"
     />
+    <LoadingSpinner v-if="eventLoading" class="mx-auto block" />
 
     <EventList
       v-if="!eventLoading && !eventError && eventResult"
