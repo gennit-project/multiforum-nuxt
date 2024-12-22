@@ -40,7 +40,6 @@ const buttonClasses = computed(() => {
 
   return [...baseClasses, defaultClasses, permalinkClasses].join(" ");
 });
-
 </script>
 
 <template>
@@ -59,10 +58,12 @@ const buttonClasses = computed(() => {
       </AuthButton>
     </template>
     <template #default>
-      <TooltipContent
-        :tooltip-unicode="tooltipUnicode"
-        :tooltip-text="tooltipText"
-      />
+      <client-only>
+        <TooltipContent
+          :tooltip-unicode="tooltipUnicode"
+          :tooltip-text="tooltipText"
+        />
+      </client-only>
     </template>
   </v-tooltip>
 
