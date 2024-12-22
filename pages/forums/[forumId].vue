@@ -116,24 +116,26 @@ if (!channelId.value) {
         :channel="channel"
         :channel-id="channelId"
       />
-      <ChannelHeaderDesktop
-        class="hidden md:block"
-        :channel="channel"
-        :channel-id="channelId"
-        :admin-list="adminList"
-        :route="route"
-        :show-create-button="true"
-      >
-        <ChannelTabs
-          class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
-          :vertical="false"
-          :show-counts="true"
+      <client-only>
+        <ChannelHeaderDesktop
+          class="hidden md:block"
+          :channel="channel"
+          :channel-id="channelId"
           :admin-list="adminList"
           :route="route"
-          :channel="channel"
-          :desktop="true"
-        />
-      </ChannelHeaderDesktop>
+          :show-create-button="true"
+        >
+          <ChannelTabs
+            class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
+            :vertical="false"
+            :show-counts="true"
+            :admin-list="adminList"
+            :route="route"
+            :channel="channel"
+            :desktop="true"
+          />
+        </ChannelHeaderDesktop>
+      </client-only>
       <main v-if="channel" class="flex-1 flex justify-center w-full">
         <article
           class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
