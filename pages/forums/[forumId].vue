@@ -139,7 +139,7 @@ if (!channelId.value) {
           class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            class="md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
@@ -170,7 +170,7 @@ if (!channelId.value) {
               </div>
               <aside
                 v-if="channelId"
-                class="w-full md:w-80 flex-shrink-0 bg-white dark:bg-gray-800 sticky top-0 overflow-y-auto max-h-screen"
+                class="w-full flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
               >
                 <ChannelSidebar
                   v-if="channel"
