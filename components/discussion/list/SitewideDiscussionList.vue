@@ -160,7 +160,7 @@ const filterByChannel = (channel: string) => {
       v-else-if="discussions && discussions.length === 0"
       class="my-6 flex gap-2 px-4"
     >
-      <span>There are no discussions to show.</span>
+      <span class="dark:text-white">There are no discussions to show.</span>
 
       <RequireAuth :full-width="false">
         <template #has-auth>

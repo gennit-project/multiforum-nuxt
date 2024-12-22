@@ -175,7 +175,7 @@ const reachedEndOfResults = computed(() => {
       "
       class="flex gap-2 p-4"
     >
-      <span>There are no discussions to show.</span>
+      <span class="dark:text-white">There are no discussions to show.</span>
 
       <RequireAuth :full-width="false">
         <template #has-auth>

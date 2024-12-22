@@ -170,7 +170,7 @@ if (!channelId.value) {
               </div>
               <aside
                 v-if="channelId"
-                class="w-full flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
+                class="w-full md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
               >
                 <ChannelSidebar
                   v-if="channel"
