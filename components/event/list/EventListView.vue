@@ -54,7 +54,6 @@ const eventWhere = computed(() => {
 const {
   error: eventError,
   result: eventResult,
-  loading: eventLoading,
   fetchMore,
 } = useQuery(
   GET_EVENTS,
@@ -76,14 +75,17 @@ const loadMore = () => {
   fetchMore({
     variables: {
       // @ts-ignore
-      offset: eventResult.value.events.length,
+      offset: eventResult.value?.events.length || 0,
     },
+    // Prevent cache clearing which causes content shift
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
-
+      
+      // Merge the results while preserving existing data
       return {
         ...previousResult,
-        events: [...previousResult.events, ...fetchMoreResult.events],
+        events: [...(previousResult?.events || []), ...fetchMoreResult.events],
+        eventsAggregate: fetchMoreResult.eventsAggregate // Update the aggregate count
       };
     },
   });
@@ -157,7 +159,7 @@ const filterByChannel = (channel: string) => {
 </script>
 
 <template>
-  <div class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 p-4 md:p-8">
+  <div class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 p-4">
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
@@ -172,13 +174,12 @@ const filterByChannel = (channel: string) => {
       class="mx-auto block"
       :text="eventError.message"
     />
-    <LoadingSpinner v-if="eventLoading" class="mx-auto block" />
 
     <EventList
-      v-if="!eventLoading && !eventError && eventResult"
+      v-if="eventResult?.events"
       id="listView"
       class="relative"
-      :result-count="eventResult ? eventResult.eventsAggregate?.count : 0"
+      :result-count="eventResult.eventsAggregate?.count || 0"
       :events="eventResult.events"
       :channel-id="channelId"
       :search-input="filterValues.searchInput"
