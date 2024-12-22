@@ -43,30 +43,33 @@ const buttonClasses = computed(() => {
 </script>
 
 <template>
-  <v-tooltip v-if="tooltipText" location="top" content-class="custom-tooltip">
-    <template #activator="{ props }">
-      <AuthButton
-        :props="props"
-        :test-id="testId"
-        :button-classes="buttonClasses"
-        :loading="loading"
-        :show-count="showCount"
-        :count="count"
-        @click="emit('vote')"
-      >
-        <slot />
-      </AuthButton>
-    </template>
-    <template #default>
-      <client-only>
-        <TooltipContent
-          :tooltip-unicode="tooltipUnicode"
-          :tooltip-text="tooltipText"
-        />
-      </client-only>
-    </template>
-  </v-tooltip>
-
+  <div v-if="tooltipText">
+    <client-only>
+      <v-tooltip location="top" content-class="custom-tooltip">
+        <template #activator="{ props }">
+          <AuthButton
+            :props="props"
+            :test-id="testId"
+            :button-classes="buttonClasses"
+            :loading="loading"
+            :show-count="showCount"
+            :count="count"
+            @click="emit('vote')"
+          >
+            <slot />
+          </AuthButton>
+        </template>
+        <template #default>
+          <client-only>
+            <TooltipContent
+              :tooltip-unicode="tooltipUnicode"
+              :tooltip-text="tooltipText"
+            />
+          </client-only>
+        </template>
+      </v-tooltip>
+    </client-only>
+  </div>
   <template v-else>
     <AuthButton
       :test-id="testId"

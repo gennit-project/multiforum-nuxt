@@ -23,7 +23,6 @@ import Popper from "vue3-popper";
 import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
 import SearchableTagList from "@/components/SearchableTagList.vue";
-import { useDisplay } from "vuetify";
 import { updateFilters } from "@/utils/routerUtils";
 
 // Props
@@ -242,7 +241,6 @@ const toggleSelectedTag = (tag: string) => {
   setSelectedTags(filterValues.value.tags);
 };
 
-const { smAndDown } = useDisplay();
 
 type ChannelOption = {
   uniqueName: string;
@@ -278,8 +276,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 align-items">
           <div
-            v-if="!smAndDown"
-            class="flex space-x-2 items-center justify-center"
+            class="flex space-x-2 items-center justify-center hidden md:block"
           >
             <FilterChip
               v-if="!channelId"
@@ -431,8 +428,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             </client-only>
           </LocationSearchBar>
           <div
-            class="flex space-x-2 items-center justify-center"
-            v-if="!smAndDown"
+            class="flex space-x-2 items-center justify-center hidden md:block"
           >
             <FilterChip
               class="items-center align-middle"
@@ -454,7 +450,7 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
             </FilterChip>
           </div>
         </div>
-        <div v-if="smAndDown" class="flex items-center mt-4">
+        <div class="flex items-center mt-4 block md:hidden">
           <FilterChip
             v-if="!channelId"
             class="items-center align-middle"

@@ -34,7 +34,6 @@ const emit = defineEmits(["toggleEmojiPicker"]);
 function handleClick() {
   emit("toggleEmojiPicker");
 }
-
 </script>
 
 <template>
@@ -53,13 +52,15 @@ function handleClick() {
         </VoteButton>
       </template>
       <template #content>
-        <EmojiPicker
-          :discussion-channel-id="discussionChannelId"
-          :comment-id="commentId"
-          :emoji-json="emojiJson"
-          @emoji-click="showMenu = false"
-          @close="showMenu = false"
-        />
+        <client-only>
+          <EmojiPicker
+            :discussion-channel-id="discussionChannelId"
+            :comment-id="commentId"
+            :emoji-json="emojiJson"
+            @emoji-click="showMenu = false"
+            @close="showMenu = false"
+          />
+        </client-only>
       </template>
     </FloatingDropdown>
   </div>

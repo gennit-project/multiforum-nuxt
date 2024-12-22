@@ -22,7 +22,7 @@ import { sideNavIsOpenVar, setSideNavIsOpenVar } from "@/cache";
 const showUserProfileDropdown = ref(false);
 const toggleDropdown = () => {
   setSideNavIsOpenVar(!sideNavIsOpenVar.value);
-}
+};
 const toggleUserProfileDropdown = () =>
   (showUserProfileDropdown.value = !showUserProfileDropdown.value);
 const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
@@ -86,7 +86,7 @@ const showMainContent = computed(() => {
   <v-app>
     <main class="min-h-screen flex flex-col">
       <div
-        class="dark:bg-black dark:text-gray-200 list-disc flex flex-col"
+        class="dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col"
       >
         <TopNav
           :show-user-profile-dropdown="showUserProfileDropdown"

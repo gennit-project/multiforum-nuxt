@@ -67,6 +67,7 @@ const menuStyles = {
 </script>
 
 <template>
+  <client-only>
   <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
     <template #activator="{ props }">
       <button
@@ -117,4 +118,5 @@ const menuStyles = {
       </v-list-item>
     </v-list>
   </v-menu>
+</client-only>
 </template>
