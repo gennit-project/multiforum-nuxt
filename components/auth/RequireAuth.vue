@@ -101,11 +101,8 @@ if (import.meta.env.SSR === false) {
     class="flex align-items"
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
-    <div v-if="!isMounted" class="...">
-      <slot name="loading" />
-    </div>
     <div
-      v-else-if="!showAuthContent"
+      v-if="!showAuthContent"
       :class="[
         fullWidth
           ? 'w-full flex align-items justify-center'

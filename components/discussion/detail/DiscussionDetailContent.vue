@@ -49,16 +49,27 @@ const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
 );
 const loggedInUserModName = computed(() => modProfileNameVar.value);
+const lastValidDiscussion = ref<Discussion | null>(null);
+
 
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
   loading: getDiscussionLoading,
   refetch: refetchDiscussion,
+  onResult: onGetDiscussionResult,
 } = useQuery(GET_DISCUSSION, {
   id: props.discussionId,
   loggedInModName: loggedInUserModName,
   channelUniqueName: channelId.value,
+},{
+  fetchPolicy: "cache-first",
+});
+
+onGetDiscussionResult((newResult) => {
+  if (newResult?.data?.discussions?.length) {
+    lastValidDiscussion.value = newResult.data.discussions[0];
+  }
 });
 
 const {
@@ -84,7 +95,7 @@ const {
   result: getDiscussionChannelResult,
   error: getDiscussionChannelError,
   loading: getDiscussionChannelLoading,
-  fetchMore: fetchMoreComments,
+  fetchMore: fetchMoreComments
 } = useQuery(GET_DISCUSSION_COMMENTS, {
   discussionId: props.discussionId,
   channelUniqueName: channelId,
@@ -92,7 +103,17 @@ const {
   offset: offset.value,
   limit: COMMENT_LIMIT,
   sort: commentSort,
+},{
+  fetchPolicy: "cache-first",
 });
+
+
+const discussion = computed<Discussion | null>(() => {
+  const currentDiscussion = getDiscussionResult.value?.discussions[0];
+
+  return currentDiscussion || lastValidDiscussion.value;
+});
+
 
 watch(commentSort, () =>
   // @ts-ignore - the sort is correctly typed.
@@ -129,6 +150,8 @@ const {
 } = useQuery(GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE, {
   discussionId: props.discussionId,
   channelUniqueName: channelId,
+},{
+  fetchPolicy: "cache-first",
 });
 
 const {
@@ -136,13 +159,10 @@ const {
 } = useQuery(GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE, {
   discussionId: props.discussionId,
   channelUniqueName: channelId,
+},{
+  fetchPolicy: "cache-first",
 });
 
-const discussion = computed<Discussion | null>(() =>
-  getDiscussionLoading.value || getDiscussionError.value
-    ? null
-    : getDiscussionResult.value.discussions[0]
-);
 
 const commentCount = computed(
   () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
@@ -250,6 +270,7 @@ const handleClickEditFeedback = () => {
       v-if="
         !getDiscussionLoading &&
         !getDiscussionChannelLoading &&
+        !discussion &&
         !activeDiscussionChannel
       "
     />
