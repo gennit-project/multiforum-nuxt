@@ -35,21 +35,21 @@ let handleLogin = () => {};
 
 const isMounted = ref(false);
 const isOwner = computed(() => {
-  if (!usernameVar.value) return false
-  return props.owners?.includes(usernameVar.value)
-})
+  if (!usernameVar.value) return false;
+  return props.owners?.includes(usernameVar.value);
+});
 const showAuthContent = computed(() => {
   // If not mounted yet, pretend not authenticated
-  if (!isMounted.value) return false
+  if (!isMounted.value) return false;
 
   // If user not logged in or no username, false
-  if (!usernameVar.value) return false
+  if (!usernameVar.value) return false;
 
   // If requireOwnership is true, ensure user isOwner
-  if (props.requireOwnership && !isOwner.value) return false
+  if (props.requireOwnership && !isOwner.value) return false;
 
-  return true
-})
+  return true;
+});
 
 if (import.meta.env.SSR === false) {
   const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect } =
@@ -101,10 +101,16 @@ if (import.meta.env.SSR === false) {
     class="flex align-items"
     :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
   >
+    <div v-if="!isMounted" class="...">
+      <slot name="loading" />
+    </div>
     <div
-      v-if="!showAuthContent"
-      :class="[fullWidth ? 'w-full flex align-items justify-center'
-                         : 'w-full flex align-items justify-end']"
+      v-else-if="!showAuthContent"
+      :class="[
+        fullWidth
+          ? 'w-full flex align-items justify-center'
+          : 'w-full flex align-items justify-end',
+      ]"
       data-auth-state="unauthenticated"
       @click="handleLogin"
     >
@@ -112,8 +118,11 @@ if (import.meta.env.SSR === false) {
     </div>
     <div
       v-else
-      :class="[fullWidth ? 'w-full flex align-items justify-center'
-                         : 'w-full flex align-items justify-end']"
+      :class="[
+        fullWidth
+          ? 'w-full flex align-items justify-center'
+          : 'w-full flex align-items justify-end',
+      ]"
       data-auth-state="authenticated"
     >
       <slot name="has-auth" />
