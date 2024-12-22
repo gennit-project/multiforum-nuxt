@@ -139,7 +139,7 @@ if (!channelId.value) {
           class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+            class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"

@@ -37,7 +37,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="hidden md:block w-full">
+  <div class="w-full">
     <img
       v-if="channel?.channelBannerURL"
       :src="channel?.channelBannerURL"

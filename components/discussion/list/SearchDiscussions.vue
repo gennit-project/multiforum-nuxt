@@ -22,9 +22,7 @@ const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string"
-    ? route.params.forumId
-    : "";
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
 const filterValues = ref(
@@ -164,28 +162,27 @@ const handleClickChannel = (uniqueName: string) => {
 </script>
 
 <template>
-  <div
-  >
-  <div class="max-w-5xl">
-    <SitewideDiscussionList
-      v-if="!isForumScoped"
-      @filter-by-tag="handleClickTag"
-      @filter-by-channel="handleClickChannel"
-    >
-      <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
-    </SitewideDiscussionList>
-    <ChannelDiscussionList
-      v-else
-      :channel-id="channelId"
-      :search-input="filterValues.searchInput"
-      :selected-tags="filterValues.tags"
-      :selected-channels="filterValues.channels"
-      @filter-by-tag="handleClickTag"
-      @filter-by-channel="handleClickChannel"
-    >
-      <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
-    </ChannelDiscussionList>
-  </div>
+  <div class="flex justify-center">
+    <div class="max-w-5xl">
+      <SitewideDiscussionList
+        v-if="!isForumScoped"
+        @filter-by-tag="handleClickTag"
+        @filter-by-channel="handleClickChannel"
+      >
+        <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
+      </SitewideDiscussionList>
+      <ChannelDiscussionList
+        v-else
+        :channel-id="channelId"
+        :search-input="filterValues.searchInput"
+        :selected-tags="filterValues.tags"
+        :selected-channels="filterValues.channels"
+        @filter-by-tag="handleClickTag"
+        @filter-by-channel="handleClickChannel"
+      >
+        <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
+      </ChannelDiscussionList>
+    </div>
   </div>
 </template>
 
