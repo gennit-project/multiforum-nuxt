@@ -89,6 +89,9 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
         Tags: {
           merge: (existing = [], incoming) => [...incoming]
         },
+        EventChannels: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
         Channels: {
           merge: (existing = [], incoming) => [...incoming]
         },
@@ -131,12 +134,6 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
           merge: (existing = [], incoming) => [...incoming]
         },
         UpvotedEvents: {
-          merge: (existing = [], incoming) => [...incoming]
-        },
-        SubscribedChannels: {
-          merge: (existing = [], incoming) => [...incoming]
-        },
-        SubscribedTags: {
           merge: (existing = [], incoming) => [...incoming]
         },
         ModProfiles: {
