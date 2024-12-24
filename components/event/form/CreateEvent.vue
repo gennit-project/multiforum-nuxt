@@ -80,24 +80,17 @@ const {
 } = useMutation(CREATE_EVENT_WITH_CHANNEL_CONNECTIONS, {
   update(cache, result) {
     const newEvent: Event = result.data?.createEventWithChannelConnections;
-    cache.modify({
-      fields: {
-        events(existingEventRefs = []) {
-          const newEventRef = cache.writeFragment({
-            data: newEvent,
-            fragment: gql`
-              fragment NewEvent on Events {
-                id
-              }
-            `,
-          });
-          return [newEventRef, ...existingEventRefs];
+    if (newEvent) {
+      cache.modify({
+        fields: {
+          events(existingEvents = []) {
+            return [newEvent, ...existingEvents];
+          },
         },
-      },
-    });
+      });
+    }
   },
 });
-
 onDone((response) => {
   createEventLoading.value = false;
   const newEventId = response.data?.createEventWithChannelConnections[0]?.id;

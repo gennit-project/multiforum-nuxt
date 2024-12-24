@@ -332,27 +332,28 @@ const upload = async (file: any) => {
   }
 };
 
+const coverImageLoading = ref(false);
+
 const handleCoverImageChange = async (input: FileChangeInput) => {
   if (!input.event || !input.event.target) {
     return;
   }
   const { event, fieldName } = input;
-  console.log("Parent sees file change for field:", fieldName);
   const target = event?.target as HTMLInputElement;
   if (!target.files || !target.files[0]) {
     return;
   }
   const selectedFile = target.files[0];
-  console.log("selectedFile", selectedFile);
 
   if (fieldName === "coverImageURL" && selectedFile) {
+    coverImageLoading.value = true;
     const embeddedLink = await upload(selectedFile);
-    console.log("embeddedLink", embeddedLink);
 
     if (!embeddedLink) {
       return;
     }
     emit("updateFormValues", { coverImageURL: embeddedLink });
+    coverImageLoading.value = false;
   }
 };
 
@@ -565,7 +566,6 @@ const inputStyles =
               key="cover-image-url" 
               :field-name="'coverImageURL'"
               @file-change="(input: FileChangeInput) => {
-                console.log('detected file change in parent', input);
                 handleCoverImageChange(input);
               }"
             />
