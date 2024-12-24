@@ -1,22 +1,17 @@
-<script lang="ts">
-import { defineComponent } from "vue";
-
-export default defineComponent({
-  props: {
-    sectionTitle: {
-      type: String,
-      default: "",
-    },
-    description: {
-      type: String,
-      default: "",
-    },
-    required: {
-      type: Boolean,
-      default: false,
-    },
+<script lang="ts" setup>
+defineProps({
+  sectionTitle: {
+    type: String,
+    default: "",
   },
-  setup() {},
+  description: {
+    type: String,
+    default: "",
+  },
+  required: {
+    type: Boolean,
+    default: false,
+  },
 });
 </script>
 
@@ -27,10 +22,7 @@ export default defineComponent({
       :for="sectionTitle"
       class="font-medium block text-sm leading-6 text-gray-900 dark:text-gray-200"
     >
-      {{ sectionTitle }}<span
-        v-if="required"
-        class="ml-1 text-red-400"
-      >*</span>
+      {{ sectionTitle }}<span v-if="required" class="ml-1 text-red-400">*</span>
     </label>
     <p
       v-if="description"
@@ -39,7 +31,7 @@ export default defineComponent({
       {{ description }}
     </p>
     <div>
-      <slot name="content" />
+      <slot name="content" v-bind="$attrs"  />
     </div>
   </div>
 </template>

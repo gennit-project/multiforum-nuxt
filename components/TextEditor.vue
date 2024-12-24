@@ -43,6 +43,10 @@ const props = defineProps({
     type: Number,
     default: MAX_CHARS_IN_COMMENT,
   },
+  fieldName: {
+    type: String,
+    default: "",
+  },
 });
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
@@ -327,6 +331,7 @@ const selectedTab = ref(0);
             <AddImage
               v-if="props.allowImageUpload"
               label="Paste, drop, or click to add files"
+              :field-name="fieldName"
               @change="handleFileChange"
             />
           </div>

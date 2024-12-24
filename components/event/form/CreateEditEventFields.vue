@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref, nextTick } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
-import TextEditor from "@/components/TextEditor.vue";
 import FormRow from "@/components/FormRow.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -36,6 +35,12 @@ export type UpdateLocationInput = {
   lng: number;
 };
 
+
+type FileChangeInput = {
+  // event of HTMLInputElement;
+  event: Event;   
+  fieldName: string;
+}
 // Props and Emits
 const props = defineProps({
   editMode: {
@@ -72,7 +77,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["updateFormValues", "setSelectedChannels", "submit"]);
+const emit = defineEmits([
+  "updateFormValues", 
+  "setSelectedChannels", 
+  "submit",
+  "file-change"
+]);
 
 const startTime = computed(() => {
   return new Date(props.formValues.startTime);
@@ -322,11 +332,22 @@ const upload = async (file: any) => {
   }
 };
 
-const handleCoverImageChange = async (event: any) => {
-  const selectedFile = event.target.files[0];
+const handleCoverImageChange = async (input: FileChangeInput) => {
+  if (!input.event || !input.event.target) {
+    return;
+  }
+  const { event, fieldName } = input;
+  console.log("Parent sees file change for field:", fieldName);
+  const target = event?.target as HTMLInputElement;
+  if (!target.files || !target.files[0]) {
+    return;
+  }
+  const selectedFile = target.files[0];
+  console.log("selectedFile", selectedFile);
 
-  if (selectedFile) {
+  if (fieldName === "coverImageURL" && selectedFile) {
     const embeddedLink = await upload(selectedFile);
+    console.log("embeddedLink", embeddedLink);
 
     if (!embeddedLink) {
       return;
@@ -516,6 +537,7 @@ const inputStyles =
               :disable-auto-focus="true"
               :initial-value="formValues.description"
               :placeholder="'Add details'"
+              :field-name="'description'"
               :rows="10"
               @update="emit('updateFormValues', { description: $event })"
             />
@@ -524,7 +546,7 @@ const inputStyles =
               :max="MAX_CHARS_IN_EVENT_DESCRIPTION"
             />
           </template>
-        </FormRow>
+        </FormRow>     
         <FormRow section-title="Cover Image">
           <template #content>
             <div v-if="formValues.coverImageURL">
@@ -539,7 +561,14 @@ const inputStyles =
                 No cover image uploaded
               </span>
             </div>
-            <AddImage key="cover-image-url" @change="handleCoverImageChange" />
+            <AddImage 
+              key="cover-image-url" 
+              :field-name="'coverImageURL'"
+              @file-change="(input: FileChangeInput) => {
+                console.log('detected file change in parent', input);
+                handleCoverImageChange(input);
+              }"
+            />
           </template>
         </FormRow>
         <FormRow section-title="Tags">

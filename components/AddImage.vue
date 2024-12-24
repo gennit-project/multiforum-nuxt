@@ -4,7 +4,7 @@ import { ref } from "vue";
 const props = defineProps({
   fieldName: {
     type: String,
-    required: false,
+    required: true,
     default: "",
   },
   label: {
@@ -14,15 +14,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["change"]);
+const emit = defineEmits(['file-change']);
 
 const fileInput = ref<HTMLInputElement | null>(null);
 
-function handleFileChange(event: Event) {
-  event.preventDefault();
-  event.stopPropagation();
-  emit("change", event, props.fieldName);
-}
+
 </script>
 
 <template>
@@ -37,7 +33,12 @@ function handleFileChange(event: Event) {
         ref="fileInput"
         type="file"
         style="display: none"
-        @change="handleFileChange"
+        @change="(event: Event) => {
+          emit('file-change', {
+            event,
+            fieldName
+          });
+        }"
       >
     </label>
   </div>
