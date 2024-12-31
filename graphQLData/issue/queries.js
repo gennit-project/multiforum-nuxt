@@ -45,6 +45,9 @@ export const ISSUE_FIELDS = gql`
               displayName
             }
           }
+          Channel {
+            uniqueName
+          }
           ChildCommentsAggregate {
             count
           }

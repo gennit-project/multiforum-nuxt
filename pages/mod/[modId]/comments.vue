@@ -17,17 +17,12 @@ const modProfileName = computed(() => {
 
 const {
   result: modResult,
-  loading: getModLoading,
   error: getModError,
 } = useQuery(GET_MOD, () => ({
   displayName: modProfileName.value,
 }));
 
-
 const mod = computed(() => {
-  if (getModLoading.value || getModError.value) {
-    return null;
-  }
   if (modResult.value && modResult.value.moderationProfiles.length > 0) {
     return modResult.value.moderationProfiles[0];
   }
@@ -35,10 +30,15 @@ const mod = computed(() => {
 });
 
 const commentsAggregate = computed(() => {
-  return mod.value ? mod.value.CommentsAggregate.count : 0;
+  return mod.value ? mod.value.AuthoredCommentsAggregate?.count : 0;
 });
 
-const { result: commentResult, loading, error, fetchMore } = useQuery(
+const {
+  result: commentResult,
+  loading,
+  error,
+  fetchMore,
+} = useQuery(
   GET_MOD_COMMENTS,
   () => ({
     displayName: modProfileName.value,
@@ -49,7 +49,6 @@ const { result: commentResult, loading, error, fetchMore } = useQuery(
     fetchPolicy: "cache-first",
   }
 );
-console.log(commentResult.value); 
 
 const loadMore = () => {
   if (!commentResult.value?.moderationProfiles?.[0]?.AuthoredComments) return;
@@ -61,13 +60,16 @@ const loadMore = () => {
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
+      const prevModProfile = previousResult.moderationProfiles[0]
+      const prevAuthoredComments = prevModProfile.AuthoredComments || [];
+      const newComments = fetchMoreResult.moderationProfiles[0].AuthoredComments || [];
       return {
         moderationProfiles: [
           {
-            ...previousResult.moderationProfiles[0],
+            ...prevModProfile,
             AuthoredComments: [
-              ...previousResult.moderationProfiles[0].AuthoredComments,
-              ...fetchMoreResult.moderationProfiles[0].AuthoredComments,
+              ...prevAuthoredComments,
+              ...newComments,
             ],
           },
         ],
@@ -75,40 +77,54 @@ const loadMore = () => {
     },
   });
 };
+
+const commentCount = computed(() => {
+  return commentResult.value?.moderationProfiles[0]?.AuthoredComments.length
+})
 </script>
 
 <template>
   <div class="py-3 dark:text-white">
-    <div v-if="error">
+    <ErrorBanner v-if="error">
       {{ error.message }}
-    </div>
+    </ErrorBanner>
+    <ErrorBanner v-if="getModError">
+      {{ getModError.message }}
+    </ErrorBanner>
     <div
       v-else-if="
         commentResult?.moderationProfiles?.length === 0 ||
-        commentResult?.moderationProfiles[0]?.AuthoredComments.length === 0
+        commentCount === 0
       "
     >
       No comments yet
     </div>
-    <div v-else-if="commentResult && commentResult?.moderationProfiles?.length > 0">
+    <div
+      v-else-if="commentResult && commentResult?.moderationProfiles?.length > 0"
+    >
       <Comment
         v-for="comment in commentResult.moderationProfiles[0].AuthoredComments"
         :key="comment.id"
         :comment-data="comment"
-        :parent-comment-id="comment.ParentComment ? comment.ParentComment.id : null"
+        :parent-comment-id="
+          comment.ParentComment ? comment.ParentComment.id : null
+        "
         :depth="0"
         :show-channel="true"
         :show-context-link="true"
         :go-to-permalink-on-click="true"
       />
     </div>
-    <div v-if="loading">
-      Loading...
-    </div>
-    <div v-if="commentResult?.moderationProfiles[0]?.AuthoredComments?.length > 0">
+    <div v-if="loading && !commentCount">Loading...</div>
+    <div
+      v-if="commentCount"
+    >
       <LoadMore
         class="justify-self-center"
-        :reached-end-of-results="commentsAggregate === commentResult.moderationProfiles[0].AuthoredComments.length"
+        :reached-end-of-results="
+          commentsAggregate ===
+          commentResult.moderationProfiles[0].AuthoredComments.length
+        "
         @load-more="loadMore"
       />
     </div>

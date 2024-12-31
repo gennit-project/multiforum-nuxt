@@ -1,40 +1,28 @@
-import { gql } from '@apollo/client/core';
+import { gql } from "@apollo/client/core";
 
 export const COUNT_OPEN_ISSUES = gql`
-query countOpenIssues(
-  $channelUniqueName: String!
-) {
-  issuesAggregate (
-    where: {
-      channelUniqueName: $channelUniqueName,
-      isOpen: true
+  query countOpenIssues($channelUniqueName: String!) {
+    issuesAggregate(
+      where: { channelUniqueName: $channelUniqueName, isOpen: true }
+    ) {
+      count
     }
-  ) {
-    count
   }
-}
 `;
 
 export const COUNT_CLOSED_ISSUES = gql`
-query countClosedIssues(
-  $channelUniqueName: String!
-) {
-  issuesAggregate (
-    where: {
-      channelUniqueName: $channelUniqueName,
-      isOpen: false
+  query countClosedIssues($channelUniqueName: String!) {
+    issuesAggregate(
+      where: { channelUniqueName: $channelUniqueName, isOpen: false }
+    ) {
+      count
     }
-  ) {
-    count
   }
-}
 `;
 
 export const GET_MOD = gql`
   query getMod($displayName: String!) {
-    moderationProfiles(where: {
-      displayName: $displayName
-    }) {
+    moderationProfiles(where: { displayName: $displayName }) {
       displayName
       createdAt
       AuthoredCommentsAggregate {
@@ -50,14 +38,16 @@ export const GET_MOD = gql`
         __typename
       }
     }
-  }`
-
+  }
+`;
 
 export const GET_MOD_COMMENTS = gql`
   query getModComments($displayName: String!, $offset: Int!, $limit: Int!) {
     moderationProfiles(where: { displayName: $displayName }) {
       displayName
-      AuthoredComments(options: { limit: $limit, offset: $offset }) {
+      AuthoredComments(
+        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+      ) {
         id
         text
         createdAt

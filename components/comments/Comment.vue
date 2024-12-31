@@ -172,7 +172,6 @@ const permalinkObject = computed(() => {
   }
   const discussionIdInLink =
     discussionId || props.commentData?.DiscussionChannel?.discussionId;
-
   if (discussionIdInLink) {
     return {
       name: "forums-forumId-discussions-discussionId-comments-commentId",

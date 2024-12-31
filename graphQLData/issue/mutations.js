@@ -87,6 +87,7 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
     $actionType: String!
     $displayName: String!
     $commentText: String!
+    $channelUniqueName: String!
   ) {
     updateIssues(
       where: { id: $issueId }
@@ -104,6 +105,9 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
                   node: {
                     isRootComment: false
                     text: $commentText
+                    Channel: {
+                      connect: { where: { node: { uniqueName: $channelUniqueName } } }
+                    }
                     CommentAuthor: {
                       ModerationProfile: {
                         connect: {

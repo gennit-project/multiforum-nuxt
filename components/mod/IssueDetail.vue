@@ -408,6 +408,7 @@ const handleCreateComment = async () => {
     displayName: modProfileNameVar.value,
     actionDescription: "commented on the issue",
     actionType: "comment",
+    channelUniqueName: channelId.value,
   });
   createFormValues.value.text = "";
 };

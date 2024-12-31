@@ -21,7 +21,7 @@ const { result, loading, error } = useQuery(GET_MOD, {
 });
 
 const mod = computed(() => {
-  if (loading.value || error.value) {
+  if ((loading.value && !result.value) || error.value) {
     return null;
   }
   if (result.value && result.value.moderationProfiles.length > 0) {

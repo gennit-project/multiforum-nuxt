@@ -277,6 +277,7 @@ const submit = async () => {
       actionDescription: 'reported the discussion',
       actionType: 'report',
       commentText: reportText.value,
+      channelUniqueName: channelId.value,
     });
 
     if (existingIssueId) {

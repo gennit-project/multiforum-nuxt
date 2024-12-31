@@ -120,6 +120,7 @@ export default defineComponent({
           ? " in c/" +
             (this.commentData.DiscussionChannel?.channelUniqueName ||
               this.commentData.Event?.EventChannels[0]?.channelUniqueName ||
+                this.commentData.Channel?.uniqueName ||
               "")
           : ""
       }`;

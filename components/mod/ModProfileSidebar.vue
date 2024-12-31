@@ -47,16 +47,17 @@ const mod = computed(() => {
         :is-square="false"
         :is-medium="true"
       />
+      <label>Mod Profile</label>
       <h1
         v-if="mod?.displayName"
-        class="mt-4 flex border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
+        class="flex border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
       >
-        {{ `m/${mod.displayName}` }}
+        {{ mod.displayName }}
       </h1>
 
       <div
         v-if="mod && mod.createdAt"
-        class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden"
+        class="min-w-0 flex-1 sm:block 2xl:hidden"
       >
         {{ `Joined ${relativeTime(mod.createdAt)}` }}
       </div>
