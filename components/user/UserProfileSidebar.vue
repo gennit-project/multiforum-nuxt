@@ -45,7 +45,7 @@ const user = computed(() => {
 </script>
 
 <template>
-  <div class="sticky top-0 max-h-screen overflow-auto rounded-lg pt-6">
+  <div class="rounded-lg pt-6">
     <div class="mb-4 mt-6 p-2 flex flex-col gap-2">
       <AvatarComponent
         :src="user?.profilePicURL"

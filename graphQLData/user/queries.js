@@ -121,7 +121,7 @@ export const GET_USER_EVENTS = gql`
   query getUserEvents($username: String!) {
     users(where: { username: $username }) {
       username
-      Events {
+      Events(options: { sort: { createdAt: DESC } }) {
         id
         title
         startTime
