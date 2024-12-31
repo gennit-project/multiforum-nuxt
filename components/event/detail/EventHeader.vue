@@ -318,7 +318,7 @@ function handleFeedbackInput(event: string) {
           <div class="h-5 w-5">
             <i class="fa-solid fa-ticket h-5" />
           </div>
-          <MarkdownPreview class="-ml-2" :disable-gallery="true" :text="eventData.cost" />
+          <MarkdownPreview class="-ml-6" :disable-gallery="true" :text="eventData.cost" />
         </li>
         <li
           v-if="eventData.isHostedByOP && eventData.Poster"

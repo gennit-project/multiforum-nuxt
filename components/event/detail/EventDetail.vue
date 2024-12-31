@@ -288,7 +288,7 @@ const addToOutlook = () => {
                 :event-data="event"
                 :show-menu-buttons="showMenuButtons"
               />
-              <EventBody v-if="event.description" :event="event" />
+              <EventBody v-if="event.description" :event="event" class="-ml-4" />
 
               <div class="p-4">
                 <h2 class="text-md mt-4">Add to Calendar</h2>
