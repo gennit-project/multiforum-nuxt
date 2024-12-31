@@ -98,16 +98,14 @@ if (import.meta.env.SSR === false) {
 
 <template>
   <div
-    class="flex align-items"
-    :class="[!justifyLeft ? 'justify-center' : '', fullWidth ? 'w-full' : '']"
+    class="flex items-center"
+    :class="[
+      fullWidth ? 'w-full' : '',
+      justifyLeft ? 'justify-start' : 'justify-center'
+    ]"
   >
     <div
       v-if="!showAuthContent"
-      :class="[
-        fullWidth
-          ? 'w-full flex align-items justify-center'
-          : 'w-full flex align-items justify-end',
-      ]"
       data-auth-state="unauthenticated"
       @click="handleLogin"
     >
@@ -115,11 +113,6 @@ if (import.meta.env.SSR === false) {
     </div>
     <div
       v-else
-      :class="[
-        fullWidth
-          ? 'w-full flex align-items justify-center'
-          : 'w-full flex align-items justify-end',
-      ]"
       data-auth-state="authenticated"
     >
       <slot name="has-auth" />

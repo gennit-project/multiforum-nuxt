@@ -107,14 +107,6 @@ const isOnMapPage = computed(() => {
         >
           <LoginButton />
         </div>
-        <template #fallback>
-          <button
-            data-testid="login-button"
-            class="flex-end items-center px-3 py-1 text-xs font-medium text-gray-400 rounded-full hover:text-black hover:dark:text-white mr-2"
-          >
-            Log In
-          </button>
-        </template>
       </client-only>
       <div class="flex items-center space-x-2">
         <CreateAnythingButton />
