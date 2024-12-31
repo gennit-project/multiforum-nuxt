@@ -1,8 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref, watch } from "vue";
 import TabButton from "@/components/channel/TabButton.vue";
-import type { User } from "@/__generated__/graphql";
-import { usernameVar, isAuthenticatedVar } from "@/cache";
+import type { ModerationProfile } from "@/__generated__/graphql";
 import { useRoute } from "nuxt/app";
 
 const route = useRoute();
@@ -15,12 +14,8 @@ type TabData = {
 };
 
 const props = defineProps({
-  vertical: {
-    type: Boolean,
-    default: false,
-  },
-  user: {
-    type: Object as () => User,
+  mod: {
+    type: Object as () => ModerationProfile,
     required: true,
   },
   showCounts: {
@@ -30,8 +25,8 @@ const props = defineProps({
 });
 
 const channelId = ref(route.params.forumId);
-const usernameInParams = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
+const modNameInParams = computed(() => {
+  return typeof route.params.modId === "string" ? route.params.modId : "";
 });
 
 watch(
@@ -46,35 +41,23 @@ const tabs = computed(() => {
   const tabList: TabData[] = [
     {
       name: "Comments",
-      href: `/u/${usernameInParams.value}/comments`,
+      href: `/mod/${modNameInParams.value}/comments`,
       current: true,
-      count: props.user?.CommentsAggregate?.count,
+      count: props.mod?.AuthoredCommentsAggregate?.count,
     },
     {
-      name: "Discussions",
-      href: `/u/${usernameInParams.value}/discussions`,
+      name: "Mod Actions",
+      href: `/mod/${modNameInParams.value}/actions`,
       current: false,
-      count: props.user?.DiscussionsAggregate?.count,
+      count: props.mod?.ActivityFeedAggregate?.count,
     },
     {
-      name: "Events",
-      href: `/u/${usernameInParams.value}/events`,
+      name: "Issues",
+      href: `/mod/${modNameInParams.value}/issues`,
       current: false,
-      count: props.user?.EventsAggregate?.count,
+      count: props.mod?.AuthoredIssuesAggregate?.count,
     },
   ];
-
-  if (
-    isAuthenticatedVar.value &&
-    usernameVar.value === usernameInParams.value
-  ) {
-    tabList.push({
-      name: "Settings",
-      href: `/u/${usernameInParams.value}/settings`,
-      current: false,
-      count: null,
-    });
-  }
   return tabList;
 });
 </script>

@@ -45,33 +45,41 @@ export const GET_MOD = gql`
         count
         __typename
       }
+      ActivityFeedAggregate {
+        count
+        __typename
+      }
     }
   }`
 
-export const GET_FEEDBACK_BY_MOD_PROFILE = gql`
-query getFeedbackByModProfile {
-  moderationProfiles(
-    where: {
-      displayName: "miniatureDeafeningMysteriousTeacher"
-    }
-  ) {
-    displayName
-    
-    AuthoredComments {
-      Channel {
-        uniqueName
-      }
-      text
-      GivesFeedbackOnDiscussion {
-        title
-      }
-      GivesFeedbackOnComment {
+
+export const GET_MOD_COMMENTS = gql`
+  query getModComments($displayName: String!, $offset: Int!, $limit: Int!) {
+    moderationProfiles(where: { displayName: $displayName }) {
+      displayName
+      AuthoredComments(options: { limit: $limit, offset: $offset }) {
+        id
         text
-      }
-      GivesFeedbackOnEvent {
-        title
+        createdAt
+        updatedAt
+        deleted
+        CommentAuthor {
+          ... on ModerationProfile {
+            displayName
+          }
+        }
+        DiscussionChannel {
+          id
+          Channel {
+            uniqueName
+          }
+          discussionId
+          channelUniqueName
+        }
+        Channel {
+          uniqueName
+        }
       }
     }
   }
-}
-`
+`;

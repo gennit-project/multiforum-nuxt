@@ -1,0 +1,116 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useQuery } from "@vue/apollo-composable";
+import { useRoute } from "nuxt/app";
+import { modProfileNameVar } from "@/cache";
+
+import { GET_MOD, GET_MOD_COMMENTS } from "@/graphQLData/mod/queries";
+import Comment from "@/components/comments/Comment.vue";
+
+const PAGE_LIMIT = 25;
+
+const route = useRoute();
+
+const modProfileName = computed(() => {
+  return typeof route.params.modId === "string" ? route.params.modId : "";
+});
+
+const {
+  result: modResult,
+  loading: getModLoading,
+  error: getModError,
+} = useQuery(GET_MOD, () => ({
+  displayName: modProfileName.value,
+}));
+
+
+const mod = computed(() => {
+  if (getModLoading.value || getModError.value) {
+    return null;
+  }
+  if (modResult.value && modResult.value.moderationProfiles.length > 0) {
+    return modResult.value.moderationProfiles[0];
+  }
+  return null;
+});
+
+const commentsAggregate = computed(() => {
+  return mod.value ? mod.value.CommentsAggregate.count : 0;
+});
+
+const { result: commentResult, loading, error, fetchMore } = useQuery(
+  GET_MOD_COMMENTS,
+  () => ({
+    displayName: modProfileName.value,
+    limit: PAGE_LIMIT,
+    offset: 0,
+  }),
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+console.log(commentResult.value); 
+
+const loadMore = () => {
+  if (!commentResult.value?.moderationProfiles?.[0]?.AuthoredComments) return;
+
+  fetchMore({
+    variables: {
+      limit: PAGE_LIMIT,
+      offset: commentResult.value.moderationProfiles[0].AuthoredComments.length,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult;
+      return {
+        moderationProfiles: [
+          {
+            ...previousResult.moderationProfiles[0],
+            AuthoredComments: [
+              ...previousResult.moderationProfiles[0].AuthoredComments,
+              ...fetchMoreResult.moderationProfiles[0].AuthoredComments,
+            ],
+          },
+        ],
+      };
+    },
+  });
+};
+</script>
+
+<template>
+  <div class="py-3 dark:text-white">
+    <div v-if="error">
+      {{ error.message }}
+    </div>
+    <div
+      v-else-if="
+        commentResult?.moderationProfiles?.length === 0 ||
+        commentResult?.moderationProfiles[0]?.AuthoredComments.length === 0
+      "
+    >
+      No comments yet
+    </div>
+    <div v-else-if="commentResult && commentResult?.moderationProfiles?.length > 0">
+      <Comment
+        v-for="comment in commentResult.moderationProfiles[0].AuthoredComments"
+        :key="comment.id"
+        :comment-data="comment"
+        :parent-comment-id="comment.ParentComment ? comment.ParentComment.id : null"
+        :depth="0"
+        :show-channel="true"
+        :show-context-link="true"
+        :go-to-permalink-on-click="true"
+      />
+    </div>
+    <div v-if="loading">
+      Loading...
+    </div>
+    <div v-if="commentResult?.moderationProfiles[0]?.AuthoredComments?.length > 0">
+      <LoadMore
+        class="justify-self-center"
+        :reached-end-of-results="commentsAggregate === commentResult.moderationProfiles[0].AuthoredComments.length"
+        @load-more="loadMore"
+      />
+    </div>
+  </div>
+</template>

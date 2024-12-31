@@ -1,98 +1,91 @@
-<script lang="ts">
-import { defineComponent, computed } from "vue";
-import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
+<script setup lang="ts">
+import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
-import Comment from "@/components/comments/Comment.vue";
 import { useRoute } from "nuxt/app";
+
+import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
+import Comment from "@/components/comments/Comment.vue";
 
 const PAGE_LIMIT = 25;
 
-export default defineComponent({
-  components: {
-    Comment,
-  },
-  setup() {
-    const route = useRoute();
+const route = useRoute();
 
-    const username = computed(() => {
-      if (typeof route.params.username === "string") {
-        return route.params.username;
-      }
-      return "";
-    });
-
-    const { result: userResult, loading: getUserLoading, error: getUserError } = useQuery(GET_USER, () => ({
-      username: username.value,
-    }));
-
-    const user = computed(() => {
-      if (getUserLoading.value || getUserError.value) {
-        return null;
-      }
-      if (userResult.value && userResult.value.users.length > 0) {
-        return userResult.value.users[0];
-      }
-      return null;
-    });
-
-    const commentsAggregate = computed(() => {
-      if (user.value) {
-        return user.value.CommentsAggregate.count;
-      }
-      return 0;
-    });
-
-    const { result: commentResult, loading, error, fetchMore } = useQuery(
-      GET_USER_COMMENTS,
-      () => ({
-        username: username.value,
-        limit: PAGE_LIMIT,
-        offset: 0,
-      }),
-      {
-        fetchPolicy: "cache-first",
-      }
-    );
-
-    const loadMore = () => {
-      fetchMore({
-        variables: {
-          limit: PAGE_LIMIT,
-          offset: commentResult.value.users[0].Comments.length,
-        },
-        updateQuery: (previousResult, { fetchMoreResult }) => {
-          if (!fetchMoreResult) return previousResult;
-          return {
-            users: [
-              {
-                ...previousResult.users[0],
-                Comments: [
-                  ...previousResult.users[0].Comments,
-                  ...fetchMoreResult.users[0].Comments,
-                ],
-              },
-            ],
-          };
-        },
-      });
-    };
-
-    return {
-      commentsAggregate,
-      loading,
-      error,
-      commentResult,
-      loadMore,
-    };
-  },
+const username = computed(() => {
+  return typeof route.params.username === "string" ? route.params.username : "";
 });
+
+const {
+  result: userResult,
+  loading: getUserLoading,
+  error: getUserError,
+} = useQuery(GET_USER, () => ({
+  username: username.value,
+}));
+
+
+const user = computed(() => {
+  if (getUserLoading.value || getUserError.value) {
+    return null;
+  }
+  if (userResult.value && userResult.value.users.length > 0) {
+    return userResult.value.users[0];
+  }
+  return null;
+});
+
+const commentsAggregate = computed(() => {
+  return user.value ? user.value.CommentsAggregate.count : 0;
+});
+
+const { result: commentResult, loading, error, fetchMore } = useQuery(
+  GET_USER_COMMENTS,
+  () => ({
+    username: username.value,
+    limit: PAGE_LIMIT,
+    offset: 0,
+  }),
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+const loadMore = () => {
+  if (!commentResult.value?.users?.[0]?.Comments) return;
+
+  fetchMore({
+    variables: {
+      limit: PAGE_LIMIT,
+      offset: commentResult.value.users[0].Comments.length,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult;
+      return {
+        users: [
+          {
+            ...previousResult.users[0],
+            Comments: [
+              ...previousResult.users[0].Comments,
+              ...fetchMoreResult.users[0].Comments,
+            ],
+          },
+        ],
+      };
+    },
+  });
+};
 </script>
+
 <template>
   <div class="py-3 dark:text-white">
     <div v-if="error">
       Error
     </div>
-    <div v-else-if="commentResult?.users?.length === 0 || commentResult?.users[0]?.Comments.length === 0">
+    <div
+      v-else-if="
+        commentResult?.users?.length === 0 ||
+        commentResult?.users[0]?.Comments.length === 0
+      "
+    >
       No comments yet
     </div>
     <div v-else-if="commentResult && commentResult?.users?.length > 0">
@@ -100,9 +93,7 @@ export default defineComponent({
         v-for="comment in commentResult.users[0].Comments"
         :key="comment.id"
         :comment-data="comment"
-        :parent-comment-id="
-          comment.ParentComment ? comment.ParentComment.id : null
-        "
+        :parent-comment-id="comment.ParentComment ? comment.ParentComment.id : null"
         :depth="0"
         :show-channel="true"
         :show-context-link="true"
@@ -115,9 +106,7 @@ export default defineComponent({
     <div v-if="commentResult?.users[0]?.Comments.length > 0">
       <LoadMore
         class="justify-self-center"
-        :reached-end-of-results="
-          commentsAggregate === commentResult.users[0].Comments.length
-        "
+        :reached-end-of-results="commentsAggregate === commentResult.users[0].Comments.length"
         @load-more="loadMore"
       />
     </div>
