@@ -30,13 +30,12 @@ const mod = computed(() => {
   return null;
 });
 
-
 </script>
 
 <template>
   <NuxtLayout>
     <div class="max-w-screen-2xl w-full px-2 dark:bg-black">
-      <ModProfileSidebar :is-admin="false" />
+      <ModProfileSidebar :is-admin="false"  />
       <div class="flex-1 min-w-0">
         <ModProfileTabs
           v-if="mod"

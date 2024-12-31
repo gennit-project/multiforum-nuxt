@@ -2,8 +2,6 @@
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
-import { modProfileNameVar } from "@/cache";
-
 import { GET_MOD, GET_MOD_COMMENTS } from "@/graphQLData/mod/queries";
 import Comment from "@/components/comments/Comment.vue";
 
@@ -49,6 +47,7 @@ const {
     fetchPolicy: "cache-first",
   }
 );
+
 
 const loadMore = () => {
   if (!commentResult.value?.moderationProfiles?.[0]?.AuthoredComments) return;

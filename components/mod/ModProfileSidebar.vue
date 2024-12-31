@@ -5,8 +5,8 @@ import "md-editor-v3/lib/style.css";
 import { GET_MOD } from "@/graphQLData/mod/queries";
 import { relativeTime } from "@/utils";
 import { useRoute } from "nuxt/app";
+import { modProfileNameVar } from "@/cache";
 
-// Define props
 defineProps({
   isAdmin: {
     type: Boolean,
@@ -21,6 +21,10 @@ const modName = computed(() => {
     return route.params.modId;
   }
   return "";
+});
+
+const modProfileIsYourself = computed(() => {
+  return modProfileNameVar.value === modName.value;
 });
 
 const {
@@ -52,7 +56,7 @@ const mod = computed(() => {
         v-if="mod?.displayName"
         class="flex border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
       >
-        {{ mod.displayName }}
+        {{ mod.displayName }}<span v-if="modProfileIsYourself" class="ml-2">(You)</span>
       </h1>
 
       <div
