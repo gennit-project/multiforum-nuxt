@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
 import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
-import TwoSeparatelyScrollingPanes from "@/components/TwoSeparatelyScrollingPanes.vue";
+import { useRoute } from "nuxt/app";
 
 // Route handling
 const route = useRoute();
@@ -49,28 +49,19 @@ const isAdmin = computed(() => {
 
 <template>
   <NuxtLayout>
-    <div class="max-w-screen-2xl mx-auto dark:bg-black">
-      <TwoSeparatelyScrollingPanes
-        :show-right-pane-at-medium-screen-width="true"
-      >
-        <template #leftpane>
-          <UserProfileSidebar :is-admin="isAdmin" />
-        </template>
-        <template #rightpane>
-          <div class="hidden md:block">
-            <UserProfileTabs
-              v-if="user"
-              :show-counts="true"
-              :vertical="false"
-              :user="user"
-              class="block border-b border-gray-200 dark:border-gray-600"
-              :route="route"
-            />
-          </div>
-          <NuxtPage />
-        </template>
-       
-      </TwoSeparatelyScrollingPanes>
+    <div class="max-w-screen-2xl w-full px-2 dark:bg-black">
+      <UserProfileSidebar :is-admin="isAdmin" />
+      <div class="flex-1 min-w-0">
+        <UserProfileTabs
+          v-if="user"
+          :show-counts="true"
+          :vertical="false"
+          :user="user"
+          class="block border-b border-gray-200 dark:border-gray-600"
+          :route="route"
+        />
+      </div>
+      <NuxtPage />
     </div>
   </NuxtLayout>
 </template>
