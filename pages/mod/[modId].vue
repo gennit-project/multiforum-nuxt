@@ -3,10 +3,11 @@ import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_MOD } from "@/graphQLData/mod/queries";
 import ModProfileSidebar from "@/components/mod/ModProfileSidebar.vue";
-import { useRoute } from "nuxt/app";
+import { useRoute, useRouter } from "nuxt/app";
 import ModProfileTabs from "../../components/mod/ModProfileTabs.vue";
 
 const route = useRoute();
+const router = useRouter();
 const modId = computed(() => {
   if (typeof route.params.modId === "string") {
     return route.params.modId;
@@ -14,11 +15,15 @@ const modId = computed(() => {
   return "";
 });
 
-const { result, loading, error } = useQuery(GET_MOD, {
-  displayName: modId.value,
-},{
-  fetchPolicy:'cache-first'
-});
+const { result, loading, error, onResult } = useQuery(
+  GET_MOD,
+  {
+    displayName: modId.value,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 const mod = computed(() => {
   if ((loading.value && !result.value) || error.value) {
@@ -30,12 +35,18 @@ const mod = computed(() => {
   return null;
 });
 
+if (modId.value) {
+  const modProfileBasePathName = `mod-modId`;
+  if (route.name === modProfileBasePathName) {
+    router.push(`/mod/${modId.value}/comments`);
+  }
+}
 </script>
 
 <template>
   <NuxtLayout>
     <div class="max-w-screen-2xl w-full px-2 dark:bg-black">
-      <ModProfileSidebar :is-admin="false"  />
+      <ModProfileSidebar :is-admin="false" />
       <div class="flex-1 min-w-0">
         <ModProfileTabs
           v-if="mod"
