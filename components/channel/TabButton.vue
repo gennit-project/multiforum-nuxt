@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute } from 'nuxt/app';
 
 const props = defineProps({
   count: {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { useRouter } from 'nuxt/app';
 
 const props = defineProps({
   to: {

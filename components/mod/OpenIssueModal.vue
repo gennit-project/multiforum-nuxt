@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import type { PropType } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute } from 'nuxt/app';
 import { useMutation, useLazyQuery } from '@vue/apollo-composable';
 import GenericModal from '@/components/GenericModal.vue';
 import FlagIcon from '@/components/icons/FlagIcon.vue';

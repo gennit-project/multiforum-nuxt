@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 // redirect to /comments
 import { GET_USER } from "@/graphQLData/user/queries";
-import { useRouter } from "nuxt/app";
+import { useRoute, useRouter } from "nuxt/app";
 import UserProfileTabs from "@/components/user/UserProfileTabs.vue";
+import { useQuery } from "@vue/apollo-composable";
+import { computed } from "vue";
 
 const router = useRouter();
 
