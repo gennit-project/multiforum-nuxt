@@ -48,14 +48,14 @@ const writeReplyStyle =
       v-if="createCommentError"
       :text="createCommentError?.message"
     />
-    <div class="flex gap-2">
+    <div class="flex gap-2 w-full">
       <RequireAuth
         v-if="!commentEditorOpen"
         :justify-left="true"
         :full-width="true"
       >
         <template #has-auth>
-          <div class="flex w-full gap-2">
+          <div class="flex align-items w-full gap-2">
             <LoggedInUserAvatar v-if="usernameVar" />
             <textarea
               data-testid="addComment"

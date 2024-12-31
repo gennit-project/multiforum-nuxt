@@ -148,6 +148,9 @@ export const GET_ISSUES_BY_CHANNEL = gql`
         updatedAt
         isOpen
         relatedDiscussionId
+        Channel {
+          uniqueName
+        }
       }
     }
   }

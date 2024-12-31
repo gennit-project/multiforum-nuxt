@@ -15,7 +15,7 @@ const modId = computed(() => {
   return "";
 });
 
-const { result, loading, error, onResult } = useQuery(
+const { result, loading, error } = useQuery(
   GET_MOD,
   {
     displayName: modId.value,

@@ -98,14 +98,15 @@ if (import.meta.env.SSR === false) {
 
 <template>
   <div
-    class="flex items-center"
+    class="flex items-center "
     :class="[
       fullWidth ? 'w-full' : '',
-      justifyLeft ? 'justify-start' : 'justify-center'
+      justifyLeft ? 'justify-start w-full' : 'justify-center',
     ]"
   >
     <div
       v-if="!showAuthContent"
+      class="w-full"
       data-auth-state="unauthenticated"
       @click="handleLogin"
     >
@@ -113,6 +114,7 @@ if (import.meta.env.SSR === false) {
     </div>
     <div
       v-else
+      class="w-full"
       data-auth-state="authenticated"
     >
       <slot name="has-auth" />
