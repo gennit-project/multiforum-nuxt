@@ -40,14 +40,14 @@ const mod = computed(() => {
     return null;
   }
   return result.value?.moderationProfiles[0] || null;
-});
+});console.log(mod.value)
 </script>
 
 <template>
   <div class="rounded-lg pt-6">
     <div class="mb-4 mt-6 p-2 flex flex-col gap-2">
       <AvatarComponent
-        :text="mod?.displayName"
+        :text="mod?.displayName || ''"
         :is-square="false"
         :is-medium="true"
       />
@@ -58,9 +58,8 @@ const mod = computed(() => {
       >
         {{ mod.displayName }}<span v-if="modProfileIsYourself" class="ml-2">(You)</span>
       </h1>
-
       <div
-        v-if="mod && mod.createdAt"
+        v-if="mod?.createdAt"
         class="min-w-0 flex-1 sm:block 2xl:hidden"
       >
         {{ `Joined ${relativeTime(mod.createdAt)}` }}

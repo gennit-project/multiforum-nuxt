@@ -59,7 +59,7 @@ const showFormatted = ref(false);
 // Methods
 const focusEditor = () => {
   nextTick(() => {
-    if (editorRef.value) {
+    if (editorRef.value && !props.disableAutoFocus) {
       editorRef.value.focus();
     }
   });

@@ -534,6 +534,7 @@ const toggleCloseOpenIssue = () => {
             <TextEditor
               :key="`${createFormValues.text === ''}`"
               :test-id="'texteditor-textarea'"
+              :disable-auto-focus="true"
               :placeholder="'Please be kind'"
               :initial-value="createFormValues.text"
               @update="updateComment"

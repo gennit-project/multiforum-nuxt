@@ -73,3 +73,28 @@ export const GET_MOD_COMMENTS = gql`
     }
   }
 `;
+
+export const GET_MOD_ISSUES = gql`
+  query getModIssues($displayName: String!, $offset: Int!, $limit: Int!) {
+    moderationProfiles(where: { displayName: $displayName }) {
+      displayName
+      AuthoredIssues(
+        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+      ) {
+        id
+        title
+        createdAt
+        updatedAt
+        isOpen
+        Author {
+          ... on ModerationProfile {
+            displayName
+          }
+        }
+        Channel {
+          uniqueName
+        }
+      }
+    }
+  }
+`;

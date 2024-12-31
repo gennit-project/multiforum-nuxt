@@ -23,7 +23,6 @@ export const REPORT_CONTENT = gql`
   }
 `;
 
-
 export const CLOSE_ISSUE = gql`
   mutation closeIssue($id: ID!) {
     updateIssues(where: { id: $id }, update: { isOpen: false }) {
