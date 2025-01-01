@@ -107,6 +107,9 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
                     Channel: {
                       connect: { where: { node: { uniqueName: $channelUniqueName } } }
                     }
+                    Issue: {
+                      connect: { where: { node: { id: $issueId } } }
+                    }
                     CommentAuthor: {
                       ModerationProfile: {
                         connect: {
