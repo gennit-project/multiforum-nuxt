@@ -91,7 +91,7 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="mt-4 px-4 text-xs text-gray-700 dark:text-gray-200">
+  <div class="mt-4 text-xs text-gray-700 dark:text-gray-200">
     <div class="organizer flex items-center gap-1">
       <nuxt-link
         v-if="eventData.Poster"

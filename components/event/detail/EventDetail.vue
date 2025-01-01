@@ -248,7 +248,7 @@ const addToOutlook = () => {
 
           <div
             v-else-if="event"
-            class="dark:bg-dark-700 mx-auto flex flex-col gap-4 pt-8"
+            class="dark:bg-dark-700 flex flex-col gap-4 pt-8"
           >
             <InfoBanner
               v-if="eventHasStarted"
@@ -290,7 +290,7 @@ const addToOutlook = () => {
               />
               <EventBody v-if="event.description" :event="event" class="-ml-4" />
 
-              <div class="p-4">
+              <div >
                 <h2 class="text-md mt-4">Add to Calendar</h2>
                 <hr />
                 <div class="mt-4 flex">
@@ -321,7 +321,7 @@ const addToOutlook = () => {
               </div>
             </div>
 
-            <div class="mx-4 my-2">
+            <div class="my-2">
               <div class="flex space-x-1">
                 <Tag
                   v-for="tag in event.Tags"
