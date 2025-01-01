@@ -194,12 +194,10 @@ const filteredQuery = computed(() => {
                     },
                     query: filteredQuery,
                   }"
-                  class="rounded-md p-1 pr-4 underline"
+                  class="p-1 rounded-full dark:bg-gray-700 bg-gray-100 px-4 flex items-center gap-2"
                 >
-                  <i class="fa-regular fa-comment h-5 w-5" />
-                  <span class="text-md">{{
-                    `${commentCount} comment${commentCount === 1 ? "" : "s"}`
-                  }}</span>
+                  <i class="fa-regular fa-comment h-4 w-4" />
+                  <span class="text-sm">{{commentCount}}</span>
                 </nuxt-link>
               </div>
             </div>
