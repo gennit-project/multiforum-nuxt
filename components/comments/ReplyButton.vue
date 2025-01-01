@@ -35,13 +35,13 @@ const buttonClasses = computed(() => {
     "flex gap-1 max-h-6 cursor-pointer items-center rounded-full px-2 py-1",
   ];
 
-  const defaultClasses = "border-gray-100 bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-700";
+  const defaultClasses = "bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700";
   return [
     ...baseClasses,
     ...defaultClasses,
     props.isPermalinked
-      ? "border border-blue-500 hover:bg-blue-300"
-      : "border border-gray-200 dark:border-gray-600 hover:bg-gray-200 dark:hover:bg-gray-700",
+      ? "hover:bg-blue-300 dark:hover:bg-blue-700"
+      : "hover:bg-gray-200 dark:hover:bg-gray-700 dark:bg-gray-700",
   ];
 });
 
