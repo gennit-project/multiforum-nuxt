@@ -40,7 +40,7 @@ const mod = computed(() => {
     return null;
   }
   return result.value?.moderationProfiles[0] || null;
-});console.log(mod.value)
+});
 </script>
 
 <template>

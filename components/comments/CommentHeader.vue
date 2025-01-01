@@ -39,6 +39,10 @@ export default defineComponent({
       type: String,
       default: "",
     },
+    label: {
+      type: String,
+      default: "",
+    },
   },
   setup(props) {
     const isAdmin = computed(() => {
@@ -224,6 +228,12 @@ export default defineComponent({
             v-if="isHighlighted"
             class="rounded-lg bg-blue-500 px-2 py-1 text-black"
             >Permalinked
+          </span>
+          <span 
+            v-if="label"
+            class="rounded-lg border border-blue-500 px-2 py-1 text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900"
+          >
+            {{ label }}
           </span>
         </div>
       </div>

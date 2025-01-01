@@ -4,11 +4,11 @@ import type { Issue } from "@/__generated__/graphql";
 import { GET_ISSUES_BY_CHANNEL } from "@/graphQLData/issue/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
-import IssueListItem from "./IssueListItem.vue";
+import ModIssueListItem from "./ModIssueListItem.vue";
 
 export default defineComponent({
   components: {
-    IssueListItem,
+    ModIssueListItem,
   },
   setup() {
     const route = useRoute();
@@ -53,7 +53,7 @@ export default defineComponent({
     class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
     data-testid="issue-list"
   >
-    <IssueListItem v-for="issue in issues" :key="issue.id" :issue="issue" :channel-id="channelId" />
+    <ModIssueListItem v-for="issue in issues" :key="issue.id" :issue="issue" :channel-id="channelId" />
   </ul>
 </template>
 

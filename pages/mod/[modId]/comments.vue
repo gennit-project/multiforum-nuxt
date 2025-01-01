@@ -80,6 +80,10 @@ const loadMore = () => {
 const commentCount = computed(() => {
   return commentResult.value?.moderationProfiles[0]?.AuthoredComments.length
 })
+
+const comments = computed(() => {
+  return commentResult.value?.moderationProfiles[0]?.AuthoredComments || []
+})
 </script>
 
 <template>
@@ -102,7 +106,7 @@ const commentCount = computed(() => {
       v-else-if="commentResult && commentResult?.moderationProfiles?.length > 0"
     >
       <Comment
-        v-for="comment in commentResult.moderationProfiles[0].AuthoredComments"
+        v-for="comment in comments"
         :key="comment.id"
         :comment-data="comment"
         :parent-comment-id="
@@ -111,6 +115,7 @@ const commentCount = computed(() => {
         :depth="0"
         :show-channel="true"
         :show-context-link="true"
+        :show-label="true"
         :go-to-permalink-on-click="true"
       />
     </div>

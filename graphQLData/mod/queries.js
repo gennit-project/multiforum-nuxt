@@ -69,6 +69,18 @@ export const GET_MOD_COMMENTS = gql`
         Channel {
           uniqueName
         }
+        GivesFeedbackOnDiscussion {
+          id
+        }
+        GivesFeedbackOnEvent {
+          id
+        }
+        GivesFeedbackOnComment {
+          id
+        }
+        Issue {
+          id
+        }
       }
     }
   }

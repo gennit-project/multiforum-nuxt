@@ -8,7 +8,7 @@ const props = defineProps({
     required: true,
   },
 });
-console.log('props', props.issue);
+
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);

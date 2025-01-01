@@ -16,6 +16,7 @@ import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
+import { VFieldLabel } from "vuetify/lib/components/index.mjs";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -118,6 +119,10 @@ const props = defineProps({
   lengthOfCommentInProgress: {
     type: Number,
     default: 1,
+  },
+  showLabel: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -352,6 +357,22 @@ const saveDisabled = computed(() => {
   return props.lengthOfCommentInProgress === 0 ||
     props.lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
 });
+
+const label = computed(() => {
+  let label = "";
+  if (props.showLabel) {
+    if (props.commentData.GivesFeedbackOnDiscussion) {
+      label = "Feedback on Discussion";
+    } else if (props.commentData.GivesFeedbackOnEvent) {
+      label = "Feedback on Event";
+    } else if (props.commentData.GivesFeedbackOnComment) {
+      label = "Feedback on Comment";
+    } else if (props.commentData.Issue) {
+      label = "Comment on Issue";
+    }
+  }
+  return label;
+});
 </script>
 
 <template>
@@ -382,6 +403,7 @@ const saveDisabled = computed(() => {
               :show-context-link="props.showContextLink"
               :show-channel="props.showChannel"
               :original-poster="props.originalPoster"
+              :label="label"
             />
             <div
               class="ml-3 flex-grow border-l border-gray-300 pl-4 dark:border-gray-500"

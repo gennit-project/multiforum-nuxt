@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useRoute } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
-import IssueListItem from "@/components/mod/IssueListItem.vue";
+import IssueListItem from "@/components/mod/ModIssueListItem.vue";
 import { GET_MOD, GET_MOD_ISSUES } from "@/graphQLData/mod/queries";
 
 const PAGE_LIMIT = 25;
@@ -45,35 +45,35 @@ const {
     limit: PAGE_LIMIT,
     offset: 0,
   }),
-//   {
-//     fetchPolicy: "cache-first",
-//   }
+  {
+    fetchPolicy: "cache-first",
+  }
 );
 
 const loadMore = () => {
-//   if (!issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues) return;
+  if (!issueResult.value?.moderationProfiles?.[0]?.AuthoredIssues) return;
 
-//   fetchMore({
-//     variables: {
-//       limit: PAGE_LIMIT,
-//       offset: issueResult.value.moderationProfiles[0].AuthoredIssues.length,
-//     },
-//     updateQuery: (previousResult, { fetchMoreResult }) => {
-//       if (!fetchMoreResult) return previousResult;
-//       const prevModProfile = previousResult.moderationProfiles[0];
-//       const prevAuthoredIssues = prevModProfile.AuthoredIssues || [];
-//       const newComments =
-//         fetchMoreResult.moderationProfiles[0].AuthoredIssues || [];
-//       return {
-//         moderationProfiles: [
-//           {
-//             ...prevModProfile,
-//             AuthoredIssues: [...prevAuthoredIssues, ...newComments],
-//           },
-//         ],
-//       };
-//     },
-//   });
+  fetchMore({
+    variables: {
+      limit: PAGE_LIMIT,
+      offset: issueResult.value.moderationProfiles[0].AuthoredIssues.length,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult;
+      const prevModProfile = previousResult.moderationProfiles[0];
+      const prevAuthoredIssues = prevModProfile.AuthoredIssues || [];
+      const newComments =
+        fetchMoreResult.moderationProfiles[0].AuthoredIssues || [];
+      return {
+        moderationProfiles: [
+          {
+            ...prevModProfile,
+            AuthoredIssues: [...prevAuthoredIssues, ...newComments],
+          },
+        ],
+      };
+    },
+  });
 };
 
 const issueCount = computed(() => {

@@ -5,7 +5,7 @@ import { GET_CLOSED_ISSUES_BY_CHANNEL } from "@/graphQLData/issue/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
 import { DateTime } from "luxon";
-import IssueListItem from "@/components/mod/IssueListItem.vue";
+import IssueListItem from "@/components/mod/ModIssueListItem.vue";
 
 export default defineComponent({
   components: {
