@@ -212,7 +212,7 @@ export const GET_DISCUSSION_CHANNEL_BY_ID = gql`
 `;
 
 export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
-query getDiscussionChannelRootCommentAggregate(
+  query getDiscussionChannelRootCommentAggregate(
     $channelUniqueName: String!
     $discussionId: ID!
   ) {
@@ -297,6 +297,47 @@ export const GET_FEEDBACK_COMMENT = gql`
         }
       }
     }
+  }
+`;
+
+export const GET_ACTIVITY_FEED_COMMENT = gql`
+  query getActivityFeedComment($id: ID!) {
+    comments(where: { id: $id }) {
+      id
+      ModerationAction {
+        id
+        actionType
+        actionDescription
+        createdAt
+        ModerationProfile {
+          displayName
+          createdAt
+          __typename
+        }
+        Comment {
+          text
+          createdAt
+          CommentAuthor {
+            ... on ModerationProfile {
+              displayName
+              __typename
+            }
+            __typename
+          }
+          Issue {
+            id
+            __typename
+          }
+          Channel {
+            uniqueName
+            __typename
+          }
+          __typename
+        }
+      }
+      __typename
+    }
+    __typename
   }
 `;
 

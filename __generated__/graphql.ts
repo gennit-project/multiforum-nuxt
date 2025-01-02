@@ -3068,6 +3068,9 @@ export type Comment = {
   Issue?: Maybe<Issue>;
   IssueAggregate?: Maybe<CommentIssueIssueAggregationSelection>;
   IssueConnection: CommentIssueConnection;
+  ModerationAction?: Maybe<ModerationAction>;
+  ModerationActionAggregate?: Maybe<CommentModerationActionModerationActionAggregationSelection>;
+  ModerationActionConnection: CommentModerationActionConnection;
   ParentComment?: Maybe<Comment>;
   ParentCommentAggregate?: Maybe<CommentCommentParentCommentAggregationSelection>;
   ParentCommentConnection: CommentParentCommentConnection;
@@ -3299,6 +3302,28 @@ export type CommentIssueConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<CommentIssueConnectionSort>>;
   where?: InputMaybe<CommentIssueConnectionWhere>;
+};
+
+
+export type CommentModerationActionArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ModerationActionOptions>;
+  where?: InputMaybe<ModerationActionWhere>;
+};
+
+
+export type CommentModerationActionAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ModerationActionWhere>;
+};
+
+
+export type CommentModerationActionConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<CommentModerationActionConnectionSort>>;
+  where?: InputMaybe<CommentModerationActionConnectionWhere>;
 };
 
 
@@ -3947,6 +3972,7 @@ export type CommentConnectInput = {
   GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionConnectFieldInput>;
   GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventConnectFieldInput>;
   Issue?: InputMaybe<CommentIssueConnectFieldInput>;
+  ModerationAction?: InputMaybe<CommentModerationActionConnectFieldInput>;
   ParentComment?: InputMaybe<CommentParentCommentConnectFieldInput>;
   Tags?: InputMaybe<Array<CommentTagsConnectFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersConnectFieldInput>>;
@@ -3974,6 +4000,7 @@ export type CommentCreateInput = {
   GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionFieldInput>;
   GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventFieldInput>;
   Issue?: InputMaybe<CommentIssueFieldInput>;
+  ModerationAction?: InputMaybe<CommentModerationActionFieldInput>;
   ParentComment?: InputMaybe<CommentParentCommentFieldInput>;
   Tags?: InputMaybe<CommentTagsFieldInput>;
   UpvotedByUsers?: InputMaybe<CommentUpvotedByUsersFieldInput>;
@@ -3997,6 +4024,7 @@ export type CommentDeleteInput = {
   GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionDeleteFieldInput>;
   GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventDeleteFieldInput>;
   Issue?: InputMaybe<CommentIssueDeleteFieldInput>;
+  ModerationAction?: InputMaybe<CommentModerationActionDeleteFieldInput>;
   ParentComment?: InputMaybe<CommentParentCommentDeleteFieldInput>;
   Tags?: InputMaybe<Array<CommentTagsDeleteFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersDeleteFieldInput>>;
@@ -4013,6 +4041,7 @@ export type CommentDisconnectInput = {
   GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionDisconnectFieldInput>;
   GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventDisconnectFieldInput>;
   Issue?: InputMaybe<CommentIssueDisconnectFieldInput>;
+  ModerationAction?: InputMaybe<CommentModerationActionDisconnectFieldInput>;
   ParentComment?: InputMaybe<CommentParentCommentDisconnectFieldInput>;
   Tags?: InputMaybe<Array<CommentTagsDisconnectFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersDisconnectFieldInput>>;
@@ -5366,6 +5395,141 @@ export type CommentIssueUpdateFieldInput = {
   where?: InputMaybe<CommentIssueConnectionWhere>;
 };
 
+export type CommentModerationActionAggregateInput = {
+  AND?: InputMaybe<Array<CommentModerationActionAggregateInput>>;
+  NOT?: InputMaybe<CommentModerationActionAggregateInput>;
+  OR?: InputMaybe<Array<CommentModerationActionAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<CommentModerationActionNodeAggregationWhereInput>;
+};
+
+export type CommentModerationActionConnectFieldInput = {
+  connect?: InputMaybe<ModerationActionConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ModerationActionConnectWhere>;
+};
+
+export type CommentModerationActionConnection = {
+  __typename?: 'CommentModerationActionConnection';
+  edges: Array<CommentModerationActionRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type CommentModerationActionConnectionSort = {
+  node?: InputMaybe<ModerationActionSort>;
+};
+
+export type CommentModerationActionConnectionWhere = {
+  AND?: InputMaybe<Array<CommentModerationActionConnectionWhere>>;
+  NOT?: InputMaybe<CommentModerationActionConnectionWhere>;
+  OR?: InputMaybe<Array<CommentModerationActionConnectionWhere>>;
+  node?: InputMaybe<ModerationActionWhere>;
+};
+
+export type CommentModerationActionCreateFieldInput = {
+  node: ModerationActionCreateInput;
+};
+
+export type CommentModerationActionDeleteFieldInput = {
+  delete?: InputMaybe<ModerationActionDeleteInput>;
+  where?: InputMaybe<CommentModerationActionConnectionWhere>;
+};
+
+export type CommentModerationActionDisconnectFieldInput = {
+  disconnect?: InputMaybe<ModerationActionDisconnectInput>;
+  where?: InputMaybe<CommentModerationActionConnectionWhere>;
+};
+
+export type CommentModerationActionFieldInput = {
+  connect?: InputMaybe<CommentModerationActionConnectFieldInput>;
+  create?: InputMaybe<CommentModerationActionCreateFieldInput>;
+};
+
+export type CommentModerationActionModerationActionAggregationSelection = {
+  __typename?: 'CommentModerationActionModerationActionAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<CommentModerationActionModerationActionNodeAggregateSelection>;
+};
+
+export type CommentModerationActionModerationActionNodeAggregateSelection = {
+  __typename?: 'CommentModerationActionModerationActionNodeAggregateSelection';
+  actionDescription: StringAggregateSelection;
+  actionType: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+};
+
+export type CommentModerationActionNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<CommentModerationActionNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<CommentModerationActionNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<CommentModerationActionNodeAggregationWhereInput>>;
+  actionDescription_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  actionDescription_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  actionDescription_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  actionDescription_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  actionDescription_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  actionDescription_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  actionDescription_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  actionType_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  actionType_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  actionType_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type CommentModerationActionRelationship = {
+  __typename?: 'CommentModerationActionRelationship';
+  cursor: Scalars['String']['output'];
+  node: ModerationAction;
+};
+
+export type CommentModerationActionUpdateConnectionInput = {
+  node?: InputMaybe<ModerationActionUpdateInput>;
+};
+
+export type CommentModerationActionUpdateFieldInput = {
+  connect?: InputMaybe<CommentModerationActionConnectFieldInput>;
+  create?: InputMaybe<CommentModerationActionCreateFieldInput>;
+  delete?: InputMaybe<CommentModerationActionDeleteFieldInput>;
+  disconnect?: InputMaybe<CommentModerationActionDisconnectFieldInput>;
+  update?: InputMaybe<CommentModerationActionUpdateConnectionInput>;
+  where?: InputMaybe<CommentModerationActionConnectionWhere>;
+};
+
 export type CommentOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -5520,6 +5684,7 @@ export type CommentRelationInput = {
   GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionCreateFieldInput>;
   GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventCreateFieldInput>;
   Issue?: InputMaybe<CommentIssueCreateFieldInput>;
+  ModerationAction?: InputMaybe<CommentModerationActionCreateFieldInput>;
   ParentComment?: InputMaybe<CommentParentCommentCreateFieldInput>;
   Tags?: InputMaybe<Array<CommentTagsCreateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersCreateFieldInput>>;
@@ -5771,6 +5936,7 @@ export type CommentUpdateInput = {
   GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionUpdateFieldInput>;
   GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventUpdateFieldInput>;
   Issue?: InputMaybe<CommentIssueUpdateFieldInput>;
+  ModerationAction?: InputMaybe<CommentModerationActionUpdateFieldInput>;
   ParentComment?: InputMaybe<CommentParentCommentUpdateFieldInput>;
   Tags?: InputMaybe<Array<CommentTagsUpdateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersUpdateFieldInput>>;
@@ -6161,6 +6327,11 @@ export type CommentWhere = {
   IssueConnection?: InputMaybe<CommentIssueConnectionWhere>;
   IssueConnection_NOT?: InputMaybe<CommentIssueConnectionWhere>;
   Issue_NOT?: InputMaybe<IssueWhere>;
+  ModerationAction?: InputMaybe<ModerationActionWhere>;
+  ModerationActionAggregate?: InputMaybe<CommentModerationActionAggregateInput>;
+  ModerationActionConnection?: InputMaybe<CommentModerationActionConnectionWhere>;
+  ModerationActionConnection_NOT?: InputMaybe<CommentModerationActionConnectionWhere>;
+  ModerationAction_NOT?: InputMaybe<ModerationActionWhere>;
   NOT?: InputMaybe<CommentWhere>;
   OR?: InputMaybe<Array<CommentWhere>>;
   ParentComment?: InputMaybe<CommentWhere>;

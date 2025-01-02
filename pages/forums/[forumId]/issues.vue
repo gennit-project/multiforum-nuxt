@@ -37,8 +37,8 @@ const closedCount = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-900 dark:text-white rounded-t-lg border border-b border-gray-200 dark:border-gray-600">
-    <nav class="flex items-center rounded-t-lg gap-4 py-3 pl-8">
+  <div class="bg-white dark:bg-gray-900 dark:text-white border-gray-200 dark:border-gray-600">
+    <nav class="flex items-center gap-4 py-3 pl-8">
       <nuxt-link
         :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
         class="px-4 py-2 border-b-2"

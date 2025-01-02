@@ -16,7 +16,6 @@ import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
-import { VFieldLabel } from "vuetify/lib/components/index.mjs";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -150,7 +149,7 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { discussionId, eventId, forumId } = route.params;
+const { discussionId, eventId, issueId, forumId } = route.params;
 const permalinkedCommentId = route.params.commentId;
 const isHighlighted = computed(() => {
   return props.isPermalinked || permalinkedCommentId === props.commentData.id;
@@ -167,7 +166,11 @@ const textCopy = computed(() => props.commentData.text);
 
 const canShowPermalink =
   props.commentData.DiscussionChannel ||
+  props.commentData.GivesFeedbackOnDiscussion ||
+  props.commentData.GivesFeedbackOnEvent ||
+  props.commentData.GivesFeedbackOnComment ||
   props.commentData.Event ||
+  props.commentData.Issue ||
   (discussionId && forumId) ||
   (eventId && forumId);
 
@@ -175,10 +178,45 @@ const permalinkObject = computed(() => {
   if (!canShowPermalink) {
     return {};
   }
+  // This is the default comment permalink object
+  let result = {};
+  if (props.commentData.GivesFeedbackOnDiscussion) {
+    // Permalink for comment that gives feedback on a discussion
+    result = {
+      name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
+      params: {
+        discussionId: props.commentData.GivesFeedbackOnDiscussion.id,
+        feedbackId: props.commentData.id,
+        forumId: props.commentData.Channel?.uniqueName,
+      },
+    };
+  } else if (props.commentData.GivesFeedbackOnEvent) {
+    // Permalink for comment that gives feedback on an event
+    result = {
+      name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
+      params: {
+        eventId: props.commentData.GivesFeedbackOnEvent.id,
+        feedbackId: props.commentData.id,
+        forumId: props.commentData.Channel?.uniqueName,
+      },
+    };
+  } else if (props.commentData.GivesFeedbackOnComment) {
+    // Permalink for comment that gives feedback on another comment.
+    // Need separate logic for whether it gave feedback on a discussion or event.
+    // result = {
+    //   name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
+    //   params: {
+    //     commentId: props.commentData.GivesFeedbackOnComment.id,
+    //     feedbackId: props.commentData.id,
+    //     forumId: props.commentData.Channel?.uniqueName,
+    //   },
+    // };
+  }
   const discussionIdInLink =
     discussionId || props.commentData?.DiscussionChannel?.discussionId;
   if (discussionIdInLink) {
-    return {
+    // Permalink for comment on a discussion
+    result = {
       name: "forums-forumId-discussions-discussionId-comments-commentId",
       params: {
         discussionId: discussionIdInLink,
@@ -188,15 +226,30 @@ const permalinkObject = computed(() => {
       },
     };
   }
+  const eventIdInLink = eventId || props.commentData?.Event?.id;
+  if (eventIdInLink) {
+    result = {
+      name: "forums-forumId-events-eventId-comments-commentId",
+      params: {
+        eventId: props.commentData.Event?.id,
+        forumId: forumId || props.commentData.Channel?.uniqueName,
+        commentId: props.commentData.id,
+      },
+    };
+  }
+  const issueIdInLink = issueId || props.commentData?.Issue?.id;
+  if (issueIdInLink) {
+    result = {
+      name: "forums-forumId-issues-issueId-comments-commentId",
+      params: {
+        issueId: issueIdInLink,
+        forumId: props.commentData.Channel?.uniqueName,
+        commentId: props.commentData.id,
+      },
+    };
+  }
 
-  return {
-    name: "forums-forumId-events-eventId-comments-commentId",
-    params: {
-      eventId: props.commentData.Event?.id,
-      forumId: forumId,
-      commentId: props.commentData.id,
-    },
-  };
+  return result;
 });
 
 let basePath = "";
@@ -234,7 +287,10 @@ const commentMenuItems = computed(() => {
     ]);
   }
 
-  if (props.commentData?.CommentAuthor?.__typename === "User" && props.commentData?.CommentAuthor?.username === usernameVar.value) {
+  if (
+    props.commentData?.CommentAuthor?.__typename === "User" &&
+    props.commentData?.CommentAuthor?.username === usernameVar.value
+  ) {
     out = out.concat([
       {
         label: "Edit",
@@ -354,8 +410,10 @@ const showEditCommentForm = computed(() => {
 });
 
 const saveDisabled = computed(() => {
-  return props.lengthOfCommentInProgress === 0 ||
+  return (
+    props.lengthOfCommentInProgress === 0 ||
     props.lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
+  );
 });
 
 const label = computed(() => {
@@ -417,7 +475,7 @@ const label = computed(() => {
                     "
                     class="-ml-2 mt-2"
                     :class="[
-                      props.goToPermalinkOnClick ? 'cursor-pointer' : '',
+                      props.goToPermalinkOnClick ? 'cursor-pointer hover:text-gray-500' : '',
                     ]"
                   >
                     <MarkdownPreview
@@ -427,6 +485,7 @@ const label = computed(() => {
                       :disable-gallery="props.goToPermalinkOnClick"
                       @click="
                         () => {
+                          console.log('navigating to', permalinkObject)
                           if (props.goToPermalinkOnClick) {
                             router.push(permalinkObject);
                           }
