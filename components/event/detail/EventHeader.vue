@@ -217,6 +217,18 @@ const menuItems = computed(() => {
 });
 
 function getFormattedDateString(startTime: string) {
+  // if the event is all day and spans multiple days,
+  // include start and end date but not time
+  if (props.eventData.isAllDay && props.eventData.endTime) {
+    const start = DateTime.fromISO(startTime);
+    const end = DateTime.fromISO(props.eventData.endTime);
+    if (start.hasSame(end, "day")) {
+      return start.toFormat("cccc LLLL d yyyy");
+    }
+    return `${start.toFormat("cccc LLLL d yyyy")} - ${end.toFormat(
+      "cccc LLLL d yyyy"
+    )}`;
+  }
   return DateTime.fromISO(startTime).toFormat("cccc LLLL d yyyy h:mm a");
 }
 

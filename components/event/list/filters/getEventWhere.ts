@@ -262,11 +262,11 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       // },
       // @ts-ignore
       {
-        startTime_GT: `${beginningOfDateRangeISO}`,
+        endTime_GT: `${beginningOfDateRangeISO}`,
       },
       // @ts-ignore
       {
-        startTime_LT: `${endOfDateRangeISO}`,
+        endTime_LT: `${endOfDateRangeISO}`,
       },
     ]),
   };
