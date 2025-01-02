@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from "vue";
+import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
 import { useRoute } from "nuxt/app";
 import { useMutation } from "@vue/apollo-composable";
@@ -13,6 +14,12 @@ import type { EditAccountSettingsFormValues } from "@/types/User";
 import FormComponent from "../FormComponent.vue";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
+
+type FileChangeInput = {
+  // event of HTMLInputElement;
+  event: Event;   
+  fieldName: string;
+}
 
 const props = defineProps({
   formValues: {
@@ -82,7 +89,11 @@ const upload = async (file: any) => {
   }
 };
 
-const handleProfilePicChange = async (event: any) => {
+const handleProfilePicChange = async (input: FileChangeInput) => {
+  const { event } = input;
+  if (!event.target || !event.target.files) {
+    return;
+  }
   const selectedFile = event.target.files[0];
 
   if (selectedFile) {
@@ -182,7 +193,10 @@ const needsChanges = computed(() => {
                 :is-square="false"
                 :is-large="true"
               />
-              <AddImage @change="handleProfilePicChange" />
+              <AddImage  
+                @file-change="(input: FileChangeInput) => {
+                  handleProfilePicChange(input);
+                }" />
             </template>
           </FormRow>
         </div>

@@ -9,6 +9,12 @@ import ErrorBanner from "./ErrorBanner.vue";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 
+type FileChangeInput = {
+  // event of HTMLInputElement;
+  event: Event;   
+  fieldName: string;
+}
+
 // Props
 const props = defineProps({
   allowImageUpload: {
@@ -218,8 +224,12 @@ const formatButtons = [
 
 const markdownDocsLink = "https://www.markdownguide.org/basic-syntax/";
 
-const handleFileChange = async (event: any) => {
+const handleFileChange = async (input: FileChangeInput) => {
+  const { event } = input;
   if (!props.allowImageUpload) {
+    return;
+  }
+  if (!event.target || !(event.target.files)) {
     return;
   }
   const selectedFile = event.target.files[0];
@@ -332,7 +342,9 @@ const selectedTab = ref(0);
               v-if="props.allowImageUpload"
               label="Paste, drop, or click to add files"
               :field-name="fieldName"
-              @change="handleFileChange"
+              @file-change="(input: FileChangeInput) => {
+                handleFileChange(input);
+              }"
             />
           </div>
         </TabPanel>

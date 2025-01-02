@@ -21,6 +21,12 @@ import {
   MAX_CHARS_IN_CHANNEL_DISPLAY_NAME,
 } from "@/utils/constants";
 
+type FileChangeInput = {
+  // event of HTMLInputElement;
+  event: Event;   
+  fieldName: string;
+}
+
 const props = defineProps({
   editMode: {
     type: Boolean,
@@ -118,7 +124,8 @@ const upload = async (file: File) => {
 };
 
 // Handler for image changes
-const handleImageChange = async (event: Event, fieldName: string) => {
+const handleImageChange = async (input: FileChangeInput) => {
+  const { event, fieldName } = input;
   const selectedFile = (event.target as HTMLInputElement).files?.[0];
 
   if (selectedFile) {
@@ -279,7 +286,9 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
               <AddImage
                 key="channel-icon-url"
                 :field-name="'channelIconURL'"
-                @change="handleImageChange"
+                @file-change="(input: FileChangeInput) => {
+                  handleImageChange(input);
+                }"
               />
             </template>
           </FormRow>
@@ -296,7 +305,9 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
               <AddImage
                 key="channel-banner-url"
                 :field-name="'channelBannerURL'"
-                @change="handleImageChange"
+                @file-change="(input: FileChangeInput) => {
+                  handleImageChange(input);
+                }"
               />
             </template>
           </FormRow>

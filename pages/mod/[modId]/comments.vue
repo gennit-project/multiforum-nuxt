@@ -43,9 +43,9 @@ const {
     limit: PAGE_LIMIT,
     offset: 0,
   }),
-  // {
-  //   fetchPolicy: "cache-first",
-  // }
+  {
+    fetchPolicy: "cache-first",
+  }
 );
 
 
