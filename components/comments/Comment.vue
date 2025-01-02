@@ -485,7 +485,6 @@ const label = computed(() => {
                       :disable-gallery="props.goToPermalinkOnClick"
                       @click="
                         () => {
-                          console.log('navigating to', permalinkObject)
                           if (props.goToPermalinkOnClick) {
                             router.push(permalinkObject);
                           }

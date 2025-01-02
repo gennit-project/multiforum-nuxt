@@ -5,6 +5,7 @@ import type { PropType } from "vue";
 import { timeAgo } from "@/utils";
 import { ActionType } from "@/types/Comment";
 import type { ModerationAction } from "@/__generated__/graphql";
+import { useRoute } from "nuxt/app";
 
 const getBackgroundColor = (actionType: string) => {
   switch (actionType) {
@@ -43,6 +44,8 @@ defineProps({
     required: true,
   },
 });
+
+const commentIdInParams = useRoute().params.commentId as string;
 </script>
 
 <template>
@@ -90,6 +93,11 @@ defineProps({
               <span class="text-sm text-gray-500 dark:text-gray-300">
                 Commented
                 {{ `${timeAgo(new Date(activityItem.createdAt))}` }}
+              </span>
+              <span
+                v-if="activityItem?.Comment?.id === commentIdInParams"
+                class="rounded-lg text-xs bg-blue-500 px-2 py-1 text-black"
+                >Permalinked
               </span>
             </div>
             <div class="mt-3 border-l-2 border-gray-200 dark:border-gray-500">

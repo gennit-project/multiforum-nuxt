@@ -315,6 +315,7 @@ export const GET_ACTIVITY_FEED_COMMENT = gql`
           __typename
         }
         Comment {
+          id
           text
           createdAt
           CommentAuthor {

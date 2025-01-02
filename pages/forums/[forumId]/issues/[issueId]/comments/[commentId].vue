@@ -3,6 +3,7 @@ import { useRoute } from "nuxt/app";
 import { ref } from "vue";
 import type { ApolloError } from "@apollo/client";
 import PermalinkedActivityFeedItem from "@/components/mod/PermalinkedActivityFeedItem.vue";
+import ActivityFeedListItem from "@/components/mod/ActivityFeedListItem.vue";
 
 const route = useRoute();
 const permalinkedCommentId = ref(route.params.commentId);

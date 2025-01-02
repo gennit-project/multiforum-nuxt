@@ -45,7 +45,6 @@ export default defineComponent({
     },
   },
   setup(props) {
-    console.log('comment data',props.commentData);
     const isAdmin = computed(() => {
       const author: User | ModerationProfile | undefined | null =
         props.commentData.CommentAuthor;
