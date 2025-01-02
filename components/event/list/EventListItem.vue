@@ -266,13 +266,11 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           class="flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
         >
           <button
-            class="rounded-md bg-gray-100 px-4 pt-1 hover:bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+            class="rounded-md bg-gray-100 px-4 py-1 hover:bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
           >
-            <i class="fa-regular fa-comment mt-1 h-6 w-6" />
-            <span class="text black dark:text-white">{{
-              `View ${commentCount} ${
-                commentCount === 1 ? "comment " : "comments "
-              }`
+            <i class="fa-regular fa-comment h-4 w-4 mr-2" />
+            <span class="text black text-sm dark:text-white">{{
+              `${commentCount}`
             }}</span>
             <span v-if="!isWithinChannel">{{
                `in c/${event.EventChannels[0].channelUniqueName}`

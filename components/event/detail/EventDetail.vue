@@ -248,7 +248,7 @@ const addToOutlook = () => {
 
           <div
             v-else-if="event"
-            class="dark:bg-dark-700 flex flex-col gap-4 pt-8"
+            class="dark:bg-dark-700 flex flex-col gap-4"
           >
             <InfoBanner
               v-if="eventHasStarted"
