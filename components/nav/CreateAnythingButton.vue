@@ -100,10 +100,10 @@ const handleItemClick = (item: any) => {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              class="border dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
+              class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
               :class="[
                 usePrimaryButton
-                  ? 'bg-blue-600 dark:bg-blue-700 text-white'
+                  ? 'bg-blue-500 dark:bg-blue-700 text-white'
                   : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
               ]"
               @click="adjustMenuPosition"

@@ -68,7 +68,9 @@ const detailLink = computed(() => {
   return `/forums/${defaultUniqueName.value}/events/${props.event.id}`;
 });
 
-const submittedToMultipleChannels = computed(() => props.event.EventChannels.length > 1);
+const submittedToMultipleChannels = computed(
+  () => props.event.EventChannels.length > 1
+);
 
 const eventDetailOptions = computed(() => {
   if (!props.event) {
@@ -146,10 +148,7 @@ const updateFilters = (params: SearchEventValues) => {
 };
 
 const handleClick = () => {
-  if (
-    props.currentChannelId ||
-    route.name === "events-list-search"
-  ) {
+  if (props.currentChannelId || route.name === "events-list-search") {
     router.push(detailLink.value);
   } else {
     emit("openPreview");
@@ -163,150 +162,158 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 <template>
   <li
     :ref="`#${event.id}`"
-    class="relative pt-4 pr-4 dark:bg-gray-800 list-none"
+    class="relative pt-4 dark:bg-gray-800 list-none flex justify-between gap-4"
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
-    <div class="flex w-full">
-      <div class="flex-shrink-0 rounded-lg">
-        <div class="flex h-16 w-16 flex-col items-center justify-center">
-          <div
-            class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
-          >
-            {{
-              new Date(event.startTime).toLocaleString("en-US", {
-                weekday: "short",
-              })
-            }}
-          </div>
-          <div class="text-2xl font-bold text-black dark:text-white">
-            {{ new Date(event.startTime).getDate() }}
-          </div>
-          <div
-            class="font-semibold text-xs lowercase text-gray-500 dark:text-gray-200"
-          >
-            {{
-              new Date(event.startTime).toLocaleString("en-US", {
-                month: "short",
-              })
-            }}
-          </div>
-        </div>
-      </div>
-
-      <div class="flex-1 min-w-0">
-        <img
-          v-if="event.coverImageURL"
-          :src="event.coverImageURL"
-          alt="Event cover image"
-          class="mb-4 max-h-48 rounded-lg block md:hidden"
-        >
-        <div>
-          <router-link
-            :to="detailLink"
-            class="text-md flex-wrap cursor-pointer font-bold text-blue-500 hover:underline"
-          >
-            <HighlightedSearchTerms
-              :text="event.title"
-              :search-input="searchInput"
-            />
-          </router-link>
-
-          <span
-            v-if="event.canceled"
-            class="rounded-lg bg-red-100 px-3 ml-2 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
-            >Canceled</span
-          >
-        </div>
-
-        <div class="flex gap-1 flex-wrap">
-          <span class="mt-2 flex flex-wrap text-sm text-gray-500 dark:text-gray-200">
-            {{
-              `${event.locationName || ""}${event.locationName ? " at " : ""}${timeOfDay}`
-            }}
-          </span>
-        </div>
-        <p v-if="event.virtualEventUrl" class="text-black dark:text-white">Online event</p>
-        <p v-if="event.free" class="text-sm font-medium text-gray-600">Free</p>
-
+    <div class="flex-shrink-0 rounded-lg">
+      <div class="flex h-16 w-16 flex-col items-center justify-center">
         <div
-          v-if="truncatedDescription"
-          class="my-2 max-w-lg border-l-2 border-gray-400"
+          class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
         >
-          <MarkdownPreview
-            :text="truncatedDescription || ''"
-            :disable-gallery="true"
-            :word-limit="10"
-            class="ml-2"
-          />
+          {{
+            new Date(event.startTime).toLocaleString("en-US", {
+              weekday: "short",
+            })
+          }}
         </div>
+        <div class="text-2xl font-bold text-black dark:text-white">
+          {{ new Date(event.startTime).getDate() }}
+        </div>
+        <div
+          class="font-semibold text-xs lowercase text-gray-500 dark:text-gray-200"
+        >
+          {{
+            new Date(event.startTime).toLocaleString("en-US", {
+              month: "short",
+            })
+          }}
+        </div>
+      </div>
+    </div>
 
-        <p class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline">
-          <Tag
-            v-for="tag in event.Tags"
-            :key="`tag-${tag.text}`"
-            class="my-1"
-            :active="selectedTags.includes(tag.text)"
-            :tag="tag.text"
-            @click="
-              () => {
-                handleClickTag(tag.text);
-              }
-            "
-          />
-        </p>
-
-        <nuxt-link
-          v-if="
-            showDetailLink &&
-            event &&
-            (isWithinChannel || !submittedToMultipleChannels)
-          "
+    <div class="flex-1 min-w-0">
+      <img
+        v-if="event.coverImageURL"
+        :src="event.coverImageURL"
+        alt="Event cover image"
+        class="mb-4 max-h-48 rounded-lg block md:hidden"
+      />
+      <div class="border-b border-gray-200 dark:border-gray-600">
+        <router-link
           :to="detailLink"
-          class="flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
+          class="text-md flex-wrap cursor-pointer font-bold text-blue-500 hover:text-blue-700 dark:text-white"
         >
-          <button
-            class="rounded-md bg-gray-100 px-4 py-1 hover:bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
-          >
-            <i class="fa-regular fa-comment h-4 w-4 mr-2" />
-            <span class="text black text-sm dark:text-white">{{
-              `${commentCount}`
-            }}</span>
-            <span v-if="!isWithinChannel">{{
-               `in c/${event.EventChannels[0].channelUniqueName}`
-            }}</span>
-          </button>
-        </nuxt-link>
+          <HighlightedSearchTerms
+            :text="event.title"
+            :search-input="searchInput"
+          />
+        </router-link>
 
-        <MenuButton
-          v-else-if="showDetailLink && event"
-          :items="eventDetailOptions"
+        <span
+          v-if="event.canceled"
+          class="rounded-lg bg-red-100 px-3 ml-2 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
+          >Canceled</span
         >
-          <button
-            class="-ml-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
-          >
-            <i class="fa-regular fa-comment mr-2 h-4 w-4" />
-            {{
-              `${commentCount} ${
-                commentCount === 1 ? "comment" : "comments"
-              } in ${channelCount} ${
-                channelCount === 1 ? "channel" : "channels"
-              }`
-            }}
-            <ChevronDownIcon class="-mr-1 ml-2 h-4 w-4" aria-hidden="true" />
-          </button>
-        </MenuButton>
       </div>
 
-      <div
-        class="flex-shrink-0 hidden md:flex items-center justify-center rounded-lg"
-      >
-        <img
-          v-if="event.coverImageURL"
-          :alt="event.title"
-          :src="event.coverImageURL"
-          class="h-32 w-32 rounded-lg"
-        >
+      <div class="flex gap-1">
+        <div>
+          <div class="flex gap-1 flex-wrap">
+            <span
+              class="mt-2 flex flex-wrap text-sm text-gray-500 dark:text-gray-200"
+            >
+              {{
+                `${event.locationName || ""}${event.locationName ? " at " : ""}${timeOfDay}`
+              }}
+            </span>
+          </div>
+          <p v-if="event.virtualEventUrl" class="text-black dark:text-white">
+            Online event
+          </p>
+          <p v-if="event.free" class="text-sm font-medium text-gray-600">
+            Free
+          </p>
+
+          <div
+            v-if="truncatedDescription"
+            class="my-2 max-w-lg border-l-2 border-gray-400"
+          >
+            <MarkdownPreview
+              :text="truncatedDescription || ''"
+              :disable-gallery="true"
+              :word-limit="10"
+              class="ml-2"
+            />
+          </div>
+
+          <p
+            class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
+          >
+            <Tag
+              v-for="tag in event.Tags"
+              :key="`tag-${tag.text}`"
+              class="my-1"
+              :active="selectedTags.includes(tag.text)"
+              :tag="tag.text"
+              @click="
+                () => {
+                  handleClickTag(tag.text);
+                }
+              "
+            />
+          </p>
+
+          <nuxt-link
+            v-if="
+              showDetailLink &&
+              event &&
+              (isWithinChannel || !submittedToMultipleChannels)
+            "
+            :to="detailLink"
+            class="flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
+          >
+            <button
+              class="rounded-md bg-gray-100 px-4 py-1 hover:bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+            >
+              <i class="fa-regular fa-comment h-4 w-4 mr-2" />
+              <span class="text black text-sm dark:text-white">{{
+                `${commentCount}`
+              }}</span>
+              <span v-if="!isWithinChannel">{{
+                `in c/${event.EventChannels[0].channelUniqueName}`
+              }}</span>
+            </button>
+          </nuxt-link>
+
+          <MenuButton
+            v-else-if="showDetailLink && event"
+            :items="eventDetailOptions"
+          >
+            <button
+              class="-ml-1 flex items-center rounded-md bg-gray-100 px-4 pb-2 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
+            >
+              <i class="fa-regular fa-comment mr-2 h-4 w-4" />
+              {{
+                `${commentCount} ${
+                  commentCount === 1 ? "comment" : "comments"
+                } in ${channelCount} ${
+                  channelCount === 1 ? "channel" : "channels"
+                }`
+              }}
+              <ChevronDownIcon class="-mr-1 ml-2 h-4 w-4" aria-hidden="true" />
+            </button>
+          </MenuButton>
+        </div>
+
+        <div class="flex-shrink-0 hidden md:flex rounded-lg">
+          <img
+            v-if="event.coverImageURL"
+            :alt="event.title"
+            :src="event.coverImageURL"
+            class="h-44 w-44 rounded-lg"
+          />
+        </div>
       </div>
     </div>
   </li>
