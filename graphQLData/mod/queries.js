@@ -10,10 +10,32 @@ export const COUNT_OPEN_ISSUES = gql`
   }
 `;
 
+export const SERVER_SCOPED_ISSUE_COUNT = gql`
+  query countIssuesByServer {
+    issuesAggregate (
+      where: {
+        isOpen: true
+      }
+    ){
+      count
+    }
+  }
+`;
+
 export const COUNT_CLOSED_ISSUES = gql`
   query countClosedIssues($channelUniqueName: String!) {
     issuesAggregate(
       where: { channelUniqueName: $channelUniqueName, isOpen: false }
+    ) {
+      count
+    }
+  }
+`;
+
+export const SERVER_SCOPED_CLOSED_ISSUE_COUNT = gql`
+  query countClosedIssuesByServer {
+    issuesAggregate(
+      where: {  isOpen: false }
     ) {
       count
     }

@@ -18,18 +18,12 @@ export const ISSUE_FIELDS = gql`
         displayName
       }
     }
-    ActivityFeed (
-      options: {
-        sort: {
-          createdAt: DESC
-        }
-      }
-    ) {
+    ActivityFeed(options: { sort: { createdAt: DESC } }) {
       ... on ModerationAction {
         id
         actionDescription
-        actionType 
-        createdAt 
+        actionType
+        createdAt
         ModerationProfile {
           displayName
         }
@@ -65,7 +59,7 @@ export const GET_ISSUE = gql`
   ${ISSUE_FIELDS}
   query getIssue($id: ID!) {
     issues(where: { id: $id }) {
-      ...IssueFields,
+      ...IssueFields
     }
   }
 `;
@@ -74,7 +68,7 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
   query getIssue($discussionId: ID!, $channelUniqueName: String!) {
     issues(
       where: {
-        relatedDiscussionId: $discussionId,
+        relatedDiscussionId: $discussionId
         channelUniqueName: $channelUniqueName
       }
     ) {
@@ -86,28 +80,25 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
 export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
   query getIssue($eventId: ID!, $channelUniqueName: String!) {
     issues(
-      where: {
-        relatedEventId: $eventId,
-        channelUniqueName: $channelUniqueName
-      }
+      where: { relatedEventId: $eventId, channelUniqueName: $channelUniqueName }
     ) {
       id
     }
   }
-`
+`;
 
 export const CHECK_COMMENT_ISSUE_EXISTENCE = gql`
   query getIssue($commentId: ID!, $channelUniqueName: String!) {
     issues(
       where: {
-        relatedCommentId: $commentId,
+        relatedCommentId: $commentId
         channelUniqueName: $channelUniqueName
       }
     ) {
       id
     }
   }
-`
+`;
 export const GET_ISSUES_BY_DISCUSSION = gql`
   query getIssuesByDiscussion($discussionId: ID!) {
     discussions(where: { id: $discussionId }) {
@@ -127,15 +118,9 @@ export const GET_ISSUES_BY_DISCUSSION = gql`
 
 export const GET_ISSUES_BY_CHANNEL = gql`
   query getIssuesByChannel($channelUniqueName: String!) {
-    channels(where: { 
-      uniqueName: $channelUniqueName,
-    }) {
+    channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
-      Issues (
-        where: {
-          isOpen: true
-        }
-      ) {
+      Issues(where: { isOpen: true }) {
         id
         title
         body
@@ -158,15 +143,9 @@ export const GET_ISSUES_BY_CHANNEL = gql`
 
 export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
   query getClosedIssuesByChannel($channelUniqueName: String!) {
-    channels(where: { 
-      uniqueName: $channelUniqueName,
-    }) {
+    channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
-      Issues (
-        where: {
-          isOpen: false
-        }
-      ) {
+      Issues(where: { isOpen: false }) {
         id
         title
         body
@@ -248,6 +227,54 @@ export const GET_ISSUES_BY_COMMENT = gql`
           ... on ModerationProfile {
             displayName
           }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_ISSUES = gql`
+  query getIssues {
+    issues(where: { isOpen: true }, options: { sort: { createdAt: DESC } }) {
+      id
+      title
+      body
+      isOpen
+      createdAt
+      updatedAt
+      relatedCommentId
+      relatedDiscussionId
+      relatedEventId
+      Channel {
+        uniqueName
+      }
+      Author {
+        ... on ModerationProfile {
+          displayName
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CLOSED_ISSUES = gql`
+  query getClosedIssues {
+    issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {
+      id
+      title
+      body
+      isOpen
+      createdAt
+      updatedAt
+      relatedCommentId
+      relatedDiscussionId
+      relatedEventId
+      Channel {
+        uniqueName
+      }
+      Author {
+        ... on ModerationProfile {
+          displayName
         }
       }
     }

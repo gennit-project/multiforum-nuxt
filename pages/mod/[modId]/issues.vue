@@ -15,13 +15,6 @@ const { result: modResult, error: getModError } = useQuery(GET_MOD, () => ({
   displayName: modProfileName.value,
 }));
 
-const forumId = computed(() => {
-  if (typeof route.params.forumId !== "string") {
-    return "";
-  }
-  return route.params.forumId;
-});
-
 const mod = computed(() => {
   if (modResult.value && modResult.value.moderationProfiles.length > 0) {
     return modResult.value.moderationProfiles[0];
