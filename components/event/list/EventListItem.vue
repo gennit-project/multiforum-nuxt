@@ -306,7 +306,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           </MenuButton>
         </div>
 
-        <div class="flex-shrink-0 hidden md:flex rounded-lg">
+        <div class="flex-shrink-0 hidden md:flex ml-auto rounded-lg mr-2">
           <img
             v-if="event.coverImageURL"
             :alt="event.title"
