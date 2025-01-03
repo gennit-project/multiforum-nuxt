@@ -60,7 +60,7 @@ const filterChannelsByTag = (tag: string) => {
       <div v-if="channel">
         <div class="mt-6 flex w-full flex-col gap-6">
           <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
-            <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Rules</span>
+            <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Forum Rules</span>
             <ChannelRules :rules="channelRules" />
           </div>
           

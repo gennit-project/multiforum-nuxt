@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, ref, computed } from "vue";
-import MarkdownPreview from "./../MarkdownPreview.vue";
+import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
 type Rule = {
   detail: string;
@@ -10,7 +10,7 @@ type Rule = {
 export default defineComponent({
   name: "RulesComponent",
   components: {
-    MarkdownPreview,
+    MarkdownRenderer,
   },
   props: {
     rules: {
