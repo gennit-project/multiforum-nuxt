@@ -74,7 +74,7 @@ const menuStyles = {
         :data-testid="dataTestid"
         variant="text"
         v-bind="props"
-        class="shadow-none focus:ring-indigo-500 inline-flex justify-center rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100"
+        class="shadow-none focus:ring-indigo-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100"
         @click="adjustMenuPosition"
       >
         <slot>

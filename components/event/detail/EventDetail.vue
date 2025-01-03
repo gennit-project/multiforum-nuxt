@@ -1,18 +1,21 @@
 <script lang="ts" setup>
-import { computed, ref, watch, onMounted } from "vue";
+import { computed, ref, watch } from "vue";
 import Tag from "@/components/TagComponent.vue";
-import { useLazyQuery, useQuery } from "@vue/apollo-composable";
+import { useQuery } from "@vue/apollo-composable";
 import { GET_EVENT } from "@/graphQLData/event/queries";
 import {
   GET_EVENT_COMMENTS,
   GET_EVENT_ROOT_COMMENT_AGGREGATE,
 } from "@/graphQLData/comment/queries";
-import type { Comment, EventChannel } from "@/__generated__/graphql";
+import type {
+  Comment,
+  EventChannel,
+  Event as EventData,
+} from "@/__generated__/graphql";
 import { DateTime } from "luxon";
 import "md-editor-v3/lib/style.css";
 import EventFooter from "@/components/event/detail/EventFooter.vue";
 import EventHeader from "@/components/event/detail/EventHeader.vue";
-import GenericButton from "@/components/GenericButton.vue";
 import EventBody from "@/components/event/detail/EventBody.vue";
 import ExpandableImage from "@/components/ExpandableImage.vue";
 import EventCommentsWrapper from "@/components/event/detail/EventCommentsWrapper.vue";
@@ -21,6 +24,7 @@ import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
 import { useRoute } from "nuxt/app";
 import { modProfileNameVar } from "@/cache";
+import AddToCalendarButton from "../AddToCalendarButton.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -80,7 +84,7 @@ const {
   loggedInModName: loggedInUserModName.value,
 });
 
-const event = computed(() => eventResult.value?.events?.[0] || null);
+const event = computed<EventData>(() => eventResult.value?.events?.[0] || null);
 
 const commentSort = computed(() => getSortFromQuery(route.query));
 
@@ -181,54 +185,6 @@ const eventHasStarted = computed(() => {
 });
 
 const originalPoster = computed(() => event.value?.Poster?.username || "");
-const addToGoogleCalendar = () => {
-  const googleCalendarDateFormat = "yyyyMMdd'T'HHmmss";
-  const start = DateTime.fromISO(event.value?.startTime).toFormat(
-    googleCalendarDateFormat
-  );
-  const end = DateTime.fromISO(event.value?.endTime).toFormat(
-    googleCalendarDateFormat
-  );
-
-  const baseUrl = "https://www.google.com/calendar/render";
-  const location = event.value?.address
-    ? encodeURIComponent(event.value?.address)
-    : encodeURIComponent(event.value?.virtualEventUrl);
-  const name = encodeURIComponent(event.value?.title);
-  const details = encodeURIComponent(event.value?.description);
-
-  const googleUrl = `${baseUrl}?action=TEMPLATE&text=${name}&dates=${start}/${end}&details=${details}&location=${location}`;
-  window.open(googleUrl, "_blank");
-};
-
-const addToiCal = () => {
-  const data = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "BEGIN:VEVENT",
-    `URL:${document.URL}`,
-    `DTSTART:${event.value?.startTime.replace(/-|:|\.\d{3}/g, "")}`,
-    `DTEND:${event.value?.endTime.replace(/-|:|\.\d{3}/g, "")}`,
-    `SUMMARY:${event.value?.title}`,
-    `DESCRIPTION:${event.value?.description}`,
-    `LOCATION:${event.value?.address}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\n");
-
-  const blob = new Blob([data], { type: "text/calendar;charset=utf-8;" });
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute("download", "event.ics");
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
-const addToOutlook = () => {
-  // For Outlook, you can use the same iCal method, because Outlook supports iCal files.
-  // Alternatively, if you want to create a link to Outlook Calendar's web version, you would construct a URL like the Google Calendar one.
-  addToiCal();
-};
 </script>
 
 <template>
@@ -246,10 +202,7 @@ const addToOutlook = () => {
           />
           <div v-else-if="!event">Could not find the event.</div>
 
-          <div
-            v-else-if="event"
-            class="dark:bg-dark-700 flex flex-col gap-4"
-          >
+          <div v-else-if="event" class="dark:bg-dark-700 flex flex-col gap-4">
             <InfoBanner
               v-if="eventHasStarted"
               :text="'This event has started.'"
@@ -288,39 +241,13 @@ const addToOutlook = () => {
                 :event-data="event"
                 :show-menu-buttons="showMenuButtons"
               />
-              <EventBody v-if="event.description" :event="event" class="-ml-4" />
-
-              <div >
-                <h2 class="text-md mt-4">Add to Calendar</h2>
-                <hr />
-                <div class="mt-4 flex">
-                  <div class="flex flex-row gap-2 text-sm">
-                    <div class="flex justify-start">
-                      <GenericButton
-                        :text="'Google Calendar'"
-                        data-testid="add-to-google-calendar-button"
-                        @click="addToGoogleCalendar"
-                      />
-                    </div>
-                    <div class="flex justify-center">
-                      <GenericButton
-                        :text="'iCal'"
-                        data-testid="add-to-ical-button"
-                        @click="addToiCal"
-                      />
-                    </div>
-                    <div class="flex justify-end">
-                      <GenericButton
-                        :text="'Outlook'"
-                        data-testid="add-to-outlook-button"
-                        @click="addToOutlook"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <EventBody
+                v-if="event.description"
+                :event="event"
+                class="-ml-4"
+              />
             </div>
-
+            
             <div class="my-2">
               <div class="flex space-x-1">
                 <Tag
@@ -332,7 +259,7 @@ const addToOutlook = () => {
                 />
               </div>
             </div>
-
+            <AddToCalendarButton v-if="event" :event="event" class="mt-4" />
             <EventFooter
               :event-data="event"
               :channels-except-current="channelsExceptCurrent"
