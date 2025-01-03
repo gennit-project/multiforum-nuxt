@@ -7,8 +7,6 @@ import { config } from "@/config";
 import ServerSidebar from "@/components/admin/ServerSidebar.vue";
 import ServerTabs from "@/components/admin/ServerTabs.vue";
 
-console.log('admin page renders')
-
 const route = useRoute();
 const { result: getServerResult, error: getServerError } = useQuery(
   GET_SERVER_CONFIG,
@@ -24,7 +22,6 @@ const serverConfig = computed(() => {
   if (getServerError.value || !getServerResult.value?.serverConfigs) {
     return null;
   }
-  console.log('serverConfig', getServerResult.value?.serverConfigs[0])
   return getServerResult.value?.serverConfigs[0] || null;
 });
 
@@ -57,6 +54,7 @@ const serverConfig = computed(() => {
               class="w-full md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
             >
               <ServerSidebar
+                :key="serverConfig.rules"
                 :server-config="serverConfig"
                 class="p-6 pt-8"
               />

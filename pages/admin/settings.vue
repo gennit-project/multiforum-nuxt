@@ -29,7 +29,6 @@ const serverConfig = computed(() => {
   if (getServerError.value || !getServerResult.value?.serverConfigs) {
     return null;
   }
-  console.log("serverConfig", getServerResult.value?.serverConfigs[0]);
   return getServerResult.value?.serverConfigs[0] || null;
 });
 const formValues = ref<ServerConfigUpdateInput>({
@@ -40,7 +39,7 @@ const formValues = ref<ServerConfigUpdateInput>({
 onGetServerResult((result) => {
   dataLoaded.value = true;
   const serverConfig = result.data?.serverConfigs[0];
-  let rules = []
+  let rules = [];
   try {
     rules = JSON.parse(serverConfig.rules) || [];
   } catch (e) {
@@ -68,25 +67,36 @@ const {
   loading: editServerLoading,
   error: updateServerError,
   onDone,
-} = useMutation(UPDATE_SERVER_CONFIG);
+} = useMutation(UPDATE_SERVER_CONFIG, {
+  update: (cache, { data }) => {
+    const newServerConfig = data?.updateServerConfigs.serverConfigs[0];
+    if (newServerConfig) {
+      cache.writeQuery({
+        query: GET_SERVER_CONFIG,
+        variables: {
+          serverName: config.serverName,
+        },
+        data: {
+          serverConfigs: [newServerConfig],
+        },
+      });
+    }
+  },
+});
 
 onDone(() => {
   showSavedChangesNotification.value = true;
 });
 
 function submit() {
-    console.log('submitting server settings form', serverUpdateInput.value)
-
   updateServer({
     input: serverUpdateInput.value,
   });
 }
 
 function updateFormValues(data: ServerConfigUpdateInput) {
-    console.log('updating form values in server settings form', data)
   formValues.value = { ...formValues.value, ...data };
 }
-console.log('form values in server settings form', formValues.value)
 </script>
 
 <template>

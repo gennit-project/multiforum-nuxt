@@ -34,6 +34,9 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       keyFields: ["text"],
     },
+    ServerConfig: {
+      keyFields: ["serverName"]
+    },
     Channel: {
       keyFields: ["uniqueName"],
       merge: true,

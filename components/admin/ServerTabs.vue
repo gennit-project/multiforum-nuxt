@@ -67,7 +67,6 @@ const tabs = computed((): Tab[] => {
 
   return baseTabs;
 });
-console.log("server tabs rendered");
 </script>
 
 <template>

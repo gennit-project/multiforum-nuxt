@@ -9,7 +9,6 @@ const props = defineProps<{
   };
 }>();
 
-console.log('rules editor', props.formValues);
 const emit = defineEmits(["updateFormValues"]);
 
 type RuleInput = {

@@ -22,6 +22,7 @@ export const GET_SERVER_CONFIG = gql`
         name
         channelUniqueName
       }
+      rules
     }
   }
 `;

@@ -45,7 +45,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["submit", "updateFormValues"]);
-console.log('create edit server fields', props.formValues)
 
 </script>
 
