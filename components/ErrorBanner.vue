@@ -11,9 +11,9 @@ defineProps({
 </script>
 
 <template>
-  <p class="text-wrap text-red-500 bg-red-100 p-3 my-2 rounded pl-4 dark:bg-red-500 dark:text-white">
+  <span class="text-wrap text-red-500 bg-red-100 p-3 my-2 pl-4 rounded dark:bg-red-500 dark:text-white flex-grow">
     {{ text }}
-  </p>
+  </span>
 </template>
 
 <style scoped>
