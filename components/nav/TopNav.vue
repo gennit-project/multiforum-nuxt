@@ -44,6 +44,8 @@ function getLabel() {
   if (route.name === "SitewideSearchDiscussionPreview") return "• discussions";
   if (route.name === "SearchEventsList") return "• online events";
   if (route.name === "MapEventPreview") return "• in-person events";
+  if (typeof route.name === 'string' && route.name.includes("admin")) return "• admin dashboard";
+  return "";
 }
 
 const isOnMapPage = computed(() => {

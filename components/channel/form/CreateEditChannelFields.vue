@@ -11,7 +11,6 @@ import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import { useMutation } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
 import TailwindForm from "@/components/FormComponent.vue";
 import { usernameVar } from "@/cache";
@@ -139,8 +138,6 @@ const handleImageChange = async (input: FileChangeInput) => {
     }
   }
 };
-
-
 
 const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
 </script>

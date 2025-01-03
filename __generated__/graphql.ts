@@ -19012,6 +19012,7 @@ export type ServerConfig = {
   DefaultServerRole?: Maybe<ServerRole>;
   DefaultServerRoleAggregate?: Maybe<ServerConfigServerRoleDefaultServerRoleAggregationSelection>;
   DefaultServerRoleConnection: ServerConfigDefaultServerRoleConnection;
+  rules?: Maybe<Scalars['JSON']['output']>;
   serverDescription?: Maybe<Scalars['String']['output']>;
   serverIconURL?: Maybe<Scalars['String']['output']>;
   serverName?: Maybe<Scalars['String']['output']>;
@@ -19145,6 +19146,7 @@ export type ServerConfigCreateInput = {
   DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleFieldInput>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverName?: InputMaybe<Scalars['String']['input']>;
@@ -19729,6 +19731,7 @@ export type ServerConfigServerRoleDefaultServerRoleNodeAggregateSelection = {
 
 /** Fields to sort ServerConfigs by. The order in which sorts are applied is not guaranteed when specifying many fields in one ServerConfigSort object. */
 export type ServerConfigSort = {
+  rules?: InputMaybe<SortDirection>;
   serverDescription?: InputMaybe<SortDirection>;
   serverIconURL?: InputMaybe<SortDirection>;
   serverName?: InputMaybe<SortDirection>;
@@ -19739,6 +19742,7 @@ export type ServerConfigUpdateInput = {
   DefaultModChannelRole?: InputMaybe<ServerConfigDefaultModChannelRoleUpdateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleUpdateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleUpdateFieldInput>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverName?: InputMaybe<Scalars['String']['input']>;
@@ -19768,6 +19772,8 @@ export type ServerConfigWhere = {
   DefaultServerRole_NOT?: InputMaybe<ServerRoleWhere>;
   NOT?: InputMaybe<ServerConfigWhere>;
   OR?: InputMaybe<Array<ServerConfigWhere>>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
+  rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   serverDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;

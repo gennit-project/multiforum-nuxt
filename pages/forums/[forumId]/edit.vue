@@ -9,6 +9,8 @@ import RequireAuth from "@/components/auth/RequireAuth.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { usernameVar } from "@/cache";
 import type { Tag as TagData } from "@/__generated__/graphql";
+import { useRoute } from "nuxt/app";
+import { useQuery, useMutation } from "@vue/apollo-composable";
 
 const route = useRoute();
 const channelId = route.params.forumId as string;

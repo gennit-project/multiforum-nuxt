@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import XmarkIcon from './icons/XmarkIcon.vue';
 const props = defineProps<{
   formValues: {
     rules: {
@@ -6,9 +7,9 @@ const props = defineProps<{
       detail: string;
     }[];
   };
-  updateFormValues: (value: any) => void;
 }>();
 
+console.log('rules editor', props.formValues);
 const emit = defineEmits(["updateFormValues"]);
 
 type RuleInput = {

@@ -8,28 +8,17 @@ import {
 } from "@/graphQLData/mod/queries";
 
 const route = useRoute();
-
-const channelId = computed(() => {
-  if (typeof route.params.forumId !== "string") {
-    return "";
-  }
-  return route.params.forumId;
-});
 const {
   result: issuesResult,
   error: issuesError,
   loading: issuesLoading,
-} = useQuery(SERVER_SCOPED_ISSUE_COUNT, {
-  channelUniqueName: channelId.value,
-});
+} = useQuery(SERVER_SCOPED_ISSUE_COUNT);
 
 const {
   result: closedIssuesResult,
   error: closedIssuesError,
   loading: closedIssuesLoading,
-} = useQuery(SERVER_SCOPED_CLOSED_ISSUE_COUNT, {
-  channelUniqueName: channelId.value,
-});
+} = useQuery(SERVER_SCOPED_CLOSED_ISSUE_COUNT);
 
 const openCount = computed(() => {
   if (issuesLoading.value || issuesError.value) {

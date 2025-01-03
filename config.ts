@@ -18,5 +18,6 @@ const config = {
     openCageApiKey: import.meta.env.VITE_OPEN_CAGE_API_KEY,
     lightgalleryLicenseKey: import.meta.env.VITE_LIGHTGALLERY_LICENSE_KEY,
     auth0username: import.meta.env.VITE_AUTH0_USERNAME,
+    serverName: import.meta.env.VITE_SERVER_NAME,
 }
 export { config };
