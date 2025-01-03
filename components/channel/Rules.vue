@@ -59,23 +59,22 @@ export default defineComponent({
     <div
       v-for="(rule, i) in openRules"
       :key="rule.summary"
-      class="my-2 pt-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-200"
-      :class="[
-        rule.detail ? 'cursor-pointer' : '',
-      ]"
-      @click="
-        () => {
-          if (rule.detail) {
-            toggleRule(rule.summary);
-          }
-        }
-      "
+      class="my-2 pt-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+      :class="[rule.detail && !isOpen(rule.summary) ? 'cursor-pointer' : '']"
     >
       <div
         v-if="rule.summary"
         class="flex items-center text-sm"
+        @click="
+          () => {
+            if (rule.detail) {
+              toggleRule(rule.summary);
+            }
+          }
+        "
       >
-        <span class="mr-2 dark:text-gray-400">{{ `${i + 1}.` }}</span>{{ rule.summary }}
+        <span class="mr-2 dark:text-gray-400">{{ `${i + 1}.` }}</span
+        >{{ rule.summary }}
         <i
           v-if="rule.detail"
           :class="[
@@ -88,11 +87,11 @@ export default defineComponent({
           ]"
         />
       </div>
-      <div
-        v-if="isOpen(rule.summary)"
-        class="text-sm text-gray-600 dark:text-gray-300"
-      >
-        <MarkdownPreview :text="rule.detail" />
+      <div v-if="isOpen(rule.summary)" class="mt-2">
+        <MarkdownRenderer
+          class="text-gray-600 dark:text-gray-300"
+          :text="rule.detail"
+        />
       </div>
     </div>
   </div>
