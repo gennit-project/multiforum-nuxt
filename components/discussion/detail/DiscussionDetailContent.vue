@@ -276,7 +276,7 @@ const handleClickEditFeedback = () => {
     />
     <div
       v-else
-      class="flex max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800 sm:px-2 md:px-5"
+      class="flex max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800"
     >
       <div class="w-full flex-col space-y-2">
         <ErrorBanner
