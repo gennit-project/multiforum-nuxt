@@ -83,12 +83,11 @@ const emit = defineEmits(["submit", "updateFormValues"]);
           <FormRow section-title="Description">
             <template #content>
               <TextEditor
-               :key="formValues.serverDescription || ''"
                 class="my-3"
                 :test-id="'description-input'"
                 :initial-value="formValues.serverDescription || ''"
                 :placeholder="'Add description'"
-                :disable-auto-focus="true"
+                :disable-auto-focus="false"
                 :allow-image-upload="false"
                 @update="$emit('updateFormValues', { serverDescription: $event })"
               />
