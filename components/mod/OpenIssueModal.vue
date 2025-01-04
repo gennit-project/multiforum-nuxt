@@ -35,10 +35,6 @@ const updateIssueInCache = (input: UpdateIssueInCacheInput) => {
   const { cache, result, channelId } = input;
   const resultIssues = result?.data?.createIssues?.issues;
   const activeIssue = resultIssues[0];
-  console.log({
-    activeIssue,
-    resultIssues
-  })
 
   const existingOpenIssuesData = cache.readQuery({
     query: COUNT_OPEN_ISSUES,

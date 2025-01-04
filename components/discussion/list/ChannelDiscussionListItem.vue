@@ -13,7 +13,15 @@ import type {
   Discussion,
   DiscussionChannel,
   Tag,
+  Image
 } from "@/__generated__/graphql";
+import "vue3-carousel/dist/carousel.css";
+import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
+
+const carouselConfig = {
+  itemsToShow: 2.5,
+  wrapAround: true,
+};
 
 // Define props
 const props = defineProps({
@@ -95,6 +103,14 @@ const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
 );
 
+const images = computed<Image[]>(() => {
+  let result: Image[] = []
+  if (props.discussion?.Album?.Images) {
+    result = props.discussion.Album.Images;
+  }
+  return result;
+});
+
 const filteredQuery = computed(() => {
   const query = { ...route.query };
   for (const key in query) {
@@ -171,6 +187,23 @@ const filteredQuery = computed(() => {
                 class="-ml-2"
               />
             </div>
+            <Carousel v-if="images.length > 0" v-bind="carouselConfig">
+              <Slide v-for="image in images" :key="image.id">
+                <div class="carousel__item">
+                  <img
+                    v-if="image.url && image.alt"
+                    :src="image.url"
+                    :alt="image.alt"
+                    class="w-full h-48 object-cover rounded-lg"
+                  >
+                </div>
+              </Slide>
+
+              <template #addons>
+                <Navigation />
+                <Pagination />
+              </template>
+            </Carousel>
             <div
               class="font-medium my-1 flex space-x-1 text-xs text-gray-600 hover:no-underline"
             >
@@ -197,7 +230,7 @@ const filteredQuery = computed(() => {
                   class="p-1 rounded-full dark:bg-gray-700 bg-gray-100 px-4 flex items-center gap-2"
                 >
                   <i class="fa-regular fa-comment h-4 w-4" />
-                  <span class="text-sm">{{commentCount}}</span>
+                  <span class="text-sm">{{ commentCount }}</span>
                 </nuxt-link>
               </div>
             </div>

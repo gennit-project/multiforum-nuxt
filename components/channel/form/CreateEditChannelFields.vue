@@ -22,9 +22,9 @@ import {
 
 type FileChangeInput = {
   // event of HTMLInputElement;
-  event: Event;   
+  event: Event;
   fieldName: string;
-}
+};
 
 const props = defineProps({
   editMode: {
@@ -156,10 +156,9 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
       @submit="emit('submit')"
     >
       <div>
-        <ErrorBanner
-          v-if="updateChannelError"
-          :text="updateChannelError.message"
-        />
+        <div v-if="updateChannelError" class="mt-6">
+          <ErrorBanner :text="updateChannelError.message" />
+        </div>
         <div v-if="getChannelError">
           <ErrorBanner
             v-for="(error, i) in getChannelError?.graphQLErrors"
@@ -260,9 +259,11 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
               <AddImage
                 key="channel-icon-url"
                 :field-name="'channelIconURL'"
-                @file-change="(input: FileChangeInput) => {
-                  handleImageChange(input);
-                }"
+                @file-change="
+                  (input: FileChangeInput) => {
+                    handleImageChange(input);
+                  }
+                "
               />
             </template>
           </FormRow>
@@ -273,19 +274,21 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
                 class="w-full shadow-sm"
                 :src="formValues.channelBannerURL"
                 :alt="formValues.uniqueName"
-              >
+              />
               <AddImage
                 key="channel-banner-url"
                 :field-name="'channelBannerURL'"
-                @file-change="(input: FileChangeInput) => {
-                  handleImageChange(input);
-                }"
+                @file-change="
+                  (input: FileChangeInput) => {
+                    handleImageChange(input);
+                  }
+                "
               />
             </template>
           </FormRow>
           <FormRow section-title="Forum Rules">
             <template #content>
-              <RulesEditor 
+              <RulesEditor
                 :form-values="formValues"
                 @update-form-values="$emit('updateFormValues', $event)"
               />

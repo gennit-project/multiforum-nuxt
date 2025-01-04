@@ -62,6 +62,15 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
               showModTag
             }
           }
+          Album {
+            id 
+            Images {
+              id
+              url 
+              alt
+              caption
+            }
+          }
           Tags {
             text
           }

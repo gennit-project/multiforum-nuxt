@@ -140,7 +140,7 @@ if (!channelId.value) {
           />
         </ChannelHeaderDesktop>
       </client-only>
-      <main v-if="channel" class="flex-1 flex justify-center w-full">
+      <main v-if="channel" class="flex justify-center w-full">
         <article
           class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
@@ -174,14 +174,13 @@ if (!channelId.value) {
             <div
               class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
-              <div class="flex-1 min-w-0 p-4 md:p-6 bg-white dark:bg-gray-800">
-                <div class="max-w-full">
+              <div class="flex-1 p-4 md:p-6 bg-white dark:bg-gray-800">
+       
                   <NuxtPage />
-                </div>
               </div>
               <aside
                 v-if="channelId"
-                class="w-full md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
+                class="md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
               >
                 <ChannelSidebar
                   v-if="channel"
