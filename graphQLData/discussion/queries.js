@@ -57,16 +57,16 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           createdAt
           updatedAt
           Author {
-            ...AuthorFields,
+            ...AuthorFields
             ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {
               showModTag
             }
           }
           Album {
-            id 
+            id
             Images {
               id
-              url 
+              url
               alt
               caption
             }
@@ -117,6 +117,15 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
             count
           }
         }
+        Album {
+          id
+          Images {
+            id
+            url
+            alt
+            caption
+          }
+        }
         Tags {
           text
         }
@@ -146,10 +155,10 @@ export const GET_DISCUSSION = gql`
         }
       }
       Album {
-        id 
+        id
         Images {
           id
-          url 
+          url
           alt
         }
       }
@@ -169,7 +178,7 @@ export const GET_DISCUSSION = gql`
         Discussion {
           id
         }
-        CommentsAggregate(where: { isFeedbackComment: false })  {
+        CommentsAggregate(where: { isFeedbackComment: false }) {
           count
         }
       }
@@ -193,7 +202,12 @@ export const GET_DISCUSSION = gql`
 `;
 
 export const GET_DISCUSSION_FEEDBACK = gql`
-  query getDiscussionFeedback($id: ID!, $limit: Int, $offset: Int, $loggedInModName: String!) {
+  query getDiscussionFeedback(
+    $id: ID!
+    $limit: Int
+    $offset: Int
+    $loggedInModName: String!
+  ) {
     discussions(where: { id: $id }) {
       id
       title

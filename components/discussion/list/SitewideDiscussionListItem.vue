@@ -13,6 +13,7 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
+import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 
 const props = defineProps({
   discussion: {
@@ -115,13 +116,13 @@ const relative = computed(() =>
   >
     <div class="flex w-full justify-between">
       <div class="w-full">
-        <div class="flex">
+        <div class="flex gap-2">
           <div
             class="mr-2 flex items-center justify-center flex-start w-8 h-8 text-xl rounded-md bg-gray-100 dark:bg-gray-600"
           >
             💬
           </div>
-          <div>
+          <div class="flex-1">
             <nuxt-link
               v-if="discussion"
               :to="
@@ -192,6 +193,12 @@ const relative = computed(() =>
                 :disable-gallery="false"
                 class="-ml-2"
               />
+              <div v-if="discussion.Album" class="my-4 overflow-x-auto bg-black">
+                <DiscussionAlbum
+                  :album="discussion.Album"
+                  :carousel-format="true"
+                />
+              </div>
             </div>
             <div
               class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline"
