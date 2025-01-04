@@ -53,6 +53,14 @@ export const GET_CHANNEL = gql`
   }
 `;
 
+export const GET_CHANNEL_RULES = gql`
+  query getChannelRules($uniqueName: String!) {
+    channels(where: { uniqueName: $uniqueName }) {
+      rules
+    }
+  }
+`;
+
 export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
   query getEvents($uniqueName: String!, $now: DateTime) {
     events(

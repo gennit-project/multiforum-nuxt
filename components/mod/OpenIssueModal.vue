@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import type { PropType } from 'vue';
-import { useRoute } from 'nuxt/app';
-import { useMutation, useLazyQuery } from '@vue/apollo-composable';
-import GenericModal from '@/components/GenericModal.vue';
-import FlagIcon from '@/components/icons/FlagIcon.vue';
-import ErrorBanner from '@/components/ErrorBanner.vue';
-import TextEditor from '@/components/TextEditor.vue';
+import { computed, ref } from "vue";
+import type { PropType } from "vue";
+import { useRoute } from "nuxt/app";
+import { useMutation, useLazyQuery } from "@vue/apollo-composable";
+import GenericModal from "@/components/GenericModal.vue";
+import FlagIcon from "@/components/icons/FlagIcon.vue";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import TextEditor from "@/components/TextEditor.vue";
 import {
   REPORT_CONTENT,
   REOPEN_ISSUE,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT,
-} from '@/graphQLData/issue/mutations';
+} from "@/graphQLData/issue/mutations";
 import {
   CHECK_DISCUSSION_ISSUE_EXISTENCE,
   CHECK_EVENT_ISSUE_EXISTENCE,
   CHECK_COMMENT_ISSUE_EXISTENCE,
   GET_ISSUES_BY_CHANNEL,
-} from '@/graphQLData/issue/queries';
-import { COUNT_OPEN_ISSUES } from '@/graphQLData/mod/queries';
-import type { IssueCreateInput, Comment } from '@/__generated__/graphql';
-import { modProfileNameVar } from '@/cache';
+} from "@/graphQLData/issue/queries";
+import { COUNT_OPEN_ISSUES } from "@/graphQLData/mod/queries";
+import type { IssueCreateInput, Comment } from "@/__generated__/graphql";
+import { modProfileNameVar } from "@/cache";
+import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
 
 type UpdateIssueInCacheInput = {
   cache: any;
@@ -28,7 +29,7 @@ type UpdateIssueInCacheInput = {
   channelId: string;
 };
 
-const emit = defineEmits(['close', 'reportSubmittedSuccessfully']);
+const emit = defineEmits(["close", "reportSubmittedSuccessfully"]);
 
 const updateIssueInCache = (input: UpdateIssueInCacheInput) => {
   const { cache, result, channelId } = input;
@@ -40,10 +41,7 @@ const updateIssueInCache = (input: UpdateIssueInCacheInput) => {
     variables: { channelUniqueName: channelId },
   });
 
-  if (
-    existingOpenIssuesData &&
-    existingOpenIssuesData.issuesAggregate
-  ) {
+  if (existingOpenIssuesData && existingOpenIssuesData.issuesAggregate) {
     const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
     const newOpenIssues = {
       count: existingOpenIssues.count + 1,
@@ -66,10 +64,7 @@ const updateIssueInCache = (input: UpdateIssueInCacheInput) => {
     variables: { channelUniqueName: channelId },
   });
 
-  if (
-    existingIssuesByChannelData &&
-    existingIssuesByChannelData.channels
-  ) {
+  if (existingIssuesByChannelData && existingIssuesByChannelData.channels) {
     const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
     const newIssuesByChannel = {
       ...existingIssuesByChannel,
@@ -90,17 +85,17 @@ const props = defineProps({
   discussionTitle: {
     type: String,
     required: false,
-    default: '',
+    default: "",
   },
   eventTitle: {
     type: String,
     required: false,
-    default: '',
+    default: "",
   },
   commentId: {
     type: String,
     required: false,
-    default: '',
+    default: "",
   },
   comment: {
     type: Object as PropType<Comment | null | undefined>,
@@ -116,15 +111,17 @@ const props = defineProps({
 const route = useRoute();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
 const discussionId = computed(() => {
-  return typeof route.params.discussionId === 'string' ? route.params.discussionId : '';
+  return typeof route.params.discussionId === "string"
+    ? route.params.discussionId
+    : "";
 });
 
 const eventId = computed(() => {
-  return typeof route.params.eventId === 'string' ? route.params.eventId : '';
+  return typeof route.params.eventId === "string" ? route.params.eventId : "";
 });
 
 const {
@@ -137,23 +134,21 @@ const {
     channelUniqueName: channelId.value,
   },
   {
-    fetchPolicy: 'network-only',
+    fetchPolicy: "network-only",
   }
 );
 
-const {
-  load: checkEventIssueExistence,
-  result: eventIssueExistenceResult,
-} = useLazyQuery(
-  CHECK_EVENT_ISSUE_EXISTENCE,
-  {
-    eventId: eventId.value,
-    channelUniqueName: channelId.value,
-  },
-  {
-    fetchPolicy: 'network-only',
-  }
-);
+const { load: checkEventIssueExistence, result: eventIssueExistenceResult } =
+  useLazyQuery(
+    CHECK_EVENT_ISSUE_EXISTENCE,
+    {
+      eventId: eventId.value,
+      channelUniqueName: channelId.value,
+    },
+    {
+      fetchPolicy: "network-only",
+    }
+  );
 
 const {
   load: checkCommentIssueExistence,
@@ -165,13 +160,69 @@ const {
     channelUniqueName: channelId.value,
   },
   {
-    fetchPolicy: 'network-only',
+    fetchPolicy: "network-only",
   }
 );
 
 const { mutate: reopenIssue } = useMutation(REOPEN_ISSUE);
 
-const reportText = ref('');
+const selectedForumRules = ref<string[]>([]);
+const selectedServerRules = ref<string[]>([]);
+const reportText = ref("");
+const finalCommentText = computed(() => {
+  return `
+${
+  selectedForumRules.value.length > 0
+    ? `
+## Broken Forum Rules
+
+${selectedForumRules.value.map((rule) => `- ${rule}`).join("\n")}
+`
+    : ""
+}
+
+${
+  selectedServerRules.value.length > 0
+    ? `
+  
+## Broken Server Rules
+
+${selectedServerRules.value.map((rule) => `- ${rule}`).join("\n")}
+`
+    : ""
+}
+
+${
+  reportText.value
+    ? `
+## Notes
+
+${reportText.value}
+`
+    : ""
+}
+`;
+});
+
+const toggleForumRuleSelection = (rule: string) => {
+  if (selectedForumRules.value.includes(rule)) {
+    selectedForumRules.value = selectedForumRules.value.filter(
+      (r) => r !== rule
+    );
+  } else {
+    selectedForumRules.value = [...selectedForumRules.value, rule];
+  }
+};
+
+const toggleServerRuleSelection = (rule: string) => {
+  if (selectedServerRules.value.includes(rule)) {
+    selectedServerRules.value = selectedServerRules.value.filter(
+      (r) => r !== rule
+    );
+  } else {
+    selectedServerRules.value = [...selectedServerRules.value, rule];
+  }
+};
 
 const {
   mutate: addIssueActivityFeedItem,
@@ -180,7 +231,7 @@ const {
 } = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT);
 
 addIssueActivityFeedItemDone(() => {
-  emit('reportSubmittedSuccessfully');
+  emit("reportSubmittedSuccessfully");
 });
 
 const {
@@ -199,74 +250,74 @@ const {
 }));
 
 reportContentDone(() => {
-  reportText.value = '';
-  emit('reportSubmittedSuccessfully');
+  reportText.value = "";
+  emit("reportSubmittedSuccessfully");
 });
 
 const modalTitle = computed(() => {
   if (props.commentId) {
-    return 'Report Comment';
+    return "Report Comment";
   } else if (discussionId.value) {
-    return 'Report Discussion';
+    return "Report Discussion";
   } else if (eventId.value) {
-    return 'Report Event';
+    return "Report Event";
   }
-  return 'Report Content';
+  return "Report Content";
 });
 
 const modalBody = computed(() => {
-  let contentType = 'discussion';
+  let contentType = "discussion";
   if (props.commentId) {
-    contentType = 'comment';
+    contentType = "comment";
   } else if (eventId.value) {
-    contentType = 'event';
+    contentType = "event";
   }
-  return `Why should this ${contentType} be removed? Please be specific about any rule violations.`;
+  return `(Optional) Please add any more information or context about why this ${contentType} be removed.`;
 });
 
 const modalPlaceholder = computed(() => {
-  let contentType = 'discussion';
+  let contentType = "discussion";
   if (props.commentId) {
-    contentType = 'comment';
+    contentType = "comment";
   } else if (eventId.value) {
-    contentType = 'event';
+    contentType = "event";
   }
   return `Explain why this ${contentType} should be removed`;
 });
 
 const modActionDescription = computed(() => {
   if (props.commentId) {
-    return 'reported the comment';
+    return "reported the comment";
   } else if (discussionId.value) {
-    return 'reported the discussion';
+    return "reported the discussion";
   } else if (eventId.value) {
-    return 'reported the event';
+    return "reported the event";
   }
-  return 'reported the content';
+  return "reported the content";
 });
 
 const submit = async () => {
   if (!discussionId.value && !eventId.value && !props.commentId) {
-    console.error('No discussion, event, or comment ID provided.');
+    console.error("No discussion, event, or comment ID provided.");
     return;
   }
 
-  let existingIssueId = '';
+  let existingIssueId = "";
 
   if (props.commentId) {
     await checkCommentIssueExistence();
     if (commentIssueExistenceResult.value.issues?.length > 0) {
-      existingIssueId = commentIssueExistenceResult.value.issues[0].id || '';
+      existingIssueId = commentIssueExistenceResult.value.issues[0].id || "";
     }
   } else if (discussionId.value) {
     await checkDiscussionIssueExistence();
     if (discussionIssueExistenceResult.value.issues?.length > 0) {
-      existingIssueId = discussionIssueExistenceResult.value.issues[0].id || '';
+      existingIssueId = discussionIssueExistenceResult.value.issues[0].id || "";
     }
   } else if (eventId.value) {
     await checkEventIssueExistence();
     if (eventIssueExistenceResult.value.issues?.length > 0) {
-      existingIssueId = eventIssueExistenceResult.value.issues[0].id || '';
+      existingIssueId = eventIssueExistenceResult.value.issues[0].id || "";
     }
   }
 
@@ -274,9 +325,9 @@ const submit = async () => {
     addIssueActivityFeedItem({
       issueId: existingIssueId,
       displayName: modProfileNameVar.value,
-      actionDescription: 'reported the discussion',
-      actionType: 'report',
-      commentText: reportText.value,
+      actionDescription: "reported the discussion",
+      actionType: "report",
+      commentText: finalCommentText.value,
       channelUniqueName: channelId.value,
     });
 
@@ -326,12 +377,12 @@ const submit = async () => {
               },
             },
           },
-          actionType: 'report',
+          actionType: "report",
           actionDescription: modActionDescription.value,
           Comment: {
             create: {
               node: {
-                text: reportText.value,
+                text: finalCommentText.value,
                 isRootComment: true,
                 CommentAuthor: {
                   ModerationProfile: {
@@ -365,16 +416,16 @@ const submit = async () => {
 };
 
 const close = () => {
-  emit('close');
+  emit("close");
 };
 
 const getIssueTitle = () => {
   if (props.commentId) {
     const truncatedCommentText =
       props.comment?.text?.length && props.comment.text.length > 50
-        ? props.comment?.text?.substring(0, 50) + '...'
+        ? props.comment?.text?.substring(0, 50) + "..."
         : props.comment?.text;
-    return `Reported Comment: "${truncatedCommentText || ''}"`;
+    return `Reported Comment: "${truncatedCommentText || ""}"`;
   }
   if (discussionId.value) {
     return `Reported Discussion: "${props.discussionTitle}"`;
@@ -383,19 +434,20 @@ const getIssueTitle = () => {
     return `Reported Event: "${props.eventTitle}"`;
   }
 };
-
 </script>
 
 <template>
   <GenericModal
     :highlight-color="'red'"
     :title="modalTitle"
-    :body="modalBody"
+    :body="'Please select at least one broken rule:'"
     :open="open"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
     :loading="reportContentLoading || addIssueActivityFeedItemLoading"
-    :primary-button-disabled="!reportText"
+    :primary-button-disabled="
+      selectedForumRules.length === 0 && selectedServerRules.length === 0
+    "
     :error="reportContentError?.message"
     @primary-button-click="submit"
     @close="close"
@@ -407,6 +459,17 @@ const getIssueTitle = () => {
       />
     </template>
     <template #content>
+      <SelectBrokenRules
+        @toggle-forum-rule-selection="toggleForumRuleSelection"
+        @toggle-server-rule-selection="toggleServerRuleSelection"
+      />
+      <ErrorBanner
+        v-if="reportContentError"
+        :text="reportContentError.message"
+      />
+      <h2 class="text-gray-500 dark:text-gray-400 text-sm mt-2">
+        {{ modalBody }}
+      </h2>
       <TextEditor
         :test-id="'report-discussion-input'"
         :initial-value="reportText"
@@ -414,10 +477,6 @@ const getIssueTitle = () => {
         :disable-auto-focus="false"
         :allow-image-upload="false"
         @update="reportText = $event"
-      />
-      <ErrorBanner
-        v-if="reportContentError"
-        :text="reportContentError.message"
       />
     </template>
   </GenericModal>

@@ -79,7 +79,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="px-4 dark:text-white">
+  <div class="px-3 dark:text-white">
     <div
       v-if="!channelId"
       class="my-4"
@@ -108,7 +108,7 @@ export default defineComponent({
         <h2 class="mt-4 text-lg">
           Comments in Other Forums
         </h2>
-        <ul class="list-disc pl-3">
+        <ul class="list-disc pl-4">
           <DiscussionChannelLink
             v-for="dc in channelsExceptActive"
             :key="dc.id"

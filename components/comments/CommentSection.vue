@@ -598,7 +598,7 @@ const lengthOfCommentInProgress = computed(() => {
       <div class="my-4">
         <div
           v-if="!loading && aggregateCommentCount === 0"
-          class="dark:text-white"
+          class="ml-1 text-sm dark:text-gray-400"
         >
           There are no comments yet.
         </div>

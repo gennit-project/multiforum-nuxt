@@ -13647,6 +13647,7 @@ export type Issue = {
   body?: Maybe<Scalars['String']['output']>;
   channelUniqueName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  flaggedServerRuleViolation?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   isOpen: Scalars['Boolean']['output'];
   relatedCommentId?: Maybe<Scalars['ID']['output']>;
@@ -14243,6 +14244,7 @@ export type IssueCreateInput = {
   authorName?: InputMaybe<Scalars['String']['input']>;
   body?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  flaggedServerRuleViolation?: InputMaybe<Scalars['Boolean']['input']>;
   isOpen: Scalars['Boolean']['input'];
   relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
@@ -14302,6 +14304,7 @@ export type IssueSort = {
   body?: InputMaybe<SortDirection>;
   channelUniqueName?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
+  flaggedServerRuleViolation?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   isOpen?: InputMaybe<SortDirection>;
   relatedCommentId?: InputMaybe<SortDirection>;
@@ -14319,6 +14322,7 @@ export type IssueUpdateInput = {
   body?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  flaggedServerRuleViolation?: InputMaybe<Scalars['Boolean']['input']>;
   isOpen?: InputMaybe<Scalars['Boolean']['input']>;
   relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
   relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
@@ -14380,6 +14384,7 @@ export type IssueWhere = {
   createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  flaggedServerRuleViolation?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;

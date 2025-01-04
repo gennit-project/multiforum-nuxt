@@ -120,7 +120,7 @@ export const GET_ISSUES_BY_CHANNEL = gql`
   query getIssuesByChannel($channelUniqueName: String!) {
     channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
-      Issues(where: { isOpen: true }) {
+      Issues(where: { isOpen: true }, options: { sort: { createdAt: DESC } }) {
         id
         title
         body
