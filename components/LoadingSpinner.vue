@@ -7,7 +7,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="flex items-center justify-center space-x-2">
+  <div class="flex items-center justify-center space-x-2 dark:text-gray-200">
     <svg
       class="animate-spin h-4 w-4"
       xmlns="http://www.w3.org/2000/svg"

@@ -153,7 +153,7 @@ const defaultLabels = {
     <div class="bg-gray-200 dark:bg-black">
       <div class="py-6">
         <div
-          class="mx-auto flex max-w-3xl items-center justify-between px-4 py-2"
+          class="flex max-w-4xl items-center justify-between px-4 py-2"
         >
           <SearchBar
             class="mr-2 w-full align-middle"

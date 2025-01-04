@@ -443,7 +443,7 @@ const toggleCloseOpenIssue = () => {
     class="w-full max-w-screen-2xl space-y-2 rounded-lg bg-white py-2 dark:bg-gray-800 dark:text-white sm:px-2 md:px-4 lg:px-6"
   >
     <div
-      v-if="route.name === 'IssueDetail'"
+      v-if="route.name === 'forums-forumId-issues-issueId'"
       class="align-center mx-1 mt-2 flex justify-between px-4"
     >
       <BackLink
@@ -457,20 +457,11 @@ const toggleCloseOpenIssue = () => {
       class="mt-2 px-4"
       :text="getIssueError.message"
     />
-    <div v-else-if="!getIssueLoading" class="mt-2 flex flex-col gap-2 px-4">
-      <h1 class="text-wrap text-2xl font-bold sm:tracking-tight">
-        {{ issue?.title || "[Deleted]" }}
-      </h1>
-      <div class="flex items-center gap-2">
-        <IssueBadge v-if="issue" :key="issue?.id" :issue="issue" />
-        <div v-if="issue" class="text-sm text-gray-500 dark:text-gray-400">
-          {{
-            `First reported on ${formatDate(issue.createdAt)} by ${issue?.Author?.displayName || "[Deleted]"}`
-          }}
-        </div>
-      </div>
-
-      <p v-if="activeIssue?.relatedDiscussionId || activeIssue?.relatedEventId">
+    <div v-else-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
+      <h2 
+        v-if="activeIssue?.relatedDiscussionId || activeIssue?.relatedEventId || activeIssue?.relatedCommentId"
+        class="text-xl font-bold"
+        >
         Original post (
         <nuxt-link
           v-if="activeIssue?.relatedDiscussionId"
@@ -495,8 +486,21 @@ const toggleCloseOpenIssue = () => {
         >
           link
         </nuxt-link>
-        <span>):</span>
-      </p>
+        <nuxt-link
+          v-else-if="activeIssue?.relatedCommentId"
+          class="text-blue-500 hover:underline"
+          :to="{
+            name: 'forums-forumId-discussions-discussionId',
+            params: {
+              discussionId: activeIssue.relatedCommentId,
+              forumId: channelId,
+            },
+          }"
+        >
+          link
+        </nuxt-link>
+        <span>)</span>
+      </h2>
 
       <DiscussionDetails
         v-if="activeIssue?.relatedDiscussionId"

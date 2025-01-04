@@ -4,6 +4,7 @@ import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
 import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
 import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
 import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
+import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import type { Channel, User } from "@/__generated__/graphql";
 import { computed } from "vue";
@@ -20,6 +21,9 @@ const showDiscussionTitle = computed(() =>
 );
 const showEventTitle = computed(() =>
   route.name?.toString().includes("forums-forumId-events-eventId")
+);
+const showIssueTitle = computed(() =>
+  route.name?.toString().includes("forums-forumId-issues-issueId")
 );
 
 const channelId = computed(() => {
@@ -158,6 +162,11 @@ if (!channelId.value) {
           <div v-else-if="showEventTitle" class="flex w-full justify-center">
             <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
               <EventTitleEditForm />
+            </div>
+          </div>
+          <div v-else-if="showIssueTitle" class="flex w-full justify-center">
+            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+              <IssueTitleEditForm />
             </div>
           </div>
 

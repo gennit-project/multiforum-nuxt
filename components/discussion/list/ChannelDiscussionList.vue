@@ -162,7 +162,12 @@ const reachedEndOfResults = computed(() => {
 <template>
   <div class="px-2">
     <slot />
-    <p v-if="!discussionChannelResult && discussionLoading">Loading...</p>
+    <p
+      v-if="!discussionChannelResult && discussionLoading"
+      class="dark:text-gray-200"
+    >
+      Loading...
+    </p>
     <ErrorBanner
       v-else-if="discussionError"
       class="max-w-5xl"

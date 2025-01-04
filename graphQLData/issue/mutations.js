@@ -47,6 +47,20 @@ export const REOPEN_ISSUE = gql`
   }
 `;
 
+export const UPDATE_ISSUE = gql`
+  ${ISSUE_FIELDS}
+  mutation updateIssue(
+    $issueWhere: IssueWhere!
+    $updateIssueInput: IssueUpdateInput!
+  ) {
+    updateIssues(where: $issueWhere, update: $updateIssueInput) {
+      issues {
+        ...IssueFields
+      }
+    }
+  }
+`;
+
 export const ADD_ISSUE_ACTIVITY_FEED_ITEM = gql`
   ${ISSUE_FIELDS}
   mutation addIssueActivityFeedItem(
@@ -105,11 +119,11 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
                     isRootComment: false
                     text: $commentText
                     Channel: {
-                      connect: { where: { node: { uniqueName: $channelUniqueName } } }
+                      connect: {
+                        where: { node: { uniqueName: $channelUniqueName } }
+                      }
                     }
-                    Issue: {
-                      connect: { where: { node: { id: $issueId } } }
-                    }
+                    Issue: { connect: { where: { node: { id: $issueId } } } }
                     CommentAuthor: {
                       ModerationProfile: {
                         connect: {
