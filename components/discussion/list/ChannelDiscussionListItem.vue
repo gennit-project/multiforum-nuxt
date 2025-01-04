@@ -13,16 +13,8 @@ import type {
   Discussion,
   DiscussionChannel,
   Tag,
-  Image
 } from "@/__generated__/graphql";
-import "vue3-carousel/dist/carousel.css";
-import { Carousel, Slide, Pagination, Navigation } from "vue3-carousel";
-
-const carouselConfig = {
-  itemsToShow: 2.5,
-  wrapAround: true,
-};
-
+import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 // Define props
 const props = defineProps({
   discussionQueryFilters: {
@@ -103,14 +95,6 @@ const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
 );
 
-const images = computed<Image[]>(() => {
-  let result: Image[] = []
-  if (props.discussion?.Album?.Images) {
-    result = props.discussion.Album.Images;
-  }
-  return result;
-});
-
 const filteredQuery = computed(() => {
   const query = { ...route.query };
   for (const key in query) {
@@ -187,23 +171,12 @@ const filteredQuery = computed(() => {
                 class="-ml-2"
               />
             </div>
-            <Carousel v-if="images.length > 0" v-bind="carouselConfig">
-              <Slide v-for="image in images" :key="image.id">
-                <div class="carousel__item">
-                  <img
-                    v-if="image.url && image.alt"
-                    :src="image.url"
-                    :alt="image.alt"
-                    class="w-full h-48 object-cover rounded-lg"
-                  >
-                </div>
-              </Slide>
-
-              <template #addons>
-                <Navigation />
-                <Pagination />
-              </template>
-            </Carousel>
+            <div v-if="discussion.Album" class="my-4">
+              <DiscussionAlbum
+                :album="discussion.Album"
+                :carousel-format="true"
+              />
+            </div>
             <div
               class="font-medium my-1 flex space-x-1 text-xs text-gray-600 hover:no-underline"
             >

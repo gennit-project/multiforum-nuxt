@@ -16,6 +16,10 @@ defineProps({
     type: Object as PropType<Album>,
     required: true,
   },
+  carouselFormat: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const plugins = ref([lgThumbnail, lgZoom]);
@@ -25,22 +29,53 @@ const lightGalleryLicenseKey = config.lightgalleryLicenseKey;
 
 <template>
   <lightgallery
+    v-if="!carouselFormat"
     :settings="{
       speed: 500,
       plugins: plugins,
       licenseKey: lightGalleryLicenseKey,
     }"
-    class="grid grid-cols-2 gap-2 dark:text-white"
+    class="grid grid-cols-3 gap-2 dark:text-white"
   >
     <a v-for="image in album.Images" :key="image.id" :href="image.url || ''">
-      <img v-if="image" :src="image.url || ''" :alt="image.alt || ''" class="shadow-sm" >
+      <img
+        v-if="image"
+        :src="image.url || ''"
+        :alt="image.alt || ''"
+        class="shadow-sm"
+      >
       <span class="text-center">
         {{ image.alt }}
       </span>
     </a>
   </lightgallery>
+  <lightgallery
+    v-else
+    :settings="{
+      speed: 500,
+      plugins: plugins,
+      licenseKey: lightGalleryLicenseKey,
+    }"
+    class="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-4 dark:text-white"
+  >
+    <a
+      v-for="image in album.Images"
+      :key="image.id"
+      :href="image.url || ''"
+      class="flex-none w-3/4 first:pl-4 last:pr-4 snap-center"
+    >
+      <img
+        v-if="image"
+        :src="image.url || ''"
+        :alt="image.alt || ''"
+        class="w-full h-48 object-cover rounded-lg shadow-sm"
+      >
+      <span class="text-center block mt-2">
+        {{ image.alt }}
+      </span>
+    </a>
+  </lightgallery>
 </template>
-
 <style scoped>
 img {
   cursor: pointer;
