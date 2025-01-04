@@ -28,56 +28,57 @@ const lightGalleryLicenseKey = config.lightgalleryLicenseKey;
 </script>
 
 <template>
-  <lightgallery
-    v-if="!carouselFormat"
-    :settings="{
-      speed: 500,
-      plugins: plugins,
-      licenseKey: lightGalleryLicenseKey,
-    }"
-    class="grid grid-cols-3 gap-2 dark:text-white"
-  >
-    <a v-for="image in album.Images" :key="image.id" :href="image.url || ''">
-      <img
-        v-if="image"
-        :src="image.url || ''"
-        :alt="image.alt || ''"
-        class="shadow-sm"
-      >
-      <span class="text-center">
-        {{ image.alt }}
-      </span>
-    </a>
-  </lightgallery>
-
+  <div class="overflow-x-auto">
     <lightgallery
-      v-else
+      v-if="!carouselFormat"
       :settings="{
         speed: 500,
         plugins: plugins,
         licenseKey: lightGalleryLicenseKey,
       }"
-      class="flex overflow-x-auto snap-x snap-mandatory space-x-4 pb-4 dark:text-white"
+      class="grid grid-cols-3 gap-2 dark:text-white"
     >
-      <a 
-        v-for="image in album.Images" 
-        :key="image.id" 
-        :href="image.url || ''"
-        class="flex-none w-3/4 first:pl-4 last:pr-4 snap-center flex flex-col"
-      >
-        <div class="relative w-full pt-[56.25%]">
-          <img 
-            v-if="image" 
-            :src="image.url || ''" 
-            :alt="image.alt || ''" 
-            class="absolute inset-0 w-full h-full object-contain bg-gray-100 dark:bg-gray-800 rounded-lg shadow-sm"
-          >
-        </div>
-        <span class="text-center mt-2">
+      <a v-for="image in album.Images" :key="image.id" :href="image.url || ''">
+        <img
+          v-if="image"
+          :src="image.url || ''"
+          :alt="image.alt || ''"
+          class="shadow-sm"
+        >
+        <span class="text-center">
           {{ image.alt }}
         </span>
       </a>
     </lightgallery>
+
+    <lightgallery
+      v-else
+      :settings="{
+        speed: 1,
+        plugins: plugins,
+        licenseKey: lightGalleryLicenseKey,
+      }"
+      class="flex flex-wrap gap-2 dark:text-white"
+    >
+      <a
+        v-for="image in album.Images"
+        :key="image.id"
+        :href="image.url || ''"
+        class="flex-none w-64 snap-center"
+      >
+        <div class="relative pt-[100%]">
+          <img
+            :src="image.url || ''"
+            :alt="image.alt || ''"
+            class="absolute inset-0 w-full h-full object-cover rounded-lg shadow-sm"
+          >
+        </div>
+        <span class="block text-center mt-2">
+          {{ image.alt }}
+        </span>
+      </a>
+    </lightgallery>
+  </div>
 </template>
 <style scoped>
 img {

@@ -106,7 +106,7 @@ const filteredQuery = computed(() => {
 
 <template>
   <li class="m-2 pt-5 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
-    <div class="flex w-full flex-row justify-start gap-4 rounded-lg">
+    <div class="flex w-full flex-row justify-start gap-4 rounded-lg overflow-hidden">
       <div v-if="discussion" class="w-full flex-col">
         <div class="flex gap-3">
           <div class="flex flex-col gap-2">
@@ -171,7 +171,7 @@ const filteredQuery = computed(() => {
                 class="-ml-2"
               />
             </div>
-            <div v-if="discussion.Album" class="my-4">
+            <div v-if="discussion.Album" class="my-4 overflow-x-auto">
               <DiscussionAlbum
                 :album="discussion.Album"
                 :carousel-format="true"
