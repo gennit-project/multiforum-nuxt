@@ -54,32 +54,34 @@ const lightGalleryLicenseKey = config.lightgalleryLicenseKey;
     <lightgallery
       v-else
       :settings="{
-        speed: 1,
+        speed: 500,
         plugins: plugins,
         licenseKey: lightGalleryLicenseKey,
       }"
-      class="flex flex-wrap gap-2 dark:text-white"
+      class=" p-4 flex rounded gap-x-2 dark:text-white max-h-96 max-w-96"
     >
       <a
         v-for="image in album.Images"
         :key="image.id"
         :href="image.url || ''"
-        class="flex-none w-64 snap-center"
+        class=" flex flex-shrink-0 w-auto"
       >
-        <div class="relative pt-[100%]">
+        <div class="h-72 w-72">
           <img
+            v-if="image"
             :src="image.url || ''"
             :alt="image.alt || ''"
-            class="absolute inset-0 w-full h-full object-cover rounded-lg shadow-sm"
+            class="shadow-sm"
           >
+          <span class="text-center">
+            {{ image.alt }}
+          </span>
         </div>
-        <span class="block text-center mt-2">
-          {{ image.alt }}
-        </span>
       </a>
     </lightgallery>
   </div>
 </template>
+
 <style scoped>
 img {
   cursor: pointer;

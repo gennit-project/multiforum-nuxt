@@ -171,7 +171,7 @@ const filteredQuery = computed(() => {
                 class="-ml-2"
               />
             </div>
-            <div v-if="discussion.Album" class="my-4 overflow-x-auto">
+            <div v-if="discussion.Album" class="my-4 overflow-x-auto bg-black">
               <DiscussionAlbum
                 :album="discussion.Album"
                 :carousel-format="true"
