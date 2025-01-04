@@ -18,7 +18,10 @@ type RuleOption = {
   detail: string;
 };
 
-const emit = defineEmits(["toggleForumRuleSelection", "toggleServerRuleSelection"]);
+const emit = defineEmits([
+  "toggleForumRuleSelection",
+  "toggleServerRuleSelection",
+]);
 const selected = ref([]);
 const route = useRoute();
 
@@ -77,7 +80,6 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
 
   return getRules(serverConfig.rules);
 });
-
 </script>
 
 <template>
@@ -97,9 +99,7 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
 
     <template v-else>
       <div class="pl-1">
-       
-
-        <div class="pt-3">
+        <div v-if="forumRuleOptions.length > 0" class="pt-3">
           <h3 class="uppercase text-sm text-gray-700 dark:text-gray-300">
             Forum rules for {{ forumId }}
           </h3>
@@ -111,7 +111,9 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
             <BrokenRuleListItem
               :rule="rule"
               :selected="selected"
-              @toggle-selection="() => emit('toggleForumRuleSelection', rule.summary)"
+              @toggle-selection="
+                () => emit('toggleForumRuleSelection', rule.summary)
+              "
             />
           </div>
         </div>
@@ -127,7 +129,9 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
             <BrokenRuleListItem
               :rule="rule"
               :selected="selected"
-              @toggle-selection="() => emit('toggleServerRuleSelection', rule.summary)"
+              @toggle-selection="
+                () => emit('toggleServerRuleSelection', rule.summary)
+              "
             />
           </div>
         </div>
