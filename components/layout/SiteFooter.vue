@@ -1,9 +1,19 @@
-<script>
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 
-export default defineComponent({
-  setup() {},
-});
+const links = [
+  {
+    text: "Privacy Policy",
+    to: "/privacy-policy",
+  },
+  {
+    text: "Terms of Use",
+    to: "/terms-of-use",
+  },
+  {
+    text: "About",
+    to: "/about",
+  }
+];
 </script>
 <template>
   <div class="mt-auto w-full">
@@ -12,17 +22,12 @@ export default defineComponent({
     >
     <span class="flex items-center gap-2">
       <nuxt-link
-        :to="`/privacy-policy`"
+        v-for="link in links"
+        :key="link.to"
+        :to="link.to"
         class="flex cursor-pointer underline text-white"
       >
-        Privacy Policy
-      </nuxt-link>
-
-      <nuxt-link
-        :to="`/terms-of-use`"
-        class="flex cursor-pointer underline text-white"
-      >
-        Terms of Use
+        {{ link.text }}
       </nuxt-link>
     </span>
     </div>
