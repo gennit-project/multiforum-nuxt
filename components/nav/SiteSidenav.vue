@@ -267,6 +267,19 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
         >
           Account Settings
         </nuxt-link>
+        <nuxt-link
+          :to="{
+            name: 'admin-issues'
+          }"
+          :class="navLinkClasses"
+          @click.prevent="() => {
+            routeAndClose({
+              name: 'admin-issues',
+            })
+          }"
+        >
+          Admin Dashboard
+        </nuxt-link>
 
         <RequireAuth :require-ownership="false" :full-width="true">
           <template #has-auth>
