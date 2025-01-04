@@ -66,7 +66,7 @@ const lightGalleryLicenseKey = config.lightgalleryLicenseKey;
         :href="image.url || ''"
         class=" flex flex-shrink-0 w-auto"
       >
-        <div class="h-72 w-72">
+        <div class="max-h-96 max-w-96">
           <img
             v-if="image"
             :src="image.url || ''"
