@@ -23,7 +23,7 @@ When the project is finished, I will add documentation so that anyone can deploy
 
 ## Screenshots - Desktop width
 
-The below screenshots capture the state of the project as of January 2024. The layout is responsive with both desktop and mobile views.
+The below screenshots capture the state of the project as of January 2025. The layout is responsive with both desktop and mobile views.
 
 ### Sitewide event search - filtering by time
 
@@ -48,7 +48,7 @@ If you click the map marker, more details about the event show up:
 If I'm only interested in events from a few specific forums, I filter the 
 map by those forums:
 
-![Filtering map by multiple forums](./screenshots/filtering-map-by-multiple-forums.png)
+![Filtering map by multiple forums](./screenshots/filtering-map-by-multiple-forums2.png)
 
 The resulting event list is now filtered by the two forums I selected - the free events group
 and the family-friendly one. All of the concerts are no longer in the list and their map

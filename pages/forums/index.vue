@@ -151,7 +151,7 @@ const defaultLabels = {
 <template>
   <NuxtLayout>
     <div class="bg-gray-200 dark:bg-black">
-      <div class="py-6">
+      <div class="py-6 flex-col w-full justify-center">
         <div
           class="flex max-w-4xl items-center justify-between px-4 py-2"
         >
