@@ -38,10 +38,15 @@ const md = new MarkdownIt({
 // Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
 md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
   const token = tokens[idx];
-  // Add target="_blank" and security attributes to link tokens
   token.attrPush(["target", "_blank"]);
   token.attrPush(["rel", "noopener noreferrer"]);
+  token.attrPush(["class", "external-link"]);
   return self.renderToken(tokens, idx, options);
+};
+
+// Add external link icon after the link content
+md.renderer.rules.link_close = () => {
+  return '</a><span class="external-link-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>';
 };
 
 const renderedMarkdown = computed(() => {
@@ -51,6 +56,7 @@ const renderedMarkdown = computed(() => {
     // Configure DOMPurify to allow target="_blank" attribute
     const config = {
       ADD_ATTR: ["target", "rel"],
+      ADD_TAGS: ["svg", "path", "polyline", "line"],
     };
     return DOMPurify.sanitize(rawHTML, config);
   }
@@ -69,6 +75,30 @@ const renderedMarkdown = computed(() => {
   padding-bottom: 0.25rem !important;
   word-wrap: break-word;
   overflow-wrap: break-word;
+
+  .external-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .external-link-icon {
+    color: #3182ce !important;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    color: currentColor;
+    opacity: 0.6;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
 
   .dark {
     background-color: transparent;
