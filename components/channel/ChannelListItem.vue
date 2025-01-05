@@ -63,7 +63,7 @@ defineEmits(["filterByTag"]);
       </nuxt-link>
       <div
         v-if="channel?.description"
-        class="text-gray-500 dark:text-gray-400 break-all my-2"
+        class="text-gray-500 dark:text-gray-400 break-word my-2 text-sm"
       >
         <HighlightedSearchTerms
           :text="channel.description"
