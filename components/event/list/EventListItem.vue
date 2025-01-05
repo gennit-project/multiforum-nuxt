@@ -243,7 +243,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               :text="truncatedDescription || ''"
               :disable-gallery="true"
               :word-limit="10"
-              class="ml-2"
+              class="pr-2"
             />
           </div>
 
@@ -306,13 +306,13 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           </MenuButton>
         </div>
 
-        <div class="flex-shrink-0 hidden md:flex ml-auto rounded-lg mr-2">
+        <div class="flex-shrink-0 hidden md:flex ml-auto rounded-lg mr-2 mt-2">
           <img
             v-if="event.coverImageURL"
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-44 w-44 rounded-lg"
-          />
+          >
         </div>
       </div>
     </div>
