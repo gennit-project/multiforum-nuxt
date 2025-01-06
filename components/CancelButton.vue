@@ -17,7 +17,7 @@ export default defineComponent({
       'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
       'dark:bg-opacity-60', // class for controlling the background opacity in dark mode
     ]"
-    class="font-medium rounded-full border border-gray-300 px-4 py-2 text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    class="font-medium rounded-full border border-gray-300 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     @keydown.enter.prevent
   />
 </template>

@@ -100,10 +100,10 @@ const handleItemClick = (item: any) => {
           <template #activator="{ props }">
             <v-btn
               v-bind="props"
-              class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
+              class="shadow-none border font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
               :class="[
                 usePrimaryButton
-                  ? 'bg-blue-500 dark:bg-blue-700 text-white'
+                  ? 'bg-blue-600 dark:bg-blue-700 text-white'
                   : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
               ]"
               @click="adjustMenuPosition"
@@ -152,7 +152,7 @@ const handleItemClick = (item: any) => {
         </v-menu>
         <template #fallback>
           <button
-            class="border dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
+            class="dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
             :class="[
               usePrimaryButton
                 ? 'bg-blue-600 dark:bg-blue-700 text-white'
@@ -174,10 +174,10 @@ const handleItemClick = (item: any) => {
 
     <template #does-not-have-auth>
       <button
-        class="border dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
+        class="dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
         :class="[
           usePrimaryButton
-            ? 'bg-blue-500 dark:bg-blue-600 text-white'
+            ? 'bg-blue-600 dark:bg-blue-600 text-white'
             : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
         ]"
         data-testid="fake-create-anything-button"
