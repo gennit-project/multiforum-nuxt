@@ -7,7 +7,6 @@ import Tag from "@/components/TagComponent.vue";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 
-// Define props
 const props = defineProps({
   channel: {
     type: Object as PropType<Channel>,
@@ -29,82 +28,78 @@ defineEmits(["filterByTag"]);
 </script>
 
 <template>
-  <tr class="border border-gray-300 dark:border-gray-800">
-    <td class="flex-col px-4 py-4 border border-gray-300 dark:border-gray-800">
-      <nuxt-link
-        :to="`/forums/${channel.uniqueName}/discussions`"
-        class="flex items-center gap-2"
-      >
-        <AvatarComponent
-          :text="channel.uniqueName"
-          :src="channel?.channelIconURL || ''"
-          :is-small="true"
-          :square="true"
-        />
-        <div>
-          <div
-            v-if="channel?.displayName"
-            class="font-bold text-wrap text-gray-700 dark:text-gray-200"
-          >
-            <HighlightedSearchTerms
-              :text="channel.displayName"
-              :search-input="searchInput"
-            />
-          </div>
-          <span
-            class="text-gray-400 dark:text-gray-300 text-wrap font-xs font-mono"
-          >
-            <HighlightedSearchTerms
-              :text="channel.uniqueName"
-              :search-input="searchInput"
-            />
-          </span>
-        </div>
-      </nuxt-link>
-      <div
-        v-if="channel?.description"
-        class="text-gray-500 dark:text-gray-400 break-word my-2 text-sm"
-      >
-        <HighlightedSearchTerms
-          :text="channel.description"
-          :search-input="searchInput"
-        />
-      </div>
-
-      <div class="flex gap-1">
-        <Tag
-          v-for="tag in tags"
-          :key="tag"
-          :active="selectedTags.includes(tag)"
-          :tag="tag"
-          @click="$emit('filterByTag', tag)"
-        />
-      </div>
-    </td>
-    <td
-      class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800"
+  <div
+    class="break-inside-avoid p-4 mb-4 border border-gray-300 dark:border-gray-800 rounded-lg shadow-sm bg-white dark:bg-gray-900"
+  >
+    <nuxt-link
+      :to="`/forums/${channel.uniqueName}/discussions`"
+      class="block mb-2"
     >
+      <AvatarComponent
+        :text="channel.uniqueName"
+        :src="channel?.channelIconURL || ''"
+        :is-small="true"
+        :square="true"
+        class="mb-2"
+      />
+      <div>
+        <h3
+          class="font-bold text-gray-700 dark:text-gray-200"
+          v-if="channel.displayName"
+        >
+          <HighlightedSearchTerms
+            :text="channel.displayName"
+            :search-input="searchInput"
+          />
+        </h3>
+        <p class="text-gray-400 dark:text-gray-300 text-sm">
+          <HighlightedSearchTerms
+            :text="channel.uniqueName"
+            :search-input="searchInput"
+          />
+        </p>
+      </div>
+    </nuxt-link>
+    <p
+      class="text-gray-500 dark:text-gray-400 text-sm mb-2"
+      v-if="channel.description"
+    >
+      <HighlightedSearchTerms
+        :text="channel.description"
+        :search-input="searchInput"
+      />
+    </p>
+    <div class="flex gap-1 mb-2">
+      <Tag
+        v-for="tag in tags"
+        :key="tag"
+        :active="selectedTags.includes(tag)"
+        :tag="tag"
+        @click="$emit('filterByTag', tag)"
+      />
+    </div>
+    <div class="flex justify-between text-sm">
       <nuxt-link
         :to="`/forums/${channel.uniqueName}/discussions`"
-        class="flex items-center justify-center gap-1"
+        class="flex items-center gap-1"
       >
         <DiscussionIcon class="h-4 w-4" />
-        {{ channel?.DiscussionChannelsAggregate?.count || 0 }}
+        {{ channel?.DiscussionChannelsAggregate?.count || 0 }} Discussions
       </nuxt-link>
-    </td>
-    <td
-      class="px-4 py-2 text-center border border-gray-300 dark:border-gray-800"
-    >
       <nuxt-link
         v-if="channel?.EventChannelsAggregate?.count"
         :to="`/forums/${channel.uniqueName}/events`"
-        class="flex items-center justify-center gap-1"
+        class="flex items-center gap-1"
       >
         <CalendarIcon class="h-4 w-4" />
-        {{ channel?.EventChannelsAggregate?.count || 0 }}
+        {{ channel?.EventChannelsAggregate?.count || 0 }} Events
       </nuxt-link>
-    </td>
-  </tr>
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.break-inside-avoid {
+  break-inside: avoid;
+}
+</style>

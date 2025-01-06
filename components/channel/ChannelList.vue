@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { PropType } from 'vue';
-import type { Channel } from '@/__generated__/graphql';
-import ChannelListItem from '@/components/channel/ChannelListItem.vue';
-import LoadMore from '@/components/LoadMore.vue';
+import type { PropType } from "vue";
+import type { Channel } from "@/__generated__/graphql";
+import ChannelListItem from "@/components/channel/ChannelListItem.vue";
+import LoadMore from "@/components/LoadMore.vue";
 
 // Define props
 defineProps({
@@ -16,7 +16,7 @@ defineProps({
   },
   searchInput: {
     type: String,
-    default: '',
+    default: "",
   },
   selectedTags: {
     type: Array as PropType<Array<string>>,
@@ -24,10 +24,10 @@ defineProps({
   },
 });
 
-const emit = defineEmits(['filterByTag', 'loadMore']);
+const emit = defineEmits(["filterByTag", "loadMore"]);
 
 function filterByTag(tag: string) {
-  emit('filterByTag', tag);
+  emit("filterByTag", tag);
 }
 </script>
 
@@ -36,26 +36,16 @@ function filterByTag(tag: string) {
     <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
       There are no results.
     </p>
-    <table class="min-w-full table-auto border-collapse border border-gray-300 dark:border-gray-800">
-      <thead class="border border-gray-300 dark:border-gray-800">
-        <tr class="border-b border border-gray-300 dark:border-gray-800">
-          <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Channel</th>
-          <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Discussions</th>
-          <th class="px-4 py-2 border-r border border-gray-300 dark:border-gray-800">Events</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ChannelListItem
-          v-for="channel in channels"
-          :key="channel.uniqueName"
-          :channel="channel"
-          :search-input="searchInput"
-          :selected-tags="selectedTags"
-          class="border-b border border-gray-300 dark:border-gray-800"
-          @filter-by-tag="filterByTag"
-        />
-      </tbody>
-    </table>
+    <div class="columns-3 gap-4">
+      <ChannelListItem
+        v-for="channel in channels"
+        :key="channel.uniqueName"
+        :channel="channel"
+        :search-input="searchInput"
+        :selected-tags="selectedTags"
+        @filter-by-tag="filterByTag"
+      />
+    </div>
     <div class="m-10 grid justify-items-stretch">
       <LoadMore
         class="justify-self-center font-normal"
@@ -66,4 +56,8 @@ function filterByTag(tag: string) {
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.columns-3 {
+  column-count: 3;
+}
+</style>
