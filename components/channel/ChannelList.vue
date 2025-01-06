@@ -36,7 +36,7 @@ function filterByTag(tag: string) {
     <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
       There are no results.
     </p>
-    <div class="columns-3 gap-4">
+    <div class="columns-1 sm:columns-2 lg:columns-3 gap-4">
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"
@@ -57,7 +57,4 @@ function filterByTag(tag: string) {
 </template>
 
 <style scoped>
-.columns-3 {
-  column-count: 3;
-}
 </style>
