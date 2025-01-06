@@ -151,12 +151,10 @@ const defaultLabels = {
 <template>
   <NuxtLayout>
     <div class="bg-gray-200 dark:bg-black">
-      <div class="py-6 flex-col w-full justify-center">
-        <div
-          class="flex max-w-4xl items-center justify-between px-4 py-2"
-        >
+      <div class="flex-col justify-center">
+        <div class="flex max-w-4xl items-center justify-between py-2 mx-auto">
           <SearchBar
-            class="mr-2 w-full align-middle"
+            class="mr-4 w-full align-middle"
             :search-placeholder="'Search forums'"
             @update-search-input="setSearchInput"
           />
@@ -182,12 +180,12 @@ const defaultLabels = {
         </div>
         <ErrorBanner
           v-if="channelError"
-          class="mx-auto max-w-5xl"
+          class="mx-auto max-w-4xl"
           :text="channelError.message"
         />
         <ChannelList
           v-if="channelResult && channelResult.channels"
-          class="mx-auto max-w-3xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
+          class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
           :channels="channelResult.channels"
           :result-count="channelResult.channelsAggregate?.count || 0"
           :search-input="searchInput"
