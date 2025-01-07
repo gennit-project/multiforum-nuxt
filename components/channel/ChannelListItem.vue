@@ -29,7 +29,7 @@ defineEmits(["filterByTag"]);
 
 <template>
   <div
-    class="break-inside-avoid p-4 mb-4 border border-gray-300 dark:border-gray-800 rounded-lg shadow-sm bg-white dark:bg-gray-900"
+    class="break-inside-avoid dark:text-gray-200 p-4 mb-4 border border-gray-300 dark:border-gray-500 rounded-lg shadow-sm bg-white dark:bg-gray-900"
   >
     <nuxt-link
       :to="`/forums/${channel.uniqueName}/discussions`"
