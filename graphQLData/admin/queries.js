@@ -36,6 +36,7 @@ export const GET_SERVER_CONFIG = gql`
 export const GET_SERVER_RULES = gql`
   query getServerRules {
     serverConfigs {
+      serverName
       rules
     }
   }

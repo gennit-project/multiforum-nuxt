@@ -1,18 +1,14 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
-import type { Channel } from "@/__generated__/graphql";
 import { GET_CHANNEL_RULES } from "@/graphQLData/channel/queries";
 import { GET_SERVER_RULES } from "@/graphQLData/admin/queries";
-// import type { PropType } from "vue";
 import BrokenRuleListItem from "./BrokenRuleListItem.vue";
 import { config } from "@/config";
 import { useRoute } from "nuxt/app";
+import ErrorBanner from "@/components/ErrorBanner.vue";
 
-// defineProps<{
-//   selectedForumRules: string[];
-//   selectedServerRules: string[];
-// }>();
+
 type RuleOption = {
   summary: string;
   detail: string;
@@ -89,6 +85,7 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
     <div v-if="channelRulesLoading || serverRulesLoading">Loading...</div>
 
     <div v-else-if="channelRulesError || serverRulesError">
+      <ErrorBanner :text="serverRulesError" />
       <div v-for="(error, i) of channelRulesError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>

@@ -56,6 +56,7 @@ export const GET_CHANNEL = gql`
 export const GET_CHANNEL_RULES = gql`
   query getChannelRules($uniqueName: String!) {
     channels(where: { uniqueName: $uniqueName }) {
+      uniqueName
       rules
     }
   }
