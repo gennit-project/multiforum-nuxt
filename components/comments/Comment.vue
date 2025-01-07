@@ -669,6 +669,7 @@ const label = computed(() => {
                 :length-of-comment-in-progress="props.lengthOfCommentInProgress"
                 @start-comment-save="emit('startCommentSave')"
                 @click-edit-comment="emit('clickEditComment', $event)"
+                @click-report="emit('clickReport', $event)"
                 @delete-comment="handleDelete"
                 @create-comment="emit('createComment')"
                 @save-edit="emit('saveEdit')"
