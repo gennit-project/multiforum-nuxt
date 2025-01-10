@@ -1,4 +1,12 @@
 module.exports = {
+  content: [
+    "./pages/**/*.vue",
+    "./components/**/*.vue",
+    "./layouts/**/*.vue",
+    "./app.vue",
+    "./plugins/**/*.js",
+    "./nuxt.config.{js,ts}",
+  ],
   cssPath: ["@/assets/css/tailwind.css", { injectPosition: "last" }],
   darkMode: "class",
   important: true,
