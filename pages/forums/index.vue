@@ -58,42 +58,6 @@ watchEffect(() => {
   }
 });
 
-// Construct the query conditionally based on tags and search input
-const channelWhere = computed(() => {
-  if (selectedTags.value.length === 0 && searchInput.value === "") {
-    return {};
-  }
-
-  const tagSearch = {
-    Tags: {
-      OR: selectedTags.value.map((tag: string) => {
-        return { text_CONTAINS: tag };
-      }),
-    },
-  };
-
-  const textSearch = {
-    OR: [
-      { uniqueName_MATCHES: `(?i).*${searchInput.value}.*` },
-      { description_MATCHES: `(?i).*${searchInput.value}.*` },
-    ],
-  };
-
-  if (selectedTags.value.length === 0) {
-    return { OR: [textSearch] };
-  }
-
-  if (searchInput.value === "") {
-    return { OR: [tagSearch] };
-  }
-
-  return { AND: [tagSearch, textSearch] };
-});
-
-// Get current date-time for filtering events
-const now = new Date().toISOString();
-
-// Fetch channels using Apollo query
 const {
   result: channelResult,
   loading: channelLoading,
@@ -102,39 +66,35 @@ const {
 } = useQuery(
   GET_CHANNELS,
   {
-    channelWhere: channelWhere,
-    eventChannelWhere: {
-      Event: {
-        startTime_GT: now,
-        canceled: false,
-      },
-      NOT: {
-        Event: null
-      }
-    },
     limit: 25,
     offset: 0,
-    sort: {
-      // sort alphabetically by uniqueName
-      uniqueName: "ASC",
-    },
+    tags: selectedTags,
+    searchInput: searchInput,
   },
   {
     fetchPolicy: "cache-first",
   }
 );
+console.log(channelResult.value);
+console.log('result count',channelResult.value.getSortedChannels?.aggregateChannelCount)
 
 // Function to load more channels
 const loadMore = () => {
   fetchMore({
     variables: {
-      offset: channelResult.value.channels.length,
+      offset: channelResult.value.getSortedChannels?.channels?.length || 0,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
       return {
         ...previousResult,
-        channels: [...previousResult.channels, ...fetchMoreResult.channels],
+        getSortedChannels: {
+          channels: [
+            ...previousResult.getSortedChannels.channels, 
+            ...fetchMoreResult.getSortedChannels.channels,
+          ],
+          aggregateChannelCount: fetchMoreResult.getSortedChannels.aggregateChannelCount,
+        }
       };
     },
   });
@@ -184,10 +144,10 @@ const defaultLabels = {
           :text="channelError.message"
         />
         <ChannelList
-          v-if="channelResult && channelResult.channels"
+          v-if="channelResult && channelResult.getSortedChannels?.channels"
           class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
-          :channels="channelResult.channels"
-          :result-count="channelResult.channelsAggregate?.count || 0"
+          :channels="channelResult.getSortedChannels.channels"
+          :result-count="channelResult.getSortedChannels?.aggregateChannelCount || 0"
           :search-input="searchInput"
           :selected-tags="selectedTags"
           @filter-by-tag="setSelectedTags"

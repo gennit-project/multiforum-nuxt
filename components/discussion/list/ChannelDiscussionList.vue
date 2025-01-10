@@ -160,7 +160,7 @@ const reachedEndOfResults = computed(() => {
 </script>
 
 <template>
-  <div class="px-2 flex-1">
+  <div class="px-2 ">
     <slot />
     <p
       v-if="!discussionChannelResult && discussionLoading"

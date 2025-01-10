@@ -6518,6 +6518,12 @@ export type CreateFeedsMutationResponse = {
   info: CreateInfo;
 };
 
+export type CreateGetSortedChannelsResponsesMutationResponse = {
+  __typename?: 'CreateGetSortedChannelsResponsesMutationResponse';
+  getSortedChannelsResponses: Array<GetSortedChannelsResponse>;
+  info: CreateInfo;
+};
+
 export type CreateImagesMutationResponse = {
   __typename?: 'CreateImagesMutationResponse';
   images: Array<Image>;
@@ -13378,6 +13384,65 @@ export type FloatAggregateSelection = {
   sum?: Maybe<Scalars['Float']['output']>;
 };
 
+export type GetSortedChannelsResponse = {
+  __typename?: 'GetSortedChannelsResponse';
+  aggregateChannelCount?: Maybe<Scalars['Int']['output']>;
+  channels?: Maybe<Array<Maybe<Channel>>>;
+};
+
+export type GetSortedChannelsResponseAggregateSelection = {
+  __typename?: 'GetSortedChannelsResponseAggregateSelection';
+  aggregateChannelCount: IntAggregateSelection;
+  count: Scalars['Int']['output'];
+};
+
+export type GetSortedChannelsResponseCreateInput = {
+  aggregateChannelCount?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type GetSortedChannelsResponseEdge = {
+  __typename?: 'GetSortedChannelsResponseEdge';
+  cursor: Scalars['String']['output'];
+  node: GetSortedChannelsResponse;
+};
+
+export type GetSortedChannelsResponseOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more GetSortedChannelsResponseSort objects to sort GetSortedChannelsResponses by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<GetSortedChannelsResponseSort>>;
+};
+
+/** Fields to sort GetSortedChannelsResponses by. The order in which sorts are applied is not guaranteed when specifying many fields in one GetSortedChannelsResponseSort object. */
+export type GetSortedChannelsResponseSort = {
+  aggregateChannelCount?: InputMaybe<SortDirection>;
+};
+
+export type GetSortedChannelsResponseUpdateInput = {
+  aggregateChannelCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type GetSortedChannelsResponseWhere = {
+  AND?: InputMaybe<Array<GetSortedChannelsResponseWhere>>;
+  NOT?: InputMaybe<GetSortedChannelsResponseWhere>;
+  OR?: InputMaybe<Array<GetSortedChannelsResponseWhere>>;
+  aggregateChannelCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  aggregateChannelCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type GetSortedChannelsResponsesConnection = {
+  __typename?: 'GetSortedChannelsResponsesConnection';
+  edges: Array<GetSortedChannelsResponseEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
 export type IdAggregateSelection = {
   __typename?: 'IDAggregateSelection';
   longest?: Maybe<Scalars['ID']['output']>;
@@ -16652,6 +16717,7 @@ export type Mutation = {
   createEventWithChannelConnections: Array<Event>;
   createEvents: CreateEventsMutationResponse;
   createFeeds: CreateFeedsMutationResponse;
+  createGetSortedChannelsResponses: CreateGetSortedChannelsResponsesMutationResponse;
   createImages: CreateImagesMutationResponse;
   createIssues: CreateIssuesMutationResponse;
   createLinkFlairs: CreateLinkFlairsMutationResponse;
@@ -16688,6 +16754,7 @@ export type Mutation = {
   deleteEventCommentsFormats: DeleteInfo;
   deleteEvents: DeleteInfo;
   deleteFeeds: DeleteInfo;
+  deleteGetSortedChannelsResponses: DeleteInfo;
   deleteImages: DeleteInfo;
   deleteIssues: DeleteInfo;
   deleteLinkFlairs: DeleteInfo;
@@ -16731,6 +16798,7 @@ export type Mutation = {
   updateEventWithChannelConnections?: Maybe<Event>;
   updateEvents: UpdateEventsMutationResponse;
   updateFeeds: UpdateFeedsMutationResponse;
+  updateGetSortedChannelsResponses: UpdateGetSortedChannelsResponsesMutationResponse;
   updateImages: UpdateImagesMutationResponse;
   updateIssues: UpdateIssuesMutationResponse;
   updateLinkFlairs: UpdateLinkFlairsMutationResponse;
@@ -16868,6 +16936,11 @@ export type MutationCreateEventsArgs = {
 
 export type MutationCreateFeedsArgs = {
   input: Array<FeedCreateInput>;
+};
+
+
+export type MutationCreateGetSortedChannelsResponsesArgs = {
+  input: Array<GetSortedChannelsResponseCreateInput>;
 };
 
 
@@ -17059,6 +17132,11 @@ export type MutationDeleteEventsArgs = {
 export type MutationDeleteFeedsArgs = {
   delete?: InputMaybe<FeedDeleteInput>;
   where?: InputMaybe<FeedWhere>;
+};
+
+
+export type MutationDeleteGetSortedChannelsResponsesArgs = {
+  where?: InputMaybe<GetSortedChannelsResponseWhere>;
 };
 
 
@@ -17319,6 +17397,12 @@ export type MutationUpdateFeedsArgs = {
 };
 
 
+export type MutationUpdateGetSortedChannelsResponsesArgs = {
+  update?: InputMaybe<GetSortedChannelsResponseUpdateInput>;
+  where?: InputMaybe<GetSortedChannelsResponseWhere>;
+};
+
+
 export type MutationUpdateImagesArgs = {
   update?: InputMaybe<ImageUpdateInput>;
   where?: InputMaybe<ImageWhere>;
@@ -17535,6 +17619,10 @@ export type Query = {
   getDiscussionsInChannel?: Maybe<DiscussionChannelListFormat>;
   getEventComments?: Maybe<EventCommentsFormat>;
   getSiteWideDiscussionList?: Maybe<SiteWideDiscussionListFormat>;
+  getSortedChannels?: Maybe<GetSortedChannelsResponse>;
+  getSortedChannelsResponses: Array<GetSortedChannelsResponse>;
+  getSortedChannelsResponsesAggregate: GetSortedChannelsResponseAggregateSelection;
+  getSortedChannelsResponsesConnection: GetSortedChannelsResponsesConnection;
   images: Array<Image>;
   imagesAggregate: ImageAggregateSelection;
   imagesConnection: ImagesConnection;
@@ -17962,6 +18050,33 @@ export type QueryGetSiteWideDiscussionListArgs = {
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedChannels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryGetSortedChannelsArgs = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  searchInput?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+
+export type QueryGetSortedChannelsResponsesArgs = {
+  options?: InputMaybe<GetSortedChannelsResponseOptions>;
+  where?: InputMaybe<GetSortedChannelsResponseWhere>;
+};
+
+
+export type QueryGetSortedChannelsResponsesAggregateArgs = {
+  where?: InputMaybe<GetSortedChannelsResponseWhere>;
+};
+
+
+export type QueryGetSortedChannelsResponsesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<GetSortedChannelsResponseSort>>>;
+  where?: InputMaybe<GetSortedChannelsResponseWhere>;
 };
 
 
@@ -21429,6 +21544,12 @@ export type UpdateEventsMutationResponse = {
 export type UpdateFeedsMutationResponse = {
   __typename?: 'UpdateFeedsMutationResponse';
   feeds: Array<Feed>;
+  info: UpdateInfo;
+};
+
+export type UpdateGetSortedChannelsResponsesMutationResponse = {
+  __typename?: 'UpdateGetSortedChannelsResponsesMutationResponse';
+  getSortedChannelsResponses: Array<GetSortedChannelsResponse>;
   info: UpdateInfo;
 };
 

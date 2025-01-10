@@ -88,33 +88,34 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
 `;
 
 export const GET_CHANNELS = gql`
-  query getChannels(
-    $channelWhere: ChannelWhere
-    $eventChannelWhere: EventChannelWhere
-    $limit: Int
+  query getSortedChannels(
     $offset: Int
-    $sort: [ChannelSort!]
+    $limit: Int
+    $tags: [String]
+    $searchInput: String
   ) {
-    channelsAggregate(where: $channelWhere) {
-      count
-    }
-    channels(
-      where: $channelWhere
-      options: { limit: $limit, offset: $offset, sort: $sort }
+    getSortedChannels(
+      offset: $offset
+      limit: $limit
+      tags: $tags
+      searchInput: $searchInput
     ) {
-      uniqueName
-      displayName
-      channelIconURL
-      description
-      Tags {
-        text
+      channels {
+        uniqueName
+        displayName
+        channelIconURL
+        description
+        Tags {
+          text
+        }
+        EventChannelsAggregate {
+          count
+        }
+        DiscussionChannelsAggregate {
+          count
+        }
       }
-      EventChannelsAggregate(where: $eventChannelWhere) {
-        count
-      }
-      DiscussionChannelsAggregate(where: { NOT: { Discussion: null } }) {
-        count
-      }
+      aggregateChannelCount
     }
   }
 `;
