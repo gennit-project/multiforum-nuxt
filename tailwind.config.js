@@ -16,6 +16,14 @@ module.exports = {
     './layouts/**/*.vue',
     './app.vue',
   ],
+  safeList: [
+    'border-blue-500',
+    'text-blue-500',
+    'block',
+    'hidden',
+    'md:hidden',
+    'md:block',
+],    
   darkMode: "class",
   important: true,
   theme: {
