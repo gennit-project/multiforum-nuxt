@@ -36,7 +36,6 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
-
     "@nuxtjs/tailwindcss",
   ],
   nitro: {
