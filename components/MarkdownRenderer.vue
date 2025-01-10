@@ -23,7 +23,7 @@ const props = defineProps({
 });
 
 const md = new MarkdownIt({
-  highlight: (str, lang) => {
+  highlight: (str, lang): any => {
     if (lang && hljs.getLanguage(lang)) {
       try {
         return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
