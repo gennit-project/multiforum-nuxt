@@ -14,9 +14,14 @@ import {
   setIsAuthenticated,
   isLoadingAuthVar,
   setIsLoadingAuth,
+  sideNavIsOpenVar,
+  setSideNavIsOpenVar,
 } from "@/cache";
 import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
-import { sideNavIsOpenVar, setSideNavIsOpenVar } from "@/cache";
+import { config } from "@/config";
+import DevOverlay from '@/components/nav/DevOverlay.vue'
+
+const isDevelopment = computed(() => config.environment === 'development');
 
 // UI states
 const showUserProfileDropdown = ref(false);
@@ -84,6 +89,7 @@ const showMainContent = computed(() => {
 
 <template>
   <v-app>
+    <DevOverlay v-if="isDevelopment" />
     <main class="min-h-screen flex flex-col">
       <div
         class="dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col"

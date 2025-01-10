@@ -9,10 +9,12 @@ import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
 import { modProfileNameVar, usernameVar, sideNavIsOpenVar } from "@/cache";
+import { config } from "@/config";
 
 defineEmits(["toggleDropdown"]);
 
 const route = useRoute();
+const isDevelopment = computed(() => config.environment === "development");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -44,7 +46,8 @@ function getLabel() {
   if (route.name === "SitewideSearchDiscussionPreview") return "• discussions";
   if (route.name === "SearchEventsList") return "• online events";
   if (route.name === "MapEventPreview") return "• in-person events";
-  if (typeof route.name === 'string' && route.name.includes("admin")) return "• admin dashboard";
+  if (typeof route.name === "string" && route.name.includes("admin"))
+    return "• admin dashboard";
   return "";
 }
 
@@ -74,11 +77,12 @@ const isOnMapPage = computed(() => {
           <nuxt-link to="/" class="flex items-center gap-2">
             <ArrowUpBoldBox :size="38" class="text-blue dark:text-blue-500" />
             <span class="font-bold dark:text-white">Topical</span>
+
             <div
               class="text-xs py-0.5 px-1 rounded-md"
               style="border: 1px solid #1d9bd1; color: #1d9bd1"
             >
-              ALPHA
+              {{ isDevelopment ? "DEV" : "ALPHA" }}
             </div>
           </nuxt-link>
 
