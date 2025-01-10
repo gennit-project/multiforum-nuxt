@@ -1,15 +1,20 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import {
+  enteredDevelopmentEnvironmentVar,
+  setEnteredDevelopmentEnvironment,
+} from "@/cache";
 
-const show = ref(true);
 const hideOverlay = () => {
-  show.value = false;
+  setEnteredDevelopmentEnvironment(true);
 };
 </script>
 
 <template>
   <Transition name="fade">
-    <div v-if="show" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-90">
+    <div
+      v-if="!enteredDevelopmentEnvironmentVar"
+      class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-90"
+    >
       <div class="text-white text-2xl md:text-4xl font-bold mb-8">
         This is a remote development environment
       </div>

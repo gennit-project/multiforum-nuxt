@@ -1,5 +1,6 @@
 import type { InMemoryCacheConfig } from "@apollo/client/core";
 import { ref } from "vue";
+import { config } from "./config";
 
 export const usernameVar = ref("");
 export const setUsername = (username: string) => {
@@ -26,6 +27,11 @@ export const setSideNavIsOpenVar = (status: boolean) => {
   // in the side nav. This state is used to turn off the 
   // event listeners in the event list when the side nav is open.
   sideNavIsOpenVar.value = status;
+};
+
+export const enteredDevelopmentEnvironmentVar = ref(config.environment === "development");
+export const setEnteredDevelopmentEnvironment = (status: boolean) => {
+  enteredDevelopmentEnvironmentVar.value = status;
 };
 
 export const inMemoryCacheOptions: InMemoryCacheConfig = {
