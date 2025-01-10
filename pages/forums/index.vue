@@ -75,8 +75,6 @@ const {
     fetchPolicy: "cache-first",
   }
 );
-console.log(channelResult.value);
-console.log('result count',channelResult.value.getSortedChannels?.aggregateChannelCount)
 
 // Function to load more channels
 const loadMore = () => {
@@ -90,10 +88,10 @@ const loadMore = () => {
         ...previousResult,
         getSortedChannels: {
           channels: [
-            ...previousResult.getSortedChannels.channels, 
-            ...fetchMoreResult.getSortedChannels.channels,
+            ...previousResult.getSortedChannels?.channels || [], 
+            ...fetchMoreResult.getSortedChannels?.channels || [],
           ],
-          aggregateChannelCount: fetchMoreResult.getSortedChannels.aggregateChannelCount,
+          aggregateChannelCount: fetchMoreResult.getSortedChannels?.aggregateChannelCount || 0,
         }
       };
     },
@@ -146,7 +144,7 @@ const defaultLabels = {
         <ChannelList
           v-if="channelResult && channelResult.getSortedChannels?.channels"
           class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
-          :channels="channelResult.getSortedChannels.channels"
+          :channels="channelResult.getSortedChannels?.channels || []"
           :result-count="channelResult.getSortedChannels?.aggregateChannelCount || 0"
           :search-input="searchInput"
           :selected-tags="selectedTags"
