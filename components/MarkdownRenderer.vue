@@ -26,17 +26,18 @@ const md = new MarkdownIt({
   highlight: (str, lang) => {
     if (lang && hljs.getLanguage(lang)) {
       try {
-        return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(lang, str, true).value}</code></pre>`;
-      } catch {
-        console.warn("Failed to highlight code block");
+        return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
+      } catch (error) {
+        console.warn("Failed to highlight code block", error);
       }
     }
-    return "";
+    return `<pre class="hljs p-4 text-xs"><code>${md.utils.escapeHtml(str)}</code></pre>`;
   },
 });
 
+
 // Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
-md.renderer.rules.link_open = (tokens, idx, options, env, self) => {
+md.renderer.rules.link_open = (tokens: any, idx: number, options: any, env: any, self: any) => {
   const token = tokens[idx];
   token.attrPush(["target", "_blank"]);
   token.attrPush(["rel", "noopener noreferrer"]);
