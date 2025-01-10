@@ -1,12 +1,6 @@
 const svgToDataUri = require("mini-svg-data-uri");
 
 module.exports = {
-  content: [
-    // Include all .vue files in the nuxt app
-    "components/**/*.vue",
-    "layouts/**/*.vue",
-    "pages/**/*.vue",
-  ],
   darkMode: "class",
   important: true,
   theme: {
