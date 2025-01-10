@@ -10,7 +10,12 @@ module.exports = {
       }
     }
   },
-  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  content: [
+    './pages/**/*.vue',
+    './components/**/*.vue',
+    './layouts/**/*.vue',
+    './app.vue',
+  ],
   darkMode: "class",
   important: true,
   theme: {
