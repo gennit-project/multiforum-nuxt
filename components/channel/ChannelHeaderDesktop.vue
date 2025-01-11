@@ -1,41 +1,28 @@
-<script>
-import { defineComponent } from "vue";
-import ExpandableImage from "../ExpandableImage.vue";
-import CreateAnythingButton from "../nav/CreateAnythingButton.vue";
-
-export default defineComponent({
-  name: "ChannelHeaderMobile",
-  components: {
-    ExpandableImage,
-    CreateAnythingButton,
+<script setup>
+defineProps({
+  adminList: {
+    type: Array,
+    required: true,
   },
-  props: {
-    adminList: {
-      type: Array,
-      required: true,
-    },
-    channelId: {
-      type: String,
-      required: true,
-    },
-    channel: {
-      type: Object,
-      required: true,
-    },
-    route: {
-      type: Object,
-      required: true,
-    },
-    showCreateButton: {
-      type: Boolean,
-      required: true,
-    },
+  channelId: {
+    type: String,
+    required: true,
   },
-  setup() {
-    return {};
+  channel: {
+    type: Object,
+    required: true,
+  },
+  route: {
+    type: Object,
+    required: true,
+  },
+  showCreateButton: {
+    type: Boolean,
+    required: true,
   },
 });
 </script>
+
 <template>
   <div class="w-full">
     <img

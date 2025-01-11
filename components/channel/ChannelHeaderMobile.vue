@@ -1,24 +1,12 @@
-<script>
-import { defineComponent } from "vue";
-import CreateAnythingButton from "../nav/CreateAnythingButton.vue";
-
-export default defineComponent({
-  name: "ChannelHeaderMobile",
-  components: {
-    CreateAnythingButton,
+<script setup>
+defineProps({
+  channelId: {
+    type: String,
+    required: true,
   },
-  props: {
-    channelId: {
-      type: String,
-      required: true,
-    },
-    channel: {
-      type: Object,
-      required: true,
-    },
-  },
-  setup() {
-    return {};
+  channel: {
+    type: Object,
+    required: true,
   },
 });
 </script>
@@ -26,7 +14,7 @@ export default defineComponent({
 <template>
   <div>
     <div
-      class="flex flex-row md:hidden pb-4 items-center justify-center gap-4 bg-black mb-2"
+      class="flex flex-row pb-4 items-center justify-center gap-4 bg-black mb-2"
     >
       <AvatarComponent
         class="flex justify-center align-items shadow-sm dark:border-gray-800 pt-2"
