@@ -44,15 +44,14 @@ const {
   },
   {
     fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first"
   }
 );
 
 const channel = computed(() => {
-  const channel = getChannelResult.value?.channels?.[0];
-  if ((getChannelLoading.value && !channel) || getChannelError.value) {
-    return null;
-  }
-  return channel ?? null;
+  if (getChannelLoading.value) return null;
+  if (getChannelError.value) return null;
+  return getChannelResult.value?.channels?.[0] ?? null;
 });
 
 const addForumToLocalStorage = (channel: Channel) => {
@@ -121,7 +120,7 @@ if (!channelId.value) {
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
-        :key="`channel-header-desktop-${channelId}`"
+        v-if="channel"
         class="hidden md:block"
         :channel="channel"
         :channel-id="channelId"
