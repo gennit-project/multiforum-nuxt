@@ -1,4 +1,5 @@
 <script setup>
+import CreateAnythingButton from '../nav/CreateAnythingButton.vue';
 defineProps({
   channelId: {
     type: String,
@@ -12,37 +13,33 @@ defineProps({
 </script>
 
 <template>
-  <div>
-    <div
-      class="flex flex-row pb-4 items-center justify-center gap-4 bg-black mb-2"
-    >
+  <div class="flex items-center justify-center">
+    <div class="flex flex-row items-center justify-center gap-4 dark:bg-black mb-2">
       <AvatarComponent
-        class="flex justify-center align-items shadow-sm dark:border-gray-800 pt-2"
+        class="flex h-14 w-14 justify-center align-items shadow-sm pt-2"
         :text="channelId"
         :src="channel?.channelIconURL ?? ''"
-        :is-medium="true"
         :is-square="false"
       />
       <div v-if="channel.displayName && channel.uniqueName" class="mt-4">
         <h1
           v-if="channel.displayName"
-          class="flex border-gray-700 mt-2 text-2xl leading-6 text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+          class="flex border-gray-700 mt-2 text-2xl leading-6 text-black dark:text-white text-outline"
         >
           {{ channel.displayName }}
         </h1>
         <h2
-          class="text-sm font-mono leading-6 text-white dark:text-gray-300 drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
+          class="text-sm font-mono leading-6 text-black dark:text-gray-300"
         >
           {{ `${channel.uniqueName}` }}
         </h2>
       </div>
-      <div v-else>
-        <h1
-          class="flex border-gray-700 text-2xl leading-6 text-white drop-shadow-[0_1.2px_1.2px_rgba(0,0,0,0.8)]"
-        >
-          {{ channelId }}
-        </h1>
-      </div>
+      <h1
+        v-else
+        class="flex mb-0 mt-3 border-gray-700 text-2xl leading-6 text-black dark:text-white"
+      >
+        {{ channelId }}
+      </h1>
     </div>
     <CreateAnythingButton class="mb-4 mx-2" :use-primary-button="true" />
   </div>

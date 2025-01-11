@@ -121,6 +121,7 @@ if (!channelId.value) {
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
+        :key="`channel-header-desktop-${channelId}`"
         class="hidden md:block"
         :channel="channel"
         :channel-id="channelId"

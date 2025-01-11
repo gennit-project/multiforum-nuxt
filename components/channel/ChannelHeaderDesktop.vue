@@ -1,4 +1,5 @@
 <script setup>
+import CreateAnythingButton from '../nav/CreateAnythingButton.vue';
 defineProps({
   adminList: {
     type: Array,
@@ -39,7 +40,7 @@ defineProps({
           <div class="flex items-center w-full gap-4">
             <ExpandableImage
               v-if="channel?.channelIconURL"
-              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
+              class="ml-6 h-14 w-14 dark:border-gray-800"
               :rounded="true"
               :full-width="true"
               :alt="channelId"
@@ -47,7 +48,7 @@ defineProps({
             />
             <AvatarComponent
               v-if="!channel?.channelIconURL"
-              class="ml-6 h-10 w-10 shadow-sm dark:border-gray-800"
+              class="ml-6 h-14 w-14 dark:border-gray-800"
               :text="channelId"
               :src="channel?.channelIconURL ?? ''"
               :full-width="true"
