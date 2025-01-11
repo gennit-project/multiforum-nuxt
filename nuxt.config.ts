@@ -36,7 +36,10 @@ export default defineNuxtConfig({
     "@nuxtjs/color-mode",
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
-    "@nuxtjs/tailwindcss",
+    ["@nuxtjs/tailwindcss", {
+      cssPath: ["@/assets/css/tailwind.css", { injectPosition: "last" }],
+      configPath: 'tailwind.config.js',
+    }],
   ],
   nitro: {
     preset: "vercel",
