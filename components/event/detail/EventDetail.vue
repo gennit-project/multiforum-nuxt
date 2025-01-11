@@ -200,7 +200,7 @@ const originalPoster = computed(() => event.value?.Poster?.username || "");
             class="px-4 lg:px-10"
             :text="eventError.message"
           />
-          <div v-else-if="!event">Could not find the event.</div>
+          <div v-else-if="!eventLoading && !event">Could not find the event.</div>
 
           <div v-else-if="event" class="dark:bg-dark-700 flex flex-col gap-4">
             <InfoBanner

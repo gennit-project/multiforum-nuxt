@@ -268,8 +268,6 @@ const handleClickEditFeedback = () => {
   <div class="w-full">
     <PageNotFound
       v-if="
-        !getDiscussionLoading &&
-        !getDiscussionChannelLoading &&
         !discussion &&
         !activeDiscussionChannel
       "
