@@ -12,8 +12,8 @@ export default defineNuxtConfig({
   components: true,
   css: [
     "vuetify/styles",
-    "@/assets/css/index.css",
     "@fortawesome/fontawesome-free/css/all.css",
+    "@/assets/css/index.css",
   ],
   devtools: { enabled: true },
   imports: {
@@ -37,7 +37,7 @@ export default defineNuxtConfig({
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
     ["@nuxtjs/tailwindcss", {
-      cssPath: ["@/assets/css/tailwind.css", { injectPosition: "last" }],
+      cssPath: ["@/assets/css/index.css", { injectPosition: "last" }],
       configPath: 'tailwind.config.js',
     }],
   ],
