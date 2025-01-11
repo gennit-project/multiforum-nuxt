@@ -108,85 +108,84 @@ if (!channelId.value) {
 
 <template>
   <NuxtLayout>
-    <template>
-      <div
-        class="flex flex-col md:min-h-screen dark:bg-black bg-gray-100 dark:text-white"
+    <div
+      v-if="channel"
+      class="flex flex-col md:min-h-screen dark:bg-black bg-gray-100 dark:text-white"
+    >
+      <ChannelHeaderMobile
+        class="block md:hidden"
+        :channel="channel"
+        :channel-id="channelId"
+      />
+      <ChannelHeaderDesktop
+        class="hidden md:block"
+        :channel="channel"
+        :channel-id="channelId"
+        :admin-list="adminList"
+        :route="route"
+        :show-create-button="true"
       >
-        <ChannelHeaderMobile
-          class="block md:hidden"
-          :channel="channel"
-          :channel-id="channelId"
-        />
-        <ChannelHeaderDesktop
-          class="hidden md:block"
-          :channel="channel"
-          :channel-id="channelId"
+        <ChannelTabs
+          class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
+          :vertical="false"
+          :show-counts="true"
           :admin-list="adminList"
           :route="route"
-          :show-create-button="true"
+          :channel="channel"
+          :desktop="true"
+        />
+      </ChannelHeaderDesktop>
+      <main class="flex justify-center w-full">
+        <article
+          class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
-            class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
+            class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
             :admin-list="adminList"
             :route="route"
             :channel="channel"
-            :desktop="true"
+            :desktop="false"
           />
-        </ChannelHeaderDesktop>
-        <main class="flex justify-center w-full">
-          <article
-            class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
-          >
-            <ChannelTabs
-              class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
-              :vertical="false"
-              :show-counts="true"
-              :admin-list="adminList"
-              :route="route"
-              :channel="channel"
-              :desktop="false"
-            />
 
-            <div v-if="showDiscussionTitle" class="flex w-full justify-center">
-              <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
-                <DiscussionTitleEditForm />
-              </div>
+          <div v-if="showDiscussionTitle" class="flex w-full justify-center">
+            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+              <DiscussionTitleEditForm />
             </div>
-            <div v-else-if="showEventTitle" class="flex w-full justify-center">
-              <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
-                <EventTitleEditForm />
-              </div>
+          </div>
+          <div v-else-if="showEventTitle" class="flex w-full justify-center">
+            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+              <EventTitleEditForm />
             </div>
-            <div v-else-if="showIssueTitle" class="flex w-full justify-center">
-              <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
-                <IssueTitleEditForm />
-              </div>
+          </div>
+          <div v-else-if="showIssueTitle" class="flex w-full justify-center">
+            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+              <IssueTitleEditForm />
             </div>
+          </div>
 
-            <div class="relative w-full">
-              <div
-                class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
+          <div class="relative w-full">
+            <div
+              class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
+            >
+              <div class="flex-1 p-4 md:p-6 bg-white dark:bg-gray-800">
+                <NuxtPage />
+              </div>
+              <aside
+                v-if="channelId"
+                class="md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
               >
-                <div class="flex-1 p-4 md:p-6 bg-white dark:bg-gray-800">
-                  <NuxtPage />
-                </div>
-                <aside
-                  v-if="channelId"
-                  class="md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
-                >
-                  <ChannelSidebar
-                    v-if="channel"
-                    :channel="channel"
-                    class="p-6 pt-8"
-                  />
-                </aside>
-              </div>
+                <ChannelSidebar
+                  v-if="channel"
+                  :channel="channel"
+                  class="p-6 pt-8"
+                />
+              </aside>
             </div>
-          </article>
-        </main>
-      </div>
-    </template>
+          </div>
+        </article>
+      </main>
+    </div>
   </NuxtLayout>
 </template>
