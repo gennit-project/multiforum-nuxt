@@ -183,7 +183,7 @@ const filteredQuery = computed(() => {
                 @click="$emit('filterByTag', tag)"
               />
             </div>
-            <div class="flex items-center dark:text-white">
+            <div class="flex items-center dark:text-white gap-2">
               <DiscussionVotes
                 v-if="discussionChannel"
                 :discussion="discussion"
@@ -200,9 +200,9 @@ const filteredQuery = computed(() => {
                     },
                     query: filteredQuery,
                   }"
-                  class="p-1 rounded-full dark:bg-gray-700 bg-gray-100 px-4 flex items-center gap-2"
+                  class="py-0.5 rounded-full dark:bg-gray-700 bg-gray-100 px-2 flex items-center gap-2 dark:hover:bg-gray-600"
                 >
-                  <i class="fa-regular fa-comment h-4 w-4" />
+                  <i class="fa-regular fa-comment" />
                   <span class="text-sm">{{ commentCount }}</span>
                 </nuxt-link>
               </div>
