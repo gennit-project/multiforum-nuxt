@@ -44,7 +44,7 @@ const {
   },
   {
     fetchPolicy: "cache-first",
-    nextFetchPolicy: "cache-first"
+    nextFetchPolicy: "cache-first",
   }
 );
 
@@ -111,7 +111,7 @@ if (!channelId.value) {
 <template>
   <NuxtLayout>
     <div
-      v-if="channel"
+      v-if="!getChannelLoading && !getChannelError && channel"
       class="flex flex-col md:min-h-screen dark:bg-black bg-gray-100 dark:text-white"
     >
       <ChannelHeaderMobile
@@ -120,7 +120,6 @@ if (!channelId.value) {
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
-        v-if="channel"
         class="hidden md:block"
         :channel="channel"
         :channel-id="channelId"
