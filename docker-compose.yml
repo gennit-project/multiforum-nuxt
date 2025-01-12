@@ -13,6 +13,11 @@ services:
       - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*
       - NEO4J_dbms_default__database=neo4j
+      - NEO4J_dbms_logs_debug_level=INFO
+      - NEO4J_dbms_logs_query_enabled=OFF
+      - NEO4J_dbms_memory_pagecache_size=512M
+      - NEO4J_dbms_memory_heap_initial__size=512M
+      - NEO4J_dbms_memory_heap_max__size=1G
     volumes:
       - neo4j-data:/data
       - neo4j-logs:/logs
@@ -20,9 +25,9 @@ services:
       - neo4j-plugins:/plugins
     healthcheck:
       test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 15s
+      timeout: 10s
+      retries: 10
 
   backend:
     image: cluse/multiforum-backend:latest
@@ -45,11 +50,16 @@ services:
       - NEO4J_USERNAME=${NEO4J_USERNAME}
       - SERVER_CONFIG_NAME=${VITE_SERVER_NAME}
       - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
-  
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   frontend:
     build:
       context: .
-    container_name: frontend
+    container_name: multiforum-frontend
     ports:
       - "3000:3000"
     depends_on:
