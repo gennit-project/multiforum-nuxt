@@ -10,7 +10,7 @@ services:
       - "7687:7687"
     environment:
       - NEO4J_AUTH=${NEO4J_AUTH}
-      - NEO4JLABS_PLUGINS=["apoc"]
+      - NEO4J_PLUGINS=["apoc"]
       - NEO4J_dbms_security_procedures_unrestricted=apoc.*
       - NEO4J_dbms_default__database=neo4j
     volumes:
@@ -18,6 +18,11 @@ services:
       - neo4j-logs:/logs
       - neo4j-import:/import
       - neo4j-plugins:/plugins
+    healthcheck:
+      test: ["CMD", "cypher-shell", "-u", "neo4j", "-p", "${NEO4J_PASSWORD}", "RETURN 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   backend:
     image: cluse/multiforum-backend:latest
@@ -25,7 +30,8 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - database
+      database:
+        condition: service_healthy
     environment:
       - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
       - AUTH0_DOMAIN=${AUTH0_DOMAIN}
@@ -42,15 +48,14 @@ services:
   
   frontend:
     build:
-      context: ./frontend
+      context: .
     container_name: frontend
     ports:
       - "3000:3000"
     depends_on:
-      - multiforum-backend
+      - backend
     environment:
       - GRAPHQL_URL_FOR_TYPES=${GRAPHQL_URL_FOR_TYPES}
-      - NITRO_PRESET=${NITRO_PRESET}
       - VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
       - VITE_AUTH0_CALLBACK_URL=${VITE_AUTH0_CALLBACK_URL}
       - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}

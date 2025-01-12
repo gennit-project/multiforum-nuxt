@@ -47,7 +47,6 @@ jobs:
         NEO4J_AUTH: ${{ secrets.NEO4J_AUTH }}
         NEO4J_PASSWORD: ${{ secrets.NEO4J_PASSWORD }}
         NEO4J_USERNAME: ${{ secrets.NEO4J_USERNAME }}
-        NITRO_PRESET: ${{ secrets.NITRO_PRESET }}
         SERVER_CONFIG_NAME: ${{ secrets.VITE_SERVER_NAME }}
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         VITE_AUTH0_AUDIENCE: ${{ secrets.VITE_AUTH0_AUDIENCE }}
