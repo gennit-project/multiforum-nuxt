@@ -1,0 +1,81 @@
+version: '3.8'
+# This docker-compose is used in the GitHub Actions workflow to run the Cypress tests.
+
+services:
+  database:
+    image: neo4j:5.1.0
+    container_name: database
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH}
+      - NEO4JLABS_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_default__database=neo4j
+    volumes:
+      - neo4j-data:/data
+      - neo4j-logs:/logs
+      - neo4j-import:/import
+      - neo4j-plugins:/plugins
+
+  backend:
+    image: cluse/multiforum-backend:latest
+    container_name: multiforum-backend
+    ports:
+      - "4000:4000"
+    depends_on:
+      - database
+    environment:
+      - ENVIRONMENT=local
+      - NEO4J_URI=bolt://database:7687
+      - NEO4J_USERNAME=${NEO4J_USERNAME}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD}
+      - SERVER_CONFIG_NAME=${VITE_SERVER_NAME}
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      - GOOGLE_APPLICATION_CREDENTIALS=/config/listical-dev-gcp.json
+      - GOOGLE_CREDENTIALS_BASE64=${GOOGLE_CREDENTIALS_BASE64}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - CYPRESS_ADMIN_TEST_EMAIL=${CYPRESS_ADMIN_TEST_EMAIL}
+      - CYPRESS_ADMIN_TEST_USERNAME=${CYPRESS_ADMIN_TEST_USERNAME}
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - multiforum-backend
+    environment:
+      - GRAPHQL_URL_FOR_TYPES=${GRAPHQL_URL_FOR_TYPES}
+      - VITE_GRAPHQL_URL=${VITE_GRAPHQL_URL}
+      - VITE_BASE_URL=${VITE_BASE_URL}
+      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+      - VITE_OPEN_CAGE_API_KEY=${VITE_OPEN_CAGE_API_KEY}
+      - VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
+      - VITE_OPEN_GRAPH_API_KEY=${VITE_OPEN_GRAPH_API_KEY}
+      - VITE_LOGOUT_URL=${VITE_LOGOUT_URL}
+      - VITE_AUTH0_USERNAME=${VITE_AUTH0_USERNAME}
+      - VITE_AUTH0_PASSWORD=${VITE_AUTH0_PASSWORD}
+      - VITE_AUTH0_USERNAME_2=${VITE_AUTH0_USERNAME_2}
+      - VITE_AUTH0_PASSWORD_2=${VITE_AUTH0_PASSWORD_2}
+      - VITE_AUTH0_URL=${VITE_AUTH0_URL}
+      - VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
+      - VITE_AUTH0_SCOPE=${VITE_AUTH0_SCOPE}
+      - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}
+      - VITE_AUTH0_CLIENT_SECRET=${VITE_AUTH0_CLIENT_SECRET}
+      - VITE_AUTH0_CALLBACK_URL=${VITE_AUTH0_CALLBACK_URL}
+      - VITE_GOOGLE_CLOUD_STORAGE_BUCKET=${VITE_GOOGLE_CLOUD_STORAGE_BUCKET}
+      - VITE_LIGHTGALLERY_LICENSE_KEY=${VITE_LIGHTGALLERY_LICENSE_KEY}
+      - NITRO_PRESET=${NITRO_PRESET}
+      - VITE_SERVER_NAME=${VITE_SERVER_NAME}
+      - VITE_ENVIRONMENT=${VITE_ENVIRONMENT}
+
+volumes:
+  neo4j-data:
+  neo4j-logs:
+  neo4j-import:
+  neo4j-plugins:

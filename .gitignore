@@ -24,6 +24,9 @@ logs
 !.env.example
 cypress.env.json
 
+# config for docker compose
+config
+
 # Generated files
 /src/__generated__
 cypress/videos
