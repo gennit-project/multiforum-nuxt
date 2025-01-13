@@ -15,7 +15,7 @@ const modId = computed(() => {
   return "";
 });
 
-const { result, loading, error } = useQuery(
+const { result, error } = useQuery(
   GET_MOD,
   {
     displayName: modId.value,
@@ -26,9 +26,6 @@ const { result, loading, error } = useQuery(
 );
 
 const mod = computed(() => {
-  if ((loading.value && !result.value) || error.value) {
-    return null;
-  }
   if (result.value && result.value.moderationProfiles.length > 0) {
     return result.value.moderationProfiles[0];
   }
@@ -56,6 +53,7 @@ if (modId.value) {
           :route="route"
         />
       </div>
+      <ErrorBanner v-if="error" :error="error" />
       <NuxtPage />
     </div>
   </NuxtLayout>

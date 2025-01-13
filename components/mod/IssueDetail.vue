@@ -458,10 +458,14 @@ const toggleCloseOpenIssue = () => {
       :text="getIssueError.message"
     />
     <div v-else-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
-      <h2 
-        v-if="activeIssue?.relatedDiscussionId || activeIssue?.relatedEventId || activeIssue?.relatedCommentId"
+      <h2
+        v-if="
+          activeIssue?.relatedDiscussionId ||
+          activeIssue?.relatedEventId ||
+          activeIssue?.relatedCommentId
+        "
         class="text-xl font-bold"
-        >
+      >
         Original post (
         <nuxt-link
           v-if="activeIssue?.relatedDiscussionId"
@@ -501,21 +505,22 @@ const toggleCloseOpenIssue = () => {
         </nuxt-link>
         <span>)</span>
       </h2>
-
-      <DiscussionDetails
-        v-if="activeIssue?.relatedDiscussionId"
-        :active-issue="activeIssue"
-      />
-      <EventDetail
-        v-if="activeIssue?.relatedEventId"
-        :issue-event-id="activeIssue.relatedEventId"
-        :show-comments="false"
-        :show-menu-buttons="false"
-      />
-      <CommentDetails
-        v-if="activeIssue?.relatedCommentId"
-        :comment-id="activeIssue.relatedCommentId"
-      />
+      <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+        <DiscussionDetails
+          v-if="activeIssue?.relatedDiscussionId"
+          :active-issue="activeIssue"
+        />
+        <EventDetail
+          v-if="activeIssue?.relatedEventId"
+          :issue-event-id="activeIssue.relatedEventId"
+          :show-comments="false"
+          :show-menu-buttons="false"
+        />
+        <CommentDetails
+          v-if="activeIssue?.relatedCommentId"
+          :comment-id="activeIssue.relatedCommentId"
+        />
+      </div>
     </div>
 
     <v-row v-if="issue" class="flex justify-center dark:text-white">

@@ -29,16 +29,12 @@ const modProfileIsYourself = computed(() => {
 
 const {
   result,
-  loading: getModLoading,
   error: getModError,
 } = useQuery(GET_MOD, () => ({
   displayName: modName.value,
 }));
 
 const mod = computed(() => {
-  if (getModLoading.value || getModError.value) {
-    return null;
-  }
   return result.value?.moderationProfiles[0] || null;
 });
 </script>
@@ -68,8 +64,7 @@ const mod = computed(() => {
   </div>
 
   <div class="w-full">
-    <p v-if="getModLoading">Loading...</p>
-    <div v-else-if="getModError">
+    <div v-if="getModError">
       <div v-for="(error, i) of getModError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
