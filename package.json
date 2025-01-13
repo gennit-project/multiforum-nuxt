@@ -13,6 +13,7 @@
     "postinstall": "nuxt prepare",
     "compile": "graphql-codegen",
     "prepare": "husky install",
+    "start": "nuxt start",
     "test": "cypress open",
     "tsc": "tsc"
   },

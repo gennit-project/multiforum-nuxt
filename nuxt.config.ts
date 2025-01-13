@@ -44,7 +44,7 @@ export default defineNuxtConfig({
       },
     ],
   ],
-  nitro: config.environment === "local" ? {} : { preset: "vercel" },
+  nitro: { preset: config.environment === "local" ? "node" : "vercel" },
   plugins: [
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },

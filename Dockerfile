@@ -1,23 +1,26 @@
-# Use a lightweight Node.js image
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to install dependencies
 COPY package*.json ./
 
-# Install dependencies
 RUN npm install
 
-# Copy the entire application
 COPY . .
 
 # Build the Nuxt application
 RUN npm run build
 
-# Expose the Nuxt port (default is 3000)
 EXPOSE 3000
 
-# Start the Nuxt application in production mode
-CMD ["npm", "run", "preview"]
+# Add debug environment variables
+ENV NODE_ENV=development
+ENV DEBUG=*
+ENV NITRO_DEBUG=1
+
+# Start with verbose debugging
+CMD ["sh", "-c", "echo 'Debug: Current directory:' && pwd && \
+echo 'Debug: Directory contents:' && ls -la && \
+echo 'Debug: Output directory contents:' && ls -la .output/server/ && \
+echo 'Debug: Starting server with full logging...' && \
+NITRO_DEBUG=1 node --trace-warnings .output/server/index.mjs 2>&1"]
