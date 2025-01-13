@@ -69,13 +69,16 @@ const writeReplyStyle =
           </div>
         </template>
         <template #does-not-have-auth>
-          <textarea
-            id="addCommentLoginPrompt"
-            name="addComment"
-            rows="1"
-            placeholder="Write a comment"
-            :class="writeReplyStyle"
-          />
+          <div class="flex align-items w-full gap-2">
+            <PlaceholderAvatar />
+            <textarea
+              id="addCommentLoginPrompt"
+              name="addComment"
+              rows="1"
+              placeholder="Write a comment"
+              :class="writeReplyStyle"
+            />
+          </div>
         </template>
       </RequireAuth>
 
@@ -91,7 +94,10 @@ const writeReplyStyle =
           <CancelButton @click="emit('closeCommentEditor')" />
           <SaveButton
             data-testid="createCommentButton"
-            :disabled="createFormValues.text.length === 0 || createFormValues.text.length > MAX_CHARS_IN_COMMENT"
+            :disabled="
+              createFormValues.text.length === 0 ||
+              createFormValues.text.length > MAX_CHARS_IN_COMMENT
+            "
             :loading="createCommentLoading && !createCommentError"
             @click.prevent="emit('handleCreateComment')"
           />

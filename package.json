@@ -53,6 +53,7 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^4.0.0",
     "lightgallery": "^2.7.2",
+    "lucide-vue-next": "^0.471.0",
     "luxon": "^3.3.0",
     "markdown-it": "^14.1.0",
     "md-editor-v3": "^4.2.2",
