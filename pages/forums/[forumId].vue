@@ -54,21 +54,27 @@ const addForumToLocalStorage = (channel: Channel) => {
   if (!import.meta.client) {
     return;
   }
-  let recentForums =
+  let recentForums = 
     JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
 
   const sideNavItem = {
     uniqueName: channelId.value,
     displayName: channel.displayName,
     channelIconURL: channel.channelIconURL,
+    timestamp: Date.now()
   };
-  recentForums = recentForums.slice(0, 20);
-  recentForums.push(sideNavItem);
-  recentForums = recentForums.filter((forum: any) => typeof forum === "object");
+
   recentForums = recentForums.filter(
-    (forum: any, index: number, self: any) =>
-      index === self.findIndex((t: any) => t.uniqueName === forum.uniqueName)
+    (forum: any) => forum.uniqueName !== channelId.value
   );
+
+  recentForums.unshift(sideNavItem);
+
+  // Limit to 20 items after adding the new one
+  recentForums = recentForums.slice(0, 20);
+
+  // Clean up invalid entries
+  recentForums = recentForums.filter((forum: any) => typeof forum === "object");
 
   localStorage.setItem("recentForums", JSON.stringify(recentForums));
 };
