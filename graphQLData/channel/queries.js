@@ -38,7 +38,11 @@ export const GET_CHANNEL = gql`
       ) {
         count
       }
-      IssuesAggregate {
+      IssuesAggregate(
+        where: {
+         isOpen: true 
+        }
+      ) {
         count
       }
       EventChannelsAggregate(

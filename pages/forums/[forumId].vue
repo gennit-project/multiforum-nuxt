@@ -32,8 +32,6 @@ const channelId = computed(() => {
 
 const {
   result: getChannelResult,
-  loading: getChannelLoading,
-  error: getChannelError,
   onResult: onGetChannelResult,
 } = useQuery(
   GET_CHANNEL,
