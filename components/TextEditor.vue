@@ -106,6 +106,13 @@ const formatText = (format: string) => {
     case "header3":
       formattedText = `### ${selectedText}`;
       break;
+    case "quote":
+      // Split the text into lines and add > to the beginning of each line
+      formattedText = selectedText
+        .split('\n')
+        .map(line => `> ${line}`)
+        .join('\n');
+      break;
     default:
       formattedText = selectedText;
   }
@@ -220,6 +227,7 @@ const formatButtons = [
   { label: "H1", format: "header1" },
   { label: "H2", format: "header2" },
   { label: "H3", format: "header3" },
+  { label: "Quote", format: "quote" },
 ];
 
 const markdownDocsLink = "https://www.markdownguide.org/basic-syntax/";
@@ -308,7 +316,7 @@ const selectedTab = ref(0);
           <button
             v-for="button in formatButtons"
             :key="button.label"
-            class="border-transparent rounded-md px-2 py-1 text-sm font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
+            class="border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
             @click.prevent="formatText(button.format)"
           >
             {{ button.label }}
