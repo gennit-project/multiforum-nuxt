@@ -13,7 +13,6 @@ const sizeClasses: Record<string, string> = {
   md: "h-10 w-10",
   lg: "h-12 w-12",
 };
-console.log('avatar')
 </script>
 
 <template>

@@ -18,7 +18,6 @@ export default defineComponent({
   setup(props) {
     const route = useRoute();
     const content = ref("");
-    console.log('slug', props.slug)
 
     const loadPost = async (slug: string) => {
       try {

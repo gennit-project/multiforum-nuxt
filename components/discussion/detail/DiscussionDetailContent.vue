@@ -5,7 +5,7 @@ import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import {
   GET_DISCUSSION_COMMENTS,
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
-  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE
+  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
 } from "@/graphQLData/comment/queries";
 import type {
   Discussion,
@@ -51,20 +51,23 @@ const channelId = computed(() =>
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
 
-
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
   loading: getDiscussionLoading,
   refetch: refetchDiscussion,
   onResult: onGetDiscussionResult,
-} = useQuery(GET_DISCUSSION, {
-  id: props.discussionId,
-  loggedInModName: loggedInUserModName,
-  channelUniqueName: channelId.value,
-},{
-  fetchPolicy: "cache-first",
-});
+} = useQuery(
+  GET_DISCUSSION,
+  {
+    id: props.discussionId,
+    loggedInModName: loggedInUserModName,
+    channelUniqueName: channelId.value,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 onGetDiscussionResult((newResult) => {
   if (newResult?.data?.discussions?.length) {
@@ -95,18 +98,21 @@ const {
   result: getDiscussionChannelResult,
   error: getDiscussionChannelError,
   loading: getDiscussionChannelLoading,
-  fetchMore: fetchMoreComments
-} = useQuery(GET_DISCUSSION_COMMENTS, {
-  discussionId: props.discussionId,
-  channelUniqueName: channelId,
-  modName: loggedInUserModName,
-  offset: offset.value,
-  limit: COMMENT_LIMIT,
-  sort: commentSort,
-},{
-  fetchPolicy: "cache-first",
-});
-
+  fetchMore: fetchMoreComments,
+} = useQuery(
+  GET_DISCUSSION_COMMENTS,
+  {
+    discussionId: props.discussionId,
+    channelUniqueName: channelId,
+    modName: loggedInUserModName,
+    offset: offset.value,
+    limit: COMMENT_LIMIT,
+    sort: commentSort,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 const discussion = computed<Discussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions[0];
@@ -114,16 +120,13 @@ const discussion = computed<Discussion | null>(() => {
   return currentDiscussion || lastValidDiscussion.value;
 });
 
-
 watch(commentSort, () =>
   // @ts-ignore - the sort is correctly typed.
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
 
 const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
-  if (
-    !getDiscussionChannelResult.value
-  ) {
+  if (!getDiscussionChannelResult.value) {
     return null;
   }
   return (
@@ -145,24 +148,27 @@ const loadedRootCommentCount = computed(() => {
   return rootComments.length;
 });
 
-const {
-  result: getDiscussionChannelCommentAggregateResult,
-} = useQuery(GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE, {
-  discussionId: props.discussionId,
-  channelUniqueName: channelId,
-},{
-  fetchPolicy: "cache-first",
-});
+const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
+  GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
+  {
+    discussionId: props.discussionId,
+    channelUniqueName: channelId,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
-const {
-  result: getDiscussionChannelRootCommentAggregateResult,
-} = useQuery(GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE, {
-  discussionId: props.discussionId,
-  channelUniqueName: channelId,
-},{
-  fetchPolicy: "cache-first",
-});
-
+const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
+  GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
+  {
+    discussionId: props.discussionId,
+    channelUniqueName: channelId,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 
 const commentCount = computed(
   () => activeDiscussionChannel.value?.CommentsAggregate?.count || 0
@@ -212,11 +218,9 @@ const reachedEndOfResults = computed(
     loadedRootCommentCount.value >= commentCount.value
 );
 
-const loggedInUserIsAuthor = computed(
-  () => {
-   return discussion.value?.Author?.username === usernameVar.value
-  }
-);
+const loggedInUserIsAuthor = computed(() => {
+  return discussion.value?.Author?.username === usernameVar.value;
+});
 const discussionAuthor = computed(
   () => discussion.value?.Author?.username || ""
 );
@@ -261,17 +265,11 @@ const handleClickUndoFeedback = () => {
 const handleClickEditFeedback = () => {
   showEditFeedbackModal.value = true;
 };
-
 </script>
 
 <template>
   <div class="w-full">
-    <PageNotFound
-      v-if="
-        !discussion &&
-        !activeDiscussionChannel
-      "
-    />
+    <PageNotFound v-if="!discussion && !activeDiscussionChannel" />
     <div
       v-else
       class="flex max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800"
@@ -299,12 +297,16 @@ const handleClickEditFeedback = () => {
                   :emoji-json="activeDiscussionChannel?.emoji"
                 >
                   <template #album-slot>
-                    <DiscussionAlbum
-                      v-if="
-                        discussion.Album && discussion.Album.Images?.length > 0
-                      "
-                      :album="discussion.Album"
-                    />
+                    <div class="bg-black text-white">
+                      <DiscussionAlbum
+                        v-if="
+                          discussion.Album &&
+                          discussion.Album.Images?.length > 0
+                        "
+                        :album="discussion.Album"
+                        :carousel-format="true"
+                      />
+                    </div>
                   </template>
                   <template #button-slot>
                     <div class="flex h-12 items-center">
@@ -330,7 +332,6 @@ const handleClickEditFeedback = () => {
             class="pr-3"
             :channel-id="channelId"
             :discussion-channel="activeDiscussionChannel || undefined"
-           
             :previous-offset="previousOffset"
             :mod-name="loggedInUserModName"
           />
