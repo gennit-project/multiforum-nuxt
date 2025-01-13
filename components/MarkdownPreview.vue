@@ -3,7 +3,7 @@ import { computed, defineComponent, ref, watchEffect } from "vue";
 import VueEasyLightbox from "vue-easy-lightbox";
 import MarkdownIt from "markdown-it";
 import { config } from "@/config";
-import MarkdownRenderer from '@/components/MarkdownRenderer.vue'
+import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
 function linkifyUsernames(markdownString: string) {
   const regex = /(?<!https?:\/\/(?:[\w.-]+))\b(u\/|@)([a-zA-Z0-9_-]+)/g;
@@ -56,7 +56,7 @@ function calculateAspectRatioFit(
   srcWidth: number,
   srcHeight: number,
   maxWidth: number,
-  maxHeight: number,
+  maxHeight: number
 ) {
   const ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
   return { width: srcWidth * ratio, height: srcHeight * ratio };
@@ -115,7 +115,7 @@ export default defineComponent({
     };
 
     const showFullText = ref(
-      !props.showShowMore || countWords(props.text) < props.wordLimit,
+      !props.showShowMore || countWords(props.text) < props.wordLimit
     );
 
     const shouldShowMoreButton = computed(() => {
@@ -141,10 +141,12 @@ export default defineComponent({
             img.width,
             img.height,
             window.innerWidth,
-            window.innerHeight,
+            window.innerHeight
           );
 
-          const imageItem = embeddedImages.value.find((item) => item.src === src);
+          const imageItem = embeddedImages.value.find(
+            (item) => item.src === src
+          );
           if (imageItem) {
             imageItem.width = width;
             imageItem.height = height;
@@ -196,7 +198,7 @@ export default defineComponent({
       if (event.target.tagName === "IMG") {
         const clickedSrc = event.target.src;
         const clickedIndex = embeddedImages.value.findIndex(
-          (image: GalleryItem) => image.href === clickedSrc,
+          (image: GalleryItem) => image.href === clickedSrc
         );
         if (clickedIndex !== -1) {
           indexRef.value = clickedIndex;
@@ -209,6 +211,58 @@ export default defineComponent({
       visibleRef.value = false;
     };
 
+    const showWarningModal = ref(false);
+    const pendingUrl = ref("");
+
+    const handleClick = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+
+      // Handle image clicks
+      if (target.tagName === "IMG") {
+        if (props.disableGallery) {
+          return;
+        }
+        const clickedSrc = target.getAttribute("src");
+        if (clickedSrc) {
+          const clickedIndex = embeddedImages.value.findIndex(
+            (image: GalleryItem) => image.href === clickedSrc
+          );
+          if (clickedIndex !== -1) {
+            indexRef.value = clickedIndex;
+            visibleRef.value = true;
+          }
+        }
+        return;
+      }
+
+      // Handle link clicks
+      const link = target.tagName === "A" ? target : target.closest("a");
+      if (link && link instanceof HTMLAnchorElement && link.href) {
+        // Only show warning for external links
+        const isExternalLink =
+          !link.href.startsWith(window.location.origin) &&
+          !link.href.startsWith(config.baseUrl);
+
+        if (isExternalLink) {
+          event.preventDefault();
+          pendingUrl.value = link.href;
+          showWarningModal.value = true;
+        }
+      }
+    };
+
+    const handleModalConfirm = () => {
+      if (pendingUrl.value) {
+        window.open(pendingUrl.value, "_blank", "noopener,noreferrer");
+      }
+      showWarningModal.value = false;
+    };
+
+    const handleModalClose = () => {
+      showWarningModal.value = false;
+      pendingUrl.value = "";
+    };
+
     return {
       embeddedImages,
       shownText,
@@ -219,16 +273,21 @@ export default defineComponent({
       visibleRef,
       indexRef,
       onHide,
+      handleClick,
+      showWarningModal,
+      pendingUrl,
+      handleModalConfirm,
+      handleModalClose,
     };
   },
 });
 </script>
 
 <template>
-  <div class="w-full dark:text-white">
+  <div class="w-full dark:text-white" @click="handleClick">
     <MarkdownRenderer
       :text="`${shownText}${!showFullText ? '...' : ''}`"
-      :class="[ { clickable: !disableGallery }]"
+      :class="[{ clickable: !disableGallery }]"
       @click="handleImageClick"
     />
     <button
@@ -243,6 +302,16 @@ export default defineComponent({
       :imgs="embeddedImages.map((image) => image.src)"
       :index="indexRef"
       @hide="onHide"
+    />
+    <WarningModal
+      data-testid="external-link-warning"
+      title="Open External Link"
+      :body="`You're about to visit an external website: ${pendingUrl}. Verify links before sharing personal information.`"
+      :open="showWarningModal"
+      :loading="false"
+      :primary-button-text="'Continue'"
+      @close="handleModalClose"
+      @primary-button-click="handleModalConfirm"
     />
   </div>
 </template>
