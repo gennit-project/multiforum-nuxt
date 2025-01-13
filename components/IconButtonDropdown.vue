@@ -5,9 +5,10 @@ import { useRouter } from "nuxt/app";
 
 export type MenuItemType = {
   value: string;
-  icon: string;
+  icon?: string;
   label: string;
   event?: string;
+  isDivider?: boolean;
 };
 
 defineProps({
@@ -58,24 +59,33 @@ const handleItemClick = (item: MenuItemType) => {
           style="top: calc(100% + 8px)"
         >
           <div class="py-1">
-            <MenuItem
-              v-for="(item, i) in items"
-              :key="i"
-              v-slot="{ active }"
-              class="cursor-pointer"
-              @click="handleItemClick(item)"
-            >
-              <span
-                :class="[
-                  active
-                    ? 'bg-gray-100 text-gray-900 dark:hover:bg-gray-500 dark:hover:text-gray-100'
-                    : 'text-gray-700 dark:text-gray-200',
-                  'block px-4 py-2 text-sm',
-                ]"
+            <template v-for="(item, i) in items" :key="i">
+              <!-- Divider -->
+              <div
+                v-if="item.isDivider"
+                class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
               >
-                <i v-if="item.icon" :class="item.icon" /> {{ item.label }}
-              </span>
-            </MenuItem>
+                {{ item.value }}
+              </div>
+              <!-- Regular menu item -->
+              <MenuItem
+                v-else
+                v-slot="{ active }"
+                class="cursor-pointer"
+                @click="handleItemClick(item)"
+              >
+                <span
+                  :class="[
+                    active
+                      ? 'bg-gray-100 text-gray-900 dark:hover:bg-gray-500 dark:hover:text-gray-100'
+                      : 'text-gray-700 dark:text-gray-200',
+                    'block px-4 py-2 text-sm',
+                  ]"
+                >
+                  <i v-if="item.icon" :class="item.icon" /> {{ item.label }}
+                </span>
+              </MenuItem>
+            </template>
           </div>
         </MenuItems>
       </transition>

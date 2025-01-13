@@ -24,6 +24,13 @@ import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute, useRouter } from "nuxt/app";
 import InfoBanner from "@/components/InfoBanner.vue";
+type MenuItem = {
+  label?: string;
+  value?: string;
+  event?: string;
+  icon?: string;
+  isDivider?: boolean;
+};
 
 const props = defineProps({
   eventData: {
@@ -161,7 +168,7 @@ const isAdmin = computed(() => {
 });
 
 const menuItems = computed(() => {
-  const items = [];
+  let items: MenuItem[] = [];
   if (props.eventData && route.name !== "EventFeedback") {
     items.push({
       label: "Copy Link",
@@ -195,18 +202,25 @@ const menuItems = computed(() => {
       });
     }
   } else {
-    items.push({
-      label: "Report",
-      event: "handleReport",
-      icon: ALLOWED_ICONS.REPORT,
-    });
+    items = items.concat([
+      {
+        value: "Moderation Actions",
+        isDivider: true,
+      },
+      {
+        label: "Report",
+        event: "handleReport",
+        icon: ALLOWED_ICONS.REPORT,
+      }
+    ]
+    );
     if (route.name !== "EventFeedback") {
       items.push({
         label: "Give Feedback",
         event: "handleFeedback",
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
       });
-      items.push({
+      items.unshift({
         label: "View Feedback",
         event: "handleViewFeedback",
         icon: ALLOWED_ICONS.VIEW_FEEDBACK,

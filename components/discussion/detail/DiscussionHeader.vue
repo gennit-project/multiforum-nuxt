@@ -14,10 +14,11 @@ import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar, modProfileNameVar } from "@/cache";
 
 type MenuItem = {
-  label: string;
+  label?: string;
   value: string;
-  event: string;
-  icon: string;
+  event?: string;
+  icon?: string;
+  isDivider?: boolean;
 };
 const props = defineProps({
   discussion: {
@@ -165,19 +166,24 @@ const menuItems = computed(() => {
         value: props.discussion.id,
       });
     } else if (usernameVar.value && modProfileNameVar.value) {
-      out.push({
-        label: "Report",
-        event: "handleClickReport",
-        icon: ALLOWED_ICONS.REPORT,
-        value: props.discussion.id,
-      });
-
-      out.push({
-        label: "Give Feedback",
-        event: "handleFeedback",
-        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-        value: props.discussion.id,
-      });
+      out = out.concat([
+        {
+          value: "Moderation Actions",
+          isDivider: true,
+        },
+        {
+          label: "Report",
+          event: "handleClickReport",
+          icon: ALLOWED_ICONS.REPORT,
+          value: props.discussion.id,
+        },
+        {
+          label: "Give Feedback",
+          event: "handleFeedback",
+          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+          value: props.discussion.id,
+        },
+      ]);
     }
   }
   return out;

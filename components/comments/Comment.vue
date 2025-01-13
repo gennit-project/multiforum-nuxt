@@ -309,6 +309,10 @@ const commentMenuItems = computed(() => {
     if (props.modProfileName) {
       out = out.concat([
         {
+          value: "Moderation Actions",
+          isDivider: true,
+        },
+        {
           label: "Report",
           value: "",
           event: "clickReport",
@@ -343,7 +347,7 @@ const commentMenuItems = computed(() => {
     }
   }
   if (canShowPermalink) {
-    out.push({
+    out.unshift({
       label: "Copy Link",
       value: "",
       event: "copyLink",
