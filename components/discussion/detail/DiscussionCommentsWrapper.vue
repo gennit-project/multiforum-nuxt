@@ -71,6 +71,8 @@ const commentSectionQueryVariables = computed(() => ({
   sort: getSortFromQuery(route.query),
 }));
 
+
+
 const createCommentDefaultValues: CreateEditCommentFormValues = {
   text: "",
   isRootComment: false,

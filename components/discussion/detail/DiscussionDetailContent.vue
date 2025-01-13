@@ -103,11 +103,11 @@ const {
   GET_DISCUSSION_COMMENTS,
   {
     discussionId: props.discussionId,
-    channelUniqueName: channelId,
-    modName: loggedInUserModName,
+    channelUniqueName: channelId.value,
+    modName: loggedInUserModName.value,
     offset: offset.value,
     limit: COMMENT_LIMIT,
-    sort: commentSort,
+    sort: commentSort.value
   },
   {
     fetchPolicy: "cache-first",
