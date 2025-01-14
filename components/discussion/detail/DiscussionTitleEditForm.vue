@@ -72,6 +72,7 @@ const {
     updateDiscussionInput: formValues.value,
   },
 }));
+
 onDone(() => (titleEditMode.value = false));
 
 const onClickEdit = () => {

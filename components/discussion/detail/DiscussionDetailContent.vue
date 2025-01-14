@@ -29,6 +29,7 @@ import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue"
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
+import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -54,7 +55,6 @@ const lastValidDiscussion = ref<Discussion | null>(null);
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
-  loading: getDiscussionLoading,
   refetch: refetchDiscussion,
   onResult: onGetDiscussionResult,
 } = useQuery(
@@ -107,12 +107,14 @@ const {
     modName: loggedInUserModName.value,
     offset: offset.value,
     limit: COMMENT_LIMIT,
-    sort: commentSort.value
+    sort: commentSort.value,
   },
   {
     fetchPolicy: "cache-first",
   }
 );
+
+const discussionBodyEditMode = ref(false);
 
 const discussion = computed<Discussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions[0];
@@ -265,6 +267,9 @@ const handleClickUndoFeedback = () => {
 const handleClickEditFeedback = () => {
   showEditFeedbackModal.value = true;
 };
+const handleClickEditDiscussionBody = () => {
+  discussionBodyEditMode.value = true;
+};
 </script>
 
 <template>
@@ -288,40 +293,51 @@ const handleClickEditFeedback = () => {
                   :discussion="discussion"
                   :channel-id="channelId"
                   :compact-mode="compactMode"
+                  :discussion-body-edit-mode="discussionBodyEditMode"
                   @handle-click-give-feedback="handleClickGiveFeedback"
+                  @handle-click-edit-body="handleClickEditDiscussionBody"
+                  @cancel-edit-discussion-body="discussionBodyEditMode = false"
                 />
-                <DiscussionBody
-                  :discussion="discussion"
-                  :channel-id="channelId"
-                  :discussion-channel-id="activeDiscussionChannel?.id"
-                  :emoji-json="activeDiscussionChannel?.emoji"
-                >
-                  <template #album-slot>
-                    <div class="bg-black text-white">
-                      <DiscussionAlbum
-                        v-if="
-                          discussion.Album &&
-                          discussion.Album.Images?.length > 0
-                        "
-                        :album="discussion.Album"
-                        :carousel-format="true"
-                      />
-                    </div>
-                  </template>
-                  <template #button-slot>
-                    <div class="flex h-12 items-center">
-                      <DiscussionVotes
-                        v-if="activeDiscussionChannel"
-                        :discussion="discussion"
-                        :discussion-channel="activeDiscussionChannel"
-                        :show-downvote="!loggedInUserIsAuthor"
-                        @handle-click-give-feedback="handleClickGiveFeedback"
-                        @handle-click-undo-feedback="handleClickUndoFeedback"
-                        @handle-click-edit-feedback="handleClickEditFeedback"
-                      />
-                    </div>
-                  </template>
-                </DiscussionBody>
+                <div class="flex-1">
+                  <DiscussionBodyEditForm 
+                    v-if="discussionBodyEditMode"
+                    :discussion="discussion"
+                    @close-editor="discussionBodyEditMode = false"
+                  />
+                  <DiscussionBody
+                    v-else
+                    :discussion="discussion"
+                    :channel-id="channelId"
+                    :discussion-channel-id="activeDiscussionChannel?.id"
+                    :emoji-json="activeDiscussionChannel?.emoji"
+                  >
+                    <template #album-slot>
+                      <div class="bg-black text-white">
+                        <DiscussionAlbum
+                          v-if="
+                            discussion.Album &&
+                            discussion.Album.Images?.length > 0
+                          "
+                          :album="discussion.Album"
+                          :carousel-format="true"
+                        />
+                      </div>
+                    </template>
+                    <template #button-slot>
+                      <div class="flex h-12 items-center">
+                        <DiscussionVotes
+                          v-if="activeDiscussionChannel"
+                          :discussion="discussion"
+                          :discussion-channel="activeDiscussionChannel"
+                          :show-downvote="!loggedInUserIsAuthor"
+                          @handle-click-give-feedback="handleClickGiveFeedback"
+                          @handle-click-undo-feedback="handleClickUndoFeedback"
+                          @handle-click-edit-feedback="handleClickEditFeedback"
+                        />
+                      </div>
+                    </template>
+                  </DiscussionBody>
+                </div>
               </div>
             </div>
           </v-col>

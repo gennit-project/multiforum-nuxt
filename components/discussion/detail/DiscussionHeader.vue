@@ -41,9 +41,14 @@ const props = defineProps({
     required: false,
     default: true,
   },
+  discussionBodyEditMode: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["handleClickGiveFeedback"]);
+const emit = defineEmits(["handleClickGiveFeedback", "handleClickEditBody", "cancelEditDiscussionBody"]);
 
 const route = useRoute();
 const router = useRouter();
@@ -232,31 +237,51 @@ const authorIsMod = computed(
         <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
         <div>{{ editedAt }}</div>
       </div>
-      <MenuButton
-        v-if="showActionMenu && discussion && menuItems.length > 0"
-        :items="menuItems"
-        :data-testid="'discussion-menu-button'"
-        @copy-link="copyLink"
-        @handle-edit="
-          router.push(`/forums/${channelId}/discussions/edit/${discussion.id}`)
-        "
-        @handle-delete="deleteModalIsOpen = true"
-        @handle-click-report="showOpenIssueModal = true"
-        @handle-feedback="emit('handleClickGiveFeedback')"
-        @handle-view-feedback="
-          router.push({
-            name: 'forums-forumId-discussions-feedback-discussionId',
-            params: {
-              forumId: defaultChannel,
-              discussionId: discussion.id,
-            },
-          })
-        "
-      >
-        <EllipsisHorizontal
-          class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
-        />
-      </MenuButton>
+      <div class="flex items-center gap-2">
+        <button
+          v-if="!discussionBodyEditMode && usernameVar"
+          type="button"
+          class="flex align-items gap-2 text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
+          @click="$emit('handleClickEditBody')"
+        >
+          Edit
+        </button>
+        <button 
+          v-else-if="usernameVar"
+          type="button"
+          class="text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
+          @click="$emit('cancelEditDiscussionBody')"
+        >
+          Cancel
+        </button>
+        <MenuButton
+          v-if="showActionMenu && discussion && menuItems.length > 0"
+          :items="menuItems"
+          :data-testid="'discussion-menu-button'"
+          @copy-link="copyLink"
+          @handle-edit="
+            router.push(
+              `/forums/${channelId}/discussions/edit/${discussion.id}`
+            )
+          "
+          @handle-delete="deleteModalIsOpen = true"
+          @handle-click-report="showOpenIssueModal = true"
+          @handle-feedback="emit('handleClickGiveFeedback')"
+          @handle-view-feedback="
+            router.push({
+              name: 'forums-forumId-discussions-feedback-discussionId',
+              params: {
+                forumId: defaultChannel,
+                discussionId: discussion.id,
+              },
+            })
+          "
+        >
+          <EllipsisHorizontal
+            class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
+          />
+        </MenuButton>
+      </div>
     </div>
     <WarningModal
       :title="'Delete Discussion'"
