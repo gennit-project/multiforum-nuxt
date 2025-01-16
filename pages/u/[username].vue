@@ -44,17 +44,21 @@ const isAdmin = computed(() => {
 <template>
   <NuxtLayout>
     <div class="max-w-screen-2xl w-full px-2 dark:bg-black">
-      <UserProfileSidebar :is-admin="isAdmin" />
-      <div class="flex-1 min-w-0">
-        <UserProfileTabs
-          v-if="user"
-          :show-counts="true"
-          :vertical="false"
-          :user="user"
-          class="block border-b border-gray-200 dark:border-gray-600"
-        />
+      <div class="flex flex-col lg:flex-row w-full">
+        <div class="w-full lg:w-80 lg:shrink-0">
+          <UserProfileSidebar :is-admin="isAdmin" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <UserProfileTabs
+            v-if="user"
+            :show-counts="true"
+            :vertical="false"
+            :user="user"
+            class="block border-b border-gray-200 dark:border-gray-600"
+          />
+          <NuxtPage />
+        </div>
       </div>
-      <NuxtPage />
     </div>
   </NuxtLayout>
 </template>
