@@ -51,7 +51,7 @@ const user = computed(() => {
         :src="user?.profilePicURL"
         :text="username"
         :is-square="false"
-        :is-medium="true"
+        :is-large="true"
       />
       <h1
         v-if="username && !user?.displayName"
