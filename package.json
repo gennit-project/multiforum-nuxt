@@ -40,7 +40,7 @@
     "@vue/apollo-option": "^4.0.0-alpha.20",
     "@vue/apollo-util": "^4.0.0-alpha.18",
     "@vueform/multiselect": "^2.5.2",
-    "auth0": "^4.8.0",
+    "auth0": "^4.16.0",
     "axios": "^1.7.2",
     "crypto-js": "^4.1.1",
     "cypress": "13.14.2",
