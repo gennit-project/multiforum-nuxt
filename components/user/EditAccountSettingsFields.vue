@@ -17,9 +17,9 @@ import { MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
-  event: Event;   
+  event: Event;
   fieldName: string;
-}
+};
 
 const props = defineProps({
   formValues: {
@@ -111,16 +111,21 @@ const handleProfilePicChange = async (input: FileChangeInput) => {
 // Focus the input on creation
 nextTick(() => {
   if (titleInputRef.value) {
-    (titleInputRef.value?.$el?.children[0].childNodes[0] as HTMLElement).focus();
+    (
+      titleInputRef.value?.$el?.children[0].childNodes[0] as HTMLElement
+    ).focus();
   }
 });
 
 const needsChanges = computed(() => {
-  if (props.formValues?.bio && props.formValues.bio?.length > MAX_CHARS_IN_USER_BIO) {
+  if (
+    props.formValues?.bio &&
+    props.formValues.bio?.length > MAX_CHARS_IN_USER_BIO
+  ) {
     return true;
   }
-  return false
-})
+  return false;
+});
 </script>
 
 <template>
@@ -193,10 +198,15 @@ const needsChanges = computed(() => {
                 :is-square="false"
                 :is-large="true"
               />
-              <AddImage  
-                @file-change="(input: FileChangeInput) => {
-                  handleProfilePicChange(input);
-                }" />
+              <AddImage
+                key="profile-pic-image-url"
+                :field-name="'coverImageURL'"
+                @file-change="
+                  (input: FileChangeInput) => {
+                    handleProfilePicChange(input);
+                  }
+                "
+              />
             </template>
           </FormRow>
         </div>
