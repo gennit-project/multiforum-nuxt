@@ -239,7 +239,7 @@ const authorIsMod = computed(
       </div>
       <div class="flex items-center gap-2">
         <button
-          v-if="!discussionBodyEditMode && usernameVar"
+          v-if="!discussionBodyEditMode && usernameVar === discussion?.Author?.username"
           type="button"
           class="flex align-items gap-2 text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
           @click="$emit('handleClickEditBody')"

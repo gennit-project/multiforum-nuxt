@@ -211,9 +211,8 @@ const menuItems = computed(() => {
         label: "Report",
         event: "handleReport",
         icon: ALLOWED_ICONS.REPORT,
-      }
-    ]
-    );
+      },
+    ]);
     if (route.name !== "EventFeedback") {
       items.push({
         label: "Give Feedback",
@@ -344,7 +343,11 @@ function handleFeedbackInput(event: string) {
           <div class="h-5 w-5">
             <i class="fa-solid fa-ticket h-5" />
           </div>
-          <MarkdownPreview class="flex-1 -ml-2" :disable-gallery="true" :text="eventData.cost" />
+          <MarkdownPreview
+            class="flex-1 -ml-2"
+            :disable-gallery="true"
+            :text="eventData.cost"
+          />
         </li>
         <li
           v-if="eventData.isHostedByOP && eventData.Poster"
@@ -373,7 +376,6 @@ function handleFeedbackInput(event: string) {
           </nuxt-link>
         </li>
       </ul>
-
       <div>
         <MenuButton
           v-if="showMenuButtons && eventData && menuItems.length > 0"
@@ -394,7 +396,6 @@ function handleFeedbackInput(event: string) {
           />
         </MenuButton>
       </div>
-
       <Notification
         :show="showAddressCopiedNotification"
         :title="'Copied to clipboard!'"

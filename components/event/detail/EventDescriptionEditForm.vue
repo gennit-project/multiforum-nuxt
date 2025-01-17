@@ -1,34 +1,36 @@
 <script lang="ts" setup>
 import { ref } from "vue";
 import type { PropType } from "vue";
-import type { Discussion } from "@/__generated__/graphql";
+import type { Event } from "@/__generated__/graphql";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import GenericButton from "@/components/GenericButton.vue";
 import { useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
-import { MAX_CHARS_IN_DISCUSSION_BODY } from "@/utils/constants";
+import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
+import { MAX_CHARS_IN_EVENT_DESCRIPTION } from "@/utils/constants";
 
 const props = defineProps({
-  discussion: {
-    type: Object as PropType<Discussion>,
+  event: {
+    type: Object as PropType<Event>,
     required: true,
   },
 });
 const emits = defineEmits(["closeEditor"]);
 const formValues = ref({
-  body: props.discussion?.body || "",
+  description: props.event?.description || "",
 });
 
 const {
-  mutate: updateDiscussion,
-  error: updateDiscussionError,
-  loading: updateDiscussionLoading,
+  mutate: updateEvent,
+  error: updateEventError,
+  loading: updateEventLoading,
   onDone,
-} = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+} = useMutation(UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    discussionWhere: { id: props.discussion.id },
-    updateDiscussionInput: formValues.value,
+    where: { id: props.event.id },
+    updateEventInput: formValues.value,
+    channelConnections: [],
+    channelDisconnections: [],
   },
 }));
 
@@ -44,32 +46,32 @@ onDone(() => {
         class="mb-3"
         :test-id="'body-input'"
         :disable-auto-focus="false"
-        :initial-value="formValues.body || ''"
+        :initial-value="formValues.description || ''"
         :placeholder="'Add details'"
         :rows="8"
-        @update="formValues.body = $event"
+        @update="formValues.description = $event"
       />
       <CharCounter
-        :current="formValues.body?.length || 0"
-        :max="MAX_CHARS_IN_DISCUSSION_BODY"
+        :current="formValues.description?.length || 0"
+        :max="MAX_CHARS_IN_EVENT_DESCRIPTION"
       />
       <div class="flex align-items gap-2 justify-end">
         <GenericButton :text="'Cancel'" @click="emits('closeEditor')" />
         <PrimaryButton
           :disabled="
-            formValues.body.length === 0 ||
-            formValues.body.length > MAX_CHARS_IN_DISCUSSION_BODY
+            formValues.description.length === 0 ||
+            formValues.description.length > MAX_CHARS_IN_EVENT_DESCRIPTION
           "
           :label="'Save'"
-          :loading="updateDiscussionLoading"
-          @click="updateDiscussion"
+          :loading="updateEventLoading"
+          @click="updateEvent"
         />
       </div>
     </div>
     <ErrorBanner
-      v-if="updateDiscussionError"
+      v-if="updateEventError"
       class="mx-auto my-3 max-w-5xl"
-      :text="updateDiscussionError.message"
+      :text="updateEventError.message"
     />
   </div>
 </template>

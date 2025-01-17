@@ -185,6 +185,12 @@ const eventHasStarted = computed(() => {
 });
 
 const originalPoster = computed(() => event.value?.Poster?.username || "");
+
+const eventDescriptionEditMode = ref(false);
+
+const handleClickEditEventDescription = () => {
+  eventDescriptionEditMode.value = true;
+};
 </script>
 
 <template>
@@ -243,8 +249,11 @@ const originalPoster = computed(() => event.value?.Poster?.username || "");
               />
               <EventBody
                 v-if="event.description"
-                :event="event"
                 class="-ml-4"
+                :event="event"
+                :event-description-edit-mode="eventDescriptionEditMode"
+                @handle-click-edit-event-description="handleClickEditEventDescription"
+                @close-edit-event-description="eventDescriptionEditMode = false"
               />
             </div>
             
