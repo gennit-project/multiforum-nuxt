@@ -48,7 +48,11 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["handleClickGiveFeedback", "handleClickEditBody", "cancelEditDiscussionBody"]);
+const emit = defineEmits([
+  "handleClickGiveFeedback",
+  "handleClickEditBody",
+  "cancelEditDiscussionBody",
+]);
 
 const route = useRoute();
 const router = useRouter();
@@ -238,22 +242,24 @@ const authorIsMod = computed(
         <div>{{ editedAt }}</div>
       </div>
       <div class="flex items-center gap-2">
-        <button
-          v-if="!discussionBodyEditMode && usernameVar === discussion?.Author?.username"
-          type="button"
-          class="flex align-items gap-2 text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
-          @click="$emit('handleClickEditBody')"
-        >
-          Edit
-        </button>
-        <button 
-          v-else-if="usernameVar"
-          type="button"
-          class="text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
-          @click="$emit('cancelEditDiscussionBody')"
-        >
-          Cancel
-        </button>
+        <div v-if="usernameVar === discussion?.Author?.username">
+          <button
+            v-if="!discussionBodyEditMode"
+            type="button"
+            class="flex align-items gap-2 text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
+            @click="$emit('handleClickEditBody')"
+          >
+            Edit
+          </button>
+          <button
+            v-else-if="usernameVar"
+            type="button"
+            class="text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
+            @click="$emit('cancelEditDiscussionBody')"
+          >
+            Cancel
+          </button>
+        </div>
         <MenuButton
           v-if="showActionMenu && discussion && menuItems.length > 0"
           :items="menuItems"

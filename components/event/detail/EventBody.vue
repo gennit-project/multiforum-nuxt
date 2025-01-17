@@ -32,9 +32,9 @@ const description = computed(() => {
     />
     <div  v-else class="flex">
     <MarkdownPreview  :text="description || ''" :disable-gallery="false" />
-    <div>
+    <div v-if="usernameVar === event.Poster?.username">
       <button
-        v-if="!eventDescriptionEditMode && usernameVar === event.Poster?.username"
+        v-if="!eventDescriptionEditMode"
         type="button"
         class="text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
         @click="$emit('handleClickEditEventDescription')"
