@@ -10,6 +10,7 @@ export default defineNuxtPlugin((nuxtApp) => {
     authorizationParams: {
       audience: config.auth0Audience,
       redirect_uri: config.auth0CallbackUrl,
+      prompt: "select_account",
     },
   };
 
