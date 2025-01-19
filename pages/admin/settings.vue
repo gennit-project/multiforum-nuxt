@@ -9,6 +9,8 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import { config } from "@/config";
 import CreateEditServerFields from "@/components/admin/CreateEditServerFields.vue";
 
+
+console.log('settings.vue')
 const dataLoaded = ref(false);
 const {
   result: getServerResult,
@@ -20,9 +22,9 @@ const {
   {
     serverName: config.serverName,
   },
-  {
-    fetchPolicy: "cache-first",
-  }
+  // {
+  //   fetchPolicy: "cache-first",
+  // }
 );
 
 const serverConfig = computed(() => {
@@ -91,6 +93,7 @@ onDone(() => {
 function submit() {
   updateServer({
     input: serverUpdateInput.value,
+    serverName: config.serverName,
   });
 }
 
