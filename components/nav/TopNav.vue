@@ -64,7 +64,7 @@ const isOnMapPage = computed(() => {
     class="z-20 w-full bg-gray-100 border-b dark:bg-gray-900"
     :class="[isOnMapPage ? 'fixed' : '']"
   >
-    <div class="flex items-center justify-between px-2 pt-2 lg:px-4 lg:py-1">
+    <div class="flex items-center justify-between px-2 py-1 lg:px-4">
       <div class="flex items-center">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
@@ -107,23 +107,25 @@ const isOnMapPage = computed(() => {
           </div>
         </div>
       </div>
-      <client-only>
-        <div
-          class="hidden sm:flex items-center justify-end space-x-2 md:flex-1"
-        >
-          <LoginButton />
-        </div>
-      </client-only>
-      <div class="flex items-center space-x-2">
-        <CreateAnythingButton />
-        <ThemeSwitcher />
-        <div v-if="usernameVar" class="hidden lg:block">
-          <div class="flex items-center">
-            <div class="relative flex-shrink-0">
-              <UserProfileDropdownMenu
-                :username="usernameVar"
-                :mod-name="modProfileNameVar"
-              />
+      <div class="flex items-center gap-2">
+        <client-only>
+          <div
+            class="hidden sm:flex items-center justify-end space-x-2 md:flex-1"
+          >
+            <LoginButton />
+          </div>
+        </client-only>
+        <div class="flex items-center space-x-2">
+          <CreateAnythingButton />
+          <ThemeSwitcher />
+          <div v-if="usernameVar" class="hidden lg:block">
+            <div class="flex items-center">
+              <div class="relative flex-shrink-0">
+                <UserProfileDropdownMenu
+                  :username="usernameVar"
+                  :mod-name="modProfileNameVar"
+                />
+              </div>
             </div>
           </div>
         </div>

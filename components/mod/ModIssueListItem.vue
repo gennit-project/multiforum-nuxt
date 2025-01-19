@@ -2,13 +2,12 @@
 import type { Issue } from "@/__generated__/graphql";
 import { DateTime } from "luxon";
 
-const props = defineProps({
+defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,
   },
 });
-
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
@@ -24,19 +23,25 @@ const formatDate = (date: string) => {
       <i v-else class="mt-1 fa-solid fa-circle-check text-purple-500" />
 
       <div class="flex-col">
-        <nuxt-link
-          v-if="issue.Channel"
-          class="hover:underline dark:text-gray-200"
-          :to="{
-            name: 'forums-forumId-issues-issueId',
-            params: {
-              issueId: issue.id,
-              forumId: issue.Channel?.uniqueName,
-            },
-          }"
-        >
-          {{ issue.title }}
-        </nuxt-link>
+        <span v-if="issue.Channel" class="flex gap-2">
+          <nuxt-link
+            class="hover:underline dark:text-gray-200"
+            :to="{
+              name: 'forums-forumId-issues-issueId',
+              params: {
+                issueId: issue.id,
+                forumId: issue.Channel?.uniqueName,
+              },
+            }"
+          >
+            {{ issue.title }}
+          </nuxt-link>
+          <span
+            v-if="issue.flaggedServerRuleViolation"
+            class="bg-gray-200 dark:bg-gray-700 dark:text-white px-2 py-1 rounded-lg text-xs"
+            >Server Rule Violation</span
+          >
+        </span>
         <div v-else class="dark:text-gray-200">{{ issue.title }}</div>
         <div class="text-xs text-gray-500 dark:text-gray-200">
           {{

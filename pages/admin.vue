@@ -13,9 +13,9 @@ const { result: getServerResult, error: getServerError } = useQuery(
   {
     serverName: config.serverName,
   },
-  // {
-  //   fetchPolicy: "cache-first",
-  // }
+  {
+    fetchPolicy: "cache-first",
+  }
 );
 
 const serverConfig = computed(() => {
@@ -24,8 +24,6 @@ const serverConfig = computed(() => {
   }
   return getServerResult.value?.serverConfigs[0] || null;
 });
-
-console.log('admin.vue', serverConfig.value, getServerError.value)
 
 
 </script>

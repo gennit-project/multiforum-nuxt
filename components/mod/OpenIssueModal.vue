@@ -29,7 +29,6 @@ type UpdateIssueInCacheInput = {
   channelId: string;
 };
 
-
 type ActivityFeedItemInput = {
   issueId: string;
   actionDescription: string;
@@ -185,7 +184,7 @@ const finalCommentText = computed(() => {
 ${
   selectedForumRules.value.length > 0
     ? `
-## Broken Forum Rules
+## Server Rule Violations
 
 ${selectedForumRules.value.map((rule) => `- ${rule}`).join("\n")}
 `
@@ -196,7 +195,7 @@ ${
   selectedServerRules.value.length > 0
     ? `
   
-## Broken Server Rules
+## Forum Rule Violations
 
 ${selectedServerRules.value.map((rule) => `- ${rule}`).join("\n")}
 `
@@ -314,21 +313,34 @@ const submit = async () => {
   }
 
   let existingIssueId = "";
+  let existingIssueFlaggedServerRuleViolation = false;
 
   if (props.commentId) {
     await checkCommentIssueExistence();
     if (commentIssueExistenceResult.value.issues?.length > 0) {
-      existingIssueId = commentIssueExistenceResult.value.issues[0].id || "";
+      const existingIssue = commentIssueExistenceResult.value.issues[0];
+      const { id, flaggedServerRuleViolation } = existingIssue;
+      existingIssueId = id || "";
+      existingIssueFlaggedServerRuleViolation =
+        flaggedServerRuleViolation || false;
     }
   } else if (discussionId.value) {
     await checkDiscussionIssueExistence();
     if (discussionIssueExistenceResult.value.issues?.length > 0) {
-      existingIssueId = discussionIssueExistenceResult.value.issues[0].id || "";
+      const existingIssue = discussionIssueExistenceResult.value.issues[0];
+      const { id, flaggedServerRuleViolation } = existingIssue;
+      existingIssueId = id || "";
+      existingIssueFlaggedServerRuleViolation =
+        flaggedServerRuleViolation || false;
     }
   } else if (eventId.value) {
     await checkEventIssueExistence();
     if (eventIssueExistenceResult.value.issues?.length > 0) {
-      existingIssueId = eventIssueExistenceResult.value.issues[0].id || "";
+      const existingIssue = eventIssueExistenceResult.value.issues[0];
+      const { id, flaggedServerRuleViolation } = existingIssue;
+      existingIssueId = id || "";
+      existingIssueFlaggedServerRuleViolation =
+        flaggedServerRuleViolation || false;
     }
   }
 
@@ -340,9 +352,12 @@ const submit = async () => {
       actionType: "report",
       commentText: finalCommentText.value,
       channelUniqueName: channelId.value,
-      
-    }
-    if (selectedServerRules.value.length > 0) {
+    };
+
+    if (
+      selectedServerRules.value.length > 0 ||
+      existingIssueFlaggedServerRuleViolation
+    ) {
       activityFeedItemInput.flaggedServerRuleViolation = true;
     }
     addIssueActivityFeedItem(activityFeedItemInput);

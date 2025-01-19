@@ -33,7 +33,6 @@ const closedCount = computed(() => {
   }
   return closedIssuesResult.value?.issuesAggregate?.count || 0;
 });
-console.log('issues.vue')
 </script>
 
 <template>
@@ -70,6 +69,6 @@ console.log('issues.vue')
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
       </nuxt-link>
     </nav>
-    <!-- <NuxtPage /> -->
+    <NuxtPage />
   </div>
 </template>

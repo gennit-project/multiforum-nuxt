@@ -18,6 +18,7 @@ export const ISSUE_FIELDS = gql`
         displayName
       }
     }
+    flaggedServerRuleViolation
     ActivityFeed(options: { sort: { createdAt: DESC } }) {
       ... on ModerationAction {
         id
@@ -73,6 +74,7 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
       }
     ) {
       id
+      flaggedServerRuleViolation
     }
   }
 `;
@@ -83,6 +85,7 @@ export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
       where: { relatedEventId: $eventId, channelUniqueName: $channelUniqueName }
     ) {
       id
+      flaggedServerRuleViolation
     }
   }
 `;
@@ -96,6 +99,7 @@ export const CHECK_COMMENT_ISSUE_EXISTENCE = gql`
       }
     ) {
       id
+      flaggedServerRuleViolation
     }
   }
 `;
@@ -136,6 +140,7 @@ export const GET_ISSUES_BY_CHANNEL = gql`
         Channel {
           uniqueName
         }
+        flaggedServerRuleViolation
       }
     }
   }
@@ -234,8 +239,14 @@ export const GET_ISSUES_BY_COMMENT = gql`
 `;
 
 export const GET_ISSUES = gql`
-  query getIssues {
-    issues(where: { isOpen: true }, options: { sort: { createdAt: DESC } }) {
+  query getIssues (
+    $issueWhere: IssueWhere
+  ){
+    issues(where: $issueWhere, options: { 
+      sort: { 
+        createdAt: DESC 
+      } 
+    }) {
       id
       title
       body
@@ -245,6 +256,7 @@ export const GET_ISSUES = gql`
       relatedCommentId
       relatedDiscussionId
       relatedEventId
+      flaggedServerRuleViolation
       Channel {
         uniqueName
       }

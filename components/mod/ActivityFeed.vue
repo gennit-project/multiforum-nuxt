@@ -5,7 +5,6 @@ import ActivityFeedListItem from "./ActivityFeedListItem.vue";
 
 const props = defineProps<{
   feedItems: ModerationAction[];
-  label: string;
 }>();
 
 const reversedFeedItems = computed(() => {
