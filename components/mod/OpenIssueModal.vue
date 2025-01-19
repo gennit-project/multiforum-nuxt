@@ -29,6 +29,17 @@ type UpdateIssueInCacheInput = {
   channelId: string;
 };
 
+
+type ActivityFeedItemInput = {
+  issueId: string;
+  actionDescription: string;
+  actionType: string;
+  displayName: string;
+  commentText: string;
+  channelUniqueName: string;
+  flaggedServerRuleViolation?: boolean;
+};
+
 const emit = defineEmits(["close", "reportSubmittedSuccessfully"]);
 
 const updateIssueInCache = (input: UpdateIssueInCacheInput) => {
@@ -322,14 +333,19 @@ const submit = async () => {
   }
 
   if (existingIssueId) {
-    addIssueActivityFeedItem({
+    const activityFeedItemInput: ActivityFeedItemInput = {
       issueId: existingIssueId,
       displayName: modProfileNameVar.value,
       actionDescription: "reported the discussion",
       actionType: "report",
       commentText: finalCommentText.value,
       channelUniqueName: channelId.value,
-    });
+      
+    }
+    if (selectedServerRules.value.length > 0) {
+      activityFeedItemInput.flaggedServerRuleViolation = true;
+    }
+    addIssueActivityFeedItem(activityFeedItemInput);
 
     if (existingIssueId) {
       reopenIssue({
@@ -344,6 +360,7 @@ const submit = async () => {
     title: getIssueTitle(),
     isOpen: true,
     authorName: modProfileNameVar.value,
+    flaggedServerRuleViolation: selectedServerRules.value.length > 0,
     Author: {
       ModerationProfile: {
         connect: {

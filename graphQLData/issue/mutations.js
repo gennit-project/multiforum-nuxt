@@ -101,9 +101,11 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
     $displayName: String!
     $commentText: String!
     $channelUniqueName: String!
+    $flaggedServerRuleViolation: Boolean
   ) {
     updateIssues(
       where: { id: $issueId }
+      update: { flaggedServerRuleViolation: $flaggedServerRuleViolation }
       create: {
         ActivityFeed: [
           {

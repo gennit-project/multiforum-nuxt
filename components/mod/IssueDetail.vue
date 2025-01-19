@@ -25,9 +25,7 @@ import DiscussionDetails from "@/components/mod/DiscussionDetails.vue";
 import EventDetail from "@/components/event/detail/EventDetail.vue";
 import CommentDetails from "@/components/mod/CommentDetails.vue";
 import ModerationWizard from "@/components/mod/ModerationWizard.vue";
-import IssueBadge from "@/components/mod/IssueBadge.vue";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
-import { DateTime } from "luxon";
 import { modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 
@@ -391,10 +389,6 @@ const createFormValues = ref(createCommentDefaultValues);
 const issue = computed<Issue | null>(
   () => getIssueResult.value?.issues[0] || null
 );
-
-// Methods for formatting date and toggling issue status
-const formatDate = (date: string) =>
-  DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
 
 const updateComment = (text: string) => {
   createFormValues.value.text = text;
