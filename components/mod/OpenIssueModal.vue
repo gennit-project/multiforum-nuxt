@@ -184,7 +184,7 @@ const finalCommentText = computed(() => {
 ${
   selectedForumRules.value.length > 0
     ? `
-## Server Rule Violations
+Server rule violations:
 
 ${selectedForumRules.value.map((rule) => `- ${rule}`).join("\n")}
 `
@@ -195,7 +195,7 @@ ${
   selectedServerRules.value.length > 0
     ? `
   
-## Forum Rule Violations
+Forum rule violations:
 
 ${selectedServerRules.value.map((rule) => `- ${rule}`).join("\n")}
 `
@@ -205,7 +205,7 @@ ${selectedServerRules.value.map((rule) => `- ${rule}`).join("\n")}
 ${
   reportText.value
     ? `
-## Notes
+Notes:
 
 ${reportText.value}
 `

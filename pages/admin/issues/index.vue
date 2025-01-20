@@ -49,7 +49,7 @@ const {
   loading: getIssuesLoading,
   refetch,
 } = useQuery(GET_ISSUES, variables, {
-  fetchPolicy: "cache-and-network",
+  fetchPolicy: "cache-first",
 });
 
 const issues = computed<Issue[]>(() => {
