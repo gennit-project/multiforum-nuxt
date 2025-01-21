@@ -9,7 +9,7 @@ import FormRow from "@/components/FormRow.vue";
 import TextEditor from "@/components/TextEditor.vue";
 import AddImage from "@/components/AddImage.vue";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
-import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+
 import type { EditAccountSettingsFormValues } from "@/types/User";
 import FormComponent from "../FormComponent.vue";
 import { usernameVar } from "@/cache";
