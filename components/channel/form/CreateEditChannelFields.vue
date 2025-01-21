@@ -143,6 +143,17 @@ const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
 
 const activeTab = ref("basic");
 
+const tabs = [
+  {
+    key: "basic",
+    label: "Basic Settings",
+  },
+  {
+    key: "rules",
+    label: "Rules",
+  },
+];
+
 const setActiveTab = (tab: string) => {
   activeTab.value = tab;
 };
@@ -182,42 +193,31 @@ const setActiveTab = (tab: string) => {
       >
         <div>
           <div class="mt-5 flex w-full">
-
-
-
             <div
               class="w-1/4 border-r border-gray-200 dark:border-gray-500 mr-4 bg-gray-50"
             >
               <ul class="flex flex-col space-y-2">
                 <li
+                  v-for="tab in tabs"
+                  :key="tab.key"
                   :class="{
                     'text-blue-600 dark:text-blue-500 font-bold border-r-2 border-blue-500':
-                      activeTab === 'basic',
+                      activeTab === tab.key,
                     'text-gray-600 dark:text-gray-300 hover:text-blue-600':
-                      activeTab !== 'basic',
-                  }"
-                  class="py-2  cursor-pointer"
-                  @click="setActiveTab('basic')"
-                >
-                  Basic Settings
-                </li>
-                <li
-                  :class="{
-                    'text-blue-600 dark:text-blue-500 font-bold border-r-2 border-blue-500':
-                      activeTab === 'rules',
-                    'text-gray-600 dark:text-gray-200 hover:text-blue-600':
-                      activeTab !== 'rules',
+                      activeTab !== tab.key,
                   }"
                   class="py-2 cursor-pointer"
-                  @click="setActiveTab('rules')"
+                  @click="setActiveTab(tab.key)"
                 >
-                  Rules
+                  {{ tab.label }}
                 </li>
               </ul>
             </div>
 
-
-            <div v-if="activeTab === 'basic'" class="space-y-4 sm:space-y-5 flex-1">
+            <div
+              v-if="activeTab === 'basic'"
+              class="space-y-4 sm:space-y-5 flex-1"
+            >
               <FormRow section-title="Forum Unique Name" :required="!editMode">
                 <template #content>
                   <TextInput
