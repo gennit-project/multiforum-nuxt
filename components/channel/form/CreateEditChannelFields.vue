@@ -140,7 +140,7 @@ const touched = ref(false);
                 :form-values="formValues"
                 :edit-mode="editMode"
                 @update-form-values="emit('updateFormValues', $event)"
-                @submit="emit('submit')"
+                @submit="$emit('submit', $event)"
               />
             </keep-alive>
           </div>

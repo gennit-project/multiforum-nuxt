@@ -98,22 +98,17 @@ const handleItemClick = (item: any) => {
       <client-only>
         <v-menu v-model="isMenuOpen" :close-on-content-click="true" offset-y>
           <template #activator="{ props }">
-            <v-btn
+            <button
+              type="button"
               v-bind="props"
-              class="shadow-none border font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
-              :class="[
-                usePrimaryButton
-                  ? 'bg-blue-600 dark:bg-blue-700 text-white'
-                  : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
-              ]"
+              class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span class="flex items-center text-md dark:text-white">
-                + {{ usePrimaryButton ? "Create" : "" }}
+              <span class="flex items-center text-md text-blue-500"> {{ usePrimaryButton ? "Create" : "+" }}
               </span>
               <ChevronDownIcon
-                class="-mr-1 ml-1 mt-0.5 h-3 w-3 dark:text-white"
+                class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
                 aria-hidden="true"
               />
               <v-tooltip
@@ -123,11 +118,11 @@ const handleItemClick = (item: any) => {
               >
                 Create new...
               </v-tooltip>
-            </v-btn>
+            </button>
           </template>
 
           <v-list
-            class="dark:bg-gray-700 dark:text-white"
+            class="dark:bg-gray-700 text-blue-500"
             :style="{
               top: shouldOpenUpwards ? 'auto' : '100%',
               right: shouldOpenLeftwards ? 0 : 'auto',
@@ -142,8 +137,7 @@ const handleItemClick = (item: any) => {
               @click="() => handleItemClick(item)"
             >
               <span
-                class="block px-4 py-2 text-sm"
-                :class="['text-gray-700 dark:text-white']"
+                class="block px-4 py-2 text-sm text-black dark:text-white"
               >
                 {{ item.text }}
               </span>
@@ -152,19 +146,19 @@ const handleItemClick = (item: any) => {
         </v-menu>
         <template #fallback>
           <button
-            class="dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
+            class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
             :class="[
               usePrimaryButton
-                ? 'bg-blue-600 dark:bg-blue-700 text-white'
-                : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
+                ? 'border border-blue-600 dark:border-blue-700 text-blue-500'
+                : 'hover:bg-gray-200 dark:bg-gray-700 text-blue-500 dark:hover:bg-gray-600',
             ]"
             data-testid="fake-create-anything-button"
           >
-            <span class="flex items-center text-md dark:text-white">
+            <span class="flex items-center text-md text-blue-500">
               + {{ usePrimaryButton ? "Create" : "" }}
             </span>
             <ChevronDownIcon
-              class="-mr-1 ml-1 mt-0.5 h-3 w-3 dark:text-white"
+              class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
               aria-hidden="true"
             />
           </button>
@@ -174,19 +168,19 @@ const handleItemClick = (item: any) => {
 
     <template #does-not-have-auth>
       <button
-        class="dark:border-gray-700 font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-md px-4 text-sm focus:outline-none"
+        class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
         :class="[
           usePrimaryButton
-            ? 'bg-blue-600 dark:bg-blue-600 text-white'
-            : 'bg-white text-black hover:bg-gray-200 dark:border-gray-800 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
+            ? 'border border-blue-600 dark:border-blue-600 text-blue-500'
+            : 'hover:bg-gray-200 dark:bg-gray-700 text-blue-500 dark:hover:bg-gray-600',
         ]"
         data-testid="fake-create-anything-button"
       >
-        <span class="flex items-center text-md dark:text-white">
+        <span class="flex items-center text-md text-blue-500">
           + {{ usePrimaryButton ? "Create" : "" }}
         </span>
         <ChevronDownIcon
-          class="-mr-1 ml-1 mt-0.5 h-3 w-3 dark:text-white"
+          class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
           aria-hidden="true"
         />
       </button>
