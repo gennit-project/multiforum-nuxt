@@ -13,7 +13,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="flex items-center justify-center">
+  <div class="flex items-center justify-between">
     <div class="flex flex-row items-center justify-center gap-4 dark:bg-black mb-2">
       <AvatarComponent
         class="flex h-14 w-14 justify-center align-items shadow-sm pt-2"
