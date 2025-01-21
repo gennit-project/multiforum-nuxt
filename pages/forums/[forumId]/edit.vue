@@ -110,7 +110,7 @@ function updateFormValues(data: CreateEditChannelFormValues) {
 </script>
 
 <template>
-  <div class="px-8">
+  <div class="px-2 md:px-8">
     <RequireAuth :require-ownership="true" :owners="ownerList" :loading="!dataLoaded || getChannelLoading">
       <template #has-auth>
         <CreateEditChannelFields

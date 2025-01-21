@@ -19,6 +19,8 @@ import {
   MAX_CHARS_IN_CHANNEL_NAME,
   MAX_CHARS_IN_CHANNEL_DISPLAY_NAME,
 } from "@/utils/constants";
+import ForumOwnerList from "@/components/channel/form/ForumOwnerList.vue";
+import ModList from "@/components/channel/form/ModList.vue";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -152,6 +154,14 @@ const tabs = [
     key: "rules",
     label: "Rules",
   },
+  {
+    key: "mods",
+    label: "Moderators",
+  },
+  {
+    key: "owners",
+    label: "Forum Owners",
+  }
 ];
 
 const setActiveTab = (tab: string) => {
@@ -336,6 +346,16 @@ const setActiveTab = (tab: string) => {
                   :form-values="formValues"
                   @update-form-values="$emit('updateFormValues', $event)"
                 />
+              </template>
+            </FormRow>
+            <FormRow v-if="activeTab === 'mods'" section-title="Moderators">
+              <template #content>
+                <ModList />
+              </template>
+            </FormRow>
+            <FormRow v-if="activeTab === 'owners'" section-title="Forum Owners">
+              <template #content>
+                <ForumOwnerList />
               </template>
             </FormRow>
           </div>

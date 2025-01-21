@@ -37,7 +37,7 @@ function handleCancel() {
 
 <template>
   <form
-    class="rounded-lg space-y-3 divide-y divide-gray-200 border-gray-200 bg-white py-6 lg:py-12 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800"
+    class="rounded-lg space-y-3 divide-y divide-gray-200 border-gray-200 bg-white py-6 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800"
     autocomplete="off"
   >
     <div>
