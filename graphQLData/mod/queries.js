@@ -12,11 +12,7 @@ export const COUNT_OPEN_ISSUES = gql`
 
 export const SERVER_SCOPED_ISSUE_COUNT = gql`
   query countIssuesByServer {
-    issuesAggregate (
-      where: {
-        isOpen: true
-      }
-    ){
+    issuesAggregate(where: { isOpen: true }) {
       count
     }
   }
@@ -34,9 +30,7 @@ export const COUNT_CLOSED_ISSUES = gql`
 
 export const SERVER_SCOPED_CLOSED_ISSUE_COUNT = gql`
   query countClosedIssuesByServer {
-    issuesAggregate(
-      where: {  isOpen: false }
-    ) {
+    issuesAggregate(where: { isOpen: false }) {
       count
     }
   }
@@ -128,6 +122,42 @@ export const GET_MOD_ISSUES = gql`
         Channel {
           uniqueName
         }
+      }
+    }
+  }
+`;
+
+export const GET_MODS_BY_CHANNEL = gql`
+  query getModsByChannel($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      Admins {
+        username
+        createdAt
+        displayName
+        profilePicURL
+      }
+      Moderators {
+        displayName
+        createdAt
+        ModChannelRoles {
+          name
+          description
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CHANNEL_OWNERS_BY_CHANNEL = gql`
+  query getChannelOwnersByChannel($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      Admins {
+        username
+        displayName
+        createdAt
+        profilePicURL
       }
     }
   }

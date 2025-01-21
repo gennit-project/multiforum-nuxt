@@ -62,6 +62,12 @@ const tabs = computed(() => {
       current: false,
       count: props.user?.EventsAggregate?.count,
     },
+    {
+      name: "Owned Forums",
+      href: `/u/${usernameInParams.value}/ownedForums`,
+      current: false,
+      count: props.user?.AdminOfChannelsAggregate?.count,
+    }
   ];
 
   if (

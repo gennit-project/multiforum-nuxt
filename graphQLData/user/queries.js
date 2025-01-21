@@ -37,6 +37,9 @@ export const GET_USER = gql`
       ServerRoles {
         showAdminTag
       }
+      AdminOfChannelsAggregate {
+        count
+      }
     }
   }
 `;
@@ -280,3 +283,93 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+
+export const GET_MODDED_CHANNELS = gql`
+query getModdedChannels (
+  $username: String!,
+  $channelUniqueName: String!
+){
+  users (
+    where: {
+      username: $username
+    }
+  ){
+    username
+    AdminOfChannels (
+      where: {
+        uniqueName: $channelUniqueName
+      }
+    ){
+      
+      uniqueName
+      description
+      channelIconURL
+      Tags {
+        text
+      }
+      EventChannelsAggregate (
+        where: {
+          NOT: {
+            Event: null
+          }
+        }
+      ){
+        count
+      }
+      DiscussionChannelsAggregate (
+        where: {
+          NOT: {
+            Discussion: null
+          }
+        }
+      ){
+        count
+      }
+    }
+  }
+}
+`
+
+export const GET_OWNED_CHANNELS = gql`
+query getOwnedChannels (
+  $username: String!
+){
+  users (
+    where: {
+      username: $username
+    }
+  ){
+    username
+    AdminOfChannels {
+      uniqueName
+      description
+      channelIconURL
+      Tags {
+        text
+      }
+      EventChannelsAggregate (
+        where: {
+          NOT: {
+            Event: null
+          }
+        }
+      ){
+        count
+      }
+      DiscussionChannelsAggregate (
+        where: {
+          NOT: {
+            Discussion: null
+          }
+        }
+      ){
+        count
+      }
+    }
+    AdminOfChannelsAggregate {
+      count
+    }
+  }
+}
+`
