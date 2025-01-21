@@ -140,166 +140,210 @@ const handleImageChange = async (input: FileChangeInput) => {
 };
 
 const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
+
+const activeTab = ref("basic");
+
+const setActiveTab = (tab: string) => {
+  activeTab.value = tab;
+};
 </script>
 
 <template>
   <div class="mt-4 w-full pt-0 px-0">
     <div v-if="channelLoading">Loading...</div>
 
-    <TailwindForm
-      v-else-if="formValues"
-      :form-title="editMode ? 'Forum Settings' : 'Create a Forum'"
-      :description="'Forums are where you can start discussions and share content with others.'"
-      :needs-changes="titleIsInvalid"
-      :loading="createChannelLoading || editChannelLoading"
-      @input="touched = true"
-      @submit="emit('submit')"
-    >
-      <div>
-        <div v-if="updateChannelError" class="mt-6">
-          <ErrorBanner :text="updateChannelError.message" />
-        </div>
-        <div v-if="getChannelError">
-          <ErrorBanner
-            v-for="(error, i) in getChannelError?.graphQLErrors"
-            :key="i"
-            :text="error.message"
-          />
-        </div>
-        <div v-if="createChannelError">
-          <ErrorBanner
-            v-for="(error, i) in createChannelError?.graphQLErrors"
-            :key="i"
-            :text="`${error.message.split(CHANNEL_ALREADY_EXISTS_ERROR).join('Channel name is already taken')}`"
-          />
-        </div>
-
-        <div class="mt-5 space-y-4 sm:space-y-5">
-          <FormRow section-title="Unique Name" :required="!editMode">
-            <template #content>
-              <TextInput
-                ref="titleInputRef"
-                :test-id="'title-input'"
-                :disabled="editMode"
-                :value="formValues.uniqueName"
-                :placeholder="'Add unique name with no spaces. Ex. forum_name'"
-                :full-width="true"
-                @update="$emit('updateFormValues', { uniqueName: $event })"
-              />
-              <CharCounter
-                :current="formValues.uniqueName?.length || 0"
-                :max="MAX_CHARS_IN_CHANNEL_NAME"
-              />
-              <p
-                v-if="titleIsInvalid && touched"
-                class="text-red-500 text-sm mt-2"
-              >
-                Title can only contain letters, numbers, and underscores.
-              </p>
-            </template>
-          </FormRow>
-
-          <FormRow section-title="Display Name">
-            <template #content>
-              <TextInput
-                ref="displayNameInputRef"
-                :test-id="'display-name-input'"
-                :value="formValues.displayName"
-                :placeholder="'A more human readable display name'"
-                :full-width="true"
-                @update="$emit('updateFormValues', { displayName: $event })"
-              />
-              <CharCounter
-                :current="formValues.displayName?.length || 0"
-                :max="MAX_CHARS_IN_CHANNEL_DISPLAY_NAME"
-              />
-            </template>
-          </FormRow>
-
-          <FormRow section-title="Tags">
-            <template #content>
-              <TagPicker
-                data-testid="tag-input"
-                :selected-tags="formValues.selectedTags"
-                @set-selected-tags="
-                  $emit('updateFormValues', { selectedTags: $event })
-                "
-              />
-            </template>
-          </FormRow>
-
-          <FormRow section-title="Description">
-            <template #content>
-              <TextEditor
-                class="my-3"
-                :test-id="'description-input'"
-                :initial-value="formValues.description || ''"
-                :placeholder="'Add description'"
-                :disable-auto-focus="true"
-                :allow-image-upload="false"
-                @update="$emit('updateFormValues', { description: $event })"
-              />
-              <CharCounter
-                :current="formValues.description?.length || 0"
-                :max="MAX_CHARS_IN_CHANNEL_DESCRIPTION"
-              />
-            </template>
-          </FormRow>
-
-          <!-- Forum Icon Upload -->
-          <FormRow section-title="Forum Icon">
-            <template #content>
-              <AvatarComponent
-                class="shadow-sm"
-                :src="formValues.channelIconURL"
-                :text="formValues.uniqueName"
-                :is-square="true"
-                :is-medium="true"
-              />
-              <AddImage
-                key="channel-icon-url"
-                :field-name="'channelIconURL'"
-                @file-change="
-                  (input: FileChangeInput) => {
-                    handleImageChange(input);
-                  }
-                "
-              />
-            </template>
-          </FormRow>
-          <FormRow section-title="Forum Banner">
-            <template #content>
-              <img
-                v-if="formValues.channelBannerURL"
-                class="w-full shadow-sm"
-                :src="formValues.channelBannerURL"
-                :alt="formValues.uniqueName"
-              />
-              <AddImage
-                key="channel-banner-url"
-                :field-name="'channelBannerURL'"
-                @file-change="
-                  (input: FileChangeInput) => {
-                    handleImageChange(input);
-                  }
-                "
-              />
-            </template>
-          </FormRow>
-          <FormRow section-title="Forum Rules">
-            <template #content>
-              <RulesEditor
-                :form-values="formValues"
-                @update-form-values="$emit('updateFormValues', $event)"
-              />
-            </template>
-          </FormRow>
-        </div>
+    <div>
+      <div v-if="updateChannelError" class="mt-6">
+        <ErrorBanner :text="updateChannelError.message" />
       </div>
-    </TailwindForm>
+      <div v-if="getChannelError">
+        <ErrorBanner
+          v-for="(error, i) in getChannelError?.graphQLErrors"
+          :key="i"
+          :text="error.message"
+        />
+      </div>
+      <div v-if="createChannelError">
+        <ErrorBanner
+          v-for="(error, i) in createChannelError?.graphQLErrors"
+          :key="i"
+          :text="`${error.message.split(CHANNEL_ALREADY_EXISTS_ERROR).join('Channel name is already taken')}`"
+        />
+      </div>
 
-    <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
-      {{ error.message }}
+      <TailwindForm
+        v-if="formValues"
+        :form-title="editMode ? 'Forum Settings' : 'Create a Forum'"
+        :description="'Forums are where you can start discussions and share content with others.'"
+        :needs-changes="titleIsInvalid"
+        :loading="createChannelLoading || editChannelLoading"
+        @input="touched = true"
+        @submit="emit('submit')"
+      >
+        <div>
+          <div class="mt-5 flex w-full">
+
+
+
+            <div
+              class="w-1/4 border-r border-gray-200 dark:border-gray-500 mr-4 bg-gray-50"
+            >
+              <ul class="flex flex-col space-y-2">
+                <li
+                  :class="{
+                    'text-blue-600 dark:text-blue-500 font-bold border-r-2 border-blue-500':
+                      activeTab === 'basic',
+                    'text-gray-600 dark:text-gray-300 hover:text-blue-600':
+                      activeTab !== 'basic',
+                  }"
+                  class="py-2  cursor-pointer"
+                  @click="setActiveTab('basic')"
+                >
+                  Basic Settings
+                </li>
+                <li
+                  :class="{
+                    'text-blue-600 dark:text-blue-500 font-bold border-r-2 border-blue-500':
+                      activeTab === 'rules',
+                    'text-gray-600 dark:text-gray-200 hover:text-blue-600':
+                      activeTab !== 'rules',
+                  }"
+                  class="py-2 cursor-pointer"
+                  @click="setActiveTab('rules')"
+                >
+                  Rules
+                </li>
+              </ul>
+            </div>
+
+
+            <div v-if="activeTab === 'basic'" class="space-y-4 sm:space-y-5 flex-1">
+              <FormRow section-title="Forum Unique Name" :required="!editMode">
+                <template #content>
+                  <TextInput
+                    ref="titleInputRef"
+                    :test-id="'title-input'"
+                    :disabled="editMode"
+                    :value="formValues.uniqueName"
+                    :placeholder="'Add unique name with no spaces. Ex. forum_name'"
+                    :full-width="true"
+                    @update="$emit('updateFormValues', { uniqueName: $event })"
+                  />
+                  <CharCounter
+                    :current="formValues.uniqueName?.length || 0"
+                    :max="MAX_CHARS_IN_CHANNEL_NAME"
+                  />
+                  <p
+                    v-if="titleIsInvalid && touched"
+                    class="text-red-500 text-sm mt-2"
+                  >
+                    Title can only contain letters, numbers, and underscores.
+                  </p>
+                </template>
+              </FormRow>
+
+              <FormRow section-title="Forum Display Name">
+                <template #content>
+                  <TextInput
+                    ref="displayNameInputRef"
+                    :test-id="'display-name-input'"
+                    :value="formValues.displayName"
+                    :placeholder="'A more human readable display name'"
+                    :full-width="true"
+                    @update="$emit('updateFormValues', { displayName: $event })"
+                  />
+                  <CharCounter
+                    :current="formValues.displayName?.length || 0"
+                    :max="MAX_CHARS_IN_CHANNEL_DISPLAY_NAME"
+                  />
+                </template>
+              </FormRow>
+
+              <FormRow section-title="Tags">
+                <template #content>
+                  <TagPicker
+                    data-testid="tag-input"
+                    :selected-tags="formValues.selectedTags"
+                    @set-selected-tags="
+                      $emit('updateFormValues', { selectedTags: $event })
+                    "
+                  />
+                </template>
+              </FormRow>
+
+              <FormRow section-title="Description">
+                <template #content>
+                  <TextEditor
+                    class="my-3"
+                    :test-id="'description-input'"
+                    :initial-value="formValues.description || ''"
+                    :placeholder="'Add description'"
+                    :disable-auto-focus="true"
+                    :allow-image-upload="false"
+                    @update="$emit('updateFormValues', { description: $event })"
+                  />
+                  <CharCounter
+                    :current="formValues.description?.length || 0"
+                    :max="MAX_CHARS_IN_CHANNEL_DESCRIPTION"
+                  />
+                </template>
+              </FormRow>
+
+              <!-- Forum Icon Upload -->
+              <FormRow section-title="Forum Icon">
+                <template #content>
+                  <AvatarComponent
+                    class="shadow-sm"
+                    :src="formValues.channelIconURL"
+                    :text="formValues.uniqueName"
+                    :is-square="true"
+                    :is-medium="true"
+                  />
+                  <AddImage
+                    key="channel-icon-url"
+                    :field-name="'channelIconURL'"
+                    @file-change="
+                      (input: FileChangeInput) => {
+                        handleImageChange(input);
+                      }
+                    "
+                  />
+                </template>
+              </FormRow>
+              <FormRow section-title="Forum Banner">
+                <template #content>
+                  <img
+                    v-if="formValues.channelBannerURL"
+                    class="w-full shadow-sm"
+                    :src="formValues.channelBannerURL"
+                    :alt="formValues.uniqueName"
+                  />
+                  <AddImage
+                    key="channel-banner-url"
+                    :field-name="'channelBannerURL'"
+                    @file-change="
+                      (input: FileChangeInput) => {
+                        handleImageChange(input);
+                      }
+                    "
+                  />
+                </template>
+              </FormRow>
+            </div>
+            <FormRow v-if="activeTab === 'rules'" section-title="Forum Rules">
+              <template #content>
+                <RulesEditor
+                  :form-values="formValues"
+                  @update-form-values="$emit('updateFormValues', $event)"
+                />
+              </template>
+            </FormRow>
+          </div>
+        </div>
+      </TailwindForm>
+      <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
+        {{ error.message }}
+      </div>
     </div>
   </div>
 </template>
