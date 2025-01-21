@@ -67,7 +67,13 @@ const tabs = computed(() => {
       href: `/u/${usernameInParams.value}/ownedForums`,
       current: false,
       count: props.user?.AdminOfChannelsAggregate?.count,
-    }
+    },
+    {
+      name: "Modded Forums",
+      href: `/u/${usernameInParams.value}/moddedForums`,
+      current: false,
+      count: props.user?.ModOfChannelsAggregate?.count,
+    },
   ];
 
   if (

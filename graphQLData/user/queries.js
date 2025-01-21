@@ -288,7 +288,6 @@ export const GET_USERS = gql`
 export const GET_MODDED_CHANNELS = gql`
 query getModdedChannels (
   $username: String!,
-  $channelUniqueName: String!
 ){
   users (
     where: {
@@ -296,12 +295,7 @@ query getModdedChannels (
     }
   ){
     username
-    AdminOfChannels (
-      where: {
-        uniqueName: $channelUniqueName
-      }
-    ){
-      
+    ModOfChannels {
       uniqueName
       description
       channelIconURL
@@ -326,6 +320,9 @@ query getModdedChannels (
       ){
         count
       }
+    }
+    AdminOfChannelsAggregate {
+      count
     }
   }
 }

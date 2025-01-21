@@ -19,9 +19,9 @@ const { result, loading, error } = useQuery(
   () => ({
     username: username.value,
   }),
-//   {
-//     fetchPolicy: "cache-first",
-//   }
+  {
+    fetchPolicy: "cache-first",
+  }
 );
 </script>
 <template>
