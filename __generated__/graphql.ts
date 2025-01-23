@@ -848,6 +848,12 @@ export type Channel = {
   Moderators: Array<ModerationProfile>;
   ModeratorsAggregate?: Maybe<ChannelModerationProfileModeratorsAggregationSelection>;
   ModeratorsConnection: ChannelModeratorsConnection;
+  PendingModInvites: Array<User>;
+  PendingModInvitesAggregate?: Maybe<ChannelUserPendingModInvitesAggregationSelection>;
+  PendingModInvitesConnection: ChannelPendingModInvitesConnection;
+  PendingOwnerInvites: Array<User>;
+  PendingOwnerInvitesAggregate?: Maybe<ChannelUserPendingOwnerInvitesAggregationSelection>;
+  PendingOwnerInvitesConnection: ChannelPendingOwnerInvitesConnection;
   RelatedChannels: Array<Channel>;
   RelatedChannelsAggregate?: Maybe<ChannelChannelRelatedChannelsAggregationSelection>;
   RelatedChannelsConnection: ChannelRelatedChannelsConnection;
@@ -1017,6 +1023,50 @@ export type ChannelModeratorsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelModeratorsConnectionSort>>;
   where?: InputMaybe<ChannelModeratorsConnectionWhere>;
+};
+
+
+export type ChannelPendingModInvitesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ChannelPendingModInvitesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ChannelPendingModInvitesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ChannelPendingModInvitesConnectionSort>>;
+  where?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+};
+
+
+export type ChannelPendingOwnerInvitesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ChannelPendingOwnerInvitesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ChannelPendingOwnerInvitesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectionSort>>;
+  where?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
 };
 
 
@@ -1539,6 +1589,8 @@ export type ChannelConnectInput = {
   EventChannels?: InputMaybe<Array<ChannelEventChannelsConnectFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesConnectFieldInput>>;
   Moderators?: InputMaybe<Array<ChannelModeratorsConnectFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesConnectFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsConnectFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsConnectFieldInput>>;
 };
@@ -1547,6 +1599,8 @@ export type ChannelConnectOrCreateInput = {
   Admins?: InputMaybe<Array<ChannelAdminsConnectOrCreateFieldInput>>;
   DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleConnectOrCreateFieldInput>;
   Moderators?: InputMaybe<Array<ChannelModeratorsConnectOrCreateFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesConnectOrCreateFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectOrCreateFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsConnectOrCreateFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsConnectOrCreateFieldInput>>;
 };
@@ -1567,6 +1621,8 @@ export type ChannelCreateInput = {
   EventChannels?: InputMaybe<ChannelEventChannelsFieldInput>;
   Issues?: InputMaybe<ChannelIssuesFieldInput>;
   Moderators?: InputMaybe<ChannelModeratorsFieldInput>;
+  PendingModInvites?: InputMaybe<ChannelPendingModInvitesFieldInput>;
+  PendingOwnerInvites?: InputMaybe<ChannelPendingOwnerInvitesFieldInput>;
   RelatedChannels?: InputMaybe<ChannelRelatedChannelsFieldInput>;
   Tags?: InputMaybe<ChannelTagsFieldInput>;
   channelBannerURL?: InputMaybe<Scalars['String']['input']>;
@@ -1721,6 +1777,8 @@ export type ChannelDeleteInput = {
   EventChannels?: InputMaybe<Array<ChannelEventChannelsDeleteFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesDeleteFieldInput>>;
   Moderators?: InputMaybe<Array<ChannelModeratorsDeleteFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesDeleteFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesDeleteFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsDeleteFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsDeleteFieldInput>>;
 };
@@ -1733,6 +1791,8 @@ export type ChannelDisconnectInput = {
   EventChannels?: InputMaybe<Array<ChannelEventChannelsDisconnectFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesDisconnectFieldInput>>;
   Moderators?: InputMaybe<Array<ChannelModeratorsDisconnectFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesDisconnectFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesDisconnectFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsDisconnectFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsDisconnectFieldInput>>;
 };
@@ -2332,6 +2392,560 @@ export type ChannelOptions = {
   sort?: InputMaybe<Array<ChannelSort>>;
 };
 
+export type ChannelPendingModInvitesAggregateInput = {
+  AND?: InputMaybe<Array<ChannelPendingModInvitesAggregateInput>>;
+  NOT?: InputMaybe<ChannelPendingModInvitesAggregateInput>;
+  OR?: InputMaybe<Array<ChannelPendingModInvitesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ChannelPendingModInvitesNodeAggregationWhereInput>;
+};
+
+export type ChannelPendingModInvitesConnectFieldInput = {
+  connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type ChannelPendingModInvitesConnectOrCreateFieldInput = {
+  onCreate: ChannelPendingModInvitesConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type ChannelPendingModInvitesConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type ChannelPendingModInvitesConnection = {
+  __typename?: 'ChannelPendingModInvitesConnection';
+  edges: Array<ChannelPendingModInvitesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChannelPendingModInvitesConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type ChannelPendingModInvitesConnectionWhere = {
+  AND?: InputMaybe<Array<ChannelPendingModInvitesConnectionWhere>>;
+  NOT?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+  OR?: InputMaybe<Array<ChannelPendingModInvitesConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type ChannelPendingModInvitesCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type ChannelPendingModInvitesDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+};
+
+export type ChannelPendingModInvitesDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+};
+
+export type ChannelPendingModInvitesFieldInput = {
+  connect?: InputMaybe<Array<ChannelPendingModInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelPendingModInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<ChannelPendingModInvitesCreateFieldInput>>;
+};
+
+export type ChannelPendingModInvitesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ChannelPendingModInvitesNodeAggregationWhereInput>>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NOT?: InputMaybe<ChannelPendingModInvitesNodeAggregationWhereInput>;
+  NotificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  OR?: InputMaybe<Array<ChannelPendingModInvitesNodeAggregationWhereInput>>;
+  PreferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChannelPendingModInvitesRelationship = {
+  __typename?: 'ChannelPendingModInvitesRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type ChannelPendingModInvitesUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type ChannelPendingModInvitesUpdateFieldInput = {
+  connect?: InputMaybe<Array<ChannelPendingModInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelPendingModInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<ChannelPendingModInvitesCreateFieldInput>>;
+  delete?: InputMaybe<Array<ChannelPendingModInvitesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ChannelPendingModInvitesDisconnectFieldInput>>;
+  update?: InputMaybe<ChannelPendingModInvitesUpdateConnectionInput>;
+  where?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+};
+
+export type ChannelPendingOwnerInvitesAggregateInput = {
+  AND?: InputMaybe<Array<ChannelPendingOwnerInvitesAggregateInput>>;
+  NOT?: InputMaybe<ChannelPendingOwnerInvitesAggregateInput>;
+  OR?: InputMaybe<Array<ChannelPendingOwnerInvitesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ChannelPendingOwnerInvitesNodeAggregationWhereInput>;
+};
+
+export type ChannelPendingOwnerInvitesConnectFieldInput = {
+  connect?: InputMaybe<Array<UserConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type ChannelPendingOwnerInvitesConnectOrCreateFieldInput = {
+  onCreate: ChannelPendingOwnerInvitesConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type ChannelPendingOwnerInvitesConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type ChannelPendingOwnerInvitesConnection = {
+  __typename?: 'ChannelPendingOwnerInvitesConnection';
+  edges: Array<ChannelPendingOwnerInvitesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChannelPendingOwnerInvitesConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type ChannelPendingOwnerInvitesConnectionWhere = {
+  AND?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectionWhere>>;
+  NOT?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+  OR?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type ChannelPendingOwnerInvitesCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type ChannelPendingOwnerInvitesDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+};
+
+export type ChannelPendingOwnerInvitesDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+};
+
+export type ChannelPendingOwnerInvitesFieldInput = {
+  connect?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<ChannelPendingOwnerInvitesCreateFieldInput>>;
+};
+
+export type ChannelPendingOwnerInvitesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ChannelPendingOwnerInvitesNodeAggregationWhereInput>>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NOT?: InputMaybe<ChannelPendingOwnerInvitesNodeAggregationWhereInput>;
+  NotificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  OR?: InputMaybe<Array<ChannelPendingOwnerInvitesNodeAggregationWhereInput>>;
+  PreferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChannelPendingOwnerInvitesRelationship = {
+  __typename?: 'ChannelPendingOwnerInvitesRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type ChannelPendingOwnerInvitesUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type ChannelPendingOwnerInvitesUpdateFieldInput = {
+  connect?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<ChannelPendingOwnerInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<ChannelPendingOwnerInvitesCreateFieldInput>>;
+  delete?: InputMaybe<Array<ChannelPendingOwnerInvitesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ChannelPendingOwnerInvitesDisconnectFieldInput>>;
+  update?: InputMaybe<ChannelPendingOwnerInvitesUpdateConnectionInput>;
+  where?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+};
+
 export type ChannelRelatedChannelsAggregateInput = {
   AND?: InputMaybe<Array<ChannelRelatedChannelsAggregateInput>>;
   NOT?: InputMaybe<ChannelRelatedChannelsAggregateInput>;
@@ -2517,6 +3131,8 @@ export type ChannelRelationInput = {
   EventChannels?: InputMaybe<Array<ChannelEventChannelsCreateFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesCreateFieldInput>>;
   Moderators?: InputMaybe<Array<ChannelModeratorsCreateFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesCreateFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesCreateFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsCreateFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsCreateFieldInput>>;
 };
@@ -2808,6 +3424,8 @@ export type ChannelUpdateInput = {
   EventChannels?: InputMaybe<Array<ChannelEventChannelsUpdateFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesUpdateFieldInput>>;
   Moderators?: InputMaybe<Array<ChannelModeratorsUpdateFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<ChannelPendingModInvitesUpdateFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<ChannelPendingOwnerInvitesUpdateFieldInput>>;
   RelatedChannels?: InputMaybe<Array<ChannelRelatedChannelsUpdateFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsUpdateFieldInput>>;
   channelBannerURL?: InputMaybe<Scalars['String']['input']>;
@@ -2829,6 +3447,50 @@ export type ChannelUserAdminsAggregationSelection = {
 
 export type ChannelUserAdminsNodeAggregateSelection = {
   __typename?: 'ChannelUserAdminsNodeAggregateSelection';
+  DefaultEmojiSkinTone: StringAggregateSelection;
+  NotificationBundleInterval: StringAggregateSelection;
+  PreferredTimeZone: StringAggregateSelection;
+  bio: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type ChannelUserPendingModInvitesAggregationSelection = {
+  __typename?: 'ChannelUserPendingModInvitesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ChannelUserPendingModInvitesNodeAggregateSelection>;
+};
+
+export type ChannelUserPendingModInvitesNodeAggregateSelection = {
+  __typename?: 'ChannelUserPendingModInvitesNodeAggregateSelection';
+  DefaultEmojiSkinTone: StringAggregateSelection;
+  NotificationBundleInterval: StringAggregateSelection;
+  PreferredTimeZone: StringAggregateSelection;
+  bio: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type ChannelUserPendingOwnerInvitesAggregationSelection = {
+  __typename?: 'ChannelUserPendingOwnerInvitesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ChannelUserPendingOwnerInvitesNodeAggregateSelection>;
+};
+
+export type ChannelUserPendingOwnerInvitesNodeAggregateSelection = {
+  __typename?: 'ChannelUserPendingOwnerInvitesNodeAggregateSelection';
   DefaultEmojiSkinTone: StringAggregateSelection;
   NotificationBundleInterval: StringAggregateSelection;
   PreferredTimeZone: StringAggregateSelection;
@@ -2954,6 +3616,40 @@ export type ChannelWhere = {
   Moderators_SOME?: InputMaybe<ModerationProfileWhere>;
   NOT?: InputMaybe<ChannelWhere>;
   OR?: InputMaybe<Array<ChannelWhere>>;
+  PendingModInvitesAggregate?: InputMaybe<ChannelPendingModInvitesAggregateInput>;
+  /** Return Channels where all of the related ChannelPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_ALL?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+  /** Return Channels where none of the related ChannelPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_NONE?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+  /** Return Channels where one of the related ChannelPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_SINGLE?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+  /** Return Channels where some of the related ChannelPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_SOME?: InputMaybe<ChannelPendingModInvitesConnectionWhere>;
+  /** Return Channels where all of the related Users match this filter */
+  PendingModInvites_ALL?: InputMaybe<UserWhere>;
+  /** Return Channels where none of the related Users match this filter */
+  PendingModInvites_NONE?: InputMaybe<UserWhere>;
+  /** Return Channels where one of the related Users match this filter */
+  PendingModInvites_SINGLE?: InputMaybe<UserWhere>;
+  /** Return Channels where some of the related Users match this filter */
+  PendingModInvites_SOME?: InputMaybe<UserWhere>;
+  PendingOwnerInvitesAggregate?: InputMaybe<ChannelPendingOwnerInvitesAggregateInput>;
+  /** Return Channels where all of the related ChannelPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_ALL?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+  /** Return Channels where none of the related ChannelPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_NONE?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+  /** Return Channels where one of the related ChannelPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_SINGLE?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+  /** Return Channels where some of the related ChannelPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_SOME?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
+  /** Return Channels where all of the related Users match this filter */
+  PendingOwnerInvites_ALL?: InputMaybe<UserWhere>;
+  /** Return Channels where none of the related Users match this filter */
+  PendingOwnerInvites_NONE?: InputMaybe<UserWhere>;
+  /** Return Channels where one of the related Users match this filter */
+  PendingOwnerInvites_SINGLE?: InputMaybe<UserWhere>;
+  /** Return Channels where some of the related Users match this filter */
+  PendingOwnerInvites_SOME?: InputMaybe<UserWhere>;
   RelatedChannelsAggregate?: InputMaybe<ChannelRelatedChannelsAggregateInput>;
   /** Return Channels where all of the related ChannelRelatedChannelsConnections match this filter */
   RelatedChannelsConnection_ALL?: InputMaybe<ChannelRelatedChannelsConnectionWhere>;
@@ -6573,6 +7269,12 @@ export type CreateModerationProfilesMutationResponse = {
   __typename?: 'CreateModerationProfilesMutationResponse';
   info: CreateInfo;
   moderationProfiles: Array<ModerationProfile>;
+};
+
+export type CreateNotificationsMutationResponse = {
+  __typename?: 'CreateNotificationsMutationResponse';
+  info: CreateInfo;
+  notifications: Array<Notification>;
 };
 
 export type CreateRecurringEventsMutationResponse = {
@@ -16695,8 +17397,12 @@ export type ModerationProfilesConnection = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  acceptForumModInvite?: Maybe<Scalars['Boolean']['output']>;
+  acceptForumOwnerInvite?: Maybe<Scalars['Boolean']['output']>;
   addEmojiToComment?: Maybe<Comment>;
   addEmojiToDiscussionChannel?: Maybe<DiscussionChannel>;
+  cancelInviteForumMod?: Maybe<Scalars['Boolean']['output']>;
+  cancelInviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
   createAlbums: CreateAlbumsMutationResponse;
   createChannelRoles: CreateChannelRolesMutationResponse;
   createChannels: CreateChannelsMutationResponse;
@@ -16725,6 +17431,7 @@ export type Mutation = {
   createModServerRoles: CreateModServerRolesMutationResponse;
   createModerationActions: CreateModerationActionsMutationResponse;
   createModerationProfiles: CreateModerationProfilesMutationResponse;
+  createNotifications: CreateNotificationsMutationResponse;
   createRecurringEvents: CreateRecurringEventsMutationResponse;
   createRepeatEnds: CreateRepeatEndsMutationResponse;
   createRepeatEveries: CreateRepeatEveriesMutationResponse;
@@ -16762,6 +17469,7 @@ export type Mutation = {
   deleteModServerRoles: DeleteInfo;
   deleteModerationActions: DeleteInfo;
   deleteModerationProfiles: DeleteInfo;
+  deleteNotifications: DeleteInfo;
   deleteRecurringEvents: DeleteInfo;
   deleteRepeatEnds: DeleteInfo;
   deleteRepeatEveries: DeleteInfo;
@@ -16774,8 +17482,12 @@ export type Mutation = {
   deleteTags: DeleteInfo;
   deleteUsers: DeleteInfo;
   dropDataForCypressTests?: Maybe<DropDataResponse>;
+  inviteForumMod?: Maybe<Scalars['Boolean']['output']>;
+  inviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
   removeEmojiFromComment?: Maybe<Comment>;
   removeEmojiFromDiscussionChannel?: Maybe<DiscussionChannel>;
+  removeForumMod?: Maybe<Scalars['Boolean']['output']>;
+  removeForumOwner?: Maybe<Scalars['Boolean']['output']>;
   seedDataForCypressTests?: Maybe<SeedDataResponse>;
   undoUpvoteComment?: Maybe<Comment>;
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
@@ -16806,6 +17518,7 @@ export type Mutation = {
   updateModServerRoles: UpdateModServerRolesMutationResponse;
   updateModerationActions: UpdateModerationActionsMutationResponse;
   updateModerationProfiles: UpdateModerationProfilesMutationResponse;
+  updateNotifications: UpdateNotificationsMutationResponse;
   updateRecurringEvents: UpdateRecurringEventsMutationResponse;
   updateRepeatEnds: UpdateRepeatEndsMutationResponse;
   updateRepeatEveries: UpdateRepeatEveriesMutationResponse;
@@ -16822,6 +17535,16 @@ export type Mutation = {
 };
 
 
+export type MutationAcceptForumModInviteArgs = {
+  channelUniqueName: Scalars['String']['input'];
+};
+
+
+export type MutationAcceptForumOwnerInviteArgs = {
+  channelUniqueName: Scalars['String']['input'];
+};
+
+
 export type MutationAddEmojiToCommentArgs = {
   commentId: Scalars['ID']['input'];
   emojiLabel: Scalars['String']['input'];
@@ -16835,6 +17558,17 @@ export type MutationAddEmojiToDiscussionChannelArgs = {
   emojiLabel: Scalars['String']['input'];
   unicode: Scalars['String']['input'];
   username: Scalars['String']['input'];
+};
+
+
+export type MutationCancelInviteForumModArgs = {
+  channelUniqueName: Scalars['String']['input'];
+};
+
+
+export type MutationCancelInviteForumOwnerArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  inviteeUsername: Scalars['String']['input'];
 };
 
 
@@ -16976,6 +17710,11 @@ export type MutationCreateModerationActionsArgs = {
 
 export type MutationCreateModerationProfilesArgs = {
   input: Array<ModerationProfileCreateInput>;
+};
+
+
+export type MutationCreateNotificationsArgs = {
+  input: Array<NotificationCreateInput>;
 };
 
 
@@ -17179,6 +17918,11 @@ export type MutationDeleteModerationProfilesArgs = {
 };
 
 
+export type MutationDeleteNotificationsArgs = {
+  where?: InputMaybe<NotificationWhere>;
+};
+
+
 export type MutationDeleteRecurringEventsArgs = {
   delete?: InputMaybe<RecurringEventDeleteInput>;
   where?: InputMaybe<RecurringEventWhere>;
@@ -17238,6 +17982,18 @@ export type MutationDeleteUsersArgs = {
 };
 
 
+export type MutationInviteForumModArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  inviteeUsername: Scalars['String']['input'];
+};
+
+
+export type MutationInviteForumOwnerArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  inviteeUsername: Scalars['String']['input'];
+};
+
+
 export type MutationRemoveEmojiFromCommentArgs = {
   commentId: Scalars['ID']['input'];
   emojiLabel: Scalars['String']['input'];
@@ -17248,6 +18004,18 @@ export type MutationRemoveEmojiFromCommentArgs = {
 export type MutationRemoveEmojiFromDiscussionChannelArgs = {
   discussionChannelId: Scalars['ID']['input'];
   emojiLabel: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveForumModArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  username: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveForumOwnerArgs = {
+  channelUniqueName: Scalars['String']['input'];
   username: Scalars['String']['input'];
 };
 
@@ -17445,6 +18213,12 @@ export type MutationUpdateModerationProfilesArgs = {
 };
 
 
+export type MutationUpdateNotificationsArgs = {
+  update?: InputMaybe<NotificationUpdateInput>;
+  where?: InputMaybe<NotificationWhere>;
+};
+
+
 export type MutationUpdateRecurringEventsArgs = {
   update?: InputMaybe<RecurringEventUpdateInput>;
   where?: InputMaybe<RecurringEventWhere>;
@@ -17525,6 +18299,89 @@ export type MutationUpvoteDiscussionChannelArgs = {
 export type NewUserInput = {
   emailAddress: Scalars['String']['input'];
   username: Scalars['String']['input'];
+};
+
+export type Notification = {
+  __typename?: 'Notification';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  read?: Maybe<Scalars['Boolean']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
+};
+
+export type NotificationAggregateSelection = {
+  __typename?: 'NotificationAggregateSelection';
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  text: StringAggregateSelection;
+};
+
+export type NotificationConnectWhere = {
+  node: NotificationWhere;
+};
+
+export type NotificationCreateInput = {
+  read?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type NotificationEdge = {
+  __typename?: 'NotificationEdge';
+  cursor: Scalars['String']['output'];
+  node: Notification;
+};
+
+export type NotificationOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more NotificationSort objects to sort Notifications by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<NotificationSort>>;
+};
+
+/** Fields to sort Notifications by. The order in which sorts are applied is not guaranteed when specifying many fields in one NotificationSort object. */
+export type NotificationSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  read?: InputMaybe<SortDirection>;
+  text?: InputMaybe<SortDirection>;
+};
+
+export type NotificationUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  read?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type NotificationWhere = {
+  AND?: InputMaybe<Array<NotificationWhere>>;
+  NOT?: InputMaybe<NotificationWhere>;
+  OR?: InputMaybe<Array<NotificationWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  read?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type NotificationsConnection = {
+  __typename?: 'NotificationsConnection';
+  edges: Array<NotificationEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** Pagination information (Relay) */
@@ -17646,6 +18503,9 @@ export type Query = {
   moderationProfiles: Array<ModerationProfile>;
   moderationProfilesAggregate: ModerationProfileAggregateSelection;
   moderationProfilesConnection: ModerationProfilesConnection;
+  notifications: Array<Notification>;
+  notificationsAggregate: NotificationAggregateSelection;
+  notificationsConnection: NotificationsConnection;
   recurringEvents: Array<RecurringEvent>;
   recurringEventsAggregate: RecurringEventAggregateSelection;
   recurringEventsConnection: RecurringEventsConnection;
@@ -18222,6 +19082,25 @@ export type QueryModerationProfilesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<ModerationProfileSort>>>;
   where?: InputMaybe<ModerationProfileWhere>;
+};
+
+
+export type QueryNotificationsArgs = {
+  options?: InputMaybe<NotificationOptions>;
+  where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type QueryNotificationsAggregateArgs = {
+  where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type QueryNotificationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<NotificationSort>>>;
+  where?: InputMaybe<NotificationWhere>;
 };
 
 
@@ -21606,6 +22485,12 @@ export type UpdateModerationProfilesMutationResponse = {
   moderationProfiles: Array<ModerationProfile>;
 };
 
+export type UpdateNotificationsMutationResponse = {
+  __typename?: 'UpdateNotificationsMutationResponse';
+  info: UpdateInfo;
+  notifications: Array<Notification>;
+};
+
 export type UpdateRecurringEventsMutationResponse = {
   __typename?: 'UpdateRecurringEventsMutationResponse';
   info: UpdateInfo;
@@ -21727,6 +22612,15 @@ export type User = {
   ModerationProfileAggregate?: Maybe<UserModerationProfileModerationProfileAggregationSelection>;
   ModerationProfileConnection: UserModerationProfileConnection;
   NotificationBundleInterval?: Maybe<Scalars['String']['output']>;
+  Notifications: Array<Notification>;
+  NotificationsAggregate?: Maybe<UserNotificationNotificationsAggregationSelection>;
+  NotificationsConnection: UserNotificationsConnection;
+  PendingModInvites: Array<Channel>;
+  PendingModInvitesAggregate?: Maybe<UserChannelPendingModInvitesAggregationSelection>;
+  PendingModInvitesConnection: UserPendingModInvitesConnection;
+  PendingOwnerInvites: Array<Channel>;
+  PendingOwnerInvitesAggregate?: Maybe<UserChannelPendingOwnerInvitesAggregationSelection>;
+  PendingOwnerInvitesConnection: UserPendingOwnerInvitesConnection;
   PreferredTimeZone?: Maybe<Scalars['String']['output']>;
   RecentlyVisitedChannels: Array<Channel>;
   RecentlyVisitedChannelsAggregate?: Maybe<UserChannelRecentlyVisitedChannelsAggregationSelection>;
@@ -22124,6 +23018,72 @@ export type UserModerationProfileConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserModerationProfileConnectionSort>>;
   where?: InputMaybe<UserModerationProfileConnectionWhere>;
+};
+
+
+export type UserNotificationsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<NotificationOptions>;
+  where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type UserNotificationsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<NotificationWhere>;
+};
+
+
+export type UserNotificationsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserNotificationsConnectionSort>>;
+  where?: InputMaybe<UserNotificationsConnectionWhere>;
+};
+
+
+export type UserPendingModInvitesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
+  where?: InputMaybe<ChannelWhere>;
+};
+
+
+export type UserPendingModInvitesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ChannelWhere>;
+};
+
+
+export type UserPendingModInvitesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserPendingModInvitesConnectionSort>>;
+  where?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+};
+
+
+export type UserPendingOwnerInvitesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ChannelOptions>;
+  where?: InputMaybe<ChannelWhere>;
+};
+
+
+export type UserPendingOwnerInvitesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ChannelWhere>;
+};
+
+
+export type UserPendingOwnerInvitesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserPendingOwnerInvitesConnectionSort>>;
+  where?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
 };
 
 
@@ -22825,6 +23785,38 @@ export type UserChannelModOfChannelsNodeAggregateSelection = {
   uniqueName: StringAggregateSelection;
 };
 
+export type UserChannelPendingModInvitesAggregationSelection = {
+  __typename?: 'UserChannelPendingModInvitesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserChannelPendingModInvitesNodeAggregateSelection>;
+};
+
+export type UserChannelPendingModInvitesNodeAggregateSelection = {
+  __typename?: 'UserChannelPendingModInvitesNodeAggregateSelection';
+  channelBannerURL: StringAggregateSelection;
+  channelIconURL: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  displayName: StringAggregateSelection;
+  uniqueName: StringAggregateSelection;
+};
+
+export type UserChannelPendingOwnerInvitesAggregationSelection = {
+  __typename?: 'UserChannelPendingOwnerInvitesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserChannelPendingOwnerInvitesNodeAggregateSelection>;
+};
+
+export type UserChannelPendingOwnerInvitesNodeAggregateSelection = {
+  __typename?: 'UserChannelPendingOwnerInvitesNodeAggregateSelection';
+  channelBannerURL: StringAggregateSelection;
+  channelIconURL: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  description: StringAggregateSelection;
+  displayName: StringAggregateSelection;
+  uniqueName: StringAggregateSelection;
+};
+
 export type UserChannelRecentlyVisitedChannelsAggregationSelection = {
   __typename?: 'UserChannelRecentlyVisitedChannelsAggregationSelection';
   count: Scalars['Int']['output'];
@@ -23187,6 +24179,9 @@ export type UserConnectInput = {
   Issues?: InputMaybe<Array<UserIssuesConnectFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsConnectFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileConnectFieldInput>;
+  Notifications?: InputMaybe<Array<UserNotificationsConnectFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<UserPendingModInvitesConnectFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<UserPendingOwnerInvitesConnectFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesConnectFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsConnectFieldInput>>;
@@ -23202,6 +24197,8 @@ export type UserConnectOrCreateInput = {
   IsBlockedBy?: InputMaybe<UserIsBlockedByConnectOrCreateFieldInput>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsConnectOrCreateFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileConnectOrCreateFieldInput>;
+  PendingModInvites?: InputMaybe<Array<UserPendingModInvitesConnectOrCreateFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<UserPendingOwnerInvitesConnectOrCreateFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsConnectOrCreateFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesConnectOrCreateFieldInput>>;
 };
@@ -23234,6 +24231,9 @@ export type UserCreateInput = {
   ModOfChannels?: InputMaybe<UserModOfChannelsFieldInput>;
   ModerationProfile?: InputMaybe<UserModerationProfileFieldInput>;
   NotificationBundleInterval?: InputMaybe<Scalars['String']['input']>;
+  Notifications?: InputMaybe<UserNotificationsFieldInput>;
+  PendingModInvites?: InputMaybe<UserPendingModInvitesFieldInput>;
+  PendingOwnerInvites?: InputMaybe<UserPendingOwnerInvitesFieldInput>;
   PreferredTimeZone?: InputMaybe<Scalars['String']['input']>;
   RecentlyVisitedChannels?: InputMaybe<UserRecentlyVisitedChannelsFieldInput>;
   ServerRoles?: InputMaybe<UserServerRolesFieldInput>;
@@ -23490,6 +24490,9 @@ export type UserDeleteInput = {
   Issues?: InputMaybe<Array<UserIssuesDeleteFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsDeleteFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileDeleteFieldInput>;
+  Notifications?: InputMaybe<Array<UserNotificationsDeleteFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<UserPendingModInvitesDeleteFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<UserPendingOwnerInvitesDeleteFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsDeleteFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesDeleteFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsDeleteFieldInput>>;
@@ -23514,6 +24517,9 @@ export type UserDisconnectInput = {
   Issues?: InputMaybe<Array<UserIssuesDisconnectFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsDisconnectFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileDisconnectFieldInput>;
+  Notifications?: InputMaybe<Array<UserNotificationsDisconnectFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<UserPendingModInvitesDisconnectFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<UserPendingOwnerInvitesDisconnectFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsDisconnectFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesDisconnectFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsDisconnectFieldInput>>;
@@ -25333,6 +26339,122 @@ export type UserModerationProfileUpdateFieldInput = {
   where?: InputMaybe<UserModerationProfileConnectionWhere>;
 };
 
+export type UserNotificationNotificationsAggregationSelection = {
+  __typename?: 'UserNotificationNotificationsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserNotificationNotificationsNodeAggregateSelection>;
+};
+
+export type UserNotificationNotificationsNodeAggregateSelection = {
+  __typename?: 'UserNotificationNotificationsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  text: StringAggregateSelection;
+};
+
+export type UserNotificationsAggregateInput = {
+  AND?: InputMaybe<Array<UserNotificationsAggregateInput>>;
+  NOT?: InputMaybe<UserNotificationsAggregateInput>;
+  OR?: InputMaybe<Array<UserNotificationsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserNotificationsNodeAggregationWhereInput>;
+};
+
+export type UserNotificationsConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<NotificationConnectWhere>;
+};
+
+export type UserNotificationsConnection = {
+  __typename?: 'UserNotificationsConnection';
+  edges: Array<UserNotificationsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserNotificationsConnectionSort = {
+  node?: InputMaybe<NotificationSort>;
+};
+
+export type UserNotificationsConnectionWhere = {
+  AND?: InputMaybe<Array<UserNotificationsConnectionWhere>>;
+  NOT?: InputMaybe<UserNotificationsConnectionWhere>;
+  OR?: InputMaybe<Array<UserNotificationsConnectionWhere>>;
+  node?: InputMaybe<NotificationWhere>;
+};
+
+export type UserNotificationsCreateFieldInput = {
+  node: NotificationCreateInput;
+};
+
+export type UserNotificationsDeleteFieldInput = {
+  where?: InputMaybe<UserNotificationsConnectionWhere>;
+};
+
+export type UserNotificationsDisconnectFieldInput = {
+  where?: InputMaybe<UserNotificationsConnectionWhere>;
+};
+
+export type UserNotificationsFieldInput = {
+  connect?: InputMaybe<Array<UserNotificationsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserNotificationsCreateFieldInput>>;
+};
+
+export type UserNotificationsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserNotificationsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserNotificationsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserNotificationsNodeAggregationWhereInput>>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  text_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserNotificationsRelationship = {
+  __typename?: 'UserNotificationsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Notification;
+};
+
+export type UserNotificationsUpdateConnectionInput = {
+  node?: InputMaybe<NotificationUpdateInput>;
+};
+
+export type UserNotificationsUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserNotificationsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserNotificationsCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserNotificationsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserNotificationsDisconnectFieldInput>>;
+  update?: InputMaybe<UserNotificationsUpdateConnectionInput>;
+  where?: InputMaybe<UserNotificationsConnectionWhere>;
+};
+
 export type UserOnCreateInput = {
   DefaultEmojiSkinTone?: InputMaybe<Scalars['String']['input']>;
   NotificationBundleInterval?: InputMaybe<Scalars['String']['input']>;
@@ -25353,6 +26475,360 @@ export type UserOptions = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   /** Specify one or more UserSort objects to sort Users by. The sorts will be applied in the order in which they are arranged in the array. */
   sort?: InputMaybe<Array<UserSort>>;
+};
+
+export type UserPendingModInvitesAggregateInput = {
+  AND?: InputMaybe<Array<UserPendingModInvitesAggregateInput>>;
+  NOT?: InputMaybe<UserPendingModInvitesAggregateInput>;
+  OR?: InputMaybe<Array<UserPendingModInvitesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserPendingModInvitesNodeAggregationWhereInput>;
+};
+
+export type UserPendingModInvitesConnectFieldInput = {
+  connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ChannelConnectWhere>;
+};
+
+export type UserPendingModInvitesConnectOrCreateFieldInput = {
+  onCreate: UserPendingModInvitesConnectOrCreateFieldInputOnCreate;
+  where: ChannelConnectOrCreateWhere;
+};
+
+export type UserPendingModInvitesConnectOrCreateFieldInputOnCreate = {
+  node: ChannelOnCreateInput;
+};
+
+export type UserPendingModInvitesConnection = {
+  __typename?: 'UserPendingModInvitesConnection';
+  edges: Array<UserPendingModInvitesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserPendingModInvitesConnectionSort = {
+  node?: InputMaybe<ChannelSort>;
+};
+
+export type UserPendingModInvitesConnectionWhere = {
+  AND?: InputMaybe<Array<UserPendingModInvitesConnectionWhere>>;
+  NOT?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+  OR?: InputMaybe<Array<UserPendingModInvitesConnectionWhere>>;
+  node?: InputMaybe<ChannelWhere>;
+};
+
+export type UserPendingModInvitesCreateFieldInput = {
+  node: ChannelCreateInput;
+};
+
+export type UserPendingModInvitesDeleteFieldInput = {
+  delete?: InputMaybe<ChannelDeleteInput>;
+  where?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+};
+
+export type UserPendingModInvitesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ChannelDisconnectInput>;
+  where?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+};
+
+export type UserPendingModInvitesFieldInput = {
+  connect?: InputMaybe<Array<UserPendingModInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserPendingModInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<UserPendingModInvitesCreateFieldInput>>;
+};
+
+export type UserPendingModInvitesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserPendingModInvitesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserPendingModInvitesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserPendingModInvitesNodeAggregationWhereInput>>;
+  channelBannerURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  description_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserPendingModInvitesRelationship = {
+  __typename?: 'UserPendingModInvitesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Channel;
+};
+
+export type UserPendingModInvitesUpdateConnectionInput = {
+  node?: InputMaybe<ChannelUpdateInput>;
+};
+
+export type UserPendingModInvitesUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserPendingModInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserPendingModInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<UserPendingModInvitesCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserPendingModInvitesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserPendingModInvitesDisconnectFieldInput>>;
+  update?: InputMaybe<UserPendingModInvitesUpdateConnectionInput>;
+  where?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+};
+
+export type UserPendingOwnerInvitesAggregateInput = {
+  AND?: InputMaybe<Array<UserPendingOwnerInvitesAggregateInput>>;
+  NOT?: InputMaybe<UserPendingOwnerInvitesAggregateInput>;
+  OR?: InputMaybe<Array<UserPendingOwnerInvitesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserPendingOwnerInvitesNodeAggregationWhereInput>;
+};
+
+export type UserPendingOwnerInvitesConnectFieldInput = {
+  connect?: InputMaybe<Array<ChannelConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ChannelConnectWhere>;
+};
+
+export type UserPendingOwnerInvitesConnectOrCreateFieldInput = {
+  onCreate: UserPendingOwnerInvitesConnectOrCreateFieldInputOnCreate;
+  where: ChannelConnectOrCreateWhere;
+};
+
+export type UserPendingOwnerInvitesConnectOrCreateFieldInputOnCreate = {
+  node: ChannelOnCreateInput;
+};
+
+export type UserPendingOwnerInvitesConnection = {
+  __typename?: 'UserPendingOwnerInvitesConnection';
+  edges: Array<UserPendingOwnerInvitesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserPendingOwnerInvitesConnectionSort = {
+  node?: InputMaybe<ChannelSort>;
+};
+
+export type UserPendingOwnerInvitesConnectionWhere = {
+  AND?: InputMaybe<Array<UserPendingOwnerInvitesConnectionWhere>>;
+  NOT?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+  OR?: InputMaybe<Array<UserPendingOwnerInvitesConnectionWhere>>;
+  node?: InputMaybe<ChannelWhere>;
+};
+
+export type UserPendingOwnerInvitesCreateFieldInput = {
+  node: ChannelCreateInput;
+};
+
+export type UserPendingOwnerInvitesDeleteFieldInput = {
+  delete?: InputMaybe<ChannelDeleteInput>;
+  where?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+};
+
+export type UserPendingOwnerInvitesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ChannelDisconnectInput>;
+  where?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+};
+
+export type UserPendingOwnerInvitesFieldInput = {
+  connect?: InputMaybe<Array<UserPendingOwnerInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserPendingOwnerInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<UserPendingOwnerInvitesCreateFieldInput>>;
+};
+
+export type UserPendingOwnerInvitesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserPendingOwnerInvitesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserPendingOwnerInvitesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserPendingOwnerInvitesNodeAggregationWhereInput>>;
+  channelBannerURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelBannerURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelBannerURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelIconURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelIconURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  description_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  description_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  uniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  uniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserPendingOwnerInvitesRelationship = {
+  __typename?: 'UserPendingOwnerInvitesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Channel;
+};
+
+export type UserPendingOwnerInvitesUpdateConnectionInput = {
+  node?: InputMaybe<ChannelUpdateInput>;
+};
+
+export type UserPendingOwnerInvitesUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserPendingOwnerInvitesConnectFieldInput>>;
+  connectOrCreate?: InputMaybe<Array<UserPendingOwnerInvitesConnectOrCreateFieldInput>>;
+  create?: InputMaybe<Array<UserPendingOwnerInvitesCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserPendingOwnerInvitesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserPendingOwnerInvitesDisconnectFieldInput>>;
+  update?: InputMaybe<UserPendingOwnerInvitesUpdateConnectionInput>;
+  where?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
 };
 
 export type UserRecentlyVisitedChannelsAggregateInput = {
@@ -25550,6 +27026,9 @@ export type UserRelationInput = {
   Issues?: InputMaybe<Array<UserIssuesCreateFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsCreateFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileCreateFieldInput>;
+  Notifications?: InputMaybe<Array<UserNotificationsCreateFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<UserPendingModInvitesCreateFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<UserPendingOwnerInvitesCreateFieldInput>>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsCreateFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesCreateFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsCreateFieldInput>>;
@@ -25728,6 +27207,9 @@ export type UserUpdateInput = {
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsUpdateFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileUpdateFieldInput>;
   NotificationBundleInterval?: InputMaybe<Scalars['String']['input']>;
+  Notifications?: InputMaybe<Array<UserNotificationsUpdateFieldInput>>;
+  PendingModInvites?: InputMaybe<Array<UserPendingModInvitesUpdateFieldInput>>;
+  PendingOwnerInvites?: InputMaybe<Array<UserPendingOwnerInvitesUpdateFieldInput>>;
   PreferredTimeZone?: InputMaybe<Scalars['String']['input']>;
   RecentlyVisitedChannels?: InputMaybe<Array<UserRecentlyVisitedChannelsUpdateFieldInput>>;
   ServerRoles?: InputMaybe<Array<UserServerRolesUpdateFieldInput>>;
@@ -26299,7 +27781,58 @@ export type UserWhere = {
   NotificationBundleInterval_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   NotificationBundleInterval_MATCHES?: InputMaybe<Scalars['String']['input']>;
   NotificationBundleInterval_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  NotificationsAggregate?: InputMaybe<UserNotificationsAggregateInput>;
+  /** Return Users where all of the related UserNotificationsConnections match this filter */
+  NotificationsConnection_ALL?: InputMaybe<UserNotificationsConnectionWhere>;
+  /** Return Users where none of the related UserNotificationsConnections match this filter */
+  NotificationsConnection_NONE?: InputMaybe<UserNotificationsConnectionWhere>;
+  /** Return Users where one of the related UserNotificationsConnections match this filter */
+  NotificationsConnection_SINGLE?: InputMaybe<UserNotificationsConnectionWhere>;
+  /** Return Users where some of the related UserNotificationsConnections match this filter */
+  NotificationsConnection_SOME?: InputMaybe<UserNotificationsConnectionWhere>;
+  /** Return Users where all of the related Notifications match this filter */
+  Notifications_ALL?: InputMaybe<NotificationWhere>;
+  /** Return Users where none of the related Notifications match this filter */
+  Notifications_NONE?: InputMaybe<NotificationWhere>;
+  /** Return Users where one of the related Notifications match this filter */
+  Notifications_SINGLE?: InputMaybe<NotificationWhere>;
+  /** Return Users where some of the related Notifications match this filter */
+  Notifications_SOME?: InputMaybe<NotificationWhere>;
   OR?: InputMaybe<Array<UserWhere>>;
+  PendingModInvitesAggregate?: InputMaybe<UserPendingModInvitesAggregateInput>;
+  /** Return Users where all of the related UserPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_ALL?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+  /** Return Users where none of the related UserPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_NONE?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+  /** Return Users where one of the related UserPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_SINGLE?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+  /** Return Users where some of the related UserPendingModInvitesConnections match this filter */
+  PendingModInvitesConnection_SOME?: InputMaybe<UserPendingModInvitesConnectionWhere>;
+  /** Return Users where all of the related Channels match this filter */
+  PendingModInvites_ALL?: InputMaybe<ChannelWhere>;
+  /** Return Users where none of the related Channels match this filter */
+  PendingModInvites_NONE?: InputMaybe<ChannelWhere>;
+  /** Return Users where one of the related Channels match this filter */
+  PendingModInvites_SINGLE?: InputMaybe<ChannelWhere>;
+  /** Return Users where some of the related Channels match this filter */
+  PendingModInvites_SOME?: InputMaybe<ChannelWhere>;
+  PendingOwnerInvitesAggregate?: InputMaybe<UserPendingOwnerInvitesAggregateInput>;
+  /** Return Users where all of the related UserPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_ALL?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+  /** Return Users where none of the related UserPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_NONE?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+  /** Return Users where one of the related UserPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_SINGLE?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+  /** Return Users where some of the related UserPendingOwnerInvitesConnections match this filter */
+  PendingOwnerInvitesConnection_SOME?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
+  /** Return Users where all of the related Channels match this filter */
+  PendingOwnerInvites_ALL?: InputMaybe<ChannelWhere>;
+  /** Return Users where none of the related Channels match this filter */
+  PendingOwnerInvites_NONE?: InputMaybe<ChannelWhere>;
+  /** Return Users where one of the related Channels match this filter */
+  PendingOwnerInvites_SINGLE?: InputMaybe<ChannelWhere>;
+  /** Return Users where some of the related Channels match this filter */
+  PendingOwnerInvites_SOME?: InputMaybe<ChannelWhere>;
   PreferredTimeZone?: InputMaybe<Scalars['String']['input']>;
   PreferredTimeZone_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   PreferredTimeZone_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;

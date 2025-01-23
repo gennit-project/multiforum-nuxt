@@ -162,3 +162,17 @@ export const GET_CHANNEL_OWNERS_BY_CHANNEL = gql`
     }
   }
 `;
+
+export const GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL = gql`
+  query getPendingChannelOwnersByChannel($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      PendingOwnerInvites {
+        username
+        displayName
+        createdAt
+        profilePicURL
+      }
+    }
+  }
+`;

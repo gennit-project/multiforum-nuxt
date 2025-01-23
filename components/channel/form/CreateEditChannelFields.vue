@@ -73,6 +73,7 @@ const titleIsInvalid = computed(
   () => !isValidTitle(props.formValues?.uniqueName || "")
 );
 const touched = ref(false);
+
 </script>
 
 <template>
@@ -133,16 +134,14 @@ const touched = ref(false);
             </ul>
           </div>
           <div class="flex-1">
-            <keep-alive>
-              <NuxtPage
-                :touched="touched"
-                :title-is-invalid="titleIsInvalid"
-                :form-values="formValues"
-                :edit-mode="editMode"
-                @update-form-values="emit('updateFormValues', $event)"
-                @submit="$emit('submit', $event)"
-              />
-            </keep-alive>
+            <NuxtPage
+              :touched="touched"
+              :title-is-invalid="titleIsInvalid"
+              :form-values="formValues"
+              :edit-mode="editMode"
+              @update-form-values="emit('updateFormValues', $event)"
+              @submit="$emit('submit', $event)"
+            />
           </div>
         </div>
       </TailwindForm>

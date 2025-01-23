@@ -19,6 +19,7 @@ defineProps({
 
 <template>
   <button
+    type="button"
     :disabled="disabled"
     :class="[
       disabled

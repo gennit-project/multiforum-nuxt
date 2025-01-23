@@ -12,6 +12,7 @@ import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import { usernameVar } from "@/cache";
 import { ref, nextTick, defineProps, defineEmits } from "vue";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import { useMutation } from "@vue/apollo-composable";
 
 defineProps({
   formValues: {

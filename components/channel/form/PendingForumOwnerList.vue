@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { GET_CHANNEL_OWNERS_BY_CHANNEL } from "@/graphQLData/mod/queries";
+import { GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL } from "@/graphQLData/mod/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
 
@@ -13,7 +13,7 @@ const forumId = computed(() => {
 });
 
 const { result, loading, error } = useQuery(
-  GET_CHANNEL_OWNERS_BY_CHANNEL,
+  GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
   () => ({
     channelUniqueName: forumId.value,
   }),
@@ -21,9 +21,11 @@ const { result, loading, error } = useQuery(
     fetchPolicy: "cache-first",
   }
 );
-const admins = computed(() => result.value?.channels[0]?.Admins);
+const invites = computed(
+  () => result.value?.channels[0]?.PendingOwnerInvites ?? []
+);
 
-defineEmits(["click-remove-owner"]);
+defineEmits(["click-cancel-invite"]);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -37,38 +39,41 @@ defineEmits(["click-remove-owner"]);
     >
       This forum has no owners.
     </div>
-    <div v-if="admins && admins.length > 0" class="flex-col text-sm ">
+    <div
+      v-if="invites && invites.length > 0"
+      class="flex-col text-sm"
+    >
       <div
-        v-for="admin in admins"
-        :key="admin.username"
+        v-for="invite in invites"
+        :key="invite.username"
         class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
       >
         <nuxt-link
-          :to="{ name: 'u-username', params: { username: admin.username } }"
+          :to="{ name: 'u-username', params: { username: invite.username } }"
           class="flex items-center dark:text-white font-bold"
         >
           <AvatarComponent
-            :text="admin.username"
-            :src="admin.profilePicURL ?? ''"
+            :text="invite.username"
+            :src="invite.profilePicURL ?? ''"
             class="mr-2 h-6 w-6"
           />
           <UsernameWithTooltip
-            v-if="admin.username"
-            :username="admin.username"
-            :src="admin.profilePicURL ?? ''"
-            :display-name="admin.displayName ?? ''"
-            :comment-karma="admin.commentKarma ?? 0"
-            :discussion-karma="admin.discussionKarma ?? 0"
-            :account-created="admin.createdAt ?? ''"
+            v-if="invite.username"
+            :username="invite.username"
+            :src="invite.profilePicURL ?? ''"
+            :display-name="invite.displayName ?? ''"
+            :comment-karma="invite.commentKarma ?? 0"
+            :discussion-karma="invite.discussionKarma ?? 0"
+            :account-created="invite.createdAt ?? ''"
           />
         </nuxt-link>
 
         <button
           type="button"
           class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
-          @click="$emit('click-remove-owner', admin.username)"
+          @click="$emit('click-cancel-invite', invite.username)"
         >
-          Remove Owner
+          Cancel Invite
         </button>
       </div>
     </div>
