@@ -130,7 +130,7 @@ const filteredQuery = computed(() => {
                   <HighlightedSearchTerms
                     :text="title"
                     :search-input="searchInput"
-                    :classes="'font-medium text-base hover:underline dark:text-gray-100 dark:hover:text-gray-300'"
+                    :classes="'text-sm text-base hover:underline dark:text-gray-100 dark:hover:text-gray-300'"
                   />
                 </span>
               </nuxt-link>

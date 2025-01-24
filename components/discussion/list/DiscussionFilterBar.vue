@@ -129,7 +129,7 @@ const toggleSelectedTag = (tag: string) => {
 
 <template>
   <div>
-    <div class="flex items-center space-x-2 py-2">
+    <div class="flex flex-wrap items-center space-x-2 py-2">
       <FilterChip
         v-if="!isForumScoped"
         class="align-middle"
@@ -158,7 +158,6 @@ const toggleSelectedTag = (tag: string) => {
         :small="true"
         @update-search-input="updateSearchInput"
       />
-
       <FilterChip
         class="align-middle"
         :data-testid="'tag-filter-button'"

@@ -39,7 +39,7 @@ function handleClick(item: MenuItemType) {
       <div>
         <MenuButton
           :data-testid="`text-dropdown-${label}`"
-          class="inline-flex border dark:border-gray-600 hover:dark:bg-gray-600 h-10 w-full items-center justify-center gap-x-1.5 rounded-lg bg-white pr-4 pl-3 text-xs text-black hover:bg-gray-200 focus:outline-none dark:bg-gray-700 dark:text-white"
+          class="inline-flex border dark:border-gray-600 hover:dark:bg-gray-600 h-8 w-full items-center justify-center gap-x-1.5 rounded-lg bg-white pr-4 pl-3 text-xs text-black hover:bg-gray-200 focus:outline-none dark:bg-gray-700 dark:text-white"
         >
           <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
           {{ label }}
