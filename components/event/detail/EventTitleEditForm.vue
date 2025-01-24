@@ -132,7 +132,7 @@ const { theme } = useTheme()
       }}
     </p>
       </div>
-      <RequireAuth class="flex" :full-width="false">
+      <RequireAuth class="hidden md:block" :full-width="false">
         <template #has-auth>
           <div class="h-10 flex items-center">
           <GenericButton

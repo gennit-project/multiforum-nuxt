@@ -108,7 +108,7 @@ const formattedDate = computed(() => {
       <div v-else ref="discussionDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-xl md:text-2xl font-medium sm:tracking-tight"
+          class="text-wrap px-1 text-md md:text-2xl font-medium sm:tracking-tight"
         >
           {{ discussion && discussion.title ? discussion.title : "Couldn't find the discussion" }}
         </h2>
@@ -135,7 +135,7 @@ const formattedDate = computed(() => {
           }}
         </p>
       </div>
-      <RequireAuth class="flex justify-end" :full-width="false">
+      <RequireAuth class="hidden md:block" :full-width="false">
         <template #has-auth>
           <GenericButton
             v-if="!titleEditMode && authorIsLoggedInUser"

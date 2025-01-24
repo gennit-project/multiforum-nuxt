@@ -121,7 +121,7 @@ const renderedMarkdown = computed(() => {
 
   p,
   li {
-    font-size: 0.9rem !important;
+    font-size: 0.8rem !important;
     font-weight: 400 !important;
   }
   ul,

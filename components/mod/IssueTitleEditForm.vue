@@ -136,7 +136,7 @@ const formattedDate = computed(() => {
           </div>
         </div>
       </div>
-      <RequireAuth class="flex justify-end" :full-width="false">
+      <RequireAuth class="hidden md:block" :full-width="false">
         <template #has-auth>
           <GenericButton
             v-if="!titleEditMode && authorIsLoggedInUser"

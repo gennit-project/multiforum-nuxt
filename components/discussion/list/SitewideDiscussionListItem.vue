@@ -118,7 +118,7 @@ const relative = computed(() =>
       <div class="w-full">
         <div class="flex gap-2">
           <div
-            class="mr-2 flex items-center justify-center flex-start w-8 h-8 text-xl rounded-md bg-gray-100 dark:bg-gray-600"
+            class="mr-2 hidden md:flex md:items-center md:justify-center md:flex-start w-8 h-8 text-xl rounded-md bg-gray-100 dark:bg-gray-600"
           >
             💬
           </div>
@@ -145,7 +145,7 @@ const relative = computed(() =>
               </span>
             </nuxt-link>
             <div
-              class="font-sm flex flex-wrap items-center gap-1 text-sm text-gray-500 no-underline dark:text-gray-300"
+              class="text-xs flex flex-wrap items-center gap-1 text-sm text-gray-500 no-underline dark:text-gray-300"
             >
               <span>
                 {{ `Posted ${relative} by ` }}
@@ -163,7 +163,7 @@ const relative = computed(() =>
             </div>
             <button
               v-if="discussion && discussion.body && !showBody"
-              class="text-md text-gray-600 dark:text-gray-300 hover:underline"
+              class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
               @click="showBody = true"
             >
               <i
@@ -219,7 +219,7 @@ const relative = computed(() =>
                   discussion.DiscussionChannels[0].channelUniqueName
                 )
               "
-              class="flex items-center gap-2 pt-2 dark:text-white"
+              class="flex items-center gap-2 pt-2 dark:text-white text-xs"
             >
               <span>{{
                 `${commentCount} ${

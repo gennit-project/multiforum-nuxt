@@ -12,6 +12,7 @@ import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import { useRoute, useRouter } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { DateTime } from "luxon";
+import BackLink from "@/components/BackLink.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -26,14 +27,17 @@ const showIssueTitle = computed(() =>
   route.name?.toString().includes("forums-forumId-issues-issueId")
 );
 
+const showChannelTabs = computed(() => {
+  return (
+    !showDiscussionTitle.value && !showEventTitle.value && !showIssueTitle.value
+  );
+});
+
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
-const {
-  result: getChannelResult,
-  onResult: onGetChannelResult,
-} = useQuery(
+const { result: getChannelResult, onResult: onGetChannelResult } = useQuery(
   GET_CHANNEL,
   {
     uniqueName: channelId,
@@ -54,14 +58,14 @@ const addForumToLocalStorage = (channel: Channel) => {
   if (!import.meta.client) {
     return;
   }
-  let recentForums = 
+  let recentForums =
     JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
 
   const sideNavItem = {
     uniqueName: channelId.value,
     displayName: channel.displayName,
     channelIconURL: channel.channelIconURL,
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
 
   recentForums = recentForums.filter(
@@ -130,6 +134,7 @@ if (!channelId.value) {
         :show-create-button="true"
       >
         <ChannelTabs
+          v-if="showChannelTabs"
           class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
           :vertical="false"
           :show-counts="true"
@@ -144,6 +149,7 @@ if (!channelId.value) {
           class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
           <ChannelTabs
+            v-if="showChannelTabs"
             class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
             :vertical="false"
             :show-counts="true"
@@ -153,18 +159,28 @@ if (!channelId.value) {
             :desktop="false"
           />
 
-          <div v-if="showDiscussionTitle" class="flex w-full justify-center">
-            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+          <div v-if="showDiscussionTitle" class="flex w-full items-start gap-2">
+            <BackLink
+              class="mt-6"
+              :link="`/forums/${channelId}/discussions`"
+              :data-testid="'discussion-detail-back-link'"
+            />
+            <div class="max-w-screen-2xl flex-1 pr-3">
               <DiscussionTitleEditForm />
             </div>
           </div>
-          <div v-else-if="showEventTitle" class="flex w-full justify-center">
-            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+          <div v-else-if="showEventTitle" class="flex w-full items-start gap-2">
+            <BackLink
+              class="mt-6"
+              :link="`/forums/${channelId}/events`"
+              :data-testid="'event-detail-back-link'"
+            />
+            <div class="max-w-screen-2xl flex-1 pr-3">
               <EventTitleEditForm />
             </div>
           </div>
-          <div v-else-if="showIssueTitle" class="flex w-full justify-center">
-            <div class="max-w-screen-2xl flex-1 px-3 md:px-6">
+          <div v-else-if="showIssueTitle" class="flex w-full items-start gap-2">
+            <div class="max-w-screen-2xl flex-1 pr-3">
               <IssueTitleEditForm />
             </div>
           </div>
@@ -173,7 +189,7 @@ if (!channelId.value) {
             <div
               class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
-              <div class="flex-1 p-4 md:p-6 bg-white dark:bg-gray-800">
+              <div class="flex-1 p-0 md:p-6 bg-white dark:bg-gray-800">
                 <NuxtPage />
               </div>
               <aside

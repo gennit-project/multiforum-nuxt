@@ -37,10 +37,10 @@ defineProps({
         <div
           class="flex justify-between items-center border-b border-gray-200 py-2 dark:border-gray-600 pr-6"
         >
-          <div class="flex items-center w-full gap-4">
+          <div class="ml-3 flex items-center w-full gap-4">
             <ExpandableImage
               v-if="channel?.channelIconURL"
-              class="ml-6 h-14 w-14 dark:border-gray-800"
+              class="h-12 w-12 dark:border-gray-800"
               :rounded="true"
               :full-width="true"
               :alt="channelId"
@@ -48,7 +48,7 @@ defineProps({
             />
             <AvatarComponent
               v-if="!channel?.channelIconURL"
-              class="ml-6 h-14 w-14 dark:border-gray-800"
+              class="h-12 w-12 dark:border-gray-800"
               :text="channelId"
               :src="channel?.channelIconURL ?? ''"
               :full-width="true"

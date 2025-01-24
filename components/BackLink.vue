@@ -18,7 +18,7 @@ export default defineComponent({
     },
     text: {
       type: String,
-      default: "Back",
+      default: "",
     },
   },
   setup() {},
@@ -29,8 +29,9 @@ export default defineComponent({
   <nuxt-link
     :to="link"
     :data-testid="dataTestid"
-    class="inline-flex items-center text-xs gap-2 text-blue-500 hover:underline"
+    class="inline-flex text-xs gap-2 rounded-full items-center px-2 py-1 bg-gray-200 dark:bg-gray-800 dark:text-white"
   >
-    <LeftArrowIcon class="h-4 w-4" /> {{ text }}
+    <LeftArrowIcon class="h-4 w-4" />
+    <span v-if="text">{{ text }}</span>
   </nuxt-link>
 </template>

@@ -550,7 +550,7 @@ const lengthOfCommentInProgress = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800">
+  <div class="bg-white dark:bg-gray-800 pr-2">
     <div>
       <div class="align-items flex justify-between">
         <h2 id="comments" class="px-1 text-lg dark:text-white">
