@@ -37,34 +37,25 @@ export default defineComponent({
 </script>
 <template>
   <li>
-    <div class="flex items-center space-x-1">
+    <div class="flex items-center flex-wrap gap-1">
       <nuxt-link
         :data-testid="`comments-in-${channelId}`"
-        class="mr-1 underline"
+        class="underline"
         :to="{
           name: 'forums-forumId-discussions-discussionId',
-          params: {
-            discussionId,
-            forumId: channelId,
-          },
+          params: { discussionId, forumId: channelId },
         }"
       >
         {{ `${commentCount} comments` }}
       </nuxt-link>
-      and {{ upvoteCount || 0 }}
-      {{ upvoteCount === 1 ? "upvote" : "upvotes" }} in
+      <span>and {{ upvoteCount || 0 }} {{ upvoteCount === 1 ? "upvote" : "upvotes" }} in</span>
       <nuxt-link
         :to="{
           name: 'forums-forumId-discussions-discussionId',
-          params: {
-            discussionId,
-            forumId: channelId,
-          },
+          params: { discussionId, forumId: channelId },
         }"
       >
-        <div
-          class="flex items-center gap-3 rounded-md bg-gray-100 px-2 py-2 dark:bg-gray-700"
-        >
+        <div class="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-700">
           <AvatarComponent
             class="shadow-sm dark:border-gray-800"
             :text="channelId"
@@ -72,20 +63,9 @@ export default defineComponent({
             :is-small="true"
             :is-square="false"
           />
-          <div class="flex-col space-y-1 text-xs">
-            <div
-              v-if="channelDisplayName"
-              class="font-bold"
-            >
-              {{ channelDisplayName }}
-            </div>
-            <div
-              :class="[
-                channelDisplayName ? 'font-mono' : 'font-mono font-bold',
-              ]"
-            >
-              {{ channelId }}
-            </div>
+          <div class="flex flex-col text-xs">
+            <div v-if="channelDisplayName" class="font-bold">{{ channelDisplayName }}</div>
+            <div :class="[channelDisplayName ? 'font-mono' : 'font-mono font-bold']">{{ channelId }}</div>
           </div>
         </div>
       </nuxt-link>
