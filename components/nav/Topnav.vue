@@ -8,7 +8,7 @@ import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
-import { modProfileNameVar, usernameVar, sideNavIsOpenVar } from "@/cache";
+import { modProfileNameVar, usernameVar, sideNavIsOpenVar, notificationCountVar } from "@/cache";
 import { config } from "@/config";
 
 defineEmits(["toggleDropdown"]);
@@ -57,6 +57,7 @@ const isOnMapPage = computed(() => {
   }
   return false;
 });
+console.log('count', notificationCountVar.value)
 </script>
 
 <template>
@@ -124,6 +125,9 @@ const isOnMapPage = computed(() => {
             class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white"
           >
             <i class="fas fa-bell" />
+            <span v-if="notificationCountVar > 0" class="text-xs">
+              {{ notificationCountVar }}
+            </span>
           </nuxt-link>
           <ThemeSwitcher />
           <div v-if="usernameVar" class="hidden lg:block">

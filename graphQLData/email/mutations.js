@@ -6,6 +6,9 @@ export const GET_EMAIL = gql`
       address
       User {
         username
+        NotificationsAggregate {
+          count
+        }
       }
     }
   }
@@ -24,4 +27,3 @@ export const CREATE_EMAIL_AND_USER = gql`
     }
   }
 `;
-

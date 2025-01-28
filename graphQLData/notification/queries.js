@@ -4,7 +4,7 @@ export const GET_NOTIFICATIONS = gql`
   query getNotifications($username: String!) {
     users(where: { username: $username }) {
       username
-      Notifications {
+      Notifications(options: { sort: { createdAt: DESC } }) {
         id
         createdAt
         read

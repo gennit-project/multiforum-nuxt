@@ -16,6 +16,7 @@ import {
   setIsLoadingAuth,
   sideNavIsOpenVar,
   setSideNavIsOpenVar,
+  setNotificationCount,
 } from "@/cache";
 import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 import { config } from "@/config";
@@ -68,12 +69,14 @@ onMounted(() => {
 onResult((newResult) => {
   const userData = newResult?.data?.emails?.[0]?.User;
   const modProfileData = userData?.ModerationProfile;
+  console.log('userData', userData) 
 
   if (userData && !userData.loading) {
     setUsername(userData.username);
     setIsLoadingAuth(false);
     setIsAuthenticated(true);
     setModProfileName(modProfileData?.displayName || "");
+    setNotificationCount(userData.NotificationsAggregate?.count || 0);
   }
 });
 const emailDoesNotHaveUsernameAttached = computed(() => {

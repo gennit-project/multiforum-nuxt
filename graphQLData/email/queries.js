@@ -11,6 +11,9 @@ export const GET_EMAIL = gql`
         ModerationProfile {
           displayName
         }
+        NotificationsAggregate {
+          count
+        }
       }
     }
   }

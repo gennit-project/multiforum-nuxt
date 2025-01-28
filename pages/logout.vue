@@ -14,5 +14,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>Logging out...</div>
+  <NuxtLayout>
+    <div class="dark:bg-black dark:text-white">Logging out...</div>
+  </NuxtLayout>
 </template>

@@ -159,7 +159,7 @@ const filterByChannel = (channel: string) => {
 </script>
 
 <template>
-  <div class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800">
+  <div class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 lg:px-4">
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"

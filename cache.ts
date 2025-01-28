@@ -20,6 +20,11 @@ export const setIsLoadingAuth = (status: boolean) => {
   isLoadingAuthVar.value = status;
 };
 
+export const notificationCountVar = ref(0);
+export const setNotificationCount = (count: number) => {
+  notificationCountVar.value = count;
+};
+
 export const sideNavIsOpenVar = ref(false);
 export const setSideNavIsOpenVar = (status: boolean) => {
   // Necessary to prevent a bug in which the event list

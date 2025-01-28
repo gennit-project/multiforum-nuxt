@@ -25,6 +25,9 @@ export const GET_USER = gql`
       location
       pronouns
       bio
+      NotificationsAggregate {
+        count
+      }
       CommentsAggregate {
         count
       }

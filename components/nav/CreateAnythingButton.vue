@@ -105,7 +105,7 @@ const handleItemClick = (item: any) => {
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span class="flex items-center text-md text-blue-500"> {{ usePrimaryButton ? "Create" : "+" }}
+              <span class="flex items-center text-sm text-blue-500"> {{ usePrimaryButton ? "Create" : "+" }}
               </span>
               <ChevronDownIcon
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
@@ -154,7 +154,7 @@ const handleItemClick = (item: any) => {
             ]"
             data-testid="fake-create-anything-button"
           >
-            <span class="flex items-center text-md text-blue-500">
+            <span class="flex items-center text-sm text-blue-500">
               + {{ usePrimaryButton ? "Create" : "" }}
             </span>
             <ChevronDownIcon
@@ -176,7 +176,7 @@ const handleItemClick = (item: any) => {
         ]"
         data-testid="fake-create-anything-button"
       >
-        <span class="flex items-center text-md text-blue-500">
+        <span class="flex items-center text-sm text-blue-500">
           + {{ usePrimaryButton ? "Create" : "" }}
         </span>
         <ChevronDownIcon

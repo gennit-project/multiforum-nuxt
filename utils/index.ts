@@ -165,6 +165,10 @@ const pluralize = (number: number, word: string) => {
 };
 
 function timeAgo(jsDate: Date) {
+  // Throw an error if the input is not a Date object
+  if (!(jsDate instanceof Date)) {
+    throw new Error("Input must be a Date object");
+  }
   const then = DateTime.fromJSDate(jsDate);
   const now = DateTime.now();
   const diff = now.diff(then);
