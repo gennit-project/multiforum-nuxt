@@ -162,26 +162,24 @@ const handleClickChannel = (uniqueName: string) => {
 </script>
 
 <template>
-  <div class="flex justify-center">
-    <SitewideDiscussionList
-      v-if="!isForumScoped"
-      @filter-by-tag="handleClickTag"
-      @filter-by-channel="handleClickChannel"
-    >
-      <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
-    </SitewideDiscussionList>
-    <ChannelDiscussionList
-      v-else
-      :channel-id="channelId"
-      :search-input="filterValues.searchInput"
-      :selected-tags="filterValues.tags"
-      :selected-channels="filterValues.channels"
-      @filter-by-tag="handleClickTag"
-      @filter-by-channel="handleClickChannel"
-    >
-      <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
-    </ChannelDiscussionList>
-  </div>
+  <SitewideDiscussionList
+    v-if="!isForumScoped"
+    @filter-by-tag="handleClickTag"
+    @filter-by-channel="handleClickChannel"
+  >
+    <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
+  </SitewideDiscussionList>
+  <ChannelDiscussionList
+    v-else
+    :channel-id="channelId"
+    :search-input="filterValues.searchInput"
+    :selected-tags="filterValues.tags"
+    :selected-channels="filterValues.channels"
+    @filter-by-tag="handleClickTag"
+    @filter-by-channel="handleClickChannel"
+  >
+    <DiscussionFilterBar :is-forum-scoped="isForumScoped" />
+  </ChannelDiscussionList>
 </template>
 
 <style>

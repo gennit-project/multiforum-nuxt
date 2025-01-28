@@ -85,7 +85,7 @@ const filterChannelsByTag = (tag: string) => {
             <span class="my-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Admins</span>
           </div>
           
-          <div v-if="channel.Admins.length > 0" class="flex-col text-sm font-bold">
+          <div v-if="channel.Admins.length > 0" class="flex-col space-y-2 text-sm font-bold">
             <div v-for="admin in channel.Admins" :key="admin.username">
               <nuxt-link
                 :to="{ name: 'u-username', params: { username: admin.username } }"

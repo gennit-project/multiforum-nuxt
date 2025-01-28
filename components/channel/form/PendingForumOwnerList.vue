@@ -34,10 +34,11 @@ defineEmits(["click-cancel-invite"]);
     <div
       v-else-if="
         result?.channels?.length === 0 ||
-        result.channels[0]?.Admins?.length === 0
+        result.channels[0]?.PendingOwnerInvites?.length === 0
       "
+      class="text-sm"
     >
-      This forum has no owners.
+      This forum has no pending owner invites.
     </div>
     <div
       v-if="invites && invites.length > 0"

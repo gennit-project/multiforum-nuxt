@@ -176,3 +176,31 @@ export const GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL = gql`
     }
   }
 `;
+
+export const PENDING_FORUM_OWNER_INVITE_EXISTS = gql`
+  query pendingInviteExists($channelId: String!, $username: String!) {
+    channels(where: { uniqueName: $channelId }) {
+      uniqueName
+      PendingOwnerInvites(where: { username: $username }) {
+        username
+      }
+    }
+  }
+`;
+
+export const PENDING_FORUM_MOD_INVITE_EXISTS = gql`
+  query pendingModInviteExists($channelId: String!, $username: String!) {
+    channels(where: { uniqueName: $channelId }) {
+      uniqueName
+      PendingModInvites(where: { username: $username }) {
+        username
+      }
+    }
+  }
+`;
+
+export const ACCEPT_FORUM_OWNER_INVITE = gql`
+  mutation acceptInviteForumOwner($channelId: String!) {
+    acceptForumOwnerInvite(channelUniqueName: $channelId)
+  }
+`;

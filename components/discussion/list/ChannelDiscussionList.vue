@@ -70,9 +70,6 @@ const {
       timeFrame: activeTimeFrame,
     },
   },
-  {
-    fetchPolicy: "cache-first",
-  }
 );
 watch(
   () => usernameVar.value,

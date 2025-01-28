@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, onMounted } from "vue";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
 import TailwindForm from "@/components/FormComponent.vue";
-import { useRoute } from "nuxt/app";
+import { useRoute, useRouter } from "nuxt/app";
 
 const route = useRoute();
 const props = defineProps({
@@ -73,7 +73,19 @@ const titleIsInvalid = computed(
   () => !isValidTitle(props.formValues?.uniqueName || "")
 );
 const touched = ref(false);
+const router = useRouter();
 
+// On mounted, if no tab is selected, go to /basic
+onMounted(() => {
+  if (route.name === "forums-forumId-edit") {
+    router.push({
+      name: "forums-forumId-edit-basic",
+      params: {
+        forumId: props.formValues?.uniqueName,
+      },
+    })
+  }
+});
 </script>
 
 <template>

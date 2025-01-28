@@ -35,6 +35,7 @@ defineProps({
 // Nuxt route and router
 const route = useRoute();
 const router = useRouter();
+
 // Default filter labels
 const defaultFilterLabels = {
   channels: "All Forums",
@@ -156,6 +157,8 @@ const toggleSelectedTag = (tag: string) => {
         :search-placeholder="'Search'"
         :auto-focus="false"
         :small="true"
+        :left-side-is-rounded="false"
+        :right-side-is-rounded="false"
         @update-search-input="updateSearchInput"
       />
       <FilterChip
@@ -185,6 +188,8 @@ const toggleSelectedTag = (tag: string) => {
       :search-placeholder="'Search'"
       :auto-focus="false"
       :small="true"
+      :left-side-is-rounded="false"
+      :right-side-is-rounded="false"
       @update-search-input="updateSearchInput"
     />
   </div>

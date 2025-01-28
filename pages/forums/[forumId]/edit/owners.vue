@@ -109,7 +109,12 @@ const {
   },
 });
 
-const { mutate: removeForumOwner, loading: removeForumOwnerLoading } =
+const { 
+  mutate: removeForumOwner, 
+  loading: removeForumOwnerLoading,
+  onDone: removeForumOwnerDone,
+  error: removeForumOwnerError,
+} =
   useMutation(REMOVE_FORUM_OWNER, {
     update: (cache, { data }) => {
       console.log("Remove forum owner result", data);
@@ -149,7 +154,9 @@ inviteOwnerDone(() => {
   newOwnerUsername.value = "";
 });
 
-
+removeForumOwnerDone(() => {
+  showRemoveChannelOwnerModal.value = false;
+});
 
 const showCancelInviteModal = ref(false);
 const showRemoveChannelOwnerModal = ref(false);
@@ -220,6 +227,7 @@ const clickRemoveOwner = (ownerUsername: string) => {
       :open="showCancelInviteModal"
       :loading="cancelInviteOwnerLoading"
       :primary-button-text="'Yes, Cancel Invite'"
+      :error="cancelInviteOwnerError"
       @close="showCancelInviteModal = false"
       @primary-button-click="
         () =>
@@ -232,15 +240,16 @@ const clickRemoveOwner = (ownerUsername: string) => {
     <WarningModal
       data-testid="confirm-cancel-invite-modal"
       title="Confirm Remove Forum Owner"
-      :body="`Are you sure you want to remove ${newOwnerUsername} as a forum owner?`"
+      :body="`Are you sure you want to remove ${forumOwnerToRemove} as a forum owner?`"
       :open="showRemoveChannelOwnerModal"
       :loading="removeForumOwnerLoading"
       :primary-button-text="'Yes, Remove Owner'"
+      :error="removeForumOwnerError"
       @close="showRemoveChannelOwnerModal = false"
       @primary-button-click="
         () =>
           removeForumOwner({
-            inviteeUsername: forumOwnerToRemove,
+            username: forumOwnerToRemove,
             channelUniqueName: forumId,
           })
       "
