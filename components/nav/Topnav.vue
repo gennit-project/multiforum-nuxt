@@ -61,7 +61,7 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 w-full bg-gray-100 border-b dark:bg-gray-900"
+    class="z-20 w-full bg-gray-100 border-b dark:bg-gray-900 pr-4"
     :class="[isOnMapPage ? 'fixed' : '']"
   >
     <div class="flex items-center justify-between px-2 py-1 lg:px-4">
@@ -117,6 +117,14 @@ const isOnMapPage = computed(() => {
         </client-only>
         <div class="flex items-center space-x-2">
           <CreateAnythingButton />
+          <nuxt-link
+            data-testid="notification-bell"
+            to="/notifications"
+            sr-only="Notifications"
+            class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white"
+          >
+            <i class="fas fa-bell" />
+          </nuxt-link>
           <ThemeSwitcher />
           <div v-if="usernameVar" class="hidden lg:block">
             <div class="flex items-center">

@@ -116,12 +116,25 @@ const relative = computed(() =>
   >
     <div class="flex w-full justify-between">
       <div class="w-full">
-        <div class="flex gap-2">
-          <div
-            class="mr-2 hidden md:flex md:items-center md:justify-center md:flex-start w-8 h-8 text-xl rounded-md bg-gray-100 dark:bg-gray-600"
-          >
-            💬
+        <nuxt-link
+          v-if="discussion"
+          :to="
+            getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
+          "
+          class="-ml-0.5 mb-1 flex items-center gap-2 dark:text-white text-xs"
+        >
+          <div class="flex items-center text-blue-700 dark:text-white">
+            <AvatarComponent
+              :text="discussion.DiscussionChannels[0].channelUniqueName || ''"
+              :is-square="true"
+              class="mr-1 h-6 w-6"
+            />
+            <span>{{
+              discussion.DiscussionChannels[0].channelUniqueName || ""
+            }}</span>
           </div>
+        </nuxt-link>
+        <div class="flex gap-2">
           <div class="flex-1">
             <nuxt-link
               v-if="discussion"
@@ -193,7 +206,10 @@ const relative = computed(() =>
                 :disable-gallery="false"
                 class="-ml-2"
               />
-              <div v-if="discussion.Album" class="my-4 overflow-x-auto bg-black">
+              <div
+                v-if="discussion.Album"
+                class="my-4 overflow-x-auto bg-black"
+              >
                 <DiscussionAlbum
                   :album="discussion.Album"
                   :carousel-format="true"
@@ -222,29 +238,13 @@ const relative = computed(() =>
               class="flex items-center gap-2 pt-2 dark:text-white text-xs"
             >
               <span>{{
-                `${commentCount} ${
-                  commentCount === 1 ? "comment" : "comments"
-                } in `
+                `${commentCount} ${commentCount === 1 ? "comment" : "comments"}`
               }}</span>
-
-              <div
-                class="mr-2 flex items-center rounded-full bg-blue-100 pr-2 text-blue-700 dark:bg-gray-600 dark:text-white"
-              >
-                <AvatarComponent
-                  :text="
-                    discussion.DiscussionChannels[0].channelUniqueName || ''
-                  "
-                  class="mr-1 h-8 w-8"
-                />
-                <span>{{
-                  discussion.DiscussionChannels[0].channelUniqueName || ""
-                }}</span>
-              </div>
             </nuxt-link>
 
             <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
               <button
-                class="flex items-center rounded-md bg-gray-100 pb-2 px-4 pt-2 hover:bg-gray-200 dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white"
+                class="flex items-center rounded-md dark:text-white text-xs"
               >
                 <i class="fa-regular fa-comment mr-2 h-4 w-4" />
                 {{

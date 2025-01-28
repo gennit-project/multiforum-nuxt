@@ -65,7 +65,6 @@ const {
     sort: activeSort,
     timeFrame: activeTimeFrame,
   },
-  fetchPolicy: "cache-and-network",
 });
 
 const discussions = computed(() => {
