@@ -29,7 +29,6 @@ const notifications = computed<Notification[]>(() => {
   if (!notificationResult.value) {
     return [];
   }
-  console.log("result", notificationResult.value);
   const userData = notificationResult.value.users[0];
   if (!userData) {
     return [];

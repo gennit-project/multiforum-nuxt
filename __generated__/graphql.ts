@@ -19022,6 +19022,7 @@ export type MutationAddEmojiToDiscussionChannelArgs = {
 
 export type MutationCancelInviteForumModArgs = {
   channelUniqueName: Scalars['String']['input'];
+  inviteeUsername: Scalars['String']['input'];
 };
 
 

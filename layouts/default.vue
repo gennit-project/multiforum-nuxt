@@ -69,7 +69,6 @@ onMounted(() => {
 onResult((newResult) => {
   const userData = newResult?.data?.emails?.[0]?.User;
   const modProfileData = userData?.ModerationProfile;
-  console.log('userData', userData) 
 
   if (userData && !userData.loading) {
     setUsername(userData.username);

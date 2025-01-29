@@ -3,8 +3,11 @@ import { computed, ref } from "vue";
 import {
   PENDING_FORUM_OWNER_INVITE_EXISTS,
   PENDING_FORUM_MOD_INVITE_EXISTS,
-  ACCEPT_FORUM_OWNER_INVITE,
 } from "@/graphQLData/mod/queries";
+import {
+  ACCEPT_FORUM_OWNER_INVITE,
+  ACCEPT_FORUM_MOD_INVITE,
+} from "@/graphQLData/mod/mutations";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
@@ -25,13 +28,13 @@ const { result: pendingOwnerInviteResult } = useQuery(
   }
 );
 
-const {
-    result: pendingModInviteResult,
-} = useQuery(PENDING_FORUM_MOD_INVITE_EXISTS, {
+const { result: pendingModInviteResult } = useQuery(
+  PENDING_FORUM_MOD_INVITE_EXISTS,
+  {
     username: usernameVar.value,
     channelId: channelId.value,
-});
-
+  }
+);
 
 const {
   mutate: acceptForumOwnerInvite,
@@ -40,8 +43,14 @@ const {
   error: acceptForumOwnerInviteError,
 } = useMutation(ACCEPT_FORUM_OWNER_INVITE);
 
+const {
+  mutate: acceptForumModInvite,
+  loading: acceptForumModInviteLoading,
+  onDone: onDoneAcceptForumModInvite,
+  error: acceptForumModInviteError,
+} = useMutation(ACCEPT_FORUM_MOD_INVITE);
+
 const pendingOwnerInviteExists = computed(() => {
-  console.log("pendingInviteResult", pendingOwnerInviteResult.value);
   const channelData = pendingOwnerInviteResult.value?.channels[0];
   if (!channelData) {
     return false;
@@ -54,7 +63,6 @@ const pendingOwnerInviteExists = computed(() => {
 });
 
 const pendingModInviteExists = computed(() => {
-  console.log("pendingInviteResult", pendingModInviteResult.value);
   const channelData = pendingModInviteResult.value?.channels[0];
   if (!channelData) {
     return false;
@@ -72,9 +80,19 @@ const handleAcceptForumOwnerInvite = () => {
   });
 };
 
+const handleAcceptForumModInvite = () => {
+  acceptForumModInvite({
+    channelId: channelId.value,
+  });
+};
+
 const showSuccess = ref(false);
 
 onDoneAcceptForumOwnerInvite(() => {
+  showSuccess.value = true;
+});
+
+onDoneAcceptForumModInvite(() => {
   showSuccess.value = true;
 });
 </script>
@@ -108,11 +126,18 @@ onDoneAcceptForumOwnerInvite(() => {
         You have been invited to be a moderator of this forum.
       </p>
       <PrimaryButton
+        v-if="!showSuccess"
         class="mt-4"
         :label="'Accept Invite'"
-        @click="console.log('accept invite')"
+        :loading="acceptForumModInviteLoading"
+        @click="handleAcceptForumModInvite"
       />
+      <p v-else class="mt-4">Invite accepted!</p>
     </div>
     <p v-else>You have no pending invites for this forum.</p>
+    <ErrorBanner
+      v-if="acceptForumModInviteError"
+      :text="acceptForumModInviteError.message"
+    />
   </div>
 </template>

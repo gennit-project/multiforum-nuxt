@@ -33,7 +33,6 @@ const {
   onDone: inviteOwnerDone,
 } = useMutation(INVITE_FORUM_OWNER, {
   update: (cache, { data }) => {
-    console.log("Invite owner result", data);
     // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
     // to add the newly invited user
 
@@ -74,8 +73,7 @@ const {
   error: cancelInviteOwnerError,
   onDone: cancelInviteOwnerDone,
 } = useMutation(CANCEL_INVITE_FORUM_OWNER, {
-  update: (cache, { data }) => {
-    console.log("Cancel invite owner result", data);
+  update: (cache) => {
     // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
     // to add the newly invited user
 
@@ -116,8 +114,7 @@ const {
   error: removeForumOwnerError,
 } =
   useMutation(REMOVE_FORUM_OWNER, {
-    update: (cache, { data }) => {
-      console.log("Remove forum owner result", data);
+    update: (cache) => {
       // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
       // to remove the removed user
 

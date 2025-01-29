@@ -57,7 +57,6 @@ const isOnMapPage = computed(() => {
   }
   return false;
 });
-console.log('count', notificationCountVar.value)
 </script>
 
 <template>

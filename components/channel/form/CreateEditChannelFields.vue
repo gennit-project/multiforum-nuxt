@@ -63,7 +63,7 @@ const tabs = [
   },
   {
     key: "owners",
-    label: "Forum Owners",
+    label: "Forum Admins",
   },
 ];
 
