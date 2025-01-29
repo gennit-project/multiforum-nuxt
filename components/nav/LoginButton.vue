@@ -6,9 +6,8 @@ import { useRoute } from "nuxt/app";
 
 const { logout } = useAuth0();
 
-const route = useRoute();
-
 const handleLogout = () => {
+  const route = useRoute();
   // Store the current path in local storage
   localStorage.setItem("postLogoutRedirect", route.fullPath);
   // Redirect to the fixed logout route

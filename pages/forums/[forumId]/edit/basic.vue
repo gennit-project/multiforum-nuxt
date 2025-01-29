@@ -109,19 +109,11 @@ const handleImageChange = async (input: FileChangeInput) => {
         <TextInput
           ref="titleInputRef"
           :test-id="'title-input'"
-          :disabled="editMode"
+          :disabled="true"
           :value="formValues.uniqueName"
           :placeholder="'Add unique name with no spaces. Ex. forum_name'"
           :full-width="true"
-          @update="$emit('updateFormValues', { uniqueName: $event })"
         />
-        <CharCounter
-          :current="formValues.uniqueName?.length || 0"
-          :max="MAX_CHARS_IN_CHANNEL_NAME"
-        />
-        <p v-if="titleIsInvalid && touched" class="text-red-500 text-sm mt-2">
-          Title can only contain letters, numbers, and underscores.
-        </p>
       </template>
     </FormRow>
 

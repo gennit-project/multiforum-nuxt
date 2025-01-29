@@ -25,6 +25,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showButtonsInHeader: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const emit = defineEmits(["submit"]);
@@ -48,7 +52,7 @@ function handleCancel() {
           {{ props.formTitle }}
         </h2>
 
-        <div class="float-right">
+        <div v-if="showButtonsInHeader" class="float-right">
           <CancelButton
             v-if="!props.loading && props.showCancelButton"
             @click.prevent="handleCancel"

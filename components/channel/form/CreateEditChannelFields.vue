@@ -6,6 +6,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { CreateEditChannelFormValues } from "@/types/Channel";
 import TailwindForm from "@/components/FormComponent.vue";
 import { useRoute, useRouter } from "nuxt/app";
+import { MAX_CHARS_IN_CHANNEL_NAME } from "@/utils/constants";
 
 const route = useRoute();
 const props = defineProps({
@@ -75,15 +76,15 @@ const titleIsInvalid = computed(
 const touched = ref(false);
 const router = useRouter();
 
-// On mounted, if no tab is selected, go to /basic
+// On mounted, if in edit mode and no tab is selected, go to /basic
 onMounted(() => {
-  if (route.name === "forums-forumId-edit") {
+  if (props.editMode && route.name === "forums-forumId-edit") {
     router.push({
       name: "forums-forumId-edit-basic",
       params: {
         forumId: props.formValues?.uniqueName,
       },
-    })
+    });
   }
 });
 </script>
@@ -93,6 +94,7 @@ onMounted(() => {
     <div v-if="channelLoading">Loading...</div>
 
     <div>
+      <!-- Error Displays -->
       <div v-if="updateChannelError" class="mt-6">
         <ErrorBanner :text="updateChannelError.message" />
       </div>
@@ -112,11 +114,47 @@ onMounted(() => {
       </div>
 
       <TailwindForm
-        v-if="formValues"
-        :form-title="editMode ? 'Forum Settings' : 'Create a Forum'"
-        :description="'Forums are where you can start discussions and share content with others.'"
+        v-if="formValues && !editMode"
+        form-title="Create a Forum"
+        description="Forums are where you can start discussions and share content with others."
+        class="mt-4"
         :needs-changes="titleIsInvalid"
-        :loading="createChannelLoading || editChannelLoading"
+        :loading="createChannelLoading"
+        :show-buttons-in-header="false"
+        @input="touched = true"
+        @submit="emit('submit')"
+      >
+        <FormRow section-title="Forum Unique Name" :required="!editMode" class="mt-4">
+          <template #content>
+            <TextInput
+              ref="titleInputRef"
+              :test-id="'title-input'"
+              :disabled="false"
+              :value="formValues.uniqueName"
+              :placeholder="'Add unique name with no spaces. Ex. forum_name'"
+              :full-width="true"
+              @update="$emit('updateFormValues', { uniqueName: $event })"
+            />
+            <CharCounter
+              :current="formValues.uniqueName?.length || 0"
+              :max="MAX_CHARS_IN_CHANNEL_NAME"
+            />
+            <p
+              v-if="titleIsInvalid && touched"
+              class="text-red-500 text-sm mt-2"
+            >
+              Title can only contain letters, numbers, and underscores.
+            </p>
+          </template>
+        </FormRow>
+      </TailwindForm>
+
+      <TailwindForm
+        v-if="formValues && editMode"
+        form-title="Forum Settings"
+        description="Forums are where you can start discussions and share content with others."
+        :needs-changes="titleIsInvalid"
+        :loading="editChannelLoading"
         @input="touched = true"
         @submit="emit('submit')"
       >
@@ -136,9 +174,15 @@ onMounted(() => {
                 }"
                 class="py-2 cursor-pointer"
                 :class="{
-                  'dark:text-white border-r-2 border-blue-500': typeof route.name === 'string' && route.name?.includes(tab.key),
-                  'text-gray-900 ': typeof route.name === 'string' && route.name?.includes(tab.key),
-                  'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300': typeof route.name === 'string' && !route.name?.includes(tab.key),
+                  'dark:text-white border-r-2 border-blue-500':
+                    typeof route.name === 'string' &&
+                    route.name?.includes(tab.key),
+                  'text-gray-900 ':
+                    typeof route.name === 'string' &&
+                    route.name?.includes(tab.key),
+                  'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
+                    typeof route.name === 'string' &&
+                    !route.name?.includes(tab.key),
                 }"
               >
                 {{ tab.label }}
@@ -150,13 +194,14 @@ onMounted(() => {
               :touched="touched"
               :title-is-invalid="titleIsInvalid"
               :form-values="formValues"
-              :edit-mode="editMode"
+              :edit-mode="true"
               @update-form-values="emit('updateFormValues', $event)"
               @submit="$emit('submit', $event)"
             />
           </div>
         </div>
       </TailwindForm>
+
       <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
