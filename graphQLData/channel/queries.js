@@ -48,7 +48,7 @@ export const GET_CHANNEL = gql`
       EventChannelsAggregate(
         where: {
           NOT: { Event: null }
-          Event: { canceled: false, startTime_GT: $now }
+          Event: { canceled: false, endTime_GT: $now }
         }
       ) {
         count
@@ -75,7 +75,7 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
           { EventChannels_SOME: { channelUniqueName: $uniqueName } }
           {
             OR: [
-              { canceled: false, startTime_GT: $now }
+              { canceled: false, endTime_GT: $now }
               { canceled: false, startTime_LT: $now, endTime_GT: $now }
             ]
           }

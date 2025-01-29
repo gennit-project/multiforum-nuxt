@@ -103,7 +103,6 @@ function updateFormValues(data: ServerConfigUpdateInput) {
 <template>
   <div class="px-8">
     <RequireAuth :loading="getServerLoading">
-      {{ serverConfig }}
       <template #has-auth>
         <CreateEditServerFields
           :key="dataLoaded.toString()"
