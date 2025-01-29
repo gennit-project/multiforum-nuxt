@@ -8,7 +8,12 @@ import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
 import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
-import { modProfileNameVar, usernameVar, sideNavIsOpenVar, notificationCountVar } from "@/cache";
+import {
+  modProfileNameVar,
+  usernameVar,
+  sideNavIsOpenVar,
+  notificationCountVar,
+} from "@/cache";
 import { config } from "@/config";
 
 defineEmits(["toggleDropdown"]);
@@ -121,10 +126,13 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             sr-only="Notifications"
-            class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white"
+            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white"
           >
             <i class="fas fa-bell" />
-            <span v-if="notificationCountVar > 0" class="text-xs">
+            <span
+              v-if="notificationCountVar > 0"
+              class="absolute top-0 right-0 h-4 w-4 flex justify-center  items-center px-1 text-xs font-semibold leading-none text-white bg-red-500 rounded-full"
+            >
               {{ notificationCountVar }}
             </span>
           </nuxt-link>

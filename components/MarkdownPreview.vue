@@ -284,7 +284,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="w-full dark:text-white" @click="handleClick">
+  <div class="dark:text-white" @click="handleClick">
     <MarkdownRenderer
       :text="`${shownText}${!showFullText ? '...' : ''}`"
       :class="[{ clickable: !disableGallery }]"

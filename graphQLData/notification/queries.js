@@ -10,7 +10,9 @@ export const GET_NOTIFICATIONS = gql`
         read
         text
       }
-      NotificationsAggregate {
+      NotificationsAggregate (
+        where: { read: false }
+      ) {
         count
       }
     }

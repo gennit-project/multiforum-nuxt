@@ -25,7 +25,9 @@ export const GET_USER = gql`
       location
       pronouns
       bio
-      NotificationsAggregate {
+      NotificationsAggregate(
+        where: { read: false }
+      ) {
         count
       }
       CommentsAggregate {
@@ -287,89 +289,53 @@ export const GET_USERS = gql`
   }
 `;
 
-
 export const GET_MODDED_CHANNELS = gql`
-query getModdedChannels (
-  $username: String!,
-){
-  users (
-    where: {
-      username: $username
-    }
-  ){
-    username
-    ModOfChannels {
-      uniqueName
-      description
-      channelIconURL
-      Tags {
-        text
-      }
-      EventChannelsAggregate (
-        where: {
-          NOT: {
-            Event: null
-          }
+  query getModdedChannels($username: String!) {
+    users(where: { username: $username }) {
+      username
+      ModOfChannels {
+        uniqueName
+        description
+        channelIconURL
+        Tags {
+          text
         }
-      ){
+        EventChannelsAggregate(where: { NOT: { Event: null } }) {
+          count
+        }
+        DiscussionChannelsAggregate(where: { NOT: { Discussion: null } }) {
+          count
+        }
+      }
+      AdminOfChannelsAggregate {
         count
       }
-      DiscussionChannelsAggregate (
-        where: {
-          NOT: {
-            Discussion: null
-          }
-        }
-      ){
-        count
-      }
-    }
-    AdminOfChannelsAggregate {
-      count
     }
   }
-}
-`
+`;
 
 export const GET_OWNED_CHANNELS = gql`
-query getOwnedChannels (
-  $username: String!
-){
-  users (
-    where: {
-      username: $username
-    }
-  ){
-    username
-    AdminOfChannels {
-      uniqueName
-      description
-      channelIconURL
-      Tags {
-        text
-      }
-      EventChannelsAggregate (
-        where: {
-          NOT: {
-            Event: null
-          }
+  query getOwnedChannels($username: String!) {
+    users(where: { username: $username }) {
+      username
+      AdminOfChannels {
+        uniqueName
+        description
+        channelIconURL
+        Tags {
+          text
         }
-      ){
+        EventChannelsAggregate(where: { NOT: { Event: null } }) {
+          count
+        }
+        DiscussionChannelsAggregate(where: { NOT: { Discussion: null } }) {
+          count
+        }
+      }
+      AdminOfChannelsAggregate {
         count
       }
-      DiscussionChannelsAggregate (
-        where: {
-          NOT: {
-            Discussion: null
-          }
-        }
-      ){
-        count
-      }
-    }
-    AdminOfChannelsAggregate {
-      count
     }
   }
-}
-`
+`;
+

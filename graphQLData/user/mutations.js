@@ -42,3 +42,26 @@ export const CREATE_MOD_PROFILE = gql`
     }
   }
 `;
+
+export const MARK_NOTIFICATIONS_AS_READ = gql`
+  mutation markNotificationsAsRead($username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        Notifications: {
+          where: { node: { read: false } }
+          update: { node: { read: true } }
+        }
+      }
+    ) {
+      users {
+        username
+        Notifications {
+          text
+          read
+          createdAt
+        }
+      }
+    }
+  }
+`;

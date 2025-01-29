@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { GET_NOTIFICATIONS } from "@/graphQLData/notification/queries";
-import { useQuery } from "@vue/apollo-composable";
+import { useQuery, useMutation } from "@vue/apollo-composable";
 import { usernameVar } from "@/cache";
 import { timeAgo } from "@/utils";
 import type { Notification } from "@/__generated__/graphql";
-import MarkdownPreview from "../MarkdownPreview.vue";
+import MarkdownRenderer from "../MarkdownRenderer.vue";
+import { MARK_NOTIFICATIONS_AS_READ } from "@/graphQLData/user/mutations";
 
 const NOTIFICATION_PAGE_LIMIT = 15;
 
@@ -24,6 +25,12 @@ const {
     },
   },
 });
+
+const { 
+    mutate: markNotificationsAsRead,
+    loading: markNotificationsAsReadLoading,
+    error: markNotificationsAsReadError,
+} = useMutation(MARK_NOTIFICATIONS_AS_READ);
 
 const notifications = computed<Notification[]>(() => {
   if (!notificationResult.value) {
@@ -76,56 +83,81 @@ const loadMore = () => {
     },
   });
 };
+
+const markAllAsRead = () => {
+  markNotificationsAsRead({
+    username: usernameVar.value,
+  });
+};
 </script>
 
 <template>
-  <div class="flex justify-center">
-    <p v-if="notificationLoading">Loading...</p>
-    <ErrorBanner
-      v-else-if="notificationError"
-      class="max-w-5xl"
-      :text="notificationError.message"
-    />
-    <p
-      v-else-if="notifications && notifications.length === 0"
-      class="my-6 flex gap-2 px-4"
-    >
-      <span class="dark:text-white">There are no notifications to show.</span>
-    </p>
-    <div v-if="notifications && notifications.length > 0" class="p-0 max-w-5xl">
-      <h1 class="text-2xl mt-4 ml-4">Notifications</h1>
-      <ul
-        role="list"
-        class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 shadow sm:rounded-lg p-0 m-0 dark:text-gray-100"
-        data-testid="notification-list"
+  <div class="flex justify-center dak:text-white">
+    <div class="w-full max-w-5xl">
+      <p v-if="notificationLoading">Loading...</p>
+      <ErrorBanner
+        v-else-if="notificationError"
+        :text="notificationError.message"
+      />
+      <p
+        v-else-if="notifications && notifications.length === 0"
+        class="my-6 flex gap-2 px-4"
       >
-        <li
-          v-for="notification in notifications"
-          :key="notification.id"
-          class="p-4 flex-col"
-        >
-          <p class="text-gray-500 dark:text-gray-300 text-sm mb-2">{{ timeAgo(new Date(notification.createdAt)) }}</p>
-          <MarkdownPreview
-            v-if="notification.text" :text="notification.text" 
-            class="-ml-4"
-          />
-        </li>
-      </ul>
+        <span class="dark:text-white">There are no notifications to show.</span>
+      </p>
       <div
-        v-if="
-          aggregateNotificationCount >
-          notificationResult.users[0].Notifications.length
-        "
+        v-if="notifications && notifications.length > 0"
+        class="flex flex-col gap-2"
       >
-        <LoadMore
-          class="ml-4 justify-self-center"
-          :loading="notificationLoading"
-          :reached-end-of-results="
-            aggregateNotificationCount ===
+        <h1 class="text-2xl border border-b-gray-500 mt-4 mx-4 mb-2">Notifications</h1>
+        <p class="text-sm text-gray-500 dark:text-gray-300 mx-4">
+          You have {{ aggregateNotificationCount }} unread notifications
+        </p>
+        <div>
+          <GenericButton
+            class="mx-4"
+            :text="'Mark all as read'"
+            :loading="markNotificationsAsReadLoading"
+            @click="markAllAsRead"
+          />
+        </div>
+        <ErrorBanner v-if="markNotificationsAsReadError" :text="markNotificationsAsReadError.message" />
+        <ul
+          role="list"
+          class="flex-1 flex-col divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 dark:text-white shadow sm:rounded-lg"
+          data-testid="notification-list"
+        >
+          <li
+            v-for="notification in notifications"
+            :key="notification.id"
+            class="p-4"
+          >
+            <p class="text-gray-500 dark:text-gray-300 text-sm mb-2">
+              {{ timeAgo(new Date(notification.createdAt)) }} - {{ notification.read ? "Read" : "Unread" }}
+            </p>
+            <MarkdownRenderer
+              v-if="notification.text"
+              :text="notification.text"
+              class="w-full"
+            />
+          </li>
+        </ul>
+        <div
+          v-if="
+            aggregateNotificationCount >
             notificationResult.users[0].Notifications.length
           "
-          @load-more="loadMore"
-        />
+        >
+          <LoadMore
+            class="ml-4 justify-self-center"
+            :loading="notificationLoading"
+            :reached-end-of-results="
+              aggregateNotificationCount ===
+              notificationResult.users[0].Notifications.length
+            "
+            @load-more="loadMore"
+          />
+        </div>
       </div>
     </div>
   </div>

@@ -35,9 +35,14 @@ const md = new MarkdownIt({
   },
 });
 
-
 // Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
-md.renderer.rules.link_open = (tokens: any, idx: number, options: any, env: any, self: any) => {
+md.renderer.rules.link_open = (
+  tokens: any,
+  idx: number,
+  options: any,
+  env: any,
+  self: any
+) => {
   const token = tokens[idx];
   token.attrPush(["target", "_blank"]);
   token.attrPush(["rel", "noopener noreferrer"]);
@@ -71,11 +76,12 @@ const renderedMarkdown = computed(() => {
 
 <style lang="scss">
 .markdown-body {
-  padding-left: 20px;
+  padding: 0 1rem;
   padding-top: 1px;
   padding-bottom: 0.25rem !important;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  width: 100%;
 
   .external-link {
     display: inline-flex;
