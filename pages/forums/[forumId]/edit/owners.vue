@@ -194,6 +194,7 @@ const clickRemoveOwner = (ownerUsername: string) => {
           <PrimaryButton
             :label="'Invite'"
             :loading="inviteOwnerLoading"
+            :disabled="newOwnerUsername === ''"
             @click="() => inviteOwner({
               inviteeUsername: newOwnerUsername,
               channelUniqueName: forumId,

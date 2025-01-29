@@ -117,7 +117,6 @@ onMounted(() => {
         v-if="formValues && !editMode"
         form-title="Create a Forum"
         description="Forums are where you can start discussions and share content with others."
-        class="mt-4"
         :needs-changes="titleIsInvalid"
         :loading="createChannelLoading"
         :show-buttons-in-header="false"

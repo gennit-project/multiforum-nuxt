@@ -194,6 +194,7 @@ const clickRemoveMod = (modUsername: string) => {
           <PrimaryButton
             :label="'Invite'"
             :loading="inviteModLoading"
+            :disabled="!newModUsername"
             @click="() => inviteMod({
               inviteeUsername: newModUsername,
               channelUniqueName: forumId,
