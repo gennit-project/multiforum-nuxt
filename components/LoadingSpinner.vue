@@ -1,9 +1,5 @@
-<script lang="ts">
-import { defineComponent } from "vue";
+<script lang="ts" setup>
 
-export default defineComponent({
-  setup() {},
-});
 </script>
 
 <template>
@@ -11,26 +7,25 @@ export default defineComponent({
     <svg
       class="animate-spin h-4 w-4"
       xmlns="http://www.w3.org/2000/svg"
-      fill="none"
       viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="4"
     >
-      <circle
-        class="opacity-25"
-        cx="12"
-        cy="12"
-        r="10"
-        stroke="currentColor"
-        stroke-width="4"
-      />
-      <path
-        class="opacity-75"
-        fill="currentColor"
-        d="M4 12a8 8 0 0116 0H4z"
+      <circle 
+        cx="12" 
+        cy="12" 
+        r="10" 
+        stroke-dasharray="42"
+        stroke-dashoffset="12"
+        stroke-linecap="round"
       />
     </svg>
   </div>
 </template>
 
 <style scoped>
-/* You can add any additional styling here if needed */
+.animate-spin {
+  animation-duration: 1s;
+}
 </style>
