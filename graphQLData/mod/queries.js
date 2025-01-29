@@ -161,6 +161,8 @@ export const GET_CHANNEL_OWNERS_BY_CHANNEL = gql`
         displayName
         createdAt
         profilePicURL
+        commentKarma
+        discussionKarma
       }
     }
   }
@@ -175,6 +177,8 @@ export const GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL = gql`
         displayName
         createdAt
         profilePicURL
+        commentKarma
+        discussionKarma
       }
     }
   }
