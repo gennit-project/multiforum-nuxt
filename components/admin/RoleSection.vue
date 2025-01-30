@@ -3,7 +3,7 @@ import PermissionsList from "@/components/admin/PermissionsList.vue";
 defineProps({
   roleTitle: {
     type: String,
-    required: true
+    default: ''
   },
   roleDescription: {
     type: String,
@@ -21,11 +21,11 @@ defineProps({
 </script>
 <template>
   <div class="mb-6">
-    <h2 class="text-lg font-semibold border-b pb-2">
+    <h2 v-if="sectionTitle" class="text-lg font-semibold border-b pb-2">
       {{ sectionTitle }}
     </h2>
     <hr class="mb-4" >
-    <div class="bg-gray-50 dark:bg-gray-800 py-4 rounded-lg">
+    <div class="bg-gray-50 dark:bg-gray-800 py-2 rounded-lg">
       <h3 class="font-medium">
         {{ roleTitle }}
       </h3>

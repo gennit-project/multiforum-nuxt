@@ -10,17 +10,20 @@ export const GET_SERVER_CONFIG = gql`
         name
         description
       }
-      DefaultChannelRole {
-        name
-        description
-      }
       DefaultModRole {
         name
         description
       }
-      DefaultModChannelRole {
+      DefaultElevatedModRole {
         name
-        channelUniqueName
+      }
+      DefaultSuspendedRole {
+        name
+        description
+      }
+      DefaultSuspendedModRole {
+        name
+        description
       }
       rules
     }
@@ -31,38 +34,55 @@ export const GET_SERVER_PERMISSIONS = gql`
   query getServerConfig($serverName: String!) {
     serverConfigs(where: { serverName: $serverName }) {
       serverName
-      DefaultChannelRole {
-        name
-        description
-        canCreateComment
-        canCreateDiscussion
-        canCreateEvent
-        canUpdateChannel
-        canUploadFile
-        canUpvoteComment
-        canUpvoteDiscussion
-        showModTag
-      }
-      DefaultModChannelRole {
-        name
-        description
-        canGiveFeedback
-        canCloseSupportTickets
-        canHideComment
-        canHideDiscussion
-        canHideEvent
-        canReport
-        canOpenSupportTickets
-      }
       DefaultModRole {
         name
         description
+        canHideComment
+        canHideEvent
+        canHideDiscussion
         canGiveFeedback
-        canCloseSupportTickets
         canOpenSupportTickets
-        canLockChannel
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
+      DefaultElevatedModRole {
+        name
+        description
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
+      DefaultSuspendedModRole {
+        name
+        description
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
       }
       DefaultServerRole {
+        name
+        description
+        canUpvoteDiscussion
+        canUpvoteComment
+        canUploadFile
+        canGiveFeedback
+        canCreateEvent
+        canCreateDiscussion
+        canCreateComment
+        canCreateChannel
+      }
+      DefaultSuspendedRole {
         name
         description
         canUpvoteDiscussion

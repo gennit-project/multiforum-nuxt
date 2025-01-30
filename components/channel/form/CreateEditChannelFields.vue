@@ -66,6 +66,10 @@ const tabs = [
     key: "owners",
     label: "Forum Admins",
   },
+  {
+    key: "roles",
+    label: "Roles",
+  }
 ];
 
 const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);

@@ -8,14 +8,35 @@ const modServerRoles: ModServerRoleCreateInput[] = [
     canLockChannel: false,
     canOpenSupportTickets: true,
     canGiveFeedback: true,
+    canReport: true,
+    canSuspendUser: false,
+    canHideComment: false,
+    canHideEvent: false,
+    canHideDiscussion: false
   },
   {
-    name: "AdvancedModRole",
-    description: "Intended to be an advanced mod role for experienced users",
+    name: "DefaultElevatedModRole",
+    description: "A permissive role for trusted mods",
     canCloseSupportTickets: true,
-    canLockChannel: true,
     canOpenSupportTickets: true,
-    canGiveFeedback: true,
+    canReport: true,
+    canSuspendUser: true,
+    canHideComment: true,
+    canHideEvent: true,
+    canHideDiscussion: true,
+    canGiveFeedback: true
+  },
+  {
+    name: "DefaultSuspendedModRole",
+    description: "A role for suspended mods",
+    canCloseSupportTickets: false,
+    canOpenSupportTickets: false,
+    canReport: false,
+    canSuspendUser: false,
+    canHideComment: false,
+    canHideEvent: false,
+    canHideDiscussion: false,
+    canGiveFeedback: false
   }
 ];
 

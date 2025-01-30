@@ -27,8 +27,16 @@ const formatPermissionName = (name: string) => {
       ]"
       class="flex items-center"
     >
-      <CheckIcon v-if="value" class="w-4 h-4 text-green-500" />
-      <XmarkIcon v-else class="w-4 h-4 text-red-500" />
+      <CheckIcon
+        v-if="value"
+        class="w-4 h-4 text-green-500"
+        aria-label="Permission granted"
+      />
+      <XmarkIcon
+        v-else
+        class="w-4 h-4 text-red-500"
+        aria-label="Permission denied"
+      />
       <span class="ml-2 text-sm">{{ formatPermissionName(key) }}</span>
     </div>
   </div>

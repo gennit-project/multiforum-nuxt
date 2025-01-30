@@ -54,6 +54,27 @@ const serverConfig = computed(() => {
             :role-description="serverConfig.DefaultModRole.description"
             :permissions="serverConfig.DefaultModRole"
           />
+          <RoleSection
+            v-if="serverConfig.DefaultElevatedModRole"
+            :section-title="'Default Elevated Mod Role'"
+            :role-title="serverConfig.DefaultElevatedModRole.name"
+            :role-description="serverConfig.DefaultElevatedModRole.description"
+            :permissions="serverConfig.DefaultElevatedModRole"
+          />
+          <RoleSection
+            v-if="serverConfig.DefaultSuspendedRole"
+            :section-title="'Default Suspended Role'"
+            :role-title="serverConfig.DefaultSuspendedRole.name"
+            :role-description="serverConfig.DefaultSuspendedRole.description"
+            :permissions="serverConfig.DefaultSuspendedRole"
+          />
+          <RoleSection
+            v-if="serverConfig.DefaultSuspendedModRole"
+            :section-title="'Default Suspended Mod Role'"
+            :role-title="serverConfig.DefaultSuspendedModRole.name"
+            :role-description="serverConfig.DefaultSuspendedModRole.description"
+            :permissions="serverConfig.DefaultSuspendedModRole"
+          />
         </div>
       </template>
       <template #does-not-have-auth>
