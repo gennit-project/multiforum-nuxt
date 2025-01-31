@@ -1,28 +1,6 @@
 import { gql } from "@apollo/client/core";
 import { ISSUE_FIELDS } from "./queries";
 
-export const REPORT_CONTENT = gql`
-  mutation reportContent($input: [IssueCreateInput!]!) {
-    createIssues(input: $input) {
-      issues {
-        title
-        relatedDiscussionId
-        relatedCommentId
-        relatedEventId
-        channelUniqueName
-        Author {
-          ... on ModerationProfile {
-            displayName
-          }
-        }
-        Channel {
-          uniqueName
-        }
-      }
-    }
-  }
-`;
-
 export const CLOSE_ISSUE = gql`
   mutation closeIssue($id: ID!) {
     updateIssues(where: { id: $id }, update: { isOpen: false }) {
@@ -144,6 +122,66 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
       issues {
         ...IssueFields
       }
+    }
+  }
+`;
+
+export const REPORT_DISCUSSION = gql`
+  mutation reportDiscussion(
+    $discussionId: ID!
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String!
+  ) {
+    reportDiscussion(
+      discussionId: $discussionId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+    }
+  }
+`;
+
+export const REPORT_EVENT = gql`
+  mutation reportEvent(
+    $eventId: ID!
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String!
+  ) {
+    reportEvent(
+      eventId: $eventId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+    }
+  }
+`;
+
+export const REPORT_COMMENT = gql`
+  mutation reportComment(
+    $commentId: ID!
+    $reportText: String!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $channelUniqueName: String!
+  ) {
+    reportComment(
+      commentId: $commentId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
     }
   }
 `;

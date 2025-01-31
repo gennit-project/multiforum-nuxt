@@ -69,7 +69,15 @@ const tabs = [
   {
     key: "roles",
     label: "Roles",
-  }
+  },
+  {
+    key: "suspended-users",
+    label: "Suspended Users",
+  },
+  {
+    key: "suspended-mods",
+    label: "Suspended Mods",
+  },
 ];
 
 const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
@@ -127,7 +135,11 @@ onMounted(() => {
         @input="touched = true"
         @submit="emit('submit')"
       >
-        <FormRow section-title="Forum Unique Name" :required="!editMode" class="mt-4">
+        <FormRow
+          section-title="Forum Unique Name"
+          :required="!editMode"
+          class="mt-4"
+        >
           <template #content>
             <TextInput
               ref="titleInputRef"
@@ -179,13 +191,13 @@ onMounted(() => {
                 :class="{
                   'dark:text-white border-r-2 border-blue-500':
                     typeof route.name === 'string' &&
-                    route.name?.includes(tab.key),
+                    route.name?.includes(`edit-${tab.key}`),
                   'text-gray-900 ':
                     typeof route.name === 'string' &&
-                    route.name?.includes(tab.key),
+                    route.name?.includes(`edit-${tab.key}`),
                   'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
                     typeof route.name === 'string' &&
-                    !route.name?.includes(tab.key),
+                    !route.name?.includes(`edit-${tab.key}`),
                 }"
               >
                 {{ tab.label }}

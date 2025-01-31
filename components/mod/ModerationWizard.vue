@@ -139,7 +139,7 @@ const requestChangeMessage = computed(() => {
 </script>
 
 <template>
-  <div class="flex flex-col justify-center w-full">
+  <div class="flex flex-col justify-center w-full pt-12">
     <h1 class="text-xl font-bold">Moderation Wizard</h1>
     <hr>
     <div class="mt-6 flex justify-center space-y-4">

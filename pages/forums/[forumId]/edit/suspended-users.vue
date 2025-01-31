@@ -107,45 +107,44 @@ const {
   },
 });
 
-const { 
-  mutate: removeForumOwner, 
+const {
+  mutate: removeForumOwner,
   loading: removeForumOwnerLoading,
   onDone: removeForumOwnerDone,
   error: removeForumOwnerError,
-} =
-  useMutation(REMOVE_FORUM_OWNER, {
-    update: (cache) => {
-      // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
-      // to remove the removed user
+} = useMutation(REMOVE_FORUM_OWNER, {
+  update: (cache) => {
+    // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
+    // to remove the removed user
 
-      const existingData: any = cache.readQuery({
-        query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-        variables: {
-          channelUniqueName: forumId.value,
-        },
-      });
+    const existingData: any = cache.readQuery({
+      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
+      variables: {
+        channelUniqueName: forumId.value,
+      },
+    });
 
-      const existingOwners = existingData?.channels[0]?.Admins ?? [];
+    const existingOwners = existingData?.channels[0]?.Admins ?? [];
 
-      cache.writeQuery({
-        query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-        variables: {
-          channelUniqueName: forumId.value,
-        },
-        data: {
-          channels: [
-            {
-              Admins: [
-                ...existingOwners.filter(
-                  (owner: any) => owner.username !== newOwnerUsername.value
-                ),
-              ],
-            },
-          ],
-        },
-      });
-    },
-  });
+    cache.writeQuery({
+      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
+      variables: {
+        channelUniqueName: forumId.value,
+      },
+      data: {
+        channels: [
+          {
+            Admins: [
+              ...existingOwners.filter(
+                (owner: any) => owner.username !== newOwnerUsername.value
+              ),
+            ],
+          },
+        ],
+      },
+    });
+  },
+});
 
 inviteOwnerDone(() => {
   newOwnerUsername.value = "";
@@ -178,79 +177,28 @@ const clickRemoveOwner = (ownerUsername: string) => {
 
 <template>
   <div class="flex-col space-y-4 dark:text-white">
-    <FormRow section-title="Invite a New Admin">
-      <template #content>
-        <div class="w-full flex items-center gap-2">
-          <div class="w-full">
-            <TextInput
-              :test-id="'new-owner-input'"
-              :placeholder="'Enter the username of the new owner'"
-              :value="newOwnerUsername"
-              :full-width="true"
-              @update="newOwnerUsername = $event"
-            />
-          </div>
-
-          <PrimaryButton
-            :label="'Invite'"
-            :loading="inviteOwnerLoading"
-            :disabled="newOwnerUsername === ''"
-            @click="() => inviteOwner({
-              inviteeUsername: newOwnerUsername,
-              channelUniqueName: forumId,
-            })"
-          />
-        </div>
-        <ErrorBanner v-if="inviteOwnerError" :text="inviteOwnerError.message" />
-        <ErrorBanner
-          v-if="cancelInviteOwnerError"
-          :text="cancelInviteOwnerError.message"
-        />
-      </template>
-    </FormRow>
-    <FormRow section-title="Pending Invites">
-      <template #content>
-        <PendingForumOwnerList @click-cancel-invite="clickCancelInvite" />
-      </template>
-    </FormRow>
-    <FormRow section-title="Admin List">
+    <div class="mb-6">
+      <h1 class="text-xl font-bold mb-2">Suspended Users</h1>
+      <p class="text-gray-600 text-sm dark:text-gray-400">
+        {{ `These users have been suspended from ${forumId}.` }}
+      </p>
+      <ul
+        class="text-gray-600 text-sm dark:text-gray-400 list-disc ml-4 list-outside"
+      >
+        <li>
+          To un-suspend a user, click Related Issue and follow the provided
+          instructions.
+        </li>
+        <li>
+          To suspend a user, go to the rule-breaking comment or post and click
+          Suspend Mod in the action menu.
+        </li>
+      </ul>
+    </div>
+    <FormRow section-title="Suspended User List">
       <template #content>
         <ForumOwnerList @click-remove-owner="clickRemoveOwner" />
       </template>
     </FormRow>
-    <WarningModal
-      data-testid="confirm-cancel-invite-modal"
-      title="Confirm Cancel Invite"
-      :body="`Are you sure you want to cancel the invite to ${inviteeToRemove}?`"
-      :open="showCancelInviteModal"
-      :loading="cancelInviteOwnerLoading"
-      :primary-button-text="'Yes, Cancel Invite'"
-      :error="cancelInviteOwnerError"
-      @close="showCancelInviteModal = false"
-      @primary-button-click="
-        () =>
-          cancelInviteOwner({
-            inviteeUsername: inviteeToRemove,
-            channelUniqueName: forumId,
-          })
-      "
-    />
-    <WarningModal
-      data-testid="confirm-cancel-invite-modal"
-      title="Confirm Remove Forum Owner"
-      :body="`Are you sure you want to remove ${forumOwnerToRemove} as a forum owner?`"
-      :open="showRemoveChannelOwnerModal"
-      :loading="removeForumOwnerLoading"
-      :primary-button-text="'Yes, Remove Admin'"
-      :error="removeForumOwnerError"
-      @close="showRemoveChannelOwnerModal = false"
-      @primary-button-click="
-        () =>
-          removeForumOwner({
-            username: forumOwnerToRemove,
-            channelUniqueName: forumId,
-          })
-      "
-    />
   </div>
 </template>

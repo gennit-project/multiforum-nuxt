@@ -11,6 +11,10 @@ export default defineComponent({
       type: String,
       required: true,
     },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
   }
 });
 </script>
@@ -25,6 +29,7 @@ export default defineComponent({
     class="inline-flex py-2 px-4 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 whitespace-nowrap"
     @keydown.enter.prevent
   >
+    <LoadingSpinner v-if="loading" />
     <slot />
     {{ text }}
   </button>
