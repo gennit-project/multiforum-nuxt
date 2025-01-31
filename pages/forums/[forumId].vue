@@ -159,7 +159,7 @@ if (!channelId.value) {
             :desktop="false"
           />
 
-          <div v-if="showDiscussionTitle" class="flex w-full items-start gap-2">
+          <div v-if="showDiscussionTitle" class="flex w-full items-start gap-2 px-2">
             <BackLink
               class="mt-6"
               :link="`/forums/${channelId}/discussions`"

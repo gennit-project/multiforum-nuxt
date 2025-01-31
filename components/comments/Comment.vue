@@ -171,11 +171,21 @@ const canShowPermalink =
   props.commentData.GivesFeedbackOnComment ||
   props.commentData.Event ||
   props.commentData.Issue ||
-  (discussionId && forumId) ||
-  (eventId && forumId);
+  (issueId && forumId && props.commentData.id) ||  // For issue comments
+  (discussionId && forumId) || // For discussion comments
+  (eventId && forumId); // For event comments
 
 const permalinkObject = computed(() => {
+  console.log('canShowPermalink', canShowPermalink);
   if (!canShowPermalink) {
+    console.warn("No permalink object found for comment", props.commentData);
+    console.log({
+      issueId,
+      discussionId,
+      eventId,
+      forumId,
+      commentId: props.commentData.id,
+    })
     return {};
   }
   // This is the default comment permalink object
@@ -479,22 +489,26 @@ const label = computed(() => {
                     "
                     class="-ml-2 mt-2"
                     :class="[
-                      props.goToPermalinkOnClick ? 'cursor-pointer hover:text-gray-500 hover:bg-gray-100 hover:dark:bg-gray-700' : '',
+                      props.goToPermalinkOnClick
+                        ? 'cursor-pointer hover:text-gray-500 hover:bg-gray-100 hover:dark:bg-gray-700'
+                        : '',
                     ]"
                   >
                     <MarkdownPreview
+                      v-if="!goToPermalinkOnClick"
                       :key="textCopy || ''"
                       :text="textCopy || ''"
                       :word-limit="SHOW_MORE_THRESHOLD"
-                      :disable-gallery="props.goToPermalinkOnClick"
-                      @click="
-                        () => {
-                          if (props.goToPermalinkOnClick) {
-                            router.push(permalinkObject);
-                          }
-                        }
-                      "
+                      :disable-gallery="false"
                     />
+                    <router-link v-else :to="permalinkObject">
+                      <MarkdownPreview
+                        :key="textCopy || ''"
+                        :text="textCopy || ''"
+                        :word-limit="SHOW_MORE_THRESHOLD"
+                        :disable-gallery="true"
+                      />
+                    </router-link>
                   </div>
                   <TextEditor
                     v-if="showEditCommentForm"

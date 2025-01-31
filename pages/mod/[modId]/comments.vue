@@ -8,7 +8,6 @@ import Comment from "@/components/comments/Comment.vue";
 const PAGE_LIMIT = 25;
 
 const route = useRoute();
-
 const modProfileName = computed(() => {
   return typeof route.params.modId === "string" ? route.params.modId : "";
 });
@@ -43,7 +42,6 @@ const {
     fetchPolicy: "cache-first",
   }
 );
-
 
 const loadMore = () => {
   if (!commentResult.value?.moderationProfiles?.[0]?.AuthoredComments) return;
@@ -88,11 +86,7 @@ const comments = computed(() => {
     <ErrorBanner v-if="getModError">
       {{ getModError.message }}
     </ErrorBanner>
-    <div
-      v-else-if="commentCount === 0"
-    >
-      No comments yet
-    </div>
+    <div v-else-if="commentCount === 0">No comments yet</div>
     <Comment
       v-for="comment in comments"
       :key="comment.id"
