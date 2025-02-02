@@ -142,6 +142,8 @@ export const CREATE_DISCUSSION_CHANNEL = gql`
         channelUniqueName
         discussionId
         emoji
+        archived
+        locked
         Discussion {
           id
           title

@@ -56,7 +56,8 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
       body
       DiscussionChannels {
         id
-        id
+        archived
+        locked
         discussionId
         channelUniqueName
         CommentsAggregate {
@@ -112,6 +113,8 @@ export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
         Channel {
           uniqueName
         }
+        archived
+        locked
       }
       createdAt
       updatedAt

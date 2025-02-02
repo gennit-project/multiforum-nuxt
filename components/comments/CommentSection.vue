@@ -82,6 +82,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  locked: {
+    type: Boolean,
+    default: false,
+  },
   reachedEndOfResults: {
     type: Boolean,
     required: true,
@@ -141,7 +145,7 @@ const showCopiedLinkNotification = ref(false);
 const showModProfileModal = ref(false);
 const showOpenIssueModal = ref(false);
 const showSuccessfullyReported = ref(false);
-const locked = ref(false);
+const locked = ref(props.locked);
 
 const editFormValues = ref<CreateEditCommentFormValues>({
   text: commentToEdit.value?.text || "",
@@ -558,10 +562,10 @@ const lengthOfCommentInProgress = computed(() => {
         </h2>
         <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />
       </div>
-      <ErrorBanner
+      <InfoBanner
         v-if="locked"
         class="mr-10 mt-2"
-        :text="'This comment section is locked because the post was removed from the channel.'"
+        :text="'This comment section is locked because the post was removed from the forum.'"
       />
       <LoadingSpinner v-if="loading" class="ml-2" />
       <NuxtPage

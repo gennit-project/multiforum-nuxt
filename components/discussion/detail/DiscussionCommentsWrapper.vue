@@ -59,6 +59,11 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  locked: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const route = useRoute();
@@ -279,6 +284,7 @@ const decrementCommentCount = (cache: any) => {
     :create-comment-input="createCommentInput"
     :previous-offset="previousOffset"
     :original-poster="discussionAuthor"
+    :locked="locked"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

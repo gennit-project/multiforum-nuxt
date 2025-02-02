@@ -133,7 +133,6 @@ function toggleEmojiPicker() {
       class="flex flex-wrap items-center gap-1 text-xs"
     >
       <VoteButtons
-        v-if="!locked"
         :comment-data="commentData"
         :show-downvote="enableFeedback && !loggedInUserIsAuthor"
         :is-permalinked="isPermalinked"
@@ -149,6 +148,7 @@ function toggleEmojiPicker() {
         @toggle-emoji-picker="toggleEmojiPicker"
       />
       <ReplyButton
+        v-if="!locked"
         :show-reply-editor="!!replyFormOpenAtCommentID"
         :comment-data="commentData"
         :parent-comment-id="parentCommentId"

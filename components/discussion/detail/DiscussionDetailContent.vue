@@ -137,6 +137,21 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
   );
 });
 
+const isArchived = computed(() => {
+  return activeDiscussionChannel.value?.archived || false
+});
+
+const locked = computed(() => {
+  if (isArchived.value) {
+    // Archived means the mods hid this discussion from channel view.
+    // If that is the case, don't allow further comments.
+    return true;
+  }
+  // A locked discussion allows no further comments, but the mods
+  // may not archive it if they think the existing discussion has merit.
+  return activeDiscussionChannel.value?.locked || false;
+});
+
 const comments = computed(() =>
   getDiscussionChannelError.value
     ? []
@@ -270,6 +285,7 @@ const handleClickEditFeedback = () => {
 const handleClickEditDiscussionBody = () => {
   discussionBodyEditMode.value = true;
 };
+console.log('active discussionchannel is', activeDiscussionChannel.value)
 </script>
 
 <template>
@@ -285,6 +301,8 @@ const handleClickEditDiscussionBody = () => {
           class="mt-2 px-4"
           :text="getDiscussionError.message"
         />
+        <InfoBanner v-if="isArchived" text="This discussion is archived. New comments cannot be added." />
+        <InfoBanner v-else-if="locked" text="This discussion is locked. New comments cannot be added." />
         <v-row v-if="discussion" class="flex justify-center">
           <v-col>
             <div class="space-y-3 px-2">
@@ -345,6 +363,7 @@ const handleClickEditDiscussionBody = () => {
         </v-row>
         <div>
           <DiscussionRootCommentFormWrapper
+            v-if="activeDiscussionChannel && !isArchived && !locked"
             :key="`${channelId}${discussionId}`"
             class="pr-3"
             :channel-id="channelId"
@@ -352,6 +371,7 @@ const handleClickEditDiscussionBody = () => {
             :previous-offset="previousOffset"
             :mod-name="loggedInUserModName"
           />
+          
           <div class="mx-2 my-6 rounded-lg">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
@@ -363,6 +383,7 @@ const handleClickEditDiscussionBody = () => {
               :mod-name="loggedInUserModName"
               :reached-end-of-results="reachedEndOfResults"
               :previous-offset="previousOffset"
+              :locked="locked"
               @load-more="loadMore"
             />
           </div>

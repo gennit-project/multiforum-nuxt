@@ -63,6 +63,8 @@ export const GET_DISCUSSION_COMMENTS = gql`
         discussionId
         channelUniqueName
         emoji
+        archived
+        locked
         Channel {
           uniqueName
         }

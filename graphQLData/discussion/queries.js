@@ -167,6 +167,8 @@ export const GET_DISCUSSION = gql`
         discussionId
         channelUniqueName
         weightedVotesCount
+        archived
+        locked
         UpvotedByUsers {
           username
         }
