@@ -9,6 +9,10 @@ import EyeIcon from '@/components/icons/EyeIcon.vue'
 import PencilIcon from '@/components/icons/PencilIcon.vue'
 import TrashIcon from '@/components/icons/TrashIcon.vue'
 import XmarkIcon from '@/components/icons/XmarkIcon.vue'
+import ArchiveBox from "@/components/icons/ArchiveBox.vue";
+import UnarchiveBox from "@/components/icons/UnarchiveBox.vue";
+import UserPlus from "@/components/icons/UserPlus.vue";
+import UserMinus from "@/components/icons/UserMinus.vue";
 import type { Event, Tag as TagData } from "@/__generated__/graphql"
 
 const getTimePieces = (timeObj: DateTime) => {
@@ -385,6 +389,10 @@ const ALLOWED_ICONS = {
   DELETE: 'DELETE',
   CANCEL: 'CANCEL',
   UNDO: 'UNDO',
+  ARCHIVE: 'ARCHIVE',
+  UNARCHIVE: 'UNARCHIVE',
+  SUSPEND: 'SUSPEND',
+  UNSUSPEND: 'UNSUSPEND',
 }
 
 const actionIconMap = {
@@ -396,6 +404,10 @@ const actionIconMap = {
   [ALLOWED_ICONS.DELETE]: TrashIcon,
   [ALLOWED_ICONS.CANCEL]: XmarkIcon,
   [ALLOWED_ICONS.UNDO]: XmarkIcon,
+  [ALLOWED_ICONS.ARCHIVE]: ArchiveBox,
+  [ALLOWED_ICONS.UNARCHIVE]: UnarchiveBox,
+  [ALLOWED_ICONS.SUSPEND]: UserMinus,
+  [ALLOWED_ICONS.UNSUSPEND]: UserPlus,
 }
 
 export {

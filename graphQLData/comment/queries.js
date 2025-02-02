@@ -179,6 +179,7 @@ export const GET_DISCUSSION_CHANNEL_BY_ID = gql`
   query getDiscussionChannel($id: ID!) {
     discussionChannels(where: { id: $id }) {
       id
+      archived
       weightedVotesCount
       discussionId
       channelUniqueName

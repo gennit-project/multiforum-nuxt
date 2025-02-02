@@ -78,7 +78,7 @@ function updateFeedback(text: string) {
         :max="FEEDBACK_MAX_LENGTH"
         :min="FEEDBACK_MIN_LENGTH"
       />
-      <p class="mt-1 text-gray-600 dark:text-gray-400">
+      <p class="mt-1 text-gray-600 dark:text-gray-300 text-sm">
         Feedback is intended to be a helpful tool for the author. If you think
         the post should be removed, report it.
       </p>

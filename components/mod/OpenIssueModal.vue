@@ -10,6 +10,9 @@ import {
   REPORT_DISCUSSION,
   REPORT_EVENT,
   REPORT_COMMENT,
+  ARCHIVE_DISCUSSION,
+  ARCHIVE_EVENT,
+  ARCHIVE_COMMENT,
 } from "@/graphQLData/issue/mutations";
 import type { Comment } from "@/__generated__/graphql";
 import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
@@ -39,8 +42,21 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  archiveAfterReporting: {
+    type: Boolean,
+    default: false,
+  },
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
+  },
 });
-const emit = defineEmits(["close", "reportSubmittedSuccessfully"]);
+const emit = defineEmits([
+  "close",
+  "reportSubmittedSuccessfully",
+  "reportedAndArchivedSuccessfully",
+]);
 
 const route = useRoute();
 
@@ -57,7 +73,6 @@ const discussionId = computed(() => {
 const eventId = computed(() => {
   return typeof route.params.eventId === "string" ? route.params.eventId : "";
 });
-
 
 const selectedForumRules = ref<string[]>([]);
 const selectedServerRules = ref<string[]>([]);
@@ -104,6 +119,49 @@ const {
   onDone: reportCommentDone,
 } = useMutation(REPORT_COMMENT);
 
+const {
+  mutate: archiveDiscussion,
+  loading: archiveDiscussionLoading,
+  error: archiveDiscussionError,
+  onDone: archiveDiscussionDone,
+} = useMutation(ARCHIVE_DISCUSSION, {
+  update: (cache, { data }) => {
+    // update the result of GET_DISCUSSION_CHANNEL_BY_ID
+    // so that archived=true.
+
+    if (!props.discussionChannelId) {
+      console.error("No discussion channel ID provided.");
+      return;
+    }
+
+    cache.modify({
+      id: cache.identify({
+        __typename: "DiscussionChannel",
+        id: props.discussionChannelId,
+      }),
+      fields: {
+        archived() {
+          return true;
+        },
+      },
+    });
+  },
+});
+
+const {
+  mutate: archiveEvent,
+  loading: archiveEventLoading,
+  error: archiveEventError,
+  onDone: archiveEventDone,
+} = useMutation(ARCHIVE_EVENT);
+
+const {
+  mutate: archiveComment,
+  loading: archiveCommentLoading,
+  error: archiveCommentError,
+  onDone: archiveCommentDone,
+} = useMutation(ARCHIVE_COMMENT);
+
 reportDiscussionDone(() => {
   reportText.value = "";
   emit("reportSubmittedSuccessfully");
@@ -119,13 +177,35 @@ reportCommentDone(() => {
   emit("reportSubmittedSuccessfully");
 });
 
+archiveDiscussionDone(() => {
+  emit("reportedAndArchivedSuccessfully");
+});
+
+archiveEventDone(() => {
+  emit("reportedAndArchivedSuccessfully");
+});
+
+archiveCommentDone(() => {
+  emit("reportedAndArchivedSuccessfully");
+});
+
 const modalTitle = computed(() => {
-  if (props.commentId) {
-    return "Report Comment";
-  } else if (discussionId.value) {
-    return "Report Discussion";
-  } else if (eventId.value) {
-    return "Report Event";
+  if (props.archiveAfterReporting) {
+    if (props.commentId) {
+      return "Archive Comment";
+    } else if (discussionId.value) {
+      return "Archive Discussion";
+    } else if (eventId.value) {
+      return "Archive Event";
+    }
+  } else {
+    if (props.commentId) {
+      return "Report Comment";
+    } else if (discussionId.value) {
+      return "Report Discussion";
+    } else if (eventId.value) {
+      return "Report Event";
+    }
   }
   return "Report Content";
 });
@@ -155,40 +235,70 @@ const submit = async () => {
     console.error("No discussion, event, or comment ID provided.");
     return;
   }
-  if (discussionId.value) {
-    reportDiscussion({
-      discussionId: discussionId.value,
-      reportText: reportText.value,
-      selectedForumRules: selectedForumRules.value,
-      selectedServerRules: selectedServerRules.value,
-      channelUniqueName: channelId.value,
-    });
-  }
-  if (eventId.value) {
-    reportEvent({
-      eventId: eventId.value,
-      reportText: reportText.value,
-      selectedForumRules: selectedForumRules.value,
-      selectedServerRules: selectedServerRules.value,
-      channelUniqueName: channelId.value,
-    });
-  }
-  if (props.commentId) {
-    reportComment({
-      commentId: props.commentId,
-      reportText: reportText.value,
-      selectedForumRules: selectedForumRules.value,
-      selectedServerRules: selectedServerRules.value,
-      channelUniqueName: channelId.value,
-    });
+  if (!props.archiveAfterReporting) {
+    if (discussionId.value) {
+      reportDiscussion({
+        discussionId: discussionId.value,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+    }
+    if (eventId.value) {
+      reportEvent({
+        eventId: eventId.value,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+    }
+    if (props.commentId) {
+      reportComment({
+        commentId: props.commentId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+    }
+  } else {
+    // We don't have to call report mutations here because the reports
+    // are already built into the archive resolvers.
+    if (discussionId.value) {
+      archiveDiscussion({
+        discussionId: discussionId.value,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+    }
+    if (eventId.value) {
+      archiveEvent({
+        eventId: eventId.value,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+    }
+    if (props.commentId) {
+      archiveComment({
+        commentId: props.commentId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+    }
   }
 };
 
 const close = () => {
   emit("close");
 };
-
-
 </script>
 
 <template>
@@ -199,11 +309,25 @@ const close = () => {
     :open="open"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
-    :loading="reportDiscussionLoading || reportEventLoading || reportCommentLoading"
+    :loading="
+      reportDiscussionLoading ||
+      reportEventLoading ||
+      reportCommentLoading ||
+      archiveDiscussionLoading ||
+      archiveEventLoading ||
+      archiveCommentLoading
+    "
     :primary-button-disabled="
       selectedForumRules.length === 0 && selectedServerRules.length === 0
     "
-    :error="reportDiscussionError?.message || reportEventError?.message || reportCommentError?.message"
+    :error="
+      reportDiscussionError?.message ||
+      reportEventError?.message ||
+      reportCommentError?.message ||
+      archiveDiscussionError?.message ||
+      archiveEventError?.message ||
+      archiveCommentError?.message
+    "
     @primary-button-click="submit"
     @close="close"
   >

@@ -291,6 +291,7 @@ const handleClickEditDiscussionBody = () => {
               <div class="rounded-lg pb-2 dark:border-gray-700">
                 <DiscussionHeader
                   :discussion="discussion"
+                  :discussion-channel-id="activeDiscussionChannel?.id"
                   :channel-id="channelId"
                   :compact-mode="compactMode"
                   :discussion-body-edit-mode="discussionBodyEditMode"

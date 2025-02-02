@@ -146,6 +146,26 @@ export const REPORT_DISCUSSION = gql`
   }
 `;
 
+export const ARCHIVE_DISCUSSION = gql`
+  mutation archiveDiscussion(
+    $discussionId: ID!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $reportText: String!
+    $channelUniqueName: String!
+  ) {
+    archiveDiscussion(
+      discussionId: $discussionId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+    }
+  }
+`;
+
 export const REPORT_EVENT = gql`
   mutation reportEvent(
     $eventId: ID!
@@ -166,6 +186,26 @@ export const REPORT_EVENT = gql`
   }
 `;
 
+export const ARCHIVE_EVENT = gql`
+  mutation archiveEvent(
+    $eventId: ID!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $reportText: String!
+    $channelUniqueName: String!
+  ) {
+    archiveEvent(
+      eventId: $discussionId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+    }
+  }
+`;
+
 export const REPORT_COMMENT = gql`
   mutation reportComment(
     $commentId: ID!
@@ -175,6 +215,26 @@ export const REPORT_COMMENT = gql`
     $channelUniqueName: String!
   ) {
     reportComment(
+      commentId: $commentId
+      reportText: $reportText
+      selectedForumRules: $selectedForumRules
+      selectedServerRules: $selectedServerRules
+      channelUniqueName: $channelUniqueName
+    ) {
+      id
+    }
+  }
+`;
+
+export const ARCHIVE_COMMENT = gql`
+  mutation archiveComment(
+    $commentId: ID!
+    $selectedForumRules: [String!]!
+    $selectedServerRules: [String!]!
+    $reportText: String!
+    $channelUniqueName: String!
+  ) {
+    archiveComment(
       commentId: $commentId
       reportText: $reportText
       selectedForumRules: $selectedForumRules

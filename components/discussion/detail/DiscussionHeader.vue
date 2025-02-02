@@ -26,6 +26,11 @@ const props = defineProps({
     required: false,
     default: null,
   },
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
+  },
   compactMode: {
     type: Boolean,
     required: false,
@@ -139,8 +144,12 @@ const copyLink = async (event: any) => {
   }, 2000);
 };
 const deleteModalIsOpen = ref(false);
+
 const showOpenIssueModal = ref(false);
+const showArchiveModal = ref(false)
+
 const showSuccessfullyReported = ref(false);
+const showSuccessfullyArchived = ref(false);
 
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
@@ -192,6 +201,20 @@ const menuItems = computed(() => {
           icon: ALLOWED_ICONS.GIVE_FEEDBACK,
           value: props.discussion.id,
         },
+
+        // Only add these if mod permissions are elevated
+        {
+          label: "Archive",
+          event: "handleClickArchive",
+          icon: ALLOWED_ICONS.ARCHIVE,
+          value: props.discussion.id,
+        },
+        {
+          label: "Archive and Suspend",
+          event: "handleClickArchiveAndSuspend",
+          icon: ALLOWED_ICONS.SUSPEND,
+          value: props.discussion.id,
+        }
       ]);
     }
   }
@@ -272,6 +295,7 @@ const authorIsMod = computed(
           "
           @handle-delete="deleteModalIsOpen = true"
           @handle-click-report="showOpenIssueModal = true"
+          @handle-click-archive="showArchiveModal = true"
           @handle-feedback="emit('handleClickGiveFeedback')"
           @handle-view-feedback="
             router.push({
@@ -301,6 +325,7 @@ const authorIsMod = computed(
     <OpenIssueModal
       :open="showOpenIssueModal"
       :discussion-title="discussion?.title"
+      :archive-after-reporting="false"
       @close="showOpenIssueModal = false"
       @report-submitted-successfully="
         () => {
@@ -309,11 +334,29 @@ const authorIsMod = computed(
         }
       "
     />
+    <OpenIssueModal
+      :open="showArchiveModal"
+      :discussion-title="discussion?.title"
+      :archive-after-reporting="true"
+      :discussion-channel-id="discussionChannelId"
+      @close="showArchiveModal = false"
+      @reported-and-archived-successfully="
+        () => {
+          showSuccessfullyArchived = true;
+          showArchiveModal = false;
+        }
+      "
+    />
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
       @close-notification="showSuccessfullyReported = false"
     />
+    <Notification
+    :show="showSuccessfullyArchived"
+    :title="'The content was reported and archived successfully.'"
+    @close-notification="showSuccessfullyArchived = false"
+  />
     <ErrorBanner
       v-if="deleteDiscussionError"
       class="mt-2"

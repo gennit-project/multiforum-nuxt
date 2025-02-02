@@ -128,7 +128,7 @@ const formattedDate = computed(() => {
           :max="DISCUSSION_TITLE_CHAR_LIMIT"
         />
         <div v-if="!titleEditMode" class="flex items-center gap-2 mt-1">
-          <IssueBadge v-if="issue" :key="issue?.id" :issue="issue" />
+          <IssueBadge v-if="issue" :key="`${issue?.id}+${issue?.isOpen}`" :issue="issue" />
           <div v-if="issue" class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm">
             {{
               `First reported on ${formattedDate} by ${issue?.Author?.displayName || "[Deleted]"}`

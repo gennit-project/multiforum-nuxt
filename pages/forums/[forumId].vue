@@ -121,11 +121,13 @@ if (!channelId.value) {
       class="flex flex-col md:min-h-screen dark:bg-black bg-gray-100 dark:text-white"
     >
       <ChannelHeaderMobile
+        v-if="!showDiscussionTitle && !showEventTitle && !showIssueTitle"
         class="block md:hidden"
         :channel="channel"
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
+        v-if="!showDiscussionTitle && !showEventTitle && !showIssueTitle"
         class="hidden md:block"
         :channel="channel"
         :channel-id="channelId"
@@ -169,7 +171,7 @@ if (!channelId.value) {
               <DiscussionTitleEditForm />
             </div>
           </div>
-          <div v-else-if="showEventTitle" class="flex w-full items-start gap-2">
+          <div v-else-if="showEventTitle" class="flex w-full items-start gap-2 pl-3">
             <BackLink
               class="mt-6"
               :link="`/forums/${channelId}/events`"
@@ -179,7 +181,12 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
-          <div v-else-if="showIssueTitle" class="flex w-full items-start gap-2">
+          <div v-else-if="showIssueTitle" class="flex w-full items-start gap-2 px-2">
+            <BackLink
+              class="mt-6"
+              :link="`/forums/${channelId}/discussions`"
+              :data-testid="'discussion-detail-back-link'"
+            />
             <div class="max-w-screen-2xl flex-1 pr-3">
               <IssueTitleEditForm />
             </div>

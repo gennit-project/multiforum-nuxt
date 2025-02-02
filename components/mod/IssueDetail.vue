@@ -61,6 +61,19 @@ const { mutate: closeIssue } = useMutation(CLOSE_ISSUE, () => ({
     id: activeIssueId.value,
   },
   update(cache) {
+    // Get the issue in the cache by ID, then edit it so the isOpen field is false.
+    cache.modify({
+      id: cache.identify({
+        __typename: "Issue",
+        id: activeIssueId.value,
+      }),
+      fields: {
+        isOpen() {
+          return false;
+        },
+      },
+    });
+
     // update the result of COUNT_CLOSED_ISSUES
     // to increment the count of closed issues
     const existingClosedIssuesData = cache.readQuery({
@@ -181,6 +194,18 @@ const { mutate: reopenIssue } = useMutation(REOPEN_ISSUE, () => ({
     id: activeIssueId.value,
   },
   update(cache) {
+    // Get the issue in the cache by ID, then edit it so the isOpen field is true.
+    cache.modify({
+      id: cache.identify({
+        __typename: "Issue",
+        id: activeIssueId.value,
+      }),
+      fields: {
+        isOpen() {
+          return true;
+        },
+      },
+    });
     // update the result of COUNT_CLOSED_ISSUES
     // to decrement the count of closed issues
     const existingClosedIssuesData = cache.readQuery({
