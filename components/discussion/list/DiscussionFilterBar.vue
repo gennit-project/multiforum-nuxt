@@ -69,6 +69,7 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
+      console.log('route.query', route.query);
       filterValues.value = getFilterValuesFromParams({
         route,
         channelId: channelId.value,
@@ -81,7 +82,7 @@ const setSelectedChannels = (channels: string[]) => {
   updateFilters({
     router,
     route,
-    params: { channels }
+    params: { channels },
   });
 };
 
@@ -89,7 +90,7 @@ const setSelectedTags = (tags: string[]) => {
   updateFilters({
     router,
     route,
-    params: { tags }
+    params: { tags },
   });
 };
 
@@ -97,7 +98,7 @@ const updateSearchInput = (searchInput: string) => {
   updateFilters({
     router,
     route,
-    params: { searchInput }
+    params: { searchInput },
   });
 };
 
@@ -126,32 +127,75 @@ const toggleSelectedTag = (tag: string) => {
   }
   setSelectedTags(filterValues.value.tags);
 };
+
+const updateShowArchived = (event: Event) => {
+  const checkbox = event.target as HTMLInputElement;
+  updateFilters({
+    router,
+    route,
+    params: { showArchived: checkbox.checked },
+  });
+};
 </script>
 
 <template>
   <div>
-    <div class="flex flex-wrap items-center space-x-2 py-2">
-      <FilterChip
-        v-if="!isForumScoped"
-        class="align-middle"
-        :data-testid="'forum-filter-button'"
-        :label="channelLabel"
-        :highlighted="filterValues.channels && filterValues.channels.length > 0"
-      >
-        <template #icon>
-          <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
-        </template>
-        <template #content>
-          <div class="relative w-96">
-            <SearchableForumList
-              :selected-channels="filterValues.channels"
-              @toggle-selection="toggleSelectedChannel"
-            />
-          </div>
-        </template>
-      </FilterChip>
+    <div>
+      <div class="flex flex-wrap items-center space-x-2 py-2">
+        <FilterChip
+          v-if="!isForumScoped"
+          class="align-middle"
+          :data-testid="'forum-filter-button'"
+          :label="channelLabel"
+          :highlighted="
+            filterValues.channels && filterValues.channels.length > 0
+          "
+        >
+          <template #icon>
+            <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          </template>
+          <template #content>
+            <div class="relative w-96">
+              <SearchableForumList
+                :selected-channels="filterValues.channels"
+                @toggle-selection="toggleSelectedChannel"
+              />
+            </div>
+          </template>
+        </FilterChip>
+        <SearchBar
+          class="hidden md:block"
+          data-testid="discussion-filter-search-bar"
+          :initial-value="filterValues.searchInput"
+          :search-placeholder="'Search'"
+          :auto-focus="false"
+          :small="true"
+          :left-side-is-rounded="false"
+          :right-side-is-rounded="false"
+          @update-search-input="updateSearchInput"
+        />
+        <FilterChip
+          class="align-middle"
+          :data-testid="'tag-filter-button'"
+          :label="tagLabel"
+          :highlighted="tagLabel !== defaultFilterLabels.tags"
+        >
+          <template #icon>
+            <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+          </template>
+          <template #content>
+            <div class="relative w-96">
+              <SearchableTagList
+                :selected-tags="filterValues.tags"
+                @toggle-selection="toggleSelectedTag"
+              />
+            </div>
+          </template>
+        </FilterChip>
+        <SortButtons />
+      </div>
       <SearchBar
-        class="hidden md:block"
+        class="block md:hidden"
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search'"
@@ -161,36 +205,16 @@ const toggleSelectedTag = (tag: string) => {
         :right-side-is-rounded="false"
         @update-search-input="updateSearchInput"
       />
-      <FilterChip
-        class="align-middle"
-        :data-testid="'tag-filter-button'"
-        :label="tagLabel"
-        :highlighted="tagLabel !== defaultFilterLabels.tags"
-      >
-        <template #icon>
-          <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
-        </template>
-        <template #content>
-          <div class="relative w-96">
-            <SearchableTagList
-              :selected-tags="filterValues.tags"
-              @toggle-selection="toggleSelectedTag"
-            />
-          </div>
-        </template>
-      </FilterChip>
-      <SortButtons />
     </div>
-    <SearchBar
-      class="block md:hidden"
-      data-testid="discussion-filter-search-bar"
-      :initial-value="filterValues.searchInput"
-      :search-placeholder="'Search'"
-      :auto-focus="false"
-      :small="true"
-      :left-side-is-rounded="false"
-      :right-side-is-rounded="false"
-      @update-search-input="updateSearchInput"
-    />
+
+    <div class="flex items-center justify-end gap-2 py-2 dark:text-gray-300">
+      <CheckBox
+        data-testid="show-archived-discussions"
+        class="align-middle"
+        :checked="filterValues.showArchived"
+        @input="updateShowArchived"
+      />
+      Show archived discussions
+    </div>
   </div>
 </template>

@@ -20558,6 +20558,9 @@ export type Mutation = {
   seedDataForCypressTests?: Maybe<SeedDataResponse>;
   suspendMod?: Maybe<Issue>;
   suspendUser?: Maybe<Issue>;
+  unarchiveComment?: Maybe<Issue>;
+  unarchiveDiscussion?: Maybe<Issue>;
+  unarchiveEvent?: Maybe<Issue>;
   undoUpvoteComment?: Maybe<Comment>;
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
   updateAlbums: UpdateAlbumsMutationResponse;
@@ -21225,6 +21228,26 @@ export type MutationSuspendModArgs = {
 
 export type MutationSuspendUserArgs = {
   issueId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnarchiveCommentArgs = {
+  commentId: Scalars['ID']['input'];
+  explanation?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUnarchiveDiscussionArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  discussionId: Scalars['ID']['input'];
+  explanation?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationUnarchiveEventArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  eventId: Scalars['ID']['input'];
+  explanation?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -22151,6 +22174,7 @@ export type QueryGetDiscussionsInChannelArgs = {
   options?: InputMaybe<DiscussionListOptions>;
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  showArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 
@@ -22167,6 +22191,7 @@ export type QueryGetSiteWideDiscussionListArgs = {
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedChannels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  showArchived?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 

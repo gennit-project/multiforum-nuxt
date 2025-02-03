@@ -12,5 +12,6 @@ export type SearchDiscussionValues = {
     tags?: Array<string>
     channels?: Array<string>
     searchInput?: string;
+    showArchived?: boolean;
   };
   

@@ -13,6 +13,7 @@ export type UpdateStateInput = {
   showCanceledEvents?: boolean;
   showOnlyFreeEvents?: boolean;
   locationFilter?: LocationFilterTypes;
+  showArchived?: boolean;
 };
 
 type UpdateFiltersInput = {

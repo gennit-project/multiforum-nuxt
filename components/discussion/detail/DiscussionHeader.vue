@@ -51,6 +51,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  discussionIsArchived: {
+    type: Boolean || undefined || null,
+    // boolean or undefined or null
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -146,7 +151,7 @@ const copyLink = async (event: any) => {
 const deleteModalIsOpen = ref(false);
 
 const showOpenIssueModal = ref(false);
-const showArchiveModal = ref(false)
+const showArchiveModal = ref(false);
 
 const showSuccessfullyReported = ref(false);
 const showSuccessfullyArchived = ref(false);
@@ -201,21 +206,34 @@ const menuItems = computed(() => {
           icon: ALLOWED_ICONS.GIVE_FEEDBACK,
           value: props.discussion.id,
         },
-
-        // Only add these if mod permissions are elevated
-        {
-          label: "Archive",
-          event: "handleClickArchive",
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: props.discussion.id,
-        },
-        {
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: props.discussion.id,
-        }
       ]);
+      // Only add these if mod permissions are elevated
+      console.log('is archived', props.discussionIsArchived)
+      if (!props.discussionIsArchived) {
+        out = out.concat([
+          {
+            label: "Archive",
+            event: "handleClickArchive",
+            icon: ALLOWED_ICONS.ARCHIVE,
+            value: props.discussion.id,
+          },
+          {
+            label: "Archive and Suspend",
+            event: "handleClickArchiveAndSuspend",
+            icon: ALLOWED_ICONS.SUSPEND,
+            value: props.discussion.id,
+          },
+        ]);
+      } else {
+        out = out.concat([
+          {
+            label: "Unarchive",
+            event: "handleClickUnarchive",
+            icon: ALLOWED_ICONS.UNARCHIVE,
+            value: props.discussion.id,
+          },
+        ]);
+      }
     }
   }
   return out;
@@ -353,10 +371,10 @@ const authorIsMod = computed(
       @close-notification="showSuccessfullyReported = false"
     />
     <Notification
-    :show="showSuccessfullyArchived"
-    :title="'The content was reported and archived successfully.'"
-    @close-notification="showSuccessfullyArchived = false"
-  />
+      :show="showSuccessfullyArchived"
+      :title="'The content was reported and archived successfully.'"
+      @close-notification="showSuccessfullyArchived = false"
+    />
     <ErrorBanner
       v-if="deleteDiscussionError"
       class="mt-2"

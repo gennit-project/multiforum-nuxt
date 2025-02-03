@@ -23,6 +23,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
     $channelUniqueName: String!
     $searchInput: String!
     $selectedTags: [String!]
+    $showArchived: Boolean!
     $options: DiscussionListOptions
   ) {
     getDiscussionsInChannel(
@@ -30,6 +31,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
       options: $options
       selectedTags: $selectedTags
       searchInput: $searchInput
+      showArchived: $showArchived
     ) {
       aggregateDiscussionChannelsCount
       discussionChannels {
@@ -50,6 +52,8 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
         UpvotedByUsersAggregate {
           count
         }
+        locked
+        archived
         Discussion {
           id
           title
@@ -86,12 +90,14 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
     $searchInput: String!
     $selectedChannels: [String!]
     $selectedTags: [String!]
+    $showArchived: Boolean!
     $options: DiscussionListOptions
   ) {
     getSiteWideDiscussionList(
       searchInput: $searchInput
       selectedChannels: $selectedChannels
       selectedTags: $selectedTags
+      showArchived: $showArchived
       options: $options
     ) {
       aggregateDiscussionCount
@@ -110,6 +116,8 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           channelUniqueName
           discussionId
           weightedVotesCount
+          archived
+          locked
           UpvotedByUsers {
             username
           }

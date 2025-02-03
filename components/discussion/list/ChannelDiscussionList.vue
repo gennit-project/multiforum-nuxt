@@ -30,6 +30,7 @@ const filterValues = ref(
     channelId: channelId.value,
   })
 );
+console.log("filterValues", filterValues.value);
 
 const activeSort = computed(() => {
   return getSortFromQuery(route.query);
@@ -51,6 +52,10 @@ const selectedChannels = computed(() => {
   return filterValues.value.channels;
 });
 
+const showArchived = computed(() => {
+  return filterValues.value.showArchived;
+});
+
 const {
   result: discussionChannelResult,
   error: discussionError,
@@ -63,6 +68,7 @@ const {
     channelUniqueName: channelId,
     searchInput,
     selectedTags,
+    showArchived,
     options: {
       limit: DISCUSSION_PAGE_LIMIT,
       offset: 0,

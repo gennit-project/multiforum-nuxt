@@ -122,7 +122,7 @@ const filteredQuery = computed(() => {
                   },
                   query: filteredQuery,
                 }"
-                class="w-full"
+                class="w-full flex items-center gap-2"
               >
                 <span
                   class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
@@ -133,6 +133,11 @@ const filteredQuery = computed(() => {
                     :classes="'text-sm text-base hover:underline dark:text-gray-100 dark:hover:text-gray-300'"
                   />
                 </span>
+                <span
+                  v-if="discussionChannel.archived"
+                  class="text-xs text-red-500 dark:text-red-400 border border-red-500 dark:border-red-400 rounded-full px-2"
+                  >Archived</span
+                >
               </nuxt-link>
               <div
                 class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"

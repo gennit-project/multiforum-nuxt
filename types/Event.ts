@@ -89,4 +89,5 @@ export type SearchEventValues = {
   free?: boolean;
   resultsOrder?: any;
   hasVirtualEventUrl?: boolean;
+  showArchived?: boolean;
 };

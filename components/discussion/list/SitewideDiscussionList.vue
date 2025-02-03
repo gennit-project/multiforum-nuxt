@@ -59,6 +59,7 @@ const {
   searchInput: searchInputComputed,
   selectedChannels: selectedChannelsComputed,
   selectedTags: selectedTagsComputed,
+  showArchived: false,
   options: {
     limit: DISCUSSION_PAGE_LIMIT,
     offset: 0,

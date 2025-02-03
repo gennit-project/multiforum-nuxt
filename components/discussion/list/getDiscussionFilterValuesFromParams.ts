@@ -16,6 +16,7 @@ export const getFilterValuesFromParams = function (
     tags: [],
     channels: channelId ? [channelId] : [],
     searchInput: "",
+    showArchived: false,
   };
 
   for (const key in route?.query || {}) {
@@ -47,15 +48,24 @@ export const getFilterValuesFromParams = function (
           cleanedValues.searchInput = val;
         }
         break;
+      case "showArchived":
+        if (val === "true") {
+          cleanedValues.showArchived = true;
+        }
+        if (val === "false") {
+          cleanedValues.showArchived = false;
+        }
+        break;
     }
   }
 
-  const { tags, channels, searchInput } = cleanedValues;
+  const { tags, channels, searchInput, showArchived } = cleanedValues;
 
   const filterValues: SearchDiscussionValues = {
     tags: tags || [],
     channels: channels || [],
     searchInput: searchInput || "",
+    showArchived,
   };
   return filterValues;
 };

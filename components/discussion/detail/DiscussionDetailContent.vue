@@ -138,7 +138,7 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
 });
 
 const isArchived = computed(() => {
-  return activeDiscussionChannel.value?.archived || false
+  return activeDiscussionChannel.value?.archived
 });
 
 const locked = computed(() => {
@@ -313,6 +313,7 @@ console.log('active discussionchannel is', activeDiscussionChannel.value)
                   :channel-id="channelId"
                   :compact-mode="compactMode"
                   :discussion-body-edit-mode="discussionBodyEditMode"
+                  :discussion-is-archived="isArchived"
                   @handle-click-give-feedback="handleClickGiveFeedback"
                   @handle-click-edit-body="handleClickEditDiscussionBody"
                   @cancel-edit-discussion-body="discussionBodyEditMode = false"

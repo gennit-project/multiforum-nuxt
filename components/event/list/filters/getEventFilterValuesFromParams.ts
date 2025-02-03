@@ -36,6 +36,7 @@ const getFilterValuesFromParams = function (
     resultsOrder: chronologicalOrder,
     locationFilter: LocationFilterTypes.NONE,
     hasVirtualEventUrl: false,
+    showArchived: false,
   };
 
   // For the online events list, only include
@@ -145,6 +146,13 @@ const getFilterValuesFromParams = function (
       case "locationFilter":
         cleanedValues.locationFilter = val?.toString();
         break;
+      case "showArchived":
+        if (val === "true") {
+          cleanedValues.showArchived = true;
+        } else if (val === "false") {
+          cleanedValues.showArchived = false;
+        }
+        break;
     }
   }
 
@@ -163,6 +171,7 @@ const getFilterValuesFromParams = function (
     resultsOrder,
     locationFilter,
     hasVirtualEventUrl,
+    showArchived
   } = cleanedValues;
 
   const defaultRadius = 160.934; // 100 miles
@@ -185,6 +194,7 @@ const getFilterValuesFromParams = function (
     free: free || false,
     resultsOrder: resultsOrder || chronologicalOrder,
     hasVirtualEventUrl: hasVirtualEventUrl || false,
+    showArchived: showArchived || false,
   };
 
   const locationParams = {
