@@ -166,6 +166,24 @@ export const ARCHIVE_DISCUSSION = gql`
   }
 `;
 
+
+export const UNARCHIVE_DISCUSSION = gql`
+  mutation unarchiveDiscussion(
+    $discussionId: ID!
+    $channelUniqueName: String!
+    $explanation: String!
+  ) {
+    unarchiveDiscussion(
+      discussionId: $discussionId
+      channelUniqueName: $channelUniqueName
+      explanation: $explanation
+    ) {
+      id
+    }
+  }
+`
+
+
 export const REPORT_EVENT = gql`
   mutation reportEvent(
     $eventId: ID!
@@ -185,6 +203,22 @@ export const REPORT_EVENT = gql`
     }
   }
 `;
+
+export const UNARCHIVE_EVENT = gql`
+  mutation unarchiveEvent(
+    $eventId: ID!
+    $channelUniqueName: String!
+    $explanation: String!
+  ) {
+    unarchiveEvent(
+      eventId: $eventId
+      channelUniqueName: $channelUniqueName
+      explanation: $explanation
+    ) {
+      id
+    }
+  }
+`
 
 export const ARCHIVE_EVENT = gql`
   mutation archiveEvent(
@@ -245,3 +279,19 @@ export const ARCHIVE_COMMENT = gql`
     }
   }
 `;
+
+export const UNARCHIVE_COMMENT = gql`
+  mutation unarchiveComment(
+    $commentId: ID!
+    $channelUniqueName: String!
+    $explanation: String!
+  ) {
+    unarchiveComment(
+      commentId: $commentId
+      channelUniqueName: $channelUniqueName
+      explanation: $explanation
+    ) {
+      id
+    }
+  }
+`

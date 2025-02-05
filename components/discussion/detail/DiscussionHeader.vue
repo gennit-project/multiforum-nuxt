@@ -12,6 +12,7 @@ import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar, modProfileNameVar } from "@/cache";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 
 type MenuItem = {
   label?: string;
@@ -152,9 +153,11 @@ const deleteModalIsOpen = ref(false);
 
 const showOpenIssueModal = ref(false);
 const showArchiveModal = ref(false);
+const showUnarchiveModal = ref(false);
 
 const showSuccessfullyReported = ref(false);
 const showSuccessfullyArchived = ref(false);
+const showSuccessfullyUnarchived = ref(false);
 
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
@@ -208,7 +211,7 @@ const menuItems = computed(() => {
         },
       ]);
       // Only add these if mod permissions are elevated
-      console.log('is archived', props.discussionIsArchived)
+      console.log("is archived", props.discussionIsArchived);
       if (!props.discussionIsArchived) {
         out = out.concat([
           {
@@ -314,6 +317,7 @@ const authorIsMod = computed(
           @handle-delete="deleteModalIsOpen = true"
           @handle-click-report="showOpenIssueModal = true"
           @handle-click-archive="showArchiveModal = true"
+          @handle-click-unarchive="showUnarchiveModal = true"
           @handle-feedback="emit('handleClickGiveFeedback')"
           @handle-view-feedback="
             router.push({
@@ -365,6 +369,17 @@ const authorIsMod = computed(
         }
       "
     />
+    <UnarchiveModal
+      :open="showUnarchiveModal"
+      :discussion-channel-id="discussionChannelId"
+      @close="showUnarchiveModal = false"
+      @unarchived-successfully="
+        () => {
+          showSuccessfullyUnarchived = true;
+          showUnarchiveModal = false;
+        }
+      "
+    />
     <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
@@ -374,6 +389,11 @@ const authorIsMod = computed(
       :show="showSuccessfullyArchived"
       :title="'The content was reported and archived successfully.'"
       @close-notification="showSuccessfullyArchived = false"
+    />
+    <Notification
+      :show="showSuccessfullyUnarchived"
+      :title="'The content was unarchived successfully.'"
+      @close-notification="showSuccessfullyUnarchived = false"
     />
     <ErrorBanner
       v-if="deleteDiscussionError"

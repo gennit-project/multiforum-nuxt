@@ -217,7 +217,7 @@ const modalBody = computed(() => {
   } else if (eventId.value) {
     contentType = "event";
   }
-  return `(Optional) Please add any more information or context about why this ${contentType} be removed.`;
+  return `(Optional) Please add any more information or context about why this ${contentType} should be removed.`;
 });
 
 const modalPlaceholder = computed(() => {
