@@ -21,6 +21,10 @@ const getBackgroundColor = (actionType: string) => {
       return "bg-green-200 dark:bg-green-500";
     case ActionType.Reopen:
       return "bg-green-200 dark:bg-green-500";
+    case ActionType.Archive:
+      return "bg-yellow-200 dark:bg-yellow-500";
+    case ActionType.Unarchive:
+      return "bg-green-200 dark:bg-green-500";
     default:
       return "bg-gray-200 dark:bg-gray-600";
   }
@@ -29,21 +33,22 @@ const getBackgroundColor = (actionType: string) => {
 const actionTypeToIcon = {
   [ActionType.Close]: "fa-regular fa-circle-check",
   [ActionType.Comment]: "fa-regular fa-comment",
-  [ActionType.Hide]: "fa-solid fa-eye-slash",
   [ActionType.Remove]: "fa-solid fa-xmark",
   [ActionType.Reopen]: "fa-solid fa-arrows-rotate",
   [ActionType.Report]: "fa-regular fa-flag",
   [ActionType.Suspend]: "fa-solid fa-user-lock",
-  [ActionType.Unhide]: "fa-solid fa-eye",
   [ActionType.Unsuspend]: "fa-solid fa-user-plus",
+  [ActionType.Archive]: "fa-solid fa-eye-slash",
+  [ActionType.Unarchive]: "fa-solid fa-eye",
 };
 
-defineProps({
+const props = defineProps({
   activityItem: {
     type: Object as PropType<ModerationAction>,
     required: true,
   },
 });
+console.log('props.activityItem', props.activityItem);
 
 const commentIdInParams = useRoute().params.commentId as string;
 </script>

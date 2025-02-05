@@ -5,12 +5,12 @@ import type { TagData } from './Tag'
 export enum ActionType {
   Close = "close",
   Comment = "comment",
-  Hide = "hide",
+  Archive = "archive",
   Remove = "remove",
   Reopen = "reopen",
   Report = "report",
   Suspend = "suspend",
-  Unhide = "unhide",
+  Unarchive = "un-archive",
   Unsuspend = "unsuspend",
 }
 
