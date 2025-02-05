@@ -136,6 +136,7 @@ export const GET_ISSUES_BY_CHANNEL = gql`
         createdAt
         updatedAt
         isOpen
+        channelUniqueName
         relatedDiscussionId
         Channel {
           uniqueName
@@ -150,7 +151,7 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
   query getClosedIssuesByChannel($channelUniqueName: String!) {
     channels(where: { uniqueName: $channelUniqueName }) {
       uniqueName
-      Issues(where: { isOpen: false }) {
+      Issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {
         id
         title
         body
@@ -162,7 +163,12 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
         createdAt
         updatedAt
         isOpen
+        channelUniqueName
         relatedDiscussionId
+        Channel {
+          uniqueName
+        }
+        flaggedServerRuleViolation
       }
     }
   }
@@ -284,6 +290,7 @@ export const GET_CLOSED_ISSUES = gql`
       Channel {
         uniqueName
       }
+      channelUniqueName
       Author {
         ... on ModerationProfile {
           displayName
