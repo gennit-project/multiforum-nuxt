@@ -442,6 +442,7 @@ function handleFeedbackInput(event: string) {
       <OpenIssueModal
         :open="showReportEventModal"
         :event-title="eventData.title"
+        :event-id="eventId"
         @close="showReportEventModal = false"
         @report-submitted-successfully="
           () => {

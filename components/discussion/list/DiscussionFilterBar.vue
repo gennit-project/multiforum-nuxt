@@ -69,7 +69,6 @@ watch(
   () => route.query,
   () => {
     if (route.query) {
-      console.log('route.query', route.query);
       filterValues.value = getFilterValuesFromParams({
         route,
         channelId: channelId.value,

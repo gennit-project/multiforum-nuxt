@@ -31,6 +31,16 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  discussionId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  eventId: {
+    type: String,
+    required: false,
+    default: "",
+  },
 });
 const emit = defineEmits(["close", "unarchivedSuccessfully"]);
 
@@ -40,18 +50,7 @@ const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
 });
 
-const discussionId = computed(() => {
-  return typeof route.params.discussionId === "string"
-    ? route.params.discussionId
-    : "";
-});
 
-const eventId = computed(() => {
-  return typeof route.params.eventId === "string" ? route.params.eventId : "";
-});
-
-const selectedForumRules = ref<string[]>([]);
-const selectedServerRules = ref<string[]>([]);
 const explanation = ref("No violation");
 
 const {
@@ -156,9 +155,9 @@ unarchiveCommentDone(() => {
 const modalTitle = computed(() => {
   if (props.commentId) {
     return "Unarchive Comment";
-  } else if (discussionId.value) {
+  } else if (props.discussionId) {
     return "Unarchive Discussion";
-  } else if (eventId.value) {
+  } else if (props.eventId) {
     return "Unarchive Event";
   }
 
@@ -169,7 +168,7 @@ const modalBody = computed(() => {
   let contentType = "discussion";
   if (props.commentId) {
     contentType = "comment";
-  } else if (eventId.value) {
+  } else if (props.eventId) {
     contentType = "event";
   }
   return `(Optional) Please add any more information or context about why this ${contentType} should be unarchived.`;
@@ -179,14 +178,14 @@ const modalPlaceholder = computed(() => {
   let contentType = "discussion";
   if (props.commentId) {
     contentType = "comment";
-  } else if (eventId.value) {
+  } else if (props.eventId) {
     contentType = "event";
   }
   return `Explain why this ${contentType} should be unarchived`;
 });
 
 const submit = async () => {
-  if (!discussionId.value && !eventId.value && !props.commentId) {
+  if (!props.discussionId && !props.eventId && !props.commentId) {
     console.error("No discussion, event, or comment ID provided.");
     return;
   }
@@ -200,17 +199,17 @@ const submit = async () => {
     return;
   }
 
-  if (discussionId.value) {
+  if (props.discussionId) {
     unarchiveDiscussion({
-      discussionId: discussionId.value,
+      discussionId: props.discussionId,
       explanation: explanation.value,
       channelUniqueName: channelId.value,
     });
   }
 
-  if (eventId.value) {
+  if (props.eventId) {
     unarchiveEvent({
-      eventId: eventId.value,
+      eventId: props.eventId,
       explanation: explanation.value,
       channelUniqueName: channelId.value,
     });
@@ -259,6 +258,9 @@ const close = () => {
         :allow-image-upload="false"
         @update="explanation = $event"
       />
+      <ErrorBanner 
+        v-if="unarchiveDiscussionError || unarchiveEventError || unarchiveCommentError"
+        :text="unarchiveDiscussionError?.message || unarchiveEventError?.message || unarchiveCommentError?.message" />
     </template>
   </GenericModal>
 </template>

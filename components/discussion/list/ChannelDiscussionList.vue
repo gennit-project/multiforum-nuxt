@@ -30,7 +30,6 @@ const filterValues = ref(
     channelId: channelId.value,
   })
 );
-console.log("filterValues", filterValues.value);
 
 const activeSort = computed(() => {
   return getSortFromQuery(route.query);

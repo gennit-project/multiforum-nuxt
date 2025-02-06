@@ -2,13 +2,12 @@
 import type { Issue } from "@/__generated__/graphql";
 import { DateTime } from "luxon";
 
-const props = defineProps({
+defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,
   },
 });
-console.log('props.issue', props.issue);
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);

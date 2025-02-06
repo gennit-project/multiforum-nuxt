@@ -285,7 +285,6 @@ const handleClickEditFeedback = () => {
 const handleClickEditDiscussionBody = () => {
   discussionBodyEditMode.value = true;
 };
-console.log('active discussionchannel is', activeDiscussionChannel.value)
 </script>
 
 <template>

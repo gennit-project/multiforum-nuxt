@@ -176,16 +176,8 @@ const canShowPermalink =
   (eventId && forumId); // For event comments
 
 const permalinkObject = computed(() => {
-  console.log('canShowPermalink', canShowPermalink);
   if (!canShowPermalink) {
     console.warn("No permalink object found for comment", props.commentData);
-    console.log({
-      issueId,
-      discussionId,
-      eventId,
-      forumId,
-      commentId: props.commentData.id,
-    })
     return {};
   }
   // This is the default comment permalink object

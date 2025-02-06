@@ -16,6 +16,7 @@ import {
 } from "@/graphQLData/issue/mutations";
 import type { Comment } from "@/__generated__/graphql";
 import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
+import ArchiveBox from "@/components/icons/ArchiveBox.vue";
 
 const props = defineProps({
   discussionTitle: {
@@ -29,6 +30,16 @@ const props = defineProps({
     default: "",
   },
   commentId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  discussionId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  eventId: {
     type: String,
     required: false,
     default: "",
@@ -62,16 +73,6 @@ const route = useRoute();
 
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
-});
-
-const discussionId = computed(() => {
-  return typeof route.params.discussionId === "string"
-    ? route.params.discussionId
-    : "";
-});
-
-const eventId = computed(() => {
-  return typeof route.params.eventId === "string" ? route.params.eventId : "";
 });
 
 const selectedForumRules = ref<string[]>([]);
@@ -193,17 +194,17 @@ const modalTitle = computed(() => {
   if (props.archiveAfterReporting) {
     if (props.commentId) {
       return "Archive Comment";
-    } else if (discussionId.value) {
+    } else if (props.discussionId) {
       return "Archive Discussion";
-    } else if (eventId.value) {
+    } else if (props.eventId) {
       return "Archive Event";
     }
   } else {
     if (props.commentId) {
       return "Report Comment";
-    } else if (discussionId.value) {
+    } else if (props.discussionId) {
       return "Report Discussion";
-    } else if (eventId.value) {
+    } else if (props.eventId) {
       return "Report Event";
     }
   }
@@ -214,7 +215,7 @@ const modalBody = computed(() => {
   let contentType = "discussion";
   if (props.commentId) {
     contentType = "comment";
-  } else if (eventId.value) {
+  } else if (props.eventId) {
     contentType = "event";
   }
   return `(Optional) Please add any more information or context about why this ${contentType} should be removed.`;
@@ -224,30 +225,30 @@ const modalPlaceholder = computed(() => {
   let contentType = "discussion";
   if (props.commentId) {
     contentType = "comment";
-  } else if (eventId.value) {
+  } else if (props.eventId) {
     contentType = "event";
   }
   return `Explain why this ${contentType} should be removed`;
 });
 
 const submit = async () => {
-  if (!discussionId.value && !eventId.value && !props.commentId) {
+  if (!props.discussionId && !props.eventId && !props.commentId) {
     console.error("No discussion, event, or comment ID provided.");
     return;
   }
   if (!props.archiveAfterReporting) {
-    if (discussionId.value) {
+    if (props.discussionId) {
       reportDiscussion({
-        discussionId: discussionId.value,
+        discussionId: props.discussionId,
         reportText: reportText.value,
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
     }
-    if (eventId.value) {
+    if (props.eventId) {
       reportEvent({
-        eventId: eventId.value,
+        eventId: props.eventId,
         reportText: reportText.value,
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
@@ -266,18 +267,18 @@ const submit = async () => {
   } else {
     // We don't have to call report mutations here because the reports
     // are already built into the archive resolvers.
-    if (discussionId.value) {
+    if (props.discussionId) {
       archiveDiscussion({
-        discussionId: discussionId.value,
+        discussionId: props.discussionId,
         reportText: reportText.value,
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
     }
-    if (eventId.value) {
+    if (props.eventId) {
       archiveEvent({
-        eventId: eventId.value,
+        eventId: props.eventId,
         reportText: reportText.value,
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
@@ -333,6 +334,12 @@ const close = () => {
   >
     <template #icon>
       <FlagIcon
+        v-if="!archiveAfterReporting"
+        class="h-6 w-6 text-red-600 opacity-100 dark:text-red-400"
+        aria-hidden="true"
+      />
+      <ArchiveBox
+        v-else
         class="h-6 w-6 text-red-600 opacity-100 dark:text-red-400"
         aria-hidden="true"
       />

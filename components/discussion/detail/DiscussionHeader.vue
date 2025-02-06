@@ -211,7 +211,6 @@ const menuItems = computed(() => {
         },
       ]);
       // Only add these if mod permissions are elevated
-      console.log("is archived", props.discussionIsArchived);
       if (!props.discussionIsArchived) {
         out = out.concat([
           {
@@ -345,8 +344,10 @@ const authorIsMod = computed(
       @primary-button-click="deleteDiscussion"
     />
     <OpenIssueModal
+      v-if="discussion"
       :open="showOpenIssueModal"
       :discussion-title="discussion?.title"
+      :discussion-id="discussion?.id"
       :archive-after-reporting="false"
       @close="showOpenIssueModal = false"
       @report-submitted-successfully="
@@ -357,8 +358,10 @@ const authorIsMod = computed(
       "
     />
     <OpenIssueModal
+      :v-if="discussion"
       :open="showArchiveModal"
       :discussion-title="discussion?.title"
+      :discussion-id="discussion?.id"
       :archive-after-reporting="true"
       :discussion-channel-id="discussionChannelId"
       @close="showArchiveModal = false"
@@ -370,8 +373,10 @@ const authorIsMod = computed(
       "
     />
     <UnarchiveModal
+      v-if="discussionChannelId && discussion?.id"
       :open="showUnarchiveModal"
       :discussion-channel-id="discussionChannelId"
+      :discussion-id="discussion?.id"
       @close="showUnarchiveModal = false"
       @unarchived-successfully="
         () => {

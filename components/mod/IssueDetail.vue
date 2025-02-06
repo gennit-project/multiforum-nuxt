@@ -46,6 +46,7 @@ const {
   result: getIssueResult,
   error: getIssueError,
   loading: getIssueLoading,
+  refetch: refetchIssue,
 } = useQuery(GET_ISSUE, { id: issueId.value });
 
 const activeIssue = computed<Issue | null>(() => {
@@ -553,10 +554,17 @@ const toggleCloseOpenIssue = () => {
             :feed-items="activeIssue.ActivityFeed || []"
           />
 
-          <ModerationWizard v-if="activeIssue?.isOpen" :issue="issue" />
+          <ModerationWizard 
+            v-if="issue && activeIssue?.relatedDiscussionId"
+            :issue="issue" 
+            :discussion-id="activeIssue?.relatedDiscussionId"
+            :channel-unique-name="channelId"
+            @archived-successfully="refetchIssue"
+            @unarchived-successfully="refetchIssue"
+          />
 
           <div class="flex w-full flex-col">
-            <h2 v-if="activeIssue" class="text-xl font-bold border-b mb-4 pb-1">
+            <h2 v-if="activeIssue" class="text-xl font-bold border-b mb-4 mt-8 pb-1">
               Leave a comment
             </h2>
             <TextEditor

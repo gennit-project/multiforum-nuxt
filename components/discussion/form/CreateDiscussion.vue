@@ -137,7 +137,6 @@ onDone((response) => {
   const newDiscussion = newDiscussionArray?.[0]?.DiscussionChannels?.[0]
   const newDiscussionId = newDiscussion?.Discussion?.id;
   createDiscussionLoading.value = false;
-  console.log(  'on done', newDiscussionId)
 
   router.push({
     name: "forums-forumId-discussions-discussionId",

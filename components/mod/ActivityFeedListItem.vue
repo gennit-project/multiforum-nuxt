@@ -3,9 +3,18 @@ import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import type { PropType } from "vue";
 import { timeAgo } from "@/utils";
-import { ActionType } from "@/types/Comment";
 import type { ModerationAction } from "@/__generated__/graphql";
 import { useRoute } from "nuxt/app";
+import ArchiveBox from "../icons/ArchiveBox.vue";
+import ArchiveBoxXMark from "../icons/ArchiveBoxXMark.vue";
+import CheckCircle from "../icons/CheckCircle.vue";
+import ChatBubbleBottomCenter from "../icons/ChatBubbleBottomCenter.vue";
+import XmarkIcon from "../icons/XmarkIcon.vue";
+import UserPlus from "../icons/UserPlus.vue";
+import UserMinus from "../icons/UserMinus.vue";
+import ArrowPath from "../icons/ArrowPath.vue";
+import FlagIcon from "../icons/FlagIcon.vue";
+import { ActionType } from "@/types/Comment";
 
 const getBackgroundColor = (actionType: string) => {
   switch (actionType) {
@@ -22,7 +31,7 @@ const getBackgroundColor = (actionType: string) => {
     case ActionType.Reopen:
       return "bg-green-200 dark:bg-green-500";
     case ActionType.Archive:
-      return "bg-yellow-200 dark:bg-yellow-500";
+      return "bg-yellow-200 dark:bg-red-500";
     case ActionType.Unarchive:
       return "bg-green-200 dark:bg-green-500";
     default:
@@ -31,15 +40,15 @@ const getBackgroundColor = (actionType: string) => {
 };
 
 const actionTypeToIcon = {
-  [ActionType.Close]: "fa-regular fa-circle-check",
-  [ActionType.Comment]: "fa-regular fa-comment",
-  [ActionType.Remove]: "fa-solid fa-xmark",
-  [ActionType.Reopen]: "fa-solid fa-arrows-rotate",
-  [ActionType.Report]: "fa-regular fa-flag",
-  [ActionType.Suspend]: "fa-solid fa-user-lock",
-  [ActionType.Unsuspend]: "fa-solid fa-user-plus",
-  [ActionType.Archive]: "fa-solid fa-eye-slash",
-  [ActionType.Unarchive]: "fa-solid fa-eye",
+  [ActionType.Close]: CheckCircle,
+  [ActionType.Comment]: ChatBubbleBottomCenter,
+  [ActionType.Remove]: XmarkIcon,
+  [ActionType.Reopen]: ArrowPath,
+  [ActionType.Report]: FlagIcon,
+  [ActionType.Suspend]: UserMinus,
+  [ActionType.Unsuspend]: UserPlus,
+  [ActionType.Archive]: ArchiveBox,
+  [ActionType.Unarchive]: ArchiveBoxXMark,
 };
 
 const props = defineProps({
@@ -48,7 +57,6 @@ const props = defineProps({
     required: true,
   },
 });
-console.log('props.activityItem', props.activityItem);
 
 const commentIdInParams = useRoute().params.commentId as string;
 </script>
@@ -126,10 +134,10 @@ const commentIdInParams = useRoute().params.commentId as string;
                 class="flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white dark:text-white dark:ring-gray-800"
                 :class="[getBackgroundColor(activityItem.actionType)]"
               >
-                <i
-                  :class="[
-                    `${actionTypeToIcon[activityItem.actionType as ActionType]}`,
-                  ]"
+                <component
+                  :is="actionTypeToIcon[activityItem.actionType as ActionType]"
+                  class="h-5 w-5 text-black"
+                  aria-hidden="true"
                 />
               </div>
             </div>

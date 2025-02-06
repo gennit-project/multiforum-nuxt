@@ -220,3 +220,16 @@ export const PENDING_FORUM_MOD_INVITE_EXISTS = gql`
   }
 `;
 
+export const GET_DISCUSSION_CHANNEL = gql`
+  query getDiscussionChannelID(
+    $discussionId: ID!
+    $channelUniqueName: String!
+  ) {
+    discussionChannels(
+      where: { discussionId: $discussionId, channelUniqueName: $channelUniqueName }
+    ) {
+      id
+      archived
+    }
+  }
+`;
