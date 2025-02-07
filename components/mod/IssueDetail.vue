@@ -57,271 +57,277 @@ const activeIssue = computed<Issue | null>(() => {
 
 const activeIssueId = computed(() => activeIssue.value?.id || "");
 
-const { mutate: closeIssue } = useMutation(CLOSE_ISSUE, () => ({
-  variables: {
-    id: activeIssueId.value,
-  },
-  update(cache) {
-    // Get the issue in the cache by ID, then edit it so the isOpen field is false.
-    cache.modify({
-      id: cache.identify({
-        __typename: "Issue",
-        id: activeIssueId.value,
-      }),
-      fields: {
-        isOpen() {
-          return false;
+const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
+  CLOSE_ISSUE,
+  () => ({
+    variables: {
+      id: activeIssueId.value,
+    },
+    update(cache) {
+      // Get the issue in the cache by ID, then edit it so the isOpen field is false.
+      cache.modify({
+        id: cache.identify({
+          __typename: "Issue",
+          id: activeIssueId.value,
+        }),
+        fields: {
+          isOpen() {
+            return false;
+          },
         },
-      },
-    });
+      });
 
-    // update the result of COUNT_CLOSED_ISSUES
-    // to increment the count of closed issues
-    const existingClosedIssuesData = cache.readQuery({
-      query: COUNT_CLOSED_ISSUES,
-      variables: { channelUniqueName: channelId.value },
-    });
-
-    if (
-      existingClosedIssuesData &&
-      // @ts-ignore
-      existingClosedIssuesData.issuesAggregate
-    ) {
-      // @ts-ignore
-      const existingClosedIssues = existingClosedIssuesData.issuesAggregate;
-      const newClosedIssues = {
-        count: existingClosedIssues.count + 1,
-      };
-
-      cache.writeQuery({
+      // update the result of COUNT_CLOSED_ISSUES
+      // to increment the count of closed issues
+      const existingClosedIssuesData = cache.readQuery({
         query: COUNT_CLOSED_ISSUES,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          issuesAggregate: newClosedIssues,
-        },
       });
-    }
 
-    // Also update the result of COUNT_OPEN_ISSUES
-    // to decrement the count of open issues
-    const existingOpenIssuesData = cache.readQuery({
-      query: COUNT_OPEN_ISSUES,
-      variables: { channelUniqueName: channelId.value },
-    });
+      if (
+        existingClosedIssuesData &&
+        // @ts-ignore
+        existingClosedIssuesData.issuesAggregate
+      ) {
+        // @ts-ignore
+        const existingClosedIssues = existingClosedIssuesData.issuesAggregate;
+        const newClosedIssues = {
+          count: existingClosedIssues.count + 1,
+        };
 
-    if (
-      existingOpenIssuesData &&
-      // @ts-ignore
-      existingOpenIssuesData.issuesAggregate
-    ) {
-      // @ts-ignore
-      const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
-      const newOpenIssues = {
-        count: existingOpenIssues.count - 1,
-      };
+        cache.writeQuery({
+          query: COUNT_CLOSED_ISSUES,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            issuesAggregate: newClosedIssues,
+          },
+        });
+      }
 
-      cache.writeQuery({
+      // Also update the result of COUNT_OPEN_ISSUES
+      // to decrement the count of open issues
+      const existingOpenIssuesData = cache.readQuery({
         query: COUNT_OPEN_ISSUES,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          issuesAggregate: newOpenIssues,
-        },
       });
-    }
 
-    // Also update the result of GET_ISSUES_BY_CHANNEL
-    // to remove this issue from the list of open issues
-    const existingIssuesByChannelData = cache.readQuery({
-      query: GET_ISSUES_BY_CHANNEL,
-      variables: { channelUniqueName: channelId.value },
-    });
+      if (
+        existingOpenIssuesData &&
+        // @ts-ignore
+        existingOpenIssuesData.issuesAggregate
+      ) {
+        // @ts-ignore
+        const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
+        const newOpenIssues = {
+          count: existingOpenIssues.count - 1,
+        };
 
-    if (
-      existingIssuesByChannelData &&
-      // @ts-ignore
-      existingIssuesByChannelData.channels
-    ) {
-      // @ts-ignore
-      const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
-      const newIssuesByChannel = {
-        ...existingIssuesByChannel,
-        Issues: existingIssuesByChannel.Issues.filter(
-          (issue: Issue) => issue.id !== activeIssueId.value
-        ),
-      };
+        cache.writeQuery({
+          query: COUNT_OPEN_ISSUES,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            issuesAggregate: newOpenIssues,
+          },
+        });
+      }
 
-      cache.writeQuery({
+      // Also update the result of GET_ISSUES_BY_CHANNEL
+      // to remove this issue from the list of open issues
+      const existingIssuesByChannelData = cache.readQuery({
         query: GET_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          channels: [newIssuesByChannel],
-        },
       });
-    }
 
-    // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
-    // to add this issue to the list of closed issues
-    const existingClosedIssuesByChannelData: any = cache.readQuery({
-      query: GET_CLOSED_ISSUES_BY_CHANNEL,
-      variables: { channelUniqueName: channelId.value },
-    });
+      if (
+        existingIssuesByChannelData &&
+        // @ts-ignore
+        existingIssuesByChannelData.channels
+      ) {
+        // @ts-ignore
+        const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
+        const newIssuesByChannel = {
+          ...existingIssuesByChannel,
+          Issues: existingIssuesByChannel.Issues.filter(
+            (issue: Issue) => issue.id !== activeIssueId.value
+          ),
+        };
 
-    if (
-      existingClosedIssuesByChannelData &&
-      // @ts-ignore
-      existingClosedIssuesByChannelData.channels
-    ) {
-      // @ts-ignore
-      const existingClosedIssuesByChannel =
-        existingClosedIssuesByChannelData.channels[0];
-      const newClosedIssuesByChannel = {
-        ...existingClosedIssuesByChannel,
-        Issues: [...existingClosedIssuesByChannel.Issues, activeIssue.value],
-      };
+        cache.writeQuery({
+          query: GET_ISSUES_BY_CHANNEL,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            channels: [newIssuesByChannel],
+          },
+        });
+      }
 
-      cache.writeQuery({
+      // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
+      // to add this issue to the list of closed issues
+      const existingClosedIssuesByChannelData: any = cache.readQuery({
         query: GET_CLOSED_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          channels: [newClosedIssuesByChannel],
+      });
+
+      if (
+        existingClosedIssuesByChannelData &&
+        // @ts-ignore
+        existingClosedIssuesByChannelData.channels
+      ) {
+        // @ts-ignore
+        const existingClosedIssuesByChannel =
+          existingClosedIssuesByChannelData.channels[0];
+        const newClosedIssuesByChannel = {
+          ...existingClosedIssuesByChannel,
+          Issues: [...existingClosedIssuesByChannel.Issues, activeIssue.value],
+        };
+
+        cache.writeQuery({
+          query: GET_CLOSED_ISSUES_BY_CHANNEL,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            channels: [newClosedIssuesByChannel],
+          },
+        });
+      }
+    },
+  })
+);
+
+const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
+  REOPEN_ISSUE,
+  () => ({
+    variables: {
+      id: activeIssueId.value,
+    },
+    update(cache) {
+      // Get the issue in the cache by ID, then edit it so the isOpen field is true.
+      cache.modify({
+        id: cache.identify({
+          __typename: "Issue",
+          id: activeIssueId.value,
+        }),
+        fields: {
+          isOpen() {
+            return true;
+          },
         },
       });
-    }
-  },
-}));
-
-const { mutate: reopenIssue } = useMutation(REOPEN_ISSUE, () => ({
-  variables: {
-    id: activeIssueId.value,
-  },
-  update(cache) {
-    // Get the issue in the cache by ID, then edit it so the isOpen field is true.
-    cache.modify({
-      id: cache.identify({
-        __typename: "Issue",
-        id: activeIssueId.value,
-      }),
-      fields: {
-        isOpen() {
-          return true;
-        },
-      },
-    });
-    // update the result of COUNT_CLOSED_ISSUES
-    // to decrement the count of closed issues
-    const existingClosedIssuesData = cache.readQuery({
-      query: COUNT_CLOSED_ISSUES,
-      variables: { channelUniqueName: channelId.value },
-    });
-
-    if (
-      existingClosedIssuesData &&
-      // @ts-ignore
-      existingClosedIssuesData.issuesAggregate
-    ) {
-      // @ts-ignore
-      const existingClosedIssues = existingClosedIssuesData.issuesAggregate;
-      const newClosedIssues = {
-        count: existingClosedIssues.count - 1,
-      };
-
-      cache.writeQuery({
+      // update the result of COUNT_CLOSED_ISSUES
+      // to decrement the count of closed issues
+      const existingClosedIssuesData = cache.readQuery({
         query: COUNT_CLOSED_ISSUES,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          issuesAggregate: newClosedIssues,
-        },
       });
-    }
 
-    // Also update the result of COUNT_OPEN_ISSUES
-    // to increment the count of open issues
-    const existingOpenIssuesData = cache.readQuery({
-      query: COUNT_OPEN_ISSUES,
-      variables: { channelUniqueName: channelId.value },
-    });
+      if (
+        existingClosedIssuesData &&
+        // @ts-ignore
+        existingClosedIssuesData.issuesAggregate
+      ) {
+        // @ts-ignore
+        const existingClosedIssues = existingClosedIssuesData.issuesAggregate;
+        const newClosedIssues = {
+          count: existingClosedIssues.count - 1,
+        };
 
-    if (
-      existingOpenIssuesData &&
-      // @ts-ignore
-      existingOpenIssuesData.issuesAggregate
-    ) {
-      // @ts-ignore
-      const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
-      const newOpenIssues = {
-        count: existingOpenIssues.count + 1,
-      };
+        cache.writeQuery({
+          query: COUNT_CLOSED_ISSUES,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            issuesAggregate: newClosedIssues,
+          },
+        });
+      }
 
-      cache.writeQuery({
+      // Also update the result of COUNT_OPEN_ISSUES
+      // to increment the count of open issues
+      const existingOpenIssuesData = cache.readQuery({
         query: COUNT_OPEN_ISSUES,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          issuesAggregate: newOpenIssues,
-        },
       });
-    }
 
-    // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
-    // so that the newly reopened issue is removed from the list
-    // of closed issues.
-    const existingClosedIssuesByChannelData: any = cache.readQuery({
-      query: GET_CLOSED_ISSUES_BY_CHANNEL,
-      variables: { channelUniqueName: channelId.value },
-    });
+      if (
+        existingOpenIssuesData &&
+        // @ts-ignore
+        existingOpenIssuesData.issuesAggregate
+      ) {
+        // @ts-ignore
+        const existingOpenIssues = existingOpenIssuesData.issuesAggregate;
+        const newOpenIssues = {
+          count: existingOpenIssues.count + 1,
+        };
 
-    if (
-      existingClosedIssuesByChannelData &&
-      // @ts-ignore
-      existingClosedIssuesByChannelData.channels
-    ) {
-      // @ts-ignore
-      const existingClosedIssuesByChannel =
-        existingClosedIssuesByChannelData.channels[0];
-      const newClosedIssuesByChannel = {
-        ...existingClosedIssuesByChannel,
-        Issues: existingClosedIssuesByChannel.Issues.filter(
-          (issue: Issue) => issue.id !== activeIssueId.value
-        ),
-      };
+        cache.writeQuery({
+          query: COUNT_OPEN_ISSUES,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            issuesAggregate: newOpenIssues,
+          },
+        });
+      }
 
-      cache.writeQuery({
+      // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
+      // so that the newly reopened issue is removed from the list
+      // of closed issues.
+      const existingClosedIssuesByChannelData: any = cache.readQuery({
         query: GET_CLOSED_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          channels: [newClosedIssuesByChannel],
-        },
       });
-    }
 
-    // Also update the result of GET_ISSUES_BY_CHANNEL
-    // to add this issue to the list of open issues
-    const existingIssuesByChannelData = cache.readQuery({
-      query: GET_ISSUES_BY_CHANNEL,
-      variables: { channelUniqueName: channelId.value },
-    });
+      if (
+        existingClosedIssuesByChannelData &&
+        // @ts-ignore
+        existingClosedIssuesByChannelData.channels
+      ) {
+        // @ts-ignore
+        const existingClosedIssuesByChannel =
+          existingClosedIssuesByChannelData.channels[0];
+        const newClosedIssuesByChannel = {
+          ...existingClosedIssuesByChannel,
+          Issues: existingClosedIssuesByChannel.Issues.filter(
+            (issue: Issue) => issue.id !== activeIssueId.value
+          ),
+        };
 
-    if (
-      existingIssuesByChannelData &&
-      // @ts-ignore
-      existingIssuesByChannelData.channels
-    ) {
-      // @ts-ignore
-      const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
-      const newIssuesByChannel = {
-        ...existingIssuesByChannel,
-        Issues: [...existingIssuesByChannel.Issues, activeIssue.value],
-      };
+        cache.writeQuery({
+          query: GET_CLOSED_ISSUES_BY_CHANNEL,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            channels: [newClosedIssuesByChannel],
+          },
+        });
+      }
 
-      cache.writeQuery({
+      // Also update the result of GET_ISSUES_BY_CHANNEL
+      // to add this issue to the list of open issues
+      const existingIssuesByChannelData = cache.readQuery({
         query: GET_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
-        data: {
-          channels: [newIssuesByChannel],
-        },
       });
-    }
-  },
-}));
+
+      if (
+        existingIssuesByChannelData &&
+        // @ts-ignore
+        existingIssuesByChannelData.channels
+      ) {
+        // @ts-ignore
+        const existingIssuesByChannel = existingIssuesByChannelData.channels[0];
+        const newIssuesByChannel = {
+          ...existingIssuesByChannel,
+          Issues: [...existingIssuesByChannel.Issues, activeIssue.value],
+        };
+
+        cache.writeQuery({
+          query: GET_ISSUES_BY_CHANNEL,
+          variables: { channelUniqueName: channelId.value },
+          data: {
+            channels: [newIssuesByChannel],
+          },
+        });
+      }
+    },
+  })
+);
 
 const { mutate: addIssueActivityFeedItem } = useMutation(
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
@@ -363,9 +369,9 @@ const { mutate: addIssueActivityFeedItem } = useMutation(
 );
 
 const {
-  mutate: createComment,
-  loading: createCommentLoading,
-  error: createCommentError,
+  mutate: addIssueActivityFeedItemWithComment,
+  loading: addIssueActivityFeedItemWithCommentLoading,
+  error: addIssueActivityFeedItemWithCommentError,
 } = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT, {
   update: (cache, { data: { updateIssues } }) => {
     const { issues } = updateIssues;
@@ -422,7 +428,7 @@ const updateComment = (text: string) => {
 
 const handleCreateComment = async () => {
   if (!activeIssue.value || !modProfileNameVar.value) return;
-  await createComment({
+  await addIssueActivityFeedItemWithComment({
     issueId: activeIssue.value.id,
     commentText: createFormValues.value.text,
     displayName: modProfileNameVar.value,
@@ -433,26 +439,50 @@ const handleCreateComment = async () => {
   createFormValues.value.text = "";
 };
 
-const toggleCloseOpenIssue = () => {
+const toggleCloseOpenIssue = async () => {
   if (!activeIssue.value || !modProfileNameVar.value) return;
-  if (createFormValues.value.text) handleCreateComment();
   if (activeIssue.value.isOpen) {
     closeIssue();
-    addIssueActivityFeedItem({
-      issueId: activeIssue.value.id,
-      displayName: modProfileNameVar.value,
-      actionDescription: "closed the issue",
-      actionType: "close",
-    });
+
+    if (createFormValues.value.text) {
+      addIssueActivityFeedItemWithComment({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: "closed the issue",
+        actionType: "close",
+        commentText: createFormValues.value.text,
+        channelUniqueName: channelId.value,
+      });
+    } else {
+      addIssueActivityFeedItem({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: "closed the issue",
+        actionType: "close",
+      });
+    }
   } else {
     reopenIssue();
-    addIssueActivityFeedItem({
-      issueId: activeIssue.value.id,
-      displayName: modProfileNameVar.value,
-      actionDescription: "reopened the issue",
-      actionType: "reopen",
-    });
+    if (createFormValues.value.text) {
+      addIssueActivityFeedItemWithComment({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: "reopened the issue",
+        actionType: "reopen",
+        commentText: createFormValues.value.text,
+        channelUniqueName: channelId.value,
+      });
+    } else {
+      addIssueActivityFeedItem({
+        issueId: activeIssue.value.id,
+        displayName: modProfileNameVar.value,
+        actionDescription: "reopened the issue",
+        actionType: "reopen",
+      });
+    }
   }
+  // reset comment form
+  createFormValues.value.text = "";
 };
 </script>
 
@@ -554,23 +584,21 @@ const toggleCloseOpenIssue = () => {
             :feed-items="activeIssue.ActivityFeed || []"
           />
 
-          <ModerationWizard 
-            v-if="issue && activeIssue?.relatedDiscussionId"
-            :issue="issue" 
-            :discussion-id="activeIssue?.relatedDiscussionId"
-            :channel-unique-name="channelId"
-            @archived-successfully="refetchIssue"
-            @unarchived-successfully="refetchIssue"
+          <ErrorBanner
+            v-if="addIssueActivityFeedItemWithCommentError"
+            :text="addIssueActivityFeedItemWithCommentError.message"
           />
-
           <div class="flex w-full flex-col">
-            <h2 v-if="activeIssue" class="text-xl font-bold border-b mb-4 mt-8 pb-1">
+            <h2
+              v-if="activeIssue"
+              class="text-xl font-bold border-b mb-4 mt-8 pb-1"
+            >
               Leave a comment
             </h2>
             <TextEditor
               :key="`${createFormValues.text === ''}`"
               :test-id="'texteditor-textarea'"
-              :disable-auto-focus="true"
+              :disable-auto-focus="false"
               :placeholder="'Please be kind'"
               :initial-value="createFormValues.text"
               @update="updateComment"
@@ -578,17 +606,27 @@ const toggleCloseOpenIssue = () => {
             <div class="mt-3 flex justify-end">
               <GenericButton
                 :text="closeOpenButtonText"
+                :loading="closeIssueLoading || reopenIssueLoading"
                 @click="toggleCloseOpenIssue"
               />
               <SaveButton
                 :data-testid="'createCommentButton'"
                 :label="'Comment'"
                 :disabled="createFormValues.text.length === 0"
-                :loading="createCommentLoading && !createCommentError"
+                :loading="addIssueActivityFeedItemWithCommentLoading"
                 @click.prevent="handleCreateComment"
               />
             </div>
           </div>
+
+          <ModerationWizard
+            v-if="issue && activeIssue?.relatedDiscussionId"
+            :issue="issue"
+            :discussion-id="activeIssue?.relatedDiscussionId"
+            :channel-unique-name="channelId"
+            @archived-successfully="refetchIssue"
+            @unarchived-successfully="refetchIssue"
+          />
         </div>
       </v-col>
     </v-row>

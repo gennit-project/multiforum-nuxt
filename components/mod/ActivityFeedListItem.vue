@@ -69,64 +69,6 @@ const commentIdInParams = useRoute().params.commentId as string;
         aria-hidden="true"
       />
       <div class="relative flex items-start space-x-3">
-        <template v-if="activityItem.actionType === 'comment'">
-          <div class="relative">
-            <AvatarComponent
-              v-if="activityItem.ModerationProfile?.displayName"
-              class="z-10"
-              :is-small="true"
-              :text="activityItem.ModerationProfile.displayName"
-            />
-
-            <span
-              class="absolute -bottom-0.5 -right-1 rounded-tl bg-white px-0.5 py-px dark:bg-gray-600"
-            >
-              <DiscussionIcon
-                class="h-5 w-5 text-gray-400"
-                aria-hidden="true"
-              />
-            </span>
-          </div>
-          <div class="min-w-0 flex-1">
-            <div class="flex align-items gap-2">
-              <span class="text-sm">
-                <nuxt-link
-                  v-if="activityItem.ModerationProfile?.displayName"
-                  :to="{
-                    name: 'mod-modId',
-                    params: {
-                      modId: activityItem.ModerationProfile.displayName,
-                    },
-                  }"
-                  class="font-medium text-gray-900 hover:underline dark:text-gray-200"
-                >
-                  {{ activityItem.ModerationProfile?.displayName }}
-                </nuxt-link>
-              </span>
-              <span class="text-sm text-gray-500 dark:text-gray-300">
-                Commented
-                {{ `${timeAgo(new Date(activityItem.createdAt))}` }}
-              </span>
-              <span
-                v-if="activityItem?.Comment?.id === commentIdInParams"
-                class="rounded-lg text-xs bg-blue-500 px-2 py-1 text-black"
-                >Permalinked
-              </span>
-            </div>
-            <div class="mt-3 border-l-2 border-gray-200 dark:border-gray-500">
-              <MarkdownPreview
-                v-if="
-                  activityItem.actionType === 'comment' && activityItem.Comment
-                "
-                :text="activityItem.Comment.text || ''"
-                :word-limit="1000"
-                :disable-gallery="true"
-              />
-            </div>
-          </div>
-        </template>
-
-        <template v-else>
           <div>
             <div class="relative px-1">
               <div
@@ -136,7 +78,7 @@ const commentIdInParams = useRoute().params.commentId as string;
               >
                 <component
                   :is="actionTypeToIcon[activityItem.actionType as ActionType]"
-                  class="h-5 w-5 text-black"
+                  class="h-5 w-5 text-white"
                   aria-hidden="true"
                 />
               </div>
@@ -167,16 +109,13 @@ const commentIdInParams = useRoute().params.commentId as string;
 
             <div class="border-l-2 border-gray-200 dark:border-gray-500">
               <MarkdownPreview
-                v-if="
-                  activityItem.actionType === 'report' && activityItem.Comment
-                "
+                v-if="activityItem.Comment"
                 :text="activityItem.Comment.text || ''"
                 :word-limit="1000"
                 :disable-gallery="true"
               />
             </div>
           </div>
-        </template>
       </div>
     </div>
   </li>
