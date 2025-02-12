@@ -5,7 +5,7 @@ import Comment from "./Comment.vue";
 import LoadMore from "../LoadMore.vue";
 import ErrorBanner from "../ErrorBanner.vue";
 import WarningModal from "../WarningModal.vue";
-import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import SortButtons from "@/components/SortButtons.vue";
 import Notification from "@/components/NotificationComponent.vue";
@@ -143,7 +143,7 @@ const replyFormOpenAtCommentID = ref("");
 const editFormOpenAtCommentID = ref("");
 const showCopiedLinkNotification = ref(false);
 const showModProfileModal = ref(false);
-const showOpenIssueModal = ref(false);
+const showBrokenRulesModal = ref(false);
 const showSuccessfullyReported = ref(false);
 const locked = ref(props.locked);
 
@@ -503,7 +503,7 @@ function handleClickEditFeedback(input: EditFeedbackInput) {
 
 function handleClickReport(commentData: CommentType) {
   commentToReport.value = commentData;
-  showOpenIssueModal.value = true;
+  showBrokenRulesModal.value = true;
 }
 
 function handleSubmitFeedback() {
@@ -666,16 +666,16 @@ const lengthOfCommentInProgress = computed(() => {
       @close="showDeleteCommentModal = false"
       @primary-button-click="handleDeleteComment"
     />
-    <OpenIssueModal
-      v-if="showOpenIssueModal"
-      :open="showOpenIssueModal"
+    <BrokenRulesModal
+      v-if="showBrokenRulesModal"
+      :open="showBrokenRulesModal"
       :comment-id="commentToReport?.id"
       :comment="commentToReport"
-      @close="showOpenIssueModal = false"
+      @close="showBrokenRulesModal = false"
       @report-submitted-successfully="
         () => {
           showSuccessfullyReported = true;
-          showOpenIssueModal = false;
+          showBrokenRulesModal = false;
         }
       "
     />

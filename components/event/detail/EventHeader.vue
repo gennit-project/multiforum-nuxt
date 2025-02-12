@@ -20,7 +20,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
-import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute, useRouter } from "nuxt/app";
 import InfoBanner from "@/components/InfoBanner.vue";
@@ -439,7 +439,7 @@ function handleFeedbackInput(event: string) {
         :title="'Your feedback has been recorded. Thank you!'"
         @close-notification="showFeedbackSubmittedSuccessfully = false"
       />
-      <OpenIssueModal
+      <BrokenRulesModal
         :open="showReportEventModal"
         :event-title="eventData.title"
         :event-id="eventId"

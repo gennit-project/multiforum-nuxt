@@ -8,7 +8,7 @@ import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import Notification from "@/components/NotificationComponent.vue";
-import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar, modProfileNameVar } from "@/cache";
@@ -151,7 +151,7 @@ const copyLink = async (event: any) => {
 };
 const deleteModalIsOpen = ref(false);
 
-const showOpenIssueModal = ref(false);
+const showBrokenRulesModal = ref(false);
 const showArchiveModal = ref(false);
 const showUnarchiveModal = ref(false);
 
@@ -314,7 +314,7 @@ const authorIsMod = computed(
             )
           "
           @handle-delete="deleteModalIsOpen = true"
-          @handle-click-report="showOpenIssueModal = true"
+          @handle-click-report="showBrokenRulesModal = true"
           @handle-click-archive="showArchiveModal = true"
           @handle-click-unarchive="showUnarchiveModal = true"
           @handle-feedback="emit('handleClickGiveFeedback')"
@@ -343,21 +343,21 @@ const authorIsMod = computed(
       @close="deleteModalIsOpen = false"
       @primary-button-click="deleteDiscussion"
     />
-    <OpenIssueModal
+    <BrokenRulesModal
       v-if="discussion"
-      :open="showOpenIssueModal"
+      :open="showBrokenRulesModal"
       :discussion-title="discussion?.title"
       :discussion-id="discussion?.id"
       :archive-after-reporting="false"
-      @close="showOpenIssueModal = false"
+      @close="showBrokenRulesModal = false"
       @report-submitted-successfully="
         () => {
           showSuccessfullyReported = true;
-          showOpenIssueModal = false;
+          showBrokenRulesModal = false;
         }
       "
     />
-    <OpenIssueModal
+    <BrokenRulesModal
       :v-if="discussion"
       :open="showArchiveModal"
       :discussion-title="discussion?.title"

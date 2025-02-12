@@ -226,10 +226,55 @@ export const GET_DISCUSSION_CHANNEL = gql`
     $channelUniqueName: String!
   ) {
     discussionChannels(
-      where: { discussionId: $discussionId, channelUniqueName: $channelUniqueName }
+      where: {
+        discussionId: $discussionId
+        channelUniqueName: $channelUniqueName
+      }
     ) {
       id
       archived
+    }
+  }
+`;
+
+export const GET_EVENT_CHANNEL = gql`
+  query getEventChannelID(
+    $eventId: ID!
+    $channelUniqueName: String!
+  ) {
+    eventChannels(
+      where: {
+        eventId: $eventId
+        channelUniqueName: $channelUniqueName
+      }
+    ) {
+      id
+      archived
+    }
+  }
+`;
+
+export const GET_USER_SUSPENSION = gql`
+  query getUserSuspension($channelUniqueName: String!, $username: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      SuspendedUsers(where: { username: $username }) {
+        username
+      }
+    }
+  }
+`;
+
+export const GET_MOD_SUSPENSION = gql`
+  query getModSuspension(
+    $channelUniqueName: String!
+    $modProfileName: String!
+  ) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      SuspendedMods(where: { modProfileName: $modProfileName }) {
+        modProfileName
+      }
     }
   }
 `;

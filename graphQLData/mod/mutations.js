@@ -71,3 +71,39 @@ export const ACCEPT_FORUM_MOD_INVITE = gql`
     acceptForumModInvite(channelUniqueName: $channelId)
   }
 `;
+
+export const SUSPEND_USER = gql`
+mutation suspendUser (
+  $issueID: ID!
+  $suspendUntil: DateTime
+  $suspendIndefinitely: Boolean 
+  $explanation: String
+) {
+  suspendUser(
+    issueId: $issueID,
+    suspendUntil: $suspendUntil,
+    suspendIndefinitely: $suspendIndefinitely,
+    explanation: $explanation
+  ) {
+    id
+  }
+}
+`
+
+export const SUSPEND_MOD = gql`
+mutation suspendMod (
+  $issueID: ID!
+  $suspendUntil: DateTime
+  $suspendIndefinitely: Boolean 
+  $explanation: String
+) {
+  suspendMod(
+    issueId: $issueID,
+    suspendUntil: $suspendUntil,
+    suspendIndefinitely: $suspendIndefinitely,
+    explanation: $explanation
+  ) {
+    id
+  }
+}
+`

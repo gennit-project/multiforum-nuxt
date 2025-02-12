@@ -4102,6 +4102,21 @@ export type ChannelSuspendedModsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  modProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   suspendedUntil_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4367,6 +4382,21 @@ export type ChannelSuspendedUsersNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  modProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   suspendedUntil_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -4424,6 +4454,7 @@ export type ChannelSuspensionSuspendedModsNodeAggregateSelection = {
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
+  modProfileName: StringAggregateSelection;
   suspendedUntil: DateTimeAggregateSelection;
   username: StringAggregateSelection;
 };
@@ -4439,6 +4470,7 @@ export type ChannelSuspensionSuspendedUsersNodeAggregateSelection = {
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
+  modProfileName: StringAggregateSelection;
   suspendedUntil: DateTimeAggregateSelection;
   username: StringAggregateSelection;
 };
@@ -19864,6 +19896,7 @@ export type ModerationProfileSuspensionSuspensionsNodeAggregateSelection = {
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
+  modProfileName: StringAggregateSelection;
   suspendedUntil: DateTimeAggregateSelection;
   username: StringAggregateSelection;
 };
@@ -19953,6 +19986,21 @@ export type ModerationProfileSuspensionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  modProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   suspendedUntil_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -24578,9 +24626,10 @@ export type Suspension = {
   channelUniqueName: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
+  modProfileName?: Maybe<Scalars['String']['output']>;
   suspendedIndefinitely?: Maybe<Scalars['Boolean']['output']>;
   suspendedUntil?: Maybe<Scalars['DateTime']['output']>;
-  username: Scalars['String']['output'];
+  username?: Maybe<Scalars['String']['output']>;
 };
 
 
@@ -24633,6 +24682,7 @@ export type SuspensionAggregateSelection = {
   count: Scalars['Int']['output'];
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
+  modProfileName: StringAggregateSelection;
   suspendedUntil: DateTimeAggregateSelection;
   username: StringAggregateSelection;
 };
@@ -24655,9 +24705,10 @@ export type SuspensionCreateInput = {
   SuspendedMod?: InputMaybe<SuspensionSuspendedModFieldInput>;
   SuspendedUser?: InputMaybe<SuspensionSuspendedUserFieldInput>;
   channelUniqueName: Scalars['String']['input'];
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
   suspendedIndefinitely?: InputMaybe<Scalars['Boolean']['input']>;
   suspendedUntil?: InputMaybe<Scalars['DateTime']['input']>;
-  username: Scalars['String']['input'];
+  username?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SuspensionDeleteInput = {
@@ -24705,6 +24756,7 @@ export type SuspensionSort = {
   channelUniqueName?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
+  modProfileName?: InputMaybe<SortDirection>;
   suspendedIndefinitely?: InputMaybe<SortDirection>;
   suspendedUntil?: InputMaybe<SortDirection>;
   username?: InputMaybe<SortDirection>;
@@ -25109,6 +25161,7 @@ export type SuspensionUpdateInput = {
   SuspendedUser?: InputMaybe<SuspensionSuspendedUserUpdateFieldInput>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
   suspendedIndefinitely?: InputMaybe<Scalars['Boolean']['input']>;
   suspendedUntil?: InputMaybe<Scalars['DateTime']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
@@ -25167,6 +25220,12 @@ export type SuspensionWhere = {
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  modProfileName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   suspendedIndefinitely?: InputMaybe<Scalars['Boolean']['input']>;
   suspendedUntil?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_GT?: InputMaybe<Scalars['DateTime']['input']>;
@@ -25177,7 +25236,7 @@ export type SuspensionWhere = {
   username?: InputMaybe<Scalars['String']['input']>;
   username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  username_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  username_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   username_MATCHES?: InputMaybe<Scalars['String']['input']>;
   username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
@@ -31845,6 +31904,7 @@ export type UserSuspensionSuspensionsNodeAggregateSelection = {
   channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
+  modProfileName: StringAggregateSelection;
   suspendedUntil: DateTimeAggregateSelection;
   username: StringAggregateSelection;
 };
@@ -31934,6 +31994,21 @@ export type UserSuspensionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  modProfileName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  modProfileName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  modProfileName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   suspendedUntil_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   suspendedUntil_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;

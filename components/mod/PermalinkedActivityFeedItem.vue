@@ -24,13 +24,12 @@ const moderationAction = computed(() => {
 </script>
 
 <template>
-  <div class="border border-blue-500 px-4 py-2 my-2 rounded-md">
+  <div class="px-4 py-2 my-2 rounded-md">
+    <span class="text-sm text-blue-500 font-semibold">Permalinked Comment</span>
     <div v-if="commentLoading">Loading...</div>
     <ErrorBanner v-if="commentError" :text="commentError.message" />
-    
-    <div
-      v-else-if="moderationAction"
-    >
+
+    <div v-else-if="moderationAction">
       <slot name="moderation-action" :moderation-action="moderationAction" />
     </div>
     <div v-else>

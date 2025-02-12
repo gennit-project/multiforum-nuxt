@@ -14,11 +14,17 @@ import {
   ARCHIVE_EVENT,
   ARCHIVE_COMMENT,
 } from "@/graphQLData/issue/mutations";
+import { SUSPEND_USER, SUSPEND_MOD } from "@/graphQLData/mod/mutations";
 import type { Comment } from "@/__generated__/graphql";
 import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
 import ArchiveBox from "@/components/icons/ArchiveBox.vue";
 
 const props = defineProps({
+  issueId: {
+    type: String,
+    required: false,
+    default: "",
+  },
   discussionTitle: {
     type: String,
     required: false,
@@ -62,11 +68,17 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  suspendUserEnabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 const emit = defineEmits([
   "close",
   "reportSubmittedSuccessfully",
   "reportedAndArchivedSuccessfully",
+  "suspended-user-successfully",
+  "suspended-mod-successfully",
 ]);
 
 const route = useRoute();
@@ -98,6 +110,20 @@ const toggleServerRuleSelection = (rule: string) => {
     selectedServerRules.value = [...selectedServerRules.value, rule];
   }
 };
+
+const {
+  mutate: suspendUser,
+  loading: suspendUserLoading,
+  error: suspendUserError,
+  onDone: suspendUserDone,
+} = useMutation(SUSPEND_USER);
+
+const {
+  mutate: suspendMod,
+  loading: suspendModLoading,
+  error: suspendModError,
+  onDone: suspendModDone,
+} = useMutation(SUSPEND_MOD);
 
 const {
   mutate: reportDiscussion,
@@ -190,6 +216,14 @@ archiveCommentDone(() => {
   emit("reportedAndArchivedSuccessfully");
 });
 
+suspendUserDone(() => {
+  emit("suspended-user-successfully");
+});
+
+suspendModDone(() => {
+  emit("suspended-mod-successfully");
+});
+
 const modalTitle = computed(() => {
   if (props.archiveAfterReporting) {
     if (props.commentId) {
@@ -236,7 +270,22 @@ const submit = async () => {
     console.error("No discussion, event, or comment ID provided.");
     return;
   }
-  if (!props.archiveAfterReporting) {
+  if (props.suspendUserEnabled) {
+    if (!props.issueId) {
+      console.error("No issue ID provided.");
+      return;
+    }
+
+    suspendUser({
+      issueID: props.issueId,
+      suspendUntil: null,
+      suspendIndefinitely: true,
+      explanation: reportText.value,
+    });
+
+  }
+  else if (!props.archiveAfterReporting) {
+    // Assume the user is reporting the content.
     if (props.discussionId) {
       reportDiscussion({
         discussionId: props.discussionId,
@@ -265,8 +314,8 @@ const submit = async () => {
       });
     }
   } else {
-    // We don't have to call report mutations here because the reports
-    // are already built into the archive resolvers.
+    // Assume the user is archiving the content.
+    // Note: Reports are already built into the archive resolvers.
     if (props.discussionId) {
       archiveDiscussion({
         discussionId: props.discussionId,
@@ -316,7 +365,9 @@ const close = () => {
       reportCommentLoading ||
       archiveDiscussionLoading ||
       archiveEventLoading ||
-      archiveCommentLoading
+      archiveCommentLoading ||
+      suspendUserLoading ||
+      suspendModLoading
     "
     :primary-button-disabled="
       selectedForumRules.length === 0 && selectedServerRules.length === 0
@@ -327,7 +378,9 @@ const close = () => {
       reportCommentError?.message ||
       archiveDiscussionError?.message ||
       archiveEventError?.message ||
-      archiveCommentError?.message
+      archiveCommentError?.message ||
+      suspendUserError?.message ||
+      suspendModError?.message
     "
     @primary-button-click="submit"
     @close="close"

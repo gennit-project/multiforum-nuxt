@@ -1,13 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import type { Issue } from "@/__generated__/graphql";
-import ArchiveBox from "@/components/icons/ArchiveBox.vue";
-import ArchiveBoxXMark from "@/components/icons/ArchiveBoxXMark.vue";
-import OpenIssueModal from "@/components/mod/OpenIssueModal.vue";
-import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import { GET_DISCUSSION_CHANNEL } from "@/graphQLData/mod/queries";
 import { useQuery } from "@vue/apollo-composable";
+import {
+  GET_USER_SUSPENSION,
+  GET_MOD_SUSPENSION,
+} from "@/graphQLData/mod/queries";
+import { modProfileNameVar } from "@/cache";
+import ArchiveButton from "./ArchiveButton.vue";
+import SuspendUserButton from "./SuspendUserButton.vue";
 
 const props = defineProps({
   issue: {
@@ -41,106 +42,84 @@ const props = defineProps({
   },
 });
 
-const { result } = useQuery(GET_DISCUSSION_CHANNEL, {
-  discussionId: props.discussionId,
-  channelUniqueName: props.channelUniqueName,
-});
-
-const discussionChannelId = computed(() => {
-  return result.value?.discussionChannels?.[0]?.id ?? "";
-});
-
-const isArchived = computed(() => {
-  return  result.value?.discussionChannels?.[0]?.archived;
-})
-
-// Emits for custom events
-defineEmits(["close-issue", "archived-successfully", "unarchived-successfully"]);
+defineEmits([
+  "close-issue",
+  "archived-successfully",
+  "unarchived-successfully",
+  "suspended-successfully",
+  "unsuspended-successfully",
+]);
 
 // const suspensionMessage = computed(() => {
 //   return `
-//     Your post has been removed from ${channelId.value} for violating the following rules:
+//     This post has been removed from ${channelId.value} for violating the following rules:
 //     ${brokenRules.value}
 
-//     As a result, you have been suspended from posting in ${channelId.value} ${
+//     As a result, I have suspended ${authorUsername} from posting in ${channelId.value} ${
 //       selectedSuspensionLength.value === "indefinitely"
 //         ? "indefinitely"
 //         : `for ${selectedSuspensionLength.value}`
 //     }.
-
-//     If you believe this was done in error, please open a support ticket.
 //   `;
 // });
+const {
+  result: getUserSuspensionResult,
+  loading: getUserSuspensionLoading,
+  error: getUserSuspensionError,
+  // refetch: refetchUserSuspension
+} = useQuery(GET_USER_SUSPENSION, {
+  channelUniqueName: props.channelUniqueName,
+  username: modProfileNameVar.value,
+});
 
-const showArchiveModal = ref(false);
-const showUnarchiveModal = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyUnarchived = ref(false);
+const {
+  result: getModSuspensionResult,
+  loading: getModSuspensionLoading,
+  error: getModSuspensionError,
+  // refetch: refetchModSuspension
+} = useQuery(GET_MOD_SUSPENSION, {
+  channelUniqueName: props.channelUniqueName,
+  modProfileName: modProfileNameVar.value,
+});
+
+const userIsSuspendedFromChannel = computed(() => {
+  if (getUserSuspensionLoading.value || getUserSuspensionError.value)
+    return false;
+  return getUserSuspensionResult.value?.channels[0].SuspendedUsers.length > 0;
+});
+
+const modIsSuspendedFromChannel = computed(() => {
+  if (getModSuspensionLoading.value || getModSuspensionError.value)
+    return false;
+  return getModSuspensionResult.value?.channels[0].SuspendedMods.length > 0;
+});
 </script>
 
 <template>
   <div class="flex flex-col justify-center w-full pt-12">
     <h1 class="text-xl font-bold">Moderation Actions</h1>
-    <hr />
+    <hr >
     <div class="flex flex-col space-y-4 mt-4">
-      <button
-        v-if="isArchived"
-        @click="showUnarchiveModal = true"
-        class="bg-green-600 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
-      >
-        <ArchiveBoxXMark />
-        Unarchive
-      </button>
-      <button
-        v-else
-        @click="showArchiveModal = true"
-        class="bg-red-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
-        :disabled="issue.isOpen"
-      >
-        <ArchiveBox />
-        Archive
-      </button>
+      <ArchiveButton
+        :discussion-id="discussionId"
+        :event-id="eventId"
+        :comment-id="commentId"
+        :context-text="contextText"
+        :channel-unique-name="channelUniqueName"
+        :issue="issue"
+      />
+      <SuspendUserButton 
+        :issue-id="issue.id"
+        :discussion-title="contextText"
+        :discussion-id="discussionId"
+        :event-title="contextText"
+        :event-id="eventId"
+        :user-is-suspended="userIsSuspendedFromChannel" 
+        :channel-unique-name="channelUniqueName"
+      />
+      <!-- <SuspendModButton 
+        :mod-is-suspended="modIsSuspendedFromChannel" 
+      /> -->
     </div>
-
-    <OpenIssueModal
-      :title="'Archive Content'"
-      :open="showArchiveModal"
-      :discussion-title="contextText"
-      :discussion-id="discussionId"
-      :archive-after-reporting="true"
-      :discussion-channel-id="discussionChannelId"
-      @close="showArchiveModal = false"
-      @reported-and-archived-successfully="
-        () => {
-          showSuccessfullyArchived = true;
-          showArchiveModal = false;
-          $emit('archived-successfully');
-        }
-      "
-    />
-    <UnarchiveModal
-      v-if="discussionChannelId && discussionId"
-      :open="showUnarchiveModal"
-      :discussion-channel-id="discussionChannelId"
-      :discussion-id="discussionId"
-      @close="showUnarchiveModal = false"
-      @unarchived-successfully="
-        () => {
-          showSuccessfullyUnarchived = true;
-          showUnarchiveModal = false;
-          $emit('unarchived-successfully');
-        }
-      "
-    />
-    <Notification
-      :show="showSuccessfullyArchived"
-      :title="'The content was reported and archived successfully.'"
-      @close-notification="showSuccessfullyArchived = false"
-    />
-    <Notification
-      :show="showSuccessfullyUnarchived"
-      :title="'The content was unarchived successfully.'"
-      @close-notification="showSuccessfullyUnarchived = false"
-    />
   </div>
 </template>

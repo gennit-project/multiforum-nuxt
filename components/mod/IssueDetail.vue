@@ -575,7 +575,7 @@ const toggleCloseOpenIssue = async () => {
 
     <v-row v-if="issue" class="flex justify-center dark:text-white">
       <v-col>
-        <div class="space-y-3 px-4">
+        <div class="px-4 ">
           <h2 v-if="activeIssue" class="text-xl font-bold">Activity Feed</h2>
 
           <ActivityFeed
@@ -591,7 +591,7 @@ const toggleCloseOpenIssue = async () => {
           <div class="flex w-full flex-col">
             <h2
               v-if="activeIssue"
-              class="text-xl font-bold border-b mb-4 mt-8 pb-1"
+              class="text-xl font-bold border-b mt-8 pb-1"
             >
               Leave a comment
             </h2>
@@ -626,6 +626,10 @@ const toggleCloseOpenIssue = async () => {
             :channel-unique-name="channelId"
             @archived-successfully="refetchIssue"
             @unarchived-successfully="refetchIssue"
+            @suspended-user-successfully="refetchIssue"
+            @suspended-mod-successfully="refetchIssue"
+            @unsuspended-user-successfully="refetchIssue"
+            @unsuspended-mod-successfully="refetchIssue"
           />
         </div>
       </v-col>
