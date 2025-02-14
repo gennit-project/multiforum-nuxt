@@ -26,6 +26,8 @@ const getBackgroundColor = (actionType: string) => {
       return "bg-red-200 dark:bg-red-500";
     case ActionType.Report:
       return "bg-red-200 dark:bg-red-500";
+    case ActionType.Suspension:
+      return "bg-red-200 dark:bg-red-500";
     case ActionType.Unsuspend:
       return "bg-green-200 dark:bg-green-500";
     case ActionType.Reopen:
@@ -45,7 +47,7 @@ const actionTypeToIcon = {
   [ActionType.Remove]: XmarkIcon,
   [ActionType.Reopen]: ArrowPath,
   [ActionType.Report]: FlagIcon,
-  [ActionType.Suspend]: UserMinus,
+  [ActionType.Suspension]: UserMinus,
   [ActionType.Unsuspend]: UserPlus,
   [ActionType.Archive]: ArchiveBox,
   [ActionType.Unarchive]: ArchiveBoxXMark,
@@ -57,14 +59,13 @@ const props = defineProps({
     required: true,
   },
 });
-
 const commentIdInParams = useRoute().params.commentId as string;
 const isPermalinked = commentIdInParams === props.activityItem.Comment?.id;
 </script>
 
 <template>
   <li
-    class="list-none"
+    class="list-none mt-4"
     :class="[
       isPermalinked
         ? 'bg-blue-100 rounded-lg border border-blue-500 dark:bg-blue-900'

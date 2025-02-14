@@ -347,6 +347,12 @@ const submit = async () => {
 };
 
 const close = () => {
+  // Clear the form
+
+  selectedForumRules.value = [];
+  selectedServerRules.value = [];
+  reportText.value = "";
+
   emit("close");
 };
 </script>

@@ -34,7 +34,7 @@ const { result, loading, error } = useQuery(
         result.users[0]?.ModOfChannels?.length === 0
       "
     >
-      This user is not a mod in any channels.
+      This user is not a mod in any forums.
     </div>
     <ChannelList
       v-else

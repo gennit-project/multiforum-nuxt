@@ -9,7 +9,7 @@ export enum ActionType {
   Remove = "remove",
   Reopen = "reopen",
   Report = "report",
-  Suspend = "suspend",
+  Suspension = "suspension",
   Unarchive = "un-archive",
   Unsuspend = "unsuspend",
 }

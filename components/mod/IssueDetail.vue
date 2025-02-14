@@ -620,9 +620,11 @@ const toggleCloseOpenIssue = async () => {
           </div>
 
           <ModerationWizard
-            v-if="issue && activeIssue?.relatedDiscussionId"
+            v-if="issue && (activeIssue?.relatedDiscussionId || activeIssue?.relatedEventId || activeIssue?.relatedCommentId)"
             :issue="issue"
-            :discussion-id="activeIssue?.relatedDiscussionId"
+            :discussion-id="activeIssue?.relatedDiscussionId || ''"
+            :event-id="activeIssue?.relatedEventId || ''"
+            :comment-id="activeIssue?.relatedCommentId || ''"
             :channel-unique-name="channelId"
             @archived-successfully="refetchIssue"
             @unarchived-successfully="refetchIssue"

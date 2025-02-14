@@ -278,3 +278,29 @@ export const GET_MOD_SUSPENSION = gql`
     }
   }
 `;
+
+export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
+query getChannel(
+    $channelUniqueName: String!
+  )  {
+  channels(
+    where: {
+      uniqueName:  $channelUniqueName
+    }
+  ) {
+    uniqueName
+    SuspendedUsersAggregate {
+      count
+    }
+    SuspendedUsers {
+      username
+      SuspendedUser {
+        username
+      }
+      RelatedIssue {
+        id
+      }
+    }
+  }
+}
+`

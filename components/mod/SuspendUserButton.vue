@@ -103,6 +103,9 @@ const clickUnsuspend = () => {
     :discussion-title="discussionTitle"
     :discussion-id="discussionId"
     :discussion-channel-id="discussionChannelId"
+    :event-title="eventTitle"
+    :event-id="eventId"
+    :event-channel-id="eventChannelId"
     :suspend-user-enabled="true"
     :text-box-label="'(Optional) Explain why you are suspending this author:'"
     :issue-id="issueId"
@@ -114,7 +117,7 @@ const clickUnsuspend = () => {
       }
     "
   />
-  <UnsuspendModal
+  <!-- <UnsuspendModal
     :title="'Unsuspend Author'"
     :open="showUnsuspendModal"
     :discussion-title="discussionTitle"
@@ -129,7 +132,7 @@ const clickUnsuspend = () => {
         showUnsuspendModal = false;
       }
     "
-  />
+  /> -->
 
   <Notification
     :show="showSuccessfullySuspended"

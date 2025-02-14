@@ -1,23 +1,10 @@
 <script lang="ts" setup>
-import PendingForumOwnerList from "@/components/channel/form/PendingForumOwnerList.vue";
-import ForumOwnerList from "@/components/channel/form/ForumOwnerList.vue";
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import {
-  INVITE_FORUM_OWNER,
-  CANCEL_INVITE_FORUM_OWNER,
-  REMOVE_FORUM_OWNER,
-} from "@/graphQLData/mod/mutations";
+import { computed } from "vue";
 import { useRoute } from "nuxt/app";
-import {
-  GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-  GET_CHANNEL_OWNERS_BY_CHANNEL,
-} from "@/graphQLData/mod/queries";
-import ErrorBanner from "@/components/ErrorBanner.vue";
+import { useQuery } from "@vue/apollo-composable";
+import { GET_SUSPENDED_USERS_IN_CHANNEL } from "@/graphQLData/mod/queries";
 
 const route = useRoute();
-
-const newOwnerUsername = ref("");
 
 const forumId = computed(() => {
   if (typeof route.params.forumId === "string") {
@@ -26,153 +13,16 @@ const forumId = computed(() => {
   return "";
 });
 
-const {
-  loading: inviteOwnerLoading,
-  error: inviteOwnerError,
-  mutate: inviteOwner,
-  onDone: inviteOwnerDone,
-} = useMutation(INVITE_FORUM_OWNER, {
-  update: (cache, { data }) => {
-    // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
-    // to add the newly invited user
-
-    const existingData: any = cache.readQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    });
-
-    const existingInvites =
-      existingData?.channels[0]?.PendingOwnerInvites ?? [];
-
-    cache.writeQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            PendingOwnerInvites: [
-              ...existingInvites,
-              {
-                username: newOwnerUsername.value,
-              },
-            ],
-          },
-        ],
-      },
-    });
-  },
+const { 
+  result: suspendedUsersResult,
+  loading,
+  error,
+} = useQuery(GET_SUSPENDED_USERS_IN_CHANNEL, {
+  channelUniqueName: forumId.value,
 });
-
-const {
-  mutate: cancelInviteOwner,
-  loading: cancelInviteOwnerLoading,
-  error: cancelInviteOwnerError,
-  onDone: cancelInviteOwnerDone,
-} = useMutation(CANCEL_INVITE_FORUM_OWNER, {
-  update: (cache) => {
-    // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
-    // to add the newly invited user
-
-    const existingData: any = cache.readQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    });
-
-    const existingInvites =
-      existingData?.channels[0]?.PendingOwnerInvites ?? [];
-
-    cache.writeQuery({
-      query: GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            PendingOwnerInvites: [
-              ...existingInvites.filter(
-                (invite: any) => invite.username !== newOwnerUsername.value
-              ),
-            ],
-          },
-        ],
-      },
-    });
-  },
+const suspendedUsers = computed(() => {
+  return suspendedUsersResult.value?.channels[0]?.SuspendedUsers ?? [];
 });
-
-const {
-  mutate: removeForumOwner,
-  loading: removeForumOwnerLoading,
-  onDone: removeForumOwnerDone,
-  error: removeForumOwnerError,
-} = useMutation(REMOVE_FORUM_OWNER, {
-  update: (cache) => {
-    // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
-    // to remove the removed user
-
-    const existingData: any = cache.readQuery({
-      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-    });
-
-    const existingOwners = existingData?.channels[0]?.Admins ?? [];
-
-    cache.writeQuery({
-      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-      variables: {
-        channelUniqueName: forumId.value,
-      },
-      data: {
-        channels: [
-          {
-            Admins: [
-              ...existingOwners.filter(
-                (owner: any) => owner.username !== newOwnerUsername.value
-              ),
-            ],
-          },
-        ],
-      },
-    });
-  },
-});
-
-inviteOwnerDone(() => {
-  newOwnerUsername.value = "";
-});
-
-removeForumOwnerDone(() => {
-  showRemoveChannelOwnerModal.value = false;
-});
-
-const showCancelInviteModal = ref(false);
-const showRemoveChannelOwnerModal = ref(false);
-
-cancelInviteOwnerDone(() => {
-  showCancelInviteModal.value = false;
-});
-
-const inviteeToRemove = ref("");
-const forumOwnerToRemove = ref("");
-
-const clickCancelInvite = (inviteeUsername: string) => {
-  inviteeToRemove.value = inviteeUsername;
-  showCancelInviteModal.value = true;
-};
-
-const clickRemoveOwner = (ownerUsername: string) => {
-  forumOwnerToRemove.value = ownerUsername;
-  showRemoveChannelOwnerModal.value = true;
-};
 </script>
 
 <template>
@@ -195,10 +45,51 @@ const clickRemoveOwner = (ownerUsername: string) => {
         </li>
       </ul>
     </div>
-    <FormRow section-title="Suspended User List">
-      <template #content>
-        <ForumOwnerList @click-remove-owner="clickRemoveOwner" />
-      </template>
-    </FormRow>
+    <div class="flex flex-col gap-3 py-3 dark:text-white">
+      <div v-if="loading">Loading...</div>
+      <ErrorBanner v-else-if="error" :text="error.message" />
+      <div
+        v-else-if="
+          suspendedUsers.length === 0
+        "
+      >
+        This forum has no suspended users.
+      </div>
+      <div v-if="suspendedUsers.length > 0" class="flex-col text-sm ">
+        <div
+          v-for="user in suspendedUsers"
+          :key="user.username"
+          class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+        >
+          <nuxt-link
+            :to="{ name: 'u-username', params: { username: user.username } }"
+            class="flex items-center dark:text-white font-bold"
+          >
+            <AvatarComponent
+              :text="user.username"
+              :src="user.profilePicURL ?? ''"
+              class="mr-2 h-6 w-6"
+            />
+            <UsernameWithTooltip
+              v-if="user.username"
+              :username="user.username"
+              :src="user.profilePicURL ?? ''"
+              :display-name="user.displayName ?? ''"
+              :comment-karma="user.commentKarma ?? 0"
+              :discussion-karma="user.discussionKarma ?? 0"
+              :account-created="user.createdAt ?? ''"
+            />
+          </nuxt-link>
+  
+          <nuxt-link
+            v-if="user.RelatedIssue"
+            class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
+            :to="{ name: 'forums-forumId-issues-issueId', params: { issueId: user.RelatedIssue?.id } }"
+          >
+            Related Issue
+          </nuxt-link>
+        </div>
+      </div>
+    </div>
   </div>
 </template>

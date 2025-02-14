@@ -15,7 +15,7 @@ const reversedFeedItems = computed(() => {
 <template>
   <div class="flow-root">
     <NuxtPage />
-    <ul role="list" class="mt-2">
+    <ul role="list">
       <ActivityFeedListItem
         v-for="activityItem in reversedFeedItems"
         :key="activityItem.id"
