@@ -15,6 +15,7 @@ const {
   error: notificationError,
   loading: notificationLoading,
   fetchMore,
+  refetch
 } = useQuery(GET_NOTIFICATIONS, {
   username: usernameVar.value,
   options: {
@@ -30,7 +31,12 @@ const {
     mutate: markNotificationsAsRead,
     loading: markNotificationsAsReadLoading,
     error: markNotificationsAsReadError,
-} = useMutation(MARK_NOTIFICATIONS_AS_READ);
+    onDone: markNotificationsAsReadDone,
+} = useMutation(MARK_NOTIFICATIONS_AS_READ,);
+
+markNotificationsAsReadDone(() => {
+  refetch();
+});
 
 const notifications = computed<Notification[]>(() => {
   if (!notificationResult.value) {
