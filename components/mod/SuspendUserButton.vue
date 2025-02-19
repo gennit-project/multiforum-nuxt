@@ -1,15 +1,18 @@
 <script lang="ts" setup>
 import { ref, defineProps, computed } from "vue";
+import type { PropType } from "vue";
 import UserPlus from "../icons/UserPlus.vue";
 import UserMinus from "../icons/UserMinus.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { useQuery } from "@vue/apollo-composable";
-import { GET_DISCUSSION_CHANNEL, GET_EVENT_CHANNEL } from "@/graphQLData/mod/queries";
+import { GET_DISCUSSION_CHANNEL, GET_EVENT_CHANNEL, IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
+import UnsuspendUserModal from "@/components/mod/UnsuspendUserModal.vue";
+import type { Issue } from "@/__generated__/graphql";
 
 const props = defineProps({
-  issueId: {
-    type: String,
+  issue: {
+    type: Object as PropType<Issue>,
     required: true,
   },
   channelUniqueName: {
@@ -36,10 +39,20 @@ const props = defineProps({
     required: false,
     default: "",
   },
-  userIsSuspended: {
-    type: Boolean,
-    required: true,
-  },
+});
+
+const {
+  result: getUserSuspensionResult,
+  loading: getUserSuspensionLoading,
+  error: getUserSuspensionError,
+  // refetch: refetchUserSuspension
+} = useQuery(IS_ORIGINAL_POSTER_SUSPENDED, {
+  issueId: props.issue.id,
+});
+const userIsSuspendedFromChannel = computed(() => {
+  if (getUserSuspensionLoading.value || getUserSuspensionError.value)
+    return false;
+  return getUserSuspensionResult.value?.isOriginalPosterSuspended ?? false;
 });
 
 const showSuspendModal = ref(false);
@@ -61,7 +74,6 @@ const {
   channelUniqueName: props.channelUniqueName,
 });
 
-
 const discussionChannelId = computed(() => {
   return getDiscussionChannelResult.value?.discussionChannels?.[0]?.id ?? "";
 });
@@ -82,12 +94,12 @@ const clickUnsuspend = () => {
 
 <template>
   <button
-    v-if="userIsSuspended"
+    v-if="userIsSuspendedFromChannel"
     class="cursor-pointer bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
     @click="clickUnsuspend"
   >
     <UserPlus />
-    Unsuspend
+    Unsuspend Author
   </button>
   <button
     v-else
@@ -101,14 +113,15 @@ const clickUnsuspend = () => {
     :title="'Suspend Author'"
     :open="showSuspendModal"
     :discussion-title="discussionTitle"
-    :discussion-id="discussionId"
+    :discussion-id="issue.relatedDiscussionId ?? ''"
     :discussion-channel-id="discussionChannelId"
     :event-title="eventTitle"
-    :event-id="eventId"
+    :event-id="issue.relatedEventId ?? ''"
     :event-channel-id="eventChannelId"
+    :comment-id="issue.relatedCommentId ?? ''"
     :suspend-user-enabled="true"
     :text-box-label="'(Optional) Explain why you are suspending this author:'"
-    :issue-id="issueId"
+    :issue-id="issue.id"
     @close="showSuspendModal = false"
     @suspended-user-successfully="
       () => {
@@ -117,23 +130,18 @@ const clickUnsuspend = () => {
       }
     "
   />
-  <!-- <UnsuspendModal
+  <UnsuspendUserModal
     :title="'Unsuspend Author'"
     :open="showUnsuspendModal"
-    :discussion-title="discussionTitle"
-    :discussion-id="discussionId"
-    :suspend-author="true"
-    :discussion-channel-id="discussionChannelId"
-    :issue-id="issueId"
+    :issue-id="issue.id"
     @close="showUnsuspendModal = false"
-    @unsuspend-user-successfully="
+    @unsuspended-successfully="
       () => {
         showSuccessfullyUnsuspended = true;
         showUnsuspendModal = false;
       }
     "
-  /> -->
-
+  />
   <Notification
     :show="showSuccessfullySuspended"
     :title="'The author was suspended.'"

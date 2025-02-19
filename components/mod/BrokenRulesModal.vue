@@ -18,6 +18,7 @@ import { SUSPEND_USER, SUSPEND_MOD } from "@/graphQLData/mod/mutations";
 import type { Comment } from "@/__generated__/graphql";
 import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
 import ArchiveBox from "@/components/icons/ArchiveBox.vue";
+import { IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
 
 const props = defineProps({
   issueId: {
@@ -116,14 +117,42 @@ const {
   loading: suspendUserLoading,
   error: suspendUserError,
   onDone: suspendUserDone,
-} = useMutation(SUSPEND_USER);
+} = useMutation(SUSPEND_USER, {
+  update: (cache) => {
+     // update the result of IS_ORIGINAL_POSTER_SUSPENDED
+    // is true.
+    cache.writeQuery({
+      query: IS_ORIGINAL_POSTER_SUSPENDED,
+      variables: {
+        issueId: props.issueId,
+      },
+      data: {
+        isOriginalPosterSuspended: true,
+      },
+    });
+  },
+});
 
 const {
   mutate: suspendMod,
   loading: suspendModLoading,
   error: suspendModError,
   onDone: suspendModDone,
-} = useMutation(SUSPEND_MOD);
+} = useMutation(SUSPEND_MOD, {
+  update: (cache) => {
+    // update the result of IS_ORIGINAL_POSTER_SUSPENDED
+    // is true.
+    cache.writeQuery({
+      query: IS_ORIGINAL_POSTER_SUSPENDED,
+      variables: {
+        issueId: props.issueId,
+      },
+      data: {
+        isOriginalPosterSuspended: true,
+      },
+    });
+  },
+});
 
 const {
   mutate: reportDiscussion,

@@ -32,7 +32,7 @@ const {
   mutate: inviteOwner,
   onDone: inviteOwnerDone,
 } = useMutation(INVITE_FORUM_OWNER, {
-  update: (cache, { data }) => {
+  update: (cache) => {
     // update the result of GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL
     // to add the newly invited user
 
@@ -54,6 +54,7 @@ const {
       data: {
         channels: [
           {
+            ...existingData.channels[0],
             PendingOwnerInvites: [
               ...existingInvites,
               {

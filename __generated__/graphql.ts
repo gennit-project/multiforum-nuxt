@@ -20611,6 +20611,8 @@ export type Mutation = {
   unarchiveEvent?: Maybe<Issue>;
   undoUpvoteComment?: Maybe<Comment>;
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
+  unsuspendMod?: Maybe<Issue>;
+  unsuspendUser?: Maybe<Issue>;
   updateAlbums: UpdateAlbumsMutationResponse;
   updateChannelRoles: UpdateChannelRolesMutationResponse;
   updateChannels: UpdateChannelsMutationResponse;
@@ -21317,6 +21319,18 @@ export type MutationUndoUpvoteDiscussionChannelArgs = {
 };
 
 
+export type MutationUnsuspendModArgs = {
+  explanation?: InputMaybe<Scalars['String']['input']>;
+  issueId: Scalars['ID']['input'];
+};
+
+
+export type MutationUnsuspendUserArgs = {
+  explanation?: InputMaybe<Scalars['String']['input']>;
+  issueId: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateAlbumsArgs = {
   update?: InputMaybe<AlbumUpdateInput>;
   where?: InputMaybe<AlbumWhere>;
@@ -21786,6 +21800,7 @@ export type Query = {
   images: Array<Image>;
   imagesAggregate: ImageAggregateSelection;
   imagesConnection: ImagesConnection;
+  isOriginalPosterSuspended?: Maybe<Scalars['Boolean']['output']>;
   issueAuthors: Array<IssueAuthor>;
   issueCommentAuthors: Array<IssueCommentAuthor>;
   issues: Array<Issue>;
@@ -22292,6 +22307,11 @@ export type QueryImagesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<ImageSort>>>;
   where?: InputMaybe<ImageWhere>;
+};
+
+
+export type QueryIsOriginalPosterSuspendedArgs = {
+  issueId: Scalars['String']['input'];
 };
 
 

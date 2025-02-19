@@ -238,15 +238,9 @@ export const GET_DISCUSSION_CHANNEL = gql`
 `;
 
 export const GET_EVENT_CHANNEL = gql`
-  query getEventChannelID(
-    $eventId: ID!
-    $channelUniqueName: String!
-  ) {
+  query getEventChannelID($eventId: ID!, $channelUniqueName: String!) {
     eventChannels(
-      where: {
-        eventId: $eventId
-        channelUniqueName: $channelUniqueName
-      }
+      where: { eventId: $eventId, channelUniqueName: $channelUniqueName }
     ) {
       id
       archived
@@ -254,53 +248,28 @@ export const GET_EVENT_CHANNEL = gql`
   }
 `;
 
-export const GET_USER_SUSPENSION = gql`
-  query getUserSuspension($channelUniqueName: String!, $username: String!) {
-    channels(where: { uniqueName: $channelUniqueName }) {
-      uniqueName
-      SuspendedUsers(where: { username: $username }) {
-        username
-      }
-    }
-  }
-`;
-
-export const GET_MOD_SUSPENSION = gql`
-  query getModSuspension(
-    $channelUniqueName: String!
-    $modProfileName: String!
-  ) {
-    channels(where: { uniqueName: $channelUniqueName }) {
-      uniqueName
-      SuspendedMods(where: { modProfileName: $modProfileName }) {
-        modProfileName
-      }
-    }
+export const IS_ORIGINAL_POSTER_SUSPENDED = gql`
+  query getSuspension($issueId: String!) {
+    isOriginalPosterSuspended(issueId: $issueId)
   }
 `;
 
 export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
-query getChannel(
-    $channelUniqueName: String!
-  )  {
-  channels(
-    where: {
-      uniqueName:  $channelUniqueName
-    }
-  ) {
-    uniqueName
-    SuspendedUsersAggregate {
-      count
-    }
-    SuspendedUsers {
-      username
-      SuspendedUser {
-        username
+  query getChannel($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      SuspendedUsersAggregate {
+        count
       }
-      RelatedIssue {
-        id
+      SuspendedUsers {
+        username
+        SuspendedUser {
+          username
+        }
+        RelatedIssue {
+          id
+        }
       }
     }
   }
-}
-`
+`;
