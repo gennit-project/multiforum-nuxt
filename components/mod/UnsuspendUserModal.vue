@@ -47,7 +47,6 @@ const {
 });
 
 unsuspendDone(() => {
-  console.log("User unsuspended successfully.");
   emit("unsuspendedSuccessfully");
 });
 
@@ -64,7 +63,6 @@ const submit = async () => {
     console.error("No issue ID provided.");
     return;
   }
-  console.log("Unsuspending user...",props.issueId);
 
   await unsuspendUser({
     issueId: props.issueId,

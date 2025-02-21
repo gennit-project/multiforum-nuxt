@@ -39,8 +39,10 @@ defineEmits([
   "close-issue",
   "archived-successfully",
   "unarchived-successfully",
-  "suspended-successfully",
-  "unsuspended-successfully",
+  "suspended-user-successfully",
+  "unsuspended-user-successfully",
+  "suspended-mod-successfully",
+  "unsuspended-mod-successfully",
 ]);
 
 // const suspensionMessage = computed(() => {
@@ -77,6 +79,8 @@ defineEmits([
         :event-title="contextText"
         :event-id="eventId"
         :channel-unique-name="channelUniqueName"
+        @suspended-successfully="$emit('suspended-user-successfully')"
+        @unsuspended-successfully="$emit('unsuspended-mod-successfully')"
       />
       <!-- <SuspendModButton 
         :mod-is-suspended="modIsSuspendedFromChannel" 

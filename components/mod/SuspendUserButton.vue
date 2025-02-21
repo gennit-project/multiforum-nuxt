@@ -9,6 +9,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION_CHANNEL, GET_EVENT_CHANNEL, IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
 import UnsuspendUserModal from "@/components/mod/UnsuspendUserModal.vue";
 import type { Issue } from "@/__generated__/graphql";
+import { emit } from "process";
 
 const props = defineProps({
   issue: {
@@ -40,6 +41,11 @@ const props = defineProps({
     default: "",
   },
 });
+
+defineEmits([
+  "suspended-successfully",
+  "unsuspended-successfully",
+]);
 
 const {
   result: getUserSuspensionResult,
@@ -93,6 +99,7 @@ const clickUnsuspend = () => {
 </script>
 
 <template>
+  <div>
   <button
     v-if="userIsSuspendedFromChannel"
     class="cursor-pointer bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
@@ -127,6 +134,7 @@ const clickUnsuspend = () => {
       () => {
         showSuccessfullySuspended = true;
         showSuspendModal = false;
+        $emit('suspended-successfully');
       }
     "
   />
@@ -139,6 +147,7 @@ const clickUnsuspend = () => {
       () => {
         showSuccessfullyUnsuspended = true;
         showUnsuspendModal = false;
+        $emit('unsuspended-successfully');
       }
     "
   />
@@ -152,4 +161,5 @@ const clickUnsuspend = () => {
     :title="'The author was unsuspended.'"
     @close-notification="showSuccessfullyUnsuspended = false"
   />
+  </div>
 </template>
