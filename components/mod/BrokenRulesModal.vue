@@ -20,6 +20,12 @@ import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
 import ArchiveBox from "@/components/icons/ArchiveBox.vue";
 import { IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
 
+type FinalCommentTextInput = {
+  selectedForumRules: string[];
+  selectedServerRules: string[];
+  reportText: string;
+};
+
 const props = defineProps({
   issueId: {
     type: String,
@@ -93,6 +99,7 @@ const selectedServerRules = ref<string[]>([]);
 const reportText = ref("");
 
 const toggleForumRuleSelection = (rule: string) => {
+  console.log("toggleForumRuleSelection", rule);
   if (selectedForumRules.value.includes(rule)) {
     selectedForumRules.value = selectedForumRules.value.filter(
       (r) => r !== rule
@@ -103,6 +110,7 @@ const toggleForumRuleSelection = (rule: string) => {
 };
 
 const toggleServerRuleSelection = (rule: string) => {
+  console.log("toggleServerRuleSelection", rule);
   if (selectedServerRules.value.includes(rule)) {
     selectedServerRules.value = selectedServerRules.value.filter(
       (r) => r !== rule
@@ -294,6 +302,42 @@ const modalPlaceholder = computed(() => {
   return `Explain why this ${contentType} should be removed`;
 });
 
+const getFinalCommentText = (input: FinalCommentTextInput) => {
+  const { selectedForumRules, selectedServerRules, reportText } = input;
+  return `
+${
+  selectedForumRules.length > 0
+    ? `
+Server rule violations:
+
+${selectedForumRules.map((rule) => `- ${rule}`).join("\n")}
+`
+    : ""
+}
+
+${
+  selectedServerRules.length > 0
+    ? `
+
+Forum rule violations:
+
+${selectedServerRules.map((rule) => `- ${rule}`).join("\n")}
+`
+    : ""
+}
+
+${
+  reportText
+    ? `
+Notes:
+
+${reportText}
+`
+    : ""
+}
+`;
+};
+
 const submit = async () => {
   if (!props.discussionId && !props.eventId && !props.commentId) {
     console.error("No discussion, event, or comment ID provided.");
@@ -309,7 +353,11 @@ const submit = async () => {
       issueID: props.issueId,
       suspendUntil: null,
       suspendIndefinitely: true,
-      explanation: reportText.value,
+      explanation: getFinalCommentText({
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        reportText: reportText.value,
+      })
     });
 
   }

@@ -129,7 +129,7 @@ const clickUnsuspend = () => {
     @click="clickSuspend"
   >
     <UserMinus />
-    Suspend Author
+    Archive and Suspend Author
   </button>
   <BrokenRulesModal
     :title="'Suspend Author'"
