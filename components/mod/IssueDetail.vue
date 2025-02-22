@@ -52,7 +52,7 @@ const {
 } = useQuery(GET_ISSUE, { id: issueId.value });
 
 const activeIssue = computed<Issue | null>(() => {
-  if (getIssueLoading.value || getIssueError.value || !getIssueResult.value)
+  if (getIssueError.value || !getIssueResult.value)
     return null;
   return getIssueResult.value.issues[0];
 });
@@ -489,7 +489,7 @@ const toggleCloseOpenIssue = async () => {
 </script>
 
 <template>
-  <PageNotFound v-if="!getIssueLoading && !getIssueLoading && !activeIssue" />
+  <PageNotFound v-if="!getIssueLoading && !activeIssue" />
   <div
     v-else
     class="w-full max-w-screen-2xl space-y-2 rounded-lg bg-white py-2 dark:bg-gray-800 dark:text-white sm:px-2 md:px-4 lg:px-6"
@@ -611,6 +611,7 @@ const toggleCloseOpenIssue = async () => {
             @unsuspended-user-successfully="refetchIssue"
             @unsuspended-mod-successfully="refetchIssue"
             @open-issue="toggleCloseOpenIssue"
+            @close-issue="toggleCloseOpenIssue"
           />
           <div class="flex w-full flex-col">
             <h2 v-if="activeIssue" class="text-xl font-bold border-b mt-8 pb-1">

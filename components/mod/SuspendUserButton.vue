@@ -9,7 +9,6 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION_CHANNEL, GET_EVENT_CHANNEL, IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
 import UnsuspendUserModal from "@/components/mod/UnsuspendUserModal.vue";
 import type { Issue } from "@/__generated__/graphql";
-import { emit } from "process";
 
 const props = defineProps({
   issue: {

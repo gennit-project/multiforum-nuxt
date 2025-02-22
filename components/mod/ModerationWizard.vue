@@ -70,7 +70,7 @@ defineEmits([
   <div class="flex pt-12 border gap-x-2">
     <div
       class="flex justify-center items-center w-10 h-10  rounded-lg"
-      :class="[issue.isOpen ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700']"
+      :class="[issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700']"
     >
       <div class="">
         <EyeIcon class="h-6 w-6 text-white" />
