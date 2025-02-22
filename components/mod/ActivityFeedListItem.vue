@@ -16,31 +16,6 @@ import ArrowPath from "../icons/ArrowPath.vue";
 import FlagIcon from "../icons/FlagIcon.vue";
 import { ActionType } from "@/types/Comment";
 
-const getBackgroundColor = (actionType: string) => {
-  switch (actionType) {
-    case ActionType.Close:
-      return "bg-purple-200 dark:bg-purple-500";
-    case ActionType.Comment:
-      return "bg-blue-200 dark:bg-blue-500";
-    case ActionType.Remove:
-      return "bg-red-200 dark:bg-red-500";
-    case ActionType.Report:
-      return "bg-red-200 dark:bg-red-500";
-    case ActionType.Suspension:
-      return "bg-red-200 dark:bg-red-500";
-    case ActionType.Unsuspend:
-      return "bg-green-200 dark:bg-green-500";
-    case ActionType.Reopen:
-      return "bg-green-200 dark:bg-green-500";
-    case ActionType.Archive:
-      return "bg-yellow-200 dark:bg-red-500";
-    case ActionType.Unarchive:
-      return "bg-green-200 dark:bg-green-500";
-    default:
-      return "bg-gray-200 dark:bg-gray-600";
-  }
-};
-
 const actionTypeToIcon = {
   [ActionType.Close]: CheckCircle,
   [ActionType.Comment]: ChatBubbleBottomCenter,
@@ -82,8 +57,7 @@ const isPermalinked = commentIdInParams === props.activityItem.Comment?.id;
           <div class="relative px-1">
             <div
               v-if="activityItem.actionType"
-              class="flex h-8 w-8 items-center justify-center rounded-full ring-8 ring-white dark:text-white dark:ring-gray-800"
-              :class="[getBackgroundColor(activityItem.actionType)]"
+              class="flex h-8 w-8 items-center bg-gray-500 justify-center rounded-full ring-8 ring-white dark:text-white dark:ring-gray-800"
             >
               <component
                 :is="actionTypeToIcon[activityItem.actionType as ActionType]"

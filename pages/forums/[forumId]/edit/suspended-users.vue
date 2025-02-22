@@ -41,7 +41,7 @@ const suspendedUsers = computed(() => {
         </li>
         <li>
           To suspend a user, go to the rule-breaking comment or post and click
-          Suspend Mod in the action menu.
+          Suspend User in the action menu.
         </li>
       </ul>
     </div>

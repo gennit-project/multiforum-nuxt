@@ -2,6 +2,7 @@
 import type { Issue } from "@/__generated__/graphql";
 import ArchiveButton from "./ArchiveButton.vue";
 import SuspendUserButton from "./SuspendUserButton.vue";
+import EyeIcon from "../icons/EyeIcon.vue";
 
 defineProps({
   issue: {
@@ -60,31 +61,50 @@ defineEmits([
 </script>
 
 <template>
-  <div class="flex flex-col justify-center w-full pt-12">
-    <h1 class="text-xl font-bold">Moderation Actions</h1>
-    <hr >
-    <div class="flex flex-col space-y-4 mt-4">
-      <ArchiveButton
-        :discussion-id="discussionId"
-        :event-id="eventId"
-        :comment-id="commentId"
-        :context-text="contextText"
-        :channel-unique-name="channelUniqueName"
-        :issue="issue"
-      />
-      <SuspendUserButton 
-        :issue="issue"
-        :discussion-title="contextText"
-        :discussion-id="discussionId"
-        :event-title="contextText"
-        :event-id="eventId"
-        :channel-unique-name="channelUniqueName"
-        @suspended-successfully="$emit('suspended-user-successfully')"
-        @unsuspended-successfully="$emit('unsuspended-mod-successfully')"
-      />
-      <!-- <SuspendModButton 
+  <div class="flex pt-12 border gap-x-2">
+    <div
+      class="flex justify-center items-center w-10 h-10 bg-blue-500 rounded-lg"
+    >
+      <div class="">
+        <EyeIcon class="h-6 w-6 text-white" />
+      </div>
+    </div>
+    <div
+      class="flex-1 flex-col space-y-4 px-4 py-6 border rounded-lg"
+      :class="[
+        issue.isOpen
+          ? 'border-blue-500'
+          : 'border-gray-300 dark:border-gray-700',
+      ]"
+    >
+      <h1
+        class="text-xl font-bold text-blue-500 border-b border-gray-300 dark:border-gray-600 pb-2"
+      >
+        Mod Decision Needed
+      </h1>
+      <div class="flex flex-col space-y-4 mt-4">
+        <ArchiveButton
+          :discussion-id="discussionId"
+          :event-id="eventId"
+          :comment-id="commentId"
+          :context-text="contextText"
+          :channel-unique-name="channelUniqueName"
+          :issue="issue"
+        />
+        <SuspendUserButton
+          :issue="issue"
+          :discussion-title="contextText"
+          :discussion-id="discussionId"
+          :event-title="contextText"
+          :event-id="eventId"
+          :channel-unique-name="channelUniqueName"
+          @suspended-successfully="$emit('suspended-user-successfully')"
+          @unsuspended-successfully="$emit('unsuspended-mod-successfully')"
+        />
+        <!-- <SuspendModButton 
         :mod-is-suspended="modIsSuspendedFromChannel" 
       /> -->
+      </div>
     </div>
   </div>
 </template>

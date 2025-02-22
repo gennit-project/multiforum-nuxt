@@ -102,7 +102,7 @@ const clickUnsuspend = () => {
   <div>
   <button
     v-if="userIsSuspendedFromChannel"
-    class="cursor-pointer bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
+    class="w-full cursor-pointer bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
     @click="clickUnsuspend"
   >
     <UserPlus />
@@ -110,7 +110,7 @@ const clickUnsuspend = () => {
   </button>
   <button
     v-else
-    class="cursor-pointer bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+    class="w-full cursor-pointer bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
     @click="clickSuspend"
   >
     <UserMinus />
