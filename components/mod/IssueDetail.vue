@@ -28,6 +28,7 @@ import ModerationWizard from "@/components/mod/ModerationWizard.vue";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
 import { modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
+import XCircleIcon from "../icons/XCircleIcon.vue";
 
 // Setup
 const route = useRoute();
@@ -601,12 +602,14 @@ const toggleCloseOpenIssue = async () => {
             :event-id="activeIssue?.relatedEventId || ''"
             :comment-id="activeIssue?.relatedCommentId || ''"
             :channel-unique-name="channelId"
+            :close-issue-loading="closeIssueLoading"
             @archived-successfully="refetchIssue"
             @unarchived-successfully="refetchIssue"
             @suspended-user-successfully="refetchIssue"
             @suspended-mod-successfully="refetchIssue"
             @unsuspended-user-successfully="refetchIssue"
             @unsuspended-mod-successfully="refetchIssue"
+            @open-issue="toggleCloseOpenIssue"
           />
           <div class="flex w-full flex-col">
             <h2 v-if="activeIssue" class="text-xl font-bold border-b mt-8 pb-1">
@@ -625,7 +628,9 @@ const toggleCloseOpenIssue = async () => {
                 :text="closeOpenButtonText"
                 :loading="closeIssueLoading || reopenIssueLoading"
                 @click="toggleCloseOpenIssue"
-              />
+              >
+                <XCircleIcon />
+              </GenericButton>
               <SaveButton
                 :data-testid="'createCommentButton'"
                 :label="'Comment'"

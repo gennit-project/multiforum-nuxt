@@ -3,6 +3,7 @@ import type { Issue } from "@/__generated__/graphql";
 import ArchiveButton from "./ArchiveButton.vue";
 import SuspendUserButton from "./SuspendUserButton.vue";
 import EyeIcon from "../icons/EyeIcon.vue";
+import XCircleIcon from "../icons/XCircleIcon.vue";
 
 defineProps({
   issue: {
@@ -33,6 +34,11 @@ defineProps({
     type: String,
     required: false,
     default: "",
+  },
+  closeIssueLoading: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 });
 
@@ -70,7 +76,7 @@ defineEmits([
       </div>
     </div>
     <div
-      class="flex-1 flex-col space-y-4 px-4 py-6 border rounded-lg"
+      class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
       :class="[
         issue.isOpen
           ? 'border-blue-500'
@@ -104,6 +110,15 @@ defineEmits([
         <!-- <SuspendModButton 
         :mod-is-suspended="modIsSuspendedFromChannel" 
       /> -->
+        <button
+          v-if="issue.isOpen"
+          class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+          :loading="closeIssueLoading"
+          @click="$emit('close-issue')"
+        >
+          <XCircleIcon />
+          Close Issue (No Action Needed)
+        </button>
       </div>
     </div>
   </div>
