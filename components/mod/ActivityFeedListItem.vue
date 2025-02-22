@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import MarkdownPreview from "../MarkdownPreview.vue";
 import type { PropType } from "vue";
 import { timeAgo } from "@/utils";
@@ -7,17 +6,17 @@ import type { ModerationAction } from "@/__generated__/graphql";
 import { useRoute } from "nuxt/app";
 import ArchiveBox from "../icons/ArchiveBox.vue";
 import ArchiveBoxXMark from "../icons/ArchiveBoxXMark.vue";
-import CheckCircle from "../icons/CheckCircle.vue";
 import ChatBubbleBottomCenter from "../icons/ChatBubbleBottomCenter.vue";
 import XmarkIcon from "../icons/XmarkIcon.vue";
 import UserPlus from "../icons/UserPlus.vue";
 import UserMinus from "../icons/UserMinus.vue";
 import ArrowPath from "../icons/ArrowPath.vue";
 import FlagIcon from "../icons/FlagIcon.vue";
+import XCircleIcon from "../icons/XCircleIcon.vue";
 import { ActionType } from "@/types/Comment";
 
 const actionTypeToIcon = {
-  [ActionType.Close]: CheckCircle,
+  [ActionType.Close]: XCircleIcon,
   [ActionType.Comment]: ChatBubbleBottomCenter,
   [ActionType.Remove]: XmarkIcon,
   [ActionType.Reopen]: ArrowPath,

@@ -38,6 +38,11 @@ const props = defineProps({
     type: String,
     required: true
   },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const { 
@@ -80,9 +85,15 @@ const showSuccessfullyArchived = ref(false);
 const showSuccessfullyUnarchived = ref(false);
 
 const clickUnarchive = () => {
+  if (props.disabled) {
+    return;
+  }
   showUnarchiveModal.value = true;
 };
 const clickArchive = () => {
+  if (props.disabled) {
+    return;
+  }
   showArchiveModal.value = true;
 };
 
@@ -101,15 +112,23 @@ const archivedContentType = computed(() => {
 <template>
   <button
     v-if="isArchived"
-    class="cursor-pointer bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
-    @click="clickUnarchive"
+    :disabled="disabled"
+    class="text-white py-2 px-4 rounded flex items-center gap-2 justify-center bg-red-600 hover:bg-red-500 cursor-pointer"
+    :class="{
+      'bg-gray-500 cursor-not-allowed': disabled,
+    }"
   >
     <ArchiveBoxXMark />
     Unarchive
   </button>
   <button
     v-else
-    class="cursor-pointer bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+    class="text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+    :class="{
+      'bg-red-600 hover:bg-red-500 cursor-pointer': !disabled,
+      'bg-gray-500 cursor-not-allowed': disabled,
+    }"
+    :disabled="disabled"
     @click="clickArchive"
   >
     <ArchiveBox />

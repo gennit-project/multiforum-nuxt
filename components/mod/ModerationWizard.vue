@@ -69,7 +69,8 @@ defineEmits([
 <template>
   <div class="flex pt-12 border gap-x-2">
     <div
-      class="flex justify-center items-center w-10 h-10 bg-blue-500 rounded-lg"
+      class="flex justify-center items-center w-10 h-10  rounded-lg"
+      :class="[issue.isOpen ? 'bg-blue-500' : 'bg-gray-300 dark:bg-gray-700']"
     >
       <div class="">
         <EyeIcon class="h-6 w-6 text-white" />
@@ -84,10 +85,21 @@ defineEmits([
       ]"
     >
       <h1
+        v-if="issue.isOpen"
         class="text-xl font-bold text-blue-500 border-b border-gray-300 dark:border-gray-600 pb-2"
       >
         Mod Decision Needed
       </h1>
+      <h1
+        v-else
+        class="text-xl font-bold text-gray-500 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 pb-2"
+
+        >
+        Mod Actions
+      </h1>
+      <p class="text-gray-600 dark:text-gray-400" v-if="!issue.isOpen">
+        {{ "Mod actions are disabled because the issue is closed." }}
+      </p>
       <div class="flex flex-col space-y-4 mt-4">
         <ArchiveButton
           :discussion-id="discussionId"
@@ -96,6 +108,7 @@ defineEmits([
           :context-text="contextText"
           :channel-unique-name="channelUniqueName"
           :issue="issue"
+          :disabled="!issue.isOpen"
         />
         <SuspendUserButton
           :issue="issue"
@@ -104,6 +117,7 @@ defineEmits([
           :event-title="contextText"
           :event-id="eventId"
           :channel-unique-name="channelUniqueName"
+          :disabled="!issue.isOpen"
           @suspended-successfully="$emit('suspended-user-successfully')"
           @unsuspended-successfully="$emit('unsuspended-mod-successfully')"
         />

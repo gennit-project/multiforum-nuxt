@@ -40,6 +40,11 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 defineEmits([
@@ -89,10 +94,12 @@ const eventChannelId = computed(() => {
 });
 
 const clickSuspend = () => {
+  if (props.disabled) return;
   showSuspendModal.value = true;
 };
 
 const clickUnsuspend = () => {
+  if (props.disabled) return;
   showUnsuspendModal.value = true;
 };
 
@@ -102,7 +109,11 @@ const clickUnsuspend = () => {
   <div>
   <button
     v-if="userIsSuspendedFromChannel"
-    class="w-full cursor-pointer bg-green-600 hover:bg-green-500 text-white py-2 px-4 rounded flex items-center justify-center gap-2"
+    class="w-full text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+    :class="{
+      'bg-green-600 hover:bg-green-500 cursor-pointer': !disabled,
+      'bg-gray-500 cursor-not-allowed': disabled,
+    }"
     @click="clickUnsuspend"
   >
     <UserPlus />
@@ -110,7 +121,11 @@ const clickUnsuspend = () => {
   </button>
   <button
     v-else
-    class="w-full cursor-pointer bg-red-600 hover:bg-red-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+    class="w-full text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+    :class="{
+      'bg-red-600 hover:bg-red-500 cursor-pointer': !disabled,
+      'bg-gray-500 cursor-not-allowed': disabled,
+    }"
     @click="clickSuspend"
   >
     <UserMinus />

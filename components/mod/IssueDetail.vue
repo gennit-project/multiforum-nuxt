@@ -29,6 +29,7 @@ import ActivityFeed from "@/components/mod/ActivityFeed.vue";
 import { modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 import XCircleIcon from "../icons/XCircleIcon.vue";
+import ArrowPathIcon from "../icons/ArrowPath.vue";
 
 // Setup
 const route = useRoute();
@@ -629,7 +630,8 @@ const toggleCloseOpenIssue = async () => {
                 :loading="closeIssueLoading || reopenIssueLoading"
                 @click="toggleCloseOpenIssue"
               >
-                <XCircleIcon />
+                <XCircleIcon v-if="issue.isOpen"/>
+                <ArrowPathIcon v-else/>
               </GenericButton>
               <SaveButton
                 :data-testid="'createCommentButton'"
