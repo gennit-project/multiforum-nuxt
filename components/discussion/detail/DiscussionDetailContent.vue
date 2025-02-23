@@ -312,7 +312,7 @@ const handleClickEditDiscussionBody = () => {
                   :channel-id="channelId"
                   :compact-mode="compactMode"
                   :discussion-body-edit-mode="discussionBodyEditMode"
-                  :discussion-is-archived="isArchived"
+                  :discussion-is-archived="isArchived || false"
                   @handle-click-give-feedback="handleClickGiveFeedback"
                   @handle-click-edit-body="handleClickEditDiscussionBody"
                   @cancel-edit-discussion-body="discussionBodyEditMode = false"

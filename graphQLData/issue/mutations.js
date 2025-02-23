@@ -229,7 +229,7 @@ export const ARCHIVE_EVENT = gql`
     $channelUniqueName: String!
   ) {
     archiveEvent(
-      eventId: $discussionId
+      eventId: $eventId
       reportText: $reportText
       selectedForumRules: $selectedForumRules
       selectedServerRules: $selectedServerRules

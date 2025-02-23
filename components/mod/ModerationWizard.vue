@@ -109,6 +109,8 @@ defineEmits([
           :channel-unique-name="channelUniqueName"
           :issue="issue"
           :disabled="!issue.isOpen"
+          @archived-successfully="$emit('archived-successfully')"
+          @unarchived-successfully="$emit('unarchived-successfully')"
         />
         <SuspendUserButton
           :issue="issue"

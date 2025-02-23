@@ -7,6 +7,7 @@ import {
   GET_EVENT_COMMENTS,
   GET_EVENT_ROOT_COMMENT_AGGREGATE,
 } from "@/graphQLData/comment/queries";
+import { GET_EVENT_CHANNEL } from "@/graphQLData/mod/queries";
 import type {
   Comment,
   EventChannel,
@@ -107,6 +108,32 @@ watch(commentSort, () =>
 const comments = computed<Comment[]>(
   () => getEventCommentsResult.value?.getEventComments?.Comments || []
 );
+
+const {
+  result: getEventChannelResult,
+  refetch: refetchEventChannel,
+} = useQuery(GET_EVENT_CHANNEL, {
+  eventId: eventId,
+  channelUniqueName: channelId.value,
+});
+
+const activeEventChannel = computed<EventChannel | null>(() => {
+  if (!getEventChannelResult.value) {
+    return null;
+  }
+  if (!getEventChannelResult.value.eventChannels?.length){
+    return null
+  }
+  return getEventChannelResult.value.eventChannels[0];
+});
+
+const isArchived = computed(() => {
+  return activeEventChannel.value?.archived
+});
+
+const eventChannelId = computed(() => {
+  return activeEventChannel.value?.id;
+})
 
 const {
   result: getEventRootCommentAggregateResult,
@@ -213,6 +240,7 @@ const handleClickEditEventDescription = () => {
               v-if="eventHasStarted"
               :text="'This event has started.'"
             />
+            <InfoBanner v-if="isArchived" text="This event is archived. New comments cannot be added." />
             <ErrorBanner
               v-if="eventIsInThePast"
               class="mb-2 mt-2"
@@ -246,6 +274,9 @@ const handleClickEditEventDescription = () => {
               <EventHeader
                 :event-data="event"
                 :show-menu-buttons="showMenuButtons"
+                :event-is-archived="isArchived || false"
+                :event-channel-id="eventChannelId"
+                @archived-successfully="refetchEventChannel"
               />
               <EventBody
                 v-if="event.description"
@@ -257,7 +288,7 @@ const handleClickEditEventDescription = () => {
               />
             </div>
             
-            <div class="my-2">
+            <div  v-if="event.Tags?.length > 0" class="my-2">
               <div class="flex space-x-1">
                 <Tag
                   v-for="tag in event.Tags"

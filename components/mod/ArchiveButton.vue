@@ -113,10 +113,12 @@ const archivedContentType = computed(() => {
   <button
     v-if="isArchived"
     :disabled="disabled"
-    class="text-white py-2 px-4 rounded flex items-center gap-2 justify-center bg-red-600 hover:bg-red-500 cursor-pointer"
+    class="text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
     :class="{
+      'bg-green-600 hover:bg-green-500 cursor-pointer': !disabled,
       'bg-gray-500 cursor-not-allowed': disabled,
     }"
+    @click="clickUnarchive"
   >
     <ArchiveBoxXMark />
     Unarchive
@@ -138,7 +140,9 @@ const archivedContentType = computed(() => {
     :title="'Archive Content'"
     :open="showArchiveModal"
     :discussion-title="contextText"
+    :event-title="contextText"
     :discussion-id="discussionId"
+    :event-id="eventId"
     :archive-after-reporting="true"
     :discussion-channel-id="discussionChannelId"
     :event-channel-id="eventChannelId"
@@ -155,7 +159,9 @@ const archivedContentType = computed(() => {
     v-if="discussionChannelId && discussionId"
     :open="showUnarchiveModal"
     :discussion-channel-id="discussionChannelId"
+    :event-channel-id="eventChannelId"
     :discussion-id="discussionId"
+    :event-id="eventId"
     @close="showUnarchiveModal = false"
     @unarchived-successfully="
       () => {

@@ -34,7 +34,7 @@ const props = defineProps({
   },
 });
 const commentIdInParams = useRoute().params.commentId as string;
-const isPermalinked = commentIdInParams === props.activityItem.Comment?.id;
+const isPermalinked = commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
 </script>
 
 <template>

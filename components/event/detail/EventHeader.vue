@@ -24,6 +24,8 @@ import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute, useRouter } from "nuxt/app";
 import InfoBanner from "@/components/InfoBanner.vue";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+
 type MenuItem = {
   label?: string;
   value?: string;
@@ -41,6 +43,14 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  eventIsArchived: {
+    type: Boolean,
+    default: false,
+  },
+  eventChannelId: {
+    type: String,
+    default: "",
+  },
 });
 
 const route = useRoute();
@@ -52,7 +62,15 @@ const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 const confirmDeleteIsOpen = ref(false);
 const confirmCancelIsOpen = ref(false);
+
 const showReportEventModal = ref(false);
+const showArchiveModal = ref(false);
+const showUnarchiveModal = ref(false);
+const showSuccessfullyArchived = ref(false);
+const showSuccessfullyUnarchived = ref(false);
+const showSuspendModal = ref(false);
+const showSuccessfullySuspended = ref(false);
+
 const showSuccessfullyReported = ref(false);
 
 const eventId = computed(() => {
@@ -177,23 +195,23 @@ const menuItems = computed(() => {
     });
   }
   if (props.eventData?.Poster?.username === usernameVar.value) {
-    items.push({
-      label: "Edit",
-      event: "handleEdit",
-      icon: ALLOWED_ICONS.EDIT,
-    });
-    items.push({
-      label: "Delete",
-      event: "handleDelete",
-      icon: ALLOWED_ICONS.DELETE,
-    });
-    if (route.name !== "EventFeedback") {
-      items.push({
+    items = items.concat([
+      {
+        label: "Edit",
+        event: "handleEdit",
+        icon: ALLOWED_ICONS.EDIT,
+      },
+      {
+        label: "Delete",
+        event: "handleDelete",
+        icon: ALLOWED_ICONS.DELETE,
+      },
+      {
         label: "View Feedback",
         event: "handleViewFeedback",
         icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-      });
-    }
+      },
+    ]);
     if (!props.eventData.canceled) {
       items.push({
         label: "Cancel",
@@ -224,6 +242,32 @@ const menuItems = computed(() => {
         event: "handleViewFeedback",
         icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       });
+    }
+    // Only add these if mod permissions are elevated
+    if (!props.eventIsArchived) {
+      items = items.concat([
+        {
+          label: "Archive",
+          event: "handleClickArchive",
+          icon: ALLOWED_ICONS.ARCHIVE,
+          value: props.eventData.id,
+        },
+        {
+          label: "Archive and Suspend",
+          event: "handleClickArchiveAndSuspend",
+          icon: ALLOWED_ICONS.SUSPEND,
+          value: props.eventData.id,
+        },
+      ]);
+    } else {
+      items = items.concat([
+        {
+          label: "Unarchive",
+          event: "handleClickUnarchive",
+          icon: ALLOWED_ICONS.UNARCHIVE,
+          value: props.eventData.id,
+        },
+      ]);
     }
   }
   return items;
@@ -390,6 +434,9 @@ function handleFeedbackInput(event: string) {
           @handle-report="showReportEventModal = true"
           @handle-feedback="showFeedbackFormModal = true"
           @handle-view-feedback="handleViewFeedback"
+          @handle-click-archive="showArchiveModal = true"
+          @handle-click-archive-and-suspend="showSuspendModal = true"
+          @handle-click-unarchive="showUnarchiveModal = true"
         >
           <EllipsisHorizontal
             class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -451,10 +498,54 @@ function handleFeedbackInput(event: string) {
           }
         "
       />
+      <BrokenRulesModal
+        :v-if="eventData && eventData.id"
+        :open="showArchiveModal"
+        :event-title="eventData?.title"
+        :event-id="eventData?.id"
+        :archive-after-reporting="true"
+        :event-channel-id="eventChannelId"
+        @close="showArchiveModal = false"
+        @reported-and-archived-successfully="
+          () => {
+            showSuccessfullyArchived = true;
+            showArchiveModal = false;
+            $emit('archived-successfully');
+          }
+        "
+      />
+      <UnarchiveModal
+        v-if="eventChannelId && eventData?.id"
+        :open="showUnarchiveModal"
+        :event-channel-id="eventChannelId"
+        :event-id="eventData?.id"
+        @close="showUnarchiveModal = false"
+        @unarchived-successfully="
+          () => {
+            showSuccessfullyUnarchived = true;
+            showUnarchiveModal = false;
+          }
+        "
+      />
       <Notification
         :show="showSuccessfullyReported"
         :title="'Your report was submitted successfully.'"
         @close-notification="showSuccessfullyReported = false"
+      />
+      <Notification
+        :show="showSuccessfullyArchived"
+        :title="'The event was archived successfully.'"
+        @close-notification="showSuccessfullyArchived = false"
+      />
+      <Notification
+        :show="showSuccessfullyUnarchived"
+        :title="'The event was unarchived successfully.'"
+        @close-notification="showSuccessfullyUnarchived = false"
+      />
+      <Notification
+        :show="showSuccessfullySuspended"
+        :title="'The event was suspended successfully.'"
+        @close-notification="showSuccessfullySuspended = false"
       />
     </div>
     <InfoBanner

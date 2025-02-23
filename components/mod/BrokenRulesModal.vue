@@ -99,7 +99,6 @@ const selectedServerRules = ref<string[]>([]);
 const reportText = ref("");
 
 const toggleForumRuleSelection = (rule: string) => {
-  console.log("toggleForumRuleSelection", rule);
   if (selectedForumRules.value.includes(rule)) {
     selectedForumRules.value = selectedForumRules.value.filter(
       (r) => r !== rule
@@ -110,7 +109,6 @@ const toggleForumRuleSelection = (rule: string) => {
 };
 
 const toggleServerRuleSelection = (rule: string) => {
-  console.log("toggleServerRuleSelection", rule);
   if (selectedServerRules.value.includes(rule)) {
     selectedServerRules.value = selectedServerRules.value.filter(
       (r) => r !== rule
