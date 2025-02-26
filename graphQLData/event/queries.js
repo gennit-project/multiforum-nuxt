@@ -125,6 +125,7 @@ export const GET_EVENTS = gql`
         id
         eventId
         channelUniqueName
+        archived
       }
     }
   }

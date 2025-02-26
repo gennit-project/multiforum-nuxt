@@ -268,6 +268,14 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
     description: "",
   },
 ];
+const updateShowArchived = (event: Event) => {
+  const checkbox = event.target as HTMLInputElement;
+  updateFilters({
+    router,
+    route,
+    params: { showArchived: checkbox.checked },
+  });
+};
 </script>
 
 <template>
@@ -494,6 +502,15 @@ const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
         </div>
       </div>
       <slot />
+      <div class="flex items-center justify-start gap-2 py-2 dark:text-gray-300">
+        <CheckBox
+          data-testid="show-archived-discussions"
+          class="align-middle"
+          :checked="filterValues.showArchived"
+          @input="updateShowArchived"
+        />
+        Show archived events
+      </div>
     </div>
 
     <div class="flex items-center justify-end">

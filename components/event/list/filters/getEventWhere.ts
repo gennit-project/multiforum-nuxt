@@ -1,8 +1,9 @@
 import LocationFilterTypes from "./locationFilterTypes";
 import type { SearchEventValues } from "@/types/Event";
-import { hourRangesObject , timeShortcutValues } from "./eventSearchOptions";
+import { timeShortcutValues } from "./eventSearchOptions";
 import { DateTime } from "luxon";
 import type { EventWhere } from "@/__generated__/graphql";
+
 const now = DateTime.now();
 
 const getStartOfThisWeekend = () => {
@@ -34,6 +35,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     longitude,
     free,
     hasVirtualEventUrl,
+    showArchived
   } = filterValues;
   // These conditions will be added to the filter
   // object under an AND operator.
@@ -41,13 +43,25 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
 
   if (!channelId) {
     // In sitewide view, require at least one channel.
-    conditions.push({
-      EventChannels_SOME: {
-        NOT: {
-          channelUniqueName: null,
-        }
-      },
-    });
+    if (!showArchived) {
+      conditions.push({
+        EventChannels_SOME: {
+          NOT: {
+            channelUniqueName: null,
+          },
+          archived: false
+        },
+      });
+    } else {
+      conditions.push({
+        EventChannels_SOME: {
+          NOT: {
+            channelUniqueName: null,
+          },
+        },
+      });
+    }
+    
   }
 
   // Free event filter
@@ -163,11 +177,21 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     // If we are in the channel view, only show events from
     // that channel, even if a channel filter has accidentally
     // gotten into the query params.
-    conditions.push({
-      EventChannels_SOME: {
-        channelUniqueName: channelId,
-      },
-    });
+    if (!showArchived) {
+      conditions.push({
+        EventChannels_SOME: {
+          channelUniqueName: channelId,
+          archived: false
+        },
+      });
+    } else {
+      conditions.push({
+        EventChannels_SOME: {
+          channelUniqueName: channelId,
+        },
+      });
+    }
+  
   } else if (truthyChannels.length > 0) {
     // If we are in the sitewide event search page,
     // show events from any channel in the query params.
@@ -176,6 +200,12 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       // Technically a selected channel could be an array
       // of strings, but we expect it to always be a string.
       (prev: any, curr: any) => {
+        if (!showArchived)  {
+          return prev.concat({ 
+            channelUniqueName_CONTAINS: curr, 
+            archived: false 
+          });
+        }
         return prev.concat({ channelUniqueName_CONTAINS: curr });
       },
       [],

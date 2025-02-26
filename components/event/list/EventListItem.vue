@@ -155,6 +155,10 @@ const handleClick = () => {
   }
 };
 
+const isArchived = computed(() => {
+  return props.event.EventChannels.some((dc) => dc.archived);
+})
+
 const commentCount = computed(() => props.event?.CommentsAggregate?.count || 0);
 const channelCount = computed(() => props.event?.EventChannels.length || 0);
 </script>
@@ -198,18 +202,22 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         :src="event.coverImageURL"
         alt="Event cover image"
         class="mb-4 max-h-48 rounded-lg block md:hidden"
-      />
+      >
       <div class="border-b border-gray-200 dark:border-gray-600">
         <router-link
           :to="detailLink"
-          class="text-md flex-wrap cursor-pointer font-bold text-blue-500 hover:text-blue-700 dark:text-white"
+          class="text-md flex-wrap gap-2 flex items-center cursor-pointer font-bold text-blue-500 hover:text-blue-700 dark:text-white"
         >
           <HighlightedSearchTerms
             :text="event.title"
             :search-input="searchInput"
           />
+          <span
+            v-if="isArchived"
+            class="text-xs text-red-500 dark:text-red-400 border border-red-500 dark:border-red-400 rounded-full px-2"
+            >Archived</span
+          >
         </router-link>
-
         <span
           v-if="event.canceled"
           class="rounded-lg bg-red-100 px-3 ml-2 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
