@@ -164,6 +164,7 @@ const filterByChannel = (channel: string) => {
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
       :show-main-filters-by-default="!channelId"
+      :toggle-show-archived-enabled="true"
     >
       <TimeShortcuts :is-list-view="true" />
       <OnlineInPersonShortcuts v-if="channelId" />

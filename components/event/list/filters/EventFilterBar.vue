@@ -43,6 +43,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  toggleShowArchivedEnabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Setup function
@@ -325,7 +329,7 @@ const updateShowArchived = (event: Event) => {
                   data-testid="more-filters-button"
                   class="absolute inset-y-0 right-2 flex rounded-full cursor-pointer items-center bg-white dark:text-white dark:bg-gray-700 pr-3"
                 >
-                  <FilterIcon class="h-4 w-4" />
+                  <FilterIcon class="h-4 w-4 dark:text-white" />
                 </button>
 
                 <template #content>
@@ -388,7 +392,7 @@ const updateShowArchived = (event: Event) => {
                   data-testid="more-filters-button"
                   class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3"
                 >
-                  <FilterIcon class="h-4 w-4 bg-white dark:bg-gray-700" />
+                  <FilterIcon class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white" />
                 </button>
 
                 <template #content>
@@ -502,7 +506,7 @@ const updateShowArchived = (event: Event) => {
         </div>
       </div>
       <slot />
-      <div class="flex items-center justify-start gap-2 py-2 dark:text-gray-300">
+      <div v-if="toggleShowArchivedEnabled" class="flex items-center justify-start gap-2 py-2 dark:text-gray-300">
         <CheckBox
           data-testid="show-archived-discussions"
           class="align-middle"
