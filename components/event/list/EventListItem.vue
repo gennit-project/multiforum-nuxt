@@ -159,6 +159,13 @@ const isArchived = computed(() => {
   return props.event.EventChannels.some((dc) => dc.archived);
 })
 
+const eventSpansMultipleDates = computed(() => {
+  return (
+    // If the difference between start time and end time is greater than 24 hours
+    Math.abs(startTimeObj.diff(DateTime.fromISO(props.event.endTime), "hours").hours) > 24
+  );
+});
+
 const commentCount = computed(() => props.event?.CommentsAggregate?.count || 0);
 const channelCount = computed(() => props.event?.EventChannels.length || 0);
 </script>
@@ -171,7 +178,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
     @click="handleClick"
   >
     <div class="flex-shrink-0 rounded-lg">
-      <div class="flex h-16 w-16 flex-col items-center justify-center">
+      <div class="flex w-16 flex-col items-center justify-center">
         <div
           class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
         >
@@ -193,7 +200,13 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             })
           }}
         </div>
+        <div 
+          v-if="eventSpansMultipleDates"
+          class="bg-white mt-2 ml-2 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-200 rounded-full px-2 py-1"
+        > <span>Multiple Days</span>
+        </div>
       </div>
+     
     </div>
 
     <div class="flex-1 min-w-0">
