@@ -494,16 +494,6 @@ const toggleCloseOpenIssue = async () => {
     v-else
     class="w-full max-w-screen-2xl space-y-2 rounded-lg bg-white py-2 dark:bg-gray-800 dark:text-white sm:px-2 md:px-4 lg:px-6"
   >
-    <div
-      v-if="route.name === 'forums-forumId-issues-issueId'"
-      class="align-center mx-1 mt-2 flex justify-between px-4"
-    >
-      <BackLink
-        :link="`/forums/${channelId}/issues`"
-        :data-testid="'issue-detail-back-link'"
-      />
-    </div>
-
     <ErrorBanner
       v-if="getIssueError"
       class="mt-2 px-4"
