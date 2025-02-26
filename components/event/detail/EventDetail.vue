@@ -43,7 +43,15 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  showAddToCalendar: {
+    type: Boolean,
+    default: true,
+  },
   showComments: {
+    type: Boolean,
+    default: true,
+  },
+  showEventInPastBanner: {
     type: Boolean,
     default: true,
   },
@@ -280,7 +288,7 @@ const handleClickEditEventDescription = () => {
               text="This event is archived. New comments cannot be added."
             />
             <ErrorBanner
-              v-if="eventIsInThePast"
+              v-if="eventIsInThePast && showEventInPastBanner"
               class="mb-2 mt-2"
               :text="'This event is in the past.'"
             />
@@ -339,7 +347,7 @@ const handleClickEditEventDescription = () => {
                 />
               </div>
             </div>
-            <AddToCalendarButton v-if="event" :event="event" class="mt-4" />
+            <AddToCalendarButton v-if="event && showAddToCalendar" :event="event" class="mt-4" />
             <EventFooter
               :event-data="event"
               :channels-except-current="channelsExceptCurrent"
