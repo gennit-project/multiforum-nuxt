@@ -20,6 +20,7 @@ export const GET_CHANNEL = gql`
       channelIconURL
       channelBannerURL
       rules
+      locked
       Tags {
         text
       }

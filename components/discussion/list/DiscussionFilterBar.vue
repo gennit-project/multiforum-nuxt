@@ -15,7 +15,7 @@ import { useRoute, useRouter } from "nuxt/app";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 
 defineProps({
-  showMap: {
+  isForumScoped: {
     type: Boolean,
     default: false,
   },
@@ -27,7 +27,7 @@ defineProps({
     type: Number,
     default: 0,
   },
-  isForumScoped: {
+  showMap: {
     type: Boolean,
     default: false,
   },

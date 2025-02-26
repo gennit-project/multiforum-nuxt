@@ -2,7 +2,6 @@
 import {
   MAX_CHARS_IN_CHANNEL_DESCRIPTION,
   MAX_CHARS_IN_CHANNEL_DISPLAY_NAME,
-  MAX_CHARS_IN_CHANNEL_NAME,
 } from "@/utils/constants";
 import TagPicker from "@/components/TagPicker.vue";
 import TextInput from "@/components/TextInput.vue";
@@ -200,6 +199,29 @@ const handleImageChange = async (input: FileChangeInput) => {
             }
           "
         />
+      </template>
+    </FormRow>
+    <FormRow section-title="Destructive Settings" :dangerous="true">
+      <template #content>
+        <div class="flex gap-2 align-items mt-4">
+          <CheckBox
+            :test-id="'lock-forum-checkbox'"
+            :checked="formValues.locked"
+            @update="$emit('updateFormValues', { locked: $event })"
+          />
+          <label
+            class="text-sm text-gray-600 dark:text-gray-400"
+            for="lock-forum-checkbox"
+            >Lock Forum</label
+          >
+        
+        </div>
+        <p
+          class="text-sm text-gray-600 dark:text-gray-400 mt-2"
+        >
+          Locking a forum will prevent users from creating new threads or
+          replying to existing threads.
+        </p>
       </template>
     </FormRow>
   </div>

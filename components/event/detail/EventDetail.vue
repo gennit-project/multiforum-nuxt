@@ -224,7 +224,7 @@ const handleClickEditEventDescription = () => {
   <div
     class="w-full space-y-4 bg-white dark:bg-gray-800 md:px-6 dark:text-white"
   >
-    <div class="mb-10 flex w-full justify-center rounded-lg">
+    <div class="mb-10 px-2 flex w-full justify-center rounded-lg">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
           <p v-if="eventLoading && !event" class="px-4 lg:px-10">Loading...</p>
