@@ -55,13 +55,18 @@ const featuredChannels = computed(() => {
   return props.featuredForums
     .filter((channelOption: ChannelOption) => {
       return props.featuredForums.some(
-        (featuredChannel) => featuredChannel.uniqueName === channelOption.uniqueName
+        (featuredChannel) =>
+          featuredChannel.uniqueName === channelOption.uniqueName
       );
     })
     .sort(
       (a, b) =>
-        props.featuredForums.findIndex((channel) => channel.uniqueName === a.uniqueName) -
-        props.featuredForums.findIndex((channel) => channel.uniqueName === b.uniqueName)
+        props.featuredForums.findIndex(
+          (channel) => channel.uniqueName === a.uniqueName
+        ) -
+        props.featuredForums.findIndex(
+          (channel) => channel.uniqueName === b.uniqueName
+        )
     );
 });
 
@@ -102,7 +107,7 @@ const updateSearchResult = (input: string) => {
 
 <template>
   <div
-    class="absolute z-10 p-3 w-full rounded-md max-h-96 overflow-y-auto border-gray-200 bg-white dark:text-white shadow-lg dark:border-gray-600 dark:bg-gray-800"
+    class="absolute z-10 left-0 right-0 top-full max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white dark:bg-gray-800 shadow-lg dark:border-gray-700 dark:text-white touch-scroll-y"
   >
     <SearchBar
       class="w-full align-middle"
@@ -121,7 +126,6 @@ const updateSearchResult = (input: string) => {
       </div>
     </div>
     <template v-else>
-      <!-- Featured Forums Section -->
       <div
         v-if="featuredChannels.length > 0"
         class="border-b dark:border-gray-600"
@@ -136,15 +140,15 @@ const updateSearchResult = (input: string) => {
           :key="channel.uniqueName"
           class="border-b last:border-b-0 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
         >
-          <SearchableForumListItem 
-            :channel="channel" 
-            :selected="selected" 
-            @toggle-selection="() => emit('toggleSelection', channel.uniqueName)"
+          <SearchableForumListItem
+            :channel="channel"
+            :selected="selected"
+            @toggle-selection="
+              () => emit('toggleSelection', channel.uniqueName)
+            "
           />
         </div>
       </div>
-
-      <!-- All Forums Section -->
       <div class="pt-3">
         <h3 class="px-3 uppercase text-sm text-gray-700 dark:text-gray-300">
           All Forums
@@ -154,13 +158,20 @@ const updateSearchResult = (input: string) => {
           :key="channel.uniqueName"
           class="border-b last:border-b-0 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
         >
-          <SearchableForumListItem 
-            :channel="channel" 
-            :selected="selected" 
-            @toggle-selection="() => emit('toggleSelection', channel.uniqueName)"
+          <SearchableForumListItem
+            :channel="channel"
+            :selected="selected"
+            @toggle-selection="
+              () => emit('toggleSelection', channel.uniqueName)
+            "
           />
         </div>
       </div>
     </template>
   </div>
 </template>
+<style>
+.touch-scroll-y {
+  -webkit-overflow-scrolling: touch;
+}
+</style>

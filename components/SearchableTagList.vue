@@ -95,7 +95,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
 
 <template>
   <div
-    class="absolute z-10 mt-1 max-h-96 w-full overflow-y-auto rounded-md border border-gray-200 dark:border-gray-700 bg-white dark:text-white shadow-lg dark:bg-gray-800"
+    class="absolute z-10 left-0 right-0 top-full max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white dark:bg-gray-800 shadow-lg dark:border-gray-700 dark:text-white touch-scroll-y"
   >
     <SearchBar
       class="w-full align-middle"
@@ -144,3 +144,8 @@ const handleAddTag = async (event: KeyboardEvent) => {
     </div>
   </div>
 </template>
+<style>
+.touch-scroll-y {
+  -webkit-overflow-scrolling: touch;
+}
+</style>
