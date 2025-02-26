@@ -137,7 +137,7 @@ const updateFormValues = (data: any) => {
 <template>
   <NuxtLayout>
     <div class="flex justify-center">
-      <div class="max-w-3xl w-full px-8 bg-white dark:bg-gray-800 mt-2 pt-2">
+      <div class="max-w-3xl w-full px-2 md:px-8 bg-white dark:bg-gray-800 mt-2 pt-2">
         <RequireAuth>
           <template #has-auth>
             <div class="w-full px-8">

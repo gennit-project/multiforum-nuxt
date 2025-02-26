@@ -55,39 +55,39 @@ const removeSelection = (tag: string) => {
 
 <template>
   <div>
-    <div>
-      <div v-if="description" class="py-1 text-sm dark:text-gray-300">
-        {{ description }}
-      </div>
-      <div class="relative">
+    <div v-if="description" class="py-1 text-sm dark:text-gray-300">
+      {{ description }}
+    </div>
+    <div class="relative"> 
+      <div
+        class="flex min-h-12 w-full cursor-text flex-wrap items-center rounded-lg border 
+               px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
+        @click="toggleDropdown"
+      >
         <div
-          class="flex min-h-12 w-full cursor-text flex-wrap items-center rounded-lg border px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
-          @click="toggleDropdown"
+          v-for="(tag, index) in selected"
+          :key="index"
+          class="mr-2 mt-1 inline-flex items-center rounded-full bg-blue-100 
+                 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
+          @click="removeSelection(tag)"
         >
-          <div
-            v-for="(tag, index) in selected"
-            :key="index"
-            class="mr-2 mt-1 inline-flex items-center rounded-full bg-blue-100 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
-            @click="removeSelection(tag)"
-          >
-            <span>{{ tag }}</span>
-            <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
-              &times;
-            </span>
-          </div>
-          <input
-            data-testid="tag-picker"
-            class="flex-1 border-none bg-transparent focus:outline-none dark:text-white"
-            placeholder="Add a tag..."
-          >
+          <span>{{ tag }}</span>
+          <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
+            &times;
+          </span>
         </div>
-        <SearchableTagList
-          v-if="isDropdownOpen"
-          v-click-outside="outside"
-          :selected-tags="selected"
-          @toggle-selection="toggleSelectedTag"
-        />
+        <input
+          data-testid="tag-picker"
+          class="flex-1 border-none bg-transparent focus:outline-none dark:text-white"
+          placeholder="Add a tag..."
+        >
       </div>
+      <SearchableTagList
+        v-if="isDropdownOpen"
+        v-click-outside="outside"
+        :selected-tags="selected"
+        @toggle-selection="toggleSelectedTag"
+      />
     </div>
   </div>
 </template>
