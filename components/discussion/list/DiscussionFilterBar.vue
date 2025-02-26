@@ -12,6 +12,7 @@ import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams
 import type { SearchDiscussionValues } from "@/types/Discussion";
 import { updateFilters } from "@/utils/routerUtils";
 import { useRoute, useRouter } from "nuxt/app";
+import FilterIcon from "@/components/icons/FilterIcon.vue";
 
 defineProps({
   showMap: {
@@ -135,6 +136,11 @@ const updateShowArchived = (event: Event) => {
     params: { showArchived: checkbox.checked },
   });
 };
+
+const showFilters = ref(false);
+const toggleShowFilters = () => {
+  showFilters.value = !showFilters.value;
+};
 </script>
 
 <template>
@@ -173,25 +179,17 @@ const updateShowArchived = (event: Event) => {
           :right-side-is-rounded="false"
           @update-search-input="updateSearchInput"
         />
-        <FilterChip
-          class="align-middle"
-          :data-testid="'tag-filter-button'"
-          :label="tagLabel"
-          :highlighted="tagLabel !== defaultFilterLabels.tags"
-        >
-          <template #icon>
-            <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
-          </template>
-          <template #content>
-            <div class="relative w-96">
-              <SearchableTagList
-                :selected-tags="filterValues.tags"
-                @toggle-selection="toggleSelectedTag"
-              />
-            </div>
-          </template>
-        </FilterChip>
         <SortButtons />
+        <button
+          :class="showFilters ? 'border-blue-500' : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'"
+          class="border flex p-1.5 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100"
+          @click="(event)=> {
+            event.preventDefault()
+            toggleShowFilters()
+          }"
+        >
+          <FilterIcon />
+        </button>
       </div>
       <SearchBar
         class="block md:hidden"
@@ -206,7 +204,11 @@ const updateShowArchived = (event: Event) => {
       />
     </div>
 
-    <div class="flex items-center justify-end gap-2 py-2 dark:text-gray-300">
+    <div
+      v-if="showFilters"
+      class="flex items-center justify-end gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+    >
+      
       <CheckBox
         data-testid="show-archived-discussions"
         class="align-middle"
@@ -214,6 +216,25 @@ const updateShowArchived = (event: Event) => {
         @input="updateShowArchived"
       />
       Show archived discussions
+
+      <FilterChip
+        class="align-middle"
+        :data-testid="'tag-filter-button'"
+        :label="tagLabel"
+        :highlighted="tagLabel !== defaultFilterLabels.tags"
+      >
+        <template #icon>
+          <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
+        </template>
+        <template #content>
+          <div class="relative w-96">
+            <SearchableTagList
+              :selected-tags="filterValues.tags"
+              @toggle-selection="toggleSelectedTag"
+            />
+          </div>
+        </template>
+      </FilterChip>
     </div>
   </div>
 </template>
