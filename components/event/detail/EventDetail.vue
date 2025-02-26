@@ -27,6 +27,10 @@ import { useRoute } from "nuxt/app";
 import { modProfileNameVar } from "@/cache";
 import AddToCalendarButton from "../AddToCalendarButton.vue";
 
+const formatDate = (date: string) => {
+  return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
+};
+
 const COMMENT_LIMIT = 50;
 
 const props = defineProps({
@@ -46,6 +50,10 @@ const props = defineProps({
   showMenuButtons: {
     type: Boolean,
     default: true,
+  },
+  usernameOnTop: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -109,31 +117,29 @@ const comments = computed<Comment[]>(
   () => getEventCommentsResult.value?.getEventComments?.Comments || []
 );
 
-const {
-  result: getEventChannelResult,
-  refetch: refetchEventChannel,
-} = useQuery(GET_EVENT_CHANNEL, {
-  eventId: eventId,
-  channelUniqueName: channelId.value,
-});
+const { result: getEventChannelResult, refetch: refetchEventChannel } =
+  useQuery(GET_EVENT_CHANNEL, {
+    eventId: eventId,
+    channelUniqueName: channelId.value,
+  });
 
 const activeEventChannel = computed<EventChannel | null>(() => {
   if (!getEventChannelResult.value) {
     return null;
   }
-  if (!getEventChannelResult.value.eventChannels?.length){
-    return null
+  if (!getEventChannelResult.value.eventChannels?.length) {
+    return null;
   }
   return getEventChannelResult.value.eventChannels[0];
 });
 
 const isArchived = computed(() => {
-  return activeEventChannel.value?.archived
+  return activeEventChannel.value?.archived;
 });
 
 const eventChannelId = computed(() => {
   return activeEventChannel.value?.id;
-})
+});
 
 const {
   result: getEventRootCommentAggregateResult,
@@ -233,14 +239,46 @@ const handleClickEditEventDescription = () => {
             class="px-4 lg:px-10"
             :text="eventError.message"
           />
-          <div v-else-if="!eventLoading && !event">Could not find the event.</div>
+          <div v-else-if="!eventLoading && !event">
+            Could not find the event.
+          </div>
 
           <div v-else-if="event" class="dark:bg-dark-700 flex flex-col gap-4">
+            <nuxt-link
+              v-if="usernameOnTop"
+              :to="{
+                name: 'u-username',
+                params: { username: event?.Poster?.username },
+              }"
+              class="flex items-center dark:text-white"
+            >
+              <AvatarComponent
+                v-if="event?.Poster?.username"
+                :text="event?.Poster.username"
+                :src="event?.Poster.profilePicURL ?? ''"
+                class="mr-2 h-6 w-6"
+              />
+              <UsernameWithTooltip
+                v-if="event?.Poster?.username"
+                :username="event?.Poster?.username"
+                :src="event?.Poster.profilePicURL ?? ''"
+                :display-name="event?.Poster.displayName ?? ''"
+                :comment-karma="event?.Poster.commentKarma ?? 0"
+                :discussion-karma="event?.Poster.discussionKarma ?? 0"
+                :account-created="event?.Poster.createdAt ?? ''"
+              />
+              <span class="ml-1"
+                >posted on {{ formatDate(event.createdAt) }}</span
+              >
+            </nuxt-link>
             <InfoBanner
               v-if="eventHasStarted"
               :text="'This event has started.'"
             />
-            <InfoBanner v-if="isArchived" text="This event is archived. New comments cannot be added." />
+            <InfoBanner
+              v-if="isArchived"
+              text="This event is archived. New comments cannot be added."
+            />
             <ErrorBanner
               v-if="eventIsInThePast"
               class="mb-2 mt-2"
@@ -283,12 +321,14 @@ const handleClickEditEventDescription = () => {
                 class="-ml-4"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
-                @handle-click-edit-event-description="handleClickEditEventDescription"
+                @handle-click-edit-event-description="
+                  handleClickEditEventDescription
+                "
                 @close-edit-event-description="eventDescriptionEditMode = false"
               />
             </div>
-            
-            <div  v-if="event.Tags?.length > 0" class="my-2">
+
+            <div v-if="event.Tags?.length > 0" class="my-2">
               <div class="flex space-x-1">
                 <Tag
                   v-for="tag in event.Tags"
@@ -303,6 +343,7 @@ const handleClickEditEventDescription = () => {
             <EventFooter
               :event-data="event"
               :channels-except-current="channelsExceptCurrent"
+              :show-poster="!usernameOnTop"
             />
 
             <div v-if="showComments">

@@ -52,8 +52,7 @@ const {
 } = useQuery(GET_ISSUE, { id: issueId.value });
 
 const activeIssue = computed<Issue | null>(() => {
-  if (getIssueError.value || !getIssueResult.value)
-    return null;
+  if (getIssueError.value || !getIssueResult.value) return null;
   return getIssueResult.value.issues[0];
 });
 
@@ -508,7 +507,15 @@ const toggleCloseOpenIssue = async () => {
         "
         class="text-xl font-bold"
       >
-        Original post (
+        {{
+          `Original ${
+            activeIssue?.relatedDiscussionId
+              ? "discussion"
+              : activeIssue?.relatedEventId
+                ? "event"
+                : "comment"
+          } (`
+        }}
         <nuxt-link
           v-if="activeIssue?.relatedDiscussionId"
           class="text-blue-500 hover:underline"
@@ -557,6 +564,7 @@ const toggleCloseOpenIssue = async () => {
           :issue-event-id="activeIssue.relatedEventId"
           :show-comments="false"
           :show-menu-buttons="false"
+          :username-on-top="true"
         />
         <CommentDetails
           v-if="activeIssue?.relatedCommentId"
@@ -621,8 +629,8 @@ const toggleCloseOpenIssue = async () => {
                 :loading="closeIssueLoading || reopenIssueLoading"
                 @click="toggleCloseOpenIssue"
               >
-                <XCircleIcon v-if="issue.isOpen"/>
-                <ArrowPathIcon v-else/>
+                <XCircleIcon v-if="issue.isOpen" />
+                <ArrowPathIcon v-else />
               </GenericButton>
               <SaveButton
                 :data-testid="'createCommentButton'"

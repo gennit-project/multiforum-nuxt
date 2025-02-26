@@ -40,10 +40,10 @@ export default defineComponent({
       result: getDiscussionResult,
       error: getDiscussionError,
       loading: getDiscussionLoading,
-    } = useQuery(GET_DISCUSSION, { 
-      id: discussionId, 
+    } = useQuery(GET_DISCUSSION, {
+      id: discussionId,
       loggedInModName: modProfileNameVar.value,
-      channelUniqueName: channelId.value
+      channelUniqueName: channelId.value,
     });
 
     const discussion = computed(() => {
@@ -70,16 +70,32 @@ export default defineComponent({
 
 <template>
   <div>
-    <ErrorBanner
-      v-if="getDiscussionError"
-      :text="getDiscussionError.message"
-    />
+    <ErrorBanner v-if="getDiscussionError" :text="getDiscussionError.message" />
     <LoadingSpinner v-else-if="getDiscussionLoading" />
-    <div
-      v-if="discussion"
-      class="mt-3 flex w-full flex-col gap-2"
-    >
-      <p>This is the original discussion:</p>
+    <div v-if="discussion" class="mt-3 flex w-full flex-col gap-2">
+      <nuxt-link
+        :to="{
+          name: 'u-username',
+          params: { username: discussion?.Author?.username },
+        }"
+        class="flex items-center dark:text-white"
+      > 
+        <AvatarComponent
+          :text="discussion?.Author.username"
+          :src="discussion?.Author.profilePicURL ?? ''"
+          class="mr-2 h-6 w-6"
+        />
+        <UsernameWithTooltip
+          v-if="discussion?.Author?.username"
+          :username="discussion?.Author?.username"
+          :src="discussion?.Author.profilePicURL ?? ''"
+          :display-name="discussion?.Author.displayName ?? ''"
+          :comment-karma="discussion?.Author.commentKarma ?? 0"
+          :discussion-karma="discussion?.Author.discussionKarma ?? 0"
+          :account-created="discussion?.Author.createdAt ?? ''"
+        /> 
+        <span class="ml-1">posted on {{ formatDate(discussion.createdAt) }}</span>
+      </nuxt-link>
       <div class="border-l border-l-2 pl-6">
         <h3 v-if="discussion?.title">
           <nuxt-link

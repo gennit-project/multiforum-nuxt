@@ -24,6 +24,10 @@ export default defineComponent({
       type: Array as PropType<EventChannel[]>,
       default: () => [],
     },
+    showPoster: {
+      type: Boolean,
+      default: true,
+    },
   },
   setup(props) {
     const route = useRoute();
@@ -92,7 +96,7 @@ export default defineComponent({
 </script>
 <template>
   <div class="mt-4 text-xs text-gray-700 dark:text-gray-200">
-    <div class="organizer flex items-center gap-1">
+    <div v-if="showPoster" class="organizer flex items-center gap-1">
       <nuxt-link
         v-if="eventData.Poster"
         class="underline"
