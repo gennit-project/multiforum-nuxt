@@ -6,7 +6,6 @@ import { actionIconMap } from "@/utils";
 
 import type { MenuItemType } from "./IconButtonDropdown.vue";
 
-// Props
 defineProps({
   dataTestid: {
     type: String,
@@ -91,10 +90,9 @@ const menuStyles = {
             v-if="item.isDivider"
             class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-default"
           >
+          
             {{ item.value }}
           </v-list-subheader>
-
-          <!-- Regular menu item -->
           <v-list-item
             v-else
             :data-testid="`${dataTestid}-item-${item.label}`"
@@ -112,16 +110,25 @@ const menuStyles = {
               class="flex gap-2 items-center text-sm"
               :class="['text-gray-700 dark:text-white']"
             >
-              <component :is="actionIconMap[item.icon]" class="h-5 w-5" />
+              <component
+                :is="actionIconMap[item.icon]" 
+                v-if="item.icon" 
+                class="h-5 w-5" 
+              />
               {{ item.label }}
             </nuxt-link>
             <div
               v-else-if="item.event"
               :data-testid="`${dataTestid}-item-${item.label}`"
-              class="flex items-center block cursor-pointer px-4 py-2 text-sm"
+               class="flex gap-2 items-center text-sm cursor-pointer"
               :class="['text-gray-700 dark:text-white']"
               @click="emitEvent(item?.event ?? '')"
             >
+            <component
+                :is="actionIconMap[item.icon]" 
+                v-if="item.icon" 
+                class="h-5 w-5" 
+              />
               {{ item.label }}
             </div>
           </v-list-item>

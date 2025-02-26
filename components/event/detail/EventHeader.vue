@@ -18,7 +18,7 @@ import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { getDuration, ALLOWED_ICONS } from "@/utils";
+import { getDuration, ALLOWED_ICONS, actionIconMap } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
