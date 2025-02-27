@@ -9,11 +9,12 @@ import TextInput from "@/components/TextInput.vue";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
+import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
 import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useTheme } from "@/composables/useTheme";
 import { useRoute } from "nuxt/app";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 
 const { theme } = useTheme()
 
@@ -26,6 +27,21 @@ const channelId = computed(() =>
 const discussionId = computed(() =>
   typeof route.params.discussionId === "string" ? route.params.discussionId : ""
 );
+
+const {
+  result: isDiscussionAnsweredResult,
+  error: isDiscussionAnsweredError,
+  loading: isDiscussionAnsweredLoading,
+} = useQuery(IS_DISCUSSION_ANSWERED, {
+  discussionId: discussionId.value,
+  channelUniqueName: channelId.value,
+})
+
+const answered = computed(() => {
+  if (isDiscussionAnsweredLoading.value) return false;
+  if (isDiscussionAnsweredError.value) return false;
+  return isDiscussionAnsweredResult.value?.discussionChannels[0]?.answered || false;
+})
 
 const {
   result: getDiscussionResult,
@@ -128,11 +144,18 @@ const formattedDate = computed(() => {
         />
         <p
           v-if="!titleEditMode"
-          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm"
+          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm flex items-center"
         >
-          {{
-            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ''}`
-          }}
+          <span
+            v-if="answered"
+            class="text-green-500 dark:text-green-400 mr-1 border dark:border-green-400 border-green-500 rounded-full text-xs flex gap-1 items-center py-1 px-2"
+            aria-label="This discussion has been answered"
+          > 
+            <CheckCircleIcon class="h-4 w-4" /> Answered
+          </span>
+          <span>{{
+            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ''} in ${channelId}`
+          }}</span>
         </p>
       </div>
       <RequireAuth class="hidden md:block" :full-width="false">

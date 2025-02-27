@@ -54,6 +54,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
         }
         locked
         archived
+        answered
         Discussion {
           id
           title
@@ -117,6 +118,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
           discussionId
           weightedVotesCount
           archived
+          answered
           locked
           UpvotedByUsers {
             username
@@ -142,6 +144,23 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
   }
   ${AUTHOR_FIELDS}
 `;
+
+export const IS_DISCUSSION_ANSWERED = gql`
+  query isDiscussionAnswered(
+    $channelUniqueName: String!,
+    $discussionId: ID!
+  ) {
+    discussionChannels (
+      where: {
+        channelUniqueName: $channelUniqueName,
+        discussionId: $discussionId
+      } 
+    ) {
+      id
+      answered
+    }
+  }
+`
 
 export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
@@ -176,6 +195,7 @@ export const GET_DISCUSSION = gql`
         channelUniqueName
         weightedVotesCount
         archived
+        answered
         locked
         UpvotedByUsers {
           username

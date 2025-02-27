@@ -15,6 +15,8 @@ import type {
   Tag,
 } from "@/__generated__/graphql";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+
 // Define props
 const props = defineProps({
   discussionQueryFilters: {
@@ -122,7 +124,7 @@ const filteredQuery = computed(() => {
                   },
                   query: filteredQuery,
                 }"
-                class="w-full flex items-center gap-2"
+                class="w-full flex items-center gap-2 mb-1"
               >
                 <span
                   class="cursor-pointer hover:text-gray-500 dark:text-gray-100"
@@ -138,6 +140,13 @@ const filteredQuery = computed(() => {
                   class="text-xs text-red-500 dark:text-red-400 border border-red-500 dark:border-red-400 rounded-full px-2"
                   >Archived</span
                 >
+                <span
+                  v-if="discussionChannel.answered"
+                  class="text-green-500 dark:text-green-400 mr-1 border dark:border-green-400 border-green-500 rounded-full text-xs flex gap-1 items-center py-0.5 px-2"
+                  aria-label="This discussion has been answered"
+                > 
+                  <CheckCircleIcon class="h-4 w-4" /> Answered
+                </span>
               </nuxt-link>
               <div
                 class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"

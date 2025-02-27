@@ -91,17 +91,17 @@ export default defineComponent({
             </nuxt-link>
             <span
               v-if="isAdmin"
-              class="rounded-md border border-blue-500 px-1 py-0.5 text-xs text-blue-500"
+              class="rounded-md border border-blue-500 px-1 py-0 text-xs text-blue-500"
             >Admin</span>
             <span
               v-else-if="isMod"
-              class="rounded-md border border-blue-500 px-1 py-0.5 text-xs text-blue-500"
+              class="rounded-md border border-blue-500 px-1 py-0 text-xs text-blue-500"
             >
               Mod
             </span>
             <span
               v-if="isOriginalPoster"
-              class="rounded-md border border-green-500 px-1 py-0.5 text-xs text-green-500"
+              class="rounded-md border border-green-500 px-1 py-0 text-xs text-green-500"
             >OP</span>
           </div>
         </slot>

@@ -53,7 +53,6 @@ const bodyText = computed(() => {
   return props.discussion?.body || "";
 });
 
-
 // Scroll element setup, ensure document.documentElement is accessed only on the client-side
 const scrollElement = ref<HTMLElement | null>(null);
 
@@ -79,7 +78,11 @@ const filterByTag = (tag: string) => {
 
 <template>
   <div>
-    <div v-if="discussion?.body" class="-ml-2 -mt-4rounded" :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ': '']">
+    <div
+      v-if="discussion?.body"
+      class="-ml-2 -mt-4rounded"
+      :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
+    >
       <MarkdownPreview
         :text="bodyText"
         :disable-gallery="false"
@@ -93,7 +96,7 @@ const filterByTag = (tag: string) => {
         :emoji-json="emojiJson"
       />
     </div>
-    <div class="flex gap-1">
+    <div class="flex-col gap-2">
       <Tag
         v-for="tag in discussion?.Tags"
         :key="tag.text"
@@ -103,6 +106,9 @@ const filterByTag = (tag: string) => {
       />
     </div>
     <slot name="album-slot" />
+    <div class="my-2">
+      <slot name="mark-answered-slot" />
+    </div>
     <div class="flex items-center gap-2">
       <slot name="button-slot" />
       <NewEmojiButton

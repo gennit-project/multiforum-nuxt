@@ -110,6 +110,7 @@ export const GET_USER_DISCUSSIONS = gql`
         deleted
         DiscussionChannels {
           archived
+          answered
           locked
           Channel {
             uniqueName

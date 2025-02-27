@@ -30,6 +30,7 @@ import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
+import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -99,6 +100,7 @@ const {
   error: getDiscussionChannelError,
   loading: getDiscussionChannelLoading,
   fetchMore: fetchMoreComments,
+  refetch: refetchDiscussionChannel,
 } = useQuery(
   GET_DISCUSSION_COMMENTS,
   {
@@ -342,8 +344,19 @@ const handleClickEditDiscussionBody = () => {
                         />
                       </div>
                     </template>
+                    <template #mark-answered-slot>
+                      <MarkAsAnsweredButton 
+                        v-if="loggedInUserIsAuthor"
+                        :answered="activeDiscussionChannel?.answered || false" 
+                        :discussion-id="discussionId"
+                        :channel-id="channelId"
+                        :discussion-channel-id="activeDiscussionChannel?.id"
+                        @mark-unanswered="refetchDiscussionChannel"
+                      />
+                    </template>
                     <template #button-slot>
-                      <div class="flex h-12 items-center">
+                      <div class="flex-col items-center">
+                       
                         <DiscussionVotes
                           v-if="activeDiscussionChannel"
                           :discussion="discussion"

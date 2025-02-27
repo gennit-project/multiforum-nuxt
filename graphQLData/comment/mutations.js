@@ -143,6 +143,7 @@ export const CREATE_DISCUSSION_CHANNEL = gql`
         discussionId
         emoji
         archived
+        answered
         locked
         Discussion {
           id

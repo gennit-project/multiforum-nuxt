@@ -10070,6 +10070,9 @@ export type DiscussionAuthorUpdateFieldInput = {
 
 export type DiscussionChannel = {
   __typename?: 'DiscussionChannel';
+  Answers: Array<Comment>;
+  AnswersAggregate?: Maybe<DiscussionChannelCommentAnswersAggregationSelection>;
+  AnswersConnection: DiscussionChannelAnswersConnection;
   Channel?: Maybe<Channel>;
   ChannelAggregate?: Maybe<DiscussionChannelChannelChannelAggregationSelection>;
   ChannelConnection: DiscussionChannelChannelConnection;
@@ -10085,6 +10088,7 @@ export type DiscussionChannel = {
   UpvotedByUsers: Array<User>;
   UpvotedByUsersAggregate?: Maybe<DiscussionChannelUserUpvotedByUsersAggregationSelection>;
   UpvotedByUsersConnection: DiscussionChannelUpvotedByUsersConnection;
+  answered?: Maybe<Scalars['Boolean']['output']>;
   archived?: Maybe<Scalars['Boolean']['output']>;
   channelUniqueName: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -10093,6 +10097,28 @@ export type DiscussionChannel = {
   id: Scalars['ID']['output'];
   locked?: Maybe<Scalars['Boolean']['output']>;
   weightedVotesCount?: Maybe<Scalars['Float']['output']>;
+};
+
+
+export type DiscussionChannelAnswersArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<CommentOptions>;
+  where?: InputMaybe<CommentWhere>;
+};
+
+
+export type DiscussionChannelAnswersAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<CommentWhere>;
+};
+
+
+export type DiscussionChannelAnswersConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<DiscussionChannelAnswersConnectionSort>>;
+  where?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
 };
 
 
@@ -10213,6 +10239,142 @@ export type DiscussionChannelAggregateSelection = {
   discussionId: IdAggregateSelection;
   id: IdAggregateSelection;
   weightedVotesCount: FloatAggregateSelection;
+};
+
+export type DiscussionChannelAnswersAggregateInput = {
+  AND?: InputMaybe<Array<DiscussionChannelAnswersAggregateInput>>;
+  NOT?: InputMaybe<DiscussionChannelAnswersAggregateInput>;
+  OR?: InputMaybe<Array<DiscussionChannelAnswersAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<DiscussionChannelAnswersNodeAggregationWhereInput>;
+};
+
+export type DiscussionChannelAnswersConnectFieldInput = {
+  connect?: InputMaybe<Array<CommentConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type DiscussionChannelAnswersConnection = {
+  __typename?: 'DiscussionChannelAnswersConnection';
+  edges: Array<DiscussionChannelAnswersRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DiscussionChannelAnswersConnectionSort = {
+  node?: InputMaybe<CommentSort>;
+};
+
+export type DiscussionChannelAnswersConnectionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelAnswersConnectionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelAnswersConnectionWhere>>;
+  node?: InputMaybe<CommentWhere>;
+};
+
+export type DiscussionChannelAnswersCreateFieldInput = {
+  node: CommentCreateInput;
+};
+
+export type DiscussionChannelAnswersDeleteFieldInput = {
+  delete?: InputMaybe<CommentDeleteInput>;
+  where?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+};
+
+export type DiscussionChannelAnswersDisconnectFieldInput = {
+  disconnect?: InputMaybe<CommentDisconnectInput>;
+  where?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+};
+
+export type DiscussionChannelAnswersFieldInput = {
+  connect?: InputMaybe<Array<DiscussionChannelAnswersConnectFieldInput>>;
+  create?: InputMaybe<Array<DiscussionChannelAnswersCreateFieldInput>>;
+};
+
+export type DiscussionChannelAnswersNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<DiscussionChannelAnswersNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<DiscussionChannelAnswersNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<DiscussionChannelAnswersNodeAggregationWhereInput>>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  text_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_LTE?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type DiscussionChannelAnswersRelationship = {
+  __typename?: 'DiscussionChannelAnswersRelationship';
+  cursor: Scalars['String']['output'];
+  node: Comment;
+};
+
+export type DiscussionChannelAnswersUpdateConnectionInput = {
+  node?: InputMaybe<CommentUpdateInput>;
+};
+
+export type DiscussionChannelAnswersUpdateFieldInput = {
+  connect?: InputMaybe<Array<DiscussionChannelAnswersConnectFieldInput>>;
+  create?: InputMaybe<Array<DiscussionChannelAnswersCreateFieldInput>>;
+  delete?: InputMaybe<Array<DiscussionChannelAnswersDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<DiscussionChannelAnswersDisconnectFieldInput>>;
+  update?: InputMaybe<DiscussionChannelAnswersUpdateConnectionInput>;
+  where?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
 };
 
 export type DiscussionChannelChannelAggregateInput = {
@@ -10408,6 +10570,21 @@ export type DiscussionChannelChannelUpdateFieldInput = {
   where?: InputMaybe<DiscussionChannelChannelConnectionWhere>;
 };
 
+export type DiscussionChannelCommentAnswersAggregationSelection = {
+  __typename?: 'DiscussionChannelCommentAnswersAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<DiscussionChannelCommentAnswersNodeAggregateSelection>;
+};
+
+export type DiscussionChannelCommentAnswersNodeAggregateSelection = {
+  __typename?: 'DiscussionChannelCommentAnswersNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  text: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  weightedVotesCount: FloatAggregateSelection;
+};
+
 export type DiscussionChannelCommentCommentsAggregationSelection = {
   __typename?: 'DiscussionChannelCommentCommentsAggregationSelection';
   count: Scalars['Int']['output'];
@@ -10560,6 +10737,7 @@ export type DiscussionChannelCommentsUpdateFieldInput = {
 };
 
 export type DiscussionChannelConnectInput = {
+  Answers?: InputMaybe<Array<DiscussionChannelAnswersConnectFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelConnectFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsConnectFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionConnectFieldInput>;
@@ -10577,11 +10755,13 @@ export type DiscussionChannelConnectWhere = {
 };
 
 export type DiscussionChannelCreateInput = {
+  Answers?: InputMaybe<DiscussionChannelAnswersFieldInput>;
   Channel?: InputMaybe<DiscussionChannelChannelFieldInput>;
   Comments?: InputMaybe<DiscussionChannelCommentsFieldInput>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionFieldInput>;
   RelatedIssues?: InputMaybe<DiscussionChannelRelatedIssuesFieldInput>;
   UpvotedByUsers?: InputMaybe<DiscussionChannelUpvotedByUsersFieldInput>;
+  answered?: InputMaybe<Scalars['Boolean']['input']>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   channelUniqueName: Scalars['String']['input'];
   discussionId: Scalars['ID']['input'];
@@ -10591,6 +10771,7 @@ export type DiscussionChannelCreateInput = {
 };
 
 export type DiscussionChannelDeleteInput = {
+  Answers?: InputMaybe<Array<DiscussionChannelAnswersDeleteFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelDeleteFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsDeleteFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionDeleteFieldInput>;
@@ -10599,6 +10780,7 @@ export type DiscussionChannelDeleteInput = {
 };
 
 export type DiscussionChannelDisconnectInput = {
+  Answers?: InputMaybe<Array<DiscussionChannelAnswersDisconnectFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelDisconnectFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsDisconnectFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionDisconnectFieldInput>;
@@ -11038,6 +11220,7 @@ export type DiscussionChannelRelatedIssuesUpdateFieldInput = {
 };
 
 export type DiscussionChannelRelationInput = {
+  Answers?: InputMaybe<Array<DiscussionChannelAnswersCreateFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelCreateFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsCreateFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionCreateFieldInput>;
@@ -11047,6 +11230,7 @@ export type DiscussionChannelRelationInput = {
 
 /** Fields to sort DiscussionChannels by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionChannelSort object. */
 export type DiscussionChannelSort = {
+  answered?: InputMaybe<SortDirection>;
   archived?: InputMaybe<SortDirection>;
   channelUniqueName?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
@@ -11058,11 +11242,13 @@ export type DiscussionChannelSort = {
 };
 
 export type DiscussionChannelUpdateInput = {
+  Answers?: InputMaybe<Array<DiscussionChannelAnswersUpdateFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelUpdateFieldInput>;
   Comments?: InputMaybe<Array<DiscussionChannelCommentsUpdateFieldInput>>;
   Discussion?: InputMaybe<DiscussionChannelDiscussionUpdateFieldInput>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesUpdateFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersUpdateFieldInput>>;
+  answered?: InputMaybe<Scalars['Boolean']['input']>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -11377,6 +11563,23 @@ export type DiscussionChannelUserUpvotedByUsersNodeAggregateSelection = {
 
 export type DiscussionChannelWhere = {
   AND?: InputMaybe<Array<DiscussionChannelWhere>>;
+  AnswersAggregate?: InputMaybe<DiscussionChannelAnswersAggregateInput>;
+  /** Return DiscussionChannels where all of the related DiscussionChannelAnswersConnections match this filter */
+  AnswersConnection_ALL?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+  /** Return DiscussionChannels where none of the related DiscussionChannelAnswersConnections match this filter */
+  AnswersConnection_NONE?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+  /** Return DiscussionChannels where one of the related DiscussionChannelAnswersConnections match this filter */
+  AnswersConnection_SINGLE?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+  /** Return DiscussionChannels where some of the related DiscussionChannelAnswersConnections match this filter */
+  AnswersConnection_SOME?: InputMaybe<DiscussionChannelAnswersConnectionWhere>;
+  /** Return DiscussionChannels where all of the related Comments match this filter */
+  Answers_ALL?: InputMaybe<CommentWhere>;
+  /** Return DiscussionChannels where none of the related Comments match this filter */
+  Answers_NONE?: InputMaybe<CommentWhere>;
+  /** Return DiscussionChannels where one of the related Comments match this filter */
+  Answers_SINGLE?: InputMaybe<CommentWhere>;
+  /** Return DiscussionChannels where some of the related Comments match this filter */
+  Answers_SOME?: InputMaybe<CommentWhere>;
   Channel?: InputMaybe<ChannelWhere>;
   ChannelAggregate?: InputMaybe<DiscussionChannelChannelAggregateInput>;
   ChannelConnection?: InputMaybe<DiscussionChannelChannelConnectionWhere>;
@@ -11440,6 +11643,7 @@ export type DiscussionChannelWhere = {
   UpvotedByUsers_SINGLE?: InputMaybe<UserWhere>;
   /** Return DiscussionChannels where some of the related Users match this filter */
   UpvotedByUsers_SOME?: InputMaybe<UserWhere>;
+  answered?: InputMaybe<Scalars['Boolean']['input']>;
   archived?: InputMaybe<Scalars['Boolean']['input']>;
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
