@@ -40,6 +40,11 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  archived: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   locked: {
     type: Boolean,
     required: false,
@@ -253,6 +258,7 @@ function decrementCommentCount(cache: any) {
     :original-poster="originalPoster"
     :show-comment-sort-buttons="false"
     :locked="locked"
+    :archived="archived"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

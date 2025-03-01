@@ -86,6 +86,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  archived: {
+    type: Boolean,
+    default: false,
+  },
   reachedEndOfResults: {
     type: Boolean,
     required: true,
@@ -563,7 +567,7 @@ const lengthOfCommentInProgress = computed(() => {
         <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />
       </div>
       <InfoBanner
-        v-if="locked"
+        v-if="locked || archived"
         class="mr-10 mt-2"
         :text="'This comment section is locked because the post was removed from the forum.'"
       />
@@ -571,7 +575,7 @@ const lengthOfCommentInProgress = computed(() => {
       <NuxtPage
         :aggregate-comment-count="aggregateCommentCount"
         :enable-feedback="enableFeedback"
-        :locked="locked"
+        :locked="locked || archived"
         :comment-in-process="commentInProcess"
         :logged-in-user-mod-name="modProfileNameVar"
         :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
@@ -615,7 +619,7 @@ const lengthOfCommentInProgress = computed(() => {
               :comment-data="comment"
               :enable-feedback="enableFeedback"
               :depth="1"
-              :locked="locked"
+              :locked="locked || archived"
               :comment-in-process="commentInProcess"
               :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
               :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"

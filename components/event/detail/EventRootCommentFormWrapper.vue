@@ -23,6 +23,7 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  
 });
 const route = useRoute();
 

@@ -59,6 +59,11 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  archived: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   locked: {
     type: Boolean,
     required: false,
@@ -285,6 +290,7 @@ const decrementCommentCount = (cache: any) => {
     :previous-offset="previousOffset"
     :original-poster="discussionAuthor"
     :locked="locked"
+    :archived="archived"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

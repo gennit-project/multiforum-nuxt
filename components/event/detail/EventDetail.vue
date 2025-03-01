@@ -356,6 +356,7 @@ const handleClickEditEventDescription = () => {
 
             <div v-if="showComments">
               <EventRootCommentFormWrapper
+                v-if="event && !isArchived"
                 :key="`${eventId}`"
                 :event="event"
                 :previous-offset="previousOffset"
@@ -369,6 +370,7 @@ const handleClickEditEventDescription = () => {
                   :reached-end-of-results="reachedEndOfResults"
                   :previous-offset="previousOffset"
                   :original-poster="originalPoster"
+                  :archived="isArchived || false"
                   @load-more="loadMore"
                 />
               </div>
