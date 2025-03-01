@@ -154,10 +154,12 @@ const deleteModalIsOpen = ref(false);
 const showBrokenRulesModal = ref(false);
 const showArchiveModal = ref(false);
 const showUnarchiveModal = ref(false);
+const showArchiveAndSuspendModal = ref(false);
 
 const showSuccessfullyReported = ref(false);
 const showSuccessfullyArchived = ref(false);
 const showSuccessfullyUnarchived = ref(false);
+const showSuccessfullyArchivedAndSuspended = ref(false);
 
 const menuItems = computed(() => {
   let out: MenuItem[] = [];
@@ -316,6 +318,7 @@ const authorIsMod = computed(
           @handle-delete="deleteModalIsOpen = true"
           @handle-click-report="showBrokenRulesModal = true"
           @handle-click-archive="showArchiveModal = true"
+          @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
           @handle-click-unarchive="showUnarchiveModal = true"
           @handle-feedback="emit('handleClickGiveFeedback')"
           @handle-view-feedback="
@@ -384,6 +387,28 @@ const authorIsMod = computed(
           showUnarchiveModal = false;
         }
       "
+    />
+    <BrokenRulesModal
+      v-if="discussion"
+      :title="'Suspend Author'"
+      :open="showArchiveAndSuspendModal"
+      :discussion-title="discussion.title"
+      :discussion-id="discussion.id"
+      :discussion-channel-id="discussionChannelId"
+      :suspend-user-enabled="true"
+      :text-box-label="'(Optional) Explain why you are suspending this author:'"
+      @close="showArchiveAndSuspendModal = false"
+      @suspended-user-successfully="
+        () => {
+          showSuccessfullyArchivedAndSuspended = true;
+          showArchiveAndSuspendModal = false;
+        }
+      "
+    />
+    <Notification
+      :show="showSuccessfullyArchivedAndSuspended"
+      :title="'Archived the post and suspended the author.'"
+      @close-notification="showSuccessfullyArchivedAndSuspended = false"
     />
     <Notification
       :show="showSuccessfullyReported"

@@ -72,11 +72,11 @@ const tabs = [
   },
   {
     key: "suspended-users",
-    label: "Suspended Users",
+    label: "User Suspensions",
   },
   {
     key: "suspended-mods",
-    label: "Suspended Mods",
+    label: "Mod Suspensions",
   },
 ];
 

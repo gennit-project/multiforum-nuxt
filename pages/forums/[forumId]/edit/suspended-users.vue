@@ -28,7 +28,7 @@ const suspendedUsers = computed(() => {
 <template>
   <div class="flex-col space-y-4 dark:text-white">
     <div class="mb-6">
-      <h1 class="text-xl font-bold mb-2">Suspended Users</h1>
+      <h1 class="text-xl font-bold mb-2">User Suspensions</h1>
       <p class="text-gray-600 text-sm dark:text-gray-400">
         {{ `These users have been suspended from ${forumId}.` }}
       </p>

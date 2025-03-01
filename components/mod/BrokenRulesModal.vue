@@ -125,7 +125,7 @@ const {
   onDone: suspendUserDone,
 } = useMutation(SUSPEND_USER, {
   update: (cache) => {
-     // update the result of IS_ORIGINAL_POSTER_SUSPENDED
+    // update the result of IS_ORIGINAL_POSTER_SUSPENDED
     // is true.
     cache.writeQuery({
       query: IS_ORIGINAL_POSTER_SUSPENDED,
@@ -342,24 +342,56 @@ const submit = async () => {
     return;
   }
   if (props.suspendUserEnabled) {
-    if (!props.issueId) {
-      console.error("No issue ID provided.");
+    let issueId = props.issueId;
+    if (!issueId) {
+      // If an issue does not already exist, create one.
+      if (props.discussionId) {
+        const issue = await archiveDiscussion({
+          discussionId: props.discussionId,
+          reportText: reportText.value,
+          selectedForumRules: selectedForumRules.value,
+          selectedServerRules: selectedServerRules.value,
+          channelUniqueName: channelId.value,
+        });
+        issueId = issue?.data?.archiveDiscussion?.id;
+      }
+      if (props.eventId) {
+        const issue = await archiveEvent({
+          eventId: props.eventId,
+          reportText: reportText.value,
+          selectedForumRules: selectedForumRules.value,
+          selectedServerRules: selectedServerRules.value,
+          channelUniqueName: channelId.value,
+        });
+        issueId = issue?.data?.archiveEvent?.id;
+      }
+      if (props.commentId) {
+        const issue = await archiveComment({
+          commentId: props.commentId,
+          reportText: reportText.value,
+          selectedForumRules: selectedForumRules.value,
+          selectedServerRules: selectedServerRules.value,
+          channelUniqueName: channelId.value,
+        });
+        issueId = issue?.data?.archiveComment?.id;
+      }
+    }
+    if (!issueId) {
+      console.error("Could not suspend the user without an issue ID.");
       return;
     }
 
     suspendUser({
-      issueID: props.issueId,
+      issueID: issueId,
       suspendUntil: null,
       suspendIndefinitely: true,
       explanation: getFinalCommentText({
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
         reportText: reportText.value,
-      })
+      }),
     });
-
-  }
-  else if (!props.archiveAfterReporting) {
+  } else if (!props.archiveAfterReporting) {
     // Assume the user is reporting the content.
     if (props.discussionId) {
       reportDiscussion({

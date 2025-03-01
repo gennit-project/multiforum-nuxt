@@ -130,11 +130,8 @@ watch(commentSort, () =>
 );
 
 const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
-  if (!getDiscussionChannelResult.value) {
-    return null;
-  }
   return (
-    getDiscussionChannelResult.value.getCommentSection?.DiscussionChannel ||
+    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
     null
   );
 });
