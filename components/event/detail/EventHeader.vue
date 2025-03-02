@@ -62,15 +62,15 @@ const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
 const confirmDeleteIsOpen = ref(false);
 const confirmCancelIsOpen = ref(false);
+const showArchiveAndSuspendModal = ref(false);
 
 const showReportEventModal = ref(false);
 const showArchiveModal = ref(false);
 const showUnarchiveModal = ref(false);
 const showSuccessfullyArchived = ref(false);
 const showSuccessfullyUnarchived = ref(false);
-const showSuspendModal = ref(false);
 const showSuccessfullySuspended = ref(false);
-
+const showSuccessfullyArchivedAndSuspended = ref(false);
 const showSuccessfullyReported = ref(false);
 
 const eventId = computed(() => {
@@ -193,6 +193,14 @@ const menuItems = computed(() => {
       event: "copyLink",
       icon: ALLOWED_ICONS.COPY_LINK,
     });
+    items.unshift({
+      label: "View Feedback",
+      event: "handleViewFeedback",
+      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+    });
+  }
+  if (!usernameVar.value) {
+    return items;
   }
   if (props.eventData?.Poster?.username === usernameVar.value) {
     items = items.concat([
@@ -236,11 +244,6 @@ const menuItems = computed(() => {
         label: "Give Feedback",
         event: "handleFeedback",
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-      });
-      items.unshift({
-        label: "View Feedback",
-        event: "handleViewFeedback",
-        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       });
     }
     // Only add these if mod permissions are elevated
@@ -435,7 +438,7 @@ function handleFeedbackInput(event: string) {
           @handle-feedback="showFeedbackFormModal = true"
           @handle-view-feedback="handleViewFeedback"
           @handle-click-archive="showArchiveModal = true"
-          @handle-click-archive-and-suspend="showSuspendModal = true"
+          @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
           @handle-click-unarchive="showUnarchiveModal = true"
         >
           <EllipsisHorizontal
@@ -480,6 +483,28 @@ function handleFeedbackInput(event: string) {
         @update-feedback="handleFeedbackInput"
         @close="showFeedbackFormModal = false"
         @primary-button-click="handleSubmitFeedback"
+      />
+      <BrokenRulesModal
+        v-if="eventData"
+        :title="'Suspend Event Submitter'"
+        :open="showArchiveAndSuspendModal"
+        :event-title="eventData.title"
+        :event-id="eventData.id"
+        :event-channel-id="eventChannelId"
+        :suspend-user-enabled="true"
+        :text-box-label="'(Optional) Explain why you are suspending the event submitter:'"
+        @close="showArchiveAndSuspendModal = false"
+        @suspended-user-successfully="
+          () => {
+            showSuccessfullyArchivedAndSuspended = true;
+            showArchiveAndSuspendModal = false;
+          }
+        "
+      />
+      <Notification
+        :show="showSuccessfullyArchivedAndSuspended"
+        :title="'Archived the post and suspended the author.'"
+        @close-notification="showSuccessfullyArchivedAndSuspended = false"
       />
       <Notification
         :show="showFeedbackSubmittedSuccessfully"
@@ -549,8 +574,8 @@ function handleFeedbackInput(event: string) {
       />
     </div>
     <InfoBanner
-      class="mx-4"
       v-if="eventData.virtualEventUrl"
+      class="mx-4"
       :text="'The official event page is on an external website. Refer to the official event page for the most complete, correct and up-to-date information.'"
     />
   </div>

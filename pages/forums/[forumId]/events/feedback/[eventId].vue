@@ -4,6 +4,7 @@ import BackLink from "@/components/BackLink.vue";
 import { GET_EVENT_FEEDBACK } from "@/graphQLData/event/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { computed } from "vue";
+import { useRoute } from "nuxt/app";
 import EventHeader from "@/components/event/detail/EventHeader.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
@@ -125,6 +126,7 @@ const reachedEndOfResults = computed(() => {
             v-if="event"
             :event-data="event"
             :channel-id="channelId"
+            :event-channel-id
             :show-menu-buttons="false"
           />
           <EventBody v-if="event?.description" :event="event" />

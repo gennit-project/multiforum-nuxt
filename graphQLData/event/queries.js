@@ -95,18 +95,6 @@ export const GET_EVENT = gql`
   ${EVENT_FIELDS}
 `;
 
-// Get all event IDs in channel
-export const GET_EVENT_IDS_IN_CHANNEL = gql`
-  query getEventIdsInChannel($url: String!) {
-    getChannel(url: $url) {
-      url
-      Events {
-        id
-      }
-    }
-  }
-`;
-
 export const GET_EVENTS = gql`
   query getEvents($where: EventWhere, $options: EventOptions) {
     eventsAggregate(where: $where) {

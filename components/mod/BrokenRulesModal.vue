@@ -75,6 +75,11 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  eventChannelId: {
+    type: String,
+    required: false,
+    default: "",
+  },
   suspendUserEnabled: {
     type: Boolean,
     default: false,
@@ -187,10 +192,7 @@ const {
   error: archiveDiscussionError,
   onDone: archiveDiscussionDone,
 } = useMutation(ARCHIVE_DISCUSSION, {
-  update: (cache, { data }) => {
-    // update the result of GET_DISCUSSION_CHANNEL_BY_ID
-    // so that archived=true.
-
+  update: (cache) => {
     if (!props.discussionChannelId) {
       console.error("No discussion channel ID provided.");
       return;
@@ -215,7 +217,26 @@ const {
   loading: archiveEventLoading,
   error: archiveEventError,
   onDone: archiveEventDone,
-} = useMutation(ARCHIVE_EVENT);
+} = useMutation(ARCHIVE_EVENT, {
+  update: (cache) => {
+    if (!props.eventChannelId) {
+      console.error("No event channel ID provided.");
+      return;
+    }
+
+    cache.modify({
+      id: cache.identify({
+        __typename: "EventChannel",
+        id: props.eventChannelId,
+      }),
+      fields: {
+        archived() {
+          return true;
+        },
+      },
+    });
+  },
+});
 
 const {
   mutate: archiveComment,
@@ -363,6 +384,7 @@ const submit = async () => {
           selectedServerRules: selectedServerRules.value,
           channelUniqueName: channelId.value,
         });
+        console.log('issue', issue);
         issueId = issue?.data?.archiveEvent?.id;
       }
       if (props.commentId) {
