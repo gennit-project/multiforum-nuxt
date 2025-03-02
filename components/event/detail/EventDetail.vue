@@ -26,6 +26,7 @@ import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
 import { useRoute } from "nuxt/app";
 import { modProfileNameVar } from "@/cache";
 import AddToCalendarButton from "../AddToCalendarButton.vue";
+import ArchivedEventInfoBanner from "./ArchivedEventInfoBanner.vue";
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
@@ -65,7 +66,7 @@ const props = defineProps({
   },
   showTitle: {
     type: Boolean,
-    default: true,
+    default: false,
   },
 });
 
@@ -287,9 +288,10 @@ const handleClickEditEventDescription = () => {
               v-if="eventHasStarted"
               :text="'This event has started.'"
             />
-            <InfoBanner
-              v-if="isArchived"
-              text="This event is archived. New comments cannot be added."
+            <ArchivedEventInfoBanner 
+              v-if="isArchived && route.name !== 'forums-forumId-issues-issueId'"
+              :channel-id="channelId"
+              :event-channel-id="activeEventChannel?.id"
             />
             <ErrorBanner
               v-if="eventIsInThePast && showEventInPastBanner"

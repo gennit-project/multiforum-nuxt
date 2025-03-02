@@ -237,6 +237,40 @@ export const GET_DISCUSSION_CHANNEL = gql`
   }
 `;
 
+export const GET_DISCUSSION_ISSUE = gql`
+query getDiscussionChannels(
+  $discussionChannelId: ID!
+) {
+  discussionChannels (
+    where: {
+      id: $discussionChannelId
+    }
+  ){  
+    id
+    RelatedIssues {
+      id
+    }
+  }
+}
+`
+
+export const GET_EVENT_ISSUE = gql`
+query getEventChannels(
+  $eventChannelId: ID!
+) {
+  eventChannels (
+    where: {
+      id: $eventChannelId
+    }
+  ){  
+    id
+    RelatedIssues {
+      id
+    }
+  }
+}
+`
+
 export const GET_EVENT_CHANNEL = gql`
   query getEventChannelID($eventId: ID!, $channelUniqueName: String!) {
     eventChannels(

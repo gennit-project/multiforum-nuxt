@@ -19,7 +19,6 @@ import {
 import type { Issue } from "@/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
-import BackLink from "@/components/BackLink.vue";
 import PageNotFound from "@/components/PageNotFound.vue";
 import DiscussionDetails from "@/components/mod/DiscussionDetails.vue";
 import EventDetail from "@/components/event/detail/EventDetail.vue";

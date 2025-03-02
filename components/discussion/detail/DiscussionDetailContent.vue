@@ -31,6 +31,7 @@ import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
 import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
+import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -299,7 +300,11 @@ const handleClickEditDiscussionBody = () => {
           class="mt-2 px-4"
           :text="getDiscussionError.message"
         />
-        <InfoBanner v-if="isArchived" text="This discussion is archived. New comments cannot be added." />
+        <ArchivedDiscussionInfoBanner 
+          v-if="isArchived"
+          :channel-id="channelId"
+          :discussion-channel-id="activeDiscussionChannel?.id"
+        />
         <InfoBanner v-else-if="locked" text="This discussion is locked. New comments cannot be added." />
         <v-row v-if="discussion" class="flex justify-center">
           <v-col>

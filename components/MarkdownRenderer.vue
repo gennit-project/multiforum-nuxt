@@ -78,9 +78,11 @@ const renderedMarkdown = computed(() => {
 .markdown-body {
   padding: 0 1rem;
   padding-top: 1px;
-  padding-bottom: 0.25rem !important;
+  padding-top: 0.25rem !important;
   word-wrap: break-word;
   overflow-wrap: break-word;
+  display: flex;
+  align-items: center;
   width: 100%;
 
   .external-link {
