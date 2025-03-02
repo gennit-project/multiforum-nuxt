@@ -109,7 +109,7 @@ const relative = computed(() =>
 
 <template>
   <li
-    class="pt-4 pb-2 px-4 list-none"
+    class="pt-2 pb-2 px-4 list-none"
     :class="{
       'bg-gray-100 dark:bg-gray-700': discussionIdInParams === discussionId,
     }"
@@ -158,8 +158,41 @@ const relative = computed(() =>
               </span>
             </nuxt-link>
             <div
-              class="text-xs flex flex-wrap items-center gap-1 text-sm text-gray-500 no-underline dark:text-gray-300"
+              class="text-xs flex flex-wrap pt-1 items-center gap-1 text-gray-500 no-underline dark:text-gray-300"
             >
+              <nuxt-link
+                v-if="discussion && !submittedToMultipleChannels"
+                :to="
+                  getDetailLink(
+                    discussion.DiscussionChannels[0].channelUniqueName
+                  )
+                "
+                class="flex items-center gap-2 text-xs"
+              >
+                <span>{{
+                  `${commentCount} ${commentCount === 1 ? "comment" : "comments"} •`
+                }}</span>
+              </nuxt-link>
+
+              <MenuButton
+                v-else-if="discussion"
+                :items="discussionDetailOptions"
+              >
+                <button
+                  class="flex items-center rounded-md dark:text-white text-xs"
+                >
+                  <i class="fa-regular fa-comment mr-2 h-4 w-4" />
+                  {{
+                    `${commentCount} ${
+                      commentCount === 1 ? "comment" : "comments"
+                    } in ${channelCount} ${channelCount === 1 ? "forum" : "forums"}`
+                  }}
+                  <ChevronDownIcon
+                    class="-mr-1 ml-2 h-4 w-4"
+                    aria-hidden="true"
+                  />
+                </button>
+              </MenuButton>
               <span>
                 {{ `Posted ${relative} by ` }}
                 <UsernameWithTooltip
@@ -228,36 +261,6 @@ const relative = computed(() =>
                 @click="$emit('filterByTag', tag)"
               />
             </div>
-            <nuxt-link
-              v-if="discussion && !submittedToMultipleChannels"
-              :to="
-                getDetailLink(
-                  discussion.DiscussionChannels[0].channelUniqueName
-                )
-              "
-              class="flex items-center gap-2 pt-2 dark:text-white text-xs"
-            >
-              <span>{{
-                `${commentCount} ${commentCount === 1 ? "comment" : "comments"}`
-              }}</span>
-            </nuxt-link>
-
-            <MenuButton v-else-if="discussion" :items="discussionDetailOptions">
-              <button
-                class="flex items-center rounded-md dark:text-white text-xs"
-              >
-                <i class="fa-regular fa-comment mr-2 h-4 w-4" />
-                {{
-                  `${commentCount} ${
-                    commentCount === 1 ? "comment" : "comments"
-                  } in ${channelCount} ${channelCount === 1 ? "forum" : "forums"}`
-                }}
-                <ChevronDownIcon
-                  class="-mr-1 ml-2 h-4 w-4"
-                  aria-hidden="true"
-                />
-              </button>
-            </MenuButton>
           </div>
         </div>
       </div>
