@@ -384,7 +384,6 @@ const submit = async () => {
           selectedServerRules: selectedServerRules.value,
           channelUniqueName: channelId.value,
         });
-        console.log('issue', issue);
         issueId = issue?.data?.archiveEvent?.id;
       }
       if (props.commentId) {

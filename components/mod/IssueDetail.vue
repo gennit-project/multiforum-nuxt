@@ -567,6 +567,7 @@ const toggleCloseOpenIssue = async () => {
           :username-on-top="true"
           :show-add-to-calendar="false"
           :show-event-in-past-banner="false"
+          :show-title="true"
         />
         <CommentDetails
           v-if="activeIssue?.relatedCommentId"

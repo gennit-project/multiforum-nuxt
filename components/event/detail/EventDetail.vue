@@ -63,6 +63,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  showTitle: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const route = useRoute();
@@ -300,7 +304,7 @@ const handleClickEditEventDescription = () => {
             />
 
             <div
-              v-if="route.name === 'map-search-eventId' && event"
+              v-if="showTitle || (route.name === 'map-search-eventId' && event)"
               class="dark:text-gray-100 md:flex md:items-center md:justify-between"
             >
               <div class="min-w-0 flex-1">
