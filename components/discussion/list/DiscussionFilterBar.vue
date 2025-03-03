@@ -144,7 +144,7 @@ const toggleShowFilters = () => {
 </script>
 
 <template>
-  <div>
+  <div class="px-2">
     <div>
       <div class="flex flex-wrap items-center space-x-2 py-2">
         <FilterChip
@@ -182,7 +182,7 @@ const toggleShowFilters = () => {
         <SortButtons />
         <button
           :class="showFilters ? 'border-blue-500' : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'"
-          class="border flex p-1.5 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100"
+          class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
           @click="(event)=> {
             event.preventDefault()
             toggleShowFilters()
