@@ -78,7 +78,6 @@ const filterChannelsByTag = (tag: string) => {
           </div>
         </div>
       </div>
-      <h2 class="mt-2 text-xl font-bold dark:text-white">Forum Intro</h2>
       <MarkdownPreview
         v-if="channel?.description"
         :text="channel?.description"
