@@ -9,6 +9,7 @@ import InfoIcon from "@/components/icons/InfoIcon.vue";
 import type { Channel } from "@/__generated__/graphql";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
+import { useDisplay } from 'vuetify'
 
 type Tab = {
   name: string;
@@ -74,6 +75,8 @@ const iconSize = computed(() =>
   props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"
 );
 
+const { smAndDown } = useDisplay()
+
 const tabs = computed((): Tab[] => {
   const baseTabs: Tab[] = [
     {
@@ -90,14 +93,17 @@ const tabs = computed((): Tab[] => {
       icon: CalendarIcon,
       countProperty: "EventChannelsAggregate",
     },
-    {
+  ];
+
+  if (smAndDown.value) {
+    baseTabs.push({
       name: "about",
       routeSuffix: "about",
       label: "About",
       icon: InfoIcon,
       countProperty: null,
-    },
-  ];
+    });
+  }
 
   const adminList = props.channel.Admins.map((user) => user.username || "");
   const modList = props.channel.Moderators.map(

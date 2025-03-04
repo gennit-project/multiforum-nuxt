@@ -13,6 +13,7 @@ import type { SearchDiscussionValues } from "@/types/Discussion";
 import { updateFilters } from "@/utils/routerUtils";
 import { useRoute, useRouter } from "nuxt/app";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
+import SearchIcon from "@/components/icons/SearchIcon.vue";
 
 defineProps({
   isForumScoped: {
@@ -138,15 +139,21 @@ const updateShowArchived = (event: Event) => {
 };
 
 const showFilters = ref(false);
+const showSearch = ref(false);
+
 const toggleShowFilters = () => {
   showFilters.value = !showFilters.value;
+};
+
+const toggleShowSearch = () => {
+  showSearch.value = !showSearch.value;
 };
 </script>
 
 <template>
   <div class="px-2">
     <div>
-      <div class="flex flex-wrap items-center space-x-2 py-2">
+      <div class="flex flex-wrap items-center justify-end space-x-2 py-2 border border-b-gray-700">
         <FilterChip
           v-if="!isForumScoped"
           class="align-middle"
@@ -168,31 +175,46 @@ const toggleShowFilters = () => {
             </div>
           </template>
         </FilterChip>
-        <SearchBar
-          class="hidden md:block"
-          data-testid="discussion-filter-search-bar"
-          :initial-value="filterValues.searchInput"
-          :search-placeholder="'Search'"
-          :auto-focus="false"
-          :small="true"
-          :left-side-is-rounded="false"
-          :right-side-is-rounded="false"
-          @update-search-input="updateSearchInput"
-        />
         <SortButtons />
         <button
-          :class="showFilters ? 'border-blue-500' : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'"
+          :class="
+            showFilters
+              ? 'border-blue-500'
+              : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'
+          "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
-          @click="(event)=> {
-            event.preventDefault()
-            toggleShowFilters()
-          }"
+          @click="
+            (event) => {
+              event.preventDefault();
+              toggleShowFilters();
+            }
+          "
         >
           <FilterIcon />
         </button>
+        <button
+          :class="
+            showSearch
+              ? 'border-blue-500'
+              : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'
+          "
+          class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
+          @click="
+            (event) => {
+              event.preventDefault();
+              toggleShowSearch();
+            }
+          "
+        >
+          <SearchIcon />
+        </button>
       </div>
+    </div>
+    <div
+      v-if="showSearch"
+      class="flex flex-col gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+    >
       <SearchBar
-        class="block md:hidden"
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search'"
@@ -203,20 +225,10 @@ const toggleShowFilters = () => {
         @update-search-input="updateSearchInput"
       />
     </div>
-
     <div
       v-if="showFilters"
-      class="flex items-center justify-end gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+      class="flex justify-end gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
     >
-      
-      <CheckBox
-        data-testid="show-archived-discussions"
-        class="align-middle"
-        :checked="filterValues.showArchived"
-        @input="updateShowArchived"
-      />
-      Show archived discussions
-
       <FilterChip
         class="align-middle"
         :data-testid="'tag-filter-button'"
@@ -235,6 +247,15 @@ const toggleShowFilters = () => {
           </div>
         </template>
       </FilterChip>
+      <div class="flex items-center gap-2 text-sm pr-2">
+        <CheckBox
+          data-testid="show-archived-discussions"
+          class="align-middle"
+          :checked="filterValues.showArchived"
+          @input="updateShowArchived"
+        />
+        Show archived discussions
+      </div>
     </div>
   </div>
 </template>
