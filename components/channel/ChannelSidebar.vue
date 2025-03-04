@@ -44,12 +44,46 @@ const filterChannelsByTag = (tag: string) => {
     <div v-if="channelId && channel" class="items-center gap-2" />
     
     <div>
+      <ExpandableImage
+      v-if="channel?.channelIconURL"
+      class="h-12 w-12 dark:border-gray-800"
+      :rounded="true"
+      :full-width="true"
+      :alt="channelId"
+      :src="channel?.channelIconURL ?? ''"
+    />
+    <AvatarComponent
+      v-if="!channel?.channelIconURL"
+      class="h-12 w-12 dark:border-gray-800"
+      :text="channelId"
+      :src="channel?.channelIconURL ?? ''"
+      :full-width="true"
+      :is-square="false"
+    />
+      <div class="flex items-center w-full gap-4">
+       
+        <div v-if="channelId" class="flex items-center">
+          <div class="mt-3 mb-1">
+            <span
+              class="flex space-y-2 rounded-full border-gray-700 text-2xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
+            >
+              {{ channel?.displayName ? channel.displayName : channelId }}
+            </span>
+            <span
+              v-if="channel?.uniqueName && channel?.displayName"
+              class="rounded-full bg-white text-sm font-mono text-gray-500 dark:bg-gray-900 dark:text-gray-300"
+            >
+              {{ `${channel.uniqueName}` }}
+            </span>
+          </div>
+        </div>
+      </div>
       <h2 class="mt-2 text-xl font-bold dark:text-white">Forum Intro</h2>
       <MarkdownPreview
         v-if="channel?.description"
         :text="channel?.description"
         :word-limit="1000"
-        class="-ml-5"
+        class="-ml-4"
       />
       <p v-else class="text-xs dark:text-white">Welcome to {{ channelId }}!</p>
     </div>

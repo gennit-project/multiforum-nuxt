@@ -148,12 +148,11 @@ const relative = computed(() =>
                 :class="
                   discussionIdInParams === discussionId ? 'text-black' : ''
                 "
-                class="cursor-pointer text-sm md:text-base lg:text-base hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
               >
                 <HighlightedSearchTerms
                   :text="title"
                   :search-input="searchInput"
-                  :classes="'font-medium'"
                 />
               </span>
             </nuxt-link>

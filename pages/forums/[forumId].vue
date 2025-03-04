@@ -127,41 +127,27 @@ if (!channelId.value) {
         :channel-id="channelId"
       />
       <ChannelHeaderDesktop
-        v-if="!showDiscussionTitle && !showEventTitle && !showIssueTitle"
+        v-if="
+          channel.channelBannerURL &&
+          !showDiscussionTitle &&
+          !showEventTitle &&
+          !showIssueTitle
+        "
         class="hidden md:block"
         :channel="channel"
         :channel-id="channelId"
         :admin-list="adminList"
         :route="route"
         :show-create-button="true"
-      >
-        <ChannelTabs
-          v-if="showChannelTabs"
-          class="w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800 md:px-6"
-          :vertical="false"
-          :show-counts="true"
-          :admin-list="adminList"
-          :route="route"
-          :channel="channel"
-          :desktop="true"
-        />
-      </ChannelHeaderDesktop>
+      />
       <main class="flex justify-center w-full">
         <article
           class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
         >
-          <ChannelTabs
-            v-if="showChannelTabs"
-            class="block md:hidden mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
-            :vertical="false"
-            :show-counts="true"
-            :admin-list="adminList"
-            :route="route"
-            :channel="channel"
-            :desktop="false"
-          />
-
-          <div v-if="showDiscussionTitle" class="flex w-full items-start gap-2 px-2">
+          <div
+            v-if="showDiscussionTitle"
+            class="flex w-full items-start gap-2 px-2"
+          >
             <BackLink
               class="mt-6"
               :link="`/forums/${channelId}/discussions`"
@@ -171,7 +157,10 @@ if (!channelId.value) {
               <DiscussionTitleEditForm />
             </div>
           </div>
-          <div v-else-if="showEventTitle" class="flex w-full items-start gap-2 pl-3">
+          <div
+            v-else-if="showEventTitle"
+            class="flex w-full items-start gap-2 pl-3"
+          >
             <BackLink
               class="mt-6"
               :link="`/forums/${channelId}/events`"
@@ -181,7 +170,10 @@ if (!channelId.value) {
               <EventTitleEditForm />
             </div>
           </div>
-          <div v-else-if="showIssueTitle" class="flex w-full items-start gap-2 px-2">
+          <div
+            v-else-if="showIssueTitle"
+            class="flex w-full items-start gap-2 px-2"
+          >
             <BackLink
               class="mt-6"
               :link="`/forums/${channelId}/discussions`"
@@ -196,7 +188,17 @@ if (!channelId.value) {
             <div
               class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
-              <div class="flex-1 p-0 md:p-6 bg-white dark:bg-gray-800">
+              <div class="flex-1 p-0 md:px-4 bg-white dark:bg-gray-800">
+                <ChannelTabs
+                  v-if="showChannelTabs"
+                  class="mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+                  :vertical="false"
+                  :show-counts="true"
+                  :admin-list="adminList"
+                  :route="route"
+                  :channel="channel"
+                  :desktop="false"
+                />
                 <NuxtPage />
               </div>
               <aside
@@ -206,7 +208,7 @@ if (!channelId.value) {
                 <ChannelSidebar
                   v-if="channel"
                   :channel="channel"
-                  class="p-6 pt-8"
+                  class="px-6"
                 />
               </aside>
             </div>

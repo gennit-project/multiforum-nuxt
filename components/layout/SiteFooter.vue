@@ -34,14 +34,13 @@ const links = [
     <div
       class="w-full text-xs items-center justify-center text-wrap bg-gray-800 p-4 text-white"
     >
-      This project is in alpha. I have hosted it publicly so that others can
-      help me test the app. If you have feedback or technical problems, please
+      If you have feedback or technical problems, please
       open an issue in the
       <a
         class="ml-1 text-blue-500 underline"
         target="_blank"
         href="https://github.com/gennit-project/multiforum-nuxt/issues"
-      >GitHub repo</a>, or email me at
+      >GitHub repo</a>, or email support at
       <a
         class="ml-1 text-blue-500"
         href="mailto:gennitdev@gmail.com"
