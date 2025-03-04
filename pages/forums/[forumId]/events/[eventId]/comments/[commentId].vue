@@ -24,16 +24,44 @@ defineEmits([
   "updateEditCommentInput",
 ]);
 
-defineProps<{
-  aggregateCommentCount: number;
-  locked: boolean;
-  commentInProcess: boolean;
-  loggedInUserModName: string;
-  replyFormOpenAtCommentID: string;
-  editFormOpenAtCommentID: string;
-  editCommentError: ApolloError | null | undefined;
-  originalPoster: string;
-}>();
+defineProps({
+  aggregateCommentCount: {
+    type: Number,
+    required: true,
+  },
+  locked: {
+    type: Boolean,
+    required: true,
+  },
+  commentInProcess: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  loggedInUserModName: {
+    type: String,
+    required: true,
+  },
+  replyFormOpenAtCommentID: {
+    type: String,
+    required: true,
+  },
+  editFormOpenAtCommentID: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  editCommentError: {
+    type: Object as () => ApolloError | null | undefined,
+    required: false,
+    default: null,
+  },
+  originalPoster: {
+    type: String,
+    required: false,
+    default: "",
+  },
+});
 </script>
 
 <template>

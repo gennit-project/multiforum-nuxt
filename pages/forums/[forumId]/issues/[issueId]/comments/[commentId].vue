@@ -21,13 +21,28 @@ defineEmits([
   "showCopiedLinkNotification",
 ]);
 
-defineProps<{
-  aggregateCommentCount: number;
-  commentInProcess: boolean;
-  editFormOpenAtCommentID: string;
-  editCommentError: ApolloError | null | undefined;
-  originalPoster: string;
-}>();
+defineProps({
+  commentInProcess: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  editFormOpenAtCommentID: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  editCommentError: {
+    type: Object as () => ApolloError | null | undefined,
+    required: false,
+    default: null,
+  },
+  originalPoster: {
+    type: String,
+    required: false,
+    default: "",
+  },
+});
 </script>
 
 <template>
