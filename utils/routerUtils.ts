@@ -16,7 +16,6 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   const { routeName, forumId, discussionId, eventId, feedbackId, commentId, isFeedbackOnDiscussion, isFeedbackOnEvent } = input;
   // If this is feedback on a discussion, give the discussion feedback permalink
   if (routeName === "forums-forumId-discussions-feedback-discussionId" || isFeedbackOnDiscussion) {
-    console.log('feedback on discussion');
     if (!discussionId || !commentId || !feedbackId) {
       throw new Error("Missing required parameters for feedback permalink");
     }
@@ -32,7 +31,6 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
 
   // If this is feedback on an event, give the event feedback permalink
   if (routeName === "forums-forumId-events-feedback-eventId" || isFeedbackOnEvent) {
-    console.log('feedback on event');
     if (!eventId || !commentId || !feedbackId) {
       throw new Error("Missing required parameters for feedback permalink");
     }
@@ -47,7 +45,6 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
 
   // If this is feedback on a comment, give the comment feedback permalink
-  console.log('feedback on comment');
   if (!discussionId || !commentId || !feedbackId || !forumId) {
     throw new Error("Missing required parameters for feedback permalink");
   }

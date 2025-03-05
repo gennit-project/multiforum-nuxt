@@ -16,6 +16,7 @@ import type { Discussion, DiscussionChannel, Tag as TagData,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
+  Image,
 } from "@/__generated__/graphql";
 import { modProfileNameVar } from "@/cache";
 
@@ -87,6 +88,15 @@ export default defineComponent({
             },
           ),
           author: discussion.value.Author?.username || '',
+          album: {
+            images: discussion.value.Album?.Images ? discussion.value.Album.Images.map((image: Image) => {
+              return {
+                url: image.url,
+                alt: image.alt,
+                attribution: '',
+              };
+            }) : [],
+          },
         };
       }
       // If the discussion data is loading, start with empty values. These
@@ -98,6 +108,9 @@ export default defineComponent({
         selectedTags: [],
         selectedChannels: [],
         author: "",
+        album: {
+          images: [],
+        }
       };
     };
 
@@ -125,6 +138,15 @@ export default defineComponent({
           },
         ),
         author: discussion.Author.username,
+        album: {
+          images: discussion.Album?.Images?.map((image: Image) => {
+            return {
+              url: image.url,
+              alt: image.alt,
+              attribution: '',
+            };
+          }),
+        },
       };
       formValues.value = formFields;
       dataLoaded.value = true;

@@ -10,6 +10,7 @@ import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
 import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+import AlbumEditor from "./AlbumEditor.vue";
 
 const props = defineProps<{
   editMode: boolean;
@@ -22,7 +23,7 @@ const props = defineProps<{
   updateDiscussionLoading?: boolean;
 }>();
 
-defineEmits(["submit", "updateFormValues"]);
+const emit = defineEmits(["submit", "updateFormValues"]);
 
 const formTitle = computed(() =>
   props.editMode ? "Edit Discussion" : "Start Discussion"
@@ -59,6 +60,13 @@ onMounted(() => {
     });
   }
 });
+function handleUpdateAlbum(newVals: { album: { images: any[] } }) {
+  // Merge these changes back into the parent's form data
+  emit("updateFormValues", {
+    ...props.formValues,
+    ...newVals,
+  });
+}
 </script>
 
 <template>
@@ -138,6 +146,15 @@ onMounted(() => {
                 <CharCounter
                   :current="formValues.body?.length || 0"
                   :max="MAX_CHARS_IN_DISCUSSION_BODY"
+                />
+              </template>
+            </FormRow>
+
+            <FormRow section-title="Images">
+              <template #content>
+                <AlbumEditor
+                  :form-values="formValues"
+                  @update-form-values="handleUpdateAlbum"
                 />
               </template>
             </FormRow>

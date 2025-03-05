@@ -202,14 +202,6 @@ const permalinkObject = computed(() => {
   }
 
   if (isFeedbackComment.value) {
-    console.log('feedback comment input' ,{
-      routeName: route.name as string,
-      forumId: props.commentData.Channel?.uniqueName || forumId as string,
-      discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
-      eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
-      feedbackId: feedbackCommentId.value,
-      commentId: props.commentData.id,
-    })
     return getFeedbackPermalinkObject({
       routeName: route.name as string,
       forumId: props.commentData.Channel?.uniqueName || forumId as string,
