@@ -96,7 +96,7 @@ const filterByTag = (tag: string) => {
         :emoji-json="emojiJson"
       />
     </div>
-    <div class="flex-col gap-2">
+    <div class="flex gap-2">
       <Tag
         v-for="tag in discussion?.Tags"
         :key="tag.text"

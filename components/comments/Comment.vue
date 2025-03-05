@@ -16,6 +16,7 @@ import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
+import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -171,49 +172,58 @@ const canShowPermalink =
   props.commentData.GivesFeedbackOnComment ||
   props.commentData.Event ||
   props.commentData.Issue ||
-  (issueId && forumId && props.commentData.id) ||  // For issue comments
+  (issueId && forumId && props.commentData.id) || // For issue comments
   (discussionId && forumId) || // For discussion comments
   (eventId && forumId); // For event comments
+
+const isFeedbackComment = computed(() => {
+  return (
+    props.commentData.GivesFeedbackOnDiscussion ||
+    props.commentData.GivesFeedbackOnEvent ||
+    props.commentData.GivesFeedbackOnComment
+  );
+});
+
+const feedbackCommentId = computed(() => {
+  if (isFeedbackComment.value) {
+    return (
+      props.commentData.GivesFeedbackOnDiscussion?.id ||
+      props.commentData.GivesFeedbackOnEvent?.id ||
+      props.commentData.GivesFeedbackOnComment?.id
+    );
+  }
+  return "";
+});
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink) {
     console.warn("No permalink object found for comment", props.commentData);
     return {};
   }
+
+  if (isFeedbackComment.value) {
+    console.log('feedback comment input' ,{
+      routeName: route.name as string,
+      forumId: props.commentData.Channel?.uniqueName || forumId as string,
+      discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
+      eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
+      feedbackId: feedbackCommentId.value,
+      commentId: props.commentData.id,
+    })
+    return getFeedbackPermalinkObject({
+      routeName: route.name as string,
+      forumId: props.commentData.Channel?.uniqueName || forumId as string,
+      discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
+      eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
+      feedbackId: feedbackCommentId.value,
+      commentId: props.commentData.id,
+      isFeedbackOnDiscussion: !!props.commentData.GivesFeedbackOnDiscussion,
+      isFeedbackOnEvent: !!props.commentData.GivesFeedbackOnEvent,
+    });
+  }
   // This is the default comment permalink object
   let result = {};
-  if (props.commentData.GivesFeedbackOnDiscussion) {
-    // Permalink for comment that gives feedback on a discussion
-    result = {
-      name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
-      params: {
-        discussionId: props.commentData.GivesFeedbackOnDiscussion.id,
-        feedbackId: props.commentData.id,
-        forumId: props.commentData.Channel?.uniqueName,
-      },
-    };
-  } else if (props.commentData.GivesFeedbackOnEvent) {
-    // Permalink for comment that gives feedback on an event
-    result = {
-      name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
-      params: {
-        eventId: props.commentData.GivesFeedbackOnEvent.id,
-        feedbackId: props.commentData.id,
-        forumId: props.commentData.Channel?.uniqueName,
-      },
-    };
-  } else if (props.commentData.GivesFeedbackOnComment) {
-    // Permalink for comment that gives feedback on another comment.
-    // Need separate logic for whether it gave feedback on a discussion or event.
-    // result = {
-    //   name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
-    //   params: {
-    //     commentId: props.commentData.GivesFeedbackOnComment.id,
-    //     feedbackId: props.commentData.id,
-    //     forumId: props.commentData.Channel?.uniqueName,
-    //   },
-    // };
-  }
+
   const discussionIdInLink =
     discussionId || props.commentData?.DiscussionChannel?.discussionId;
   if (discussionIdInLink) {
@@ -421,7 +431,6 @@ const saveDisabled = computed(() => {
     props.lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
   );
 });
-
 const label = computed(() => {
   let label = "";
   if (props.showLabel) {

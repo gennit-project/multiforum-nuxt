@@ -18,6 +18,7 @@ import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
 import { timeAgo, ALLOWED_ICONS } from "@/utils";
 import { modProfileNameVar } from "@/cache";
+import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
 
 const props = defineProps({
   comment: {
@@ -119,42 +120,7 @@ const commentMenuItems = computed(() => {
   return out;
 });
 
-const getPermalinkObject = () => {
-  // If this is feedback on a discussion, give the discussion feedback permalink
-  if (route.name === "forums-forumId-discussions-feedback-discussionId") {
-    return {
-      name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
-      params: {
-        forumId,
-        discussionId,
-        feedbackId: props.comment.id,
-      },
-    };
-  }
 
-  // If this is feedback on an event, give the event feedback permalink
-  if (route.name === "forums-forumId-events-feedback-eventId") {
-    return {
-      name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
-      params: {
-        forumId,
-        eventId,
-        feedbackId: props.comment.id,
-      },
-    };
-  }
-
-  // If this is feedback on a comment, give the comment feedback permalink
-  return {
-    name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
-    params: {
-      forumId,
-      discussionId,
-      commentId: feedbackId,
-      feedbackId: props.comment.id,
-    },
-  };
-};
 
 const copyLink = async () => {
   let basePath = "";
@@ -163,7 +129,15 @@ const copyLink = async () => {
   } else {
     basePath = process.env.BASE_URL || "";
   }
-  const permalinkObject = getPermalinkObject();
+
+  const permalinkObject = getFeedbackPermalinkObject({
+    routeName: route.name as string,
+    forumId: forumId as string,
+    discussionId: discussionId as string,
+    eventId: eventId as string,
+    feedbackId: feedbackId as string,
+    commentId: props.comment.id,
+  });
   const permalink = `${basePath}${router.resolve(permalinkObject).href}`;
   try {
     await navigator.clipboard.writeText(permalink);

@@ -1,5 +1,66 @@
 import type LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
-import type { Router, LocationQuery } from "nuxt/app";
+import type { LocationQuery, Router } from "vue-router";
+
+type FeedbackPermalinkInput = {
+  routeName: string;
+  forumId: string;
+  isFeedbackOnDiscussion?: boolean;
+  isFeedbackOnEvent?: boolean;
+  discussionId?: string;
+  eventId?: string;
+  feedbackId?: string;
+  commentId?: string;
+};
+
+export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
+  const { routeName, forumId, discussionId, eventId, feedbackId, commentId, isFeedbackOnDiscussion, isFeedbackOnEvent } = input;
+  // If this is feedback on a discussion, give the discussion feedback permalink
+  if (routeName === "forums-forumId-discussions-feedback-discussionId" || isFeedbackOnDiscussion) {
+    console.log('feedback on discussion');
+    if (!discussionId || !commentId || !feedbackId) {
+      throw new Error("Missing required parameters for feedback permalink");
+    }
+    return {
+      name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
+      params: {
+        forumId,
+        discussionId,
+        feedbackId: commentId,
+      },
+    };
+  }
+
+  // If this is feedback on an event, give the event feedback permalink
+  if (routeName === "forums-forumId-events-feedback-eventId" || isFeedbackOnEvent) {
+    console.log('feedback on event');
+    if (!eventId || !commentId || !feedbackId) {
+      throw new Error("Missing required parameters for feedback permalink");
+    }
+    return {
+      name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
+      params: {
+        forumId,
+        eventId,
+        feedbackId: commentId,
+      },
+    };
+  }
+
+  // If this is feedback on a comment, give the comment feedback permalink
+  console.log('feedback on comment');
+  if (!discussionId || !commentId || !feedbackId || !forumId) {
+    throw new Error("Missing required parameters for feedback permalink");
+  }
+  return {
+    name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
+    params: {
+      forumId,
+      discussionId,
+      commentId: feedbackId,
+      feedbackId: commentId,
+    },
+  };
+};
 
 export type UpdateStateInput = {
   channels?: string[];
