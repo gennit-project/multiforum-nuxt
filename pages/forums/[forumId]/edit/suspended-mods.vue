@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import ModList from "@/components/channel/form/ModList.vue";
+import SuspendedModList from "@/components/channel/form/SuspendedModList.vue";
 import { computed } from "vue";
 import { useRoute } from "nuxt/app";
 
@@ -33,9 +33,9 @@ const forumId = computed(() => {
         </li>
       </ul>
     </div>
-    <FormRow section-title="Suspended Mod List">
+    <FormRow>
       <template #content>
-        <ModList />
+        <SuspendedModList />
       </template>
     </FormRow>
   </div>

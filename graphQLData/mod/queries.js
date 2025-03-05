@@ -127,6 +127,26 @@ export const GET_MOD_ISSUES = gql`
   }
 `;
 
+export const GET_SUSPENDED_MODS_BY_CHANNEL = gql`
+  query getModsByChannel($channelUniqueName: String!) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      SuspendedModsAggregate {
+        count
+      }
+      SuspendedMods {
+        username
+        SuspendedMod {
+          displayName
+        }
+        RelatedIssue {
+          id
+        }
+      }
+    }
+  }
+`;
+
 export const GET_MODS_BY_CHANNEL = gql`
   query getModsByChannel($channelUniqueName: String!) {
     channels(where: { uniqueName: $channelUniqueName }) {

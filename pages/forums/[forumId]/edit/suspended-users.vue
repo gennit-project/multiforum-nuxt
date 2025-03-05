@@ -23,6 +23,9 @@ const {
 const suspendedUsers = computed(() => {
   return suspendedUsersResult.value?.channels[0]?.SuspendedUsers ?? [];
 });
+const aggregateCount = computed(() => {
+  return suspendedUsersResult.value?.channels[0]?.SuspendedUsersAggregate?.count ?? 0;
+});
 </script>
 
 <template>
@@ -30,7 +33,7 @@ const suspendedUsers = computed(() => {
     <div class="mb-6">
       <h1 class="text-xl font-bold mb-2">User Suspensions</h1>
       <p class="text-gray-600 text-sm dark:text-gray-400">
-        {{ `These users have been suspended from ${forumId}.` }}
+        {{ `These are the active suspensions of users from ${forumId}. It's possible for a user to be listed twice if moderation actions were taken on more than one of their posts.` }}
       </p>
       <ul
         class="text-gray-600 text-sm dark:text-gray-400 list-disc ml-4 list-outside"
@@ -54,6 +57,9 @@ const suspendedUsers = computed(() => {
         "
       >
         This forum has no suspended users.
+      </div>
+      <div >
+         {{ `Active Suspensions (${aggregateCount})` }}
       </div>
       <div v-if="suspendedUsers.length > 0" class="flex-col text-sm ">
         <div
