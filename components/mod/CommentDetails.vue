@@ -66,7 +66,7 @@ export default defineComponent({
       // if discussionId is not present, assume it is an event comment
       if (eventIdInLink) {
         return {
-          name: 'forums-forumId-event-eventId-comments-commentId',
+          name: 'forums-forumId-events-eventId-comments-commentId',
           params: {
             eventId: eventIdInLink,
             commentId: props.commentId,

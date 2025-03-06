@@ -76,8 +76,6 @@ const renderedMarkdown = computed(() => {
 
 <style lang="scss">
 .markdown-body {
-  display: flex;
-  align-items: center;
   word-wrap: break-word;
   overflow-wrap: break-word;
   width: 100%;

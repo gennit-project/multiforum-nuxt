@@ -242,7 +242,21 @@ const {
   loading: archiveCommentLoading,
   error: archiveCommentError,
   onDone: archiveCommentDone,
-} = useMutation(ARCHIVE_COMMENT);
+} = useMutation(ARCHIVE_COMMENT, {
+  update: (cache) => {
+    cache.modify({
+      id: cache.identify({
+        __typename: "Comment",
+        id: props.commentId,
+      }),
+      fields: {
+        archived() {
+          return true;
+        },
+      },
+    });
+  },
+});
 
 reportDiscussionDone(() => {
   reportText.value = "";

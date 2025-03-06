@@ -2,7 +2,7 @@
 import { ref, computed, watchEffect } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import Comment from "./Comment.vue";
-import LoadMore from "../LoadMore.vue"
+import LoadMore from "../LoadMore.vue";
 import WarningModal from "../WarningModal.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
@@ -33,6 +33,7 @@ import type { Ref, PropType } from "vue";
 import { modProfileNameVar } from "@/cache";
 import { useRouter, useRoute } from "nuxt/app";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+import LockIcon from "@/components/icons/LockIcon.vue";
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -261,67 +262,64 @@ const {
   onDone: onDoneUpdatingComment,
 } = useMutation(UPDATE_COMMENT);
 
-const { 
-  mutate: deleteComment, 
+const {
+  mutate: deleteComment,
   onDone: onDoneDeletingComment,
   loading: deleteCommentLoading,
-} = useMutation(
-  DELETE_COMMENT,
-  {
-    update: (cache) => {
-      if (parentOfCommentToDelete.value) {
-        const readQueryResult: any = cache.readQuery({
+} = useMutation(DELETE_COMMENT, {
+  update: (cache) => {
+    if (parentOfCommentToDelete.value) {
+      const readQueryResult: any = cache.readQuery({
+        query: GET_COMMENT_REPLIES,
+        variables: {
+          ...getCommentRepliesVariables,
+          commentId: parentOfCommentToDelete.value,
+        },
+      });
+
+      if (readQueryResult) {
+        const existingReplies =
+          readQueryResult?.getCommentReplies?.ChildComments;
+        const filteredReplies = existingReplies.filter(
+          (reply: CommentType) => reply.id !== commentToDeleteId.value
+        );
+
+        const existingChildCommentAggregate =
+          readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
+        const newChildCommentAggregate = Math.max(
+          0,
+          existingChildCommentAggregate - 1
+        );
+
+        const writeQueryData = {
+          ...readQueryResult,
+          getCommentReplies: {
+            ...readQueryResult.getCommentReplies,
+            ChildComments: filteredReplies,
+            aggregateChildCommentCount: newChildCommentAggregate,
+          },
+        };
+
+        cache.writeQuery({
           query: GET_COMMENT_REPLIES,
+          data: writeQueryData,
           variables: {
             ...getCommentRepliesVariables,
             commentId: parentOfCommentToDelete.value,
           },
         });
 
-        if (readQueryResult) {
-          const existingReplies =
-            readQueryResult?.getCommentReplies?.ChildComments;
-          const filteredReplies = existingReplies.filter(
-            (reply: CommentType) => reply.id !== commentToDeleteId.value
-          );
-
-          const existingChildCommentAggregate =
-            readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
-          const newChildCommentAggregate = Math.max(
-            0,
-            existingChildCommentAggregate - 1
-          );
-
-          const writeQueryData = {
-            ...readQueryResult,
-            getCommentReplies: {
-              ...readQueryResult.getCommentReplies,
-              ChildComments: filteredReplies,
-              aggregateChildCommentCount: newChildCommentAggregate,
-            },
-          };
-
-          cache.writeQuery({
-            query: GET_COMMENT_REPLIES,
-            data: writeQueryData,
-            variables: {
-              ...getCommentRepliesVariables,
-              commentId: parentOfCommentToDelete.value,
-            },
-          });
-
-          emit("decrementCommentCount", cache);
-        }
-      } else {
-        emit("updateCommentSectionQueryResult", {
-          cache,
-          commentToDeleteId: commentToDeleteId.value,
-        });
+        emit("decrementCommentCount", cache);
       }
-      emit("decrementCommentCount", cache);
-    },
-  }
-);
+    } else {
+      emit("updateCommentSectionQueryResult", {
+        cache,
+        commentToDeleteId: commentToDeleteId.value,
+      });
+    }
+    emit("decrementCommentCount", cache);
+  },
+});
 
 onDoneDeletingComment(() => {
   commentToDeleteId.value = "";
@@ -398,7 +396,7 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
           },
         });
       }
-      
+
       emit("incrementCommentCount", cache);
     },
   }
@@ -596,8 +594,10 @@ const lengthOfCommentInProgress = computed(() => {
       <InfoBanner
         v-if="locked || archived"
         class="mr-10 mt-2"
-        :text="'This comment section is locked because the post was removed from the forum.'"
-      />
+        :text="'This comment section is locked.'"
+      >
+        <LockIcon class="h-5 w-5" />
+      </InfoBanner>
       <LoadingSpinner v-if="loading" class="ml-2" />
       <NuxtPage
         :aggregate-comment-count="aggregateCommentCount"

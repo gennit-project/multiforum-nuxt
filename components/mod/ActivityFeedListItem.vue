@@ -92,7 +92,7 @@ const isPermalinked = commentIdInParams && commentIdInParams === props.activityI
             }}</span>
           </div>
 
-          <div class="border-l-2 border-gray-200 dark:border-gray-500">
+          <div class="border-l-2 border-gray-200 dark:border-gray-500 pl-2">
             <MarkdownPreview
               v-if="activityItem.Comment"
               :text="activityItem.Comment.text || ''"

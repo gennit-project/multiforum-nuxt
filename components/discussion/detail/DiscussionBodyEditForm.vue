@@ -39,7 +39,7 @@ onDone(() => {
 
 <template>
   <div class="w-full">
-    <div class="mb-2 mt-4 w-full flex flex-col">
+    <div class="mb-3 mt-3 w-full flex flex-col">
       <TextEditor
         class="mb-3"
         :test-id="'body-input'"

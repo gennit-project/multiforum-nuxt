@@ -176,7 +176,7 @@ const filteredQuery = computed(() => {
                 :text="discussion.body"
                 :disable-gallery="false"
                 :word-limit="50"
-                class="-ml-2"
+                class="ml-2"
               />
             </div>
             <div v-if="discussion.Album" class="my-4 overflow-x-auto bg-black">

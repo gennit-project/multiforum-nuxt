@@ -230,13 +230,13 @@ const relative = computed(() =>
             </button>
             <div
               v-if="discussion && discussion.body && showBody"
-              class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-gray-800"
+              class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
             >
               <MarkdownPreview
                 :text="discussion.body"
                 :word-limit="50"
                 :disable-gallery="false"
-                class="-ml-2"
+                class="ml-2 pb-2"
               />
               <div
                 v-if="discussion.Album"

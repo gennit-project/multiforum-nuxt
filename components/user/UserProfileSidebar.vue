@@ -55,7 +55,7 @@ const user = computed(() => {
       />
       <h1
         v-if="username && !user?.displayName"
-        class="mb-2 mt-4 flex items-center gap-2 border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
+        class="mb-3 mt-3 flex items-center gap-2 border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
       >
         {{ username }}
         <span

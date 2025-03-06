@@ -2,6 +2,7 @@
 import { computed, defineProps } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EVENT_ISSUE } from "@/graphQLData/mod/queries";
+import ArchiveBox from "@/components/icons/ArchiveBox.vue";
 
 const props = defineProps({
     channelId: {
@@ -36,7 +37,7 @@ const text = computed(()=>{
 
 </script>
 <template>
-  <InfoBanner
-    :text="text"
-  />
+  <InfoBanner :text="text">
+    <ArchiveBox class="h-5 w-5" />
+  </InfoBanner>
 </template>

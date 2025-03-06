@@ -156,7 +156,14 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { discussionId, eventId, issueId, forumId } = route.params;
+const { discussionId, eventId, issueId } = route.params;
+
+const forumId = computed (() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
 const permalinkedCommentId = route.params.commentId;
 const isHighlighted = computed(() => {
   return props.isPermalinked || permalinkedCommentId === props.commentData.id;
