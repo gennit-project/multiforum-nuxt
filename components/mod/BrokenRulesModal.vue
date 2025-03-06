@@ -3,6 +3,7 @@ import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "nuxt/app";
 import { useMutation } from "@vue/apollo-composable";
+import { DateTime } from "luxon"; // <-- Use Luxon
 import GenericModal from "@/components/GenericModal.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import TextEditor from "@/components/TextEditor.vue";
@@ -85,6 +86,7 @@ const props = defineProps({
     default: false,
   },
 });
+
 const emit = defineEmits([
   "close",
   "reportSubmittedSuccessfully",
@@ -102,6 +104,9 @@ const channelId = computed(() => {
 const selectedForumRules = ref<string[]>([]);
 const selectedServerRules = ref<string[]>([]);
 const reportText = ref("");
+
+// Holds the chosen suspension length if props.suspendUserEnabled is true
+const suspensionLength = ref<"" | "two_weeks" | "one_month" | "indefinite">("");
 
 const toggleForumRuleSelection = (rule: string) => {
   if (selectedForumRules.value.includes(rule)) {
@@ -130,8 +135,6 @@ const {
   onDone: suspendUserDone,
 } = useMutation(SUSPEND_USER, {
   update: (cache) => {
-    // update the result of IS_ORIGINAL_POSTER_SUSPENDED
-    // is true.
     cache.writeQuery({
       query: IS_ORIGINAL_POSTER_SUSPENDED,
       variables: {
@@ -151,8 +154,6 @@ const {
   onDone: suspendModDone,
 } = useMutation(SUSPEND_MOD, {
   update: (cache) => {
-    // update the result of IS_ORIGINAL_POSTER_SUSPENDED
-    // is true.
     cache.writeQuery({
       query: IS_ORIGINAL_POSTER_SUSPENDED,
       variables: {
@@ -197,7 +198,6 @@ const {
       console.error("No discussion channel ID provided.");
       return;
     }
-
     cache.modify({
       id: cache.identify({
         __typename: "DiscussionChannel",
@@ -223,7 +223,6 @@ const {
       console.error("No event channel ID provided.");
       return;
     }
-
     cache.modify({
       id: cache.identify({
         __typename: "EventChannel",
@@ -337,7 +336,6 @@ ${selectedForumRules.map((rule) => `- ${rule}`).join("\n")}
 ${
   selectedServerRules.length > 0
     ? `
-
 Forum rule violations:
 
 ${selectedServerRules.map((rule) => `- ${rule}`).join("\n")}
@@ -362,10 +360,18 @@ const submit = async () => {
     console.error("No discussion, event, or comment ID provided.");
     return;
   }
+
   if (props.suspendUserEnabled) {
+    // Require a suspension length
+    if (!suspensionLength.value) {
+      console.error("A suspension length is required to suspend the user.");
+      return;
+    }
+
     let issueId = props.issueId;
+
+    // If there is no existing issue, create an archived issue first
     if (!issueId) {
-      // If an issue does not already exist, create one.
       if (props.discussionId) {
         const issue = await archiveDiscussion({
           discussionId: props.discussionId,
@@ -375,8 +381,7 @@ const submit = async () => {
           channelUniqueName: channelId.value,
         });
         issueId = issue?.data?.archiveDiscussion?.id;
-      }
-      if (props.eventId) {
+      } else if (props.eventId) {
         const issue = await archiveEvent({
           eventId: props.eventId,
           reportText: reportText.value,
@@ -385,8 +390,7 @@ const submit = async () => {
           channelUniqueName: channelId.value,
         });
         issueId = issue?.data?.archiveEvent?.id;
-      }
-      if (props.commentId) {
+      } else if (props.commentId) {
         const issue = await archiveComment({
           commentId: props.commentId,
           reportText: reportText.value,
@@ -397,23 +401,41 @@ const submit = async () => {
         issueId = issue?.data?.archiveComment?.id;
       }
     }
+
     if (!issueId) {
       console.error("Could not suspend the user without an issue ID.");
       return;
     }
 
+    // Figure out the suspendUntil date or indefinite
+    let suspendUntil: string | null = null;
+    let suspendIndefinitely = false;
+
+    switch (suspensionLength.value) {
+      case "two_weeks":
+        suspendUntil = DateTime.now().plus({ weeks: 2 }).toISO();
+        break;
+      case "one_month":
+        suspendUntil = DateTime.now().plus({ months: 1 }).toISO();
+        break;
+      case "indefinite":
+        suspendIndefinitely = true;
+        break;
+    }
+
     suspendUser({
       issueID: issueId,
-      suspendUntil: null,
-      suspendIndefinitely: true,
+      suspendUntil,
+      suspendIndefinitely,
       explanation: getFinalCommentText({
         selectedForumRules: selectedForumRules.value,
         selectedServerRules: selectedServerRules.value,
         reportText: reportText.value,
       }),
     });
-  } else if (!props.archiveAfterReporting) {
-    // Assume the user is reporting the content.
+  } 
+  else if (!props.archiveAfterReporting) {
+    // Standard "report" flow
     if (props.discussionId) {
       reportDiscussion({
         discussionId: props.discussionId,
@@ -422,8 +444,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
-    }
-    if (props.eventId) {
+    } else if (props.eventId) {
       reportEvent({
         eventId: props.eventId,
         reportText: reportText.value,
@@ -431,8 +452,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
-    }
-    if (props.commentId) {
+    } else if (props.commentId) {
       reportComment({
         commentId: props.commentId,
         reportText: reportText.value,
@@ -441,9 +461,9 @@ const submit = async () => {
         channelUniqueName: channelId.value,
       });
     }
-  } else {
-    // Assume the user is archiving the content.
-    // Note: Reports are already built into the archive resolvers.
+  } 
+  else {
+    // "archive" flow (also includes a report)
     if (props.discussionId) {
       archiveDiscussion({
         discussionId: props.discussionId,
@@ -452,8 +472,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
-    }
-    if (props.eventId) {
+    } else if (props.eventId) {
       archiveEvent({
         eventId: props.eventId,
         reportText: reportText.value,
@@ -461,8 +480,7 @@ const submit = async () => {
         selectedServerRules: selectedServerRules.value,
         channelUniqueName: channelId.value,
       });
-    }
-    if (props.commentId) {
+    } else if (props.commentId) {
       archiveComment({
         commentId: props.commentId,
         reportText: reportText.value,
@@ -475,12 +493,10 @@ const submit = async () => {
 };
 
 const close = () => {
-  // Clear the form
-
   selectedForumRules.value = [];
   selectedServerRules.value = [];
   reportText.value = "";
-
+  suspensionLength.value = "";
   emit("close");
 };
 </script>
@@ -504,7 +520,8 @@ const close = () => {
       suspendModLoading
     "
     :primary-button-disabled="
-      selectedForumRules.length === 0 && selectedServerRules.length === 0
+      (selectedForumRules.length === 0 && selectedServerRules.length === 0) ||
+      (suspendUserEnabled && !suspensionLength)
     "
     :error="
       reportDiscussionError?.message ||
@@ -536,7 +553,21 @@ const close = () => {
         @toggle-forum-rule-selection="toggleForumRuleSelection"
         @toggle-server-rule-selection="toggleServerRuleSelection"
       />
-      <h2 class="text-gray-500 dark:text-gray-400 text-sm mt-2">
+      <div class="mt-4" v-if="suspendUserEnabled">
+        <label class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+          >Suspend user for</label
+        >
+        <select
+          v-model="suspensionLength"
+          class="block w-60 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+        >
+          <option disabled value="">-- Select --</option>
+          <option value="two_weeks">Two Weeks</option>
+          <option value="one_month">One Month</option>
+          <option value="indefinite">Indefinite</option>
+        </select>
+      </div>
+      <h2 class="text-gray-500 dark:text-gray-400 text-sm mt-4">
         {{ modalBody }}
       </h2>
       <TextEditor

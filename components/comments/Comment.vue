@@ -309,7 +309,7 @@ const commentMenuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
-  } else {
+  } else if (usernameVar.value){
     if (props.modProfileName) {
       out = out.concat([
         {
