@@ -520,8 +520,7 @@ const close = () => {
       suspendModLoading
     "
     :primary-button-disabled="
-      (selectedForumRules.length === 0 && selectedServerRules.length === 0) ||
-      (suspendUserEnabled && !suspensionLength)
+      (selectedForumRules.length === 0 && selectedServerRules.length === 0)
     "
     :error="
       reportDiscussionError?.message ||

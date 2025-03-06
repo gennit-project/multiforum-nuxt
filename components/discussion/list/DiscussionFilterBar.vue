@@ -153,7 +153,7 @@ const toggleShowSearch = () => {
 <template>
   <div class="px-2">
     <div>
-      <div class="flex flex-wrap items-center justify-end space-x-2 py-2 border border-b-gray-700">
+      <div class="flex flex-wrap items-center justify-end space-x-2 py-2">
         <FilterChip
           v-if="!isForumScoped"
           class="align-middle"
@@ -180,7 +180,7 @@ const toggleShowSearch = () => {
           :class="
             showFilters
               ? 'border-blue-500'
-              : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'
+              : 'text-gray-500 border-gray-200 dark:border-gray-600 dark:text-gray-300'
           "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
           @click="
@@ -196,7 +196,7 @@ const toggleShowSearch = () => {
           :class="
             showSearch
               ? 'border-blue-500'
-              : 'text-gray-500 border-gray-500 dark:border-gray-600 dark:text-gray-300'
+              : 'text-gray-500 border-gray-200 dark:border-gray-600 dark:text-gray-300'
           "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
           @click="
@@ -218,7 +218,7 @@ const toggleShowSearch = () => {
         data-testid="discussion-filter-search-bar"
         :initial-value="filterValues.searchInput"
         :search-placeholder="'Search'"
-        :auto-focus="false"
+        :auto-focus="true"
         :small="true"
         :left-side-is-rounded="false"
         :right-side-is-rounded="false"
