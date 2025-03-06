@@ -135,7 +135,11 @@ export const GET_SUSPENDED_MODS_BY_CHANNEL = gql`
         count
       }
       SuspendedMods {
+        id
         username
+        createdAt
+        suspendedUntil
+        suspendedIndefinitely
         SuspendedMod {
           displayName
         }
@@ -316,7 +320,11 @@ export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
         count
       }
       SuspendedUsers {
+        id
         username
+        createdAt
+        suspendedUntil
+        suspendedIndefinitely
         SuspendedUser {
           username
         }

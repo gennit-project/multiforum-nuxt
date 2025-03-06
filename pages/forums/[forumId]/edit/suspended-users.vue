@@ -3,6 +3,7 @@ import { computed } from "vue";
 import { useRoute } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_SUSPENDED_USERS_IN_CHANNEL } from "@/graphQLData/mod/queries";
+import { DateTime } from "luxon"
 
 const route = useRoute();
 
@@ -26,6 +27,9 @@ const suspendedUsers = computed(() => {
 const aggregateCount = computed(() => {
   return suspendedUsersResult.value?.channels[0]?.SuspendedUsersAggregate?.count ?? 0;
 });
+const humanReadableDate = (dateISO: string): string => {
+  return DateTime.fromISO(dateISO).toLocaleString(DateTime.DATETIME_MED);
+};
 </script>
 
 <template>
@@ -67,6 +71,7 @@ const aggregateCount = computed(() => {
           :key="user.username"
           class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
         >
+        <div class="flex-col">
           <nuxt-link
             :to="{ name: 'u-username', params: { username: user.username } }"
             class="flex items-center dark:text-white font-bold"
@@ -86,6 +91,13 @@ const aggregateCount = computed(() => {
               :account-created="user.createdAt ?? ''"
             />
           </nuxt-link>
+          <div class="text-sm text-gray-500 dark:text-gray-300" v-if="!user.suspendedIndefinitely">
+            {{ `Suspended until ${humanReadableDate(user.suspendedUntil)}` }}
+            </div>
+          <div class="text-sm text-gray-500 dark:text-gray-300" v-else>
+            {{ `Suspended indefinitely as of ${humanReadableDate(user.createdAt)}` }}
+          </div>
+        </div>
   
           <nuxt-link
             v-if="user.RelatedIssue"
