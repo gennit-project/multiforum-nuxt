@@ -105,7 +105,7 @@ const handleItemClick = (item: any) => {
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span class="flex items-center text-sm text-blue-500"> {{ usePrimaryButton ? "Create" : "+" }}
+              <span class="flex whitespace-nowrap items-center text-xs text-blue-500"> {{ usePrimaryButton ? "Create" : "+ Add" }}
               </span>
               <ChevronDownIcon
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
