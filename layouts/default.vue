@@ -94,7 +94,7 @@ const showMainContent = computed(() => {
     <DevOverlay v-if="isDevelopment" />
     <main class="min-h-screen flex flex-col">
       <div
-        class="dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col"
+        class="bg-gray-200 dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col"
       >
         <TopNav
           :show-user-profile-dropdown="showUserProfileDropdown"
