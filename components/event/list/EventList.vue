@@ -129,7 +129,7 @@ const onMouseLeaveEventListItem = () => {
 <template>
   <div>
     <div v-if="events.length === 0">
-      <p v-if="!showMap" class="mt-3 px-4 dark:text-gray-200">
+      <p v-if="!showMap" class="my-4 px-4 dark:text-gray-200">
         Could not find any events.
         <nuxt-link :to="createEventLink" class="text-blue-500 underline">
           Create one?

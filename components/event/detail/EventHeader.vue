@@ -340,7 +340,7 @@ function handleFeedbackInput(event: string) {
     />
 
     <div
-      class="flex justify-between text-sm text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
+      class="flex justify-between text-sm pt-2 text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
     >
       <ul class="space-y-2">
         <li class="hanging-indent flex items-start">
@@ -576,7 +576,7 @@ function handleFeedbackInput(event: string) {
     <InfoBanner
       v-if="eventData.virtualEventUrl"
       class="mx-4"
-      :text="'The official event page is on an external website. Refer to the official event page for the most complete, correct and up-to-date information.'"
+      :text="`The official event page is on an external website. Refer to the [official event page](${eventData.virtualEventUrl}) for the most complete, correct and up-to-date information.`"
     />
   </div>
 </template>
