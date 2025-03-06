@@ -143,6 +143,7 @@ const archivedContentType = computed(() => {
     :event-title="contextText"
     :discussion-id="discussionId"
     :event-id="eventId"
+    :comment-id="commentId"
     :archive-after-reporting="true"
     :discussion-channel-id="discussionChannelId"
     :event-channel-id="eventChannelId"

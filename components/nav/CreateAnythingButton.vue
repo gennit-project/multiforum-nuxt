@@ -101,7 +101,7 @@ const handleItemClick = (item: any) => {
             <button
               type="button"
               v-bind="props"
-              class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
+              class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1 hover:bg-blue-200 dark:bg-gray-800 dark:hover:bg-blue-900 focus:outline-none"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >

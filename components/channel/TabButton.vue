@@ -65,7 +65,7 @@ const isHovered = ref(false);
       ]"
       class="md:my-1 sm:my-1 flex h-6 items-center space-x-2 rounded-lg"
     >
-      <div class="text-black dark:text-blue-500">
+      <div class="text-black dark:text-gray-400">
         <slot />
       </div>
       <span class="text-xs text-gray-700 dark:text-white">{{ label }}</span>
@@ -81,6 +81,6 @@ const isHovered = ref(false);
 
 <style>
 .link.currentPage {
-  @apply border-blue-500 text-black;
+  @apply border-gray-500 text-black;
 }
 </style>
