@@ -396,7 +396,6 @@ const submit = async () => {
           reportText: reportText.value,
           selectedForumRules: selectedForumRules.value,
           selectedServerRules: selectedServerRules.value,
-          channelUniqueName: channelId.value,
         });
         issueId = issue?.data?.archiveComment?.id;
       }

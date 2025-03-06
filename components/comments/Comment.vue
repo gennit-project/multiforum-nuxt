@@ -17,6 +17,7 @@ import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
+import ArchivedCommentText from "./ArchivedCommentText.vue";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -126,6 +127,8 @@ const props = defineProps({
   },
 });
 
+console.log('props', props)
+
 const emit = defineEmits([
   "createComment",
   "deleteComment",
@@ -146,6 +149,9 @@ const emit = defineEmits([
   "saveEdit",
   "openModProfile",
   "scrollToTop",
+  "handleClickArchive",
+  "handleClickArchiveAndSuspend",
+  "handleClickUnarchive",
 ]);
 
 const route = useRoute();
@@ -279,6 +285,14 @@ const copyLink = async () => {
 
 const commentMenuItems = computed(() => {
   let out: any[] = [];
+  if (canShowPermalink) {
+    out.unshift({
+      label: "Copy Link",
+      value: "",
+      event: "copyLink",
+      icon: ALLOWED_ICONS.COPY_LINK,
+    });
+  }
 
   if (props.enableFeedback) {
     out = out.concat([
@@ -289,6 +303,9 @@ const commentMenuItems = computed(() => {
         icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       },
     ]);
+  }
+  if (!usernameVar.value) {
+    return out;
   }
 
   if (
@@ -349,14 +366,32 @@ const commentMenuItems = computed(() => {
         });
       }
     }
-  }
-  if (canShowPermalink) {
-    out.unshift({
-      label: "Copy Link",
-      value: "",
-      event: "copyLink",
-      icon: ALLOWED_ICONS.COPY_LINK,
-    });
+   // Only add these if mod permissions are elevated
+    if (!props.commentData.archived) {
+      out = out.concat([
+        {
+          label: "Archive",
+          event: "handleClickArchive",
+          icon: ALLOWED_ICONS.ARCHIVE,
+          value: '',
+        },
+        {
+          label: "Archive and Suspend",
+          event: "handleClickArchiveAndSuspend",
+          icon: ALLOWED_ICONS.SUSPEND,
+          value: '',
+        },
+      ]);
+    } else {
+      out = out.concat([
+        {
+          label: "Unarchive",
+          event: "handleClickUnarchive",
+          icon: ALLOWED_ICONS.UNARCHIVE,
+          value: '',
+        },
+      ]);
+    }
   }
   return out;
 });
@@ -475,12 +510,17 @@ const label = computed(() => {
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
+                  <ArchivedCommentText 
+                    v-if="props.commentData?.archived"
+                    :channel-id="forumId"
+                    :comment-id="props.commentData.id"
+                  />
                   <div
-                    v-if="
+                    v-else-if="
                       props.commentData.text &&
                       props.editFormOpenAtCommentID !== props.commentData.id
                     "
-                    class="-ml-2 mt-2"
+                    class="ml-3"
                     :class="[
                       props.goToPermalinkOnClick
                         ? 'cursor-pointer hover:text-gray-500 hover:bg-gray-100 hover:dark:bg-gray-700'
@@ -625,6 +665,22 @@ const label = computed(() => {
                         () =>
                           handleEditFeedback({ commentData: props.commentData })
                       "
+                      @handle-click-archive="
+                        () => {
+                          console.log('archive')
+                          emit('handleClickArchive', props.commentData.id);
+                        }
+                      "
+                      @handle-click-archive-and-suspend="
+                        () => {
+                          emit('handleClickArchiveAndSuspend', props.commentData.id);
+                        }
+                      "
+                      @handle-click-unarchive="
+                        () => {
+                          emit('handleClickUnarchive', props.commentData.id);
+                        }
+                      "
                     >
                       <EllipsisHorizontal
                         class="h-5 w-5 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -704,6 +760,11 @@ const label = computed(() => {
                 @handle-view-feedback="
                   (commentId: string) => emit('handleViewFeedback', commentId)
                 "
+                @handle-click-archive="emit('handleClickArchive', $event)"
+                @handle-click-archive-and-suspend="
+                  emit('handleClickArchiveAndSuspend', $event)
+                "
+                @handle-click-unarchive="emit('handleClickUnarchive', $event)"
               />
             </div>
           </ChildComments>

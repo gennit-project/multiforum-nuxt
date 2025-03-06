@@ -76,9 +76,8 @@ const renderedMarkdown = computed(() => {
 
 <style lang="scss">
 .markdown-body {
-  padding: 0 1rem;
-  padding-top: 1px;
-  padding-top: 0.25rem !important;
+  display: flex;
+  align-items: center;
   word-wrap: break-word;
   overflow-wrap: break-word;
   width: 100%;
@@ -138,7 +137,8 @@ const renderedMarkdown = computed(() => {
   }
 
   p {
-    margin-bottom: 0.5rem !important;
+    margin-bottom: 0.25rem !important;
+    margin-top: 0.25rem !important;
   }
   pre,
   code {

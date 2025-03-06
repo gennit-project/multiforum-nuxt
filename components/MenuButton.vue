@@ -6,7 +6,7 @@ import { actionIconMap } from "@/utils";
 
 import type { MenuItemType } from "./IconButtonDropdown.vue";
 
-defineProps({
+const props = defineProps({
   dataTestid: {
     type: String,
     default: "",
@@ -16,6 +16,7 @@ defineProps({
     default: () => [],
   },
 });
+console.log('props', props)
 
 const emits = defineEmits<(e: string) => void>(); // Accept any event type
 

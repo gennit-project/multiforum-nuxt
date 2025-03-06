@@ -22,6 +22,7 @@ export const COMMENT_FIELDS = gql`
     weightedVotesCount
     createdAt
     updatedAt
+    archived
     CommentAuthor {
       ...AuthorFields
       ... on User {
@@ -98,6 +99,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         weightedVotesCount
         createdAt
         updatedAt
+        archived
         CommentAuthor {
           ...AuthorFields
           ... on User {

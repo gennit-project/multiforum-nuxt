@@ -262,38 +262,26 @@ export const GET_DISCUSSION_CHANNEL = gql`
 `;
 
 export const GET_DISCUSSION_ISSUE = gql`
-query getDiscussionChannels(
-  $discussionChannelId: ID!
-) {
-  discussionChannels (
-    where: {
-      id: $discussionChannelId
-    }
-  ){  
-    id
-    RelatedIssues {
+  query getDiscussionChannels($discussionChannelId: ID!) {
+    discussionChannels(where: { id: $discussionChannelId }) {
       id
+      RelatedIssues {
+        id
+      }
     }
   }
-}
-`
+`;
 
 export const GET_EVENT_ISSUE = gql`
-query getEventChannels(
-  $eventChannelId: ID!
-) {
-  eventChannels (
-    where: {
-      id: $eventChannelId
-    }
-  ){  
-    id
-    RelatedIssues {
+  query getEventChannels($eventChannelId: ID!) {
+    eventChannels(where: { id: $eventChannelId }) {
       id
+      RelatedIssues {
+        id
+      }
     }
   }
-}
-`
+`;
 
 export const GET_EVENT_CHANNEL = gql`
   query getEventChannelID($eventId: ID!, $channelUniqueName: String!) {
@@ -331,6 +319,17 @@ export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
         RelatedIssue {
           id
         }
+      }
+    }
+  }
+`;
+
+export const GET_COMMENT_ISSUE = gql`
+  query getCommentIssue($commentId: ID!) {
+    comments(where: { id: $commentId }) {
+      id
+      RelatedIssues {
+        id
       }
     }
   }

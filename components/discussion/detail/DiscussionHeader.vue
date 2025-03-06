@@ -406,11 +406,6 @@ const authorIsMod = computed(
       "
     />
     <Notification
-      :show="showSuccessfullyArchivedAndSuspended"
-      :title="'Archived the post and suspended the author.'"
-      @close-notification="showSuccessfullyArchivedAndSuspended = false"
-    />
-    <Notification
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
       @close-notification="showSuccessfullyReported = false"
@@ -419,6 +414,11 @@ const authorIsMod = computed(
       :show="showSuccessfullyArchived"
       :title="'The content was reported and archived successfully.'"
       @close-notification="showSuccessfullyArchived = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchivedAndSuspended"
+      :title="'Archived the post and suspended the author.'"
+      @close-notification="showSuccessfullyArchivedAndSuspended = false"
     />
     <Notification
       :show="showSuccessfullyUnarchived"

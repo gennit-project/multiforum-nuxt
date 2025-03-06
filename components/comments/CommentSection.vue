@@ -2,8 +2,7 @@
 import { ref, computed, watchEffect } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import Comment from "./Comment.vue";
-import LoadMore from "../LoadMore.vue";
-import ErrorBanner from "../ErrorBanner.vue";
+import LoadMore from "../LoadMore.vue"
 import WarningModal from "../WarningModal.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
@@ -33,6 +32,7 @@ import type {
 import type { Ref, PropType } from "vue";
 import { modProfileNameVar } from "@/cache";
 import { useRouter, useRoute } from "nuxt/app";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -130,6 +130,7 @@ const permalinkedCommentId = ref(`${route.params.commentId}`);
 
 // Comment form state
 const commentToDeleteId = ref("");
+
 const commentToDeleteReplyCount = ref(0);
 const commentToEdit: Ref<CommentType | null> = ref(null);
 const showFeedbackSubmittedSuccessfully = ref(false);
@@ -146,9 +147,20 @@ const commentInProcess = ref(false);
 const replyFormOpenAtCommentID = ref("");
 const editFormOpenAtCommentID = ref("");
 const showCopiedLinkNotification = ref(false);
+
+// Moderation related state
+const commentToArchiveId = ref("");
+const commentToArchiveAndSuspendId = ref("");
+const commentToUnarchiveId = ref("");
+const showArchiveModal = ref(false);
+const showArchiveAndSuspendModal = ref(false);
+const showUnarchiveModal = ref(false);
 const showModProfileModal = ref(false);
 const showBrokenRulesModal = ref(false);
 const showSuccessfullyReported = ref(false);
+const showSuccessfullyArchived = ref(false);
+const showSuccessfullyArchivedAndSuspended = ref(false);
+const showSuccessfullyUnarchived = ref(false);
 const locked = ref(props.locked);
 
 const editFormValues = ref<CreateEditCommentFormValues>({
@@ -510,6 +522,21 @@ function handleClickReport(commentData: CommentType) {
   showBrokenRulesModal.value = true;
 }
 
+function handleClickArchive(commentId: string) {
+  commentToArchiveId.value = commentId;
+  showArchiveModal.value = true;
+}
+
+function handleClickArchiveAndSuspend(commentId: string) {
+  commentToArchiveAndSuspendId.value = commentId;
+  showArchiveAndSuspendModal.value = true;
+}
+
+function handleClickUnarchive(commentId: string) {
+  commentToUnarchiveId.value = commentId;
+  showUnarchiveModal.value = true;
+}
+
 function handleSubmitFeedback() {
   if (!commentToGiveFeedbackOn.value?.id) {
     console.error("commentId is required to submit feedback");
@@ -602,6 +629,9 @@ const lengthOfCommentInProgress = computed(() => {
         @update-feedback="updateFeedback"
         @handle-view-feedback="handleViewFeedback"
         @show-copied-link-notification="showCopiedLinkNotification = $event"
+        @handle-click-archive="handleClickArchive"
+        @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
+        @handle-click-unarchive="handleClickUnarchive"
       />
       <div class="my-4">
         <div
@@ -651,6 +681,9 @@ const lengthOfCommentInProgress = computed(() => {
               @click-edit-feedback="handleClickEditFeedback"
               @update-feedback="updateFeedback"
               @handle-view-feedback="handleViewFeedback"
+              @handle-click-archive="handleClickArchive"
+              @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
+              @handle-click-unarchive="handleClickUnarchive"
             />
           </div>
         </div>
@@ -680,6 +713,46 @@ const lengthOfCommentInProgress = computed(() => {
         () => {
           showSuccessfullyReported = true;
           showBrokenRulesModal = false;
+        }
+      "
+    />
+    <BrokenRulesModal
+      :v-if="commentToArchiveId"
+      :open="showArchiveModal"
+      :comment-id="commentToArchiveId"
+      :archive-after-reporting="true"
+      @close="showArchiveModal = false"
+      @reported-and-archived-successfully="
+        () => {
+          showSuccessfullyArchived = true;
+          showArchiveModal = false;
+        }
+      "
+    />
+    <UnarchiveModal
+      v-if="commentToUnarchiveId"
+      :open="showUnarchiveModal"
+      :comment-id="commentToUnarchiveId"
+      @close="showUnarchiveModal = false"
+      @unarchived-successfully="
+        () => {
+          showSuccessfullyUnarchived = true;
+          showUnarchiveModal = false;
+        }
+      "
+    />
+    <BrokenRulesModal
+      v-if="commentToArchiveAndSuspendId"
+      :open="showArchiveAndSuspendModal"
+      :title="'Suspend Author'"
+      :comment-id="commentToArchiveAndSuspendId"
+      :suspend-user-enabled="true"
+      :text-box-label="'(Optional) Explain why you are suspending this author:'"
+      @close="showArchiveAndSuspendModal = false"
+      @suspended-user-successfully="
+        () => {
+          showSuccessfullyArchivedAndSuspended = true;
+          showArchiveAndSuspendModal = false;
         }
       "
     />
@@ -721,6 +794,21 @@ const lengthOfCommentInProgress = computed(() => {
       :show="showFeedbackSubmittedSuccessfully"
       :title="'Your feedback was submitted successfully.'"
       @close-notification="showFeedbackSubmittedSuccessfully = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchived"
+      :title="'The content was reported and archived successfully.'"
+      @close-notification="showSuccessfullyArchived = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchivedAndSuspended"
+      :title="'Archived the post and suspended the author.'"
+      @close-notification="showSuccessfullyArchivedAndSuspended = false"
+    />
+    <Notification
+      :show="showSuccessfullyUnarchived"
+      :title="'The content was unarchived successfully.'"
+      @close-notification="showSuccessfullyUnarchived = false"
     />
   </div>
 </template>

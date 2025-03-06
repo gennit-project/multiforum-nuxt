@@ -72,7 +72,6 @@ const commentAuthorDisplayName = computed(() => props.commentData.CommentAuthor?
 const commentKarma = computed(() => props.commentData.CommentAuthor?.commentKarma ?? 0)
 const discussionKarma = computed(() => props.commentData.CommentAuthor?.discussionKarma ?? 0)
 const commentAuthorAge = computed(() => props.commentData.CommentAuthor?.createdAt)
-const createdAt = computed(() => props.commentData.createdAt)
 
 const createdAtFormatted = computed(() => {
   if (!props.commentData.createdAt) {

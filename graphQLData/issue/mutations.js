@@ -266,14 +266,12 @@ export const ARCHIVE_COMMENT = gql`
     $selectedForumRules: [String!]!
     $selectedServerRules: [String!]!
     $reportText: String!
-    $channelUniqueName: String!
   ) {
     archiveComment(
       commentId: $commentId
       reportText: $reportText
       selectedForumRules: $selectedForumRules
       selectedServerRules: $selectedServerRules
-      channelUniqueName: $channelUniqueName
     ) {
       id
     }
