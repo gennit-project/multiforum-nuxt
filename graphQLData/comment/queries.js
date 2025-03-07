@@ -364,6 +364,15 @@ export const GET_COMMENT = gql`
   ${COMMENT_FIELDS}
 `;
 
+export const GET_COMMENT_ARCHIVED = gql`
+  query getComment($commentId: ID!) {
+    comments(where: { id: $commentId }) {
+      id
+      archived
+    }
+  }
+`
+
 export const GET_COMMENT_REPLIES = gql`
   query getCommentWithReplies(
     $commentId: ID!

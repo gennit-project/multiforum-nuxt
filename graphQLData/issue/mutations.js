@@ -281,12 +281,10 @@ export const ARCHIVE_COMMENT = gql`
 export const UNARCHIVE_COMMENT = gql`
   mutation unarchiveComment(
     $commentId: ID!
-    $channelUniqueName: String!
     $explanation: String!
   ) {
     unarchiveComment(
       commentId: $commentId
-      channelUniqueName: $channelUniqueName
       explanation: $explanation
     ) {
       id

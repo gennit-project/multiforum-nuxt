@@ -92,6 +92,7 @@
     "@nuxt/types": "^2.18.1",
     "@nuxtjs/apollo": "^5.0.0-alpha.14",
     "@nuxtjs/eslint-module": "^4.1.0",
+    "@nuxtjs/google-fonts": "^3.2.0",
     "@nuxtjs/tailwindcss": "^6.12.1",
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@types/crypto-js": "^4.2.2",

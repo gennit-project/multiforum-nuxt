@@ -11,6 +11,10 @@ body {
     font-display: swap;
 }
 
+.logo-font {
+    font-family: 'Montserrat', sans-serif;
+}
+
 @font-face {
     font-family: "Inter";
     font-weight: 100;

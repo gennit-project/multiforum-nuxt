@@ -81,7 +81,7 @@ const isOnMapPage = computed(() => {
         <div class="ml-12 flex items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-2">
             <ArrowUpBoldBox :size="38" class="text-blue dark:text-blue-500" />
-            <span class="font-bold dark:text-white">Topical</span>
+            <span class="font-bold dark:text-white logo-font">Topical</span>
 
             <div
               class="text-xs py-0.5 px-1 rounded-md"

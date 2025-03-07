@@ -194,7 +194,6 @@ const submit = async () => {
     unarchiveComment({
       commentId: props.commentId,
       explanation: explanation.value,
-      channelUniqueName: channelId.value,
     });
     return;
   }

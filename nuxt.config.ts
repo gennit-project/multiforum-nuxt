@@ -43,6 +43,13 @@ export default defineNuxtConfig({
         configPath: "tailwind.config.js",
       },
     ],
+    ['@nuxtjs/google-fonts', {
+      families: {
+        Roboto: true,
+        Inter: [400, 700],
+        Montserrat: [400, 700],
+      }
+  }],
   ],
   nitro: { preset: "vercel"},
   plugins: [

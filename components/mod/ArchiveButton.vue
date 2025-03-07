@@ -8,6 +8,7 @@ import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION_CHANNEL, GET_EVENT_CHANNEL } from "@/graphQLData/mod/queries";
+import { GET_COMMENT_ARCHIVED } from "@/graphQLData/comment/queries";
 
 const props = defineProps({
   issue: {
@@ -59,11 +60,19 @@ const {
   channelUniqueName: props.channelUniqueName,
 });
 
+const {
+  result: isCommentArchivedResult
+} = useQuery(GET_COMMENT_ARCHIVED, {
+  commentId: props.commentId,
+});
+
 const isArchived = computed(() => {
     if (props.discussionId) {
         return getDiscussionChannelResult.value?.discussionChannels?.[0]?.archived;
     } else if (props.eventId) {
         return getEventChannelResult.value?.eventChannels?.[0]?.archived;
+    } else if (props.commentId) {
+        return isCommentArchivedResult.value?.comments?.[0]?.archived;
     }
     return false;
 });
@@ -85,6 +94,7 @@ const showSuccessfullyArchived = ref(false);
 const showSuccessfullyUnarchived = ref(false);
 
 const clickUnarchive = () => {
+  console.log("clickUnarchive", props.disabled);
   if (props.disabled) {
     return;
   }
@@ -157,12 +167,13 @@ const archivedContentType = computed(() => {
     "
   />
   <UnarchiveModal
-    v-if="discussionChannelId && discussionId"
+    v-if="(discussionChannelId && discussionId) || (eventChannelId && eventId) || commentId"
     :open="showUnarchiveModal"
     :discussion-channel-id="discussionChannelId"
     :event-channel-id="eventChannelId"
     :discussion-id="discussionId"
     :event-id="eventId"
+    :comment-id="commentId"
     @close="showUnarchiveModal = false"
     @unarchived-successfully="
       () => {
