@@ -14,7 +14,6 @@ export default defineComponent({
     stroke-width="1.5"
     :stroke="`url(#pinkToLightBlueGradient)`"
   >
-    <!-- Define the gradient with softer colors -->
     <defs>
       <linearGradient id="pinkToLightBlueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#FF98C7" />

@@ -4,8 +4,7 @@ import HamburgerMenuButton from "@/components/nav/HamburgerMenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
-// @ts-ignore
-import ArrowUpBoldBox from "vue-material-design-icons/ArrowUpBoldBox.vue";
+import LogoIcon from "@/components/icons/LogoIcon.vue";
 import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
 import {
@@ -79,12 +78,12 @@ const isOnMapPage = computed(() => {
         />
 
         <div class="ml-12 flex items-center space-x-1 text-sm">
-          <nuxt-link to="/" class="flex items-center gap-2">
-            <ArrowUpBoldBox :size="38" class="text-blue dark:text-blue-500" />
+          <nuxt-link to="/" class="flex items-center gap-1">
+            <LogoIcon class="h-5 w-5"/>
             <span class="font-bold dark:text-white logo-font">Topical</span>
 
             <div
-              class="text-xs py-0.5 px-1 rounded-md"
+              class="text-xs py-0.5 px-1 mx-1 rounded-md"
               style="border: 1px solid #1d9bd1; color: #1d9bd1"
             >
               {{ isDevelopment ? "DEV" : "ALPHA" }}
