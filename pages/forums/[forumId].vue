@@ -146,7 +146,7 @@ if (!channelId.value) {
         >
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 px-2 md:px-4"
+            class="flex w-full items-start gap-2 px-2 md:px- lg:px-0"
           >
             <BackLink
               class="mt-6"
