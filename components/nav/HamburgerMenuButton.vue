@@ -10,7 +10,7 @@ export default defineComponent({
   <button
     data-testid="hamburger-menu-button"
     type="button"
-    class="bg-white dark:bg-black inline-flex border border-gray-300 dark:border-gray-700 hover:bg-gray-200 items-center justify-center rounded-md p-2 text-gray-400 dark:text-gray-300 dark:hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white dark:focus:ring-gray-700  hover:dark:text-white"
+    class="bg-black inline-flex border border-gray-700 items-center justify-center rounded-md p-2 text-gray-300 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700  hover:text-white"
     aria-controls="mobile-menu"
     aria-expanded="false"
   >

@@ -101,7 +101,7 @@ const handleItemClick = (item: any) => {
             <button
               type="button"
               v-bind="props"
-              class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1 hover:bg-blue-200 dark:bg-gray-800 dark:hover:bg-blue-900 focus:outline-none"
+              class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1 bg-gray-800 hover:bg-blue-900 focus:outline-none"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
@@ -122,7 +122,7 @@ const handleItemClick = (item: any) => {
           </template>
 
           <v-list
-            class="dark:bg-gray-700 text-blue-500"
+            class="bg-gray-700 text-blue-500"
             :style="{
               top: shouldOpenUpwards ? 'auto' : '100%',
               right: shouldOpenLeftwards ? 0 : 'auto',
@@ -137,7 +137,7 @@ const handleItemClick = (item: any) => {
               @click="() => handleItemClick(item)"
             >
               <span
-                class="block px-4 py-2 text-sm text-black dark:text-white"
+                class="block px-4 py-2 text-sm text-black text-white"
               >
                 {{ item.text }}
               </span>
@@ -149,8 +149,8 @@ const handleItemClick = (item: any) => {
             class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
             :class="[
               usePrimaryButton
-                ? 'border border-blue-600 dark:border-blue-700 text-blue-500'
-                : 'hover:bg-gray-200 dark:bg-gray-700 text-blue-500 dark:hover:bg-gray-600',
+                ? 'border border-blue-700 text-blue-500'
+                : 'bg-gray-700 text-blue-500 hover:bg-gray-600',
             ]"
             data-testid="fake-create-anything-button"
           >
@@ -171,8 +171,8 @@ const handleItemClick = (item: any) => {
         class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
         :class="[
           usePrimaryButton
-            ? 'border border-blue-600 dark:border-blue-600 text-blue-500'
-            : 'hover:bg-gray-200 dark:bg-gray-700 text-blue-500 dark:hover:bg-gray-600',
+            ? 'border border-blue-600 text-blue-500'
+            : 'dark:bg-gray-700 text-blue-500 hover:bg-gray-600',
         ]"
         data-testid="fake-create-anything-button"
       >

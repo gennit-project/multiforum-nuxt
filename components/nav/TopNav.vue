@@ -65,7 +65,7 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 w-full bg-gray-100 border-b dark:bg-gray-900 pr-4"
+    class="z-20 w-full bg-gray-900 border-b pr-4"
     :class="[isOnMapPage ? 'fixed' : '']"
   >
     <div class="flex items-center justify-between px-2 py-1 lg:px-4">
@@ -80,7 +80,7 @@ const isOnMapPage = computed(() => {
         <div class="ml-12 flex items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
             <LogoIcon class="h-5 w-5"/>
-            <span class="font-bold dark:text-white logo-font">Topical</span>
+            <span class="font-bold text-white logo-font">Topical</span>
 
             <div
               class="text-xs py-0.5 px-1 mx-1 rounded-md"
@@ -95,7 +95,7 @@ const isOnMapPage = computed(() => {
             class="hidden sm:flex items-center gap-1"
           >
             <span>•</span>
-            <span class="font-mono text-gray-800 dark:text-gray-300">{{
+            <span class="font-mono text-gray-800 text-gray-300">{{
               channelId
             }}</span>
           </div>
@@ -125,7 +125,7 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             sr-only="Notifications"
-            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white"
+            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm focus:outline-none text-white"
           >
             <i class="fas fa-bell" />
             <span

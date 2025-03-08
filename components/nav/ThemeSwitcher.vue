@@ -17,6 +17,7 @@ const setSystemMode = () => {
 
 <template>
   <IconButtonDropdown
+    :dark-background="true"
     :menu-button-icon="'fa-regular fa-sun'"
     :items="[
       {

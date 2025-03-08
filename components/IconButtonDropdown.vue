@@ -12,6 +12,11 @@ export type MenuItemType = {
 };
 
 defineProps({
+  darkBackground: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
   items: {
     type: Array as PropType<MenuItemType[]>,
     required: true,
@@ -39,7 +44,10 @@ const handleItemClick = (item: MenuItemType) => {
   <client-only>
     <Menu as="div" class="relative text-left flex items-center">
       <MenuButton
-        class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white"
+        :class="[
+          'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white',
+          darkBackground ? 'text-gray-200' : '',
+        ]"
       >
         <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />
         <div v-else class="flex items-center">
