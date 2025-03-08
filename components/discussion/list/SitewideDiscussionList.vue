@@ -148,7 +148,7 @@ const filterByChannel = (channel: string) => {
 </script>
 
 <template>
-  <div>
+  <div class="bg-white dark:bg-gray-800 dark:text-white">
     <slot />
     <p v-if="discussionLoading">Loading...</p>
     <ErrorBanner
