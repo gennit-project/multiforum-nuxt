@@ -82,7 +82,6 @@ const filterChannelsByTag = (tag: string) => {
         v-if="channel?.description"
         :text="channel?.description"
         :word-limit="1000"
-        class="-ml-4"
       />
       <p v-else class="text-xs dark:text-white">Welcome to {{ channelId }}!</p>
     </div>
