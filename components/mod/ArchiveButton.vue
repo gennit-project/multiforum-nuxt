@@ -94,7 +94,6 @@ const showSuccessfullyArchived = ref(false);
 const showSuccessfullyUnarchived = ref(false);
 
 const clickUnarchive = () => {
-  console.log("clickUnarchive", props.disabled);
   if (props.disabled) {
     return;
   }
