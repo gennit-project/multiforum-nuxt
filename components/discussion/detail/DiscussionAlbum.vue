@@ -90,7 +90,7 @@ const goRight = () => {
           plugins: plugins,
           licenseKey: lightGalleryLicenseKey,
         }"
-        class="m-4 flex rounded dark:text-white max-h-96 max-w-96"
+        class="mb-4 flex rounded dark:text-white max-h-96 max-w-96"
       >
         <a
           v-for="(image, idx) in album.Images"
