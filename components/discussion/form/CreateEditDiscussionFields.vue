@@ -154,6 +154,7 @@ function handleUpdateAlbum(newVals: { album: { images: any[] } }) {
               <template #content>
                 <AlbumEditor
                   :form-values="formValues"
+                  :allow-image-upload="true"
                   @update-form-values="handleUpdateAlbum"
                 />
               </template>

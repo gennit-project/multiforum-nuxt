@@ -146,14 +146,14 @@ if (!channelId.value) {
         >
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 px-2"
+            class="flex w-full items-start gap-2 px-2 md:px-4"
           >
             <BackLink
               class="mt-6"
               :link="`/forums/${channelId}/discussions`"
               :data-testid="'discussion-detail-back-link'"
             />
-            <div class="max-w-screen-2xl flex-1 pr-3">
+            <div class="max-w-screen-2xl flex-1 pr-1">
               <DiscussionTitleEditForm />
             </div>
           </div>
@@ -166,7 +166,7 @@ if (!channelId.value) {
               :link="`/forums/${channelId}/events`"
               :data-testid="'event-detail-back-link'"
             />
-            <div class="max-w-screen-2xl flex-1 pr-3">
+            <div class="max-w-screen-2xl flex-1 pr-1">
               <EventTitleEditForm />
             </div>
           </div>
@@ -179,7 +179,7 @@ if (!channelId.value) {
               :link="`/forums/${channelId}/discussions`"
               :data-testid="'discussion-detail-back-link'"
             />
-            <div class="max-w-screen-2xl flex-1 pr-3">
+            <div class="max-w-screen-2xl flex-1 pr-1">
               <IssueTitleEditForm />
             </div>
           </div>
@@ -188,10 +188,10 @@ if (!channelId.value) {
             <div
               class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
             >
-              <div class="flex-1 p-0 md:px-4 bg-white dark:bg-gray-800">
+              <div class="flex-1 p-0 md:px-2 bg-white dark:bg-gray-800">
                 <ChannelTabs
                   v-if="showChannelTabs"
-                  class="mb-2 w-full border-b border-gray-200 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+                  class="mb-2 w-full border-b border-gray-200 bg-white md:ml-4 dark:border-gray-600 dark:bg-gray-800"
                   :vertical="false"
                   :show-counts="true"
                   :admin-list="adminList"

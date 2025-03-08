@@ -358,7 +358,6 @@ const handleClickEditDiscussionBody = () => {
                     </template>
                     <template #button-slot>
                       <div class="flex-col items-center">
-                       
                         <DiscussionVotes
                           v-if="activeDiscussionChannel"
                           :discussion="discussion"

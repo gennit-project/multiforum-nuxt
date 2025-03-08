@@ -32,6 +32,9 @@ const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
   selectedChannels: channelId ? [channelId] : [],
   selectedTags: [],
   author: usernameVar.value,
+  album: {
+    images: [],
+  }
 };
 
 const formValues = ref(createDiscussionDefaultValues);
@@ -46,7 +49,7 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
     },
   }));
 
-  return {
+  const result: DiscussionCreateInput = {
     title: formValues.value.title,
     body: formValues.value.body,
     Tags: { connectOrCreate: tagConnections },
@@ -58,6 +61,27 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
       },
     },
   };
+
+  if (formValues.value.album.images.length > 0) {
+    result.Album = {
+      create:   {
+         node: { 
+            Images: {
+              create: formValues.value.album.images.map((image) => ({
+                node: {
+                  url: image.url,
+                  alt: image.caption,
+                  caption: image.caption,
+                  copyright: image.copyright,
+                }
+              }))
+            }
+          }
+        }
+    };
+  }
+
+  return result
 });
 
 const channelConnections = computed(() => formValues.value.selectedChannels);

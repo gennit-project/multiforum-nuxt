@@ -43,7 +43,7 @@ const writeReplyStyle =
 </script>
 
 <template>
-  <div class="ml-1 flex w-full flex-col space-x-2">
+  <div class="ml-1 md:ml-2 flex w-full flex-col space-x-2">
     <ErrorBanner
       v-if="createCommentError"
       :text="createCommentError?.message"

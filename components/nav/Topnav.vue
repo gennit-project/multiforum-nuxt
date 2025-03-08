@@ -73,7 +73,7 @@ const isOnMapPage = computed(() => {
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
           data-testid="menu-button"
-          class="cursor-pointer fixed-menu-button"
+          class="cursor-pointer fixed-menu-button md:ml-1"
           @click="$emit('toggleDropdown')"
         />
 
@@ -92,7 +92,7 @@ const isOnMapPage = computed(() => {
 
           <div
             v-if="shouldShowChannelId"
-            class="hidden sm:flex items-center gap-1"
+            class="hidden sm:flex items-center gap-1 text-gray-300"
           >
             <span>•</span>
             <span class="font-mono text-gray-300">{{
@@ -119,7 +119,7 @@ const isOnMapPage = computed(() => {
             <LoginButton />
           </div>
         </client-only>
-        <div class="flex items-center space-x-2">
+        <div class="flex items-center space-x-2 md:mr-2">
           <CreateAnythingButton />
           <nuxt-link
             data-testid="notification-bell"

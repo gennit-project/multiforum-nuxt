@@ -1,9 +1,12 @@
 
 
 export interface Image {
-  fileName: string;
+  url: string;
   caption: string;
-  attribution: string;
+  copyright: string;
+  alt: string;
+  hasSensitiveContent: boolean;
+  isCoverImage: boolean;
 }
 
 export interface Album {

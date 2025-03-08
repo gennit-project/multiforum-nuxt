@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { ref, onMounted, onBeforeUnmount } from "vue";
+import { ref } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
-import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils"; 
+import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import TextInput from "@/components/TextInput.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
@@ -17,7 +17,7 @@ const props = defineProps<{
         id?: string;
         url: string;
         alt: string;
-        attribution?: string;
+        copyright?: string;
       }[];
     };
   };
@@ -30,7 +30,8 @@ type ImageInput = {
   id?: string;
   url: string;
   alt: string;
-  attribution?: string;
+  copyright?: string;
+  caption?: string;
 };
 
 // GraphQL Mutation to get the signed storage URL
@@ -70,6 +71,9 @@ const uploadFile = async (file: File): Promise<string | null> => {
       fileType: contentType,
       signedStorageURL,
     });
+    if (!finalLink) {
+      throw new Error("No final link returned");
+    }
     return finalLink;
   } catch (err) {
     console.error("Error uploading file:", err);
@@ -88,7 +92,7 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
   // Optionally you can show a global loading spinner,
   // or track loading for each file. We'll do a quick approach
   // by turning on "global" loading in a single key:
-  loadingStates.value[-1] = true; 
+  loadingStates.value[-1] = true;
 
   for (let i = 0; i < files.length; i++) {
     console.log("Uploading file", i);
@@ -109,12 +113,13 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
 //  Handling the drop zone
 // ------------------------------------
 
-const fileInputRef = ref<HTMLInputElement | null>(null);
+const albumFileInputRef = ref<HTMLInputElement | null>(null);
 
 const selectFiles = () => {
+  console.log("fileInputRef.value:", albumFileInputRef.value);
   // Programmatically trigger file input click
-  if (fileInputRef.value) {
-    fileInputRef.value.click();
+  if (albumFileInputRef.value) {
+    albumFileInputRef.value.click();
   }
 };
 
@@ -163,18 +168,15 @@ const deleteImage = (index: number) => {
   emit("updateFormValues", { album: { images: updatedImages } });
 };
 
-/**
- * Adds a brand new image entry to the album. If you pass
- * a URL, it sets that automatically. Otherwise, it’s blank.
- */
 const addNewImage = (url = "", alt = "") => {
   const updatedImages = [
     ...props.formValues.album.images,
     {
       url,
       alt,
-      attribution: "",
-    },
+      copyright: "",
+      caption: "",
+    } as ImageInput,
   ];
   emit("updateFormValues", { album: { images: updatedImages } });
 };
@@ -187,23 +189,6 @@ const addNewImage = (url = "", alt = "") => {
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
     />
-    <div
-      class="my-3 border-2 border-dotted border-gray-400 p-4 text-center cursor-pointer rounded-md"
-      @click="selectFiles"
-      @drop="handleDrop"
-      @dragover="handleDragOver"
-    >
-      <p class="text-sm text-gray-500 dark:text-gray-300">
-        Drag and drop, or click to add files
-      </p>
-      <input
-        ref="fileInputRef"
-        type="file"
-        multiple
-        style="display: none"
-        @change="handleFileInputChange"
-      >
-    </div>
     <div v-if="loadingStates[-1]" class="mb-2">
       <LoadingSpinner />
     </div>
@@ -233,12 +218,12 @@ const addNewImage = (url = "", alt = "") => {
         @update="(val) => updateImageField(index, 'url', val)"
       />
       <div>
-        <img
+        <ExpandableImage
           v-if="image.url"
+          class="max-w-full h-32 mt-2 object-cover"
           :src="image.url"
           :alt="image.alt"
-          class="max-w-full h-32 mt-2 object-cover"
-        >
+        />
       </div>
       <TextInput
         class="mt-2"
@@ -250,23 +235,36 @@ const addNewImage = (url = "", alt = "") => {
       />
       <TextInput
         class="mt-2"
-        label="Attribution"
-        :value="image.attribution"
+        label="Attribution/Copyright"
+        :value="image.copyright"
         placeholder="Who took this photo? (optional)"
         :full-width="true"
-        @update="(val) => updateImageField(index, 'attribution', val)"
+        @update="(val) => updateImageField(index, 'copyright', val)"
       />
     </div>
-
-    <!-- If you still want a button to add a blank image entry: -->
-    <!--
+    <div
+      class="my-3 border-2 border-dotted border-gray-400 p-4 text-center cursor-pointer rounded-md"
+      @click="selectFiles"
+      @drop="handleDrop"
+      @dragover="handleDragOver"
+    >
+      <p class="text-sm text-gray-500 dark:text-gray-300">
+        Drag and drop, or click to add files
+      </p>
+      <input
+        ref="albumFileInputRef"
+        type="file"
+        multiple
+        style="display: none"
+        @change="handleFileInputChange"
+      />
+    </div>
     <button
       type="button"
       class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500"
-      @click="addNewImage"
+      @click="() => addNewImage()"
     >
       + Add New Image
     </button>
-    -->
   </div>
 </template>

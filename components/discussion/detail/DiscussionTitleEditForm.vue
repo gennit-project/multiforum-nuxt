@@ -113,7 +113,7 @@ const formattedDate = computed(() => {
 <template>
   <div class="w-full">
     <div
-      class="mb-3 mt-3 w-full flex flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
+      class="mb-3 mt-4 w-full flex flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <v-skeleton-loader
         v-if="getDiscussionLoading"

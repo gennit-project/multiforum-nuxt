@@ -77,6 +77,7 @@ const goRight = () => {
       class="flex items-center justify-center gap-2"
     >
       <button
+        v-if="album.Images.length > 1"
         type="button"
         class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
         @click="goLeft"
@@ -119,6 +120,7 @@ const goRight = () => {
         </a>
       </lightgallery>
       <button
+        v-if="album.Images.length > 1"
         class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
         type="button"
         @click="goRight"

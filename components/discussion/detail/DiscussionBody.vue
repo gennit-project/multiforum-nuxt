@@ -80,7 +80,7 @@ const filterByTag = (tag: string) => {
   <div>
     <div
       v-if="discussion?.body"
-      class="-ml-2 -mt-4rounded"
+      class="rounded"
       :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
     >
       <MarkdownPreview
@@ -88,6 +88,7 @@ const filterByTag = (tag: string) => {
         :disable-gallery="false"
         :word-limit="wordLimit"
       />
+      <slot name="album-slot" />
     </div>
     <div class="flex mt-2">
       <EmojiButtons
@@ -105,7 +106,7 @@ const filterByTag = (tag: string) => {
         @click="filterByTag(tag.text)"
       />
     </div>
-    <slot name="album-slot" />
+    
     <div class="my-2">
       <slot name="mark-answered-slot" />
     </div>
