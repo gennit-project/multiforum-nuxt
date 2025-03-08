@@ -47,6 +47,8 @@ const props = defineProps({
     default: 1000,
   },
 });
+console.log('discussion body')
+
 
 // Computed properties for discussion body and links
 const bodyText = computed(() => {
@@ -88,8 +90,8 @@ const filterByTag = (tag: string) => {
         :disable-gallery="false"
         :word-limit="wordLimit"
       />
-      <slot name="album-slot" />
     </div>
+    <slot name="album-slot" />
     <div class="flex mt-2">
       <EmojiButtons
         :key="emojiJson"

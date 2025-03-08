@@ -220,7 +220,7 @@ const addNewImage = (url = "", alt = "") => {
       <div>
         <ExpandableImage
           v-if="image.url"
-          class="max-w-full h-32 mt-2 object-cover"
+          class="max-w-56 h-32 mt-2 object-cover"
           :src="image.url"
           :alt="image.alt"
         />
@@ -257,7 +257,7 @@ const addNewImage = (url = "", alt = "") => {
         multiple
         style="display: none"
         @change="handleFileInputChange"
-      />
+      >
     </div>
     <button
       type="button"
