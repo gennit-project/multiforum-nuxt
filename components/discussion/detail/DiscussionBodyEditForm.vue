@@ -51,25 +51,23 @@ const formValues = ref({
 });
 
 function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
-  // If there is no album yet, we CREATE an Album and images
+  // 1) If the album doesn't exist yet, just CREATE it (and its images)
   if (!albumId.value) {
-    const createImageArray: AlbumImagesCreateFieldInput[] =
-      formValues.value.album.images.map((image) => ({
-        node: {
-          url: image.url,
-          alt: image.alt,
-          caption: image.caption,
-          copyright: image.copyright,
-        },
-      }));
-
+    const newImages = formValues.value.album.images || [];
     return {
-      body: formValues.value.body, // include body if you want to update that too
+      body: formValues.value.body,
       Album: {
         create: {
           node: {
             Images: {
-              create: createImageArray,
+              create: newImages.map((img) => ({
+                node: {
+                  url: img.url,
+                  alt: img.alt,
+                  caption: img.caption,
+                  copyright: img.copyright,
+                },
+              })),
             },
           },
         },
@@ -77,119 +75,67 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     };
   }
 
-  // If we DO have an albumId, we UPDATE the existing Album/images
-  const createImageArray: AlbumImagesCreateFieldInput[] = (
-    props.discussion.Album?.Images ?? []
-  )
-    .filter((image) => {
-      // Example logic: find images that exist in `formValues` but do NOT match
-      // what we had originally, etc. (Adjust as needed.)
-      return !formValues.value.album.images.some(
-        (newImage) => newImage.id === image.id
-      );
-    })
-    .map((image) => ({
-      node: {
-        url: image.url,
-        alt: image.alt,
-        caption: image.caption,
-        copyright: image.copyright,
-      },
-    }));
+  // 2) If the album already exists, we build the create/update/delete arrays
+  const oldImages = props.discussion.Album?.Images ?? [];
+  const newImages = formValues.value.album.images;
 
-  const deleteImageArray: AlbumImagesDeleteFieldInput[] = (
-    props.discussion.Album?.Images ?? []
-  )
-    .filter((image) => {
-      // Example logic: images removed from the form
-      return !formValues.value.album.images.some(
-        (newImage) => newImage.id === image.id
-      );
-    })
-    .map((image) => ({
-      where: {
+  // CREATE array: any new image in `newImages` that has NO matching ID in `oldImages`
+  const createImageArray = newImages
+    .filter((img) => !oldImages.some((old) => old.id === img.id))
+    .map((img) => ({
+      create: {
         node: {
-          id: image.id,
+          url: img.url,
+          alt: img.alt,
+          caption: img.caption,
+          copyright: img.copyright,
         },
       },
     }));
 
-  const updateImageArray: AlbumImagesUpdateFieldInput[] = (
-    props.discussion.Album?.Images ?? []
-  )
-    .filter((image) => {
-      // Example logic: images that still exist, but could have changed
-      return formValues.value.album.images.some(
-        (newImage) => newImage.id === image.id
-      );
-    })
-    .map((image) => {
-      const newImage = formValues.value.album.images.find(
-        (newImage) => newImage.id === image.id
-      );
-      if (!newImage) throw new Error("newImage is undefined");
-
-      return {
-        where: {
-          node: {
-            id: image.id,
-          },
+  // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
+  const updateImageArray = newImages
+    .filter((img) => oldImages.some((old) => old.id === img.id))
+    .map((img) => ({
+      where: { node: { id: img.id } },
+      update: {
+        node: {
+          url: img.url,
+          alt: img.alt,
+          caption: img.caption,
+          copyright: img.copyright,
         },
-        update: {
-          node: {
-            url: newImage.url,
-            alt: newImage.alt,
-            caption: newImage.caption,
-            copyright: newImage.copyright,
-          },
-        },
-      };
-    });
+      },
+    }));
 
-  // ---- NEW: Build up a single array of image operations so each
-  //           create/update/delete is its own item in the Images[] array
-  const imagesOperations: any[] = [];
-
-  // Flatten "create" operations (each item is { create: { node: {...}} })
-  createImageArray.forEach((item) => {
-    imagesOperations.push({
-      create: item,
-    });
-  });
-
-  // Flatten "delete" operations (each item is { where: {...}, delete: {...} })
-  deleteImageArray.forEach((item) => {
-    imagesOperations.push({
-      where: item.where,
-      // Some schemas allow simply `delete: true` or `delete: { node: {} }`.
-      // Adjust as needed. For example:
+  // DELETE array: any old image that is no longer present in `newImages`
+  const deleteImageArray = oldImages
+    .filter((old) => !newImages.some((img) => img.id === old.id))
+    .map((old) => ({
+      where: { node: { id: old.id } },
+      // Depending on your schema, you might need:
+      // delete: { node: { ... } } or just delete: true
       delete: {
         node: {},
       },
-    });
-  });
+    }));
 
-  // Flatten "update" operations (each item is { where: {...}, update: {...} })
-  updateImageArray.forEach((item) => {
-    imagesOperations.push({
-      where: item.where,
-      update: item.update,
-    });
-  });
+  // Combine all operations into a single array. Each object is one “Images” operation.
+  const imagesOps = [...createImageArray, ...updateImageArray, ...deleteImageArray];
 
-  // Finally, wrap this in the correct shape: 
-  // { body: '...', Album: { update: { node: { Images: [...] } } } }
+  // Wrap them in the correct update shape, including "body" if you want to change it:
   return {
-    body: formValues.value.body, // if you want to also update discussion body
+    body: formValues.value.body,
     Album: {
       update: {
         node: {
-          Images: imagesOperations,
+          Images: imagesOps,
         },
       },
     },
   };
 }
+
 
 
 const {

@@ -98,7 +98,7 @@ const goRight = () => {
           :href="image.url || ''"
           class="flex flex-shrink-0 w-auto"
         >
-          <div class="max-h-96 max-w-96">
+          <div class="max-h-96 max-w-96 min-h-10">
             <img
               v-if="image"
               :src="image.url || ''"
