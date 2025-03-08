@@ -95,7 +95,7 @@ const isOnMapPage = computed(() => {
             class="hidden sm:flex items-center gap-1"
           >
             <span>•</span>
-            <span class="font-mono text-gray-800 text-gray-300">{{
+            <span class="font-mono text-gray-300">{{
               channelId
             }}</span>
           </div>
