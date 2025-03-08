@@ -84,7 +84,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    discussionWhere: { id: discussionId.value },
+    where: { id: discussionId.value },
     updateDiscussionInput: formValues.value,
   },
 }));

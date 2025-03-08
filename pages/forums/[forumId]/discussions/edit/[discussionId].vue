@@ -91,9 +91,13 @@ export default defineComponent({
           album: {
             images: discussion.value.Album?.Images ? discussion.value.Album.Images.map((image: Image) => {
               return {
-                url: image.url,
-                alt: image.alt,
-                attribution: '',
+                url: image.url || '',
+                alt: image.alt || '',
+                caption: '',
+                copyright: '',
+                hasSensitiveContent: false,
+                hasSpoiler: false,
+                isCoverImage: false,
               };
             }) : [],
           },
@@ -228,7 +232,7 @@ export default defineComponent({
       onDone,
     } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
       variables: {
-        discussionWhere: {
+        where: {
           id: discussionId.value,
         },
         updateDiscussionInput: updateDiscussionInput.value,

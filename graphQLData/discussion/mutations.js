@@ -90,13 +90,13 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
 export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
   mutation updateDiscussionWithChannelConnections(
     $updateDiscussionInput: DiscussionUpdateInput!
-    $discussionWhere: DiscussionWhere!
+    $where: DiscussionWhere!
     $channelConnections: [String!]
     $channelDisconnections: [String!]
   ) {
     updateDiscussionWithChannelConnections(
       discussionUpdateInput: $updateDiscussionInput
-      where: $discussionWhere
+      where: $where
       channelConnections: $channelConnections
       channelDisconnections: $channelDisconnections
     ) {

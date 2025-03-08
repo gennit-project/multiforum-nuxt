@@ -50,23 +50,21 @@ const formValues = ref({
   },
 });
 
-const getUpdateDiscussionInputFromFormValues = () => {
-  let result: DiscussionUpdateInput | undefined;
-
-  // If there is no discussionID, which means we need to create a new album,
-  // then we need to create a new album with the images.
+function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
+  // If there is no album yet, we CREATE an Album and images
   if (!albumId.value) {
     const createImageArray: AlbumImagesCreateFieldInput[] =
-    formValues.value.album.images.map((image) => ({
-      node: {
-        url: image.url,
-        alt: image.alt,
-        caption: image.caption,
-        copyright: image.copyright,
-      },
-    }));
-    const createAlbumResult: DiscussionUpdateInput = {
-      body: formValues.value.body,
+      formValues.value.album.images.map((image) => ({
+        node: {
+          url: image.url,
+          alt: image.alt,
+          caption: image.caption,
+          copyright: image.copyright,
+        },
+      }));
+
+    return {
+      body: formValues.value.body, // include body if you want to update that too
       Album: {
         create: {
           node: {
@@ -77,61 +75,65 @@ const getUpdateDiscussionInputFromFormValues = () => {
         },
       },
     };
-    return createAlbumResult;
   }
-  if (albumId.value) {
-    // If an album ID exists, then we're creating images like this:
-    const baseAlbumUpdateInput: AlbumUpdateFieldInput = {
-      update: {
-        node: {
-          Images: []
-        }
-      }
-    }
 
-    // For images that are in the form now, but were not in the original album,
-    // we need to create them.
-    const createImageArray: AlbumImagesUpdateFieldInput[] =
-    (props.discussion.Album?.Images ?? []).filter((image) => {
-      return !formValues.value.album.images.some((newImage) => newImage.id === image.id);
-    }).map((image) => ({
-      create: {
+  // If we DO have an albumId, we UPDATE the existing Album/images
+  const createImageArray: AlbumImagesCreateFieldInput[] = (
+    props.discussion.Album?.Images ?? []
+  )
+    .filter((image) => {
+      // Example logic: find images that exist in `formValues` but do NOT match
+      // what we had originally, etc. (Adjust as needed.)
+      return !formValues.value.album.images.some(
+        (newImage) => newImage.id === image.id
+      );
+    })
+    .map((image) => ({
+      node: {
+        url: image.url,
+        alt: image.alt,
+        caption: image.caption,
+        copyright: image.copyright,
+      },
+    }));
+
+  const deleteImageArray: AlbumImagesDeleteFieldInput[] = (
+    props.discussion.Album?.Images ?? []
+  )
+    .filter((image) => {
+      // Example logic: images removed from the form
+      return !formValues.value.album.images.some(
+        (newImage) => newImage.id === image.id
+      );
+    })
+    .map((image) => ({
+      where: {
         node: {
-          url: image.url,
-          alt: image.alt,
-          caption: image.caption,
-          copyright: image.copyright,
+          id: image.id,
         },
       },
     }));
 
-    // For images that were deleted from the original album, we need to delete them.
-    const deleteImageArray: AlbumImagesUpdateFieldInput[] = 
-    (props.discussion.Album?.Images ?? []).filter((image) => {
-      return !formValues.value.album.images.some((newImage) => newImage.id === image.id);
-    }).map((image) => ({
-      delete: {
-        node: {
-          id: image.id,
-        }
-      }
-    }));
+  const updateImageArray: AlbumImagesUpdateFieldInput[] = (
+    props.discussion.Album?.Images ?? []
+  )
+    .filter((image) => {
+      // Example logic: images that still exist, but could have changed
+      return formValues.value.album.images.some(
+        (newImage) => newImage.id === image.id
+      );
+    })
+    .map((image) => {
+      const newImage = formValues.value.album.images.find(
+        (newImage) => newImage.id === image.id
+      );
+      if (!newImage) throw new Error("newImage is undefined");
 
-    // For images whose ID is on the original album and the form, but whose values have changed,
-    // we need to update them.
-    const updateImageArray: AlbumImagesUpdateFieldInput[] =
-    (props.discussion.Album?.Images ?? []).filter((image) => {
-      return formValues.value.album.images.some((newImage) => newImage.id === image.id);
-    }).map((image) => {
-      const newImage = formValues.value.album.images.find((newImage) => newImage.id === image.id);
-      if (!newImage) {
-        throw new Error("newImage is undefined");
-      }
       return {
         where: {
           node: {
             id: image.id,
-          }
+          },
         },
         update: {
           node: {
@@ -139,29 +141,56 @@ const getUpdateDiscussionInputFromFormValues = () => {
             alt: newImage.alt,
             caption: newImage.caption,
             copyright: newImage.copyright,
-          }
-        }
-      }
+          },
+        },
+      };
     });
 
+  // ---- NEW: Build up a single array of image operations so each
+  //           create/update/delete is its own item in the Images[] array
+  const imagesOperations: any[] = [];
 
-    // Add to base album input 
-    if (createImageArray.length > 0) {
-      baseAlbumUpdateInput.update.node.Images.push(...createImageArray);
-    }
-    if (deleteImageArray.length > 0) {
-      baseAlbumUpdateInput.update.node.Images.push(...deleteImageArray);
-    }
-    if (updateImageArray.length > 0) {
-      baseAlbumUpdateInput.update.node.Images.push(...updateImageArray);
-    }
-    result = baseAlbumUpdateInput;
-  }
-  if (!result) {
-    throw new Error("updateDiscussionInput is undefined");
-  }
-  return result;
-};
+  // Flatten "create" operations (each item is { create: { node: {...}} })
+  createImageArray.forEach((item) => {
+    imagesOperations.push({
+      create: item,
+    });
+  });
+
+  // Flatten "delete" operations (each item is { where: {...}, delete: {...} })
+  deleteImageArray.forEach((item) => {
+    imagesOperations.push({
+      where: item.where,
+      // Some schemas allow simply `delete: true` or `delete: { node: {} }`.
+      // Adjust as needed. For example:
+      delete: {
+        node: {},
+      },
+    });
+  });
+
+  // Flatten "update" operations (each item is { where: {...}, update: {...} })
+  updateImageArray.forEach((item) => {
+    imagesOperations.push({
+      where: item.where,
+      update: item.update,
+    });
+  });
+
+  // Finally, wrap this in the correct shape: 
+  // { body: '...', Album: { update: { node: { Images: [...] } } } }
+  return {
+    body: formValues.value.body, // if you want to also update discussion body
+    Album: {
+      update: {
+        node: {
+          Images: imagesOperations,
+        },
+      },
+    },
+  };
+}
+
 
 const {
   mutate: updateDiscussion,
@@ -170,7 +199,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
   variables: {
-    discussionWhere: { id: props.discussion.id },
+    where: { id: props.discussion.id },
     updateDiscussionInput: getUpdateDiscussionInputFromFormValues(),
   },
 }));
