@@ -282,6 +282,7 @@ archiveEventDone(() => {
 });
 
 archiveCommentDone(() => {
+  console.log('archive comment done')
   emit("reportedAndArchivedSuccessfully");
 });
 
@@ -476,6 +477,7 @@ const submit = async () => {
     }
   } 
   else {
+    console.log('archive flow')
     // "archive" flow (also includes a report)
     if (props.discussionId) {
       archiveDiscussion({

@@ -127,6 +127,8 @@ const props = defineProps({
   },
 });
 
+console.log('props', props)
+
 const emit = defineEmits([
   "createComment",
   "deleteComment",
@@ -672,6 +674,7 @@ const label = computed(() => {
                       "
                       @handle-click-archive="
                         () => {
+                          console.log('archive')
                           emit('handleClickArchive', props.commentData.id);
                         }
                       "

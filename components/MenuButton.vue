@@ -16,6 +16,7 @@ const props = defineProps({
     default: () => [],
   },
 });
+console.log('props', props)
 
 const emits = defineEmits<(e: string) => void>(); // Accept any event type
 
