@@ -8,6 +8,7 @@ import ChannelRules from "@/components/channel/Rules.vue";
 import SidebarEventList from "@/components/channel/SidebarEventList.vue";
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { useRouter, useRoute } from "nuxt/app";
+import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 
 const props = defineProps({
   channel: {
@@ -44,6 +45,7 @@ const filterChannelsByTag = (tag: string) => {
     <div v-if="channelId && channel" class="items-center gap-2" />
     
     <div>
+      <div class="flex justify-between">
       <ExpandableImage
         v-if="channel?.channelIconURL"
         class="h-12 w-12 dark:border-gray-800"
@@ -60,6 +62,8 @@ const filterChannelsByTag = (tag: string) => {
         :full-width="true"
         :is-square="false"
       />
+      <CreateAnythingButton class="mb-4 mx-2" :use-primary-button="true" />
+    </div>
       <div class="flex items-center w-full gap-4">
        
         <div v-if="channelId" class="flex items-center">
