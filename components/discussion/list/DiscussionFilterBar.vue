@@ -151,9 +151,9 @@ const toggleShowSearch = () => {
 </script>
 
 <template>
-  <div class="px-2">
+  <div class="pt-2">
     <div>
-      <div class="flex flex-wrap items-center justify-end space-x-2 py-2">
+      <div class="flex flex-wrap items-center justify-end space-x-2">
         <FilterChip
           v-if="!isForumScoped"
           class="align-middle"

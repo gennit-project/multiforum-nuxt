@@ -45,21 +45,21 @@ const filterChannelsByTag = (tag: string) => {
     
     <div>
       <ExpandableImage
-      v-if="channel?.channelIconURL"
-      class="h-12 w-12 dark:border-gray-800"
-      :rounded="true"
-      :full-width="true"
-      :alt="channelId"
-      :src="channel?.channelIconURL ?? ''"
-    />
-    <AvatarComponent
-      v-if="!channel?.channelIconURL"
-      class="h-12 w-12 dark:border-gray-800"
-      :text="channelId"
-      :src="channel?.channelIconURL ?? ''"
-      :full-width="true"
-      :is-square="false"
-    />
+        v-if="channel?.channelIconURL"
+        class="h-12 w-12 dark:border-gray-800"
+        :rounded="true"
+        :full-width="true"
+        :alt="channelId"
+        :src="channel?.channelIconURL ?? ''"
+      />
+      <AvatarComponent
+        v-if="!channel?.channelIconURL"
+        class="h-12 w-12 dark:border-gray-800"
+        :text="channelId"
+        :src="channel?.channelIconURL ?? ''"
+        :full-width="true"
+        :is-square="false"
+      />
       <div class="flex items-center w-full gap-4">
        
         <div v-if="channelId" class="flex items-center">

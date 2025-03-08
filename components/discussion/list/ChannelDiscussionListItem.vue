@@ -107,7 +107,7 @@ const filteredQuery = computed(() => {
 </script>
 
 <template>
-  <li class="m-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
+  <li class="my-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
     <div
       class="flex w-full flex-row justify-start gap-4 rounded-lg overflow-hidden"
     >
@@ -170,7 +170,7 @@ const filteredQuery = computed(() => {
 
             <div
               v-if="discussion?.body"
-              class="my-2 dark:bg-black bg-gray-100 pl-2 pt-4 pb-4 rounded"
+              class="my-2 dark:bg-black bg-gray-100 px-2 pt-4 pb-4 rounded"
             >
               <MarkdownPreview
                 :text="discussion.body"

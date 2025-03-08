@@ -191,7 +191,7 @@ if (!channelId.value) {
               <div class="flex-1 p-0 md:px-2 bg-white dark:bg-gray-800">
                 <ChannelTabs
                   v-if="showChannelTabs"
-                  class="mb-2 w-full border-b border-gray-200 bg-white md:ml-4 dark:border-gray-600 dark:bg-gray-800"
+                  class="mb-2 w-full border-b border-gray-200 bg-white md:ml-2 dark:border-gray-600 dark:bg-gray-800"
                   :vertical="false"
                   :show-counts="true"
                   :admin-list="adminList"
@@ -208,7 +208,7 @@ if (!channelId.value) {
                 <ChannelSidebar
                   v-if="channel"
                   :channel="channel"
-                  class="px-6"
+                  class="px-4"
                 />
               </aside>
             </div>
