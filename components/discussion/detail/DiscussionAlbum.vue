@@ -45,47 +45,17 @@ const goRight = () => {
   }
 };
 
-// Custom onAfterOpen handler to apply our caption panel styles after lightgallery opens
-const onAfterOpen = () => {
-  // This runs after lightgallery opens
-  // We'll add our custom CSS classes and move the captions to the right panel
-  const lgContainer = document.querySelector('.lg-container');
-  if (lgContainer) {
-    lgContainer.classList.add('custom-layout');
-    
-    // Find all caption elements and move them to the right panel
-    const captionElements = document.querySelectorAll('.lg-sub-html');
-    captionElements.forEach((caption) => {
-      const rightPanel = document.querySelector('.lg-caption-panel');
-      if (rightPanel && caption.textContent) {
-        rightPanel.innerHTML = caption.textContent;
-        caption.innerHTML = ''; // Clear the original caption area
-      }
-    });
-  }
-};
-
-// Add custom CSS to modify lightgallery's layout
-const customLightgallerySettings = {
+// Configure lightgallery settings to show captions on the right side
+const lightgallerySettings = {
   speed: 500,
   plugins: plugins.value,
   licenseKey: lightGalleryLicenseKey,
-  addClass: 'lg-custom-layout',
-  appendSubHtmlTo: '.lg-item',
-  onAfterOpen: onAfterOpen,
-  // Add custom HTML template to include our right panel
-  template: `
-    <div class="lg-outer lg-css3">
-      <div class="lg-inner">
-        <div class="lg-item"></div>
-      </div>
-      <div class="lg-toolbar"></div>
-      <div class="lg-caption-panel"></div>
-      <div class="lg-prev"></div>
-      <div class="lg-next"></div>
-      <div class="lg-counter"></div>
-    </div>
-  `,
+  // Place captions outside the slide container
+  appendSubHtmlTo: '.lg-outer',
+  // Add our custom class for the right-side caption layout
+  addClass: 'lg-right-caption',
+  // Make sure caption container is created
+  subHtmlSelectorRelative: false
 };
 </script>
 
@@ -94,14 +64,14 @@ const customLightgallerySettings = {
     <span class="p-1">{{ `${activeIndex + 1} of ${album.Images.length}` }}</span>
     <lightgallery
       v-if="!carouselFormat"
-      :settings="customLightgallerySettings"
+      :settings="lightgallerySettings"
       class="grid grid-cols-3 gap-2 dark:text-white"
     >
       <a
         v-for="image in album.Images"
         :key="image.id"
         :href="image.url || ''"
-        :data-sub-html="image.caption"
+        :data-sub-html="image.caption ? `<div class='lg-caption-content'>${image.caption}</div>` : ''"
       >
         <img
           v-if="image"
@@ -121,14 +91,14 @@ const customLightgallerySettings = {
         <LeftArrowIcon class="h-4 w-4" />
       </button>
       <lightgallery
-        :settings="customLightgallerySettings"
+        :settings="lightgallerySettings"
         class="mb-4 flex rounded dark:text-white max-h-96 max-w-96"
       >
         <a
           v-for="(image, idx) in album.Images"
           :key="image.id"
           :href="image.url || ''"
-          :data-sub-html="image.caption"
+          :data-sub-html="image.caption ? `<div class='lg-caption-content'>${image.caption}</div>` : ''"
           class="flex flex-shrink-0 w-auto"
         >
           <div class="max-h-96 max-w-96 min-h-10">
@@ -159,33 +129,44 @@ img {
   cursor: pointer;
 }
 
-/* Custom lightgallery layout with right panel for captions */
-.lg-custom-layout .lg-inner {
-  width: 75% !important;
-  float: left;
-}
+/* Right-side caption layout */
+.lg-right-caption {
+  /* Add position relative to lg-outer to enable absolute positioning */
+  &.lg-outer {
+    position: relative;
+  }
 
-.lg-custom-layout .lg-caption-panel {
-  width: 25%;
-  float: right;
-  height: 100%;
-  position: absolute;
-  right: 0;
-  top: 0;
-  background-color: rgba(0, 0, 0, 0.8);
-  color: white;
-  padding: 20px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 16px;
-  line-height: 1.5;
-  text-align: left;
-}
+  /* Set up the layout - main content takes 75% width */
+  & .lg-inner {
+    width: 75%;
+  }
 
-/* Hide original caption area */
-.lg-custom-layout .lg-sub-html {
-  display: none;
+  /* Position and style the caption panel on the right */
+  & .lg-sub-html {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25%;
+    height: 100%;
+    padding: 20px;
+    margin-top: 40px;
+    margin-right: 60px;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    text-align: left;
+    display: flex;
+    justify-content: flex-start;
+    font-size: 16px;
+    line-height: 1.5;
+    overflow-y: auto;
+    bottom: auto; /* Override default bottom positioning */
+    max-height: none; /* Override default max-height */
+  }
+
+  /* Style the caption content */
+  & .lg-caption-content {
+    max-width: 100%;
+    overflow-wrap: break-word;
+  }
 }
 </style>
