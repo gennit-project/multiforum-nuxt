@@ -33,7 +33,6 @@ const serverDescription = computed(() => props.serverConfig?.serverDescription ?
         v-if="serverDescription"
         :text="serverDescription"
         :word-limit="1000"
-        class="-ml-5"
       />
       <p v-else class="text-xs dark:text-white">
         Welcome to the admin dashboard. Here is where you can edit server settings and manage server scoped issues.

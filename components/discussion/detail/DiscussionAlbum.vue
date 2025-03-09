@@ -1,166 +1,3 @@
-<template>
-  <div class="album-container">
-    <!-- Normal thumbnail grid view -->
-    <div v-if="!isLightboxOpen" class="overflow-x-auto border">
-      <span class="p-1">{{ `${activeIndex + 1} of ${album.Images.length}` }}</span>
-      
-      <!-- Grid view -->
-      <div v-if="!carouselFormat" class="grid grid-cols-3 gap-2 dark:text-white">
-        <div v-for="(image, idx) in album.Images" :key="image.id" class="cursor-pointer" @click="openLightbox(idx)">
-          <img
-            v-if="image"
-            :src="image.url || ''"
-            :alt="image.alt || ''"
-            class="shadow-sm"
-          >
-          <span class="text-center">
-            {{ image.caption }}
-          </span>
-        </div>
-      </div>
-      
-      <!-- Carousel view -->
-      <div v-else class="flex items-center justify-center gap-2">
-        <button
-          v-if="album.Images.length > 1"
-          type="button"
-          class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
-          @click="goLeft"
-        >
-          <LeftArrowIcon class="h-4 w-4" />
-        </button>
-        
-        <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
-          <div v-for="(image, idx) in album.Images" :key="image.id" class="flex flex-shrink-0 w-auto">
-            <div class="max-h-96 max-w-96 min-h-10 cursor-pointer" @click="openLightbox(idx)">
-              <img
-                v-if="image"
-                :src="image.url || ''"
-                :alt="image.alt || ''"
-                class="shadow-sm max-h-96 max-w-96"
-                :class="{ hidden: idx !== activeIndex }"
-              >
-              <span class="text-center" :class="{ hidden: idx !== activeIndex }">
-                {{ image.caption }}
-              </span>
-            </div>
-          </div>
-        </div>
-        
-        <button
-          v-if="album.Images.length > 1"
-          class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
-          type="button"
-          @click="goRight"
-        >
-          <RightArrowIcon class="h-4 w-4" />
-        </button>
-      </div>
-    </div>
-    
-    <!-- Custom lightbox with split layout -->
-    <div v-if="isLightboxOpen" class="custom-lightbox-container" :class="{'flex-column': mdAndDown}">
-      <!-- Left panel for images (75% width on desktop, full width on mobile) -->
-      <div class="lightbox-image-panel" :class="{'full-width': mdAndDown}">
-        <div class="lightbox-header">
-          <div class="header-left">
-            <button class="close-button" @click="closeLightbox">×</button>
-          </div>
-          <div class="header-center">
-            <span class="image-counter">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
-          </div>
-          <div class="header-right">
-            <button class="action-button" @click="toggleFullscreen" title="Toggle fullscreen">
-              <span v-if="isFullscreen">⊟</span>
-              <span v-else>⊞</span>
-            </button>
-            <a 
-              class="action-button" 
-              :href="currentImage.url || ''" 
-              download 
-              title="Download image"
-            >
-              ↓
-            </a>
-          </div>
-        </div>
-        
-        <div class="image-container">
-          <button 
-            v-if="album.Images.length > 1" 
-            class="nav-button prev-button" 
-            @click="prevImage"
-          >
-            <LeftArrowIcon class="h-6 w-6" />
-          </button>
-          
-          <img 
-            :src="currentImage.url || ''" 
-            :alt="currentImage.alt || ''" 
-            class="lightbox-image"
-          />
-          
-          <button 
-            v-if="album.Images.length > 1" 
-            class="nav-button next-button" 
-            @click="nextImage"
-          >
-            <RightArrowIcon class="h-6 w-6" />
-          </button>
-        </div>
-      </div>
-      
-      <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
-      <div class="content-panel" :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}">
-        <div class="content-panel-inner">
-          <!-- This is where you can put your custom Vue components -->
-          <h3 class="panel-title">{{ currentImage.caption || 'Image Details' }}</h3>
-          
-          <!-- Demo custom component - replace with your own -->
-          <div class="custom-panel-content">
-            <p>This is a fully customizable Vue panel where you can put any components you want!</p>
-            
-            <!-- Example interactive elements -->
-            <div class="interactive-demo mt-4">
-              <button 
-                class="interactive-button" 
-                @click="likeCount++"
-              >
-                👍 Like ({{ likeCount }})
-              </button>
-              
-              <div class="comment-input mt-4">
-                <input 
-                  v-model="commentText" 
-                  placeholder="Add a comment..." 
-                  class="comment-field"
-                />
-                <button 
-                  class="submit-button" 
-                  :disabled="!commentText.trim()" 
-                  @click="addComment"
-                >
-                  Send
-                </button>
-              </div>
-              
-              <div class="comments-section mt-4">
-                <div v-if="comments.length === 0" class="no-comments">
-                  No comments yet
-                </div>
-                <div v-else class="comments-list">
-                  <div v-for="(comment, idx) in comments" :key="idx" class="comment-item">
-                    <strong>User:</strong> {{ comment }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
 
 <script lang="ts" setup>
 import type { PropType } from "vue";
@@ -169,6 +6,7 @@ import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
 import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import type { Album } from "@/__generated__/graphql";
 import { useDisplay } from "vuetify";
+import MarkdownPreview from "@/components/MarkdownPreview.vue";
 
 const props = defineProps({
   album: {
@@ -319,7 +157,129 @@ onUnmounted(() => {
     document.exitFullscreen().catch(() => {});
   }
 });
+
+
 </script>
+<template>
+  <div class="album-container">
+    <!-- Normal thumbnail grid view -->
+    <div v-if="!isLightboxOpen" class="overflow-x-auto border">
+      <span class="p-1">{{ `${activeIndex + 1} of ${album.Images.length}` }}</span>
+      
+      <!-- Grid view -->
+      <div v-if="!carouselFormat" class="grid grid-cols-3 gap-2 dark:text-white">
+        <div v-for="(image, idx) in album.Images" :key="image.id" class="cursor-pointer" @click="openLightbox(idx)">
+          <img
+            v-if="image"
+            :src="image.url || ''"
+            :alt="image.alt || ''"
+            class="shadow-sm"
+          >
+          <span class="text-center">
+            {{ image.caption }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- Carousel view -->
+      <div v-else class="flex items-center justify-center gap-2">
+        <button
+          v-if="album.Images.length > 1"
+          type="button"
+          class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
+          @click="goLeft"
+        >
+          <LeftArrowIcon class="h-4 w-4" />
+        </button>
+        
+        <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
+          <div v-for="(image, idx) in album.Images" :key="image.id" class="flex flex-shrink-0 w-auto">
+            <div class="max-h-96 max-w-96 min-h-10 cursor-pointer" @click="openLightbox(idx)">
+              <img
+                v-if="image"
+                :src="image.url || ''"
+                :alt="image.alt || ''"
+                class="shadow-sm max-h-96 max-w-96"
+                :class="{ hidden: idx !== activeIndex }"
+              >
+              <span class="text-center" :class="{ hidden: idx !== activeIndex }">
+                {{ image.caption }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <button
+          v-if="album.Images.length > 1"
+          class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
+          type="button"
+          @click="goRight"
+        >
+          <RightArrowIcon class="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+    
+    <!-- Custom lightbox with split layout -->
+    <div v-if="isLightboxOpen" class="custom-lightbox-container" :class="{'flex-column': mdAndDown}">
+      <!-- Left panel for images (75% width on desktop, full width on mobile) -->
+      <div class="lightbox-image-panel" :class="{'full-width': mdAndDown}">
+        <div class="lightbox-header">
+          <div class="header-left">
+            <button class="close-button" @click="closeLightbox">×</button>
+          </div>
+          <div class="header-center">
+            <span class="image-counter">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
+          </div>
+          <div class="header-right">
+            <button class="action-button" @click="toggleFullscreen" title="Toggle fullscreen">
+              <span v-if="isFullscreen">⊟</span>
+              <span v-else>⊞</span>
+            </button>
+            <a 
+              class="action-button" 
+              :href="currentImage.url || ''" 
+              download 
+              title="Download image"
+            >
+              ↓
+            </a>
+          </div>
+        </div>
+        
+        <div class="image-container">
+          <button 
+            v-if="album.Images.length > 1" 
+            class="nav-button prev-button" 
+            @click="prevImage"
+          >
+            <LeftArrowIcon class="h-6 w-6" />
+          </button>
+          
+          <img 
+            :src="currentImage.url || ''" 
+            :alt="currentImage.alt || ''" 
+            class="lightbox-image"
+          />
+          
+          <button 
+            v-if="album.Images.length > 1" 
+            class="nav-button next-button" 
+            @click="nextImage"
+          >
+            <RightArrowIcon class="h-6 w-6" />
+          </button>
+        </div>
+      </div>
+      
+      <div class="content-panel" :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}">
+        <div class="content-panel-inner">
+          <MarkdownPreview :text="currentImage.caption || ''" />
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 .album-container {
@@ -334,7 +294,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: #000;
   z-index: 9999;
   display: flex;
   flex-direction: row;
@@ -461,7 +421,7 @@ onUnmounted(() => {
 
 .lightbox-bottom-panel {
   width: 100%;
-  height: 15%;
+  height: 10%;
   min-height: 100px; /* Ensure minimum height */
   background-color: #1e1e1e;
   color: white;
