@@ -106,6 +106,8 @@ mutation updateDiscussion (
         Images {
           id 
           url
+          caption
+          copyright
         }
       }
     }

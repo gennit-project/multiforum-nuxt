@@ -65,7 +65,7 @@ const goRight = () => {
           :src="image.url || ''"
           :alt="image.alt || ''"
           class="shadow-sm"
-        />
+        >
         <span class="text-center">
           {{ image.caption }}
         </span>

@@ -144,6 +144,7 @@ const {
 }));
 
 onDone(() => {
+  console.log("Discussion updated successfully");
   emit("closeEditor");
 });
 

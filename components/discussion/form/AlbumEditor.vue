@@ -17,6 +17,7 @@ const props = defineProps<{
         id?: string;
         url: string;
         alt: string;
+        caption?: string;
         copyright?: string;
       }[];
     };
@@ -114,7 +115,6 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
 const albumFileInputRef = ref<HTMLInputElement | null>(null);
 
 const selectFiles = () => {
-  console.log("fileInputRef.value:", albumFileInputRef.value);
   // Programmatically trigger file input click
   if (albumFileInputRef.value) {
     albumFileInputRef.value.click();
@@ -172,8 +172,8 @@ const addNewImage = (url = "", alt = "") => {
     {
       url,
       alt,
-      copyright: "",
-      caption: "",
+      copyright,
+      caption,
     } as ImageInput,
   ];
   emit("updateFormValues", { album: { images: updatedImages } });
@@ -182,7 +182,6 @@ const addNewImage = (url = "", alt = "") => {
 
 <template>
   <div class="border p-2 rounded-md dark:border-gray-600">
-    <!-- If there's a GraphQL error, show it -->
     <ErrorBanner
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
@@ -226,11 +225,14 @@ const addNewImage = (url = "", alt = "") => {
       />
       <TextInput
         class="mt-2"
-        label="Alt (short description)"
-        :value="image.alt"
-        placeholder="Alt text / short description"
+        label="Caption"
+        :value="image.caption"
+        placeholder="Short caption or description"
         :full-width="true"
-        @update="(val) => updateImageField(index, 'alt', val)"
+        @update="(val) => {
+          updateImageField(index, 'caption', val)
+          updateImageField(index, 'alt', val)
+        }"
       />
       <TextInput
         class="mt-2"

@@ -93,8 +93,8 @@ export default defineComponent({
               return {
                 url: image.url || '',
                 alt: image.alt || '',
-                caption: '',
-                copyright: '',
+                caption: image.caption || '',
+                copyright: image.copyright || '',
                 hasSensitiveContent: false,
                 hasSpoiler: false,
                 isCoverImage: false,
@@ -147,7 +147,8 @@ export default defineComponent({
             return {
               url: image.url,
               alt: image.alt,
-              attribution: '',
+              caption: image.caption,
+              copyright: image.copyright,
             };
           }),
         },

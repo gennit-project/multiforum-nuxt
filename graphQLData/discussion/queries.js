@@ -187,6 +187,8 @@ export const GET_DISCUSSION = gql`
           id
           url
           alt
+          caption
+          copyright
         }
       }
       DiscussionChannels {
