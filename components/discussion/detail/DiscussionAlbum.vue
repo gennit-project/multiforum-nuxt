@@ -59,7 +59,7 @@
     </div>
     
     <!-- Custom lightbox with split layout -->
-    <div v-if="isLightboxOpen" class="custom-lightbox-container">
+    <div v-if="isLightboxOpen" class="custom-lightbox-container" :class="{'flex-column': mdAndDown}">
       <!-- Left panel for images (75% width on desktop, full width on mobile) -->
       <div class="lightbox-image-panel" :class="{'full-width': mdAndDown}">
         <div class="lightbox-header">
@@ -92,8 +92,8 @@
         </div>
       </div>
       
-      <!-- Right panel for custom content (25% width on desktop, below image on mobile) -->
-      <div v-if="!mdAndDown" class="lightbox-content-panel">
+      <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
+      <div class="content-panel" :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}">
         <div class="content-panel-inner">
           <!-- This is where you can put your custom Vue components -->
           <h3 class="panel-title">{{ currentImage.caption || 'Image Details' }}</h3>
@@ -103,54 +103,6 @@
             <p>This is a fully customizable Vue panel where you can put any components you want!</p>
             
             <!-- Example interactive elements -->
-            <div class="interactive-demo mt-4">
-              <button 
-                class="interactive-button" 
-                @click="likeCount++"
-              >
-                👍 Like ({{ likeCount }})
-              </button>
-              
-              <div class="comment-input mt-4">
-                <input 
-                  v-model="commentText" 
-                  placeholder="Add a comment..." 
-                  class="comment-field"
-                />
-                <button 
-                  class="submit-button" 
-                  :disabled="!commentText.trim()" 
-                  @click="addComment"
-                >
-                  Send
-                </button>
-              </div>
-              
-              <div class="comments-section mt-4">
-                <div v-if="comments.length === 0" class="no-comments">
-                  No comments yet
-                </div>
-                <div v-else class="comments-list">
-                  <div v-for="(comment, idx) in comments" :key="idx" class="comment-item">
-                    <strong>User:</strong> {{ comment }}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Mobile view for the panel (below image) -->
-      <div v-if="mdAndDown" class="lightbox-mobile-panel">
-        <div class="content-panel-inner">
-          <h3 class="panel-title">{{ currentImage.caption || 'Image Details' }}</h3>
-          
-          <!-- Mobile version of custom content -->
-          <div class="custom-panel-content">
-            <p>This is a fully customizable Vue panel where you can put any components you want!</p>
-            
-            <!-- Mobile interactive elements -->
             <div class="interactive-demo mt-4">
               <button 
                 class="interactive-button" 
@@ -320,7 +272,11 @@ onUnmounted(() => {
   z-index: 9999;
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
+}
+
+/* When on medium or smaller screens, stack vertically */
+.custom-lightbox-container.flex-column {
+  flex-direction: column;
 }
 
 .lightbox-header {
@@ -352,6 +308,7 @@ onUnmounted(() => {
 
 .lightbox-image-panel.full-width {
   width: 100%;
+  height: 60%; /* Take 60% of height when in column layout */
 }
 
 .image-container {
@@ -391,6 +348,7 @@ onUnmounted(() => {
   right: 20px;
 }
 
+/* Panel styles for desktop (right side) */
 .lightbox-content-panel {
   width: 25%;
   height: 100%;
@@ -399,9 +357,10 @@ onUnmounted(() => {
   overflow-y: auto;
 }
 
-.lightbox-mobile-panel {
+/* Panel styles for mobile/tablet (bottom) */
+.lightbox-bottom-panel {
   width: 100%;
-  max-height: 40vh;
+  height: 40%;
   background-color: #1e1e1e;
   color: white;
   overflow-y: auto;
