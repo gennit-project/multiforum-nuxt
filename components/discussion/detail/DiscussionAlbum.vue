@@ -1,4 +1,3 @@
-
 <script lang="ts" setup>
 import type { PropType } from "vue";
 import { ref, computed, onMounted, onUnmounted } from "vue";
@@ -6,7 +5,6 @@ import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
 import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import type { Album } from "@/__generated__/graphql";
 import { useDisplay } from "vuetify";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
 
 const props = defineProps({
   album: {
@@ -29,7 +27,7 @@ const activeIndex = ref(0);
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 const currentImage = computed(() => props.album.Images[lightboxIndex.value] || {});
-const isFullscreen = ref(false);
+const isPanelVisible = ref(true);
 
 // Example interactive panel state
 const likeCount = ref(0);
@@ -57,6 +55,7 @@ const goRight = () => {
 const openLightbox = (index: number) => {
   lightboxIndex.value = index;
   isLightboxOpen.value = true;
+  isPanelVisible.value = true; // Always show panel when opening lightbox
   document.body.style.overflow = 'hidden'; // Prevent scrolling
 };
 
@@ -81,85 +80,37 @@ const prevImage = () => {
   }
 };
 
-// Example panel interaction function
-const addComment = () => {
-  if (commentText.value.trim()) {
-    comments.value.push(commentText.value);
-    commentText.value = '';
-  }
-};
-
-// Toggle fullscreen mode
-const toggleFullscreen = () => {
-  if (!document.fullscreenElement) {
-    const container = document.querySelector('.custom-lightbox-container');
-    if (container && container.requestFullscreen) {
-      container.requestFullscreen()
-        .then(() => {
-          isFullscreen.value = true;
-        })
-        .catch((err) => {
-          console.error(`Error attempting to enable fullscreen: ${err.message}`);
-        });
-    }
-  } else {
-    if (document.exitFullscreen) {
-      document.exitFullscreen()
-        .then(() => {
-          isFullscreen.value = false;
-        })
-        .catch((err) => {
-          console.error(`Error attempting to exit fullscreen: ${err.message}`);
-        });
-    }
-  }
+// Toggle panel visibility
+const togglePanel = () => {
+  isPanelVisible.value = !isPanelVisible.value;
 };
 
 // Keyboard navigation
 const handleKeyDown = (e: KeyboardEvent) => {
   if (isLightboxOpen.value) {
     if (e.key === 'Escape') {
-      if (isFullscreen.value) {
-        document.exitFullscreen()
-          .then(() => {
-            isFullscreen.value = false;
-          })
-          .catch(() => {});
-      } else {
-        closeLightbox();
-      }
+      closeLightbox();
     } else if (e.key === 'ArrowRight') {
       nextImage();
     } else if (e.key === 'ArrowLeft') {
       prevImage();
-    } else if (e.key === 'f') {
-      toggleFullscreen();
+    } else if (e.key === 'i') {
+      // 'i' for info panel toggle
+      togglePanel();
     }
   }
 };
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
-  
-  // Listen for fullscreen change events
-  document.addEventListener('fullscreenchange', () => {
-    isFullscreen.value = !!document.fullscreenElement;
-  });
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
-  document.removeEventListener('fullscreenchange', () => {});
   document.body.style.overflow = ''; // Ensure scrolling is restored
-  
-  // Ensure we exit fullscreen if component is unmounted while in fullscreen
-  if (document.fullscreenElement && document.exitFullscreen) {
-    document.exitFullscreen().catch(() => {});
-  }
 });
-
-
 </script>
+
 <template>
   <div class="album-container">
     <!-- Normal thumbnail grid view -->
@@ -219,11 +170,17 @@ onUnmounted(() => {
         </button>
       </div>
     </div>
-    
-    <!-- Custom lightbox with split layout -->
-    <div v-if="isLightboxOpen" class="custom-lightbox-container" :class="{'flex-column': mdAndDown}">
+    <div 
+      v-if="isLightboxOpen" 
+      class="custom-lightbox-container" 
+      :class="{
+        'flex-column': mdAndDown,
+        'panel-expanded': isPanelVisible,
+        'panel-collapsed': !isPanelVisible
+      }"
+    >
       <!-- Left panel for images (75% width on desktop, full width on mobile) -->
-      <div class="lightbox-image-panel" :class="{'full-width': mdAndDown}">
+      <div class="lightbox-image-panel" :class="{'full-width': mdAndDown || !isPanelVisible}">
         <div class="lightbox-header">
           <div class="header-left">
             <button class="close-button" @click="closeLightbox">×</button>
@@ -232,9 +189,11 @@ onUnmounted(() => {
             <span class="image-counter">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
           </div>
           <div class="header-right">
-            <button class="action-button" @click="toggleFullscreen" title="Toggle fullscreen">
-              <span v-if="isFullscreen">⊟</span>
-              <span v-else>⊞</span>
+            <!-- Panel toggle button - Show different icons based on state -->
+            <button class="action-button" @click="togglePanel" :title="isPanelVisible ? 'Hide panel' : 'Show panel'">
+              <span v-if="isPanelVisible">▶</span>
+              <span v-else>◀</span>
+              
             </button>
             <a 
               class="action-button" 
@@ -272,9 +231,20 @@ onUnmounted(() => {
         </div>
       </div>
       
-      <div class="content-panel" :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}">
+      <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
+      <div 
+        v-if="isPanelVisible" 
+        class="content-panel" 
+        :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}"
+      >
         <div class="content-panel-inner">
-          <MarkdownPreview :text="currentImage.caption || ''" />
+          
+          <!-- This is where you can put your custom Vue components -->
+          <MarkdownPreview v-if="currentImage.caption" :text="currentImage.caption" />
+          
+          <div v-else class="no-caption">
+            No caption available for this image.
+          </div>
         </div>
       </div>
     </div>
@@ -299,6 +269,17 @@ onUnmounted(() => {
   display: flex;
   flex-direction: row;
   overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+/* Panel visibility transition */
+.custom-lightbox-container.panel-collapsed .lightbox-image-panel {
+  width: 100%;
+  transition: width 0.3s ease;
+}
+
+.custom-lightbox-container.panel-expanded .lightbox-image-panel {
+  transition: width 0.3s ease;
 }
 
 /* When on medium or smaller screens, stack vertically */
@@ -364,11 +345,11 @@ onUnmounted(() => {
   flex-direction: column;
   z-index: 10000;
   position: relative;
+  transition: width 0.3s ease;
 }
 
 .lightbox-image-panel.full-width {
   width: 100%;
-  /* Don't constrain the height on small screens - let it take natural height */
   height: auto;
   flex: 1;
 }
@@ -385,6 +366,13 @@ onUnmounted(() => {
   max-height: 90%;
   max-width: 90%;
   object-fit: contain;
+  transition: max-height 0.3s ease, max-width 0.3s ease;
+}
+
+/* Make image larger when panel is collapsed */
+.panel-collapsed .lightbox-image {
+  max-height: 95%;
+  max-width: 95%;
 }
 
 .nav-button {
@@ -410,6 +398,7 @@ onUnmounted(() => {
   right: 20px;
 }
 
+/* Panel styles for desktop (right side) */
 .lightbox-content-panel {
   width: 25%;
   height: 100%;
@@ -417,8 +406,10 @@ onUnmounted(() => {
   color: white;
   overflow-y: auto;
   z-index: 10000;
+  transition: width 0.3s ease;
 }
 
+/* Panel styles for mobile/tablet (bottom) */
 .lightbox-bottom-panel {
   width: 100%;
   height: 10%;
@@ -431,6 +422,7 @@ onUnmounted(() => {
   bottom: 0;
   left: 0;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5); /* Add shadow for visual separation */
+  transition: height 0.3s ease;
 }
 
 .content-panel-inner {
@@ -445,64 +437,9 @@ onUnmounted(() => {
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
-.custom-panel-content {
-  margin-top: 10px;
-  font-size: 14px;
-}
-
-/* Example interactive elements styling */
-.interactive-demo {
-  width: 100%;
-}
-
-.interactive-button {
-  background-color: #3b5998;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.comment-input {
-  display: flex;
-  gap: 8px;
-}
-
-.comment-field {
-  flex: 1;
-  padding: 8px;
-  border-radius: 4px;
-  border: 1px solid #3b5998;
-  background-color: #242424;
-  color: white;
-}
-
-.submit-button {
-  background-color: #3b5998;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.submit-button:disabled {
-  background-color: #666;
-  cursor: not-allowed;
-}
-
-.comments-section {
-  margin-top: 15px;
-}
-
-.no-comments {
+.no-caption {
   color: #888;
   font-style: italic;
-}
-
-.comment-item {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 10px;
 }
 </style>
