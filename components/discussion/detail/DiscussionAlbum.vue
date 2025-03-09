@@ -63,8 +63,26 @@
       <!-- Left panel for images (75% width on desktop, full width on mobile) -->
       <div class="lightbox-image-panel" :class="{'full-width': mdAndDown}">
         <div class="lightbox-header">
-          <button class="close-button" @click="closeLightbox">×</button>
-          <span class="image-counter">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
+          <div class="header-left">
+            <button class="close-button" @click="closeLightbox">×</button>
+          </div>
+          <div class="header-center">
+            <span class="image-counter">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
+          </div>
+          <div class="header-right">
+            <button class="action-button" @click="toggleFullscreen" title="Toggle fullscreen">
+              <span v-if="isFullscreen">⊟</span>
+              <span v-else>⊞</span>
+            </button>
+            <a 
+              class="action-button" 
+              :href="currentImage.url || ''" 
+              download 
+              title="Download image"
+            >
+              ↓
+            </a>
+          </div>
         </div>
         
         <div class="image-container">
@@ -173,6 +191,7 @@ const activeIndex = ref(0);
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 const currentImage = computed(() => props.album.Images[lightboxIndex.value] || {});
+const isFullscreen = ref(false);
 
 // Example interactive panel state
 const likeCount = ref(0);
@@ -232,26 +251,73 @@ const addComment = () => {
   }
 };
 
+// Toggle fullscreen mode
+const toggleFullscreen = () => {
+  if (!document.fullscreenElement) {
+    const container = document.querySelector('.custom-lightbox-container');
+    if (container && container.requestFullscreen) {
+      container.requestFullscreen()
+        .then(() => {
+          isFullscreen.value = true;
+        })
+        .catch((err) => {
+          console.error(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+    }
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen()
+        .then(() => {
+          isFullscreen.value = false;
+        })
+        .catch((err) => {
+          console.error(`Error attempting to exit fullscreen: ${err.message}`);
+        });
+    }
+  }
+};
+
 // Keyboard navigation
 const handleKeyDown = (e: KeyboardEvent) => {
   if (isLightboxOpen.value) {
     if (e.key === 'Escape') {
-      closeLightbox();
+      if (isFullscreen.value) {
+        document.exitFullscreen()
+          .then(() => {
+            isFullscreen.value = false;
+          })
+          .catch(() => {});
+      } else {
+        closeLightbox();
+      }
     } else if (e.key === 'ArrowRight') {
       nextImage();
     } else if (e.key === 'ArrowLeft') {
       prevImage();
+    } else if (e.key === 'f') {
+      toggleFullscreen();
     }
   }
 };
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
+  
+  // Listen for fullscreen change events
+  document.addEventListener('fullscreenchange', () => {
+    isFullscreen.value = !!document.fullscreenElement;
+  });
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
+  document.removeEventListener('fullscreenchange', () => {});
   document.body.style.overflow = ''; // Ensure scrolling is restored
+  
+  // Ensure we exit fullscreen if component is unmounted while in fullscreen
+  if (document.fullscreenElement && document.exitFullscreen) {
+    document.exitFullscreen().catch(() => {});
+  }
 });
 </script>
 
@@ -289,12 +355,42 @@ onUnmounted(() => {
   z-index: 10001; /* Keep header above all elements */
 }
 
+.header-left, .header-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+
 .close-button {
   background: none;
   border: none;
   color: white;
   font-size: 30px;
   cursor: pointer;
+}
+
+.action-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  text-decoration: none;
+}
+
+.action-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .image-counter {
@@ -354,7 +450,6 @@ onUnmounted(() => {
   right: 20px;
 }
 
-/* Panel styles for desktop (right side) */
 .lightbox-content-panel {
   width: 25%;
   height: 100%;
@@ -364,7 +459,6 @@ onUnmounted(() => {
   z-index: 10000;
 }
 
-/* Panel styles for mobile/tablet (bottom) */
 .lightbox-bottom-panel {
   width: 100%;
   height: 15%;
