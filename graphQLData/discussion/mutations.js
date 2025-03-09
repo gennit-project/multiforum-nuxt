@@ -86,7 +86,32 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
     }
   }
 `;
-
+export const UPDATE_DISCUSSION = gql`
+mutation updateDiscussion (
+  $where: DiscussionWhere!,
+  $updateDiscussionInput: DiscussionUpdateInput!
+) {
+  updateDiscussions(
+    where: $where,
+    update: $updateDiscussionInput
+  ) {
+    discussions {
+      id
+      title
+      body
+      createdAt
+      updatedAt
+      Album {
+        id
+        Images {
+          id 
+          url
+        }
+      }
+    }
+  }
+}
+`
 export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
   mutation updateDiscussionWithChannelConnections(
     $updateDiscussionInput: DiscussionUpdateInput!

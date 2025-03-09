@@ -2,10 +2,6 @@
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
 import type {
-  AlbumImagesCreateFieldInput,
-  AlbumImagesUpdateFieldInput,
-  AlbumUpdateFieldInput,
-  AlbumImagesDeleteFieldInput,
   Discussion,
   Image,
   DiscussionUpdateInput,
@@ -14,7 +10,7 @@ import PrimaryButton from "@/components/PrimaryButton.vue";
 import GenericButton from "@/components/GenericButton.vue";
 import { useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
+import { UPDATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import { MAX_CHARS_IN_DISCUSSION_BODY } from "@/utils/constants";
 import AlbumEditor from "@/components/discussion/form/AlbumEditor.vue";
 
@@ -112,12 +108,9 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
   const deleteImageArray = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
     .map((old) => ({
-      where: { node: { id: old.id } },
-      // Depending on your schema, you might need:
-      // delete: { node: { ... } } or just delete: true
       delete: {
-        node: {},
-      },
+        where: { node: { id: old.id } },
+      }
     }));
 
   // Combine all operations into a single array. Each object is one “Images” operation.
@@ -143,7 +136,7 @@ const {
   error: updateDiscussionError,
   loading: updateDiscussionLoading,
   onDone,
-} = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+} = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
     where: { id: props.discussion.id },
     updateDiscussionInput: getUpdateDiscussionInputFromFormValues(),
@@ -182,11 +175,10 @@ function handleUpdateAlbum(newVals: { album: { images: any[] } }) {
         :allow-image-upload="true"
         @update-form-values="handleUpdateAlbum"
       />
-      <div class="flex align-items gap-2 justify-end">
+      <div class="flex align-items gap-2 justify-end mt-2">
         <GenericButton :text="'Cancel'" @click="emits('closeEditor')" />
         <PrimaryButton
           :disabled="
-            formValues.body.length === 0 ||
             formValues.body.length > MAX_CHARS_IN_DISCUSSION_BODY
           "
           :label="'Save'"

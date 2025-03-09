@@ -65,17 +65,14 @@ const goRight = () => {
           :src="image.url || ''"
           :alt="image.alt || ''"
           class="shadow-sm"
-        >
+        />
         <span class="text-center">
-          {{ image.alt }}
+          {{ image.caption }}
         </span>
       </a>
     </lightgallery>
 
-    <div
-      v-else
-      class="flex items-center justify-center gap-2"
-    >
+    <div v-else class="flex items-center justify-center gap-2">
       <button
         v-if="album.Images.length > 1"
         type="button"
@@ -103,7 +100,7 @@ const goRight = () => {
               v-if="image"
               :src="image.url || ''"
               :alt="image.alt || ''"
-              class="shadow-sm"
+              class="shadow-sm max-h-96 max-w-96"
               :class="{
                 hidden: idx !== activeIndex,
               }"
@@ -114,7 +111,7 @@ const goRight = () => {
                 hidden: idx !== activeIndex,
               }"
             >
-              {{ image.alt }}
+              {{ image.caption }}
             </span>
           </div>
         </a>
@@ -130,7 +127,6 @@ const goRight = () => {
     </div>
   </div>
 </template>
-
 
 <style scoped>
 img {

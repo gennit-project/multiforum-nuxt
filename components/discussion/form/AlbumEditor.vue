@@ -86,7 +86,6 @@ const uploadFile = async (file: File): Promise<string | null> => {
  * add them to the album array as new images.
  */
 const handleMultipleFiles = async (files: FileList | File[]) => {
-  console.log("Handling multiple files...");
   if (!files || files.length === 0) return;
 
   // Optionally you can show a global loading spinner,
@@ -95,7 +94,6 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
   loadingStates.value[-1] = true;
 
   for (let i = 0; i < files.length; i++) {
-    console.log("Uploading file", i);
     const file = files[i];
     // Upload each file
     const uploadedUrl = await uploadFile(file);
@@ -209,6 +207,15 @@ const addNewImage = (url = "", alt = "") => {
         </button>
       </div>
       <LoadingSpinner v-if="loadingStates[index]" class="mb-2" />
+
+      <div>
+        <ExpandableImage
+          v-if="image.url"
+          class="w-36 h-36 object-cover rounded-md"
+          :src="image.url"
+          :alt="image.alt"
+        />
+      </div>
       <TextInput
         class="mt-2"
         label="Image URL"
@@ -217,14 +224,6 @@ const addNewImage = (url = "", alt = "") => {
         :full-width="true"
         @update="(val) => updateImageField(index, 'url', val)"
       />
-      <div>
-        <ExpandableImage
-          v-if="image.url"
-          class="max-w-56 h-32 mt-2 object-cover"
-          :src="image.url"
-          :alt="image.alt"
-        />
-      </div>
       <TextInput
         class="mt-2"
         label="Alt (short description)"
@@ -259,12 +258,12 @@ const addNewImage = (url = "", alt = "") => {
         @change="handleFileInputChange"
       >
     </div>
-    <button
+    <!-- <button
       type="button"
       class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500"
       @click="() => addNewImage()"
     >
       + Add New Image
-    </button>
+    </button> -->
   </div>
 </template>

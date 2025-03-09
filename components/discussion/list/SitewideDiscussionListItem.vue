@@ -207,7 +207,7 @@ const relative = computed(() =>
               </span>
             </div>
             <button
-              v-if="discussion && discussion.body && !showBody"
+              v-if="discussion && (discussion.body || discussion.Album) && !showBody"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
               @click="showBody = true"
             >
@@ -218,7 +218,7 @@ const relative = computed(() =>
               Expand
             </button>
             <button
-              v-if="discussion && discussion.body && showBody"
+              v-if="discussion && (discussion.body || discussion.Album) && showBody"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
               @click="showBody = false"
             >
@@ -229,7 +229,7 @@ const relative = computed(() =>
               Collapse
             </button>
             <div
-              v-if="discussion && discussion.body && showBody"
+              v-if="discussion && (discussion.body || discussion.Album) && showBody"
               class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
             >
               <MarkdownPreview

@@ -152,7 +152,8 @@ const renderedMarkdown = computed(() => {
     word-break: break-all;
   }
   img {
-    max-height: 300px !important;
+    margin-top: 1rem !important;
+    max-height: 350px !important;
     max-width: 100% !important;
     height: auto !important;
     width: auto !important;

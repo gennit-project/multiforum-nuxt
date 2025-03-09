@@ -47,8 +47,6 @@ const props = defineProps({
     default: 1000,
   },
 });
-console.log('discussion body')
-
 
 // Computed properties for discussion body and links
 const bodyText = computed(() => {
