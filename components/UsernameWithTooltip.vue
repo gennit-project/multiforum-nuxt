@@ -101,7 +101,7 @@ export default defineComponent({
             </span>
             <span
               v-if="isOriginalPoster"
-              class="rounded-md border border-green-500 px-1 py-0 text-xs text-green-500"
+              class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
             >OP</span>
           </div>
         </slot>
