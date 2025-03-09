@@ -272,6 +272,7 @@ onUnmounted(() => {
   z-index: 9999;
   display: flex;
   flex-direction: row;
+  overflow: hidden;
 }
 
 /* When on medium or smaller screens, stack vertically */
@@ -285,6 +286,7 @@ onUnmounted(() => {
   align-items: center;
   padding: 10px 20px;
   color: white;
+  z-index: 10001; /* Keep header above all elements */
 }
 
 .close-button {
@@ -304,11 +306,15 @@ onUnmounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  z-index: 10000;
+  position: relative;
 }
 
 .lightbox-image-panel.full-width {
   width: 100%;
-  height: 60%; /* Take 60% of height when in column layout */
+  /* Don't constrain the height on small screens - let it take natural height */
+  height: auto;
+  flex: 1;
 }
 
 .image-container {
@@ -337,7 +343,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   cursor: pointer;
-  z-index: 1;
+  z-index: 10001; /* Keep nav buttons above all elements */
 }
 
 .prev-button {
@@ -355,15 +361,22 @@ onUnmounted(() => {
   background-color: #1e1e1e;
   color: white;
   overflow-y: auto;
+  z-index: 10000;
 }
 
 /* Panel styles for mobile/tablet (bottom) */
 .lightbox-bottom-panel {
   width: 100%;
-  height: 40%;
+  height: 15%;
+  min-height: 100px; /* Ensure minimum height */
   background-color: #1e1e1e;
   color: white;
   overflow-y: auto;
+  z-index: 10002; /* Ensure the bottom panel appears above the image */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5); /* Add shadow for visual separation */
 }
 
 .content-panel-inner {
