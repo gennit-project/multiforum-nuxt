@@ -29,10 +29,70 @@ const lightboxIndex = ref(0);
 const currentImage = computed(() => props.album.Images[lightboxIndex.value] || {});
 const isPanelVisible = ref(true);
 
-// Example interactive panel state
-const likeCount = ref(0);
-const commentText = ref('');
-const comments = ref<string[]>([]);
+// Zoom functionality
+const zoomLevel = ref(1);
+const isZoomed = computed(() => zoomLevel.value > 1);
+
+// Image panning
+const isDragging = ref(false);
+const startX = ref(0);
+const startY = ref(0);
+const translateX = ref(0);
+const translateY = ref(0);
+
+const startDrag = (event: MouseEvent) => {
+  if (!isZoomed.value) return;
+  
+  // Only start dragging on left mouse button (button 0)
+  if (event.button !== 0) return;
+  
+  event.preventDefault();
+  isDragging.value = true;
+  startX.value = event.clientX - translateX.value;
+  startY.value = event.clientY - translateY.value;
+};
+
+const onDrag = (event: MouseEvent) => {
+  // Only move if we're actively dragging (mouse button is held down)
+  if (!isDragging.value) return;
+  
+  event.preventDefault();
+  translateX.value = event.clientX - startX.value;
+  translateY.value = event.clientY - startY.value;
+};
+
+const stopDrag = () => {
+  // Stop dragging when mouse button is released
+  isDragging.value = false;
+};
+
+// Handle touch events for mobile devices
+const startTouchDrag = (event: TouchEvent) => {
+  if (!isZoomed.value) return;
+  
+  event.preventDefault();
+  isDragging.value = true;
+  
+  const touch = event.touches[0];
+  startX.value = touch.clientX - translateX.value;
+  startY.value = touch.clientY - translateY.value;
+};
+
+const onTouchDrag = (event: TouchEvent) => {
+  if (!isDragging.value) return;
+  
+  event.preventDefault();
+  
+  const touch = event.touches[0];
+  translateX.value = touch.clientX - startX.value;
+  translateY.value = touch.clientY - startY.value;
+};
+
+// Reset translation when changing images or zoom
+const resetTranslation = () => {
+  translateX.value = 0;
+  translateY.value = 0;
+};
 
 // Carousel navigation functions
 const goLeft = () => {
@@ -56,11 +116,15 @@ const openLightbox = (index: number) => {
   lightboxIndex.value = index;
   isLightboxOpen.value = true;
   isPanelVisible.value = true; // Always show panel when opening lightbox
+  zoomLevel.value = 1; // Reset zoom when opening lightbox
+  resetTranslation(); // Reset position when opening lightbox
   document.body.style.overflow = 'hidden'; // Prevent scrolling
 };
 
 const closeLightbox = () => {
   isLightboxOpen.value = false;
+  zoomLevel.value = 1; // Reset zoom when closing
+  resetTranslation(); // Reset position when closing
   document.body.style.overflow = ''; // Restore scrolling
 };
 
@@ -70,6 +134,8 @@ const nextImage = () => {
   } else {
     lightboxIndex.value++;
   }
+  zoomLevel.value = 1; // Reset zoom when changing images
+  resetTranslation(); // Reset position when changing images
 };
 
 const prevImage = () => {
@@ -78,19 +144,31 @@ const prevImage = () => {
   } else {
     lightboxIndex.value--;
   }
-};
-
-// Example panel interaction function
-const addComment = () => {
-  if (commentText.value.trim()) {
-    comments.value.push(commentText.value);
-    commentText.value = '';
-  }
+  zoomLevel.value = 1; // Reset zoom when changing images
+  resetTranslation(); // Reset position when changing images
 };
 
 // Toggle panel visibility
 const togglePanel = () => {
   isPanelVisible.value = !isPanelVisible.value;
+};
+
+// Zoom functions
+const zoomIn = () => {
+  if (zoomLevel.value < 3) {
+    zoomLevel.value += 0.5;
+  }
+};
+
+const zoomOut = () => {
+  if (zoomLevel.value > 1) {
+    zoomLevel.value -= 0.5;
+  }
+};
+
+const resetZoom = () => {
+  zoomLevel.value = 1;
+  resetTranslation();
 };
 
 // Keyboard navigation
@@ -105,16 +183,36 @@ const handleKeyDown = (e: KeyboardEvent) => {
     } else if (e.key === 'i') {
       // 'i' for info panel toggle
       togglePanel();
+    } else if (e.key === '+') {
+      zoomIn();
+    } else if (e.key === '-') {
+      zoomOut();
+    } else if (e.key === '0') {
+      resetZoom();
     }
   }
 };
 
 onMounted(() => {
   window.addEventListener('keydown', handleKeyDown);
+  
+  // Global event listeners to handle events outside the image element
+  window.addEventListener('mouseup', stopDrag);
+  window.addEventListener('mouseleave', stopDrag); // Stop dragging if mouse leaves window
+  window.addEventListener('mousemove', onDrag);
+  
+  // Touch events for mobile
+  window.addEventListener('touchend', stopDrag);
+  window.addEventListener('touchcancel', stopDrag);
 });
 
 onUnmounted(() => {
   window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('mouseup', stopDrag);
+  window.removeEventListener('mouseleave', stopDrag);
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('touchend', stopDrag);
+  window.removeEventListener('touchcancel', stopDrag);
   document.body.style.overflow = ''; // Ensure scrolling is restored
 });
 </script>
@@ -204,6 +302,37 @@ onUnmounted(() => {
             <span class="text-sm">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
           </div>
           <div class="flex items-center gap-4">
+            <!-- Zoom controls -->
+            <div class="flex items-center bg-opacity-10 bg-white rounded">
+              <button 
+                class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                @click="zoomOut"
+                :disabled="zoomLevel <= 1"
+                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"
+                title="Zoom out"
+              >
+                −
+              </button>
+              <span class="px-2 text-sm text-white">{{ Math.round(zoomLevel * 100) }}%</span>
+              <button 
+                class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                @click="zoomIn"
+                :disabled="zoomLevel >= 3"
+                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel >= 3 }"
+                title="Zoom in"
+              >
+                +
+              </button>
+              <button 
+                v-if="isZoomed"
+                class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                @click="resetZoom"
+                title="Reset zoom"
+              >
+                Reset
+              </button>
+            </div>
+            
             <!-- Panel toggle button -->
             <button 
               class="bg-opacity-10 hover:bg-opacity-20 bg-white border-0 text-white py-1 px-2 rounded cursor-pointer text-sm transition-colors"
@@ -224,7 +353,7 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <div class="flex-1 flex justify-center items-center relative h-full">
+        <div class="flex-1 flex justify-center items-center relative h-full overflow-hidden">
           <button 
             v-if="album.Images.length > 1" 
             class="absolute left-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50" 
@@ -237,11 +366,18 @@ onUnmounted(() => {
             :src="currentImage.url || ''" 
             :alt="currentImage.alt || ''" 
             class="object-contain transition-all duration-300 ease-in-out"
-            :class="{
-              'max-h-[90%] max-w-[90%]': isPanelVisible,
-              'max-h-[95%] max-w-[95%]': !isPanelVisible
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
+              cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto'
             }"
-          />
+            :class="{
+              'max-h-[90%] max-w-[90%]': isPanelVisible && !isZoomed,
+              'max-h-[95%] max-w-[95%]': !isPanelVisible && !isZoomed
+            }"
+            @mousedown="startDrag"
+            @touchstart="startTouchDrag"
+            @touchmove="onTouchDrag"
+          >
           
           <button 
             v-if="album.Images.length > 1" 
