@@ -163,7 +163,14 @@ const updateImageField = (
     ...updatedImages[index],
     [fieldName]: newValue,
   };
-  emit("updateFormValues", { album: { images: updatedImages } });
+  
+  // Include imageOrder in the emit
+  emit("updateFormValues", {
+    album: {
+      images: updatedImages,
+      imageOrder: props.formValues.album.imageOrder
+    }
+  });
 };
 
 const deleteImage = (index: number) => {
@@ -361,7 +368,6 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
             @update="
               (val) => {
                 updateImageField(index, 'caption', val);
-                updateImageField(index, 'alt', val);
               }
             "
           />
