@@ -3,16 +3,14 @@ import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { defineComponent, computed, ref } from "vue";
 import { useRouter, useRoute } from "nuxt/app";
-import {
-  useQuery,
-  useMutation,
-} from "@vue/apollo-composable";
-import type {
-  CreateEditDiscussionFormValues,
-} from "@/types/Discussion";
+import { useQuery, useMutation } from "@vue/apollo-composable";
+import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import type { Discussion, DiscussionChannel, Tag as TagData,
+import type {
+  Discussion,
+  DiscussionChannel,
+  Tag as TagData,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
@@ -28,7 +26,6 @@ export default defineComponent({
   },
   apollo: {},
   setup() {
-
     const route = useRoute();
     const router = useRouter();
 
@@ -54,7 +51,7 @@ export default defineComponent({
     } = useQuery(GET_DISCUSSION, {
       id: discussionId,
       loggedInModName: modProfileNameVar.value,
-      channelUniqueName: channelId.value
+      channelUniqueName: channelId.value,
     });
 
     const discussion = computed<Discussion>(() => {
@@ -62,6 +59,36 @@ export default defineComponent({
         return null;
       }
       return getDiscussionResult.value.discussions[0];
+    });
+
+    const images = computed(() => {
+      if (!discussion.value?.Album?.Images) return [];
+      return discussion.value.Album.Images.map((image: Image) => {
+        return {
+          url: image.url || "",
+          alt: image.alt || "",
+          caption: image.caption || "",
+          isCoverImage: false,
+          hasSensitiveContent: false,
+          hasSpoiler: false,
+          copyright: image.copyright || "",
+        };
+      });
+    });
+
+    const imageOrder = computed<string[]>(() => {
+      return (discussion.value.Album?.imageOrder ?? []).filter(
+        (imageId): imageId is string => !!imageId
+      );
+    });
+
+    const orderedImages = computed(() => {
+      return imageOrder.value
+        .map((imageId) => {
+          const image = images.value.find((image) => imageId === image.id);
+          return image || null;
+        })
+        .filter((image): image is NonNullable<typeof image> => image !== null);
     });
 
     const ownerList = computed(() => {
@@ -84,22 +111,12 @@ export default defineComponent({
           }),
           selectedChannels: discussion.value.DiscussionChannels.map(
             (discussionChannel: DiscussionChannel) => {
-              return discussionChannel?.Channel?.uniqueName || ''
-            },
+              return discussionChannel?.Channel?.uniqueName || "";
+            }
           ),
-          author: discussion.value.Author?.username || '',
+          author: discussion.value.Author?.username || "",
           album: {
-            images: discussion.value.Album?.Images ? discussion.value.Album.Images.map((image: Image) => {
-              return {
-                url: image.url || '',
-                alt: image.alt || '',
-                caption: image.caption || '',
-                copyright: image.copyright || '',
-                hasSensitiveContent: false,
-                hasSpoiler: false,
-                isCoverImage: false,
-              };
-            }) : [],
+            images: orderedImages.value,
           },
         };
       }
@@ -114,12 +131,12 @@ export default defineComponent({
         author: "",
         album: {
           images: [],
-        }
+        },
       };
     };
 
     const formValues = ref<CreateEditDiscussionFormValues>(
-      getDefaultFormValues(),
+      getDefaultFormValues()
     );
 
     const dataLoaded = ref(false);
@@ -139,7 +156,7 @@ export default defineComponent({
         selectedChannels: discussion.DiscussionChannels.map(
           (discussionChannel: DiscussionChannel) => {
             return discussionChannel?.Channel?.uniqueName;
-          },
+          }
         ),
         author: discussion.Author.username,
         album: {
@@ -171,7 +188,7 @@ export default defineComponent({
       return getDiscussionResult.value.discussions[0].Tags.map(
         (tag: TagData) => {
           return tag.text;
-        },
+        }
       );
     });
 
@@ -240,8 +257,10 @@ export default defineComponent({
         channelConnections: channelConnections.value,
         channelDisconnections: discussion.value.DiscussionChannels.filter(
           (dc) => {
-            return !channelConnections.value.includes(dc.Channel?.uniqueName || '');
-          },
+            return !channelConnections.value.includes(
+              dc.Channel?.uniqueName || ""
+            );
+          }
         ).map((dc) => {
           return dc.Channel?.uniqueName;
         }),

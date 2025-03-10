@@ -267,8 +267,11 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
   const imageOrder = props.formValues.album.imageOrder || [];
   const imageOrderMap: Record<string, ImageInput> = {};
 
-  images.forEach((image, index) => {
-    imageOrderMap[imageOrder[index]] = image;
+  imageOrder.forEach((imageId) => {
+    const imageAtIndex = images.find((img) => img.id === imageId);
+    if (imageAtIndex) {
+      imageOrderMap[imageId] = imageAtIndex;
+    }
   });
 
   return imageOrderMap;
@@ -340,7 +343,7 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
       <TextInput
         class="mt-2"
         label="Image URL"
-        :value="imageMap[imageId].url"
+        :value="imageMap[imageId]?.url || ''"
         placeholder="https://example.com/my-image.jpg"
         :full-width="true"
         @update="(val) => updateImageField(index, 'url', val)"
@@ -348,7 +351,7 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
       <TextInput
         class="mt-2"
         label="Caption"
-        :value="imageMap[imageId].caption"
+        :value="imageMap[imageId]?.caption"
         placeholder="Short caption or description"
         :full-width="true"
         @update="
@@ -361,7 +364,7 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
       <TextInput
         class="mt-2"
         label="Attribution/Copyright"
-        :value="imageMap[imageId].copyright"
+        :value="imageMap[imageId]?.copyright"
         placeholder="Who took this photo? (optional)"
         :full-width="true"
         @update="(val) => updateImageField(index, 'copyright', val)"

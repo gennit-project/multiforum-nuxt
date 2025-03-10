@@ -22,28 +22,45 @@ const props = defineProps({
 });
 const emit = defineEmits(["closeEditor", "updateFormValues"]);
 
+const albumId = computed(() => {
+  return props.discussion?.Album?.id || "";
+});
 const images = computed(() => {
   if (!props.discussion?.Album?.Images) return [];
   return props.discussion.Album.Images.map((image: Image) => {
     return {
-      id: image.id,
+      id: image.id || "",
       url: image.url || "",
       alt: image.alt || "",
       caption: image.caption || "",
+      isCoverImage: false,
+      hasSensitiveContent: false,
+      hasSpoiler: false,
       copyright: image.copyright || "",
     };
   });
 });
 
-const albumId = computed(() => {
-  return props.discussion?.Album?.id || "";
+const imageOrder = computed<string[]>(() => {
+  return (props.discussion.Album?.imageOrder ?? []).filter(
+    (imageId): imageId is string => !!imageId
+  );
+});
+
+const orderedImages = computed(() => {
+  return imageOrder.value
+    .map((imageId) => {
+      const image = images.value.find((image) => imageId === image.id);
+      return image || null;
+    })
+    .filter((image): image is NonNullable<typeof image> => image !== null);
 });
 
 const formValues = ref({
   body: props.discussion?.body || "",
   album: {
-    images: images.value,
-    imageOrder: images.value.map((img) => img.id),
+    images: orderedImages.value,
+    imageOrder: imageOrder.value,
   },
 });
 
@@ -112,11 +129,15 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     .map((old) => ({
       delete: {
         where: { node: { id: old.id } },
-      }
+      },
     }));
 
   // Combine all operations into a single array. Each object is one “Images” operation.
-  const imagesOps = [...createImageArray, ...updateImageArray, ...deleteImageArray];
+  const imagesOps = [
+    ...createImageArray,
+    ...updateImageArray,
+    ...deleteImageArray,
+  ];
 
   // Wrap them in the correct update shape, including "body" if you want to change it:
   return {
@@ -131,8 +152,6 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     },
   };
 }
-
-
 
 const {
   mutate: updateDiscussion,
@@ -151,11 +170,11 @@ onDone(() => {
   emit("closeEditor");
 });
 
-function handleUpdateAlbum(newVals: { 
-  album: { 
-    images: any[],
-    imageOrder: string[]
-  } 
+function handleUpdateAlbum(newVals: {
+  album: {
+    images: any[];
+    imageOrder: string[];
+  };
 }) {
   // Merge these changes back into the parent's form data
   formValues.value.album = newVals.album;
@@ -187,9 +206,7 @@ function handleUpdateAlbum(newVals: {
       <div class="flex align-items gap-2 justify-end mt-2">
         <GenericButton :text="'Cancel'" @click="emits('closeEditor')" />
         <PrimaryButton
-          :disabled="
-            formValues.body.length > MAX_CHARS_IN_DISCUSSION_BODY
-          "
+          :disabled="formValues.body.length > MAX_CHARS_IN_DISCUSSION_BODY"
           :label="'Save'"
           :loading="updateDiscussionLoading"
           @click="updateDiscussion"

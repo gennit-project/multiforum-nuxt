@@ -27,8 +27,26 @@ const activeIndex = ref(0);
 // Custom lightbox state
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
+
+// Image ordering
+const imageOrder = computed<string[]>(() => {
+  return (props.album?.imageOrder ?? []).filter(
+    (imageId): imageId is string => !!imageId
+  );
+});
+
+const orderedImages = computed(() => {
+  return imageOrder.value
+    .map((imageId) => {
+      const image = props.album.Images.find((image) => imageId === image.id);
+      return image || null;
+    })
+    .filter((image): image is NonNullable<typeof image> => image !== null);
+});
+
+// Current image based on ordered images
 const currentImage = computed(
-  () => props.album.Images[lightboxIndex.value] || {}
+  () => orderedImages.value[lightboxIndex.value] || {}
 );
 const isPanelVisible = ref(true);
 
@@ -100,14 +118,14 @@ const resetTranslation = () => {
 // Carousel navigation functions
 const goLeft = () => {
   if (activeIndex.value === 0) {
-    activeIndex.value = (props.album.imageOrder?.length || 0) - 1;
+    activeIndex.value = orderedImages.value.length - 1;
   } else {
     activeIndex.value--;
   }
 };
 
 const goRight = () => {
-  if (activeIndex.value ===(props.album.imageOrder?.length || 0) - 1) {
+  if (activeIndex.value === orderedImages.value.length - 1) {
     activeIndex.value = 0;
   } else {
     activeIndex.value++;
@@ -132,7 +150,7 @@ const closeLightbox = () => {
 };
 
 const nextImage = () => {
-  if (lightboxIndex.value === (props.album.imageOrder?.length || 0) - 1) {
+  if (lightboxIndex.value === orderedImages.value.length - 1) {
     lightboxIndex.value = 0;
   } else {
     lightboxIndex.value++;
@@ -143,7 +161,7 @@ const nextImage = () => {
 
 const prevImage = () => {
   if (lightboxIndex.value === 0) {
-    lightboxIndex.value = (props.album.imageOrder?.length || 0) - 1;
+    lightboxIndex.value = orderedImages.value.length - 1;
   } else {
     lightboxIndex.value--;
   }
@@ -246,29 +264,6 @@ const downloadImage = (imageUrl: string) => {
       console.error("Download failed:", error);
     });
 };
-
-const imageMap = computed<Record<string, Image>>(() => {
-  const images = props.album.Images;
-  const imageOrder = props.album.imageOrder || [];
-  const imageOrderMap: Record<string, Image> = {};
-
-  imageOrder.forEach((imageId) => {
-    if (!imageId) return;
-    const imageAtIdx = images.find((img) => img.id === imageId);
-    if (!imageAtIdx) return;
-    imageOrderMap[imageId] = imageAtIdx;
-  });
-
-  return imageOrderMap;
-});
-
-const nonNullImageIDs = computed<string[]>(() => {
-  if (!props.album.imageOrder) return [];
-  return props.album.imageOrder.filter((id): id is string => {
-    if (!id) return false;
-    return imageMap.value[id] !== undefined && imageMap.value[id] !== null;
-  });
-});
 </script>
 
 <template>
@@ -276,7 +271,7 @@ const nonNullImageIDs = computed<string[]>(() => {
     <!-- Normal thumbnail grid view -->
     <div v-if="!isLightboxOpen" class="overflow-x-auto border">
       <span class="p-1">{{
-        `${activeIndex + 1} of ${album.imageOrder?.length || 0}`
+        `${activeIndex + 1} of ${orderedImages.length}`
       }}</span>
 
       <!-- Grid view -->
@@ -285,19 +280,19 @@ const nonNullImageIDs = computed<string[]>(() => {
         class="grid grid-cols-3 gap-2 dark:text-white"
       >
         <div
-          v-for="(imageId, idx) in nonNullImageIDs"
-          :key="imageId"
+          v-for="(image, idx) in orderedImages"
+          :key="image.id"
           class="cursor-pointer"
           @click="openLightbox(idx)"
         >
           <img
-            v-if="imageMap[imageId]"
-            :src="imageMap[imageId].url || ''"
-            :alt="imageMap[imageId].alt || ''"
+            v-if="image"
+            :src="image.url || ''"
+            :alt="image.alt || ''"
             class="shadow-sm"
           >
           <span class="text-center">
-            {{ imageMap[imageId].caption }}
+            {{ image.caption }}
           </span>
         </div>
       </div>
@@ -305,7 +300,7 @@ const nonNullImageIDs = computed<string[]>(() => {
       <!-- Carousel view -->
       <div v-else class="flex items-center justify-center gap-2">
         <button
-          v-if="album.imageOrder && album.imageOrder.length > 1"
+          v-if="orderedImages.length > 1"
           type="button"
           class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
           @click="goLeft"
@@ -315,8 +310,8 @@ const nonNullImageIDs = computed<string[]>(() => {
 
         <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
           <div
-            v-for="(imageId, idx) in nonNullImageIDs"
-            :key="imageId"
+            v-for="(image, idx) in orderedImages"
+            :key="image.id"
             class="flex flex-shrink-0 w-auto"
           >
             <div
@@ -324,9 +319,9 @@ const nonNullImageIDs = computed<string[]>(() => {
               @click="openLightbox(idx)"
             >
             <img
-              v-if="imageMap[imageId]"
-              :src="imageMap[imageId].url || ''"
-              :alt="imageMap[imageId].alt || ''"
+              v-if="image"
+              :src="image.url || ''"
+              :alt="image.alt || ''"
               class="shadow-sm max-h-96 max-w-96"
               :class="{ hidden: idx !== activeIndex }"
             >
@@ -334,14 +329,14 @@ const nonNullImageIDs = computed<string[]>(() => {
                 class="text-center"
                 :class="{ hidden: idx !== activeIndex }"
               >
-                {{ imageMap[imageId].caption }}
+                {{ image.caption }}
               </span>
             </div>
           </div>
         </div>
 
         <button
-          v-if="album.Images.length > 1"
+          v-if="orderedImages.length > 1"
           class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
           type="button"
           @click="goRight"
@@ -378,7 +373,7 @@ const nonNullImageIDs = computed<string[]>(() => {
             </button>
             <div class="flex-1">
               <span class="text-sm">{{
-                `${lightboxIndex + 1} of ${album.Images.length}`
+                `${lightboxIndex + 1} of ${orderedImages.length}`
               }}</span>
             </div>
           </div>
@@ -388,10 +383,10 @@ const nonNullImageIDs = computed<string[]>(() => {
             <div class="flex items-center bg-opacity-10 bg-white rounded">
               <button
                 class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                title="Zoom out"
                 @click="zoomOut"
                 :disabled="zoomLevel <= 1"
-                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"
-                title="Zoom out"
+                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"   
               >
                 −
               </button>
@@ -400,18 +395,18 @@ const nonNullImageIDs = computed<string[]>(() => {
               >
               <button
                 class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                title="Zoom in"
                 @click="zoomIn"
                 :disabled="zoomLevel >= 3"
                 :class="{ 'opacity-50 cursor-not-allowed': zoomLevel >= 3 }"
-                title="Zoom in"
               >
                 +
               </button>
               <button
                 v-if="isZoomed"
                 class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
-                @click="resetZoom"
                 title="Reset zoom"
+                @click="resetZoom"
               >
                 Reset
               </button>
@@ -441,7 +436,7 @@ const nonNullImageIDs = computed<string[]>(() => {
           class="flex-1 flex justify-center items-center relative h-full overflow-hidden"
         >
           <button
-            v-if="album.Images.length > 1"
+            v-if="orderedImages.length > 1"
             class="absolute left-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50"
             @click="prevImage"
           >
@@ -466,7 +461,7 @@ const nonNullImageIDs = computed<string[]>(() => {
           >
 
           <button
-            v-if="album.Images.length > 1"
+            v-if="orderedImages.length > 1"
             class="absolute right-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50"
             @click="nextImage"
           >
