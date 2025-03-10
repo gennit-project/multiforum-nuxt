@@ -17,24 +17,16 @@ const props = defineProps({
   },
 });
 
-// Use Vuetify's display utilities for responsive design
 const { mdAndDown } = useDisplay();
 
 // Carousel navigation state
 const activeIndex = ref(0);
 
-// Custom lightbox state
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 const currentImage = computed(() => props.album.Images[lightboxIndex.value] || {});
 const isPanelVisible = ref(true);
 
-// Example interactive panel state
-const likeCount = ref(0);
-const commentText = ref('');
-const comments = ref<string[]>([]);
-
-// Carousel navigation functions
 const goLeft = () => {
   if (activeIndex.value === 0) {
     activeIndex.value = props.album.Images.length - 1;
@@ -81,7 +73,8 @@ const prevImage = () => {
 };
 
 // Toggle panel visibility
-const togglePanel = () => {
+const togglePanel = (event: any) => {
+  event.preventDefault()
   isPanelVisible.value = !isPanelVisible.value;
 };
 
@@ -190,9 +183,9 @@ onUnmounted(() => {
           </div>
           <div class="header-right">
             <!-- Panel toggle button - Show different icons based on state -->
-            <button class="action-button" @click="togglePanel" :title="isPanelVisible ? 'Hide panel' : 'Show panel'">
-              <span v-if="isPanelVisible">▶</span>
-              <span v-else>◀</span>
+            <button  @click="togglePanel" :title="isPanelVisible ? 'Hide panel' : 'Show panel'">
+              <span v-if="isPanelVisible">Close panel</span>
+              <span v-else>Open panel</span>
               
             </button>
             <a 
@@ -219,7 +212,7 @@ onUnmounted(() => {
             :src="currentImage.url || ''" 
             :alt="currentImage.alt || ''" 
             class="lightbox-image"
-          />
+          >
           
           <button 
             v-if="album.Images.length > 1" 
@@ -234,13 +227,13 @@ onUnmounted(() => {
       <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
       <div 
         v-if="isPanelVisible" 
-        class="content-panel" 
+        class="content-panel flex" 
         :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}"
       >
-        <div class="content-panel-inner">
+        <div class="content-panel-inner flex-1">
+          <h1 class="text-xl font-bold dark:text-white">{{currentImage.caption}}</h1>
           
-          <!-- This is where you can put your custom Vue components -->
-          <MarkdownPreview v-if="currentImage.caption" :text="currentImage.caption" />
+          <MarkdownPreview v-if="currentImage.caption" :text="currentImage.caption"/>
           
           <div v-else class="no-caption">
             No caption available for this image.
@@ -427,14 +420,6 @@ onUnmounted(() => {
 
 .content-panel-inner {
   padding: 20px;
-}
-
-.panel-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .no-caption {
