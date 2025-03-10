@@ -7,8 +7,8 @@ import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import TextInput from "@/components/TextInput.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue"; // Assuming you have this
-// If you don't, remove or implement your own spinner
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { useDisplay } from "vuetify";
 
 const props = defineProps<{
   formValues: {
@@ -27,6 +27,8 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["updateFormValues"]);
+
+const { mdAndDown } = useDisplay();
 
 type ImageInput = {
   id?: string;
@@ -332,43 +334,47 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
       </div>
       <LoadingSpinner v-if="loadingStates[index]" class="mb-2" />
 
-      <div>
-        <ExpandableImage
-          v-if="imageMap[imageId]?.url"
-          class="w-72 object-cover"
-          :src="imageMap[imageId].url"
-          :alt="imageMap[imageId].alt"
-        />
+      <div :class="[mdAndDown ? 'flex-col' : 'flex', 'gap-2']">
+        <div>
+          <ExpandableImage
+            v-if="imageMap[imageId]?.url"
+            class="w-72 object-cover"
+            :src="imageMap[imageId].url"
+            :alt="imageMap[imageId].alt"
+          />
+        </div>
+        <div class="flex-col gap-2 flex-1">
+          <TextInput
+            class="mt-2"
+            label="Image URL"
+            :value="imageMap[imageId]?.url || ''"
+            placeholder="https://example.com/my-image.jpg"
+            :full-width="true"
+            @update="(val) => updateImageField(index, 'url', val)"
+          />
+          <TextInput
+            class="mt-2"
+            label="Caption"
+            :value="imageMap[imageId]?.caption"
+            placeholder="Short caption or description"
+            :full-width="true"
+            @update="
+              (val) => {
+                updateImageField(index, 'caption', val);
+                updateImageField(index, 'alt', val);
+              }
+            "
+          />
+          <TextInput
+            class="mt-2"
+            label="Attribution/Copyright"
+            :value="imageMap[imageId]?.copyright"
+            placeholder="Who took this photo? (optional)"
+            :full-width="true"
+            @update="(val) => updateImageField(index, 'copyright', val)"
+          />
+        </div>
       </div>
-      <TextInput
-        class="mt-2"
-        label="Image URL"
-        :value="imageMap[imageId]?.url || ''"
-        placeholder="https://example.com/my-image.jpg"
-        :full-width="true"
-        @update="(val) => updateImageField(index, 'url', val)"
-      />
-      <TextInput
-        class="mt-2"
-        label="Caption"
-        :value="imageMap[imageId]?.caption"
-        placeholder="Short caption or description"
-        :full-width="true"
-        @update="
-          (val) => {
-            updateImageField(index, 'caption', val);
-            updateImageField(index, 'alt', val);
-          }
-        "
-      />
-      <TextInput
-        class="mt-2"
-        label="Attribution/Copyright"
-        :value="imageMap[imageId]?.copyright"
-        placeholder="Who took this photo? (optional)"
-        :full-width="true"
-        @update="(val) => updateImageField(index, 'copyright', val)"
-      />
     </div>
     <div
       class="my-3 border-2 border-dotted border-gray-400 p-4 text-center cursor-pointer rounded-md"
@@ -385,7 +391,7 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
         multiple
         style="display: none"
         @change="handleFileInputChange"
-      />
+      >
     </div>
     <!-- <button
       type="button"
