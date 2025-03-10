@@ -120,7 +120,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="album-container">
+  <div class="w-full h-full">
     <!-- Normal thumbnail grid view -->
     <div v-if="!isLightboxOpen" class="overflow-x-auto border">
       <span class="p-1">{{ `${activeIndex + 1} of ${album.Images.length}` }}</span>
@@ -182,31 +182,39 @@ onUnmounted(() => {
     <!-- Custom lightbox with split layout -->
     <div 
       v-if="isLightboxOpen" 
-      class="custom-lightbox-container" 
+      class="fixed top-0 left-0 w-full h-full bg-black z-50 transition-all duration-300 ease-in-out"
       :class="{
-        'flex-column': mdAndDown,
-        'panel-expanded': isPanelVisible,
-        'panel-collapsed': !isPanelVisible
+        'flex-col': mdAndDown,
+        'flex': true
       }"
     >
       <!-- Left panel for images (75% width on desktop, full width on mobile) -->
-      <div class="lightbox-image-panel" :class="{'full-width': mdAndDown || !isPanelVisible}">
-        <div class="lightbox-header">
-          <div class="header-left">
-            <button class="close-button" @click="closeLightbox">×</button>
+      <div 
+        class="flex flex-col relative transition-all duration-300 ease-in-out z-40 overflow-hidden"
+        :class="{
+          'w-3/4 h-full': !mdAndDown && isPanelVisible,
+          'w-full h-full': mdAndDown || !isPanelVisible
+        }"
+      >
+        <div class="flex justify-between items-center p-2 px-5 text-white z-50">
+          <div class="flex items-center gap-4">
+            <button class="bg-transparent border-0 text-white text-3xl cursor-pointer" @click="closeLightbox">×</button>
           </div>
-          <div class="header-center">
-            <span class="image-counter">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
+          <div class="flex-1 text-center">
+            <span class="text-sm">{{ `${lightboxIndex + 1} of ${album.Images.length}` }}</span>
           </div>
-          <div class="header-right">
-            <!-- Panel toggle button - Show different icons based on state -->
-            <button  @click="togglePanel" :title="isPanelVisible ? 'Hide panel' : 'Show panel'">
+          <div class="flex items-center gap-4">
+            <!-- Panel toggle button -->
+            <button 
+              class="bg-opacity-10 hover:bg-opacity-20 bg-white border-0 text-white py-1 px-2 rounded cursor-pointer text-sm transition-colors"
+              @click="togglePanel" 
+              :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
+            >
               <span v-if="isPanelVisible">Close panel</span>
               <span v-else>Open panel</span>
-              
             </button>
             <a 
-              class="action-button" 
+              class="flex items-center justify-center w-8 h-8 rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer" 
               :href="currentImage.url || ''" 
               download 
               title="Download image"
@@ -216,10 +224,10 @@ onUnmounted(() => {
           </div>
         </div>
         
-        <div class="image-container">
+        <div class="flex-1 flex justify-center items-center relative h-full">
           <button 
             v-if="album.Images.length > 1" 
-            class="nav-button prev-button" 
+            class="absolute left-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50" 
             @click="prevImage"
           >
             <LeftArrowIcon class="h-6 w-6" />
@@ -228,12 +236,16 @@ onUnmounted(() => {
           <img 
             :src="currentImage.url || ''" 
             :alt="currentImage.alt || ''" 
-            class="lightbox-image"
+            class="object-contain transition-all duration-300 ease-in-out"
+            :class="{
+              'max-h-[90%] max-w-[90%]': isPanelVisible,
+              'max-h-[95%] max-w-[95%]': !isPanelVisible
+            }"
           />
           
           <button 
             v-if="album.Images.length > 1" 
-            class="nav-button next-button" 
+            class="absolute right-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50" 
             @click="nextImage"
           >
             <RightArrowIcon class="h-6 w-6" />
@@ -244,16 +256,21 @@ onUnmounted(() => {
       <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
       <div 
         v-if="isPanelVisible" 
-        class="content-panel" 
-        :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}"
+        class="bg-gray-900 text-white overflow-y-auto z-40 transition-all duration-300 ease-in-out"
+        :class="{
+          'w-1/4 h-full': !mdAndDown,
+          'w-full h-24 min-h-[100px] absolute bottom-0 left-0 shadow-md shadow-black': mdAndDown
+        }"
       >
-        <div class="content-panel-inner">
-          <h3 class="panel-title">{{ currentImage.caption || 'Image Details' }}</h3>
+        <div class="p-5">
+          <h3 class="text-lg font-bold mb-4 pb-2 border-b border-white border-opacity-20">
+            {{ currentImage.caption || 'Image Details' }}
+          </h3>
           
           <!-- This is where you can put your custom Vue components -->
           <MarkdownPreview v-if="currentImage.caption" :text="currentImage.caption" />
           
-          <div v-else class="no-caption">
+          <div v-else class="text-gray-400 italic mt-2">
             No caption available for this image.
           </div>
         </div>
@@ -261,236 +278,3 @@ onUnmounted(() => {
     </div>
   </div>
 </template>
-
-<style scoped>
-.album-container {
-  width: 100%;
-  height: 100%;
-}
-
-/* Custom lightbox styling */
-.custom-lightbox-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #000;
-  z-index: 9999;
-  display: flex;
-  flex-direction: row;
-  overflow: hidden;
-  transition: all 0.3s ease;
-}
-
-/* Panel visibility transition */
-.custom-lightbox-container.panel-collapsed .lightbox-image-panel {
-  width: 100%;
-  transition: width 0.3s ease;
-}
-
-.custom-lightbox-container.panel-collapsed.flex-column .lightbox-image-panel {
-  height: 100%; /* Ensure full height in collapsed state on mobile */
-}
-
-.custom-lightbox-container.panel-expanded .lightbox-image-panel {
-  transition: width 0.3s ease;
-}
-
-/* When on medium or smaller screens, stack vertically */
-.custom-lightbox-container.flex-column {
-  flex-direction: column;
-}
-
-.lightbox-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  color: white;
-  z-index: 10001; /* Keep header above all elements */
-}
-
-.header-left, .header-right {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-
-.header-center {
-  flex: 1;
-  text-align: center;
-}
-
-.close-button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 30px;
-  cursor: pointer;
-}
-
-.panel-toggle-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: white;
-  padding: 5px 10px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 14px;
-  transition: background-color 0.2s;
-}
-
-.panel-toggle-button:hover {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.action-button {
-  background: none;
-  border: none;
-  color: white;
-  font-size: 20px;
-  cursor: pointer;
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-  text-decoration: none;
-}
-
-.action-button:hover {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.image-counter {
-  font-size: 14px;
-}
-
-.lightbox-image-panel.full-width {
-  width: 100%;
-  height: 100%; /* Keep full height when expanded */
-}
-
-.image-container {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  height: calc(100% - 60px); /* Account for header height */
-  overflow: hidden; /* Prevent image overflow */
-}
-
-.image-container.reposition {
-  /* This class is added/removed to force reflow */
-}
-
-.lightbox-image {
-  max-height: 90%;
-  max-width: 90%;
-  object-fit: contain;
-  transition: max-height 0.3s ease, max-width 0.3s ease;
-}
-
-/* Make image larger when panel is collapsed */
-.panel-collapsed .lightbox-image {
-  max-height: 95%;
-  max-width: 95%;
-}
-
-.lightbox-image-panel {
-  width: 75%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  z-index: 10000;
-  position: relative;
-  transition: width 0.3s ease;
-  overflow: hidden; /* Prevent content from overflowing */
-}
-
-.nav-button {
-  position: absolute;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  z-index: 10001; /* Keep nav buttons above all elements */
-}
-
-.prev-button {
-  left: 20px;
-}
-
-.next-button {
-  right: 20px;
-}
-
-/* Panel styles for desktop (right side) */
-.lightbox-content-panel {
-  width: 25%;
-  height: 100%;
-  background-color: #1e1e1e;
-  color: white;
-  overflow-y: auto;
-  z-index: 10000;
-  transition: width 0.3s ease;
-}
-
-/* Panel styles for mobile/tablet (bottom) */
-.lightbox-bottom-panel {
-  width: 100%;
-  height: 10%;
-  min-height: 100px; /* Ensure minimum height */
-  background-color: #1e1e1e;
-  color: white;
-  overflow-y: auto;
-  z-index: 10002; /* Ensure the bottom panel appears above the image */
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.5); /* Add shadow for visual separation */
-  transition: height 0.3s ease;
-}
-
-.content-panel-inner {
-  padding: 20px;
-}
-
-.no-caption {
-  color: #888;
-  font-style: italic;
-  margin-top: 10px;
-}
-
-.panel-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-@media (max-width: 960px) {
-  /* Adjust the height for mobile when panel is closed to ensure the image is fully visible */
-  .panel-collapsed .lightbox-image-panel {
-    height: 100%;
-  }
-
-  /* Make sure image is properly centered when panel is closed */
-  .panel-collapsed .image-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: calc(100% - 60px);
-  }
-}
-</style>
