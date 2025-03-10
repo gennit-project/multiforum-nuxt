@@ -272,7 +272,7 @@ const downloadImage = (imageUrl: string) => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <span class="text-center">
             {{ image.caption }}
           </span>
@@ -306,7 +306,7 @@ const downloadImage = (imageUrl: string) => {
                 :alt="image.alt || ''"
                 class="shadow-sm max-h-96 max-w-96"
                 :class="{ hidden: idx !== activeIndex }"
-              >
+              />
               <span
                 class="text-center"
                 :class="{ hidden: idx !== activeIndex }"
@@ -353,12 +353,13 @@ const downloadImage = (imageUrl: string) => {
             >
               ×
             </button>
+            <div class="flex-1">
+              <span class="text-sm">{{
+                `${lightboxIndex + 1} of ${album.Images.length}`
+              }}</span>
+            </div>
           </div>
-          <div class="flex-1 text-center">
-            <span class="text-sm">{{
-              `${lightboxIndex + 1} of ${album.Images.length}`
-            }}</span>
-          </div>
+
           <div class="flex items-center gap-4">
             <!-- Zoom controls -->
             <div class="flex items-center bg-opacity-10 bg-white rounded">
@@ -439,7 +440,7 @@ const downloadImage = (imageUrl: string) => {
             @mousedown="startDrag"
             @touchstart="startTouchDrag"
             @touchmove="onTouchDrag"
-          >
+          />
 
           <button
             v-if="album.Images.length > 1"
@@ -475,7 +476,6 @@ const downloadImage = (imageUrl: string) => {
             v-if="currentImage.caption"
             :text="currentImage.caption"
           /> -->
-         
         </div>
       </div>
     </div>
