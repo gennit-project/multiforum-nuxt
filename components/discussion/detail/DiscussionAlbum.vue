@@ -28,20 +28,21 @@ const activeIndex = ref(0);
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 
-// Image ordering
-const imageOrder = computed<string[]>(() => {
-  return (props.album?.imageOrder ?? []).filter(
-    (imageId): imageId is string => !!imageId
-  );
-});
-
 const orderedImages = computed(() => {
-  return imageOrder.value
-    .map((imageId) => {
-      const image = props.album.Images.find((image) => imageId === image.id);
-      return image || null;
-    })
-    .filter((image): image is NonNullable<typeof image> => image !== null);
+  // If imageOrder exists and has items, use it to order the images
+  if (props.album?.imageOrder && props.album.imageOrder.length > 0) {
+    return props.album.imageOrder
+      .filter((imageId): imageId is string => !!imageId)
+      .map((imageId) => {
+        const image = props.album.Images.find((image) => imageId === image.id);
+        return image || null;
+      })
+      .filter((image): image is NonNullable<typeof image> => image !== null);
+  } 
+  // Otherwise, just return all images directly
+  else {
+    return props.album.Images || [];
+  }
 });
 
 // Current image based on ordered images
