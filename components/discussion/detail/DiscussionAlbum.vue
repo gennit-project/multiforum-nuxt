@@ -17,16 +17,24 @@ const props = defineProps({
   },
 });
 
+// Use Vuetify's display utilities for responsive design
 const { mdAndDown } = useDisplay();
 
 // Carousel navigation state
 const activeIndex = ref(0);
 
+// Custom lightbox state
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 const currentImage = computed(() => props.album.Images[lightboxIndex.value] || {});
 const isPanelVisible = ref(true);
 
+// Example interactive panel state
+const likeCount = ref(0);
+const commentText = ref('');
+const comments = ref<string[]>([]);
+
+// Carousel navigation functions
 const goLeft = () => {
   if (activeIndex.value === 0) {
     activeIndex.value = props.album.Images.length - 1;
@@ -72,9 +80,16 @@ const prevImage = () => {
   }
 };
 
+// Example panel interaction function
+const addComment = () => {
+  if (commentText.value.trim()) {
+    comments.value.push(commentText.value);
+    commentText.value = '';
+  }
+};
+
 // Toggle panel visibility
-const togglePanel = (event: any) => {
-  event.preventDefault()
+const togglePanel = () => {
   isPanelVisible.value = !isPanelVisible.value;
 };
 
@@ -163,6 +178,8 @@ onUnmounted(() => {
         </button>
       </div>
     </div>
+    
+    <!-- Custom lightbox with split layout -->
     <div 
       v-if="isLightboxOpen" 
       class="custom-lightbox-container" 
@@ -212,7 +229,7 @@ onUnmounted(() => {
             :src="currentImage.url || ''" 
             :alt="currentImage.alt || ''" 
             class="lightbox-image"
-          >
+          />
           
           <button 
             v-if="album.Images.length > 1" 
@@ -227,13 +244,14 @@ onUnmounted(() => {
       <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
       <div 
         v-if="isPanelVisible" 
-        class="content-panel flex" 
+        class="content-panel" 
         :class="{'lightbox-content-panel': !mdAndDown, 'lightbox-bottom-panel': mdAndDown}"
       >
-        <div class="content-panel-inner flex-1">
-          <h1 class="text-xl font-bold dark:text-white">{{currentImage.caption}}</h1>
+        <div class="content-panel-inner">
+          <h3 class="panel-title">{{ currentImage.caption || 'Image Details' }}</h3>
           
-          <MarkdownPreview v-if="currentImage.caption" :text="currentImage.caption"/>
+          <!-- This is where you can put your custom Vue components -->
+          <MarkdownPreview v-if="currentImage.caption" :text="currentImage.caption" />
           
           <div v-else class="no-caption">
             No caption available for this image.
@@ -269,6 +287,10 @@ onUnmounted(() => {
 .custom-lightbox-container.panel-collapsed .lightbox-image-panel {
   width: 100%;
   transition: width 0.3s ease;
+}
+
+.custom-lightbox-container.panel-collapsed.flex-column .lightbox-image-panel {
+  height: 100%; /* Ensure full height in collapsed state on mobile */
 }
 
 .custom-lightbox-container.panel-expanded .lightbox-image-panel {
@@ -308,6 +330,21 @@ onUnmounted(() => {
   cursor: pointer;
 }
 
+.panel-toggle-button {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.panel-toggle-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
 .action-button {
   background: none;
   border: none;
@@ -331,20 +368,9 @@ onUnmounted(() => {
   font-size: 14px;
 }
 
-.lightbox-image-panel {
-  width: 75%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  z-index: 10000;
-  position: relative;
-  transition: width 0.3s ease;
-}
-
 .lightbox-image-panel.full-width {
   width: 100%;
-  height: auto;
-  flex: 1;
+  height: 100%; /* Keep full height when expanded */
 }
 
 .image-container {
@@ -353,6 +379,12 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   position: relative;
+  height: calc(100% - 60px); /* Account for header height */
+  overflow: hidden; /* Prevent image overflow */
+}
+
+.image-container.reposition {
+  /* This class is added/removed to force reflow */
 }
 
 .lightbox-image {
@@ -366,6 +398,17 @@ onUnmounted(() => {
 .panel-collapsed .lightbox-image {
   max-height: 95%;
   max-width: 95%;
+}
+
+.lightbox-image-panel {
+  width: 75%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  z-index: 10000;
+  position: relative;
+  transition: width 0.3s ease;
+  overflow: hidden; /* Prevent content from overflowing */
 }
 
 .nav-button {
@@ -426,5 +469,28 @@ onUnmounted(() => {
   color: #888;
   font-style: italic;
   margin-top: 10px;
+}
+
+.panel-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 960px) {
+  /* Adjust the height for mobile when panel is closed to ensure the image is fully visible */
+  .panel-collapsed .lightbox-image-panel {
+    height: 100%;
+  }
+
+  /* Make sure image is properly centered when panel is closed */
+  .panel-collapsed .image-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: calc(100% - 60px);
+  }
 }
 </style>
