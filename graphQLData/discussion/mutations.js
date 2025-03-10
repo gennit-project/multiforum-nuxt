@@ -103,6 +103,7 @@ mutation updateDiscussion (
       updatedAt
       Album {
         id
+        imageOrder
         Images {
           id 
           url

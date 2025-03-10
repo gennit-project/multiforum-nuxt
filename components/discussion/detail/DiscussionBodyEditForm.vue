@@ -43,6 +43,7 @@ const formValues = ref({
   body: props.discussion?.body || "",
   album: {
     images: images.value,
+    imageOrder: images.value.map((img) => img.id),
   },
 });
 
@@ -55,6 +56,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
       Album: {
         create: {
           node: {
+            imageOrder: newImages.map((img) => img.id),
             Images: {
               create: newImages.map((img) => ({
                 node: {
@@ -122,6 +124,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     Album: {
       update: {
         node: {
+          imageOrder: newImages.map((img) => img.id),
           Images: imagesOps,
         },
       },
@@ -148,7 +151,12 @@ onDone(() => {
   emit("closeEditor");
 });
 
-function handleUpdateAlbum(newVals: { album: { images: any[] } }) {
+function handleUpdateAlbum(newVals: { 
+  album: { 
+    images: any[],
+    imageOrder: string[]
+  } 
+}) {
   // Merge these changes back into the parent's form data
   formValues.value.album = newVals.album;
 }

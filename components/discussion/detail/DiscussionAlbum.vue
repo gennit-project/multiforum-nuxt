@@ -3,7 +3,7 @@ import type { PropType } from "vue";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
 import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
-import type { Album } from "@/__generated__/graphql";
+import type { Album, Image } from "@/__generated__/graphql";
 import { useDisplay } from "vuetify";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 
@@ -100,14 +100,14 @@ const resetTranslation = () => {
 // Carousel navigation functions
 const goLeft = () => {
   if (activeIndex.value === 0) {
-    activeIndex.value = props.album.Images.length - 1;
+    activeIndex.value = (props.album.imageOrder?.length || 0) - 1;
   } else {
     activeIndex.value--;
   }
 };
 
 const goRight = () => {
-  if (activeIndex.value === props.album.Images.length - 1) {
+  if (activeIndex.value ===(props.album.imageOrder?.length || 0) - 1) {
     activeIndex.value = 0;
   } else {
     activeIndex.value++;
@@ -132,7 +132,7 @@ const closeLightbox = () => {
 };
 
 const nextImage = () => {
-  if (lightboxIndex.value === props.album.Images.length - 1) {
+  if (lightboxIndex.value === (props.album.imageOrder?.length || 0) - 1) {
     lightboxIndex.value = 0;
   } else {
     lightboxIndex.value++;
@@ -143,7 +143,7 @@ const nextImage = () => {
 
 const prevImage = () => {
   if (lightboxIndex.value === 0) {
-    lightboxIndex.value = props.album.Images.length - 1;
+    lightboxIndex.value = (props.album.imageOrder?.length || 0) - 1;
   } else {
     lightboxIndex.value--;
   }
@@ -246,6 +246,29 @@ const downloadImage = (imageUrl: string) => {
       console.error("Download failed:", error);
     });
 };
+
+const imageMap = computed<Record<string, Image>>(() => {
+  const images = props.album.Images;
+  const imageOrder = props.album.imageOrder || [];
+  const imageOrderMap: Record<string, Image> = {};
+
+  imageOrder.forEach((imageId) => {
+    if (!imageId) return;
+    const imageAtIdx = images.find((img) => img.id === imageId);
+    if (!imageAtIdx) return;
+    imageOrderMap[imageId] = imageAtIdx;
+  });
+
+  return imageOrderMap;
+});
+
+const nonNullImageIDs = computed<string[]>(() => {
+  if (!props.album.imageOrder) return [];
+  return props.album.imageOrder.filter((id): id is string => {
+    if (!id) return false;
+    return imageMap.value[id] !== undefined && imageMap.value[id] !== null;
+  });
+});
 </script>
 
 <template>
@@ -253,7 +276,7 @@ const downloadImage = (imageUrl: string) => {
     <!-- Normal thumbnail grid view -->
     <div v-if="!isLightboxOpen" class="overflow-x-auto border">
       <span class="p-1">{{
-        `${activeIndex + 1} of ${album.Images.length}`
+        `${activeIndex + 1} of ${album.imageOrder?.length || 0}`
       }}</span>
 
       <!-- Grid view -->
@@ -262,19 +285,19 @@ const downloadImage = (imageUrl: string) => {
         class="grid grid-cols-3 gap-2 dark:text-white"
       >
         <div
-          v-for="(image, idx) in album.Images"
-          :key="image.id"
+          v-for="(imageId, idx) in nonNullImageIDs"
+          :key="imageId"
           class="cursor-pointer"
           @click="openLightbox(idx)"
         >
           <img
-            v-if="image"
-            :src="image.url || ''"
-            :alt="image.alt || ''"
+            v-if="imageMap[imageId]"
+            :src="imageMap[imageId].url || ''"
+            :alt="imageMap[imageId].alt || ''"
             class="shadow-sm"
-          />
+          >
           <span class="text-center">
-            {{ image.caption }}
+            {{ imageMap[imageId].caption }}
           </span>
         </div>
       </div>
@@ -282,7 +305,7 @@ const downloadImage = (imageUrl: string) => {
       <!-- Carousel view -->
       <div v-else class="flex items-center justify-center gap-2">
         <button
-          v-if="album.Images.length > 1"
+          v-if="album.imageOrder && album.imageOrder.length > 1"
           type="button"
           class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
           @click="goLeft"
@@ -292,26 +315,26 @@ const downloadImage = (imageUrl: string) => {
 
         <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
           <div
-            v-for="(image, idx) in album.Images"
-            :key="image.id"
+            v-for="(imageId, idx) in nonNullImageIDs"
+            :key="imageId"
             class="flex flex-shrink-0 w-auto"
           >
             <div
               class="max-h-96 max-w-96 min-h-10 cursor-pointer"
               @click="openLightbox(idx)"
             >
-              <img
-                v-if="image"
-                :src="image.url || ''"
-                :alt="image.alt || ''"
-                class="shadow-sm max-h-96 max-w-96"
-                :class="{ hidden: idx !== activeIndex }"
-              />
+            <img
+              v-if="imageMap[imageId]"
+              :src="imageMap[imageId].url || ''"
+              :alt="imageMap[imageId].alt || ''"
+              class="shadow-sm max-h-96 max-w-96"
+              :class="{ hidden: idx !== activeIndex }"
+            >
               <span
                 class="text-center"
                 :class="{ hidden: idx !== activeIndex }"
               >
-                {{ image.caption }}
+                {{ imageMap[imageId].caption }}
               </span>
             </div>
           </div>
@@ -440,7 +463,7 @@ const downloadImage = (imageUrl: string) => {
             @mousedown="startDrag"
             @touchstart="startTouchDrag"
             @touchmove="onTouchDrag"
-          />
+          >
 
           <button
             v-if="album.Images.length > 1"
@@ -458,14 +481,14 @@ const downloadImage = (imageUrl: string) => {
         class="bg-gray-900 text-white overflow-y-auto z-40 transition-all duration-300 ease-in-out"
         :class="{
           'w-1/4 h-full': !mdAndDown,
-          'w-full h-24 min-h-[100px] absolute bottom-0 left-0 shadow-md shadow-black':
+          'w-full h-22 min-h-[70px] absolute bottom-0 left-0 shadow-md shadow-black':
             mdAndDown,
         }"
       >
         <div class="p-5">
           <div
             v-if="currentImage.caption"
-            class="text-lg font-bold mb-4 pb-2 border-white border-opacity-20"
+            class="text-md mb-4 pb-2 border-white border-opacity-20"
           >
             {{ currentImage.caption || "Image Details" }}
           </div>

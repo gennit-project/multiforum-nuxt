@@ -69,6 +69,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           }
           Album {
             id
+            imageOrder
             Images {
               id
               url
@@ -129,6 +130,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         }
         Album {
           id
+          imageOrder
           Images {
             id
             url
@@ -183,6 +185,7 @@ export const GET_DISCUSSION = gql`
       }
       Album {
         id
+        imageOrder
         Images {
           id
           url

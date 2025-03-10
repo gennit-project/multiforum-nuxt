@@ -4,5 +4,6 @@
         "Multiforum",
         "permalinked",
         "Topnav"
-    ]
+    ],
+    "editor.suggestDelay": 2000
 }

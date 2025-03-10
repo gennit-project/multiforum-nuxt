@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
@@ -20,6 +20,7 @@ const props = defineProps<{
         caption?: string;
         copyright?: string;
       }[];
+      imageOrder: string[];
     };
   };
   allowImageUpload?: boolean;
@@ -100,7 +101,10 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     const uploadedUrl = await uploadFile(file);
     if (uploadedUrl) {
       // Insert a new image object into the album
-      addNewImage(uploadedUrl, file.name);
+      addNewImage({
+        url: uploadedUrl,
+        alt: file.name,
+      });
     }
   }
 
@@ -163,21 +167,112 @@ const updateImageField = (
 const deleteImage = (index: number) => {
   const updatedImages = [...props.formValues.album.images];
   updatedImages.splice(index, 1);
-  emit("updateFormValues", { album: { images: updatedImages } });
+
+  // Update imageOrder after deletion
+  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
+
+  emit("updateFormValues", {
+    album: {
+      images: updatedImages,
+      imageOrder: updatedImageOrder,
+    },
+  });
 };
 
-const addNewImage = (url = "", alt = "") => {
-  const updatedImages = [
-    ...props.formValues.album.images,
-    {
-      url,
-      alt,
-      copyright,
-      caption,
-    } as ImageInput,
+// Function to move image up in the order
+const moveImageUp = (index: number) => {
+  if (index <= 0) return; // Can't move up if it's the first item
+
+  const updatedImages = [...props.formValues.album.images];
+  // Swap with the item above
+  [updatedImages[index], updatedImages[index - 1]] = [
+    updatedImages[index - 1],
+    updatedImages[index],
   ];
-  emit("updateFormValues", { album: { images: updatedImages } });
+
+  // Update imageOrder after reordering
+  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
+
+  emit("updateFormValues", {
+    album: {
+      images: updatedImages,
+      imageOrder: updatedImageOrder,
+    },
+  });
 };
+
+// Function to move image down in the order
+const moveImageDown = (index: number) => {
+  const images = props.formValues.album.images;
+  if (index >= images.length - 1) return; // Can't move down if it's the last item
+
+  const updatedImages = [...images];
+  // Swap with the item below
+  [updatedImages[index], updatedImages[index + 1]] = [
+    updatedImages[index + 1],
+    updatedImages[index],
+  ];
+
+  // Update imageOrder after reordering
+  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
+
+  emit("updateFormValues", {
+    album: {
+      images: updatedImages,
+      imageOrder: updatedImageOrder,
+    },
+  });
+};
+
+// Helper function to update imageOrder based on the current image array
+const updateImageOrderAfterChange = (images: ImageInput[]) => {
+  // Create imageOrder from image IDs, filtering out undefined IDs
+  return images
+    .map((img) => img.id)
+    .filter((id): id is string => id !== undefined);
+};
+
+type AddImageInput = {
+  url: string;
+  alt: string;
+  caption?: string;
+  copyright?: string;
+};
+
+const addNewImage = (input: AddImageInput) => {
+  const { url, alt, caption, copyright } = input;
+
+  const newImage = {
+    url,
+    alt,
+    copyright,
+    caption,
+  } as ImageInput;
+
+  const updatedImages = [...props.formValues.album.images, newImage];
+
+  // Update imageOrder after adding a new image
+  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
+
+  emit("updateFormValues", {
+    album: {
+      images: updatedImages,
+      imageOrder: updatedImageOrder,
+    },
+  });
+};
+
+const imageMap = computed<Record<string, ImageInput>>(() => {
+  const images = props.formValues.album.images;
+  const imageOrder = props.formValues.album.imageOrder || [];
+  const imageOrderMap: Record<string, ImageInput> = {};
+
+  images.forEach((image, index) => {
+    imageOrderMap[imageOrder[index]] = image;
+  });
+
+  return imageOrderMap;
+});
 </script>
 
 <template>
@@ -190,35 +285,62 @@ const addNewImage = (url = "", alt = "") => {
       <LoadingSpinner />
     </div>
     <div
-      v-for="(image, index) in formValues.album?.images || []"
-      :key="image.id ?? index"
+      v-for="(imageId, index) in formValues.album?.imageOrder || []"
+      :key="imageId ?? index"
       class="mb-4 border-b py-2"
     >
       <div class="flex items-center justify-between mb-2">
-        <span class="font-bold dark:text-white">Image {{ index + 1 }}</span>
-        <button
-          type="button"
-          class="rounded border border-blue-500 px-2 py-1 text-blue-500 flex items-center gap-1"
-          @click="deleteImage(index)"
-        >
-          <XmarkIcon class="h-4" />
-          Delete
-        </button>
+        <div class="flex items-center">
+          <span class="font-bold dark:text-white">Image {{ index + 1 }}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="ml-4 flex gap-1">
+            <button
+              type="button"
+              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:text-gray-200 dark:border-gray-600"
+              :disabled="index === 0"
+              :class="{ 'opacity-50 cursor-not-allowed': index === 0 }"
+              @click="moveImageUp(index)"
+            >
+              ↑
+            </button>
+            <button
+              type="button"
+              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:text-gray-200 dark:border-gray-600"
+              :disabled="index === (formValues.album?.images?.length || 0) - 1"
+              :class="{
+                'opacity-50 cursor-not-allowed':
+                  index === (formValues.album?.images?.length || 0) - 1,
+              }"
+              @click="moveImageDown(index)"
+            >
+              ↓
+            </button>
+          </div>
+          <button
+            type="button"
+            class="rounded border border-gray-500 dark:border-gray-600 px-2 py-1 text-gray-500 dark:text-gray-200 flex items-center gap-1"
+            @click="deleteImage(index)"
+          >
+            <XmarkIcon class="h-4" />
+            Delete
+          </button>
+        </div>
       </div>
       <LoadingSpinner v-if="loadingStates[index]" class="mb-2" />
 
       <div>
         <ExpandableImage
-          v-if="image.url"
-          class="w-36 h-36 object-cover rounded-md"
-          :src="image.url"
-          :alt="image.alt"
+          v-if="imageMap[imageId]?.url"
+          class="w-72 object-cover"
+          :src="imageMap[imageId].url"
+          :alt="imageMap[imageId].alt"
         />
       </div>
       <TextInput
         class="mt-2"
         label="Image URL"
-        :value="image.url"
+        :value="imageMap[imageId].url"
         placeholder="https://example.com/my-image.jpg"
         :full-width="true"
         @update="(val) => updateImageField(index, 'url', val)"
@@ -226,18 +348,20 @@ const addNewImage = (url = "", alt = "") => {
       <TextInput
         class="mt-2"
         label="Caption"
-        :value="image.caption"
+        :value="imageMap[imageId].caption"
         placeholder="Short caption or description"
         :full-width="true"
-        @update="(val) => {
-          updateImageField(index, 'caption', val)
-          updateImageField(index, 'alt', val)
-        }"
+        @update="
+          (val) => {
+            updateImageField(index, 'caption', val);
+            updateImageField(index, 'alt', val);
+          }
+        "
       />
       <TextInput
         class="mt-2"
         label="Attribution/Copyright"
-        :value="image.copyright"
+        :value="imageMap[imageId].copyright"
         placeholder="Who took this photo? (optional)"
         :full-width="true"
         @update="(val) => updateImageField(index, 'copyright', val)"
@@ -258,7 +382,7 @@ const addNewImage = (url = "", alt = "") => {
         multiple
         style="display: none"
         @change="handleFileInputChange"
-      >
+      />
     </div>
     <!-- <button
       type="button"

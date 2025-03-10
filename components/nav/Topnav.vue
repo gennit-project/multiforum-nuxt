@@ -83,8 +83,7 @@ const isOnMapPage = computed(() => {
             <span class="font-bold text-white logo-font">Topical</span>
 
             <div
-              class="text-xs py-0.5 px-1 mx-1 rounded-md"
-              style="border: 1px solid #1d9bd1; color: #1d9bd1"
+              class="text-xs py-0.5 px-1 mx-1 rounded-md text-gray-300 border-gray-400 border"
             >
               {{ isDevelopment ? "DEV" : "ALPHA" }}
             </div>
