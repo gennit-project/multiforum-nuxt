@@ -148,7 +148,8 @@ const filterByChannel = (channel: string) => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-800 dark:text-white">
+  <div class="flex justify-center">
+  <div class="flex-1 bg-white dark:bg-gray-800 dark:text-white max-w-screen-2xl">
     <slot />
     <p v-if="discussionLoading">Loading...</p>
     <ErrorBanner
@@ -212,4 +213,5 @@ const filterByChannel = (channel: string) => {
       </div>
     </div>
   </div>
+</div>
 </template>
