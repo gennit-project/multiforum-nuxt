@@ -439,7 +439,7 @@ const downloadImage = (imageUrl: string) => {
             @mousedown="startDrag"
             @touchstart="startTouchDrag"
             @touchmove="onTouchDrag"
-          />
+          >
 
           <button
             v-if="album.Images.length > 1"
@@ -462,21 +462,20 @@ const downloadImage = (imageUrl: string) => {
         }"
       >
         <div class="p-5">
-          <h3
-            class="text-lg font-bold mb-4 pb-2 border-b border-white border-opacity-20"
+          <div
+            v-if="currentImage.caption"
+            class="text-lg font-bold mb-4 pb-2 border-white border-opacity-20"
           >
             {{ currentImage.caption || "Image Details" }}
-          </h3>
-
-          <!-- This is where you can put your custom Vue components -->
-          <MarkdownPreview
-            v-if="currentImage.caption"
-            :text="currentImage.caption"
-          />
-
+          </div>
           <div v-else class="text-gray-400 italic mt-2">
             No caption available for this image.
           </div>
+          <!-- <MarkdownPreview
+            v-if="currentImage.caption"
+            :text="currentImage.caption"
+          /> -->
+         
         </div>
       </div>
     </div>
