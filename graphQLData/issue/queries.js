@@ -1,6 +1,22 @@
 import { COMMENT_VOTE_FIELDS } from "../comment/queries";
 import { gql } from "@apollo/client/core";
 
+export const GET_ISSUE_FOR_COMMENT = gql`
+query getIssueForComment(
+  $commentId: ID!
+) {
+  comments(
+    where: {
+      id: $commentId
+    }) {
+      id
+      RelatedIssues {
+        id
+      }
+    }
+}
+`
+
 export const ISSUE_FIELDS = gql`
   ${COMMENT_VOTE_FIELDS}
   fragment IssueFields on Issue {
