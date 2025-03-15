@@ -717,7 +717,7 @@ const lengthOfCommentInProgress = computed(() => {
       "
     />
     <BrokenRulesModal
-      :v-if="commentToArchiveId"
+      v-if="commentToArchiveId"
       :open="showArchiveModal"
       :comment-id="commentToArchiveId"
       :archive-after-reporting="true"
@@ -757,11 +757,6 @@ const lengthOfCommentInProgress = computed(() => {
       "
     />
     <Notification
-      :show="showSuccessfullyReported"
-      :title="'Your report was submitted successfully.'"
-      @close-notification="showSuccessfullyReported = false"
-    />
-    <Notification
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"
       @close-notification="showCopiedLinkNotification = false"
@@ -794,6 +789,11 @@ const lengthOfCommentInProgress = computed(() => {
       :show="showFeedbackSubmittedSuccessfully"
       :title="'Your feedback was submitted successfully.'"
       @close-notification="showFeedbackSubmittedSuccessfully = false"
+    />
+    <Notification
+      :show="showSuccessfullyReported"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="showSuccessfullyReported = false"
     />
     <Notification
       :show="showSuccessfullyArchived"

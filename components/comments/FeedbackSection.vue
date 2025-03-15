@@ -10,6 +10,8 @@ import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/Conf
 import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
 import type { Comment } from "@/__generated__/graphql";
 import type { PropType } from "vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 
 type GiveFeedbackInput = {
   commentData: Comment;
@@ -133,6 +135,20 @@ function handleSubmitFeedback() {
   emit("addFeedbackCommentToComment", feedbackInput);
 }
 
+const showBrokenRulesModal = ref(false);
+const showArchiveModal = ref(false);  
+const showUnarchiveModal = ref(false);
+const showArchiveAndSuspendModal = ref(false);
+const showSuccessfullyReported = ref(false);
+const showSuccessfullyArchived = ref(false);
+const showSuccessfullyUnarchived = ref(false);
+const showSuccessfullyArchivedAndSuspended = ref(false);
+
+const commentToReport = ref<Comment | null>(null);
+const commentToArchiveId = ref<string | null>(null);
+const commentToUnarchiveId = ref<string | null>(null);
+const commentToArchiveAndSuspendId = ref<string | null>(null);
+
 </script>
 
 <template>
@@ -164,6 +180,22 @@ function handleSubmitFeedback() {
         @click-feedback="handleClickGiveFeedback"
         @click-undo-feedback="handleClickUndoFeedback"
         @click-edit-feedback="handleClickEditFeedback"
+        @click-report="() => {
+          commentToReport = comment;
+          showBrokenRulesModal = true;
+        }"
+        @click-archive="() => {
+          commentToArchiveId = comment.id;
+          showArchiveModal = true;
+        }"
+        @click-unarchive="() => {
+          commentToUnarchiveId = comment.id;
+          showUnarchiveModal = true;
+        }"
+        @click-archive-and-suspend="() => {
+          commentToArchiveAndSuspendId = comment.id;
+          showArchiveAndSuspendModal = true;
+        }"
       />
     </div>
     <LoadMore
@@ -200,6 +232,80 @@ function handleSubmitFeedback() {
       :comment-id="commentToGiveFeedbackOn?.id || ''"
       :mod-name="loggedInUserModName"
       @close="showEditCommentFeedbackModal = false"
+    />
+
+    <BrokenRulesModal
+      v-if="showBrokenRulesModal"
+      :open="showBrokenRulesModal"
+      :comment-id="commentToReport?.id"
+      :comment="commentToReport"
+      @close="showBrokenRulesModal = false"
+      @report-submitted-successfully="
+        () => {
+          showSuccessfullyReported = true;
+          showBrokenRulesModal = false;
+        }
+      "
+    />
+    <BrokenRulesModal
+      v-if="commentToArchiveId"
+      :open="showArchiveModal"
+      :comment-id="commentToArchiveId"
+      :archive-after-reporting="true"
+      @close="showArchiveModal = false"
+      @reported-and-archived-successfully="
+        () => {
+          showSuccessfullyArchived = true;
+          showArchiveModal = false;
+        }
+      "
+    />
+    <UnarchiveModal
+      v-if="commentToUnarchiveId"
+      :open="showUnarchiveModal"
+      :comment-id="commentToUnarchiveId"
+      @close="showUnarchiveModal = false"
+      @unarchived-successfully="
+        () => {
+          showSuccessfullyUnarchived = true;
+          showUnarchiveModal = false;
+        }
+      "
+    />
+    <BrokenRulesModal
+      v-if="commentToArchiveAndSuspendId"
+      :open="showArchiveAndSuspendModal"
+      :title="'Suspend Author'"
+      :comment-id="commentToArchiveAndSuspendId"
+      :suspend-user-enabled="true"
+      :text-box-label="'(Optional) Explain why you are suspending this author:'"
+      @close="showArchiveAndSuspendModal = false"
+      @suspended-user-successfully="
+        () => {
+          showSuccessfullyArchivedAndSuspended = true;
+          showArchiveAndSuspendModal = false;
+        }
+      "
+    />
+    <Notification
+      :show="showSuccessfullyReported"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="showSuccessfullyReported = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchived"
+      :title="'The content was reported and archived successfully.'"
+      @close-notification="showSuccessfullyArchived = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchivedAndSuspended"
+      :title="'Archived the post and suspended the author.'"
+      @close-notification="showSuccessfullyArchivedAndSuspended = false"
+    />
+    <Notification
+      :show="showSuccessfullyUnarchived"
+      :title="'The content was unarchived successfully.'"
+      @close-notification="showSuccessfullyUnarchived = false"
     />
   </div>
 </template>

@@ -332,7 +332,6 @@ const handleClickEditEventDescription = () => {
               />
               <EventBody
                 v-if="event.description"
-                class="-ml-4"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
                 @handle-click-edit-event-description="

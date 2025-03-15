@@ -25,7 +25,6 @@ const serverConfig = computed(() => {
   return getServerResult.value?.serverConfigs[0] || null;
 });
 
-
 </script>
 
 <template>
@@ -63,5 +62,11 @@ const serverConfig = computed(() => {
         </div>
       </article>
     </main>
+    <div v-else class="flex-1 flex-col my-6 mx-4 items-center">
+        <h1 class="text-2xl font-bold">Server not found</h1>
+        <p class="text-gray-500 dark:text-gray-400">
+          Could not find the server configuration.
+        </p>
+    </div>
   </NuxtLayout>
 </template>

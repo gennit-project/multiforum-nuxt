@@ -188,7 +188,7 @@ const updateCommentSectionQueryResult = (
     });
 
     const existingComments =
-      readCommentQueryResult?.getCommentSection?.Comments;
+      readCommentQueryResult?.getCommentSection?.Comments || [];
 
     const updatedComments = existingComments.map((comment: CommentType) => {
       if (comment.id === commentToAddFeedbackTo.id) {

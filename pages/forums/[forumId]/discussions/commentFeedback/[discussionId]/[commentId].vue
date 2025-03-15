@@ -294,7 +294,6 @@ onAddFeedbackCommentToCommentDone(() => {
           />
           <div class="ml-2 flex flex-col gap-2 border-l pl-4">
             <MarkdownPreview
-              class="-ml-4"
               :text="originalComment?.text || '[Deleted]'"
               :disable-gallery="true"
             />

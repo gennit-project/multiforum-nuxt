@@ -74,7 +74,7 @@ const user = computed(() => {
       </span>
 
       <div v-if="user">
-        <div class="-ml-4 w-full">
+        <div class="w-full">
           <MarkdownPreview
             v-if="user.bio"
             :key="user.bio || ''"

@@ -95,7 +95,7 @@ watch(showOnlyServerRuleViolations, () => {
         @change="toggleShowOnlyServerRuleViolations"
         class="mr-2"
         data-testid="show-only-server-rule-violations"
-      />
+      >
       <label for="show-only-server-rule-violations" class="mr-2"
         >Show only server rule violations</label
       >

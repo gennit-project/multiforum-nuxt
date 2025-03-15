@@ -104,7 +104,7 @@ const body = computed(() => "Are you sure you want to delete your feedback?");
         class="ml-2 flex flex-col gap-2 border-l pl-4"
       >
         <MarkdownPreview
-          class="-ml-4 dark:text-white"
+          class="dark:text-white"
           :text="commentData?.text || '[Deleted]'"
           :disable-gallery="true"
         />
