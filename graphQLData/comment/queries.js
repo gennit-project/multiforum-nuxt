@@ -14,7 +14,6 @@ export const COMMENT_VOTE_FIELDS = gql`
 
 export const COMMENT_FIELDS = gql`
   ${COMMENT_VOTE_FIELDS}
-  ${AUTHOR_FIELDS}
   fragment CommentFields on Comment {
     id
     text
@@ -24,8 +23,15 @@ export const COMMENT_FIELDS = gql`
     updatedAt
     archived
     CommentAuthor {
-      ...AuthorFields
+      ... on ModerationProfile {
+        displayName
+      }
       ... on User {
+        username
+        profilePicURL
+        createdAt
+        discussionKarma
+        commentKarma
         ChannelRoles {
           showModTag
         }
@@ -352,6 +358,9 @@ export const GET_COMMENT = gql`
   query getComment($id: ID!) {
     comments(where: { id: $id }) {
       ...CommentFields
+      GivesFeedbackOnComment {
+        id
+      }
       DiscussionChannel {
         channelUniqueName
         discussionId
@@ -371,7 +380,7 @@ export const GET_COMMENT_ARCHIVED = gql`
       archived
     }
   }
-`
+`;
 
 export const GET_COMMENT_REPLIES = gql`
   query getCommentWithReplies(

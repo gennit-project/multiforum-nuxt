@@ -18,7 +18,7 @@ query getIssueForComment(
 `
 
 export const ISSUE_FIELDS = gql`
-  ${COMMENT_VOTE_FIELDS}
+  # ${COMMENT_VOTE_FIELDS}
   fragment IssueFields on Issue {
     id
     title
