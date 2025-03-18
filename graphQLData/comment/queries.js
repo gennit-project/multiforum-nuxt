@@ -359,6 +359,13 @@ export const GET_COMMENT = gql`
       ...CommentFields
       GivesFeedbackOnComment {
         id
+        DiscussionChannel {
+          channelUniqueName
+          discussionId
+        }
+        Event {
+          id
+        }
       }
       GivesFeedbackOnDiscussion {
         id

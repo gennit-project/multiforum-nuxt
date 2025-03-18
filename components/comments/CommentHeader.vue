@@ -125,7 +125,6 @@ const contextLinkObject = computed(() => {
     Event,
     ParentComment,
   } = props.commentData;
-  console.log('getting link for feedback on comment')
   if (!Channel?.uniqueName && !DiscussionChannel?.channelUniqueName) {
     console.error(
       "Could not get context link because the channel unique name was not found"

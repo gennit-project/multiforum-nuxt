@@ -53,14 +53,12 @@ const originalComment = computed(() => {
 });
 
 const permalinkObject = computed(() => {
-  console.log("originalComment", originalComment.value);
-
   return getFeedbackPermalinkObject({
     routeName: route.name as string,
     forumId: channelId.value,
     commentId: originalComment.value?.id,
-    discussionId: discussionId.value,
-    eventId: eventId.value,
+    // This discussionId parameter is used for permalinks to a feedback on a comment in a discussion.
+    discussionId: originalComment.value?.GivesFeedbackOnComment?.DiscussionChannel?.discussionId,
     GivesFeedbackOnComment: originalComment.value?.GivesFeedbackOnComment || undefined,
     GivesFeedbackOnDiscussion: originalComment.value?.GivesFeedbackOnDiscussion || undefined,
     GivesFeedbackOnEvent: originalComment.value?.GivesFeedbackOnEvent || undefined,

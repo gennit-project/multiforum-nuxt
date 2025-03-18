@@ -78,7 +78,7 @@ const {
   },
 });
 
-const { discussionId, eventId, forumId, feedbackId } = route.params;
+const { discussionId, eventId, forumId } = route.params;
 
 const commentMenuItems = computed(() => {
   let out: any[] = [];

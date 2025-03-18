@@ -88,7 +88,6 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
     routeName, 
     forumId, 
     discussionId, 
-    eventId, 
     commentId, 
     GivesFeedbackOnComment, 
     GivesFeedbackOnDiscussion,
@@ -97,7 +96,6 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   // If this is feedback on a discussion, give the discussion feedback permalink
   if (routeName === "forums-forumId-discussions-feedback-discussionId" || GivesFeedbackOnDiscussion) {
     if (!forumId || !commentId || !GivesFeedbackOnDiscussion) {
-      console.log('input', input);
       throw new Error("Missing required parameters for permalink to feedback on discussion");
     }
     return {
@@ -141,16 +139,9 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
       },
     };
   }
-  // For feedback on comments on an event
-  return {
-    name: "forums-forumId-events-commentFeedback-eventId-commentId-feedbackPermalink-feedbackId",
-    params: {
-      forumId,
-      eventId: eventId,
-      commentId: GivesFeedbackOnComment?.id || "",
-      feedbackId: commentId,
-    },
-  }
+  // Note: we do not handle the case to permalink to feedback on comments on an event
+  // because feedback on event comments is not currently supported in the app.
+  return {}
 };
 
 export type UpdateStateInput = {
