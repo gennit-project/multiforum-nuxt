@@ -513,45 +513,8 @@ const toggleCloseOpenIssue = async () => {
               : activeIssue?.relatedEventId
                 ? "event"
                 : "comment"
-          } (`
+          }`
         }}
-        <nuxt-link
-          v-if="activeIssue?.relatedDiscussionId"
-          class="text-blue-500 hover:underline"
-          :to="{
-            name: 'forums-forumId-discussions-discussionId',
-            params: {
-              discussionId: activeIssue.relatedDiscussionId,
-              forumId: channelId,
-            },
-          }"
-        >
-          link
-        </nuxt-link>
-        <nuxt-link
-          v-else-if="activeIssue?.relatedEventId"
-          class="text-blue-500 hover:underline"
-          :to="{
-            name: 'forums-forumId-events-eventId',
-            params: { eventId: activeIssue.relatedEventId, forumId: channelId },
-          }"
-        >
-          link
-        </nuxt-link>
-        <nuxt-link
-          v-else-if="activeIssue?.relatedCommentId"
-          class="text-blue-500 hover:underline"
-          :to="{
-            name: 'forums-forumId-discussions-discussionId',
-            params: {
-              discussionId: activeIssue.relatedCommentId,
-              forumId: channelId,
-            },
-          }"
-        >
-          link
-        </nuxt-link>
-        <span>)</span>
       </h2>
       <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
         <DiscussionDetails

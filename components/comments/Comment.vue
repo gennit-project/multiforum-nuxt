@@ -215,13 +215,14 @@ const permalinkObject = computed(() => {
   if (isFeedbackComment.value) {
     return getFeedbackPermalinkObject({
       routeName: route.name as string,
-      forumId: props.commentData.Channel?.uniqueName || forumId as string,
+      forumId: props.commentData.Channel?.uniqueName || forumId.value as string,
       discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
       eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
-      feedbackId: feedbackCommentId.value,
-      commentId: props.commentData.id,
+      feedbackId: props.commentData.id,
+      commentId: props.commentData.GivesFeedbackOnComment?.id,
       isFeedbackOnDiscussion: !!props.commentData.GivesFeedbackOnDiscussion,
       isFeedbackOnEvent: !!props.commentData.GivesFeedbackOnEvent,
+      GivesFeedbackOnComment: props.commentData.GivesFeedbackOnComment || undefined,
     });
   }
   // This is the default comment permalink object
@@ -237,7 +238,7 @@ const permalinkObject = computed(() => {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
         forumId:
-          forumId || props.commentData?.DiscussionChannel?.channelUniqueName,
+          forumId.value || props.commentData?.DiscussionChannel?.channelUniqueName,
       },
     };
   }
@@ -247,7 +248,7 @@ const permalinkObject = computed(() => {
       name: "forums-forumId-events-eventId-comments-commentId",
       params: {
         eventId: props.commentData.Event?.id,
-        forumId: forumId || props.commentData.Channel?.uniqueName,
+        forumId: forumId.value || props.commentData.Channel?.uniqueName,
         commentId: props.commentData.id,
       },
     };

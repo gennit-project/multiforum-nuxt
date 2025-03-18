@@ -361,12 +361,21 @@ export const GET_COMMENT = gql`
       GivesFeedbackOnComment {
         id
       }
+      GivesFeedbackOnDiscussion {
+        id
+      }
+      GivesFeedbackOnEvent {
+        id
+      }
       DiscussionChannel {
         channelUniqueName
         discussionId
       }
       Event {
         id
+      }
+      Channel {
+        uniqueName
       }
     }
   }
@@ -406,7 +415,6 @@ export const GET_COMMENT_REPLIES = gql`
       }
     }
   }
-  ${AUTHOR_FIELDS}
   ${COMMENT_FIELDS}
   ${COMMENT_VOTE_FIELDS}
 `;

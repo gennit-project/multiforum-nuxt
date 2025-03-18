@@ -206,7 +206,7 @@ const updateCommentSectionQueryResult = (
       data: {
         ...readCommentQueryResult,
         getCommentSection: {
-          ...readCommentQueryResult.getCommentSection,
+          ...readCommentQueryResult?.getCommentSection || {},
           Comments: updatedComments,
         },
       },

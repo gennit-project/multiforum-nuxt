@@ -1,5 +1,6 @@
 import type LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
 import type { LocationQuery, Router } from "vue-router";
+import type { Comment } from "@/__generated__/graphql";
 
 type FeedbackPermalinkInput = {
   routeName: string;
@@ -10,14 +11,15 @@ type FeedbackPermalinkInput = {
   eventId?: string;
   feedbackId?: string;
   commentId?: string;
+  GivesFeedbackOnComment?: Comment;
 };
 
 export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
-  const { routeName, forumId, discussionId, eventId, feedbackId, commentId, isFeedbackOnDiscussion, isFeedbackOnEvent } = input;
+  const { routeName, forumId, discussionId, eventId, feedbackId, commentId, isFeedbackOnDiscussion, isFeedbackOnEvent, GivesFeedbackOnComment } = input;
   // If this is feedback on a discussion, give the discussion feedback permalink
   if (routeName === "forums-forumId-discussions-feedback-discussionId" || isFeedbackOnDiscussion) {
     if (!discussionId || !commentId || !feedbackId) {
-      throw new Error("Missing required parameters for feedback permalink");
+      throw new Error("Missing required parameters for permalink to feedback on discussion");
     }
     return {
       name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
@@ -32,7 +34,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   // If this is feedback on an event, give the event feedback permalink
   if (routeName === "forums-forumId-events-feedback-eventId" || isFeedbackOnEvent) {
     if (!eventId || !commentId || !feedbackId) {
-      throw new Error("Missing required parameters for feedback permalink");
+      throw new Error("Missing required parameters for permalink to feedback on event");
     }
     return {
       name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
@@ -45,15 +47,15 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
 
   // If this is feedback on a comment, give the comment feedback permalink
-  if (!discussionId || !commentId || !feedbackId || !forumId) {
-    throw new Error("Missing required parameters for feedback permalink");
+  if (!discussionId || !commentId || !forumId || !GivesFeedbackOnComment?.id) {
+    throw new Error("Missing required parameters for permalink to feedback on comment");
   }
   return {
     name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
     params: {
       forumId,
       discussionId,
-      commentId: feedbackId,
+      commentId: GivesFeedbackOnComment.id,
       feedbackId: commentId,
     },
   };

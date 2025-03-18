@@ -137,6 +137,7 @@ const copyLink = async () => {
     eventId: eventId as string,
     feedbackId: feedbackId as string,
     commentId: props.comment.id,
+    GivesFeedbackOnComment: props.comment.GivesFeedbackOnComment || undefined
   });
   const permalink = `${basePath}${router.resolve(permalinkObject).href}`;
   try {
