@@ -302,6 +302,7 @@ export const GET_FEEDBACK_COMMENT = gql`
       id
       text
       createdAt
+      archived
       CommentAuthor {
         ... on ModerationProfile {
           displayName
@@ -450,6 +451,7 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
       }
       createdAt
       text
+      archived
       FeedbackCommentsAggregate {
         count
       }
@@ -462,6 +464,7 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
       FeedbackComments(options: { limit: $limit, offset: $offset }) {
         id
         text
+        archived
         Channel {
           uniqueName
         }
@@ -511,6 +514,7 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
       id
       text
       createdAt
+      archived
       Channel {
         uniqueName
       }

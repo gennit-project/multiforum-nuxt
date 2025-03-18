@@ -256,6 +256,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       FeedbackComments(options: { limit: $limit, offset: $offset }) {
         id
         text
+        archived
         Channel {
           uniqueName
         }
@@ -305,6 +306,7 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
       id
       text
       createdAt
+      archived
       Channel {
         uniqueName
       }

@@ -69,6 +69,7 @@ export const GET_MOD_COMMENTS = gql`
         createdAt
         updatedAt
         deleted
+        archived
         CommentAuthor {
           ... on ModerationProfile {
             displayName

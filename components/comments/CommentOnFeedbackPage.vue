@@ -19,6 +19,7 @@ import type { Comment } from "@/__generated__/graphql";
 import { timeAgo, ALLOWED_ICONS } from "@/utils";
 import { modProfileNameVar } from "@/cache";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
+import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
 
 const props = defineProps({
   comment: {
@@ -30,7 +31,6 @@ const props = defineProps({
     default: false,
   },
 });
-
 const emit = defineEmits([
   "showCopiedLinkNotification",
   "clickReport",
@@ -241,8 +241,13 @@ function handleReport() {
     </div>
 
     <div class="ml-12 border-l-2 border-gray-200 pl-2 dark:border-gray-500">
+      <ArchivedCommentText 
+        v-if="comment?.archived"
+        :channel-id="forumId as string"
+        :comment-id="comment.id"
+      />
       <MarkdownPreview
-        v-if="comment.text && !editCommentMode"
+        v-else-if="comment.text && !editCommentMode"
         :text="comment.text"
         :disable-gallery="true"
       />

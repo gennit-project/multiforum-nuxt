@@ -135,6 +135,7 @@ export const GET_EVENT_FEEDBACK = gql`
         id
         text
         createdAt
+        archived
         Channel {
           uniqueName
         }
