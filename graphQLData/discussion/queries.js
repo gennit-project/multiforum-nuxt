@@ -284,7 +284,7 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         ) {
           id
         }
-        GivesFeedbackOnComment {
+        GivesFeedbackOnDiscussion {
           id
         }
       }

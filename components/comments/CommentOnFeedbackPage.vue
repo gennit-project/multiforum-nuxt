@@ -135,9 +135,10 @@ const copyLink = async () => {
     forumId: forumId as string,
     discussionId: discussionId as string,
     eventId: eventId as string,
-    feedbackId: feedbackId as string,
     commentId: props.comment.id,
-    GivesFeedbackOnComment: props.comment.GivesFeedbackOnComment || undefined
+    GivesFeedbackOnComment: props.comment.GivesFeedbackOnComment || undefined,
+    GivesFeedbackOnDiscussion: props.comment.GivesFeedbackOnDiscussion || undefined,
+    GivesFeedbackOnEvent: props.comment.GivesFeedbackOnEvent || undefined,
   });
   const permalink = `${basePath}${router.resolve(permalinkObject).href}`;
   try {

@@ -1,6 +1,6 @@
 import type LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
 import type { LocationQuery, Router } from "vue-router";
-import type { Comment } from "@/__generated__/graphql";
+import type { Comment, Discussion, Event } from "@/__generated__/graphql";
 
 type FeedbackPermalinkInput = {
   routeName: string;
@@ -9,45 +9,124 @@ type FeedbackPermalinkInput = {
   isFeedbackOnEvent?: boolean;
   discussionId?: string;
   eventId?: string;
-  feedbackId?: string;
   commentId?: string;
   GivesFeedbackOnComment?: Comment;
+  GivesFeedbackOnDiscussion?: Discussion;
+  GivesFeedbackOnEvent?: Event;
 };
 
+type DiscussionCommentPermalinkInput = {
+  forumId: string;
+  discussionId: string;
+  commentId: string;
+}
+export const getPermalinkToDiscussionComment = (input: DiscussionCommentPermalinkInput) => {
+  const { forumId, discussionId, commentId } = input;
+  return {
+    name: "forums-forumId-discussions-discussionId-comments-commentId",
+    params: {
+      forumId,
+      discussionId,
+      commentId,
+    },
+  };
+}
+
+type DiscussionPermalinkInput = {
+  forumId: string;
+  discussionId: string;
+}
+
+export const getPermalinkToDiscussion = (input: DiscussionPermalinkInput) => {
+  const { forumId, discussionId } = input;
+  return {
+    name: "forums-forumId-discussions-discussionId",
+    params: {
+      forumId,
+      discussionId,
+    },
+  };
+  
+}
+
+type EventCommentPermalinkInput = {
+  forumId: string;
+  eventId: string;
+  commentId: string;
+}
+
+export const getPermalinkToEventComment = (input: EventCommentPermalinkInput) => {
+  const { forumId, eventId, commentId } = input;
+  return {
+    name: "forums-forumId-events-eventId-comments-commentId",
+    params: {
+      forumId,
+      eventId,
+      commentId,
+    },
+  };
+}
+
+type EventPermalinkInput = {
+  forumId: string;
+  eventId: string;
+}
+
+export const getPermalinkToEvent = (input: EventPermalinkInput) => {
+  const { forumId, eventId } = input;
+  return {
+    name: "forums-forumId-events-eventId",
+    params: {
+      forumId,
+      eventId,
+    },
+  };
+}
+
 export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
-  const { routeName, forumId, discussionId, eventId, feedbackId, commentId, isFeedbackOnDiscussion, isFeedbackOnEvent, GivesFeedbackOnComment } = input;
+  const { 
+    routeName, 
+    forumId, 
+    discussionId, 
+    eventId, 
+    commentId, 
+    GivesFeedbackOnComment, 
+    GivesFeedbackOnDiscussion,
+    GivesFeedbackOnEvent,
+  } = input;
   // If this is feedback on a discussion, give the discussion feedback permalink
-  if (routeName === "forums-forumId-discussions-feedback-discussionId" || isFeedbackOnDiscussion) {
-    if (!discussionId || !commentId || !feedbackId) {
+  if (routeName === "forums-forumId-discussions-feedback-discussionId" || GivesFeedbackOnDiscussion) {
+    if (!discussionId || !commentId || !GivesFeedbackOnDiscussion) {
+      console.log('input', input);
       throw new Error("Missing required parameters for permalink to feedback on discussion");
     }
     return {
       name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
       params: {
         forumId,
-        discussionId,
+        discussionId: GivesFeedbackOnDiscussion.id,
         feedbackId: commentId,
       },
     };
   }
 
   // If this is feedback on an event, give the event feedback permalink
-  if (routeName === "forums-forumId-events-feedback-eventId" || isFeedbackOnEvent) {
-    if (!eventId || !commentId || !feedbackId) {
+  if (routeName === "forums-forumId-events-feedback-eventId" || GivesFeedbackOnEvent) {
+    if (!eventId || !commentId || !GivesFeedbackOnEvent) {
       throw new Error("Missing required parameters for permalink to feedback on event");
     }
     return {
       name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
       params: {
         forumId,
-        eventId,
+        eventId: GivesFeedbackOnEvent.id,
         feedbackId: commentId,
       },
     };
   }
 
   // If this is feedback on a comment, give the comment feedback permalink
-  if (!discussionId || !commentId || !forumId || !GivesFeedbackOnComment?.id) {
+  if (!discussionId || !commentId || !forumId || !GivesFeedbackOnComment) {
     throw new Error("Missing required parameters for permalink to feedback on comment");
   }
   return {

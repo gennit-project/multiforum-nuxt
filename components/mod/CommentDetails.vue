@@ -39,6 +39,7 @@ const originalComment = computed(() => {
 });
 
 const permalinkObject = computed(() => {
+  console.log("originalComment", originalComment.value);
   const discussionIdInLink =
     originalComment.value?.DiscussionChannel?.discussionId;
   const eventIdInLink = originalComment.value?.Event?.id;

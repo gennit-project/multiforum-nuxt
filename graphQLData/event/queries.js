@@ -143,6 +143,9 @@ export const GET_EVENT_FEEDBACK = gql`
             displayName
           }
         }
+        GivesFeedbackOnEvent {
+          id
+        }
       }
     }
   }

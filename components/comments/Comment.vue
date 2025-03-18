@@ -195,17 +195,6 @@ const isFeedbackComment = computed(() => {
   );
 });
 
-const feedbackCommentId = computed(() => {
-  if (isFeedbackComment.value) {
-    return (
-      props.commentData.GivesFeedbackOnDiscussion?.id ||
-      props.commentData.GivesFeedbackOnEvent?.id ||
-      props.commentData.GivesFeedbackOnComment?.id
-    );
-  }
-  return "";
-});
-
 const permalinkObject = computed(() => {
   if (!canShowPermalink) {
     console.warn("No permalink object found for comment", props.commentData);
@@ -218,11 +207,10 @@ const permalinkObject = computed(() => {
       forumId: props.commentData.Channel?.uniqueName || forumId.value as string,
       discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
       eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
-      feedbackId: props.commentData.id,
       commentId: props.commentData.GivesFeedbackOnComment?.id,
-      isFeedbackOnDiscussion: !!props.commentData.GivesFeedbackOnDiscussion,
-      isFeedbackOnEvent: !!props.commentData.GivesFeedbackOnEvent,
       GivesFeedbackOnComment: props.commentData.GivesFeedbackOnComment || undefined,
+      GivesFeedbackOnDiscussion: props.commentData.GivesFeedbackOnDiscussion || undefined,
+      GivesFeedbackOnEvent: props.commentData.GivesFeedbackOnEvent || undefined,
     });
   }
   // This is the default comment permalink object
