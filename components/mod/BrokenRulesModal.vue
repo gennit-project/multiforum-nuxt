@@ -346,13 +346,7 @@ ${reportText}
 }
 `;
 };
-
-const { load: loadIssueData } = useLazyQuery(GET_ISSUE_FOR_COMMENT, {
-  commentId: props.commentId,
-});
-
 const submit = async () => {
-  console.log("Submitting ", props);
   if (!props.discussionId && !props.eventId && !props.commentId) {
     console.error("No discussion, event, or comment ID provided.");
     return;
@@ -391,30 +385,13 @@ const submit = async () => {
       });
       issueId = issue?.data?.archiveEvent?.id;
     } else if (props.commentId) {
-      // If the user clicked archive or suspend from a comment
-      // section, the BrokenRulesModal won't have access to the existing
-      // issue ID if one exists. (In the context of doing the action from
-      // an issue page, that issue ID would be in the route.)
-      // So in the case of a comment we check to see if there is any issue
-      // by calling the lazy query to get the issue for the comment.
-      const issueResult = await loadIssueData();
-      const comment = issueResult?.comments?.[0];
-      const relatedIssue = comment?.RelatedIssues?.[0];
-      if (relatedIssue) {
-        issueId = relatedIssue.id;
-      } else {
-        // If there is no existing issue, create an archived issue first
-        const issue = await archiveComment({
-          commentId: props.commentId,
-          reportText: reportText.value,
-          selectedForumRules: selectedForumRules.value,
-          selectedServerRules: selectedServerRules.value,
-        });
-        issueId = issue?.data?.archiveComment?.id;
-        if (!issueId) {
-          console.error("No issue ID found for the comment.");
-        }
-      }
+      const issue = await archiveComment({
+        commentId: props.commentId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+      });
+      issueId = issue?.data?.archiveComment?.id;
     }
 
     if (!issueId) {

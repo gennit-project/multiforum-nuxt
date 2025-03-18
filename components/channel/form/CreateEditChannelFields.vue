@@ -167,7 +167,6 @@ onMounted(() => {
       <TailwindForm
         v-if="formValues && editMode"
         form-title="Forum Settings"
-        description="Forums are where you can start discussions and share content with others."
         :needs-changes="titleIsInvalid"
         :loading="editChannelLoading"
         @input="touched = true"

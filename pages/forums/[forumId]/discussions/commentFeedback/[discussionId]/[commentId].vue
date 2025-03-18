@@ -282,7 +282,7 @@ onAddFeedbackCommentToCommentDone(() => {
           <PageNotFound
             v-if="!getCommentLoading && !getCommentError && !originalComment"
           />
-          <p class="px-2 dark:text-white">
+          <p class="px-2 mb-4 dark:text-white">
             This page collects feedback on this comment:
           </p>
           <CommentHeader

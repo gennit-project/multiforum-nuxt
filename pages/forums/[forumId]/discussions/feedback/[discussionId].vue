@@ -181,7 +181,7 @@ watch(() => route.params, updateParams, { immediate: true });
     <ErrorBanner v-else-if="getDiscussionError" class="mt-2 px-4" :text="getDiscussionError.message" />
     <PageNotFound v-else-if="getDiscussionResult && !discussion" />
     <div v-else-if="discussion">
-      <p class="px-2">This page collects feedback on this discussion:</p>
+      <p class="px-2 mb-4">This page collects feedback on this discussion:</p>
       <div class="ml-2 flex flex-col gap-2 border-l pl-4">
         <h3 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">{{ discussion && discussion.title ? discussion.title : "[Deleted]" }}</h3>
         <div class="space-y-3 px-2">

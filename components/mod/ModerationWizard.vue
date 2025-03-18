@@ -5,7 +5,7 @@ import SuspendUserButton from "./SuspendUserButton.vue";
 import EyeIcon from "../icons/EyeIcon.vue";
 import XCircleIcon from "../icons/XCircleIcon.vue";
 
-defineProps({
+const props = defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,
@@ -48,22 +48,8 @@ defineEmits([
   "unarchived-successfully",
   "suspended-user-successfully",
   "unsuspended-user-successfully",
-  "suspended-mod-successfully",
-  "unsuspended-mod-successfully",
 ]);
 
-// const suspensionMessage = computed(() => {
-//   return `
-//     This post has been removed from ${channelId.value} for violating the following rules:
-//     ${brokenRules.value}
-
-//     As a result, I have suspended ${authorUsername} from posting in ${channelId.value} ${
-//       selectedSuspensionLength.value === "indefinitely"
-//         ? "indefinitely"
-//         : `for ${selectedSuspensionLength.value}`
-//     }.
-//   `;
-// });
 </script>
 
 <template>

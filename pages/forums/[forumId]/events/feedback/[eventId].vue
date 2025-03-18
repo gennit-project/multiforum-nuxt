@@ -112,9 +112,9 @@ const reachedEndOfResults = computed(() => {
       :text="getEventError.message"
     />
     <PageNotFound v-if="!getEventLoading && !getEventError && !event" />
-    <p class="px-2">This page collects feedback on this event:</p>
+    <p class="px-2 mb-4">This page collects feedback on this event:</p>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
-      <h3 class="text-wrap px-1 px-2 text-xl font-bold sm:tracking-tight">
+      <h3 class="text-wrap px-2 text-xl font-bold sm:tracking-tight">
         {{ event && event.title ? event.title : "[Deleted]" }}
       </h3>
 
@@ -126,7 +126,6 @@ const reachedEndOfResults = computed(() => {
             v-if="event"
             :event-data="event"
             :channel-id="channelId"
-            :event-channel-id
             :show-menu-buttons="false"
           />
           <EventBody v-if="event?.description" :event="event" />
