@@ -96,7 +96,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   } = input;
   // If this is feedback on a discussion, give the discussion feedback permalink
   if (routeName === "forums-forumId-discussions-feedback-discussionId" || GivesFeedbackOnDiscussion) {
-    if (!discussionId || !commentId || !GivesFeedbackOnDiscussion) {
+    if (!forumId || !commentId || !GivesFeedbackOnDiscussion) {
       console.log('input', input);
       throw new Error("Missing required parameters for permalink to feedback on discussion");
     }
@@ -112,7 +112,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
 
   // If this is feedback on an event, give the event feedback permalink
   if (routeName === "forums-forumId-events-feedback-eventId" || GivesFeedbackOnEvent) {
-    if (!eventId || !commentId || !GivesFeedbackOnEvent) {
+    if (!forumId || !commentId || !GivesFeedbackOnEvent) {
       throw new Error("Missing required parameters for permalink to feedback on event");
     }
     return {
@@ -126,18 +126,31 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
 
   // If this is feedback on a comment, give the comment feedback permalink
-  if (!discussionId || !commentId || !forumId || !GivesFeedbackOnComment) {
+  if ( !commentId || !forumId || !GivesFeedbackOnComment) {
     throw new Error("Missing required parameters for permalink to feedback on comment");
   }
+  if (discussionId) {
+    // For feedback on comments on a discussion
+    return {
+      name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
+      params: {
+        forumId,
+        discussionId,
+        commentId: GivesFeedbackOnComment.id,
+        feedbackId: commentId,
+      },
+    };
+  }
+  // For feedback on comments on an event
   return {
-    name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
+    name: "forums-forumId-events-commentFeedback-eventId-commentId-feedbackPermalink-feedbackId",
     params: {
       forumId,
-      discussionId,
-      commentId: GivesFeedbackOnComment.id,
+      eventId: eventId,
+      commentId: GivesFeedbackOnComment?.id || "",
       feedbackId: commentId,
     },
-  };
+  }
 };
 
 export type UpdateStateInput = {

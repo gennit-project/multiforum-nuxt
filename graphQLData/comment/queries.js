@@ -181,7 +181,6 @@ export const GET_EVENT_COMMENTS = gql`
       }
     }
   }
-  ${AUTHOR_FIELDS}
   ${COMMENT_FIELDS}
   ${COMMENT_VOTE_FIELDS}
 `;

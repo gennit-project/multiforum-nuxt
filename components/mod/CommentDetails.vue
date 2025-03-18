@@ -7,6 +7,7 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ErrorBanner from "../ErrorBanner.vue";
 import { useRoute } from "nuxt/app";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
 
 const props = defineProps({
   commentId: {
@@ -18,6 +19,19 @@ const route = useRoute();
 const channelId = computed(() => {
   if (typeof route.params.forumId === "string") {
     return route.params.forumId;
+  }
+  return "";
+});
+const eventId = computed(() => {
+  if (typeof route.params.eventId === "string") {
+    return route.params.eventId;
+  }
+  return "";
+});
+
+const discussionId = computed(() => {
+  if (typeof route.params.discussionId === "string") {
+    return route.params.discussionId;
   }
   return "";
 });
@@ -40,33 +54,17 @@ const originalComment = computed(() => {
 
 const permalinkObject = computed(() => {
   console.log("originalComment", originalComment.value);
-  const discussionIdInLink =
-    originalComment.value?.DiscussionChannel?.discussionId;
-  const eventIdInLink = originalComment.value?.Event?.id;
 
-  if (discussionIdInLink) {
-    return {
-      name: "forums-forumId-discussions-discussionId-comments-commentId",
-      params: {
-        discussionId: discussionIdInLink,
-        commentId: props.commentId,
-        forumId: channelId.value,
-      },
-    };
-  }
-
-  // if discussionId is not present, assume it is an event comment
-  if (eventIdInLink) {
-    return {
-      name: "forums-forumId-events-eventId-comments-commentId",
-      params: {
-        eventId: eventIdInLink,
-        commentId: props.commentId,
-        forumId: channelId.value,
-      },
-    };
-  }
-  return {};
+  return getFeedbackPermalinkObject({
+    routeName: route.name as string,
+    forumId: channelId.value,
+    commentId: originalComment.value?.id,
+    discussionId: discussionId.value,
+    eventId: eventId.value,
+    GivesFeedbackOnComment: originalComment.value?.GivesFeedbackOnComment || undefined,
+    GivesFeedbackOnDiscussion: originalComment.value?.GivesFeedbackOnDiscussion || undefined,
+    GivesFeedbackOnEvent: originalComment.value?.GivesFeedbackOnEvent || undefined,
+  });
 });
 </script>
 
