@@ -51,9 +51,6 @@ defineEmits(["click-remove-mod"]);
       <div class="text-sm">
         {{ `Active Suspensions (${aggregateCount})` }}
       </div>
-      <div class="text-sm">
-        {{ `Active Suspensions (${aggregateCount})` }}
-      </div>
       <div
         v-for="suspension in suspensions"
         :key="suspension.username"
@@ -74,13 +71,16 @@ defineEmits(["click-remove-mod"]);
             `${suspension?.SuspendedMod?.displayName} ${suspension?.username ? `(${suspension?.username})` : ""}`
           }}</span>
         </nuxt-link>
-        <button
-          type="button"
+        <nuxt-link
+          v-if="suspension.RelatedIssue"
           class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
-          @click="$emit('click-remove-mod', suspension?.username)"
+          :to="{
+            name: 'forums-forumId-issues-issueId',
+            params: { issueId: suspension.RelatedIssue?.id },
+          }"
         >
-          Remove Mod
-        </button>
+          Related Issue
+        </nuxt-link>
       </div>
     </div>
   </div>

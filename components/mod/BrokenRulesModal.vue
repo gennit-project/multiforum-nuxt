@@ -377,6 +377,7 @@ const {
 });
 
 const submit = async () => {
+  console.log("Submitting ", props);
   if (!props.discussionId && !props.eventId && !props.commentId) {
     console.error("No discussion, event, or comment ID provided.");
     return;
@@ -460,16 +461,32 @@ const submit = async () => {
         break;
     }
 
-    suspendUser({
-      issueID: issueId,
-      suspendUntil,
-      suspendIndefinitely,
-      explanation: getFinalCommentText({
-        selectedForumRules: selectedForumRules.value,
-        selectedServerRules: selectedServerRules.value,
-        reportText: reportText.value,
-      }),
-    });
+    // If the content in question is a feedback comment, do suspendMod.
+    // Otherwise do suspendUser.
+    const isFeedbackComment = props.comment?.GivesFeedbackOnComment || props.comment?.GivesFeedbackOnDiscussion || props.comment?.GivesFeedbackOnEvent;
+    if (isFeedbackComment) {
+      suspendMod({
+        issueID: issueId,
+        suspendUntil,
+        suspendIndefinitely,
+        explanation: getFinalCommentText({
+          selectedForumRules: selectedForumRules.value,
+          selectedServerRules: selectedServerRules.value,
+          reportText: reportText.value,
+        }),
+      });
+    } else {
+      suspendUser({
+        issueID: issueId,
+        suspendUntil,
+        suspendIndefinitely,
+        explanation: getFinalCommentText({
+          selectedForumRules: selectedForumRules.value,
+          selectedServerRules: selectedServerRules.value,
+          reportText: reportText.value,
+        }),
+      });
+    }
   } else if (!props.archiveAfterReporting) {
     // Standard "report" flow
     if (props.discussionId) {
@@ -586,7 +603,7 @@ const close = () => {
         @toggle-forum-rule-selection="toggleForumRuleSelection"
         @toggle-server-rule-selection="toggleServerRuleSelection"
       />
-      <div class="mt-4" v-if="suspendUserEnabled">
+      <div v-if="suspendUserEnabled" class="mt-4">
         <label
           class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
           >Suspend user for</label

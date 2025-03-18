@@ -121,11 +121,8 @@ defineEmits([
           :channel-unique-name="channelUniqueName"
           :disabled="!issue.isOpen"
           @suspended-successfully="$emit('suspended-user-successfully')"
-          @unsuspended-successfully="$emit('unsuspended-mod-successfully')"
+          @unsuspended-successfully="$emit('unsuspended-user-successfully')"
         />
-        <!-- <SuspendModButton 
-        :mod-is-suspended="modIsSuspendedFromChannel" 
-      /> -->
         <button
           v-if="issue.isOpen"
           class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
