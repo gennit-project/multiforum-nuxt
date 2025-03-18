@@ -15,7 +15,7 @@ import {
   ARCHIVE_EVENT,
   ARCHIVE_COMMENT,
 } from "@/graphQLData/issue/mutations";
-import { SUSPEND_USER, SUSPEND_MOD } from "@/graphQLData/mod/mutations";
+import { SUSPEND_USER } from "@/graphQLData/mod/mutations";
 import type { Comment } from "@/__generated__/graphql";
 import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
 import ArchiveBox from "@/components/icons/ArchiveBox.vue";
@@ -135,25 +135,6 @@ const {
   error: suspendUserError,
   onDone: suspendUserDone,
 } = useMutation(SUSPEND_USER, {
-  update: (cache) => {
-    cache.writeQuery({
-      query: IS_ORIGINAL_POSTER_SUSPENDED,
-      variables: {
-        issueId: props.issueId,
-      },
-      data: {
-        isOriginalPosterSuspended: true,
-      },
-    });
-  },
-});
-
-const {
-  mutate: suspendMod,
-  loading: suspendModLoading,
-  error: suspendModError,
-  onDone: suspendModDone,
-} = useMutation(SUSPEND_MOD, {
   update: (cache) => {
     cache.writeQuery({
       query: IS_ORIGINAL_POSTER_SUSPENDED,
@@ -290,10 +271,6 @@ suspendUserDone(() => {
   emit("suspended-user-successfully");
 });
 
-suspendModDone(() => {
-  emit("suspended-mod-successfully");
-});
-
 const modalTitle = computed(() => {
   if (props.archiveAfterReporting) {
     if (props.commentId) {
@@ -370,9 +347,7 @@ ${reportText}
 `;
 };
 
-const {
-  load: loadIssueData,
-} = useLazyQuery(GET_ISSUE_FOR_COMMENT, {
+const { load: loadIssueData } = useLazyQuery(GET_ISSUE_FOR_COMMENT, {
   commentId: props.commentId,
 });
 
@@ -392,50 +367,52 @@ const submit = async () => {
 
     let issueId = props.issueId;
 
-    // If there is no existing issue, create an archived issue first
-    if (!issueId) {
-      if (props.discussionId) {
-        const issue = await archiveDiscussion({
-          discussionId: props.discussionId,
+    // Archive the issue first. This makes sure
+    // that there is always an issue ID before the user is
+    // suspended, and the content is always archived
+    // before the user is suspended.
+
+    if (props.discussionId) {
+      const issue = await archiveDiscussion({
+        discussionId: props.discussionId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+      issueId = issue?.data?.archiveDiscussion?.id;
+    } else if (props.eventId) {
+      const issue = await archiveEvent({
+        eventId: props.eventId,
+        reportText: reportText.value,
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        channelUniqueName: channelId.value,
+      });
+      issueId = issue?.data?.archiveEvent?.id;
+    } else if (props.commentId) {
+      // If the user clicked archive or suspend from a comment
+      // section, the BrokenRulesModal won't have access to the existing
+      // issue ID if one exists. (In the context of doing the action from
+      // an issue page, that issue ID would be in the route.)
+      // So in the case of a comment we check to see if there is any issue
+      // by calling the lazy query to get the issue for the comment.
+      const issueResult = await loadIssueData();
+      const comment = issueResult?.comments?.[0];
+      const relatedIssue = comment?.RelatedIssues?.[0];
+      if (relatedIssue) {
+        issueId = relatedIssue.id;
+      } else {
+        // If there is no existing issue, create an archived issue first
+        const issue = await archiveComment({
+          commentId: props.commentId,
           reportText: reportText.value,
           selectedForumRules: selectedForumRules.value,
           selectedServerRules: selectedServerRules.value,
-          channelUniqueName: channelId.value,
         });
-        issueId = issue?.data?.archiveDiscussion?.id;
-      } else if (props.eventId) {
-        const issue = await archiveEvent({
-          eventId: props.eventId,
-          reportText: reportText.value,
-          selectedForumRules: selectedForumRules.value,
-          selectedServerRules: selectedServerRules.value,
-          channelUniqueName: channelId.value,
-        });
-        issueId = issue?.data?.archiveEvent?.id;
-      } else if (props.commentId) {
-        // If the user clicked archive or suspend from a comment
-        // section, the BrokenRulesModal won't have access to the existing
-        // issue ID if one exists. (In the context of doing the action from
-        // an issue page, that issue ID would be in the route.)
-        // So in the case of a comment we check to see if there is any issue
-        // by calling the lazy query to get the issue for the comment.
-        const issueResult = await loadIssueData();
-        const comment = issueResult?.comments?.[0];
-        const relatedIssue = comment?.RelatedIssues?.[0];
-        if (relatedIssue) {
-          issueId = relatedIssue.id;
-        } else {
-          // If there is no existing issue, create an archived issue first
-          const issue = await archiveComment({
-            commentId: props.commentId,
-            reportText: reportText.value,
-            selectedForumRules: selectedForumRules.value,
-            selectedServerRules: selectedServerRules.value,
-          });
-          issueId = issue?.data?.archiveComment?.id;
-          if (!issueId) {
-            console.error("No issue ID found for the comment.");
-          }
+        issueId = issue?.data?.archiveComment?.id;
+        if (!issueId) {
+          console.error("No issue ID found for the comment.");
         }
       }
     }
@@ -461,32 +438,16 @@ const submit = async () => {
         break;
     }
 
-    // If the content in question is a feedback comment, do suspendMod.
-    // Otherwise do suspendUser.
-    const isFeedbackComment = props.comment?.GivesFeedbackOnComment || props.comment?.GivesFeedbackOnDiscussion || props.comment?.GivesFeedbackOnEvent;
-    if (isFeedbackComment) {
-      suspendMod({
-        issueID: issueId,
-        suspendUntil,
-        suspendIndefinitely,
-        explanation: getFinalCommentText({
-          selectedForumRules: selectedForumRules.value,
-          selectedServerRules: selectedServerRules.value,
-          reportText: reportText.value,
-        }),
-      });
-    } else {
-      suspendUser({
-        issueID: issueId,
-        suspendUntil,
-        suspendIndefinitely,
-        explanation: getFinalCommentText({
-          selectedForumRules: selectedForumRules.value,
-          selectedServerRules: selectedServerRules.value,
-          reportText: reportText.value,
-        }),
-      });
-    }
+    suspendUser({
+      issueID: issueId,
+      suspendUntil,
+      suspendIndefinitely,
+      explanation: getFinalCommentText({
+        selectedForumRules: selectedForumRules.value,
+        selectedServerRules: selectedServerRules.value,
+        reportText: reportText.value,
+      }),
+    });
   } else if (!props.archiveAfterReporting) {
     // Standard "report" flow
     if (props.discussionId) {
@@ -567,8 +528,7 @@ const close = () => {
       archiveDiscussionLoading ||
       archiveEventLoading ||
       archiveCommentLoading ||
-      suspendUserLoading ||
-      suspendModLoading
+      suspendUserLoading
     "
     :primary-button-disabled="
       selectedForumRules.length === 0 && selectedServerRules.length === 0
@@ -580,8 +540,7 @@ const close = () => {
       archiveDiscussionError?.message ||
       archiveEventError?.message ||
       archiveCommentError?.message ||
-      suspendUserError?.message ||
-      suspendModError?.message
+      suspendUserError?.message
     "
     @primary-button-click="submit"
     @close="close"

@@ -63,7 +63,6 @@ const submit = async () => {
     console.error("No issue ID provided.");
     return;
   }
-
   await unsuspendUser({
     issueId: props.issueId,
     explanation: explanation.value,

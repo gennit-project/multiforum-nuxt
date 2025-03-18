@@ -90,35 +90,9 @@ export const SUSPEND_USER = gql`
   }
 `;
 
-export const SUSPEND_MOD = gql`
-  mutation suspendMod(
-    $issueID: ID!
-    $suspendUntil: DateTime
-    $suspendIndefinitely: Boolean
-    $explanation: String
-  ) {
-    suspendMod(
-      issueId: $issueID
-      suspendUntil: $suspendUntil
-      suspendIndefinitely: $suspendIndefinitely
-      explanation: $explanation
-    ) {
-      id
-    }
-  }
-`;
-
 export const UNSUSPEND_USER = gql`
   mutation unsuspendUser($issueId: ID!, $explanation: String) {
     unsuspendUser(issueId: $issueId, explanation: $explanation) {
-      id
-    }
-  }
-`;
-
-export const UNSUSPEND_MOD = gql`
-  mutation unsuspendMod($issueId: ID!, $explanation: String) {
-    unsuspendMod(issueId: $issueId, explanation: $explanation) {
       id
     }
   }
