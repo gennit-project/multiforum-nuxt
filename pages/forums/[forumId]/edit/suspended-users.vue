@@ -21,12 +21,15 @@ const {
 } = useQuery(GET_SUSPENDED_USERS_IN_CHANNEL, {
   channelUniqueName: forumId.value,
 });
+
 const suspendedUsers = computed(() => {
   return suspendedUsersResult.value?.channels[0]?.SuspendedUsers ?? [];
 });
+
 const aggregateCount = computed(() => {
   return suspendedUsersResult.value?.channels[0]?.SuspendedUsersAggregate?.count ?? 0;
 });
+
 const humanReadableDate = (dateISO: string): string => {
   return DateTime.fromISO(dateISO).toLocaleString(DateTime.DATETIME_MED);
 };
