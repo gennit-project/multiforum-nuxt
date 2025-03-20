@@ -81,7 +81,7 @@ const clear = () => {
       </div>
       <input
         ref="searchInputRef"
-        v-model="input"
+        :value="initialValue"
         name="search"
         :data-testid="testId"
         :class="[
@@ -89,21 +89,19 @@ const clear = () => {
           rightSideIsRounded ? 'rounded-r-full' : 'rounded-r-md',
           small ? 'h-9' : 'h-12',
         ]"
-        class="w-full border border-gray-200 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
         :placeholder="searchPlaceholder"
         type="text"
         @input="updateSearchInput"
       >
-      <slot>
-        <div
-          class="absolute inset-y-0 right-0 flex cursor-pointer items-center pr-3"
-          @click="clear"
-        >
-          <i
-            class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300"
-          />
-        </div>
-      </slot>
+      <div 
+        v-if="initialValue" 
+        class="absolute right-12 inset-y-0 flex cursor-pointer items-center z-10" 
+        @click="clear"
+      >
+        <i class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300" />
+      </div>
+      <slot />
       <label for="search" class="sr-only">Search</label>
     </div>
   </div>
