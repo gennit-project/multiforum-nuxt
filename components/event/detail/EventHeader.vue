@@ -391,7 +391,7 @@ function handleFeedbackInput(event: string) {
             <i class="fa-solid fa-ticket h-5" />
           </div>
           <MarkdownPreview
-            class="flex-1 -ml-2"
+            class="flex-1 ml-3"
             :disable-gallery="true"
             :text="eventData.cost"
           />
