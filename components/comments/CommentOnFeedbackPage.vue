@@ -17,7 +17,7 @@ import WarningModal from "@/components/WarningModal.vue";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
 import { timeAgo, ALLOWED_ICONS } from "@/utils";
-import { modProfileNameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
 import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
 
@@ -35,6 +35,9 @@ const emit = defineEmits([
   "showCopiedLinkNotification",
   "clickReport",
   "openModProfile",
+  "clickArchive",
+  "clickUnarchive",
+  "clickArchiveAndSuspend",
 ]);
 const route = useRoute();
 const router = useRouter();
@@ -100,15 +103,52 @@ const commentMenuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
-  } else if (loggedInModName.value) {
-    out = out.concat([
-      {
-        label: "Report",
-        value: "",
-        event: "clickReport",
-        icon: ALLOWED_ICONS.REPORT,
-      },
-    ]);
+  } else if (usernameVar.value) {
+    if (loggedInModName.value) {
+      out = out.concat([
+        {
+          label: "Report",
+          value: "",
+          event: "clickReport",
+          icon: ALLOWED_ICONS.REPORT,
+        },
+      ]);
+      // Only add these if mod permissions are elevated
+      if (!props.comment.archived) {
+        out = out.concat([
+          {
+            label: "Archive",
+            event: "clickArchive",
+            icon: ALLOWED_ICONS.ARCHIVE,
+            value: '',
+          },
+          {
+            label: "Archive and Suspend",
+            event: "clickArchiveAndSuspend",
+            icon: ALLOWED_ICONS.SUSPEND,
+            value: '',
+          },
+        ]);
+      } else {
+        out = out.concat([
+          {
+            label: "Unarchive",
+            event: "clickUnarchive",
+            icon: ALLOWED_ICONS.UNARCHIVE,
+            value: '',
+          },
+        ]);
+      }
+    } else {
+      out = out.concat([
+        {
+          label: "Report",
+          value: "",
+          event: "clickReport",
+          icon: ALLOWED_ICONS.REPORT,
+        },
+      ]);
+    }
   }
   out.push({
     label: "Copy Link",
@@ -119,8 +159,6 @@ const commentMenuItems = computed(() => {
 
   return out;
 });
-
-
 
 const copyLink = async () => {
   let basePath = "";
@@ -233,6 +271,9 @@ function handleReport() {
             showDeleteCommentModal = true;
           }
         "
+        @click-archive="() => emit('clickArchive', comment.id)"
+        @click-unarchive="() => emit('clickUnarchive', comment.id)"
+        @click-archive-and-suspend="() => emit('clickArchiveAndSuspend', comment.id)"
       >
         <EllipsisHorizontal
           class="h-5 w-5 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
