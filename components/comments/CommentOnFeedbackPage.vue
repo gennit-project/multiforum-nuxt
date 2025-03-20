@@ -221,9 +221,21 @@ function updateText(text: string) {
 
 const showBrokenRulesModal = ref(false);
 const showSuccessfullyReported = ref(false);
+const showArchiveModal = ref(false);
+const showSuccessfullyArchived = ref(false);
+const showArchiveAndSuspendModal = ref(false);
+const showSuccessfullyArchivedAndSuspended = ref(false);
 
 function handleReport() {
   showBrokenRulesModal.value = true;
+}
+
+function handleArchive() {
+  showArchiveModal.value = true;
+}
+
+function handleArchiveAndSuspend() {
+  showArchiveAndSuspendModal.value = true;
 }
 
 const showUnarchiveModal = ref(false);
@@ -284,9 +296,9 @@ function handleUnarchive() {
             showDeleteCommentModal = true;
           }
         "
-        @click-archive="() => emit('clickArchive', comment.id)"
+        @click-archive="handleArchive"
         @click-unarchive="handleUnarchive"
-        @click-archive-and-suspend="() => emit('clickArchiveAndSuspend', comment.id)"
+        @click-archive-and-suspend="handleArchiveAndSuspend"
       >
         <EllipsisHorizontal
           class="h-5 w-5 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -363,6 +375,34 @@ function handleUnarchive() {
         }
       "
     />
+    <BrokenRulesModal
+      v-if="showArchiveModal"
+      :open="showArchiveModal"
+      :comment-id="comment.id"
+      :archive-after-reporting="true"
+      @close="showArchiveModal = false"
+      @reported-and-archived-successfully="
+        () => {
+          showSuccessfullyArchived = true;
+          showArchiveModal = false;
+        }
+      "
+    />
+    <BrokenRulesModal
+      v-if="showArchiveAndSuspendModal"
+      :open="showArchiveAndSuspendModal"
+      :title="'Suspend Author'"
+      :comment-id="comment.id"
+      :suspend-user-enabled="true"
+      :text-box-label="'(Optional) Explain why you are suspending this author:'"
+      @close="showArchiveAndSuspendModal = false"
+      @suspended-user-successfully="
+        () => {
+          showSuccessfullyArchivedAndSuspended = true;
+          showArchiveAndSuspendModal = false;
+        }
+      "
+    />
     <UnarchiveModal
       v-if="showUnarchiveModal"
       :open="showUnarchiveModal"
@@ -379,6 +419,16 @@ function handleUnarchive() {
       :show="showSuccessfullyReported"
       :title="'Your report was submitted successfully.'"
       @close-notification="showSuccessfullyReported = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchived"
+      :title="'The content was reported and archived successfully.'"
+      @close-notification="showSuccessfullyArchived = false"
+    />
+    <Notification
+      :show="showSuccessfullyArchivedAndSuspended"
+      :title="'Archived the post and suspended the author.'"
+      @close-notification="showSuccessfullyArchivedAndSuspended = false"
     />
     <Notification
       :show="showSuccessfullyUnarchived"
