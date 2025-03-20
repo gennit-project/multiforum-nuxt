@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { GET_SERVER_PERMISSIONS } from "@/graphQLData/admin/queries";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { config } from "@/config";
 import RoleSection from "@/components/admin/RoleSection.vue";
@@ -9,7 +8,6 @@ import RoleSection from "@/components/admin/RoleSection.vue";
 const {
   result: getServerResult,
   error: getServerError,
-  loading: getServerLoading,
 } = useQuery(
   GET_SERVER_PERMISSIONS,
   {

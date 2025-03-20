@@ -221,26 +221,63 @@ The frontend is a Vue application that makes GraphQL queries to the Apollo serve
 
 ## Environment Variables
 
-I will fill out this section when the project is finished, or if someone expresses interest in collaborating on this project, whichever comes sooner. Anyone interested can contact me at catherine.luse@gmail.com.
+The application requires several environment variables to be set up.
+
+### Database Configuration
+- `NEO4J_AUTH`: Neo4j authentication credentials (format: username/password)
+- `NEO4J_PASSWORD`: Neo4j database password
+- `NEO4J_USERNAME`: Neo4j database username
+
+### Auth0 Configuration
+- `AUTH0_CLIENT_ID`: Auth0 application client ID
+- `AUTH0_DOMAIN`: Auth0 domain (e.g., your-tenant.auth0.com)
+- `VITE_AUTH0_AUDIENCE`: Auth0 API audience
+- `VITE_AUTH0_CALLBACK_URL`: URL to redirect after authentication
+- `VITE_AUTH0_CLIENT_SECRET`: Auth0 application client secret
+- `VITE_AUTH0_SCOPE`: Auth0 authentication scopes
+- `VITE_AUTH0_URL`: Auth0 application URL
+- `VITE_AUTH0_USERNAME`: Default test username
+- `VITE_AUTH0_PASSWORD`: Default test password
+- `VITE_AUTH0_USERNAME_2`: Secondary test username
+- `VITE_AUTH0_PASSWORD_2`: Secondary test password
+
+### Server Configuration
+- `VITE_SERVER_NAME`: Name of your server instance (e.g., "Gennit")
+- `VITE_BASE_URL`: Base URL of your application
+- `VITE_ENVIRONMENT`: Environment (development/production)
+- `VITE_GRAPHQL_URL`: URL of the GraphQL API
+- `GRAPHQL_URL_FOR_TYPES`: URL for GraphQL type generation
+
+### External Services
+- `GCS_BUCKET_NAME`: Google Cloud Storage bucket name
+- `GOOGLE_CREDENTIALS_BASE64`: Base64-encoded Google Cloud credentials
+- `VITE_GOOGLE_MAPS_API_KEY`: Google Maps API key
+- `VITE_GOOGLE_CLOUD_STORAGE_BUCKET`: Google Cloud Storage bucket name
+- `VITE_LIGHTGALLERY_LICENSE_KEY`: License key for Lightgallery
+- `VITE_OPEN_CAGE_API_KEY`: OpenCage Geocoding API key
+- `VITE_OPEN_GRAPH_API_KEY`: OpenGraph API key
+- `SLACK_WEBHOOK_URL`: Slack webhook URL for notifications
+
+### Testing Configuration
+- `CYPRESS_ADMIN_TEST_EMAIL`: Admin test user email
+- `CYPRESS_ADMIN_TEST_USERNAME`: Admin test username
+
+### Development Setup
+1. Create a `.env` file in the root directory
+2. Copy the variables from `.env.example` (if available)
+3. Fill in your values for each required variable
+4. Never commit the `.env` file to version control
+
+### Docker Setup
+When using Docker Compose, these variables can be set in the environment or in a `.env` file. The `docker-compose.yml` file includes default values for some variables:
+- `NEO4J_AUTH`: defaults to "neo4j/neo4j"
+- `NEO4J_PASSWORD`: defaults to "neo4j"
+- `NEO4J_USERNAME`: defaults to "neo4j"
+- `VITE_SERVER_NAME`: title of the app
+- `VITE_BASE_URL`: defaults to "http://localhost:3000"
+- `VITE_GRAPHQL_URL`: defaults to "http://localhost:4000"
+- `VITE_ENVIRONMENT`: defaults to "development"
 
 ## Tests
 
-Integration tests are in the `cypress` directory and cover all the create, read, update and delete operations on forums, events, discussions and comments, as well as the filtering in the list views.
-
-## Project status
-
-I'm currently working on what I feel is the boring part of the project - permissions,
-roles and content moderation features.
-
-After that, some of the next-up features are:
-
-
-- The ability for OP to mark a comment as the best answer to their question.
-- The ability to manage recurring events or events with multiple dates.
-- Automod features.
-- The ability to 'super upvote' a post or comment if you write something nice on the author's public scratchpad.
-- Bundled notifications.
-- The ability to put downloadable files in a discussion post - useful for sharing video game
-  mods and the like.
-- The ability to gate some of the above downloadable files behind a paywall and other 
-  monetization features.
+Integration tests are in the `cypress` directory
