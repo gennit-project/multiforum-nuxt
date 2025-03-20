@@ -43,7 +43,7 @@ const isAdmin = computed(() => {
 
 <template>
   <NuxtLayout>
-    <div class="max-w-screen-2xl w-full px-2 dark:bg-black">
+    <div class="max-w-screen-2xl w-full px-2 dark:bg-black bg-white">
       <div class="flex flex-col lg:flex-row w-full">
         <div class="w-full lg:w-80 lg:shrink-0">
           <UserProfileSidebar :is-admin="isAdmin" />
