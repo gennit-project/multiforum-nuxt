@@ -158,7 +158,7 @@ function toggleEmojiPicker() {
       />
       <span
         v-if="showEditCommentField"
-        class="cursor-pointer hover:text-black dark:hover:text-white text-white bg-gray-700 rounded-full dark:text-gray-300 px-2 py-1"
+        class="cursor-pointer hover:text-black dark:hover:text-white text-white bg-gray-700 rounded-full dark:text-gray-100 px-2 py-1"
         @click="emit('hideEditCommentEditor')"
       >
         Cancel
@@ -168,7 +168,7 @@ function toggleEmojiPicker() {
         :class="[
           saveDisabled
             ? 'text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 rounded-lg'
-            : 'cursor-pointer text-white hover:text-black dark:hover:text-white rounded-full bg-blue-500 dark:text-gray-300',
+            : 'cursor-pointer text-white hover:text-black dark:hover:text-white rounded-full bg-blue-600 dark:text-gray-100',
         ]"
         class="px-2 py-1"
         @click="
@@ -185,14 +185,14 @@ function toggleEmojiPicker() {
       </span>
       <span
         v-if="showEditCommentField && commentInProcess"
-        class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
+        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
       >
         Saving...
       </span>
       <span
         v-if="commentData.DiscussionChannel"
         :to="`${route.path}/comments/${commentData.id}`"
-        class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
+        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="
           router.push({
             name: 'forums-forumId-discussions-discussionId-comments-commentId',
@@ -208,14 +208,14 @@ function toggleEmojiPicker() {
       </span>
       <span
         v-if="showReplies && replyCount > 0"
-        class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
+        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="emit('hideReplies')"
       >
         {{ `Hide ${replyCount} ${replyCount === 1 ? "Reply" : "Replies"}` }}
       </span>
       <span
         v-if="!showReplies"
-        class="cursor-pointer underline hover:text-black dark:text-gray-300 dark:hover:text-white"
+        class="cursor-pointer underline hover:text-black dark:text-gray-100 dark:hover:text-white"
         @click="emit('showReplies')"
       >
         {{ `Show ${replyCount} ${replyCount === 1 ? "Reply" : "Replies"}` }}
