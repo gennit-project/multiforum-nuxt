@@ -29,7 +29,7 @@ const showIssueTitle = computed(() =>
 
 const showChannelTabs = computed(() => {
   return (
-    !showDiscussionTitle.value && !showEventTitle.value && !showIssueTitle.value
+    !showDiscussionTitle.value && !showEventTitle.value && !showIssueTitle.value && !`${String(route.name)}`.includes('feedback')
   );
 });
 
