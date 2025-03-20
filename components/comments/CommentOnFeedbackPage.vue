@@ -20,6 +20,9 @@ import { timeAgo, ALLOWED_ICONS } from "@/utils";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
 import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
+import Notification from "@/components/NotificationComponent.vue";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 
 const props = defineProps({
   comment: {
@@ -216,8 +219,18 @@ function updateText(text: string) {
   updateCommentInput.value.text = text;
 }
 
+const showBrokenRulesModal = ref(false);
+const showSuccessfullyReported = ref(false);
+
 function handleReport() {
-  emit("clickReport", props.comment);
+  showBrokenRulesModal.value = true;
+}
+
+const showUnarchiveModal = ref(false);
+const showSuccessfullyUnarchived = ref(false);
+
+function handleUnarchive() {
+  showUnarchiveModal.value = true;
 }
 </script>
 
@@ -272,7 +285,7 @@ function handleReport() {
           }
         "
         @click-archive="() => emit('clickArchive', comment.id)"
-        @click-unarchive="() => emit('clickUnarchive', comment.id)"
+        @click-unarchive="handleUnarchive"
         @click-archive-and-suspend="() => emit('clickArchiveAndSuspend', comment.id)"
       >
         <EllipsisHorizontal
@@ -335,6 +348,42 @@ function handleReport() {
         }
       "
       @primary-button-click="handleDeleteComment"
+    />
+    <BrokenRulesModal
+      v-if="showBrokenRulesModal"
+      :open="showBrokenRulesModal"
+      :comment-id="comment.id"
+      :comment="comment"
+      :channel-unique-name="forumId as string"
+      @close="showBrokenRulesModal = false"
+      @report-submitted-successfully="
+        () => {
+          showSuccessfullyReported = true;
+          showBrokenRulesModal = false;
+        }
+      "
+    />
+    <UnarchiveModal
+      v-if="showUnarchiveModal"
+      :open="showUnarchiveModal"
+      :comment-id="comment.id"
+      @close="showUnarchiveModal = false"
+      @unarchived-successfully="
+        () => {
+          showSuccessfullyUnarchived = true;
+          showUnarchiveModal = false;
+        }
+      "
+    />
+    <Notification
+      :show="showSuccessfullyReported"
+      :title="'Your report was submitted successfully.'"
+      @close-notification="showSuccessfullyReported = false"
+    />
+    <Notification
+      :show="showSuccessfullyUnarchived"
+      :title="'The content was unarchived successfully.'"
+      @close-notification="showSuccessfullyUnarchived = false"
     />
   </div>
 </template>
