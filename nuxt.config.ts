@@ -5,6 +5,16 @@ import path from "path";
 import { inMemoryCacheOptions } from "./cache";
 
 export default defineNuxtConfig({
+  app: {
+    head: {
+      title: config.serverName,
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: `Welcome to ${config.serverName}` }
+      ]
+    }
+  },
   build: {
     transpile: ["vuetify"],
   },
