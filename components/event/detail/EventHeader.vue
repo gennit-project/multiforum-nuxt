@@ -153,13 +153,15 @@ onAddFeedbackCommentToEventDone(() => {
   showFeedbackSubmittedSuccessfully.value = true;
 });
 
+const addressCopied = ref(false);
+
 const copyAddress = async () => {
   try {
     const address = props.eventData.address || "";
     await navigator.clipboard.writeText(address);
-    showAddressCopiedNotification.value = true;
+    addressCopied.value = true;
     setTimeout(() => {
-      showAddressCopiedNotification.value = false;
+      addressCopied.value = false;
     }, 2000);
   } catch (error) {
     console.error(error);
@@ -377,10 +379,15 @@ function handleFeedbackInput(event: string) {
           </div>
           <div class="inline">
             {{ eventData.address }}
-            <ClipboardIcon
-              class="ml-1 h-4 w-4 cursor-pointer inline-block align-text-bottom"
-              @click="copyAddress"
-            />
+            <span v-if="!addressCopied" class="inline-flex items-center">
+              <ClipboardIcon
+                class="ml-1 h-4 w-4 cursor-pointer inline-block align-text-bottom"
+                @click="copyAddress"
+              />
+            </span>
+            <span v-else class="ml-1 text-sm text-green-600 dark:text-green-400">
+              Copied!
+            </span>
           </div>
         </li>
         <li
@@ -446,11 +453,6 @@ function handleFeedbackInput(event: string) {
           />
         </MenuButton>
       </div>
-      <Notification
-        :show="showAddressCopiedNotification"
-        :title="'Copied to clipboard!'"
-        @close-notification="showAddressCopiedNotification = false"
-      />
       <Notification
         :show="showCopiedLinkNotification"
         :title="'Copied to clipboard!'"
