@@ -112,6 +112,7 @@ const body = '';
     :primary-button-text="'Update'"
     :secondary-button-text="'Cancel'"
     @primary-button-click="handleEdit"
+    @close="$emit('close')"
     @secondary-button-click="$emit('close')"
   >
     <template #icon>
