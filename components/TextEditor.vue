@@ -8,6 +8,7 @@ import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import ErrorBanner from "./ErrorBanner.vue";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
+import { isFileSizeValid } from "@/utils/index";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -140,6 +141,11 @@ const handlePaste = async (event: ClipboardEvent) => {
 const handleFormStateDuringUpload = async (file: File) => {
   const textarea = editorRef.value;
   if (!textarea) return;
+  const sizeCheck = isFileSizeValid(file);
+  if (!sizeCheck.valid) {
+    alert(sizeCheck.message);
+    return;
+  }
 
   const cursorPositionStart = textarea.selectionStart;
   const cursorPositionEnd = textarea.selectionEnd;

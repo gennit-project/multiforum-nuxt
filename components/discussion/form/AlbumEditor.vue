@@ -9,6 +9,8 @@ import TextInput from "@/components/TextInput.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import { useDisplay } from "vuetify";
+import ExpandableImage from "@/components/ExpandableImage.vue";
+import { isFileSizeValid } from "@/utils/index";
 
 const props = defineProps<{
   formValues: {
@@ -17,8 +19,8 @@ const props = defineProps<{
         id?: string;
         url: string;
         alt: string;
-        caption?: string;
-        copyright?: string;
+        caption: string;
+        copyright: string;
       }[];
       imageOrder: string[];
     };
@@ -37,8 +39,8 @@ type ImageInput = {
   id?: string;
   url: string;
   alt: string;
-  copyright?: string;
-  caption?: string;
+  copyright: string;
+  caption: string;
 };
 
 // GraphQL Mutation to get the signed storage URL
@@ -50,7 +52,7 @@ const loadingStates = ref<{ [key: number]: boolean }>({});
 
 // Track if we've reached the image limit
 const isImageLimitReached = computed(() => {
-  return props.formValues.album.images.length >= MAX_IMAGES;
+  return (props.formValues.album?.images?.length ?? 0) >= MAX_IMAGES;
 });
 
 /**
@@ -59,6 +61,11 @@ const isImageLimitReached = computed(() => {
 const uploadFile = async (file: File): Promise<string | null> => {
   if (!usernameVar.value) {
     console.error("No username found, cannot upload.");
+    return null;
+  }
+  const sizeCheck = isFileSizeValid(file);
+  if (!sizeCheck.valid) {
+    alert(sizeCheck.message);
     return null;
   }
 
@@ -99,15 +106,20 @@ const uploadFile = async (file: File): Promise<string | null> => {
  */
 const handleMultipleFiles = async (files: FileList | File[]) => {
   if (!files || files.length === 0) return;
-  
+
   // Check if adding these files would exceed the limit
-  if (props.formValues.album.images.length + files.length > MAX_IMAGES) {
+  if (
+    (props.formValues.album?.images?.length ?? 0) + files.length >
+    MAX_IMAGES
+  ) {
     const remainingSlots = MAX_IMAGES - props.formValues.album.images.length;
-    alert(`You can only add ${remainingSlots} more image${remainingSlots !== 1 ? 's' : ''}. Maximum limit is ${MAX_IMAGES} images.`);
+    alert(
+      `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? "s" : ""}. Maximum limit is ${MAX_IMAGES} images.`
+    );
     // Only process up to the remaining slots
     const filesToProcess = Array.from(files).slice(0, remainingSlots);
     if (filesToProcess.length === 0) return;
-    
+
     // Optionally you can show a global loading spinner,
     // or track loading for each file. We'll do a quick approach
     // by turning on "global" loading in a single key:
@@ -122,6 +134,8 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
         addNewImage({
           url: uploadedUrl,
           alt: file.name,
+          caption: "",
+          copyright: "",
         });
       }
     }
@@ -138,6 +152,8 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
         addNewImage({
           url: uploadedUrl,
           alt: file.name,
+          caption: "",
+          copyright: "",
         });
       }
     }
@@ -159,7 +175,7 @@ const selectFiles = () => {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
     return;
   }
-  
+
   // Programmatically trigger file input click
   if (albumFileInputRef.value) {
     albumFileInputRef.value.click();
@@ -177,16 +193,16 @@ const handleFileInputChange = (event: Event) => {
 
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault();
-  
+
   if (props.allowImageUpload === false) return;
   if (!event.dataTransfer?.files?.length) return;
-  
+
   // Check if we've reached the limit before processing dropped files
   if (isImageLimitReached.value) {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
     return;
   }
-  
+
   const files = event.dataTransfer.files;
   handleMultipleFiles(files);
 };
@@ -206,13 +222,13 @@ const updateImageField = (
     ...updatedImages[index],
     [fieldName]: newValue,
   };
-  
+
   // Include imageOrder in the emit
   emit("updateFormValues", {
     album: {
       images: updatedImages,
-      imageOrder: props.formValues.album.imageOrder
-    }
+      imageOrder: props.formValues.album.imageOrder,
+    },
   });
 };
 
@@ -276,64 +292,56 @@ const moveImageDown = (index: number) => {
   });
 };
 
-// Helper function to update imageOrder based on the current image array
-const updateImageOrderAfterChange = (images: ImageInput[]) => {
-  // Create imageOrder from image IDs, filtering out undefined IDs
-  return images
-    .map((img) => img.id)
-    .filter((id): id is string => id !== undefined);
-};
-
 type AddImageInput = {
   url: string;
   alt: string;
-  caption?: string;
-  copyright?: string;
+  caption: string;
+  copyright: string;
 };
 
-const addNewImage = (input: AddImageInput) => {
-  // Check if we've reached the limit
-  if (props.formValues.album.images.length >= MAX_IMAGES) {
+const updateImageOrderAfterChange = (images: ImageInput[]) => {
+  // Filter out any images without IDs first
+  const validImages = images.filter((img): img is ImageInput & { id: string } => {
+    return typeof img.id === 'string' && img.id.length > 0;
+  });
+
+  // If we have no valid IDs, return an empty array instead of [null]
+  if (validImages.length === 0) {
+    return [];
+  }
+
+  // Map to just the IDs
+  return validImages.map(img => img.id);
+};
+
+const addNewImage = (input: Partial<AddImageInput>) => {
+  if ((props.formValues.album?.images?.length ?? 0) >= MAX_IMAGES) {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
     return;
   }
-  
-  const { url, alt, caption, copyright } = input;
 
-  const newImage = {
-    url,
-    alt,
-    copyright,
-    caption,
-  } as ImageInput;
+  const { url, alt } = input;
+
+  const newImage: ImageInput = {
+    url: url || '',
+    alt: alt || '',
+    caption: input.caption || '', // Provide default empty string
+    copyright: input.copyright || '', // Provide default empty string
+  };
 
   const updatedImages = [...props.formValues.album.images, newImage];
 
-  // Update imageOrder after adding a new image
+  // Only include real IDs in the imageOrder
   const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
 
   emit("updateFormValues", {
     album: {
       images: updatedImages,
-      imageOrder: updatedImageOrder,
+      imageOrder: updatedImageOrder.length > 0 ? updatedImageOrder : [], // Ensure we never emit empty array
     },
   });
 };
 
-const imageMap = computed<Record<string, ImageInput>>(() => {
-  const images = props.formValues.album.images;
-  const imageOrder = props.formValues.album.imageOrder || [];
-  const imageOrderMap: Record<string, ImageInput> = {};
-
-  imageOrder.forEach((imageId) => {
-    const imageAtIndex = images.find((img) => img.id === imageId);
-    if (imageAtIndex) {
-      imageOrderMap[imageId] = imageAtIndex;
-    }
-  });
-
-  return imageOrderMap;
-});
 </script>
 
 <template>
@@ -347,12 +355,13 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
     </div>
     <div class="mb-2">
       <p class="text-sm text-gray-600 dark:text-gray-300">
-        {{ props.formValues.album.images.length }}/{{ MAX_IMAGES }} images
+        {{ props.formValues.album?.images?.length ?? 0 }}/{{ MAX_IMAGES }}
+        images
       </p>
     </div>
     <div
-      v-for="(imageId, index) in formValues.album?.imageOrder || []"
-      :key="imageId ?? index"
+      v-for="(image, index) in props.formValues.album.images"
+      :key="image.id || `temp-${index}`"
       class="mb-4 border-b py-2"
     >
       <div class="flex items-center justify-between mb-2">
@@ -398,17 +407,17 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
       <div :class="[mdAndDown ? 'flex-col' : 'flex', 'gap-2']">
         <div>
           <ExpandableImage
-            v-if="imageMap[imageId]?.url"
+            v-if="image.url"
             class="w-72 object-cover"
-            :src="imageMap[imageId].url"
-            :alt="imageMap[imageId].alt"
+            :src="image.url"
+            :alt="image.alt"
           />
         </div>
         <div class="flex-col gap-2 flex-1">
           <TextInput
             class="mt-2"
             label="Image URL"
-            :value="imageMap[imageId]?.url || ''"
+            :value="image.url"
             placeholder="https://example.com/my-image.jpg"
             :full-width="true"
             @update="(val) => updateImageField(index, 'url', val)"
@@ -416,19 +425,15 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
           <TextInput
             class="mt-2"
             label="Caption"
-            :value="imageMap[imageId]?.caption"
+            :value="image.caption"
             placeholder="Short caption or description"
             :full-width="true"
-            @update="
-              (val) => {
-                updateImageField(index, 'caption', val);
-              }
-            "
+            @update="(val) => updateImageField(index, 'caption', val)"
           />
           <TextInput
             class="mt-2"
             label="Attribution/Copyright"
-            :value="imageMap[imageId]?.copyright"
+            :value="image.copyright"
             placeholder="Who took this photo? (optional)"
             :full-width="true"
             @update="(val) => updateImageField(index, 'copyright', val)"
@@ -452,7 +457,7 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
         multiple
         style="display: none"
         @change="handleFileInputChange"
-      >
+      />
     </div>
     <div
       v-else

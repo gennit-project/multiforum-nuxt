@@ -27,6 +27,7 @@ import {
   MAX_CHARS_IN_EVENT_DESCRIPTION,
 } from "@/utils/constants";
 import type { PropType } from "vue";
+import { isFileSizeValid } from "@/utils/index";
 
 export type UpdateLocationInput = {
   name: string;
@@ -308,6 +309,11 @@ const handleUpdateLocation = (event: UpdateLocationInput) => {
 const upload = async (file: any) => {
   if (!usernameVar.value) {
     console.error("No username found");
+    return;
+  }
+  const sizeCheck = isFileSizeValid(file);
+  if (!sizeCheck.valid) {
+    alert(sizeCheck.message);
     return;
   }
   try {

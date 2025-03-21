@@ -1,5 +1,4 @@
 
-
 export interface Image {
   url: string;
   caption: string;
@@ -9,16 +8,23 @@ export interface Image {
   isCoverImage: boolean;
 }
 
-export interface Album {
-    images: Array<Image>;
-}
+
 export interface CreateEditDiscussionFormValues {
     title: string;
     body: string;
     selectedTags: Array<string>;
     selectedChannels: Array<string>;
     author: string;
-    album: Album;
+    album: {
+      images: {
+        id?: string;
+        url: string;
+        alt: string;
+        caption: string;
+        copyright: string;
+      }[];
+      imageOrder: string[];
+    };
 }
 
 export type SearchDiscussionValues = {

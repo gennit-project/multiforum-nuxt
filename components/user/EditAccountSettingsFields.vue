@@ -14,6 +14,8 @@ import type { EditAccountSettingsFormValues } from "@/types/User";
 import FormComponent from "../FormComponent.vue";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
+import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import { isFileSizeValid } from "@/utils/index";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -64,6 +66,11 @@ const { mutate: createSignedStorageUrl } = useMutation(
 const upload = async (file: any) => {
   if (!usernameVar.value) {
     console.error("No username found");
+    return;
+  }
+  const sizeCheck = isFileSizeValid(file);
+  if (!sizeCheck.valid) {
+    alert(sizeCheck.message);
     return;
   }
 

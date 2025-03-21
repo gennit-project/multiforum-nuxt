@@ -15,6 +15,19 @@ import UserPlus from "@/components/icons/UserPlus.vue";
 import UserMinus from "@/components/icons/UserMinus.vue";
 import type { Event, Tag as TagData } from "@/__generated__/graphql"
 
+const MAX_FILE_SIZE_MB = 5;
+const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024; // Convert MB to bytes
+
+export function isFileSizeValid(file: File): { valid: boolean; message: string } {
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return {
+      valid: false,
+      message: `File size must be less than ${MAX_FILE_SIZE_MB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+    };
+  }
+  return { valid: true, message: '' };
+}
+
 const getTimePieces = (timeObj: DateTime) => {
   const { year, month, day, weekday, hour } = timeObj;
 
@@ -223,6 +236,12 @@ export function encodeSpacesInURL(url: string) {
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const { signedStorageURL, filename, file } = input;
 
+  const sizeCheck = isFileSizeValid(file);
+  if (!sizeCheck.valid) {
+    console.error(sizeCheck.message);
+    throw new Error(sizeCheck.message);
+  }
+  
   if (!signedStorageURL) {
     console.error("No signedStorageURL provided");
     return;

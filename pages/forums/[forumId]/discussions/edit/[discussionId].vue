@@ -99,9 +99,6 @@ export default defineComponent({
     });
 
     const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
-      // If the discussion data is already loaded, start with
-      // the existing values. This will be used if you load the page,
-      // navigate away and come back.
       if (discussion.value) {
         return {
           title: discussion.value.title,
@@ -117,12 +114,10 @@ export default defineComponent({
           author: discussion.value.Author?.username || "",
           album: {
             images: orderedImages.value,
+            imageOrder: imageOrder.value, // Add imageOrder
           },
         };
       }
-      // If the discussion data is loading, start with empty values. These
-      // will be overwritten by onGetDiscussionResult function when the discussion
-      // data is loaded.
       return {
         title: "",
         body: "",
@@ -131,6 +126,7 @@ export default defineComponent({
         author: "",
         album: {
           images: [],
+          imageOrder: [], // Add empty imageOrder
         },
       };
     };
@@ -147,6 +143,25 @@ export default defineComponent({
       }
       const discussion = value.data.discussions[0];
 
+      // Create a map of valid images with their IDs
+      const validImages = (discussion.Album?.Images ?? [])
+        .filter((image: Image) => image.id && image.url) // Only include images with valid IDs and URLs
+        .map((image: Image) => ({
+          id: image.id,
+          url: image.url,
+          alt: image.alt || "",
+          caption: image.caption || "",
+          copyright: image.copyright || "",
+        }));
+
+      // Filter out any null or undefined values from imageOrder and ensure they exist in images
+      const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
+        (id): id is string =>
+          typeof id === "string" &&
+          id.length > 0 &&
+          validImages.some((img) => img.id === id)
+      );
+
       const formFields: CreateEditDiscussionFormValues = {
         title: discussion.title,
         body: discussion.body,
@@ -160,14 +175,8 @@ export default defineComponent({
         ),
         author: discussion.Author.username,
         album: {
-          images: discussion.Album?.Images?.map((image: Image) => {
-            return {
-              url: image.url,
-              alt: image.alt,
-              caption: image.caption,
-              copyright: image.copyright,
-            };
-          }),
+          images: validImages,
+          imageOrder: validImageOrder, // Add the validated imageOrder
         },
       };
       formValues.value = formFields;

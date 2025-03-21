@@ -44,7 +44,7 @@ const images = computed(() => {
 const imageOrder = computed<string[]>(() => {
   // If there's an existing order, use it
   if (props.discussion?.Album?.imageOrder?.length) {
-    return props.discussion.Album.imageOrder.map((imageId: string) => {
+    return props.discussion.Album.imageOrder.map((imageId: string | null) => {
       const image = images.value.find((image) => image.id === imageId);
       return image ? image.id : "";
     });
@@ -52,8 +52,12 @@ const imageOrder = computed<string[]>(() => {
   
   // If no order exists, create one from the images array
   return images.value
-    .map(image => image.id)
-    .filter((id): id is string => id !== "");
+    .filter((image: { id: string; url: string; alt: string; caption: string; isCoverImage: boolean; hasSensitiveContent: boolean; hasSpoiler: boolean; copyright: string }) => {
+      return image.id !== null && image.id !== undefined;
+    })
+    .map((image: { id: string; url: string; alt: string; caption: string; isCoverImage: boolean; hasSensitiveContent: boolean; hasSpoiler: boolean; copyright: string }) => {
+      return image.id;
+    });
 });
 
 const orderedImages = computed(() => {
@@ -82,7 +86,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
       Album: {
         create: {
           node: {
-            imageOrder: newImages.map((img) => img.id),
+            imageOrder: [],
             Images: {
               create: newImages.map((img) => ({
                 node: {
@@ -131,7 +135,6 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
         },
       },
     }));
-
   // DELETE array: any old image that is no longer present in `newImages`
   const deleteImageArray = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
@@ -140,7 +143,6 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
         where: { node: { id: old.id } },
       },
     }));
-
   // Combine all operations into a single array. Each object is one “Images” operation.
   const imagesOps = [
     ...createImageArray,
@@ -154,7 +156,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     Album: {
       update: {
         node: {
-          imageOrder: newImages.map((img) => img.id),
+          imageOrder: imageOrder.value, 
           Images: imagesOps,
         },
       },

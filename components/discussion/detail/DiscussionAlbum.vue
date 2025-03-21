@@ -458,7 +458,7 @@ const handleTouchEnd = (event: TouchEvent) => {
             </button>
             <button
               type="button"
-              class="flex items-center justify-center w-8 h-8 rounded bg-gray-800 text-white text-xl no-underline cursor-pointer"
+              class="flex items-center justify-center w-8 h-8 rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer"
               :href="currentImage.url || ''"
               @click="() => downloadImage(currentImage.url || '')"
             >

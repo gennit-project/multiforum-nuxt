@@ -12,6 +12,7 @@ import { usernameVar } from "@/cache";
 import { ref, nextTick, defineProps, defineEmits } from "vue";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { useMutation } from "@vue/apollo-composable";
+import { isFileSizeValid } from "@/utils/index";
 
 defineProps({
   formValues: {
@@ -55,6 +56,11 @@ const { mutate: createSignedStorageUrl } = useMutation(
 const upload = async (file: File) => {
   if (!usernameVar.value) {
     console.error("No username found");
+    return;
+  }
+  const sizeCheck = isFileSizeValid(file);
+  if (!sizeCheck.valid) {
+    alert(sizeCheck.message);
     return;
   }
 
