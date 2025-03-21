@@ -3,7 +3,7 @@ import { computed } from "vue";
 import { GET_SUSPENDED_MODS_BY_CHANNEL } from "@/graphQLData/mod/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
-import { DateTime } from "luxon"
+import { DateTime } from "luxon";
 
 const route = useRoute();
 const forumId = computed(() => {
@@ -48,10 +48,7 @@ defineEmits(["click-remove-mod"]);
       There are no active mod suspensions.
     </div>
 
-    <div
-      v-if="suspensions && suspensions.length > 0"
-      class="flex-col text-sm"
-    >
+    <div v-if="suspensions && suspensions.length > 0" class="flex-col text-sm">
       <div class="text-sm font-bold">
         {{ `Active Suspensions (${aggregateCount})` }}
       </div>
@@ -60,39 +57,49 @@ defineEmits(["click-remove-mod"]);
         :key="suspension.username"
         class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
       >
-      <div class="flex-col">
-        <nuxt-link
-          :to="{
-            name: 'mod-modId',
-            params: { modId: suspension?.SuspendedMod?.displayName },
-          }"
-          class="flex items-center dark:text-white"
-        >
-          <AvatarComponent
-            :text="suspension?.SuspendedMod?.displayName"
-            class="mr-2 h-6 w-6"
-          />
-          <span class="text-sm">{{
-            `${suspension?.SuspendedMod?.displayName} ${suspension?.username ? `(${suspension?.username})` : ""}`
-          }}</span>
-        </nuxt-link>
-        <div v-if="!suspension.suspendedIndefinitely" class="text-sm text-gray-500 dark:text-gray-300" >
-          {{ `Suspended until ${humanReadableDate(suspension?.suspendedUntil)}` }}
+        <div class="flex-col w-full">
+          <div class="flex justify-between gap-2 w-full">
+            <nuxt-link
+              :to="{
+                name: 'mod-modId',
+                params: { modId: suspension?.SuspendedMod?.displayName },
+              }"
+              class="flex items-center dark:text-white"
+            >
+              <AvatarComponent
+                :text="suspension?.SuspendedMod?.displayName"
+                class="mr-2 h-6 w-6"
+              />
+              <span class="text-sm">{{
+                `${suspension?.SuspendedMod?.displayName} ${suspension?.username ? `(${suspension?.username})` : ""}`
+              }}</span>
+            </nuxt-link>
+            <nuxt-link
+              v-if="suspension.RelatedIssue"
+              class="rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
+              :to="{
+                name: 'forums-forumId-issues-issueId',
+                params: { issueId: suspension.RelatedIssue?.id },
+              }"
+            >
+              Related Issue
+            </nuxt-link>
           </div>
-        <div v-else class="text-sm text-gray-500 dark:text-gray-300" >
-          {{ `Suspended indefinitely as of ${humanReadableDate(suspension?.createdAt)}` }}
+
+          <div
+            v-if="!suspension.suspendedIndefinitely"
+            class="text-sm text-gray-500 dark:text-gray-300"
+          >
+            {{
+              `Suspended until ${humanReadableDate(suspension?.suspendedUntil)}`
+            }}
+          </div>
+          <div v-else class="text-sm text-gray-500 dark:text-gray-300">
+            {{
+              `Suspended indefinitely as of ${humanReadableDate(suspension?.createdAt)}`
+            }}
+          </div>
         </div>
-      </div>
-        <nuxt-link
-          v-if="suspension.RelatedIssue"
-          class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
-          :to="{
-            name: 'forums-forumId-issues-issueId',
-            params: { issueId: suspension.RelatedIssue?.id },
-          }"
-        >
-          Related Issue
-        </nuxt-link>
       </div>
     </div>
   </div>
