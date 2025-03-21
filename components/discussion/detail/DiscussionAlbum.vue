@@ -38,7 +38,7 @@ const orderedImages = computed(() => {
         return image || null;
       })
       .filter((image): image is NonNullable<typeof image> => image !== null);
-  } 
+  }
   // Otherwise, just return all images directly
   else {
     return props.album.Images || [];
@@ -271,9 +271,6 @@ const downloadImage = (imageUrl: string) => {
   <div class="w-full h-full">
     <!-- Normal thumbnail grid view -->
     <div v-if="!isLightboxOpen" class="overflow-x-auto border">
-      <span class="p-1">{{
-        `${activeIndex + 1} of ${orderedImages.length}`
-      }}</span>
 
       <!-- Grid view -->
       <div
@@ -291,7 +288,7 @@ const downloadImage = (imageUrl: string) => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <span class="text-center">
             {{ image.caption }}
           </span>
@@ -299,51 +296,61 @@ const downloadImage = (imageUrl: string) => {
       </div>
 
       <!-- Carousel view -->
-      <div v-else class="flex items-center justify-center gap-2">
-        <button
-          v-if="orderedImages.length > 1"
-          type="button"
-          class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
-          @click="goLeft"
-        >
-          <LeftArrowIcon class="h-4 w-4" />
-        </button>
+      <div v-else class="flex flex-col">
+        <!-- Counter and navigation row -->
+        <div class="flex items-center justify-between p-2">
+          <span class="text-sm">{{
+            `${activeIndex + 1} of ${orderedImages.length}`
+          }}</span>
 
-        <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
-          <div
-            v-for="(image, idx) in orderedImages"
-            :key="image.id"
-            class="flex flex-shrink-0 w-auto"
-          >
-            <div
-              class="max-h-96 max-w-96 min-h-10 cursor-pointer"
-              @click="openLightbox(idx)"
+          <div v-if="orderedImages.length > 1" class="flex gap-2">
+            <button
+              type="button"
+              class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+              @click="goLeft"
             >
-            <img
-              v-if="image"
-              :src="image.url || ''"
-              :alt="image.alt || ''"
-              class="shadow-sm max-h-96 max-w-96"
-              :class="{ hidden: idx !== activeIndex }"
+              <LeftArrowIcon class="h-4 w-4" />
+            </button>
+
+            <button
+              class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+              type="button"
+              @click="goRight"
             >
-              <span
-                class="text-center"
-                :class="{ hidden: idx !== activeIndex }"
-              >
-                {{ image.caption }}
-              </span>
-            </div>
+              <RightArrowIcon class="h-4 w-4" />
+            </button>
           </div>
         </div>
 
-        <button
-          v-if="orderedImages.length > 1"
-          class="h-36 hover:bg-gray-500 flex items-center justify-center px-2"
-          type="button"
-          @click="goRight"
-        >
-          <RightArrowIcon class="h-4 w-4" />
-        </button>
+        <!-- Image container -->
+        <div class="flex items-center justify-center">
+          <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
+            <div
+              v-for="(image, idx) in orderedImages"
+              :key="image.id"
+              class="flex flex-shrink-0 w-auto"
+            >
+              <div
+                class="max-h-96 max-w-96 min-h-10 cursor-pointer"
+                @click="openLightbox(idx)"
+              >
+                <img
+                  v-if="image"
+                  :src="image.url || ''"
+                  :alt="image.alt || ''"
+                  class="shadow-sm max-h-96 max-w-96"
+                  :class="{ hidden: idx !== activeIndex }"
+                >
+                <span
+                  class="text-center"
+                  :class="{ hidden: idx !== activeIndex }"
+                >
+                  {{ image.caption }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -387,7 +394,7 @@ const downloadImage = (imageUrl: string) => {
                 title="Zoom out"
                 @click="zoomOut"
                 :disabled="zoomLevel <= 1"
-                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"   
+                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"
               >
                 −
               </button>
@@ -459,7 +466,7 @@ const downloadImage = (imageUrl: string) => {
             @mousedown="startDrag"
             @touchstart="startTouchDrag"
             @touchmove="onTouchDrag"
-          >
+          />
 
           <button
             v-if="orderedImages.length > 1"
