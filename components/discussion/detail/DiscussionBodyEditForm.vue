@@ -41,7 +41,7 @@ const images = computed(() => {
   });
 });
 
-const imageOrder = computed<string[]>(() => {
+const initialImageOrder = computed<string[]>(() => {
   // If there's an existing order, use it
   if (props.discussion?.Album?.imageOrder?.length) {
     return props.discussion.Album.imageOrder.map((imageId: string | null) => {
@@ -61,7 +61,7 @@ const imageOrder = computed<string[]>(() => {
 });
 
 const orderedImages = computed(() => {
-  return imageOrder.value
+  return initialImageOrder.value
     .map((imageId) => {
       const image = images.value.find((image) => imageId === image.id);
       return image || null;
@@ -73,7 +73,7 @@ const formValues = ref({
   body: props.discussion?.body || "",
   album: {
     images: orderedImages.value,
-    imageOrder: imageOrder.value,
+    imageOrder: initialImageOrder.value,
   },
 });
 
@@ -86,7 +86,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
       Album: {
         create: {
           node: {
-            imageOrder: [],
+            imageOrder: formValues.value.album.imageOrder, // Use the current image order from form values
             Images: {
               create: newImages.map((img) => ({
                 node: {
@@ -143,7 +143,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
         where: { node: { id: old.id } },
       },
     }));
-  // Combine all operations into a single array. Each object is one “Images” operation.
+  // Combine all operations into a single array. Each object is one "Images" operation.
   const imagesOps = [
     ...createImageArray,
     ...updateImageArray,
@@ -156,7 +156,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     Album: {
       update: {
         node: {
-          imageOrder: imageOrder.value, 
+          imageOrder: formValues.value.album.imageOrder, // Use updated image order from form values
           Images: imagesOps,
         },
       },
@@ -214,7 +214,7 @@ function handleUpdateAlbum(newVals: {
         @update-form-values="handleUpdateAlbum"
       />
       <div class="flex align-items gap-2 justify-end mt-2">
-        <GenericButton :text="'Cancel'" @click="emits('closeEditor')" />
+        <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
         <PrimaryButton
           :disabled="formValues.body.length > MAX_CHARS_IN_DISCUSSION_BODY"
           :label="'Save'"
