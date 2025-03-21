@@ -42,9 +42,18 @@ const images = computed(() => {
 });
 
 const imageOrder = computed<string[]>(() => {
-  return (props.discussion.Album?.imageOrder ?? []).filter(
-    (imageId): imageId is string => !!imageId
-  );
+  // If there's an existing order, use it
+  if (props.discussion?.Album?.imageOrder?.length) {
+    return props.discussion.Album.imageOrder.map((imageId: string) => {
+      const image = images.value.find((image) => image.id === imageId);
+      return image ? image.id : "";
+    });
+  }
+  
+  // If no order exists, create one from the images array
+  return images.value
+    .map(image => image.id)
+    .filter((id): id is string => id !== "");
 });
 
 const orderedImages = computed(() => {
@@ -166,7 +175,6 @@ const {
 }));
 
 onDone(() => {
-  console.log("Discussion updated successfully");
   emit("closeEditor");
 });
 

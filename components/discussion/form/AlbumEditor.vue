@@ -30,6 +30,9 @@ const emit = defineEmits(["updateFormValues"]);
 
 const { mdAndDown } = useDisplay();
 
+// Maximum number of images allowed
+const MAX_IMAGES = 25;
+
 type ImageInput = {
   id?: string;
   url: string;
@@ -44,6 +47,11 @@ const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
 
 // Keep track of which item is uploading or done
 const loadingStates = ref<{ [key: number]: boolean }>({});
+
+// Track if we've reached the image limit
+const isImageLimitReached = computed(() => {
+  return props.formValues.album.images.length >= MAX_IMAGES;
+});
 
 /**
  * Upload a single file and return the final link or null on failure.
@@ -91,22 +99,47 @@ const uploadFile = async (file: File): Promise<string | null> => {
  */
 const handleMultipleFiles = async (files: FileList | File[]) => {
   if (!files || files.length === 0) return;
+  
+  // Check if adding these files would exceed the limit
+  if (props.formValues.album.images.length + files.length > MAX_IMAGES) {
+    const remainingSlots = MAX_IMAGES - props.formValues.album.images.length;
+    alert(`You can only add ${remainingSlots} more image${remainingSlots !== 1 ? 's' : ''}. Maximum limit is ${MAX_IMAGES} images.`);
+    // Only process up to the remaining slots
+    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+    if (filesToProcess.length === 0) return;
+    
+    // Optionally you can show a global loading spinner,
+    // or track loading for each file. We'll do a quick approach
+    // by turning on "global" loading in a single key:
+    loadingStates.value[-1] = true;
 
-  // Optionally you can show a global loading spinner,
-  // or track loading for each file. We'll do a quick approach
-  // by turning on "global" loading in a single key:
-  loadingStates.value[-1] = true;
+    for (let i = 0; i < filesToProcess.length; i++) {
+      const file = filesToProcess[i];
+      // Upload each file
+      const uploadedUrl = await uploadFile(file);
+      if (uploadedUrl) {
+        // Insert a new image object into the album
+        addNewImage({
+          url: uploadedUrl,
+          alt: file.name,
+        });
+      }
+    }
+  } else {
+    // Normal flow when not exceeding limits
+    loadingStates.value[-1] = true;
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
-    // Upload each file
-    const uploadedUrl = await uploadFile(file);
-    if (uploadedUrl) {
-      // Insert a new image object into the album
-      addNewImage({
-        url: uploadedUrl,
-        alt: file.name,
-      });
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      // Upload each file
+      const uploadedUrl = await uploadFile(file);
+      if (uploadedUrl) {
+        // Insert a new image object into the album
+        addNewImage({
+          url: uploadedUrl,
+          alt: file.name,
+        });
+      }
     }
   }
 
@@ -121,6 +154,12 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
 const albumFileInputRef = ref<HTMLInputElement | null>(null);
 
 const selectFiles = () => {
+  // Check if we've reached the limit before opening file dialog
+  if (isImageLimitReached.value) {
+    alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
+    return;
+  }
+  
   // Programmatically trigger file input click
   if (albumFileInputRef.value) {
     albumFileInputRef.value.click();
@@ -138,12 +177,16 @@ const handleFileInputChange = (event: Event) => {
 
 const handleDrop = async (event: DragEvent) => {
   event.preventDefault();
-  console.log("Dropped files:", event.dataTransfer?.files);
+  
   if (props.allowImageUpload === false) return;
-  console.log("Uploading files...");
   if (!event.dataTransfer?.files?.length) return;
-  console.log("Handling files...");
-
+  
+  // Check if we've reached the limit before processing dropped files
+  if (isImageLimitReached.value) {
+    alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
+    return;
+  }
+  
   const files = event.dataTransfer.files;
   handleMultipleFiles(files);
 };
@@ -249,6 +292,12 @@ type AddImageInput = {
 };
 
 const addNewImage = (input: AddImageInput) => {
+  // Check if we've reached the limit
+  if (props.formValues.album.images.length >= MAX_IMAGES) {
+    alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
+    return;
+  }
+  
   const { url, alt, caption, copyright } = input;
 
   const newImage = {
@@ -295,6 +344,11 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
     />
     <div v-if="loadingStates[-1]" class="mb-2">
       <LoadingSpinner />
+    </div>
+    <div class="mb-2">
+      <p class="text-sm text-gray-600 dark:text-gray-300">
+        {{ props.formValues.album.images.length }}/{{ MAX_IMAGES }} images
+      </p>
     </div>
     <div
       v-for="(imageId, index) in formValues.album?.imageOrder || []"
@@ -383,6 +437,7 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
       </div>
     </div>
     <div
+      v-if="!isImageLimitReached"
       class="my-3 border-2 border-dotted border-gray-400 p-4 text-center cursor-pointer rounded-md"
       @click="selectFiles"
       @drop="handleDrop"
@@ -398,6 +453,14 @@ const imageMap = computed<Record<string, ImageInput>>(() => {
         style="display: none"
         @change="handleFileInputChange"
       >
+    </div>
+    <div
+      v-else
+      class="my-3 border-2 border-dotted border-gray-300 p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-md opacity-70"
+    >
+      <p class="text-sm text-gray-500 dark:text-gray-400">
+        Maximum limit of {{ MAX_IMAGES }} images reached
+      </p>
     </div>
     <!-- <button
       type="button"
