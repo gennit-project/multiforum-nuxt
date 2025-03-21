@@ -99,6 +99,16 @@ onMounted(() => {
     });
   }
 });
+
+const isDropdownOpen = ref(false);
+
+const getCurrentTabLabel = computed(() => {
+  const currentTab = tabs.find(
+    (tab) =>
+      typeof route.name === "string" && route.name?.includes(`edit-${tab.key}`)
+  );
+  return currentTab?.label || "Settings";
+});
 </script>
 
 <template>
@@ -172,46 +182,97 @@ onMounted(() => {
         @input="touched = true"
         @submit="emit('submit')"
       >
-        <div class="mt-5 flex w-full">
-          <div
-            class="w-1/4 border-r border-gray-200 dark:border-gray-500 mr-4 bg-gray-50"
-          >
-            <ul class="flex flex-col space-y-2">
-              <router-link
-                v-for="tab in tabs"
-                :key="tab.key"
-                :to="{
-                  name: `forums-forumId-edit-${tab.key}`,
-                  params: {
-                    forumId: formValues.uniqueName,
-                  },
-                }"
-                class="py-2 cursor-pointer"
-                :class="{
-                  'dark:text-white border-r-2 border-blue-500':
-                    typeof route.name === 'string' &&
-                    route.name?.includes(`edit-${tab.key}`),
-                  'text-gray-900 ':
-                    typeof route.name === 'string' &&
-                    route.name?.includes(`edit-${tab.key}`),
-                  'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
-                    typeof route.name === 'string' &&
-                    !route.name?.includes(`edit-${tab.key}`),
-                }"
+        <div class="mt-5 w-full">
+          <!-- Mobile Dropdown -->
+          <div class="lg:hidden mb-4">
+            <div class="relative">
+              <button
+                type="button"
+                @click="isDropdownOpen = !isDropdownOpen"
+                class="w-full flex items-center justify-between px-4 py-2 text-sm bg-gray-50 border rounded-md"
               >
-                {{ tab.label }}
-              </router-link>
-            </ul>
+                <span>{{ getCurrentTabLabel }}</span>
+                <i
+                  class="fa-solid fa-chevron-down"
+                  :class="{ 'rotate-180': isDropdownOpen }"
+                ></i>
+              </button>
+
+              <ul
+                v-if="isDropdownOpen"
+                class="absolute z-10 w-full mt-1 bg-white dark:bg-gray-800 border rounded-md shadow-lg"
+              >
+                <router-link
+                  v-for="tab in tabs"
+                  :key="tab.key"
+                  :to="{
+                    name: `forums-forumId-edit-${tab.key}`,
+                    params: {
+                      forumId: formValues.uniqueName,
+                    },
+                  }"
+                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  :class="{
+                    'text-blue-500 bg-gray-50 dark:bg-gray-700':
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`edit-${tab.key}`),
+                    'text-gray-700 dark:text-gray-300':
+                      typeof route.name === 'string' &&
+                      !route.name?.includes(`edit-${tab.key}`),
+                  }"
+                  @click="isDropdownOpen = false"
+                >
+                  {{ tab.label }}
+                </router-link>
+              </ul>
+            </div>
           </div>
-          <div class="flex-1">
-            <NuxtPage
-              :touched="touched"
-              :title-is-invalid="titleIsInvalid"
-              :form-values="formValues"
-              :edit-mode="true"
-              @update-form-values="emit('updateFormValues', $event)"
-              @submit="$emit('submit', $event)"
-            />
+
+          <!-- Desktop Sidebar and Content -->
+          <div class="flex w-full">
+            <!-- Left Sidebar (hidden on mobile) -->
+            <div
+              class="hidden lg:block w-1/4 border-r border-gray-200 dark:border-gray-500 mr-4 bg-gray-50"
+            >
+              <ul class="flex flex-col space-y-2">
+                <router-link
+                  v-for="tab in tabs"
+                  :key="tab.key"
+                  :to="{
+                    name: `forums-forumId-edit-${tab.key}`,
+                    params: {
+                      forumId: formValues.uniqueName,
+                    },
+                  }"
+                  class="py-2 cursor-pointer"
+                  :class="{
+                    'dark:text-white border-r-2 border-blue-500':
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`edit-${tab.key}`),
+                    'text-gray-900':
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`edit-${tab.key}`),
+                    'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
+                      typeof route.name === 'string' &&
+                      !route.name?.includes(`edit-${tab.key}`),
+                  }"
+                >
+                  {{ tab.label }}
+                </router-link>
+              </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1">
+              <NuxtPage
+                :touched="touched"
+                :title-is-invalid="titleIsInvalid"
+                :form-values="formValues"
+                :edit-mode="true"
+                @update-form-values="emit('updateFormValues', $event)"
+                @submit="$emit('submit', $event)"
+              />
+            </div>
           </div>
         </div>
       </TailwindForm>
