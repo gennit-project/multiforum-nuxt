@@ -2,8 +2,6 @@ import { computed, ref, watch, nextTick } from "vue";
 import { useCookie, useRoute, useRouter } from "nuxt/app";
 
 export const useTheme = () => {
-  const route = useRoute();
-  const router = useRouter();
   const themeCookie = useCookie("theme", {
     default: () => "system",
   });
@@ -27,6 +25,10 @@ export const useTheme = () => {
   }
 
   const setTheme = (newTheme: string) => {
+    // Only get route and router when needed
+    const route = useRoute();
+    const router = useRouter();
+    
     // Capture current query params before theme change
     const currentQuery = { ...route.query };
     
