@@ -265,6 +265,29 @@ const downloadImage = (imageUrl: string) => {
       console.error("Download failed:", error);
     });
 };
+
+const touchStartX = ref(0);
+const touchEndX = ref(0);
+
+const handleTouchStart = (event: TouchEvent) => {
+  touchStartX.value = event.touches[0].clientX;
+};
+
+const handleTouchEnd = (event: TouchEvent) => {
+  touchEndX.value = event.changedTouches[0].clientX;
+  const swipeDistance = touchEndX.value - touchStartX.value;
+  
+  // Only trigger if the swipe is significant enough (e.g., > 50px)
+  if (Math.abs(swipeDistance) > 50) {
+    if (swipeDistance > 0) {
+      // Swiped right
+      goLeft();
+    } else {
+      // Swiped left
+      goRight();
+    }
+  }
+};
 </script>
 
 <template>
@@ -288,7 +311,7 @@ const downloadImage = (imageUrl: string) => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          />
+          >
           <span class="text-center">
             {{ image.caption }}
           </span>
@@ -324,7 +347,11 @@ const downloadImage = (imageUrl: string) => {
 
         <!-- Image container -->
         <div class="flex items-center justify-center">
-          <div class="mb-4 flex rounded dark:text-white max-h-96 max-w-96">
+          <div 
+            class="mb-4 flex rounded dark:text-white max-h-96 max-w-96"
+            @touchstart="handleTouchStart"
+            @touchend="handleTouchEnd"
+          >
             <div
               v-for="(image, idx) in orderedImages"
               :key="image.id"
