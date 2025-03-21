@@ -415,9 +415,9 @@ const handleTouchEnd = (event: TouchEvent) => {
 
           <div class="flex items-center gap-4">
             <!-- Zoom controls -->
-            <div class="flex items-center bg-opacity-10 bg-white rounded">
+            <div class="flex items-center bg-opacity-10 rounded">
               <button
-                class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
                 title="Zoom out"
                 @click="zoomOut"
                 :disabled="zoomLevel <= 1"
@@ -429,7 +429,7 @@ const handleTouchEnd = (event: TouchEvent) => {
                 >{{ Math.round(zoomLevel * 100) }}%</span
               >
               <button
-                class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
                 title="Zoom in"
                 @click="zoomIn"
                 :disabled="zoomLevel >= 3"
@@ -439,7 +439,7 @@ const handleTouchEnd = (event: TouchEvent) => {
               </button>
               <button
                 v-if="isZoomed"
-                class="px-2 py-1 hover:bg-white hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
                 title="Reset zoom"
                 @click="resetZoom"
               >
@@ -449,7 +449,7 @@ const handleTouchEnd = (event: TouchEvent) => {
 
             <!-- Panel toggle button -->
             <button
-              class="bg-opacity-10 hover:bg-opacity-20 bg-white border-0 text-white py-1 px-2 rounded cursor-pointer text-sm transition-colors"
+              class="bg-opacity-10 bg-gray-800 border-0 text-white py-1 px-2 rounded cursor-pointer text-sm transition-colors"
               @click="togglePanel"
               :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
             >
@@ -458,7 +458,7 @@ const handleTouchEnd = (event: TouchEvent) => {
             </button>
             <button
               type="button"
-              class="flex items-center justify-center w-8 h-8 rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer"
+              class="flex items-center justify-center w-8 h-8 rounded bg-gray-800 text-white text-xl no-underline cursor-pointer"
               :href="currentImage.url || ''"
               @click="() => downloadImage(currentImage.url || '')"
             >
