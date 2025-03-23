@@ -44,10 +44,13 @@ const props = defineProps({
 
 defineEmits([
   "close-issue",
+  "open-issue",
   "archived-successfully",
   "unarchived-successfully",
   "suspended-user-successfully",
+  "suspended-mod-successfully",
   "unsuspended-user-successfully",
+  "unsuspended-mod-successfully"
 ]);
 
 </script>

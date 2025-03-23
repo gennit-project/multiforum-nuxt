@@ -1,4 +1,26 @@
-const config = {
+type ConfigType = {
+    auth0username: string;
+    auth0Url: string;
+    auth0Scope: string;
+    auth0Audience: string;
+    baseUrl: string;
+    domain: string;
+    clientId: string;
+    clientSecret: string;
+    callbackUrl: string;
+    environment: string;
+    googleCloudStorageBucket: string;
+    googleMapsApiKey: string;
+    graphqlUrl: string;
+    lightgalleryLicenseKey: string;
+    logoutUrl: string;
+    openCageApiKey: string;
+    openGraphApiKey: string;
+    sentryDsn: string;
+    sentryAuthToken: string;
+    serverName: string;
+}
+const config: ConfigType = {
     auth0username: import.meta.env.VITE_AUTH0_USERNAME,
     auth0Url: import.meta.env.VITE_AUTH0_URL,
     auth0Scope: import.meta.env.VITE_AUTH0_SCOPE,

@@ -81,6 +81,7 @@ export default defineNuxtConfig({
       auth0ClientId: config?.clientId,
       auth0CallbackUrl: config?.callbackUrl,
       auth0Url: config?.auth0Url,
+      auth0Audience: config?.auth0Audience,
     },
   },
   ssr: true,

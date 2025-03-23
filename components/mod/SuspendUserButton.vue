@@ -45,7 +45,7 @@ const props = defineProps({
     default: false,
   },
 });
-
+console.log('suspend user button')
 defineEmits([
   "suspended-successfully",
   "unsuspended-successfully",
