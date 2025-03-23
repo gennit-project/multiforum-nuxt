@@ -17,7 +17,7 @@ export default defineComponent({
         y2="0%"
       >
         <stop offset="0%" stop-color="#FF9966" />
-        <stop offset="100%" stop-color="#3B82F6" />
+        <stop offset="100%" stop-color="#1d9bd1" />
       </linearGradient>
     </defs>
   
