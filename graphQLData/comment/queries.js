@@ -308,6 +308,15 @@ export const GET_FEEDBACK_COMMENT = gql`
           displayName
         }
       }
+      GivesFeedbackOnComment {
+        id
+      }
+      GivesFeedbackOnDiscussion {
+        id
+      }
+      GivesFeedbackOnEvent {
+        id
+      }
     }
   }
 `;
