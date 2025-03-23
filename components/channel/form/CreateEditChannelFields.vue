@@ -188,9 +188,9 @@ const getCurrentTabLabel = computed(() => {
             <div class="relative">
               <button
                 type="button"
+                class="w-full flex items-center justify-between px-4 py-2 text-sm bg-gray-50 border border-gray-500 rounded-md dark:text-white"
                 @click="isDropdownOpen = !isDropdownOpen"
-                class="w-full flex items-center justify-between px-4 py-2 text-sm bg-gray-50 border rounded-md"
-              >
+                >
                 <span>{{ getCurrentTabLabel }}</span>
                 <i
                   class="fa-solid fa-chevron-down"
