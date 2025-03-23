@@ -73,6 +73,8 @@ function updateSearchResult(input: string) {
 }
 
 const handleAddTag = async (event: KeyboardEvent) => {
+  event.preventDefault();
+  event.stopPropagation();
   const input = event.target as HTMLInputElement;
   const value = input.value.trim();
   if (value) {

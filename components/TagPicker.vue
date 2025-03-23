@@ -64,6 +64,9 @@ const removeSelection = (tag: string) => {
                px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
         @click="toggleDropdown"
       >
+        <div v-if="selected.length === 0" class="text-gray-500 dark:text-gray-400">
+          There are no tags yet
+        </div>
         <div
           v-for="(tag, index) in selected"
           :key="index"
