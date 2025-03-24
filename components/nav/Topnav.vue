@@ -94,9 +94,9 @@ const isOnMapPage = computed(() => {
             class="hidden sm:flex items-center gap-1 text-gray-300"
           >
             <span>•</span>
-            <span class="font-mono text-gray-300">{{
-              channelId
-            }}</span>
+            <nuxt-link :to="`/forums/${channelId}`" class="font-mono text-gray-300 hover:text-white">
+              {{ channelId }}
+            </nuxt-link>
           </div>
           <div
             v-else-if="routeInfoLabel"

@@ -112,6 +112,10 @@ if (!channelId.value) {
     });
   }
 }
+
+definePageMeta({
+  middleware: 'forum-redirect'
+})
 </script>
 
 <template>
