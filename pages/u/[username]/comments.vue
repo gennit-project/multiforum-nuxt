@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
-
+import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
 import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
 import Comment from "@/components/comments/Comment.vue";
 

@@ -59,6 +59,7 @@ export const GET_USER_COMMENTS = gql`
         createdAt
         updatedAt
         deleted
+        archived
         weightedVotesCount
         ParentComment {
           id
