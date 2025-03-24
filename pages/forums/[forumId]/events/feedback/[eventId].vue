@@ -131,6 +131,12 @@ const reachedEndOfResults = computed(() => {
           <EventBody v-if="event?.description" :event="event" />
         </div>
       </div>
+      <router-link
+        v-if="event"
+        :to="`/forums/${channelId}/events/${event.id}`"
+        class="text-sm text-blue-500 hover:underline dark:text-blue-400"
+        >View Event</router-link
+      >
     </div>
     <FeedbackSection
       v-if="feedbackCommentsAggregate > 0"

@@ -58,6 +58,7 @@ const contextOfFeedbackComment = computed(() => {
 const feedbackOnComment = "forums-forumId-discussions-commentFeedback-discussionId-commentId";
 const commentPermalinkRoute = "forums-forumId-discussions-discussionId-comments-commentId"
 const feedbackOnDiscussionPermalink = "forums-forumId-discussions-feedback-discussionId-feedbackId";
+const feedbackOnCommentPermalink = "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId"
 
 const updateContextLink = () => {
   if (originalComment.value) {
@@ -82,6 +83,17 @@ const updateContextLink = () => {
           },
         };
       }
+    }
+    if (route.name === feedbackOnCommentPermalink) {
+        // If the comment is a feedback comment, we want to link to the original comment.
+      return {
+        name: commentPermalinkRoute,
+        params: {
+          forumId: route.params.forumId,
+          discussionId: route.params.discussionId,
+          commentId: originalComment.value.id || "",
+        },
+      };
     }
   }
   return "";

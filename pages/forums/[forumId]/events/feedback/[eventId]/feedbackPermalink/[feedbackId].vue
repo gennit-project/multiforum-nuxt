@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from "vue";
+import { useRoute } from "nuxt/app";
 import CommentOnFeedbackPage from "@/components/comments/CommentOnFeedbackPage.vue";
 import PermalinkedFeedbackComment from "@/components/comments/PermalinkedFeedbackComment.vue";
 

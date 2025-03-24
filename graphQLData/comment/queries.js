@@ -291,7 +291,6 @@ export const GET_COMMENT_AND_REPLIES = gql`
       }
     }
   }
-  ${AUTHOR_FIELDS}
   ${COMMENT_FIELDS}
   ${COMMENT_VOTE_FIELDS}
 `;
@@ -468,6 +467,9 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
         id
       }
       GivesFeedbackOnDiscussion {
+        id
+      }
+      GivesFeedbackOnEvent {
         id
       }
       FeedbackComments(options: { limit: $limit, offset: $offset }) {
