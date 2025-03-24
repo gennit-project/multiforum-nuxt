@@ -78,6 +78,10 @@ const tabs = [
     key: "suspended-mods",
     label: "Mod Suspensions",
   },
+  {
+    key: "wiki",
+    label: "Wiki",
+  }
 ];
 
 const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);

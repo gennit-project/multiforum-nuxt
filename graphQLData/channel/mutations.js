@@ -31,6 +31,7 @@ export const UPDATE_CHANNEL = gql`
         description
         channelIconURL
         channelBannerURL
+        wikiEnabled
         Admins {
           username
         }

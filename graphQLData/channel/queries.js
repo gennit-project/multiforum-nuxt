@@ -21,6 +21,9 @@ export const GET_CHANNEL = gql`
       channelBannerURL
       rules
       locked
+      wikiEnabled
+      eventsEnabled
+      feedbackEnabled
       Tags {
         text
       }

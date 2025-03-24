@@ -11,4 +11,5 @@ export type CreateEditChannelFormValues = {
     channelIconURL: string;
     channelBannerURL: string;
     rules: Array<RuleInput>;
+    wikiEnabled: boolean;
 }

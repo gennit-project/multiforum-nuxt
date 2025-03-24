@@ -6,6 +6,7 @@ import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import InfoIcon from "@/components/icons/InfoIcon.vue";
+import BookIcon from "@/components/icons/BookIcon.vue";
 import type { Channel } from "@/__generated__/graphql";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
@@ -67,6 +68,7 @@ const tabRoutes = computed(() => {
     about: `/forums/${forumId.value}/about`,
     settings: `/forums/${forumId.value}/edit`,
     moderation: `/forums/${forumId.value}/issues`,
+    wiki: `/forums/${forumId.value}/wiki`,
   };
   return routes;
 });
@@ -101,6 +103,16 @@ const tabs = computed((): Tab[] => {
       routeSuffix: "about",
       label: "About",
       icon: InfoIcon,
+      countProperty: null,
+    });
+  }
+
+  if (props.channel?.wikiEnabled) {
+    baseTabs.push({
+      name: "wiki",
+      routeSuffix: "wiki",
+      label: "Wiki",
+      icon: BookIcon,
       countProperty: null,
     });
   }
@@ -146,8 +158,8 @@ const tabs = computed((): Tab[] => {
     >
       <TabButton
         v-for="tab in tabs"
-        :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
         :key="tab.name"
+        :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
         :to="tabRoutes[tab.name]"
         :label="tab.label"
         :is-active="route.path.includes(tab.routeSuffix)"
