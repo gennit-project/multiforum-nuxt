@@ -39,16 +39,21 @@ const isOwner = computed(() => {
   return props.owners?.includes(usernameVar.value);
 });
 const showAuthContent = computed(() => {
-  // If we have a username from SSR, we can show auth content immediately
+  // During SSR, always show unauthenticated content
+  if (import.meta.env.SSR) return false;
+  
+  // If we have a username from server auth check, show auth content
   if (usernameVar.value) return true;
   
-  // Otherwise fall back to current logic
+  // Client-side checks
   if (!isMounted.value) return false;
   if (!usernameVar.value) return false;
   if (props.requireOwnership && !isOwner.value) return false;
+  
   return true;
 });
 
+// Only run client-side auth logic
 if (import.meta.env.SSR === false) {
   const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect } =
     useAuth0();
@@ -82,7 +87,6 @@ if (import.meta.env.SSR === false) {
   });
 
   handleLogin = async () => {
-    // ts-ignore because Cypress is not defined in the browser
     // @ts-ignore
     if (window?.parent?.Cypress) {
       await loginWithRedirect();

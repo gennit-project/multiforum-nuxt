@@ -1,22 +1,27 @@
 <script setup lang="ts">
-import { useAuth0 } from "@auth0/auth0-vue";
 import { config } from "@/config";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useRoute } from "nuxt/app";
+import { useAuth0 } from "@auth0/auth0-vue";
 
-const { logout } = useAuth0();
+let handleLogout = () => {};
 
-const handleLogout = () => {
-  const route = useRoute();
-  // Store the current path in local storage
-  localStorage.setItem("postLogoutRedirect", route.fullPath);
-  // Redirect to the fixed logout route
-  logout({
-    logoutParams: {
-      returnTo: `${config.baseUrl}/logout`,
-    },
-  });
-};
+// Only initialize auth0 on client side
+if (import.meta.env.SSR === false) {
+  const { logout } = useAuth0();
+  
+  handleLogout = () => {
+    const route = useRoute();
+    // Store the current path in local storage
+    localStorage.setItem("postLogoutRedirect", route.fullPath);
+    // Redirect to the fixed logout route
+    logout({
+      logoutParams: {
+        returnTo: `${config.baseUrl}/logout`,
+      },
+    });
+  };
+}
 </script>
 
 <template>

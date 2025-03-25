@@ -111,13 +111,11 @@ const isOnMapPage = computed(() => {
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <client-only>
-          <div
+        <div
             class="hidden sm:flex items-center justify-end space-x-2 md:flex-1"
           >
             <LoginButton />
-          </div>
-        </client-only>
+        </div>
         <div class="flex items-center space-x-2 md:mr-2">
           <CreateAnythingButton />
           <nuxt-link
