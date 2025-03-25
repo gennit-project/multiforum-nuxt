@@ -48,36 +48,39 @@ onError((error) => {
   console.error("GraphQL query error:", error);
 });
 
-// ===== Token Expiration Handler =====
-const auth0 = useAuth0();
+// Move Auth0-specific code into a separate composable or conditional block
+let auth0 = null;
+if (import.meta.env.SSR === false) {
+  auth0 = useAuth0();
+}
+
+// Modify the token check logic to be client-only
 const tokenCheckInterval = ref<number | null>(null);
 
 // Check token expiration status
 const checkTokenExpiration = async () => {
+  if (!auth0) return;
+  
   try {
     if (auth0.isAuthenticated.value) {
-      // Check if we can get claims from the token
-      const claims = auth0.idTokenClaims
+      const claims = auth0.idTokenClaims;
       
       if (claims) {
         const currentTime = Math.floor(Date.now() / 1000);
-        const expiresAt = claims.exp;
+        const expiresAt = claims?.exp;
         
-        // If token is expired or about to expire in the next minute
         if (expiresAt <= currentTime + 60) {
           console.log('Token is expired or about to expire, attempting refresh');
           
           try {
-            // Try to silently refresh the token
             await auth0.getAccessTokenSilently({ cacheMode: 'off' });
             console.log('Token refreshed successfully');
           } catch (refreshError) {
             console.error('Failed to refresh token, logging out locally:', refreshError);
             
-            // If refresh fails, logout the user without redirect
             auth0.logout({
               logoutParams: {
-                returnTo: window.location.href, // Stay on current page
+                returnTo: window.location.href,
               },
             });
           }
@@ -87,13 +90,11 @@ const checkTokenExpiration = async () => {
   } catch (error) {
     console.error('Error checking token expiration:', error);
     
-    // If we can't check the token at all, it's likely an issue with auth
-    // Log the user out to be safe
-    if (auth0.isAuthenticated.value) {
+    if (auth0?.isAuthenticated.value) {
       console.log('Authentication error detected, logging out locally');
       auth0.logout({
         logoutParams: {
-          returnTo: window.location.href, // Stay on current page
+          returnTo: window.location.href,
         },
       });
     }
@@ -107,13 +108,14 @@ const handleVisibilityChange = () => {
   }
 };
 
-// Setup token checks and event listeners
+// Setup token checks and event listeners only on client
 onMounted(() => {
-  const { user, isAuthenticated } = useAuth0();
+  if (!auth0) return;
+  
+  const { user, isAuthenticated } = auth0;
   isAuthenticatedVar.value = isAuthenticated.value;
   isLoadingAuthVar.value = false;
 
-  // Watch for authentication state
   watch(
     user,
     (user) => {
@@ -125,7 +127,6 @@ onMounted(() => {
     { immediate: true }
   );
   
-  // Watch for authentication errors
   watch(
     () => auth0.error.value,
     (error) => {
@@ -137,7 +138,7 @@ onMounted(() => {
         console.error('Auth0 error detected:', error);
         auth0.logout({
           logoutParams: {
-            returnTo: window.location.href, // Stay on current page
+            returnTo: window.location.href,
           },
         });
       }
