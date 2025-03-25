@@ -30,6 +30,8 @@
       "@nuxt/types",
       "@nuxt/typescript-runtime",
       "@types/node",
+      "@nuxt/components",
+      "@nuxt/schema"
     ],
     "paths": {
       "@/*": ["./*"],
@@ -37,7 +39,12 @@
       "#app/*": ["./.nuxt/types/app/*"],
       "#build/*": ["./.nuxt/types/build/*"],
       "#imports": ["./.nuxt/types/imports.d.ts"],
-      "#imports/*": ["./.nuxt/types/imports/*"]
+      "#imports/*": ["./.nuxt/types/imports/*"],
+      "~~/*": ["./*"],
+      "@@/*": ["./*"],
+      "~/*": ["./*"],
+      "components/*": ["./components/*"],
+      "layouts/*": ["./layouts/*"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
@@ -55,6 +62,7 @@
     "types/**/*.d.ts",
     "components/**/*.vue",
     "pages/**/*.vue",
+    "layouts/**/*.vue",
     "config.ts",
     "types/Channel.ts",
     "types/Comment.ts",
@@ -62,7 +70,9 @@
     "types/Event.ts",
     "types/Tag.ts",
     "types/User.ts",
-    "types/GenericFormTypes.ts"
-, "cache.ts"  ],
+    "types/GenericFormTypes.ts",
+    "cache.ts",
+    ".nuxt/nuxt.d.ts"
+  ],
   "exclude": ["node_modules", ".nuxt", "dist", "cypress/**/*"]
 }

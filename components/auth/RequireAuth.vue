@@ -6,18 +6,18 @@ import { isAuthenticatedVar, setIsLoadingAuth, usernameVar } from "@/cache";
 /* 
 This component is a wrapper around content that requires authentication.
 It shows the content if the user is authenticated, and a login button 
-if they’re not.
+if they're not.
 
 It also has logic to prevent hydration errors and content shift.
 It works like this:
 
-SSR: We cannot know if the user is logged in. So we pretend they’re not.
+SSR: We cannot know if the user is logged in. So we pretend they're not.
 
-Client Initial Hydration: We also pretend they’re not logged in, 
+Client Initial Hydration: We also pretend they're not logged in, 
 matching the SSR output. (No mismatch!)
 
-Client After Mount: We check usernameVar.value. If it’s non-empty,
- we flip to the “has-auth” content. That causes a normal Vue re-render, 
+Client After Mount: We check usernameVar.value. If it's non-empty,
+ we flip to the "has-auth" content. That causes a normal Vue re-render, 
  not a hydration mismatch.
 */
 const props = defineProps({
@@ -39,15 +39,13 @@ const isOwner = computed(() => {
   return props.owners?.includes(usernameVar.value);
 });
 const showAuthContent = computed(() => {
-  // If not mounted yet, pretend not authenticated
+  // If we have a username from SSR, we can show auth content immediately
+  if (usernameVar.value) return true;
+  
+  // Otherwise fall back to current logic
   if (!isMounted.value) return false;
-
-  // If user not logged in or no username, false
   if (!usernameVar.value) return false;
-
-  // If requireOwnership is true, ensure user isOwner
   if (props.requireOwnership && !isOwner.value) return false;
-
   return true;
 });
 
