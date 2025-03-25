@@ -57,7 +57,10 @@ if (import.meta.env.SSR === false) {
 // Modify the token check logic to be client-only
 const tokenCheckInterval = ref<number | null>(null);
 
-// Check token expiration status
+// Add new ref for session expired state
+const isSessionExpired = ref(false);
+
+// Update checkTokenExpiration to set the expired state
 const checkTokenExpiration = async () => {
   if (!auth0) return;
   
@@ -71,33 +74,22 @@ const checkTokenExpiration = async () => {
         
         if (expiresAt <= currentTime + 60) {
           console.log('Token is expired or about to expire, attempting refresh');
+          isSessionExpired.value = true;
           
           try {
             await auth0.getAccessTokenSilently({ cacheMode: 'off' });
             console.log('Token refreshed successfully');
+            isSessionExpired.value = false;
           } catch (refreshError) {
             console.error('Failed to refresh token, logging out locally:', refreshError);
-            
-            auth0.logout({
-              logoutParams: {
-                returnTo: window.location.href,
-              },
-            });
+            isSessionExpired.value = true;
           }
         }
       }
     }
   } catch (error) {
     console.error('Error checking token expiration:', error);
-    
-    if (auth0?.isAuthenticated.value) {
-      console.log('Authentication error detected, logging out locally');
-      auth0.logout({
-        logoutParams: {
-          returnTo: window.location.href,
-        },
-      });
-    }
+    isSessionExpired.value = true;
   }
 };
 
@@ -192,6 +184,15 @@ const showMainContent = computed(() => {
   <v-app>
     <DevOverlay v-if="isDevelopment" />
     <main class="min-h-screen flex flex-col">
+      <div v-if="isSessionExpired" class="bg-red-500 text-white p-4 text-center">
+        Your session has expired. Please 
+        <button 
+          @click="auth0?.loginWithRedirect()" 
+          class="underline font-bold hover:text-red-100"
+        >
+          click here to log in again
+        </button>
+      </div>
       <div
         class="bg-gray-200 dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col"
       >

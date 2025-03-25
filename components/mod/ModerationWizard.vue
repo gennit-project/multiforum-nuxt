@@ -6,7 +6,7 @@ import SuspendUserButton from "./SuspendUserButton.vue";
 import EyeIcon from "../icons/EyeIcon.vue";
 import XCircleIcon from "../icons/XCircleIcon.vue";
 
-const props = defineProps({
+defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,
