@@ -265,6 +265,10 @@ export const GET_DISCUSSION_FEEDBACK = gql`
             createdAt
             displayName
           }
+          ... on User {
+            username
+            createdAt
+          }
         }
         createdAt
         FeedbackCommentsAggregate(
@@ -313,6 +317,9 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
       CommentAuthor(where: { ModerationProfile: { displayName: $modName } }) {
         ... on ModerationProfile {
           displayName
+        }
+        ... on User {
+          username
         }
       }
     }

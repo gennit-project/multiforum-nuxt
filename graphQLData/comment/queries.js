@@ -306,6 +306,14 @@ export const GET_FEEDBACK_COMMENT = gql`
         ... on ModerationProfile {
           displayName
         }
+        ... on User {
+          username
+          profilePicURL
+          displayName
+          commentKarma
+          discussionKarma
+          createdAt
+        }
       }
       GivesFeedbackOnComment {
         id
@@ -341,6 +349,10 @@ export const GET_ACTIVITY_FEED_COMMENT = gql`
           CommentAuthor {
             ... on ModerationProfile {
               displayName
+              __typename
+            }
+            ... on User {
+              username
               __typename
             }
             __typename
@@ -484,6 +496,14 @@ export const GET_FEEDBACK_ON_COMMENT = gql`
             createdAt
             displayName
           }
+          ... on User {
+            username
+            profilePicURL
+            displayName
+            commentKarma
+            discussionKarma
+            createdAt
+          }
         }
         createdAt
         FeedbackCommentsAggregate(
@@ -532,6 +552,14 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
       CommentAuthor(where: { ModerationProfile: { displayName: $modName } }) {
         ... on ModerationProfile {
           displayName
+        }
+        ... on User {
+          username
+          profilePicURL
+          displayName
+          commentKarma
+          discussionKarma
+          createdAt
         }
       }
     }

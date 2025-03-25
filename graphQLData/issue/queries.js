@@ -260,6 +260,9 @@ export const GET_ISSUES_BY_EVENT = gql`
           ... on ModerationProfile {
             displayName
           }
+          ... on User {
+            username
+          }
         }
       }
     }

@@ -96,6 +96,11 @@ export const CREATE_COMMENT = gql`
               name
             }
           }
+          ... on ModerationProfile {
+            displayName
+            createdAt
+            profilePicURL
+          }
         }
         ParentComment {
           id
@@ -217,6 +222,9 @@ export const UPDATE_COMMENT = gql`
             ... on ModerationProfile {
               displayName
             }
+            ... on User {
+              username
+            }
           }
         }
         FeedbackCommentsAggregate {
@@ -293,6 +301,10 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
         CommentAuthor {
           ... on ModerationProfile {
             displayName
+            createdAt
+          }
+          ... on User {
+            username
             createdAt
           }
         }

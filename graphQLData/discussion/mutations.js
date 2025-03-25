@@ -249,6 +249,9 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
           ... on ModerationProfile {
             displayName
           }
+          ... on User {
+            username
+          }
         }
         createdAt
         text

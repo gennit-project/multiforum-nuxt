@@ -74,6 +74,9 @@ export const GET_MOD_COMMENTS = gql`
           ... on ModerationProfile {
             displayName
           }
+          ... on User {
+            username
+          }
         }
         DiscussionChannel {
           id
@@ -118,6 +121,9 @@ export const GET_MOD_ISSUES = gql`
         Author {
           ... on ModerationProfile {
             displayName
+          }
+          ... on User {
+            username
           }
         }
         Channel {

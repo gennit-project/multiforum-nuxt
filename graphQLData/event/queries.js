@@ -143,6 +143,9 @@ export const GET_EVENT_FEEDBACK = gql`
           ... on ModerationProfile {
             displayName
           }
+          ... on User {
+            username
+          }
         }
         GivesFeedbackOnEvent {
           id
