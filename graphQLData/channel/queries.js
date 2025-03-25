@@ -11,6 +11,26 @@ export const GET_CHANNEL_NAMES = gql`
   }
 `;
 
+export const GET_CHANNEL_WIKI = gql`
+  query getChannelWiki($uniqueName: String!) {
+    channels(where: { uniqueName: $uniqueName }) {
+      uniqueName
+      wikiEnabled
+      WikiHomePage {
+        id
+        title
+        body
+        slug
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
+        }
+      }
+    }
+  }
+`;
+
 export const GET_CHANNEL = gql`
   query getChannel($uniqueName: String!, $now: DateTime) {
     channels(where: { uniqueName: $uniqueName }) {

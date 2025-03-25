@@ -28061,6 +28061,12 @@ export type User = {
   Albums: Array<Album>;
   AlbumsAggregate?: Maybe<UserAlbumAlbumsAggregationSelection>;
   AlbumsConnection: UserAlbumsConnection;
+  AuthoredWikiPageVersions: Array<TextVersion>;
+  AuthoredWikiPageVersionsAggregate?: Maybe<UserTextVersionAuthoredWikiPageVersionsAggregationSelection>;
+  AuthoredWikiPageVersionsConnection: UserAuthoredWikiPageVersionsConnection;
+  AuthoredWikiPages: Array<WikiPage>;
+  AuthoredWikiPagesAggregate?: Maybe<UserWikiPageAuthoredWikiPagesAggregationSelection>;
+  AuthoredWikiPagesConnection: UserAuthoredWikiPagesConnection;
   Blocked?: Maybe<User>;
   BlockedAggregate?: Maybe<UserUserBlockedAggregationSelection>;
   BlockedConnection: UserBlockedConnection;
@@ -28191,6 +28197,50 @@ export type UserAlbumsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<UserAlbumsConnectionSort>>;
   where?: InputMaybe<UserAlbumsConnectionWhere>;
+};
+
+
+export type UserAuthoredWikiPageVersionsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<TextVersionOptions>;
+  where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type UserAuthoredWikiPageVersionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type UserAuthoredWikiPageVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserAuthoredWikiPageVersionsConnectionSort>>;
+  where?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+};
+
+
+export type UserAuthoredWikiPagesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<WikiPageOptions>;
+  where?: InputMaybe<WikiPageWhere>;
+};
+
+
+export type UserAuthoredWikiPagesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<WikiPageWhere>;
+};
+
+
+export type UserAuthoredWikiPagesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserAuthoredWikiPagesConnectionSort>>;
+  where?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
 };
 
 
@@ -29007,6 +29057,268 @@ export type UserAlbumsUpdateFieldInput = {
   where?: InputMaybe<UserAlbumsConnectionWhere>;
 };
 
+export type UserAuthoredWikiPageVersionsAggregateInput = {
+  AND?: InputMaybe<Array<UserAuthoredWikiPageVersionsAggregateInput>>;
+  NOT?: InputMaybe<UserAuthoredWikiPageVersionsAggregateInput>;
+  OR?: InputMaybe<Array<UserAuthoredWikiPageVersionsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserAuthoredWikiPageVersionsNodeAggregationWhereInput>;
+};
+
+export type UserAuthoredWikiPageVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<TextVersionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<TextVersionConnectWhere>;
+};
+
+export type UserAuthoredWikiPageVersionsConnection = {
+  __typename?: 'UserAuthoredWikiPageVersionsConnection';
+  edges: Array<UserAuthoredWikiPageVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserAuthoredWikiPageVersionsConnectionSort = {
+  node?: InputMaybe<TextVersionSort>;
+};
+
+export type UserAuthoredWikiPageVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<UserAuthoredWikiPageVersionsConnectionWhere>>;
+  NOT?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<UserAuthoredWikiPageVersionsConnectionWhere>>;
+  node?: InputMaybe<TextVersionWhere>;
+};
+
+export type UserAuthoredWikiPageVersionsCreateFieldInput = {
+  node: TextVersionCreateInput;
+};
+
+export type UserAuthoredWikiPageVersionsDeleteFieldInput = {
+  delete?: InputMaybe<TextVersionDeleteInput>;
+  where?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+};
+
+export type UserAuthoredWikiPageVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<TextVersionDisconnectInput>;
+  where?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+};
+
+export type UserAuthoredWikiPageVersionsFieldInput = {
+  connect?: InputMaybe<Array<UserAuthoredWikiPageVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserAuthoredWikiPageVersionsCreateFieldInput>>;
+};
+
+export type UserAuthoredWikiPageVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserAuthoredWikiPageVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserAuthoredWikiPageVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserAuthoredWikiPageVersionsNodeAggregationWhereInput>>;
+  body_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  body_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type UserAuthoredWikiPageVersionsRelationship = {
+  __typename?: 'UserAuthoredWikiPageVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: TextVersion;
+};
+
+export type UserAuthoredWikiPageVersionsUpdateConnectionInput = {
+  node?: InputMaybe<TextVersionUpdateInput>;
+};
+
+export type UserAuthoredWikiPageVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserAuthoredWikiPageVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserAuthoredWikiPageVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserAuthoredWikiPageVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserAuthoredWikiPageVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<UserAuthoredWikiPageVersionsUpdateConnectionInput>;
+  where?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+};
+
+export type UserAuthoredWikiPagesAggregateInput = {
+  AND?: InputMaybe<Array<UserAuthoredWikiPagesAggregateInput>>;
+  NOT?: InputMaybe<UserAuthoredWikiPagesAggregateInput>;
+  OR?: InputMaybe<Array<UserAuthoredWikiPagesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserAuthoredWikiPagesNodeAggregationWhereInput>;
+};
+
+export type UserAuthoredWikiPagesConnectFieldInput = {
+  connect?: InputMaybe<Array<WikiPageConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<WikiPageConnectWhere>;
+};
+
+export type UserAuthoredWikiPagesConnection = {
+  __typename?: 'UserAuthoredWikiPagesConnection';
+  edges: Array<UserAuthoredWikiPagesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserAuthoredWikiPagesConnectionSort = {
+  node?: InputMaybe<WikiPageSort>;
+};
+
+export type UserAuthoredWikiPagesConnectionWhere = {
+  AND?: InputMaybe<Array<UserAuthoredWikiPagesConnectionWhere>>;
+  NOT?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+  OR?: InputMaybe<Array<UserAuthoredWikiPagesConnectionWhere>>;
+  node?: InputMaybe<WikiPageWhere>;
+};
+
+export type UserAuthoredWikiPagesCreateFieldInput = {
+  node: WikiPageCreateInput;
+};
+
+export type UserAuthoredWikiPagesDeleteFieldInput = {
+  delete?: InputMaybe<WikiPageDeleteInput>;
+  where?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+};
+
+export type UserAuthoredWikiPagesDisconnectFieldInput = {
+  disconnect?: InputMaybe<WikiPageDisconnectInput>;
+  where?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+};
+
+export type UserAuthoredWikiPagesFieldInput = {
+  connect?: InputMaybe<Array<UserAuthoredWikiPagesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserAuthoredWikiPagesCreateFieldInput>>;
+};
+
+export type UserAuthoredWikiPagesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserAuthoredWikiPagesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserAuthoredWikiPagesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserAuthoredWikiPagesNodeAggregationWhereInput>>;
+  body_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  body_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  slug_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  slug_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  slug_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  slug_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  slug_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  slug_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  slug_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  slug_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  slug_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  slug_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  slug_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  slug_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  slug_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  slug_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  slug_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  title_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type UserAuthoredWikiPagesRelationship = {
+  __typename?: 'UserAuthoredWikiPagesRelationship';
+  cursor: Scalars['String']['output'];
+  node: WikiPage;
+};
+
+export type UserAuthoredWikiPagesUpdateConnectionInput = {
+  node?: InputMaybe<WikiPageUpdateInput>;
+};
+
+export type UserAuthoredWikiPagesUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserAuthoredWikiPagesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserAuthoredWikiPagesCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserAuthoredWikiPagesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserAuthoredWikiPagesDisconnectFieldInput>>;
+  update?: InputMaybe<UserAuthoredWikiPagesUpdateConnectionInput>;
+  where?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+};
+
 export type UserBlockedAggregateInput = {
   AND?: InputMaybe<Array<UserBlockedAggregateInput>>;
   NOT?: InputMaybe<UserBlockedAggregateInput>;
@@ -29711,6 +30023,8 @@ export type UserCommentsUpdateFieldInput = {
 export type UserConnectInput = {
   AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsConnectFieldInput>>;
   Albums?: InputMaybe<Array<UserAlbumsConnectFieldInput>>;
+  AuthoredWikiPageVersions?: InputMaybe<Array<UserAuthoredWikiPageVersionsConnectFieldInput>>;
+  AuthoredWikiPages?: InputMaybe<Array<UserAuthoredWikiPagesConnectFieldInput>>;
   Blocked?: InputMaybe<UserBlockedConnectFieldInput>;
   ChannelRoles?: InputMaybe<Array<UserChannelRolesConnectFieldInput>>;
   Comments?: InputMaybe<Array<UserCommentsConnectFieldInput>>;
@@ -29763,6 +30077,8 @@ export type UserConnectWhere = {
 export type UserCreateInput = {
   AdminOfChannels?: InputMaybe<UserAdminOfChannelsFieldInput>;
   Albums?: InputMaybe<UserAlbumsFieldInput>;
+  AuthoredWikiPageVersions?: InputMaybe<UserAuthoredWikiPageVersionsFieldInput>;
+  AuthoredWikiPages?: InputMaybe<UserAuthoredWikiPagesFieldInput>;
   Blocked?: InputMaybe<UserBlockedFieldInput>;
   ChannelRoles?: InputMaybe<UserChannelRolesFieldInput>;
   Comments?: InputMaybe<UserCommentsFieldInput>;
@@ -30027,6 +30343,8 @@ export type UserDefaultFeedUpdateFieldInput = {
 export type UserDeleteInput = {
   AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsDeleteFieldInput>>;
   Albums?: InputMaybe<Array<UserAlbumsDeleteFieldInput>>;
+  AuthoredWikiPageVersions?: InputMaybe<Array<UserAuthoredWikiPageVersionsDeleteFieldInput>>;
+  AuthoredWikiPages?: InputMaybe<Array<UserAuthoredWikiPagesDeleteFieldInput>>;
   Blocked?: InputMaybe<UserBlockedDeleteFieldInput>;
   ChannelRoles?: InputMaybe<Array<UserChannelRolesDeleteFieldInput>>;
   Comments?: InputMaybe<Array<UserCommentsDeleteFieldInput>>;
@@ -30056,6 +30374,8 @@ export type UserDeleteInput = {
 export type UserDisconnectInput = {
   AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsDisconnectFieldInput>>;
   Albums?: InputMaybe<Array<UserAlbumsDisconnectFieldInput>>;
+  AuthoredWikiPageVersions?: InputMaybe<Array<UserAuthoredWikiPageVersionsDisconnectFieldInput>>;
+  AuthoredWikiPages?: InputMaybe<Array<UserAuthoredWikiPagesDisconnectFieldInput>>;
   Blocked?: InputMaybe<UserBlockedDisconnectFieldInput>;
   ChannelRoles?: InputMaybe<Array<UserChannelRolesDisconnectFieldInput>>;
   Comments?: InputMaybe<Array<UserCommentsDisconnectFieldInput>>;
@@ -32783,6 +33103,8 @@ export type UserRecentlyVisitedChannelsUpdateFieldInput = {
 export type UserRelationInput = {
   AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsCreateFieldInput>>;
   Albums?: InputMaybe<Array<UserAlbumsCreateFieldInput>>;
+  AuthoredWikiPageVersions?: InputMaybe<Array<UserAuthoredWikiPageVersionsCreateFieldInput>>;
+  AuthoredWikiPages?: InputMaybe<Array<UserAuthoredWikiPagesCreateFieldInput>>;
   Blocked?: InputMaybe<UserBlockedCreateFieldInput>;
   ChannelRoles?: InputMaybe<Array<UserChannelRolesCreateFieldInput>>;
   Comments?: InputMaybe<Array<UserCommentsCreateFieldInput>>;
@@ -33120,6 +33442,20 @@ export type UserSuspensionsUpdateFieldInput = {
   where?: InputMaybe<UserSuspensionsConnectionWhere>;
 };
 
+export type UserTextVersionAuthoredWikiPageVersionsAggregationSelection = {
+  __typename?: 'UserTextVersionAuthoredWikiPageVersionsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserTextVersionAuthoredWikiPageVersionsNodeAggregateSelection>;
+};
+
+export type UserTextVersionAuthoredWikiPageVersionsNodeAggregateSelection = {
+  __typename?: 'UserTextVersionAuthoredWikiPageVersionsNodeAggregateSelection';
+  body: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type UserUniqueWhere = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
@@ -33127,6 +33463,8 @@ export type UserUniqueWhere = {
 export type UserUpdateInput = {
   AdminOfChannels?: InputMaybe<Array<UserAdminOfChannelsUpdateFieldInput>>;
   Albums?: InputMaybe<Array<UserAlbumsUpdateFieldInput>>;
+  AuthoredWikiPageVersions?: InputMaybe<Array<UserAuthoredWikiPageVersionsUpdateFieldInput>>;
+  AuthoredWikiPages?: InputMaybe<Array<UserAuthoredWikiPagesUpdateFieldInput>>;
   Blocked?: InputMaybe<UserBlockedUpdateFieldInput>;
   ChannelRoles?: InputMaybe<Array<UserChannelRolesUpdateFieldInput>>;
   Comments?: InputMaybe<Array<UserCommentsUpdateFieldInput>>;
@@ -33513,6 +33851,40 @@ export type UserWhere = {
   Albums_SINGLE?: InputMaybe<AlbumWhere>;
   /** Return Users where some of the related Albums match this filter */
   Albums_SOME?: InputMaybe<AlbumWhere>;
+  AuthoredWikiPageVersionsAggregate?: InputMaybe<UserAuthoredWikiPageVersionsAggregateInput>;
+  /** Return Users where all of the related UserAuthoredWikiPageVersionsConnections match this filter */
+  AuthoredWikiPageVersionsConnection_ALL?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+  /** Return Users where none of the related UserAuthoredWikiPageVersionsConnections match this filter */
+  AuthoredWikiPageVersionsConnection_NONE?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+  /** Return Users where one of the related UserAuthoredWikiPageVersionsConnections match this filter */
+  AuthoredWikiPageVersionsConnection_SINGLE?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+  /** Return Users where some of the related UserAuthoredWikiPageVersionsConnections match this filter */
+  AuthoredWikiPageVersionsConnection_SOME?: InputMaybe<UserAuthoredWikiPageVersionsConnectionWhere>;
+  /** Return Users where all of the related TextVersions match this filter */
+  AuthoredWikiPageVersions_ALL?: InputMaybe<TextVersionWhere>;
+  /** Return Users where none of the related TextVersions match this filter */
+  AuthoredWikiPageVersions_NONE?: InputMaybe<TextVersionWhere>;
+  /** Return Users where one of the related TextVersions match this filter */
+  AuthoredWikiPageVersions_SINGLE?: InputMaybe<TextVersionWhere>;
+  /** Return Users where some of the related TextVersions match this filter */
+  AuthoredWikiPageVersions_SOME?: InputMaybe<TextVersionWhere>;
+  AuthoredWikiPagesAggregate?: InputMaybe<UserAuthoredWikiPagesAggregateInput>;
+  /** Return Users where all of the related UserAuthoredWikiPagesConnections match this filter */
+  AuthoredWikiPagesConnection_ALL?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+  /** Return Users where none of the related UserAuthoredWikiPagesConnections match this filter */
+  AuthoredWikiPagesConnection_NONE?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+  /** Return Users where one of the related UserAuthoredWikiPagesConnections match this filter */
+  AuthoredWikiPagesConnection_SINGLE?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+  /** Return Users where some of the related UserAuthoredWikiPagesConnections match this filter */
+  AuthoredWikiPagesConnection_SOME?: InputMaybe<UserAuthoredWikiPagesConnectionWhere>;
+  /** Return Users where all of the related WikiPages match this filter */
+  AuthoredWikiPages_ALL?: InputMaybe<WikiPageWhere>;
+  /** Return Users where none of the related WikiPages match this filter */
+  AuthoredWikiPages_NONE?: InputMaybe<WikiPageWhere>;
+  /** Return Users where one of the related WikiPages match this filter */
+  AuthoredWikiPages_SINGLE?: InputMaybe<WikiPageWhere>;
+  /** Return Users where some of the related WikiPages match this filter */
+  AuthoredWikiPages_SOME?: InputMaybe<WikiPageWhere>;
   Blocked?: InputMaybe<UserWhere>;
   BlockedAggregate?: InputMaybe<UserBlockedAggregateInput>;
   BlockedConnection?: InputMaybe<UserBlockedConnectionWhere>;
@@ -33939,6 +34311,22 @@ export type UserWhere = {
   username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UserWikiPageAuthoredWikiPagesAggregationSelection = {
+  __typename?: 'UserWikiPageAuthoredWikiPagesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserWikiPageAuthoredWikiPagesNodeAggregateSelection>;
+};
+
+export type UserWikiPageAuthoredWikiPagesNodeAggregateSelection = {
+  __typename?: 'UserWikiPageAuthoredWikiPagesNodeAggregateSelection';
+  body: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  slug: StringAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
 export type UsersConnection = {
   __typename?: 'UsersConnection';
   edges: Array<UserEdge>;
@@ -33957,6 +34345,9 @@ export type WikiPage = {
   ProposedEdits: Array<TextVersion>;
   ProposedEditsAggregate?: Maybe<WikiPageTextVersionProposedEditsAggregationSelection>;
   ProposedEditsConnection: WikiPageProposedEditsConnection;
+  VersionAuthor?: Maybe<User>;
+  VersionAuthorAggregate?: Maybe<WikiPageUserVersionAuthorAggregationSelection>;
+  VersionAuthorConnection: WikiPageVersionAuthorConnection;
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
@@ -34029,6 +34420,28 @@ export type WikiPageProposedEditsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<WikiPageProposedEditsConnectionSort>>;
   where?: InputMaybe<WikiPageProposedEditsConnectionWhere>;
+};
+
+
+export type WikiPageVersionAuthorArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type WikiPageVersionAuthorAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type WikiPageVersionAuthorConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<WikiPageVersionAuthorConnectionSort>>;
+  where?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
 };
 
 export type WikiPageAggregateSelection = {
@@ -34192,6 +34605,11 @@ export type WikiPageConnectInput = {
   ChildPages?: InputMaybe<Array<WikiPageChildPagesConnectFieldInput>>;
   PastVersions?: InputMaybe<Array<WikiPagePastVersionsConnectFieldInput>>;
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsConnectFieldInput>>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorConnectFieldInput>;
+};
+
+export type WikiPageConnectOrCreateInput = {
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorConnectOrCreateFieldInput>;
 };
 
 export type WikiPageConnectWhere = {
@@ -34202,6 +34620,7 @@ export type WikiPageCreateInput = {
   ChildPages?: InputMaybe<WikiPageChildPagesFieldInput>;
   PastVersions?: InputMaybe<WikiPagePastVersionsFieldInput>;
   ProposedEdits?: InputMaybe<WikiPageProposedEditsFieldInput>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   slug: Scalars['String']['input'];
   title: Scalars['String']['input'];
@@ -34212,12 +34631,14 @@ export type WikiPageDeleteInput = {
   ChildPages?: InputMaybe<Array<WikiPageChildPagesDeleteFieldInput>>;
   PastVersions?: InputMaybe<Array<WikiPagePastVersionsDeleteFieldInput>>;
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsDeleteFieldInput>>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorDeleteFieldInput>;
 };
 
 export type WikiPageDisconnectInput = {
   ChildPages?: InputMaybe<Array<WikiPageChildPagesDisconnectFieldInput>>;
   PastVersions?: InputMaybe<Array<WikiPagePastVersionsDisconnectFieldInput>>;
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsDisconnectFieldInput>>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorDisconnectFieldInput>;
 };
 
 export type WikiPageEdge = {
@@ -34469,6 +34890,7 @@ export type WikiPageRelationInput = {
   ChildPages?: InputMaybe<Array<WikiPageChildPagesCreateFieldInput>>;
   PastVersions?: InputMaybe<Array<WikiPagePastVersionsCreateFieldInput>>;
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsCreateFieldInput>>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorCreateFieldInput>;
 };
 
 /** Fields to sort WikiPages by. The order in which sorts are applied is not guaranteed when specifying many fields in one WikiPageSort object. */
@@ -34513,10 +34935,310 @@ export type WikiPageUpdateInput = {
   ChildPages?: InputMaybe<Array<WikiPageChildPagesUpdateFieldInput>>;
   PastVersions?: InputMaybe<Array<WikiPagePastVersionsUpdateFieldInput>>;
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsUpdateFieldInput>>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorUpdateFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WikiPageUserVersionAuthorAggregationSelection = {
+  __typename?: 'WikiPageUserVersionAuthorAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<WikiPageUserVersionAuthorNodeAggregateSelection>;
+};
+
+export type WikiPageUserVersionAuthorNodeAggregateSelection = {
+  __typename?: 'WikiPageUserVersionAuthorNodeAggregateSelection';
+  DefaultEmojiSkinTone: StringAggregateSelection;
+  NotificationBundleInterval: StringAggregateSelection;
+  PreferredTimeZone: StringAggregateSelection;
+  bio: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type WikiPageVersionAuthorAggregateInput = {
+  AND?: InputMaybe<Array<WikiPageVersionAuthorAggregateInput>>;
+  NOT?: InputMaybe<WikiPageVersionAuthorAggregateInput>;
+  OR?: InputMaybe<Array<WikiPageVersionAuthorAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<WikiPageVersionAuthorNodeAggregationWhereInput>;
+};
+
+export type WikiPageVersionAuthorConnectFieldInput = {
+  connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type WikiPageVersionAuthorConnectOrCreateFieldInput = {
+  onCreate: WikiPageVersionAuthorConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type WikiPageVersionAuthorConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type WikiPageVersionAuthorConnection = {
+  __typename?: 'WikiPageVersionAuthorConnection';
+  edges: Array<WikiPageVersionAuthorRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type WikiPageVersionAuthorConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type WikiPageVersionAuthorConnectionWhere = {
+  AND?: InputMaybe<Array<WikiPageVersionAuthorConnectionWhere>>;
+  NOT?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
+  OR?: InputMaybe<Array<WikiPageVersionAuthorConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type WikiPageVersionAuthorCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type WikiPageVersionAuthorDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
+};
+
+export type WikiPageVersionAuthorDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
+};
+
+export type WikiPageVersionAuthorFieldInput = {
+  connect?: InputMaybe<WikiPageVersionAuthorConnectFieldInput>;
+  connectOrCreate?: InputMaybe<WikiPageVersionAuthorConnectOrCreateFieldInput>;
+  create?: InputMaybe<WikiPageVersionAuthorCreateFieldInput>;
+};
+
+export type WikiPageVersionAuthorNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<WikiPageVersionAuthorNodeAggregationWhereInput>>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NOT?: InputMaybe<WikiPageVersionAuthorNodeAggregationWhereInput>;
+  NotificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  OR?: InputMaybe<Array<WikiPageVersionAuthorNodeAggregationWhereInput>>;
+  PreferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type WikiPageVersionAuthorRelationship = {
+  __typename?: 'WikiPageVersionAuthorRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type WikiPageVersionAuthorUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type WikiPageVersionAuthorUpdateFieldInput = {
+  connect?: InputMaybe<WikiPageVersionAuthorConnectFieldInput>;
+  connectOrCreate?: InputMaybe<WikiPageVersionAuthorConnectOrCreateFieldInput>;
+  create?: InputMaybe<WikiPageVersionAuthorCreateFieldInput>;
+  delete?: InputMaybe<WikiPageVersionAuthorDeleteFieldInput>;
+  disconnect?: InputMaybe<WikiPageVersionAuthorDisconnectFieldInput>;
+  update?: InputMaybe<WikiPageVersionAuthorUpdateConnectionInput>;
+  where?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
 };
 
 export type WikiPageWhere = {
@@ -34574,6 +35296,11 @@ export type WikiPageWhere = {
   ProposedEdits_SINGLE?: InputMaybe<TextVersionWhere>;
   /** Return WikiPages where some of the related TextVersions match this filter */
   ProposedEdits_SOME?: InputMaybe<TextVersionWhere>;
+  VersionAuthor?: InputMaybe<UserWhere>;
+  VersionAuthorAggregate?: InputMaybe<WikiPageVersionAuthorAggregateInput>;
+  VersionAuthorConnection?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
+  VersionAuthorConnection_NOT?: InputMaybe<WikiPageVersionAuthorConnectionWhere>;
+  VersionAuthor_NOT?: InputMaybe<UserWhere>;
   body?: InputMaybe<Scalars['String']['input']>;
   body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;

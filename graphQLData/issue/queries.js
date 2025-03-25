@@ -30,8 +30,12 @@ export const ISSUE_FIELDS = gql`
     relatedDiscussionId
     relatedEventId
     Author {
+      __typename
       ... on ModerationProfile {
         displayName
+      }
+      ... on User {
+        username
       }
     }
     flaggedServerRuleViolation
@@ -54,6 +58,9 @@ export const ISSUE_FIELDS = gql`
           CommentAuthor {
             ... on ModerationProfile {
               displayName
+            }
+            ... on User {
+              username
             }
           }
           Channel {
@@ -127,8 +134,12 @@ export const GET_ISSUES_BY_DISCUSSION = gql`
       RelatedIssues {
         title
         Author {
+          __typename
           ... on ModerationProfile {
             displayName
+          }
+          ... on User {
+            username
           }
         }
       }
@@ -145,8 +156,12 @@ export const GET_ISSUES_BY_CHANNEL = gql`
         title
         body
         Author {
+          __typename
           ... on ModerationProfile {
             displayName
+          }
+          ... on User {
+            username
           }
         }
         createdAt
@@ -172,8 +187,12 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
         title
         body
         Author {
+          __typename
           ... on ModerationProfile {
             displayName
+          }
+          ... on User {
+            username
           }
         }
         createdAt
@@ -210,8 +229,12 @@ export const GET_ISSUES_BY_SERVER = gql`
       title
       authorName
       Author {
+        __typename
         ... on ModerationProfile {
           displayName
+        }
+        ... on User {
+          username
         }
       }
       relatedDiscussionId
@@ -251,8 +274,12 @@ export const GET_ISSUES_BY_COMMENT = gql`
       RelatedIssues {
         title
         Author {
+          __typename
           ... on ModerationProfile {
             displayName
+          }
+          ... on User {
+            username
           }
         }
       }
@@ -283,8 +310,12 @@ export const GET_ISSUES = gql`
         uniqueName
       }
       Author {
+        __typename
         ... on ModerationProfile {
           displayName
+        }
+        ... on User {
+          username
         }
       }
     }
@@ -308,8 +339,12 @@ export const GET_CLOSED_ISSUES = gql`
       }
       channelUniqueName
       Author {
+        __typename
         ... on ModerationProfile {
           displayName
+        }
+        ... on User {
+          username
         }
       }
     }

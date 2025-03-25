@@ -97,15 +97,6 @@ const tabs = computed((): Tab[] => {
     },
   ];
 
-  if (smAndDown.value) {
-    baseTabs.push({
-      name: "about",
-      routeSuffix: "about",
-      label: "About",
-      icon: InfoIcon,
-      countProperty: null,
-    });
-  }
 
   if (props.channel?.wikiEnabled) {
     baseTabs.push({
@@ -141,6 +132,15 @@ const tabs = computed((): Tab[] => {
       label: "Issues",
       icon: FlagIcon,
       countProperty: "IssuesAggregate",
+    });
+  }
+  if (smAndDown.value) {
+    baseTabs.push({
+      name: "about",
+      routeSuffix: "about",
+      label: "About",
+      icon: InfoIcon,
+      countProperty: null,
     });
   }
 
