@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type { Issue } from "@/__generated__/graphql";
 import ArchiveButton from "./ArchiveButton.vue";
 import SuspendUserButton from "./SuspendUserButton.vue";
@@ -56,72 +57,92 @@ defineEmits([
 </script>
 
 <template>
-  <div class="flex pt-12 gap-x-2">
-    <div
-      class="flex justify-center items-center w-10 h-10  rounded-lg"
-      :class="[issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700']"
-    >
-      <div class="">
-        <EyeIcon class="h-6 w-6 text-white" />
-      </div>
-    </div>
-    <div
-      class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
-      :class="[
-        issue.isOpen
-          ? 'border-blue-500'
-          : 'border-gray-300 dark:border-gray-700',
-      ]"
-    >
-      <h1
-        v-if="issue.isOpen"
-        class="text-xl font-bold text-blue-500 border-b border-gray-300 dark:border-gray-600 pb-2"
-      >
-        Mod Decision Needed
-      </h1>
-      <h1
-        v-else
-        class="text-xl font-bold text-gray-500 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 pb-2"
-
+  <RequireAuth>
+    <template #has-auth>
+      <div class="flex pt-12 gap-x-2">
+        <div
+          class="flex justify-center items-center w-10 h-10  rounded-lg"
+          :class="[issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700']"
         >
-        Mod Actions
-      </h1>
-      <p class="text-gray-600 dark:text-gray-400" v-if="!issue.isOpen">
-        {{ "Mod actions are disabled because the issue is closed." }}
-      </p>
-      <div class="flex flex-col space-y-4 mt-4">
-        <ArchiveButton
-          :discussion-id="discussionId"
-          :event-id="eventId"
-          :comment-id="commentId"
-          :context-text="contextText"
-          :channel-unique-name="channelUniqueName"
-          :issue="issue"
-          :disabled="!issue.isOpen"
-          @archived-successfully="$emit('archived-successfully')"
-          @unarchived-successfully="$emit('unarchived-successfully')"
-        />
-        <SuspendUserButton
-          :issue="issue"
-          :discussion-title="contextText"
-          :discussion-id="discussionId"
-          :event-title="contextText"
-          :event-id="eventId"
-          :channel-unique-name="channelUniqueName"
-          :disabled="!issue.isOpen"
-          @suspended-successfully="$emit('suspended-user-successfully')"
-          @unsuspended-successfully="$emit('unsuspended-user-successfully')"
-        />
-        <button
-          v-if="issue.isOpen"
-          class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
-          :loading="closeIssueLoading"
-          @click="$emit('close-issue')"
+          <div class="">
+            <EyeIcon class="h-6 w-6 text-white" />
+          </div>
+        </div>
+        <div
+          class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
+          :class="[
+            issue.isOpen
+              ? 'border-blue-500'
+              : 'border-gray-300 dark:border-gray-700',
+          ]"
         >
-          <XCircleIcon />
-          Close Issue (No Action Needed)
-        </button>
+          <h1
+            v-if="issue.isOpen"
+            class="text-xl font-bold text-blue-500 border-b border-gray-300 dark:border-gray-600 pb-2"
+          >
+            Mod Decision Needed
+          </h1>
+          <h1
+            v-else
+            class="text-xl font-bold text-gray-500 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 pb-2"
+          >
+            Mod Actions
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400" v-if="!issue.isOpen">
+            {{ "Mod actions are disabled because the issue is closed." }}
+          </p>
+          <div class="flex flex-col space-y-4 mt-4">
+            <ArchiveButton
+              :discussion-id="discussionId"
+              :event-id="eventId"
+              :comment-id="commentId"
+              :context-text="contextText"
+              :channel-unique-name="channelUniqueName"
+              :issue="issue"
+              :disabled="!issue.isOpen"
+              @archived-successfully="$emit('archived-successfully')"
+              @unarchived-successfully="$emit('unarchived-successfully')"
+            />
+            <SuspendUserButton
+              :issue="issue"
+              :discussion-title="contextText"
+              :discussion-id="discussionId"
+              :event-title="contextText"
+              :event-id="eventId"
+              :channel-unique-name="channelUniqueName"
+              :disabled="!issue.isOpen"
+              @suspended-successfully="$emit('suspended-user-successfully')"
+              @unsuspended-successfully="$emit('unsuspended-user-successfully')"
+            />
+            <button
+              v-if="issue.isOpen"
+              class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+              :loading="closeIssueLoading"
+              @click="$emit('close-issue')"
+            >
+              <XCircleIcon />
+              Close Issue (No Action Needed)
+            </button>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
+    </template>
+    <template #does-not-have-auth>
+      <div class="flex pt-12 gap-x-2">
+        <div class="flex justify-center items-center w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-lg">
+          <div class="">
+            <EyeIcon class="h-6 w-6 text-white" />
+          </div>
+        </div>
+        <div class="flex-1 flex-col space-y-4 px-4 py-4 border border-gray-300 dark:border-gray-700 rounded-lg">
+          <h1 class="text-xl font-bold text-gray-500 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 pb-2">
+            Mod Actions
+          </h1>
+          <p class="text-gray-600 dark:text-gray-400">
+            Please log in to access moderation features
+          </p>
+        </div>
+      </div>
+    </template>
+  </RequireAuth>
 </template>

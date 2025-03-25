@@ -99,7 +99,6 @@ export const CREATE_COMMENT = gql`
           ... on ModerationProfile {
             displayName
             createdAt
-            profilePicURL
           }
         }
         ParentComment {
@@ -123,6 +122,9 @@ export const CREATE_COMMENT = gql`
           CommentAuthor {
             ... on User {
               username
+            }
+            ... on ModerationProfile {
+              displayName
             }
           }
           UpvotedByUsers {

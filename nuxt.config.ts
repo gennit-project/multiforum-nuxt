@@ -39,6 +39,19 @@ export default defineNuxtConfig({
             tokenName: "token",
             tokenStorage: "localStorage",
             inMemoryCacheOptions,
+            defaultOptions: {
+              watchQuery: {
+                errorPolicy: 'all',
+                notifyOnNetworkStatusChange: true,
+              },
+              query: {
+                errorPolicy: 'all',
+                notifyOnNetworkStatusChange: true,
+              },
+              mutation: {
+                errorPolicy: 'all',
+              },
+            },
           },
         },
       },

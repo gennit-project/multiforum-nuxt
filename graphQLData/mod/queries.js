@@ -223,7 +223,6 @@ export const GET_PENDING_CHANNEL_MODS_BY_CHANNEL = gql`
         username
         displayName
         createdAt
-        profilePicURL
       }
     }
   }

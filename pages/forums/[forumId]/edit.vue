@@ -17,6 +17,7 @@ const channelId = route.params.forumId as string;
 
 const { result: getChannelResult, loading: getChannelLoading, error: getChannelError } = useQuery(GET_CHANNEL, {
   uniqueName: channelId,
+  errorPolicy: 'all',
 });
 
 const formValues = ref<CreateEditChannelFormValues>({
@@ -110,13 +111,23 @@ function submit() {
 function updateFormValues(data: CreateEditChannelFormValues) {
   formValues.value = { ...formValues.value, ...data };
 }
+
+const hasError = computed(() => {
+  return !!getChannelError.value || !!updateChannelError.value;
+});
 </script>
 
 <template>
   <div class="px-2 md:px-8">
     <RequireAuth :require-ownership="true" :owners="ownerList" :loading="!dataLoaded || getChannelLoading">
       <template #has-auth>
+        <div v-if="hasError" class="p-4 mb-4 text-red-700 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
+          <p>Sorry, there was an error loading the forum data. Please try again later.</p>
+          <p class="text-sm mt-2">{{ getChannelError?.message || updateChannelError?.message }}</p>
+        </div>
+        
         <CreateEditChannelFields
+          v-if="!hasError"
           :key="dataLoaded.toString()"
           :edit-mode="true"
           :channel-loading="getChannelLoading"
