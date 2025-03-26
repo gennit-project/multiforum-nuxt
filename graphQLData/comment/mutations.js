@@ -108,6 +108,7 @@ export const CREATE_COMMENT = gql`
         emoji
         createdAt
         updatedAt
+        archived
         ChildCommentsAggregate {
           count
         }

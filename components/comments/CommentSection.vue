@@ -34,6 +34,8 @@ import { modProfileNameVar } from "@/cache";
 import { useRouter, useRoute } from "nuxt/app";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 import LockIcon from "@/components/icons/LockIcon.vue";
+import { gql } from "@apollo/client/core";
+
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -194,53 +196,21 @@ const {
       JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
     );
     const newFeedbackComment = result.data.createComments.comments[0];
+    const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
 
-    if (parentId) {
-      const readQueryResult: any = cache.readQuery({
-        query: GET_COMMENT_REPLIES,
-        variables: {
-          ...getCommentRepliesVariables,
-          commentId: parentId,
-        },
-      });
-
-      if (readQueryResult) {
-        const existingReplies =
-          readQueryResult?.getCommentReplies?.ChildComments;
-
-        const newChildComments = existingReplies.map((comment: CommentType) => {
-          const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
-
-          if (comment.id === commentWeGaveFeedbackOn?.id) {
-            const updatedComment = {
-              ...commentWeGaveFeedbackOn,
-              FeedbackComments: [
-                ...comment.FeedbackComments,
-                newFeedbackComment,
-              ],
-            };
-            return updatedComment;
+    if (parentId && commentWeGaveFeedbackOn) {
+      // Modify the comment to add feedback
+      cache.modify({
+        id: cache.identify({ 
+          __typename: "Comment", 
+          id: commentWeGaveFeedbackOn.id 
+        }),
+        fields: {
+          FeedbackComments(existing = []) {
+            return [...existing, newFeedbackComment];
           }
-          return comment;
-        });
-
-        const writeQueryData = {
-          ...readQueryResult,
-          getCommentReplies: {
-            ...readQueryResult.getCommentReplies,
-            ChildComments: newChildComments,
-          },
-        };
-
-        cache.writeQuery({
-          query: GET_COMMENT_REPLIES,
-          data: writeQueryData,
-          variables: {
-            ...getCommentRepliesVariables,
-            commentId: parentId,
-          },
-        });
-      }
+        }
+      });
     } else {
       emit("updateCommentSectionQueryResult", {
         cache,
@@ -269,48 +239,26 @@ const {
 } = useMutation(DELETE_COMMENT, {
   update: (cache) => {
     if (parentOfCommentToDelete.value) {
-      const readQueryResult: any = cache.readQuery({
-        query: GET_COMMENT_REPLIES,
-        variables: {
-          ...getCommentRepliesVariables,
-          commentId: parentOfCommentToDelete.value,
-        },
+      // Modify the parent comment's child comments and count
+      cache.modify({
+        id: cache.identify({
+          __typename: "Comment",
+          id: parentOfCommentToDelete.value
+        }),
+        fields: {
+          ChildComments(existing = []) {
+            return existing.filter(
+              (reply: CommentType) => reply.id !== commentToDeleteId.value
+            );
+          },
+          ChildCommentsAggregate(existing = { count: 0 }) {
+            return {
+              ...existing,
+              count: Math.max(0, (existing.count || 0) - 1)
+            };
+          }
+        }
       });
-
-      if (readQueryResult) {
-        const existingReplies =
-          readQueryResult?.getCommentReplies?.ChildComments;
-        const filteredReplies = existingReplies.filter(
-          (reply: CommentType) => reply.id !== commentToDeleteId.value
-        );
-
-        const existingChildCommentAggregate =
-          readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
-        const newChildCommentAggregate = Math.max(
-          0,
-          existingChildCommentAggregate - 1
-        );
-
-        const writeQueryData = {
-          ...readQueryResult,
-          getCommentReplies: {
-            ...readQueryResult.getCommentReplies,
-            ChildComments: filteredReplies,
-            aggregateChildCommentCount: newChildCommentAggregate,
-          },
-        };
-
-        cache.writeQuery({
-          query: GET_COMMENT_REPLIES,
-          data: writeQueryData,
-          variables: {
-            ...getCommentRepliesVariables,
-            commentId: parentOfCommentToDelete.value,
-          },
-        });
-
-        emit("decrementCommentCount", cache);
-      }
     } else {
       emit("updateCommentSectionQueryResult", {
         cache,
@@ -340,64 +288,111 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
     errorPolicy: "all",
     update: (cache, result) => {
       const newComment: CommentType = result.data?.createComments?.comments[0];
-
       const newCommentParentId = newComment?.ParentComment?.id;
-      if (!newCommentParentId) {
-        throw new Error("newCommentParentId is required");
-      }
 
-      const readQueryResult: any = cache.readQuery({
-        query: GET_COMMENT_REPLIES,
-        variables: {
-          ...getCommentRepliesVariables,
-          commentId: newCommentParentId,
-        },
+      cache.modify({
+        id: cache.identify({
+          __typename: "DiscussionChannel",
+          id: props.commentSectionQueryVariables.discussionId,
+        }),
+        fields: {
+          Comments(existingComments = []) {
+            return [newComment, ...existingComments];
+          },
+          CommentsAggregate(existing = { count: 0 }) {
+            return {
+              ...existing,
+              count: (existing?.count || 0) + 1
+            };
+          }
+        }
       });
+      emit("incrementCommentCount", cache);
 
-      if (!readQueryResult) {
-        cache.modify({
-          id: cache.identify({
-            __typename: "Comment",
-            id: props.createFormValues.parentCommentId,
-          }),
-          fields: {
-            ChildCommentsAggregate(existingValue: any) {
-              return {
-                ...existingValue,
-                count: existingValue.count + 1,
-              };
-            },
-          },
+      if (!newCommentParentId) return;
+
+      // Handle replies (has parent)
+      try {
+        console.log('Adding reply to parent:', {
+          parentId: newCommentParentId,
+          newComment: newComment.id
         });
-      }
 
-      if (readQueryResult) {
-        const existingReplies =
-          readQueryResult?.getCommentReplies?.ChildComments;
-        const existingChildCommentAggregate =
-          readQueryResult?.getCommentReplies?.aggregateChildCommentCount || 0;
-        const newChildCommentAggregate = existingChildCommentAggregate + 1;
-
-        const newGetRepliesData = {
-          ...readQueryResult,
-          getCommentReplies: {
-            ...readQueryResult?.getCommentReplies,
-            ChildComments: [newComment, ...existingReplies],
-            aggregateChildCommentCount: newChildCommentAggregate,
-          },
-        };
-
-        cache.writeQuery({
+        const parentRef = cache.identify({
+          __typename: "Comment",
+          id: newCommentParentId,
+        });
+        
+        const existingReplies: any = cache.readQuery({
           query: GET_COMMENT_REPLIES,
-          data: newGetRepliesData,
           variables: {
             ...getCommentRepliesVariables,
             commentId: newCommentParentId,
           },
         });
-      }
+        const existingChildComments = existingReplies?.getCommentReplies?.ChildComments || [];
+        const existingChildCommentsCount = existingReplies?.getCommentReplies?.ChildCommentsAggregate?.count || 0;
+        const newChildComments = [newComment, ...existingChildComments];
+        const newChildCommentsCount = existingChildCommentsCount + 1;
+        const newChildCommentsAggregate = {
+          __typename: "CommentsAggregate",
+          count: newChildCommentsCount,
+        };
 
-      emit("incrementCommentCount", cache);
+        // First ensure the new comment is properly normalized with all required fields
+        cache.writeQuery({
+          query: GET_COMMENT_REPLIES,
+          variables: {
+            ...getCommentRepliesVariables,
+            commentId: newCommentParentId,
+          },
+          data: {
+            getCommentReplies: {
+              ...existingReplies?.getCommentReplies,
+              ChildComments: newChildComments,
+              ChildCommentsAggregate: newChildCommentsAggregate,
+            },
+          },
+        });
+
+        // Then update the parent's fields
+        console.log('Updating parent comment:', {
+          parentRef,
+          newComment
+        });
+        cache.modify({
+          id: parentRef,
+          fields: {
+            ChildComments(existing = []) {
+              // Filter out undefined values
+              const validReplies = existing.filter((reply: CommentType) => reply && reply.id);
+              
+              // If we have no valid replies, start fresh with the new comment
+              if (!validReplies.length) {
+                return [newComment];
+              }
+              
+              // Otherwise add the new comment to existing valid replies
+              return [newComment, ...validReplies];
+            },
+            ChildCommentsAggregate(existing = { count: 0 }) {
+              return {
+                __typename: "CommentsAggregate",
+                count: (existing.count || 0) + 1,
+                aggregateChildCommentCount: (existing.aggregateChildCommentCount || 0) + 1,
+                ...existing,
+              };
+            },
+            replyCount(existing = 0) {
+              return (existing || 0) + 1;
+            }
+          }
+        });
+
+        emit("incrementCommentCount", cache);
+      } catch (error) {
+        console.error("Error updating cache:", error);
+      }
     },
   }
 );
