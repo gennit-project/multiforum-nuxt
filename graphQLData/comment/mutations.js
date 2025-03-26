@@ -118,6 +118,7 @@ export const CREATE_COMMENT = gql`
           id
           text
           createdAt
+          emoji
           weightedVotesCount
           CommentAuthor {
             ... on User {

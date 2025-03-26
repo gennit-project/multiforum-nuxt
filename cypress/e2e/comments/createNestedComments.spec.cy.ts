@@ -28,7 +28,8 @@ describe("Basic root comment operations", () => {
     );
 
     // Save the comment
-    cy.get("button").contains("Save").click();
+    cy.get("button").contains("Save").click()
+      .wait(1000);
 
     // Check for paragraph with comment text
     cy.get("p").contains(TEST_COMMENT_TEXT_1);
@@ -62,12 +63,17 @@ describe("Basic root comment operations", () => {
     );
 
     // Save the comment
-    cy.get("button").contains("Save").click();
+    cy.get("button").contains("Save").click()
+      .wait(1000);
+
+    // Add an explicit wait/check for TEST_COMMENT_TEXT_3 to appear
+    cy.get("p").contains(TEST_COMMENT_TEXT_3).should('be.visible');
 
     // CREATE THIRD LEVEL COMMENTS
 
     // Write a reply to the reply
     cy.contains("[data-testid='comment']", TEST_COMMENT_TEXT_3)
+      .should('be.visible')  // Add explicit visibility check
       .find('div[data-testid="reply-comment-button"]')
       .click();
 

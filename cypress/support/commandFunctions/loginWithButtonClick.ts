@@ -11,7 +11,7 @@ const login = (input: LoginInput) => {
   const password = input?.password || Cypress.env("auth0_password");
 
   cy.visit(ONLINE_EVENT_LIST)
-    .wait(2000)
+    .wait(3000)
     .get("[data-testid='fake-create-anything-button']", { timeout: 10000 })
     .should('be.visible')
     .click();

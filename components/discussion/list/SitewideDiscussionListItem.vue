@@ -46,6 +46,11 @@ defineEmits(["filterByTag"]);
 
 const route = useRoute();
 
+const forumId = computed(() => {
+  if (!props.discussion) return "";
+  return props.discussion.DiscussionChannels[0].channelUniqueName;
+})
+
 const showBody = ref(props.showBodyByDefault);
 
 const commentCount = computed(() => {
@@ -84,11 +89,22 @@ const authorIsAdmin = computed(() => {
   return serverRoles?.[0]?.showAdminTag || false;
 });
 
-const getDetailLink = (channelId: string) => {
+const getDetailLink = () => {
   if (!props.discussion) {
-    return "";
+    return {
+      name: "forums-forumId-discussions",
+      params: {
+        forumId: forumId.value,
+      }
+    };
   }
-  return `/forums/${channelId}/discussions/${props.discussion.id}`;
+  return {
+    name: 'forums-forumId-discussions-discussionId',
+    params: {
+      forumId: forumId.value,
+      discussionId: props.discussion.id
+    }
+  };
 };
 
 const discussionIdInParams = computed(() =>
@@ -119,7 +135,7 @@ const relative = computed(() =>
         <nuxt-link
           v-if="discussion"
           :to="
-            getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)
+            getDetailLink()
           "
           class="-ml-0.5 mb-1 flex items-center gap-2 dark:text-white text-xs"
         >
