@@ -402,7 +402,7 @@ function createComment(parentCommentId: string) {
 }
 
 function handleDelete(input: DeleteCommentInputData) {
-  emit("deleteComment", input);
+  emit("delete-comment", input);
 }
 
 function handleEdit(commentData: Comment) {
@@ -410,7 +410,7 @@ function handleEdit(commentData: Comment) {
 }
 
 function updateExistingComment(text: string, depth: number) {
-  emit("updateEditCommentInput", text, depth === 1);
+  emit("update-edit-comment-input", text, depth === 1);
 }
 
 function updateNewComment(input: CreateReplyInputData) {
@@ -730,7 +730,7 @@ const label = computed(() => {
                 @start-comment-save="emit('startCommentSave')"
                 @click-edit-comment="handleEdit"
                 @click-report="emit('clickReport', $event)"
-                @delete-comment="handleDelete"
+                @delete-comment="(input) => emit('delete-comment', input)"
                 @create-comment="emit('createComment')"
                 @save-edit="emit('saveEdit')"
                 @update-create-reply-comment-input="updateNewComment"

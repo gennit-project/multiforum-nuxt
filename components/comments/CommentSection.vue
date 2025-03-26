@@ -172,19 +172,6 @@ const editFormValues = ref<CreateEditCommentFormValues>({
   depth: 1,
 });
 
-const updateCommentInput = computed(() => ({
-  text: editFormValues.value?.text || "",
-  isRootComment: editFormValues.value?.isRootComment,
-}));
-
-const getCommentRepliesVariables = {
-  commentId: props.createFormValues.parentCommentId,
-  modName: modProfileNameVar.value,
-  limit: 5,
-  offset: 0,
-  sort: getSortFromQuery(route.query),
-};
-
 const {
   mutate: addFeedbackCommentToComment,
   loading: addFeedbackCommentToCommentLoading,
@@ -238,8 +225,16 @@ const {
   loading: deleteCommentLoading,
 } = useMutation(DELETE_COMMENT, {
   update: (cache) => {
+    // First evict the comment itself
+    cache.evict({
+      id: cache.identify({
+        __typename: "Comment",
+        id: commentToDeleteId.value
+      })
+    });
+
     if (parentOfCommentToDelete.value) {
-      // Modify the parent comment's child comments and count
+      // For replies, update the parent's child comments and count
       cache.modify({
         id: cache.identify({
           __typename: "Comment",
@@ -260,11 +255,31 @@ const {
         }
       });
     } else {
-      emit("updateCommentSectionQueryResult", {
-        cache,
-        commentToDeleteId: commentToDeleteId.value,
+      // For root comments, update the DiscussionChannel's comments
+      cache.modify({
+        id: cache.identify({
+          __typename: "DiscussionChannel",
+          id: props.commentSectionQueryVariables.discussionId,
+        }),
+        fields: {
+          Comments(existing = []) {
+            return existing.filter(
+              (comment: CommentType) => comment.id !== commentToDeleteId.value
+            );
+          },
+          CommentsAggregate(existing = { count: 0 }) {
+            return {
+              ...existing,
+              count: Math.max(0, (existing.count || 0) - 1)
+            };
+          }
+        }
       });
     }
+
+    // Clean up any dangling references
+    cache.gc();
+    
     emit("decrementCommentCount", cache);
   },
 });
@@ -427,8 +442,19 @@ function updateCreateInputValuesForReply(input: CreateReplyInputData) {
 function handleClickEdit(commentData: CommentType) {
   commentToEdit.value = commentData;
   editFormOpenAtCommentID.value = commentData.id;
-  editFormValues.value.text = commentData.text || "";
-  editFormValues.value.isRootComment = !commentData.ParentComment;
+  editFormValues.value = {
+    text: commentData.text || "",
+    isRootComment: !commentData.ParentComment,
+    depth: 1,
+  };
+}
+
+function updateEditInputValues(text: string, isRootComment: boolean) {
+  editFormValues.value = {
+    ...editFormValues.value,
+    text,
+    isRootComment,
+  };
 }
 
 function handleClickDelete(input: DeleteCommentInputData) {
@@ -449,7 +475,10 @@ function handleSaveEdit() {
     commentWhere: {
       id: commentToEdit.value.id,
     },
-    updateCommentInput: updateCommentInput.value,
+    updateCommentInput: {
+      text: editFormValues.value.text,
+      isRootComment: editFormValues.value.isRootComment,
+    },
   });
 }
 
@@ -667,6 +696,7 @@ const lengthOfCommentInProgress = computed(() => {
               @update-feedback="updateEditInputValues"
               @save-edit="handleSaveEdit"
               @update-edit-comment-input="updateEditInputValues"
+              @delete-comment="handleClickDelete"
             />
           </div>
         </div>
