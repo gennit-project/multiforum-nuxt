@@ -416,6 +416,11 @@ onDoneUpdatingComment(() => {
   commentInProcess.value = false;
   editFormOpenAtCommentID.value = "";
   commentToEdit.value = null;
+  editFormValues.value = {
+    text: "",
+    isRootComment: true,
+    depth: 1,
+  };
 });
 
 watchEffect(() => {
@@ -439,8 +444,11 @@ function updateCreateInputValuesForReply(input: CreateReplyInputData) {
 }
 
 function updateEditInputValues(text: string, isRootComment: boolean) {
-  editFormValues.value.isRootComment = isRootComment;
-  editFormValues.value.text = text;
+  editFormValues.value = {
+    ...editFormValues.value,
+    text: text,
+    isRootComment: isRootComment
+  };
 }
 
 function handleClickCreate() {
@@ -451,7 +459,9 @@ function handleClickCreate() {
 
 function handleClickEdit(commentData: CommentType) {
   commentToEdit.value = commentData;
-  openEditCommentEditor(commentData.id);
+  editFormOpenAtCommentID.value = commentData.id;
+  editFormValues.value.text = commentData.text || "";
+  editFormValues.value.isRootComment = !commentData.ParentComment;
 }
 
 function handleClickDelete(input: DeleteCommentInputData) {
@@ -463,9 +473,14 @@ function handleClickDelete(input: DeleteCommentInputData) {
 }
 
 function handleSaveEdit() {
+  if (!commentToEdit.value?.id) {
+    console.error("No comment to edit");
+    return;
+  }
+  
   editComment({
     commentWhere: {
-      id: commentToEdit.value?.id || "",
+      id: commentToEdit.value.id,
     },
     updateCommentInput: updateCommentInput.value,
   });
@@ -673,13 +688,6 @@ const lengthOfCommentInProgress = computed(() => {
               @open-edit-comment-editor="openEditCommentEditor"
               @hide-edit-comment-editor="hideEditCommentEditor"
               @click-edit-comment="handleClickEdit"
-              @delete-comment="handleClickDelete"
-              @create-comment="handleClickCreate"
-              @update-create-reply-comment-input="
-                updateCreateInputValuesForReply
-              "
-              @update-edit-comment-input="updateEditInputValues"
-              @save-edit="handleSaveEdit"
               @show-copied-link-notification="
                 showCopiedLinkNotification = $event
               "
@@ -689,11 +697,9 @@ const lengthOfCommentInProgress = computed(() => {
               @click-feedback="handleClickGiveFeedback"
               @click-undo-feedback="handleClickUndoFeedback"
               @click-edit-feedback="handleClickEditFeedback"
-              @update-feedback="updateFeedback"
-              @handle-view-feedback="handleViewFeedback"
-              @handle-click-archive="handleClickArchive"
-              @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
-              @handle-click-unarchive="handleClickUnarchive"
+              @update-feedback="updateEditInputValues"
+              @save-edit="handleSaveEdit"
+              @update-edit-comment-input="updateEditInputValues"
             />
           </div>
         </div>

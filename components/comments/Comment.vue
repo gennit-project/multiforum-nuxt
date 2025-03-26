@@ -130,7 +130,7 @@ const props = defineProps({
 const emit = defineEmits([
   "createComment",
   "deleteComment",
-  "clickEditComment",
+  "click-edit-comment",
   "openEditCommentEditor",
   "updateEditCommentInput",
   "updateCreateReplyCommentInput",
@@ -150,6 +150,7 @@ const emit = defineEmits([
   "handleClickArchive",
   "handleClickArchiveAndSuspend",
   "handleClickUnarchive",
+  "update-edit-comment-input",
 ]);
 
 const route = useRoute();
@@ -405,8 +406,7 @@ function handleDelete(input: DeleteCommentInputData) {
 }
 
 function handleEdit(commentData: Comment) {
-  emit("clickEditComment", commentData);
-  emit("openEditCommentEditor", commentData.id);
+  emit("click-edit-comment", commentData);
 }
 
 function updateExistingComment(text: string, depth: number) {
@@ -545,7 +545,7 @@ const label = computed(() => {
                     :editor-id="editorId"
                     :show-char-counter="true"
                     :max-chars="MAX_CHARS_IN_COMMENT"
-                    @update="updateExistingComment($event, props.depth)"
+                    @update="(text) => emit('update-edit-comment-input', text, props.depth === 1)"
                   />
                   <ErrorBanner
                     v-if="
@@ -722,13 +722,13 @@ const label = computed(() => {
                 :locked="props.locked"
                 :parent-comment-id="props.commentData.id"
                 :comment-in-process="props.commentInProcess"
-                :edit-form-open-at-comment-i-d="props.editFormOpenAtCommentID"
+                :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
                 :reply-form-open-at-comment-i-d="props.replyFormOpenAtCommentID"
                 :mod-profile-name="props.modProfileName"
                 :original-poster="props.originalPoster"
                 :length-of-comment-in-progress="props.lengthOfCommentInProgress"
                 @start-comment-save="emit('startCommentSave')"
-                @click-edit-comment="emit('clickEditComment', $event)"
+                @click-edit-comment="handleEdit"
                 @click-report="emit('clickReport', $event)"
                 @delete-comment="handleDelete"
                 @create-comment="emit('createComment')"
