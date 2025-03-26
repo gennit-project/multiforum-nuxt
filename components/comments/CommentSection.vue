@@ -313,91 +313,59 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
         return;
       }
 
-      // Handle replies
+      // Handle replies - always use GET_COMMENT_REPLIES query
       try {
-        // Read current replies
-        const readQueryResult = cache.readQuery({
+        const existingData = cache.readQuery({
           query: GET_COMMENT_REPLIES,
           variables: {
-            ...getCommentRepliesVariables,
             commentId: newCommentParentId,
+            modName: modProfileNameVar.value,
+            limit: 5,
+            offset: 0,
+            sort: getSortFromQuery(route.query),
           },
         });
 
-        if (!readQueryResult) {
-          // First reply - update the count and initialize replies
-          cache.writeQuery({
-            query: GET_COMMENT_REPLIES,
-            variables: {
-              ...getCommentRepliesVariables,
-              commentId: newCommentParentId,
+        const existingReplies = existingData?.getCommentReplies?.ChildComments || [];
+        const existingCount = existingData?.getCommentReplies?.aggregateChildCommentCount || 0;
+
+        // Write the updated data back to the cache
+        cache.writeQuery({
+          query: GET_COMMENT_REPLIES,
+          variables: {
+            commentId: newCommentParentId,
+            modName: modProfileNameVar.value,
+            limit: 5,
+            offset: 0,
+            sort: getSortFromQuery(route.query),
+          },
+          data: {
+            getCommentReplies: {
+              __typename: "CommentReplies",
+              ChildComments: [newComment, ...existingReplies],
+              aggregateChildCommentCount: existingCount + 1
+            }
+          }
+        });
+
+        // Update the parent comment's counts
+        cache.modify({
+          id: cache.identify({
+            __typename: "Comment",
+            id: newCommentParentId,
+          }),
+          fields: {
+            ChildCommentsAggregate(existing = { count: 0 }) {
+              return {
+                __typename: "CommentsAggregate",
+                count: (existing.count || 0) + 1
+              };
             },
-            data: {
-              getCommentReplies: {
-                __typename: "CommentReplies",
-                ChildComments: [newComment],
-                aggregateChildCommentCount: 1
-              }
+            replyCount(existing = 0) {
+              return (existing || 0) + 1;
             }
-          });
-
-          // Update parent comment's aggregate
-          cache.modify({
-            id: cache.identify({
-              __typename: "Comment",
-              id: newCommentParentId,
-            }),
-            fields: {
-              ChildCommentsAggregate(existing = { count: 0 }) {
-                return {
-                  __typename: "CommentsAggregate",
-                  count: 1
-                };
-              },
-              replyCount(existing = 0) {
-                return 1;
-              }
-            }
-          });
-        } else {
-          // Subsequent replies - update both count and list
-          const existingReplies = readQueryResult.getCommentReplies?.ChildComments || [];
-          const existingCount = readQueryResult.getCommentReplies?.aggregateChildCommentCount || 0;
-
-          cache.writeQuery({
-            query: GET_COMMENT_REPLIES,
-            variables: {
-              ...getCommentRepliesVariables,
-              commentId: newCommentParentId,
-            },
-            data: {
-              getCommentReplies: {
-                __typename: "CommentReplies",
-                ChildComments: [newComment, ...existingReplies],
-                aggregateChildCommentCount: existingCount + 1
-              }
-            }
-          });
-
-          // Update parent comment's aggregate
-          cache.modify({
-            id: cache.identify({
-              __typename: "Comment",
-              id: newCommentParentId,
-            }),
-            fields: {
-              ChildCommentsAggregate(existing = { count: 0 }) {
-                return {
-                  __typename: "CommentsAggregate",
-                  count: (existing.count || 0) + 1
-                };
-              },
-              replyCount(existing = 0) {
-                return (existing || 0) + 1;
-              }
-            }
-          });
-        }
+          }
+        });
 
         emit("incrementCommentCount", cache);
       } catch (error) {
@@ -410,6 +378,12 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
 onDoneCreatingComment(() => {
   commentInProcess.value = false;
   replyFormOpenAtCommentID.value = "";
+  createFormValues.value = {
+    text: "",
+    isRootComment: true,
+    depth: 1,
+    parentCommentId: "",
+  };
 });
 
 onDoneUpdatingComment(() => {
@@ -429,31 +403,24 @@ watchEffect(() => {
   }
 });
 
+function handleClickCreate() {
+  // Simply trigger the mutation with the properly structured input from props
+  createComment({
+    createCommentInput: props.createCommentInput
+  });
+}
+
 function updateCreateInputValuesForReply(input: CreateReplyInputData) {
   const { text, parentCommentId, depth } = input;
   if (!parentCommentId) {
     throw new Error("parentCommentId is required to reply to a comment");
   }
-  const updatedCreateFormValues = {
-    ...props.createFormValues,
+  // Emit to parent to update the form values
+  emit("updateCreateReplyCommentInput", {
     text,
+    isRootComment: false,
     parentCommentId,
     depth,
-  };
-  emit("updateCreateReplyCommentInput", updatedCreateFormValues);
-}
-
-function updateEditInputValues(text: string, isRootComment: boolean) {
-  editFormValues.value = {
-    ...editFormValues.value,
-    text: text,
-    isRootComment: isRootComment
-  };
-}
-
-function handleClickCreate() {
-  createComment({
-    createCommentInput: props.createCommentInput,
   });
 }
 
@@ -593,13 +560,11 @@ function handleViewFeedback(commentId: string) {
   });
 }
 
+// Use the parent's createFormValues for length computation
 const lengthOfCommentInProgress = computed(() => {
-  // if edit form is open, return the edit form value length
   if (editFormOpenAtCommentID.value) {
     return editFormValues.value.text.length;
   }
-  // if the reply-to-comment form is open,
-  // return the create form value length
   if (replyFormOpenAtCommentID.value) {
     return props.createFormValues.text.length;
   }
@@ -688,6 +653,8 @@ const lengthOfCommentInProgress = computed(() => {
               @open-edit-comment-editor="openEditCommentEditor"
               @hide-edit-comment-editor="hideEditCommentEditor"
               @click-edit-comment="handleClickEdit"
+              @update-create-reply-comment-input="updateCreateInputValuesForReply"
+              @create-comment="handleClickCreate"
               @show-copied-link-notification="
                 showCopiedLinkNotification = $event
               "

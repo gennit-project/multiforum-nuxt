@@ -28,7 +28,7 @@ const props = defineProps({
   },
   lengthOfCommentInProgress: {
     type: Number,
-    default: 1,
+    default: 0,
   },
   locked: {
     type: Boolean,
@@ -243,10 +243,7 @@ function toggleEmojiPicker() {
         <CancelButton @click="emit('hideReplyEditor')" />
         <SaveButton
           :loading="commentInProcess"
-          :disabled="
-            !lengthOfCommentInProgress ||
-            lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT
-          "
+          :disabled="lengthOfCommentInProgress === 0 || lengthOfCommentInProgress > MAX_CHARS_IN_COMMENT"
           @click.prevent="
             () => {
               emit('createComment', parentCommentId);
