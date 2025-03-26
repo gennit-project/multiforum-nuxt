@@ -99,6 +99,7 @@ function clickUpvote() {
   if (!props.upvoteActive) {
     emit('upvote');
   } else {
+    console.log('Undo upvote');
     emit('undoUpvote');
   }
 }
