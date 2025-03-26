@@ -118,7 +118,7 @@ const hasError = computed(() => {
 </script>
 
 <template>
-  <div class="px-2 md:px-8">
+  <div :key="$route.fullPath" class="px-2 md:px-8">
     <RequireAuth :require-ownership="true" :owners="ownerList" :loading="!dataLoaded || getChannelLoading">
       <template #has-auth>
         <div v-if="hasError" class="p-4 mb-4 text-red-700 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">

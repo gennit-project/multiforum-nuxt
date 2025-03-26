@@ -91,6 +91,12 @@ const titleIsInvalid = computed(
 );
 const touched = ref(false);
 const router = useRouter();
+const forumId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+})
 
 // On mounted, if in edit mode and no tab is selected, go to /basic
 onMounted(() => {
@@ -98,7 +104,7 @@ onMounted(() => {
     router.push({
       name: "forums-forumId-edit-basic",
       params: {
-        forumId: props.formValues?.uniqueName,
+        forumId: forumId.value,
       },
     });
   }
@@ -212,7 +218,7 @@ const getCurrentTabLabel = computed(() => {
                   :to="{
                     name: `forums-forumId-edit-${tab.key}`,
                     params: {
-                      forumId: formValues.uniqueName,
+                      forumId,
                     },
                   }"
                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -245,7 +251,7 @@ const getCurrentTabLabel = computed(() => {
                   :to="{
                     name: `forums-forumId-edit-${tab.key}`,
                     params: {
-                      forumId: formValues.uniqueName,
+                      forumId,
                     },
                   }"
                   class="py-2 cursor-pointer"

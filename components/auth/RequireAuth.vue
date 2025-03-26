@@ -89,11 +89,12 @@ if (import.meta.env.SSR === false) {
   handleLogin = async () => {
     // @ts-ignore
     if (window?.parent?.Cypress) {
+      // Make sure to return early after redirect to prevent additional actions
       await loginWithRedirect();
-    } else {
-      await loginWithPopup();
-      await storeToken();
+      return;
     }
+    await loginWithPopup();
+    await storeToken();
   };
 }
 </script>
