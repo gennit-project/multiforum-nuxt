@@ -11,10 +11,12 @@ const login = (input: LoginInput) => {
   const password = input?.password || Cypress.env("auth0_password");
 
   cy.visit(ONLINE_EVENT_LIST)
-    .wait(3000)
-    .get("[data-testid='fake-create-anything-button']", { timeout: 10000 })
-    .should('be.visible')
-    .click();
+    .wait(5000)
+    // click the button that says Log in
+    .get("button")
+    .contains("Log In")
+    .click()
+    .wait(1000);
 
   cy.origin(
     "https://gennit.us.auth0.com",

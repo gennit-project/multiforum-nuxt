@@ -117,6 +117,7 @@ const emit = defineEmits([
   "decrementCommentCount",
   "incrementCommentCount",
   "updateCreateReplyCommentInput",
+  "updateCreateFormValues",
   "loadMore",
 ]);
 
@@ -393,12 +394,12 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
 onDoneCreatingComment(() => {
   commentInProcess.value = false;
   replyFormOpenAtCommentID.value = "";
-  createFormValues.value = {
+  emit("updateCreateFormValues", {
     text: "",
     isRootComment: true,
     depth: 1,
     parentCommentId: "",
-  };
+  });
 });
 
 onDoneUpdatingComment(() => {
@@ -589,12 +590,12 @@ function handleViewFeedback(commentId: string) {
   });
 }
 
-// Use the parent's createFormValues for length computation
+// Update the lengthOfCommentInProgress computed to be more defensive
 const lengthOfCommentInProgress = computed(() => {
   if (editFormOpenAtCommentID.value) {
     return editFormValues.value.text.length;
   }
-  if (replyFormOpenAtCommentID.value) {
+  if (replyFormOpenAtCommentID.value && props.createFormValues?.text) {
     return props.createFormValues.text.length;
   }
   return 0;

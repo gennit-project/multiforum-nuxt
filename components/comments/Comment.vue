@@ -129,7 +129,7 @@ const props = defineProps({
 
 const emit = defineEmits([
   "createComment",
-  "deleteComment",
+  "delete-comment",
   "click-edit-comment",
   "openEditCommentEditor",
   "updateEditCommentInput",
