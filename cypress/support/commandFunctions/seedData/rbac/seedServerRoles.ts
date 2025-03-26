@@ -39,7 +39,7 @@ const serverRoles: ServerRoleCreateInput[] = [
     canUpvoteComment: false,
     canUpvoteDiscussion: false,
     showAdminTag: false,
-  }
+  },
 ];
 
 export default serverRoles;
