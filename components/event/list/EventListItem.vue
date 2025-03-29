@@ -249,7 +249,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               }}
             </span>
           </div>
-          <p v-if="event.virtualEventUrl" class="text-black dark:text-white">
+          <p v-if="event.virtualEventUrl" class="text-black dark:text-white text-sm">
             Online event
           </p>
           <p v-if="event.free" class="text-sm font-medium text-gray-600">

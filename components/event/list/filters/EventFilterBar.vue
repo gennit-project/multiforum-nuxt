@@ -245,6 +245,13 @@ const toggleSelectedTag = (tag: string) => {
   setSelectedTags(filterValues.value.tags);
 };
 
+// Add a ref to track if the forum list is open
+const forumListOpen = ref(false);
+
+// Add a method to handle opening/closing
+const toggleForumList = () => {
+  forumListOpen.value = !forumListOpen.value;
+};
 
 type ChannelOption = {
   uniqueName: string;
@@ -296,17 +303,20 @@ const updateShowArchived = (event: Event) => {
               :data-testid="'forum-filter-button'"
               :label="channelLabel"
               :highlighted="channelLabel !== defaultFilterLabels.channels"
+              @click="toggleForumList"
             >
               <template #icon>
                 <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
               </template>
               <template #content>
-                <div class="relative bg-white dark:bg-gray-700 w-96">
+                <div 
+                  v-if="forumListOpen"
+                  class="relative bg-white dark:bg-gray-700 w-96"
+                  data-testid="forum-list-dropdown"
+                >
                   <SearchableForumList
                     :selected-channels="filterValues.channels"
-                    :featured-forums="showInPersonOnly
-                      ? IN_PERSON_FEATURED_FORUMS
-                      : undefined"
+                    :featured-forums="showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : undefined"
                     @toggle-selection="toggleSelectedChannel"
                   />
                 </div>
