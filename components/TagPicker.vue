@@ -60,8 +60,8 @@ const removeSelection = (tag: string) => {
     </div>
     <div class="relative"> 
       <div
-        class="flex min-h-12 w-full cursor-text flex-wrap items-center rounded-lg border 
-               px-4 py-2 text-left dark:border-gray-700 dark:bg-gray-700"
+        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border 
+               px-4 text-left dark:border-gray-700 dark:bg-gray-700 text-sm"
         @click="toggleDropdown"
       >
         <div v-if="selected.length === 0" class="text-gray-500 dark:text-gray-400">
@@ -81,7 +81,7 @@ const removeSelection = (tag: string) => {
         </div>
         <input
           data-testid="tag-picker"
-          class="flex-1 border-none bg-transparent focus:outline-none dark:text-white"
+          class="flex-1 border-none bg-transparent focus:outline-none dark:text-white text-sm"
           placeholder="Add a tag..."
         >
       </div>
