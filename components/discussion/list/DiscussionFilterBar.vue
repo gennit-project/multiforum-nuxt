@@ -151,7 +151,7 @@ const toggleShowSearch = () => {
 </script>
 
 <template>
-  <div class="pt-2">
+  <div class="pt-2 px-4">
     <div>
       <div class="flex flex-wrap items-center justify-end space-x-2">
         <FilterChip

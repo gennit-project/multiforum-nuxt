@@ -337,7 +337,7 @@ const updateShowArchived = (event: Event) => {
               <Popper v-if="!showLocationSearchBarAndDistanceButtons">
                 <button
                   data-testid="more-filters-button"
-                  class="absolute inset-y-0 h-12 w-12 right-0 flex rounded-full cursor-pointer items-center justify-center dark:text-white p-2 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  class="absolute inset-y-0 h-10 w-10 right-0 flex rounded-full cursor-pointer items-center justify-center dark:text-white p-2 hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   <FilterIcon class="h-4 w-4 dark:text-white" />
                 </button>
