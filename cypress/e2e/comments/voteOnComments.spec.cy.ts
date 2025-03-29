@@ -7,7 +7,7 @@ describe("Basic comment operations", () => {
     seedAll();
   });
 
-  it("User 1 can upvote their own comment", () => {
+  it("User 1 can undo upvote on their own comment", () => {
     const TEST_COMMENT_TEXT = "Test comment";
 
     // User 1 logs in
@@ -17,7 +17,8 @@ describe("Basic comment operations", () => {
     cy.visit(DISCUSSION_LIST);
 
     // Click on the first discussion
-    cy.get("span").contains("Example topic 1").click();
+    cy.get("span").contains("Example topic 1").click()
+      .wait(2000);
 
     // Add a comment
     cy.get("textarea[data-testid='addComment']", { timeout: 10000 })
@@ -28,18 +29,21 @@ describe("Basic comment operations", () => {
     );
     cy.get("button").contains("Save").click();
 
-    // Verify the comment and upvote it
+    // Verify the comment and undo the default upvote that came with the comment
     cy.get('div[data-testid="comment"]').within(() => {
       cy.contains(TEST_COMMENT_TEXT);
       cy.get('button[data-testid="upvote-comment-button"]').contains("1");
 
       // Toggle upvote
-      cy.get('button[data-testid="upvote-comment-button"]').click();
+      cy.get('button[data-testid="upvote-comment-button"]').click()
+        // wait
+        .wait(2000)
       cy.get('button[data-testid="upvote-comment-button"]').contains("0");
 
-      // Give the upvote back
+      // Undo 
       cy.get('button[data-testid="upvote-comment-button"]').click();
       cy.get('button[data-testid="upvote-comment-button"]').contains("1");
+
     });
   });
 
@@ -74,7 +78,6 @@ describe("Basic comment operations", () => {
         // there should be 2 upvotes now
         .contains("2");
 
-      // Select the button in the unauthenticated state
       cy.get(
         '[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]'
       )
