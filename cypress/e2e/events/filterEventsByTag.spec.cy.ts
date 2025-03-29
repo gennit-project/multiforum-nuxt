@@ -72,12 +72,20 @@ describe("Filter events by tag", () => {
   it("in a channel view, filters events by tag", () => {
     const searchTerm = "trivia";
 
-    cy.visit(CHANNEL_VIEW).wait(1500);
+    cy.visit(CHANNEL_VIEW).wait(3000);
     cy.get('button[data-testid="toggle-main-filters-button"]').click();
     cy.get('button[data-testid="tag-filter-button"]')
       .should('be.visible')
       .first()
       .click();
+
+    // scroll up
+    cy.scrollTo("top");
+    // in data-testid="tags-input", type trivia
+    cy.get('input[data-testid="tags-input"]')
+      .should('be.visible')
+      .first()
+      .type(searchTerm);
 
     // click the trivia tag
     cy.get('span[data-testid="tag-picker-trivia"]')
@@ -95,7 +103,7 @@ describe("Filter events by tag", () => {
   it("in a channel view, when filtering by two tags, shows events that have at least one of the tags", () => {
     cy.visit(CHANNEL_VIEW).wait(1500);
     cy.get('button[data-testid="toggle-main-filters-button"]').click();
-    cy.get('button[data-testid="tag-filter-button"]').click()
+    cy.get('button[data-testid="tag-filter-button"]')
       .should('be.visible')
       .first()
       .click();
