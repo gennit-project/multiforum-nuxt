@@ -14,9 +14,17 @@ describe("Filter events by tag", () => {
   it("in the sitewide online events list, filters events by tag", () => {
     cy.visit(ONLINE_EVENT_LIST).wait(3000);
 
-    cy.get('button[data-testid="tag-filter-button"]').click();
+    cy.get('button[data-testid="tag-filter-button"]')
+      .should('be.visible')
+      .first() // Expect elements to appear twice because we use CSS for showing and hiding
+      // based on screen width, which is probably the best and easiest way to prevent content 
+      // shift after SSR.
+      .click();
 
-    cy.get('span[data-testid="tag-picker-newYears"]').click(); // click the newYears tag
+    cy.get('span[data-testid="tag-picker-newYears"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // should have one result
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 1);
@@ -30,13 +38,22 @@ describe("Filter events by tag", () => {
   it("in the sitewide online events list, when filtering by two tags, shows events that have at least one of the tags", () => {
     cy.visit(ONLINE_EVENT_LIST).wait(3000);
 
-    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
+    cy.get('button[data-testid="tag-filter-button"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // click the newYears tag
-    cy.get('span[data-testid="tag-picker-newYears"]').click();
+    cy.get('span[data-testid="tag-picker-newYears"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // click the trivia tag
-    cy.get('span[data-testid="tag-picker-trivia"]').click();
+    cy.get('span[data-testid="tag-picker-trivia"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // should have two results
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 2);
@@ -57,10 +74,16 @@ describe("Filter events by tag", () => {
 
     cy.visit(CHANNEL_VIEW).wait(1500);
     cy.get('button[data-testid="toggle-main-filters-button"]').click();
-    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
+    cy.get('button[data-testid="tag-filter-button"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // click the trivia tag
-    cy.get('span[data-testid="tag-picker-trivia"]').click();
+    cy.get('span[data-testid="tag-picker-trivia"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // should have one result
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 1);
@@ -72,13 +95,22 @@ describe("Filter events by tag", () => {
   it("in a channel view, when filtering by two tags, shows events that have at least one of the tags", () => {
     cy.visit(CHANNEL_VIEW).wait(1500);
     cy.get('button[data-testid="toggle-main-filters-button"]').click();
-    cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
+    cy.get('button[data-testid="tag-filter-button"]').click()
+      .should('be.visible')
+      .first()
+      .click();
 
     // click the newYears tag
-    cy.get('span[data-testid="tag-picker-newYears"]').click();
+    cy.get('span[data-testid="tag-picker-newYears"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // click the trivia tag
-    cy.get('span[data-testid="tag-picker-trivia"]').click();
+    cy.get('span[data-testid="tag-picker-trivia"]')
+      .should('be.visible')
+      .first()
+      .click();
 
     // should have two results
     cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 2);

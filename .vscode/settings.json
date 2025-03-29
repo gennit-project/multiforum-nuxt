@@ -5,5 +5,8 @@
         "permalinked",
         "Topnav"
     ],
-    "editor.suggestDelay": 2000
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }
