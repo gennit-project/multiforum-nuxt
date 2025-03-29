@@ -47,15 +47,19 @@ describe("Basic event operations", () => {
       "Test description",
     );
 
-    cy.get("button").contains("Save").click();
-    cy.get("h2").contains(TEST_TITLE);
+    cy.get("button").contains("Save").click().wait(4000)
+    cy.get("h2")
+    .contains(TEST_TITLE);
     cy.get("a").contains(TEST_LINK);
 
     // Test editing an event
     cy.get('button[data-testid="event-menu-button')
       .click();
     // Click on the edit button
-    cy.get("div[data-testid=event-menu-button-item-Edit]").click();
+    cy.get("div[data-testid=event-menu-button-item-Edit]")
+      // click the first one
+      .first()
+      .click();
 
     // Change the link
     cy.get('input[data-testid="link-input"]').focus().clear();
@@ -87,7 +91,7 @@ describe("Basic event operations", () => {
     // Click on the edit button
     cy.get("div").contains("Cancel").click();
     cy.get("button").contains("Yes").click();
-    cy.get("p[data-testid='canceled-event-banner']").should("exist");
+    cy.get("div[data-testid='canceled-event-banner']").should("exist");
 
     // Test deleting an event
     cy.get('button[data-testid="event-menu-button')

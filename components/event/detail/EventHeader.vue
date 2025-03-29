@@ -18,7 +18,7 @@ import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { getDuration, ALLOWED_ICONS, actionIconMap } from "@/utils";
+import { getDuration, ALLOWED_ICONS } from "@/utils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
@@ -56,7 +56,6 @@ const props = defineProps({
 const route = useRoute();
 const router = useRouter();
 
-const showAddressCopiedNotification = ref(false);
 const showCopiedLinkNotification = ref(false);
 const showFeedbackFormModal = ref(false);
 const showFeedbackSubmittedSuccessfully = ref(false);
@@ -195,11 +194,6 @@ const menuItems = computed(() => {
       event: "copyLink",
       icon: ALLOWED_ICONS.COPY_LINK,
     });
-    items.unshift({
-      label: "View Feedback",
-      event: "handleViewFeedback",
-      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-    });
   }
   if (!usernameVar.value) {
     return items;
@@ -326,6 +320,7 @@ function handleViewFeedback() {
 function handleFeedbackInput(event: string) {
   feedbackText.value = event;
 }
+console.log('event header')
 </script>
 
 <template>
