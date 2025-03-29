@@ -20,15 +20,22 @@ describe("Give feedback on an event", () => {
       password: password2,
     });
 
-    cy.visit(CATS_FORUM_EVENTS).wait(3000);
+    cy.visit(CATS_FORUM_EVENTS);
+
+    // Wait for list to be visible and click the event
+    cy.get('ul[data-testid="event-list"]').should('be.visible');
     cy.get("span").contains(targetEventTitle).click();
+
+    // Wait for navigation to complete and new page to load
+    cy.url().should('include', '/events/');
+
+    // Now interact with elements on the new page
     cy.get('button[data-testid="event-menu-button"]')
-      .click()
-      .wait(1000);
-    cy.get(
-      'div[data-testid="event-menu-button-item-Give Feedback"]'
-    )
-      // click the first of multiple matching elements
+      .should('be.visible')
+      .click();
+
+    cy.get('div[data-testid="event-menu-button-item-Give Feedback"]')
+      .should('be.visible')
       .first()
       .click();
 
@@ -43,12 +50,20 @@ describe("Give feedback on an event", () => {
         // EDIT FEEDBACK
         // To edit event feedback, which is less prominent
         // than discussion feedback we have to do it from the feedback page.
+        cy.get('button[data-testid="add-to-calendar-button"]')
+        .should('be.visible')
+        .click()
+        .wait(2000);
+
         cy.get('button[data-testid="event-menu-button"]')
+        .should('be.visible')
         .click()
         .wait(1000);
+
         cy.get(
           'div[data-testid="event-menu-button-item-View Feedback"]'
         )
+        .should('be.visible')
         .first()
         .click()
         .wait(1000);

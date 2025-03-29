@@ -531,7 +531,7 @@ const updateShowArchived = (event: Event) => {
       <button
         v-if="allowHidingMainFilters"
         data-testid="toggle-main-filters-button"
-        class="mr-4 text-blue-500"
+        class="text-blue-500 text-sm"
         @click="toggleShowMainFilters"
       >
         {{ showMainFilters ? "Hide filters" : "Show filters" }}

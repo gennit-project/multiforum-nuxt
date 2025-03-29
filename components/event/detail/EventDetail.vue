@@ -256,7 +256,7 @@ const handleClickEditEventDescription = () => {
             Could not find the event.
           </div>
 
-          <div v-else-if="event" class="dark:bg-dark-700 flex flex-col gap-4">
+          <div v-else-if="event" class="dark:bg-dark-700 flex flex-col gap-4" data-testid="event-detail-content">
             <nuxt-link
               v-if="usernameOnTop"
               :to="{

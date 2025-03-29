@@ -127,7 +127,7 @@ const onMouseLeaveEventListItem = () => {
 </script>
 
 <template>
-  <div>
+  <div class="px-4">
     <div v-if="events.length === 0">
       <p v-if="!showMap" class="my-4 px-4 dark:text-gray-200">
         Could not find any events.

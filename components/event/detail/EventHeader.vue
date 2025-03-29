@@ -189,11 +189,18 @@ const isAdmin = computed(() => {
 const menuItems = computed(() => {
   let items: MenuItem[] = [];
   if (props.eventData && route.name !== "EventFeedback") {
-    items.push({
-      label: "Copy Link",
-      event: "copyLink",
-      icon: ALLOWED_ICONS.COPY_LINK,
-    });
+    items = items.concat([
+      {
+        label: "Copy Link",
+        event: "copyLink",
+        icon: ALLOWED_ICONS.COPY_LINK,
+      },
+      {
+        label: "View Feedback",
+        event: "handleViewFeedback",
+        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+      },
+    ]);
   }
   if (!usernameVar.value) {
     return items;
@@ -209,11 +216,6 @@ const menuItems = computed(() => {
         label: "Delete",
         event: "handleDelete",
         icon: ALLOWED_ICONS.DELETE,
-      },
-      {
-        label: "View Feedback",
-        event: "handleViewFeedback",
-        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       },
     ]);
     if (!props.eventData.canceled) {
@@ -320,7 +322,7 @@ function handleViewFeedback() {
 function handleFeedbackInput(event: string) {
   feedbackText.value = event;
 }
-console.log('event header')
+console.log("event header");
 </script>
 
 <template>
@@ -380,7 +382,10 @@ console.log('event header')
                 @click="copyAddress"
               />
             </span>
-            <span v-else class="ml-1 text-sm text-green-600 dark:text-green-400">
+            <span
+              v-else
+              class="ml-1 text-sm text-green-600 dark:text-green-400"
+            >
               Copied!
             </span>
           </div>
@@ -448,132 +453,138 @@ console.log('event header')
           />
         </MenuButton>
       </div>
-      <Notification
-        :show="showCopiedLinkNotification"
-        :title="'Copied to clipboard!'"
-        @close-notification="showCopiedLinkNotification = false"
-      />
-      <WarningModal
-        :title="'Delete Event'"
-        :body="'Are you sure you want to delete this event?'"
-        :open="confirmDeleteIsOpen"
-        :loading="deleteEventLoading"
-        @close="confirmDeleteIsOpen = false"
-        @primary-button-click="deleteEvent"
-      />
-      <WarningModal
-        v-if="confirmCancelIsOpen"
-        :title="'Cancel Event'"
-        :body="'Are you sure you want to cancel this event? This action cannot be undone.'"
-        :open="confirmCancelIsOpen"
-        :primary-button-text="'Yes, cancel the event'"
-        :secondary-button-text="'No'"
-        :loading="cancelEventLoading"
-        :error="cancelEventError?.message"
-        @close="confirmCancelIsOpen = false"
-        @primary-button-click="cancelEvent"
-      />
-      <GenericFeedbackFormModal
-        :open="showFeedbackFormModal"
-        :error="addFeedbackCommentToEventError?.message"
-        :loading="addFeedbackCommentToEventLoading"
-        @update-feedback="handleFeedbackInput"
-        @close="showFeedbackFormModal = false"
-        @primary-button-click="handleSubmitFeedback"
-      />
-      <BrokenRulesModal
-        v-if="eventData"
-        :title="'Suspend Event Submitter'"
-        :open="showArchiveAndSuspendModal"
-        :event-title="eventData.title"
-        :event-id="eventData.id"
-        :event-channel-id="eventChannelId"
-        :suspend-user-enabled="true"
-        :text-box-label="'(Optional) Explain why you are suspending the event submitter:'"
-        @close="showArchiveAndSuspendModal = false"
-        @suspended-user-successfully="
-          () => {
-            showSuccessfullyArchivedAndSuspended = true;
-            showArchiveAndSuspendModal = false;
-          }
-        "
-      />
-      <Notification
-        :show="showSuccessfullyArchivedAndSuspended"
-        :title="'Archived the post and suspended the author.'"
-        @close-notification="showSuccessfullyArchivedAndSuspended = false"
-      />
-      <Notification
-        :show="showFeedbackSubmittedSuccessfully"
-        :title="'Your feedback has been recorded. Thank you!'"
-        @close-notification="showFeedbackSubmittedSuccessfully = false"
-      />
-      <BrokenRulesModal
-        :open="showReportEventModal"
-        :event-title="eventData.title"
-        :event-id="eventId"
-        @close="showReportEventModal = false"
-        @report-submitted-successfully="
-          () => {
-            showSuccessfullyReported = true;
-            showReportEventModal = false;
-          }
-        "
-      />
-      <BrokenRulesModal
-        :v-if="eventData && eventData.id"
-        :open="showArchiveModal"
-        :event-title="eventData?.title"
-        :event-id="eventData?.id"
-        :archive-after-reporting="true"
-        :event-channel-id="eventChannelId"
-        @close="showArchiveModal = false"
-        @reported-and-archived-successfully="
-          () => {
-            showSuccessfullyArchived = true;
-            showArchiveModal = false;
-            $emit('archived-successfully');
-          }
-        "
-      />
-      <UnarchiveModal
-        v-if="eventChannelId && eventData?.id"
-        :open="showUnarchiveModal"
-        :event-channel-id="eventChannelId"
-        :event-id="eventData?.id"
-        @close="showUnarchiveModal = false"
-        @unarchived-successfully="
-          () => {
-            showSuccessfullyUnarchived = true;
-            showUnarchiveModal = false;
-          }
-        "
-      />
-      <Notification
-        :show="showSuccessfullyReported"
-        :title="'Your report was submitted successfully.'"
-        @close-notification="showSuccessfullyReported = false"
-      />
-      <Notification
-        :show="showSuccessfullyArchived"
-        :title="'The event was archived successfully.'"
-        @close-notification="showSuccessfullyArchived = false"
-      />
-      <Notification
-        :show="showSuccessfullyUnarchived"
-        :title="'The event was unarchived successfully.'"
-        @close-notification="showSuccessfullyUnarchived = false"
-      />
-      <Notification
-        :show="showSuccessfullySuspended"
-        :title="'The event was suspended successfully.'"
-        @close-notification="showSuccessfullySuspended = false"
-      />
     </div>
+
     <InfoBanner
       v-if="eventData.virtualEventUrl"
       class="mx-4"
       :text="`The official event page is on an external website. Refer to the [official event page](${eventData.virtualEventUrl}) for the most complete, correct and up-to-date information.`"
     />
+
+    <client-only>
+      <div>
+        <Notification
+          :show="showCopiedLinkNotification"
+          :title="'Copied to clipboard!'"
+          @close-notification="showCopiedLinkNotification = false"
+        />
+        <WarningModal
+          :title="'Delete Event'"
+          :body="'Are you sure you want to delete this event?'"
+          :open="confirmDeleteIsOpen"
+          :loading="deleteEventLoading"
+          @close="confirmDeleteIsOpen = false"
+          @primary-button-click="deleteEvent"
+        />
+        <WarningModal
+          v-if="confirmCancelIsOpen"
+          :title="'Cancel Event'"
+          :body="'Are you sure you want to cancel this event? This action cannot be undone.'"
+          :open="confirmCancelIsOpen"
+          :primary-button-text="'Yes, cancel the event'"
+          :secondary-button-text="'No'"
+          :loading="cancelEventLoading"
+          :error="cancelEventError?.message"
+          @close="confirmCancelIsOpen = false"
+          @primary-button-click="cancelEvent"
+        />
+        <GenericFeedbackFormModal
+          :open="showFeedbackFormModal"
+          :error="addFeedbackCommentToEventError?.message"
+          :loading="addFeedbackCommentToEventLoading"
+          @update-feedback="handleFeedbackInput"
+          @close="showFeedbackFormModal = false"
+          @primary-button-click="handleSubmitFeedback"
+        />
+        <BrokenRulesModal
+          v-if="eventData"
+          :title="'Suspend Event Submitter'"
+          :open="showArchiveAndSuspendModal"
+          :event-title="eventData.title"
+          :event-id="eventData.id"
+          :event-channel-id="eventChannelId"
+          :suspend-user-enabled="true"
+          :text-box-label="'(Optional) Explain why you are suspending the event submitter:'"
+          @close="showArchiveAndSuspendModal = false"
+          @suspended-user-successfully="
+            () => {
+              showSuccessfullyArchivedAndSuspended = true;
+              showArchiveAndSuspendModal = false;
+            }
+          "
+        />
+        <Notification
+          :show="showSuccessfullyArchivedAndSuspended"
+          :title="'Archived the post and suspended the author.'"
+          @close-notification="showSuccessfullyArchivedAndSuspended = false"
+        />
+        <Notification
+          :show="showFeedbackSubmittedSuccessfully"
+          :title="'Your feedback has been recorded. Thank you!'"
+          @close-notification="showFeedbackSubmittedSuccessfully = false"
+        />
+        <BrokenRulesModal
+          :open="showReportEventModal"
+          :event-title="eventData.title"
+          :event-id="eventId"
+          @close="showReportEventModal = false"
+          @report-submitted-successfully="
+            () => {
+              showSuccessfullyReported = true;
+              showReportEventModal = false;
+            }
+          "
+        />
+        <BrokenRulesModal
+          :v-if="eventData && eventData.id"
+          :open="showArchiveModal"
+          :event-title="eventData?.title"
+          :event-id="eventData?.id"
+          :archive-after-reporting="true"
+          :event-channel-id="eventChannelId"
+          @close="showArchiveModal = false"
+          @reported-and-archived-successfully="
+            () => {
+              showSuccessfullyArchived = true;
+              showArchiveModal = false;
+              $emit('archived-successfully');
+            }
+          "
+        />
+        <UnarchiveModal
+          v-if="eventChannelId && eventData?.id"
+          :open="showUnarchiveModal"
+          :event-channel-id="eventChannelId"
+          :event-id="eventData?.id"
+          @close="showUnarchiveModal = false"
+          @unarchived-successfully="
+            () => {
+              showSuccessfullyUnarchived = true;
+              showUnarchiveModal = false;
+            }
+          "
+        />
+        <Notification
+          :show="showSuccessfullyReported"
+          :title="'Your report was submitted successfully.'"
+          @close-notification="showSuccessfullyReported = false"
+        />
+        <Notification
+          :show="showSuccessfullyArchived"
+          :title="'The event was archived successfully.'"
+          @close-notification="showSuccessfullyArchived = false"
+        />
+        <Notification
+          :show="showSuccessfullyUnarchived"
+          :title="'The event was unarchived successfully.'"
+          @close-notification="showSuccessfullyUnarchived = false"
+        />
+        <Notification
+          :show="showSuccessfullySuspended"
+          :title="'The event was suspended successfully.'"
+          @close-notification="showSuccessfullySuspended = false"
+        />
+      </div>
+    </client-only>
   </div>
 </template>

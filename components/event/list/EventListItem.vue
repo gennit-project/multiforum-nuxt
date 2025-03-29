@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, nextTick } from "vue";
 import { DateTime } from "luxon";
 import { getDatePieces } from "@/utils";
 import Tag from "@/components/TagComponent.vue";
@@ -147,8 +147,9 @@ const updateFilters = (params: SearchEventValues) => {
   });
 };
 
-const handleClick = () => {
+const handleClick = async () => {
   if (props.currentChannelId || route.name === "events-list-search") {
+    await nextTick();
     router.push(detailLink.value);
   } else {
     emit("openPreview");
@@ -173,11 +174,11 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 <template>
   <li
     :ref="`#${event.id}`"
-    class="relative pt-4 dark:bg-gray-800 list-none flex justify-between gap-4"
+    class="relative py-2 dark:bg-gray-800 list-none flex justify-between gap-4"
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
-    <div class="flex-shrink-0 rounded-lg">
+    <div class="flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-600 py-4">
       <div class="flex w-16 flex-col items-center justify-center">
         <div
           class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
@@ -202,7 +203,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         </div>
         <div 
           v-if="eventSpansMultipleDates"
-          class="bg-white mt-2 ml-2 dark:bg-gray-800 text-xs text-gray-500 dark:text-gray-200 rounded-full px-2 py-1"
+          class="mt-2 ml-2 text-xs text-gray-500 dark:text-gray-200 rounded-full px-2 py-1"
         > <span>Multiple Days</span>
         </div>
       </div>
