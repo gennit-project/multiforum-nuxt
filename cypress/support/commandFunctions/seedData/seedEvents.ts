@@ -46,17 +46,26 @@ const timeZone = Cypress.env("TZ");
 const now = DateTime.now().setZone(timeZone);
 
 const getStartOfThisWeekend = () => {
-  const startOfWeek = now.startOf("week");
-  const weekend = startOfWeek.plus({ days: 5 });
-  // If we're already past this weekend, get next weekend
-  return weekend <= now ? now : weekend;
+  const today = now.startOf('day');
+  const saturday = today.set({ weekday: 6 }); // 6 is Saturday
+  
+  // If today is already past this Saturday, get next Saturday
+  if (today > saturday) {
+    return saturday.plus({ weeks: 1 });
+  }
+  return saturday;
 };
 
 const getStartOfNextWeek = () => {
-  const startOfThisWeek = now.startOf("week");
-  const nextWeek = startOfThisWeek.plus({ weeks: 1 });
-  // If we're already past the start of next week, get the week after
-  return nextWeek <= now ? now : nextWeek;
+  const today = now.startOf('day');
+  const nextSunday = today.set({ weekday: 7 }); // 7 is Sunday
+  
+  // If today is already Sunday, get next Sunday
+  // If today is Saturday, nextSunday will be tomorrow
+  if (today >= nextSunday) {
+    return nextSunday.plus({ weeks: 1 });
+  }
+  return nextSunday;
 };
 
 const getStartOfNextMonth = () => {
@@ -89,8 +98,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Weekend Test Event",
-    startTime: startOfNextWeekend.plus({ minutes: 1 }).toISO(),
-    endTime: startOfNextWeekend.plus({ days: 2 }).toISO(),
+    startTime: startOfNextWeekend.toISO(),  // Start exactly on Saturday
+    endTime: startOfNextWeekend.plus({ days: 1 }).toISO(), // End on Sunday
     startTimeDayOfWeek: startOfNextWeekend.weekdayLong,
     startTimeHourOfDay: startOfNextWeekend.hour,
     poster: "cluse",
@@ -101,8 +110,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Week Test Event",
-    startTime: startOfNextWeek.plus({ minutes: 1 }).toISO(),
-    endTime: startOfNextWeek.plus({ weeks: 1 }).toISO(),
+    startTime: startOfNextWeek.toISO(),
+    endTime: startOfNextWeek.plus({ days: 1 }).toISO(),
     startTimeDayOfWeek: startOfNextWeek.weekdayLong,
     startTimeHourOfDay: startOfNextWeek.hour,
     poster: "cluse",
@@ -113,8 +122,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Weekend Test Event",
-    startTime: startOfNextWeek.plus({ days: 5, minutes: 1 }).toISO(),
-    endTime: startOfNextWeek.plus({ weeks: 1 }).toISO(),
+    startTime: startOfNextWeek.plus({ days: 5 }).toISO(),  // Saturday of next week (removed the minute offset)
+    endTime: startOfNextWeek.plus({ days: 6 }).toISO(),    // Sunday of next week
     startTimeDayOfWeek: startOfNextWeek.plus({ days: 5 }).weekdayLong,
     startTimeHourOfDay: startOfNextWeek.plus({ days: 5 }).hour,
     poster: "cluse",
@@ -125,8 +134,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Month Test Event",
-    startTime: now.plus({ hours: 1 }).toISO(), // Ensure it's in the future
-    endTime: startOfNextMonth.toISO(),
+    startTime: now.plus({ hours: 1 }).toISO(), // Keep this to ensure it's in the future
+    endTime: now.plus({ hours: 3 }).toISO(),   // Just make it a 2-hour event
     startTimeDayOfWeek: now.weekdayLong,
     startTimeHourOfDay: now.hour,
     poster: "cluse",
@@ -137,10 +146,10 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Past Test Event",
-    startTime: now.minus({ years: 1 }).toISO(),
-    endTime: now.startOf("day").toISO(),
-    startTimeDayOfWeek: now.minus({ years: 1 }).weekdayLong,
-    startTimeHourOfDay: now.minus({ years: 1 }).hour,
+    startTime: now.minus({ months: 1 }).toISO(),     // One month ago
+    endTime: now.minus({ months: 1, hours: -2 }).toISO(),  // Event lasted 2 hours
+    startTimeDayOfWeek: now.minus({ months: 1 }).weekdayLong,
+    startTimeHourOfDay: now.minus({ months: 1 }).hour,
     poster: "cluse",
     cost: "0",
     canceled: false,
@@ -149,8 +158,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Month Test Event",
-    startTime: startOfNextMonth.plus({ minutes: 1 }).toISO(),
-    endTime: startOfNextMonth.plus({ months: 1 }).toISO(),
+    startTime: startOfNextMonth.toISO(),  // Start exactly at the beginning of next month
+    endTime: startOfNextMonth.plus({ hours: 2 }).toISO(),  // 2-hour event
     startTimeDayOfWeek: startOfNextMonth.weekdayLong,
     startTimeHourOfDay: startOfNextMonth.hour,
     poster: "cluse",

@@ -178,7 +178,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
-    <div class="flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-600 py-4">
+    <div class="flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 py-4">
       <div class="flex w-16 flex-col items-center justify-center">
         <div
           class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"

@@ -218,10 +218,15 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   }
 
   const getStartOfNextWeek = () => {
-    const startOfThisWeek = now.startOf("week");
-    // If today is Sunday, look for events after
-    // the following Sunday
-    return startOfThisWeek.plus({ weeks: 1 });
+    const today = now.startOf('day');
+    const nextSunday = today.set({ weekday: 7 }); // 7 is Sunday
+    
+    // If today is already Sunday, get next Sunday
+    // If today is Saturday, nextSunday will be tomorrow
+    if (today >= nextSunday) {
+      return nextSunday.plus({ weeks: 1 });
+    }
+    return nextSunday;
   };
 
   const defaultStartDateObj = now.startOf("hour");
