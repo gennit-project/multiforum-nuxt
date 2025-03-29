@@ -11,7 +11,8 @@ describe("Filter discussions by text", () => {
     const searchTerm = "topic 1";
 
     cy.visit(DISCUSSION_LIST)
-      .wait(3000);
+      .wait(2000);
+    cy.get('button[data-testid="discussion-search-button"]').click(); // open the filter menu
     cy.get('div[data-testid="discussion-filter-search-bar"]')
       .find("input")
       .type(`${searchTerm}{enter}`)
@@ -29,8 +30,9 @@ describe("Filter discussions by text", () => {
     const searchTerm = "topic 3";
 
     cy.visit(CHANNEL_VIEW)
-      .wait(3000);
+      .wait(2000);
 
+    cy.get('button[data-testid="discussion-search-button"]').click(); // open the filter menu
     cy.get('div[data-testid="discussion-filter-search-bar"]')
       .find("input")
       .type(`${searchTerm}{enter}`)

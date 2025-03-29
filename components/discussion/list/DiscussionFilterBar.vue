@@ -194,6 +194,7 @@ const toggleShowSearch = () => {
           <FilterIcon />
         </button>
         <button
+          data-testid="discussion-search-button"
           :class="
             showSearch
               ? 'border-blue-500'
