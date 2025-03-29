@@ -283,16 +283,16 @@ const updateShowArchived = (event: Event) => {
 </script>
 
 <template>
-  <div class="w-full flex-col space-y-1 dark:text-white mt-2">
+  <div class="flex-1 flex-col space-y-1 dark:text-white mt-2 mx-4">
     <div v-if="showMainFilters" class="flex flex-col gap-2">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
-        <div class="flex space-x-1 align-items">
+        <div class="flex space-x-1 items-center">
           <div
-            class="flex space-x-2 items-center justify-center hidden md:block"
+            class="flex space-x-2 justify-center align-items hidden md:block"
           >
             <FilterChip
               v-if="!channelId"
-              class="ml-4 items-center align-middle"
+              class="items-center align-middle"
               :data-testid="'forum-filter-button'"
               :label="channelLabel"
               :highlighted="channelLabel !== defaultFilterLabels.channels"
@@ -327,7 +327,7 @@ const updateShowArchived = (event: Event) => {
               <Popper v-if="!showLocationSearchBarAndDistanceButtons">
                 <button
                   data-testid="more-filters-button"
-                  class="absolute inset-y-0 right-0 flex rounded-full cursor-pointer items-center justify-center bg-white dark:text-white dark:bg-gray-700 p-2"
+                  class="absolute inset-y-0 h-12 w-12 right-0 flex rounded-full cursor-pointer items-center justify-center dark:text-white p-2 hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   <FilterIcon class="h-4 w-4 dark:text-white" />
                 </button>
@@ -462,7 +462,7 @@ const updateShowArchived = (event: Event) => {
             </FilterChip>
           </div>
         </div>
-        <div class="flex items-center mt-4 block md:hidden">
+        <div class="flex items-center mt-4 md:hidden">
           <FilterChip
             v-if="!channelId"
             class="items-center align-middle"
