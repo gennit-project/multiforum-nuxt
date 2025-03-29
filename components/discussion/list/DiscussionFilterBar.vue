@@ -177,6 +177,7 @@ const toggleShowSearch = () => {
         </FilterChip>
         <SortButtons />
         <button
+          data-testid="discussion-filter-button"
           :class="
             showFilters
               ? 'border-blue-500'

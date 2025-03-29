@@ -12,7 +12,8 @@ describe("Filter discussions by tag", () => {
   const triviaTaggedDiscussionTitle = "Example topic 3";
 
   it("in the sitewide online discussions list, filters discussions by tag", () => {
-    cy.visit(DISCUSSION_LIST).wait(3000);
+    cy.visit(DISCUSSION_LIST).wait(2000);
+    cy.get('button[data-testid="discussion-filter-button"]').click(); // open the filter menu
     cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     cy.get('span[data-testid="tag-picker-newYears"]').click(); // click the newYears tag
@@ -48,7 +49,8 @@ describe("Filter discussions by tag", () => {
     const CHANNEL_VIEW = `${Cypress.env("baseUrl")}/forums/phx_music/discussions/`;
     const searchTerm = "trivia";
 
-    cy.visit(CHANNEL_VIEW).wait(3000);
+    cy.visit(CHANNEL_VIEW).wait(2000);
+    cy.get('button[data-testid="discussion-filter-button"]').click(); // open the filter menu
     cy.get('button[data-testid="tag-filter-button"]').click(); // open the tag picker
 
     // click the trivia tag
