@@ -69,6 +69,9 @@ export const GET_USER_COMMENTS = gql`
             username
             profilePicURL
           }
+          ... on ModerationProfile {
+            displayName
+          }
         }
         DiscussionChannel {
           id

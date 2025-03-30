@@ -89,9 +89,9 @@ const loadMore = () => {
       No comments yet
     </div>
     <div v-else-if="commentResult && commentResult?.users?.length > 0">
+      <div v-for="comment in commentResult.users[0].Comments" :key="comment.id">
       <Comment
-        v-for="comment in commentResult.users[0].Comments"
-        :key="comment.id"
+        v-if="!comment.archived"
         :comment-data="comment"
         :parent-comment-id="comment.ParentComment ? comment.ParentComment.id : null"
         :depth="0"
@@ -99,6 +99,12 @@ const loadMore = () => {
         :show-context-link="true"
         :go-to-permalink-on-click="true"
       />
+      <ArchivedCommentText 
+        v-if="comment?.archived"
+        :channel-id="comment.Channel?.id"
+        :comment-id="comment.id"
+      />
+    </div>
     </div>
     <div v-if="loading">
       Loading...
