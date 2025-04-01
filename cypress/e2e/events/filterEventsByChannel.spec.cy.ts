@@ -1,11 +1,9 @@
 import { ONLINE_EVENT_LIST } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Filter events by channel", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
 
   it("filters events by channel", () => {
     const searchTerm = "Test free/virtual event";

@@ -1,12 +1,11 @@
 import { DISCUSSION_LIST } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData, loginUser } from "../../support/testSetup";
 
 describe("Basic root comment operations", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-    cy.loginWithCreateEventButton();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
+  // Login before each test
+  loginUser('loginWithCreateEventButton');
 
   it("creates, edits and deletes a comment", () => {
     const TEST_COMMENT_TEXT = "Test comment";

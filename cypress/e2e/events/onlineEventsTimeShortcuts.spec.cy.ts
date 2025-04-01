@@ -1,11 +1,11 @@
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 import { ONLINE_EVENT_LIST } from "../constants";
 
 describe("Filter events by text", () => {
+  // Set up test data once for all tests in this file
+  setupTestData();
+  
   it("should filter events by time period correctly", () => {
-    // Initial setup - only runs once
-    deleteAll();
-    seedAll();
     cy.visit(ONLINE_EVENT_LIST)
       .wait(5000); // Wait for hydration so buttons become functional
 

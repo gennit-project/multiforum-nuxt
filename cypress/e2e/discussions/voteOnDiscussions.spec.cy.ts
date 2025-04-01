@@ -1,11 +1,9 @@
 import { DISCUSSION_CREATION_FORM, CATS_FORUM } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Basic discussion operations", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
 
   it("can upvote and downvote discussions", () => {
     // User 2 logs in

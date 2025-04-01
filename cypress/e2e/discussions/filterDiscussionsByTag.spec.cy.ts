@@ -1,12 +1,11 @@
 import { DISCUSSION_LIST } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData, loginUser } from "../../support/testSetup";
 
 describe("Filter discussions by tag", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-    cy.loginWithCreateEventButton();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
+  // Login before each test
+  loginUser('loginWithCreateEventButton');
 
   const newYearsTagDiscussionTitle = "Example topic 2";
   const triviaTaggedDiscussionTitle = "Example topic 3";

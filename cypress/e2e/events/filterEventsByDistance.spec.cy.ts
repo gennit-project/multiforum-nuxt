@@ -1,11 +1,9 @@
 import { IN_PERSON_EVENT_LIST } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Filter events by distance", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
 
   it("in the sitewide in-person events list, filters events by distance", () => {
     // Go to the map view.

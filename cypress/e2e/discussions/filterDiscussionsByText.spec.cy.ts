@@ -1,11 +1,9 @@
 import { DISCUSSION_LIST } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Filter discussions by text", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
 
   it("in the sitewide online discussions list, filters discussions by text", () => {
     const searchTerm = "topic 1";

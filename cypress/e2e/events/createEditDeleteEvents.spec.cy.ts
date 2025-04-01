@@ -1,13 +1,12 @@
 import { DateTime } from "luxon";
 import { EVENT_CREATION_FORM, baseUrl } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData, loginUser } from "../../support/testSetup";
 
 describe("Basic event operations", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-    cy.loginWithCreateEventButton();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
+  // Login before each test
+  loginUser('loginWithCreateEventButton');
 
   it("creates, edits and deletes an online event", () => {
     // Helper function to format dates for input fields

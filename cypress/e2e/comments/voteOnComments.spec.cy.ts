@@ -1,11 +1,9 @@
 import { DISCUSSION_LIST } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Basic comment operations", () => {
-  before(() => {
-    deleteAll();
-    seedAll();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
 
   it("User 1 can undo upvote on their own comment", () => {
     const TEST_COMMENT_TEXT = "Test comment";

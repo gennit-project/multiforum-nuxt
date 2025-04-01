@@ -1,16 +1,17 @@
 import { getConstantsForCypress } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData, loginUser } from "../../support/testSetup";
 
 const constants = getConstantsForCypress(Cypress.env("baseUrl"));
 const { CHANNEL_CREATION_FORM } = constants;
 
 describe("Basic channel operations", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-    cy.loginWithCreateEventButton();
-    
-    // Add verification that we're actually logged in
+  // Set up test data once for all tests in this file
+  setupTestData();
+  // Login before each test
+  loginUser('loginWithCreateEventButton');
+  
+  // Add verification that we're actually logged in
+  beforeEach(() => {
     cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
   });
 
