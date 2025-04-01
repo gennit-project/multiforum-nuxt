@@ -1,12 +1,9 @@
 import { CATS_FORUM } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Give feedback on a discussion", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-    
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
 
   it("can create/edit/delete feedback and permalink to it", () => {
     const EDITED_FEEDBACK = "This is an edited test feedback";

@@ -1,12 +1,11 @@
 import { DISCUSSION_CREATION_FORM } from "../constants";
-import { deleteAll, seedAll } from "../utils";
+import { setupTestData, loginUser } from "../../support/testSetup";
 
 describe("Basic discussion operations", () => {
-  beforeEach(function () {
-    deleteAll();
-    seedAll();
-    cy.loginWithCreateEventButton();
-  });
+  // Set up test data once for all tests in this file
+  setupTestData();
+  // Login before each test
+  loginUser('loginWithCreateEventButton');
 
   it("creates, edits and deletes a discussion", () => {
     const TEST_DISCUSSION = "Test discussion title";

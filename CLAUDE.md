@@ -5,8 +5,14 @@
 - `npm run build` - Build for production
 - `npm run test` - Open Cypress test runner
 - `npx cypress run --spec "cypress/e2e/discussions/createEditDeleteDiscussions.spec.cy.ts"` - Run specific test file
+- `npx cypress run --spec "cypress/e2e/discussions/**/*.spec.cy.ts"` - Run all discussions tests
 - `npm run tsc` - Run TypeScript type checking
 - `npx eslint --fix path/to/file.vue` - Fix linting issues
+
+## Cypress Testing
+- Use `setupTestData()` from `support/testSetup.ts` to initialize data once per test file
+- Use `loginUser()` to handle authentication for tests that need it
+- Avoid multiple database resets with `beforeEach` - use shared test data when possible
 
 ## Code Style Guidelines
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
