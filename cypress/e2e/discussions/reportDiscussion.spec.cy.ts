@@ -37,11 +37,11 @@ describe("Report a discussion", () => {
     cy.get('input[type="checkbox"]').first().check();
     
     // Add report text
-    cy.get('textarea[data-testid="texteditor-textarea"]')
+    cy.get('textarea[data-testid="report-discussion-input"]')
       .type("This is a test report for automated testing");
     
     // Submit the report
-    cy.get('button[data-testid="generic-modal-primary-button"]').click();
+    cy.get('button[data-testid="report-discussion-modal-primary-button"]').click();
     
     // Verify the success notification appears
     cy.contains("Your report was submitted successfully.").should("be.visible");
