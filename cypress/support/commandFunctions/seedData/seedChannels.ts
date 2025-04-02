@@ -25,7 +25,7 @@ const baseChannels: BaseChannel[] = [
 ];
 
 const channels: ChannelCreateInput[] = baseChannels.map(
-  ({ uniqueName, admins, mods }) => ({
+  ({ uniqueName, admins, mods }): ChannelCreateInput => ({
     uniqueName,
     Admins: {
       connect: admins.map((admin) => ({
@@ -40,9 +40,7 @@ const channels: ChannelCreateInput[] = baseChannels.map(
       connect: mods.map((mod) => ({
         where: {
           node: {
-            ModerationProfile: {
-              displayName: mod,
-            },
+             displayName: mod,
           }
         },
       })),
