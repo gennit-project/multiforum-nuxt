@@ -492,6 +492,7 @@ const close = () => {
 
 <template>
   <GenericModal
+    :data-testid="`report-${props.commentId ? 'comment' : props.discussionId ? 'discussion' : 'event'}-modal`"
     :highlight-color="'red'"
     :title="modalTitle"
     :body="'Please select at least one broken rule:'"

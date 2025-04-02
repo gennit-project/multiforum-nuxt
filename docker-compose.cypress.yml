@@ -1,0 +1,391 @@
+version: '3.8'
+
+services:
+  # Base database template - not directly used
+  database-template:
+    image: neo4j:5.1.0
+    restart: "no"
+    environment:
+      - NEO4J_AUTH=${NEO4J_AUTH:-neo4j/neo4j}
+      - NEO4J_PLUGINS=["apoc"]
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+      - NEO4J_dbms_default__database=neo4j
+      - NEO4J_dbms_logs_debug_level=INFO
+      - NEO4J_dbms_logs_query_enabled=OFF
+      - NEO4J_dbms_memory_pagecache_size=256M
+      - NEO4J_dbms_memory_heap_initial__size=256M
+      - NEO4J_dbms_memory_heap_max__size=512M
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p ${NEO4J_PASSWORD:-neo4j} 'RETURN 1' || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    networks:
+      - cypress-network
+
+  # Database for discussions tests
+  database-discussions:
+    extends:
+      service: database-template
+    container_name: database-discussions
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - neo4j-data-discussions:/data
+    networks:
+      - cypress-network
+      - discussions-network
+
+  # Database for events tests
+  database-events:
+    extends:
+      service: database-template
+    container_name: database-events
+    ports:
+      - "7475:7474"
+      - "7688:7687"
+    volumes:
+      - neo4j-data-events:/data
+    networks:
+      - cypress-network
+      - events-network
+
+  # Database for comments tests
+  database-comments:
+    extends:
+      service: database-template
+    container_name: database-comments
+    ports:
+      - "7476:7474"
+      - "7689:7687"
+    volumes:
+      - neo4j-data-comments:/data
+    networks:
+      - cypress-network
+      - comments-network
+
+  # Backend for discussions tests
+  backend-discussions:
+    image: cluse/multiforum-backend:latest
+    container_name: backend-discussions
+    ports:
+      - "4003:4000"
+    depends_on:
+      database-discussions:
+        condition: service_healthy
+    environment:
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - CYPRESS_ADMIN_TEST_EMAIL=${CYPRESS_ADMIN_TEST_EMAIL}
+      - CYPRESS_ADMIN_TEST_USERNAME=${CYPRESS_ADMIN_TEST_USERNAME}
+      - ENVIRONMENT=test
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      - GOOGLE_CREDENTIALS_BASE64=${GOOGLE_CREDENTIALS_BASE64}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-neo4j}
+      - NEO4J_URI=bolt://database-discussions:7687
+      - NEO4J_USERNAME=${NEO4J_USERNAME:-neo4j}
+      - SERVER_CONFIG_NAME=${VITE_SERVER_NAME:-Gennit}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000 || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+    networks:
+      - cypress-network
+      - discussions-network
+
+  # Backend for events tests
+  backend-events:
+    image: cluse/multiforum-backend:latest
+    container_name: backend-events
+    ports:
+      - "4001:4000"
+    depends_on:
+      database-events:
+        condition: service_healthy
+    environment:
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - CYPRESS_ADMIN_TEST_EMAIL=${CYPRESS_ADMIN_TEST_EMAIL}
+      - CYPRESS_ADMIN_TEST_USERNAME=${CYPRESS_ADMIN_TEST_USERNAME}
+      - ENVIRONMENT=test
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      - GOOGLE_CREDENTIALS_BASE64=${GOOGLE_CREDENTIALS_BASE64}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-neo4j}
+      - NEO4J_URI=bolt://database-events:7687
+      - NEO4J_USERNAME=${NEO4J_USERNAME:-neo4j}
+      - SERVER_CONFIG_NAME=${VITE_SERVER_NAME:-Gennit}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000 || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+    networks:
+      - cypress-network
+      - events-network
+
+  # Backend for comments tests
+  backend-comments:
+    image: cluse/multiforum-backend:latest
+    container_name: backend-comments
+    ports:
+      - "4002:4000"
+    depends_on:
+      database-comments:
+        condition: service_healthy
+    environment:
+      - AUTH0_CLIENT_ID=${AUTH0_CLIENT_ID}
+      - AUTH0_DOMAIN=${AUTH0_DOMAIN}
+      - CYPRESS_ADMIN_TEST_EMAIL=${CYPRESS_ADMIN_TEST_EMAIL}
+      - CYPRESS_ADMIN_TEST_USERNAME=${CYPRESS_ADMIN_TEST_USERNAME}
+      - ENVIRONMENT=test
+      - GCS_BUCKET_NAME=${GCS_BUCKET_NAME}
+      - GOOGLE_CREDENTIALS_BASE64=${GOOGLE_CREDENTIALS_BASE64}
+      - NEO4J_PASSWORD=${NEO4J_PASSWORD:-neo4j}
+      - NEO4J_URI=bolt://database-comments:7687
+      - NEO4J_USERNAME=${NEO4J_USERNAME:-neo4j}
+      - SERVER_CONFIG_NAME=${VITE_SERVER_NAME:-Gennit}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4000 || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 20s
+    networks:
+      - cypress-network
+      - comments-network
+
+  # Frontend for discussions tests
+  frontend-discussions:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend-discussions
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend-discussions:
+        condition: service_healthy
+    environment:
+      - GRAPHQL_URL_FOR_TYPES=http://backend-discussions:4000
+      - VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
+      - VITE_AUTH0_CALLBACK_URL=${VITE_AUTH0_CALLBACK_URL:-http://localhost:3000}
+      - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}
+      - VITE_AUTH0_CLIENT_SECRET=${VITE_AUTH0_CLIENT_SECRET}
+      - VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
+      - VITE_AUTH0_PASSWORD=${VITE_AUTH0_PASSWORD}
+      - VITE_AUTH0_PASSWORD_2=${VITE_AUTH0_PASSWORD_2}
+      - VITE_AUTH0_SCOPE=${VITE_AUTH0_SCOPE}
+      - VITE_AUTH0_URL=${VITE_AUTH0_URL}
+      - VITE_AUTH0_USERNAME=${VITE_AUTH0_USERNAME}
+      - VITE_AUTH0_USERNAME_2=${VITE_AUTH0_USERNAME_2}
+      - VITE_BASE_URL=http://localhost:3000
+      - VITE_ENVIRONMENT=test
+      - VITE_GOOGLE_CLOUD_STORAGE_BUCKET=${VITE_GOOGLE_CLOUD_STORAGE_BUCKET}
+      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+      - VITE_GRAPHQL_URL=http://backend-discussions:4000
+      - VITE_LIGHTGALLERY_LICENSE_KEY=${VITE_LIGHTGALLERY_LICENSE_KEY}
+      - VITE_LOGOUT_URL=http://localhost:3000
+      - VITE_OPEN_CAGE_API_KEY=${VITE_OPEN_CAGE_API_KEY}
+      - VITE_OPEN_GRAPH_API_KEY=${VITE_OPEN_GRAPH_API_KEY}
+      - VITE_SERVER_NAME=${VITE_SERVER_NAME:-Gennit}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000 || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    networks:
+      - cypress-network
+      - discussions-network
+
+  # Frontend for events tests
+  frontend-events:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend-events
+    ports:
+      - "3001:3000"
+    depends_on:
+      backend-events:
+        condition: service_healthy
+    environment:
+      - GRAPHQL_URL_FOR_TYPES=http://backend-events:4000
+      - VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
+      - VITE_AUTH0_CALLBACK_URL=${VITE_AUTH0_CALLBACK_URL:-http://localhost:3001}
+      - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}
+      - VITE_AUTH0_CLIENT_SECRET=${VITE_AUTH0_CLIENT_SECRET}
+      - VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
+      - VITE_AUTH0_PASSWORD=${VITE_AUTH0_PASSWORD}
+      - VITE_AUTH0_PASSWORD_2=${VITE_AUTH0_PASSWORD_2}
+      - VITE_AUTH0_SCOPE=${VITE_AUTH0_SCOPE}
+      - VITE_AUTH0_URL=${VITE_AUTH0_URL}
+      - VITE_AUTH0_USERNAME=${VITE_AUTH0_USERNAME}
+      - VITE_AUTH0_USERNAME_2=${VITE_AUTH0_USERNAME_2}
+      - VITE_BASE_URL=http://localhost:3001
+      - VITE_ENVIRONMENT=test
+      - VITE_GOOGLE_CLOUD_STORAGE_BUCKET=${VITE_GOOGLE_CLOUD_STORAGE_BUCKET}
+      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+      - VITE_GRAPHQL_URL=http://backend-events:4000
+      - VITE_LIGHTGALLERY_LICENSE_KEY=${VITE_LIGHTGALLERY_LICENSE_KEY}
+      - VITE_LOGOUT_URL=http://localhost:3001
+      - VITE_OPEN_CAGE_API_KEY=${VITE_OPEN_CAGE_API_KEY}
+      - VITE_OPEN_GRAPH_API_KEY=${VITE_OPEN_GRAPH_API_KEY}
+      - VITE_SERVER_NAME=${VITE_SERVER_NAME:-Gennit}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000 || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    networks:
+      - cypress-network
+      - events-network
+
+  # Frontend for comments tests
+  frontend-comments:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: frontend-comments
+    ports:
+      - "3002:3000"
+    depends_on:
+      backend-comments:
+        condition: service_healthy
+    environment:
+      - GRAPHQL_URL_FOR_TYPES=http://backend-comments:4000
+      - VITE_AUTH0_AUDIENCE=${VITE_AUTH0_AUDIENCE}
+      - VITE_AUTH0_CALLBACK_URL=${VITE_AUTH0_CALLBACK_URL:-http://localhost:3002}
+      - VITE_AUTH0_CLIENT_ID=${VITE_AUTH0_CLIENT_ID}
+      - VITE_AUTH0_CLIENT_SECRET=${VITE_AUTH0_CLIENT_SECRET}
+      - VITE_AUTH0_DOMAIN=${VITE_AUTH0_DOMAIN}
+      - VITE_AUTH0_PASSWORD=${VITE_AUTH0_PASSWORD}
+      - VITE_AUTH0_PASSWORD_2=${VITE_AUTH0_PASSWORD_2}
+      - VITE_AUTH0_SCOPE=${VITE_AUTH0_SCOPE}
+      - VITE_AUTH0_URL=${VITE_AUTH0_URL}
+      - VITE_AUTH0_USERNAME=${VITE_AUTH0_USERNAME}
+      - VITE_AUTH0_USERNAME_2=${VITE_AUTH0_USERNAME_2}
+      - VITE_BASE_URL=http://localhost:3002
+      - VITE_ENVIRONMENT=test
+      - VITE_GOOGLE_CLOUD_STORAGE_BUCKET=${VITE_GOOGLE_CLOUD_STORAGE_BUCKET}
+      - VITE_GOOGLE_MAPS_API_KEY=${VITE_GOOGLE_MAPS_API_KEY}
+      - VITE_GRAPHQL_URL=http://backend-comments:4000
+      - VITE_LIGHTGALLERY_LICENSE_KEY=${VITE_LIGHTGALLERY_LICENSE_KEY}
+      - VITE_LOGOUT_URL=http://localhost:3002
+      - VITE_OPEN_CAGE_API_KEY=${VITE_OPEN_CAGE_API_KEY}
+      - VITE_OPEN_GRAPH_API_KEY=${VITE_OPEN_GRAPH_API_KEY}
+      - VITE_SERVER_NAME=${VITE_SERVER_NAME:-Gennit}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:3000 || exit 0"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+    networks:
+      - cypress-network
+      - comments-network
+
+  # Cypress runner for discussion tests
+  cypress-discussions:
+    build:
+      context: .
+      dockerfile: Dockerfile.cypress
+    container_name: cypress-discussions
+    depends_on:
+      frontend-discussions:
+        condition: service_healthy
+    environment:
+      - CYPRESS_baseUrl=http://frontend-discussions:3000
+      - CYPRESS_graphqlUrl=http://backend-discussions:4000
+      - CYPRESS_auth0Domain=${VITE_AUTH0_DOMAIN}
+      - CYPRESS_auth0ClientId=${VITE_AUTH0_CLIENT_ID}
+      - CYPRESS_auth0ClientSecret=${VITE_AUTH0_CLIENT_SECRET}
+      - CYPRESS_auth0Audience=${VITE_AUTH0_AUDIENCE}
+      - CYPRESS_email=${VITE_AUTH0_USERNAME}
+      - CYPRESS_password=${VITE_AUTH0_PASSWORD}
+      - CYPRESS_auth0_username_2=${VITE_AUTH0_USERNAME_2}
+      - CYPRESS_auth0_password_2=${VITE_AUTH0_PASSWORD_2}
+    volumes:
+      - ./cypress/videos/discussions:/app/cypress/videos
+      - ./cypress/screenshots/discussions:/app/cypress/screenshots
+    command: cypress run --spec "cypress/e2e/discussions/**/*.spec.cy.ts"
+    networks:
+      - discussions-network
+
+  # Cypress runner for event tests
+  cypress-events:
+    build:
+      context: .
+      dockerfile: Dockerfile.cypress
+    container_name: cypress-events
+    depends_on:
+      frontend-events:
+        condition: service_healthy
+    environment:
+      - CYPRESS_baseUrl=http://frontend-events:3000
+      - CYPRESS_graphqlUrl=http://backend-events:4000
+      - CYPRESS_auth0Domain=${VITE_AUTH0_DOMAIN}
+      - CYPRESS_auth0ClientId=${VITE_AUTH0_CLIENT_ID}
+      - CYPRESS_auth0ClientSecret=${VITE_AUTH0_CLIENT_SECRET}
+      - CYPRESS_auth0Audience=${VITE_AUTH0_AUDIENCE}
+      - CYPRESS_email=${VITE_AUTH0_USERNAME}
+      - CYPRESS_password=${VITE_AUTH0_PASSWORD}
+      - CYPRESS_auth0_username_2=${VITE_AUTH0_USERNAME_2}
+      - CYPRESS_auth0_password_2=${VITE_AUTH0_PASSWORD_2}
+    volumes:
+      - ./cypress/videos/events:/app/cypress/videos
+      - ./cypress/screenshots/events:/app/cypress/screenshots
+    command: cypress run --spec "cypress/e2e/events/**/*.spec.cy.ts"
+    networks:
+      - events-network
+
+  # Cypress runner for comment tests
+  cypress-comments:
+    build:
+      context: .
+      dockerfile: Dockerfile.cypress
+    container_name: cypress-comments
+    depends_on:
+      frontend-comments:
+        condition: service_healthy
+    environment:
+      - CYPRESS_baseUrl=http://frontend-comments:3000
+      - CYPRESS_graphqlUrl=http://backend-comments:4000
+      - CYPRESS_auth0Domain=${VITE_AUTH0_DOMAIN}
+      - CYPRESS_auth0ClientId=${VITE_AUTH0_CLIENT_ID}
+      - CYPRESS_auth0ClientSecret=${VITE_AUTH0_CLIENT_SECRET}
+      - CYPRESS_auth0Audience=${VITE_AUTH0_AUDIENCE}
+      - CYPRESS_email=${VITE_AUTH0_USERNAME}
+      - CYPRESS_password=${VITE_AUTH0_PASSWORD}
+      - CYPRESS_auth0_username_2=${VITE_AUTH0_USERNAME_2}
+      - CYPRESS_auth0_password_2=${VITE_AUTH0_PASSWORD_2}
+    volumes:
+      - ./cypress/videos/comments:/app/cypress/videos
+      - ./cypress/screenshots/comments:/app/cypress/screenshots
+    command: cypress run --spec "cypress/e2e/comments/**/*.spec.cy.ts,cypress/e2e/channels/**/*.spec.cy.ts"
+    networks:
+      - comments-network
+
+networks:
+  cypress-network:
+    driver: bridge
+  discussions-network:
+    driver: bridge
+  events-network:
+    driver: bridge
+  comments-network:
+    driver: bridge
+
+volumes:
+  neo4j-data-discussions:
+  neo4j-data-events:
+  neo4j-data-comments:

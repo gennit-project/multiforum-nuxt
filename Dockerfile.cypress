@@ -1,0 +1,17 @@
+FROM cypress/included:13.3.0
+
+WORKDIR /app
+
+# Install dependencies
+COPY package*.json ./
+RUN npm install
+
+# Copy all files
+COPY . .
+
+# Set environment variables
+ENV CYPRESS_baseUrl=http://frontend:3000
+ENV CYPRESS_CACHE_FOLDER=/root/.cache/Cypress
+
+# Default command - will be overridden in docker-compose
+CMD ["cypress", "run"]

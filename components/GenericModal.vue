@@ -8,7 +8,7 @@ import {
 } from "@headlessui/vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 
-defineProps({
+const props  = defineProps({
   dataTestid: {
     type: String,
     default: "",
@@ -52,6 +52,7 @@ defineProps({
     default: false,
   },
 });
+console.log('props', props.dataTestid);
 
 const emit = defineEmits(["close", "primaryButtonClick"]);
 </script>
