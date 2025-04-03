@@ -91,39 +91,51 @@ defineEmits([
           <p class="text-gray-600 dark:text-gray-400" v-if="!issue.isOpen">
             {{ "Mod actions are disabled because the issue is closed." }}
           </p>
-          <div class="flex flex-col space-y-4 mt-4">
-            <ArchiveButton
-              :discussion-id="discussionId"
-              :event-id="eventId"
-              :comment-id="commentId"
-              :context-text="contextText"
-              :channel-unique-name="channelUniqueName"
-              :issue="issue"
-              :disabled="!issue.isOpen"
-              @archived-successfully="$emit('archived-successfully')"
-              @unarchived-successfully="$emit('unarchived-successfully')"
-            />
-            <SuspendUserButton
-              :issue="issue"
-              :discussion-title="contextText"
-              :discussion-id="discussionId"
-              :event-title="contextText"
-              :event-id="eventId"
-              :channel-unique-name="channelUniqueName"
-              :disabled="!issue.isOpen"
-              @suspended-successfully="$emit('suspended-user-successfully')"
-              @unsuspended-successfully="$emit('unsuspended-user-successfully')"
-            />
-            <button
-              v-if="issue.isOpen"
-              class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
-              :loading="closeIssueLoading"
-              @click="$emit('close-issue')"
-            >
-              <XCircleIcon />
-              Close Issue (No Action Needed)
-            </button>
-          </div>
+          <RequireAuth :full-width="true">
+            <template #has-auth>
+              <div class="flex flex-col space-y-4 mt-4">
+                <ArchiveButton
+                  :discussion-id="discussionId"
+                  :event-id="eventId"
+                  :comment-id="commentId"
+                  :context-text="contextText"
+                  :channel-unique-name="channelUniqueName"
+                  :issue="issue"
+                  :disabled="!issue.isOpen"
+                  @archived-successfully="$emit('archived-successfully')"
+                  @unarchived-successfully="$emit('unarchived-successfully')"
+                />
+                <SuspendUserButton
+                  :issue="issue"
+                  :discussion-title="contextText"
+                  :discussion-id="discussionId"
+                  :event-title="contextText"
+                  :event-id="eventId"
+                  :channel-unique-name="channelUniqueName"
+                  :disabled="!issue.isOpen"
+                  @suspended-successfully="$emit('suspended-user-successfully')"
+                  @unsuspended-successfully="$emit('unsuspended-user-successfully')"
+                />
+                <button
+                  v-if="issue.isOpen"
+                  class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+                  :loading="closeIssueLoading"
+                  @click="$emit('close-issue')"
+                >
+                  <XCircleIcon />
+                  Close Issue (No Action Needed)
+                </button>
+              </div>
+            </template>
+            <template #does-not-have-auth>
+              <div class="flex flex-col space-y-4 mt-4">
+                <p class="text-gray-600 dark:text-gray-400">
+                  Please log in to access moderation features
+                </p>
+              </div>
+            </template>
+          </RequireAuth>
+         
         </div>
       </div>
     </template>
