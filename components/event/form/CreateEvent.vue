@@ -94,8 +94,7 @@ const {
 onDone((response) => {
   createEventLoading.value = false;
   const newEventId = response.data?.createEventWithChannelConnections[0]?.id;
-  const redirectChannelId =
-    channelId.value || formValues.value.selectedChannels[0];
+  const redirectChannelId = formValues.value.selectedChannels[0];
   router.push({
     name: "forums-forumId-events-eventId",
     params: { forumId: redirectChannelId, eventId: newEventId },
