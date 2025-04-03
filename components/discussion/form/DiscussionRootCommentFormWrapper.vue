@@ -111,6 +111,7 @@ const {
   
   update: (cache, result) => {
     const newComment: Comment = result.data?.createComments?.comments[0];
+    console.log("newComment", newComment);
     
     // Modify the specific field in the cache directly
     cache.modify({
@@ -130,6 +131,8 @@ const {
         }
       }
     });
+
+ 
   }
 }));
 

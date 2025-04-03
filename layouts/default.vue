@@ -119,6 +119,15 @@ onMounted(() => {
     { immediate: true }
   );
   
+  // Sync Auth0's authentication state with our local state
+  watch(isAuthenticated, (newIsAuthenticated) => {
+    setIsAuthenticated(newIsAuthenticated);
+    if (newIsAuthenticated && user.value?.email) {
+      userEmail.value = user.value.email;
+      loadUserData();
+    }
+  }, { immediate: true });
+  
   watch(
     () => auth0.error.value,
     (error) => {
@@ -176,7 +185,12 @@ const emailDoesNotHaveUsernameAttached = computed(() => {
 });
 
 const showMainContent = computed(() => {
-  return !isAuthenticatedVar || (isAuthenticatedVar && usernameVar);
+  // We want to show the CreateUsernamePage when the user is authenticated
+  // but doesn't have a username yet
+  if (isAuthenticatedVar.value && !usernameVar.value && !isLoadingAuthVar.value) {
+    return false;
+  }
+  return true;
 });
 </script>
 
@@ -187,7 +201,7 @@ const showMainContent = computed(() => {
       <div v-if="isSessionExpired" class="bg-red-500 text-white p-4 text-center">
         Your session has expired. Please 
         <button 
-          @click="auth0?.loginWithRedirect()" 
+          @click="() => { if (auth0) auth0.loginWithRedirect(); }" 
           class="underline font-bold hover:text-red-100"
         >
           click here to log in again

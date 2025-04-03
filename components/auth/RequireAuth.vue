@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, watch, onMounted, ref } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
-import { isAuthenticatedVar, setIsLoadingAuth, usernameVar } from "@/cache";
+import { isAuthenticatedVar, setIsLoadingAuth, usernameVar, setIsAuthenticated } from "@/cache";
 
 /* 
 This component is a wrapper around content that requires authentication.
@@ -55,33 +55,48 @@ const showAuthContent = computed(() => {
 
 // Only run client-side auth logic
 if (import.meta.env.SSR === false) {
-  const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect } =
+  const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect, isAuthenticated } =
     useAuth0();
 
   setIsLoadingAuth(isLoading.value);
+  
+  // Sync Auth0's authentication state with our local state
+  watch(isAuthenticated, (newValue) => {
+    setIsAuthenticated(newValue);
+  }, { immediate: true });
 
   const storeToken = async () => {
-    if (isAuthenticatedVar.value && idTokenClaims.value) {
-      const token = await idTokenClaims.value.__raw;
-      localStorage.setItem("token", token);
+    if (isAuthenticated.value && idTokenClaims.value) {
+      try {
+        const token = idTokenClaims.value.__raw;
+        localStorage.setItem("token", token);
+      } catch (error) {
+        console.error("Error storing token:", error);
+      }
     }
   };
 
   // Watch for authentication state changes
-  watch([isAuthenticatedVar, idTokenClaims], async ([isAuth, claims]) => {
-    if (isAuth && claims) {
+  watch(idTokenClaims, async (claims) => {
+    if (isAuthenticated.value && claims) {
       await storeToken();
     }
   });
 
   onMounted(() => {
     isMounted.value = true;
-    // // Also check on mount in case we're returning from a redirect
-    if (isAuthenticatedVar.value && idTokenClaims.value) {
-      // Only store the token if it's different from what's already stored
-
-      if (localStorage.getItem("token") !== idTokenClaims.value.__raw) {
-        storeToken();
+    // Also check on mount in case we're returning from a redirect
+    if (isAuthenticated.value && idTokenClaims.value) {
+      try {
+        // Only store the token if it's different from what's already stored
+        const currentToken = localStorage.getItem("token");
+        const newToken = idTokenClaims.value.__raw;
+        
+        if (currentToken !== newToken) {
+          storeToken();
+        }
+      } catch (error) {
+        console.error("Error checking token on mount:", error);
       }
     }
   });
