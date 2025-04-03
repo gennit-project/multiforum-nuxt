@@ -1,4 +1,4 @@
-import type { ChannelRoleCreateInput } from "../../../../__generated__/graphql";
+import type { ChannelRoleCreateInput } from "../../../../../__generated__/graphql";
 
 const channelRoles: ChannelRoleCreateInput[] = [
   {
