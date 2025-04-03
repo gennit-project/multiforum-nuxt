@@ -295,6 +295,13 @@ const selectedTab = ref(0);
               () => {
                 showFormatted = false;
                 selectedTab = 0;
+
+                // auto focus
+                nextTick(() => {
+                  if (editorRef) {
+                    editorRef.focus();
+                  }
+                });
               }
             "
           >
