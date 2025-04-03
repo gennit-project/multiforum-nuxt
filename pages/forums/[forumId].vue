@@ -180,8 +180,8 @@ definePageMeta({
           >
             <BackLink
               class="mt-6"
-              :link="`/forums/${channelId}/discussions`"
-              :data-testid="'discussion-detail-back-link'"
+              :link="`/forums/${channelId}/issues`"
+              :data-testid="'issue-detail-back-link'"
             />
             <div class="max-w-screen-2xl flex-1 pr-1">
               <IssueTitleEditForm />
