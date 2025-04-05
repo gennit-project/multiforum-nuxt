@@ -109,7 +109,7 @@ const tabs = computed((): Tab[] => {
   }
 
   const adminList = props.channel.Admins.map((user) => user.username || "");
-  const modList = props.channel.Moderators.map(
+  const modList = (props.channel.Moderators ?? []).map(
     (modProfile) => modProfile.displayName
   );
   const isAdmin = adminList.includes(loggedInUsername.value);

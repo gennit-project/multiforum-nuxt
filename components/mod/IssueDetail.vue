@@ -16,6 +16,8 @@ import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from "@/graphQLData/mod/queries";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import { DateTime } from "luxon";
 import type { Issue } from "@/__generated__/graphql";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import "md-editor-v3/lib/style.css";
@@ -49,6 +51,19 @@ const {
   loading: getIssueLoading,
   refetch: refetchIssue,
 } = useQuery(GET_ISSUE, { id: issueId.value });
+
+// Setup a query to get channel data (we'll use this for refetching after actions)
+const { refetch: refetchChannel } = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: channelId,
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "network-only", // Always fetch from network when refetching
+    skip: true // Skip initial execution, we'll only use for refetch
+  }
+);
 
 const activeIssue = computed<Issue | null>(() => {
   if (getIssueError.value || !getIssueResult.value) return null;
@@ -441,48 +456,66 @@ const handleCreateComment = async () => {
 
 const toggleCloseOpenIssue = async () => {
   if (!activeIssue.value || !modProfileNameVar.value) return;
-  if (activeIssue.value.isOpen) {
-    closeIssue();
+  
+  try {
+    if (activeIssue.value.isOpen) {
+      // Close the issue
+      await closeIssue();
 
-    if (createFormValues.value.text) {
-      addIssueActivityFeedItemWithComment({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: "closed the issue",
-        actionType: "close",
-        commentText: createFormValues.value.text,
-        channelUniqueName: channelId.value,
-      });
+      if (createFormValues.value.text) {
+        await addIssueActivityFeedItemWithComment({
+          issueId: activeIssue.value.id,
+          displayName: modProfileNameVar.value,
+          actionDescription: "closed the issue",
+          actionType: "close",
+          commentText: createFormValues.value.text,
+          channelUniqueName: channelId.value,
+        });
+      } else {
+        await addIssueActivityFeedItem({
+          issueId: activeIssue.value.id,
+          displayName: modProfileNameVar.value,
+          actionDescription: "closed the issue",
+          actionType: "close",
+        });
+      }
     } else {
-      addIssueActivityFeedItem({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: "closed the issue",
-        actionType: "close",
-      });
+      // Reopen the issue
+      await reopenIssue();
+      
+      if (createFormValues.value.text) {
+        await addIssueActivityFeedItemWithComment({
+          issueId: activeIssue.value.id,
+          displayName: modProfileNameVar.value,
+          actionDescription: "reopened the issue",
+          actionType: "reopen",
+          commentText: createFormValues.value.text,
+          channelUniqueName: channelId.value,
+        });
+      } else {
+        await addIssueActivityFeedItem({
+          issueId: activeIssue.value.id,
+          displayName: modProfileNameVar.value,
+          actionDescription: "reopened the issue",
+          actionType: "reopen",
+        });
+      }
     }
-  } else {
-    reopenIssue();
-    if (createFormValues.value.text) {
-      addIssueActivityFeedItemWithComment({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: "reopened the issue",
-        actionType: "reopen",
-        commentText: createFormValues.value.text,
-        channelUniqueName: channelId.value,
-      });
-    } else {
-      addIssueActivityFeedItem({
-        issueId: activeIssue.value.id,
-        displayName: modProfileNameVar.value,
-        actionDescription: "reopened the issue",
-        actionType: "reopen",
-      });
+    
+    // Refetch channel data to update issue counts in the UI
+    // This is important for updating the IssuesAggregate count in ChannelTabs
+    try {
+      await refetchChannel();
+      console.log("Refetched channel data to update issue counts");
+    } catch (error) {
+      console.error("Error refetching channel data:", error);
     }
+    
+    // Reset comment form
+    createFormValues.value.text = "";
+  } catch (error) {
+    console.error("Error toggling issue open/close state:", error);
   }
-  // reset comment form
-  createFormValues.value.text = "";
 };
 </script>
 
