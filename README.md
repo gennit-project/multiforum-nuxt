@@ -1,6 +1,22 @@
 # Multiforum
 
-Multiforum is an online platform where communities can create dedicated forums to share and organize events. Its powerful search and map integration lets users discover events across multiple forums, filtered by proximity and relevance, so they can find opportunities they can actually attend. Whether you're looking to connect with local groups or explore new interests, Multiforum makes it easy to find the right events and communities, all in one place.
+Multiforum is an online platform for communities to create forums for sharing discussions and events. Key features:
+
+1. Each forum has two main sections:
+  - Discussions: Content can be upvoted so best content rises to top
+  - Events: Calendar with upcoming community events
+2. Cross-posting capability:
+  - Events and discussions can be submitted to multiple forums for increased visibility
+3. Location-based event discovery:
+  - Map integration shows events across forums
+  - Events can be filtered by proximity, time, tags, and forums
+4. Responsive design:
+  - Works on both desktop and mobile
+5. Technology stack:
+  - Frontend: Vue/Nuxt.js with Apollo client
+  - Backend: Apollo server with Neo4j graph database
+  - Authentication: Auth0
+  - Maps: Google Maps integration
 
 This is a work in progress that intended to be an open-source, self-hosted platform.
 
