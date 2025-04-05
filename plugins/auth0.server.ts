@@ -6,6 +6,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   // Only runs on server
   if (import.meta.server) {
     const cookies = nuxtApp.ssrContext?.event.node.req.headers.cookie;
+    
+    // Default to not authenticated
+    setIsAuthenticated(false);
+    
     if (cookies) {
       // Look for Auth0 cookie - adjust the name based on your Auth0 config
       const auth0Cookie = cookies.split(';').find(c => c.trim().startsWith('auth0.is.authenticated='));
@@ -15,7 +19,6 @@ export default defineNuxtPlugin((nuxtApp) => {
         try {
           const token = decodeURIComponent(tokenCookie.split('=')[1]);
           const decoded = jwtDecode(token);
-          console.log('decoded ',JSON.stringify(decoded, null, 2));
           if (decoded && decoded.sub) {
             // Set initial auth state
             setIsAuthenticated(true);
@@ -25,6 +28,8 @@ export default defineNuxtPlugin((nuxtApp) => {
           }
         } catch (e) {
           console.error('Failed to decode auth token:', e);
+          // Explicitly set to false on error
+          setIsAuthenticated(false);
         }
       }
     }

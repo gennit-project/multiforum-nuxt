@@ -108,32 +108,61 @@ const {
   variables: {
     createCommentInput: createCommentInput.value,
   },
-  
-  update: (cache, result) => {
+
+  update: (cache: any, result: any) => {
+    // This is the logic for updating the cache
+    // after creating a root comment. For the logic for updating
+    // the cache after replying to a comment, see the CommentSection
+    // component.
+
     const newComment: Comment = result.data?.createComments?.comments[0];
-    console.log("newComment", newComment);
-    
-    // Modify the specific field in the cache directly
-    cache.modify({
-      id: cache.identify({
-        __typename: 'DiscussionChannel',
-        id: props.discussionChannel?.id
-      }),
-      fields: {
-        CommentsAggregate(existing = { count: 0 }) {
-          return {
-            ...existing,
-            count: existing.count + 1
-          }
-        },
-        Comments(existing = []) {
-          return [newComment, ...existing]
-        }
-      }
+    // Will use readQuery and writeQuery to update the cache
+    // https://www.apollographql.com/docs/react/caching/cache-interaction/#using-graphql-queries
+
+    const commentSectionQueryVariables = {
+      discussionId: props.discussionChannel.discussionId,
+      channelUniqueName: props.discussionChannel.channelUniqueName,
+      modName: props.modName,
+      limit: COMMENT_LIMIT,
+      offset: props.previousOffset,
+      sort: getSortFromQuery(route.query),
+    };
+
+    const readQueryResult = cache.readQuery({
+      query: GET_DISCUSSION_COMMENTS,
+      variables: commentSectionQueryVariables,
     });
 
- 
-  }
+    const existingDiscussionChannelData: DiscussionChannel =
+      readQueryResult?.getCommentSection?.DiscussionChannel;
+
+    const newRootComments: Comment[] = [
+      newComment,
+      ...(readQueryResult?.getCommentSection?.Comments || []),
+    ];
+
+    const existingCount =
+      existingDiscussionChannelData?.CommentsAggregate?.count || 0;
+
+    cache.writeQuery({
+      query: GET_DISCUSSION_COMMENTS,
+      variables: commentSectionQueryVariables,
+      data: {
+        ...readQueryResult,
+        getCommentSection: {
+          ...readQueryResult?.getCommentSection,
+          DiscussionChannel: {
+            ...existingDiscussionChannelData,
+            CommentsAggregate: {
+              ...existingDiscussionChannelData?.CommentsAggregate,
+              count: existingCount + 1,
+            },
+          },
+          Comments: newRootComments,
+        },
+      },
+    });
+  },
 }));
 
 onDone(() => {

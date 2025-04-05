@@ -11,15 +11,34 @@ if (import.meta.env.SSR === false) {
   const { logout } = useAuth0();
   
   handleLogout = () => {
-    const route = useRoute();
-    // Store the current path in local storage
-    localStorage.setItem("postLogoutRedirect", route.fullPath);
-    // Redirect to the fixed logout route
-    logout({
-      logoutParams: {
-        returnTo: `${config.baseUrl}/logout`,
-      },
-    });
+    try {
+      console.log("Logout initiated");
+      
+      const route = useRoute();
+      // Store the current path in local storage
+      localStorage.setItem("postLogoutRedirect", route.fullPath);
+      
+      // Create the full absolute URL for the logout redirect
+      const baseUrl = config.baseUrl || window.location.origin;
+      const logoutReturnUrl = `${baseUrl}/logout`;
+      console.log("Logout return URL:", logoutReturnUrl);
+      
+      // Clear any Auth0 token from localStorage
+      localStorage.removeItem("token");
+      
+      // Logout and redirect
+      logout({
+        logoutParams: {
+          returnTo: logoutReturnUrl,
+          clientId: config.clientId
+        },
+      });
+    } catch (error) {
+      console.error("Error during logout:", error);
+      
+      // Fallback: If logout fails, force redirect to home page
+      window.location.href = "/";
+    }
   };
 }
 </script>

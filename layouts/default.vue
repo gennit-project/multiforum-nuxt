@@ -105,7 +105,15 @@ onMounted(() => {
   if (!auth0) return;
   
   const { user, isAuthenticated } = auth0;
-  isAuthenticatedVar.value = isAuthenticated.value;
+  
+  // Only set isAuthenticatedVar to true if we have confirmed authentication
+  // Default to false, which allows non-authenticated users to see content
+  if (isAuthenticated.value === true) {
+    isAuthenticatedVar.value = true;
+  } else {
+    isAuthenticatedVar.value = false;
+  }
+  
   isLoadingAuthVar.value = false;
 
   watch(
@@ -184,13 +192,24 @@ const emailDoesNotHaveUsernameAttached = computed(() => {
   );
 });
 
+// For hydration purposes, we need to determine if we're mounted on the client
+const isMounted = ref(false);
+onMounted(() => {
+  isMounted.value = true;
+});
+
 const showMainContent = computed(() => {
-  // We want to show the CreateUsernamePage when the user is authenticated
-  // but doesn't have a username yet
-  if (isAuthenticatedVar.value && !usernameVar.value && !isLoadingAuthVar.value) {
-    return false;
+  // On SSR, always show main content to match initial render
+  if (!isMounted.value) {
+    return true;
   }
-  return true;
+  
+  // Only hide main content when user is authenticated but needs to create a username
+  // Non-authenticated users should always see the content
+  if (isAuthenticatedVar.value && !usernameVar.value && !isLoadingAuthVar.value) {
+    return false; // Show username creation form instead of content
+  }
+  return true; // Show content for non-authenticated users or users with usernames
 });
 </script>
 
@@ -223,18 +242,26 @@ const showMainContent = computed(() => {
             :show-dropdown="sideNavIsOpenVar"
             @close="setSideNavIsOpenVar(false)"
           />
-          <div v-if="showMainContent" class="w-full flex-grow flex flex-col">
-            <slot />
-            <SiteFooter v-if="showFooter" class="mt-auto" />
-          </div>
-          <div v-else>
-            <client-only>
+          <!-- During SSR and initial render, always show content -->
+          <client-only>
+            <template #fallback>
+              <div class="w-full flex-grow flex flex-col">
+                <slot />
+                <SiteFooter v-if="showFooter" class="mt-auto" />
+              </div>
+            </template>
+            
+            <div v-if="showMainContent" class="w-full flex-grow flex flex-col">
+              <slot />
+              <SiteFooter v-if="showFooter" class="mt-auto" />
+            </div>
+            <div v-else>
               <CreateUsernamePage
                 v-if="emailDoesNotHaveUsernameAttached"
                 @email-and-user-created="!usernameVar"
               />
-            </client-only>
-          </div>
+            </div>
+          </client-only>
         </div>
       </div>
     </main>

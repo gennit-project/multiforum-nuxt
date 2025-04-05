@@ -39,18 +39,28 @@ const isOwner = computed(() => {
   return props.owners?.includes(usernameVar.value);
 });
 const showAuthContent = computed(() => {
-  // During SSR, always show unauthenticated content
-  if (import.meta.env.SSR) return false;
+  // IMPORTANT: During SSR or initial mount, match the server-rendered content
+  // This prevents hydration mismatches
+  if (import.meta.env.SSR || !isMounted.value) {
+    return false; // Assume not authenticated for SSR and initial render
+  }
   
-  // If we have a username from server auth check, show auth content
-  if (usernameVar.value) return true;
+  // If we have a username, the user is fully authenticated
+  if (usernameVar.value) {
+    // If ownership is required, check that too
+    if (props.requireOwnership) {
+      return isOwner.value;
+    }
+    return true;
+  }
   
-  // Client-side checks
-  if (!isMounted.value) return false;
-  if (!usernameVar.value) return false;
-  if (props.requireOwnership && !isOwner.value) return false;
+  // If no username but authenticated, allow access to non-ownership content
+  if (isAuthenticatedVar.value && !props.requireOwnership) {
+    return true;
+  }
   
-  return true;
+  // Default: not authenticated or doesn't meet requirements
+  return false;
 });
 
 // Only run client-side auth logic
@@ -102,14 +112,32 @@ if (import.meta.env.SSR === false) {
   });
 
   handleLogin = async () => {
-    // @ts-ignore
-    if (window?.parent?.Cypress) {
-      // Make sure to return early after redirect to prevent additional actions
-      await loginWithRedirect();
-      return;
+    try {
+      // Add debug statements for troubleshooting
+      console.log("Login button clicked");
+      
+      // @ts-ignore
+      if (window?.parent?.Cypress) {
+        // Make sure to return early after redirect to prevent additional actions
+        console.log("Using redirect for Cypress");
+        await loginWithRedirect();
+        return;
+      }
+      
+      console.log("Attempting popup login");
+      await loginWithPopup();
+      console.log("Popup login completed");
+      
+      // Ensure state is updated
+      if (isAuthenticated.value) {
+        setIsAuthenticated(true);
+        console.log("Authentication state updated");
+      }
+      
+      await storeToken();
+    } catch (error) {
+      console.error("Login error:", error);
     }
-    await loginWithPopup();
-    await storeToken();
   };
 }
 </script>
@@ -122,20 +150,32 @@ if (import.meta.env.SSR === false) {
       justifyLeft ? 'justify-start w-full' : 'justify-center',
     ]"
   >
-    <div
-      v-if="!showAuthContent"
-      class="w-full"
-      data-auth-state="unauthenticated"
-      @click="handleLogin"
-    >
-      <slot name="does-not-have-auth" />
-    </div>
-    <div
-      v-else
-      class="w-full"
-      data-auth-state="authenticated"
-    >
-      <slot name="has-auth" />
-    </div>
+    <client-only>
+      <template #fallback>
+        <!-- SSR Fallback - Always show unauthenticated state to prevent hydration mismatch -->
+        <div
+          class="w-full"
+          data-auth-state="unauthenticated"
+        >
+          <slot name="does-not-have-auth" />
+        </div>
+      </template>
+      
+      <div
+        v-if="!showAuthContent"
+        class="w-full"
+        data-auth-state="unauthenticated"
+        @click="handleLogin"
+      >
+        <slot name="does-not-have-auth" />
+      </div>
+      <div
+        v-else
+        class="w-full"
+        data-auth-state="authenticated"
+      >
+        <slot name="has-auth" />
+      </div>
+    </client-only>
   </div>
 </template>
