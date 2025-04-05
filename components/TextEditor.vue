@@ -141,7 +141,7 @@ const handlePaste = async (event: ClipboardEvent) => {
 const handleFormStateDuringUpload = async (file: File) => {
   const textarea = editorRef.value;
   if (!textarea) return;
-  const sizeCheck = isFileSizeValid(file);
+  const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
     alert(sizeCheck.message);
     return;

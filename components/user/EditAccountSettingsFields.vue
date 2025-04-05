@@ -68,7 +68,7 @@ const upload = async (file: any) => {
     console.error("No username found");
     return;
   }
-  const sizeCheck = isFileSizeValid(file);
+  const sizeCheck = isFileSizeValid({ file, isProfilePic: true });
   if (!sizeCheck.valid) {
     alert(sizeCheck.message);
     return;

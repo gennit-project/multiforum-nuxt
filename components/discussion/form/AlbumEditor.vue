@@ -63,7 +63,7 @@ const uploadFile = async (file: File): Promise<string | null> => {
     console.error("No username found, cannot upload.");
     return null;
   }
-  const sizeCheck = isFileSizeValid(file);
+  const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
     alert(sizeCheck.message);
     return null;

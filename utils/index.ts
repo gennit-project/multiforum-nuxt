@@ -16,13 +16,24 @@ import UserMinus from "@/components/icons/UserMinus.vue";
 import type { Event, Tag as TagData } from "@/__generated__/graphql"
 
 const MAX_FILE_SIZE_MB = 5;
+const MAX_PROFILE_PIC_SIZE_MB = 1;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024; // Convert MB to bytes
+const MAX_PROFILE_PIC_SIZE_BYTES = MAX_PROFILE_PIC_SIZE_MB * 1024 * 1024; // Convert MB to bytes
 
-export function isFileSizeValid(file: File): { valid: boolean; message: string } {
-  if (file.size > MAX_FILE_SIZE_BYTES) {
+type FileSizeValidationInput = {
+  file: File;
+  isProfilePic?: boolean;
+};
+
+export function isFileSizeValid(input: FileSizeValidationInput): { valid: boolean; message: string } {
+  const { file, isProfilePic = false } = input;
+  const maxSize = isProfilePic ? MAX_PROFILE_PIC_SIZE_BYTES : MAX_FILE_SIZE_BYTES;
+  const maxSizeMB = isProfilePic ? MAX_PROFILE_PIC_SIZE_MB : MAX_FILE_SIZE_MB;
+  
+  if (file.size > maxSize) {
     return {
       valid: false,
-      message: `File size must be less than ${MAX_FILE_SIZE_MB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+      message: `File size must be less than ${maxSizeMB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
     };
   }
   return { valid: true, message: '' };
@@ -236,7 +247,7 @@ export function encodeSpacesInURL(url: string) {
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const { signedStorageURL, filename, file } = input;
 
-  const sizeCheck = isFileSizeValid(file);
+  const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
     console.error(sizeCheck.message);
     throw new Error(sizeCheck.message);
