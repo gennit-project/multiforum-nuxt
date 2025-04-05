@@ -103,10 +103,7 @@ const comments = computed(() => {
     <div v-if="commentCount">
       <LoadMore
         class="justify-self-center"
-        :reached-end-of-results="
-          commentsAggregate ===
-          commentResult.moderationProfiles[0].AuthoredComments.length
-        "
+        :reached-end-of-results="commentsAggregate === commentCount"
         @load-more="loadMore"
       />
     </div>
