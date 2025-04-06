@@ -108,10 +108,7 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
   if (!files || files.length === 0) return;
 
   // Check if adding these files would exceed the limit
-  if (
-    (props.formValues.album?.images?.length ?? 0) + files.length >
-    MAX_IMAGES
-  ) {
+  if ((props.formValues.album?.images?.length ?? 0) + files.length > MAX_IMAGES) {
     const remainingSlots = MAX_IMAGES - props.formValues.album.images.length;
     alert(
       `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? "s" : ""}. Maximum limit is ${MAX_IMAGES} images.`
@@ -120,43 +117,45 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     const filesToProcess = Array.from(files).slice(0, remainingSlots);
     if (filesToProcess.length === 0) return;
 
-    // Optionally you can show a global loading spinner,
-    // or track loading for each file. We'll do a quick approach
-    // by turning on "global" loading in a single key:
     loadingStates.value[-1] = true;
 
-    for (let i = 0; i < filesToProcess.length; i++) {
-      const file = filesToProcess[i];
-      // Upload each file
-      const uploadedUrl = await uploadFile(file);
-      if (uploadedUrl) {
-        // Insert a new image object into the album
+    // Process all files and collect their results
+    const uploadPromises = filesToProcess.map(file => uploadFile(file));
+    const uploadedUrls = await Promise.all(uploadPromises);
+    
+    // Add all successful uploads at once
+    uploadedUrls.forEach((url, index) => {
+      if (url) {
         addNewImage({
-          url: uploadedUrl,
-          alt: file.name,
+          url: url,
+          alt: filesToProcess[index].name,
           caption: "",
           copyright: "",
         });
       }
-    }
+    });
   } else {
     // Normal flow when not exceeding limits
     loadingStates.value[-1] = true;
 
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      // Upload each file
-      const uploadedUrl = await uploadFile(file);
-      if (uploadedUrl) {
-        // Insert a new image object into the album
+    // Convert FileList to Array first
+    const filesArray = Array.from(files);
+    
+    // Process all files and collect their results
+    const uploadPromises = filesArray.map(file => uploadFile(file));
+    const uploadedUrls = await Promise.all(uploadPromises);
+    
+    // Add all successful uploads at once
+    uploadedUrls.forEach((url, index) => {
+      if (url) {
         addNewImage({
-          url: uploadedUrl,
-          alt: file.name,
+          url: url,
+          alt: filesArray[index].name,  // Now using filesArray instead of files
           caption: "",
           copyright: "",
         });
       }
-    }
+    });
   }
 
   // Turn off the global loading
