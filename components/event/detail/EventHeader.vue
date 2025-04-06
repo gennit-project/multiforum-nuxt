@@ -457,7 +457,6 @@ console.log("event header");
 
     <InfoBanner
       v-if="eventData.virtualEventUrl"
-      class="mx-4"
       :text="`The official event page is on an external website. Refer to the [official event page](${eventData.virtualEventUrl}) for the most complete, correct and up-to-date information.`"
     />
 
