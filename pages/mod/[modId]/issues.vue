@@ -70,7 +70,7 @@ const loadMore = () => {
 };
 
 const issueCount = computed(() => {
-  return issueResult.value?.moderationProfiles[0]?.AuthoredIssues.length;
+  return issueResult.value?.moderationProfiles[0]?.AuthoredIssues?.length || 0;
 });
 
 const issues = computed(() => {
@@ -107,7 +107,6 @@ const issues = computed(() => {
         :issue="issue"
       />
     </ul>
-    <div v-if="loading && !issueCount">Loading...</div>
     <div v-if="issueCount">
       <LoadMore
         class="justify-self-center"

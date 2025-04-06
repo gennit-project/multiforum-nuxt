@@ -52,9 +52,6 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       keyFields: ["displayName"],
       merge: true,
       fields: {
-        // AuthoredComments: {
-        //   merge: (existing = [], incoming) => [...incoming]
-        // },
         ActivityFeed: {
           merge: (existing = [], incoming) => [...incoming]
         },

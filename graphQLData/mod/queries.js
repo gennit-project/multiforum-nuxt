@@ -50,6 +50,67 @@ export const GET_MOD = gql`
       ActivityFeedAggregate {
         count
       }
+      AuthoredComments(
+        options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
+      ) {
+        id
+        text
+        createdAt
+        updatedAt
+        deleted
+        archived
+        CommentAuthor {
+          ... on ModerationProfile {
+            displayName
+          }
+          ... on User {
+            username
+          }
+        }
+        DiscussionChannel {
+          id
+          Channel {
+            uniqueName
+          }
+          discussionId
+          channelUniqueName
+        }
+        Channel {
+          uniqueName
+        }
+        GivesFeedbackOnDiscussion {
+          id
+        }
+        GivesFeedbackOnEvent {
+          id
+        }
+        GivesFeedbackOnComment {
+          id
+        }
+        Issue {
+          id
+        }
+      }
+      AuthoredIssues(
+        options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
+      ) {
+        id
+        title
+        createdAt
+        updatedAt
+        isOpen
+        Author {
+          ... on ModerationProfile {
+            displayName
+          }
+          ... on User {
+            username
+          }
+        }
+        Channel {
+          uniqueName
+        }
+      }
     }
   }
 `;
