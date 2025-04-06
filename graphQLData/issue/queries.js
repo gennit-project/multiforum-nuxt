@@ -55,6 +55,9 @@ export const ISSUE_FIELDS = gql`
           weightedVotesCount
           createdAt
           updatedAt
+          Issue {
+            id
+          }
           CommentAuthor {
             ... on ModerationProfile {
               displayName
@@ -204,19 +207,6 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
           uniqueName
         }
         flaggedServerRuleViolation
-      }
-    }
-  }
-`;
-
-export const GET_ISSUES_BY_MOD = gql`
-  query getIssuesByMod {
-    moderationProfiles(
-      where: { displayName: "miniatureDeafeningMysteriousTeacher" }
-    ) {
-      displayName
-      AuthoredIssues {
-        title
       }
     }
   }
