@@ -8,17 +8,14 @@ import ModProfileTabs from "../../components/mod/ModProfileTabs.vue";
 
 const route = useRoute();
 const router = useRouter();
-const modId = computed(() => {
-  if (typeof route.params.modId === "string") {
-    return route.params.modId;
-  }
-  return "";
+const modProfileName = computed(() => {
+  return typeof route.params.modId === "string" ? route.params.modId : "";
 });
-
+console.log('route.name', route.name);
 const { result, error } = useQuery(
   GET_MOD,
   {
-    displayName: modId.value,
+    displayName: modProfileName.value,
   },
   {
     fetchPolicy: "cache-first",
@@ -32,12 +29,9 @@ const mod = computed(() => {
   return null;
 });
 
-if (modId.value) {
-  const modProfileBasePathName = `mod-modId`;
-  if (route.name === modProfileBasePathName) {
-    router.push(`/mod/${modId.value}/comments`);
-  }
-}
+definePageMeta({
+  middleware: 'mod-profile-redirect'
+})
 </script>
 
 <template>

@@ -48,6 +48,21 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
     ServerConfig: {
       keyFields: ["serverName"]
     },
+    ModerationProfile: {
+      keyFields: ["displayName"],
+      merge: true,
+      fields: {
+        // AuthoredComments: {
+        //   merge: (existing = [], incoming) => [...incoming]
+        // },
+        ActivityFeed: {
+          merge: (existing = [], incoming) => [...incoming]
+        },
+        AuthoredIssues: {
+          merge: (existing = [], incoming) => [...incoming]
+        }
+      }
+    },
     Channel: {
       keyFields: ["uniqueName"],
       merge: true,

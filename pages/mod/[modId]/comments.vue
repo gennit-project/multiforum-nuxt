@@ -12,7 +12,10 @@ const modProfileName = computed(() => {
   return typeof route.params.modId === "string" ? route.params.modId : "";
 });
 
-const { result: modResult, error: getModError } = useQuery(GET_MOD, () => ({
+const { 
+  result: modResult, 
+  error: getModError
+} = useQuery(GET_MOD, () => ({
   displayName: modProfileName.value,
 }));
 
@@ -70,7 +73,7 @@ const loadMore = () => {
 };
 
 const commentCount = computed(() => {
-  return commentResult.value?.moderationProfiles[0]?.AuthoredComments.length;
+  return commentResult.value?.moderationProfiles[0]?.AuthoredComments?.length || 0;
 });
 
 const comments = computed(() => {

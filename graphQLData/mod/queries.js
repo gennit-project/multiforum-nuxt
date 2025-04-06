@@ -43,15 +43,12 @@ export const GET_MOD = gql`
       createdAt
       AuthoredCommentsAggregate {
         count
-        __typename
       }
       AuthoredIssuesAggregate {
         count
-        __typename
       }
       ActivityFeedAggregate {
         count
-        __typename
       }
     }
   }
