@@ -82,6 +82,36 @@ export const GET_CHANNEL = gql`
       ) {
         count
       }
+      DefaultModRole { 
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
+      ElevatedModRole {
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
+      SuspendedModRole {
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
     }
   }
 `;

@@ -32,7 +32,9 @@ const {
   error: getUserError,
 } = useQuery(GET_USER, () => ({
   username: username.value,
-}));
+}),{
+  enabled: !usernameVar.value,
+});
 
 const user = computed(() => {
   if (getUserLoading.value || getUserError.value) {

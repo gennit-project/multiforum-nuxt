@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRouter } from "nuxt/app";
+import { useQuery } from "@vue/apollo-composable";
 import type { RouteLocationAsRelativeGeneric } from "vue-router";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { useQuery } from "@vue/apollo-composable";
 import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 import LocationIcon from "@/components/icons/LocationIcon.vue";
 import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
@@ -77,7 +77,9 @@ const visibleRecentForums = computed(() => {
 });
 
 const { result: getUserResult } = useQuery(GET_USER, {
-  username: usernameVar.value || "",
+  username: usernameVar.value,
+},{
+  enabled: !usernameVar.value,
 });
 
 const user = computed(() => getUserResult.value?.users[0] || null);

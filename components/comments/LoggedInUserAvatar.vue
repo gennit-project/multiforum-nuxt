@@ -7,6 +7,8 @@ import { computed } from "vue";
 
 const { result: getUserResult } = useQuery(GET_USER, {
   username: usernameVar.value,
+},{
+  enabled: !usernameVar.value,
 });
 
 const profilePicURL = computed(() => {
