@@ -107,7 +107,7 @@ const { theme } = useTheme()
       <div v-else ref="eventDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-2xl my-1 font-medium sm:tracking-tight"
+          class="text-wrap px-1 text-md md:text-4xl sm:tracking-tight"
         >
           {{ event?.title || "[Deleted]" }}
         </h2>

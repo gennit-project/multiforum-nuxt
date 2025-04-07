@@ -124,7 +124,7 @@ const formattedDate = computed(() => {
       <div v-else ref="discussionDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-md md:text-2xl font-medium sm:tracking-tight"
+          class="text-wrap px-1 text-md md:text-4xl sm:tracking-tight"
         >
           {{ discussion && discussion.title ? discussion.title : "Couldn't find the discussion" }}
         </h2>

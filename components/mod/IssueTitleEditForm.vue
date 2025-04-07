@@ -109,7 +109,7 @@ const formattedDate = computed(() => {
       <div v-else ref="issueDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-xl md:text-2xl font-medium sm:tracking-tight"
+          class="text-wrap px-1 text-md md:text-4xl sm:tracking-tight"
         >
           {{ issue && issue.title ? issue.title : "Couldn't find the issue" }}
         </h2>
