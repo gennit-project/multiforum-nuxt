@@ -661,6 +661,7 @@ const label = computed(() => {
                       "
                       @handle-click-archive="
                         () => {
+                          console.log('comment - handle click archive . root, ', props.commentData.id);
                           emit('handleClickArchive', props.commentData.id);
                         }
                       "
@@ -753,11 +754,14 @@ const label = computed(() => {
                 @handle-view-feedback="
                   (commentId: string) => emit('handleViewFeedback', commentId)
                 "
-                @handle-click-archive="emit('handleClickArchive', $event)"
-                @handle-click-archive-and-suspend="
-                  emit('handleClickArchiveAndSuspend', $event)
-                "
-                @handle-click-unarchive="emit('handleClickUnarchive', $event)"
+                @handle-click-archive="(commentId: string) => {
+                  console.log('child comment - handle click archive - nested, ', commentId);
+                  emit('handleClickArchive', commentId)
+                }"
+                @handle-click-archive-and-suspend="(commentId: string) => {
+                  emit('handleClickArchiveAndSuspend', commentId)
+                }"
+                @handle-click-unarchive="(commentId: string ) => emit('handleClickUnarchive', commentId)"
               />
             </div>
           </ChildComments>

@@ -698,6 +698,10 @@ const lengthOfCommentInProgress = computed(() => {
               @save-edit="handleSaveEdit"
               @update-edit-comment-input="updateEditInputValues"
               @delete-comment="handleClickDelete"
+              @handle-click-archive="handleClickArchive"
+              @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
+              @handle-click-unarchive="handleClickUnarchive"
+              @handle-view-feedback="handleViewFeedback"
             />
           </div>
         </div>
