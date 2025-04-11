@@ -246,7 +246,7 @@ const formattedTitle = computed(() => {
         <select 
           id="year-select"
           v-model="selectedYearValue"
-          class="p-1 border rounded text-sm"
+          class="p-1 border rounded text-sm w-20"
           :class="darkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'"
         >
           <option 
@@ -350,8 +350,8 @@ const formattedTitle = computed(() => {
       class="mt-4 p-4 rounded-lg border"
       :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'"
     >
-      <div class="flex items-center gap-3">
-        <Calendar :size="20" :class="darkMode ? 'text-blue-400' : 'text-blue-600'" />
+      <div class="flex gap-3">
+        <Calendar :size="20" :class="darkMode ? 'text-blue-400 mt-1' : 'text-blue-600 mt-1'" />
         <div>
           <h3 class="font-medium">{{ selectedDay.date }}</h3>
           <p 
