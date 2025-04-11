@@ -265,7 +265,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               :text="truncatedDescription || ''"
               :disable-gallery="true"
               :word-limit="10"
-              class="pr-2"
+              class="px-2"
             />
           </div>
 

@@ -57,6 +57,7 @@ const lastValidDiscussion = ref<Discussion | null>(null);
 const {
   result: getDiscussionResult,
   error: getDiscussionError,
+  loading: getDiscussionLoading,
   refetch: refetchDiscussion,
   onResult: onGetDiscussionResult,
 } = useQuery(
@@ -303,7 +304,7 @@ const handleClickEditDiscussionBody = () => {
         <ArchivedDiscussionInfoBanner 
           v-if="isArchived"
           :channel-id="channelId"
-          :discussion-channel-id="activeDiscussionChannel?.id"
+          :discussion-channel-id="activeDiscussionChannel?.id || ''"
         />
         <InfoBanner v-else-if="locked" text="This discussion is locked. New comments cannot be added." />
         <v-row v-if="discussion" class="flex justify-center">

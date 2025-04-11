@@ -135,7 +135,7 @@ const renderedMarkdown = computed(() => {
   }
 
   p {
-    margin-bottom: 0.25rem !important;
+    margin-bottom: 0.5rem !important;
     margin-top: 0.25rem !important;
   }
   pre,

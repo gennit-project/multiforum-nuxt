@@ -6,6 +6,7 @@ import { GET_USER } from "@/graphQLData/user/queries";
 import { relativeTime } from "@/utils";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRoute } from "nuxt/app";
+import { usernameVar } from "@/cache";
 
 // Define props
 defineProps({
@@ -14,7 +15,6 @@ defineProps({
     default: false,
   },
 });
-
 
 const route = useRoute();
 
@@ -47,8 +47,8 @@ const user = computed(() => {
 </script>
 
 <template>
-  <div class="rounded-lg pt-6">
-    <div class="mb-4 mt-6 p-2 flex flex-col gap-2">
+  <div class="rounded-lg">
+    <div class="mb-4 p-2 flex flex-col gap-2">
       <AvatarComponent
         :src="user?.profilePicURL"
         :text="username"
@@ -103,9 +103,6 @@ const user = computed(() => {
       <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
-    </div>
-    <div v-else-if="!user" class="px-4">
-      Could not find the user.
     </div>
   </div>
 </template>

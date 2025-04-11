@@ -73,7 +73,7 @@ const identiconData = computed(() => {
       v-else
       class="border dark:border-gray-600"
       :class="[
-        isLarge ? 'h-72 w-72' : '',
+        isLarge ? 'h-48 w-48' : '',
         isMedium ? 'h-12 w-12' : '',
         isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',

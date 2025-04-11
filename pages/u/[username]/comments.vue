@@ -89,7 +89,7 @@ const loadMore = () => {
       No comments yet
     </div>
     <div v-else-if="commentResult && commentResult?.users?.length > 0">
-      <div v-for="comment in commentResult.users[0].Comments" :key="comment.id">
+      <div v-for="comment in commentResult.users[0].Comments" :key="comment.id" class="space-y-4">
       <Comment
         v-if="!comment.archived"
         :comment-data="comment"

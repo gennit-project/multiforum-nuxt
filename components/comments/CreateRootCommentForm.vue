@@ -59,7 +59,7 @@ const writeReplyStyle =
             <LoggedInUserAvatar v-if="usernameVar" />
             <textarea
               data-testid="addComment"
-              class="flex-1"
+              class="flex-1 border overflow-hidden"
               name="addComment"
               rows="1"
               placeholder="Write a comment"

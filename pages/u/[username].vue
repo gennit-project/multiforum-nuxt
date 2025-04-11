@@ -4,6 +4,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
 import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
 import { useRoute } from "nuxt/app";
+import DemoChart from "@/components/charts/DemoChart.vue";
 
 const route = useRoute();
 const username = computed(() => {
@@ -48,7 +49,9 @@ const isAdmin = computed(() => {
         <div class="w-full lg:w-80 lg:shrink-0">
           <UserProfileSidebar :is-admin="isAdmin" />
         </div>
-        <div class="flex-1 min-w-0">
+        
+        <div class="flex-1 flex-col min-w-0">
+          <DemoChart />
           <UserProfileTabs
             v-if="user"
             :show-counts="true"
