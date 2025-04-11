@@ -69,8 +69,6 @@ const availableYears = computed(() => {
   return years;
 });
 
-
-
 // Generate dates based on the selected year
 const yearDates = computed(() => {
   const dates = [];
@@ -87,6 +85,32 @@ const yearDates = computed(() => {
   }
   
   return dates;
+});
+
+// Generate month labels data
+const monthLabels = computed(() => {
+  const labels = [];
+  const startDate = new Date(selectedYearValue.value, 0, 1);
+  startDate.setDate(startDate.getDate() - startDate.getDay()); // Adjust to previous Sunday
+  
+  let currentMonth = -1; // Start with invalid month to detect first change
+  
+  for (let week = 0; week < 52; week++) {
+    const weekDate = new Date(startDate);
+    weekDate.setDate(startDate.getDate() + (week * 7));
+    const month = weekDate.getMonth();
+    
+    // If this is a new month, add it to our labels
+    if (month !== currentMonth) {
+      labels.push({
+        month: weekDate.toLocaleString('default', { month: 'short' }),
+        position: week
+      });
+      currentMonth = month;
+    }
+  }
+  
+  return labels;
 });
 
 // Generate data for a specific year
@@ -219,51 +243,70 @@ const formattedTitle = computed(() => {
     
     <!-- Main chart grid -->
     <div class="overflow-x-auto">
-      <div class="flex items-center">
-        <!-- Day labels -->
-        <div 
-          class="pr-2 flex flex-col justify-around text-tiny -mt-4"
-          :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
-        >
-          <span>Sun</span>
-          <span>Mon</span>
-          <span>Tue</span>
-          <span>Wed</span>
-          <span>Thu</span>
-          <span>Fri</span>
-          <span>Sat</span>
+      <div class="flex flex-col">
+        <!-- Month labels -->
+        <div class="flex ml-8">
+          <div 
+            class="relative h-6 w-full"
+            :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
+          >
+            <div 
+              v-for="(label, index) in monthLabels" 
+              :key="'month-' + index"
+              class="absolute text-xs font-medium"
+              :style="{ left: `${label.position * 14}px` }"
+            >
+              {{ label.month }}
+            </div>
+          </div>
         </div>
         
-        <!-- SVG grid -->
-        <svg width="720" height="110" class="overflow-visible">
-          <g 
-            v-for="(week, weekIndex) in chartData" 
-            :key="'week-' + weekIndex" 
-            :transform="`translate(${weekIndex * 14}, 0)`"
+        <div class="flex items-center">
+          <!-- Day labels -->
+          <div 
+            class="pr-2 flex flex-col justify-around text-tiny"
+            :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
           >
-            <rect
-              v-for="(count, dayIndex) in week" 
-              :key="`day-${weekIndex}-${dayIndex}`"
-              x="0"
-              :y="dayIndex * 14"
-              width="10"
-              height="10"
-              :fill="getColor(count)"
-              rx="2"
-              ry="2"
-              :data-date="yearDates[weekIndex * 7 + dayIndex]"
-              :data-count="count"
-              class="cursor-pointer hover:stroke-1"
-              :class="[
-                darkMode ? 'hover:stroke-gray-600' : 'hover:stroke-gray-400',
-                selectedDay && selectedDay.week === weekIndex && selectedDay.day === dayIndex ? 'stroke-2 stroke-blue-500' : ''
-              ]"
-              @click="selectDay(weekIndex, dayIndex, count)"
+            <span>Sun</span>
+            <span>Mon</span>
+            <span>Tue</span>
+            <span>Wed</span>
+            <span>Thu</span>
+            <span>Fri</span>
+            <span>Sat</span>
+          </div>
+          
+          <!-- SVG grid -->
+          <svg width="720" height="110" class="overflow-visible">
+            <g 
+              v-for="(week, weekIndex) in chartData" 
+              :key="'week-' + weekIndex" 
+              :transform="`translate(${weekIndex * 14}, 0)`"
             >
-              <title>{{ count }} contributions on {{ yearDates[weekIndex * 7 + dayIndex] }}</title>
-            </rect>
-          </g>
-        </svg>
+              <rect
+                v-for="(count, dayIndex) in week" 
+                :key="`day-${weekIndex}-${dayIndex}`"
+                x="0"
+                :y="dayIndex * 14"
+                width="10"
+                height="10"
+                :fill="getColor(count)"
+                rx="2"
+                ry="2"
+                :data-date="yearDates[weekIndex * 7 + dayIndex]"
+                :data-count="count"
+                class="cursor-pointer hover:stroke-1"
+                :class="[
+                  darkMode ? 'hover:stroke-gray-600' : 'hover:stroke-gray-400',
+                  selectedDay && selectedDay.week === weekIndex && selectedDay.day === dayIndex ? 'stroke-2 stroke-blue-500' : ''
+                ]"
+                @click="selectDay(weekIndex, dayIndex, count)"
+              >
+                <title>{{ count }} contributions on {{ yearDates[weekIndex * 7 + dayIndex] }}</title>
+              </rect>
+            </g>
+          </svg>
+        </div>
       </div>
     </div>
     
