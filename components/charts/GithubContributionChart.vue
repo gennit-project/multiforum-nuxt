@@ -256,7 +256,7 @@ const formattedTitle = computed(() => {
               class="absolute text-xs font-medium"
               :style="{ left: `${label.position * 14}px` }"
             >
-              {{ label.month }}
+              {{ index > 0 ? label.month : '' }}
             </div>
           </div>
         </div>
