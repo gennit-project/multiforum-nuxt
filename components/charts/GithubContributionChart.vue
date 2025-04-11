@@ -239,6 +239,25 @@ const formattedTitle = computed(() => {
     <!-- Header with title -->
     <div class="flex justify-between items-center">
       <h2 class="text-xl font-semibold">{{ formattedTitle }}</h2>
+
+
+      <div class="flex items-center space-x-2">
+        <label for="year-select" class="text-sm font-medium">{{ texts.yearLabel }}</label>
+        <select 
+          id="year-select"
+          v-model="selectedYearValue"
+          class="p-1 border rounded text-sm"
+          :class="darkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'"
+        >
+          <option 
+            v-for="year in availableYears" 
+            :key="year" 
+            :value="year"
+          >
+            {{ year }}
+          </option>
+        </select>
+      </div>
     </div>
     
     <!-- Main chart grid -->
@@ -323,27 +342,6 @@ const formattedTitle = computed(() => {
         :style="{ backgroundColor: getColor(level - 1) }"
       />
       <span>{{ texts.more }}</span>
-    </div>
-    
-    <!-- Controls -->
-    <div class="mt-4 flex justify-center space-x-4 items-center">
-      <div class="flex items-center space-x-2">
-        <label for="year-select" class="text-sm font-medium">{{ texts.yearLabel }}</label>
-        <select 
-          id="year-select"
-          v-model="selectedYearValue"
-          class="p-1 border rounded text-sm"
-          :class="darkMode ? 'bg-gray-800 text-white border-gray-600' : 'bg-white text-gray-800 border-gray-300'"
-        >
-          <option 
-            v-for="year in availableYears" 
-            :key="year" 
-            :value="year"
-          >
-            {{ year }}
-          </option>
-        </select>
-      </div>
     </div>
     
     <!-- Selected day details -->
