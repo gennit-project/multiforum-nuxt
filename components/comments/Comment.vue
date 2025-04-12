@@ -474,7 +474,7 @@ const label = computed(() => {
     <div
       :class="[
         depth > 1
-          ? 'border-l border-gray-300 pl-4 pt-2 dark:border-gray-600'
+          ? 'border-l border-gray-300 pl-4 ml-1 pt-2 dark:border-gray-600'
           : '',
       ]"
       class="flex w-full"
