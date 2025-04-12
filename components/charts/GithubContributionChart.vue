@@ -103,25 +103,40 @@ const getFirstDateOfChart = (year: number) => {
 // Generate month labels data with improved calculation
 const monthLabels = computed(() => {
   const labels = [];
-  const firstDate = getFirstDateOfChart(selectedYearValue.value);
   
-  // Loop through 53 weeks (to cover full year + potential overlap)
-  for (let week = 1; week < 53; week++) {
-    const currentDate = new Date(firstDate);
-    currentDate.setDate(firstDate.getDate() + (week * 7));
+  // Only process if we have data
+  if (!chartData.value || chartData.value.length === 0) {
+    return labels;
+  }
+  
+  // Track the months we've already added
+  const addedMonths = new Set();
+  
+  // Iterate through all weeks in the data
+  chartData.value.forEach((week, weekIndex) => {
+    // Skip empty weeks
+    if (!week || week.length === 0) return;
     
-    // If this is the first day of a month or first week
-    if (currentDate.getDate() <= 7 || week === 0) {      
-      // Only add if it's a new month (or first week)
-      if (week === 0 || labels.length === 0 || 
-          labels[labels.length - 1].month !== currentDate.toLocaleString('default', { month: 'short' })) {
+    // Get the first day with a valid date in the week
+    const dayWithDate = week.find(day => day && day.date);
+    if (!dayWithDate) return;
+    
+    try {
+      const date = new Date(dayWithDate.date);
+      const monthName = date.toLocaleString('default', { month: 'short' });
+      
+      // Only add a new label if we haven't seen this month yet
+      if (!addedMonths.has(monthName)) {
+        addedMonths.add(monthName);
         labels.push({
-          month: currentDate.toLocaleString('default', { month: 'short' }),
-          position: week
+          month: monthName,
+          position: weekIndex
         });
       }
+    } catch (e) {
+      console.error("Error parsing date", e);
     }
-  }
+  });
   
   return labels;
 });
@@ -276,7 +291,7 @@ const cellCount = computed(() => {
               class="absolute text-xs font-medium"
               :style="{ left: `${label.position * 14}px` }"
             >
-              {{ label.month }}
+              <span v-if="index > 0">{{ label.month }}</span>
             </div>
           </div>
         </div>
