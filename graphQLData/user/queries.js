@@ -354,3 +354,16 @@ export const GET_OWNED_CHANNELS = gql`
   }
 `;
 
+export const GET_USER_CONTRIBUTIONS = gql`
+query getUserContributions($username: String!) {
+  getUserContributions(username: $username) {
+    count
+    date
+    activities {
+      description
+      timestamp
+      type
+    }
+  }
+}
+`

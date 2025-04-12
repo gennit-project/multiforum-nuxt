@@ -64,7 +64,7 @@ const props = defineProps({
 });
 
 // Emits
-const emit = defineEmits(['day-select', 'year-change']);
+const emit = defineEmits(['day-select', 'year-select']);
 
 interface DayInfo extends DayData {
   week: number;
@@ -176,7 +176,7 @@ const formatDate = (dateStr: string) => {
 
 // Handle year changes
 const handleYearChange = (newYear: number) => {
-  emit('year-change', newYear);
+  emit('year-select', newYear);
 };
 
 // Watch for changes to selectedYearValue
@@ -207,7 +207,7 @@ const formattedTitle = computed(() => {
 <template>
   <div 
     class="contribution-chart flex flex-col space-y-4 p-6 rounded-lg transition-colors duration-300"
-    :class="[darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800', className]"
+    :class="[darkMode ? 'text-white' : 'bg-white text-gray-800', className]"
   >
     <!-- Header with title -->
     <div class="flex justify-between items-center">
@@ -320,7 +320,7 @@ const formattedTitle = computed(() => {
     <div 
       v-if="selectedDay"
       class="mt-4 p-4 rounded-lg border"
-      :class="darkMode ? 'bg-gray-800 border-gray-700' : 'bg-gray-50 border-gray-200'"
+      :class="darkMode ? 'border-gray-700' : 'bg-gray-50 border-gray-200'"
     >
       <div class="flex gap-3">
         <Calendar :size="20" :class="darkMode ? 'text-blue-400 mt-1' : 'text-blue-600 mt-1'" />
@@ -352,7 +352,7 @@ const formattedTitle = computed(() => {
                 <span class="mr-2">•</span>
                 <div class="flex-1">
                   <div class="flex flex-col sm:flex-row sm:justify-between">
-                    <div>
+                    <div class="flex space-x-2">
                       <span class="font-medium">{{ activity.type }}</span>
                       <span> {{ activity.description }}</span>
                     </div>
