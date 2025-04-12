@@ -6,6 +6,10 @@ export const usernameVar = ref("");
 export const setUsername = (username: string) => {
   usernameVar.value = username;
 };
+export const profilePicURLVar = ref("");
+export const setProfilePicURL = (url: string) => {
+  profilePicURLVar.value = url;
+};
 export const userDataLoadingVar = ref(false);
 export const setUserDataLoading = (status: boolean) => {
   userDataLoadingVar.value = status;

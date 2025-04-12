@@ -6,7 +6,7 @@ import { GET_USER } from "@/graphQLData/user/queries";
 import { relativeTime } from "@/utils";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRoute } from "nuxt/app";
-import { usernameVar } from "@/cache";
+import { usernameVar, profilePicURLVar } from "@/cache";
 
 // Define props
 defineProps({
@@ -43,6 +43,16 @@ const user = computed(() => {
   return result.value?.users[0] || null;
 });
 
+// Use a computed property that prioritizes our global reactive state for profilePicURL
+const profilePic = computed(() => {
+  // For the current user viewing their own profile, use the reactive state variable
+  if (username.value === usernameVar.value && profilePicURLVar.value) {
+    return profilePicURLVar.value;
+  }
+  // Otherwise use the profile pic from query result
+  return user.value?.profilePicURL;
+});
+
 
 </script>
 
@@ -51,7 +61,7 @@ const user = computed(() => {
     <div class="p-2 flex flex-col gap-2">
       <AvatarComponent
         class="flex-1 max-w-72"
-        :src="user?.profilePicURL"
+        :src="profilePic"
         :text="username"
         :is-square="false"
       />

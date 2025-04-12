@@ -17,6 +17,7 @@ import {
   sideNavIsOpenVar,
   setSideNavIsOpenVar,
   setNotificationCount,
+  setProfilePicURL,
 } from "@/cache";
 import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 import { config } from "@/config";
@@ -183,6 +184,10 @@ onResult((newResult) => {
 
   if (userData && !userData.loading) {
     setUsername(userData.username);
+    // Save profile picture URL in our reactive state
+    if (userData.profilePicURL) {
+      setProfilePicURL(userData.profilePicURL);
+    }
     setIsLoadingAuth(false);
     setIsAuthenticated(true);
     setModProfileName(modProfileData?.displayName || "");
