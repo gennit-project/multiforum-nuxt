@@ -29,9 +29,9 @@ export default defineComponent({
   <nuxt-link
     :to="link"
     :data-testid="dataTestid"
-    class="inline-flex text-xs gap-2 h-8 w-8 border border-gray-3 dark:border-gray-600 rounded-full items-center px-2 py-1 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+    class="inline-flex text-xs gap-2 h-12 w-12 border border-gray-3 dark:border-gray-600 rounded-full items-center justify-center px-2 py-1 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
   >
-    <LeftArrowIcon class="h-4 w-4" />
+    <LeftArrowIcon class="h-6 w-6" />
     <span v-if="text">{{ text }}</span>
   </nuxt-link>
 </template>
