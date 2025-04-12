@@ -32,6 +32,7 @@ import { useRoute } from "nuxt/app";
 import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
 import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
 import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -290,7 +291,12 @@ const handleClickEditDiscussionBody = () => {
 
 <template>
   <div class="w-full">
-    <PageNotFound v-if="!discussion && !activeDiscussionChannel" />
+    <LoadingSpinner
+      v-if="getDiscussionLoading"
+      class="flex justify-center py-4"
+      :loading-text="'Loading discussion...'"
+      />
+    <PageNotFound v-else-if="!discussion && !activeDiscussionChannel && !isDiscussionLoading" />
     <div
       v-else
       class="flex max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800"

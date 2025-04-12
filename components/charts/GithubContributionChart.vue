@@ -46,7 +46,6 @@ const props = defineProps({
       less: "Less",
       more: "More",
       yearLabel: "Year:",
-      randomizeButton: "Randomize Data",
       noContributions: "No contributions on this day",
       contributionsText: (count) => `${count} contribution${count !== 1 ? 's' : ''} on this day`,
       activityDetailsHeading: "Activity Details:"

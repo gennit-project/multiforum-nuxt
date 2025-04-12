@@ -27,27 +27,11 @@ const customData = ref(
         })
     )
 );
-
-// Custom texts example
-const customTexts = {
-  less: "Quiet",
-  more: "Busy",
-  yearLabel: "Select Year:",
-  randomizeButton: "Shuffle Data",
-  noContributions: "No activity recorded for this day",
-  contributionsText: (count) =>
-    `${count} ${count === 1 ? "activity" : "activities"} on this day`,
-  activityDetailsHeading: "WHAT HAPPENED:",
-};
-
-const darkMode = computed(() => {
-  return theme.value === "dark";
-});
 </script>
 <template>
   <div class="rounded-lg overflow-hidden">
     <GithubContributionChart 
-      :dark-mode="darkMode" 
+      :dark-mode="theme === 'dark'"
       :data="customData"
       @day-select="logSelected" 
     />
