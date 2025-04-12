@@ -500,7 +500,7 @@ const label = computed(() => {
               :label="label"
             />
             <div
-              class="ml-3 flex-grow border-l border-gray-300 pl-4 dark:border-gray-500"
+              class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600"
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
