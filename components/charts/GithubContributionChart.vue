@@ -233,7 +233,7 @@ const cellCount = computed(() => {
 
 <template>
   <div 
-    class="contribution-chart flex flex-col space-y-4 p-6 rounded-lg transition-colors duration-300"
+    class="contribution-chart flex flex-col space-y-4 px-4 mb-4 rounded-lg transition-colors duration-300"
     :class="[darkMode ? 'text-white' : 'bg-white text-gray-800', className]"
   >
     <!-- Header with title -->

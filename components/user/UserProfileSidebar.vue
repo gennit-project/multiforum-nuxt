@@ -58,7 +58,7 @@ const profilePic = computed(() => {
 
 <template>
   <div class="rounded-lg">
-    <div class="p-2 flex flex-col gap-2">
+    <div class="p-4 flex flex-col gap-2">
       <AvatarComponent
         class="flex-1 max-w-72"
         :src="profilePic"
