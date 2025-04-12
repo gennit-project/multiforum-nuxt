@@ -1,18 +1,28 @@
-<script setup>
-import { ref, computed, watch } from 'vue';
+<script setup lang="ts">
+import { ref, computed, watch, type PropType } from 'vue';
 import { Calendar } from 'lucide-vue-next';
 
-// Props definition
+// Define the activity type
+interface Activity {
+  id: string;
+  type: string;
+  description: string;
+  timestamp: string;
+}
+
+// Define the day data type
+interface DayData {
+  date: string; // ISO date string or date format
+  count: number;
+  activities: Activity[];
+}
+
+// Props definition with PropType - data is now a 2D array
 const props = defineProps({
-  // Data can be provided directly or generated
+  // Data structure: 2D array where outer array = weeks, inner array = days
   data: {
-    type: Array,
-    default: null
-  },
-  // Function to fetch data for the specified year
-  fetchDataForYear: {
-    type: Function,
-    default: null
+    type: Array as PropType<DayData[][]>,
+    required: true
   },
   // The selected year
   year: {
@@ -47,7 +57,7 @@ const props = defineProps({
       more: "More",
       yearLabel: "Year:",
       noContributions: "No contributions on this day",
-      contributionsText: (count) => `${count} contribution${count !== 1 ? 's' : ''} on this day`,
+      contributionsText: (count: number) => `${count} contribution${count !== 1 ? 's' : ''} on this day`,
       activityDetailsHeading: "Activity Details:"
     })
   }
@@ -56,7 +66,12 @@ const props = defineProps({
 // Emits
 const emit = defineEmits(['day-select', 'year-change']);
 
-const selectedDay = ref(null);
+interface DayInfo extends DayData {
+  week: number;
+  day: number;
+}
+
+const selectedDay = ref<null | DayInfo>(null);
 const selectedYearValue = ref(props.year);
 
 // Generate year range for dropdown
@@ -68,22 +83,11 @@ const availableYears = computed(() => {
   return years;
 });
 
-// Generate dates based on the selected year
-const yearDates = computed(() => {
-  const dates = [];
-  // Start from first Sunday of the year (or last Sunday of previous year)
-  const startDate = new Date(selectedYearValue.value, 0, 1); // Jan 1 of selected year
-  startDate.setDate(startDate.getDate() - startDate.getDay()); // Adjust to previous Sunday
-  
-  for (let week = 0; week < 52; week++) {
-    for (let day = 0; day < 7; day++) {
-      const currentDate = new Date(startDate);
-      currentDate.setDate(startDate.getDate() + (week * 7) + day);
-      dates.push(currentDate.toDateString());
-    }
-  }
-  
-  return dates;
+// Filter data for the selected year
+const chartData = computed(() => {
+  // Assume the data is already organized for the right year
+  // The parent component is responsible for providing the right data for the selected year
+  return props.data;
 });
 
 // Generate month labels data
@@ -112,38 +116,8 @@ const monthLabels = computed(() => {
   return labels;
 });
 
-// Generate data for a specific year
-const generateYearData = (year) => {
-  // Use year as a simple seed for pseudo-randomness
-  const seed = year % 10;
-  
-  return Array(52).fill().map((_, weekIndex) => 
-    Array(7).fill().map((_, dayIndex) => {
-      // Create slightly different patterns for different years
-      const base = (weekIndex + dayIndex + seed) % 5;
-      return Math.floor(base * (0.7 + Math.random() * 0.6));
-    })
-  );
-};
-
-// The chart data, either from props or generated
-const chartData = computed(() => {
-  // If data prop is provided directly, use it
-  if (props.data) {
-    return props.data;
-  }
-  
-  // If fetchDataForYear function is provided, use it
-  if (props.fetchDataForYear) {
-    return props.fetchDataForYear(selectedYearValue.value);
-  }
-  
-  // Otherwise, generate random data
-  return generateYearData(selectedYearValue.value);
-});
-
 // Get color based on contribution count and theme
-const getColor = (count) => {
+const getColor = (count: number) => {
   if (props.darkMode) {
     // Dark mode colors (similar to GitHub dark mode)
     if (count === 0) return '#161b22';
@@ -162,48 +136,46 @@ const getColor = (count) => {
 };
 
 // Select a day to show details
-const selectDay = (weekIndex, dayIndex, count) => {
-  const dayInfo = {
+const selectDay = (weekIndex: number, dayIndex: number) => {
+  const dayData = chartData.value[weekIndex][dayIndex];
+  
+  const dayInfo: DayInfo = {
+    ...dayData,
     week: weekIndex,
-    day: dayIndex,
-    date: yearDates.value[weekIndex * 7 + dayIndex],
-    count: count
+    day: dayIndex
   };
   
   selectedDay.value = dayInfo;
   emit('day-select', dayInfo);
 };
 
-// Generate random activity type
-const getActivityType = (index) => {
-  const activities = [
-    "Pushed to",
-    "Opened a pull request in",
-    "Merged a pull request in",
-    "Created an issue in",
-    "Reviewed a pull request in",
-    "Commented on issue in",
-    "Updated documentation in"
-  ];
-  // Use index to make it deterministic
-  return activities[index % activities.length];
+// Format the time from ISO string
+const formatTime = (isoString: string) => {
+  try {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  } catch (e) {
+    return '';
+  }
 };
 
-// Generate random repository name
-const getRandomRepo = () => {
-  const repos = [
-    "project/frontend",
-    "organization/api",
-    "personal/website",
-    "team/dashboard",
-    "opensource/library",
-    "company/app"
-  ];
-  return repos[Math.floor(Math.random() * repos.length)];
+// Format the date from ISO string or date string
+const formatDate = (dateStr: string) => {
+  try {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString(undefined, { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    });
+  } catch (e) {
+    return dateStr;
+  }
 };
 
 // Handle year changes
-const handleYearChange = (newYear) => {
+const handleYearChange = (newYear: number) => {
   emit('year-change', newYear);
 };
 
@@ -219,11 +191,13 @@ watch(() => props.year, (newValue) => {
   selectedYearValue.value = newValue;
 });
 
+// Calculate total contributions for the year
 const totalContributionsInYear = computed(() => {
-    return chartData.value.reduce((total, week) => {
-        return total + week.reduce((weekTotal, count) => weekTotal + count, 0);
-    }, 0);
-})
+  return chartData.value.reduce((total, week) => {
+    return total + week.reduce((weekTotal, day) => weekTotal + day.count, 0);
+  }, 0);
+});
+
 // Format title with current year
 const formattedTitle = computed(() => {
   return `${totalContributionsInYear.value} contributions in ${selectedYearValue.value}`;
@@ -233,12 +207,11 @@ const formattedTitle = computed(() => {
 <template>
   <div 
     class="contribution-chart flex flex-col space-y-4 p-6 rounded-lg transition-colors duration-300"
-    :class="darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800'"
+    :class="[darkMode ? 'bg-gray-900 text-white' : 'bg-white text-gray-800', className]"
   >
     <!-- Header with title -->
     <div class="flex justify-between items-center">
       <h2 class="text-xl font-semibold">{{ formattedTitle }}</h2>
-
 
       <div class="flex items-center space-x-2">
         <label for="year-select" class="text-sm font-medium">{{ texts.yearLabel }}</label>
@@ -302,25 +275,25 @@ const formattedTitle = computed(() => {
               :transform="`translate(${weekIndex * 14}, 0)`"
             >
               <rect
-                v-for="(count, dayIndex) in week" 
+                v-for="(dayData, dayIndex) in week" 
                 :key="`day-${weekIndex}-${dayIndex}`"
                 x="0"
                 :y="dayIndex * 14"
                 width="10"
                 height="10"
-                :fill="getColor(count)"
+                :fill="getColor(dayData.count)"
                 rx="2"
                 ry="2"
-                :data-date="yearDates[weekIndex * 7 + dayIndex]"
-                :data-count="count"
+                :data-date="dayData.date"
+                :data-count="dayData.count"
                 class="cursor-pointer hover:stroke-1"
                 :class="[
                   darkMode ? 'hover:stroke-gray-600' : 'hover:stroke-gray-400',
                   selectedDay && selectedDay.week === weekIndex && selectedDay.day === dayIndex ? 'stroke-2 stroke-blue-500' : ''
                 ]"
-                @click="selectDay(weekIndex, dayIndex, count)"
+                @click="selectDay(weekIndex, dayIndex)"
               >
-                <title>{{ count }} contributions on {{ yearDates[weekIndex * 7 + dayIndex] }}</title>
+                <title>{{ dayData.count }} contributions on {{ formatDate(dayData.date) }}</title>
               </rect>
             </g>
           </svg>
@@ -351,8 +324,8 @@ const formattedTitle = computed(() => {
     >
       <div class="flex gap-3">
         <Calendar :size="20" :class="darkMode ? 'text-blue-400 mt-1' : 'text-blue-600 mt-1'" />
-        <div>
-          <h3 class="font-medium">{{ selectedDay.date }}</h3>
+        <div class="w-full">
+          <h3 class="font-medium">{{ formatDate(selectedDay.date) }}</h3>
           <p 
             class="text-sm"
             :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
@@ -368,16 +341,24 @@ const formattedTitle = computed(() => {
               {{ texts.activityDetailsHeading }}
             </div>
             <ul 
-              class="mt-1 text-sm space-y-1"
+              class="mt-1 text-sm space-y-2"
               :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
             >
               <li 
-                v-for="i in selectedDay.count" 
-                :key="'activity-' + i"
+                v-for="activity in selectedDay.activities" 
+                :key="activity.id"
                 class="flex items-start"
               >
                 <span class="mr-2">•</span>
-                <span>{{ getActivityType(i - 1) }} {{ getRandomRepo() }}</span>
+                <div class="flex-1">
+                  <div class="flex flex-col sm:flex-row sm:justify-between">
+                    <div>
+                      <span class="font-medium">{{ activity.type }}</span>
+                      <span> {{ activity.description }}</span>
+                    </div>
+                    <span class="text-xs text-gray-500 mt-1 sm:mt-0">{{ formatTime(activity.timestamp) }}</span>
+                  </div>
+                </div>
               </li>
             </ul>
           </div>
