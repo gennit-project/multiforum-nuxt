@@ -37,7 +37,7 @@ const props = defineProps({
   // Earliest year available in the dropdown
   minYear: {
     type: Number,
-    default: () => new Date().getFullYear() - 9
+    default: () => new Date().getFullYear() - 3
   },
   // Latest year available in the dropdown
   maxYear: {

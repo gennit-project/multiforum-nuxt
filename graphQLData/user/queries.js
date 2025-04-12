@@ -55,7 +55,11 @@ export const GET_USER_COMMENTS = gql`
     users(where: { username: $username }) {
       username
       profilePicURL
-      Comments(options: { limit: $limit, offset: $offset }) {
+      Comments(options: { 
+        limit: $limit, 
+        offset: $offset,
+        sort: { createdAt: DESC }
+      }) {
         id
         text
         createdAt
@@ -102,7 +106,9 @@ export const GET_USER_DISCUSSIONS = gql`
     users(where: { username: $username }) {
       username
       profilePicURL
-      Discussions {
+      Discussions(
+        options: { sort: { createdAt: DESC } }
+      ) {
         id
         Author {
           username
