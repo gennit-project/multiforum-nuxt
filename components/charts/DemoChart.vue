@@ -26,7 +26,6 @@ const { result: contributionsResult } = useQuery(
 
 const contributions = computed(() => {
   if (contributionsResult.value) {
-    console.log("Contributions result:", contributionsResult.value);
     return contributionsResult.value.getUserContributions;
   }
   return [];

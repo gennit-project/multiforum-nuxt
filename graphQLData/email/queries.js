@@ -8,6 +8,7 @@ export const GET_EMAIL = gql`
       address
       User {
         username
+        profilePicURL
         ModerationProfile {
           displayName
         }

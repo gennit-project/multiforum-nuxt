@@ -6,6 +6,10 @@ export const usernameVar = ref("");
 export const setUsername = (username: string) => {
   usernameVar.value = username;
 };
+export const userDataLoadingVar = ref(false);
+export const setUserDataLoading = (status: boolean) => {
+  userDataLoadingVar.value = status;
+};
 export const modProfileNameVar = ref("default");
 export const setModProfileName = (modProfileName: string) => {
   modProfileNameVar.value = modProfileName;

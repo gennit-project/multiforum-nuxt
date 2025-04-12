@@ -27,7 +27,7 @@ const props = defineProps({
   // The selected year
   year: {
     type: Number,
-    default: () => new Date().getFullYear()
+    default: null
   },
   // Earliest year available in the dropdown
   minYear: {
@@ -83,29 +83,12 @@ const availableYears = computed(() => {
   return years;
 });
 
-// Filter data for the selected year
-const chartData = computed(() => {
-  // Assume the data is already organized for the right year
-  // The parent component is responsible for providing the right data for the selected year
-  return props.data;
-});
-
-// Helper to get the first date to display on the chart
-const getFirstDateOfChart = (year: number) => {
-  const firstDayOfYear = new Date(year, 0, 1);
-  const dayOfWeek = firstDayOfYear.getDay();
-  // If Jan 1 is not Sunday, go back to previous Sunday
-  const firstDate = new Date(firstDayOfYear);
-  firstDate.setDate(firstDate.getDate() - dayOfWeek);
-  return firstDate;
-};
-
 // Generate month labels data with improved calculation
 const monthLabels = computed(() => {
   const labels = [];
   
   // Only process if we have data
-  if (!chartData.value || chartData.value.length === 0) {
+  if (!props.data || props.data.length === 0) {
     return labels;
   }
   
@@ -113,7 +96,7 @@ const monthLabels = computed(() => {
   const addedMonths = new Set();
   
   // Iterate through all weeks in the data
-  chartData.value.forEach((week, weekIndex) => {
+  props.data.forEach((week, weekIndex) => {
     // Skip empty weeks
     if (!week || week.length === 0) return;
     
@@ -167,9 +150,9 @@ const getColor = (count: number) => {
 
 // Select a day to show details
 const selectDay = (weekIndex: number, dayIndex: number) => {
-  if (!chartData.value[weekIndex] || !chartData.value[weekIndex][dayIndex]) return;
+  if (!props.data[weekIndex] || !props.data[weekIndex][dayIndex]) return;
   
-  const dayData = chartData.value[weekIndex][dayIndex];
+  const dayData = props.data[weekIndex][dayIndex];
   
   const dayInfo: DayInfo = {
     ...dayData,
@@ -225,9 +208,9 @@ watch(() => props.year, (newValue) => {
 
 // Calculate total contributions for the year
 const totalContributionsInYear = computed(() => {
-  if (!chartData.value) return 0;
+  if (!props.data) return 0;
   
-  return chartData.value.reduce((total, week) => {
+  return props.data.reduce((total, week) => {
     if (!week) return total;
     return total + week.reduce((weekTotal, day) => {
       if (!day) return weekTotal;
@@ -243,8 +226,8 @@ const formattedTitle = computed(() => {
 
 // Validate and get cell count to ensure proper rendering
 const cellCount = computed(() => {
-  if (!chartData.value) return 0;
-  return chartData.value.length;
+  if (!props.data) return 0;
+  return props.data.length;
 });
 </script>
 
@@ -310,7 +293,7 @@ const cellCount = computed(() => {
           <!-- SVG grid (improved to match data structure) -->
           <svg :width="`${cellCount * 14 + 10}`" height="110" class="overflow-visible">
             <g 
-              v-for="(week, weekIndex) in chartData" 
+              v-for="(week, weekIndex) in data" 
               :key="'week-' + weekIndex" 
               :transform="`translate(${weekIndex * 14}, 0)`"
             >

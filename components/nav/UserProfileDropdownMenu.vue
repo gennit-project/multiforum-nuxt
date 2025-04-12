@@ -21,8 +21,6 @@ const { logout } = useAuth0();
 
 const { result: getUserResult } = useQuery(GET_USER, {
   username: usernameVar.value,
-},{
-  enabled: !usernameVar.value,
 });
 
 const profilePicURL = computed(() => {

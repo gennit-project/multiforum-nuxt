@@ -40,8 +40,14 @@ const {
   load: loadUserData,
   onResult,
   onError,
+  loading: emailQueryLoading,
 } = useLazyQuery(GET_EMAIL, {
   emailAddress: userEmail,
+});
+
+// Update loading state whenever the query loading status changes
+watch(emailQueryLoading, (isLoading) => {
+  setIsLoadingAuth(isLoading);
 });
 
 onError((error) => {
@@ -113,8 +119,6 @@ onMounted(() => {
   } else {
     isAuthenticatedVar.value = false;
   }
-  
-  isLoadingAuthVar.value = false;
 
   watch(
     user,

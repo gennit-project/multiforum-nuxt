@@ -3,17 +3,18 @@ import { ref, onMounted } from "vue";
 import { useAuth0 } from "@auth0/auth0-vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { setUsername, usernameVar, setModProfileName } from "@/cache";
+import { setUsername, usernameVar, setModProfileName, userDataLoadingVar } from "@/cache";
 import CreateUsernameForm from "@/components/auth/CreateUsernameForm.vue";
 
 const { user } = useAuth0();
 // Start with a loading state to prevent flashing
 const emailNotInSystem = ref(false);
 const initialCheckComplete = ref(false);
+const loading = ref(true);
 
 // Only check email if we're on the client side
 if (import.meta.client) {
-  const { onResult: onEmailResult, loading } = useQuery(GET_EMAIL, {
+  const { onResult: onEmailResult, } = useQuery(GET_EMAIL, {
     emailAddress: user.value?.email,
   });
 
@@ -28,6 +29,7 @@ if (import.meta.client) {
       emailNotInSystem.value = true;
     }
     initialCheckComplete.value = true;
+    loading.value = false;
   });
 
   // If query doesn't return in a reasonable time, mark it as completed
@@ -43,7 +45,7 @@ if (import.meta.client) {
 <template>
   <client-only>
     <CreateUsernameForm
-      v-if="user?.email && !usernameVar && emailNotInSystem && initialCheckComplete"
+      v-if="!loading && user?.email && !usernameVar && !userDataLoadingVar && emailNotInSystem && initialCheckComplete"
       :email="user.email"
       @email-and-user-created="emailNotInSystem = false"
     />

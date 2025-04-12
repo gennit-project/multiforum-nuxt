@@ -50,10 +50,10 @@ const user = computed(() => {
   <div class="rounded-lg">
     <div class="p-2 flex flex-col gap-2">
       <AvatarComponent
+        class="flex-1 max-w-72"
         :src="user?.profilePicURL"
         :text="username"
         :is-square="false"
-        :is-large="true"
       />
       <h1
         v-if="username && !user?.displayName"
