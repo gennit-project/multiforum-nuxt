@@ -13,7 +13,7 @@ const username = computed(() => {
 });
 const year = ref(new Date().getFullYear());
 
-const { result: contributionsResult } = useQuery(
+const { result: contributionsResult, loading } = useQuery(
   GET_USER_CONTRIBUTIONS,
   {
     username: username,
@@ -49,6 +49,8 @@ const setYear = (newYear: number) => {
     <GithubContributionChart 
       :dark-mode="theme === 'dark'"
       :data="contributions"
+      :loading="loading"
+      :year="year"
       @day-select="logSelected"
       @year-select="setYear"
     />

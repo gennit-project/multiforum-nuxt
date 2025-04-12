@@ -24,6 +24,11 @@ const props = defineProps({
     type: Array as PropType<DayData[][]>,
     required: true
   },
+  // Loading state
+  loading: {
+    type: Boolean,
+    default: false
+  },
   // The selected year
   year: {
     type: Number,
@@ -58,7 +63,8 @@ const props = defineProps({
       yearLabel: "Year:",
       noContributions: "No contributions on this day",
       contributionsText: (count: number) => `${count} contribution${count !== 1 ? 's' : ''} on this day`,
-      activityDetailsHeading: "Activity Details:"
+      activityDetailsHeading: "Activity Details:",
+      loading: "Loading activity data..."
     })
   }
 });
@@ -261,7 +267,47 @@ const cellCount = computed(() => {
     
     <!-- Main chart grid -->
     <div class="overflow-x-auto">
-      <div class="flex flex-col">
+      <!-- Loading skeleton -->
+      <div v-if="loading" class="animate-pulse">
+        <div class="flex ml-8">
+          <div class="relative h-6 w-full">
+            <div v-for="i in 12" :key="'skeleton-month-' + i" 
+                 class="absolute h-3 w-8 rounded bg-gray-300 dark:bg-gray-700 text-xs"
+                 :style="{ left: `${i * 28}px`, opacity: 0.7 - (i * 0.05) }">
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex items-center">
+          <!-- Day labels skeleton -->
+          <div class="pr-2 flex flex-col h-110 justify-between text-tiny">
+            <span v-for="(day, index) in dayLabels" :key="'skeleton-day-' + index" class="h-14 flex items-center">
+              <div class="w-6 h-3 bg-gray-300 dark:bg-gray-700 rounded opacity-70"></div>
+            </span>
+          </div>
+          
+          <!-- SVG grid skeleton that matches actual size -->
+          <svg :width="`${52 * 14 + 10}`" height="110" class="overflow-visible">
+            <g v-for="week in 52" :key="'skeleton-week-' + week" :transform="`translate(${(week-1) * 14}, 0)`">
+              <rect
+                v-for="day in 7" 
+                :key="'skeleton-cell-' + week + '-' + day"
+                x="0"
+                :y="(day-1) * 14"
+                width="10"
+                height="10"
+                class="rounded-sm bg-gray-300 dark:bg-gray-700"
+                :style="{ opacity: 0.2 + Math.random() * 0.5 }"
+                rx="2"
+                ry="2"
+              />
+            </g>
+          </svg>
+        </div>
+      </div>
+      
+      <!-- Actual chart (when not loading) -->
+      <div v-else class="flex flex-col">
         <!-- Month labels (improved positioning) -->
         <div class="flex ml-8">
           <div 
