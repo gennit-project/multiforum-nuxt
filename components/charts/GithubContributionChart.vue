@@ -90,30 +90,45 @@ const chartData = computed(() => {
   return props.data;
 });
 
-// Generate month labels data
+// Helper to get the first date to display on the chart
+const getFirstDateOfChart = (year: number) => {
+  const firstDayOfYear = new Date(year, 0, 1);
+  const dayOfWeek = firstDayOfYear.getDay();
+  // If Jan 1 is not Sunday, go back to previous Sunday
+  const firstDate = new Date(firstDayOfYear);
+  firstDate.setDate(firstDate.getDate() - dayOfWeek);
+  return firstDate;
+};
+
+// Generate month labels data with improved calculation
 const monthLabels = computed(() => {
   const labels = [];
-  const startDate = new Date(selectedYearValue.value, 0, 1);
-  startDate.setDate(startDate.getDate() - startDate.getDay()); // Adjust to previous Sunday
+  const firstDate = getFirstDateOfChart(selectedYearValue.value);
   
-  let currentMonth = -1; // Start with invalid month to detect first change
-  
-  for (let week = 0; week < 52; week++) {
-    const weekDate = new Date(startDate);
-    weekDate.setDate(startDate.getDate() + (week * 7));
-    const month = weekDate.getMonth();
+  // Loop through 53 weeks (to cover full year + potential overlap)
+  for (let week = 1; week < 53; week++) {
+    const currentDate = new Date(firstDate);
+    currentDate.setDate(firstDate.getDate() + (week * 7));
     
-    // If this is a new month, add it to our labels
-    if (month !== currentMonth) {
-      labels.push({
-        month: weekDate.toLocaleString('default', { month: 'short' }),
-        position: week
-      });
-      currentMonth = month;
+    // If this is the first day of a month or first week
+    if (currentDate.getDate() <= 7 || week === 0) {      
+      // Only add if it's a new month (or first week)
+      if (week === 0 || labels.length === 0 || 
+          labels[labels.length - 1].month !== currentDate.toLocaleString('default', { month: 'short' })) {
+        labels.push({
+          month: currentDate.toLocaleString('default', { month: 'short' }),
+          position: week
+        });
+      }
     }
   }
   
   return labels;
+});
+
+// Get day of the week labels
+const dayLabels = computed(() => {
+  return ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 });
 
 // Get color based on contribution count and theme
@@ -137,6 +152,8 @@ const getColor = (count: number) => {
 
 // Select a day to show details
 const selectDay = (weekIndex: number, dayIndex: number) => {
+  if (!chartData.value[weekIndex] || !chartData.value[weekIndex][dayIndex]) return;
+  
   const dayData = chartData.value[weekIndex][dayIndex];
   
   const dayInfo: DayInfo = {
@@ -193,14 +210,26 @@ watch(() => props.year, (newValue) => {
 
 // Calculate total contributions for the year
 const totalContributionsInYear = computed(() => {
+  if (!chartData.value) return 0;
+  
   return chartData.value.reduce((total, week) => {
-    return total + week.reduce((weekTotal, day) => weekTotal + day.count, 0);
+    if (!week) return total;
+    return total + week.reduce((weekTotal, day) => {
+      if (!day) return weekTotal;
+      return weekTotal + day.count;
+    }, 0);
   }, 0);
 });
 
 // Format title with current year
 const formattedTitle = computed(() => {
   return `${totalContributionsInYear.value} contributions in ${selectedYearValue.value}`;
+});
+
+// Validate and get cell count to ensure proper rendering
+const cellCount = computed(() => {
+  if (!chartData.value) return 0;
+  return chartData.value.length;
 });
 </script>
 
@@ -235,7 +264,7 @@ const formattedTitle = computed(() => {
     <!-- Main chart grid -->
     <div class="overflow-x-auto">
       <div class="flex flex-col">
-        <!-- Month labels -->
+        <!-- Month labels (improved positioning) -->
         <div class="flex ml-8">
           <div 
             class="relative h-6 w-full"
@@ -247,28 +276,24 @@ const formattedTitle = computed(() => {
               class="absolute text-xs font-medium"
               :style="{ left: `${label.position * 14}px` }"
             >
-              {{ index > 0 ? label.month : '' }}
+              {{ label.month }}
             </div>
           </div>
         </div>
         
         <div class="flex items-center">
-          <!-- Day labels -->
+          <!-- Day labels (properly spaced) -->
           <div 
-            class="pr-2 flex flex-col justify-around text-tiny"
+            class="pr-2 flex flex-col h-110 justify-between text-tiny"
             :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
           >
-            <span>Sun</span>
-            <span>Mon</span>
-            <span>Tue</span>
-            <span>Wed</span>
-            <span>Thu</span>
-            <span>Fri</span>
-            <span>Sat</span>
+            <span v-for="(day, index) in dayLabels" :key="'day-label-' + index" class="h-14 flex items-center">
+              {{ day }}
+            </span>
           </div>
           
-          <!-- SVG grid -->
-          <svg width="720" height="110" class="overflow-visible">
+          <!-- SVG grid (improved to match data structure) -->
+          <svg :width="`${cellCount * 14 + 10}`" height="110" class="overflow-visible">
             <g 
               v-for="(week, weekIndex) in chartData" 
               :key="'week-' + weekIndex" 
@@ -346,7 +371,7 @@ const formattedTitle = computed(() => {
             >
               <li 
                 v-for="activity in selectedDay.activities" 
-                :key="activity.id"
+                :key="activity.id || activity.timestamp"
                 class="flex items-start"
               >
                 <span class="mr-2">•</span>
@@ -374,5 +399,8 @@ const formattedTitle = computed(() => {
 }
 .text-tiny {
   font-size: 0.6rem;
+}
+.h-110 {
+  height: 110px;
 }
 </style>
