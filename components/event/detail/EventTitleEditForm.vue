@@ -90,7 +90,7 @@ const formattedDate = computed(() => {
     year: "numeric",
   });
 });
-const { theme } = useTheme()
+const { theme } = useTheme();
 </script>
 
 <template>
@@ -124,49 +124,53 @@ const { theme } = useTheme()
           :current="formValues.title?.length || 0"
           :max="EVENT_TITLE_CHAR_LIMIT"
         />
-        <p
-      class="ml-1 mb-2 text-gray-500 dark:text-gray-400 text-sm"
-    >
-      {{
-        `${event?.Poster ? event.Poster.username : "[Deleted]"} posted this event on ${formattedDate}`
-      }}
-    </p>
+        <div
+          class="ml-1 mb-2 text-gray-500 dark:text-gray-400 text-sm flex align-items space-x-2"
+        >
+          <slot/>
+          <span class="flex align-items mt-0.5">
+            {{ `${event?.Poster ? event.Poster.username : "[Deleted]"} posted this event on ${formattedDate}`}}
+          </span>
+        </div>
       </div>
       <RequireAuth class="hidden md:block" :full-width="false">
         <template #has-auth>
           <div class="h-10 flex items-center">
-          <GenericButton
-            v-if="!titleEditMode && authorIsLoggedInUser"
-            :text="'Edit'"
-            @click="onClickEdit"
-          />
-          <CreateButton
-            v-if="!titleEditMode"
-            class="ml-2"
-            :to="`/forums/${channelId}/events/create`"
-            :label="'New Event'"
-          />
-          <PrimaryButton
-            v-if="titleEditMode"
-            :disabled="!formValues.title?.length || formValues.title?.length > EVENT_TITLE_CHAR_LIMIT"
-            :label="'Save'"
-            :loading="updateEventLoading"
-            @click="updateEvent"
-          />
-          <GenericButton
-            v-if="titleEditMode"
-            :text="'Cancel'"
-            class="ml-2"
-            @click="titleEditMode = false"
-          />
-        </div>
+            <GenericButton
+              v-if="!titleEditMode && authorIsLoggedInUser"
+              :text="'Edit'"
+              @click="onClickEdit"
+            />
+            <CreateButton
+              v-if="!titleEditMode"
+              class="ml-2"
+              :to="`/forums/${channelId}/events/create`"
+              :label="'New Event'"
+            />
+            <PrimaryButton
+              v-if="titleEditMode"
+              :disabled="
+                !formValues.title?.length ||
+                formValues.title?.length > EVENT_TITLE_CHAR_LIMIT
+              "
+              :label="'Save'"
+              :loading="updateEventLoading"
+              @click="updateEvent"
+            />
+            <GenericButton
+              v-if="titleEditMode"
+              :text="'Cancel'"
+              class="ml-2"
+              @click="titleEditMode = false"
+            />
+          </div>
         </template>
         <template #does-not-have-auth>
           <PrimaryButton class="ml-2" :label="'New Event'" />
         </template>
       </RequireAuth>
     </div>
-    
+
     <ErrorBanner
       v-if="getEventError"
       class="mx-auto my-3 max-w-5xl"

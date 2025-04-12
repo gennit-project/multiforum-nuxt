@@ -97,12 +97,6 @@ const reachedEndOfResults = computed(() => {
   <div
     class="w-full max-w-screen-2xl space-y-4 rounded-lg bg-white dark:text-white py-2 dark:bg-gray-800 sm:px-2 md:px-5"
   >
-    <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
-      <BackLink
-        :link="`/forums/${channelId}/events/${event?.id}`"
-        :data-testid="'event-detail-back-link'"
-      />
-    </div>
     <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">
       Feedback
     </h1>

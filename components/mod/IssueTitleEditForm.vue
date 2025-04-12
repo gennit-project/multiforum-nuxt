@@ -107,6 +107,7 @@ const formattedDate = computed(() => {
         :theme="theme"
       />
       <div v-else ref="issueDetail" class="flex-1">
+        <slot/>
         <h2
           v-if="!titleEditMode"
           class="text-wrap px-1 text-md md:text-4xl sm:tracking-tight"

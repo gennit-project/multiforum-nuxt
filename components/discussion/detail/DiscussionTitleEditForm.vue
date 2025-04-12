@@ -144,8 +144,9 @@ const formattedDate = computed(() => {
         />
         <p
           v-if="!titleEditMode"
-          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm flex items-center"
+          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm flex items-center space-x-2"
         >
+          <slot/>
           <span
             v-if="answered"
             class="text-green-500 dark:text-green-400 mr-1 border dark:border-green-400 border-green-500 rounded-full text-xs flex gap-1 items-center py-1 px-2"

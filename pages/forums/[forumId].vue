@@ -29,7 +29,10 @@ const showIssueTitle = computed(() =>
 
 const showChannelTabs = computed(() => {
   return (
-    !showDiscussionTitle.value && !showEventTitle.value && !showIssueTitle.value && !`${String(route.name)}`.includes('feedback')
+    !showDiscussionTitle.value &&
+    !showEventTitle.value &&
+    !showIssueTitle.value &&
+    !`${String(route.name)}`.includes("feedback")
   );
 });
 
@@ -114,8 +117,8 @@ if (!channelId.value) {
 }
 
 definePageMeta({
-  middleware: 'forum-redirect'
-})
+  middleware: "forum-redirect",
+});
 </script>
 
 <template>
@@ -152,39 +155,39 @@ definePageMeta({
             v-if="showDiscussionTitle"
             class="flex w-full items-start gap-2 px-2 lg:px-4 2xl:px-0"
           >
-            <BackLink
-              class="mt-6"
-              :link="`/forums/${channelId}/discussions`"
-              :data-testid="'discussion-detail-back-link'"
-            />
             <div class="max-w-screen-2xl flex-1 pr-1">
-              <DiscussionTitleEditForm />
+              <DiscussionTitleEditForm>
+                <BackLink
+                  :link="`/forums/${channelId}/discussions`"
+                  :data-testid="'discussion-detail-back-link'"
+                />
+              </DiscussionTitleEditForm>
             </div>
           </div>
           <div
             v-else-if="showEventTitle"
             class="flex w-full items-start gap-2 pl-3"
           >
-            <BackLink
-              class="mt-6"
-              :link="`/forums/${channelId}/events`"
-              :data-testid="'event-detail-back-link'"
-            />
             <div class="max-w-screen-2xl flex-1 pr-1">
-              <EventTitleEditForm />
+              <EventTitleEditForm>
+                <BackLink
+                  :link="`/forums/${channelId}/events`"
+                  :data-testid="'event-detail-back-link'"
+                />
+              </EventTitleEditForm>
             </div>
           </div>
           <div
             v-else-if="showIssueTitle"
             class="flex w-full items-start gap-2 px-2"
           >
-            <BackLink
-              class="mt-6"
-              :link="`/forums/${channelId}/issues`"
-              :data-testid="'issue-detail-back-link'"
-            />
             <div class="max-w-screen-2xl flex-1 pr-1">
-              <IssueTitleEditForm />
+              <IssueTitleEditForm>
+                <BackLink
+                  :link="`/forums/${channelId}/issues`"
+                  :data-testid="'issue-detail-back-link'"
+                />
+              </IssueTitleEditForm>
             </div>
           </div>
 
