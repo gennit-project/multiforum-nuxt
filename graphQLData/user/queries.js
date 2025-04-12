@@ -355,8 +355,8 @@ export const GET_OWNED_CHANNELS = gql`
 `;
 
 export const GET_USER_CONTRIBUTIONS = gql`
-query getUserContributions($username: String!) {
-  getUserContributions(username: $username) {
+query getUserContributions($username: String!, $year: Int) {
+  getUserContributions(username: $username, year: $year) {
     count
     date
     activities {

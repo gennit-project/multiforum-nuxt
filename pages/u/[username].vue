@@ -50,7 +50,7 @@ const isAdmin = computed(() => {
           <UserProfileSidebar :is-admin="isAdmin" />
         </div>
         
-        <div class="flex-1 flex-col min-w-0">
+        <div class="flex-1 flex-col min-w-0 pt-4">
           <DemoChart />
           <UserProfileTabs
             v-if="user"
