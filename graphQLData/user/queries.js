@@ -3,6 +3,7 @@ import { gql } from "@apollo/client/core";
 export const GET_USER_INFO_FOR_TAGS = gql`
   query getUser($username: String!) {
     getUser(username: $username) {
+      profilePicURL
       PosterOfChannels {
         url
       }
@@ -53,6 +54,7 @@ export const GET_USER_COMMENTS = gql`
   query getUserComments($username: String!, $offset: Int!, $limit: Int!) {
     users(where: { username: $username }) {
       username
+      profilePicURL
       Comments(options: { limit: $limit, offset: $offset }) {
         id
         text
@@ -99,6 +101,7 @@ export const GET_USER_DISCUSSIONS = gql`
   query getUserDiscussions($username: String!) {
     users(where: { username: $username }) {
       username
+      profilePicURL
       Discussions {
         id
         Author {
@@ -136,6 +139,7 @@ export const GET_USER_EVENTS = gql`
   query getUserEvents($username: String!) {
     users(where: { username: $username }) {
       username
+      profilePicURL
       Events(options: { sort: { createdAt: DESC } }) {
         id
         title
@@ -172,6 +176,7 @@ export const DOES_USER_EXIST = gql`
   query doesUserExist($username: String!) {
     users(where: { username: $username }) {
       username
+      profilePicURL
       Email {
         address
       }
@@ -292,6 +297,7 @@ export const GET_USERS = gql`
   query {
     queryUser {
       username
+      profilePicURL
     }
   }
 `;
@@ -300,6 +306,7 @@ export const GET_MODDED_CHANNELS = gql`
   query getModdedChannels($username: String!) {
     users(where: { username: $username }) {
       username
+      profilePicURL
       ModOfChannels {
         uniqueName
         description
@@ -325,6 +332,7 @@ export const GET_OWNED_CHANNELS = gql`
   query getOwnedChannels($username: String!) {
     users(where: { username: $username }) {
       username
+      profilePicURL
       AdminOfChannels {
         uniqueName
         description
