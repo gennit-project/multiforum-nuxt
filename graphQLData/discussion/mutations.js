@@ -284,6 +284,9 @@ export const MARK_AS_ANSWERED = gql`
             ... on User {
               username
             }
+            ... on ModerationProfile {
+              displayName
+            }
           }
         }
       }
