@@ -160,8 +160,6 @@ const renderedMarkdown = computed(() => {
     object-fit: contain !important;
     cursor: pointer !important;
     display: block !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
     word-wrap: break-word !important;
   }
 

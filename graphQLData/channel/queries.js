@@ -112,6 +112,26 @@ export const GET_CHANNEL = gql`
         canReport
         canSuspendUser
       }
+      DefaultChannelRole {
+        canCreateComment
+        canCreateDiscussion
+        canCreateEvent
+        canUpdateChannel
+        canUploadFile
+        canUpvoteComment
+        canUpvoteDiscussion
+        channelUniqueName
+      }
+      SuspendedRole {
+        canCreateComment
+        canCreateDiscussion
+        canCreateEvent
+        canUpdateChannel
+        canUploadFile
+        canUpvoteComment
+        canUpvoteDiscussion
+        channelUniqueName
+      }
     }
   }
 `;

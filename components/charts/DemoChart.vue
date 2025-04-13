@@ -25,8 +25,29 @@ const { result: contributionsResult, loading } = useQuery(
 );
 
 const contributions = computed(() => {
-  if (contributionsResult.value) {
-    return contributionsResult.value.getUserContributions;
+  if (contributionsResult.value?.getUserContributions) {
+    // Get the raw data from the API
+    const rawData = contributionsResult.value.getUserContributions;
+    
+    // Process the data to ensure compatibility with the chart component
+    return rawData.map(week => {
+      if (!week) return [];
+      
+      return week.map(day => {
+        if (!day) return null;
+        
+        // Set the count based on activities length if count is 0 but has activities
+        const dayCount = day.count || 0;
+        const activitiesCount = day.activities?.length || 0;
+        const finalCount = dayCount > 0 ? dayCount : activitiesCount;
+        
+        return {
+          date: day.date,
+          count: finalCount,
+          activities: day.activities || []
+        };
+      });
+    });
   }
   return [];
 });

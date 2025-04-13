@@ -41,7 +41,7 @@ const defaultUniqueName = computed(() => {
 const title = props.event.title;
 const relativeTimeText = relativeTime(props.event.createdAt);
 const poster = props.event.Poster ? props.event.Poster.username : "Deleted";
-const tags = props.event.Tags.map((tag: TagData) => tag.text);
+const tags = (props.event.Tags ?? []).map((tag: TagData) => tag.text);
 </script>
 
 <template>

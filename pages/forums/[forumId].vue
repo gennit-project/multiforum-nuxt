@@ -125,7 +125,7 @@ definePageMeta({
   <NuxtLayout>
     <div
       v-if="channel"
-      class="flex flex-col md:min-h-screen dark:bg-black bg-gray-100 dark:text-white"
+      class="flex flex-col md:min-h-screen dark:bg-black bg-white dark:text-white"
     >
       <ChannelHeaderMobile
         v-if="!showDiscussionTitle && !showEventTitle && !showIssueTitle"

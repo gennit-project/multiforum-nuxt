@@ -44,7 +44,7 @@ const relativeTimeText = relativeTime(props.discussion.createdAt);
 const authorUsername = props.discussion.Author
   ? props.discussion.Author.username
   : "Deleted";
-const tags = props.discussion.Tags.map((tag) => tag.text);
+const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
 </script>
 
 <template>

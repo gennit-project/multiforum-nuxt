@@ -367,8 +367,22 @@ query getUserContributions($username: String!, $year: Int) {
     date
     activities {
       description
-      timestamp
       type
+      Comments {
+        id
+        text
+        createdAt
+      }
+      Discussions {
+        id
+        title
+        createdAt
+      }
+      Events {
+        id
+        title
+        createdAt
+      }
     }
   }
 }
