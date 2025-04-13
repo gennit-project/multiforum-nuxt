@@ -14,10 +14,15 @@ import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import CommentHeader from "./CommentHeader.vue";
 import { ALLOWED_ICONS } from "@/utils";
-import { usernameVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
 import ArchivedCommentText from "./ArchivedCommentText.vue";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
+import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+import { DateTime } from "luxon";
+import { config } from "@/config";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -155,7 +160,7 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { discussionId, eventId, issueId } = route.params;
+const { discussionId, eventId, issueId } = route.params
 
 const forumId = computed (() => {
   if (typeof route.params.forumId === "string") {
@@ -163,6 +168,167 @@ const forumId = computed (() => {
   }
   return "";
 });
+
+const { result: getChannelResult } = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: forumId,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
+  }
+);
+
+const { result: getServerResult } = useQuery(
+  GET_SERVER_CONFIG,
+  {
+    serverName: config.serverName,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+const standardModRole = computed(() => {
+  // If the channel has a Default Mod Role, return that.
+  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
+    return getChannelResult.value?.channels[0]?.DefaultModRole;
+  }
+  // Otherwise, return the default mod role from the server config.
+  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
+  }
+  return null
+})
+
+const elevatedModRole = computed(() => {
+  // If the channel has a Default Elevated Mod Role, return that.
+  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
+    return getChannelResult.value?.channels[0]?.ElevatedModRole;
+  }
+  // Otherwise, return the default elevated mod role from the server config.
+  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
+  }
+  return null
+})
+
+const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL, {
+  modDisplayName: modProfileNameVar.value,
+  username: usernameVar.value,
+  channelUniqueName: forumId.value || "",
+}, {
+  enabled: !!modProfileNameVar.value && !!usernameVar.value && !!forumId.value,
+  fetchPolicy: "cache-first",
+});
+
+const permissionData = computed(() => {
+  console.log("Mod permissions check:", {
+    modDisplayName: modProfileNameVar.value,
+    username: usernameVar.value,
+    channelUniqueName: forumId.value || "",
+    result: getPermissionResult.value
+  });
+  if (getPermissionResult.value?.channels?.[0]) {
+    return getPermissionResult.value.channels[0];
+  }
+  return {};
+});
+
+const isSuspendedMod = computed(() => {
+  if (permissionData.value?.SuspendedMods?.length) {
+    return permissionData.value.SuspendedMods.some(
+      (mod) => mod.modProfileName === modProfileNameVar.value
+    );
+  }
+  return false;
+});
+
+const isElevatedMod = computed(() => {
+  if (permissionData.value?.Moderators?.length) {
+    return permissionData.value.Moderators.some(
+      (mod) => mod.displayName === modProfileNameVar.value
+    );
+  }
+  return false;
+});
+
+const isChannelOwner = computed(() => {
+  if (permissionData.value?.Admins?.length) {
+    return permissionData.value.Admins.some(
+      (admin) => admin.username === usernameVar.value
+    );
+  }
+  return false;
+});
+
+const canReport = computed(() => {
+  if (isChannelOwner.value){
+    return true
+  }
+  if (isSuspendedMod.value) {
+    return false
+  }
+  if (isElevatedMod.value) {
+    // For elevated mods, check the elevated mod role.
+    return elevatedModRole.value?.canReport
+  }
+
+  // For standard mods, check the standard/default mod role.
+  return standardModRole.value?.canReport
+});
+
+const canGiveFeedback = computed(() => {
+  if (isChannelOwner.value){
+    return true
+  }
+  if (isSuspendedMod.value) {
+    return false
+  }
+  if (isElevatedMod.value) {
+    // For elevated mods, check the elevated mod role.
+    return elevatedModRole.value?.canGiveFeedback
+  }
+
+  // For standard mods, check the standard/default mod role.
+  return standardModRole.value?.canGiveFeedback
+});
+
+const canHideComment = computed(() => {
+  if (isChannelOwner.value){
+    return true
+  }
+  if (isSuspendedMod.value) {
+    return false
+  }
+  if (isElevatedMod.value) {
+    // For elevated mods, check the elevated mod role.
+    return elevatedModRole.value?.canHideComment
+  }
+
+  // For standard mods, check the standard/default mod role.
+  return standardModRole.value?.canHideComment
+});
+
+const canSuspendUser = computed(() => {
+  if (isChannelOwner.value){
+    return true
+  }
+  if (isSuspendedMod.value) {
+    return false
+  }
+  if (isElevatedMod.value) {
+    // For elevated mods, check the elevated mod role.
+    return elevatedModRole.value?.canSuspendUser
+  }
+
+  // For standard mods, check the standard/default mod role.
+  return standardModRole.value?.canSuspendUser
+});
+
 const permalinkedCommentId = route.params.commentId;
 const isHighlighted = computed(() => {
   return props.isPermalinked || permalinkedCommentId === props.commentData.id;
@@ -278,8 +444,117 @@ const copyLink = async () => {
   }, 2000);
 };
 
+const availableModActions = computed(() => {
+  let out: any[] = [];
+  console.log("Mod action check:", {
+    modProfileName: props.modProfileName,
+    isSuspendedMod: isSuspendedMod.value,
+    isElevatedMod: isElevatedMod.value,
+    isChannelOwner: isChannelOwner.value,
+    canReport: canReport.value,
+    canGiveFeedback: canGiveFeedback.value,
+    canHideComment: canHideComment.value,
+    canSuspendUser: canSuspendUser.value,
+    enableFeedback: props.enableFeedback,
+    hasFeedbackComments: props.commentData.FeedbackComments?.length > 0
+  });
+  
+  // Don't show mod actions if user isn't a mod or is suspended
+  if (!props.modProfileName || isSuspendedMod.value) {
+    return out;
+  }
+ 
+  if (canReport.value) {
+    out = out.concat([
+      {
+        label: "Report",
+        value: "",
+        event: "clickReport",
+        icon: ALLOWED_ICONS.REPORT,
+      },
+    ]);
+  }
+  
+  if (props.enableFeedback) {
+    if (canGiveFeedback.value) {
+      out.push({
+        label: "Give Feedback",
+        value: "",
+        event: "clickFeedback",
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+      });
+    }
+    
+    if (props.commentData.FeedbackComments?.length > 0) {
+      out.push({
+        label: "Undo Feedback",
+        value: "",
+        event: "clickUndoFeedback",
+        icon: ALLOWED_ICONS.UNDO,
+      });
+      out.push({
+        label: "Edit Feedback",
+        value: "",
+        event: "clickEditFeedback",
+        icon: ALLOWED_ICONS.EDIT,
+      });
+    }
+  }
+
+  if (!props.commentData.archived) {
+    if (canHideComment.value){
+      out = out.concat([
+        {
+          label: "Archive",
+          event: "handleClickArchive",
+          icon: ALLOWED_ICONS.ARCHIVE,
+          value: '',
+        }
+      ]);
+    }
+    if (canSuspendUser.value) {
+      out = out.concat([
+        {
+          label: "Archive and Suspend",
+          event: "handleClickArchiveAndSuspend",
+          icon: ALLOWED_ICONS.SUSPEND,
+          value: '',
+        },
+      ]);
+    }
+  } else {
+    if (canHideComment.value){
+      out = out.concat([
+        {
+          label: "Unarchive",
+          event: "handleClickUnarchive",
+          icon: ALLOWED_ICONS.UNARCHIVE,
+          value: '',
+        },
+      ]);
+    }
+  }
+
+  // if there is at least one action in out, add the divider:
+  /*
+  {
+      value: "Moderation Actions",
+      isDivider: true,
+    },
+  **/
+  if (out.length > 0) {
+    out.unshift({
+      value: "Moderation Actions",
+      isDivider: true,
+    });
+  }
+  return out;
+})
+
 const commentMenuItems = computed(() => {
   let out: any[] = [];
+  
+  // Always show permalink if available
   if (canShowPermalink) {
     out.unshift({
       label: "Copy Link",
@@ -289,6 +564,7 @@ const commentMenuItems = computed(() => {
     });
   }
 
+  // Always show feedback option if enabled
   if (props.enableFeedback) {
     out = out.concat([
       {
@@ -299,14 +575,17 @@ const commentMenuItems = computed(() => {
       },
     ]);
   }
+  
+  // Need to be logged in for edit/delete or mod actions
   if (!usernameVar.value) {
     return out;
   }
 
-  if (
-    props.commentData?.CommentAuthor?.__typename === "User" &&
-    props.commentData?.CommentAuthor?.username === usernameVar.value
-  ) {
+  const isOwnComment = props.commentData?.CommentAuthor?.__typename === "User" &&
+                      props.commentData?.CommentAuthor?.username === usernameVar.value;
+
+  if (isOwnComment) {
+    // If user is the comment author, show edit/delete options
     out = out.concat([
       {
         label: "Edit",
@@ -321,73 +600,12 @@ const commentMenuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
-  } else if (usernameVar.value){
-    if (props.modProfileName) {
-      out = out.concat([
-        {
-          value: "Moderation Actions",
-          isDivider: true,
-        },
-        {
-          label: "Report",
-          value: "",
-          event: "clickReport",
-          icon: ALLOWED_ICONS.REPORT,
-        },
-      ]);
-    }
-
-    if (props.enableFeedback) {
-      if (props.modProfileName) {
-        out.push({
-          label: "Give Feedback",
-          value: "",
-          event: "clickFeedback",
-          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-        });
-      }
-      if (props.commentData.FeedbackComments?.length > 0) {
-        out.push({
-          label: "Undo Feedback",
-          value: "",
-          event: "clickUndoFeedback",
-          icon: ALLOWED_ICONS.UNDO,
-        });
-        out.push({
-          label: "Edit Feedback",
-          value: "",
-          event: "clickEditFeedback",
-          icon: ALLOWED_ICONS.EDIT,
-        });
-      }
-    }
-   // Only add these if mod permissions are elevated
-    if (!props.commentData.archived) {
-      out = out.concat([
-        {
-          label: "Archive",
-          event: "handleClickArchive",
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: '',
-        },
-        {
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: '',
-        },
-      ]);
-    } else {
-      out = out.concat([
-        {
-          label: "Unarchive",
-          event: "handleClickUnarchive",
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: '',
-        },
-      ]);
-    }
+  } else if (usernameVar.value) {
+    // If you're not the author, show mod actions
+    // This preserves the original logic that mod actions don't apply to your own comments
+    out = out.concat(availableModActions.value);
   }
+  
   return out;
 });
 

@@ -52,7 +52,6 @@ const props  = defineProps({
     default: false,
   },
 });
-console.log('props', props.dataTestid);
 
 const emit = defineEmits(["close", "primaryButtonClick"]);
 </script>

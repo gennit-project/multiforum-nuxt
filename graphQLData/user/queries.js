@@ -387,3 +387,45 @@ query getUserContributions($username: String!, $year: Int) {
   }
 }
 `
+
+export const USER_IS_MOD_OR_OWNER_IN_CHANNEL = gql`
+query userIsModInChannel(
+  $modDisplayName: String!,
+  $username: String!,
+  $channelUniqueName: String!
+) {
+  channels(where: {
+    uniqueName: $channelUniqueName,
+  }){
+    uniqueName
+    Admins (
+      where: {
+        username: $username
+      }
+    ){
+      username
+    }
+    SuspendedUsers(
+      where: {
+        username: $username
+      }
+    ) {
+      username
+    }
+    Moderators(
+      where: {
+        displayName: $modDisplayName
+      }
+    ) {
+      displayName
+    }
+    SuspendedMods(
+      where: {
+        modProfileName: $modDisplayName
+      }
+    ) {
+      modProfileName
+    }
+  }
+}
+`
