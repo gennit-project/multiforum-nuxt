@@ -79,7 +79,7 @@ const visibleRecentForums = computed(() => {
 const { result: getUserResult } = useQuery(GET_USER, {
   username: usernameVar.value,
 },{
-  enabled: !usernameVar.value,
+  enabled: !!usernameVar.value,
 });
 
 const user = computed(() => getUserResult.value?.users[0] || null);

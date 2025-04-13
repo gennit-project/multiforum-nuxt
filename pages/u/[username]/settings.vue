@@ -24,6 +24,9 @@ const {
   refetch: refetchUser,
 } = useQuery(GET_USER, {
   username: usernameInParams,
+},
+{
+  enabled: !!usernameInParams.value,
 });
 
 const getDefaultUserValues = () => ({

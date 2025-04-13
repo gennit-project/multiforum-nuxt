@@ -33,7 +33,7 @@ const {
 } = useQuery(GET_USER, () => ({
   username: username.value,
 }),{
-  enabled: !usernameVar.value,
+  enabled: !!usernameVar.value,
 });
 
 const user = computed(() => {

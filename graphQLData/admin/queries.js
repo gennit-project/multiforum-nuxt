@@ -9,21 +9,60 @@ export const GET_SERVER_CONFIG = gql`
       DefaultServerRole {
         name
         description
+        canCreateComment
+        canCreateDiscussion
+        canCreateEvent
+        canCreateChannel
+        canUploadFile
+        canUpvoteComment
+        canUpvoteDiscussion
       }
       DefaultModRole {
         name
         description
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
       }
       DefaultElevatedModRole {
         name
+        description
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
       }
       DefaultSuspendedRole {
         name
         description
+        canCreateComment
+        canCreateDiscussion
+        canCreateEvent
+        canCreateChannel
+        canUploadFile
+        canUpvoteComment
+        canUpvoteDiscussion
       }
       DefaultSuspendedModRole {
         name
         description
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
       }
       rules
     }

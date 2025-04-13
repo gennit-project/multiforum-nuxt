@@ -24,6 +24,7 @@ const {
     username: username.value,
   },
   {
+    enabled: !!username.value,
     fetchPolicy: "network-only",
   }
 );
