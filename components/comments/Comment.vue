@@ -17,6 +17,7 @@ import { ALLOWED_ICONS } from "@/utils";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
+import { getAllPermissions } from "@/utils/permissionUtils";
 import ArchivedCommentText from "./ArchivedCommentText.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
@@ -226,107 +227,21 @@ const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL
 });
 
 const permissionData = computed(() => {
-  console.log("Mod permissions check:", {
-    modDisplayName: modProfileNameVar.value,
-    username: usernameVar.value,
-    channelUniqueName: forumId.value || "",
-    result: getPermissionResult.value
-  });
   if (getPermissionResult.value?.channels?.[0]) {
     return getPermissionResult.value.channels[0];
   }
-  return {};
+  return null;
 });
 
-const isSuspendedMod = computed(() => {
-  if (permissionData.value?.SuspendedMods?.length) {
-    return permissionData.value.SuspendedMods.some(
-      (mod) => mod.modProfileName === modProfileNameVar.value
-    );
-  }
-  return false;
-});
-
-const isElevatedMod = computed(() => {
-  if (permissionData.value?.Moderators?.length) {
-    return permissionData.value.Moderators.some(
-      (mod) => mod.displayName === modProfileNameVar.value
-    );
-  }
-  return false;
-});
-
-const isChannelOwner = computed(() => {
-  if (permissionData.value?.Admins?.length) {
-    return permissionData.value.Admins.some(
-      (admin) => admin.username === usernameVar.value
-    );
-  }
-  return false;
-});
-
-const canReport = computed(() => {
-  if (isChannelOwner.value){
-    return true
-  }
-  if (isSuspendedMod.value) {
-    return false
-  }
-  if (isElevatedMod.value) {
-    // For elevated mods, check the elevated mod role.
-    return elevatedModRole.value?.canReport
-  }
-
-  // For standard mods, check the standard/default mod role.
-  return standardModRole.value?.canReport
-});
-
-const canGiveFeedback = computed(() => {
-  if (isChannelOwner.value){
-    return true
-  }
-  if (isSuspendedMod.value) {
-    return false
-  }
-  if (isElevatedMod.value) {
-    // For elevated mods, check the elevated mod role.
-    return elevatedModRole.value?.canGiveFeedback
-  }
-
-  // For standard mods, check the standard/default mod role.
-  return standardModRole.value?.canGiveFeedback
-});
-
-const canHideComment = computed(() => {
-  if (isChannelOwner.value){
-    return true
-  }
-  if (isSuspendedMod.value) {
-    return false
-  }
-  if (isElevatedMod.value) {
-    // For elevated mods, check the elevated mod role.
-    return elevatedModRole.value?.canHideComment
-  }
-
-  // For standard mods, check the standard/default mod role.
-  return standardModRole.value?.canHideComment
-});
-
-const canSuspendUser = computed(() => {
-  if (isChannelOwner.value){
-    return true
-  }
-  if (isSuspendedMod.value) {
-    return false
-  }
-  if (isElevatedMod.value) {
-    // For elevated mods, check the elevated mod role.
-    return elevatedModRole.value?.canSuspendUser
-  }
-
-  // For standard mods, check the standard/default mod role.
-  return standardModRole.value?.canSuspendUser
+// Use the utility function to get all permissions at once
+const userPermissions = computed(() => {
+  return getAllPermissions(
+    permissionData.value,
+    standardModRole.value,
+    elevatedModRole.value,
+    usernameVar.value,
+    modProfileNameVar.value
+  );
 });
 
 const permalinkedCommentId = route.params.commentId;
@@ -446,25 +361,13 @@ const copyLink = async () => {
 
 const availableModActions = computed(() => {
   let out: any[] = [];
-  console.log("Mod action check:", {
-    modProfileName: props.modProfileName,
-    isSuspendedMod: isSuspendedMod.value,
-    isElevatedMod: isElevatedMod.value,
-    isChannelOwner: isChannelOwner.value,
-    canReport: canReport.value,
-    canGiveFeedback: canGiveFeedback.value,
-    canHideComment: canHideComment.value,
-    canSuspendUser: canSuspendUser.value,
-    enableFeedback: props.enableFeedback,
-    hasFeedbackComments: props.commentData.FeedbackComments?.length > 0
-  });
   
   // Don't show mod actions if user isn't a mod or is suspended
-  if (!props.modProfileName || isSuspendedMod.value) {
+  if (!props.modProfileName || userPermissions.value.isSuspendedMod) {
     return out;
   }
  
-  if (canReport.value) {
+  if (userPermissions.value.canReport) {
     out = out.concat([
       {
         label: "Report",
@@ -476,7 +379,7 @@ const availableModActions = computed(() => {
   }
   
   if (props.enableFeedback) {
-    if (canGiveFeedback.value) {
+    if (userPermissions.value.canGiveFeedback) {
       out.push({
         label: "Give Feedback",
         value: "",
@@ -502,7 +405,7 @@ const availableModActions = computed(() => {
   }
 
   if (!props.commentData.archived) {
-    if (canHideComment.value){
+    if (userPermissions.value.canHideComment) {
       out = out.concat([
         {
           label: "Archive",
@@ -512,7 +415,7 @@ const availableModActions = computed(() => {
         }
       ]);
     }
-    if (canSuspendUser.value) {
+    if (userPermissions.value.canSuspendUser) {
       out = out.concat([
         {
           label: "Archive and Suspend",
@@ -523,7 +426,7 @@ const availableModActions = computed(() => {
       ]);
     }
   } else {
-    if (canHideComment.value){
+    if (userPermissions.value.canHideComment) {
       out = out.concat([
         {
           label: "Unarchive",
@@ -535,19 +438,14 @@ const availableModActions = computed(() => {
     }
   }
 
-  // if there is at least one action in out, add the divider:
-  /*
-  {
-      value: "Moderation Actions",
-      isDivider: true,
-    },
-  **/
+  // If there are actions, add a divider at the beginning
   if (out.length > 0) {
     out.unshift({
       value: "Moderation Actions",
       isDivider: true,
     });
   }
+  
   return out;
 })
 
