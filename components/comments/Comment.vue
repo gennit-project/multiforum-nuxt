@@ -481,6 +481,18 @@ const commentMenuItems = computed(() => {
 
   const isOwnComment = props.commentData?.CommentAuthor?.__typename === "User" &&
                       props.commentData?.CommentAuthor?.username === usernameVar.value;
+                      
+  // Check if the user has admin or mod permissions
+  const hasModPermissions = userPermissions.value.isChannelOwner || 
+                           (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
+                           
+  console.log("Checking mod permissions for comment menu:", {
+    isOwnComment,
+    isChannelOwner: userPermissions.value.isChannelOwner,
+    isElevatedMod: userPermissions.value.isElevatedMod, 
+    isSuspendedMod: userPermissions.value.isSuspendedMod,
+    hasModPermissions
+  });
 
   if (isOwnComment) {
     // If user is the comment author, show edit/delete options
@@ -498,7 +510,13 @@ const commentMenuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
-  } else if (usernameVar.value) {
+  }
+  
+  // Show mod actions if:
+  // 1. User is logged in
+  // 2. User is not the comment author
+  // 3. User has mod permissions (channel owner or elevated mod and not suspended)
+  if (usernameVar.value && !isOwnComment && (hasModPermissions || userPermissions.value.isChannelOwner)) {
     // If you're not the author, show mod actions
     // This preserves the original logic that mod actions don't apply to your own comments
     out = out.concat(availableModActions.value);

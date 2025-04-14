@@ -310,6 +310,19 @@ const menuItems = computed(() => {
   
   // If user is the author of the event
   const isOwnEvent = props.eventData?.Poster?.username === usernameVar.value;
+  
+  // Check if the user has admin or mod permissions
+  const hasModPermissions = userPermissions.value.isChannelOwner || 
+                           (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
+                           
+  console.log("Checking mod permissions for action menu:", {
+    isOwnEvent,
+    isChannelOwner: userPermissions.value.isChannelOwner,
+    isElevatedMod: userPermissions.value.isElevatedMod, 
+    isSuspendedMod: userPermissions.value.isSuspendedMod,
+    hasModPermissions
+  });
+                           
   if (isOwnEvent) {
     items = items.concat([
       {
@@ -331,8 +344,11 @@ const menuItems = computed(() => {
       });
     }
   } 
-  // If user is not the author but has mod permissions
-  else if (usernameVar.value && !userPermissions.value.isSuspendedMod) {
+  
+  // Show mod actions if user is not suspended and either:
+  // 1. Is a channel owner (admin), or
+  // 2. Is a moderator with permissions
+  if (usernameVar.value && (hasModPermissions || userPermissions.value.isChannelOwner) && !isOwnEvent) {
     // Create a list for mod actions
     const modActions: MenuItem[] = [];
     

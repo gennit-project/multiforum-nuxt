@@ -268,6 +268,18 @@ const menuItems = computed(() => {
     // If user is the author of the discussion
     const isOwnDiscussion = props.discussion?.Author?.username === usernameVar.value;
     
+    // Check if the user has admin or mod permissions
+    const hasModPermissions = userPermissions.value.isChannelOwner || 
+                             (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
+                             
+    console.log("Checking mod permissions for discussion menu:", {
+      isOwnDiscussion,
+      isChannelOwner: userPermissions.value.isChannelOwner,
+      isElevatedMod: userPermissions.value.isElevatedMod, 
+      isSuspendedMod: userPermissions.value.isSuspendedMod,
+      hasModPermissions
+    });
+    
     if (isOwnDiscussion) {
       out.push({
         label: "Edit",
@@ -282,8 +294,11 @@ const menuItems = computed(() => {
         value: props.discussion.id,
       });
     } 
-    // If user is not the author but is a moderator with permissions
-    else if (usernameVar.value && !userPermissions.value.isSuspendedMod) {
+    
+    // Show mod actions if user is not suspended and either:
+    // 1. Is a channel owner (admin), or
+    // 2. Is a moderator with permissions
+    if (usernameVar.value && (hasModPermissions || userPermissions.value.isChannelOwner) && !isOwnDiscussion) {
       // Create a list for mod actions
       const modActions: MenuItem[] = [];
       
