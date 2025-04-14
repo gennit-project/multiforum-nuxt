@@ -1,13 +1,27 @@
 /**
  * Permission utility functions for checking user permissions in forums/channels
  */
+import type { ModChannelRole, ModServerRole } from "@/__generated__/graphql";
 
+// Create a union type of all permission keys from ModChannelRole and ModServerRole
+type PermissionKey = keyof Pick<
+  ModChannelRole & ModServerRole,
+  | 'canReport'
+  | 'canGiveFeedback'
+  | 'canHideComment'
+  | 'canHideDiscussion'
+  | 'canHideEvent'
+  | 'canSuspendUser'
+  | 'canOpenSupportTickets'
+  | 'canCloseSupportTickets'
+  | 'canLockChannel'
+>;
+
+// Role type used in the utility functions
 type Role = {
-  canReport?: boolean;
-  canGiveFeedback?: boolean;
-  canHideComment?: boolean;
-  canHideDiscussion?: boolean;
-  canSuspendUser?: boolean;
+  [K in PermissionKey]?: boolean;
+} & {
+  // Additional permissions not directly in the schema types (like channel-specific ones)
   canEditWiki?: boolean;
   canAddMods?: boolean;
   canRemoveMods?: boolean;
@@ -34,7 +48,14 @@ type PermissionData = {
  * @param elevatedModRole - The elevated mod role for the channel/server
  * @param username - The user's username
  * @param modProfileName - The user's mod profile name (if they are a mod)
- * @param action - The permission action to check (e.g., 'canReport', 'canHideComment')
+ * @param action - The permission action to check, can be any of:
+ *   - Core permissions from ModChannelRole and ModServerRole: 
+ *     'canReport', 'canGiveFeedback', 'canHideComment', 'canHideDiscussion', 
+ *     'canHideEvent', 'canSuspendUser', 'canOpenSupportTickets', 
+ *     'canCloseSupportTickets', 'canLockChannel'
+ *   - Additional application permissions:
+ *     'canEditWiki', 'canAddMods', 'canRemoveMods', 'canAddOwners', 
+ *     'canRemoveOwners', 'canChangeSettings'
  * @returns boolean indicating if the user has permission
  */
 export const checkPermission = (
@@ -43,7 +64,7 @@ export const checkPermission = (
   elevatedModRole: Role | null,
   username: string,
   modProfileName: string,
-  action: string
+  action: PermissionKey | string
 ): boolean => {
   // If we don't have permission data or role data, the user can't perform the action
   if (!permissionData || (!standardModRole && !elevatedModRole)) {
@@ -97,7 +118,10 @@ export const checkPermission = (
  * @param elevatedModRole - The elevated mod role for the channel/server
  * @param username - The user's username
  * @param modProfileName - The user's mod profile name (if they are a mod)
- * @returns Object with all permissions mapped
+ * @returns Object with all permissions mapped:
+ *   - Core permissions from schema: 'canReport', 'canGiveFeedback', etc.
+ *   - Additional permissions: 'canEditWiki', 'canAddMods', etc.
+ *   - Role information: 'isChannelOwner', 'isElevatedMod', 'isSuspendedMod', 'isSuspendedUser'
  */
 export const getAllPermissions = (
   permissionData: PermissionData | null,
@@ -106,13 +130,21 @@ export const getAllPermissions = (
   username: string,
   modProfileName: string
 ): Record<string, boolean> => {
-  // Define all possible permissions
-  const allActions = [
+  // Define all possible permissions from ModChannelRole and ModServerRole
+  const corePermissions: PermissionKey[] = [
     'canReport',
     'canGiveFeedback',
     'canHideComment',
     'canHideDiscussion',
+    'canHideEvent',
     'canSuspendUser',
+    'canOpenSupportTickets',
+    'canCloseSupportTickets',
+    'canLockChannel'
+  ];
+
+  // Additional permissions specific to our application
+  const additionalPermissions: string[] = [
     'canEditWiki',
     'canAddMods',
     'canRemoveMods',
@@ -120,6 +152,9 @@ export const getAllPermissions = (
     'canRemoveOwners',
     'canChangeSettings'
   ];
+
+  // Combine all permission types
+  const allActions = [...corePermissions, ...additionalPermissions];
 
   // Create an object with all permissions
   const permissions: Record<string, boolean> = {};
