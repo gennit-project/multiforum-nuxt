@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "nuxt/app";
 import { DateTime } from "luxon";
 import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
@@ -11,8 +11,13 @@ import Notification from "@/components/NotificationComponent.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import { ALLOWED_ICONS } from "@/utils";
+import { getAllPermissions } from "@/utils/permissionUtils";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
+import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+import { config } from "@/config";
 
 type MenuItem = {
   label?: string;
@@ -118,6 +123,86 @@ const defaultChannel = computed(() => {
   );
 });
 
+// Query the channel data to get roles
+const { result: getChannelResult } = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: props.channelId || defaultChannel.value,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
+    enabled: computed(() => !!props.channelId || !!defaultChannel.value),
+  }
+);
+
+// Query server config to get default roles
+const { result: getServerResult } = useQuery(
+  GET_SERVER_CONFIG,
+  {
+    serverName: config.serverName,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+// Get the standard and elevated mod roles from the channel or server default
+const standardModRole = computed(() => {
+  // If the channel has a Default Mod Role, return that
+  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
+    return getChannelResult.value?.channels[0]?.DefaultModRole;
+  }
+  // Otherwise, return the default mod role from the server config
+  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
+  }
+  return null;
+});
+
+const elevatedModRole = computed(() => {
+  // If the channel has a Default Elevated Mod Role, return that
+  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
+    return getChannelResult.value?.channels[0]?.ElevatedModRole;
+  }
+  // Otherwise, return the default elevated mod role from server config
+  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
+  }
+  return null;
+});
+
+// Query user's permissions in the channel
+const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL, {
+  modDisplayName: modProfileNameVar.value,
+  username: usernameVar.value,
+  channelUniqueName: props.channelId || defaultChannel.value || "",
+}, {
+  enabled: computed(() => !!modProfileNameVar.value && !!usernameVar.value && (!!props.channelId || !!defaultChannel.value)),
+  fetchPolicy: "cache-first",
+});
+
+// Get permission data from the query result
+const permissionData = computed(() => {
+  if (getPermissionResult.value?.channels?.[0]) {
+    return getPermissionResult.value.channels[0];
+  }
+  return null;
+});
+
+// Get all permissions for the current user using our utility function
+const userPermissions = computed(() => {
+  return getAllPermissions(
+    permissionData.value,
+    standardModRole.value,
+    elevatedModRole.value,
+    usernameVar.value,
+    modProfileNameVar.value
+  );
+});
+
 const permalinkObject = computed(() => {
   if (!props.discussion) return {};
   return {
@@ -180,7 +265,10 @@ const menuItems = computed(() => {
       },
     ]);
 
-    if (props.discussion?.Author?.username === usernameVar.value) {
+    // If user is the author of the discussion
+    const isOwnDiscussion = props.discussion?.Author?.username === usernameVar.value;
+    
+    if (isOwnDiscussion) {
       out.push({
         label: "Edit",
         event: "handleEdit",
@@ -193,50 +281,69 @@ const menuItems = computed(() => {
         icon: ALLOWED_ICONS.DELETE,
         value: props.discussion.id,
       });
-    } else if (usernameVar.value && modProfileNameVar.value) {
-      out = out.concat([
-        {
-          value: "Moderation Actions",
-          isDivider: true,
-        },
-        {
+    } 
+    // If user is not the author but is a moderator with permissions
+    else if (usernameVar.value && !userPermissions.value.isSuspendedMod) {
+      // Create a list for mod actions
+      const modActions: MenuItem[] = [];
+      
+      // Add report action if user has permission
+      if (userPermissions.value.canReport) {
+        modActions.push({
           label: "Report",
           event: "handleClickReport",
           icon: ALLOWED_ICONS.REPORT,
           value: props.discussion.id,
-        },
-        {
+        });
+      }
+      
+      // Add feedback action if user has permission
+      if (userPermissions.value.canGiveFeedback) {
+        modActions.push({
           label: "Give Feedback",
           event: "handleFeedback",
           icon: ALLOWED_ICONS.GIVE_FEEDBACK,
           value: props.discussion.id,
-        },
-      ]);
-      // Only add these if mod permissions are elevated
+        });
+      }
+      
+      // Add archive/unarchive actions based on current state and permissions
       if (!props.discussionIsArchived) {
-        out = out.concat([
-          {
+        if (userPermissions.value.canHideDiscussion) {
+          modActions.push({
             label: "Archive",
             event: "handleClickArchive",
             icon: ALLOWED_ICONS.ARCHIVE,
             value: props.discussion.id,
-          },
-          {
+          });
+        }
+        
+        if (userPermissions.value.canSuspendUser) {
+          modActions.push({
             label: "Archive and Suspend",
             event: "handleClickArchiveAndSuspend",
             icon: ALLOWED_ICONS.SUSPEND,
             value: props.discussion.id,
-          },
-        ]);
+          });
+        }
       } else {
-        out = out.concat([
-          {
+        if (userPermissions.value.canHideDiscussion) {
+          modActions.push({
             label: "Unarchive",
             event: "handleClickUnarchive",
             icon: ALLOWED_ICONS.UNARCHIVE,
             value: props.discussion.id,
-          },
-        ]);
+          });
+        }
+      }
+      
+      // Only add the mod actions section if there are actually actions to show
+      if (modActions.length > 0) {
+        out.push({
+          value: "Moderation Actions",
+          isDivider: true,
+        });
+        out = out.concat(modActions);
       }
     }
   }
