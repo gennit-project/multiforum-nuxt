@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { computed, ref } from "vue";
 import type { PropType } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import type { Event } from "@/__generated__/graphql";
 import {
   CANCEL_EVENT,
@@ -19,12 +19,17 @@ import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { getDuration, ALLOWED_ICONS } from "@/utils";
+import { checkPermission, getAllPermissions } from "@/utils/permissionUtils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute, useRouter } from "nuxt/app";
 import InfoBanner from "@/components/InfoBanner.vue";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
+import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+import { config } from "@/config";
 
 type MenuItem = {
   label?: string;
@@ -81,6 +86,97 @@ const channelId = computed(() => {
     return route.params.forumId;
   }
   return props.eventData?.EventChannels?.[0]?.channelUniqueName || "";
+});
+
+// Query the channel data to get roles
+const { result: getChannelResult } = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: props.eventChannelId || channelId.value,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
+    enabled: computed(() => !!props.eventChannelId || !!channelId.value),
+  }
+);
+
+// Query server config to get default roles
+const { result: getServerResult } = useQuery(
+  GET_SERVER_CONFIG,
+  {
+    serverName: config.serverName,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+// Get the standard and elevated mod roles from the channel or server default
+const standardModRole = computed(() => {
+  // If the channel has a Default Mod Role, return that
+  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
+    return getChannelResult.value?.channels[0]?.DefaultModRole;
+  }
+  // Otherwise, return the default mod role from the server config
+  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
+  }
+  return null;
+});
+
+const elevatedModRole = computed(() => {
+  // If the channel has a Default Elevated Mod Role, return that
+  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
+    return getChannelResult.value?.channels[0]?.ElevatedModRole;
+  }
+  // Otherwise, return the default elevated mod role from server config
+  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
+  }
+  return null;
+});
+
+// Query user's permissions in the channel
+const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL, {
+  modDisplayName: modProfileNameVar.value,
+  username: usernameVar.value,
+  channelUniqueName: props.eventChannelId || channelId.value || "",
+}, {
+  enabled: computed(() => !!modProfileNameVar.value && !!usernameVar.value && (!!props.eventChannelId || !!channelId.value)),
+  fetchPolicy: "cache-first",
+});
+
+// Get permission data from the query result
+const permissionData = computed(() => {
+  if (getPermissionResult.value?.channels?.[0]) {
+    return getPermissionResult.value.channels[0];
+  }
+  return null;
+});
+
+// Get all permissions for the current user using our utility function
+const userPermissions = computed(() => {
+  return getAllPermissions(
+    permissionData.value,
+    standardModRole.value,
+    elevatedModRole.value,
+    usernameVar.value,
+    modProfileNameVar.value
+  );
+});
+
+// Log permissions for debugging
+const logPermissions = computed(() => {
+  console.log("Event header permissions:", {
+    modProfileName: modProfileNameVar.value,
+    username: usernameVar.value,
+    channelUniqueName: props.eventChannelId || channelId.value || "",
+    permissions: userPermissions.value
+  });
+  return true;
 });
 
 const permalinkObject = computed(() => {
@@ -188,6 +284,10 @@ const isAdmin = computed(() => {
 
 const menuItems = computed(() => {
   let items: MenuItem[] = [];
+  
+  // Ensure logPermissions is evaluated for debugging
+  logPermissions.value;
+  
   if (props.eventData && route.name !== "EventFeedback") {
     items = items.concat([
       {
@@ -202,10 +302,15 @@ const menuItems = computed(() => {
       },
     ]);
   }
+  
+  // Return early if user is not logged in
   if (!usernameVar.value) {
     return items;
   }
-  if (props.eventData?.Poster?.username === usernameVar.value) {
+  
+  // If user is the author of the event
+  const isOwnEvent = props.eventData?.Poster?.username === usernameVar.value;
+  if (isOwnEvent) {
     items = items.concat([
       {
         label: "Edit",
@@ -225,52 +330,70 @@ const menuItems = computed(() => {
         icon: ALLOWED_ICONS.CANCEL,
       });
     }
-  } else {
-    items = items.concat([
-      {
-        value: "Moderation Actions",
-        isDivider: true,
-      },
-      {
+  } 
+  // If user is not the author but has mod permissions
+  else if (usernameVar.value && !userPermissions.value.isSuspendedMod) {
+    // Create a list for mod actions
+    const modActions: MenuItem[] = [];
+    
+    // Add report action if user has permission
+    if (userPermissions.value.canReport) {
+      modActions.push({
         label: "Report",
         event: "handleReport",
         icon: ALLOWED_ICONS.REPORT,
-      },
-    ]);
-    if (route.name !== "EventFeedback") {
-      items.push({
+      });
+    }
+    
+    // Add feedback action if user has permission and not on the feedback page
+    if (userPermissions.value.canGiveFeedback && route.name !== "EventFeedback") {
+      modActions.push({
         label: "Give Feedback",
         event: "handleFeedback",
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
       });
     }
-    // Only add these if mod permissions are elevated
+    
+    // Add archive/unarchive actions based on current state and permissions
     if (!props.eventIsArchived) {
-      items = items.concat([
-        {
+      if (userPermissions.value.canHideEvent) {
+        modActions.push({
           label: "Archive",
           event: "handleClickArchive",
           icon: ALLOWED_ICONS.ARCHIVE,
           value: props.eventData.id,
-        },
-        {
+        });
+      }
+      
+      if (userPermissions.value.canSuspendUser) {
+        modActions.push({
           label: "Archive and Suspend",
           event: "handleClickArchiveAndSuspend",
           icon: ALLOWED_ICONS.SUSPEND,
           value: props.eventData.id,
-        },
-      ]);
+        });
+      }
     } else {
-      items = items.concat([
-        {
+      if (userPermissions.value.canHideEvent) {
+        modActions.push({
           label: "Unarchive",
           event: "handleClickUnarchive",
           icon: ALLOWED_ICONS.UNARCHIVE,
           value: props.eventData.id,
-        },
-      ]);
+        });
+      }
+    }
+    
+    // Only add the mod actions section if there are actually actions to show
+    if (modActions.length > 0) {
+      items.push({
+        value: "Moderation Actions",
+        isDivider: true,
+      });
+      items = items.concat(modActions);
     }
   }
+  
   return items;
 });
 
