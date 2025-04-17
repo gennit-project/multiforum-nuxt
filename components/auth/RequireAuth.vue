@@ -65,7 +65,7 @@ const showAuthContent = computed(() => {
 
 // Only run client-side auth logic
 if (import.meta.env.SSR === false) {
-  const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect, isAuthenticated } =
+  const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect, isAuthenticated, getAccessTokenSilently } =
     useAuth0();
 
   setIsLoadingAuth(isLoading.value);
@@ -85,6 +85,45 @@ if (import.meta.env.SSR === false) {
       }
     }
   };
+  
+  // Export a function to refresh tokens that can be called when session expired errors occur
+  // This needs to be exposed to the global window object so it can be called from anywhere
+  const refreshTokenAndRetry = async () => {
+    try {
+      // Throttle refresh requests
+      const lastRefreshAt = sessionStorage.getItem("tokenRefreshedAt");
+      const now = Date.now();
+      const thirtySecondsAgo = now - (30 * 1000); // Only refresh once every 30 seconds max
+      
+      if (lastRefreshAt && parseInt(lastRefreshAt) > thirtySecondsAgo) {
+        // Already refreshed recently, use the existing token
+        console.log("Using recently refreshed token");
+        return true;
+      }
+      
+      // Get a fresh token
+      const freshToken = await getAccessTokenSilently({
+        detailedResponse: true,
+        cacheMode: 'off' // Force refresh
+      });
+      
+      if (freshToken && idTokenClaims.value) {
+        localStorage.setItem("token", idTokenClaims.value.__raw || '');
+        sessionStorage.setItem("tokenRefreshedAt", now.toString());
+        console.log("Token refreshed after session expired error");
+        return true;
+      }
+      return false;
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      return false;
+    }
+  };
+  
+  // Expose the refresh function globally
+  if (typeof window !== 'undefined') {
+    window.refreshAuthToken = refreshTokenAndRetry;
+  }
 
   // Watch for authentication state changes
   watch(idTokenClaims, async (claims) => {
@@ -93,21 +132,47 @@ if (import.meta.env.SSR === false) {
     }
   });
 
-  onMounted(() => {
+  onMounted(async () => {
     isMounted.value = true;
-    // Also check on mount in case we're returning from a redirect
-    if (isAuthenticated.value && idTokenClaims.value) {
-      try {
-        // Only store the token if it's different from what's already stored
-        const currentToken = localStorage.getItem("token");
-        const newToken = idTokenClaims.value.__raw;
-        
-        if (currentToken !== newToken) {
-          storeToken();
+    
+    try {
+      // Use a flag to prevent multiple refreshes on the same page load
+      const hasRefreshedToken = sessionStorage.getItem("tokenRefreshedAt");
+      const now = Date.now();
+      const fiveMinutesAgo = now - (5 * 60 * 1000);
+      
+      // Only refresh if we haven't already or if it's been more than 5 minutes
+      if (!hasRefreshedToken || parseInt(hasRefreshedToken) < fiveMinutesAgo) {
+        // Force token refresh on page load/refresh if authenticated
+        if (isAuthenticated.value) {
+          // Get a fresh token
+          const freshToken = await getAccessTokenSilently({
+            detailedResponse: true,
+            cacheMode: 'off' // Force a new token to be fetched
+          });
+          
+          if (freshToken) {
+            // Store the ID token in localStorage for Apollo client
+            localStorage.setItem("token", idTokenClaims.value?.__raw || '');
+            // Set the flag to prevent multiple refreshes
+            sessionStorage.setItem("tokenRefreshedAt", now.toString());
+            console.log("Token refreshed on page load");
+          }
+        } else if (idTokenClaims.value) {
+          // Handle case for returning from a redirect
+          const currentToken = localStorage.getItem("token");
+          const newToken = idTokenClaims.value.__raw;
+          
+          if (currentToken !== newToken) {
+            storeToken();
+            // Set the flag to prevent multiple refreshes
+            sessionStorage.setItem("tokenRefreshedAt", now.toString());
+          }
         }
-      } catch (error) {
-        console.error("Error checking token on mount:", error);
       }
+    } catch (error) {
+      console.error("Error refreshing token on mount:", error);
+      // If token refresh fails, don't crash but log it
     }
   });
 
