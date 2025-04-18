@@ -9,6 +9,7 @@ import EventMap, { type MarkerMap } from "./Map.vue";
 import PreviewContainer from "../list/PreviewContainer.vue";
 import CloseButton from "../../CloseButton.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
+import LoadingSpinner from "../../LoadingSpinner.vue";
 import EventFilterBar from "../list/filters/EventFilterBar.vue";
 import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
 import { GET_EVENTS } from "@/graphQLData/event/queries";
@@ -467,7 +468,7 @@ const isClientSide = typeof window !== "undefined";
       >
         <div class="w-1/2">
           <div class="space-y-4">
-            <div v-if="eventLoading">Loading...</div>
+            <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
             <ErrorBanner
               v-else-if="eventError"
               class="block"
@@ -497,7 +498,7 @@ const isClientSide = typeof window !== "undefined";
         </div>
 
         <div class="w-1/2 h-screen bg-gray-300 dark:bg-black fixed right-0">
-          <div v-if="eventLoading">Loading...</div>
+          <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
           <ErrorBanner
             v-else-if="eventError"
             class="block"
@@ -520,6 +521,12 @@ const isClientSide = typeof window !== "undefined";
           />
         </div>
       </div>
+      <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
+      <ErrorBanner
+        v-else-if="eventError"
+        class="block"
+        :text="eventError.message"
+      />
       <div
         v-else-if="eventResult && eventResult.events"
         id="mapViewMobileWidth"

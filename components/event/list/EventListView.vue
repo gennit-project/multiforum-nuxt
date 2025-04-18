@@ -9,6 +9,7 @@ import getEventWhere from "@/components/event/list/filters/getEventWhere";
 import type { SearchEventValues } from "@/types/Event";
 import { getFilterValuesFromParams } from "./filters/getEventFilterValuesFromParams";
 import ErrorBanner from "../../ErrorBanner.vue";
+import LoadingSpinner from "../../LoadingSpinner.vue";
 import { timeShortcutValues } from "./filters/eventSearchOptions";
 import {
   chronologicalOrder,
@@ -175,6 +176,8 @@ const filterByChannel = (channel: string) => {
       class="mx-auto block"
       :text="eventError.message"
     />
+    
+    <LoadingSpinner v-if="!eventResult && !eventError" class="my-4 mx-auto" />
 
     <EventList
       v-if="eventResult?.events"
