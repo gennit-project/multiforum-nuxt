@@ -97,9 +97,13 @@ const gridData = ref<DayData[][]>([]);
 const buildGridDataFromContributions = () => {
   // Create a map of date -> activity data for quick lookup
   const activityMap: Record<string, DayData> = {};
-  props.contributionData.forEach(day => {
-    activityMap[day.date] = day;
-  });
+  
+  // Check if contributionData exists before iterating
+  if (props.contributionData && Array.isArray(props.contributionData)) {
+    props.contributionData.forEach(day => {
+      activityMap[day.date] = day;
+    });
+  }
 
   // Generate the complete grid structure for the year
   const year = selectedYearValue.value;

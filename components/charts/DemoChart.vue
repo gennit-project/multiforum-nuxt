@@ -16,7 +16,7 @@ const username = computed(() => {
 });
 
 // Year for the backend query (null by default)
-const queryYear = ref(null);
+const queryYear = ref<number | null>(null);
 
 // Year for display in the title (current year by default)
 const displayYear = ref(new Date().getFullYear());
@@ -55,7 +55,7 @@ const { result: contributionsResult, loading } = useQuery(
 const contributions = computed(() => {
   try {
     if (contributionsResult.value?.getUserContributions) {
-      // Get the raw data from the API
+      // Get the raw data from the API - this is now a flat array of day data
       const rawData = contributionsResult.value.getUserContributions;
       
       // Make sure rawData is an array
@@ -65,30 +65,20 @@ const contributions = computed(() => {
       }
       
       // Process the data to ensure compatibility with the chart component
-      return rawData.flatMap((week) => {
-        if (!week) return [];
+      return rawData.map((day) => {
+        if (!day) return null;
 
-        // Ensure week is an array
-        if (!Array.isArray(week)) {
-          console.error('Expected week to be an array, got:', typeof week);
-          return [];
-        }
+        // Calculate count - use provided count or derive from activities
+        const dayCount = day.count || 0;
+        const activitiesCount = day.activities?.length || 0;
+        const finalCount = dayCount > 0 ? dayCount : activitiesCount;
 
-        return week.map((day) => {
-          if (!day) return null;
-
-          // Set the count based on activities length if count is 0 but has activities
-          const dayCount = day.count || 0;
-          const activitiesCount = day.activities?.length || 0;
-          const finalCount = dayCount > 0 ? dayCount : activitiesCount;
-
-          return {
-            date: day.date,
-            count: finalCount,
-            activities: day.activities || [],
-          };
-        }).filter((day) => day !== null); // Filter out null values
-      });
+        return {
+          date: day.date,
+          count: finalCount,
+          activities: day.activities || [],
+        };
+      }).filter((day) => day !== null); // Filter out null values
     }
   } catch (error) {
     console.error('Error processing contribution data:', error);
@@ -123,19 +113,12 @@ const currentYear = computed(() => new Date().getFullYear());
         :max-year="currentYear"
         @day-select="logSelected"
         @year-select="setYear"
-      />
-      
-      <template #fallback>
-        <ContributionChartSkeleton :dark-mode="isDarkMode" />
-      </template>
+      >
+        <template #fallback>
+          <ContributionChartSkeleton :dark-mode="isDarkMode" />
+        </template>
+      </GithubContributionChart>
     </client-only>
   </div>
 </template>
-<style>
-body {
-  margin: 0;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
-    sans-serif;
-}
-</style>
+
