@@ -7,7 +7,7 @@ import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue
 import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import type { Channel, User } from "@/__generated__/graphql";
-import { computed, watchEffect } from "vue";
+import { computed } from "vue";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import { useRoute, useRouter, useHead } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
@@ -99,38 +99,7 @@ onGetChannelResult((result) => {
       },
     });
   }
-});
-const adminList = computed(() => {
-  return channel.value
-    ? channel.value.Admins.map((user: User) => user?.username)
-    : [];
-});
-if (!channelId.value) {
-  if (import.meta.client) {
-    router.push({
-      name: "forums-forumId-discussions",
-      params: {
-        forumId: channelId.value,
-      },
-    });
-  }
-}
-
-definePageMeta({
-  middleware: "forum-redirect",
-});
-
-// Add SEO metadata for the forum
-watchEffect(() => {
-  if (!channel.value) {
-    useHead({
-      title: 'Forum Not Found',
-      description: 'The requested forum could not be found.'
-    });
-    return;
-  }
-
-  const forumName = channel.value.displayName;
+  const forumName = channel.value.displayName || channel.value.uniqueName;
   const forumDescription = channel.value.description 
     ? channel.value.description.substring(0, 160) + (channel.value.description.length > 160 ? '...' : '')
     : `${forumName} - Community Forum`;
@@ -167,6 +136,25 @@ watchEffect(() => {
       }
     ]
   });
+});
+const adminList = computed(() => {
+  return channel.value
+    ? channel.value.Admins.map((user: User) => user?.username)
+    : [];
+});
+if (!channelId.value) {
+  if (import.meta.client) {
+    router.push({
+      name: "forums-forumId-discussions",
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
+}
+
+definePageMeta({
+  middleware: "forum-redirect",
 });
 </script>
 

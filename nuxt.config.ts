@@ -7,12 +7,21 @@ import { inMemoryCacheOptions } from "./cache";
 export default defineNuxtConfig({
   app: {
     head: {
-      title: config.serverName,
+      title: config.serverDisplayName,
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: `Welcome to ${config.serverName}` }
-      ]
+        { name: 'description', content: `Welcome to ${config.serverDisplayName}` },
+        { name: 'color-scheme', content: 'dark light' }
+      ],
+      htmlAttrs: {
+        class: 'dark dark-mode-ready'  // Default to dark mode for initial SSR
+      }
+    }
+  },
+  vue: {
+    compilerOptions: {
+      whitespace: 'preserve'
     }
   },
   build: {

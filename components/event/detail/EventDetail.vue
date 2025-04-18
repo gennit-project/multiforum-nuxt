@@ -243,23 +243,26 @@ const handleClickEditEventDescription = () => {
 watchEffect(() => {
   if (!event.value) {
     useHead({
-      title: 'Event Not Found',
+      title: `Event Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
       description: 'The requested event could not be found.'
     });
     return;
   }
 
   const title = event.value.title || 'Event';
+  const forumName = activeEventChannel.value?.Channel?.displayName || channelId.value || '';
   const description = event.value.description 
     ? event.value.description.substring(0, 160) + (event.value.description.length > 160 ? '...' : '')
     : `${title} - Event on ${formatDate(event.value.startTime)}`;
   const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverDisplayName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
   const imageUrl = event.value.coverImageURL || '';
 
   // Set basic SEO meta tags
   useHead({
-    title: `${title} | ${serverName}`,
+    title: forumName 
+      ? `${title} | ${forumName} | ${serverDisplayName}`
+      : `${title} | ${serverDisplayName}`,
     description: description,
     image: imageUrl,
     type: 'event'
@@ -362,7 +365,7 @@ watchEffect(() => {
             <ArchivedEventInfoBanner 
               v-if="isArchived && route.name !== 'forums-forumId-issues-issueId'"
               :channel-id="channelId"
-              :event-channel-id="activeEventChannel?.id"
+              :event-channel-id="activeEventChannel?.id || ''"
             />
             <ErrorBanner
               v-if="eventIsInThePast && showEventInPastBanner"
@@ -402,6 +405,7 @@ watchEffect(() => {
                 @archived-successfully="refetchEventChannel"
               />
               <EventBody
+                class="sm:px-4 px-2"
                 v-if="event.description"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
@@ -412,7 +416,7 @@ watchEffect(() => {
               />
             </div>
 
-            <div v-if="event.Tags?.length > 0" class="my-2">
+            <div v-if="event.Tags?.length > 0" class="my-2 sm:px-4 px-2">
               <div class="flex space-x-1">
                 <Tag
                   v-for="tag in event.Tags"
@@ -423,14 +427,17 @@ watchEffect(() => {
                 />
               </div>
             </div>
-            <AddToCalendarButton v-if="event && showAddToCalendar" :event="event" class="mt-4" />
+            <div class="ml-3">
+              <AddToCalendarButton v-if="event && showAddToCalendar" :event="event" class="mt-4" />
+            </div>
             <EventFooter
+              class="sm:px-4 px-2"
               :event-data="event"
               :channels-except-current="channelsExceptCurrent"
               :show-poster="!usernameOnTop"
             />
 
-            <div v-if="showComments">
+            <div v-if="showComments" class="px-2">
               <EventRootCommentFormWrapper
                 v-if="event && !isArchived"
                 :key="`${eventId}`"

@@ -7,6 +7,7 @@ import { modProfileNameVar } from "@/cache";
 import { useRoute, useHead } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
+import { usePageMeta } from "@/composables/usePageMeta";
 
 const route = useRoute();
 
@@ -33,6 +34,7 @@ const {
   result: getDiscussionResult,
   error: getDiscussionError,
   loading: getDiscussionLoading,
+  onResult: onGetDiscussionResult,
 } = useQuery(GET_DISCUSSION, {
   id: discussionId,
   loggedInModName: modProfileNameVar.value,
@@ -46,51 +48,65 @@ const discussion = computed(() => {
   return getDiscussionResult.value?.discussions[0];
 });
 
-// SEO meta tags
-useHead(() => {
-  if (!discussion.value) {
-    return {
-      title: 'Discussion Not Found',
-      meta: [
-        { name: 'description', content: 'The requested discussion could not be found.' }
-      ]
-    };
-  }
-try {
-  const title = discussion.value.title || 'Discussion';
-  const description = discussion.value.body 
-    ? discussion.value.body.substring(0, 160) + (discussion.value.body.length > 160 ? '...' : '')
-    : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  const author = discussion.value.author?.username || 'Unknown Author';
+onGetDiscussionResult((result) => {
+  if (result.data.discussions.length === 0) {
+    // Handle the case where the discussion is not found
+    usePageMeta({
+      title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
+      description: "The requested discussion could not be found.",
+    });
+    return;
+  } else {
+    const title = discussion.value.title || "Discussion";
+    const description = discussion.value.body
+      ? discussion.value.body.substring(0, 160) +
+        (discussion.value.body.length > 160 ? "..." : "")
+      : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
+    const baseUrl = import.meta.env.VITE_BASE_URL;
+    const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+    const imageUrl = discussion.value.coverImageURL || "";
 
-    return {
-      title: `${title} | ${serverName}`,
-    meta: [
-      { name: 'description', content: description },
-      // Open Graph tags
-      { property: 'og:title', content: title },
-      { property: 'og:description', content: description },
-      { property: 'og:type', content: 'article' },
-      { property: 'og:url', content: `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}` },
-      { property: 'og:site_name', content: serverName },
-      // Twitter Card tags
-      { name: 'twitter:card', content: 'summary_large_image' },
-      { name: 'twitter:title', content: title },
-      { name: 'twitter:description', content: description },
-      { property: 'article:author', content: author },
-      { property: 'article:section', content: channelId.value }
-    ]
-  };
-  } catch (error) {
-    console.error("Error setting meta tags:", error);
-    return {
-      title: 'Discussion',
-      meta: [
-        { name: 'description', content: `View this discussion on ${import.meta.env.VITE_SERVER_NAME}` }
-      ]
-    };
+    // Set basic SEO meta tags
+    usePageMeta({
+      title: `${title} | ${channelId.value} | ${serverName}`,
+      description: description,
+      image: imageUrl,
+      type: "article",
+    });
+
+    // Add structured data for rich results
+    useHead({
+      script: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "DiscussionForumPosting",
+            headline: title,
+            description: description,
+            author: {
+              "@type": "Person",
+              name:
+                discussion.value.Author?.displayName ||
+                discussion.value.Author?.username ||
+                "Anonymous",
+            },
+            datePublished: discussion.value.createdAt,
+            dateModified:
+              discussion.value.updatedAt || discussion.value.createdAt,
+            publisher: {
+              "@type": "Organization",
+              name: serverName,
+              url: baseUrl,
+            },
+            mainEntityOfPage: {
+              "@type": "WebPage",
+              "@id": `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
+            },
+          }),
+        },
+      ],
+    });
   }
 });
 </script>

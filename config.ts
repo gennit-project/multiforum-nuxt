@@ -19,6 +19,7 @@ type ConfigType = {
     sentryDsn: string;
     sentryAuthToken: string;
     serverName: string;
+    serverDisplayName: string;
 }
 const config: ConfigType = {
     auth0username: import.meta.env.VITE_AUTH0_USERNAME,
@@ -41,5 +42,6 @@ const config: ConfigType = {
     sentryDsn: import.meta.env.VITE_SENTRY_DSN,
     sentryAuthToken: import.meta.env.VITE_SENTRY_AUTH_TOKEN,
     serverName: import.meta.env.VITE_SERVER_NAME,
+    serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
 }
 export { config };
