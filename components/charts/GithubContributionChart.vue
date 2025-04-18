@@ -9,6 +9,7 @@ import { Calendar } from "lucide-vue-next";
 import CommentComponent from "@/components/comments/Comment.vue";
 import DiscussionItemInProfile from "@/components/user/DiscussionItemInProfile.vue";
 import EventListItemInProfile from "@/components/user/EventItemInProfile.vue";
+import ContributionChartSkeleton from "./ContributionChartSkeleton.vue";
 
 // Define the activity type
 interface Activity {
@@ -373,56 +374,9 @@ const cellCount = computed(() => {
 
     <!-- Main chart grid -->
     <div class="overflow-x-auto">
-      <!-- Loading skeleton -->
-      <div v-if="loading" class="animate-pulse">
-        <div class="flex ml-8">
-          <div class="relative h-6 w-full">
-            <div
-              v-for="i in 12"
-              :key="'skeleton-month-' + i"
-              class="absolute h-3 w-8 rounded bg-gray-300 dark:bg-gray-700 text-xs"
-              :style="{ left: `${i * 28}px`, opacity: 0.7 - i * 0.05 }"
-            ></div>
-          </div>
-        </div>
-
-        <div class="flex items-start">
-          <!-- Day labels skeleton -->
-          <div class="pr-2 text-tiny relative w-10" style="height: 104px;">
-            <div
-              v-for="(day, index) in dayLabels"
-              :key="'skeleton-day-' + index"
-              class="absolute flex items-center"
-              :style="{top: `${index * 14 + 3}px`}"
-            >
-              <div
-                class="w-6 h-2 bg-gray-300 dark:bg-gray-700 rounded opacity-70"
-              ></div>
-            </div>
-          </div>
-
-          <!-- SVG grid skeleton that matches actual size -->
-          <svg :width="`${52 * 14 + 10}`" height="110" class="overflow-visible">
-            <g
-              v-for="week in 52"
-              :key="'skeleton-week-' + week"
-              :transform="`translate(${(week - 1) * 14}, 0)`"
-            >
-              <rect
-                v-for="day in 7"
-                :key="'skeleton-cell-' + week + '-' + day"
-                x="0"
-                :y="(day - 1) * 14"
-                width="10"
-                height="10"
-                class="rounded-sm bg-gray-300 dark:bg-gray-700"
-                :style="{ opacity: 0.2 + Math.random() * 0.5 }"
-                rx="2"
-                ry="2"
-              />
-            </g>
-          </svg>
-        </div>
+      <!-- Loading state is handled within the component -->
+      <div v-if="loading">
+        <ContributionChartSkeleton :dark-mode="darkMode" />
       </div>
 
       <!-- Actual chart (when not loading) -->

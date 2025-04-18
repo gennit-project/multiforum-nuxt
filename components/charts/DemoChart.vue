@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useUIStore } from "@/stores/uiStore";
 import GithubContributionChart from "./GithubContributionChart.vue";
+import ContributionChartSkeleton from "./ContributionChartSkeleton.vue";
 import { GET_USER_CONTRIBUTIONS, GET_USER } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
@@ -64,7 +65,7 @@ const contributions = computed(() => {
       }
       
       // Process the data to ensure compatibility with the chart component
-      return rawData.map((week) => {
+      return rawData.flatMap((week) => {
         if (!week) return [];
 
         // Ensure week is an array
@@ -86,7 +87,7 @@ const contributions = computed(() => {
             count: finalCount,
             activities: day.activities || [],
           };
-        });
+        }).filter((day) => day !== null); // Filter out null values
       });
     }
   } catch (error) {
@@ -115,7 +116,7 @@ const currentYear = computed(() => new Date().getFullYear());
     <client-only>
       <GithubContributionChart
         :dark-mode="isDarkMode"
-        :data="contributions"
+        :contribution-data="contributions"
         :loading="loading"
         :year="displayYear"
         :min-year="minYear"
@@ -123,6 +124,10 @@ const currentYear = computed(() => new Date().getFullYear());
         @day-select="logSelected"
         @year-select="setYear"
       />
+      
+      <template #fallback>
+        <ContributionChartSkeleton :dark-mode="isDarkMode" />
+      </template>
     </client-only>
   </div>
 </template>
