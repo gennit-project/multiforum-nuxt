@@ -463,11 +463,26 @@ const cellCount = computed(() => {
             class="text-sm"
             :class="darkMode ? 'text-gray-300' : 'text-gray-700'"
           >
-            {{
-              selectedDay.count === 0
-                ? texts.noContributions
-                : texts.contributionsText(selectedDay.count)
-            }}
+            <template v-if="selectedDay.count === 0">
+              {{ texts.noContributions }}
+            </template>
+            <template v-else>
+              <template v-for="(activity, idx) in selectedDay.activities" :key="activity.id">
+                <template v-if="activity.Comments && activity.Comments.length > 0">
+                  {{ activity.Comments.length }} {{ activity.Comments.length === 1 ? 'comment' : 'comments' }}
+                </template>
+                <template v-if="activity.Discussions && activity.Discussions.length > 0">
+                  <template v-if="activity.Comments && activity.Comments.length > 0">•</template>
+                  {{ activity.Discussions.length }} {{ activity.Discussions.length === 1 ? 'discussion ' : 'discussions ' }}
+                </template>
+                <template v-if="activity.Events && activity.Events.length > 0">
+                  <template v-if="(activity.Comments && activity.Comments.length > 0) || (activity.Discussions && activity.Discussions.length > 0)">•</template>
+                  {{ activity.Events.length }} {{ activity.Events.length === 1 ? 'event' : 'events' }}
+                </template>
+                <template v-if="idx < selectedDay.activities.length - 1"> and </template>
+              </template>
+              on this day
+            </template>
           </p>
 
           <div v-if="selectedDay.count > 0" class="mt-2">
