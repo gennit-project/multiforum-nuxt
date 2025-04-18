@@ -151,9 +151,11 @@ export default defineComponent({
     },
   },
   setup(props) {
+    const uiStore = useUIStore();
     const embeddedImages = ref<GalleryItem[]>([]);
     const visibleRef = ref(false);
     const indexRef = ref(0);
+    const { fontSize } = storeToRefs(uiStore);
 
     const countWords = (str: string) => {
       return str.trim().split(/\s+/).length;
@@ -333,6 +335,7 @@ export default defineComponent({
     <MarkdownRenderer
       :text="`${shownText}${!showFullText ? '...' : ''}`"
       :class="[{ clickable: !disableGallery }]"
+      :font-size="fontSize"
       @click="handleImageClick"
     />
     <button

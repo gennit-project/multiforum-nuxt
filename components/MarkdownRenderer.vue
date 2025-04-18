@@ -1,12 +1,13 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-v-html */
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
 import { useTheme } from "@/composables/useTheme";
 
 const { theme } = useTheme();
+const slotContainer = ref<HTMLElement | null>(null);
 
 // Use DOMPurify only in the client environment
 let DOMPurify: typeof import("dompurify");
@@ -20,6 +21,14 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  hasSlot: {
+    type: Boolean,
+    default: false
+  },
+  fontSize: {
+    type: String,
+    default: 'medium'
+  }
 });
 
 const md = new MarkdownIt({
@@ -71,50 +80,87 @@ const renderedMarkdown = computed(() => {
 </script>
 
 <template>
-  <div :class="['markdown-body', theme]" v-html="renderedMarkdown" />
+  <div class="markdown-container">
+    <!-- Use both classes and inline styles to ensure font size is applied -->
+    <div 
+      class="markdown-body" 
+      :class="
+        {
+          'font-size-small': props.fontSize === 'small',
+          'font-size-medium': props.fontSize === 'medium',
+          'font-size-large': props.fontSize === 'large',
+        }
+      " 
+      v-html="renderedMarkdown" 
+      ref="slotContainer" 
+    />
+    <div v-if="$slots.default" class="inline-slot">
+      <slot></slot>
+    </div>
+  </div>
 </template>
 
 <style lang="scss">
+/* ---------- layout wrappers ---------- */
+.markdown-container {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+
+  .markdown-body {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    // allow last paragraph to flow with the slotted element
+    &:last-child > p:last-child {
+      display: inline;
+      margin-right: 6px;
+    }
+  }
+
+  .inline-slot {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 8px;
+    align-self: baseline;
+
+    // tweak button alignment with text
+    button {
+      margin-top: -4px;
+    }
+  }
+}
+
+/* ---------- markdown styles ---------- */
 .markdown-body {
   word-wrap: break-word;
   overflow-wrap: break-word;
   width: 100%;
 
-  .external-link {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
+  /* ── font‑size variants ─────────────────────────────── */
+  &.font-size-small {
+    h1 { font-size: 1rem !important; }
+    h2 { font-size: 0.9rem !important; }
+    p,
+    li { font-size: 0.8rem !important; }
   }
 
-  .external-link-icon {
-    color: #3182ce !important;
-    display: inline-flex;
-    align-items: center;
-    margin-left: 4px;
-    color: currentColor;
-    opacity: 0.6;
-
-    svg {
-      width: 14px;
-      height: 14px;
-    }
+  &.font-size-medium {
+    h1 { font-size: 1.1rem !important; }
+    h2 { font-size: 1.0rem !important; }
+    p,
+    li { font-size: 0.9rem !important; }
   }
 
-  .dark {
-    background-color: transparent;
+  &.font-size-large {
+    h1 { font-size: 1.4rem !important; }
+    h2 { font-size: 1.3rem !important; }
+    p,
+    li { font-size: 1.1rem !important; }
   }
 
-  h1 {
-    font-size: 1.25rem !important;
-    font-weight: 600 !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 1rem !important;
-  }
-
+  /* ── general typography & elements ───────────────────── */
+  h1,
   h2 {
     font-size: 1rem !important;
     font-weight: 600 !important;
@@ -122,11 +168,11 @@ const renderedMarkdown = computed(() => {
     margin-bottom: 1rem !important;
   }
 
-  p,
-  li {
-    font-size: 0.8rem !important;
-    font-weight: 400 !important;
+  p {
+    margin-bottom: 1rem !important;
+    margin-top: 0.25rem !important;
   }
+
   ul,
   ol {
     list-style-type: disc !important;
@@ -134,16 +180,13 @@ const renderedMarkdown = computed(() => {
     margin-bottom: 0.5rem !important;
   }
 
-  p {
-    margin-bottom: 0.5rem !important;
-    margin-top: 0.25rem !important;
-  }
   pre,
   code {
     border-radius: 5px;
-    overflow-x: auto; // Keep horizontal scroll for code blocks
+    overflow-x: auto;          // keep horizontal scroll for code blocks
     padding-bottom: 0.25rem !important;
   }
+
   a {
     color: #3182ce !important;
     word-wrap: break-word;
@@ -151,6 +194,7 @@ const renderedMarkdown = computed(() => {
     max-width: 100%;
     word-break: break-all;
   }
+
   img {
     margin-top: 1rem !important;
     max-height: 350px !important;
@@ -174,6 +218,35 @@ const renderedMarkdown = computed(() => {
       border-left-color: #63b3ed;
       color: #ccc;
     }
+  }
+
+  /* ── external‑link helper ───────────────────────────── */
+  .external-link {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .external-link-icon {
+    color: #3182ce !important;
+    display: inline-flex;
+    align-items: center;
+    margin-left: 4px;
+    opacity: 0.6;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+
+  /* ── theme hack for code‑theme background ───────────── */
+  .dark {
+    background-color: transparent;
   }
 }
 </style>

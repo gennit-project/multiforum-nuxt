@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
 import type { PropType } from "vue";
 
 type Option = {
@@ -20,14 +19,7 @@ const props = defineProps({
 
 const emit = defineEmits(["updateSelected"]);
 
-const selected = ref<Option>(props.selectedOption);
 
-watch(
-  () => props.selectedOption,
-  (newValue) => {
-    selected.value = newValue;
-  }
-);
 </script>
 
 <template>
@@ -41,12 +33,11 @@ watch(
         <input
           name="showBothVirtualAndInPerson"
           type="radio"
-          :checked="selected.value === option.value"
+          :checked="selectedOption.value === option.value"
           class="focus:ring-blue-500 h-4 w-4 text-blue-600 border border-gray-300"
           @input="
             () => {
               emit('updateSelected', option);
-              selected = option
             }
           "
         >
