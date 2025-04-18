@@ -3,11 +3,10 @@ import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_MOD } from "@/graphQLData/mod/queries";
 import ModProfileSidebar from "@/components/mod/ModProfileSidebar.vue";
-import { useRoute, useRouter } from "nuxt/app";
+import { useRoute } from "nuxt/app";
 import ModProfileTabs from "../../components/mod/ModProfileTabs.vue";
 
 const route = useRoute();
-const router = useRouter();
 const modProfileName = computed(() => {
   return typeof route.params.modId === "string" ? route.params.modId : "";
 });

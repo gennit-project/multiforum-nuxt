@@ -67,6 +67,7 @@ jobs:
         VITE_OPEN_CAGE_API_KEY: ${{ secrets.VITE_OPEN_CAGE_API_KEY }}
         VITE_OPEN_GRAPH_API_KEY: ${{ secrets.VITE_OPEN_GRAPH_API_KEY }}
         VITE_SERVER_NAME: ${{ secrets.VITE_SERVER_NAME }}
+        VITE_SERVER_DISPLAY_NAME: ${{ secrets.VITE_SERVER_DISPLAY_NAME }}
 
       run: docker-compose -f docker-compose.yml up --build -d
 

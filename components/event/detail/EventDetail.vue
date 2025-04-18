@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, watchEffect } from "vue";
 import Tag from "@/components/TagComponent.vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_EVENT } from "@/graphQLData/event/queries";
@@ -24,6 +24,7 @@ import EventRootCommentFormWrapper from "@/components/event/detail/EventRootComm
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
 import { useRoute } from "nuxt/app";
+import { useHead } from "nuxt"
 import { modProfileNameVar } from "@/cache";
 import AddToCalendarButton from "../AddToCalendarButton.vue";
 import ArchivedEventInfoBanner from "./ArchivedEventInfoBanner.vue";
@@ -237,6 +238,76 @@ const eventDescriptionEditMode = ref(false);
 const handleClickEditEventDescription = () => {
   eventDescriptionEditMode.value = true;
 };
+
+// Add SEO metadata for the event
+watchEffect(() => {
+  if (!event.value) {
+    useHead({
+      title: 'Event Not Found',
+      description: 'The requested event could not be found.'
+    });
+    return;
+  }
+
+  const title = event.value.title || 'Event';
+  const description = event.value.description 
+    ? event.value.description.substring(0, 160) + (event.value.description.length > 160 ? '...' : '')
+    : `${title} - Event on ${formatDate(event.value.startTime)}`;
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const imageUrl = event.value.coverImageURL || '';
+
+  // Set basic SEO meta tags
+  useHead({
+    title: `${title} | ${serverName}`,
+    description: description,
+    image: imageUrl,
+    type: 'event'
+  });
+
+  // Add structured data for rich results
+  useHead({
+    script: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'Event',
+          name: title,
+          description: description,
+          startDate: event.value.startTime,
+          endDate: event.value.endTime,
+          image: imageUrl,
+          location: event.value.address 
+            ? {
+                '@type': 'Place',
+                name: event.value.address,
+                address: {
+                  '@type': 'PostalAddress',
+                  streetAddress: event.value.address
+                }
+              }
+            : {
+                '@type': 'VirtualLocation',
+                url: event.value.virtualEventUrl ?? `${baseUrl}/events/list/search/${event.value.id}`
+              },
+          organizer: {
+            '@type': 'Person',
+            name: event.value.Poster?.displayName || event.value.Poster?.username || 'Anonymous'
+          },
+          eventStatus: event.value.canceled 
+            ? 'https://schema.org/EventCancelled' 
+            : (eventIsInThePast.value 
+                ? 'https://schema.org/EventScheduled' 
+                : 'https://schema.org/EventScheduled'),
+          eventAttendanceMode: event.value.virtualEventUrl 
+            ? 'https://schema.org/OnlineEventAttendanceMode' 
+            : 'https://schema.org/OfflineEventAttendanceMode',
+        })
+      }
+    ]
+  });
+});
 </script>
 
 <template>

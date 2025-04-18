@@ -56,17 +56,14 @@ useHead(() => {
       ]
     };
   }
-
-  try {
-    const title = discussion.value?.title || 'Discussion';
-    const description = discussion.value?.body 
-      ? discussion.value.body.substring(0, 160) + (discussion.value.body.length > 160 ? '...' : '')
-      : `View this discussion on ${import.meta.env.VITE_SERVER_NAME}`;
-    const author = discussion.value?.Author?.displayName || discussion.value?.Author?.username || 'Anonymous';
-    const publishedTime = discussion.value?.createdAt;
-    const modifiedTime = discussion.value?.updatedAt || publishedTime;
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    const serverName = import.meta.env.VITE_SERVER_NAME;
+try {
+  const title = discussion.value.title || 'Discussion';
+  const description = discussion.value.body 
+    ? discussion.value.body.substring(0, 160) + (discussion.value.body.length > 160 ? '...' : '')
+    : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const author = discussion.value.author?.username || 'Unknown Author';
 
     return {
       title: `${title} | ${serverName}`,
@@ -82,9 +79,6 @@ useHead(() => {
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
-      // Article meta tags
-      { property: 'article:published_time', content: publishedTime },
-      { property: 'article:modified_time', content: modifiedTime },
       { property: 'article:author', content: author },
       { property: 'article:section', content: channelId.value }
     ]

@@ -7,9 +7,9 @@ import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue
 import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import type { Channel, User } from "@/__generated__/graphql";
-import { computed } from "vue";
+import { computed, watchEffect } from "vue";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
-import { useRoute, useRouter } from "nuxt/app";
+import { useRoute, useRouter, useHead } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { DateTime } from "luxon";
 import BackLink from "@/components/BackLink.vue";
@@ -118,6 +118,55 @@ if (!channelId.value) {
 
 definePageMeta({
   middleware: "forum-redirect",
+});
+
+// Add SEO metadata for the forum
+watchEffect(() => {
+  if (!channel.value) {
+    useHead({
+      title: 'Forum Not Found',
+      description: 'The requested forum could not be found.'
+    });
+    return;
+  }
+
+  const forumName = channel.value.displayName;
+  const forumDescription = channel.value.description 
+    ? channel.value.description.substring(0, 160) + (channel.value.description.length > 160 ? '...' : '')
+    : `${forumName} - Community Forum`;
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const imageUrl = channel.value.channelIconURL || channel.value.channelBannerURL || '';
+
+  // Set basic SEO meta tags
+  useHead({
+    title: `${forumName} | ${serverName}`,
+    description: forumDescription,
+    image: imageUrl,
+    type: 'website'
+  });
+
+  // Add structured data for rich results
+  useHead({
+    script: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'DiscussionForumPosting',
+          name: forumName,
+          description: forumDescription,
+          image: imageUrl,
+          url: `${baseUrl}/forums/${channelId.value}`,
+          publisher: {
+            '@type': 'Organization',
+            name: serverName,
+            url: baseUrl
+          }
+        })
+      }
+    ]
+  });
 });
 </script>
 
