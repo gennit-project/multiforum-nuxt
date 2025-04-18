@@ -108,7 +108,9 @@ watchEffect(() => {
         </div>
         
         <div class="flex-1 flex-col min-w-0 pt-4">
-          <DemoChart />
+          <client-only>
+            <DemoChart />
+          </client-only>
           <UserProfileTabs
             v-if="user"
             :show-counts="true"

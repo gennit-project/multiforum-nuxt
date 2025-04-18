@@ -164,6 +164,9 @@ const router = useRouter();
 const { discussionId, eventId, issueId } = route.params
 
 const forumId = computed (() => {
+  if (props.commentData?.Channel?.uniqueName) {
+    return props.commentData.Channel.uniqueName;
+  }
   if (typeof route.params.forumId === "string") {
     return route.params.forumId;
   }
@@ -265,6 +268,7 @@ const canShowPermalink =
   props.commentData.GivesFeedbackOnComment ||
   props.commentData.Event ||
   props.commentData.Issue ||
+  props.commentData.Channel ||
   (issueId && forumId && props.commentData.id) || // For issue comments
   (discussionId && forumId) || // For discussion comments
   (eventId && forumId); // For event comments

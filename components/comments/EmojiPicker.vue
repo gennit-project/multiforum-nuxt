@@ -7,6 +7,8 @@ import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from "@/graphQLData/discussion/mutati
 import gql from "graphql-tag";
 import { usernameVar } from "@/cache";
 
+const userStore = useUserStore();
+
 // Mutation to add emoji to comment
 const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
 

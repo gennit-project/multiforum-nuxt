@@ -366,22 +366,52 @@ query getUserContributions($username: String!, $year: Int) {
     count
     date
     activities {
+      id
       description
       type
       Comments {
         id
         text
         createdAt
+        CommentAuthor {
+          username
+        }
+        Channel {
+          uniqueName
+        }
+        DiscussionChannel {
+          id
+          discussionId
+        }
+        Event {
+          id
+        }
       }
       Discussions {
         id
         title
         createdAt
+        Author {
+          username
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+          discussionId
+        }
       }
       Events {
         id
         title
         createdAt
+        Poster {
+          username
+        }
+        EventChannels {
+          id
+          channelUniqueName
+          eventId
+        }
       }
     }
   }

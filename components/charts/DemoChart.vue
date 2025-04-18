@@ -52,29 +52,45 @@ const { result: contributionsResult, loading } = useQuery(
 );
 
 const contributions = computed(() => {
-  if (contributionsResult.value?.getUserContributions) {
-    // Get the raw data from the API
-    const rawData = contributionsResult.value.getUserContributions;
+  try {
+    if (contributionsResult.value?.getUserContributions) {
+      // Get the raw data from the API
+      const rawData = contributionsResult.value.getUserContributions;
+      
+      // Make sure rawData is an array
+      if (!Array.isArray(rawData)) {
+        console.error('Expected getUserContributions to be an array, got:', typeof rawData);
+        return [];
+      }
+      
+      // Process the data to ensure compatibility with the chart component
+      return rawData.map((week) => {
+        if (!week) return [];
 
-    // Process the data to ensure compatibility with the chart component
-    return rawData.map((week) => {
-      if (!week) return [];
+        // Ensure week is an array
+        if (!Array.isArray(week)) {
+          console.error('Expected week to be an array, got:', typeof week);
+          return [];
+        }
 
-      return week.map((day) => {
-        if (!day) return null;
+        return week.map((day) => {
+          if (!day) return null;
 
-        // Set the count based on activities length if count is 0 but has activities
-        const dayCount = day.count || 0;
-        const activitiesCount = day.activities?.length || 0;
-        const finalCount = dayCount > 0 ? dayCount : activitiesCount;
+          // Set the count based on activities length if count is 0 but has activities
+          const dayCount = day.count || 0;
+          const activitiesCount = day.activities?.length || 0;
+          const finalCount = dayCount > 0 ? dayCount : activitiesCount;
 
-        return {
-          date: day.date,
-          count: finalCount,
-          activities: day.activities || [],
-        };
+          return {
+            date: day.date,
+            count: finalCount,
+            activities: day.activities || [],
+          };
+        });
       });
-    });
+    }
+  } catch (error) {
+    console.error('Error processing contribution data:', error);
   }
   return [];
 });

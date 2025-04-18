@@ -50,6 +50,7 @@ const { result: getChannelResult, onResult: onGetChannelResult } = useQuery(
   {
     fetchPolicy: "cache-first",
     nextFetchPolicy: "cache-first",
+    enabled: !!channelId.value,
   }
 );
 
