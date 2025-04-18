@@ -27,11 +27,11 @@ interface DayData {
   activities: Activity[];
 }
 
-// Props definition with PropType - data is now a 2D array
+// Props definition with sparse data input
 const props = defineProps({
-  // Data structure: 2D array where outer array = weeks, inner array = days
-  data: {
-    type: Array as PropType<DayData[][]>,
+  // Data structure: sparse array of activity data
+  contributionData: {
+    type: Array as PropType<DayData[]>,
     required: true,
   },
   // Loading state
@@ -42,7 +42,7 @@ const props = defineProps({
   // The selected year
   year: {
     type: Number,
-    default: null,
+    default: () => new Date().getFullYear(),
   },
   // Earliest year available in the dropdown
   minYear: {
@@ -90,6 +90,69 @@ interface DayInfo extends DayData {
 
 const selectedDay = ref<null | DayInfo>(null);
 const selectedYearValue = ref(props.year);
+const gridData = ref<DayData[][]>([]);
+
+// Transform sparse contribution data into grid structure
+const buildGridDataFromContributions = () => {
+  // Create a map of date -> activity data for quick lookup
+  const activityMap: Record<string, DayData> = {};
+  props.contributionData.forEach(day => {
+    activityMap[day.date] = day;
+  });
+
+  // Generate the complete grid structure for the year
+  const year = selectedYearValue.value;
+  const firstDay = new Date(year, 0, 1);
+  const lastDay = new Date(year, 11, 31);
+  
+  // Get the first Sunday of the grid
+  const startDate = new Date(firstDay);
+  startDate.setDate(firstDay.getDate() - firstDay.getDay());
+  
+  // Get the last Saturday of the grid
+  const endDate = new Date(lastDay);
+  const daysToAdd = 6 - lastDay.getDay();
+  endDate.setDate(lastDay.getDate() + daysToAdd);
+  
+  // Build the grid week by week
+  const grid: DayData[][] = [];
+  let currentDate = new Date(startDate);
+  
+  while (currentDate <= endDate) {
+    const week: DayData[] = [];
+    
+    // Add 7 days (a full week)
+    for (let i = 0; i < 7; i++) {
+      const dateStr = currentDate.toISOString().split('T')[0];
+      
+      // Check if we have activity data for this day
+      if (activityMap[dateStr]) {
+        week.push(activityMap[dateStr]);
+      } else {
+        // Create an empty day entry
+        week.push({
+          date: dateStr,
+          count: 0,
+          activities: []
+        });
+      }
+      
+      // Move to next day
+      const nextDate = new Date(currentDate);
+      nextDate.setDate(currentDate.getDate() + 1);
+      currentDate = nextDate;
+    }
+    
+    grid.push(week);
+  }
+  
+  return grid;
+};
+
+// Update grid when year or contribution data changes
+watch([() => props.contributionData, selectedYearValue], () => {
+  gridData.value = buildGridDataFromContributions();
+}, { immediate: true });
 
 // Generate year range for dropdown
 const availableYears = computed(() => {
@@ -105,7 +168,7 @@ const monthLabels = computed(() => {
   const labels = [];
 
   // Only process if we have data
-  if (!props.data || props.data.length === 0) {
+  if (!gridData.value || gridData.value.length === 0) {
     return labels;
   }
 
@@ -113,7 +176,7 @@ const monthLabels = computed(() => {
   const addedMonths = new Set();
 
   // Iterate through all weeks in the data
-  props.data.forEach((week, weekIndex) => {
+  gridData.value.forEach((week, weekIndex) => {
     // Skip empty weeks
     if (!week || week.length === 0) return;
 
@@ -178,9 +241,9 @@ const getColor = (count: number) => {
 
 // Select a day to show details
 const selectDay = (weekIndex: number, dayIndex: number) => {
-  if (!props.data[weekIndex] || !props.data[weekIndex][dayIndex]) return;
+  if (!gridData.value[weekIndex] || !gridData.value[weekIndex][dayIndex]) return;
 
-  const dayData = props.data[weekIndex][dayIndex];
+  const dayData = gridData.value[weekIndex][dayIndex];
 
   const dayInfo: DayInfo = {
     ...dayData,
@@ -252,9 +315,9 @@ watch(
 
 // Calculate total contributions for the year
 const totalContributionsInYear = computed(() => {
-  if (!props.data) return 0;
+  if (!gridData.value) return 0;
 
-  return props.data.reduce((total, week) => {
+  return gridData.value.reduce((total, week) => {
     if (!week) return total;
     return (
       total +
@@ -273,8 +336,8 @@ const formattedTitle = computed(() => {
 
 // Validate and get cell count to ensure proper rendering
 const cellCount = computed(() => {
-  if (!props.data) return 0;
-  return props.data.length;
+  if (!gridData.value) return 0;
+  return gridData.value.length;
 });
 </script>
 
@@ -404,7 +467,7 @@ const cellCount = computed(() => {
             class="overflow-visible"
           >
             <g
-              v-for="(week, weekIndex) in data"
+              v-for="(week, weekIndex) in gridData"
               :key="'week-' + weekIndex"
               :transform="`translate(${weekIndex * 14}, 0)`"
             >
