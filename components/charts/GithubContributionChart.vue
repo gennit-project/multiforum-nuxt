@@ -411,7 +411,7 @@ const cellCount = computed(() => {
                 :data-count="dayData.count"
                 class="cursor-pointer hover:stroke-1 transition-colors duration-200"
                 :class="[
-                  darkMode ? 'hover:stroke-gray-600' : 'hover:stroke-gray-400',
+                  darkMode ? 'hover:stroke-green-600' : 'hover:stroke-green-400',
                   selectedDay &&
                   selectedDay.week === weekIndex &&
                   selectedDay.day === dayIndex
@@ -450,12 +450,12 @@ const cellCount = computed(() => {
     <div
       v-if="selectedDay"
       class="mt-4 p-4 rounded-lg border"
-      :class="darkMode ? 'border-gray-700' : 'bg-gray-50 border-gray-200'"
+      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-blue-500'"
     >
       <div class="flex gap-3">
         <Calendar
           :size="20"
-          :class="darkMode ? 'text-blue-400 mt-1' : 'text-blue-600 mt-1'"
+          :class="darkMode ? 'text-green-400 mt-1' : 'text-green-500 mt-1'"
         />
         <div class="w-full">
           <h3 class="font-medium">{{ formatDate(selectedDay.date) }}</h3>
@@ -494,7 +494,9 @@ const cellCount = computed(() => {
                     </div>
                   </div>
                 </div>
-                <div v-if="activity.Comments && activity.Comments.length > 0">
+                <!-- Comments Section -->
+                <div v-if="activity.Comments && activity.Comments.length > 0" class="mt-2">
+                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comments</h4>
                   <div
                     v-for="comment in activity.Comments"
                     :key="comment.id"
@@ -504,7 +506,7 @@ const cellCount = computed(() => {
                       v-if="!comment.archived"
                       :comment-data="comment"
                       :parent-comment-id="
-                        comment.ParentComment ? comment.ParentComment.id : null
+                        comment.ParentComment ? comment.ParentComment.id : ''
                       "
                       :depth="0"
                       :show-channel="true"
@@ -518,19 +520,23 @@ const cellCount = computed(() => {
                       /> -->
                   </div>
                 </div>
-                <div
-                  v-else-if="
-                    activity.Discussions && activity.Discussions.length > 0
-                  "
-                >
+
+                <!-- Discussions Section -->
+                <div v-if="activity.Discussions && activity.Discussions.length > 0" class="py-2">
+                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discussions</h4>
                   <DiscussionItemInProfile
+                    class="flex-col gap-2 mb-1"
                     v-for="discussion in activity.Discussions"
                     :key="discussion.id"
                     :discussion="discussion"
                   />
                 </div>
-                <div v-else-if="activity.Events && activity.Events.length > 0">
+
+                <!-- Events Section -->
+                <div v-if="activity.Events && activity.Events.length > 0" class="py-2">
+                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Events</h4>
                   <EventListItemInProfile
+                    class="flex-col gap-2 mb-1"
                     v-for="event in activity.Events"
                     :key="event.id"
                     :current-channel-id="''"

@@ -87,7 +87,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
         :to="{
           name: 'forums-forumId-discussions-discussionId',
           params: {
-            forumId: discussionChannel.Channel?.uniqueName,
+            forumId: discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName,
             discussionId: discussion.id,
           },
         }"

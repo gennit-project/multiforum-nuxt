@@ -111,7 +111,7 @@ const filteredQuery = computed(() => {
 </script>
 
 <template>
-  <li class="my-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
+  <li class="mb-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
     <div
       class="flex w-full flex-row justify-start gap-4 rounded-lg overflow-hidden"
     >

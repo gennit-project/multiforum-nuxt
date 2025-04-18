@@ -30,8 +30,11 @@ const channelId = computed(() => {
 });
 
 const {
+<<<<<<< HEAD
   error: getDiscussionError,
   loading: getDiscussionLoading,
+=======
+>>>>>>> 12f8aac (Activity for a given day renders properly)
   onResult: onGetDiscussionResult,
 } = useQuery(GET_DISCUSSION, {
   id: discussionId,
@@ -43,34 +46,27 @@ onGetDiscussionResult((result) => {
   if (getDiscussionLoading.value || getDiscussionError.value) {
     return;
   }
-  if (!result.data.discussions || result.data.discussions.length === 0) {
+  if (!result.data.discussions) {
     return;
   }
-  try {
-    if (result.data.discussions.length === 0) {
-      // Handle the case where the discussion is not found
-      useHead({
-        title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
-        meta: [
-          { name: 'description', content: "The requested discussion could not be found." }
-        ]
-      });
-      return;
-    } 
-    
-    const title = result.data.discussions[0]?.title || "Discussion";
-    const body = result.data.discussions[0]?.body || "";
-    const description = body
-      ? body.substring(0, 160) + (body.length > 160 ? "..." : "")
+  if (result.data.discussions.length === 0) {
+    // Handle the case where the discussion is not found
+    useHead({
+      title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
+      description: "The requested discussion could not be found.",
+    });
+    return;
+  } else {
+    const discussion =  result.data.discussions[0]
+    console.log('discussion data:', result.data);
+    const title = discussion.title || "Discussion";
+    const description = discussion.body
+      ? discussion.body.substring(0, 160) +
+        (discussion.body.length > 160 ? "..." : "")
       : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
     const baseUrl = import.meta.env.VITE_BASE_URL;
     const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-    const imageUrl = result.data.discussions[0]?.coverImageURL || "";
-    const author = result.data.discussions[0]?.Author?.displayName || 
-                   result.data.discussions[0]?.Author?.username || 
-                   "Anonymous";
-    const datePublished = result.data.discussions[0]?.createdAt;
-    const dateModified = result.data.discussions[0]?.updatedAt || datePublished;
+    const imageUrl = discussion.coverImageURL || "";
 
     // Set all meta tags using useHead
     useHead({
@@ -102,10 +98,21 @@ onGetDiscussionResult((result) => {
             description: description,
             author: {
               "@type": "Person",
+<<<<<<< HEAD
               name: author
             },
             datePublished: datePublished,
             dateModified: dateModified,
+=======
+              name:
+                discussion.Author?.displayName ||
+                discussion.Author?.username ||
+                "Anonymous",
+            },
+            datePublished: discussion.createdAt,
+            dateModified:
+              discussion.updatedAt || discussion.createdAt,
+>>>>>>> 12f8aac (Activity for a given day renders properly)
             publisher: {
               "@type": "Organization",
               name: serverName,

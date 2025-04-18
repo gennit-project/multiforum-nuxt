@@ -197,7 +197,7 @@ function toggleEmojiPicker() {
           router.push({
             name: 'forums-forumId-discussions-discussionId-comments-commentId',
             params: {
-              forumId: commentData.DiscussionChannel?.channelUniqueName,
+              forumId: commentData.DiscussionChannel?.channelUniqueName || commentData.Channel?.uniqueName,
               discussionId: commentData.DiscussionChannel?.discussionId,
               commentId: commentData.id,
             },

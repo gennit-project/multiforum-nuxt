@@ -55,7 +55,7 @@ const tags = (props.event.Tags ?? []).map((tag: TagData) => tag.text);
       }
     "
   >
-    <p class="text-lg font-bold">
+    <p class="text-md">
       <HighlightedSearchTerms
         :text="title"
         :search-input="searchInput"
