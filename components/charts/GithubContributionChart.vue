@@ -188,6 +188,17 @@ const selectDay = (weekIndex: number, dayIndex: number) => {
     day: dayIndex,
   };
 
+  // If current day info is the same as the previous, set selected day to null
+  if (
+    selectedDay.value &&
+    selectedDay.value.week === weekIndex &&
+    selectedDay.value.day === dayIndex
+  ) {
+    selectedDay.value = null;
+    emit("day-select", null);
+    return;
+  }
+
   selectedDay.value = dayInfo;
   emit("day-select", dayInfo);
 };
