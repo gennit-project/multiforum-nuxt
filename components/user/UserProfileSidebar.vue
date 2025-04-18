@@ -77,7 +77,7 @@ const profilePic = computed(() => {
       </h1>
       <h1
         v-if="user?.displayName"
-        class="mt-4 flex border-gray-700 text-xl font-bold leading-6 text-gray-500 dark:text-gray-200"
+        class="mt-4 flex border-gray-700 text-3xl leading-6 text-gray-500 dark:text-gray-200"
       >
         {{ user.displayName }}
       </h1>
