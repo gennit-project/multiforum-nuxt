@@ -6,7 +6,7 @@ import { defineComponent, computed } from "vue";
 export default defineComponent({
   props: {
     classes: {
-      type: String,
+      type: [String, Array],
       default: '',
     },
     text: {

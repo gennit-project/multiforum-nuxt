@@ -16,6 +16,8 @@ import type {
 } from "@/__generated__/graphql";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 // Define props
 const props = defineProps({
@@ -48,6 +50,8 @@ const props = defineProps({
 defineEmits(["filterByTag"]);
 
 const route = useRoute();
+const uiStore = useUIStore();
+const { fontSize } = storeToRefs(uiStore);
 
 const channelIdInParams = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -132,7 +136,10 @@ const filteredQuery = computed(() => {
                   <HighlightedSearchTerms
                     :text="title"
                     :search-input="searchInput"
-                    :classes="'text-sm text-base hover:underline dark:text-gray-100 dark:hover:text-gray-300'"
+                    :classes="[
+                      'hover:underline dark:text-gray-100 dark:hover:text-gray-300',
+                      fontSize === 'small' ? 'text-sm' : fontSize === 'medium' ? 'text-base' : 'text-lg'
+                    ]"
                   />
                 </span>
                 <span
@@ -175,7 +182,7 @@ const filteredQuery = computed(() => {
               <MarkdownPreview
                 :text="discussion.body"
                 :disable-gallery="false"
-                :word-limit="50"
+                :word-limit="50" 
                 class="ml-2"
               />
             </div>
