@@ -99,14 +99,12 @@ const contributions = computed(() => {
 const selectedDay = ref(null);
 const logSelected = (day: any) => {
   selectedDay.value = day;
-  console.log("Selected day:", day);
 };
 
 const setYear = (newYear: number) => {
   // Update both the query year and display year when user selects a year
   queryYear.value = newYear;
   displayYear.value = newYear;
-  console.log("Selected year:", newYear);
 };
 
 // Current year for the max range

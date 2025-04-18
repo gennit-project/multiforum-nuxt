@@ -92,7 +92,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
           },
         }"
       >
-        View this post in {{ `c/${discussionChannel.Channel?.uniqueName}` }}
+        View this post in {{ `c/${discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName}` }}
       </nuxt-link>
     </div>
   </li>

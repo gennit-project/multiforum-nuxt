@@ -382,6 +382,7 @@ query getUserContributions($username: String!, $year: Int) {
         DiscussionChannel {
           id
           discussionId
+          channelUniqueName
         }
         Event {
           id

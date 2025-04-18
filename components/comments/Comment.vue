@@ -489,14 +489,6 @@ const commentMenuItems = computed(() => {
   // Check if the user has admin or mod permissions
   const hasModPermissions = userPermissions.value.isChannelOwner || 
                            (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
-                           
-  console.log("Checking mod permissions for comment menu:", {
-    isOwnComment,
-    isChannelOwner: userPermissions.value.isChannelOwner,
-    isElevatedMod: userPermissions.value.isElevatedMod, 
-    isSuspendedMod: userPermissions.value.isSuspendedMod,
-    hasModPermissions
-  });
 
   if (isOwnComment) {
     // If user is the comment author, show edit/delete options
@@ -799,7 +791,6 @@ const label = computed(() => {
                       "
                       @handle-click-archive="
                         () => {
-                          console.log('comment - handle click archive . root, ', props.commentData.id);
                           emit('handleClickArchive', props.commentData.id);
                         }
                       "
@@ -893,7 +884,6 @@ const label = computed(() => {
                   (commentId: string) => emit('handleViewFeedback', commentId)
                 "
                 @handle-click-archive="(commentId: string) => {
-                  console.log('child comment - handle click archive - nested, ', commentId);
                   emit('handleClickArchive', commentId)
                 }"
                 @handle-click-archive-and-suspend="(commentId: string) => {
