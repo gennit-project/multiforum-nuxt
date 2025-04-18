@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, type PropType } from "vue";
+import { ref, computed, watch, type PropType, nextTick } from "vue";
 import type {
   Comment as CommentType,
   Discussion as DiscussionType,
@@ -146,23 +146,34 @@ const dayLabels = computed(() => {
   return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 });
 
-// Get color based on contribution count and theme
-const getColor = (count: number) => {
+// Use computed for colors to ensure reactivity
+const getColorScheme = computed(() => {
   if (props.darkMode) {
     // Dark mode colors (similar to GitHub dark mode)
-    if (count === 0) return "#161b22";
-    if (count === 1) return "#0e4429";
-    if (count === 2) return "#006d32";
-    if (count === 3) return "#26a641";
-    return "#39d353"; // 4 or more
+    return {
+      0: "#161b22",
+      1: "#0e4429",
+      2: "#006d32",
+      3: "#26a641",
+      4: "#39d353" // 4 or more
+    };
   } else {
     // Light mode colors (GitHub default)
-    if (count === 0) return "#ebedf0";
-    if (count === 1) return "#9be9a8";
-    if (count === 2) return "#40c463";
-    if (count === 3) return "#30a14e";
-    return "#216e39"; // 4 or more
+    return {
+      0: "#ebedf0",
+      1: "#9be9a8",
+      2: "#40c463",
+      3: "#30a14e",
+      4: "#216e39" // 4 or more
+    };
   }
+});
+
+// Get color based on contribution count and theme
+const getColor = (count: number) => {
+  const colors = getColorScheme.value;
+  const level = Math.min(count, 4);
+  return colors[level];
 };
 
 // Select a day to show details
@@ -213,6 +224,18 @@ watch(
   () => props.year,
   (newValue) => {
     selectedYearValue.value = newValue;
+  }
+);
+
+// Watch for theme changes and force a re-render of the chart cells
+const chartKey = ref(0);
+watch(
+  () => props.darkMode,
+  () => {
+    // Increment the key to force a component re-render
+    nextTick(() => {
+      chartKey.value++;
+    });
   }
 );
 
@@ -362,7 +385,9 @@ const cellCount = computed(() => {
           </div>
 
           <!-- SVG grid (improved to match data structure) -->
+          <!-- Use key to force re-render when theme changes -->
           <svg
+            :key="chartKey"
             :width="`${cellCount * 14 + 10}`"
             height="110"
             class="overflow-visible"
@@ -384,7 +409,7 @@ const cellCount = computed(() => {
                 ry="2"
                 :data-date="dayData.date"
                 :data-count="dayData.count"
-                class="cursor-pointer hover:stroke-1"
+                class="cursor-pointer hover:stroke-1 transition-colors duration-200"
                 :class="[
                   darkMode ? 'hover:stroke-gray-600' : 'hover:stroke-gray-400',
                   selectedDay &&
@@ -415,7 +440,7 @@ const cellCount = computed(() => {
       <div
         v-for="level in 5"
         :key="'level-' + (level - 1)"
-        class="w-3 h-3 rounded-sm"
+        class="w-3 h-3 rounded-sm transition-colors duration-200"
         :style="{ backgroundColor: getColor(level - 1) }"
       />
       <span>{{ texts.more }}</span>
@@ -436,7 +461,7 @@ const cellCount = computed(() => {
           <h3 class="font-medium">{{ formatDate(selectedDay.date) }}</h3>
           <p
             class="text-sm"
-            :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
+            :class="darkMode ? 'text-gray-300' : 'text-gray-700'"
           >
             {{
               selectedDay.count === 0
@@ -447,13 +472,14 @@ const cellCount = computed(() => {
 
           <div v-if="selectedDay.count > 0" class="mt-2">
             <div
-              class="text-xs font-medium uppercase tracking-wide mb-1 mt-3 text-gray-500"
+              class="text-xs font-medium uppercase tracking-wide mb-1 mt-3"
+              :class="darkMode ? 'text-gray-400' : 'text-gray-600'"
             >
               {{ texts.activityDetailsHeading }}
             </div>
             <ul
               class="mt-1 text-sm space-y-2 list-none"
-              :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
+              :class="darkMode ? 'text-gray-300' : 'text-gray-700'"
             >
               <li
                 v-for="activity in selectedDay.activities"

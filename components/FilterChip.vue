@@ -1,7 +1,7 @@
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, computed } from "vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { useTheme } from "@/composables/useTheme";
+import { useUIStore } from "@/stores/uiStore";
 import Popper from "vue3-popper";
 
 export default defineComponent({
@@ -24,9 +24,9 @@ export default defineComponent({
     },
   },
   setup() {
-
     const isOpen = ref(false);
-    const { theme } = useTheme();
+    const uiStore = useUIStore();
+    const theme = computed(() => uiStore.theme);
 
     return {
       theme,

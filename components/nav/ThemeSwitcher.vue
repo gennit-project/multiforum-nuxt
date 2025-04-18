@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useTheme } from '@/composables/useTheme';
-const { setTheme } = useTheme()
+import { useUIStore } from '@/stores/uiStore';
+const uiStore = useUIStore();
 
 const setLightMode = () => {
-  setTheme('light');
+  uiStore.setTheme('light');
 };
 
 const setDarkMode = () => {
-  setTheme('dark');
+  uiStore.setTheme('dark');
 };
 
 const setSystemMode = () => {
-  setTheme('system');
+  uiStore.setTheme('system');
 };
 </script>
 

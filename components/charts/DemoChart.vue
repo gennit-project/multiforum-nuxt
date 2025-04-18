@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
-import { useTheme } from "@/composables/useTheme";
+import { useUIStore } from "@/stores/uiStore";
 import GithubContributionChart from "./GithubContributionChart.vue";
 import { GET_USER_CONTRIBUTIONS, GET_USER } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
 
-const { theme } = useTheme();
+// Get the theme from UI store
+const uiStore = useUIStore();
+const isDarkMode = computed(() => uiStore.theme === "dark");
 const route = useRoute();
 const username = computed(() => {
   return typeof route.params.username === "string" ? route.params.username : "";
@@ -53,23 +55,23 @@ const contributions = computed(() => {
   if (contributionsResult.value?.getUserContributions) {
     // Get the raw data from the API
     const rawData = contributionsResult.value.getUserContributions;
-    
+
     // Process the data to ensure compatibility with the chart component
-    return rawData.map(week => {
+    return rawData.map((week) => {
       if (!week) return [];
-      
-      return week.map(day => {
+
+      return week.map((day) => {
         if (!day) return null;
-        
+
         // Set the count based on activities length if count is 0 but has activities
         const dayCount = day.count || 0;
         const activitiesCount = day.activities?.length || 0;
         const finalCount = dayCount > 0 ? dayCount : activitiesCount;
-        
+
         return {
           date: day.date,
           count: finalCount,
-          activities: day.activities || []
+          activities: day.activities || [],
         };
       });
     });
@@ -96,16 +98,18 @@ const currentYear = computed(() => new Date().getFullYear());
 </script>
 <template>
   <div class="rounded-lg overflow-hidden">
-    <GithubContributionChart 
-      :dark-mode="theme === 'dark'"
-      :data="contributions"
-      :loading="loading"
-      :year="displayYear"
-      :min-year="minYear"
-      :max-year="currentYear"
-      @day-select="logSelected"
-      @year-select="setYear"
-    />
+    <client-only>
+      <GithubContributionChart
+        :dark-mode="isDarkMode"
+        :data="contributions"
+        :loading="loading"
+        :year="displayYear"
+        :min-year="minYear"
+        :max-year="currentYear"
+        @day-select="logSelected"
+        @year-select="setYear"
+      />
+    </client-only>
   </div>
 </template>
 <style>
