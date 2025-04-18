@@ -2,7 +2,7 @@
 import { ref, computed } from "vue";
 import { useTheme } from "@/composables/useTheme";
 import GithubContributionChart from "./GithubContributionChart.vue";
-import { GET_USER_CONTRIBUTIONS } from "@/graphQLData/user/queries";
+import { GET_USER_CONTRIBUTIONS, GET_USER } from "@/graphQLData/user/queries";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
 
@@ -11,13 +11,38 @@ const route = useRoute();
 const username = computed(() => {
   return typeof route.params.username === "string" ? route.params.username : "";
 });
-const year = ref(new Date().getFullYear());
+
+// Year for the backend query (null by default)
+const queryYear = ref(null);
+
+// Year for display in the title (current year by default)
+const displayYear = ref(new Date().getFullYear());
+
+// Get user info to determine account age
+const { result: userResult } = useQuery(
+  GET_USER,
+  {
+    username: username,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+// Calculate minYear based on user's account creation date
+const minYear = computed(() => {
+  if (userResult.value?.users?.[0]?.createdAt) {
+    const createdAt = new Date(userResult.value.users[0].createdAt);
+    return createdAt.getFullYear();
+  }
+  return new Date().getFullYear() - 3; // Default to 3 years ago if no data
+});
 
 const { result: contributionsResult, loading } = useQuery(
   GET_USER_CONTRIBUTIONS,
   {
     username: username,
-    year: year,
+    year: queryYear,
   },
   {
     fetchPolicy: "cache-first",
@@ -60,10 +85,14 @@ const logSelected = (day: any) => {
 };
 
 const setYear = (newYear: number) => {
-  year.value = newYear;
+  // Update both the query year and display year when user selects a year
+  queryYear.value = newYear;
+  displayYear.value = newYear;
   console.log("Selected year:", newYear);
 };
 
+// Current year for the max range
+const currentYear = computed(() => new Date().getFullYear());
 </script>
 <template>
   <div class="rounded-lg overflow-hidden">
@@ -71,7 +100,9 @@ const setYear = (newYear: number) => {
       :dark-mode="theme === 'dark'"
       :data="contributions"
       :loading="loading"
-      :year="year"
+      :year="displayYear"
+      :min-year="minYear"
+      :max-year="currentYear"
       @day-select="logSelected"
       @year-select="setYear"
     />
