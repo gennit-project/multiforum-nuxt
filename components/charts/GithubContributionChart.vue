@@ -206,7 +206,7 @@ const monthLabels = computed(() => {
 
 // Get day of the week labels
 const dayLabels = computed(() => {
-  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  return ["Sat","Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
 });
 
 // Use computed for colors to ensure reactivity
@@ -386,18 +386,19 @@ const cellCount = computed(() => {
           </div>
         </div>
 
-        <div class="flex items-center">
+        <div class="flex items-start">
           <!-- Day labels skeleton -->
-          <div class="pr-2 flex flex-col h-110 justify-between text-tiny">
-            <span
+          <div class="pr-2 text-tiny relative w-10" style="height: 104px;">
+            <div
               v-for="(day, index) in dayLabels"
               :key="'skeleton-day-' + index"
-              class="h-14 flex items-center"
+              class="absolute flex items-center"
+              :style="{top: `${index * 14 + 3}px`}"
             >
               <div
-                class="w-6 h-3 bg-gray-300 dark:bg-gray-700 rounded opacity-70"
+                class="w-6 h-2 bg-gray-300 dark:bg-gray-700 rounded opacity-70"
               ></div>
-            </span>
+            </div>
           </div>
 
           <!-- SVG grid skeleton that matches actual size -->
@@ -443,23 +444,22 @@ const cellCount = computed(() => {
           </div>
         </div>
 
-        <div class="flex items-center">
+        <div class="flex items-start">
           <!-- Day labels (properly spaced) -->
           <div
-            class="pr-2 flex flex-col h-110 justify-between text-tiny"
+            class="pr-2 text-tiny relative w-10"
+            style="height: 104px;"
             :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
           >
             <span
               v-for="(day, index) in dayLabels"
               :key="'day-label-' + index"
-              class="h-14 flex items-center"
+              class="absolute flex items-center"
+              :style="{top: `${index * 14 + 3}px`}"
             >
               {{ day }}
             </span>
           </div>
-
-          <!-- SVG grid (improved to match data structure) -->
-          <!-- Use key to force re-render when theme changes -->
           <svg
             :key="chartKey"
             :width="`${cellCount * 14 + 10}`"
