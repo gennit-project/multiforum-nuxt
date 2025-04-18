@@ -350,6 +350,9 @@ const handleClickEditDiscussionBody = () => {
                           "
                           :album="discussion.Album"
                           :carousel-format="true"
+                          :discussion-id="discussionId"
+                          :discussion-author="discussion.Author?.username || ''"
+                          @album-updated="refetchDiscussion"
                         />
                       </div>
                     </template>

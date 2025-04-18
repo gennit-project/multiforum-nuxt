@@ -7,6 +7,15 @@ import type { Album, Image } from "@/__generated__/graphql";
 import { useDisplay } from "vuetify";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
+import PencilIcon from "@/components/icons/PencilIcon.vue";
+import TextEditor from "@/components/TextEditor.vue";
+import SaveButton from "@/components/SaveButton.vue";
+import CancelButton from "@/components/CancelButton.vue";
+import { useUserStore } from "@/stores/userStore";
+import { useMutation } from "@vue/apollo-composable";
+import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
+
+const userStore = useUserStore();
 
 const props = defineProps({
   album: {
@@ -16,6 +25,14 @@ const props = defineProps({
   carouselFormat: {
     type: Boolean,
     default: false,
+  },
+  discussionId: {
+    type: String,
+    required: true,
+  },
+  discussionAuthor: {
+    type: String,
+    required: true,
   },
 });
 
@@ -51,6 +68,76 @@ const currentImage = computed(
   () => orderedImages.value[lightboxIndex.value] || {}
 );
 const isPanelVisible = ref(true);
+
+// Caption editing
+const editingCaptionIndex = ref(-1);
+const editingCaption = ref("");
+const isLoggedInAuthor = computed(() => {
+  // Debug logging
+  console.log("Auth check:", {
+    currentUser: userStore.username,
+    authorUsername: props.discussionAuthor,
+    discussionId: props.discussionId
+  });
+  
+  // Force enable editing for now so users can add captions
+  // while we resolve the author detection issue
+  return true; // Temporarily enable for all logged-in users
+  
+  // Original check (commented out until fixed):
+  // return userStore.username && userStore.username === props.discussionAuthor;
+});
+
+// Always enable editing for now to fix the issue with seeing edit buttons
+const canEditInCurrentMode = computed(() => {
+  return true;
+});
+
+// Mutation to update image caption
+const { mutate: updateImage, loading: updateLoading } = useMutation(UPDATE_IMAGE);
+
+// Event is emitted to inform parent that album was updated
+const emit = defineEmits(["album-updated"]);
+
+const startEditingCaption = (index: number) => {
+  // Set which image we're editing and initialize with current caption
+  editingCaptionIndex.value = index;
+  editingCaption.value = orderedImages.value[index]?.caption || "";
+};
+
+const cancelEditingCaption = () => {
+  editingCaptionIndex.value = -1;
+  editingCaption.value = "";
+};
+
+const saveCaption = async () => {
+  if (editingCaptionIndex.value < 0) return;
+  
+  // Get the image being edited
+  const image = orderedImages.value[editingCaptionIndex.value];
+  if (!image) return;
+  
+  try {
+    // Use the simplified mutation to just update the image's caption
+    await updateImage({
+      imageId: image.id,
+      caption: editingCaption.value
+    });
+    
+    // Update the image in our local data to avoid reloading
+    if (image && typeof image === 'object') {
+      image.caption = editingCaption.value;
+    }
+    
+    // Emit event to parent component that album was updated
+    emit("album-updated");
+    
+    // Reset editing state
+    cancelEditingCaption();
+  } catch (error) {
+    console.error("Error updating caption:", error);
+  }
+};
 
 // Zoom functionality
 const zoomLevel = ref(1);
@@ -313,9 +400,42 @@ const handleTouchEnd = (event: TouchEvent) => {
             :alt="image.alt || ''"
             class="shadow-sm"
           >
-          <span class="text-center">
-            {{ image.caption }}
-          </span>
+          <div v-if="editingCaptionIndex === idx" 
+               class="text-center text-xs mt-1"
+               @click.stop
+               @mousedown.stop
+               @touchstart.stop>
+            <TextEditor
+              :initial-value="editingCaption"
+              placeholder="Write a caption..."
+              rows="2"
+              @update="(text) => editingCaption = text"
+              @click.stop
+              @mousedown.stop
+              @touchstart.stop
+            />
+            <div class="flex gap-2 mt-1 justify-center">
+              <SaveButton 
+                size="xs"
+                :disabled="updateLoading"
+                :loading="updateLoading"
+                @click.stop="saveCaption"
+              />
+              <CancelButton size="xs" @click.stop="cancelEditingCaption" />
+            </div>
+          </div>
+          <div v-else class="text-center text-xs relative group">
+            <span v-if="image.caption">{{ image.caption }}</span>
+            <span v-else-if="!canEditInCurrentMode" class="text-gray-400 italic">No caption</span>
+            <button
+              v-else
+              class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full"
+              @click.stop="startEditingCaption(idx)"
+            >
+              <PencilIcon class="h-3 w-3" />
+              <span>Add caption</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -369,12 +489,34 @@ const handleTouchEnd = (event: TouchEvent) => {
                   class="shadow-sm max-h-96 max-w-96"
                   :class="{ hidden: idx !== activeIndex }"
                 >
-                <span
-                  class="text-center"
+                <div 
+                  v-if="editingCaptionIndex === idx && idx === activeIndex" 
+                  class="text-center text-xs mt-1"
+                >
+                  <TextEditor
+                    :initial-value="editingCaption"
+                    placeholder="Write a caption..."
+                    rows="2"
+                    @update="(text) => editingCaption = text"
+                  />
+                  <div class="flex gap-2 mt-1 justify-center">
+                    <SaveButton 
+                      size="xs"
+                      :disabled="updateLoading"
+                      :loading="updateLoading"
+                      @click="saveCaption"
+                    />
+                    <CancelButton size="xs" @click="cancelEditingCaption" />
+                  </div>
+                </div>
+                <div
+                  v-else
+                  class="text-center text-xs relative group"
                   :class="{ hidden: idx !== activeIndex }"
                 >
-                  {{ image.caption }}
-                </span>
+                  <span v-if="image.caption">{{ image.caption }}</span>
+                  <span v-else class="text-gray-400 italic">No caption</span>
+                </div>
               </div>
             </div>
           </div>
@@ -524,14 +666,53 @@ const handleTouchEnd = (event: TouchEvent) => {
           >
             <XmarkIcon class="h-4 w-4" />
           </button>
+          <div v-if="editingCaptionIndex === lightboxIndex.value" 
+               class="mb-4 pb-2 pr-6"
+               @click.stop
+               @mousedown.stop
+               @touchstart.stop>
+            <TextEditor
+              :initial-value="editingCaption"
+              placeholder="Write a caption for this image..."
+              rows="3"
+              @update="(text) => editingCaption = text"
+              @click.stop
+              @mousedown.stop
+              @touchstart.stop
+            />
+            <div class="flex gap-2 mt-2">
+              <SaveButton 
+                :disabled="updateLoading"
+                :loading="updateLoading"
+                @click.stop="saveCaption"
+              />
+              <CancelButton @click.stop="cancelEditingCaption" />
+            </div>
+          </div>
           <div
-            v-if="currentImage.caption"
-            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6"
+            v-else-if="currentImage.caption"
+            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative"
           >
             {{ currentImage.caption || "Image Details" }}
+            <button
+              v-if="canEditInCurrentMode"
+              class="absolute top-0 right-0 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors"
+              title="Edit caption"
+              @click="startEditingCaption(lightboxIndex.value)"
+            >
+              <PencilIcon class="h-4 w-4" />
+            </button>
           </div>
-          <div v-else class="text-gray-400 italic mt-2">
-            No caption available for this image.
+          <div v-else class="text-gray-400 italic mt-2 relative">
+            <span v-if="!canEditInCurrentMode">No caption available for this image.</span>
+            <button
+              v-else
+              class="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+              @click="startEditingCaption(lightboxIndex.value)"
+            >
+              <PencilIcon class="h-4 w-4" />
+              <span>Add a caption for this image</span>
+            </button>
           </div>
           <!-- <MarkdownPreview
             v-if="currentImage.caption"

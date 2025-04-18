@@ -348,3 +348,18 @@ export const MARK_AS_UNANSWERED = gql`
     }
   }
 `;
+
+export const UPDATE_IMAGE = gql`
+  mutation updateImage($imageId: ID!, $caption: String) {
+    updateImages(
+      where: { id: $imageId },
+      update: { caption: $caption }
+    ) {
+      images {
+        id
+        caption
+        url
+      }
+    }
+  }
+`;
