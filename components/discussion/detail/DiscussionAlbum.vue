@@ -6,6 +6,7 @@ import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 import type { Album, Image } from "@/__generated__/graphql";
 import { useDisplay } from "vuetify";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
+import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 
 const props = defineProps({
   album: {
@@ -515,10 +516,17 @@ const handleTouchEnd = (event: TouchEvent) => {
             mdAndDown,
         }"
       >
-        <div class="p-5">
+        <div class="p-5 relative">
+          <button
+            class="absolute top-2 right-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors"
+            title="Close panel"
+            @click="togglePanel"
+          >
+            <XmarkIcon class="h-4 w-4" />
+          </button>
           <div
             v-if="currentImage.caption"
-            class="text-md mb-4 pb-2 border-white border-opacity-20"
+            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6"
           >
             {{ currentImage.caption || "Image Details" }}
           </div>

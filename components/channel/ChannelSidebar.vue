@@ -69,7 +69,7 @@ const filterChannelsByTag = (tag: string) => {
         <div v-if="channelId" class="flex items-center">
           <div class="mt-3 mb-1">
             <span
-              class="flex space-y-2 rounded-full border-gray-700 text-2xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
+              class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
             >
               {{ channel?.displayName ? channel.displayName : channelId }}
             </span>
