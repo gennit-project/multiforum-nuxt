@@ -158,6 +158,7 @@ const commentToArchiveAndSuspendId = ref<string | null>(null);
     </h2>
     <InfoBanner
       v-if="feedbackCommentsAggregate > 0"
+      class="mb-4"
       :text="'Feedback should focus on the writing, not the writer. If the feedback is rude or non-actionable, please report it.'"
     />
     <div

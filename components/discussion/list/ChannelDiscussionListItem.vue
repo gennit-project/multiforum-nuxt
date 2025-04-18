@@ -216,7 +216,7 @@ const filteredQuery = computed(() => {
                   }"
                   class="py-0.5 rounded-full dark:bg-gray-700 bg-gray-100 px-2 flex items-center gap-2 dark:hover:bg-gray-600"
                 >
-                  <i class="fa-regular fa-comment" />
+                  <i class="fa-regular fa-comment text-xs" />
                   <span class="text-sm">{{ commentCount }}</span>
                 </nuxt-link>
               </div>
