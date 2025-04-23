@@ -4,6 +4,8 @@ import VueEasyLightbox from "vue-easy-lightbox";
 import MarkdownIt from "markdown-it";
 import { config } from "@/config";
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 function linkifyUsernames(markdownString: string) {
   // First find all email addresses and their positions
@@ -312,6 +314,7 @@ export default defineComponent({
 
     return {
       embeddedImages,
+      fontSize,
       shownText,
       showFullText,
       toggleShowFullText,
