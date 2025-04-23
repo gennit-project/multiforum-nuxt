@@ -4,8 +4,10 @@ module.exports = {
     "./components/**/*.vue",
     "./layouts/**/*.vue",
     "./app.vue",
-    "./plugins/**/*.js",
+    "./plugins/**/*.{js,ts}",
     "./nuxt.config.{js,ts}",
+    "./composables/**/*.ts",
+    "./stores/**/*.ts",
   ],
   darkMode: "class",
   important: true,
@@ -175,5 +177,13 @@ module.exports = {
     },
   },
   plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
-  purge: false,
+  safelist: [
+    'border',
+    'border-gray-400',
+    'border-blue-500',
+    'border-blue-600',
+    'border-blue-700',
+    'rounded-md',
+    'rounded-lg'
+  ],
 };
