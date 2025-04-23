@@ -3,7 +3,7 @@ import type { PropType } from "vue";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
 import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
-import type { Album, Image } from "@/__generated__/graphql";
+import type { Album } from "@/__generated__/graphql";
 import { useDisplay } from "vuetify";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
@@ -11,11 +11,9 @@ import PencilIcon from "@/components/icons/PencilIcon.vue";
 import TextEditor from "@/components/TextEditor.vue";
 import SaveButton from "@/components/SaveButton.vue";
 import CancelButton from "@/components/CancelButton.vue";
-import { useUserStore } from "@/stores/userStore";
 import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
-
-const userStore = useUserStore();
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   album: {
@@ -73,19 +71,7 @@ const isPanelVisible = ref(true);
 const editingCaptionIndex = ref(-1);
 const editingCaption = ref("");
 const isLoggedInAuthor = computed(() => {
-  // Debug logging
-  console.log("Auth check:", {
-    currentUser: userStore.username,
-    authorUsername: props.discussionAuthor,
-    discussionId: props.discussionId
-  });
-  
-  // Force enable editing for now so users can add captions
-  // while we resolve the author detection issue
-  return true; // Temporarily enable for all logged-in users
-  
-  // Original check (commented out until fixed):
-  // return userStore.username && userStore.username === props.discussionAuthor;
+  return usernameVar.value === props.discussionAuthor;
 });
 
 // Always enable editing for now to fix the issue with seeing edit buttons
