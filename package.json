@@ -56,6 +56,7 @@
     "markdown-it": "^14.1.0",
     "md-editor-v3": "^4.21.3",
     "nuxt": "^3.16.1",
+    "pinia": "^3.0.2",
     "prismjs": "^1.30.0",
     "random-word-slugs": "^0.1.7",
     "roboto-fontface": "*",
@@ -107,6 +108,7 @@
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "@vue/eslint-config-typescript": "^13.0.0",
+    "cypress": "13.17.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-nuxt": "^4.0.0",
@@ -121,10 +123,9 @@
     "vite": "^6.2.3",
     "vite-plugin-checker": "0.9.1",
     "vite-plugin-prismjs": "^0.0.11",
+    "vue-class-component": "^8.0.0-rc.1",
     "vue-tsc": "^2.2.8",
-    "webpack": "^5.98.0",
-    "cypress": "13.17.0",
-    "vue-class-component": "^8.0.0-rc.1"
+    "webpack": "^5.98.0"
   },
   "lint-staged": {
     "*.ts": [
