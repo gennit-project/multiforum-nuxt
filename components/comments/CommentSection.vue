@@ -661,9 +661,9 @@ const lengthOfCommentInProgress = computed(() => {
           There are no comments yet.
         </div>
         <div :key="activeSort">
-          <div v-for="comment in comments || []" :key="comment.id">
+          <div v-for="(comment, index) in comments || []" :key="comment?.id || index">
             <Comment
-              v-if="comment.id !== permalinkedCommentId"
+              v-if="comment?.id !== permalinkedCommentId"
               :aggregate-comment-count="aggregateCommentCount"
               :compact="true"
               :comment-data="comment"

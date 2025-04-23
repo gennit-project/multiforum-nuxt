@@ -345,8 +345,9 @@ const handleClickEditDiscussionBody = () => {
                       <div class="bg-black text-white">
                         <DiscussionAlbum
                           v-if="
-                            discussion.Album &&
-                            discussion.Album.Images?.length > 0
+                            discussion?.Album &&
+                            discussion?.Album?.Images &&
+                            discussion?.Album?.Images.length > 0
                           "
                           :album="discussion.Album"
                           :carousel-format="true"

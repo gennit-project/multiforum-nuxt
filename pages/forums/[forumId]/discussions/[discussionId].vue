@@ -57,18 +57,19 @@ useHead(() => {
     };
   }
 
-  const title = discussion.value.title || 'Discussion';
-  const description = discussion.value.body 
-    ? discussion.value.body.substring(0, 160) + (discussion.value.body.length > 160 ? '...' : '')
-    : `View this discussion on ${import.meta.env.VITE_SERVER_NAME}`;
-  const author = discussion.value.Author?.displayName || discussion.value.Author?.username || 'Anonymous';
-  const publishedTime = discussion.value.createdAt;
-  const modifiedTime = discussion.value.updatedAt || publishedTime;
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_NAME;
+  try {
+    const title = discussion.value?.title || 'Discussion';
+    const description = discussion.value?.body 
+      ? discussion.value.body.substring(0, 160) + (discussion.value.body.length > 160 ? '...' : '')
+      : `View this discussion on ${import.meta.env.VITE_SERVER_NAME}`;
+    const author = discussion.value?.Author?.displayName || discussion.value?.Author?.username || 'Anonymous';
+    const publishedTime = discussion.value?.createdAt;
+    const modifiedTime = discussion.value?.updatedAt || publishedTime;
+    const baseUrl = import.meta.env.VITE_BASE_URL;
+    const serverName = import.meta.env.VITE_SERVER_NAME;
 
-  return {
-    title: `${title} | ${serverName}`,
+    return {
+      title: `${title} | ${serverName}`,
     meta: [
       { name: 'description', content: description },
       // Open Graph tags
@@ -85,38 +86,18 @@ useHead(() => {
       { property: 'article:published_time', content: publishedTime },
       { property: 'article:modified_time', content: modifiedTime },
       { property: 'article:author', content: author },
-      { property: 'article:section', content: channelId.value },
-      // Schema.org markup
-      {
-        script: [
-          {
-            type: 'application/ld+json',
-            children: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'DiscussionForumPosting',
-              headline: title,
-              description: description,
-              author: {
-                '@type': 'Person',
-                name: author
-              },
-              datePublished: publishedTime,
-              dateModified: modifiedTime,
-              publisher: {
-                '@type': 'Organization',
-                name: serverName,
-                url: baseUrl
-              },
-              mainEntityOfPage: {
-                '@type': 'WebPage',
-                '@id': `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`
-              }
-            })
-          }
-        ]
-      }
+      { property: 'article:section', content: channelId.value }
     ]
   };
+  } catch (error) {
+    console.error("Error setting meta tags:", error);
+    return {
+      title: 'Discussion',
+      meta: [
+        { name: 'description', content: `View this discussion on ${import.meta.env.VITE_SERVER_NAME}` }
+      ]
+    };
+  }
 });
 </script>
 
