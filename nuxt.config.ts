@@ -128,6 +128,7 @@ export default defineNuxtConfig({
   ],
   nitro: { preset: "vercel"},
   plugins: [
+    { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },

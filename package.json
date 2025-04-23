@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "20.x"
+    "node": "22.x"
   },
   "scripts": {
     "build": "nuxt build",
@@ -30,6 +30,7 @@
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",
     "@mdi/font": "^7.4.47",
+    "@nuxt/typescript-runtime": "^3.0.2",
     "@nuxtjs/color-mode": "^3.5.2",
     "@sentry/vite-plugin": "^2.23.0",
     "@sentry/vue": "^8.55.0",
