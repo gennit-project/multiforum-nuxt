@@ -9,6 +9,7 @@ import SidebarEventList from "@/components/channel/SidebarEventList.vue";
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { useRouter, useRoute } from "nuxt/app";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
+import FontSizeControl from "@/components/channel/FontSizeControl.vue";
 
 const props = defineProps({
   channel: {
@@ -116,6 +117,8 @@ const filterChannelsByTag = (tag: string) => {
               />
             </div>
           </div>
+
+          <FontSizeControl class="mb-6" />
 
           <div class="flex justify-between">
             <span class="my-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Admins</span>
