@@ -48,7 +48,7 @@ if (import.meta.env.SSR === false) {
     <template #has-auth>
       <button
         data-testid="logout-button"
-        class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-400 rounded-full hover:text-black hover:dark:text-white mr-2"
+        class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-300 rounded-full hover:text-white mr-2"
         @click="handleLogout"
       >
         Log Out
