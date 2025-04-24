@@ -4,11 +4,8 @@ import { VuemojiPicker } from "vuemoji-picker";
 import { useMutation } from "@vue/apollo-composable";
 import { ADD_EMOJI_TO_COMMENT } from "@/graphQLData/comment/mutations";
 import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from "@/graphQLData/discussion/mutations";
-import gql from "graphql-tag";
+
 import { usernameVar } from "@/cache";
-
-const userStore = useUserStore();
-
 // Mutation to add emoji to comment
 const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
 
