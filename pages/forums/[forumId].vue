@@ -87,10 +87,11 @@ const addForumToLocalStorage = (channel: Channel) => {
   localStorage.setItem("recentForums", JSON.stringify(recentForums));
 };
 onGetChannelResult((result) => {
-  const channel = result.data?.channels[0];
-  if (channel) {
-    addForumToLocalStorage(channel);
+  const loadedChannel = result.data?.channels[0];
+  if (!loadedChannel) {
+    return;
   }
+  addForumToLocalStorage(loadedChannel);
   // redirect to /discussions if we are at the channel root
   if (route.name === "forums-forumId") {
     router.push({
@@ -100,13 +101,13 @@ onGetChannelResult((result) => {
       },
     });
   }
-  const forumName = channel.value.displayName || channel.value.uniqueName;
-  const forumDescription = channel.value.description 
-    ? channel.value.description.substring(0, 160) + (channel.value.description.length > 160 ? '...' : '')
+  const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
+  const forumDescription = loadedChannel.description 
+    ? loadedChannel.description.substring(0, 160) + (loadedChannel.description.length > 160 ? '...' : '')
     : `${forumName} - Community Forum`;
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  const imageUrl = channel.value.channelIconURL || channel.value.channelBannerURL || '';
+  const imageUrl = loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
 
   // Set basic SEO meta tags
   useHead({
