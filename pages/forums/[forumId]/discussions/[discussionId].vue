@@ -7,7 +7,6 @@ import { modProfileNameVar } from "@/cache";
 import { useRoute, useHead } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import { usePageMeta } from "@/composables/usePageMeta";
 
 const route = useRoute();
 
@@ -49,33 +48,52 @@ const discussion = computed(() => {
 });
 
 onGetDiscussionResult((result) => {
-  if (result.data.discussions.length === 0) {
-    // Handle the case where the discussion is not found
-    usePageMeta({
-      title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
-      description: "The requested discussion could not be found.",
-    });
-    return;
-  } else {
-    const title = discussion.value.title || "Discussion";
-    const description = discussion.value.body
-      ? discussion.value.body.substring(0, 160) +
-        (discussion.value.body.length > 160 ? "..." : "")
+  try {
+    if (result.data.discussions.length === 0) {
+      // Handle the case where the discussion is not found
+      useHead({
+        title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
+        meta: [
+          { name: 'description', content: "The requested discussion could not be found." }
+        ]
+      });
+      return;
+    } 
+    
+    const title = result.data.discussions[0]?.title || "Discussion";
+    const body = result.data.discussions[0]?.body || "";
+    const description = body
+      ? body.substring(0, 160) + (body.length > 160 ? "..." : "")
       : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
     const baseUrl = import.meta.env.VITE_BASE_URL;
     const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-    const imageUrl = discussion.value.coverImageURL || "";
+    const imageUrl = result.data.discussions[0]?.coverImageURL || "";
+    const author = result.data.discussions[0]?.Author?.displayName || 
+                   result.data.discussions[0]?.Author?.username || 
+                   "Anonymous";
+    const datePublished = result.data.discussions[0]?.createdAt;
+    const dateModified = result.data.discussions[0]?.updatedAt || datePublished;
 
-    // Set basic SEO meta tags
-    usePageMeta({
-      title: `${title} | ${channelId.value} | ${serverName}`,
-      description: description,
-      image: imageUrl,
-      type: "article",
-    });
-
-    // Add structured data for rich results
+    // Set all meta tags using useHead
     useHead({
+      title: `${title} | ${channelId.value} | ${serverName}`,
+      meta: [
+        { name: 'description', content: description },
+        
+        // OpenGraph tags
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: description },
+        { property: 'og:type', content: 'article' },
+        { property: 'og:url', content: `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}` },
+        { property: 'og:site_name', content: serverName },
+        ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
+        
+        // Twitter Card tags
+        { name: 'twitter:card', content: imageUrl ? 'summary_large_image' : 'summary' },
+        { name: 'twitter:title', content: title },
+        { name: 'twitter:description', content: description },
+        ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
+      ],
       script: [
         {
           type: "application/ld+json",
@@ -86,26 +104,30 @@ onGetDiscussionResult((result) => {
             description: description,
             author: {
               "@type": "Person",
-              name:
-                discussion.value.Author?.displayName ||
-                discussion.value.Author?.username ||
-                "Anonymous",
+              name: author
             },
-            datePublished: discussion.value.createdAt,
-            dateModified:
-              discussion.value.updatedAt || discussion.value.createdAt,
+            datePublished: datePublished,
+            dateModified: dateModified,
             publisher: {
               "@type": "Organization",
               name: serverName,
-              url: baseUrl,
+              url: baseUrl
             },
             mainEntityOfPage: {
               "@type": "WebPage",
-              "@id": `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
+              "@id": `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`
             },
-          }),
-        },
-      ],
+          })
+        }
+      ]
+    });
+  } catch (error) {
+    console.error("Error setting meta tags:", error);
+    useHead({
+      title: "Discussion",
+      meta: [
+        { name: 'description', content: `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}` }
+      ]
     });
   }
 });
