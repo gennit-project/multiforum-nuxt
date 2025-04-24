@@ -28,7 +28,6 @@
       "vite/client",
       "@nuxtjs/tailwindcss",
       "@nuxt/types",
-      "@nuxt/typescript-runtime",
       "@types/node",
       "@nuxt/components",
       "@nuxt/schema"

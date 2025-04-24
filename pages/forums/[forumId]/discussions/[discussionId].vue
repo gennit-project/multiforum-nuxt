@@ -30,7 +30,6 @@ const channelId = computed(() => {
 });
 
 const {
-  result: getDiscussionResult,
   error: getDiscussionError,
   loading: getDiscussionLoading,
   onResult: onGetDiscussionResult,
@@ -40,14 +39,13 @@ const {
   channelUniqueName: channelId.value,
 });
 
-const discussion = computed(() => {
-  if (getDiscussionLoading.value || getDiscussionError.value) {
-    return null;
-  }
-  return getDiscussionResult.value?.discussions[0];
-});
-
 onGetDiscussionResult((result) => {
+  if (getDiscussionLoading.value || getDiscussionError.value) {
+    return;
+  }
+  if (!result.data.discussions || result.data.discussions.length === 0) {
+    return;
+  }
   try {
     if (result.data.discussions.length === 0) {
       // Handle the case where the discussion is not found
