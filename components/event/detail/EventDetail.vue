@@ -23,8 +23,7 @@ import EventCommentsWrapper from "@/components/event/detail/EventCommentsWrapper
 import EventRootCommentFormWrapper from "@/components/event/detail/EventRootCommentFormWrapper.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
-import { useRoute } from "nuxt/app";
-import { useHead } from "nuxt"
+import { useRoute, useHead } from "nuxt/app";
 import { modProfileNameVar } from "@/cache";
 import AddToCalendarButton from "../AddToCalendarButton.vue";
 import ArchivedEventInfoBanner from "./ArchivedEventInfoBanner.vue";
