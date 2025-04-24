@@ -61,8 +61,22 @@ const props = defineProps({
 
 // Handle clicking an emoji and sending mutations based on comment or discussion ID
 function handleEmojiClick(event: any) {
+  console.log("EmojiPicker received event:", event);
+  
+  if (!event) {
+    console.error("No event data received in handleEmojiClick");
+    return;
+  }
+  
   const unicode = event.unicode;
-  const emojiLabel = event.emoji.annotation;
+  const emoji = event.emoji;
+  
+  if (!unicode || !emoji) {
+    console.error("Missing unicode or emoji in handleEmojiClick event", event);
+    return;
+  }
+  
+  const emojiLabel = emoji.annotation;
 
   if (!usernameVar.value) {
     console.error("Username not found");
@@ -76,10 +90,7 @@ function handleEmojiClick(event: any) {
       unicode,
       username: usernameVar.value,
     });
-    return;
-  }
-
-  if (props.discussionChannelId) {
+  } else if (props.discussionChannelId) {
     addEmojiToDiscussionChannel({
       discussionChannelId: props.discussionChannelId,
       emojiLabel,
@@ -88,12 +99,16 @@ function handleEmojiClick(event: any) {
     });
   }
 
-  // Emit the emojiClick event
-  emit("emojiClick");
+  // Only emit one event type based on how the component is being used
+  // We now use emoji-click for the TextEditor and emojiClick for legacy usages
+  const eventData = { unicode, emoji: emoji.char };
+  
+  // Use kebab-case for Vue template event binding (@emoji-click)
+  emit("emoji-click", eventData);
 }
 
-// Emit close event when clicking outside
-const emit = defineEmits(["close", "emojiClick"]);
+// Emit events
+const emit = defineEmits(["close", "emoji-click"]);
 function outside() {
   emit("close");
 }

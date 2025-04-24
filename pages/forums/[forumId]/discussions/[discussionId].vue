@@ -39,7 +39,7 @@ const {
 
 onGetDiscussionResult((result) => {
   try {
-    if (!result.data.discussions) {
+    if (!result?.data?.discussions) {
       return;
     }
     if (result.data.discussions.length === 0) {

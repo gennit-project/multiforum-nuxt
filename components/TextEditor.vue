@@ -9,6 +9,7 @@ import ErrorBanner from "./ErrorBanner.vue";
 import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { isFileSizeValid } from "@/utils/index";
+import EmojiPicker from "@/components/comments/EmojiPicker.vue";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -62,6 +63,8 @@ const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
 const editorRef = ref<HTMLTextAreaElement | null>(null);
 const text = ref(props.initialValue);
 const showFormatted = ref(false);
+const showEmojiPicker = ref(false);
+const emojiPickerPosition = ref({ top: '0px', left: '0px' });
 
 // Methods
 const focusEditor = () => {
@@ -77,6 +80,48 @@ const emit = defineEmits(["update"]);
 const updateText = (newText: string) => {
   text.value = newText;
   emit("update", newText);
+};
+
+const insertEmoji = (event: any) => {
+  const textarea = editorRef.value;
+  if (!textarea) return;
+  
+  // Extract the unicode emoji character from the event
+  const emojiChar = event?.unicode || '';
+  
+  if (!emojiChar) {
+    console.error('Could not extract emoji from event:', event);
+    return;
+  }
+  
+  const cursorPositionStart = textarea.selectionStart;
+  const cursorPositionEnd = textarea.selectionEnd;
+  
+  textarea.setRangeText(
+    emojiChar,
+    cursorPositionStart,
+    cursorPositionEnd,
+    "end"
+  );
+  
+  updateText(textarea.value);
+  showEmojiPicker.value = false;
+  
+  // Focus back on textarea
+  textarea.focus();
+};
+
+const toggleEmojiPicker = (event: MouseEvent) => {
+  const buttonElement = event.currentTarget as HTMLElement;
+  const rect = buttonElement.getBoundingClientRect();
+  
+  // Position emoji picker directly below the button
+  emojiPickerPosition.value = {
+    top: `${buttonElement.offsetTop + buttonElement.offsetHeight}px`,
+    left: `${buttonElement.offsetLeft}px`
+  };
+  
+  showEmojiPicker.value = !showEmojiPicker.value;
 };
 
 const formatText = (format: string) => {
@@ -234,6 +279,7 @@ const formatButtons = [
   { label: "H2", format: "header2" },
   { label: "H3", format: "header3" },
   { label: "Quote", format: "quote" },
+  { label: "Emoji", format: "emoji" },
 ];
 
 const markdownDocsLink = "https://www.markdownguide.org/basic-syntax/";
@@ -270,14 +316,27 @@ const handleDrop = async (event: any) => {
 };
 
 const selectedTab = ref(0);
+
+// Close emoji picker when clicking outside
+const closeEmojiPicker = () => {
+  showEmojiPicker.value = false;
+};
 </script>
 
 <template>
-  <form class="rounded-md border p-2 dark:border-gray-600">
+  <form class="rounded-md border p-2 dark:border-gray-600 relative">
     <ErrorBanner
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
     />
+    <div v-if="showEmojiPicker" class="absolute z-50" :style="{ top: emojiPickerPosition.top, left: emojiPickerPosition.left }">
+      <div class="relative">
+        <EmojiPicker 
+          @emoji-click="insertEmoji" 
+          @close="closeEmojiPicker" 
+        />
+      </div>
+    </div>
     <TabGroup as="div">
       <TabList
         class="border-b pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
@@ -330,7 +389,7 @@ const selectedTab = ref(0);
             v-for="button in formatButtons"
             :key="button.label"
             class="border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
-            @click.prevent="formatText(button.format)"
+            @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatText(button.format)"
           >
             {{ button.label }}
           </button>
