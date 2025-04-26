@@ -195,70 +195,59 @@ const updateCommentSectionQueryResult = (
 };
 
 const incrementCommentCount = (cache: any) => {
-  const readDiscussionChannelQueryResult = cache.readQuery({
-    query: GET_DISCUSSION_COMMENTS,
-    variables: {
-      ...commentSectionQueryVariables.value,
-    },
-  });
+  try {
+    if (!props.discussionChannel?.id) {
+      console.error("No discussion channel ID found");
+      return;
+    }
 
-  const existingDiscussionChannelData =
-    readDiscussionChannelQueryResult?.getCommentSection?.DiscussionChannel;
-
-  const existingCommentAggregate =
-    existingDiscussionChannelData?.CommentsAggregate?.count || 0;
-
-  cache.writeQuery({
-    query: GET_DISCUSSION_COMMENTS,
-    variables: {
-      ...commentSectionQueryVariables.value,
-    },
-    data: {
-      ...readDiscussionChannelQueryResult,
-      getCommentSection: {
-        ...readDiscussionChannelQueryResult.getCommentSection,
-        DiscussionChannel: {
-          ...existingDiscussionChannelData,
-          CommentsAggregate: {
-            ...existingDiscussionChannelData?.CommentsAggregate,
-            count: existingCommentAggregate + 1,
-          },
-        },
-      },
-    },
-  });
+    // Directly modify the CommentsAggregate field on the DiscussionChannel object
+    // This is much safer than using writeQuery
+    cache.modify({
+      id: cache.identify({
+        __typename: "DiscussionChannel",
+        id: props.discussionChannel.id
+      }),
+      fields: {
+        CommentsAggregate(existing = { count: 0 }) {
+          return {
+            ...existing,
+            count: (existing.count || 0) + 1
+          };
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error incrementing comment count:", error);
+  }
 };
+
 const decrementCommentCount = (cache: any) => {
-  const readDiscussionChannelQueryResult = cache.readQuery({
-    query: GET_DISCUSSION_COMMENTS,
-    variables: commentSectionQueryVariables.value,
-  });
+  try {
+    if (!props.discussionChannel?.id) {
+      console.error("No discussion channel ID found");
+      return;
+    }
 
-  const existingDiscussionChannelData =
-    readDiscussionChannelQueryResult?.getCommentSection?.DiscussionChannel;
-
-  const existingCommentAggregate =
-    existingDiscussionChannelData?.CommentsAggregate?.count || 0;
-
-  cache.writeQuery({
-    query: GET_DISCUSSION_COMMENTS,
-    variables: {
-      ...commentSectionQueryVariables.value,
-    },
-    data: {
-      ...readDiscussionChannelQueryResult,
-      getCommentSection: {
-        ...readDiscussionChannelQueryResult.getCommentSection,
-        DiscussionChannel: {
-          ...existingDiscussionChannelData,
-          CommentsAggregate: {
-            ...existingDiscussionChannelData.CommentsAggregate,
-            count: Math.max(0, existingCommentAggregate - 1),
-          },
-        },
-      },
-    },
-  });
+    // Directly modify the CommentsAggregate field on the DiscussionChannel object
+    // This is much safer than using writeQuery
+    cache.modify({
+      id: cache.identify({
+        __typename: "DiscussionChannel",
+        id: props.discussionChannel.id
+      }),
+      fields: {
+        CommentsAggregate(existing = { count: 0 }) {
+          return {
+            ...existing,
+            count: Math.max(0, (existing.count || 0) - 1)
+          };
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error decrementing comment count:", error);
+  }
 };
 </script>
 

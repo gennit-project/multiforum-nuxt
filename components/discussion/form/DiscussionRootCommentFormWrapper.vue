@@ -9,6 +9,7 @@ import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import { usernameVar } from "@/cache";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { useRoute } from "nuxt/app";
+import { gql } from "@apollo/client/core";
 
 // Props
 const props = defineProps({
@@ -114,54 +115,61 @@ const {
     // after creating a root comment. For the logic for updating
     // the cache after replying to a comment, see the CommentSection
     // component.
+    try {
+      const newComment: Comment = result.data?.createComments?.comments[0];
+      if (!newComment) {
+        console.error("No new comment returned from createComments mutation");
+        return;
+      }
 
-    const newComment: Comment = result.data?.createComments?.comments[0];
-    // Will use readQuery and writeQuery to update the cache
-    // https://www.apollographql.com/docs/react/caching/cache-interaction/#using-graphql-queries
+      // 1. Add the new comment to the comments array in the cache
+      const commentSectionRef = cache.identify({
+        __typename: "CommentSectionFormat",
+        // Use a combination of discussionId and channelUniqueName as a custom ID
+        id: `${props.discussionChannel.discussionId}:${props.discussionChannel.channelUniqueName}`,
+      });
 
-    const commentSectionQueryVariables = {
-      discussionId: props.discussionChannel.discussionId,
-      channelUniqueName: props.discussionChannel.channelUniqueName,
-      modName: props.modName,
-      limit: COMMENT_LIMIT,
-      offset: props.previousOffset,
-      sort: getSortFromQuery(route.query),
-    };
+      // Add the new comment to the beginning of the comments array
+      cache.modify({
+        id: commentSectionRef || "ROOT_QUERY",
+        fields: {
+          Comments(existingComments = []) {
+            // Create a reference to the new comment
+            const newCommentRef = cache.writeFragment({
+              data: newComment,
+              fragment: gql`
+                fragment NewComment on Comment {
+                  id
+                }
+              `
+            });
+            
+            // Add this new comment to the beginning of the array
+            return [newCommentRef, ...existingComments];
+          }
+        }
+      });
 
-    const readQueryResult = cache.readQuery({
-      query: GET_DISCUSSION_COMMENTS,
-      variables: commentSectionQueryVariables,
-    });
-
-    const existingDiscussionChannelData: DiscussionChannel =
-      readQueryResult?.getCommentSection?.DiscussionChannel;
-
-    const newRootComments: Comment[] = [
-      newComment,
-      ...(readQueryResult?.getCommentSection?.Comments || []),
-    ];
-
-    const existingCount =
-      existingDiscussionChannelData?.CommentsAggregate?.count || 0;
-
-    cache.writeQuery({
-      query: GET_DISCUSSION_COMMENTS,
-      variables: commentSectionQueryVariables,
-      data: {
-        ...readQueryResult,
-        getCommentSection: {
-          ...readQueryResult?.getCommentSection,
-          DiscussionChannel: {
-            ...existingDiscussionChannelData,
-            CommentsAggregate: {
-              ...existingDiscussionChannelData?.CommentsAggregate,
-              count: existingCount + 1,
-            },
-          },
-          Comments: newRootComments,
-        },
-      },
-    });
+      // 2. Increment the comment count on the DiscussionChannel
+      if (props.discussionChannel?.id) {
+        cache.modify({
+          id: cache.identify({
+            __typename: "DiscussionChannel",
+            id: props.discussionChannel.id
+          }),
+          fields: {
+            CommentsAggregate(existing = {}) {
+              return {
+                ...existing,
+                count: (existing.count || 0) + 1
+              };
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error updating cache after creating comment:", error);
+    }
   },
 }));
 
