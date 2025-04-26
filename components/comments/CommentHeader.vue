@@ -101,7 +101,7 @@ const createdAtFormatted = computed(() => {
     props.showChannel
       ? " in c/" +
         (props.commentData.DiscussionChannel?.channelUniqueName ||
-          props.commentData.Event?.EventChannels[0]?.channelUniqueName ||
+          (props.commentData.Event?.EventChannels && props.commentData.Event?.EventChannels[0].channelUniqueName) ||
           props.commentData.Channel?.uniqueName ||
           "")
       : ""
