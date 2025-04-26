@@ -211,7 +211,7 @@ const reachedEndOfResults = computed(
 );
 
 const channelsExceptCurrent = computed(() => {
-  if (!event.value) return [];
+  if (!event.value?.EventChannels) return [];
   return event.value.EventChannels.filter(
     (ec: EventChannel) => ec.channelUniqueName !== channelId.value
   );
@@ -404,7 +404,7 @@ watchEffect(() => {
                 @archived-successfully="refetchEventChannel"
               />
               <EventBody
-                class="sm:px-4 px-2"
+                class="sm:px-4 px-0"
                 v-if="event.description"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
@@ -415,7 +415,7 @@ watchEffect(() => {
               />
             </div>
 
-            <div v-if="event.Tags?.length > 0" class="my-2 sm:px-4 px-2">
+            <div v-if="event.Tags?.length > 0" class="my-2 sm:px-4 px-0">
               <div class="flex space-x-1">
                 <Tag
                   v-for="tag in event.Tags"
@@ -426,24 +426,23 @@ watchEffect(() => {
                 />
               </div>
             </div>
-            <div class="ml-3">
+            <div>
               <AddToCalendarButton v-if="event && showAddToCalendar" :event="event" class="mt-4" />
             </div>
             <EventFooter
-              class="sm:px-4 px-2"
               :event-data="event"
               :channels-except-current="channelsExceptCurrent"
               :show-poster="!usernameOnTop"
             />
 
-            <div v-if="showComments" class="px-2">
+            <div v-if="showComments">
               <EventRootCommentFormWrapper
                 v-if="event && !isArchived"
                 :key="`${eventId}`"
                 :event="event"
                 :previous-offset="previousOffset"
               />
-              <div class="my-6 mb-2 ml-2 rounded-lg">
+              <div class="my-6 mb-2 rounded-lg">
                 <EventCommentsWrapper
                   :key="event?.id"
                   :loading="getEventCommentsLoading"

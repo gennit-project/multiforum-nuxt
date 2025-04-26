@@ -94,7 +94,7 @@ const { theme } = useTheme();
 </script>
 
 <template>
-  <div class="w-full mt-4">
+  <div class="w-full mt-4 lg:px-4">
     <div
       class="flex md:flex-row md:items-center md:justify-between space-x-0 md:space-x-2"
     >

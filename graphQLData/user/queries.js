@@ -87,6 +87,10 @@ export const GET_USER_COMMENTS = gql`
           discussionId
           channelUniqueName
         }
+        Event {
+          id
+          title
+        }
         Channel {
           uniqueName
         }
