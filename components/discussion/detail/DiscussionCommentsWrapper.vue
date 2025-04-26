@@ -81,8 +81,6 @@ const commentSectionQueryVariables = computed(() => ({
   sort: getSortFromQuery(route.query),
 }));
 
-
-
 const createCommentDefaultValues: CreateEditCommentFormValues = {
   text: "",
   isRootComment: false,
@@ -183,47 +181,83 @@ const updateCommentSectionQueryResult = (
 
   if (commentToAddFeedbackTo && newFeedbackComment) {
     cache.modify({
-      id: cache.identify({ __typename: "Comment", id: commentToAddFeedbackTo.id }),
+      id: cache.identify({
+        __typename: "Comment",
+        id: commentToAddFeedbackTo.id,
+      }),
       fields: {
         FeedbackComments(existing = []) {
           return [...existing, newFeedbackComment];
-        }
-      }
+        },
+      },
     });
   }
 };
 
 const incrementCommentCount = (cache: any) => {
-  cache.modify({
-    id: cache.identify({
-      __typename: "DiscussionChannel",
-      id: props.discussionChannel?.id
-    }),
-    fields: {
-      CommentsAggregate(existing = { count: 0 }) {
-        return {
-          ...existing,
-          count: (existing.count || 0) + 1
-        };
-      }
-    }
+  const readDiscussionChannelQueryResult = cache.readQuery({
+    query: GET_DISCUSSION_COMMENTS,
+    variables: {
+      ...commentSectionQueryVariables.value,
+    },
+  });
+
+  const existingDiscussionChannelData =
+    readDiscussionChannelQueryResult?.getCommentSection?.DiscussionChannel;
+
+  const existingCommentAggregate =
+    existingDiscussionChannelData?.CommentsAggregate?.count || 0;
+
+  cache.writeQuery({
+    query: GET_DISCUSSION_COMMENTS,
+    variables: {
+      ...commentSectionQueryVariables.value,
+    },
+    data: {
+      ...readDiscussionChannelQueryResult,
+      getCommentSection: {
+        ...readDiscussionChannelQueryResult.getCommentSection,
+        DiscussionChannel: {
+          ...existingDiscussionChannelData,
+          CommentsAggregate: {
+            ...existingDiscussionChannelData?.CommentsAggregate,
+            count: existingCommentAggregate + 1,
+          },
+        },
+      },
+    },
   });
 };
-
 const decrementCommentCount = (cache: any) => {
-  cache.modify({
-    id: cache.identify({
-      __typename: "DiscussionChannel",
-      id: props.discussionChannel?.id
-    }),
-    fields: {
-      CommentsAggregate(existing = { count: 0 }) {
-        return {
-          ...existing,
-          count: Math.max(0, (existing.count || 0) - 1)
-        };
-      }
-    }
+  const readDiscussionChannelQueryResult = cache.readQuery({
+    query: GET_DISCUSSION_COMMENTS,
+    variables: commentSectionQueryVariables.value,
+  });
+
+  const existingDiscussionChannelData =
+    readDiscussionChannelQueryResult?.getCommentSection?.DiscussionChannel;
+
+  const existingCommentAggregate =
+    existingDiscussionChannelData?.CommentsAggregate?.count || 0;
+
+  cache.writeQuery({
+    query: GET_DISCUSSION_COMMENTS,
+    variables: {
+      ...commentSectionQueryVariables.value,
+    },
+    data: {
+      ...readDiscussionChannelQueryResult,
+      getCommentSection: {
+        ...readDiscussionChannelQueryResult.getCommentSection,
+        DiscussionChannel: {
+          ...existingDiscussionChannelData,
+          CommentsAggregate: {
+            ...existingDiscussionChannelData.CommentsAggregate,
+            count: Math.max(0, existingCommentAggregate - 1),
+          },
+        },
+      },
+    },
   });
 };
 </script>
