@@ -19,7 +19,6 @@ import {
   setNotificationCount,
   setProfilePicURL,
 } from "@/cache";
-import CreateUsernamePage from "@/components/auth/CreateUsernamePage.vue";
 import { config } from "@/config";
 import DevOverlay from '@/components/nav/DevOverlay.vue'
 
@@ -192,33 +191,36 @@ onResult((newResult) => {
     setIsAuthenticated(true);
     setModProfileName(modProfileData?.displayName || "");
     setNotificationCount(userData.NotificationsAggregate?.count || 0);
+  } else if (newResult?.data?.emails?.[0] === null || newResult?.data?.emails?.length === 0) {
+    // Email exists in Auth0 but not in our system yet
+    // User needs to create a username
+    const router = useRouter();
+    
+    // Only redirect if we're authenticated and not already on the create-username page
+    if (isAuthenticatedVar.value && 
+        !isLoadingAuthVar.value && 
+        window.location.pathname !== '/create-username') {
+      
+      // Set a flag to prevent redirect loops
+      const hasCheckedUsername = sessionStorage.getItem('hasCheckedUsername');
+      if (!hasCheckedUsername) {
+        // Store the current path so we can return after username creation
+        if (window.location.pathname !== '/') {
+          sessionStorage.setItem('previousPath', window.location.pathname);
+        }
+        
+        // Set the flag to prevent repeated redirects
+        sessionStorage.setItem('hasCheckedUsername', 'true');
+        console.log("Email not found in system, redirecting to create username page");
+        router.push('/create-username');
+      }
+    }
   }
 });
-
-const emailDoesNotHaveUsernameAttached = computed(() => {
-  return (
-    !usernameVar.value && isAuthenticatedVar.value && !isLoadingAuthVar.value
-  );
-});
-
 // For hydration purposes, we need to determine if we're mounted on the client
 const isMounted = ref(false);
 onMounted(() => {
   isMounted.value = true;
-});
-
-const showMainContent = computed(() => {
-  // On SSR, always show main content to match initial render
-  if (!isMounted.value) {
-    return true;
-  }
-  
-  // Only hide main content when user is authenticated but needs to create a username
-  // Non-authenticated users should always see the content
-  if (isAuthenticatedVar.value && !usernameVar.value && !isLoadingAuthVar.value) {
-    return false; // Show username creation form instead of content
-  }
-  return true; // Show content for non-authenticated users or users with usernames
 });
 </script>
 
@@ -260,15 +262,9 @@ const showMainContent = computed(() => {
               </div>
             </template>
             
-            <div v-if="showMainContent" class="w-full flex-grow flex flex-col">
+            <div class="w-full flex-grow flex flex-col">
               <slot />
               <SiteFooter v-if="showFooter" class="mt-auto" />
-            </div>
-            <div v-else>
-              <CreateUsernamePage
-                v-if="emailDoesNotHaveUsernameAttached"
-                @email-and-user-created="!usernameVar"
-              />
             </div>
           </client-only>
         </div>

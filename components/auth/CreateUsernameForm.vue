@@ -8,7 +8,7 @@ import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
 import { setUsername, setModProfileName, setIsAuthenticated, setIsLoadingAuth } from "@/cache";
-import { MAX_CHARS_IN_USERNAME, MAX_CHARS_IN_USER_DISPLAY_NAME, MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
+import { MAX_CHARS_IN_USERNAME } from "@/utils/constants";
 
 const props = defineProps({
   email: {
@@ -92,6 +92,12 @@ onEmailAndUserCreated((result) => {
 
     if (username) {
       setUsername(username);
+      
+      // Store username in localStorage for persistence
+      localStorage.setItem('username', username);
+      
+      // Set the flag to prevent unnecessary checks
+      sessionStorage.setItem('hasCheckedUsername', 'true');
     }
 
     if (modProfileName) {
