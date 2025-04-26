@@ -9,6 +9,7 @@ import TextInput from "@/components/TextInput.vue";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import InfoBanner from "@/components/InfoBanner.vue";
 import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
 import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 import { modProfileNameVar, usernameVar } from "@/cache";
@@ -196,6 +197,11 @@ const formattedDate = computed(() => {
       v-if="getDiscussionError"
       class="mx-auto my-3 max-w-5xl"
       :text="getDiscussionError.message"
+    />
+    <InfoBanner
+      v-else-if="!getDiscussionLoading && !getDiscussionError && !discussion"
+      class="mx-auto my-3 max-w-5xl"
+      :text="'The discussion was deleted.'"
     />
     <ErrorBanner
       v-if="updateDiscussionError"
