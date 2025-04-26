@@ -122,33 +122,94 @@ const {
         return;
       }
 
-      // 1. Add the new comment to the comments array in the cache
-      const commentSectionRef = cache.identify({
-        __typename: "CommentSectionFormat",
-        // Use a combination of discussionId and channelUniqueName as a custom ID
-        id: `${props.discussionChannel.discussionId}:${props.discussionChannel.channelUniqueName}`,
+      // First, make sure the full comment data is written to the cache
+      const commentRef = cache.writeFragment({
+        data: newComment,
+        fragment: gql`
+          fragment NewCommentWithDetails on Comment {
+            id
+            text
+            emoji
+            weightedVotesCount
+            createdAt
+            updatedAt
+            archived
+            CommentAuthor {
+              __typename
+              ... on User {
+                username
+                profilePicURL
+              }
+              ... on ModerationProfile {
+                displayName
+              }
+            }
+            ChildCommentsAggregate {
+              count
+            }
+            UpvotedByUsers {
+              username
+            }
+            UpvotedByUsersAggregate {
+              count
+            }
+          }
+        `
       });
 
-      // Add the new comment to the beginning of the comments array
-      cache.modify({
-        id: commentSectionRef || "ROOT_QUERY",
-        fields: {
-          Comments(existingComments = []) {
-            // Create a reference to the new comment
-            const newCommentRef = cache.writeFragment({
-              data: newComment,
-              fragment: gql`
-                fragment NewComment on Comment {
-                  id
-                }
-              `
-            });
-            
-            // Add this new comment to the beginning of the array
-            return [newCommentRef, ...existingComments];
-          }
-        }
+      // Read the current query result from the cache
+      const commentSectionQueryVariables = {
+        discussionId: props.discussionChannel.discussionId,
+        channelUniqueName: props.discussionChannel.channelUniqueName,
+        modName: props.modName,
+        limit: COMMENT_LIMIT,
+        offset: props.previousOffset,
+        sort: getSortFromQuery(route.query),
+      };
+
+      const queryResult = cache.readQuery({
+        query: GET_DISCUSSION_COMMENTS,
+        variables: commentSectionQueryVariables
       });
+
+      if (queryResult) {
+        // Update the Comments array within getCommentSection
+        cache.writeQuery({
+          query: GET_DISCUSSION_COMMENTS,
+          variables: commentSectionQueryVariables,
+          data: {
+            ...queryResult,
+            getCommentSection: {
+              ...queryResult.getCommentSection,
+              Comments: [
+                newComment,
+                ...queryResult.getCommentSection.Comments
+              ]
+            }
+          }
+        });
+      } else {
+        console.warn("Could not read query result from cache, falling back to direct modification");
+        
+        // Fallback: try to modify the ROOT_QUERY directly
+        const queryId = cache.identify({
+          __typename: "Query"
+        });
+        
+        cache.modify({
+          id: queryId,
+          fields: {
+            getCommentSection(existingSection = {}, { readField }) {
+              if (!existingSection) return existingSection;
+              
+              return {
+                ...existingSection,
+                Comments: [commentRef, ...(readField('Comments', existingSection) || [])]
+              };
+            }
+          }
+        });
+      }
 
       // 2. Increment the comment count on the DiscussionChannel
       if (props.discussionChannel?.id) {
