@@ -168,14 +168,23 @@ const elevatedModRole = computed(() => {
 });
 
 // Query user's permissions in the channel
-const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL, {
-  modDisplayName: modProfileNameVar.value,
-  username: usernameVar.value,
-  channelUniqueName: props.channelId || defaultChannel.value || "",
-}, {
-  enabled: computed(() => !!modProfileNameVar.value && !!usernameVar.value && (!!props.channelId || !!defaultChannel.value)),
-  fetchPolicy: "cache-first",
-});
+const { result: getPermissionResult } = useQuery(
+  USER_IS_MOD_OR_OWNER_IN_CHANNEL,
+  {
+    modDisplayName: modProfileNameVar.value,
+    username: usernameVar.value,
+    channelUniqueName: props.channelId || defaultChannel.value || "",
+  },
+  {
+    enabled: computed(
+      () =>
+        !!modProfileNameVar.value &&
+        !!usernameVar.value &&
+        (!!props.channelId || !!defaultChannel.value)
+    ),
+    fetchPolicy: "cache-first",
+  }
+);
 
 // Get permission data from the query result
 const permissionData = computed(() => {
@@ -187,13 +196,13 @@ const permissionData = computed(() => {
 
 // Get all permissions for the current user using our utility function
 const userPermissions = computed(() => {
-  return getAllPermissions(
-    permissionData.value,
-    standardModRole.value,
-    elevatedModRole.value,
-    usernameVar.value,
-    modProfileNameVar.value
-  );
+  return getAllPermissions({
+    permissionData: permissionData.value,
+    standardModRole: standardModRole.value,
+    elevatedModRole: elevatedModRole.value,
+    username: usernameVar.value,
+    modProfileName: modProfileNameVar.value,
+  });
 });
 
 const permalinkObject = computed(() => {
@@ -248,18 +257,18 @@ const menuItems = computed(() => {
   console.log("Checking mod permissions for discussion menu:", {
     isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
     isChannelOwner: userPermissions.value.isChannelOwner,
-    isElevatedMod: userPermissions.value.isElevatedMod, 
+    isElevatedMod: userPermissions.value.isElevatedMod,
     isSuspendedMod: userPermissions.value.isSuspendedMod,
-    permissions: userPermissions.value
+    permissions: userPermissions.value,
   });
-    
+
   // Use our utility function to get the menu items
   return getDiscussionHeaderMenuItems({
     isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
     isArchived: !!props.discussionIsArchived,
     userPermissions: userPermissions.value,
     isLoggedIn: !!usernameVar.value,
-    discussionId: props.discussion.id
+    discussionId: props.discussion.id,
   });
 });
 
