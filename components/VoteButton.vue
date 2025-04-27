@@ -31,7 +31,7 @@ const buttonClasses = computed(() => {
   ];
 
   const defaultClasses = properties.active
-    ? "border-blue-500 bg-blue-300 text-white dark:border-blue-600 dark:bg-blue-800 dark:hover:bg-blue-500"
+    ? "border-blue-500 bg-blue-500 text-white dark:border-blue-600 dark:bg-blue-600 dark:hover:bg-blue-500"
     : "border-gray-200 bg-gray-100 text-black hover:border-blue-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600";
 
   const permalinkClasses = properties.isPermalinked
