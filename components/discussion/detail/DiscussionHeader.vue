@@ -10,8 +10,8 @@ import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import { ALLOWED_ICONS } from "@/utils";
 import { getAllPermissions } from "@/utils/permissionUtils";
+import { getDiscussionHeaderMenuItems } from "@/utils/headerPermissionUtils";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
@@ -19,13 +19,6 @@ import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
 import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
 import { config } from "@/config";
 
-type MenuItem = {
-  label?: string;
-  value: string;
-  event?: string;
-  icon?: string;
-  isDivider?: boolean;
-};
 const props = defineProps({
   discussion: {
     type: Object,
@@ -247,122 +240,27 @@ const showSuccessfullyUnarchived = ref(false);
 const showSuccessfullyArchivedAndSuspended = ref(false);
 
 const menuItems = computed(() => {
-  let out: MenuItem[] = [];
-
-  if (props.discussion) {
-    out = out.concat([
-      {
-        label: "View Feedback",
-        event: "handleViewFeedback",
-        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-        value: props.discussion.id,
-      },
-      {
-        label: "Copy Link",
-        event: "copyLink",
-        icon: ALLOWED_ICONS.COPY_LINK,
-        value: props.discussion.id,
-      },
-    ]);
-
-    // If user is the author of the discussion
-    const isOwnDiscussion = props.discussion?.Author?.username === usernameVar.value;
-    
-    // Check if the user has admin or mod permissions
-    const hasModPermissions = userPermissions.value.isChannelOwner || 
-                             (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
-                             
-    console.log("Checking mod permissions for discussion menu:", {
-      isOwnDiscussion,
-      isChannelOwner: userPermissions.value.isChannelOwner,
-      isElevatedMod: userPermissions.value.isElevatedMod, 
-      isSuspendedMod: userPermissions.value.isSuspendedMod,
-      hasModPermissions
-    });
-    
-    if (isOwnDiscussion) {
-      out.push({
-        label: "Edit",
-        event: "handleEdit",
-        icon: ALLOWED_ICONS.EDIT,
-        value: props.discussion.id,
-      });
-      out.push({
-        label: "Delete",
-        event: "handleDelete",
-        icon: ALLOWED_ICONS.DELETE,
-        value: props.discussion.id,
-      });
-    } 
-    
-    // Show mod actions if user is not suspended and either:
-    // 1. Is a channel owner (admin), or
-    // 2. Is a moderator with permissions
-    if (usernameVar.value && (hasModPermissions || userPermissions.value.isChannelOwner) && !isOwnDiscussion) {
-      // Create a list for mod actions
-      const modActions: MenuItem[] = [];
-      
-      // Add report action if user has permission
-      if (userPermissions.value.canReport) {
-        modActions.push({
-          label: "Report",
-          event: "handleClickReport",
-          icon: ALLOWED_ICONS.REPORT,
-          value: props.discussion.id,
-        });
-      }
-      
-      // Add feedback action if user has permission
-      if (userPermissions.value.canGiveFeedback) {
-        modActions.push({
-          label: "Give Feedback",
-          event: "handleFeedback",
-          icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-          value: props.discussion.id,
-        });
-      }
-      
-      // Add archive/unarchive actions based on current state and permissions
-      if (!props.discussionIsArchived) {
-        if (userPermissions.value.canHideDiscussion) {
-          modActions.push({
-            label: "Archive",
-            event: "handleClickArchive",
-            icon: ALLOWED_ICONS.ARCHIVE,
-            value: props.discussion.id,
-          });
-        }
-        
-        if (userPermissions.value.canSuspendUser) {
-          modActions.push({
-            label: "Archive and Suspend",
-            event: "handleClickArchiveAndSuspend",
-            icon: ALLOWED_ICONS.SUSPEND,
-            value: props.discussion.id,
-          });
-        }
-      } else {
-        if (userPermissions.value.canHideDiscussion) {
-          modActions.push({
-            label: "Unarchive",
-            event: "handleClickUnarchive",
-            icon: ALLOWED_ICONS.UNARCHIVE,
-            value: props.discussion.id,
-          });
-        }
-      }
-      
-      // Only add the mod actions section if there are actually actions to show
-      if (modActions.length > 0) {
-        out.push({
-          value: "Moderation Actions",
-          isDivider: true,
-        });
-        out = out.concat(modActions);
-      }
-    }
+  if (!props.discussion) {
+    return [];
   }
-  return out;
+
+  // Log permissions for debugging
+  console.log("Checking mod permissions for discussion menu:", {
+    isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
+    isChannelOwner: userPermissions.value.isChannelOwner,
+    isElevatedMod: userPermissions.value.isElevatedMod, 
+    isSuspendedMod: userPermissions.value.isSuspendedMod,
+    permissions: userPermissions.value
+  });
+    
+  // Use our utility function to get the menu items
+  return getDiscussionHeaderMenuItems({
+    isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
+    isArchived: !!props.discussionIsArchived,
+    userPermissions: userPermissions.value,
+    isLoggedIn: !!usernameVar.value,
+    discussionId: props.discussion.id
+  });
 });
 
 const authorIsAdmin = computed(

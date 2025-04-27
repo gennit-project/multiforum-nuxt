@@ -18,8 +18,9 @@ import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { getDuration, ALLOWED_ICONS } from "@/utils";
-import { checkPermission, getAllPermissions } from "@/utils/permissionUtils";
+import { getDuration } from "@/utils";
+import { getAllPermissions } from "@/utils/permissionUtils";
+import { getEventHeaderMenuItems } from "@/utils/headerPermissionUtils";
 import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
@@ -30,14 +31,6 @@ import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
 import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
 import { config } from "@/config";
-
-type MenuItem = {
-  label?: string;
-  value?: string;
-  event?: string;
-  icon?: string;
-  isDivider?: boolean;
-};
 
 const props = defineProps({
   eventData: {
@@ -57,6 +50,8 @@ const props = defineProps({
     default: "",
   },
 });
+
+defineEmits(["archived-successfully"]);
 
 const route = useRoute();
 const router = useRouter();
@@ -168,17 +163,6 @@ const userPermissions = computed(() => {
   );
 });
 
-// Log permissions for debugging
-const logPermissions = computed(() => {
-  console.log("Event header permissions:", {
-    modProfileName: modProfileNameVar.value,
-    username: usernameVar.value,
-    channelUniqueName: props.eventChannelId || channelId.value || "",
-    permissions: userPermissions.value
-  });
-  return true;
-});
-
 const permalinkObject = computed(() => {
   if (!eventId.value) return {};
   return {
@@ -282,135 +266,21 @@ const isAdmin = computed(() => {
   return serverRoles && serverRoles?.length > 0 && serverRoles[0].showAdminTag;
 });
 
-const menuItems = computed(() => {
-  let items: MenuItem[] = [];
-  
-  // Ensure logPermissions is evaluated for debugging
-  logPermissions.value;
-  
-  if (props.eventData && route.name !== "EventFeedback") {
-    items = items.concat([
-      {
-        label: "Copy Link",
-        event: "copyLink",
-        icon: ALLOWED_ICONS.COPY_LINK,
-      },
-      {
-        label: "View Feedback",
-        event: "handleViewFeedback",
-        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-      },
-    ]);
+const menuItems = computed(() => {  
+  if (!props.eventData) {
+    return [];
   }
   
-  // Return early if user is not logged in
-  if (!usernameVar.value) {
-    return items;
-  }
-  
-  // If user is the author of the event
-  const isOwnEvent = props.eventData?.Poster?.username === usernameVar.value;
-  
-  // Check if the user has admin or mod permissions
-  const hasModPermissions = userPermissions.value.isChannelOwner || 
-                           (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
-                           
-  console.log("Checking mod permissions for action menu:", {
-    isOwnEvent,
-    isChannelOwner: userPermissions.value.isChannelOwner,
-    isElevatedMod: userPermissions.value.isElevatedMod, 
-    isSuspendedMod: userPermissions.value.isSuspendedMod,
-    hasModPermissions
+  // Use our utility function to get the menu items
+  return getEventHeaderMenuItems({
+    isOwnEvent: props.eventData?.Poster?.username === usernameVar.value,
+    isArchived: !!props.eventIsArchived,
+    isCanceled: !!props.eventData.canceled,
+    userPermissions: userPermissions.value,
+    isLoggedIn: !!usernameVar.value,
+    eventId: props.eventData.id,
+    isOnFeedbackPage: route.name === "EventFeedback"
   });
-                           
-  if (isOwnEvent) {
-    items = items.concat([
-      {
-        label: "Edit",
-        event: "handleEdit",
-        icon: ALLOWED_ICONS.EDIT,
-      },
-      {
-        label: "Delete",
-        event: "handleDelete",
-        icon: ALLOWED_ICONS.DELETE,
-      },
-    ]);
-    if (!props.eventData.canceled) {
-      items.push({
-        label: "Cancel",
-        event: "handleCancel",
-        icon: ALLOWED_ICONS.CANCEL,
-      });
-    }
-  } 
-  
-  // Show mod actions if user is not suspended and either:
-  // 1. Is a channel owner (admin), or
-  // 2. Is a moderator with permissions
-  if (usernameVar.value && (hasModPermissions || userPermissions.value.isChannelOwner) && !isOwnEvent) {
-    // Create a list for mod actions
-    const modActions: MenuItem[] = [];
-    
-    // Add report action if user has permission
-    if (userPermissions.value.canReport) {
-      modActions.push({
-        label: "Report",
-        event: "handleReport",
-        icon: ALLOWED_ICONS.REPORT,
-      });
-    }
-    
-    // Add feedback action if user has permission and not on the feedback page
-    if (userPermissions.value.canGiveFeedback && route.name !== "EventFeedback") {
-      modActions.push({
-        label: "Give Feedback",
-        event: "handleFeedback",
-        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-      });
-    }
-    
-    // Add archive/unarchive actions based on current state and permissions
-    if (!props.eventIsArchived) {
-      if (userPermissions.value.canHideEvent) {
-        modActions.push({
-          label: "Archive",
-          event: "handleClickArchive",
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: props.eventData.id,
-        });
-      }
-      
-      if (userPermissions.value.canSuspendUser) {
-        modActions.push({
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: props.eventData.id,
-        });
-      }
-    } else {
-      if (userPermissions.value.canHideEvent) {
-        modActions.push({
-          label: "Unarchive",
-          event: "handleClickUnarchive",
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: props.eventData.id,
-        });
-      }
-    }
-    
-    // Only add the mod actions section if there are actually actions to show
-    if (modActions.length > 0) {
-      items.push({
-        value: "Moderation Actions",
-        isDivider: true,
-      });
-      items = items.concat(modActions);
-    }
-  }
-  
-  return items;
 });
 
 function getFormattedDateString(startTime: string) {

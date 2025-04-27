@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { PropType } from "vue";
-import type { Comment, User, ModerationProfile } from "@/__generated__/graphql";
+import type { Comment } from "@/__generated__/graphql";
 import UsernameWithTooltip from "../UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
+import { getCommentAuthorStatus } from "@/utils/headerPermissionUtils";
 import { 
   getPermalinkToDiscussionComment, 
   getPermalinkToDiscussion, 
@@ -42,37 +43,15 @@ const props = defineProps({
     default: "",
   },
 });
-const isAdmin = computed(() => {
-  const author: User | ModerationProfile | undefined | null =
-    props.commentData.CommentAuthor;
-  if (!author) {
-    return false;
-  }
-  if (author.__typename === "User") {
-    const serverRoles = author.ServerRoles;
-    if (!serverRoles || serverRoles.length === 0) {
-      return false;
-    }
-    return serverRoles[0].showAdminTag;
-  }
-  return false;
+// Use the utility function to determine admin/mod status
+const authorStatus = computed(() => {
+  return getCommentAuthorStatus({ 
+    author: props.commentData.CommentAuthor 
+  });
 });
 
-const isMod = computed(() => {
-  const author: User | ModerationProfile | undefined | null =
-    props.commentData.CommentAuthor;
-  if (!author) {
-    return false;
-  }
-  if (author.__typename === "User") {
-    const channelRoles = author.ChannelRoles;
-    if (!channelRoles || channelRoles.length === 0) {
-      return false;
-    }
-    return channelRoles[0].showModTag;
-  }
-  return false;
-});
+const isAdmin = computed(() => authorStatus.value.isAdmin);
+const isMod = computed(() => authorStatus.value.isMod);
 
 const commentAuthorUsername = computed(
   () => props.commentData.CommentAuthor?.username
