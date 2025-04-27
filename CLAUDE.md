@@ -4,15 +4,23 @@
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run test` - Open Cypress test runner
+- `npm run test:unit` - Run unit tests with Vitest
 - `npx cypress run --spec "cypress/e2e/discussions/createEditDeleteDiscussions.spec.cy.ts"` - Run specific test file
 - `npx cypress run --spec "cypress/e2e/discussions/**/*.spec.cy.ts"` - Run all discussions tests
 - `npm run tsc` - Run TypeScript type checking
 - `npx eslint --fix path/to/file.vue` - Fix linting issues
 
-## Cypress Testing
+## Cypress Testing (E2E)
 - Use `setupTestData()` from `support/testSetup.ts` to initialize data once per test file
 - Use `loginUser()` to handle authentication for tests that need it
 - Avoid multiple database resets with `beforeEach` - use shared test data when possible
+
+## Vitest Testing (Unit)
+- Unit tests are located in `tests/unit` directory
+- Run all unit tests with `npm run test:unit`
+- Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
+- Component testing: Focus on testing the component's logic rather than DOM rendering
+- Utility functions: Create tests for edge cases and typical usage patterns
 
 ## Code Style Guidelines
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
