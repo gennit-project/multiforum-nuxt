@@ -171,16 +171,18 @@ const elevatedModRole = computed(() => {
 const { result: getPermissionResult } = useQuery(
   USER_IS_MOD_OR_OWNER_IN_CHANNEL,
   {
-    modDisplayName: modProfileNameVar.value,
-    username: usernameVar.value,
+    modDisplayName: modProfileNameVar,
+    username: usernameVar,
     channelUniqueName: props.channelId || defaultChannel.value || "",
   },
   {
+    // enable if the username and modDisplayName are set
     enabled: computed(
       () =>
-        !!modProfileNameVar.value &&
         !!usernameVar.value &&
-        (!!props.channelId || !!defaultChannel.value)
+        !!modProfileNameVar.value &&
+        !!props.channelId &&
+        !!defaultChannel.value
     ),
     fetchPolicy: "cache-first",
   }
