@@ -16,7 +16,9 @@
     "start": "nuxt start",
     "test": "cypress open",
     "test:unit": "vitest",
-    "tsc": "tsc"
+    "test:unit:run": "vitest run",
+    "tsc": "tsc",
+    "verify": "npm run tsc && npm run test:unit:run"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
@@ -137,10 +139,15 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix"
+      "eslint --fix",
+      "npm run test:unit:run"
     ],
     "*.vue": [
-      "eslint --fix"
+      "eslint --fix",
+      "npm run test:unit:run"
+    ],
+    "tests/**/*.spec.ts": [
+      "npm run test:unit:run -- --run $1"
     ]
   }
 }

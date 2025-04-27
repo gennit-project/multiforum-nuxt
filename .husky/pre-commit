@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Run verification before commit
+npm run verify
+
+# Run lint-staged to check specific files that changed
+npx lint-staged

@@ -22,8 +22,31 @@
 - Component testing: Focus on testing the component's logic rather than DOM rendering
 - Utility functions: Create tests for edge cases and typical usage patterns
 
+## Pre-commit Workflow
+- TypeScript type checking and unit tests run automatically before each commit
+- The pre-commit hook runs the `verify` command which includes:
+  - TypeScript type checking (`npm run tsc`)
+  - Unit tests (`npm run test:unit:run`)
+- Modified files are checked with lint-staged
+  - TS and Vue files: ESLint + unit tests
+  - Test files: Run the specific test that changed
+- To skip pre-commit hooks temporarily: `git commit --no-verify`
+
 ## Code Style Guidelines
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
+- **Function Parameters**: For functions with more than one parameter, use a typed object instead of positional arguments
+  ```typescript
+  // Avoid:
+  function updateUser(id: string, name: string, email: string) { ... }
+  
+  // Prefer:
+  type UpdateUserParams = {
+    id: string;
+    name: string;
+    email: string;
+  };
+  function updateUser(params: UpdateUserParams) { ... }
+  ```
 - **Vue Components**: Use script setup API with TypeScript and properly typed props/emits
 - **Error Handling**: Use try/catch with specific error types, validate GraphQL responses
 - **Naming**: camelCase for variables/functions, PascalCase for components/interfaces

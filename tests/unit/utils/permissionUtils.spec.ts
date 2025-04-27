@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest'
-import { checkPermission, getAllPermissions } from '@/utils/permissionUtils'
+import { 
+  checkPermission, 
+  getAllPermissions
+} from '@/utils/permissionUtils'
+import type { 
+  CheckPermissionParams, 
+  GetAllPermissionsParams 
+} from '@/utils/permissionUtils'
 
 describe('permissionUtils', () => {
   describe('checkPermission', () => {
@@ -23,63 +30,65 @@ describe('permissionUtils', () => {
     }
     
     it('should return false if permissionData is null', () => {
-      expect(checkPermission(
-        null, 
+      const params: CheckPermissionParams = {
+        permissionData: null, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canReport'
-      )).toBe(false)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canReport'
+      }
+      
+      expect(checkPermission(params)).toBe(false)
     })
     
     it('should return false if both roles are null', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }],
-        Moderators: [{ displayName: 'mod2' }]
+      const params: CheckPermissionParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }],
+          Moderators: [{ displayName: 'mod2' }]
+        },
+        standardModRole: null, 
+        elevatedModRole: null, 
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canReport'
       }
       
-      expect(checkPermission(
-        permissionData, 
-        null, 
-        null, 
-        'user1', 
-        'mod1', 
-        'canReport'
-      )).toBe(false)
+      expect(checkPermission(params)).toBe(false)
     })
     
     it('should return true if user is a channel owner (admin)', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }, { username: 'user1' }],
-        Moderators: [{ displayName: 'mod2' }]
-      }
-      
-      expect(checkPermission(
-        permissionData, 
+      const params: CheckPermissionParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }, { username: 'user1' }],
+          Moderators: [{ displayName: 'mod2' }]
+        },
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canSuspendUser' // Even for actions that would normally be false
-      )).toBe(true)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canSuspendUser' // Even for actions that would normally be false
+      }
+      
+      expect(checkPermission(params)).toBe(true)
     })
     
     it('should return false if user is a suspended mod', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }],
-        Moderators: [{ displayName: 'mod2' }],
-        SuspendedMods: [{ modProfileName: 'mod1' }]
-      }
-      
-      expect(checkPermission(
-        permissionData, 
+      const params: CheckPermissionParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }],
+          Moderators: [{ displayName: 'mod2' }],
+          SuspendedMods: [{ modProfileName: 'mod1' }]
+        }, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canReport' // Even for actions that would normally be true
-      )).toBe(false)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canReport' // Even for actions that would normally be true
+      }
+      
+      expect(checkPermission(params)).toBe(false)
     })
     
     it('should check elevated mod role permissions for elevated mods', () => {
@@ -89,24 +98,24 @@ describe('permissionUtils', () => {
       }
       
       // Permission that elevated mods have
-      expect(checkPermission(
+      expect(checkPermission({
         permissionData, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canHideComment'
-      )).toBe(true)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canHideComment'
+      })).toBe(true)
       
       // Permission that elevated mods don't have
-      expect(checkPermission(
+      expect(checkPermission({
         permissionData, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canSuspendUser'
-      )).toBe(false)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canSuspendUser'
+      })).toBe(false)
     })
     
     it('should check standard mod role permissions for standard users', () => {
@@ -116,24 +125,24 @@ describe('permissionUtils', () => {
       }
       
       // Permission that standard mods have
-      expect(checkPermission(
+      expect(checkPermission({
         permissionData, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canReport'
-      )).toBe(true)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canReport'
+      })).toBe(true)
       
       // Permission that standard mods don't have
-      expect(checkPermission(
+      expect(checkPermission({
         permissionData, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'canHideComment'
-      )).toBe(false)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'canHideComment'
+      })).toBe(false)
     })
     
     it('should default to false if permission is not found in roles', () => {
@@ -142,14 +151,14 @@ describe('permissionUtils', () => {
         Moderators: [{ displayName: 'mod2' }]
       }
       
-      expect(checkPermission(
+      expect(checkPermission({
         permissionData, 
         standardModRole, 
         elevatedModRole, 
-        'user1', 
-        'mod1', 
-        'nonExistentPermission' // Permission not in any role
-      )).toBe(false)
+        username: 'user1', 
+        modProfileName: 'mod1', 
+        action: 'nonExistentPermission' // Permission not in any role
+      })).toBe(false)
     })
   })
   
@@ -169,20 +178,20 @@ describe('permissionUtils', () => {
     }
     
     it('should return all permissions for a channel owner', () => {
-      const permissionData = {
-        Admins: [{ username: 'user1' }], // User is an admin
-        Moderators: [],
-        SuspendedMods: [],
-        SuspendedUsers: []
-      }
-      
-      const permissions = getAllPermissions(
-        permissionData,
+      const params: GetAllPermissionsParams = {
+        permissionData: {
+          Admins: [{ username: 'user1' }], // User is an admin
+          Moderators: [],
+          SuspendedMods: [],
+          SuspendedUsers: []
+        },
         standardModRole,
         elevatedModRole,
-        'user1',
-        'mod1'
-      )
+        username: 'user1',
+        modProfileName: 'mod1'
+      }
+      
+      const permissions = getAllPermissions(params)
       
       // Channel owners have all permissions
       expect(permissions.canReport).toBe(true)
@@ -195,20 +204,20 @@ describe('permissionUtils', () => {
     })
     
     it('should return all permissions for an elevated mod', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }],
-        Moderators: [{ displayName: 'mod1' }], // User is an elevated mod
-        SuspendedMods: [],
-        SuspendedUsers: []
-      }
-      
-      const permissions = getAllPermissions(
-        permissionData,
+      const params: GetAllPermissionsParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }],
+          Moderators: [{ displayName: 'mod1' }], // User is an elevated mod
+          SuspendedMods: [],
+          SuspendedUsers: []
+        },
         standardModRole,
         elevatedModRole,
-        'user1',
-        'mod1'
-      )
+        username: 'user1',
+        modProfileName: 'mod1'
+      }
+      
+      const permissions = getAllPermissions(params)
       
       // Should have elevated mod permissions
       expect(permissions.canReport).toBe(true)
@@ -222,20 +231,20 @@ describe('permissionUtils', () => {
     })
     
     it('should return all permissions for a standard user', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }],
-        Moderators: [{ displayName: 'mod2' }], // User is not an elevated mod
-        SuspendedMods: [],
-        SuspendedUsers: []
-      }
-      
-      const permissions = getAllPermissions(
-        permissionData,
+      const params: GetAllPermissionsParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }],
+          Moderators: [{ displayName: 'mod2' }], // User is not an elevated mod
+          SuspendedMods: [],
+          SuspendedUsers: []
+        },
         standardModRole,
         elevatedModRole,
-        'user1',
-        'mod1'
-      )
+        username: 'user1',
+        modProfileName: 'mod1'
+      }
+      
+      const permissions = getAllPermissions(params)
       
       // Should have standard permissions
       expect(permissions.canReport).toBe(true)
@@ -248,20 +257,20 @@ describe('permissionUtils', () => {
     })
     
     it('should return all permissions for a suspended mod', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }],
-        Moderators: [{ displayName: 'mod2' }],
-        SuspendedMods: [{ modProfileName: 'mod1' }], // User is suspended
-        SuspendedUsers: []
-      }
-      
-      const permissions = getAllPermissions(
-        permissionData,
+      const params: GetAllPermissionsParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }],
+          Moderators: [{ displayName: 'mod2' }],
+          SuspendedMods: [{ modProfileName: 'mod1' }], // User is suspended
+          SuspendedUsers: []
+        },
         standardModRole,
         elevatedModRole,
-        'user1',
-        'mod1'
-      )
+        username: 'user1',
+        modProfileName: 'mod1'
+      }
+      
+      const permissions = getAllPermissions(params)
       
       // Suspended mods have no permissions
       expect(permissions.canReport).toBe(false)
@@ -273,20 +282,20 @@ describe('permissionUtils', () => {
     })
     
     it('should return all permissions for a suspended user', () => {
-      const permissionData = {
-        Admins: [{ username: 'admin1' }],
-        Moderators: [{ displayName: 'mod2' }],
-        SuspendedMods: [],
-        SuspendedUsers: [{ username: 'user1' }] // User is suspended
-      }
-      
-      const permissions = getAllPermissions(
-        permissionData,
+      const params: GetAllPermissionsParams = {
+        permissionData: {
+          Admins: [{ username: 'admin1' }],
+          Moderators: [{ displayName: 'mod2' }],
+          SuspendedMods: [],
+          SuspendedUsers: [{ username: 'user1' }] // User is suspended
+        },
         standardModRole,
         elevatedModRole,
-        'user1',
-        'mod1'
-      )
+        username: 'user1',
+        modProfileName: 'mod1'
+      }
+      
+      const permissions = getAllPermissions(params)
       
       // Should still have proper permission flags
       expect(permissions.isSuspendedUser).toBe(true)

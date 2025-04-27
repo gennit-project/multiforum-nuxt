@@ -40,32 +40,53 @@ type PermissionData = {
   [key: string]: any;
 };
 
+// Parameter types for the exported functions
+export type CheckPermissionParams = {
+  permissionData: PermissionData | null;
+  standardModRole: Role | null;
+  elevatedModRole: Role | null;
+  username: string;
+  modProfileName: string;
+  action: PermissionKey | string;
+};
+
+export type GetAllPermissionsParams = {
+  permissionData: PermissionData | null;
+  standardModRole: Role | null;
+  elevatedModRole: Role | null;
+  username: string;
+  modProfileName: string;
+};
+
 /**
  * Checks if the user has permission to perform a specific action in a channel
  * 
- * @param permissionData - Data about the user's roles in the channel
- * @param standardModRole - The standard mod role for the channel/server
- * @param elevatedModRole - The elevated mod role for the channel/server
- * @param username - The user's username
- * @param modProfileName - The user's mod profile name (if they are a mod)
- * @param action - The permission action to check, can be any of:
- *   - Core permissions from ModChannelRole and ModServerRole: 
- *     'canReport', 'canGiveFeedback', 'canHideComment', 'canHideDiscussion', 
- *     'canHideEvent', 'canSuspendUser', 'canOpenSupportTickets', 
- *     'canCloseSupportTickets', 'canLockChannel'
- *   - Additional application permissions:
- *     'canEditWiki', 'canAddMods', 'canRemoveMods', 'canAddOwners', 
- *     'canRemoveOwners', 'canChangeSettings'
+ * @param params - Object containing all parameters:
+ *   - permissionData - Data about the user's roles in the channel
+ *   - standardModRole - The standard mod role for the channel/server
+ *   - elevatedModRole - The elevated mod role for the channel/server
+ *   - username - The user's username
+ *   - modProfileName - The user's mod profile name (if they are a mod)
+ *   - action - The permission action to check, can be any of:
+ *     - Core permissions from ModChannelRole and ModServerRole: 
+ *       'canReport', 'canGiveFeedback', 'canHideComment', 'canHideDiscussion', 
+ *       'canHideEvent', 'canSuspendUser', 'canOpenSupportTickets', 
+ *       'canCloseSupportTickets', 'canLockChannel'
+ *     - Additional application permissions:
+ *       'canEditWiki', 'canAddMods', 'canRemoveMods', 'canAddOwners', 
+ *       'canRemoveOwners', 'canChangeSettings'
  * @returns boolean indicating if the user has permission
  */
-export const checkPermission = (
-  permissionData: PermissionData | null,
-  standardModRole: Role | null,
-  elevatedModRole: Role | null,
-  username: string,
-  modProfileName: string,
-  action: PermissionKey | string
-): boolean => {
+export const checkPermission = (params: CheckPermissionParams): boolean => {
+  const {
+    permissionData,
+    standardModRole,
+    elevatedModRole,
+    username,
+    modProfileName,
+    action
+  } = params;
+  
   // If we don't have permission data or role data, the user can't perform the action
   if (!permissionData || (!standardModRole && !elevatedModRole)) {
     return false;
@@ -113,23 +134,26 @@ export const checkPermission = (
 /**
  * Gets all permissions for a user in a channel
  * 
- * @param permissionData - Data about the user's roles in the channel
- * @param standardModRole - The standard mod role for the channel/server
- * @param elevatedModRole - The elevated mod role for the channel/server
- * @param username - The user's username
- * @param modProfileName - The user's mod profile name (if they are a mod)
+ * @param params - Object containing all parameters:
+ *   - permissionData - Data about the user's roles in the channel
+ *   - standardModRole - The standard mod role for the channel/server
+ *   - elevatedModRole - The elevated mod role for the channel/server
+ *   - username - The user's username
+ *   - modProfileName - The user's mod profile name (if they are a mod)
  * @returns Object with all permissions mapped:
  *   - Core permissions from schema: 'canReport', 'canGiveFeedback', etc.
  *   - Additional permissions: 'canEditWiki', 'canAddMods', etc.
  *   - Role information: 'isChannelOwner', 'isElevatedMod', 'isSuspendedMod', 'isSuspendedUser'
  */
-export const getAllPermissions = (
-  permissionData: PermissionData | null,
-  standardModRole: Role | null,
-  elevatedModRole: Role | null,
-  username: string,
-  modProfileName: string
-): Record<string, boolean> => {
+export const getAllPermissions = (params: GetAllPermissionsParams): Record<string, boolean> => {
+  const {
+    permissionData,
+    standardModRole,
+    elevatedModRole,
+    username,
+    modProfileName
+  } = params;
+  
   // Define all possible permissions from ModChannelRole and ModServerRole
   const corePermissions: PermissionKey[] = [
     'canReport',
@@ -160,14 +184,14 @@ export const getAllPermissions = (
   const permissions: Record<string, boolean> = {};
   
   allActions.forEach(action => {
-    permissions[action] = checkPermission(
+    permissions[action] = checkPermission({
       permissionData,
       standardModRole,
       elevatedModRole,
       username,
       modProfileName,
       action
-    );
+    });
   });
 
   // Add role information
