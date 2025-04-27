@@ -9,6 +9,7 @@ import { GET_EVENT } from "@/graphQLData/event/queries";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
+import { gql } from "@apollo/client/core";
 
 const COMMENT_LIMIT = 50;
 
@@ -148,99 +149,96 @@ function updateCommentSectionQueryResult(input: {
   cache: any;
   commentToDeleteId: string;
 }) {
-  const { cache, commentToDeleteId } = input;
-  const readQueryResult = cache.readQuery({
-    query: GET_EVENT_COMMENTS,
-    variables: commentSectionQueryVariables.value,
-  });
-
-  const filteredRootComments = (
-    readQueryResult?.getEventComments?.Comments || []
-  ).filter((comment: CommentType) => comment.id !== commentToDeleteId);
-
-  cache.writeQuery({
-    query: GET_EVENT_COMMENTS,
-    variables: commentSectionQueryVariables.value,
-    data: {
-      ...readQueryResult,
-      getEventComments: {
-        ...readQueryResult?.getEventComments,
-        Comments: filteredRootComments,
-      },
-    },
-  });
-}
-
-function incrementCommentCount(cache: any) {
-  const readEventQueryResult = cache.readQuery({
-    query: GET_EVENT,
-    variables: {
-      id: props.event?.id,
-      channelUniqueName: channelId.value,
-      loggedInModName: loggedInUserModName.value,
-    },
-  });
-
-  const existingEventData = readEventQueryResult?.getEvent;
-
-  const existingCommentAggregate =
-    existingEventData?.CommentsAggregate?.count || 0;
-
-  cache.writeQuery({
-    query: GET_EVENT,
-    variables: {
-      id: props.event?.id,
-      channelUniqueName: channelId.value,
-      loggedInModName: loggedInUserModName.value,
-    },
-    data: {
-      ...readEventQueryResult,
-      getEvent: {
-        ...existingEventData,
-        CommentsAggregate: {
-          ...existingEventData?.CommentsAggregate,
-          count: Math.max(0, existingCommentAggregate + 1),
-        },
-      },
-    },
-  });
+  try {
+    const { cache, commentToDeleteId } = input;
+    
+    if (!commentToDeleteId) {
+      console.error("No comment ID provided for deletion");
+      return;
+    }
+    
+    // Directly evict the comment from the cache
+    cache.evict({
+      id: cache.identify({ __typename: "Comment", id: commentToDeleteId })
+    });
+    
+    // Garbage collection to clean up unreachable references
+    cache.gc();
+  } catch (error) {
+    console.error("Error updating comment section query result:", error);
+  }
 }
 
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 
+function incrementCommentCount(cache: any) {
+  try {
+    if (!props.event?.id) {
+      console.error("No event ID found for incrementing comment count");
+      return;
+    }
+    
+    // Use cache.modify to directly update the CommentsAggregate field
+    // This is much safer than using writeQuery
+    const eventId = cache.identify({
+      __typename: "Event",
+      id: props.event.id
+    });
+    
+    if (!eventId) {
+      console.error("Could not identify event in cache");
+      return;
+    }
+    
+    cache.modify({
+      id: eventId,
+      fields: {
+        CommentsAggregate(existing = {}) {
+          return {
+            ...existing,
+            count: (existing.count || 0) + 1
+          };
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error incrementing comment count:", error);
+  }
+}
+
 function decrementCommentCount(cache: any) {
-  const readEventQueryResult = cache.readQuery({
-    query: GET_EVENT,
-    variables: {
-      id: props.event?.id,
-      channelUniqueName: channelId.value,
-      loggedInModName: loggedInUserModName.value,
-    },
-  });
-
-  const existingEventData = readEventQueryResult?.getEvent;
-
-  const existingCommentAggregate =
-    existingEventData?.CommentsAggregate?.count || 0;
-
-  cache.writeQuery({
-    query: GET_EVENT,
-    variables: {
-      id: props.event?.id,
-      channelUniqueName: channelId.value,
-      loggedInModName: loggedInUserModName.value,
-    },
-    data: {
-      ...readEventQueryResult,
-      getEvent: {
-        ...existingEventData,
-        CommentsAggregate: {
-          ...existingEventData?.CommentsAggregate,
-          count: Math.max(0, existingCommentAggregate - 1),
-        },
-      },
-    },
-  });
+  try {
+    if (!props.event?.id) {
+      console.error("No event ID found for decrementing comment count");
+      return;
+    }
+    
+    // Use cache.modify to directly update the CommentsAggregate field
+    // This is much safer than using writeQuery
+    const eventId = cache.identify({
+      __typename: "Event",
+      id: props.event.id
+    });
+    
+    if (!eventId) {
+      console.error("Could not identify event in cache");
+      return;
+    }
+    
+    cache.modify({
+      id: eventId,
+      fields: {
+        CommentsAggregate(existing = {}) {
+          return {
+            ...existing,
+            count: Math.max(0, (existing.count || 0) - 1)
+          };
+        }
+      }
+    });
+  } catch (error) {
+    console.error("Error decrementing comment count:", error);
+  }
 }
 </script>
 

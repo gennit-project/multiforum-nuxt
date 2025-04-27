@@ -6,11 +6,12 @@ import { useMutation } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
 import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
-import { GET_EVENT } from "@/graphQLData/event/queries";
+import ErrorBanner from "@/components/ErrorBanner.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import type { Event, Comment } from "@/__generated__/graphql";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar, modProfileNameVar } from "@/cache";
+import { gql } from "@apollo/client/core";
 
 const COMMENT_LIMIT = 50;
 const props = defineProps({
@@ -82,7 +83,7 @@ const createCommentInput = computed(() => [
 
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);
-const loggedInUserModName = computed(() => modProfileNameVar.value);
+const createCommentPermissionError = ref('');
 
 // Mutation for creating a comment
 const {
@@ -92,74 +93,116 @@ const {
 } = useMutation(CREATE_COMMENT, {
   errorPolicy: "all",
   update(cache, result) {
-    const newComment: Comment = result.data?.createComments?.comments[0];
+    try {
+      console.log('result', result);
+      // Get the new comment from the result
+      if (result.errors?.length) {
+        console.error("Error creating comment:", result.errors);
+        createCommentPermissionError.value = result.errors[0].message;
+        return;
+      }
+      const newComment: Comment = result.data?.createComments?.comments[0];
+      if (!newComment) {
+        console.error("No new comment returned from createComments mutation");
+        return;
+      }
 
-    const eventCommentsQueryVariables = {
-      eventId: props.event?.id,
-      limit: COMMENT_LIMIT,
-      offset: props.previousOffset,
-      sort: getSortFromQuery(route.query),
-    };
+      // First, make sure the full comment data is written to the cache
+      const commentRef = cache.writeFragment({
+        data: newComment,
+        fragment: gql`
+          fragment NewCommentWithDetails on Comment {
+            id
+            text
+            emoji
+            weightedVotesCount
+            createdAt
+            updatedAt
+            archived
+            CommentAuthor {
+              __typename
+              ... on User {
+                username
+                profilePicURL
+              }
+              ... on ModerationProfile {
+                displayName
+              }
+            }
+            ChildCommentsAggregate {
+              count
+            }
+            UpvotedByUsers {
+              username
+            }
+            UpvotedByUsersAggregate {
+              count
+            }
+          }
+        `
+      });
 
-    // Update root comments in the cache
-    const readEventCommentsQueryResult: any = cache.readQuery({
-      query: GET_EVENT_COMMENTS,
-      variables: eventCommentsQueryVariables,
-    });
+      // Define the query variables
+      const eventCommentsQueryVariables = {
+        eventId: props.event?.id,
+        limit: COMMENT_LIMIT,
+        offset: props.previousOffset,
+        sort: getSortFromQuery(route.query),
+      };
 
-    const existingEventCommentsData =
-      readEventCommentsQueryResult?.getEventComments || null;
+      // Try to read the existing query result
+      try {
+        const readEventCommentsQueryResult = cache.readQuery({
+          query: GET_EVENT_COMMENTS,
+          variables: eventCommentsQueryVariables,
+        });
 
-    const newRootComments = [
-      newComment,
-      ...(existingEventCommentsData?.Comments || []),
-    ];
+        if (readEventCommentsQueryResult) {
+          // If we get a result, update it
+          cache.writeQuery({
+            query: GET_EVENT_COMMENTS,
+            variables: eventCommentsQueryVariables,
+            data: {
+              ...readEventCommentsQueryResult,
+              getEventComments: {
+                ...readEventCommentsQueryResult.getEventComments,
+                Comments: [
+                  newComment,
+                  ...(readEventCommentsQueryResult.getEventComments?.Comments || [])
+                ]
+              }
+            }
+          });
+        }
+      } catch (err) {
+        console.warn("Error reading or writing event comments query", err);
+      }
 
-    cache.writeQuery({
-      query: GET_EVENT_COMMENTS,
-      variables: eventCommentsQueryVariables,
-      data: {
-        ...readEventCommentsQueryResult,
-        getEventComments: {
-          ...existingEventCommentsData,
-          Comments: newRootComments,
-        },
-      },
-    });
+      // Update the event comment count
+      // This uses the safer cache.modify approach
+      if (props.event?.id) {
+        const eventId = cache.identify({
+          __typename: "Event",
+          id: props.event.id
+        });
 
-    // Update aggregate count from GET_EVENT
-    const readEventQueryResult: any = cache.readQuery({
-      query: GET_EVENT,
-      variables: { 
-        id: props.event?.id,
-        channelUniqueName: channelId.value,
-        loggedInModName: loggedInUserModName.value,
-      },
-    });
-
-    const existingEventData = readEventQueryResult?.events[0] || null;
-    const existingCount = existingEventData?.CommentsAggregate?.count || 0;
-
-    cache.writeQuery({
-      query: GET_EVENT,
-      variables: { 
-        id: props.event?.id,
-        channelUniqueName: channelId.value,
-        loggedInModName: loggedInUserModName.value,
-      },
-      data: {
-        ...readEventQueryResult,
-        events: [
-          {
-            ...existingEventData,
-            CommentsAggregate: {
-              ...existingEventData?.CommentsAggregate,
-              count: existingCount + 1,
-            },
-          },
-        ],
-      },
-    });
+        if (eventId) {
+          cache.modify({
+            id: eventId,
+            fields: {
+              CommentsAggregate(existing = {}) {
+                return {
+                  ...existing,
+                  count: (existing.count || 0) + 1
+                };
+              }
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error updating cache after creating event comment:", error);
+    }
   },
 });
 
@@ -187,6 +230,10 @@ function handleUpdateComment(event: string) {
 
 <template>
   <div>
+    <ErrorBanner
+      v-if="createCommentPermissionError"
+      :text="createCommentPermissionError"
+    />
     <CreateRootCommentForm
       v-if="event"
       :create-form-values="createFormValues"
