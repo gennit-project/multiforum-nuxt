@@ -10,7 +10,7 @@ const route = useRoute();
 const modProfileName = computed(() => {
   return typeof route.params.modId === "string" ? route.params.modId : "";
 });
-console.log('route.name', route.name);
+
 const { result, error } = useQuery(
   GET_MOD,
   {

@@ -255,15 +255,6 @@ const menuItems = computed(() => {
     return [];
   }
 
-  // Log permissions for debugging
-  console.log("Checking mod permissions for discussion menu:", {
-    isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
-    isChannelOwner: userPermissions.value.isChannelOwner,
-    isElevatedMod: userPermissions.value.isElevatedMod,
-    isSuspendedMod: userPermissions.value.isSuspendedMod,
-    permissions: userPermissions.value,
-  });
-
   // Use our utility function to get the menu items
   return getDiscussionHeaderMenuItems({
     isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,

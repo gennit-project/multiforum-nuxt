@@ -78,7 +78,6 @@ export type GetAllPermissionsParams = {
  * @returns boolean indicating if the user has permission
  */
 export const checkPermission = (params: CheckPermissionParams): boolean => {
-  console.log("Check permission params", params);
   const {
     permissionData,
     standardModRole,

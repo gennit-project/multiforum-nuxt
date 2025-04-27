@@ -51,7 +51,6 @@ onGetDiscussionResult((result) => {
       return;
     } else {
       const discussion =  result.data.discussions[0]
-      console.log('discussion data:', result.data);
       const title = discussion.title || "Discussion";
       const description = discussion.body
         ? discussion.body.substring(0, 160) +
