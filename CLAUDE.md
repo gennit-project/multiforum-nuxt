@@ -76,3 +76,14 @@
 - Pages in `pages/` directory matching route structure
 - GraphQL queries/mutations in `graphQLData/` by domain
 - Types in `types/` directory
+
+## Working with Claude
+- **Incremental Changes**: Make small, focused changes rather than large sweeping changes
+  - Work on one test file at a time rather than multiple tests at once
+  - Fix specific issues incrementally rather than rewriting multiple files
+- **Step-by-Step Approach**: If multiple files need changes, address them one at a time
+  - First understand the issue, then propose a targeted solution
+  - Get confirmation before proceeding to the next file
+- **Show Your Work**: Explain reasoning behind changes, especially for complex fixes
+  - When troubleshooting, describe the issue and how the solution addresses it
+  - Provide context for why a particular approach was chosen
