@@ -10,6 +10,11 @@ import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { isFileSizeValid } from "@/utils/index";
 import EmojiPicker from "@/components/comments/EmojiPicker.vue";
+import { 
+  formatText,
+  insertEmoji as insertEmojiAtPosition,
+  type FormatType
+} from "@/utils/textFormatting";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -95,15 +100,22 @@ const insertEmoji = (event: any) => {
   }
   
   const cursorPositionStart = textarea.selectionStart;
-  const cursorPositionEnd = textarea.selectionEnd;
   
-  textarea.setRangeText(
-    emojiChar,
-    cursorPositionStart,
-    cursorPositionEnd,
-    "end"
-  );
+  // Use the insertEmoji utility
+  const newText = insertEmojiAtPosition({
+    text: textarea.value,
+    position: cursorPositionStart,
+    emoji: emojiChar
+  });
   
+  // Update textarea value
+  textarea.value = newText;
+  
+  // Set cursor position after the emoji
+  textarea.selectionStart = cursorPositionStart + emojiChar.length;
+  textarea.selectionEnd = cursorPositionStart + emojiChar.length;
+  
+  // Update model and close picker
   updateText(textarea.value);
   showEmojiPicker.value = false;
   
@@ -113,8 +125,7 @@ const insertEmoji = (event: any) => {
 
 const toggleEmojiPicker = (event: MouseEvent) => {
   const buttonElement = event.currentTarget as HTMLElement;
-  const rect = buttonElement.getBoundingClientRect();
-  
+
   // Position emoji picker directly below the button
   emojiPickerPosition.value = {
     top: `${buttonElement.offsetTop + buttonElement.offsetHeight}px`,
@@ -124,7 +135,7 @@ const toggleEmojiPicker = (event: MouseEvent) => {
   showEmojiPicker.value = !showEmojiPicker.value;
 };
 
-const formatText = (format: string) => {
+const formatTextArea = (format: string) => {
   const textarea = editorRef.value;
   if (!textarea) return;
 
@@ -132,36 +143,11 @@ const formatText = (format: string) => {
   const end = textarea.selectionEnd;
   const selectedText = textarea.value.substring(start, end);
 
-  let formattedText = "";
-  switch (format) {
-    case "bold":
-      formattedText = `**${selectedText}**`;
-      break;
-    case "italic":
-      formattedText = `*${selectedText}*`;
-      break;
-    case "underline":
-      formattedText = `<u>${selectedText}</u>`;
-      break;
-    case "header1":
-      formattedText = `# ${selectedText}`;
-      break;
-    case "header2":
-      formattedText = `## ${selectedText}`;
-      break;
-    case "header3":
-      formattedText = `### ${selectedText}`;
-      break;
-    case "quote":
-      // Split the text into lines and add > to the beginning of each line
-      formattedText = selectedText
-        .split('\n')
-        .map(line => `> ${line}`)
-        .join('\n');
-      break;
-    default:
-      formattedText = selectedText;
-  }
+  // Use the format utility with the correct format type
+  const formattedText = formatText({ 
+    text: selectedText, 
+    format: format as FormatType 
+  });
 
   textarea.setRangeText(formattedText, start, end, "end");
   updateText(textarea.value);
@@ -389,7 +375,7 @@ const closeEmojiPicker = () => {
             v-for="button in formatButtons"
             :key="button.label"
             class="border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
-            @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatText(button.format)"
+            @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatTextArea(button.format)"
           >
             {{ button.label }}
           </button>

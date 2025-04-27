@@ -19,8 +19,24 @@
 - Unit tests are located in `tests/unit` directory
 - Run all unit tests with `npm run test:unit`
 - Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
-- Component testing: Focus on testing the component's logic rather than DOM rendering
-- Utility functions: Create tests for edge cases and typical usage patterns
+
+### Unit Test Best Practices
+- **Test Real Code, Not Mocks**: Ensure tests verify actual application code rather than reimplementing logic in test files
+  - Extract component logic into utility files when appropriate for better testability
+  - Import and test the actual functions from your codebase rather than creating test-only implementations
+- **Component Testing**:
+  - Mount components to test actual validation logic, error messages, and UI state
+  - Mock only external dependencies and services, not the core logic being tested
+  - Verify that error/validation messages appear in the component when expected
+- **Meaningful Tests**: Tests should validate application behavior, not trivial language features
+  - Avoid tests that only check basic JavaScript functionality
+  - Focus on edge cases, expected validations, and user interactions
+- **Testable Code**: Refactor components to make logic more testable
+  - Move complex formatting/validation logic to separate utility files
+  - Use dependency injection to make components easier to test
+- **Test Structure**: Organize tests to mirror the structure of the code being tested
+  - Group related tests with descriptive names
+  - Test both success and failure paths
 
 ## Pre-commit Workflow
 - TypeScript type checking and unit tests run automatically before each commit
