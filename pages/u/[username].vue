@@ -4,7 +4,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
 import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
 import { useHead, useRoute } from "nuxt/app";
-import DemoChart from "@/components/charts/DemoChart.vue";
+import UserContributionChart from "@/components/charts/UserContributionChart.vue";
 
 const route = useRoute();
 const username = computed(() => {
@@ -109,7 +109,7 @@ watchEffect(() => {
         
         <div class="flex-1 flex-col min-w-0 pt-4">
           <client-only>
-            <DemoChart />
+            <UserContributionChart />
           </client-only>
           <UserProfileTabs
             v-if="user"
