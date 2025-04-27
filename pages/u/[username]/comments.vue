@@ -73,6 +73,15 @@ const loadMore = () => {
     },
   });
 };
+
+const isCommentOnDeletedEvent = (comment) => {
+  // If the comment was on a deleted discussion, the DiscussionChannel would still be there
+  // because DiscussionChannels are not deleted along with the discussion, and comments
+  // are attached to the DiscussionChannel. However, if a comment was on a deleted event,
+  // the Event would be null, and the DiscussionChannel would be null. So this is how we
+  // infer that the comment was on a deleted event.
+  return comment.Event === null && comment.DiscussionChannel === null
+};
 </script>
 
 <template>
@@ -103,6 +112,12 @@ const loadMore = () => {
           v-if="comment?.archived"
           :channel-id="comment.Channel?.id"
           :comment-id="comment.id"
+        />
+        <InfoBanner
+          v-if="isCommentOnDeletedEvent(comment)"
+          class="ml-10 my-2"
+          :text="'This comment was on an event that has been deleted.'"
+          type="warning"
         />
     </div>
     </div>

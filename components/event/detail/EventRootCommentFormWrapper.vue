@@ -10,8 +10,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import type { Event, Comment } from "@/__generated__/graphql";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
-import { usernameVar, modProfileNameVar } from "@/cache";
-import { gql } from "@apollo/client/core";
+import { usernameVar } from "@/cache";
 
 const COMMENT_LIMIT = 50;
 const props = defineProps({
@@ -106,41 +105,6 @@ const {
         console.error("No new comment returned from createComments mutation");
         return;
       }
-
-      // First, make sure the full comment data is written to the cache
-      const commentRef = cache.writeFragment({
-        data: newComment,
-        fragment: gql`
-          fragment NewCommentWithDetails on Comment {
-            id
-            text
-            emoji
-            weightedVotesCount
-            createdAt
-            updatedAt
-            archived
-            CommentAuthor {
-              __typename
-              ... on User {
-                username
-                profilePicURL
-              }
-              ... on ModerationProfile {
-                displayName
-              }
-            }
-            ChildCommentsAggregate {
-              count
-            }
-            UpvotedByUsers {
-              username
-            }
-            UpvotedByUsersAggregate {
-              count
-            }
-          }
-        `
-      });
 
       // Define the query variables
       const eventCommentsQueryVariables = {
