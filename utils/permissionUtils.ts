@@ -146,6 +146,9 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
  *   - Role information: 'isChannelOwner', 'isElevatedMod', 'isSuspendedMod', 'isSuspendedUser'
  */
 export const getAllPermissions = (params: GetAllPermissionsParams): Record<string, boolean> => {
+  if (!params) {
+    return {};
+  }
   const {
     permissionData,
     standardModRole,
