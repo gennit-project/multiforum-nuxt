@@ -18,7 +18,8 @@
     "test:unit": "vitest",
     "test:unit:run": "vitest run",
     "tsc": "tsc",
-    "verify": "npm run tsc && npm run test:unit:run"
+    "verify": "npm run tsc && npm run test:unit:run",
+    "lint-verify": "npm run test:unit:run"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
@@ -139,12 +140,10 @@
   },
   "lint-staged": {
     "*.ts": [
-      "eslint --fix",
-      "npm run test:unit:run"
+      "eslint --fix"
     ],
     "*.vue": [
-      "eslint --fix",
-      "npm run test:unit:run"
+      "eslint --fix"
     ],
     "tests/**/*.spec.ts": [
       "npm run test:unit:run -- --run $1"

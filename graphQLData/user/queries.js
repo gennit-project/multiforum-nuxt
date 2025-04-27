@@ -379,6 +379,9 @@ query getUserContributions($username: String!, $year: Int) {
         createdAt
         CommentAuthor {
           username
+          ... on User {
+            profilePicURL
+          }
         }
         Channel {
           uniqueName
@@ -398,6 +401,7 @@ query getUserContributions($username: String!, $year: Int) {
         createdAt
         Author {
           username
+          profilePicURL
         }
         DiscussionChannels {
           id
