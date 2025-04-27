@@ -261,17 +261,20 @@ const replyCount = computed(() => {
 
 const textCopy = computed(() => props.commentData.text);
 
-const canShowPermalink =
-  props.commentData.DiscussionChannel ||
-  props.commentData.GivesFeedbackOnDiscussion ||
-  props.commentData.GivesFeedbackOnEvent ||
-  props.commentData.GivesFeedbackOnComment ||
-  props.commentData.Event ||
-  props.commentData.Issue ||
-  props.commentData.Channel ||
-  (issueId && forumId && props.commentData.id) || // For issue comments
-  (discussionId && forumId) || // For discussion comments
-  (eventId && forumId); // For event comments
+const canShowPermalink = computed(() => {
+  return !!(
+    props.commentData.DiscussionChannel ||
+    props.commentData.GivesFeedbackOnDiscussion ||
+    props.commentData.GivesFeedbackOnEvent ||
+    props.commentData.GivesFeedbackOnComment ||
+    props.commentData.Event ||
+    props.commentData.Issue ||
+    props.commentData.Channel ||
+    (issueId && forumId.value && props.commentData.id) || // For issue comments
+    (discussionId && forumId.value) || // For discussion comments
+    (eventId && forumId.value) // For event comments
+  );
+});
 
 const isFeedbackComment = computed(() => {
   return (
@@ -282,15 +285,25 @@ const isFeedbackComment = computed(() => {
 });
 
 const permalinkObject = computed(() => {
-  if (!canShowPermalink) {
+  if (!canShowPermalink.value) {
     console.warn("No permalink object found for comment", props.commentData);
+    return {};
+  }
+
+  const channelUniqueName = props.commentData.Channel?.uniqueName || 
+                          props.commentData?.DiscussionChannel?.channelUniqueName;
+                          
+  // If we don't have a valid forumId and we're not on a page with a forumId param,
+  // we can't create a permalink
+  if (!channelUniqueName && !forumId.value) {
+    console.warn("Missing forumId for comment permalink", props.commentData.id);
     return {};
   }
 
   if (isFeedbackComment.value) {
     return getFeedbackPermalinkObject({
       routeName: route.name as string,
-      forumId: props.commentData.Channel?.uniqueName || forumId.value as string,
+      forumId: channelUniqueName || forumId.value as string,
       discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
       eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
       commentId: props.commentData.GivesFeedbackOnComment?.id,
@@ -304,36 +317,35 @@ const permalinkObject = computed(() => {
 
   const discussionIdInLink =
     discussionId || props.commentData?.DiscussionChannel?.discussionId;
-  if (discussionIdInLink) {
+  if (discussionIdInLink && (channelUniqueName || forumId.value)) {
     // Permalink for comment on a discussion
     result = {
       name: "forums-forumId-discussions-discussionId-comments-commentId",
       params: {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
-        forumId:
-          forumId.value || props.commentData?.DiscussionChannel?.channelUniqueName,
+        forumId: channelUniqueName || forumId.value,
       },
     };
   }
   const eventIdInLink = eventId || props.commentData?.Event?.id;
-  if (eventIdInLink) {
+  if (eventIdInLink && (channelUniqueName || forumId.value)) {
     result = {
       name: "forums-forumId-events-eventId-comments-commentId",
       params: {
         eventId: props.commentData.Event?.id,
-        forumId: forumId.value || props.commentData.Channel?.uniqueName,
+        forumId: channelUniqueName || forumId.value,
         commentId: props.commentData.id,
       },
     };
   }
   const issueIdInLink = issueId || props.commentData?.Issue?.id;
-  if (issueIdInLink) {
+  if (issueIdInLink && channelUniqueName) {
     result = {
       name: "forums-forumId-issues-issueId-comments-commentId",
       params: {
         issueId: issueIdInLink,
-        forumId: props.commentData.Channel?.uniqueName,
+        forumId: channelUniqueName,
         commentId: props.commentData.id,
       },
     };
@@ -349,11 +361,21 @@ if (import.meta.client) {
   basePath = process.env.BASE_URL || "";
 }
 
-const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
+const permalink = computed(() => {
+  if (!Object.keys(permalinkObject.value).length) {
+    return '';
+  }
+  return `${basePath}${router.resolve(permalinkObject.value).href}`;
+});
 
 const copyLink = async () => {
+  if (!permalink.value) {
+    console.warn("No permalink available to copy");
+    return;
+  }
+  
   try {
-    await navigator.clipboard.writeText(permalink);
+    await navigator.clipboard.writeText(permalink.value);
     emit("showCopiedLinkNotification", true);
   } catch (e: any) {
     throw new Error(e);
@@ -456,8 +478,8 @@ const availableModActions = computed(() => {
 const commentMenuItems = computed(() => {
   let out: any[] = [];
   
-  // Always show permalink if available
-  if (canShowPermalink) {
+  // Only show Copy Link when we have a valid permalink
+  if (canShowPermalink.value && Object.keys(permalinkObject.value).length > 0) {
     out.unshift({
       label: "Copy Link",
       value: "",
@@ -652,13 +674,13 @@ const label = computed(() => {
                     ]"
                   >
                     <MarkdownPreview
-                      v-if="!goToPermalinkOnClick"
+                      v-if="!goToPermalinkOnClick || !Object.keys(permalinkObject).length"
                       :key="textCopy || ''"
                       :text="textCopy || ''"
                       :word-limit="SHOW_MORE_THRESHOLD"
                       :disable-gallery="false"
                     />
-                    <router-link v-else :to="permalinkObject">
+                    <router-link v-else-if="Object.keys(permalinkObject).length" :to="permalinkObject">
                       <MarkdownPreview
                         :key="textCopy || ''"
                         :text="textCopy || ''"
