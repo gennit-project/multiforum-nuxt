@@ -6,7 +6,7 @@ type RuleOption = {
   detail: string;
 };
 
-const props = defineProps({
+defineProps({
   rule: {
     type: Object as () => RuleOption,
     required: true,

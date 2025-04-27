@@ -8,7 +8,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import TailwindForm from "@/components/FormComponent.vue";
 
 
-const props = defineProps({
+defineProps({
   editMode: {
     type: Boolean,
     required: true,

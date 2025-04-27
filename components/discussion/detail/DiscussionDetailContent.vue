@@ -294,7 +294,7 @@ const handleClickEditDiscussionBody = () => {
 <template>
   <div class="w-full">
     <LoadingSpinner
-      v-if="getDiscussionLoading"
+      v-if="getDiscussionLoading && !discussion"
       class="flex justify-center py-4"
       :loading-text="'Loading discussion...'"
       />
