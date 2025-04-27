@@ -402,10 +402,10 @@ const cellCount = computed(() => {
           </div>
         </div>
 
-        <div class="flex items-start">
+        <div class="flex items-start space-x-6">
           <!-- Day labels (properly spaced) -->
           <div
-            class="pr-2 text-tiny relative w-10"
+            class="text-tiny relative w-10"
             style="height: 104px;"
             :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
           >
@@ -418,47 +418,49 @@ const cellCount = computed(() => {
               {{ day }}
             </span>
           </div>
-          <svg
-            :key="chartKey"
-            :width="`${cellCount * 14 + 10}`"
-            height="110"
-            class="overflow-visible"
-          >
-            <g
-              v-for="(week, weekIndex) in gridData"
-              :key="'week-' + weekIndex"
-              :transform="`translate(${weekIndex * 14}, 0)`"
+          <div class="flex-1">
+            <svg
+              :key="chartKey"
+              :width="`${cellCount * 14 + 10}`"
+              height="110"
+              class="overflow-visible"
             >
-              <rect
-                v-for="(dayData, dayIndex) in week"
-                :key="`day-${weekIndex}-${dayIndex}`"
-                x="0"
-                :y="dayIndex * 14"
-                width="10"
-                height="10"
-                :fill="getColor(dayData.count)"
-                rx="2"
-                ry="2"
-                :data-date="dayData.date"
-                :data-count="dayData.count"
-                class="cursor-pointer hover:stroke-1 transition-colors duration-200"
-                :class="[
-                  darkMode ? 'hover:stroke-green-600' : 'hover:stroke-green-400',
-                  selectedDay &&
-                  selectedDay.week === weekIndex &&
-                  selectedDay.day === dayIndex
-                    ? 'stroke-2 stroke-blue-500'
-                    : '',
-                ]"
-                @click="selectDay(weekIndex, dayIndex)"
+              <g
+                v-for="(week, weekIndex) in gridData"
+                :key="'week-' + weekIndex"
+                :transform="`translate(${weekIndex * 14}, 0)`"
               >
-                <title>
-                  {{ dayData.count }} contributions on
-                  {{ formatDate(dayData.date) }}
-                </title>
-              </rect>
-            </g>
-          </svg>
+                <rect
+                  v-for="(dayData, dayIndex) in week"
+                  :key="`day-${weekIndex}-${dayIndex}`"
+                  x="0"
+                  :y="dayIndex * 14"
+                  width="10"
+                  height="10"
+                  :fill="getColor(dayData.count)"
+                  rx="2"
+                  ry="2"
+                  :data-date="dayData.date"
+                  :data-count="dayData.count"
+                  class="cursor-pointer hover:stroke-1 transition-colors duration-200"
+                  :class="[
+                    darkMode ? 'hover:stroke-green-600' : 'hover:stroke-green-400',
+                    selectedDay &&
+                    selectedDay.week === weekIndex &&
+                    selectedDay.day === dayIndex
+                      ? 'stroke-2 stroke-blue-500'
+                      : '',
+                  ]"
+                  @click="selectDay(weekIndex, dayIndex)"
+                >
+                  <title>
+                    {{ dayData.count }} contributions on
+                    {{ formatDate(dayData.date) }}
+                  </title>
+                </rect>
+              </g>
+            </svg>
+          </div>
         </div>
       </div>
     </div>
