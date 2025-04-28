@@ -21,7 +21,8 @@ export default defineNuxtConfig({
   },
   vue: {
     compilerOptions: {
-      whitespace: 'preserve'
+      whitespace: 'preserve',
+      warnExplicitImportCheck: false // This suppresses warnings about explicit imports of compiler macros
     }
   },
   build: {
@@ -51,31 +52,31 @@ export default defineNuxtConfig({
             // Always get fresh token from localStorage on each request
             apolloLink: ({ uri }) => {
               // Only run client-side
-              if (process.client) {
-                const { ApolloLink, HttpLink, from } = require('@apollo/client/core');
-                
-                // Create regular HTTP link
-                const httpLink = new HttpLink({ uri });
-                
-                // Create auth middleware that adds the token to each request
-                const authMiddleware = new ApolloLink((operation, forward) => {
-                  // Get the latest token from localStorage on every request
-                  const token = localStorage.getItem('token');
+              if (import.meta.client) {
+                return import('@apollo/client/core').then(({ ApolloLink, HttpLink, from }) => {
+                  // Create regular HTTP link
+                  const httpLink = new HttpLink({ uri });
                   
-                  // Set auth header if token exists
-                  if (token) {
-                    operation.setContext({
-                      headers: {
-                        Authorization: `Bearer ${token}`
-                      }
-                    });
-                  }
+                  // Create auth middleware that adds the token to each request
+                  const authMiddleware = new ApolloLink((operation, forward) => {
+                    // Get the latest token from localStorage on every request
+                    const token = localStorage.getItem('token');
+                    
+                    // Set auth header if token exists
+                    if (token) {
+                      operation.setContext({
+                        headers: {
+                          Authorization: `Bearer ${token}`
+                        }
+                      });
+                    }
+                    
+                    return forward(operation);
+                  });
                   
-                  return forward(operation);
+                  // Return the combined link
+                  return from([authMiddleware, httpLink]);
                 });
-                
-                // Return the combined link
-                return from([authMiddleware, httpLink]);
               }
               
               // Server-side, use regular link
