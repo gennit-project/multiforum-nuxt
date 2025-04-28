@@ -61,6 +61,7 @@ const emit = defineEmits([
   "handleClickGiveFeedback",
   "handleClickEditBody",
   "cancelEditDiscussionBody",
+  "handleClickAddAlbum",
 ]);
 
 const route = useRoute();
@@ -262,6 +263,7 @@ const menuItems = computed(() => {
     userPermissions: userPermissions.value,
     isLoggedIn: !!usernameVar.value,
     discussionId: props.discussion.id,
+    hasAlbum: !!props.discussion?.Album?.Images?.length
   });
 });
 
@@ -343,6 +345,7 @@ const authorIsMod = computed(
           @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
           @handle-click-unarchive="showUnarchiveModal = true"
           @handle-feedback="emit('handleClickGiveFeedback')"
+          @handle-add-album="emit('handleClickAddAlbum')"
           @handle-view-feedback="
             router.push({
               name: 'forums-forumId-discussions-feedback-discussionId',

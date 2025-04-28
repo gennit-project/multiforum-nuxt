@@ -13,7 +13,7 @@ import SaveButton from "@/components/SaveButton.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
-// import { usernameVar } from "@/cache";
+import { usernameVar } from "@/cache";
 
 const props = defineProps({
   album: {
@@ -69,8 +69,8 @@ const canEditInCurrentMode = computed(() => {
 // Mutation to update image caption
 const { mutate: updateImage, loading: updateLoading } = useMutation(UPDATE_IMAGE);
 
-// Event is emitted to inform parent that album was updated
-const emit = defineEmits(["album-updated"]);
+// Events emitted by this component
+const emit = defineEmits(["album-updated", "edit-album"]);
 
 const startEditingCaption = (index: number) => {
   // Set which image we're editing and initialize with current caption
@@ -421,22 +421,37 @@ v-if="editingCaptionIndex === idx"
             `${activeIndex + 1} of ${orderedImages.length}`
           }}</span>
 
-          <div v-if="orderedImages.length > 1" class="flex gap-2">
+          <div class="flex items-center gap-2">
+            <!-- Edit Album Button - only shown to the discussion author -->
             <button
+              v-if="usernameVar === discussionAuthor"
               type="button"
-              class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
-              @click="goLeft"
+              class="hover:bg-gray-500 dark:hover:bg-gray-700 flex items-center justify-center px-2 h-8 rounded-md"
+              title="Edit Album"
+              @click="$emit('edit-album')"
             >
-              <LeftArrowIcon class="h-4 w-4" />
+              <PencilIcon class="h-4 w-4 mr-1" />
+              <span class="text-sm">Edit Album</span>
             </button>
 
-            <button
-              class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
-              type="button"
-              @click="goRight"
-            >
-              <RightArrowIcon class="h-4 w-4" />
-            </button>
+            <!-- Navigation Buttons -->
+            <div v-if="orderedImages.length > 1" class="flex gap-2">
+              <button
+                type="button"
+                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+                @click="goLeft"
+              >
+                <LeftArrowIcon class="h-4 w-4" />
+              </button>
+
+              <button
+                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+                type="button"
+                @click="goRight"
+              >
+                <RightArrowIcon class="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
 

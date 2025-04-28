@@ -25,8 +25,9 @@ export const getDiscussionHeaderMenuItems = (params: {
   userPermissions: Record<string, boolean>;
   isLoggedIn: boolean;
   discussionId: string;
+  hasAlbum?: boolean;
 }): MenuItem[] => {
-  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId } = params;
+  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false } = params;
   let menuItems: MenuItem[] = [];
 
   // Always add these base items for authenticated or unauthenticated users
@@ -58,6 +59,15 @@ export const getDiscussionHeaderMenuItems = (params: {
       icon: ALLOWED_ICONS.EDIT,
       value: discussionId,
     });
+    // Add "Add album" action if the discussion doesn't have an album
+    if (!hasAlbum) {
+      menuItems.push({
+        label: "Add Album",
+        event: "handleAddAlbum",
+        icon: ALLOWED_ICONS.EDIT,
+        value: discussionId,
+      });
+    }
     menuItems.push({
       label: "Delete",
       event: "handleDelete",

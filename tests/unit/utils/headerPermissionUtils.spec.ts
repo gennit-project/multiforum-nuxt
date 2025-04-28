@@ -61,8 +61,9 @@ describe('headerPermissionUtils', () => {
         discussionId
       })
       
-      // Should have 4 items: view feedback, copy link, edit, delete
-      expect(menuItems.length).toBe(4)
+      // Should have 4 items: view feedback, copy link, edit, delete, and
+      // add/edit album.
+      expect(menuItems.length).toBe(5)
       
       // Verify edit and delete options
       const editOption = menuItems.find(item => item.event === 'handleEdit')
@@ -219,7 +220,7 @@ describe('headerPermissionUtils', () => {
       })
       
       // Should have base items plus edit/delete, but no mod actions
-      expect(menuItems.length).toBe(4)
+      expect(menuItems.length).toBe(5)
       
       // Should have edit and delete options
       const editOption = menuItems.find(item => item.event === 'handleEdit')

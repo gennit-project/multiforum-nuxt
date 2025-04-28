@@ -30,6 +30,7 @@ import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar, modProfileNameVar, isAuthenticatedVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
+import AlbumEditForm from "./AlbumEditForm.vue";
 import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
 import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
@@ -122,6 +123,7 @@ const {
 );
 
 const discussionBodyEditMode = ref(false);
+const albumEditMode = ref(false);
 
 const discussion = computed<Discussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions[0];
@@ -289,6 +291,14 @@ const handleClickEditFeedback = () => {
 const handleClickEditDiscussionBody = () => {
   discussionBodyEditMode.value = true;
 };
+
+const handleClickAddAlbum = () => {
+  albumEditMode.value = true;
+};
+
+const handleEditAlbum = () => {
+  albumEditMode.value = true;
+};
 </script>
 
 <template>
@@ -328,6 +338,7 @@ const handleClickEditDiscussionBody = () => {
                   :discussion-is-archived="isArchived || false"
                   @handle-click-give-feedback="handleClickGiveFeedback"
                   @handle-click-edit-body="handleClickEditDiscussionBody"
+                  @handle-click-add-album="handleClickAddAlbum"
                   @cancel-edit-discussion-body="discussionBodyEditMode = false"
                 />
                 <div class="flex-1">
@@ -335,6 +346,11 @@ const handleClickEditDiscussionBody = () => {
                     v-if="discussionBodyEditMode"
                     :discussion="discussion"
                     @close-editor="discussionBodyEditMode = false"
+                  />
+                  <AlbumEditForm
+                    v-else-if="albumEditMode"
+                    :discussion="discussion"
+                    @close-editor="albumEditMode = false"
                   />
                   <DiscussionBody
                     v-else
@@ -356,6 +372,7 @@ const handleClickEditDiscussionBody = () => {
                           :discussion-id="discussionId"
                           :discussion-author="discussion.Author?.username || ''"
                           @album-updated="refetchDiscussion"
+                          @edit-album="handleEditAlbum"
                         />
                       </div>
                     </template>
