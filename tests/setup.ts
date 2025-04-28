@@ -1,5 +1,19 @@
 import { vi } from 'vitest'
 
+// Suppress Vue compiler warnings
+const originalConsoleWarn = console.warn
+console.warn = function(msg, ...args) {
+  // Skip Vue compiler macro warnings
+  if (
+    typeof msg === 'string' && 
+    (msg.includes('`defineProps` is a compiler macro') || 
+     msg.includes('`defineExpose` is a compiler macro'))
+  ) {
+    return
+  }
+  originalConsoleWarn(msg, ...args)
+}
+
 // Mock components that might cause issues
 vi.mock('vuemoji-picker', () => ({
   default: {
