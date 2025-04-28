@@ -12,7 +12,7 @@ import type {
   CommentCreateInput,
   NewUserInput
 } from "../../__generated__/graphql";
-import type { LoginInput } from "../support/commandFunctions/loginWithButtonClick";
+import type { LoginInput } from "./commandFunctions/loginWithButtonClick";
 /* eslint-disable @typescript-eslint/no-namespace */
 
 export type SeedDataInput = {
