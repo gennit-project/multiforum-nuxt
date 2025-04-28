@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
-import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import { CREATE_SIGNED_STORAGE_URL, CREATE_IMAGE } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
@@ -43,9 +43,15 @@ type ImageInput = {
   caption: string;
 };
 
-// GraphQL Mutation to get the signed storage URL
+// GraphQL Mutations
+
+// Mutation to get the signed storage URL
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
+
+// Mutation to create an image record in the database
+const { mutate: createImage, error: createImageError } =
+  useMutation(CREATE_IMAGE);
 
 // Keep track of which item is uploading or done
 const loadingStates = ref<{ [key: number]: boolean }>({});
@@ -56,17 +62,18 @@ const isImageLimitReached = computed(() => {
 });
 
 /**
- * Upload a single file and return the final link or null on failure.
+ * Upload a single file and return the created image object or null on failure.
+ * This handles both uploading the file to storage and creating the Image record in the database.
  */
-const uploadFile = async (file: File): Promise<string | null> => {
+const uploadFile = async (file: File): Promise<boolean> => {
   if (!usernameVar.value) {
     console.error("No username found, cannot upload.");
-    return null;
+    return false;
   }
   const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
     alert(sizeCheck.message);
-    return null;
+    return false;
   }
 
   try {
@@ -83,26 +90,53 @@ const uploadFile = async (file: File): Promise<string | null> => {
       throw new Error("No signed storage URL returned");
     }
 
-    // Actually upload the file using the signed URL
-    const finalLink = await uploadAndGetEmbeddedLink({
+    // Upload the file using the signed URL
+    const fileUrl = await uploadAndGetEmbeddedLink({
       file,
       filename,
       fileType: contentType,
       signedStorageURL,
     });
-    if (!finalLink) {
-      throw new Error("No final link returned");
+    
+    if (!fileUrl) {
+      throw new Error("No file URL returned from upload");
     }
-    return finalLink;
+    
+    // Now create the Image record in the database
+    const createImageResult = await createImage({
+      url: fileUrl,
+      alt: file.name,           // Default to filename for alt text
+      caption: "",              // Empty caption by default
+      copyright: "",            // Empty copyright by default
+      username: usernameVar.value
+    });
+    
+    // Get the created image from the result
+    const createdImage = createImageResult?.data?.createImages?.images?.[0];
+    
+    if (!createdImage || !createdImage.id) {
+      throw new Error("Failed to create image record in database");
+    }
+    
+    // Add the image to our album using the addNewImage helper
+    addNewImage({
+      id: createdImage.id,
+      url: createdImage.url,
+      alt: createdImage.alt || file.name,
+      caption: createdImage.caption || "",
+      copyright: createdImage.copyright || ""
+    });
+    
+    return true;
   } catch (err) {
-    console.error("Error uploading file:", err);
-    return null;
+    console.error("Error uploading file and creating image:", err);
+    return false;
   }
 };
 
 /**
- * Given multiple files, sequentially upload them and
- * add them to the album array as new images.
+ * Handle uploading multiple files at once
+ * Each file is uploaded and added to the album immediately after successful creation
  */
 const handleMultipleFiles = async (files: FileList | File[]) => {
   if (!files || files.length === 0) return;
@@ -119,21 +153,10 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
 
     loadingStates.value[-1] = true;
 
-    // Process all files and collect their results
-    const uploadPromises = filesToProcess.map(file => uploadFile(file));
-    const uploadedUrls = await Promise.all(uploadPromises);
-    
-    // Add all successful uploads at once
-    uploadedUrls.forEach((url, index) => {
-      if (url) {
-        addNewImage({
-          url: url,
-          alt: filesToProcess[index].name,
-          caption: "",
-          copyright: "",
-        });
-      }
-    });
+    // Process files one by one
+    for (const file of filesToProcess) {
+      await uploadFile(file);
+    }
   } else {
     // Normal flow when not exceeding limits
     loadingStates.value[-1] = true;
@@ -141,21 +164,10 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     // Convert FileList to Array first
     const filesArray = Array.from(files);
     
-    // Process all files and collect their results
-    const uploadPromises = filesArray.map(file => uploadFile(file));
-    const uploadedUrls = await Promise.all(uploadPromises);
-    
-    // Add all successful uploads at once
-    uploadedUrls.forEach((url, index) => {
-      if (url) {
-        addNewImage({
-          url: url,
-          alt: filesArray[index].name,  // Now using filesArray instead of files
-          caption: "",
-          copyright: "",
-        });
-      }
-    });
+    // Process files one by one sequentially to avoid race conditions
+    for (const file of filesArray) {
+      await uploadFile(file);
+    }
   }
 
   // Turn off the global loading
@@ -292,6 +304,7 @@ const moveImageDown = (index: number) => {
 };
 
 type AddImageInput = {
+  id?: string;
   url: string;
   alt: string;
   caption: string;
@@ -299,12 +312,22 @@ type AddImageInput = {
 };
 
 const updateImageOrderAfterChange = (images: ImageInput[]) => {
+  // During creation, new images won't have IDs yet
+  // If we're in creation mode (no images have IDs), we don't need imageOrder
+  const hasAnyIds = images.some(img => typeof img.id === 'string' && img.id.length > 0);
+  
+  if (!hasAnyIds) {
+    // During creation, we don't need imageOrder - it will be assigned server-side
+    return [];
+  }
+  
+  // For existing albums with IDs, keep the existing behavior
   // Filter out any images without IDs first
   const validImages = images.filter((img): img is ImageInput & { id: string } => {
     return typeof img.id === 'string' && img.id.length > 0;
   });
 
-  // If we have no valid IDs, return an empty array instead of [null]
+  // If we have no valid IDs, return an empty array
   if (validImages.length === 0) {
     return [];
   }
@@ -313,30 +336,37 @@ const updateImageOrderAfterChange = (images: ImageInput[]) => {
   return validImages.map(img => img.id);
 };
 
+/**
+ * Adds an image to the album, either from upload or manual URL entry
+ */
 const addNewImage = (input: Partial<AddImageInput>) => {
   if ((props.formValues.album?.images?.length ?? 0) >= MAX_IMAGES) {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
     return;
   }
 
-  const { url, alt } = input;
+  const { url, alt, caption, copyright, id } = input;
 
   const newImage: ImageInput = {
+    id: id, // May be undefined for manual entries
     url: url || '',
     alt: alt || '',
-    caption: input.caption || '', // Provide default empty string
-    copyright: input.copyright || '', // Provide default empty string
+    caption: caption || '', 
+    copyright: copyright || '',
   };
 
   const updatedImages = [...props.formValues.album.images, newImage];
 
-  // Only include real IDs in the imageOrder
-  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
+  // Update the imageOrder if this image has an ID
+  const updatedImageOrder = [...props.formValues.album.imageOrder];
+  if (id) {
+    updatedImageOrder.push(id);
+  }
 
   emit("updateFormValues", {
     album: {
       images: updatedImages,
-      imageOrder: updatedImageOrder.length > 0 ? updatedImageOrder : [], // Ensure we never emit empty array
+      imageOrder: updatedImageOrder
     },
   });
 };
@@ -348,6 +378,10 @@ const addNewImage = (input: Partial<AddImageInput>) => {
     <ErrorBanner
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
+    />
+    <ErrorBanner
+      v-if="createImageError"
+      :text="createImageError.message"
     />
     <div v-if="loadingStates[-1]" class="mb-2">
       <LoadingSpinner />
@@ -456,7 +490,7 @@ const addNewImage = (input: Partial<AddImageInput>) => {
         multiple
         style="display: none"
         @change="handleFileInputChange"
-      />
+      >
     </div>
     <div
       v-else

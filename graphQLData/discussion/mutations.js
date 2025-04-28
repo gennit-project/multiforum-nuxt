@@ -8,6 +8,45 @@ export const CREATE_SIGNED_STORAGE_URL = gql`
   }
 `;
 
+export const CREATE_IMAGE = gql`
+  mutation createImage(
+    $url: String!, 
+    $alt: String, 
+    $caption: String, 
+    $copyright: String, 
+    $username: String!
+  ) {
+    createImages(
+      input: [
+        {
+          url: $url,
+          alt: $alt,
+          caption: $caption,
+          copyright: $copyright,
+          hasSensitiveContent: false,
+          hasSpoiler: false,
+          Uploader: {
+            connect: { 
+              where: { node: { username: $username } } 
+            }
+          }
+        }
+      ]
+    ) {
+      images {
+        id
+        url
+        alt
+        caption
+        copyright
+        Uploader {
+          username
+        }
+      }
+    }
+  }
+`;
+
 export const ADD_EMOJI_TO_DISCUSSION_CHANNEL = gql`
   mutation addEmojiToDiscussionChannel(
     $discussionChannelId: ID!

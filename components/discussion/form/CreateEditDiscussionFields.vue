@@ -60,11 +60,11 @@ onMounted(() => {
     });
   }
 });
-function handleUpdateAlbum(newVals: { album: { images: any[] } }) {
-  // Merge these changes back into the parent's form data
+function handleUpdateAlbum(newVals: { album: { images: any[], imageOrder: string[] } }) {
+  // Only emit the album changes, not the entire form values
+  // This prevents potential duplication of form data
   emit("updateFormValues", {
-    ...props.formValues,
-    ...newVals,
+    album: newVals.album
   });
 }
 </script>

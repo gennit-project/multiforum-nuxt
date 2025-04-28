@@ -33,7 +33,8 @@ const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
   selectedTags: [],
   author: usernameVar.value,
   album: {
-    images: [],
+    images: [], // Will be populated with uploaded images that have IDs
+    imageOrder: []
   }
 };
 
@@ -63,21 +64,21 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   };
 
   if (formValues.value.album.images.length > 0) {
+    // Since images now have IDs (created when uploaded), we connect to them
+    // instead of creating them again
     result.Album = {
-      create:   {
-         node: { 
-            Images: {
-              create: formValues.value.album.images.map((image) => ({
-                node: {
-                  url: image.url,
-                  alt: image.caption,
-                  caption: image.caption,
-                  copyright: image.copyright,
-                }
+      create: {
+        node: { 
+          imageOrder: formValues.value.album.imageOrder,
+          Images: {
+            connect: formValues.value.album.images
+              .filter(image => image.id) // Only include images with IDs
+              .map(image => ({
+                where: { node: { id: image.id } }
               }))
-            }
           }
         }
+      }
     };
   }
 
@@ -180,11 +181,29 @@ function submit() {
   createDiscussion();
 }
 
-function updateFormValues(data: CreateEditDiscussionFormValues) {
-  formValues.value = {
-    ...formValues.value,
-    ...data,
-  };
+function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
+  // Handle album updates specially to avoid overwriting the entire album object
+  if (data.album) {
+    formValues.value.album = {
+      ...formValues.value.album,
+      ...data.album
+    };
+    
+    // Remove album from data to prevent double-application
+    const { album, ...restData } = data;
+    
+    // Update the rest of the form values
+    formValues.value = {
+      ...formValues.value,
+      ...restData
+    };
+  } else {
+    // If no album data, just update normally
+    formValues.value = {
+      ...formValues.value,
+      ...data,
+    };
+  }
 }
 </script>
 
