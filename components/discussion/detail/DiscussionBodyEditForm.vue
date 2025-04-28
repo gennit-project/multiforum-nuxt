@@ -78,24 +78,22 @@ const formValues = ref({
 });
 
 function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
-  // 1) If the album doesn't exist yet, just CREATE it (and its images)
+  // 1) If the album doesn't exist yet, CREATE it and connect to existing images
   if (!albumId.value) {
     const newImages = formValues.value.album.images || [];
+    
+    // All images should already have IDs since they're created when uploaded
     return {
       body: formValues.value.body,
       Album: {
         create: {
           node: {
-            imageOrder: formValues.value.album.imageOrder, // Use the current image order from form values
+            imageOrder: formValues.value.album.imageOrder,
             Images: {
-              create: newImages.map((img) => ({
-                node: {
-                  url: img.url,
-                  alt: img.alt,
-                  caption: img.caption,
-                  copyright: img.copyright,
-                },
-              })),
+              // Connect to existing images using their IDs
+              connect: newImages.map(img => ({
+                where: { node: { id: img.id } }
+              }))
             },
           },
         },
@@ -107,18 +105,14 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
   const oldImages = props.discussion.Album?.Images ?? [];
   const newImages = formValues.value.album.images;
 
-  // CREATE array: any new image in `newImages` that has NO matching ID in `oldImages`
-  const createImageArray = newImages
+  // CONNECT array: any new image in `newImages` that has NO matching ID in `oldImages`
+  // These are images that already exist in the database but need to be connected to this album
+  const connectImageArray = newImages
     .filter((img) => !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
-      create: {
-        node: {
-          url: img.url,
-          alt: img.alt,
-          caption: img.caption,
-          copyright: img.copyright,
-        },
-      },
+      connect: {
+        where: { node: { id: img.id } }
+      }
     }));
 
   // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
@@ -145,7 +139,7 @@ function getUpdateDiscussionInputFromFormValues(): DiscussionUpdateInput {
     }));
   // Combine all operations into a single array. Each object is one "Images" operation.
   const imagesOps = [
-    ...createImageArray,
+    ...connectImageArray,
     ...updateImageArray,
     ...deleteImageArray,
   ];

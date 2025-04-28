@@ -13,7 +13,7 @@ import SaveButton from "@/components/SaveButton.vue";
 import CancelButton from "@/components/CancelButton.vue";
 import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
-import { usernameVar } from "@/cache";
+// import { usernameVar } from "@/cache";
 
 const props = defineProps({
   album: {
@@ -44,21 +44,8 @@ const activeIndex = ref(0);
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 
-const orderedImages = computed(() => {
-  // If imageOrder exists and has items, use it to order the images
-  if (props.album?.imageOrder && props.album.imageOrder.length > 0) {
-    return props.album.imageOrder
-      .filter((imageId): imageId is string => !!imageId)
-      .map((imageId) => {
-        const image = props.album.Images.find((image) => imageId === image.id);
-        return image || null;
-      })
-      .filter((image): image is NonNullable<typeof image> => image !== null);
-  }
-  // Otherwise, just return all images directly
-  else {
-    return props.album.Images || [];
-  }
+const orderedImages = computed(() => {  
+  return props.album.Images || [];
 });
 
 // Current image based on ordered images
@@ -70,9 +57,9 @@ const isPanelVisible = ref(true);
 // Caption editing
 const editingCaptionIndex = ref(-1);
 const editingCaption = ref("");
-const isLoggedInAuthor = computed(() => {
-  return usernameVar.value === props.discussionAuthor;
-});
+// const isLoggedInAuthor = computed(() => {
+//   return usernameVar.value === props.discussionAuthor;
+// });
 
 // Always enable editing for now to fix the issue with seeing edit buttons
 const canEditInCurrentMode = computed(() => {
@@ -386,7 +373,8 @@ const handleTouchEnd = (event: TouchEvent) => {
             :alt="image.alt || ''"
             class="shadow-sm"
           >
-          <div v-if="editingCaptionIndex === idx" 
+          <div
+v-if="editingCaptionIndex === idx" 
                class="text-center text-xs mt-1"
                @click.stop
                @mousedown.stop
@@ -548,9 +536,9 @@ const handleTouchEnd = (event: TouchEvent) => {
               <button
                 class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
                 title="Zoom out"
-                @click="zoomOut"
                 :disabled="zoomLevel <= 1"
                 :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"
+                @click="zoomOut"
               >
                 −
               </button>
@@ -560,9 +548,9 @@ const handleTouchEnd = (event: TouchEvent) => {
               <button
                 class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
                 title="Zoom in"
-                @click="zoomIn"
                 :disabled="zoomLevel >= 3"
                 :class="{ 'opacity-50 cursor-not-allowed': zoomLevel >= 3 }"
+                @click="zoomIn"
               >
                 +
               </button>
@@ -579,8 +567,8 @@ const handleTouchEnd = (event: TouchEvent) => {
             <!-- Panel toggle button -->
             <button
               class="bg-opacity-10 bg-gray-800 border-0 text-white py-1 px-2 rounded cursor-pointer text-sm transition-colors"
-              @click="togglePanel"
               :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
+              @click="togglePanel"
             >
               <span v-if="isPanelVisible">Close panel</span>
               <span v-else>Open panel</span>
@@ -622,7 +610,7 @@ const handleTouchEnd = (event: TouchEvent) => {
             @mousedown="startDrag"
             @touchstart="startTouchDrag"
             @touchmove="onTouchDrag"
-          />
+          >
 
           <button
             v-if="orderedImages.length > 1"
@@ -652,7 +640,8 @@ const handleTouchEnd = (event: TouchEvent) => {
           >
             <XmarkIcon class="h-4 w-4" />
           </button>
-          <div v-if="editingCaptionIndex === lightboxIndex.value" 
+          <div
+v-if="editingCaptionIndex === lightboxIndex.value" 
                class="mb-4 pb-2 pr-6"
                @click.stop
                @mousedown.stop

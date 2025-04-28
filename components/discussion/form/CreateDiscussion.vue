@@ -64,18 +64,15 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   };
 
   if (formValues.value.album.images.length > 0) {
-    // Since images now have IDs (created when uploaded), we connect to them
-    // instead of creating them again
+    // Images already have IDs from when they were uploaded and created in the database
     result.Album = {
       create: {
         node: { 
           imageOrder: formValues.value.album.imageOrder,
           Images: {
-            connect: formValues.value.album.images
-              .filter(image => image.id) // Only include images with IDs
-              .map(image => ({
-                where: { node: { id: image.id } }
-              }))
+            connect: formValues.value.album.images.map(image => ({
+              where: { node: { id: image.id } }
+            }))
           }
         }
       }
