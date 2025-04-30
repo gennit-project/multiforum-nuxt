@@ -34,8 +34,6 @@ import { modProfileNameVar } from "@/cache";
 import { useRouter, useRoute } from "nuxt/app";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 import LockIcon from "@/components/icons/LockIcon.vue";
-import { gql } from "@apollo/client/core";
-
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;

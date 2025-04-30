@@ -6,7 +6,7 @@ import { actionIconMap } from "@/utils";
 
 import type { MenuItemType } from "./IconButtonDropdown.vue";
 
-const props = defineProps({
+defineProps({
   dataTestid: {
     type: String,
     default: "",

@@ -22,19 +22,6 @@ const channelId = computed(() => {
   }
   return "";
 });
-const eventId = computed(() => {
-  if (typeof route.params.eventId === "string") {
-    return route.params.eventId;
-  }
-  return "";
-});
-
-const discussionId = computed(() => {
-  if (typeof route.params.discussionId === "string") {
-    return route.params.discussionId;
-  }
-  return "";
-});
 
 const {
   result: commentResult,

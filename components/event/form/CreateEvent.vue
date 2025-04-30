@@ -3,7 +3,6 @@ import { ref, computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { useRoute, useRouter } from "nuxt/app";
 import { DateTime } from "luxon";
-import { gql } from "@apollo/client/core";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
 import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";

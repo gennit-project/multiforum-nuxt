@@ -12,6 +12,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "compile": "graphql-codegen",
+    "lint": "eslint",
+    "lint:a11y": "npx eslint \"components/**/*.vue\" --quiet",
     "prepare": "husky install",
     "start": "nuxt start",
     "test": "cypress open",
@@ -19,7 +21,7 @@
     "test:unit:run": "vitest run",
     "tsc": "tsc",
     "verify": "npm run tsc && npm run test:unit:run",
-    "lint-verify": "npm run test:unit:run"
+    "lint-verify": "npm run test:unit:run && npm run lint:a11y"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
@@ -120,8 +122,10 @@
     "cypress": "^14.3.2",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-nuxt": "^4.0.0",
     "eslint-plugin-vue": "^9.33.0",
+    "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^15.15.0",
     "happy-dom": "^17.4.4",
     "husky": "^9.1.7",

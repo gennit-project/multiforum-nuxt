@@ -59,7 +59,7 @@ const {
   error: unarchiveDiscussionError,
   onDone: unarchiveDiscussionDone,
 } = useMutation(UNARCHIVE_DISCUSSION, {
-  update: (cache, { data }) => {
+  update: (cache) => {
     // update the result of GET_DISCUSSION_CHANNEL_BY_ID
     // so that archived=false.
 
@@ -88,7 +88,7 @@ const {
   error: unarchiveEventError,
   onDone: unarchiveEventDone,
 } = useMutation(UNARCHIVE_EVENT, {
-  update: (cache, { data }) => {
+  update: (cache) => {
     // update the result of GET_EVENT_CHANNEL_BY_ID
     // so that archived=false.
 
@@ -117,7 +117,7 @@ const {
   error: unarchiveCommentError,
   onDone: unarchiveCommentDone,
 } = useMutation(UNARCHIVE_COMMENT, {
-  update: (cache, { data }) => {
+  update: (cache) => {
     // update the result of GET_COMMENT_BY_ID
     // so that archived=false.
 

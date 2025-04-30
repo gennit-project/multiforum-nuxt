@@ -1,5 +1,4 @@
 <script setup>
-import CreateAnythingButton from "../nav/CreateAnythingButton.vue";
 defineProps({
   adminList: {
     type: Array,

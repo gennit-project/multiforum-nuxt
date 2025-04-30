@@ -4,9 +4,7 @@ import { computed, ref } from "vue";
 import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
-import { useTheme } from "@/composables/useTheme";
 
-const { theme } = useTheme();
 const slotContainer = ref<HTMLElement | null>(null);
 
 // Use DOMPurify only in the client environment
@@ -83,6 +81,7 @@ const renderedMarkdown = computed(() => {
   <div class="markdown-container">
     <!-- Use both classes and inline styles to ensure font size is applied -->
     <div 
+      ref="slotContainer" 
       class="markdown-body" 
       :class="
         {
@@ -92,10 +91,9 @@ const renderedMarkdown = computed(() => {
         }
       " 
       v-html="renderedMarkdown" 
-      ref="slotContainer" 
     />
     <div v-if="$slots.default" class="inline-slot">
-      <slot></slot>
+      <slot/>
     </div>
   </div>
 </template>

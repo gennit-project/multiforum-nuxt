@@ -281,7 +281,7 @@ const formatDate = (dateStr: string) => {
       month: "long",
       day: "numeric",
     });
-  } catch (e) {
+  } catch {
     return dateStr;
   }
 };
@@ -574,9 +574,9 @@ const cellCount = computed(() => {
                 <div v-if="activity.Discussions && activity.Discussions.length > 0" class="py-2">
                   <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discussions</h4>
                   <DiscussionItemInProfile
-                    class="flex-col gap-2 mb-1"
                     v-for="discussion in activity.Discussions"
                     :key="discussion.id"
+                    class="flex-col gap-2 mb-1"
                     :discussion="discussion"
                   />
                 </div>
@@ -585,9 +585,9 @@ const cellCount = computed(() => {
                 <div v-if="activity.Events && activity.Events.length > 0" class="py-2">
                   <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Events</h4>
                   <EventListItemInProfile
-                    class="flex-col gap-2 mb-1"
                     v-for="event in activity.Events"
                     :key="event.id"
+                    class="flex-col gap-2 mb-1"
                     :current-channel-id="''"
                     :event="event"
                   />

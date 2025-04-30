@@ -2,7 +2,7 @@
 import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "nuxt/app";
-import { useMutation, useLazyQuery } from "@vue/apollo-composable";
+import { useMutation } from "@vue/apollo-composable";
 import { DateTime } from "luxon";
 import GenericModal from "@/components/GenericModal.vue";
 import FlagIcon from "@/components/icons/FlagIcon.vue";
@@ -20,7 +20,6 @@ import type { Comment } from "@/__generated__/graphql";
 import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
 import ArchiveBox from "@/components/icons/ArchiveBox.vue";
 import { IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
-import { GET_ISSUE_FOR_COMMENT } from "@/graphQLData/issue/queries";
 
 type FinalCommentTextInput = {
   selectedForumRules: string[];

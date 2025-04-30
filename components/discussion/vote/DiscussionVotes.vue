@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useRoute, useRouter } from "nuxt/app";
 import { useMutation } from "@vue/apollo-composable";
 import {

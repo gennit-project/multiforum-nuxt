@@ -1,6 +1,5 @@
 <script setup lang="ts">
-// Component props
-const props = defineProps({
+defineProps({
   darkMode: {
     type: Boolean,
     default: false,
@@ -22,7 +21,7 @@ const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
           class="absolute h-3 w-8 rounded text-xs"
           :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
           :style="{ left: `${i * 28}px`, opacity: 0.7 - i * 0.05 }"
-        ></div>
+        />
       </div>
     </div>
 
@@ -39,7 +38,7 @@ const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
           <div
             class="w-6 h-2 rounded opacity-70"
             :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
-          ></div>
+          />
         </div>
       </div>
 
@@ -69,7 +68,7 @@ const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     
     <!-- Color legend skeleton -->
     <div class="flex items-center text-xs space-x-2 mt-4">
-      <div class="w-8 h-3 rounded opacity-70" :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"></div>
+      <div class="w-8 h-3 rounded opacity-70" :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"/>
       <div
         v-for="level in 5"
         :key="'level-' + (level - 1)"
@@ -77,7 +76,7 @@ const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
         :style="{ opacity: 0.3 + (level * 0.15) }"
       />
-      <div class="w-8 h-3 rounded opacity-70" :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"></div>
+      <div class="w-8 h-3 rounded opacity-70" :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"/>
     </div>
   </div>
 </template>

@@ -7,7 +7,6 @@ import type {
 import type { PropType } from "vue";
 import { computed, defineProps, ref } from "vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import { usernameVar } from "@/cache";

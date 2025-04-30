@@ -4,12 +4,9 @@ import type { PropType } from "vue";
 import type { Event, Comment as CommentType } from "@/__generated__/graphql";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import CommentSection from "@/components/comments/CommentSection.vue";
-import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
-import { GET_EVENT } from "@/graphQLData/event/queries";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
-import { usernameVar, modProfileNameVar } from "@/cache";
+import { usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
-import { gql } from "@apollo/client/core";
 
 const COMMENT_LIMIT = 50;
 
@@ -168,8 +165,6 @@ function updateCommentSectionQueryResult(input: {
     console.error("Error updating comment section query result:", error);
   }
 }
-
-const loggedInUserModName = computed(() => modProfileNameVar.value);
 
 function incrementCommentCount(cache: any) {
   try {

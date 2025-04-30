@@ -8,7 +8,7 @@ import {
 } from "@headlessui/vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 
-const props  = defineProps({
+defineProps({
   dataTestid: {
     type: String,
     default: "",
