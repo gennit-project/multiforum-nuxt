@@ -291,9 +291,11 @@ const moveImageDown = (index: number) => {
     updatedImages[index + 1],
     updatedImages[index],
   ];
+  console.log("updatedImages", updatedImages);
 
   // Update imageOrder after reordering
   const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
+  console.log("updatedImageOrder", updatedImageOrder);
 
   emit("updateFormValues", {
     album: {
@@ -312,28 +314,8 @@ type AddImageInput = {
 };
 
 const updateImageOrderAfterChange = (images: ImageInput[]) => {
-  // During creation, new images won't have IDs yet
-  // If we're in creation mode (no images have IDs), we don't need imageOrder
-  const hasAnyIds = images.some(img => typeof img.id === 'string' && img.id.length > 0);
-  
-  if (!hasAnyIds) {
-    // During creation, we don't need imageOrder - it will be assigned server-side
-    return [];
-  }
-  
-  // For existing albums with IDs, keep the existing behavior
-  // Filter out any images without IDs first
-  const validImages = images.filter((img): img is ImageInput & { id: string } => {
-    return typeof img.id === 'string' && img.id.length > 0;
-  });
-
-  // If we have no valid IDs, return an empty array
-  if (validImages.length === 0) {
-    return [];
-  }
-
-  // Map to just the IDs
-  return validImages.map(img => img.id);
+  // Map to just the IDs, filtering out any undefined IDs
+  return images.map(img => img.id).filter(id => id !== undefined);
 };
 
 /**
@@ -394,7 +376,7 @@ const addNewImage = (input: Partial<AddImageInput>) => {
     </div>
     <div
       v-for="(image, index) in props.formValues.album.images"
-      :key="image.id || `temp-${index}`"
+      :key="image?.id || `temp-${index}`"
       class="mb-4 border-b py-2"
     >
       <div class="flex items-center justify-between mb-2">

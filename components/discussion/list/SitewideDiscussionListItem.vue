@@ -261,6 +261,8 @@ const relative = computed(() =>
                 <DiscussionAlbum
                   :album="discussion.Album"
                   :carousel-format="true"
+                  :discussion-author="authorUsername"
+                  :discussion-id="discussion.id"
                 />
               </div>
             </div>

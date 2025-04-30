@@ -64,11 +64,17 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   };
 
   if (formValues.value.album.images.length > 0) {
+    // If imageOrder is empty or doesn't match the images length, reconstruct it from the images
+    const imageIds = formValues.value.album.images.map(img => img.id);
+    
     // Images already have IDs from when they were uploaded and created in the database
     result.Album = {
       create: {
         node: { 
-          imageOrder: formValues.value.album.imageOrder,
+          // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
+          imageOrder: formValues.value.album.imageOrder.length === imageIds.length 
+            ? formValues.value.album.imageOrder
+            : imageIds,
           Images: {
             connect: formValues.value.album.images.map(image => ({
               where: { node: { id: image.id } }
@@ -179,12 +185,22 @@ function submit() {
 }
 
 function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
+  console.log("CreateDiscussion received form update:", JSON.stringify(data));
+  
   // Handle album updates specially to avoid overwriting the entire album object
   if (data.album) {
-    formValues.value.album = {
-      ...formValues.value.album,
-      ...data.album
-    };
+    console.log("Album data detected in update:", data.album);
+    
+    // Explicitly handle images and imageOrder to ensure they stay in sync
+    if (data.album.images) {
+      console.log("Updating album images:", data.album.images);
+      formValues.value.album.images = data.album.images;
+    }
+    
+    if (data.album.imageOrder) {
+      console.log("Updating album imageOrder:", data.album.imageOrder);
+      formValues.value.album.imageOrder = data.album.imageOrder;
+    }
     
     // Remove album from data to prevent double-application
     const { album, ...restData } = data;
@@ -194,6 +210,8 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
       ...formValues.value,
       ...restData
     };
+    
+    console.log("Updated form values:", JSON.stringify(formValues.value.album));
   } else {
     // If no album data, just update normally
     formValues.value = {

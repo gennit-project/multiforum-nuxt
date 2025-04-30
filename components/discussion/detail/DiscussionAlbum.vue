@@ -45,7 +45,15 @@ const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 
 const orderedImages = computed(() => {  
-  return props.album.Images || [];
+  if (!props.album) {
+    return [];
+  }
+  if (!props.album.imageOrder) {
+    return props.album.Images || [];
+  }
+  return props.album.imageOrder.map((imageId) => {
+    return props.album.Images.find((image) => image.id === imageId);
+  });
 });
 
 // Current image based on ordered images
@@ -363,7 +371,7 @@ const handleTouchEnd = (event: TouchEvent) => {
       >
         <div
           v-for="(image, idx) in orderedImages"
-          :key="image.id"
+          :key="image?.id || idx"
           class="cursor-pointer"
           @click="openLightbox(idx)"
         >
@@ -399,7 +407,7 @@ v-if="editingCaptionIndex === idx"
             </div>
           </div>
           <div v-else class="text-center text-xs relative group">
-            <span v-if="image.caption">{{ image.caption }}</span>
+            <span v-if="image?.caption">{{ image.caption }}</span>
             <span v-else-if="!canEditInCurrentMode" class="text-gray-400 italic">No caption</span>
             <button
               v-else
@@ -464,7 +472,7 @@ v-if="editingCaptionIndex === idx"
           >
             <div
               v-for="(image, idx) in orderedImages"
-              :key="image.id"
+              :key="image?.id || idx"
               class="flex flex-shrink-0 w-auto"
             >
               <div
@@ -503,7 +511,7 @@ v-if="editingCaptionIndex === idx"
                   class="text-center text-xs relative group"
                   :class="{ hidden: idx !== activeIndex }"
                 >
-                  <span v-if="image.caption">{{ image.caption }}</span>
+                  <span v-if="image?.caption">{{ image.caption }}</span>
                   <span v-else class="text-gray-400 italic">No caption</span>
                 </div>
               </div>
@@ -656,7 +664,7 @@ v-if="editingCaptionIndex === idx"
             <XmarkIcon class="h-4 w-4" />
           </button>
           <div
-v-if="editingCaptionIndex === lightboxIndex.value" 
+v-if="editingCaptionIndex === lightboxIndex" 
                class="mb-4 pb-2 pr-6"
                @click.stop
                @mousedown.stop
@@ -680,7 +688,7 @@ v-if="editingCaptionIndex === lightboxIndex.value"
             </div>
           </div>
           <div
-            v-else-if="currentImage.caption"
+            v-else-if="currentImage?.caption"
             class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative"
           >
             {{ currentImage.caption || "Image Details" }}

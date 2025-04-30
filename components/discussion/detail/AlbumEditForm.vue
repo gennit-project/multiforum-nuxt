@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import type { PropType } from "vue";
 import type {
   Discussion,
@@ -12,6 +12,7 @@ import { useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { UPDATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import AlbumEditor from "@/components/discussion/form/AlbumEditor.vue";
+import Notification from "@/components/NotificationComponent.vue";
 
 const props = defineProps({
   discussion: {
@@ -19,9 +20,27 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(["closeEditor"]);
+const emit = defineEmits(["closeEditor", "updateFormValues"]);
+
+// Check if we're in create mode (using a temporary ID) or edit mode
+// If we have images with IDs, we're not really in "create" mode for the album,
+// even if the discussion itself is new
+const isCreateMode = computed(() => {
+  // If discussion has a real ID, we're in edit mode
+  if (props.discussion.id !== 'temp-id') {
+    return false;
+  }
+  
+  // If we have images with IDs, we're editing an existing album (not in create mode)
+  const hasExistingImages = props.discussion?.Album?.Images?.some(img => img.id);
+  return !hasExistingImages;
+});
 
 const albumId = computed(() => {
+  // In create mode, we use an empty string to indicate there's no album yet
+  if (isCreateMode.value) {
+    return "";
+  }
   return props.discussion?.Album?.id || "";
 });
 
@@ -48,29 +67,38 @@ const initialImageOrder = computed<string[]>(() => {
   }
   
   // If no order exists, create one from the images array
-  return images.value
-    .filter((image: { id: string; url: string; alt: string; caption: string; isCoverImage: boolean; hasSensitiveContent: boolean; hasSpoiler: boolean; copyright: string }) => {
-      return image.id !== null && image.id !== undefined;
-    })
-    .map((image: { id: string; url: string; alt: string; caption: string; isCoverImage: boolean; hasSensitiveContent: boolean; hasSpoiler: boolean; copyright: string }) => {
-      return image.id;
-    });
+  if (images.value.length > 0) {
+    console.log("Creating image order from images");
+    // Create an order from the image IDs
+    return images.value
+      .filter(img => img.id)
+      .map(img => img.id);
+  }
+  
+  return [];
 });
 
-const orderedImages = computed(() => {
-  return initialImageOrder.value
-    .map((imageId) => {
-      const image = images.value.find((image) => imageId === image.id);
-      return image || null;
-    })
-    .filter((image): image is NonNullable<typeof image> => image !== null);
-});
-
+// Create reactive form values based on the computed props
 const formValues = ref({
   album: {
-    images: orderedImages.value,
-    imageOrder: initialImageOrder.value,
+    images: [], // Will be updated in onMounted
+    imageOrder: [],
   },
+});
+
+// Notification state
+const savedSuccessfully = ref(false);
+
+// Initialize form values after component is mounted
+onMounted(() => {
+  console.log("AlbumEditForm mounted, initializing formValues");
+  console.log("Images:", images.value);
+  console.log("ImageOrder:", initialImageOrder.value);
+  
+  formValues.value.album.images = [...images.value];
+  formValues.value.album.imageOrder = [...initialImageOrder.value];
+  
+  console.log("Initialized formValues:", formValues.value);
 });
 
 function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
@@ -170,14 +198,45 @@ onDone(() => {
   emit("closeEditor");
 });
 
+// For handling save
+function handleSave() {
+  console.log("handleSave called, isCreateMode:", isCreateMode.value);
+  console.log("Current album data:", JSON.stringify(formValues.value.album));
+  
+  // For both cases where we're inside CreateEditDiscussionFields (temp-id)
+  if (props.discussion.id === 'temp-id') {
+    // Always emit the form values to update the parent component
+    console.log("Emitting updateFormValues in CreateEditDiscussionFields context");
+    emit("updateFormValues", {
+      album: formValues.value.album
+    });
+    // Add a success notification
+savedSuccessfully.value = true;
+setTimeout(() => {
+  savedSuccessfully.value = false;
+}, 3000); // Hide after 3 seconds
+  } else {
+    // In actual edit mode for an existing discussion, perform the API mutation
+    console.log("Calling updateDiscussion in edit mode");
+    updateDiscussion();
+  }
+}
+
 function handleUpdateAlbum(newVals: {
   album: {
     images: any[];
     imageOrder: string[];
   };
 }) {
+  console.log("AlbumEditForm received update from AlbumEditor:", JSON.stringify(newVals));
+  
   // Update the album data
-  formValues.value.album = newVals.album;
+  formValues.value.album = {
+    images: newVals.album.images,
+    imageOrder: newVals.album.imageOrder
+  };
+  
+  console.log("Updated formValues in AlbumEditForm:", JSON.stringify(formValues.value.album));
 }
 </script>
 
@@ -196,8 +255,8 @@ function handleUpdateAlbum(newVals: {
         <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
         <PrimaryButton
           :label="'Save Album'"
-          :loading="updateDiscussionLoading"
-          @click="updateDiscussion"
+          :loading="updateDiscussionLoading && !isCreateMode"
+          @click="handleSave"
         />
       </div>
     </div>
@@ -206,6 +265,12 @@ function handleUpdateAlbum(newVals: {
       v-if="updateDiscussionError"
       class="mx-auto my-3 max-w-5xl"
       :text="updateDiscussionError.message"
+    />
+    
+    <Notification
+      :show="savedSuccessfully"
+      :title="'Album saved successfully'"
+      @close-notification="savedSuccessfully = false"
     />
   </div>
 </template>

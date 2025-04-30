@@ -10,7 +10,7 @@ import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
 import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
-import AlbumEditor from "./AlbumEditor.vue";
+import AlbumEditForm from "../detail/AlbumEditForm.vue";
 
 const props = defineProps<{
   editMode: boolean;
@@ -23,7 +23,7 @@ const props = defineProps<{
   updateDiscussionLoading?: boolean;
 }>();
 
-const emit = defineEmits(["submit", "updateFormValues"]);
+defineEmits(["submit", "updateFormValues"]);
 
 const formTitle = computed(() =>
   props.editMode ? "Edit Discussion" : "Start Discussion"
@@ -60,13 +60,8 @@ onMounted(() => {
     });
   }
 });
-function handleUpdateAlbum(newVals: { album: { images: any[], imageOrder: string[] } }) {
-  // Only emit the album changes, not the entire form values
-  // This prevents potential duplication of form data
-  emit("updateFormValues", {
-    album: newVals.album
-  });
-}
+// We now handle album updates directly from AlbumEditForm
+// This function is no longer needed since AlbumEditForm handles it internally
 </script>
 
 <template>
@@ -152,10 +147,21 @@ function handleUpdateAlbum(newVals: { album: { images: any[], imageOrder: string
 
             <FormRow section-title="Images">
               <template #content>
-                <AlbumEditor
-                  :form-values="formValues"
-                  :allow-image-upload="true"
-                  @update-form-values="handleUpdateAlbum"
+                <AlbumEditForm
+                  v-if="formValues"
+                  :discussion="{ 
+                    id: 'temp-id', 
+                    Album: {
+                      id: '',
+                      Images: formValues.album?.images || [],
+                      imageOrder: formValues.album?.imageOrder || []
+                    }
+                  }"
+                  @close-editor="() => {}"
+                  @update-form-values="(albumData) => {
+                    console.log('CreateEditDiscussionFields received updateFormValues:', albumData);
+                    $emit('updateFormValues', { album: albumData.album });
+                  }"
                 />
               </template>
             </FormRow>

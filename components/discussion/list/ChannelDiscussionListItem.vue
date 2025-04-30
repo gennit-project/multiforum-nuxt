@@ -189,6 +189,8 @@ const filteredQuery = computed(() => {
             <div v-if="discussion.Album" class="my-4 overflow-x-auto bg-black">
               <DiscussionAlbum
                 :album="discussion.Album"
+                :discussion-id="discussion.id"
+                :discussion-author="authorUsername"
                 :carousel-format="true"
               />
             </div>
