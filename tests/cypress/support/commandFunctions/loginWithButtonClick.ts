@@ -10,8 +10,9 @@ const login = (input: LoginInput) => {
   const username = input?.username || Cypress.env("auth0_username");
   const password = input?.password || Cypress.env("auth0_password");
 
+  // Use the original, proven approach that works reliably
   cy.visit(ONLINE_EVENT_LIST)
-    .wait(5000)
+    .wait(3000)
     // click the button that says Log in
     .get("button")
     .contains("Log In")
@@ -30,10 +31,19 @@ const login = (input: LoginInput) => {
       )
         .click()
         .wait(1000);
-
-  
     }
   );
+
+  // Add a final wait for the redirect and page load to complete
+  cy.wait(5000);
+  
+  // Check for "redirecting" text and wait longer if present
+  cy.get('body').then($body => {
+    if ($body.text().includes('redirecting')) {
+      cy.log('Detected "redirecting" text, waiting longer for completion...');
+      cy.wait(10000); // Wait an additional 10 seconds
+    }
+  });
 };
 
 export default login;

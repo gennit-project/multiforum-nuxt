@@ -11,6 +11,9 @@ describe("Report a discussion", () => {
     const username = Cypress.env("auth0_username_2");
     const password = Cypress.env("auth0_password_2");
     
+    // Set up network interception for GraphQL requests
+    cy.intercept('POST', '**/graphql').as('graphqlRequest');
+    
     // Login as the second user who is not the author of the discussion
     cy.loginWithCreateEventButton({
       username: username,
@@ -18,17 +21,17 @@ describe("Report a discussion", () => {
     });
 
     // Visit the forum and open the target discussion
-    cy.visit(CATS_FORUM).wait(1000);
+    cy.visit(CATS_FORUM);
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    
     cy.get("span").contains(targetDiscussionTitle).click();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     
     // Open the discussion action menu
     cy.get('button[data-testid="discussion-menu-button"]').click();
     
     // Click on the Report option
     cy.get('div[data-testid="discussion-menu-button-item-Report"]').click();
-    
-    // Wait for the modal to appear
-    cy.wait(1000);
     
     // Check for the modal title
     cy.contains("Report Discussion").should("be.visible");
@@ -42,6 +45,7 @@ describe("Report a discussion", () => {
     
     // Submit the report
     cy.get('button[data-testid="report-discussion-modal-primary-button"]').click();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     
     // Verify the success notification appears
     cy.contains("Your report was submitted successfully.").should("be.visible");
