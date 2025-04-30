@@ -7,12 +7,13 @@ export default defineConfig({
   includeShadowDom: true,
   e2e: {
     experimentalRunAllSpecs: true,
-    setupNodeEvents(on, config) {
+    setupNodeEvents(on) {
       on('before:run', async () => {
         console.log('🔍 Initializing test environment checks...');
       });
     },
-    supportFile: 'cypress/support/e2e.ts'
+    supportFile: 'tests/cypress/support/e2e.ts',
+    specPattern: 'tests/cypress/e2e/**/*.spec.cy.ts'
   },
   video: false,
 });

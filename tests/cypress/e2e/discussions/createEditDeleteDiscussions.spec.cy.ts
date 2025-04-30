@@ -4,7 +4,8 @@ import { setupTestData, loginUser } from "../../support/testSetup";
 describe("Basic discussion operations", () => {
   // Set up test data once for all tests in this file
   setupTestData();
-  // Login before each test
+  
+  // Use the original UI-based login method that works reliably
   loginUser('loginWithCreateEventButton');
 
   it("creates, edits and deletes a discussion", () => {
@@ -15,6 +16,9 @@ describe("Basic discussion operations", () => {
     const TEST_TAG_1 = "trivia";
     const TEST_TAG_2 = "music";
     const TEST_TAG_3 = "newYears";
+
+    // Set up network interception for GraphQL requests
+    cy.intercept('POST', '**/graphql').as('graphqlRequest');
 
     // Test creating a discussion.
     cy.visit(DISCUSSION_CREATION_FORM);
@@ -36,7 +40,11 @@ describe("Basic discussion operations", () => {
     cy.get(`span[data-testid="tag-picker-${TEST_TAG_1}"]`).click();
     cy.get(`span[data-testid="tag-picker-${TEST_TAG_2}"]`).click();
 
-    cy.get("button").contains("Save").click().wait(3000);
+    // Click save and wait for network request to complete instead of arbitrary timeout
+    cy.get("button").contains("Save").click();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    
+    // Verify the discussion was created successfully
     cy.get("h2").contains(TEST_DISCUSSION);
     cy.get("p").contains(TEST_BODY);
 
@@ -59,22 +67,28 @@ describe("Basic discussion operations", () => {
 
     // Delete one of the existing tags
     cy.get(`span[data-testid='tag-picker-${TEST_TAG_1}']`)
-        .click();
+      .click();
 
+    // Save changes and wait for network request to complete
     cy.get("button").contains("Save").click();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
+    // Verify the changes were applied
     cy.get("p").contains(TEST_BODY_2);
     cy.get("span").contains(TEST_TAG_2);
     cy.get("span").contains(TEST_TAG_3);
     // Make sure the deleted tag is not present
     cy.get("span").should("not.contain", TEST_TAG_1);
 
-
+    // Delete the discussion
     cy.get('button[data-testid="discussion-menu-button')
       .click();
     // Click on the delete button
     cy.get("div[data-testid=discussion-menu-button-item-Delete]").click();
-    cy.get("button").contains("Delete").click()
+    cy.get("button").contains("Delete").click();
+    
+    // Wait for delete request to complete
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // After deletion, the user should be redirected to the discussion list
     // for the channel view

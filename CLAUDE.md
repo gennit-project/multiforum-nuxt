@@ -15,6 +15,36 @@
 - Use `loginUser()` to handle authentication for tests that need it
 - Avoid multiple database resets with `beforeEach` - use shared test data when possible
 
+### Cypress Test Optimizations
+- **Replace arbitrary timeouts with network waits**:
+  ```javascript
+  // Before: Fixed timeout that might be too short or too long
+  cy.get("button").contains("Save").click().wait(3000);
+  
+  // After: Wait for the actual network request to complete
+  cy.intercept('POST', '**/graphql').as('graphqlRequest');
+  cy.get("button").contains("Save").click();
+  cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+  ```
+
+- **Validate network responses**: Add status code checks to ensure operations completed successfully
+  ```javascript
+  cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+  ```
+
+- **Intercept specific GraphQL operations** by pattern-matching on the request body:
+  ```javascript
+  // Match specific GraphQL operations
+  cy.intercept('POST', '**/graphql', (req) => {
+    if (req.body.query.includes('createDiscussion')) {
+      req.alias = 'createDiscussionRequest'
+    }
+  });
+  
+  // Later in the test
+  cy.wait('@createDiscussionRequest');
+  ```
+
 ## Vitest Testing (Unit)
 - Unit tests are located in `tests/unit` directory
 - Run all unit tests with `npm run test:unit`
