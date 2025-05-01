@@ -174,12 +174,12 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 <template>
   <li
     :ref="`#${event.id}`"
-    class="relative py-2 dark:bg-gray-800 list-none flex justify-between gap-4"
+    class="relative py-2 list-none flex justify-between gap-4"
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
-    <div class="flex-shrink-0 rounded-lg bg-gray-100 dark:bg-gray-700 py-4">
-      <div class="flex w-16 flex-col items-center justify-center">
+    <div class="flex-shrink-0 pt-2">
+      <div class="flex w-16 rounded-lg bg-gray-100 dark:bg-gray-700 py-4 flex-col items-center">
         <div
           class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
         >
@@ -207,7 +207,6 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         > <span>Multiple Days</span>
         </div>
       </div>
-     
     </div>
 
     <div class="flex-1 min-w-0">
