@@ -15,6 +15,7 @@ type PermissionKey = keyof Pick<
   | 'canOpenSupportTickets'
   | 'canCloseSupportTickets'
   | 'canLockChannel'
+  | 'canCreateComment'
 >;
 
 // Role type used in the utility functions

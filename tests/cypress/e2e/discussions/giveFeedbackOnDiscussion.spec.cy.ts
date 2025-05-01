@@ -45,10 +45,10 @@ describe("Give feedback on a discussion", () => {
     cy.get('button[data-testid="feedback-form-modal-primary-button"]').click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
-    // confirm that the downvote-discussion-button now has the class bg-blue-300
+    // confirm that the downvote-discussion-button now has the class bg-blue-500
     cy.get('button[data-testid="downvote-discussion-button"]').should(
       "have.class",
-      "bg-blue-300"
+      "bg-blue-500"
     );
 
     // EDIT FEEDBACK
@@ -123,10 +123,10 @@ describe("Give feedback on a discussion", () => {
     cy.get('a[data-testid="discussion-detail-back-link"]').click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
-    //confirm that the downvote-discussion-button now does NOT have the class bg-blue-300
+    //confirm that the downvote-discussion-button now does NOT have the class bg-blue-500
     cy.get('button[data-testid="downvote-discussion-button"]').should(
       "not.have.class",
-      "bg-blue-300"
+      "bg-blue-500"
     );
   });
 });
