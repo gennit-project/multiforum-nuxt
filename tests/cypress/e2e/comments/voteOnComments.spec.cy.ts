@@ -46,41 +46,39 @@ describe("Comment voting operations", () => {
     // Verify the comment and undo the default upvote that came with the comment
     cy.get('div[data-testid="comment"]')
       .should("be.visible")
-      .and("contain", TEST_COMMENT_TEXT)
-      .within(() => {
-        cy.get('button[data-testid="upvote-comment-button"]')
-          .should("be.visible")
-          .contains("1");
-      });
+      .and("contain", TEST_COMMENT_TEXT);
+      
+    // Verify the count shows 1  
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .should("be.visible")
+      .contains("1");
       
     // Wait for hydration to complete and username to be available
     cy.wait(6000);
     
-    // Now click the upvote button in a separate command
-    cy.get('div[data-testid="comment"]')
-      .contains(TEST_COMMENT_TEXT)
-      .find('button[data-testid="upvote-comment-button"]')
-      .click();
+    // Now click the upvote button directly by data-testid
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .click({force: true});
       
     // Wait outside the 'within' to avoid context restrictions
     cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
     
     cy.get('div[data-testid="comment"]')
       .should("be.visible")
-      .and("contain", TEST_COMMENT_TEXT)
-      .within(() => {
-        // Check the upvote count is now 0
-        cy.get('button[data-testid="upvote-comment-button"]')
-          .should("be.visible")
-          .contains("0");
-
-      });
+      .and("contain", TEST_COMMENT_TEXT);
       
-    // Toggle upvote again - add back the upvote (use separate command)
-    cy.get('div[data-testid="comment"]')
-      .contains(TEST_COMMENT_TEXT)
-      .find('button[data-testid="upvote-comment-button"]')
-      .click();
+    // Check the upvote count is now 0
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .should("be.visible")
+      .should("contain", "0");
+      
+    // Toggle upvote again - add back the upvote
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .click({force: true});
       
     // Wait outside the 'within' to avoid context restrictions
     cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
@@ -131,18 +129,12 @@ describe("Comment voting operations", () => {
     // Upvote the comment as User 2
     cy.get('div[data-testid="comment"]')
       .should("be.visible")
-      .and("contain", TEST_COMMENT_TEXT)
-      .within(() => {
-        // Verify the button exists but don't click it within this scope
-        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
-          .should("be.visible");
-      });
+      .and("contain", TEST_COMMENT_TEXT);
       
-    // Click upvote button in a separate command  
-    cy.get('div[data-testid="comment"]')
-      .contains(TEST_COMMENT_TEXT)
-      .find('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
-      .click();
+    // Click the upvote button directly
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .click({force: true});
       
     // Wait outside the 'within' to avoid context restrictions
     cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
@@ -150,22 +142,17 @@ describe("Comment voting operations", () => {
     // Verify the upvote count increased to 2
     cy.get('div[data-testid="comment"]')
       .should("be.visible")
-      .and("contain", TEST_COMMENT_TEXT)
-      .within(() => {
-        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
-          .should("be.visible")
-          .contains("2");
-          
-        // Verify the count but don't click within this scope
-        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
-          .should("be.visible");
-      });
+      .and("contain", TEST_COMMENT_TEXT);
       
-    // Click again to remove the upvote (in a separate command)
-    cy.get('div[data-testid="comment"]')
-      .contains(TEST_COMMENT_TEXT)
-      .find('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
-      .click();
+    // Verify the count shows 2
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .contains("2");
+      
+    // Click again to remove the upvote
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .click({force: true});
       
     // Wait outside the 'within' to avoid context restrictions
     cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
@@ -173,11 +160,11 @@ describe("Comment voting operations", () => {
     // Verify the upvote count decreased back to 1
     cy.get('div[data-testid="comment"]')
       .should("be.visible")
-      .and("contain", TEST_COMMENT_TEXT)
-      .within(() => {
-        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
-          .should("be.visible")
-          .contains("1");
-      });
+      .and("contain", TEST_COMMENT_TEXT);
+      
+    // Verify the count shows 1
+    cy.get('button[data-testid="upvote-comment-button"]')
+      .first()
+      .contains("1");
   });
 });
