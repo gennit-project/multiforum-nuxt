@@ -1,52 +1,113 @@
 import { DISCUSSION_LIST } from "../constants";
 import { setupTestData } from "../../support/testSetup";
 
-describe("Basic comment operations", () => {
+describe("Comment voting operations", () => {
   // Set up test data once for all tests in this file
   setupTestData();
 
   it("User 1 can undo upvote on their own comment", () => {
     const TEST_COMMENT_TEXT = "Test comment";
 
+    // Set up GraphQL request interception
+    cy.intercept('POST', '**/graphql').as('graphqlRequest');
+    
+    // Intercept specific GraphQL operations
+    cy.intercept('POST', '**/graphql', (req) => {
+      if (req.body.query?.includes('createComments')) {
+        req.alias = 'createCommentRequest';
+      } else if (req.body.query?.includes('upvoteComment') || req.body.query?.includes('Upvote')) {
+        req.alias = 'upvoteCommentRequest';
+      }
+    });
+
     // User 1 logs in
     cy.loginWithCreateEventButton();
 
     // Go to the discussion list
     cy.visit(DISCUSSION_LIST);
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Click on the first discussion
-    cy.get("span").contains("Example topic 1").click()
-      .wait(2000);
+    cy.get("span").contains("Example topic 1").click();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Add a comment
     cy.get("textarea[data-testid='addComment']", { timeout: 10000 })
       .should("be.visible")
       .click();
-    cy.get("textarea[data-testid='texteditor-textarea']").type(
-      TEST_COMMENT_TEXT
-    );
+      
+    cy.get("textarea[data-testid='texteditor-textarea']")
+      .should("be.visible")
+      .type(TEST_COMMENT_TEXT);
+      
     cy.get("button").contains("Save").click();
+    cy.wait('@createCommentRequest').its('response.statusCode').should('eq', 200);
 
     // Verify the comment and undo the default upvote that came with the comment
-    cy.get('div[data-testid="comment"]').within(() => {
-      cy.contains(TEST_COMMENT_TEXT);
-      cy.get('button[data-testid="upvote-comment-button"]').contains("1");
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        cy.get('button[data-testid="upvote-comment-button"]')
+          .should("be.visible")
+          .contains("1");
+      });
+      
+    // Wait for hydration to complete and username to be available
+    cy.wait(6000);
+    
+    // Now click the upvote button in a separate command
+    cy.get('div[data-testid="comment"]')
+      .contains(TEST_COMMENT_TEXT)
+      .find('button[data-testid="upvote-comment-button"]')
+      .click();
+      
+    // Wait outside the 'within' to avoid context restrictions
+    cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
+    
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        // Check the upvote count is now 0
+        cy.get('button[data-testid="upvote-comment-button"]')
+          .should("be.visible")
+          .contains("0");
 
-      // Toggle upvote
-      cy.get('button[data-testid="upvote-comment-button"]').click()
-        // wait
-        .wait(2000)
-      cy.get('button[data-testid="upvote-comment-button"]').contains("0");
-
-      // Undo 
-      cy.get('button[data-testid="upvote-comment-button"]').click();
-      cy.get('button[data-testid="upvote-comment-button"]').contains("1");
-
-    });
+      });
+      
+    // Toggle upvote again - add back the upvote (use separate command)
+    cy.get('div[data-testid="comment"]')
+      .contains(TEST_COMMENT_TEXT)
+      .find('button[data-testid="upvote-comment-button"]')
+      .click();
+      
+    // Wait outside the 'within' to avoid context restrictions
+    cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
+    
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        // Check the upvote count is back to 1
+        cy.get('button[data-testid="upvote-comment-button"]')
+          .should("be.visible")
+          .contains("1");
+      });
   });
 
   it("User 2 can upvote another user's comment", () => {
     const TEST_COMMENT_TEXT = "Test comment";
+
+    // Set up GraphQL request interception
+    cy.intercept('POST', '**/graphql').as('graphqlRequest');
+    
+    // Intercept specific GraphQL operations
+    cy.intercept('POST', '**/graphql', (req) => {
+      if (req.body.query?.includes('upvoteComment') || req.body.query?.includes('Upvote')) {
+        req.alias = 'upvoteCommentRequest';
+      }
+    });
 
     // User 2 logs in
     const username2 = Cypress.env("auth0_username_2");
@@ -58,31 +119,65 @@ describe("Basic comment operations", () => {
 
     // Go to the discussion list
     cy.visit(DISCUSSION_LIST);
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Navigate to the same discussion
     cy.get("span").contains("Example topic 1").click();
-
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    
+    // Wait for hydration to complete and username to be available
+    cy.wait(6000);
+    
     // Upvote the comment as User 2
-    cy.get('div[data-testid="comment"]').within(() => {
-      cy.contains(TEST_COMMENT_TEXT);
-
-      // Select the button in the authenticated state
-      cy.get(
-        '[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]',
-        { timeout: 10000 }
-      )
-        .should("exist")
-        .click()
-        // there should be 2 upvotes now
-        .contains("2");
-
-      cy.get(
-        '[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]'
-      )
-        .should("exist")
-        .click()
-        // there should be 1 upvote now
-        .contains("1");
-    });
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        // Verify the button exists but don't click it within this scope
+        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
+          .should("be.visible");
+      });
+      
+    // Click upvote button in a separate command  
+    cy.get('div[data-testid="comment"]')
+      .contains(TEST_COMMENT_TEXT)
+      .find('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
+      .click();
+      
+    // Wait outside the 'within' to avoid context restrictions
+    cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
+    
+    // Verify the upvote count increased to 2
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
+          .should("be.visible")
+          .contains("2");
+          
+        // Verify the count but don't click within this scope
+        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
+          .should("be.visible");
+      });
+      
+    // Click again to remove the upvote (in a separate command)
+    cy.get('div[data-testid="comment"]')
+      .contains(TEST_COMMENT_TEXT)
+      .find('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
+      .click();
+      
+    // Wait outside the 'within' to avoid context restrictions
+    cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
+    
+    // Verify the upvote count decreased back to 1
+    cy.get('div[data-testid="comment"]')
+      .should("be.visible")
+      .and("contain", TEST_COMMENT_TEXT)
+      .within(() => {
+        cy.get('[data-auth-state="authenticated"] button[data-testid="upvote-comment-button"]')
+          .should("be.visible")
+          .contains("1");
+      });
   });
 });
