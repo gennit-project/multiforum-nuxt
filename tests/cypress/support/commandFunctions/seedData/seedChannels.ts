@@ -29,8 +29,9 @@ const baseChannels: BaseChannel[] = [
 ];
 
 const channels: ChannelCreateInput[] = baseChannels.map(
-  ({ uniqueName, admins, mods }): ChannelCreateInput => ({
+  ({ uniqueName, admins, mods, rules }): ChannelCreateInput => ({
     uniqueName,
+    rules,
     Admins: {
       connect: admins.map((admin) => ({
           where: {
