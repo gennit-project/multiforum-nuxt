@@ -101,11 +101,52 @@
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
 - **Composables**: Extract reusable logic into composables under `composables/` directory
 
+## Moderator Permission System
+
+### Permission Levels
+The application has a tiered moderation system with three main permission levels:
+
+1. **Standard/Normal Moderators**:
+   - Not explicitly included in the `Channel.Moderators` list
+   - Not suspended (not in `Channel.SuspendedMods` list)
+   - By default can perform basic moderation actions like reporting content and giving feedback
+   - These permissions are controlled by the default mod role configuration
+
+2. **Elevated Moderators**:
+   - Explicitly included in the `Channel.Moderators` list
+   - Have additional permissions beyond standard moderators
+   - Can typically archive content, manage other moderators, etc.
+   - These permissions are controlled by the elevated mod role configuration
+
+3. **Suspended Moderators**:
+   - Included in the `Channel.SuspendedMods` list
+   - Cannot perform any moderation actions
+   - Remain in this state until manually unsuspended
+
+### Permission Implementation
+- The `permissionUtils.ts` file contains the core permission checking logic
+- The `headerPermissionUtils.ts` file implements component-specific permission logic for UI elements
+- The permission system uses a combination of role-based checks and specific action permissions
+- Channel owners/admins (users in `Channel.Admins` list) bypass all permission checks and can perform any action
+
+### Common Issues
+- The moderator menus in headers (Discussion/Event/Comment) should show the "Give Feedback" and "Report" options for standard moderators
+- The "Moderation Actions" menu section should appear for any user who has at least one moderation permission
+- Ensure menu items are generated correctly in each header component by checking for specific permissions, not just moderator status
+
+### Testing Moderator Permissions
+When testing moderator permissions:
+- Make sure the test user has the expected permission level
+- Check that appropriate UI elements appear based on permission level
+- Verify that unprivileged users don't see moderation options
+- Test that suspended moderators can't access moderation features
+
 ## Project Structure
 - Components in `components/` directory with subdirectories for features
 - Pages in `pages/` directory matching route structure
 - GraphQL queries/mutations in `graphQLData/` by domain
 - Types in `types/` directory
+- Utility functions in `utils/` directory (including permission utilities)
 
 ## Working with Claude
 - **Incremental Changes**: Make small, focused changes rather than large sweeping changes

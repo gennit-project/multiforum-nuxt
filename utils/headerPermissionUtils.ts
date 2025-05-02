@@ -76,15 +76,17 @@ export const getDiscussionHeaderMenuItems = (params: {
     });
   }
 
-  // Check if the user has admin or mod permissions
-  const hasModPermissions =
-    userPermissions.isChannelOwner ||
-    (userPermissions.isElevatedMod && !userPermissions.isSuspendedMod);
+  // Check if the user has any moderation permission (standard mod or above)
+  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
+  const canPerformModActions = 
+    !userPermissions.isSuspendedMod && 
+    (userPermissions.isChannelOwner || 
+     userPermissions.isElevatedMod || 
+     userPermissions.canReport || 
+     userPermissions.canGiveFeedback);
 
-  // Show mod actions if user is not suspended and either:
-  // 1. Is a channel owner (admin), or
-  // 2. Is a moderator with permissions
-  if (isLoggedIn && (hasModPermissions || userPermissions.isChannelOwner) && !isOwnDiscussion) {
+  // Show mod actions if user has any mod permissions and isn't the discussion creator
+  if (isLoggedIn && canPerformModActions && !isOwnDiscussion) {
     // Create a list for mod actions
     const modActions: MenuItem[] = [];
 
@@ -231,15 +233,17 @@ export const getEventHeaderMenuItems = (params: {
     }
   }
 
-  // Check if the user has admin or mod permissions
-  const hasModPermissions =
-    userPermissions.isChannelOwner ||
-    (userPermissions.isElevatedMod && !userPermissions.isSuspendedMod);
+  // Check if the user has any moderation permission (standard mod or above)
+  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
+  const canPerformModActions = 
+    !userPermissions.isSuspendedMod && 
+    (userPermissions.isChannelOwner || 
+     userPermissions.isElevatedMod || 
+     userPermissions.canReport || 
+     userPermissions.canGiveFeedback);
 
-  // Show mod actions if user is not suspended and either:
-  // 1. Is a channel owner (admin), or
-  // 2. Is a moderator with permissions
-  if (isLoggedIn && (hasModPermissions || userPermissions.isChannelOwner) && !isOwnEvent) {
+  // Show mod actions if user has any mod permissions and isn't the event creator
+  if (isLoggedIn && canPerformModActions && !isOwnEvent) {
     // Create a list for mod actions
     const modActions: MenuItem[] = [];
 

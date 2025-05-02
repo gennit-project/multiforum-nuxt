@@ -154,13 +154,13 @@ const permissionData = computed(() => {
 
 // Get all permissions for the current user using our utility function
 const userPermissions = computed(() => {
-  return getAllPermissions(
-    permissionData.value,
-    standardModRole.value,
-    elevatedModRole.value,
-    usernameVar.value,
-    modProfileNameVar.value
-  );
+  return getAllPermissions({
+    permissionData: permissionData.value,
+    standardModRole: standardModRole.value,
+    elevatedModRole: elevatedModRole.value,
+    username: usernameVar.value,
+    modProfileName: modProfileNameVar.value
+  });
 });
 
 const permalinkObject = computed(() => {
