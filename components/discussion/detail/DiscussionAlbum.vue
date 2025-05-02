@@ -32,6 +32,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  showEditAlbum: {
+    type: Boolean,
+    default: true, // Default to true for backward compatibility
+  },
 });
 
 // Use Vuetify's display utilities for responsive design
@@ -531,9 +535,9 @@ v-if="editingCaptionIndex === idx"
           }}</span>
 
           <div class="flex items-center gap-2">
-            <!-- Edit Album Button - only shown to the discussion author -->
+            <!-- Edit Album Button - only shown to the discussion author and when showEditAlbum is true -->
             <button
-              v-if="usernameVar === discussionAuthor"
+              v-if="usernameVar === discussionAuthor && showEditAlbum"
               type="button"
               class="hover:bg-gray-500 dark:hover:bg-gray-700 flex items-center justify-center px-2 h-8 rounded-md"
               title="Edit Album"

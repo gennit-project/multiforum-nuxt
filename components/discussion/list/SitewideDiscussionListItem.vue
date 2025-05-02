@@ -263,6 +263,7 @@ const relative = computed(() =>
                   :carousel-format="true"
                   :discussion-author="authorUsername"
                   :discussion-id="discussion.id"
+                  :show-edit-album="false"
                 />
               </div>
             </div>

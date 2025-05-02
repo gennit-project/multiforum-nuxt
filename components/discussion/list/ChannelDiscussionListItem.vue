@@ -192,6 +192,7 @@ const filteredQuery = computed(() => {
                 :discussion-id="discussion.id"
                 :discussion-author="authorUsername"
                 :carousel-format="true"
+                :show-edit-album="false"
               />
             </div>
             <div
