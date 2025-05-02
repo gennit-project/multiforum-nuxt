@@ -46,7 +46,7 @@ const handleItemClick = (item: MenuItemType) => {
       <MenuButton
         :class="[
           'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white',
-          darkBackground ? 'text-gray-200' : '',
+          darkBackground ? 'text-gray-200 hover:text-white' : '',
         ]"
       >
         <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />

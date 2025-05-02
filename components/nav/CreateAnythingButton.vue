@@ -10,6 +10,11 @@ defineProps({
     type: Boolean,
     default: false,
   },
+  backgroundColor: {
+    type: String,
+    default: 'light',
+    validator: (value: string) => ['light', 'dark'].includes(value),
+  },
 });
 
 // Setup logic
@@ -101,14 +106,29 @@ const handleItemClick = (item: any) => {
             <button
               type="button"
               v-bind="props"
-              class="flex rounded-lg border !border-blue-500 px-2 py-1 text-blue-500 items-center gap-1 dark:bg-gray-800 dark:hover:bg-blue-900 focus:outline-none"
+              class="flex rounded-lg border !border-gray-500 px-2 py-1 items-center gap-1 focus:outline-none"
+              :class="[
+                backgroundColor === 'light' 
+                  ? 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-blue-900' 
+                  : 'bg-gray-800 text-gray-100 hover:bg-gray-700'
+              ]"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span class="flex whitespace-nowrap items-center text-xs text-blue-500"> {{ usePrimaryButton ? "Create" : "+ Add" }}
+              <span
+class="flex whitespace-nowrap items-center text-xs" :class="[
+                backgroundColor === 'light' 
+                  ? 'text-gray-700 dark:text-gray-100' 
+                  : 'text-gray-100'
+              ]"> {{ usePrimaryButton ? "Create" : "+ Add" }}
               </span>
               <ChevronDownIcon
-                class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
+                class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+                :class="[
+                  backgroundColor === 'light' 
+                    ? 'text-gray-700 dark:text-gray-100' 
+                    : 'text-gray-100'
+                ]"
                 aria-hidden="true"
               />
               <v-tooltip
@@ -122,7 +142,7 @@ const handleItemClick = (item: any) => {
           </template>
 
           <v-list
-            class="bg-gray-700 text-blue-500"
+            class="bg-gray-700 text-gray-100"
             :style="{
               top: shouldOpenUpwards ? 'auto' : '100%',
               right: shouldOpenLeftwards ? 0 : 'auto',
@@ -149,16 +169,28 @@ const handleItemClick = (item: any) => {
             class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
             :class="[
               usePrimaryButton
-                ? '!border !border-blue-700 text-blue-500'
-                : 'bg-gray-700 text-blue-500 hover:bg-gray-600',
+                ? '!border !border-gray-700'
+                : backgroundColor === 'light'
+                  ? 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
+                  : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
             ]"
             data-testid="fake-create-anything-button"
           >
-            <span class="flex items-center text-sm text-blue-500">
+            <span
+class="flex items-center text-sm" :class="[
+              backgroundColor === 'light' 
+                ? 'text-gray-700 dark:text-gray-100' 
+                : 'text-gray-100'
+            ]">
               + {{ usePrimaryButton ? "Create" : "" }}
             </span>
             <ChevronDownIcon
-              class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
+              class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+              :class="[
+                backgroundColor === 'light' 
+                  ? 'text-gray-700 dark:text-gray-100' 
+                  : 'text-gray-100'
+              ]"
               aria-hidden="true"
             />
           </button>
@@ -171,16 +203,28 @@ const handleItemClick = (item: any) => {
         class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
         :class="[
           usePrimaryButton
-            ? '!border !border-blue-600 text-blue-500'
-            : 'dark:bg-gray-700 text-blue-500 hover:bg-gray-600',
+            ? '!border !border-gray-600'
+            : backgroundColor === 'light'
+              ? 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
+              : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
         ]"
         data-testid="fake-create-anything-button"
       >
-        <span class="flex items-center text-sm text-blue-500">
+        <span
+class="flex items-center text-sm" :class="[
+          backgroundColor === 'light' 
+            ? 'text-gray-700 dark:text-gray-100' 
+            : 'text-gray-100'
+        ]">
           + {{ usePrimaryButton ? "Create" : "" }}
         </span>
         <ChevronDownIcon
-          class="-mr-1 ml-1 mt-0.5 h-3 w-3 text-blue-500"
+          class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+          :class="[
+            backgroundColor === 'light' 
+              ? 'text-gray-700 dark:text-gray-100' 
+              : 'text-gray-100'
+          ]"
           aria-hidden="true"
         />
       </button>

@@ -117,17 +117,17 @@ const isOnMapPage = computed(() => {
             <LoginButton />
         </div>
         <div class="flex items-center space-x-2 md:mr-2">
-          <CreateAnythingButton />
+          <CreateAnythingButton :background-color="'dark'" />
           <nuxt-link
             data-testid="notification-bell"
             to="/notifications"
             sr-only="Notifications"
             class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm focus:outline-none text-white"
           >
-            <i class="fas fa-bell" />
+            <i class="fas fa-bell text-gray-100 hover:text-white" />
             <span
               v-if="notificationCountVar > 0"
-              class="absolute top-0 right-0 h-4 w-4 flex justify-center  items-center px-1 text-xs font-semibold leading-none text-white bg-red-500 rounded-full"
+              class="absolute top-0 right-0 h-4 w-4 flex justify-center  items-center px-1 text-xs font-semibold leading-none  bg-red-500 rounded-full"
             >
               {{ notificationCountVar }}
             </span>
