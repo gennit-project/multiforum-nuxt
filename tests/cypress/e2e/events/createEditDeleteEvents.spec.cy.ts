@@ -25,6 +25,17 @@ describe("Basic event operations", () => {
     const TEST_LINK_2 = "https://www.test2.com";
     const TEST_CHANNEL = "phx_music"
 
+    // Intercept GraphQL requests
+    cy.intercept('POST', '**/graphql', (req) => {
+      if (req.body.query?.includes('createEvent')) {
+        req.alias = 'createEventRequest';
+      } else if (req.body.query?.includes('updateEvent')) {
+        req.alias = 'updateEventRequest';
+      } else if (req.body.query?.includes('deleteEvent')) {
+        req.alias = 'deleteEventRequest';
+      }
+    });
+    
     // Test creating an online event
     cy.visit(EVENT_CREATION_FORM);
     cy.get('input[data-testid="title-input"]').type(TEST_TITLE);
@@ -46,9 +57,9 @@ describe("Basic event operations", () => {
       "Test description",
     );
 
-    cy.get("button").contains("Save").click().wait(4000)
-    cy.get("h2")
-    .contains(TEST_TITLE);
+    cy.get("button").contains("Save").click();
+    cy.wait('@createEventRequest').its('response.statusCode').should('eq', 200);
+    cy.get("h2").contains(TEST_TITLE);
     cy.get("a").contains(TEST_LINK);
 
     // Test editing an event
@@ -77,6 +88,7 @@ describe("Basic event operations", () => {
     cy.get('input[data-testid="end-time-time-input"]').type(formatTime(editedEndDateTime));
 
     cy.get("button").contains("Save").click();
+    cy.wait('@updateEventRequest').its('response.statusCode').should('eq', 200);
 
     // Check that the event has been updated
     cy.get("a").contains(TEST_LINK_2);
@@ -98,6 +110,8 @@ describe("Basic event operations", () => {
 
     cy.get("div").contains("Delete").click();
     cy.get("button").contains("Delete").click();
+    cy.wait('@deleteEventRequest').its('response.statusCode').should('eq', 200);
+    
     // After deletion, the user should be redirected to the online event list
     // for the channel view
     cy.url().should("equal", `${baseUrl}/forums/${TEST_CHANNEL}/events`);

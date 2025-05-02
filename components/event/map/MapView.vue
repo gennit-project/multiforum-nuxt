@@ -462,6 +462,7 @@ const isClientSide = typeof window !== "undefined";
         </div>
       </div>
 
+      <!-- Desktop View -->
       <div
         v-if="isClientSide && mdAndUp"
         class="flex flex-grow bg-white dark:bg-black"
@@ -521,54 +522,55 @@ const isClientSide = typeof window !== "undefined";
           />
         </div>
       </div>
-      <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
-      <ErrorBanner
-        v-else-if="eventError"
-        class="block"
-        :text="eventError.message"
-      />
-      <div
-        v-else-if="eventResult && eventResult.events"
-        id="mapViewMobileWidth"
-        :class="[
-          mdAndUp ? 'mt-52 p-4' : '',
-        ]"
-      >
-        <div class="event-map-container">
-          <EventMap
-            v-if="eventResult.events.length > 0"
-            :events="eventResult.events"
-            :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
-            :color-locked="colorLocked"
-            :use-mobile-styles="true"
-            @highlight-event="highlightEvent"
-            @open-preview="openPreview"
-            @lock-colors="colorLocked = true"
-            @set-marker-data="setMarkerData"
-          />
-        </div>
-        <div class="h-1/3 w-full">
-          <div class="mx-auto">
-            <EventList
-              key="highlightedEventId"
+      
+      <!-- Mobile View - Only render if NOT on desktop -->
+      <template v-else>
+        <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
+        <ErrorBanner
+          v-else-if="eventError"
+          class="block"
+          :text="eventError.message"
+        />
+        <div
+          v-else-if="eventResult && eventResult.events"
+          id="mapViewMobileWidth"
+        >
+          <div class="event-map-container">
+            <EventMap
+              v-if="eventResult.events.length > 0"
               :events="eventResult.events"
-              :channel-id="channelId"
-              :highlighted-event-location-id="highlightedEventLocationId"
-              :highlighted-event-id="highlightedEventId"
-              :search-input="filterValues.searchInput"
-              :selected-tags="filterValues.tags"
-              :selected-channels="filterValues.channels"
-              :loaded-event-count="eventResult.events.length"
-              :result-count="eventResult.eventsAggregate?.count"
-              @filter-by-tag="filterByTag"
-              @filter-by-channel="filterByChannel"
+              :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
+              :color-locked="colorLocked"
+              :use-mobile-styles="true"
               @highlight-event="highlightEvent"
               @open-preview="openPreview"
-              @unhighlight="unhighlight"
+              @lock-colors="colorLocked = true"
+              @set-marker-data="setMarkerData"
             />
           </div>
+          <div class="h-1/3 w-full">
+            <div class="mx-auto">
+              <EventList
+                key="highlightedEventId"
+                :events="eventResult.events"
+                :channel-id="channelId"
+                :highlighted-event-location-id="highlightedEventLocationId"
+                :highlighted-event-id="highlightedEventId"
+                :search-input="filterValues.searchInput"
+                :selected-tags="filterValues.tags"
+                :selected-channels="filterValues.channels"
+                :loaded-event-count="eventResult.events.length"
+                :result-count="eventResult.eventsAggregate?.count"
+                @filter-by-tag="filterByTag"
+                @filter-by-channel="filterByChannel"
+                @highlight-event="highlightEvent"
+                @open-preview="openPreview"
+                @unhighlight="unhighlight"
+              />
+            </div>
+          </div>
         </div>
-      </div>
+      </template>
 
       <EventPreview
         :top-layer="true"

@@ -4,16 +4,38 @@ import { setupTestData } from "../../support/testSetup";
 describe("Filter events by distance", () => {
   // Set up test data once for all tests in this file
   setupTestData();
+  
+  beforeEach(() => {
+    // Intercept GraphQL requests
+    cy.intercept('POST', '**/graphql', (req) => {
+      if (req.body.query?.includes('events')) {
+        req.alias = 'getEventsRequest';
+      } else if (req.body.query?.includes('event(')) {
+        req.alias = 'getEventDetailsRequest';
+      }
+    });
+  });
 
   it("in the sitewide in-person events list, filters events by distance", () => {
     // Go to the map view.
     cy.visit(IN_PERSON_EVENT_LIST);
+    // Wait for initial events data to load
+    cy.wait('@getEventsRequest').its('response.statusCode').should('eq', 200);
 
     // Open the "More Filters" drawer.
     cy.get('button[data-testid="more-filters-button"]').click();
-
-    // Click the distance filter for 5 miles (8.04672 km).
-    cy.get('button[data-testid="distance-8.04672"]').click();
+    
+    // Wait for the popper content to be visible and ready
+    cy.get('.popper').should('be.visible');
+    
+    // Make sure the distance button is visible and ready before clicking
+    cy.get('button[data-testid="distance-8.04672"]')
+      .should('be.visible')
+      .should('not.be.disabled')
+      .click({force: true});
+    
+    // Wait for filtered events to load
+    cy.wait('@getEventsRequest').its('response.statusCode').should('eq', 200);
 
     // Click the "More Filters" button to close the popover.
     cy.get('button[data-testid="more-filters-button"]').click();
@@ -31,9 +53,15 @@ describe("Filter events by distance", () => {
 
     // Open the "More Filters" drawer.
     cy.get('button[data-testid="more-filters-button"]').click();
+    
+    // Wait for the popper content to be visible and ready
+    cy.get('.popper').should('be.visible');
 
     // Click the "Any Distance" button.
-    cy.get('button[data-testid="distance-0"]').click();
+    cy.get('button[data-testid="distance-0"]')
+      .should('be.visible')
+      .should('not.be.disabled')
+      .click({force: true});
 
     // Click the "More Filters" button to close the popover.
     cy.get('button[data-testid="more-filters-button"]').click();
