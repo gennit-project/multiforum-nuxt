@@ -61,7 +61,7 @@ const writeReplyStyle =
               data-testid="addComment"
               class="flex-1 border overflow-hidden"
               name="addComment"
-              rows="1"
+              :rows="1"
               placeholder="Write a comment"
               :class="writeReplyStyle"
               @click="emit('openCommentEditor')"
@@ -74,7 +74,7 @@ const writeReplyStyle =
             <textarea
               id="addCommentLoginPrompt"
               name="addComment"
-              rows="1"
+              :rows="1"
               placeholder="Write a comment"
               :class="writeReplyStyle"
             />

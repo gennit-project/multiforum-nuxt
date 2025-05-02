@@ -57,21 +57,16 @@ const orderedImages = computed(() => {
 });
 
 // Current image based on ordered images
-const currentImage = computed(
-  () => orderedImages.value[lightboxIndex.value] || {}
-);
+const currentImage = computed(() => {
+  return orderedImages.value[lightboxIndex.value] || {};
+});
 const isPanelVisible = ref(true);
 
 // Caption editing
 const editingCaptionIndex = ref(-1);
 const editingCaption = ref("");
-// const isLoggedInAuthor = computed(() => {
-//   return usernameVar.value === props.discussionAuthor;
-// });
-
-// Always enable editing for now to fix the issue with seeing edit buttons
-const canEditInCurrentMode = computed(() => {
-  return true;
+const isLoggedInAuthor = computed(() => {
+  return usernameVar.value === props.discussionAuthor;
 });
 
 // Mutation to update image caption
@@ -100,23 +95,21 @@ const saveCaption = async () => {
   
   try {
     // Use the simplified mutation to just update the image's caption
-    await updateImage({
+    const result = await updateImage({
       imageId: image.id,
       caption: editingCaption.value
     });
-    
-    // Update the image in our local data to avoid reloading
-    if (image && typeof image === 'object') {
-      image.caption = editingCaption.value;
-    }
     
     // Emit event to parent component that album was updated
     emit("album-updated");
     
     // Reset editing state
     cancelEditingCaption();
+    
+    console.log("Caption saved successfully:", result);
   } catch (error) {
     console.error("Error updating caption:", error);
+    alert("Error saving caption. Please try again.");
   }
 };
 
@@ -146,15 +139,41 @@ const startDrag = (event: MouseEvent) => {
 const onDrag = (event: MouseEvent) => {
   // Only move if we're actively dragging (mouse button is held down)
   if (!isDragging.value) return;
+  
+  // Don't handle drag events if we're editing a caption
+  if (editingCaptionIndex.value !== -1) return;
+  
+  // Check if the event target is inside the text editor
+  const target = event.target as HTMLElement;
+  if (target && (
+    target.tagName === 'TEXTAREA' || 
+    target.closest('.text-editor-container') || 
+    target.closest('button')
+  )) {
+    return;
+  }
 
   event.preventDefault();
   translateX.value = event.clientX - startX.value;
   translateY.value = event.clientY - startY.value;
 };
 
-const stopDrag = () => {
+const stopDrag = (event?: MouseEvent) => {
   // Stop dragging when mouse button is released
   isDragging.value = false;
+  
+  // If we have an event and are editing a caption, check if the click is inside the editor
+  if (event && editingCaptionIndex.value !== -1) {
+    const target = event.target as HTMLElement;
+    if (target && (
+      target.tagName === 'TEXTAREA' || 
+      target.closest('form') || 
+      target.closest('button')
+    )) {
+      // Don't do anything if the click is inside the editor
+      event.stopPropagation();
+    }
+  }
 };
 
 // Handle touch events for mobile devices
@@ -284,11 +303,30 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
+// Custom event handler for mouseup that checks for text editor
+const handleMouseUp = (event: MouseEvent) => {
+  // If we're editing a caption and the click is in the editor area, don't close
+  if (editingCaptionIndex.value !== -1) {
+    const target = event.target as HTMLElement;
+    if (target && (
+      target.tagName === 'TEXTAREA' || 
+      target.closest('.text-editor-container') || 
+      target.closest('form') ||
+      target.closest('button')
+    )) {
+      event.stopPropagation();
+      return;
+    }
+  }
+  
+  stopDrag(event);
+};
+
 onMounted(() => {
   window.addEventListener("keydown", handleKeyDown);
 
   // Global event listeners to handle events outside the image element
-  window.addEventListener("mouseup", stopDrag);
+  window.addEventListener("mouseup", handleMouseUp);
   window.addEventListener("mouseleave", stopDrag); // Stop dragging if mouse leaves window
   window.addEventListener("mousemove", onDrag);
 
@@ -299,7 +337,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   window.removeEventListener("keydown", handleKeyDown);
-  window.removeEventListener("mouseup", stopDrag);
+  window.removeEventListener("mouseup", handleMouseUp);
   window.removeEventListener("mouseleave", stopDrag);
   window.removeEventListener("mousemove", onDrag);
   window.removeEventListener("touchend", stopDrag);
@@ -389,8 +427,9 @@ v-if="editingCaptionIndex === idx"
                @touchstart.stop>
             <TextEditor
               :initial-value="editingCaption"
+              :allow-image-upload="false"
               placeholder="Write a caption..."
-              rows="2"
+              :rows="2"
               @update="(text) => editingCaption = text"
               @click.stop
               @mousedown.stop
@@ -408,7 +447,7 @@ v-if="editingCaptionIndex === idx"
           </div>
           <div v-else class="text-center text-xs relative group">
             <span v-if="image?.caption">{{ image.caption }}</span>
-            <span v-else-if="!canEditInCurrentMode" class="text-gray-400 italic">No caption</span>
+            <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
             <button
               v-else
               class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full"
@@ -493,7 +532,7 @@ v-if="editingCaptionIndex === idx"
                   <TextEditor
                     :initial-value="editingCaption"
                     placeholder="Write a caption..."
-                    rows="2"
+                    :rows="2"
                     @update="(text) => editingCaption = text"
                   />
                   <div class="flex gap-2 mt-1 justify-center">
@@ -512,7 +551,15 @@ v-if="editingCaptionIndex === idx"
                   :class="{ hidden: idx !== activeIndex }"
                 >
                   <span v-if="image?.caption">{{ image.caption }}</span>
-                  <span v-else class="text-gray-400 italic">No caption</span>
+                  <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
+                  <button
+                    v-else
+                    class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full"
+                    @click.stop="startEditingCaption(idx)"
+                  >
+                    <PencilIcon class="h-3 w-3" />
+                    <span>Add caption</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -609,6 +656,20 @@ v-if="editingCaptionIndex === idx"
 
         <div
           class="flex-1 flex justify-center items-center relative h-full overflow-hidden"
+          @click="(event) => {
+            // Don't close editing mode if click happens within editor
+            if (editingCaptionIndex !== -1) {
+              const target = event.target as HTMLElement;
+              if (target && (
+                target.tagName === 'TEXTAREA' || 
+                target.closest('.text-editor-container') || 
+                target.closest('form') ||
+                target.closest('button')
+              )) {
+                event.stopPropagation();
+              }
+            }
+          }"
         >
           <button
             v-if="orderedImages.length > 1"
@@ -668,15 +729,23 @@ v-if="editingCaptionIndex === lightboxIndex"
                class="mb-4 pb-2 pr-6"
                @click.stop
                @mousedown.stop
-               @touchstart.stop>
+               @touchstart.stop
+               @mousemove.stop
+               @mouseup.stop>
             <TextEditor
+              class="text-editor-container"
               :initial-value="editingCaption"
               placeholder="Write a caption for this image..."
-              rows="3"
+              :rows="3"
               @update="(text) => editingCaption = text"
               @click.stop
               @mousedown.stop
               @touchstart.stop
+              @mousemove.stop
+              @mouseup.stop
+              @input.stop
+              @keydown.stop
+              @keyup.stop
             />
             <div class="flex gap-2 mt-2">
               <SaveButton 
@@ -693,7 +762,7 @@ v-if="editingCaptionIndex === lightboxIndex"
           >
             {{ currentImage.caption || "Image Details" }}
             <button
-              v-if="canEditInCurrentMode"
+              v-if="isLoggedInAuthor"
               class="absolute top-0 right-0 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors"
               title="Edit caption"
               @click="startEditingCaption(lightboxIndex)"
@@ -702,7 +771,7 @@ v-if="editingCaptionIndex === lightboxIndex"
             </button>
           </div>
           <div v-else class="text-gray-400 italic mt-2 relative">
-            <span v-if="!canEditInCurrentMode">No caption available for this image.</span>
+            <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
             <button
               v-else
               class="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
