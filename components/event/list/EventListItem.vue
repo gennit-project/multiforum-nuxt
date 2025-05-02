@@ -219,7 +219,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
       <div>
         <router-link
           :to="detailLink"
-          class="text-md flex-wrap gap-2 flex items-center cursor-pointer text-blue-500 hover:text-blue-700"
+          class="text-md flex-wrap gap-2 mt-2 flex items-center cursor-pointer text-gray-800 dark:text-gray-200 hover:text-blue-700"
         >
           <HighlightedSearchTerms
             :text="event.title"
@@ -242,7 +242,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         <div>
           <div class="flex gap-1 flex-wrap">
             <span
-              class="mt-2 flex flex-wrap text-sm text-gray-500 dark:text-gray-200"
+              class="flex flex-wrap text-sm text-gray-500 dark:text-gray-200"
             >
               {{
                 `${event.locationName || ""}${event.locationName ? " at " : ""}${timeOfDay}`
