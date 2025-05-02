@@ -696,7 +696,7 @@ v-if="editingCaptionIndex === lightboxIndex"
               v-if="canEditInCurrentMode"
               class="absolute top-0 right-0 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors"
               title="Edit caption"
-              @click="startEditingCaption(lightboxIndex.value)"
+              @click="startEditingCaption(lightboxIndex)"
             >
               <PencilIcon class="h-4 w-4" />
             </button>
@@ -706,7 +706,7 @@ v-if="editingCaptionIndex === lightboxIndex"
             <button
               v-else
               class="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
-              @click="startEditingCaption(lightboxIndex.value)"
+              @click="startEditingCaption(lightboxIndex)"
             >
               <PencilIcon class="h-4 w-4" />
               <span>Add a caption for this image</span>
