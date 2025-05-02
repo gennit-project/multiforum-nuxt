@@ -176,10 +176,25 @@ const stopDrag = (event?: MouseEvent) => {
   }
 };
 
-// Handle touch events for mobile devices
+// Handle touch events for mobile devices when zoomed in
 const startTouchDrag = (event: TouchEvent) => {
+  // Only handle panning when zoomed in
   if (!isZoomed.value) return;
+  
+  // Don't handle if we're editing a caption
+  if (editingCaptionIndex.value !== -1) {
+    const target = event.target as HTMLElement;
+    if (target && (
+      target.tagName === 'TEXTAREA' || 
+      target.closest('.text-editor-container') || 
+      target.closest('form') ||
+      target.closest('button')
+    )) {
+      return;
+    }
+  }
 
+  // Prevent default to avoid scrolling while panning
   event.preventDefault();
   isDragging.value = true;
 
@@ -377,21 +392,68 @@ const touchStartX = ref(0);
 const touchEndX = ref(0);
 
 const handleTouchStart = (event: TouchEvent) => {
+  // Store the initial touch position
   touchStartX.value = event.touches[0].clientX;
+  
+  // If we're in the lightbox view and zoomed in, let the image panning handle this
+  if (isLightboxOpen.value && isZoomed.value) {
+    return;
+  }
+  
+  // If we're editing a caption, ignore swipes
+  if (editingCaptionIndex.value !== -1) {
+    // Check if the touch is inside the editor
+    const target = event.target as HTMLElement;
+    if (target && (
+      target.tagName === 'TEXTAREA' || 
+      target.closest('.text-editor-container') || 
+      target.closest('form') ||
+      target.closest('button')
+    )) {
+      return;
+    }
+  }
 };
 
 const handleTouchEnd = (event: TouchEvent) => {
+  // If we're in the lightbox view and zoomed in, let the image panning handle this
+  if (isLightboxOpen.value && isZoomed.value) {
+    return;
+  }
+  
+  // If we're editing a caption, ignore swipes
+  if (editingCaptionIndex.value !== -1) {
+    // Check if the touch is inside the editor
+    const target = event.target as HTMLElement;
+    if (target && (
+      target.tagName === 'TEXTAREA' || 
+      target.closest('.text-editor-container') || 
+      target.closest('form') ||
+      target.closest('button')
+    )) {
+      return;
+    }
+  }
+  
   touchEndX.value = event.changedTouches[0].clientX;
   const swipeDistance = touchEndX.value - touchStartX.value;
   
   // Only trigger if the swipe is significant enough (e.g., > 50px)
   if (Math.abs(swipeDistance) > 50) {
     if (swipeDistance > 0) {
-      // Swiped right
-      goLeft();
+      // Swiped right - go to previous image
+      if (isLightboxOpen.value) {
+        prevImage();
+      } else {
+        goLeft();
+      }
     } else {
-      // Swiped left
-      goRight();
+      // Swiped left - go to next image
+      if (isLightboxOpen.value) {
+        nextImage();
+      } else {
+        goRight();
+      }
     }
   }
 };
@@ -656,6 +718,8 @@ v-if="editingCaptionIndex === idx"
 
         <div
           class="flex-1 flex justify-center items-center relative h-full overflow-hidden"
+          @touchstart="handleTouchStart"
+          @touchend="handleTouchEnd"
           @click="(event) => {
             // Don't close editing mode if click happens within editor
             if (editingCaptionIndex !== -1) {
@@ -692,8 +756,9 @@ v-if="editingCaptionIndex === idx"
               'max-h-[95%] max-w-[95%]': !isPanelVisible && !isZoomed,
             }"
             @mousedown="startDrag"
-            @touchstart="startTouchDrag"
-            @touchmove="onTouchDrag"
+            @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
+            @touchend="isZoomed ? undefined : handleTouchEnd"
+            @touchmove="isZoomed ? onTouchDrag : undefined"
           >
 
           <button
