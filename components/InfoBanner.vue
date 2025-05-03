@@ -3,6 +3,10 @@ import InfoIcon from "@/components/icons/InfoIcon.vue";
 import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
 defineProps({
+  testId: {
+    type: String,
+    default: "",
+  },
   text: {
     type: String,
     required: true,
@@ -11,7 +15,7 @@ defineProps({
 </script>
 
 <template>
-  <div class="rounded-md bg-blue-100 dark:bg-blue-900 p-4">
+  <div :data-testid="testId" class="rounded-md bg-blue-100 dark:bg-blue-900 p-4 dark:text-white">
     <div class="flex">
       <div class="shrink-0">
         <slot>

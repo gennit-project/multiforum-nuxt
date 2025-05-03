@@ -31,11 +31,11 @@ const markdownLinkToIssue = computed(() => {
 });
 
 const text = computed(() => {
-  return `This discussion is ${markdownLinkToIssue.value ?? "archived"}. New comments cannot be added.`;
+  return `This discussion has been ${markdownLinkToIssue.value ?? "archived"}. New comments cannot be added.`;
 });
 </script>
 <template>
-  <InfoBanner :text="text">
+  <InfoBanner :text="text" :test-id="'archived-discussion-banner'">
     <ArchiveBox class="h-5 w-5" />
   </InfoBanner>
 </template>

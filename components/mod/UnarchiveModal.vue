@@ -226,7 +226,6 @@ const close = () => {
     :title="modalTitle"
     :open="open"
     :body="modalBody"
-    :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
     :loading="
       unarchiveDiscussionLoading ||
@@ -234,6 +233,7 @@ const close = () => {
       unarchiveCommentLoading
     "
     :primary-button-disabled="explanation.length === 0"
+    :primary-button-text="'Unarchive'"
     :error="
       unarchiveDiscussionError?.message ||
       unarchiveEventError?.message ||

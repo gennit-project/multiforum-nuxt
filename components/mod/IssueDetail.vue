@@ -549,7 +549,7 @@ const toggleCloseOpenIssue = async () => {
           }`
         }}
       </h2>
-      <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+      <div id="original-post-container" class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"
           :active-issue="activeIssue"
@@ -578,8 +578,8 @@ const toggleCloseOpenIssue = async () => {
 
           <ActivityFeed
             v-if="activeIssue"
-            class="mb-6"
             :key="activeIssue.id"
+            class="mb-6"
             :feed-items="activeIssue.ActivityFeed || []"
           />
 
