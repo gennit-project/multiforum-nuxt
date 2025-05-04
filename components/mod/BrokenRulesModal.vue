@@ -291,14 +291,19 @@ const modalTitle = computed(() => {
   return "Report Content";
 });
 
-const modalBody = computed(() => {
-  let contentType = "discussion";
+const contentType = computed(() => {
   if (props.commentId) {
-    contentType = "comment";
+    return "comment";
+  } else if (props.discussionId) {
+    return "discussion";
   } else if (props.eventId) {
-    contentType = "event";
+    return "event";
   }
-  return `(Optional) Please add any more information or context about why this ${contentType} should be removed.`;
+  return "";
+});
+
+const modalBody = computed(() => {
+  return `(Optional) Please add any more information or context about why this ${contentType.value} should be removed.`;
 });
 
 const modalPlaceholder = computed(() => {
@@ -558,7 +563,7 @@ const close = () => {
         {{ modalBody }}
       </h2>
       <TextEditor
-        :test-id="'report-discussion-input'"
+        :test-id="`report-${contentType}-input`"
         :initial-value="reportText"
         :placeholder="modalPlaceholder"
         :disable-auto-focus="false"

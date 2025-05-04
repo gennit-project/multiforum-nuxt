@@ -37,7 +37,7 @@ const text = computed(()=>{
 
 </script>
 <template>
-  <InfoBanner :text="text">
+  <InfoBanner :text="text" :test-id="'archived-event-banner'">
     <ArchiveBox class="h-5 w-5" />
   </InfoBanner>
 </template>

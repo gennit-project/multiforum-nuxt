@@ -185,6 +185,18 @@ export const getEventHeaderMenuItems = (params: {
     eventId,
     isOnFeedbackPage = false
   } = params;
+  
+  // Debug log to see the permissions before making menu decisions
+  console.log("EVENT HEADER MENU PERMISSIONS:", {
+    canHideEvent: userPermissions?.canHideEvent,
+    isElevatedMod: userPermissions?.isElevatedMod,
+    canReport: userPermissions?.canReport,
+    canGiveFeedback: userPermissions?.canGiveFeedback,
+    isOwnEvent,
+    isArchived,
+    isCanceled
+  });
+  
   let menuItems: MenuItem[] = [];
 
   // Base menu items that don't depend on being on the feedback page

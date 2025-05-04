@@ -384,7 +384,24 @@ watchEffect(() => {
             >
               <div class="min-w-0 flex-1">
                 <h2 class="text-wrap px-1 text-2xl font-bold sm:tracking-tight">
-                  {{ event.title }}
+                  <template v-if="props.issueEventId && channelId && event">
+                    <nuxt-link
+                      :to="{
+                        name: 'forums-forumId-events-eventId',
+                        params: {
+                          forumId: channelId,
+                          eventId: event.id,
+                        },
+                      }"
+                      class="text-blue-500 dark:text-blue-400"
+                      rel="noopener noreferrer"
+                    >
+                      {{ event.title }}
+                    </nuxt-link>
+                  </template>
+                  <template v-else>
+                    {{ event.title }}
+                  </template>
                 </h2>
               </div>
             </div>
@@ -404,8 +421,8 @@ watchEffect(() => {
                 @archived-successfully="refetchEventChannel"
               />
               <EventBody
-                class="sm:px-4 px-0"
                 v-if="event.description"
+                class="sm:px-4 px-0"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
                 @handle-click-edit-event-description="

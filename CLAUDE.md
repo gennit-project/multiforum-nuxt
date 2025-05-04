@@ -101,33 +101,79 @@
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
 - **Composables**: Extract reusable logic into composables under `composables/` directory
 
-## Moderator Permission System
+## Permission System
 
-### Permission Levels
-The application has a tiered moderation system with three main permission levels:
+The application has two separate but related permission systems:
+
+1. **User Permissions** - Control what regular users can do (create content, upvote, etc.)
+2. **Moderator Permissions** - Control what moderators can do (archive content, give feedback, etc.)
+
+### User Permission Levels
+
+1. **Standard Users**:
+   - Use the DefaultChannelRole for the channel (or DefaultServerRole as fallback)
+   - Have permissions like createDiscussion, createComment, upvoteContent, etc.
+
+2. **Channel Admins/Owners**:
+   - Users in the `Channel.Admins` list
+   - Have all user and moderator permissions automatically
+
+3. **Suspended Users**:
+   - Users in the `Channel.SuspendedUsers` list
+   - Have very restricted permissions via SuspendedRole (or DefaultSuspendedRole as fallback)
+
+### Moderator Permission Levels
 
 1. **Standard/Normal Moderators**:
-   - Not explicitly included in the `Channel.Moderators` list
-   - Not suspended (not in `Channel.SuspendedMods` list)
-   - By default can perform basic moderation actions like reporting content and giving feedback
-   - These permissions are controlled by the default mod role configuration
+   - All authenticated users are considered standard moderators by default
+   - Not explicitly included in `Channel.Moderators` list, not in `Channel.SuspendedMods`
+   - Can perform basic moderation actions (report, give feedback) based on DefaultModRole
+   - These permissions are controlled by the DefaultModRole configuration
 
 2. **Elevated Moderators**:
    - Explicitly included in the `Channel.Moderators` list
    - Have additional permissions beyond standard moderators
    - Can typically archive content, manage other moderators, etc.
-   - These permissions are controlled by the elevated mod role configuration
+   - These permissions are controlled by the ElevatedModRole configuration
 
 3. **Suspended Moderators**:
    - Included in the `Channel.SuspendedMods` list
-   - Cannot perform any moderation actions
-   - Remain in this state until manually unsuspended
+   - Have severely restricted permissions
+   - These permissions are controlled by the SuspendedModRole configuration
+
+### Important Concepts
+
+- **Role Determination**:
+  - User roles are determined by admin/owner status and suspension status
+  - Mod roles are determined by presence in Moderators or SuspendedMods lists
+  
+- **Permission Flow**:
+  - Channel-specific roles take precedence over server-wide defaults
+  - Channel owners/admins bypass all permission checks (both user and mod)
+  - Suspended status overrides all other status for that permission type
+  
+- **Fallback Chain**:
+  - Channel-specific roles -> Server default roles -> Deny access
+
+- **User vs. Mod Actions**:
+  - Some UI actions require BOTH user and mod permissions
+  - For example, to archive content: need canHideDiscussion (mod) AND be an elevated mod or admin
 
 ### Permission Implementation
-- The `permissionUtils.ts` file contains the core permission checking logic
+
+- The `permissionUtils.ts` file contains the core permission checking logic for both systems
 - The `headerPermissionUtils.ts` file implements component-specific permission logic for UI elements
-- The permission system uses a combination of role-based checks and specific action permissions
-- Channel owners/admins (users in `Channel.Admins` list) bypass all permission checks and can perform any action
+- Channel owners/admins (users in `Channel.Admins` list) bypass all permission checks
+
+### Permission Checking Flow
+
+1. Check if the user is a channel owner/admin - if yes, grant all permissions
+2. Check user suspension status - if suspended, use suspended role permissions
+3. Check mod suspension status - if suspended mod, use suspended mod role permissions
+4. Check if the user is an elevated mod - if yes, use elevated mod role permissions
+5. Otherwise, use standard user/mod role permissions
+
+Any UI component should respect the permissions provided by these roles without adding additional restrictions.
 
 ### Common Issues
 - The moderator menus in headers (Discussion/Event/Comment) should show the "Give Feedback" and "Report" options for standard moderators

@@ -29,7 +29,7 @@ describe('permissionUtils', () => {
       canCloseSupportTickets: true
     }
     
-    it('should return false if permissionData is null', () => {
+    it('should return fall back to server permissions if permissionData from channel is null', () => {
       const params: CheckPermissionParams = {
         permissionData: null, 
         standardModRole, 
@@ -39,7 +39,7 @@ describe('permissionUtils', () => {
         action: 'canReport'
       }
       
-      expect(checkPermission(params)).toBe(false)
+      expect(checkPermission(params)).toBe(true)
     })
     
     it('should return false if both roles are null', () => {
