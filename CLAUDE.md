@@ -101,6 +101,20 @@
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
 - **Composables**: Extract reusable logic into composables under `composables/` directory
 
+## Cypress Testing Guidelines
+- **Always use URL constants**: Never use relative URLs like `cy.visit('/')` in tests
+  - Use the constants defined in `tests/cypress/e2e/constants.ts` for all URLs
+  - Example: `cy.visit(DISCUSSION_LIST)` instead of `cy.visit('/')`
+- **Use network waiting**: Wait for requests to complete rather than arbitrary timeouts
+  ```typescript
+  // Set up interception
+  cy.intercept('POST', '**/graphql').as('graphqlRequest');
+  // Perform action
+  cy.get('button').click();
+  // Wait for request to complete
+  cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+  ```
+
 ## Permission System
 
 The application has two separate but related permission systems:
