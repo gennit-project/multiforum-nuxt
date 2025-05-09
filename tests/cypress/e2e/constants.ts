@@ -24,5 +24,6 @@ export const getConstantsForCypress = (baseUrl: string) => {
     DISCUSSION_LIST: `${baseUrl}/discussions/`,
     ADMIN_ISSUES: `${baseUrl}/admin/issues`,
     CHANNEL_ISSUES: `${baseUrl}/forums/cats/issues`,
+    CATS_FORUM_EVENTS: `${baseUrl}/forums/cats/events`,
   };
 };
