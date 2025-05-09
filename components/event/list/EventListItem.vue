@@ -219,6 +219,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
       <div>
         <router-link
           :to="detailLink"
+          :data-testid="'event-title'"
           class="text-md flex-wrap gap-2 mt-2 flex items-center cursor-pointer text-gray-800 dark:text-gray-200 hover:text-blue-700"
         >
           <HighlightedSearchTerms
