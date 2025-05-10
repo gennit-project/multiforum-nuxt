@@ -76,6 +76,8 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
 
   return getRules(serverConfig.rules);
 });
+
+const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
 </script>
 
 <template>
@@ -118,19 +120,27 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
           <h3 class="uppercase text-sm text-gray-700 dark:text-gray-300">
             Server Rules
           </h3>
-          <div
-            v-for="rule in serverRuleOptions"
-            :key="rule.summary"
-            class="border-b last:border-b-0 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
-          >
-            <BrokenRuleListItem
-              :rule="rule"
-              :selected="selected"
-              @toggle-selection="
-                () => emit('toggleServerRuleSelection', rule.summary)
-              "
-            />
+          <div v-if="showServerRuleOptions">
+            <div
+              v-for="rule in serverRuleOptions"
+              :key="rule.summary"
+              class="border-b last:border-b-0 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700"
+            >
+              <BrokenRuleListItem
+                :rule="rule"
+                :selected="selected"
+                @toggle-selection="
+                  () => emit('toggleServerRuleSelection', rule.summary)
+                "
+              />
+            </div>
           </div>
+          <button
+            class="border rounded-md border-gray-600 dark:border-gray-400 px-2 py-1 mt-2 text-sm text-gray-500 dark:text-gray-300"
+            @click="showServerRuleOptions = !showServerRuleOptions"
+          >
+            {{ showServerRuleOptions ? "Hide" : "Show" }} Server Rules
+          </button>
         </div>
       </div>
     </template>
