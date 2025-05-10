@@ -242,72 +242,79 @@ const handleClickEditEventDescription = () => {
 watchEffect(() => {
   if (!event.value) {
     useHead({
-      title: `Event Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
-      description: 'The requested event could not be found.'
+      title: `Event Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
+      description: "The requested event could not be found.",
     });
     return;
   }
 
-  const title = event.value.title || 'Event';
-  const forumName = activeEventChannel.value?.Channel?.displayName || channelId.value || '';
-  const description = event.value.description 
-    ? event.value.description.substring(0, 160) + (event.value.description.length > 160 ? '...' : '')
+  const title = event.value.title || "Event";
+  const forumName =
+    activeEventChannel.value?.Channel?.displayName || channelId.value || "";
+  const description = event.value.description
+    ? event.value.description.substring(0, 160) +
+      (event.value.description.length > 160 ? "..." : "")
     : `${title} - Event on ${formatDate(event.value.startTime)}`;
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const serverDisplayName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  const imageUrl = event.value.coverImageURL || '';
+  const imageUrl = event.value.coverImageURL || "";
 
   // Set basic SEO meta tags
   useHead({
-    title: forumName 
+    title: forumName
       ? `${title} | ${forumName} | ${serverDisplayName}`
       : `${title} | ${serverDisplayName}`,
     description: description,
     image: imageUrl,
-    type: 'event'
+    type: "event",
   });
 
   // Add structured data for rich results
   useHead({
     script: [
       {
-        type: 'application/ld+json',
+        type: "application/ld+json",
         children: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Event',
+          "@context": "https://schema.org",
+          "@type": "Event",
           name: title,
           description: description,
           startDate: event.value.startTime,
           endDate: event.value.endTime,
           image: imageUrl,
-          location: event.value.address 
+          location: event.value.address
             ? {
-                '@type': 'Place',
+                "@type": "Place",
                 name: event.value.address,
                 address: {
-                  '@type': 'PostalAddress',
-                  streetAddress: event.value.address
-                }
+                  "@type": "PostalAddress",
+                  streetAddress: event.value.address,
+                },
               }
             : {
-                '@type': 'VirtualLocation',
-                url: event.value.virtualEventUrl ?? `${baseUrl}/events/list/search/${event.value.id}`
+                "@type": "VirtualLocation",
+                url:
+                  event.value.virtualEventUrl ??
+                  `${baseUrl}/events/list/search/${event.value.id}`,
               },
           organizer: {
-            '@type': 'Person',
-            name: event.value.Poster?.displayName || event.value.Poster?.username || 'Anonymous'
+            "@type": "Person",
+            name:
+              event.value.Poster?.displayName ||
+              event.value.Poster?.username ||
+              "Anonymous",
           },
-          eventStatus: event.value.canceled 
-            ? 'https://schema.org/EventCancelled' 
-            : (eventIsInThePast.value 
-                ? 'https://schema.org/EventScheduled' 
-                : 'https://schema.org/EventScheduled'),
-          eventAttendanceMode: event.value.virtualEventUrl 
-            ? 'https://schema.org/OnlineEventAttendanceMode' 
-            : 'https://schema.org/OfflineEventAttendanceMode',
-        })
-      }
-    ]
+          eventStatus: event.value.canceled
+            ? "https://schema.org/EventCancelled"
+            : eventIsInThePast.value
+              ? "https://schema.org/EventScheduled"
+              : "https://schema.org/EventScheduled",
+          eventAttendanceMode: event.value.virtualEventUrl
+            ? "https://schema.org/OnlineEventAttendanceMode"
+            : "https://schema.org/OfflineEventAttendanceMode",
+        }),
+      },
+    ],
   });
 });
 </script>
@@ -329,7 +336,11 @@ watchEffect(() => {
             Could not find the event.
           </div>
 
-          <div v-else-if="event" class="dark:bg-dark-700 flex flex-col gap-4" data-testid="event-detail-content">
+          <div
+            v-else-if="event"
+            class="dark:bg-dark-700 flex flex-col gap-4"
+            data-testid="event-detail-content"
+          >
             <nuxt-link
               v-if="usernameOnTop"
               :to="{
@@ -361,8 +372,10 @@ watchEffect(() => {
               v-if="eventHasStarted"
               :text="'This event has started.'"
             />
-            <ArchivedEventInfoBanner 
-              v-if="isArchived && route.name !== 'forums-forumId-issues-issueId'"
+            <ArchivedEventInfoBanner
+              v-if="
+                isArchived && route.name !== 'forums-forumId-issues-issueId'
+              "
               :channel-id="channelId"
               :event-channel-id="activeEventChannel?.id || ''"
             />
@@ -444,7 +457,11 @@ watchEffect(() => {
               </div>
             </div>
             <div>
-              <AddToCalendarButton v-if="event && showAddToCalendar" :event="event" class="mt-4" />
+              <AddToCalendarButton
+                v-if="event && showAddToCalendar"
+                :event="event"
+                class="mt-4"
+              />
             </div>
             <EventFooter
               :event-data="event"
@@ -453,12 +470,6 @@ watchEffect(() => {
             />
 
             <div v-if="showComments">
-              <EventRootCommentFormWrapper
-                v-if="event && !isArchived"
-                :key="`${eventId}`"
-                :event="event"
-                :previous-offset="previousOffset"
-              />
               <div class="my-6 mb-2 rounded-lg">
                 <EventCommentsWrapper
                   :key="event?.id"
@@ -470,7 +481,14 @@ watchEffect(() => {
                   :original-poster="originalPoster"
                   :archived="isArchived || false"
                   @load-more="loadMore"
-                />
+                >
+                  <EventRootCommentFormWrapper
+                    v-if="event && !isArchived"
+                    :key="`${eventId}`"
+                    :event="event"
+                    :previous-offset="previousOffset"
+                  />
+                </EventCommentsWrapper>
               </div>
             </div>
             <EventChannelLinks

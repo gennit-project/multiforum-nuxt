@@ -144,7 +144,7 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
 });
 
 const isArchived = computed(() => {
-  return activeDiscussionChannel.value?.archived
+  return activeDiscussionChannel.value?.archived;
 });
 
 const locked = computed(() => {
@@ -307,8 +307,12 @@ const handleEditAlbum = () => {
       v-if="getDiscussionLoading && !discussion"
       class="flex justify-center py-4"
       :loading-text="'Loading discussion...'"
-      />
-    <PageNotFound v-else-if="!discussion && !activeDiscussionChannel && !isDiscussionLoading" />
+    />
+    <PageNotFound
+      v-else-if="
+        !discussion && !activeDiscussionChannel && !isDiscussionLoading
+      "
+    />
     <div
       v-else
       class="flex max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800"
@@ -319,12 +323,15 @@ const handleEditAlbum = () => {
           class="mt-2 px-4"
           :text="getDiscussionError.message"
         />
-        <ArchivedDiscussionInfoBanner 
+        <ArchivedDiscussionInfoBanner
           v-if="isArchived"
           :channel-id="channelId"
           :discussion-channel-id="activeDiscussionChannel?.id || ''"
         />
-        <InfoBanner v-else-if="locked" text="This discussion is locked. New comments cannot be added." />
+        <InfoBanner
+          v-else-if="locked"
+          text="This discussion is locked. New comments cannot be added."
+        />
         <v-row v-if="discussion" class="flex justify-center">
           <v-col>
             <div class="space-y-3 px-2">
@@ -342,7 +349,7 @@ const handleEditAlbum = () => {
                   @cancel-edit-discussion-body="discussionBodyEditMode = false"
                 />
                 <div class="flex-1">
-                  <DiscussionBodyEditForm 
+                  <DiscussionBodyEditForm
                     v-if="discussionBodyEditMode"
                     :discussion="discussion"
                     @close-editor="discussionBodyEditMode = false"
@@ -377,9 +384,9 @@ const handleEditAlbum = () => {
                       </div>
                     </template>
                     <template #mark-answered-slot>
-                      <MarkAsAnsweredButton 
+                      <MarkAsAnsweredButton
                         v-if="loggedInUserIsAuthor"
-                        :answered="activeDiscussionChannel?.answered || false" 
+                        :answered="activeDiscussionChannel?.answered || false"
                         :discussion-id="discussionId"
                         :channel-id="channelId"
                         :discussion-channel-id="activeDiscussionChannel?.id"
@@ -406,16 +413,6 @@ const handleEditAlbum = () => {
           </v-col>
         </v-row>
         <div>
-          <DiscussionRootCommentFormWrapper
-            v-if="activeDiscussionChannel && !isArchived && !locked"
-            :key="`${channelId}${discussionId}`"
-            class="pr-3"
-            :channel-id="channelId"
-            :discussion-channel="activeDiscussionChannel || undefined"
-            :previous-offset="previousOffset"
-            :mod-name="loggedInUserModName"
-          />
-          
           <div class="mx-2 my-6 rounded-lg">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
@@ -429,7 +426,17 @@ const handleEditAlbum = () => {
               :previous-offset="previousOffset"
               :locked="locked"
               @load-more="loadMore"
-            />
+            >
+              <DiscussionRootCommentFormWrapper
+                v-if="activeDiscussionChannel && !isArchived && !locked"
+                :key="`${channelId}${discussionId}`"
+                class="pr-3"
+                :channel-id="channelId"
+                :discussion-channel="activeDiscussionChannel || undefined"
+                :previous-offset="previousOffset"
+                :mod-name="loggedInUserModName"
+              />
+            </DiscussionCommentsWrapper>
           </div>
           <DiscussionChannelLinks
             v-if="discussion && discussion.DiscussionChannels"

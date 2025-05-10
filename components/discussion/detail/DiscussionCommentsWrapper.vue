@@ -267,5 +267,7 @@ const decrementCommentCount = (cache: any) => {
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
-  />
+  >
+  <slot/>
+</CommentSection>
 </template>

@@ -148,17 +148,17 @@ function updateCommentSectionQueryResult(input: {
 }) {
   try {
     const { cache, commentToDeleteId } = input;
-    
+
     if (!commentToDeleteId) {
       console.error("No comment ID provided for deletion");
       return;
     }
-    
+
     // Directly evict the comment from the cache
     cache.evict({
-      id: cache.identify({ __typename: "Comment", id: commentToDeleteId })
+      id: cache.identify({ __typename: "Comment", id: commentToDeleteId }),
     });
-    
+
     // Garbage collection to clean up unreachable references
     cache.gc();
   } catch (error) {
@@ -172,29 +172,29 @@ function incrementCommentCount(cache: any) {
       console.error("No event ID found for incrementing comment count");
       return;
     }
-    
+
     // Use cache.modify to directly update the CommentsAggregate field
     // This is much safer than using writeQuery
     const eventId = cache.identify({
       __typename: "Event",
-      id: props.event.id
+      id: props.event.id,
     });
-    
+
     if (!eventId) {
       console.error("Could not identify event in cache");
       return;
     }
-    
+
     cache.modify({
       id: eventId,
       fields: {
         CommentsAggregate(existing = {}) {
           return {
             ...existing,
-            count: (existing.count || 0) + 1
+            count: (existing.count || 0) + 1,
           };
-        }
-      }
+        },
+      },
     });
   } catch (error) {
     console.error("Error incrementing comment count:", error);
@@ -207,29 +207,29 @@ function decrementCommentCount(cache: any) {
       console.error("No event ID found for decrementing comment count");
       return;
     }
-    
+
     // Use cache.modify to directly update the CommentsAggregate field
     // This is much safer than using writeQuery
     const eventId = cache.identify({
       __typename: "Event",
-      id: props.event.id
+      id: props.event.id,
     });
-    
+
     if (!eventId) {
       console.error("Could not identify event in cache");
       return;
     }
-    
+
     cache.modify({
       id: eventId,
       fields: {
         CommentsAggregate(existing = {}) {
           return {
             ...existing,
-            count: Math.max(0, (existing.count || 0) - 1)
+            count: Math.max(0, (existing.count || 0) - 1),
           };
-        }
-      }
+        },
+      },
     });
   } catch (error) {
     console.error("Error decrementing comment count:", error);
@@ -256,5 +256,7 @@ function decrementCommentCount(cache: any) {
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
-  />
+  >
+    <slot />
+  </CommentSection>
 </template>

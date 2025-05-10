@@ -609,6 +609,9 @@ const lengthOfCommentInProgress = computed(() => {
         </h2>
         <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />
       </div>
+      <div class="my-2">
+        <slot/>
+      </div>
       <InfoBanner
         v-if="locked || archived"
         class="mr-10 mt-2"
