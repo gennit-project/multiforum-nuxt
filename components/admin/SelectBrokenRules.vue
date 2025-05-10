@@ -136,6 +136,7 @@ const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
             </div>
           </div>
           <button
+            v-if="forumRuleOptions.length > 0"
             class="border rounded-md border-gray-600 dark:border-gray-400 px-2 py-1 mt-2 text-sm text-gray-500 dark:text-gray-300"
             @click="showServerRuleOptions = !showServerRuleOptions"
           >
