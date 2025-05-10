@@ -53,7 +53,7 @@ const tagClasses = computed(() => {
   return [
     props.large ? 'text-md py-1 shadow rounded-full' : '',
     props.titleMode ? 'text-xl py-1.5' : '',
-    !props.large && !props.titleMode ? 'text-sm py-1' : '',
+    !props.large && !props.titleMode ? 'text-xs py-0.5' : '',
     props.clearable ? 'pr-1' : 'cursor-pointer pr-2',
     getButtonStyles(),
     'pl-1 font-medium tag rounded flex items-center gap-1',
@@ -73,9 +73,9 @@ function getButtonStyles() {
     return 'bg-blue-500 text-white hover:bg-blue-600';
   } else {
     if (props.channelMode) {
-      return 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-100 dark:hover:bg-gray-500 dark:hover:text-white';
+      return 'bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-50 dark:hover:bg-gray-600 dark:hover:text-white';
     }
-    return 'bg-gray-200 text-gray-600 dark:bg-gray-600 hover:bg-gray-200 dark:hover:bg-gray-500 pl-2 dark:hover:bg-gray-400 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-200';
+    return 'bg-gray-100 text-gray-600 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 pl-2 dark:hover:bg-gray-400 dark:text-gray-100 hover:bg-gray-300 dark:hover:bg-gray-200';
   }
 }
 </script>
