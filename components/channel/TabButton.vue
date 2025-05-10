@@ -52,7 +52,7 @@ const isHovered = ref(false);
   <nuxt-link
     :data-testid="dataTestid"
     :to="to"
-    class="border-transparent link font-medium group inline-flex items-center gap-1 hover:text-gray-600 dark:text-gray-400"
+    class="pt-2 border-transparent link font-medium group inline-flex items-center gap-1 hover:text-gray-600 dark:text-gray-400"
     :class="classes"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
