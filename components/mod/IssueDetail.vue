@@ -549,7 +549,7 @@ const toggleCloseOpenIssue = async () => {
           }`
         }}
       </h2>
-      <div id="original-post-container" class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+      <div id="original-post-container" class="border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2">
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"
           :active-issue="activeIssue"
