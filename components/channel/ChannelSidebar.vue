@@ -8,7 +8,6 @@ import ChannelRules from "@/components/channel/Rules.vue";
 import SidebarEventList from "@/components/channel/SidebarEventList.vue";
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { useRouter, useRoute } from "nuxt/app";
-import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import FontSizeControl from "@/components/channel/FontSizeControl.vue";
 
 const props = defineProps({
@@ -63,7 +62,6 @@ const filterChannelsByTag = (tag: string) => {
         :full-width="true"
         :is-square="false"
       />
-      <CreateAnythingButton class="mb-4 mx-2" :use-primary-button="true" />
     </div>
       <div class="flex items-center w-full gap-4">
        

@@ -13,6 +13,7 @@ import type { SearchDiscussionValues } from "@/types/Discussion";
 import { updateFilters } from "@/utils/routerUtils";
 import { useRoute, useRouter } from "nuxt/app";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
+import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 
 defineProps({
@@ -210,6 +211,7 @@ const toggleShowSearch = () => {
         >
           <SearchIcon />
         </button>
+        <CreateAnythingButton class="mx-2" :use-primary-button="true" />
       </div>
     </div>
     <div

@@ -59,7 +59,12 @@ export const GET_CHANNEL = gql`
         displayName
       }
       DiscussionChannelsAggregate(
-        where: { Discussion: { NOT: { title: null } } }
+        where: {
+          archived: false
+          Discussion: { 
+            NOT: { title: null } 
+          } 
+        }
       ) {
         count
       }

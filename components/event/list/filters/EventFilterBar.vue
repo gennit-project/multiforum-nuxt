@@ -24,6 +24,7 @@ import type { UpdateLocationInput } from "@/components/event/form/CreateEditEven
 import SearchableForumList from "@/components/channel/SearchableForumList.vue";
 import SearchableTagList from "@/components/SearchableTagList.vue";
 import { updateFilters } from "@/utils/routerUtils";
+import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 
 // Props
 const props = defineProps({
@@ -64,7 +65,11 @@ const channelId = computed(() => {
 
 const showOnlineOnly = computed(() => route.name === "SearchEventsList");
 const showInPersonOnly = computed(() => {
-  return route.name && typeof route.name === 'string' && route.name.includes('map-search') ? true : undefined;
+  return route.name &&
+    typeof route.name === "string" &&
+    route.name.includes("map-search")
+    ? true
+    : undefined;
 });
 
 const filterValues = ref<SearchEventValues>(
@@ -291,7 +296,22 @@ const updateShowArchived = (event: Event) => {
 
 <template>
   <div class="flex-1 flex-col space-y-1 dark:text-white mt-2 mx-4">
-    <div v-if="showMainFilters" class="flex flex-col gap-2">
+    <div class="flex justify-end mb-2">
+      <CreateAnythingButton class="mx-2" :use-primary-button="true" />
+      <button
+        v-if="allowHidingMainFilters"
+        data-testid="toggle-main-filters-button"
+        :class="[
+          showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '',
+        ]"
+        class="border border-black dark:border-gray-500 rounded-md text-xs px-2 py-1 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+        @click="toggleShowMainFilters"
+      >
+        {{ showMainFilters ? "Hide filters" : "Show filters" }}
+      </button>
+    </div>
+    <hr class="mb-2" >
+    <div v-if="showMainFilters" class="flex flex-col gap-2 border border-gray-400 dark:border-gray-600 dark:bg-gray-800 p-4 rounded-lg">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 items-center">
           <div
@@ -309,14 +329,16 @@ const updateShowArchived = (event: Event) => {
                 <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
               </template>
               <template #content>
-                <div 
+                <div
                   v-if="forumListOpen"
                   class="relative bg-white dark:bg-gray-700 w-96"
                   data-testid="forum-list-dropdown"
                 >
                   <SearchableForumList
                     :selected-channels="filterValues.channels"
-                    :featured-forums="showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : undefined"
+                    :featured-forums="
+                      showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : undefined
+                    "
                     @toggle-selection="toggleSelectedChannel"
                   />
                 </div>
@@ -402,7 +424,9 @@ const updateShowArchived = (event: Event) => {
                   data-testid="more-filters-button"
                   class="m-1 absolute inset-y-0 right-2 flex rounded-full cursor-pointer items-center justify-center bg-white dark:text-white dark:bg-gray-700 p-2"
                 >
-                  <FilterIcon class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white" />
+                  <FilterIcon
+                    class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white"
+                  />
                 </button>
 
                 <template #content>
@@ -487,9 +511,9 @@ const updateShowArchived = (event: Event) => {
               <div class="relative bg-white dark:bg-gray-700 w-96">
                 <SearchableForumList
                   :selected-channels="filterValues.channels"
-                  :featured-forums="showInPersonOnly
-                    ? IN_PERSON_FEATURED_FORUMS
-                    : []"
+                  :featured-forums="
+                    showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : []
+                  "
                   @toggle-selection="toggleSelectedChannel"
                 />
               </div>
@@ -516,7 +540,10 @@ const updateShowArchived = (event: Event) => {
         </div>
       </div>
       <slot />
-      <div v-if="toggleShowArchivedEnabled" class="flex items-center justify-start gap-2 py-2 dark:text-gray-300">
+      <div
+        v-if="toggleShowArchivedEnabled"
+        class="flex items-center justify-start gap-2 py-2 dark:text-gray-300"
+      >
         <CheckBox
           data-testid="show-archived-discussions"
           class="align-middle"
@@ -525,17 +552,6 @@ const updateShowArchived = (event: Event) => {
         />
         Show archived events
       </div>
-    </div>
-
-    <div class="flex items-center justify-end">
-      <button
-        v-if="allowHidingMainFilters"
-        data-testid="toggle-main-filters-button"
-        class="text-blue-500 text-sm"
-        @click="toggleShowMainFilters"
-      >
-        {{ showMainFilters ? "Hide filters" : "Show filters" }}
-      </button>
     </div>
   </div>
 </template>

@@ -106,10 +106,10 @@ const handleItemClick = (item: any) => {
             <button
               type="button"
               v-bind="props"
-              class="flex rounded-lg border !border-gray-500 px-2 py-1 items-center gap-1 focus:outline-none"
+              class="flex rounded-md border !border-gray-500 px-2 py-2 items-center gap-1 focus:outline-none"
               :class="[
                 backgroundColor === 'light' 
-                  ? 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-blue-900' 
+                  ? 'bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-blue-900' 
                   : 'bg-gray-800 text-gray-100 hover:bg-gray-700'
               ]"
               @click="adjustMenuPosition"
@@ -118,7 +118,7 @@ const handleItemClick = (item: any) => {
               <span
 class="flex whitespace-nowrap items-center text-xs" :class="[
                 backgroundColor === 'light' 
-                  ? 'text-gray-700 dark:text-gray-100' 
+                  ? 'text-gray-800 dark:text-gray-100' 
                   : 'text-gray-100'
               ]"> {{ usePrimaryButton ? "Create" : "+ Add" }}
               </span>
@@ -126,7 +126,7 @@ class="flex whitespace-nowrap items-center text-xs" :class="[
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3"
                 :class="[
                   backgroundColor === 'light' 
-                    ? 'text-gray-700 dark:text-gray-100' 
+                    ? 'text-gray-800 dark:text-gray-100' 
                     : 'text-gray-100'
                 ]"
                 aria-hidden="true"
@@ -169,9 +169,9 @@ class="flex whitespace-nowrap items-center text-xs" :class="[
             class="font-semibold whitespace-nowrap flex h-8 w-full items-center gap-x-1.5 rounded-sm px-4 text-sm focus:outline-none"
             :class="[
               usePrimaryButton
-                ? '!border !border-gray-700'
+                ? '!border !border-gray-800'
                 : backgroundColor === 'light'
-                  ? 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
                   : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
             ]"
             data-testid="fake-create-anything-button"
@@ -179,7 +179,7 @@ class="flex whitespace-nowrap items-center text-xs" :class="[
             <span
 class="flex items-center text-sm" :class="[
               backgroundColor === 'light' 
-                ? 'text-gray-700 dark:text-gray-100' 
+                ? 'text-gray-800 dark:text-gray-100' 
                 : 'text-gray-100'
             ]">
               + {{ usePrimaryButton ? "Create" : "" }}
@@ -188,7 +188,7 @@ class="flex items-center text-sm" :class="[
               class="-mr-1 ml-1 mt-0.5 h-3 w-3"
               :class="[
                 backgroundColor === 'light' 
-                  ? 'text-gray-700 dark:text-gray-100' 
+                  ? 'text-gray-800 dark:text-gray-100' 
                   : 'text-gray-100'
               ]"
               aria-hidden="true"
@@ -205,7 +205,7 @@ class="flex items-center text-sm" :class="[
           usePrimaryButton
             ? '!border !border-gray-600'
             : backgroundColor === 'light'
-              ? 'bg-white text-gray-700 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
+              ? 'bg-white text-gray-800 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700'
               : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
         ]"
         data-testid="fake-create-anything-button"
@@ -213,7 +213,7 @@ class="flex items-center text-sm" :class="[
         <span
 class="flex items-center text-sm" :class="[
           backgroundColor === 'light' 
-            ? 'text-gray-700 dark:text-gray-100' 
+            ? 'text-gray-800 dark:text-gray-100' 
             : 'text-gray-100'
         ]">
           + {{ usePrimaryButton ? "Create" : "" }}
@@ -222,7 +222,7 @@ class="flex items-center text-sm" :class="[
           class="-mr-1 ml-1 mt-0.5 h-3 w-3"
           :class="[
             backgroundColor === 'light' 
-              ? 'text-gray-700 dark:text-gray-100' 
+              ? 'text-gray-800 dark:text-gray-100' 
               : 'text-gray-100'
           ]"
           aria-hidden="true"

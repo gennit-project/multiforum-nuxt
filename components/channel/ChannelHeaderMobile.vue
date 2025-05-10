@@ -1,5 +1,4 @@
 <script setup>
-import CreateAnythingButton from '../nav/CreateAnythingButton.vue';
 defineProps({
   channelId: {
     type: String,
@@ -41,6 +40,5 @@ defineProps({
         {{ channelId }}
       </h1>
     </div>
-    <CreateAnythingButton class="mb-4 mx-2" :use-primary-button="true" />
   </div>
 </template>
