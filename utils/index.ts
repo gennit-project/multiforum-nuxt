@@ -14,6 +14,7 @@ import UnarchiveBox from "@/components/icons/UnarchiveBox.vue";
 import UserPlus from "@/components/icons/UserPlus.vue";
 import UserMinus from "@/components/icons/UserMinus.vue";
 import type { Event, Tag as TagData } from "@/__generated__/graphql"
+import ImageIcon from "@/components/icons/ImageIcon.vue";
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_PROFILE_PIC_SIZE_MB = 1;
@@ -423,6 +424,7 @@ const ALLOWED_ICONS = {
   UNARCHIVE: 'UNARCHIVE',
   SUSPEND: 'SUSPEND',
   UNSUSPEND: 'UNSUSPEND',
+  ADD_ALBUM: 'ADD_ALBUM',
 }
 
 const actionIconMap = {
@@ -438,6 +440,7 @@ const actionIconMap = {
   [ALLOWED_ICONS.UNARCHIVE]: UnarchiveBox,
   [ALLOWED_ICONS.SUSPEND]: UserMinus,
   [ALLOWED_ICONS.UNSUSPEND]: UserPlus,
+  [ALLOWED_ICONS.ADD_ALBUM]: ImageIcon,
 }
 
 export {
