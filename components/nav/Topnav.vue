@@ -79,7 +79,7 @@ const isOnMapPage = computed(() => {
 
         <div class="ml-12 flex items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
-            <LogoIcon class="h-5 w-5"/>
+            <LogoIcon class="h-5 w-5" />
             <span class="font-bold text-white logo-font">Topical</span>
 
             <div
@@ -94,7 +94,10 @@ const isOnMapPage = computed(() => {
             class="hidden sm:flex items-center gap-1 text-gray-300"
           >
             <span>•</span>
-            <nuxt-link :to="`/forums/${channelId}`" class="font-mono text-gray-300 hover:text-white">
+            <nuxt-link
+              :to="`/forums/${channelId}`"
+              class="font-mono text-gray-300 hover:text-white"
+            >
               {{ channelId }}
             </nuxt-link>
           </div>
@@ -112,9 +115,9 @@ const isOnMapPage = computed(() => {
       </div>
       <div class="flex items-center gap-2">
         <div
-            class="hidden sm:flex items-center justify-end space-x-2 md:flex-1"
-          >
-            <LoginButton />
+          class="hidden sm:flex items-center justify-end space-x-2 md:flex-1"
+        >
+          <LoginButton />
         </div>
         <div class="flex items-center space-x-2 md:mr-2">
           <CreateAnythingButton :background-color="'dark'" />
@@ -122,12 +125,12 @@ const isOnMapPage = computed(() => {
             data-testid="notification-bell"
             to="/notifications"
             sr-only="Notifications"
-            class="font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm focus:outline-none text-white"
+            class="text-gray-300 hover:text-white font-semibold relative inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm focus:outline-none"
           >
-            <i class="fas fa-bell text-gray-100 hover:text-white" />
+            <i class="fas fa-bell" />
             <span
               v-if="notificationCountVar > 0"
-              class="absolute top-0 right-0 h-4 w-4 flex justify-center  items-center px-1 text-xs font-semibold leading-none  bg-red-500 rounded-full"
+              class="absolute top-0 right-0 h-4 w-4 flex justify-center items-center px-1 text-xs font-semibold leading-none bg-red-500 rounded-full"
             >
               {{ notificationCountVar }}
             </span>
