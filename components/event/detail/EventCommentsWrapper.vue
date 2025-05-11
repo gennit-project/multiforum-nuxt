@@ -252,6 +252,7 @@ function decrementCommentCount(cache: any) {
     :show-comment-sort-buttons="false"
     :locked="locked"
     :archived="archived"
+    :show-nuxt-page="true"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

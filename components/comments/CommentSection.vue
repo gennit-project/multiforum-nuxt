@@ -107,6 +107,10 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  showNuxtPage: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Emits
@@ -621,6 +625,7 @@ const lengthOfCommentInProgress = computed(() => {
       </InfoBanner>
       <LoadingSpinner v-if="loading" class="ml-2" />
       <NuxtPage
+        v-if="showNuxtPage"
         :aggregate-comment-count="aggregateCommentCount"
         :enable-feedback="enableFeedback"
         :locked="locked || archived"

@@ -263,11 +263,12 @@ const decrementCommentCount = (cache: any) => {
     :original-poster="discussionAuthor"
     :locked="locked"
     :archived="archived"
+    :show-nuxt-page="true"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
   >
-  <slot/>
-</CommentSection>
+    <slot />
+  </CommentSection>
 </template>
