@@ -1,6 +1,11 @@
 <script setup lang="ts">
 import { useTheme } from "@/composables/useTheme";
 
+// Set inheritAttrs to false so we can handle attribute inheritance manually
+defineOptions({
+  inheritAttrs: false,
+});
+
 const { theme } = useTheme();
 const props = defineProps({
   modelValue: {
@@ -27,7 +32,7 @@ function close() {
       >
         <template #activator="{ props: activatorProps }">
           <div v-bind="activatorProps">
-            <slot name="button" v-bind="activatorProps" @close="close" />
+            <slot name="button" v-bind="{...activatorProps, class: $attrs.class}" @close="close" />
           </div>
         </template>
         <v-card :theme="theme">
@@ -36,7 +41,7 @@ function close() {
       </v-menu>
     </div>
     <template #fallback>
-      <slot name="button" @close="close" />
+      <slot name="button" v-bind="{class: $attrs.class}" @close="close" />
     </template>
   </client-only>
 </template>

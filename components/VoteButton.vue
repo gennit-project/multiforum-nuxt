@@ -21,6 +21,10 @@ const properties = defineProps({
     default: "",
   },
   isPermalinked: Boolean,
+  class: {
+    type: String,
+    default: "",
+  }
 });
 
 const emit = defineEmits(["vote"]);
@@ -38,7 +42,10 @@ const buttonClasses = computed(() => {
     ? "border-blue-500 hover:bg-blue-300 dark:border-blue-600 dark:hover:bg-blue-600"
     : "border-gray-200 dark:border-gray-600 hover:bg-gray-200";
 
-  return [...baseClasses, defaultClasses, permalinkClasses].join(" ");
+  // Include external class passed from parent component
+  const externalClass = properties.class || "";
+
+  return [...baseClasses, defaultClasses, permalinkClasses, externalClass].join(" ");
 });
 </script>
 

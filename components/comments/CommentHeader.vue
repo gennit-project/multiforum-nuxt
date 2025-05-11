@@ -2,14 +2,13 @@
 import { computed } from "vue";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
-import UsernameWithTooltip from "../UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
 import { getCommentAuthorStatus } from "@/utils/headerPermissionUtils";
-import { 
-  getPermalinkToDiscussionComment, 
-  getPermalinkToDiscussion, 
-  getPermalinkToEventComment, 
-  getPermalinkToEvent 
+import {
+  getPermalinkToDiscussionComment,
+  getPermalinkToDiscussion,
+  getPermalinkToEventComment,
+  getPermalinkToEvent
 } from "@/utils/routerUtils";
 
 // Props definition using defineProps
@@ -61,15 +60,6 @@ const commentAuthorProfilePic = computed(
 );
 const commentAuthorDisplayName = computed(
   () => props.commentData.CommentAuthor?.displayName
-);
-const commentKarma = computed(
-  () => props.commentData.CommentAuthor?.commentKarma ?? 0
-);
-const discussionKarma = computed(
-  () => props.commentData.CommentAuthor?.discussionKarma ?? 0
-);
-const commentAuthorAge = computed(
-  () => props.commentData.CommentAuthor?.createdAt
 );
 
 const createdAtFormatted = computed(() => {
@@ -218,18 +208,24 @@ const contextLinkObject = computed(() => {
               params: { username: commentAuthorUsername },
             }"
           >
-            <UsernameWithTooltip
-              v-if="commentAuthorUsername"
-              :username="commentAuthorUsername"
-              :src="commentAuthorProfilePic || ''"
-              :display-name="commentAuthorDisplayName || ''"
-              :comment-karma="commentKarma"
-              :discussion-karma="discussionKarma"
-              :account-created="commentAuthorAge"
-              :is-admin="isAdmin"
-              :is-mod="isMod"
-              :is-original-poster="commentAuthorUsername === originalPoster"
-            />
+            <span class="flex flex-row items-center gap-1">
+              <span v-if="!commentAuthorDisplayName" class="font-bold">{{ commentAuthorUsername }}</span>
+              <span v-if="commentAuthorDisplayName" class="font-bold">{{ commentAuthorDisplayName }}</span>
+              <span v-if="commentAuthorDisplayName" class="text-gray-500 dark:text-gray-300">{{ `(u/${commentAuthorUsername})` }}</span>
+
+              <span
+                v-if="isAdmin"
+                class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+              >Admin</span>
+              <span
+                v-else-if="isMod"
+                class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+              >Mod</span>
+              <span
+                v-if="commentAuthorUsername === originalPoster"
+                class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+              >OP</span>
+            </span>
           </NuxtLink>
           <NuxtLink
             v-else-if="commentData.CommentAuthor?.displayName"

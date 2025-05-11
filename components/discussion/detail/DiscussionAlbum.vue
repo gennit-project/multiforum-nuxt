@@ -512,16 +512,33 @@ v-if="editingCaptionIndex === idx"
             </div>
           </div>
           <div v-else class="text-center text-xs relative group">
-            <span v-if="image?.caption">{{ image.caption }}</span>
+            <span v-if="image?.caption">
+              {{ image.caption }}
+              <span
+                v-if="isLoggedInAuthor"
+                class="inline-flex ml-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+                role="button"
+                tabindex="0"
+                @click.stop="startEditingCaption(idx)"
+                @keydown.enter.stop="startEditingCaption(idx)"
+                @keydown.space.stop="startEditingCaption(idx)"
+              >
+                <PencilIcon class="h-3 w-3" />
+              </span>
+            </span>
             <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
-            <button
+            <span
               v-else
-              class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full"
+              class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full cursor-pointer"
+              role="button"
+              tabindex="0"
               @click.stop="startEditingCaption(idx)"
+              @keydown.enter.stop="startEditingCaption(idx)"
+              @keydown.space.stop="startEditingCaption(idx)"
             >
               <PencilIcon class="h-3 w-3" />
               <span>Add caption</span>
-            </button>
+            </span>
           </div>
         </div>
       </div>
@@ -616,16 +633,33 @@ v-if="editingCaptionIndex === idx"
                   class="text-center text-xs relative group"
                   :class="{ hidden: idx !== activeIndex }"
                 >
-                  <span v-if="image?.caption">{{ image.caption }}</span>
+                  <span v-if="image?.caption">
+                    {{ image.caption }}
+                    <span
+                      v-if="isLoggedInAuthor"
+                      class="inline-flex ml-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+                      role="button"
+                      tabindex="0"
+                      @click.stop="startEditingCaption(idx)"
+                      @keydown.enter.stop="startEditingCaption(idx)"
+                      @keydown.space.stop="startEditingCaption(idx)"
+                    >
+                      <PencilIcon class="h-3 w-3" />
+                    </span>
+                  </span>
                   <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
-                  <button
+                  <span
                     v-else
-                    class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full"
+                    class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full cursor-pointer"
+                    role="button"
+                    tabindex="0"
                     @click.stop="startEditingCaption(idx)"
+                    @keydown.enter.stop="startEditingCaption(idx)"
+                    @keydown.space.stop="startEditingCaption(idx)"
                   >
                     <PencilIcon class="h-3 w-3" />
                     <span>Add caption</span>
-                  </button>
+                  </span>
                 </div>
               </div>
             </div>
@@ -830,25 +864,33 @@ v-if="editingCaptionIndex === lightboxIndex"
             class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative"
           >
             {{ currentImage.caption || "Image Details" }}
-            <button
+            <span
               v-if="isLoggedInAuthor"
-              class="absolute top-0 right-0 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors"
+              class="absolute top-0 right-0 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+              role="button"
+              tabindex="0"
               title="Edit caption"
               @click="startEditingCaption(lightboxIndex)"
+              @keydown.enter="startEditingCaption(lightboxIndex)"
+              @keydown.space="startEditingCaption(lightboxIndex)"
             >
               <PencilIcon class="h-4 w-4" />
-            </button>
+            </span>
           </div>
           <div v-else class="text-gray-400 italic mt-2 relative">
             <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
-            <button
+            <span
               v-else
-              class="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors"
+              class="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors cursor-pointer"
+              role="button"
+              tabindex="0"
               @click="startEditingCaption(lightboxIndex)"
+              @keydown.enter="startEditingCaption(lightboxIndex)"
+              @keydown.space="startEditingCaption(lightboxIndex)"
             >
               <PencilIcon class="h-4 w-4" />
               <span>Add a caption for this image</span>
-            </button>
+            </span>
           </div>
           <!-- <MarkdownPreview
             v-if="currentImage.caption"

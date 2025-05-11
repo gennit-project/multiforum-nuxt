@@ -6,7 +6,6 @@ import { DateTime } from "luxon";
 import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import WarningModal from "@/components/WarningModal.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
 import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
@@ -294,16 +293,20 @@ const authorIsMod = computed(
             params: { username: discussion.Author.username },
           }"
         >
-          <UsernameWithTooltip
-            :is-admin="authorIsAdmin"
-            :is-mod="authorIsMod"
-            :username="discussion.Author.username"
-            :src="discussion.Author.profilePicURL ?? ''"
-            :display-name="discussion.Author.displayName ?? ''"
-            :comment-karma="discussion.Author.commentKarma ?? 0"
-            :discussion-karma="discussion.Author.discussionKarma ?? 0"
-            :account-created="discussion.Author.createdAt"
-          />
+          <span class="flex flex-row items-center gap-1">
+            <span v-if="!discussion.Author.displayName" class="font-bold">{{ discussion.Author.username }}</span>
+            <span v-else class="font-bold">{{ discussion.Author.displayName }}</span>
+            <span v-if="discussion.Author.displayName" class="text-gray-500 dark:text-gray-300">{{ `(u/${discussion.Author.username})` }}</span>
+
+            <span
+              v-if="authorIsAdmin"
+              class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+            >Admin</span>
+            <span
+              v-else-if="authorIsMod"
+              class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+            >Mod</span>
+          </span>
         </nuxt-link>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
