@@ -18,7 +18,6 @@ export const AUTHOR_FIELDS = gql`
 
 // For channel list view
 export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
-  ${AUTHOR_FIELDS}
   query getDiscussionsInChannel(
     $channelUniqueName: String!
     $searchInput: String!
@@ -62,7 +61,17 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           createdAt
           updatedAt
           Author {
-            ...AuthorFields
+            ... on User {
+              displayName
+              createdAt
+              discussionKarma
+              commentKarma
+              username
+              profilePicURL
+              ServerRoles {
+                showAdminTag
+              }
+            }
             ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {
               showModTag
             }
@@ -148,21 +157,18 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
 `;
 
 export const IS_DISCUSSION_ANSWERED = gql`
-  query isDiscussionAnswered(
-    $channelUniqueName: String!,
-    $discussionId: ID!
-  ) {
-    discussionChannels (
+  query isDiscussionAnswered($channelUniqueName: String!, $discussionId: ID!) {
+    discussionChannels(
       where: {
-        channelUniqueName: $channelUniqueName,
+        channelUniqueName: $channelUniqueName
         discussionId: $discussionId
-      } 
+      }
     ) {
       id
       answered
     }
   }
-`
+`;
 
 export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}

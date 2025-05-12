@@ -68,8 +68,13 @@ describe("Archive and unarchive discussion from issues page", () => {
       .click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
-    // Wait for hydration to complete
-    cy.get('[data-testid="mod-wizard"]').should('be.visible');
+    // scroll all the way to the bottom of the page
+    cy.scrollTo('bottom');
+
+    // Wait for the page to be fully hydrated
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    // Wait for the moderation wizard to be visible
+    cy.get('[data-test="mod-wizard"]').should('be.visible', { timeout: 10000 });
     
     // Click the "Archive" button on the issue detail page
     cy.get('button').contains('Archive').click();
@@ -145,8 +150,16 @@ describe("Archive and unarchive discussion from issues page", () => {
       .click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     
-    // Click the "Unarchive" button on the issue detail page
-    cy.get('button').contains('Unarchive').click();
+     // Wait for hydration to complete by checking for the logout button
+     cy.get('[data-testid="logout-button"]').should('be.visible', { timeout: 15000 });
+
+     // Now open the issue by clicking data-testid="close-open-issue-button"
+     cy.get('button[data-testid="close-open-issue-button"]').should('be.visible',{ timeout: 10000 }).click();
+     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+
+     // Submit the unarchive
+     cy.get('button').contains('Unarchive').click();
+     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     
     // Verify unarchive confirmation modal appears
     cy.contains("Unarchive Discussion").should("be.visible");
@@ -154,12 +167,7 @@ describe("Archive and unarchive discussion from issues page", () => {
     // Add unarchive reason
     cy.get('textarea[data-testid="report-discussion-input"]').type("This discussion is being unarchived from the issues page");
     
-    // open the issue by clicking data-testid="close-open-issue-button"
-    cy.get('button[data-testid="close-open-issue-button"]').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
-    // Submit the unarchive
-    cy.get('button').contains('Unarchive').click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+   
     
     // Verify success notification
     cy.contains("The content was unarchived successfully").should("be.visible");
