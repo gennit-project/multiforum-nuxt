@@ -234,6 +234,7 @@ const close = () => {
     "
     :primary-button-disabled="explanation.length === 0"
     :primary-button-text="'Unarchive'"
+    :data-testid="'unarchive-modal'"
     :error="
       unarchiveDiscussionError?.message ||
       unarchiveEventError?.message ||
