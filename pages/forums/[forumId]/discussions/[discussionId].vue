@@ -126,9 +126,9 @@ onGetDiscussionResult((result) => {
 
 <template>
   <div
-    class="relative max-w-screen-2xl p-0 flex-1 focus:outline-none xl:order-last"
+    class="relative w-full max-w-screen-2xl p-0 flex-1 focus:outline-none xl:order-last overflow-hidden"
   >
-    <div class="flex w-full justify-center space-y-4">
+    <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
       <ErrorBanner v-if="!discussionId" text="Discussion not found" />
       <DiscussionDetailContent
         v-else

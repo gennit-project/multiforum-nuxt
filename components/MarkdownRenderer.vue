@@ -104,10 +104,15 @@ const renderedMarkdown = computed(() => {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
 
   .markdown-body {
     word-wrap: break-word;
     overflow-wrap: break-word;
+    max-width: 100%;
+    box-sizing: border-box;
 
     // allow last paragraph to flow with the slotted element
     &:last-child > p:last-child {
@@ -178,11 +183,20 @@ const renderedMarkdown = computed(() => {
     margin-bottom: 0.5rem !important;
   }
 
-  pre,
-  code {
+  pre {
     border-radius: 5px;
     overflow-x: auto;          // keep horizontal scroll for code blocks
     padding-bottom: 0.25rem !important;
+    max-width: 100%;
+    white-space: pre-wrap;
+  }
+
+  code {
+    border-radius: 5px;
+    padding-bottom: 0.25rem !important;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    white-space: pre-wrap;
   }
 
   a {
@@ -191,6 +205,7 @@ const renderedMarkdown = computed(() => {
     overflow-wrap: break-word;
     max-width: 100%;
     word-break: break-all;
+    display: inline-block;
   }
 
   img {

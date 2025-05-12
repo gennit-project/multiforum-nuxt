@@ -310,14 +310,14 @@ const handleEditAlbum = () => {
     />
     <PageNotFound
       v-else-if="
-        !discussion && !activeDiscussionChannel && !isDiscussionLoading
+        !discussion && !activeDiscussionChannel && !getDiscussionLoading
       "
     />
     <div
       v-else
-      class="flex max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800"
+      class="flex max-w-full sm:max-w-screen-2xl justify-center space-y-2 bg-white py-2 dark:bg-gray-800"
     >
-      <div class="w-full flex-col space-y-2">
+      <div class="w-full flex-col space-y-2 overflow-hidden">
         <ErrorBanner
           v-if="getDiscussionError"
           class="mt-2 px-4"
@@ -332,86 +332,85 @@ const handleEditAlbum = () => {
           v-else-if="locked"
           text="This discussion is locked. New comments cannot be added."
         />
-        <v-row v-if="discussion" class="flex justify-center">
-          <v-col>
-            <div class="space-y-3 px-2">
-              <div class="rounded-lg pb-2 dark:border-gray-700">
-                <DiscussionHeader
+        <div v-if="discussion" class="w-full">
+          <div class="space-y-3 px-2">
+            <div class="rounded-lg pb-2 dark:border-gray-700">
+              <DiscussionHeader
+                :discussion="discussion"
+                :discussion-channel-id="activeDiscussionChannel?.id"
+                :channel-id="channelId"
+                :compact-mode="compactMode"
+                :discussion-body-edit-mode="discussionBodyEditMode"
+                :discussion-is-archived="isArchived || false"
+                @handle-click-give-feedback="handleClickGiveFeedback"
+                @handle-click-edit-body="handleClickEditDiscussionBody"
+                @handle-click-add-album="handleClickAddAlbum"
+                @cancel-edit-discussion-body="discussionBodyEditMode = false"
+              />
+              <div class="flex-1">
+                <DiscussionBodyEditForm
+                  v-if="discussionBodyEditMode"
                   :discussion="discussion"
-                  :discussion-channel-id="activeDiscussionChannel?.id"
-                  :channel-id="channelId"
-                  :compact-mode="compactMode"
-                  :discussion-body-edit-mode="discussionBodyEditMode"
-                  :discussion-is-archived="isArchived || false"
-                  @handle-click-give-feedback="handleClickGiveFeedback"
-                  @handle-click-edit-body="handleClickEditDiscussionBody"
-                  @handle-click-add-album="handleClickAddAlbum"
-                  @cancel-edit-discussion-body="discussionBodyEditMode = false"
+                  @close-editor="discussionBodyEditMode = false"
                 />
-                <div class="flex-1">
-                  <DiscussionBodyEditForm
-                    v-if="discussionBodyEditMode"
-                    :discussion="discussion"
-                    @close-editor="discussionBodyEditMode = false"
-                  />
-                  <AlbumEditForm
-                    v-else-if="albumEditMode"
-                    :discussion="discussion"
-                    @close-editor="albumEditMode = false"
-                  />
-                  <DiscussionBody
-                    v-else
-                    :discussion="discussion"
-                    :channel-id="channelId"
-                    :discussion-channel-id="activeDiscussionChannel?.id"
-                    :emoji-json="activeDiscussionChannel?.emoji"
-                  >
-                    <template #album-slot>
-                      <div class="bg-black text-white">
-                        <DiscussionAlbum
-                          v-if="
-                            discussion?.Album &&
-                            discussion?.Album?.Images &&
-                            discussion?.Album?.Images.length > 0
-                          "
-                          :album="discussion.Album"
-                          :carousel-format="true"
-                          :discussion-id="discussionId"
-                          :discussion-author="discussion.Author?.username || ''"
-                          @album-updated="refetchDiscussion"
-                          @edit-album="handleEditAlbum"
-                        />
-                      </div>
-                    </template>
-                    <template #mark-answered-slot>
-                      <MarkAsAnsweredButton
-                        v-if="loggedInUserIsAuthor"
-                        :answered="activeDiscussionChannel?.answered || false"
+                <AlbumEditForm
+                  v-else-if="albumEditMode"
+                  :discussion="discussion"
+                  @close-editor="albumEditMode = false"
+                />
+                <DiscussionBody
+                  v-else
+                  :discussion="discussion"
+                  :channel-id="channelId"
+                  :discussion-channel-id="activeDiscussionChannel?.id"
+                  :emoji-json="activeDiscussionChannel?.emoji"
+                >
+                  <template #album-slot>
+                    <div class="bg-black text-white">
+                      <DiscussionAlbum
+                        v-if="
+                          discussion?.Album &&
+                          discussion?.Album?.Images &&
+                          discussion?.Album?.Images.length > 0
+                        "
+                        :album="discussion.Album"
+                        :carousel-format="true"
                         :discussion-id="discussionId"
-                        :channel-id="channelId"
-                        :discussion-channel-id="activeDiscussionChannel?.id"
-                        @mark-unanswered="refetchDiscussionChannel"
+                        :discussion-author="discussion.Author?.username || ''"
+                        @album-updated="refetchDiscussion"
+                        @edit-album="handleEditAlbum"
                       />
-                    </template>
-                    <template #button-slot>
-                      <div class="flex-col items-center">
-                        <DiscussionVotes
-                          v-if="activeDiscussionChannel"
-                          :discussion="discussion"
-                          :discussion-channel="activeDiscussionChannel"
-                          :show-downvote="!loggedInUserIsAuthor"
-                          @handle-click-give-feedback="handleClickGiveFeedback"
-                          @handle-click-undo-feedback="handleClickUndoFeedback"
-                          @handle-click-edit-feedback="handleClickEditFeedback"
-                        />
-                      </div>
-                    </template>
-                  </DiscussionBody>
-                </div>
+                    </div>
+                  </template>
+                  <template #mark-answered-slot>
+                    <MarkAsAnsweredButton
+                      v-if="loggedInUserIsAuthor"
+                      :answered="activeDiscussionChannel?.answered || false"
+                      :discussion-id="discussionId"
+                      :channel-id="channelId"
+                      :discussion-channel-id="activeDiscussionChannel?.id"
+                      @mark-unanswered="refetchDiscussionChannel"
+                    />
+                  </template>
+                  <template #button-slot>
+                    <div class="flex-col items-center">
+                      <DiscussionVotes
+                        v-if="activeDiscussionChannel"
+                        :discussion="discussion"
+                        :discussion-channel="activeDiscussionChannel"
+                        :show-downvote="!loggedInUserIsAuthor"
+                        @handle-click-give-feedback="handleClickGiveFeedback"
+                        @handle-click-undo-feedback="handleClickUndoFeedback"
+                        @handle-click-edit-feedback="handleClickEditFeedback"
+                      />
+                    </div>
+                  </template>
+                </DiscussionBody>
               </div>
             </div>
-          </v-col>
-        </v-row>
+          </div>
+        </div>
+
         <div>
           <div class="mx-2 my-6 rounded-lg">
             <DiscussionCommentsWrapper
