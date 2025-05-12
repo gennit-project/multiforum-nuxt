@@ -15,12 +15,17 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    testId: {
+      type: String,
+      default: "",
+    },
   }
 });
 </script>
 
 <template>
   <button
+    :data-testid="testId"
     :class="{
       'bg-blue-500 text-white dark:text-black hover:dark:bg-blue-600 hover:bg-gray-800': active,
       'text-gray-700 bg-white dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 dark:border-gray-600':

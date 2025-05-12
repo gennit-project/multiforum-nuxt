@@ -59,7 +59,7 @@ defineEmits([
 <template>
   <RequireAuth>
     <template #has-auth>
-      <div class="flex pt-12 gap-x-2">
+      <div class="flex pt-12 gap-x-2" data-test="mod-wizard">
         <div
           class="flex justify-center items-center w-10 h-10  rounded-lg"
           :class="[issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700']"
@@ -88,7 +88,7 @@ defineEmits([
           >
             Mod Actions
           </h1>
-          <p class="text-gray-600 dark:text-gray-400" v-if="!issue.isOpen">
+          <p v-if="!issue.isOpen" class="text-gray-600 dark:text-gray-400" >
             {{ "Mod actions are disabled because the issue is closed." }}
           </p>
           <RequireAuth :full-width="true">

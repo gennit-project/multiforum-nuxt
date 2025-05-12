@@ -623,6 +623,7 @@ const toggleCloseOpenIssue = async () => {
             />
             <div class="mt-3 flex justify-end">
               <GenericButton
+                :test-id="'close-open-issue-button'"
                 :text="closeOpenButtonText"
                 :loading="closeIssueLoading || reopenIssueLoading"
                 @click="toggleCloseOpenIssue"

@@ -115,7 +115,7 @@ const markAllAsRead = () => {
         v-if="notifications && notifications.length > 0"
         class="flex flex-col gap-2"
       >
-        <h1 class="text-2xl border border-b-gray-500 mt-4 mx-4 mb-2">Notifications</h1>
+        <h1 class="text-2xl border-b border-gray-500 mt-4 mx-4 mb-2">Notifications</h1>
         <p class="text-sm text-gray-500 dark:text-gray-300 mx-4">
           You have {{ aggregateNotificationCount }} unread notifications
         </p>

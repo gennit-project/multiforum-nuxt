@@ -26,6 +26,9 @@ describe("Archive and unarchive discussion from issues page", () => {
     
     cy.get("span").contains(targetDiscussionTitle).click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+
+    // wait for the button to be visible
+    cy.get('button[data-testid="discussion-menu-button"]').should('be.visible');
     
     // Open the discussion action menu
     cy.get('button[data-testid="discussion-menu-button"]').click();
@@ -37,8 +40,9 @@ describe("Archive and unarchive discussion from issues page", () => {
     cy.contains("Report Discussion").should("be.visible");
     
     // Select a forum rule
-    cy.get('h3').contains('Forum rules').should('be.visible');
-    cy.get('h3').contains('Forum rules').parent().find('input[type="checkbox"]').first().check();
+    // Use a longer timeout and retry until visible, matching the exact text in the UI
+    cy.get('h3').contains('Forum rules for cats', { timeout: 10000 }).should('be.visible');
+    cy.get('h3').contains('Forum rules for cats').parent().find('input[type="checkbox"]').first().check();
     
     // Add report text
     cy.get('textarea[data-testid="report-discussion-input"]')
@@ -63,22 +67,33 @@ describe("Archive and unarchive discussion from issues page", () => {
       .contains(targetDiscussionTitle)
       .click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+
+    // Wait for hydration to complete
+    cy.get('[data-testid="mod-wizard"]').should('be.visible');
     
     // Click the "Archive" button on the issue detail page
     cy.get('button').contains('Archive').click();
-    
+
+    // Wait for any GraphQL requests triggered by opening the modal
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+
     // Verify archive confirmation modal appears
-    cy.contains("Archive Discussion").should("be.visible");
-    
+    cy.contains("Archive Content").should("be.visible");
+
+    // Select a server rule (sitewide rule)
+    // Use a longer timeout and retry until visible, matching the exact text in the UI
+    cy.get('h3').contains('Forum rules for cats', { timeout: 10000 }).should('be.visible');
+    cy.get('h3').contains('Forum rules for cats').parent().find('input[type="checkbox"]').first().check();
+
     // Add archive reason
-    cy.get('textarea').type("This discussion is being archived from the issues page");
+    cy.get('textarea[data-testid="report-discussion-input"]').type("This discussion is being archived from the issues page");
     
     // Submit the archive
     cy.get('button').contains('Submit').click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     
     // Verify success notification
-    cy.contains("The content was archived successfully").should("be.visible");
+    cy.contains("The content was reported and archived successfully").should("be.visible");
     
     // Navigate to the original discussion to verify it's archived
     cy.get('#original-post-container')
@@ -107,7 +122,7 @@ describe("Archive and unarchive discussion from issues page", () => {
   });
 
   it("can unarchive a discussion from the issues page and verify the archived banner disappears", () => {
-    const targetDiscussionTitle = "Example topic 2";
+    const targetDiscussionTitle = "Example topic 1";
     const username = Cypress.env("auth0_username_2");
     const password = Cypress.env("auth0_password_2");
     
@@ -137,8 +152,11 @@ describe("Archive and unarchive discussion from issues page", () => {
     cy.contains("Unarchive Discussion").should("be.visible");
     
     // Add unarchive reason
-    cy.get('textarea').type("This discussion is being unarchived from the issues page");
+    cy.get('textarea[data-testid="report-discussion-input"]').type("This discussion is being unarchived from the issues page");
     
+    // open the issue by clicking data-testid="close-open-issue-button"
+    cy.get('button[data-testid="close-open-issue-button"]').click();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     // Submit the unarchive
     cy.get('button').contains('Unarchive').click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
