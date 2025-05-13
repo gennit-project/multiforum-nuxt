@@ -26,12 +26,6 @@ export const GET_USER = gql`
       location
       pronouns
       bio
-      Notifications(options: { sort: { createdAt: DESC } }) {
-        id
-        createdAt
-        read
-        text
-      }
       NotificationsAggregate(
         where: { read: false }
       ) {

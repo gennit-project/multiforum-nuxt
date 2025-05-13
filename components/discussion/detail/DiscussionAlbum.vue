@@ -513,7 +513,7 @@ v-if="editingCaptionIndex === idx"
           </div>
           <div v-else class="text-center text-xs relative group">
             <span v-if="image?.caption">
-              {{ image.caption }}
+              <span>{{ image.caption }}</span>
               <span
                 v-if="isLoggedInAuthor"
                 class="inline-flex ml-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
@@ -523,7 +523,7 @@ v-if="editingCaptionIndex === idx"
                 @keydown.enter.stop="startEditingCaption(idx)"
                 @keydown.space.stop="startEditingCaption(idx)"
               >
-                <PencilIcon class="h-3 w-3" />
+                <PencilIcon class="h-3 w-3 re" />
               </span>
             </span>
             <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
@@ -552,18 +552,6 @@ v-if="editingCaptionIndex === idx"
           }}</span>
 
           <div class="flex items-center gap-2">
-            <!-- Edit Album Button - only shown to the discussion author and when showEditAlbum is true -->
-            <button
-              v-if="usernameVar === discussionAuthor && showEditAlbum"
-              type="button"
-              class="hover:bg-gray-500 dark:hover:bg-gray-700 flex items-center justify-center px-2 h-8 rounded-md"
-              title="Edit Album"
-              @click="$emit('edit-album')"
-            >
-              <PencilIcon class="h-4 w-4 mr-1" />
-              <span class="text-sm">Edit Album</span>
-            </button>
-
             <!-- Navigation Buttons -->
             <div v-if="orderedImages.length > 1" class="flex gap-2">
               <button
@@ -635,31 +623,8 @@ v-if="editingCaptionIndex === idx"
                 >
                   <span v-if="image?.caption">
                     {{ image.caption }}
-                    <span
-                      v-if="isLoggedInAuthor"
-                      class="inline-flex ml-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
-                      role="button"
-                      tabindex="0"
-                      @click.stop="startEditingCaption(idx)"
-                      @keydown.enter.stop="startEditingCaption(idx)"
-                      @keydown.space.stop="startEditingCaption(idx)"
-                    >
-                      <PencilIcon class="h-3 w-3" />
-                    </span>
                   </span>
                   <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
-                  <span
-                    v-else
-                    class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full cursor-pointer"
-                    role="button"
-                    tabindex="0"
-                    @click.stop="startEditingCaption(idx)"
-                    @keydown.enter.stop="startEditingCaption(idx)"
-                    @keydown.space.stop="startEditingCaption(idx)"
-                  >
-                    <PencilIcon class="h-3 w-3" />
-                    <span>Add caption</span>
-                  </span>
                 </div>
               </div>
             </div>
@@ -861,12 +826,12 @@ v-if="editingCaptionIndex === lightboxIndex"
           </div>
           <div
             v-else-if="currentImage?.caption"
-            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative"
+            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative flex"
           >
-            {{ currentImage.caption || "Image Details" }}
+           <span> {{ currentImage.caption || "Image Details" }}</span>
             <span
               v-if="isLoggedInAuthor"
-              class="absolute top-0 right-0 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+              class="text-white bg-transparent border-0 px-2 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
               role="button"
               tabindex="0"
               title="Edit caption"
