@@ -165,7 +165,15 @@ export const IS_DISCUSSION_ANSWERED = gql`
       }
     ) {
       id
+      discussionId
+      channelUniqueName
+      weightedVotesCount
+      archived
       answered
+      locked
+      Channel {
+        uniqueName
+      }
     }
   }
 `;

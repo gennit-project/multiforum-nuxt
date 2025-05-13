@@ -10,21 +10,28 @@ import { MARK_NOTIFICATIONS_AS_READ } from "@/graphQLData/user/mutations";
 
 const NOTIFICATION_PAGE_LIMIT = 15;
 
+// Use computed for username to ensure reactivity
+const username = computed(() => usernameVar.value);
+
 const {
   result: notificationResult,
   error: notificationError,
   loading: notificationLoading,
   fetchMore,
   refetch
-} = useQuery(GET_NOTIFICATIONS, {
-  username: usernameVar.value,
+} = useQuery(GET_NOTIFICATIONS, () => ({
+  username: username.value,
   options: {
     limit: NOTIFICATION_PAGE_LIMIT,
     offset: 0,
     sort: {
       createdAt: "DESC",
     },
-  },
+  }
+}), {
+  fetchPolicy: 'cache-and-network',
+  // Only run the query when there's a username
+  enabled: computed(() => !!username.value)
 });
 
 const { 

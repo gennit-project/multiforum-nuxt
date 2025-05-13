@@ -27,7 +27,7 @@ import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.
 import Notification from "@/components/NotificationComponent.vue";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { usernameVar, modProfileNameVar, isAuthenticatedVar } from "@/cache";
+import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
 import AlbumEditForm from "./AlbumEditForm.vue";
@@ -117,8 +117,6 @@ const {
   },
   {
     fetchPolicy: "cache-first",
-    // skip if the user is authenticated but there is no username.
-    skip: !usernameVar.value && !isAuthenticatedVar.value,
   }
 );
 

@@ -234,6 +234,11 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
       }
     ) {
       id
+      discussionId
+      channelUniqueName
+      archived
+      answered
+      locked
       CommentsAggregate(
         where: {
           isRootComment: true
@@ -257,6 +262,11 @@ export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
       }
     ) {
       id
+      discussionId
+      channelUniqueName
+      archived
+      answered
+      locked
       CommentsAggregate(
         where: {
           OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
