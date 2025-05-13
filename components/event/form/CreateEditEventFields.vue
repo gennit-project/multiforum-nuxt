@@ -264,11 +264,8 @@ const handleEndTimeDateChange = (dateTimeValue: string) => {
 };
 
 const toggleCostField = () => {
-  if (props.formValues?.free) {
-    emit("updateFormValues", { cost: "This event is not free.", free: false });
-  } else {
-    emit("updateFormValues", { cost: "", free: true });
-  }
+  // Just toggle the free flag but keep cost details
+  emit("updateFormValues", { free: !props.formValues.free });
 };
 
 const toggleHostedByOPField = () => {
@@ -520,7 +517,8 @@ const inputStyles =
             />
           </template>
         </FormRow>
-        <FormRow section-title="Location"
+        <FormRow
+section-title="Location"
          :description="'Events with an address can appear in search results by location.'"
         >
           <template #icon>
@@ -593,20 +591,23 @@ const inputStyles =
             <CheckBox
               data-testid="free-input"
               class="align-middle"
-              :checked="formValues.free"
+              :checked="Boolean(formValues.free)"
               @input="toggleCostField"
             />
             <span class="ml-2 align-middle dark:text-white"
               >This event is free</span
             >
-            <TextInput
-              v-show="!formValues.free"
-              data-testid="cost-input"
-              :value="formValues.cost"
-              :full-width="true"
-              :placeholder="'Add cost details'"
-              @update="emit('updateFormValues', { cost: $event })"
-            />
+            <div class="mt-3">
+              <TextEditor
+                data-testid="cost-input"
+                :initial-value="formValues.cost"
+                :disable-auto-focus="true"
+                :field-name="'cost'"
+                :rows="3"
+                :placeholder="'Add cost details (optional)'"
+                @update="emit('updateFormValues', { cost: $event })"
+              />
+            </div>
           </template>
         </FormRow>
         <FormRow section-title="Hosting">

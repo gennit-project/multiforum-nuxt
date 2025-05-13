@@ -20,6 +20,7 @@ export const EVENT_FIELDS = gql`
     coverImageURL
     createdAt
     updatedAt
+    free
     isInPrivateResidence
     RecurringEvent {
       id
@@ -128,6 +129,8 @@ export const GET_EVENT_FEEDBACK = gql`
       title
       startTime
       endTime
+      cost 
+      free
       FeedbackCommentsAggregate {
         count
       }
