@@ -272,7 +272,7 @@ describe('CreateEditEventFields Component', () => {
       expect(wrapper.find('[data-testid="validation-error"]').exists()).toBe(true);
       
       // Find any error message about URL validity
-      expect(wrapper.html()).toContain('Must be a valid URL');
+      expect(wrapper.html()).toContain('Virtual event URL must be valid');
     });
   });
 

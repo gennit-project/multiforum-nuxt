@@ -8,6 +8,7 @@ import ErrorMessage from "@/components/ErrorMessage.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import {
@@ -28,13 +29,6 @@ import {
 } from "@/utils/constants";
 import type { PropType } from "vue";
 import { isFileSizeValid } from "@/utils/index";
-
-export type UpdateLocationInput = {
-  name: string;
-  formatted_address: string;
-  lat: number;
-  lng: number;
-};
 
 
 type FileChangeInput = {
@@ -84,6 +78,31 @@ const emit = defineEmits([
   "submit",
   "file-change"
 ]);
+
+
+// Event type options for the dropdown
+const eventTypeOptions = [
+  { label: 'In-Person', value: 'in-person' },
+  { label: 'Virtual', value: 'virtual' },
+  { label: 'Hybrid', value: 'hybrid' }
+];
+
+// State for currently selected event type (purely for UI)
+// Initialize from existing formValues.eventType if available
+const selectedEventType = ref(props.formValues.eventType || 'in-person');
+
+// Function to update event type selection
+const updateEventType = (type: string) => {
+  selectedEventType.value = type;
+};
+
+export type UpdateLocationInput = {
+  name: string;
+  formatted_address: string;
+  lat: number;
+  lng: number;
+};
+
 
 const startTime = computed(() => {
   return new Date(props.formValues.startTime);
@@ -135,13 +154,18 @@ const duration = computed(() => {
 });
 
 const needsChanges = computed(() => {
+  const hasValidVirtualEventUrl = props.formValues.virtualEventUrl 
+    ? (urlIsValid.value && !!props.formValues.virtualEventUrl) 
+    : true;
+  
   return !(
     props.formValues.selectedChannels.length > 0 &&
     props.formValues.title.length > 0 &&
     startTime.value < endTime.value &&
     props.formValues.title.length <= EVENT_TITLE_CHAR_LIMIT &&
     props.formValues.description.length <= MAX_CHARS_IN_EVENT_DESCRIPTION &&
-    (urlIsValid.value || !props.formValues.virtualEventUrl)
+    (urlIsValid.value || !props.formValues.virtualEventUrl) &&
+    hasValidVirtualEventUrl
   );
 });
 
@@ -157,6 +181,9 @@ const changesRequiredMessage = computed(() => {
   }
   if (props.formValues.description.length > MAX_CHARS_IN_EVENT_DESCRIPTION) {
     return `Description cannot exceed ${MAX_CHARS_IN_EVENT_DESCRIPTION} characters.`;
+  }
+  if (props.formValues.virtualEventUrl && !urlIsValid.value) {
+    return "Virtual event URL must be valid.";
   }
   return "";
 });
@@ -293,6 +320,7 @@ const toggleIsAllDayField = () => {
     });
   }
 };
+
 
 const handleUpdateLocation = (event: UpdateLocationInput) => {
   emit("updateFormValues", {
@@ -492,7 +520,31 @@ const inputStyles =
             </div>
           </template>
         </FormRow>
-        <FormRow section-title="Virtual Event URL">
+        <FormRow section-title="Event Type" :required="true">
+          <template #content>
+            <div class="flex flex-wrap items-center gap-2 p-2 border rounded-md border-gray-200 dark:border-gray-600">
+              <!-- Mimic Zoom's UI for meeting type selection -->
+              <div 
+                v-for="option in eventTypeOptions" 
+                :key="option.value"
+                :class="[
+                  'py-2 px-4 rounded-md cursor-pointer transition-colors',
+                  selectedEventType === option.value 
+                    ? 'bg-blue-500 text-white' 
+                    : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white'
+                ]"
+                data-testid="event-type-option"
+                @click="updateEventType(option.value)"
+              >
+                {{ option.label }}
+              </div>
+            </div>
+          </template>
+        </FormRow>
+        <FormRow 
+          v-if="selectedEventType === 'virtual' || selectedEventType === 'hybrid'" 
+          section-title="Virtual Event URL"
+        >
           <template #content>
             <TextInput
               id="virtualEventUrl"
@@ -518,8 +570,9 @@ const inputStyles =
           </template>
         </FormRow>
         <FormRow
-section-title="Location"
-         :description="'Events with an address can appear in search results by location.'"
+          v-if="selectedEventType === 'in-person' || selectedEventType === 'hybrid'"
+          section-title="Location"
+          :description="'Events with an address can appear in search results by location.'"
         >
           <template #icon>
             <LocationIcon class="float-right h-6 w-6" />
@@ -561,14 +614,21 @@ section-title="Location"
                 class="shadow-sm"
               >
             </div>
+            <div v-else-if="coverImageLoading">
+              <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
+                <LoadingSpinner class="h-5 w-5" />
+                <span>Uploading image...</span>
+              </div>
+            </div>
             <div v-else>
               <span class="text-sm text-gray-500 dark:text-gray-400">
                 No cover image uploaded
               </span>
             </div>
-            <AddImage 
-              key="cover-image-url" 
+            <AddImage
+              key="cover-image-url"
               :field-name="'coverImageURL'"
+              :disabled="coverImageLoading"
               @file-change="(input: FileChangeInput) => {
                 handleCoverImageChange(input);
               }"

@@ -12,6 +12,11 @@ const props = defineProps({
     required: false,
     default: "Add Image",
   },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['file-change']);
@@ -25,7 +30,10 @@ const fileInput = ref<HTMLInputElement | null>(null);
   <div>
     <label
       :for="`file-input-${props.fieldName}`"
-      class="text-sm flex cursor-pointer items-center text-gray-500 dark:text-gray-300 hover:underline"
+      :class="[
+        'text-sm flex items-center text-gray-500 dark:text-gray-300',
+        !disabled ? 'cursor-pointer hover:underline' : 'opacity-60 cursor-not-allowed'
+      ]"
     >
       <i class="fa fa-image mr-2" /> {{ props.label }}
       <input
@@ -33,11 +41,14 @@ const fileInput = ref<HTMLInputElement | null>(null);
         ref="fileInput"
         type="file"
         style="display: none"
+        :disabled="disabled"
         @change="(event: Event) => {
-          emit('file-change', {
-            event,
-            fieldName
-          });
+          if (!disabled) {
+            emit('file-change', {
+              event,
+              fieldName
+            });
+          }
         }"
       >
     </label>

@@ -1,3 +1,4 @@
+// Import commands using require instead of import
 import './commands';
 
 Cypress.on('fail', (error) => {

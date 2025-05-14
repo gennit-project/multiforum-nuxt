@@ -8,7 +8,7 @@ describe("Basic event operations", () => {
   // Login before each test
   loginUser('loginWithCreateEventButton');
 
-  it("creates, edits and deletes an online event", () => {
+  it("creates, edits and deletes an online event with virtual event type", () => {
     // Helper function to format dates for input fields
     const formatDate = (dt) => dt.toFormat('yyyy-MM-dd');
     const formatTime = (dt) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
@@ -50,7 +50,12 @@ describe("Basic event operations", () => {
     cy.get('input[data-testid="start-time-time-input"]').type(formatTime(startDateTime));
     cy.get('input[data-testid="end-time-date-input"]').type(formatDate(endDateTime));
     cy.get('input[data-testid="end-time-time-input"]').type(formatTime(endDateTime));
-
+    
+    // Select virtual event type from the dropdown
+    cy.contains('div[data-testid="event-type-option"]', 'Virtual').click();
+    
+    // Verify the virtual URL field appears after selecting virtual event type
+    cy.get('input[data-testid="link-input"]').should('be.visible');
     cy.get('input[data-testid="link-input"]').type(TEST_LINK);
 
     cy.get('textarea[data-testid="description-input"]').type(
@@ -70,8 +75,12 @@ describe("Basic event operations", () => {
       // click the first one
       .first()
       .click();
-
-    // Change the link
+      
+    // Need to re-select the virtual event type since our UI now uses the selectedEventType ref
+    cy.contains('div[data-testid="event-type-option"]', 'Virtual').click();
+    
+    // Now the link input should be visible
+    cy.get('input[data-testid="link-input"]').should('be.visible');
     cy.get('input[data-testid="link-input"]').focus().clear();
     cy.get('input[data-testid="link-input"]').type(TEST_LINK_2);
 
@@ -115,5 +124,66 @@ describe("Basic event operations", () => {
     // After deletion, the user should be redirected to the online event list
     // for the channel view
     cy.url().should("equal", `${baseUrl}/forums/${TEST_CHANNEL}/events`);
+  });
+
+  it("supports hybrid event type selection", () => {
+    // Helper function to format dates for input fields
+    const formatDate = (dt) => dt.toFormat('yyyy-MM-dd');
+    const formatTime = (dt) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
+    
+    // Generate future dates for testing
+    const startDateTime = DateTime.now().plus({ months: 1, hours: 2 }).startOf('hour');
+    const endDateTime = startDateTime.plus({ hours: 1 });
+    
+    const TEST_TITLE = "Hybrid Event Test";
+    const TEST_LINK = "https://www.example.com/meeting";
+    const TEST_CHANNEL = "phx_music";
+    const TEST_LOCATION = "Phoenix Convention Center";
+
+    // Intercept GraphQL requests
+    cy.intercept('POST', '**/graphql', (req) => {
+      if (req.body.query?.includes('createEvent')) {
+        req.alias = 'createEventRequest';
+      }
+    });
+    
+    // Test creating a hybrid event
+    cy.visit(EVENT_CREATION_FORM);
+    cy.get('input[data-testid="title-input"]').type(TEST_TITLE);
+
+    cy.get('div[data-testid="channel-input"]')
+      .type(`${TEST_CHANNEL}{enter}`);
+    cy.get(`span[data-testid="forum-picker-${TEST_CHANNEL}"]`).click();
+    // click outside to close the picker
+    cy.get('input[data-testid="title-input"]').click();
+
+    cy.get('input[data-testid="start-time-date-input"]').type(formatDate(startDateTime));
+    cy.get('input[data-testid="start-time-time-input"]').type(formatTime(startDateTime));
+    cy.get('input[data-testid="end-time-date-input"]').type(formatDate(endDateTime));
+    cy.get('input[data-testid="end-time-time-input"]').type(formatTime(endDateTime));
+    
+    // Select hybrid event type from the dropdown
+    cy.contains('div[data-testid="event-type-option"]', 'Hybrid').click();
+    
+    // Verify both virtual URL and location fields appear for hybrid events
+    cy.get('input[data-testid="link-input"]').should('be.visible');
+    cy.get('input[data-testid="link-input"]').type(TEST_LINK);
+    
+    cy.get('input[data-testid="location-search-input"]').should('be.visible');
+    cy.get('input[data-testid="location-search-input"]').type(TEST_LOCATION);
+    
+    // Wait for the autocomplete dropdown to appear and select the first result
+    cy.get('ul li').first().should('be.visible');
+    cy.get('ul li').first().click();
+    
+    cy.get('textarea[data-testid="description-input"]').type("Hybrid event description");
+
+    cy.get("button").contains("Save").click();
+    cy.wait('@createEventRequest').its('response.statusCode').should('eq', 200);
+    
+    // Verify both virtual and physical location info is displayed
+    cy.get("h2").contains(TEST_TITLE);
+    cy.get("a").contains(TEST_LINK);
+    cy.contains(TEST_LOCATION);
   });
 });

@@ -98,6 +98,7 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
       </div>
       <input
         v-model="searchQuery"
+        data-testid="location-search-input"
         type="text"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : '',
