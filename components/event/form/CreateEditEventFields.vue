@@ -8,8 +8,7 @@ import ErrorMessage from "@/components/ErrorMessage.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import DatePicker from "./DatePicker.vue";
-import TimePicker from "./TimePicker.vue";
+import DateTimePickersRow from "./DateTimePickersRow.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import {
@@ -128,15 +127,6 @@ const endTime = computed(() => {
   return new Date(props.formValues.endTime);
 });
 
-const formattedStartTimeDate = computed(() => {
-  const dateTime = DateTime.fromJSDate(startTime.value);
-  return dateTime.toFormat("yyyy-MM-dd");
-});
-
-const formattedEndTimeDate = computed(() => {
-  const dateTime = DateTime.fromJSDate(endTime.value);
-  return dateTime.toFormat("yyyy-MM-dd");
-});
 
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
@@ -492,70 +482,21 @@ const touched = ref(false);
             />
           </template>
         </FormRow>
-        <FormRow section-title="Forum(s)" :required="true">
-          <template #content>
-            <ForumPicker
-              :test-id="'channel-input'"
-              :selected-channels="formValues.selectedChannels"
-              @set-selected-channels="
-                emit('updateFormValues', { selectedChannels: $event })
-              "
-            />
-          </template>
-        </FormRow>
+        
         <FormRow section-title="Time">
           <template #content>
-            <div class="flex flex-col gap-3 dark:text-white">
-              <!-- Start Time Section -->
-              <!-- Time selection container with responsive layout -->
-              <div class="flex flex-col md:flex-row md:gap-6">
-                <!-- Start Time Section -->
-                <div class="w-full md:w-1/2">
-                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-                    Start Time
-                  </label>
-                  <div class="flex items-center gap-2 dark:text-white">
-                    <DatePicker
-                      test-id="start-time-date-input"
-                      :value="formattedStartTimeDate"
-                      @update="handleStartTimeDateChange"
-                    />
-                    
-                    <!-- Use reusable time picker component -->
-                    <TimePicker
-                      v-if="!formValues.isAllDay"
-                      test-id="start-time-time-input"
-                      :value="DateTime.fromJSDate(startTime).toFormat('HH:mm')"
-                      @update="handleStartTimeTimeChange"
-                    />
-                  </div>
-                </div>
+            <div class="flex flex-col dark:text-white">
+              <DateTimePickersRow 
+                :is-all-day="formValues.isAllDay"
+                :is-multi-day="isMultiDayEvent"
+                :start-time="startTime"
+                :end-time="endTime"
+                @update-start-date="handleStartTimeDateChange"
+                @update-start-time="handleStartTimeTimeChange"
+                @update-end-date="handleEndTimeDateChange"
+                @update-end-time="handleEndTimeTimeChange"
+              />
                 
-                <!-- End Time Section -->
-                <div class="w-full md:w-1/2 mt-3 md:mt-0">
-                  <label v-if="!formValues.isAllDay" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-                    End Time
-                  </label>
-                  <div class="flex items-center gap-2">
-                    <!-- Only show end date input if multi-day event is checked -->
-                    <DatePicker
-                      v-if="isMultiDayEvent"
-                      test-id="end-time-date-input"
-                      :value="formattedEndTimeDate"
-                      @update="handleEndTimeDateChange"
-                    />
-                    
-                    <!-- Use reusable time picker component -->
-                    <TimePicker
-                      v-if="!formValues.isAllDay"
-                      test-id="end-time-time-input"
-                      :value="DateTime.fromJSDate(endTime).toFormat('HH:mm')"
-                      @update="handleEndTimeTimeChange"
-                    />
-                  </div>
-                </div>
-              </div>
-              
               <!-- Duration Display -->
               <div class="text-sm text-gray-600 dark:text-gray-400 mt-2">
                 Duration: {{ duration }}
@@ -588,6 +529,17 @@ const touched = ref(false);
               
               <ErrorMessage :text="datePickerErrorMessage" class="mt-1" />
             </div>
+          </template>
+        </FormRow>
+        <FormRow section-title="Forum(s)" :required="true">
+          <template #content>
+            <ForumPicker
+              :test-id="'channel-input'"
+              :selected-channels="formValues.selectedChannels"
+              @set-selected-channels="
+                emit('updateFormValues', { selectedChannels: $event })
+              "
+            />
           </template>
         </FormRow>
         <FormRow section-title="Event Type" :required="true">
@@ -666,7 +618,7 @@ const touched = ref(false);
               :initial-value="formValues.description"
               :placeholder="'Add details'"
               :field-name="'description'"
-              :rows="10"
+              :rows="6"
               @update="emit('updateFormValues', { description: $event })"
             />
             <CharCounter
