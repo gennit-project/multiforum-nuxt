@@ -310,7 +310,7 @@ const updateShowArchived = (event: Event) => {
         {{ showMainFilters ? "Hide filters" : "Show filters" }}
       </button>
     </div>
-    <hr class="mb-2" >
+    <hr class="mb-2 border border-t-gray-500 dark:border-t-gray-600" >
     <div v-if="showMainFilters" class="flex flex-col gap-2 border border-gray-400 dark:border-gray-600 dark:bg-gray-800 p-4 rounded-lg">
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 items-center">

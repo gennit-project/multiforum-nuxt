@@ -10,6 +10,16 @@ const mockDirective = {
   unmounted: () => {}
 };
 
+const findPickerComponentsByTestId = (wrapper) => {
+  return {
+    startDatePicker: wrapper.find('[data-testid="start-date-picker"]'),
+    startTimePicker: wrapper.find('[data-testid="start-time-picker"]'),
+    endDatePicker: wrapper.find('[data-testid="end-date-picker"]'),
+    endTimePicker: wrapper.find('[data-testid="end-time-picker"]'),
+    timeArrow: wrapper.find('[data-testid="time-arrow"]')
+  };
+};
+
 describe('DateTimePickersRow', () => {
   // Create default props that all tests will use as a base
   const defaultProps = {
@@ -41,9 +51,9 @@ describe('DateTimePickersRow', () => {
     expect(datePickers.length).toBe(1);
     expect(timePickers.length).toBe(2);
     
-    // End Time label should be visible
-    const endTimeLabel = wrapper.find('[data-testid="end-time-label"]');
-    expect(endTimeLabel.exists()).toBe(true);
+    // Arrow should be visible between pickers
+    const { timeArrow } = findPickerComponentsByTestId(wrapper);
+    expect(timeArrow.exists()).toBe(true);
   });
 
   it('shows only start date picker for all-day events (single-day)', async () => {
@@ -71,9 +81,9 @@ describe('DateTimePickersRow', () => {
     expect(datePickers.length).toBe(1);
     expect(timePickers.length).toBe(0);
     
-    // End Time label should not be visible
-    const endTimeLabel = wrapper.find('[data-testid="end-time-label"]');
-    expect(endTimeLabel.exists()).toBe(false);
+    // Arrow should not be visible for all-day single-day events
+    const { timeArrow } = findPickerComponentsByTestId(wrapper);
+    expect(timeArrow.exists()).toBe(false);
   });
 
   it('shows both date pickers but no time pickers for all-day multi-day events', async () => {
@@ -102,9 +112,9 @@ describe('DateTimePickersRow', () => {
     expect(datePickers.length).toBe(2);
     expect(timePickers.length).toBe(0);
     
-    // End Time label should not be visible
-    const endTimeLabel = wrapper.find('[data-testid="end-time-label"]');
-    expect(endTimeLabel.exists()).toBe(false);
+    // Arrow should be visible for multi-day events
+    const { timeArrow } = findPickerComponentsByTestId(wrapper);
+    expect(timeArrow.exists()).toBe(true);
   });
 
   it('shows all pickers for multi-day events that are not all-day', async () => {
@@ -132,9 +142,9 @@ describe('DateTimePickersRow', () => {
     expect(datePickers.length).toBe(2);
     expect(timePickers.length).toBe(2);
     
-    // End Time label should be visible
-    const endTimeLabel = wrapper.find('[data-testid="end-time-label"]');
-    expect(endTimeLabel.exists()).toBe(true);
+    // Arrow should be visible for multi-day events
+    const { timeArrow } = findPickerComponentsByTestId(wrapper);
+    expect(timeArrow.exists()).toBe(true);
   });
 
   it('emits update events when date and time changes', async () => {

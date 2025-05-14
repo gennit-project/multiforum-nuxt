@@ -47,7 +47,7 @@ const filterChannelsByTag = (tag: string) => {
       <div class="flex justify-between">
       <ExpandableImage
         v-if="channel?.channelIconURL"
-        class="h-12 w-12 dark:border-gray-800"
+        class="h-20 w-20 dark:border-gray-800"
         :rounded="true"
         :full-width="true"
         :alt="channelId"
@@ -55,7 +55,7 @@ const filterChannelsByTag = (tag: string) => {
       />
       <AvatarComponent
         v-if="!channel?.channelIconURL"
-        class="h-12 w-12 dark:border-gray-800"
+        class="h-20 w-20 dark:border-gray-800"
         :text="channelId"
         :src="channel?.channelIconURL ?? ''"
         :full-width="true"

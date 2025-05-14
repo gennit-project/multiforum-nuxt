@@ -46,8 +46,14 @@ describe("Basic event operations", () => {
     // click outside to close the picker
     cy.get('input[data-testid="title-input"]').click();
 
+    // Set start date and time
     cy.get('input[data-testid="start-time-date-input"]').type(formatDate(startDateTime));
     cy.get('input[data-testid="start-time-time-input"]').type(formatTime(startDateTime));
+    
+    // Enable multi-day mode to make end date input visible
+    cy.get('[data-testid="multi-day-input"]').click();
+    
+    // Now set end date and time
     cy.get('input[data-testid="end-time-date-input"]').type(formatDate(endDateTime));
     cy.get('input[data-testid="end-time-time-input"]').type(formatTime(endDateTime));
     
@@ -85,16 +91,19 @@ describe("Basic event operations", () => {
     cy.get('input[data-testid="link-input"]').type(TEST_LINK_2);
 
     // Change the start date
-    cy.get('input[data-testid="start-time-date-input"]').type(formatDate(editedStartDateTime));
+    cy.get('input[data-testid="start-time-date-input"]').clear().type(formatDate(editedStartDateTime));
 
     // Change the start time
-    cy.get('input[data-testid="start-time-time-input"]').type(formatTime(editedStartDateTime));
+    cy.get('input[data-testid="start-time-time-input"]').clear().type(formatTime(editedStartDateTime));
 
+    // Make sure multi-day mode is enabled to show end date picker
+    cy.get('[data-testid="multi-day-input"]').click();
+    
     // Change the end date
-    cy.get('input[data-testid="end-time-date-input"]').type(formatDate(editedEndDateTime));
+    cy.get('input[data-testid="end-time-date-input"]').clear().type(formatDate(editedEndDateTime));
 
     // Change the end time
-    cy.get('input[data-testid="end-time-time-input"]').type(formatTime(editedEndDateTime));
+    cy.get('input[data-testid="end-time-time-input"]').clear().type(formatTime(editedEndDateTime));
 
     cy.get("button").contains("Save").click();
     cy.wait('@updateEventRequest').its('response.statusCode').should('eq', 200);
@@ -157,8 +166,14 @@ describe("Basic event operations", () => {
     // click outside to close the picker
     cy.get('input[data-testid="title-input"]').click();
 
+    // Set start date and time
     cy.get('input[data-testid="start-time-date-input"]').type(formatDate(startDateTime));
     cy.get('input[data-testid="start-time-time-input"]').type(formatTime(startDateTime));
+    
+    // Enable multi-day mode to make end date input visible
+    cy.get('[data-testid="multi-day-input"]').click();
+    
+    // Now set end date and time
     cy.get('input[data-testid="end-time-date-input"]').type(formatDate(endDateTime));
     cy.get('input[data-testid="end-time-time-input"]').type(formatTime(endDateTime));
     

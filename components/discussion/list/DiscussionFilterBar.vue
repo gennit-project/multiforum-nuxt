@@ -166,7 +166,7 @@ const collapseAll = () => {
 </script>
 
 <template>
-  <div class="pt-2 px-4">
+  <div class="pt-2 pb-2 px-2 lg:px-4 2xl:px-0">
     <div>
       <div class="flex flex-wrap items-center justify-end space-x-2">
         <FilterChip
@@ -259,6 +259,7 @@ const collapseAll = () => {
         <CreateAnythingButton class="mx-2" :use-primary-button="true" />
       </div>
     </div>
+     <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"

@@ -16,7 +16,7 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: 'Select your intended audience',
+    default: 'Select forums to submit to',
   },
   testId: {
     type: String,

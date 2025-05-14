@@ -98,7 +98,7 @@ onMounted(() => {
         />
         <div class="divide-y divide-gray-200">
           <div class="mt-6 space-y-4">
-            <FormRow section-title="Title" :required="true">
+            <FormRow  :required="true">
               <template #content>
                 <TextInput
                   ref="titleInputRef"
@@ -115,7 +115,7 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow section-title="Forums" :required="true">
+            <FormRow  :required="true">
               <template #content>
                 <ForumPicker
                   :test-id="'channel-input'"
@@ -127,7 +127,7 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow section-title="Details">
+            <FormRow>
               <template #content>
                 <TextEditor
                   class="mb-3"
@@ -145,7 +145,7 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow section-title="Images">
+            <FormRow >
               <template #content>
                 <AlbumEditForm
                   v-if="formValues"
@@ -166,7 +166,7 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow section-title="Tags">
+            <FormRow >
               <template #content>
                 <TagPicker
                   data-testid="tag-input"

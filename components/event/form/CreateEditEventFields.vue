@@ -444,7 +444,7 @@ const touched = ref(false);
 </script>
 
 <template>
-  <div class="pt-0 px-6 max-w-5xl dark:text-white">
+  <div class="pt-0 px-6 max-w-3xl mx-auto dark:text-white">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">
@@ -465,7 +465,7 @@ const touched = ref(false);
         Share an event with your community.
       </div>
       <div class="w-full space-y-5">
-        <FormRow section-title="Title" :required="true" class="mt-6">
+        <FormRow :required="true" class="mt-6">
           <template #content>
             <TextInput
               ref="titleInputRef"
@@ -483,7 +483,7 @@ const touched = ref(false);
           </template>
         </FormRow>
         
-        <FormRow section-title="Time">
+        <FormRow>
           <template #content>
             <div class="flex flex-col dark:text-white">
               <DateTimePickersRow 
@@ -531,7 +531,7 @@ const touched = ref(false);
             </div>
           </template>
         </FormRow>
-        <FormRow section-title="Forum(s)" :required="true">
+        <FormRow :required="true">
           <template #content>
             <ForumPicker
               :test-id="'channel-input'"
@@ -542,7 +542,7 @@ const touched = ref(false);
             />
           </template>
         </FormRow>
-        <FormRow section-title="Event Type" :required="true">
+        <FormRow :required="true">
           <template #content>
             <div class="flex flex-wrap items-center gap-2 p-2 border rounded-md border-gray-200 dark:border-gray-600">
               <!-- Mimic Zoom's UI for meeting type selection -->
@@ -552,7 +552,7 @@ const touched = ref(false);
                 :class="[
                   'py-2 px-4 rounded-md cursor-pointer transition-colors',
                   selectedEventType === option.value 
-                    ? 'bg-blue-500 text-white' 
+                    ? 'bg-blue-500 text-black' 
                     : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white'
                 ]"
                 data-testid="event-type-option"
@@ -565,7 +565,6 @@ const touched = ref(false);
         </FormRow>
         <FormRow 
           v-if="selectedEventType === 'virtual' || selectedEventType === 'hybrid'" 
-          section-title="Virtual Event URL"
         >
           <template #content>
             <TextInput
@@ -573,6 +572,7 @@ const touched = ref(false);
               :test-id="'link-input'"
               :full-width="true"
               :value="formValues.virtualEventUrl"
+              :placeholder="'Add a link to your event'"
               @update="
                 emit('updateFormValues', {
                   virtualEventUrl: $event,
@@ -593,7 +593,6 @@ const touched = ref(false);
         </FormRow>
         <FormRow
           v-if="selectedEventType === 'in-person' || selectedEventType === 'hybrid'"
-          section-title="Location"
           :description="'Events with an address can appear in search results by location.'"
         >
           <template #icon>
@@ -609,7 +608,7 @@ const touched = ref(false);
             />
           </template>
         </FormRow>
-        <FormRow section-title="Details">
+        <FormRow>
           <template #content>
             <TextEditor
               :test-id="'description-input'"
@@ -628,7 +627,7 @@ const touched = ref(false);
             />
           </template>
         </FormRow>     
-        <FormRow section-title="Cover Image">
+        <FormRow>
           <template #content>
             <div v-if="formValues.coverImageURL" class="mb-3">
               <div class="relative border border-gray-200 dark:border-gray-600 rounded-md overflow-hidden">
@@ -734,7 +733,7 @@ const touched = ref(false);
             </div>
           </template>
         </FormRow>
-        <FormRow section-title="Tags">
+        <FormRow>
           <template #content>
             <TagPicker
               data-testid="tag-input"
@@ -745,7 +744,7 @@ const touched = ref(false);
             />
           </template>
         </FormRow>
-        <FormRow section-title="Cost">
+        <FormRow>
           <template #content>
             <CheckBox
               data-testid="free-input"
@@ -761,6 +760,7 @@ const touched = ref(false);
                 data-testid="cost-input"
                 :initial-value="formValues.cost"
                 :disable-auto-focus="true"
+                :allow-image-upload="false"
                 :field-name="'cost'"
                 :rows="3"
                 :placeholder="'Add cost details (optional)'"
@@ -769,7 +769,7 @@ const touched = ref(false);
             </div>
           </template>
         </FormRow>
-        <FormRow section-title="Hosting">
+        <FormRow>
           <template #content>
             <CheckBox
               data-testid="free-input"

@@ -243,7 +243,7 @@ function handleUpdateAlbum(newVals: {
 <template>
   <div class="w-full">
     <div class="mb-3 mt-3 w-full flex flex-col">
-      <h3 class="text-xl font-semibold mb-4 dark:text-white">Edit Album</h3>
+      <h3 class="text-lg font-semibold mb-4 dark:text-white">Edit Album (Optional)</h3>
       
       <AlbumEditor
         :form-values="formValues"

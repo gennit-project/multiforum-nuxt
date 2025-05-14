@@ -41,8 +41,7 @@ const baseStyles = computed(() => {
       type="date"
       :value="value"
       :disabled="disabled"
-      class="[color-scheme:light_dark] [&::-webkit-calendar-picker-indicator]:opacity-0 [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer dark:[&::-webkit-calendar-picker-indicator]:filter-invert-[0.8]"
-      @click="(event) => !disabled && (event.target as HTMLInputElement).showPicker()"
+      class="[color-scheme:light_dark] [&::-webkit-calendar-picker-indicator]:absolute [&::-webkit-calendar-picker-indicator]:inset-0 [&::-webkit-calendar-picker-indicator]:cursor-pointer dark:[&::-webkit-calendar-picker-indicator]:filter-invert-[0.8]"
       @input="handleChange"
     >
     <!-- Calendar icon -->

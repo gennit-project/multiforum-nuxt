@@ -65,27 +65,24 @@ const closeDropdown = () => {
   isDropdownOpen.value = false;
 };
 
-// Styles derived from the existing component
-const baseStyles = computed(() => {
-  return [
-    'border mt-2 rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-32 appearance-none',
-    'flex items-center justify-between cursor-pointer h-10 px-3',
-    'dark:border-gray-700 dark:bg-gray-800 dark:text-white',
-    props.disabled ? 'opacity-60 cursor-not-allowed' : ''
-  ].join(' ');
-});
 </script>
 
 <template>
   <div class="relative">
-    <!-- Time input that opens the custom dropdown -->
-    <div 
+    <!-- Use a regular input for typing time directly -->
+    <input
+      type="time"
+      :value="value"
       :data-testid="testId"
-      :class="baseStyles"
-      @click="toggleDropdown"
+      class="border mt-2 rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-32 h-10 px-3
+            dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:[color-scheme:dark]"
+      :disabled="disabled"
+      @input="(e) => emit('update', (e.target as HTMLInputElement).value)"
     >
-      <span class="pl-1 my-auto">{{ formattedTime }}</span>
-      <i class="far fa-clock text-gray-500 dark:text-gray-400 mr-1"/>
+    
+    <!-- Time dropdown toggle button -->
+    <div class="absolute right-2 top-4 cursor-pointer" @click="toggleDropdown">
+      <i class="far fa-clock text-gray-500 dark:text-gray-400"/>
     </div>
     
     <!-- Custom dropdown for time selection -->
