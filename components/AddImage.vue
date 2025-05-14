@@ -31,8 +31,10 @@ const fileInput = ref<HTMLInputElement | null>(null);
     <label
       :for="`file-input-${props.fieldName}`"
       :class="[
-        'text-sm flex items-center text-gray-500 dark:text-gray-300',
-        !disabled ? 'cursor-pointer hover:underline' : 'opacity-60 cursor-not-allowed'
+        'text-sm inline-flex items-center px-3 py-1.5 rounded-md transition-colors',
+        !disabled ? 
+          'cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800' : 
+          'opacity-60 cursor-not-allowed bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
       ]"
     >
       <i class="fa fa-image mr-2" /> {{ props.label }}
@@ -40,6 +42,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
         :id="`file-input-${props.fieldName}`"
         ref="fileInput"
         type="file"
+        accept="image/*"
         style="display: none"
         :disabled="disabled"
         @change="(event: Event) => {

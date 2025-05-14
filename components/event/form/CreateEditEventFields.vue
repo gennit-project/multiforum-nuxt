@@ -8,7 +8,6 @@ import ErrorMessage from "@/components/ErrorMessage.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import {
@@ -607,32 +606,108 @@ const inputStyles =
         </FormRow>     
         <FormRow section-title="Cover Image">
           <template #content>
-            <div v-if="formValues.coverImageURL">
-              <img
-                alt="Cover Image"
-                :src="formValues.coverImageURL"
-                class="shadow-sm"
-              >
+            <div v-if="formValues.coverImageURL" class="mb-3">
+              <div class="relative border border-gray-200 dark:border-gray-600 rounded-md overflow-hidden">
+                <img
+                  alt="Cover Image"
+                  :src="formValues.coverImageURL"
+                  class="w-full h-auto max-h-64 object-cover"
+                >
+                
+                <!-- Image overlay when loading -->
+                <div 
+                  v-if="coverImageLoading" 
+                  class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+                >
+                  <div class="text-white flex flex-col items-center">
+                    <div class="h-8 w-8 text-white">
+                      <svg
+                        class="animate-spin h-8 w-8"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <circle 
+                          cx="12" 
+                          cy="12" 
+                          r="10" 
+                          stroke-dasharray="42"
+                          stroke-dashoffset="12"
+                          stroke-linecap="round"
+                        />
+                      </svg>
+                    </div>
+                    <span class="mt-2">Uploading image...</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Image actions for when an image exists -->
+              <div class="flex mt-2 space-x-2">
+                <AddImage
+                  key="cover-image-replace"
+                  field-name="coverImageURL"
+                  label="Replace Image"
+                  :disabled="coverImageLoading"
+                  @file-change="handleCoverImageChange"
+                />
+                
+                <button
+                  type="button"
+                  class="text-sm text-red-500 hover:underline flex items-center"
+                  :disabled="coverImageLoading"
+                  :class="{ 'opacity-60 cursor-not-allowed': coverImageLoading }"
+                  @click="emit('updateFormValues', { coverImageURL: '' })"
+                >
+                  <i class="fa fa-trash-can mr-2" /> Remove Image
+                </button>
+              </div>
             </div>
-            <div v-else-if="coverImageLoading">
-              <div class="flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400">
-                <LoadingSpinner class="h-5 w-5" />
+            
+            <div v-else-if="coverImageLoading" class="p-6 border border-gray-200 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 mb-3">
+              <div class="flex flex-col items-center justify-center space-y-2 text-gray-500 dark:text-gray-300">
+                <div class="h-8 w-8">
+                  <svg
+                    class="animate-spin h-8 w-8"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle 
+                      cx="12" 
+                      cy="12" 
+                      r="10" 
+                      stroke-dasharray="42"
+                      stroke-dashoffset="12"
+                      stroke-linecap="round"
+                    />
+                  </svg>
+                </div>
                 <span>Uploading image...</span>
               </div>
             </div>
-            <div v-else>
-              <span class="text-sm text-gray-500 dark:text-gray-400">
-                No cover image uploaded
-              </span>
+            
+            <div v-else class="mb-3">
+              <div class="p-8 border border-dashed border-gray-300 dark:border-gray-600 rounded-md text-center bg-gray-50 dark:bg-gray-800">
+                <i class="fa fa-image text-3xl text-gray-400 dark:text-gray-500 mb-3"/>
+                <span class="text-sm text-gray-500 dark:text-gray-400 block mb-3">
+                  No cover image uploaded
+                </span>
+                <div class="mt-2">
+                  <AddImage
+                    key="cover-image-url"
+                    field-name="coverImageURL"
+                    label="Add Cover Image"
+                    :disabled="coverImageLoading"
+                    @file-change="handleCoverImageChange"
+                  />
+                </div>
+              </div>
             </div>
-            <AddImage
-              key="cover-image-url"
-              :field-name="'coverImageURL'"
-              :disabled="coverImageLoading"
-              @file-change="(input: FileChangeInput) => {
-                handleCoverImageChange(input);
-              }"
-            />
           </template>
         </FormRow>
         <FormRow section-title="Tags">
