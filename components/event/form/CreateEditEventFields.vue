@@ -8,6 +8,8 @@ import ErrorMessage from "@/components/ErrorMessage.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import DatePicker from "./DatePicker.vue";
+import TimePicker from "./TimePicker.vue";
 import type { CreateEditEventFormValues } from "@/types/Event";
 import { DateTime } from "luxon";
 import {
@@ -95,6 +97,22 @@ const updateEventType = (type: string) => {
   selectedEventType.value = type;
 };
 
+// Track if the event spans multiple days
+const isMultiDayEvent = ref(false);
+
+// Check if start and end dates are different
+const initializeMultiDayState = () => {
+  const startDateTime = DateTime.fromISO(props.formValues.startTime);
+  const endDateTime = DateTime.fromISO(props.formValues.endTime);
+  
+  // If the dates are the same, it's a single-day event
+  // If they're different, it's a multi-day event
+  isMultiDayEvent.value = !startDateTime.hasSame(endDateTime, 'day');
+};
+
+// Initialize multi-day state when component mounts
+initializeMultiDayState();
+
 export type UpdateLocationInput = {
   name: string;
   formatted_address: string;
@@ -115,19 +133,9 @@ const formattedStartTimeDate = computed(() => {
   return dateTime.toFormat("yyyy-MM-dd");
 });
 
-const formattedStartTimeTime = computed(() => {
-  const dateTime = DateTime.fromJSDate(startTime.value);
-  return dateTime.toFormat("HH:mm");
-});
-
 const formattedEndTimeDate = computed(() => {
   const dateTime = DateTime.fromJSDate(endTime.value);
   return dateTime.toFormat("yyyy-MM-dd");
-});
-
-const formattedEndTimeTime = computed(() => {
-  const dateTime = DateTime.fromJSDate(endTime.value);
-  return dateTime.toFormat("HH:mm");
 });
 
 const { mutate: createSignedStorageUrl } = useMutation(
@@ -259,7 +267,26 @@ const handleStartTimeDateChange = (dateTimeValue: string) => {
     });
 
     if (startTimeObject.isValid) {
-      emit("updateFormValues", { startTime: startTimeObject.toISO() });
+      // Update start time
+      const updates: Partial<CreateEditEventFormValues> = { 
+        startTime: startTimeObject.toISO() 
+      };
+      
+      // If not a multi-day event, also update the end date to match the start date
+      if (!isMultiDayEvent.value) {
+        const currentEndTime = DateTime.fromJSDate(endTime.value);
+        const newEndTime = currentEndTime.set({
+          year: inputDateTime.year,
+          month: inputDateTime.month,
+          day: inputDateTime.day,
+        });
+        
+        if (newEndTime.isValid) {
+          updates.endTime = newEndTime.toISO();
+        }
+      }
+      
+      emit("updateFormValues", updates);
     }
   } catch (error) {
     console.warn("Invalid date input:", dateTimeValue, error);
@@ -282,6 +309,11 @@ const handleEndTimeDateChange = (dateTimeValue: string) => {
     });
 
     if (endTimeObject.isValid) {
+      const startDateTime = DateTime.fromJSDate(startTime.value);
+      
+      // If end date is different from start date, update multi-day status
+      isMultiDayEvent.value = !startDateTime.hasSame(endTimeObject, 'day');
+      
       emit("updateFormValues", { endTime: endTimeObject.toISO() });
     }
   } catch (error) {
@@ -299,24 +331,54 @@ const toggleHostedByOPField = () => {
 };
 
 const toggleIsAllDayField = () => {
-  emit("updateFormValues", { isAllDay: !props.formValues.isAllDay });
-  if (props.formValues.isAllDay) {
-    const newStartTime = DateTime.fromISO(props.formValues.startTime).set({
+  // Toggle the isAllDay flag
+  const newAllDayValue = !props.formValues.isAllDay;
+  emit("updateFormValues", { isAllDay: newAllDayValue });
+  
+  // If switching to All Day, set times to the full day
+  if (newAllDayValue) {
+    const startDate = DateTime.fromISO(props.formValues.startTime);
+    const endDate = isMultiDayEvent.value 
+      ? DateTime.fromISO(props.formValues.endTime)
+      : startDate; // Use same date if not multi-day
+    
+    const newStartTime = startDate.set({
       hour: 0,
       minute: 0,
       second: 0,
       millisecond: 0,
     });
-    const newEndTime = DateTime.fromISO(props.formValues.endTime).set({
+    
+    const newEndTime = endDate.set({
       hour: 23,
       minute: 59,
       second: 59,
       millisecond: 999,
     });
+    
     emit("updateFormValues", {
       startTime: newStartTime.toISO(),
       endTime: newEndTime.toISO(),
     });
+  }
+};
+
+const toggleMultiDayEvent = () => {
+  isMultiDayEvent.value = !isMultiDayEvent.value;
+  
+  // If switching to single-day event, update end date to match start date
+  if (!isMultiDayEvent.value) {
+    const startDateTime = DateTime.fromJSDate(startTime.value);
+    const currentEndTime = DateTime.fromJSDate(endTime.value);
+    
+    // Keep the same time but set date to match start date
+    const newEndTime = currentEndTime.set({
+      year: startDateTime.year,
+      month: startDateTime.month,
+      day: startDateTime.day,
+    });
+    
+    emit("updateFormValues", { endTime: newEndTime.toISO() });
   }
 };
 
@@ -389,8 +451,6 @@ const handleCoverImageChange = async (input: FileChangeInput) => {
 
 const touched = ref(false);
 
-const inputStyles =
-  "border mt-2 cursor-pointer rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-none dark:bg-gray-600 dark:[color-scheme:dark]";
 </script>
 
 <template>
@@ -426,6 +486,7 @@ const inputStyles =
               @update="emit('updateFormValues', { title: $event })"
             />
             <CharCounter
+              data-testid="title-char-counter"
               :current="formValues.title?.length || 0"
               :max="EVENT_TITLE_CHAR_LIMIT"
             />
@@ -444,78 +505,88 @@ const inputStyles =
         </FormRow>
         <FormRow section-title="Time">
           <template #content>
-            <div class="flex flex-col gap-1 dark:text-white">
-              <div class="flex flex-wrap items-center">
-                <div class="flex flex-wrap items-center gap-2 dark:text-white">
-                  <input
-                    data-testid="start-time-date-input"
-                    :class="inputStyles"
-                    type="date"
-                    :value="formattedStartTimeDate"
-                    @input="
-                      (event) =>
-                        handleStartTimeDateChange(
-                          (event.target as HTMLInputElement).value
-                        )
-                    "
-                  >
-                  <input
-                    v-if="!formValues.isAllDay"
-                    data-testid="start-time-time-input"
-                    :class="inputStyles"
-                    type="time"
-                    :value="formattedStartTimeTime"
-                    @input="
-                      (event) =>
-                        handleStartTimeTimeChange(
-                          (event.target as HTMLInputElement).value
-                        )
-                    "
-                  >
+            <div class="flex flex-col gap-3 dark:text-white">
+              <!-- Start Time Section -->
+              <!-- Time selection container with responsive layout -->
+              <div class="flex flex-col md:flex-row md:gap-6">
+                <!-- Start Time Section -->
+                <div class="w-full md:w-1/2">
+                  <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                    Start Time
+                  </label>
+                  <div class="flex items-center gap-2 dark:text-white">
+                    <DatePicker
+                      test-id="start-time-date-input"
+                      :value="formattedStartTimeDate"
+                      @update="handleStartTimeDateChange"
+                    />
+                    
+                    <!-- Use reusable time picker component -->
+                    <TimePicker
+                      v-if="!formValues.isAllDay"
+                      test-id="start-time-time-input"
+                      :value="DateTime.fromJSDate(startTime).toFormat('HH:mm')"
+                      @update="handleStartTimeTimeChange"
+                    />
+                  </div>
                 </div>
-                <span class="px-1">to</span>
-                <div class="flex flex-wrap items-center gap-2 xl:flex">
-                  <input
-                    data-testid="end-time-date-input"
-                    :class="inputStyles"
-                    type="date"
-                    :value="formattedEndTimeDate"
-                    @input="
-                      (event) =>
-                        handleEndTimeDateChange(
-                          (event.target as HTMLInputElement).value
-                        )
-                    "
-                  >
-                  <input
-                    v-if="!formValues.isAllDay"
-                    data-testid="end-time-time-input"
-                    :class="inputStyles"
-                    type="time"
-                    :value="formattedEndTimeTime"
-                    @input="
-                      (event) =>
-                        handleEndTimeTimeChange(
-                          (event.target as HTMLInputElement).value
-                        )
-                    "
-                  >
+                
+                <!-- End Time Section -->
+                <div class="w-full md:w-1/2 mt-3 md:mt-0">
+                  <label v-if="!formValues.isAllDay" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+                    End Time
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <!-- Only show end date input if multi-day event is checked -->
+                    <DatePicker
+                      v-if="isMultiDayEvent"
+                      test-id="end-time-date-input"
+                      :value="formattedEndTimeDate"
+                      @update="handleEndTimeDateChange"
+                    />
+                    
+                    <!-- Use reusable time picker component -->
+                    <TimePicker
+                      v-if="!formValues.isAllDay"
+                      test-id="end-time-time-input"
+                      :value="DateTime.fromJSDate(endTime).toFormat('HH:mm')"
+                      @update="handleEndTimeTimeChange"
+                    />
+                  </div>
                 </div>
-                <div class="pl-2">
-                  {{ duration }}
-                </div>
+              </div>
+              
+              <!-- Duration Display -->
+              <div class="text-sm text-gray-600 dark:text-gray-400 mt-2">
+                Duration: {{ duration }}
               </div>
 
-              <div class="flex items-center">
-                <CheckBox
-                  data-testid="free-input"
-                  class="align-middle"
-                  :checked="formValues.isAllDay"
-                  @input="toggleIsAllDayField"
-                />
-                <span class="ml-2 align-middle dark:text-white">All day</span>
+              <!-- Checkboxes for event options -->
+              <div class="flex flex-wrap gap-x-6 gap-y-2 mt-3">
+                <!-- All-day checkbox -->
+                <div class="flex items-center">
+                  <CheckBox
+                    data-testid="all-day-input"
+                    class="align-middle"
+                    :checked="formValues.isAllDay"
+                    @input="toggleIsAllDayField"
+                  />
+                  <span class="ml-2 align-middle dark:text-white">All day</span>
+                </div>
+                
+                <!-- Multi-day checkbox -->
+                <div class="flex items-center">
+                  <CheckBox
+                    data-testid="multi-day-input"
+                    class="align-middle"
+                    :checked="isMultiDayEvent"
+                    @input="toggleMultiDayEvent"
+                  />
+                  <span class="ml-2 align-middle dark:text-white">Multi-day event</span>
+                </div>
               </div>
-              <ErrorMessage :text="datePickerErrorMessage" />
+              
+              <ErrorMessage :text="datePickerErrorMessage" class="mt-1" />
             </div>
           </template>
         </FormRow>
@@ -599,6 +670,7 @@ const inputStyles =
               @update="emit('updateFormValues', { description: $event })"
             />
             <CharCounter
+              data-testid="description-char-counter"
               :current="formValues.description?.length || 0"
               :max="MAX_CHARS_IN_EVENT_DESCRIPTION"
             />
@@ -791,4 +863,6 @@ sl-input {
   border-color: blue;
   font-size: 0.875rem;
 }
+
+/* These styles have been moved to the individual components */
 </style>
