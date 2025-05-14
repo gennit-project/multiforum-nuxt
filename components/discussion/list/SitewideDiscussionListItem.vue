@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
+import { computed, ref, watch } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "nuxt/app";
 import type {
@@ -14,6 +14,8 @@ import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
 import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 const props = defineProps({
   discussion: {
@@ -51,7 +53,17 @@ const forumId = computed(() => {
   return props.discussion.DiscussionChannels[0].channelUniqueName;
 })
 
+// Get UI store for expand/collapse functionality
+const uiStore = useUIStore();
+const { expandAllDiscussions } = storeToRefs(uiStore);
+
+// Local state for showing body, default to the prop value
 const showBody = ref(props.showBodyByDefault);
+
+// Watch for changes in the global expand/collapse state
+watch(expandAllDiscussions, (newValue) => {
+  showBody.value = newValue;
+});
 
 const commentCount = computed(() => {
   let count = 0;

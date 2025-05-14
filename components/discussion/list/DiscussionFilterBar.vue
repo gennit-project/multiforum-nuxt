@@ -15,6 +15,8 @@ import { useRoute, useRouter } from "nuxt/app";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 defineProps({
   isForumScoped: {
@@ -142,12 +144,24 @@ const updateShowArchived = (event: Event) => {
 const showFilters = ref(false);
 const showSearch = ref(false);
 
+// Get UI store for expand/collapse functionality
+const uiStore = useUIStore();
+const { expandAllDiscussions } = storeToRefs(uiStore);
+
 const toggleShowFilters = () => {
   showFilters.value = !showFilters.value;
 };
 
 const toggleShowSearch = () => {
   showSearch.value = !showSearch.value;
+};
+
+const expandAll = () => {
+  uiStore.toggleExpandDiscussions(true);
+};
+
+const collapseAll = () => {
+  uiStore.toggleExpandDiscussions(false);
 };
 </script>
 
@@ -177,6 +191,37 @@ const toggleShowSearch = () => {
           </template>
         </FilterChip>
         <SortButtons />
+        <!-- Expand/Collapse Button Group -->
+        <div class="flex border border-gray-800 dark:border-gray-600 rounded-md overflow-hidden">
+          <!-- Expand All Button -->
+          <button
+            data-testid="expand-all-button"
+            :class="[
+              'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300',
+              'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
+              expandAllDiscussions ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
+            ]"
+            aria-label="Expand all discussions"
+            title="Expand all discussions"
+            @click="expandAll"
+          >
+            <i class="fa-solid fa-expand text-xs"/>
+          </button>
+          <!-- Collapse All Button -->
+          <button
+            data-testid="collapse-all-button"
+            :class="[
+              'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300 border-l border-gray-800 dark:border-gray-600',
+              'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
+              !expandAllDiscussions ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
+            ]"
+            aria-label="Collapse all discussions"
+            title="Collapse all discussions"
+            @click="collapseAll"
+          >
+            <i class="fa-solid fa-compress text-xs"/>
+          </button>
+        </div>
         <button
           data-testid="discussion-filter-button"
           :class="

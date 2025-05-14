@@ -12,6 +12,9 @@ export const useUIStore = defineStore('ui', () => {
   const enteredDevelopmentEnvironment = ref(config.environment === "development");
   const fontSize = ref<FontSize>('small');
   
+  // Discussion list states
+  const expandAllDiscussions = ref(false);
+  
   // Theme state
   const themeMode = ref<ThemeMode>('system');
   const systemThemeIsDark = ref(false);
@@ -103,6 +106,14 @@ export const useUIStore = defineStore('ui', () => {
       }
     }
   }
+  
+  function toggleExpandDiscussions(expand?: boolean) {
+    if (expand !== undefined) {
+      expandAllDiscussions.value = expand;
+    } else {
+      expandAllDiscussions.value = !expandAllDiscussions.value;
+    }
+  }
 
   return {
     // State
@@ -111,11 +122,13 @@ export const useUIStore = defineStore('ui', () => {
     fontSize,
     theme,
     themeMode,
+    expandAllDiscussions,
     
     // Actions
     setSideNavIsOpen,
     setEnteredDevelopmentEnvironment,
     setFontSize,
-    setTheme
+    setTheme,
+    toggleExpandDiscussions
   };
 });
