@@ -192,7 +192,7 @@ definePageMeta({
         >
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 px-2 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 px-2 lg:px-4 2xl:px-0 border-b dark:border-gray-500"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <DiscussionTitleEditForm>

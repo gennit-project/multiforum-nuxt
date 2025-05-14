@@ -148,42 +148,44 @@ export default defineComponent({
     
     <!-- SSR Fallback -->
     <template #fallback>
-      <div class="flex flex-row items-center gap-1">
-        <nuxt-link
-          :to="{
-            name: 'u-username',
-            params: { username },
-          }"
-          class="flex flex-row items-center gap-1 hover:underline"
-        >
+      <button>
+        <div class="flex flex-row items-center gap-1">
+          <nuxt-link
+            :to="{
+              name: 'u-username',
+              params: { username },
+            }"
+            class="flex flex-row items-center gap-1 hover:underline"
+          >
+            <span
+              v-if="!displayName"
+              class="font-bold"
+            >{{ username }}</span>
+            <span
+              v-if="displayName"
+              class="font-bold"
+            >{{ displayName }}</span>
+            <span
+              v-if="displayName"
+              class="text-gray-500 dark:text-gray-300"
+            >{{ `(u/${username})` }}</span>
+          </nuxt-link>
           <span
-            v-if="!displayName"
-            class="font-bold"
-          >{{ username }}</span>
+            v-if="isAdmin"
+            class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+          >Admin</span>
           <span
-            v-if="displayName"
-            class="font-bold"
-          >{{ displayName }}</span>
+            v-else-if="isMod"
+            class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+          >
+            Mod
+          </span>
           <span
-            v-if="displayName"
-            class="text-gray-500 dark:text-gray-300"
-          >{{ `(u/${username})` }}</span>
-        </nuxt-link>
-        <span
-          v-if="isAdmin"
-          class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-        >Admin</span>
-        <span
-          v-else-if="isMod"
-          class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-        >
-          Mod
-        </span>
-        <span
-          v-if="isOriginalPoster"
-          class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-        >OP</span>
-      </div>
+            v-if="isOriginalPoster"
+            class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+          >OP</span>
+        </div>
+      </button>
     </template>
   </client-only>
 </template>

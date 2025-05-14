@@ -187,8 +187,8 @@ const relative = computed(() =>
             <div
               class="text-xs pt-1 text-gray-500 no-underline dark:text-gray-300"
             >
-              <!-- Everything in a single continuous paragraph for natural wrapping -->
-              <p class="whitespace-normal">
+              <!-- Use div instead of p to avoid invalid HTML (button inside p) -->
+              <div class="whitespace-normal">
                 <!-- Comment count -->
                 <nuxt-link
                   v-if="discussion && !submittedToMultipleChannels"
@@ -224,7 +224,7 @@ const relative = computed(() =>
                   :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
                   :account-created="discussion?.Author?.createdAt"
                 />
-              </p>
+              </div>
             </div>
             <button
               v-if="discussion && (discussion.body || discussion.Album) && !showBody"

@@ -427,7 +427,7 @@ const handleEditAlbum = () => {
               <DiscussionRootCommentFormWrapper
                 v-if="activeDiscussionChannel && !isArchived && !locked"
                 :key="`${channelId}${discussionId}`"
-                class="pr-3"
+                class="pr-1"
                 :channel-id="channelId"
                 :discussion-channel="activeDiscussionChannel || undefined"
                 :previous-offset="previousOffset"
