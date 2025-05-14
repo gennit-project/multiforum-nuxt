@@ -52,7 +52,7 @@ describe('uiStore - Core Functionality', () => {
     
     expect(store.sideNavIsOpen).toBe(false);
     expect(store.fontSize).toBe('small');
-    expect(store.themeMode).toBe('system');
+    expect(store.themeMode).toBe('dark'); // Updated to match the new default
   });
   
   it('should set sideNavIsOpen correctly', async () => {
@@ -107,15 +107,15 @@ describe('uiStore - Core Functionality', () => {
     const { useUIStore } = await import('@/stores/uiStore');
     const store = useUIStore();
     
-    // Default is 'system'
-    expect(store.themeMode).toBe('system');
-    
-    // Set to 'dark'
-    store.setTheme('dark');
+    // Default is 'dark' in our new implementation
     expect(store.themeMode).toBe('dark');
     
     // Set to 'light'
     store.setTheme('light');
     expect(store.themeMode).toBe('light');
+    
+    // Set back to 'dark'
+    store.setTheme('dark');
+    expect(store.themeMode).toBe('dark');
   });
 });

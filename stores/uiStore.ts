@@ -4,7 +4,7 @@ import { config } from '@/config';
 import { useCookie, useRoute, useRouter } from 'nuxt/app';
 
 export type FontSize = 'small' | 'medium' | 'large';
-export type ThemeMode = 'light' | 'dark' | 'system';
+export type ThemeMode = 'light' | 'dark';
 
 export const useUIStore = defineStore('ui', () => {
   // State
@@ -16,23 +16,28 @@ export const useUIStore = defineStore('ui', () => {
   const expandAllDiscussions = ref(false);
   
   // Theme state
-  const themeMode = ref<ThemeMode>('system');
-  const systemThemeIsDark = ref(false);
+  const themeMode = ref<ThemeMode>('dark');
+  const systemThemeIsDark = ref(false); // Kept for backward compatibility
   
-  // Initialize theme from cookie/localStorage on client side
+  // Initialize theme from cookie/localStorage on client side - default to dark mode
   if (import.meta.client) {
-    const themeCookie = useCookie('theme', { default: () => 'system' });
+    const themeCookie = useCookie('theme', { default: () => 'dark' });
     const localTheme = localStorage.getItem('theme');
     
-    // Set initial theme preference
-    if (localTheme && ['light', 'dark', 'system'].includes(localTheme)) {
+    // Set initial theme preference - default to dark
+    if (localTheme && ['light', 'dark'].includes(localTheme)) {
       themeMode.value = localTheme as ThemeMode;
       themeCookie.value = localTheme;
-    } else if (themeCookie.value && ['light', 'dark', 'system'].includes(themeCookie.value)) {
+    } else if (themeCookie.value && ['light', 'dark'].includes(themeCookie.value)) {
       themeMode.value = themeCookie.value as ThemeMode;
+    } else {
+      // Default to dark mode if nothing is set
+      themeMode.value = 'dark';
+      themeCookie.value = 'dark';
+      localStorage.setItem('theme', 'dark');
     }
     
-    // Check if system prefers dark mode
+    // Check if system prefers dark mode - for backward compatibility
     systemThemeIsDark.value = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
     // Listen for system preference changes
@@ -43,12 +48,7 @@ export const useUIStore = defineStore('ui', () => {
   }
   
   // Computed theme value (light or dark)
-  const theme = computed(() => {
-    if (themeMode.value === 'system') {
-      return systemThemeIsDark.value ? 'dark' : 'light';
-    }
-    return themeMode.value;
-  });
+  const theme = computed(() => themeMode.value);
   
   // Apply theme class to HTML element
   if (import.meta.client) {
@@ -81,14 +81,14 @@ export const useUIStore = defineStore('ui', () => {
     }
   }
   
-  function setTheme(mode: ThemeMode) {
+  function setTheme(mode: 'light' | 'dark') {
     const route = useRoute();
     const router = useRouter();
     
     // Capture current query params before theme change
     const currentQuery = { ...route.query };
     
-    // Update theme
+    // Update theme - only allow 'light' or 'dark'
     themeMode.value = mode;
     
     // Save to cookie and localStorage

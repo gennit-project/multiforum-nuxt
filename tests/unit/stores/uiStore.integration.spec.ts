@@ -1,5 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia } from 'pinia';
+import { setActivePinia, createPinia, storeToRefs  } from 'pinia';
+import { computed } from 'vue';
 import { mount } from '@vue/test-utils';
 import { useUIStore, type FontSize } from '@/stores/uiStore';
 
@@ -17,7 +18,7 @@ vi.mock('@/config', () => ({
 
 // Mock Nuxt composables
 vi.mock('nuxt/app', () => ({
-  useCookie: vi.fn(() => ({ value: 'system' })),
+  useCookie: vi.fn(() => ({ value: 'dark' })),
   useRoute: vi.fn(() => ({ path: '/test', query: {} })),
   useRouter: vi.fn(() => ({ push: vi.fn(), replace: vi.fn() }))
 }));
@@ -27,54 +28,34 @@ vi.mock('nuxt/app', () => ({
 const createThemeSwitcherComponent = () => ({
   name: 'ThemeSwitcher',
   template: `
-    <div class="theme-switcher">
-      <div class="dropdown">
-        <button class="menu-button" data-testid="menu-button"></button>
-        <div class="menu-items">
-          <button 
-            class="light-mode-item"
-            data-testid="light-mode-button"
-            @click="setLightMode"
-          >
-            Light Mode
-          </button>
-          <button 
-            class="dark-mode-item"
-            data-testid="dark-mode-button"
-            @click="setDarkMode"
-          >
-            Dark Mode
-          </button>
-          <button 
-            class="system-mode-item"
-            data-testid="system-mode-button"
-            @click="setSystemMode"
-          >
-            System
-          </button>
-        </div>
-      </div>
-    </div>
+    <button 
+      class="toggle-button"
+      data-testid="theme-switcher"
+      @click="toggleTheme"
+    >
+      <span class="sr-only">Toggle theme</span>
+      <span class="toggle-circle">
+        <span class="icon light-icon">
+          <i class="fa-sun"></i>
+        </span>
+        <span class="icon dark-icon">
+          <i class="fa-moon"></i>
+        </span>
+      </span>
+    </button>
   `,
   setup() {
     const uiStore = useUIStore();
+    const { theme } = storeToRefs(uiStore);
     
-    const setLightMode = () => {
-      uiStore.setTheme('light');
-    };
+    const isDarkMode = computed(() => theme.value === 'dark');
     
-    const setDarkMode = () => {
-      uiStore.setTheme('dark');
-    };
-    
-    const setSystemMode = () => {
-      uiStore.setTheme('system');
+    const toggleTheme = () => {
+      uiStore.setTheme(isDarkMode.value ? 'light' : 'dark');
     };
     
     return {
-      setLightMode,
-      setDarkMode,
-      setSystemMode
+      toggleTheme
     };
   }
 });
@@ -196,7 +177,7 @@ describe('UIStore Component Integration Tests', () => {
   });
   
   describe('Theme switcher component', () => {
-    it('should update the store theme when light mode is selected', async () => {
+    it('should toggle the store theme when the toggle button is clicked', async () => {
       // Create the ThemeSwitcher component 
       const ThemeSwitcher = createThemeSwitcherComponent();
       const wrapper = mount(ThemeSwitcher);
@@ -204,51 +185,20 @@ describe('UIStore Component Integration Tests', () => {
       // Get a reference to the store
       const store = useUIStore();
       
-      // Initial theme should be 'system'
-      expect(store.themeMode).toBe('system');
+      // Initial theme should be 'dark' (our new default)
+      expect(store.themeMode).toBe('dark');
       
-      // Click the light mode button
-      await wrapper.find('[data-testid="light-mode-button"]').trigger('click');
+      // Click the toggle button (should switch to light)
+      await wrapper.find('[data-testid="theme-switcher"]').trigger('click');
       
-      // Verify the store was updated
+      // Verify the store was updated to light mode
       expect(store.themeMode).toBe('light');
-    });
-    
-    it('should update the store theme when dark mode is selected', async () => {
-      // Create the ThemeSwitcher component 
-      const ThemeSwitcher = createThemeSwitcherComponent();
-      const wrapper = mount(ThemeSwitcher);
       
-      // Get a reference to the store
-      const store = useUIStore();
+      // Click the toggle button again (should switch back to dark)
+      await wrapper.find('[data-testid="theme-switcher"]').trigger('click');
       
-      // Initial theme should be 'system'
-      expect(store.themeMode).toBe('system');
-      
-      // Click the dark mode button
-      await wrapper.find('[data-testid="dark-mode-button"]').trigger('click');
-      
-      // Verify the store was updated
+      // Verify the store was updated back to dark mode
       expect(store.themeMode).toBe('dark');
-    });
-    
-    it('should update the store theme when system mode is selected', async () => {
-      // Create the ThemeSwitcher component 
-      const ThemeSwitcher = createThemeSwitcherComponent();
-      const wrapper = mount(ThemeSwitcher);
-      
-      // Get a reference to the store and set initial theme to dark
-      const store = useUIStore();
-      store.setTheme('dark');
-      
-      // Verify initial theme is 'dark'
-      expect(store.themeMode).toBe('dark');
-      
-      // Click the system mode button
-      await wrapper.find('[data-testid="system-mode-button"]').trigger('click');
-      
-      // Verify the store was updated back to system
-      expect(store.themeMode).toBe('system');
     });
   });
   
