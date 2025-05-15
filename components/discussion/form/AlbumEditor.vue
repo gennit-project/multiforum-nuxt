@@ -134,6 +134,9 @@ const uploadFile = async (file: File): Promise<boolean> => {
   }
 };
 
+// Status message for upload feedback
+const uploadStatus = ref('');
+
 /**
  * Handle uploading multiple files at once
  * Each file is uploaded and added to the album immediately after successful creation
@@ -152,22 +155,42 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     if (filesToProcess.length === 0) return;
 
     loadingStates.value[-1] = true;
+    uploadStatus.value = `Uploading 0/${filesToProcess.length} images...`;
 
     // Process files one by one
-    for (const file of filesToProcess) {
-      await uploadFile(file);
+    let successCount = 0;
+    for (let i = 0; i < filesToProcess.length; i++) {
+      const file = filesToProcess[i];
+      uploadStatus.value = `Uploading ${i+1}/${filesToProcess.length} images...`;
+      const success = await uploadFile(file);
+      if (success) successCount++;
     }
+    
+    uploadStatus.value = `Successfully uploaded ${successCount} image${successCount !== 1 ? 's' : ''}.`;
+    setTimeout(() => {
+      uploadStatus.value = '';
+    }, 3000);
   } else {
     // Normal flow when not exceeding limits
     loadingStates.value[-1] = true;
 
     // Convert FileList to Array first
     const filesArray = Array.from(files);
+    uploadStatus.value = `Uploading 0/${filesArray.length} images...`;
     
     // Process files one by one sequentially to avoid race conditions
-    for (const file of filesArray) {
-      await uploadFile(file);
+    let successCount = 0;
+    for (let i = 0; i < filesArray.length; i++) {
+      const file = filesArray[i];
+      uploadStatus.value = `Uploading ${i+1}/${filesArray.length} images...`;
+      const success = await uploadFile(file);
+      if (success) successCount++;
     }
+    
+    uploadStatus.value = `Successfully uploaded ${successCount} image${successCount !== 1 ? 's' : ''}.`;
+    setTimeout(() => {
+      uploadStatus.value = '';
+    }, 3000);
   }
 
   // Turn off the global loading
@@ -180,7 +203,13 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
 
 const albumFileInputRef = ref<HTMLInputElement | null>(null);
 
-const selectFiles = () => {
+const selectFiles = (event?: Event) => {
+  // Prevent the default action if this is a button click
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
   // Check if we've reached the limit before opening file dialog
   if (isImageLimitReached.value) {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
@@ -189,6 +218,7 @@ const selectFiles = () => {
 
   // Programmatically trigger file input click
   if (albumFileInputRef.value) {
+    // This works reliably on both mobile and desktop browsers
     albumFileInputRef.value.click();
   }
 };
@@ -365,8 +395,9 @@ const addNewImage = (input: Partial<AddImageInput>) => {
       v-if="createImageError"
       :text="createImageError.message"
     />
-    <div v-if="loadingStates[-1]" class="mb-2">
+    <div v-if="loadingStates[-1]" class="mb-2 flex items-center gap-2">
       <LoadingSpinner />
+      <span v-if="uploadStatus" class="text-sm text-gray-600 dark:text-gray-300">{{ uploadStatus }}</span>
     </div>
     <div class="mb-2">
       <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -459,17 +490,28 @@ const addNewImage = (input: Partial<AddImageInput>) => {
     <div
       v-if="!isImageLimitReached"
       class="my-3 border-2 border-dotted border-gray-400 p-4 text-center cursor-pointer rounded-md"
-      @click="selectFiles"
       @drop="handleDrop"
       @dragover="handleDragOver"
     >
-      <p class="text-sm text-gray-500 dark:text-gray-300">
-        Drag and drop, or click to add files
-      </p>
+      <label for="album-file-input" class="w-full h-full flex flex-col items-center justify-center cursor-pointer">
+        <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">
+          Drag and drop, or tap to add files
+        </p>
+        <button 
+          type="button" 
+          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          @click="selectFiles"
+        >
+          Choose Files
+        </button>
+      </label>
       <input
+        id="album-file-input"
         ref="albumFileInputRef"
         type="file"
         multiple
+        accept="image/*"
+        capture="environment"
         style="display: none"
         @change="handleFileInputChange"
       >
