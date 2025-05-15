@@ -510,12 +510,17 @@ const updateShowArchived = (event: Event) => {
             :data-testid="'forum-filter-button'"
             :label="channelLabel"
             :highlighted="channelLabel !== defaultFilterLabels.channels"
+            @click="toggleForumList"
           >
             <template #icon>
-              <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
+              <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
             </template>
             <template #content>
-              <div class="relative bg-white dark:bg-gray-700 w-96">
+              <div 
+                v-if="forumListOpen" 
+                class="relative bg-white dark:bg-gray-700 w-80 max-w-screen-sm"
+                data-testid="forum-list-dropdown-mobile"
+              >
                 <SearchableForumList
                   :selected-channels="filterValues.channels"
                   :featured-forums="

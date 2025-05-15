@@ -2,6 +2,7 @@
 import { defineComponent } from 'vue';
 
 export default defineComponent({
+  name: 'ChannelIcon',
   setup() {},
 });
 </script>
@@ -10,16 +11,18 @@ export default defineComponent({
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="none"
+    width="24"
+    height="24"
     viewBox="0 0 24 24"
     stroke-width="1.5"
-    :stroke="`url(#pinkToLightBlueGradient)`"
+    stroke="currentColor"
+    class="channel-icon"
+    aria-hidden="true"
   >
-    <defs>
-      <linearGradient id="pinkToLightBlueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-        <stop offset="0%" stop-color="#FF98C7" />
-        <stop offset="100%" stop-color="#85E0FF" />
-      </linearGradient>
-    </defs>
+    <linearGradient id="pinkToLightBlueGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FF98C7" />
+      <stop offset="100%" stop-color="#85E0FF" />
+    </linearGradient>
 
     <path
       stroke-linecap="round"
@@ -28,3 +31,16 @@ export default defineComponent({
     />
   </svg>
 </template>
+
+<style>
+.channel-icon {
+  min-width: 16px;
+  min-height: 16px;
+}
+@media (max-width: 768px) {
+  .channel-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+</style>

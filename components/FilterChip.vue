@@ -23,14 +23,21 @@ export default defineComponent({
       default: false,
     },
   },
-  setup() {
+  emits: ["click"],
+  setup(props, { emit }) {
     const isOpen = ref(false);
     const uiStore = useUIStore();
     const theme = computed(() => uiStore.theme);
+    
+    const handleClick = () => {
+      isOpen.value = !isOpen.value;
+      emit('click');
+    };
 
     return {
       theme,
       isOpen,
+      handleClick,
     };
   },
 });
@@ -48,7 +55,7 @@ export default defineComponent({
           :data-testid="dataTestid"
           :class="[highlighted ? 'border-blue-500 ring-1 ring-blue-500' : '']"
           class="font-small flex align-items whitespace-nowrap rounded-md bg-white px-3 py-2 text-xs text-gray-700 border hover:bg-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
-          @click="isOpen = !isOpen"
+          @click="handleClick"
         >
           <slot name="icon" />
           {{ label }}

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import type { PropType } from "vue";
+import AvatarComponent from "@/components/AvatarComponent.vue";
 
 type ChannelOption = {
   uniqueName: string;
@@ -34,7 +35,7 @@ const truncate = (description: string) => {
       type="checkbox"
       :value="channel.uniqueName"
       :checked="selected.includes(channel.uniqueName)"
-      class="border border-gray-300 text-blue-600 dark:border-gray-600"
+      class="border border-gray-300 text-blue-600 dark:border-gray-600 w-4 h-4"
       @change="() => emit('toggleSelection', channel.uniqueName)"
     >
     <div class="flex items-center space-x-2">
