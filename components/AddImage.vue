@@ -63,7 +63,6 @@ const onFileSelected = (event: Event) => {
         ref="fileInput"
         type="file"
         accept="image/*"
-        capture="environment"
         style="display: none"
         :disabled="disabled"
         @change="onFileSelected"

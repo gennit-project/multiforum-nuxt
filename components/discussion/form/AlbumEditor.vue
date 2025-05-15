@@ -511,7 +511,6 @@ const addNewImage = (input: Partial<AddImageInput>) => {
         type="file"
         multiple
         accept="image/*"
-        capture="environment"
         style="display: none"
         @change="handleFileInputChange"
       >
