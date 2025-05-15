@@ -150,7 +150,11 @@ const renderMap = async () => {
         draggable: false,
         icon: {
           url: placeIcon,
-          scaledSize: { width: 20, height: 20, equals: () => false },
+          scaledSize: { 
+            width: props.useMobileStyles ? 30 : 20, 
+            height: props.useMobileStyles ? 30 : 20, 
+            equals: () => false 
+          },
         },
       });
 
@@ -160,37 +164,48 @@ const renderMap = async () => {
         event.location.latitude.toString() +
         event.location.longitude.toString();
 
-      marker.addListener("click", () => {
-        emit("openPreview", event, true);
-        emit("lockColors");
-      });
-
-      marker.addListener("mouseover", () => {
-        if (!props.colorLocked) {
+      // Use different event bindings for mobile vs desktop
+      if (props.useMobileStyles) {
+        // Mobile uses a single tap handler
+        marker.addListener("click", () => {
           emit("highlightEvent", eventLocationId, event.id, event, true);
-        }
-      });
+          emit("openPreview", event, true);
+          emit("lockColors");
+        });
+      } else {
+        // Desktop uses separate mouse events
+        marker.addListener("click", () => {
+          emit("openPreview", event, true);
+          emit("lockColors");
+        });
 
-      marker.addListener("mouseout", () => {
-        const unhighlight = () => {
+        marker.addListener("mouseover", () => {
           if (!props.colorLocked) {
-            if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
-              emit("unHighlight");
-            }
-
-            marker.setIcon({
-              url: placeIcon,
-              scaledSize: { 
-                width: 20, 
-                height: 20,
-                equals: () => false
-              },
-            });
-            infowindow.close();
+            emit("highlightEvent", eventLocationId, event.id, event, true);
           }
-        };
-        unhighlight();
-      });
+        });
+
+        marker.addListener("mouseout", () => {
+          const unhighlight = () => {
+            if (!props.colorLocked) {
+              if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
+                emit("unHighlight");
+              }
+
+              marker.setIcon({
+                url: placeIcon,
+                scaledSize: { 
+                  width: props.useMobileStyles ? 30 : 20, 
+                  height: props.useMobileStyles ? 30 : 20,
+                  equals: () => false
+                },
+              });
+              infowindow.close();
+            }
+          };
+          unhighlight();
+        });
+      }
 
       const updateMarkerMap = () => {
         if (markerMap.markers[eventLocationId]) {
@@ -255,8 +270,8 @@ watch(
       <div
         v-else-if="useMobileStyles"
         ref="mobileMapDiv"
-        class="mt-8"
-        style="width: 95vw; height: 50vw"
+        class="mt-8 w-full"
+        style="width: 100vw; height: 60vw; touch-action: pan-x pan-y;"
       />
       <div
         v-else-if="!useMobileStyles"

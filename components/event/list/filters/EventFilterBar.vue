@@ -297,21 +297,23 @@ const updateShowArchived = (event: Event) => {
 <template>
   <div class="flex-1 flex-col space-y-1 dark:text-white mt-2 mx-4">
     <div class="flex justify-end mb-2">
-      <CreateAnythingButton class="mx-2" :use-primary-button="true" />
+      <CreateAnythingButton v-if="allowHidingMainFilters" class="mx-2" :use-primary-button="true" />
       <button
         v-if="allowHidingMainFilters"
         data-testid="toggle-main-filters-button"
-        :class="[
-          showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '',
-        ]"
+        :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
         class="border border-black dark:border-gray-500 rounded-md text-xs px-2 py-1 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
         @click="toggleShowMainFilters"
       >
         {{ showMainFilters ? "Hide filters" : "Show filters" }}
       </button>
     </div>
-    <hr class="mb-2 border border-t-gray-500 dark:border-t-gray-600" >
-    <div v-if="showMainFilters" class="flex flex-col gap-2 border border-gray-400 dark:border-gray-600 dark:bg-gray-800 p-4 rounded-lg">
+    <hr v-if="allowHidingMainFilters" class="mb-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <div
+      v-if="showMainFilters"
+      :class="[allowHidingMainFilters ? 'border border-gray-400 dark:border-gray-600' : '']"
+      class="flex flex-col gap-2  dark:bg-gray-800 p-4 rounded-lg"
+    >
       <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
         <div class="flex space-x-1 items-center">
           <div
@@ -366,7 +368,12 @@ const updateShowArchived = (event: Event) => {
 
                 <template #content>
                   <div
-                    class="flex flex-col gap-3 rounded-lg border border-gray-500 bg-white p-4 dark:bg-gray-700"
+                    :class="[
+                      allowHidingMainFilters
+                        ? 'rounded-lg border border-gray-500'
+                        : '',
+                    ]"
+                    class="flex flex-col gap-3 bg-white p-4 dark:bg-gray-700"
                   >
                     <div v-if="showLocationSearchBarAndDistanceButtons">
                       <div

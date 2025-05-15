@@ -263,9 +263,15 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
   }
 
   if (markerMap.markers[eventLocationId]) {
+    // Use bigger icons on mobile for easier tapping
+    const isMobile = window.innerWidth < 768; 
     markerMap.markers[eventLocationId].marker.setIcon({
       url: highlightedPlaceIcon,
-      scaledSize: { width: 20, height: 20, equals: () => false },
+      scaledSize: { 
+        width: isMobile ? 30 : 20, 
+        height: isMobile ? 30 : 20, 
+        equals: () => false 
+      },
     });
 
     const openSpecificInfowindow = () => {
@@ -388,9 +394,15 @@ const unhighlightEventOnMap = (markerMap: MarkerMap) => {
     const markerData = markerMap.markers[locationId];
     
     if (markerData) {
+      // Use bigger icons on mobile for easier tapping
+      const isMobile = window.innerWidth < 768;
       markerData.marker?.setIcon({
         url: placeIcon,
-        scaledSize: { width: 20, height: 20, equals: () => false },
+        scaledSize: { 
+          width: isMobile ? 30 : 20, 
+          height: isMobile ? 30 : 20, 
+          equals: () => false 
+        },
       });
     }
     highlightedEventId.value = "";
@@ -535,7 +547,7 @@ const isClientSide = typeof window !== "undefined";
           v-else-if="eventResult && eventResult.events"
           id="mapViewMobileWidth"
         >
-          <div class="event-map-container">
+          <div class="event-map-container w-full">
             <EventMap
               v-if="eventResult.events.length > 0"
               :events="eventResult.events"
@@ -611,7 +623,7 @@ const isClientSide = typeof window !== "undefined";
 <style>
 .event-map-container {
   position: relative;
-  width: 50vw;
+  width: 100%;
 }
 
 .shortcut-buttons-wrapper {

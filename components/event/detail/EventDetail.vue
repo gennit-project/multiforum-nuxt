@@ -435,7 +435,7 @@ watchEffect(() => {
               />
               <EventBody
                 v-if="event.description"
-                class="sm:px-4 px-0"
+                class="px-0"
                 :event="event"
                 :event-description-edit-mode="eventDescriptionEditMode"
                 @handle-click-edit-event-description="
