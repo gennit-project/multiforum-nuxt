@@ -72,7 +72,7 @@ const closeDropdown = () => {
     <!-- Custom input field instead of native time input -->
     <div 
       :data-testid="testId"
-      class="border rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-32 h-10 px-3 pr-8 flex items-center
+      class="border rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-full sm:w-32 h-10 px-3 pr-8 flex items-center
             dark:border-gray-700 dark:bg-gray-800 dark:text-white cursor-pointer"
       :class="{ 'opacity-60 cursor-not-allowed': disabled }"
       @click="!disabled && toggleDropdown()"

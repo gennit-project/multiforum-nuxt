@@ -444,7 +444,7 @@ const touched = ref(false);
 </script>
 
 <template>
-  <div class="pt-0 px-6 max-w-3xl mx-auto dark:text-white">
+  <div class="pt-0 px-2 sm:px-6 max-w-3xl mx-auto dark:text-white">
     <div v-if="eventLoading">Loading...</div>
     <div v-else-if="getEventError">
       <div v-for="(error, i) of getEventError?.graphQLErrors" :key="i">

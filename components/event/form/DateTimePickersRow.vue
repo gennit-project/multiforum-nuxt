@@ -62,10 +62,10 @@ const handleEndTimeTimeChange = (timeValue: string) => {
 
 <template>
   <div class="flex flex-col dark:text-white">
-    <!-- Time selection container with compact responsive layout -->
-    <div class="flex flex-row items-center gap-2">
+    <!-- Time selection container with responsive layout that wraps on mobile -->
+    <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <!-- Start Time Section -->
-      <div class="flex items-center gap-2 dark:text-white">
+      <div class="flex flex-wrap items-center gap-1 sm:gap-2 dark:text-white">
         <DatePicker
           test-id="start-time-date-input"
           :value="formattedStartTimeDate"
@@ -83,15 +83,15 @@ const handleEndTimeTimeChange = (timeValue: string) => {
         />
       </div>
       
-      <!-- Arrow icon between start and end -->
-      <div v-if="!isAllDay || isMultiDay" class="flex items-center mx-1" data-testid="time-arrow">
+      <!-- Arrow icon between start and end - hidden on very small screens -->
+      <div v-if="!isAllDay || isMultiDay" class="flex items-center mx-1 sm:mx-2" data-testid="time-arrow">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
           <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
         </svg>
       </div>
       
       <!-- End Time Section -->
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center gap-1 sm:gap-2">
         <!-- Only show end date input if multi-day event is checked -->
         <DatePicker
           v-if="isMultiDay"

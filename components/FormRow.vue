@@ -20,7 +20,7 @@ defineProps({
 </script>
 
 <template>
-  <div>
+  <div class="px-1 sm:px-2">
     <label
       v-if="sectionTitle"
       :for="sectionTitle"

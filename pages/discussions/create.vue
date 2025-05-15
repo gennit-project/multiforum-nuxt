@@ -4,7 +4,7 @@ import CreateDiscussion from "@/components/discussion/form/CreateDiscussion.vue"
 <template>
   <NuxtLayout>
     <div class="flex justify-center">
-      <div class="max-w-3xl w-full px-2 md:px-8 mt-2 pt-2 bg-white dark:bg-gray-800">
+      <div class="max-w-3xl w-full px-2 mt-2 pt-2 bg-white dark:bg-gray-800">
         <CreateDiscussion />
       </div>
     </div>
