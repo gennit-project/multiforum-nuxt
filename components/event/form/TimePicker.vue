@@ -69,20 +69,20 @@ const closeDropdown = () => {
 
 <template>
   <div class="relative">
-    <!-- Use a regular input for typing time directly -->
-    <input
-      type="time"
-      :value="value"
+    <!-- Custom input field instead of native time input -->
+    <div 
       :data-testid="testId"
-      class="border mt-2 rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-32 h-10 px-3
-            dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:[color-scheme:dark]"
-      :disabled="disabled"
-      @input="(e) => emit('update', (e.target as HTMLInputElement).value)"
+      class="border rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-32 h-10 px-3 pr-8 flex items-center
+            dark:border-gray-700 dark:bg-gray-800 dark:text-white cursor-pointer"
+      :class="{ 'opacity-60 cursor-not-allowed': disabled }"
+      @click="!disabled && toggleDropdown()"
     >
-    
-    <!-- Time dropdown toggle button -->
-    <div class="absolute right-2 top-4 cursor-pointer" @click="toggleDropdown">
-      <i class="far fa-clock text-gray-500 dark:text-gray-400"/>
+      {{ formattedTime }}
+      
+      <!-- Time dropdown toggle button -->
+      <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+        <i class="far fa-clock text-gray-500 dark:text-gray-400"/>
+      </div>
     </div>
     
     <!-- Custom dropdown for time selection -->
