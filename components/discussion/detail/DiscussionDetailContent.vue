@@ -25,7 +25,6 @@ import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue"
 import ConfirmUndoDiscussionFeedbackModal from "@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue";
 import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.vue";
 import Notification from "@/components/NotificationComponent.vue";
-import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar, modProfileNameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
@@ -34,6 +33,10 @@ import AlbumEditForm from "./AlbumEditForm.vue";
 import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
 import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+// Lazy load the album component since it's not needed for initial render
+const DiscussionAlbum = defineAsyncComponent(() => 
+  import("@/components/discussion/detail/DiscussionAlbum.vue")
+);
 
 const COMMENT_LIMIT = 50;
 

@@ -14,10 +14,13 @@ import type {
   DiscussionChannel,
   Tag,
 } from "@/__generated__/graphql";
-import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
+// Lazy load the album component since it's not needed for initial render
+const DiscussionAlbum = defineAsyncComponent(() => 
+  import("@/components/discussion/detail/DiscussionAlbum.vue")
+);
 
 // Define props
 const props = defineProps({

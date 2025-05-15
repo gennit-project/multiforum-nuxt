@@ -235,6 +235,16 @@ On the backend (https://github.com/gennit-project/multiforum-backend), an Apollo
 
 The frontend is a Vue application that makes GraphQL queries to the Apollo server.
 
+## Performance Optimizations
+
+We have implemented several performance optimizations to improve load times, reduce bandwidth usage, and enhance the user experience. See [PERFORMANCE.md](./PERFORMANCE.md) for details on:
+
+- Code splitting and lazy loading
+- Text compression and caching
+- JavaScript and CSS minification
+- Image optimization
+- Server response time improvement
+
 ## Environment Variables
 
 The application requires several environment variables to be set up. For a comprehensive list of environment variables with detailed descriptions, see the [Environment Variables section in CONTRIBUTING.md](CONTRIBUTING.md#environment-variables).

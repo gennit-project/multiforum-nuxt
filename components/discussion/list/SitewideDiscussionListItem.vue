@@ -13,9 +13,12 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
-import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
+// Lazy load the album component since it's not needed for initial render
+const DiscussionAlbum = defineAsyncComponent(() => 
+  import("@/components/discussion/detail/DiscussionAlbum.vue")
+);
 
 const props = defineProps({
   discussion: {

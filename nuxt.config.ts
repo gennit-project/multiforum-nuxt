@@ -27,6 +27,39 @@ export default defineNuxtConfig({
   },
   build: {
     transpile: ["vuetify"],
+    minify: true,
+    // Extract CSS
+    cssMinify: true,
+    // Improve chunking strategy
+    chunkSizeWarningLimit: 1000,
+    optimization: {
+      splitChunks: {
+        maxSize: 300000,
+        cacheGroups: {
+          styles: {
+            name: 'styles',
+            test: /\.(css|vue)$/,
+            chunks: 'all',
+            enforce: true
+          }
+        }
+      }
+    }
+  },
+  experimental: {
+    payloadExtraction: true,
+  },
+  optimization: {
+    splitChunks: {
+      maxSize: 300000,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+      },
+    },
   },
   compatibilityDate: "2024-04-03",
   components: true,
@@ -118,6 +151,63 @@ export default defineNuxtConfig({
         },
       },
     ],
+    // Add image optimization
+    ['@nuxt/image', {
+      // Image quality options
+      quality: 80,
+      // Use WebP and AVIF formats where supported
+      format: ['webp', 'avif', 'jpg', 'png'],
+      // Provider for image generation
+      provider: 'ipx',
+      // Responsive image breakpoints
+      screens: {
+        xs: 320,
+        sm: 640,
+        md: 768,
+        lg: 1024,
+        xl: 1280,
+        xxl: 1536,
+        '2xl': 1536
+      },
+      // Default image optimization options
+      modifiers: {
+        format: 'webp',
+        quality: 80,
+        width: 'auto',
+        height: 'auto'
+      },
+      // Domains to allow for remote images
+      domains: ['storage.googleapis.com'],
+      // Adjust placeholder behavior
+      placeholder: {
+        size: 10,
+      },
+      // Presets for common image types
+      presets: {
+        avatar: {
+          modifiers: {
+            format: 'webp',
+            width: 50,
+            height: 50,
+          }
+        },
+        thumbnail: {
+          modifiers: {
+            format: 'webp',
+            width: 320,
+            height: 180,
+          }
+        },
+        cover: {
+          modifiers: {
+            format: 'webp',
+            width: 1200,
+            height: 630,
+          }
+        }
+      }
+    }],
+    // Light/dark mode support
     "@nuxtjs/color-mode",
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
@@ -133,15 +223,45 @@ export default defineNuxtConfig({
         Roboto: true,
         Inter: [400, 700],
         Montserrat: [400, 700],
-      }
+      },
+      display: 'swap',
+      prefetch: true,
+      preconnect: true,
   }],
   ],
-  nitro: { preset: "vercel"},
+  nitro: { 
+    preset: "vercel",
+    // Enable CDN caching
+    cdn: true,
+    // Enable server-side caching
+    routeRules: {
+      // Cache API routes
+      '/api/**': { 
+        cache: { 
+          // Let middleware handle specific cache times
+          headers: ['cache-control']
+        }
+      },
+      // Cache static assets
+      '/_nuxt/**': { 
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      },
+      // Cache public assets
+      '/assets/**': { 
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      }
+    }
+  },
   plugins: [
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },
+    { src: "@/plugins/performance.client", mode: "client" },
   ],
   runtimeConfig: {
     public: {
@@ -179,5 +299,29 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    build: {
+      minify: 'terser',
+      cssMinify: true,
+      terserOptions: {
+        compress: {
+          drop_console: process.env.NODE_ENV === 'production',
+          drop_debugger: process.env.NODE_ENV === 'production'
+        }
+      },
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vue-libs': ['vue', 'vue-router', 'pinia'],
+            'ui-libs': ['vuetify'],
+            'apollo': ['@apollo/client', '@vue/apollo-composable'],
+            'date-libs': ['luxon'],
+            'map-libs': ['@googlemaps/js-api-loader']
+          }
+        }
+      }
+    },
+    optimizeDeps: {
+      include: ['vue', 'vue-router', '@vue/apollo-composable', 'luxon']
+    }
   },
 });
