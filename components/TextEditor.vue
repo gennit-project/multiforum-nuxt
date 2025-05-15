@@ -181,8 +181,13 @@ const handleFormStateDuringUpload = async (file: File) => {
   const cursorPositionStart = textarea.selectionStart;
   const cursorPositionEnd = textarea.selectionEnd;
 
+  // Generate unique ID for this upload to help with tracking/replacing the placeholder
+  const uploadId = Date.now().toString();
   const placeholderText = `Uploading image...`;
-  const markdownLink = `![${file.name}](${placeholderText})`;
+  
+  // Make the placeholder clearer for mobile users
+  const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
+  const markdownLink = `![${safeFileName}](${placeholderText} (id:${uploadId}))`;
 
   textarea.setRangeText(
     markdownLink,
@@ -191,50 +196,159 @@ const handleFormStateDuringUpload = async (file: File) => {
     "end"
   );
   text.value = textarea.value;
+  textarea.value = text.value; // Ensure textarea is synced
 
+  // Store the placeholder position information
   const placeholderStart = cursorPositionStart;
   const placeholderEnd = placeholderStart + markdownLink.length;
 
-  const embeddedLink = await upload(file);
-  if (!embeddedLink) return;
+  try {
+    const embeddedLink = await upload(file);
+    if (!embeddedLink) {
+      // Handle upload failure by modifying the placeholder
+      const errorMarkdownLink = `![Upload failed: ${file.name}](Error uploading image)`;
+      const newText =
+        textarea.value.slice(0, placeholderStart) +
+        errorMarkdownLink +
+        textarea.value.slice(placeholderEnd);
+      
+      text.value = newText;
+      textarea.value = newText;
+      emit("update", text.value);
+      return;
+    }
 
-  const newMarkdownLink = `![${file.name}](${embeddedLink})`;
-  const newText =
-    textarea.value.slice(0, placeholderStart) +
-    newMarkdownLink +
-    textarea.value.slice(placeholderEnd);
+    // Check if the textarea content still contains our placeholder with the unique ID
+    // This ensures we're replacing the correct placeholder even if the user edited meanwhile
+    const placeholderIdentifier = `${placeholderText} (id:${uploadId})`;
+    const placeholderRegex = new RegExp(`!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(id:${uploadId}\\)\\)`, 'g');
+    
+    if (textarea.value.indexOf(placeholderIdentifier) === -1) {
+      console.warn("Upload completed but placeholder was modified or removed");
 
-  text.value = newText;
-  textarea.setSelectionRange(
-    placeholderStart + newMarkdownLink.length,
-    placeholderStart + newMarkdownLink.length
-  );
-  emit("update", text.value);
+      // Try to find using regex in case just parts were modified
+      const matches = textarea.value.match(placeholderRegex);
+      if (matches && matches.length > 0) {
+        // Found via regex, so replace it
+        const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
+        const newMarkdownLink = `![${safeFileName}](${embeddedLink})`;
+        const newText = textarea.value.replace(placeholderRegex, newMarkdownLink);
+        textarea.value = newText;
+        text.value = newText;
+        emit("update", text.value);
+        return;
+      }
+      
+      // If regex didn't match either, append at end
+      const newMarkdownLink = `![${file.name}](${embeddedLink})`;
+      textarea.value = textarea.value + "\n" + newMarkdownLink;
+      text.value = textarea.value;
+      emit("update", text.value);
+      return;
+    }
+
+    // Replace the placeholder with the actual image markdown
+    const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
+    const newMarkdownLink = `![${safeFileName}](${embeddedLink})`;
+    const newText =
+      textarea.value.slice(0, placeholderStart) +
+      newMarkdownLink +
+      textarea.value.slice(placeholderEnd);
+
+    text.value = newText;
+    textarea.value = newText;
+    textarea.setSelectionRange(
+      placeholderStart + newMarkdownLink.length,
+      placeholderStart + newMarkdownLink.length
+    );
+    emit("update", text.value);
+  } catch (error) {
+    console.error("Error during upload:", error);
+    
+    // Try to find the placeholder using regex
+    const placeholderRegex = new RegExp(`!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(id:${uploadId}\\)\\)`, 'g');
+    
+    let newText = '';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
+    const errorMarkdownLink = `![Upload failed: ${safeFileName}](Error: ${errorMessage.substring(0, 50)})`;
+    
+    if (textarea.value.match(placeholderRegex)) {
+      // Placeholder found with regex
+      newText = textarea.value.replace(placeholderRegex, errorMarkdownLink);
+    } else if (textarea.value.indexOf(placeholderText) !== -1) {
+      // Try simpler search
+      const simpleRegex = new RegExp(`!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\)`, 'g');
+      newText = textarea.value.replace(simpleRegex, errorMarkdownLink);
+    } else {
+      // Fallback to original position-based replacement
+      newText = textarea.value.slice(0, placeholderStart) + 
+        errorMarkdownLink + 
+        textarea.value.slice(placeholderEnd);
+    }
+    
+    text.value = newText;
+    textarea.value = newText;
+    emit("update", text.value);
+  }
 };
 
 const upload = async (file: File) => {
   if (!usernameVar.value) {
     console.error("No username found");
-    return;
+    throw new Error("Not logged in or username not found");
   }
 
   try {
+    // For mobile devices, ensure the file type is correct even when it's sometimes missing
+    const fileType = file.type || getFileTypeFromName(file.name) || "image/jpeg";
+    
     const filename = getUploadFileName({ username: usernameVar.value, file });
-    const signedStorageURLInput = { filename, contentType: file.type };
+    const signedStorageURLInput = { filename, contentType: fileType };
 
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+    
+    if (!signedStorageURL) {
+      throw new Error("Failed to get signed URL for upload");
+    }
 
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
       filename,
-      fileType: file.type,
+      fileType,
       signedStorageURL,
     });
+    
+    if (!embeddedLink) {
+      throw new Error("Upload completed but no URL was returned");
+    }
+    
     return embeddedLink;
   } catch (error) {
     console.error("Error uploading file:", error);
+    throw error; // Re-throw to allow proper error handling in the calling function
   }
+};
+
+// Helper function to determine file type from name when mobile browsers don't provide it
+const getFileTypeFromName = (filename: string): string | null => {
+  if (!filename) return null;
+  
+  const extension = filename.toLowerCase().split('.').pop();
+  if (!extension) return null;
+  
+  const mimeTypes: Record<string, string> = {
+    'jpg': 'image/jpeg',
+    'jpeg': 'image/jpeg',
+    'png': 'image/png',
+    'gif': 'image/gif',
+    'webp': 'image/webp',
+    'svg': 'image/svg+xml',
+    'bmp': 'image/bmp'
+  };
+  
+  return mimeTypes[extension] || null;
 };
 
 // Lifecycle hooks

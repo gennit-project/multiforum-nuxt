@@ -23,6 +23,26 @@ const emit = defineEmits(['file-change']);
 
 const fileInput = ref<HTMLInputElement | null>(null);
 
+// Force iOS to properly recognize this as an image upload input
+const clearFileInput = () => {
+  if (fileInput.value) {
+    fileInput.value.value = '';
+  }
+};
+
+// For mobile browsers that might not properly cleanup
+const onFileSelected = (event: Event) => {
+  if (props.disabled) return;
+  
+  emit('file-change', {
+    event,
+    fieldName: props.fieldName
+  });
+  
+  // Set a timeout to clear the input after the event has been processed
+  // This ensures the same file can be selected again on mobile
+  setTimeout(clearFileInput, 500);
+};
 
 </script>
 
@@ -43,16 +63,11 @@ const fileInput = ref<HTMLInputElement | null>(null);
         ref="fileInput"
         type="file"
         accept="image/*"
+        capture="environment"
         style="display: none"
         :disabled="disabled"
-        @change="(event: Event) => {
-          if (!disabled) {
-            emit('file-change', {
-              event,
-              fieldName
-            });
-          }
-        }"
+        @change="onFileSelected"
+        @click="clearFileInput"
       >
     </label>
   </div>

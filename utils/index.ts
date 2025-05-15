@@ -246,7 +246,7 @@ export function encodeSpacesInURL(url: string) {
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { signedStorageURL, filename, file } = input;
+  const { signedStorageURL, filename, file, fileType } = input;
 
   const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
@@ -256,7 +256,7 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   
   if (!signedStorageURL) {
     console.error("No signedStorageURL provided");
-    return;
+    throw new Error("No signedStorageURL provided");
   }
   const { googleCloudStorageBucket } = config;
 
@@ -266,19 +266,113 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
     `https://storage.googleapis.com/${googleCloudStorageBucket}/${encodedFilename}`
   );
 
-  const response = await fetch(signedStorageURL, {
-    method: "PUT",
-    body: file,
-    headers: {
-      "Content-Type": file.type, // Example "image/png",
-    },
-  });
+  // Create an AbortController for the fetch request with a longer timeout for mobile
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for mobile
+  
+  // Add retry logic for mobile networks
+  let retries = 3;
+  
+  try {
+    while (retries > 0) {
+      try {
+        const response = await fetch(signedStorageURL, {
+          method: "PUT",
+          body: file,
+          headers: {
+            "Content-Type": file.type || fileType || "image/jpeg",
+            // Prevent mobile carrier transformations but allow caching
+            "Cache-Control": "no-transform",
+            // Prevent mobile browsers from modifying the request
+            "Pragma": "no-cache" 
+          },
+          // Add signal for timeout and more robust error handling
+          signal: controller.signal,
+          // Improve timeout handling for mobile networks
+          keepalive: true,
+          // Prevent mobile browsers from modifying the request
+          cache: 'no-store',
+          // Add credentials for consistent state
+          credentials: "same-origin",
+        });
 
-  if (!response.ok) {
-    console.error("Error uploading file");
+        if (!response.ok) {
+          const errorMessage = `Error uploading file: ${response.status} ${response.statusText}`;
+          console.error(errorMessage);
+          throw new Error(errorMessage);
+        }
+
+        // Verify the file exists with a HEAD request before returning the link
+        // This helps especially on mobile where the upload may appear to succeed but isn't finalized
+        const verified = await verifyFileExists(embeddedLink, 3);
+        
+        if (verified) {
+          return embeddedLink;
+        }
+        
+        // If verification failed but upload succeeded, wait and retry verification
+        throw new Error("Upload succeeded but verification failed. Retrying...");
+        
+      } catch (error) {
+        console.warn(`Upload attempt ${4-retries}/3 failed:`, error);
+        retries--;
+        
+        if (retries > 0) {
+          // Wait before retrying (increasing delay with each retry)
+          await new Promise(resolve => setTimeout(resolve, (4-retries) * 2000));
+        } else {
+          // Last retry failed
+          throw error;
+        }
+      }
+    }
+  } catch (error) {
+    console.error("Upload failed after retries:", error);
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
   }
+}
 
-  return embeddedLink;
+// Helper function to verify the file has been successfully uploaded with retries
+async function verifyFileExists(url: string, maxRetries = 1): Promise<boolean> {
+  let retries = maxRetries;
+  
+  while (retries >= 0) {
+    try {
+      const response = await fetch(url, {
+        method: "HEAD",
+        cache: "no-store",
+        headers: {
+          "Cache-Control": "no-cache, no-store, must-revalidate",
+          "Pragma": "no-cache"
+        }
+      });
+      
+      if (response.ok) {
+        return true;
+      }
+      
+      console.warn(`File verification attempt failed, status: ${response.status}`);
+      
+      retries--;
+      if (retries >= 0) {
+        // Wait before retrying with increasing delays
+        await new Promise(resolve => setTimeout(resolve, (maxRetries - retries) * 1000));
+      }
+    } catch (error) {
+      console.warn("File verification attempt failed with error:", error);
+      retries--;
+      
+      if (retries >= 0) {
+        // Wait before retrying
+        await new Promise(resolve => setTimeout(resolve, (maxRetries - retries) * 1000));
+      }
+    }
+  }
+  
+  // After all retries, still failed
+  return false;
 }
 
 export function getDuration(startTime: string, endTime: string) {
