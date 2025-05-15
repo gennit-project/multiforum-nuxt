@@ -1,11 +1,50 @@
-<script lang="ts">
-import { defineComponent, computed } from "vue";
+<script setup lang="ts">
+import { computed } from "vue";
 import { DateTime } from "luxon";
 import type { Event } from "@/__generated__/graphql";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_SOONEST_EVENTS_IN_CHANNEL } from "@/graphQLData/channel/queries";
 import { useRoute } from "nuxt/app";
 
+defineProps({
+  eventChannelsAggregate: {
+    type: Number,
+    required: true,
+  },
+});
+
+const route = useRoute();
+
+const channelId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
+
+const {
+  error: getEventsError,
+  result: getEventsResult,
+  loading: getEventsLoading,
+} = useQuery(
+  GET_SOONEST_EVENTS_IN_CHANNEL,
+  {
+    uniqueName: channelId,
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+const soonestEventsInChannel = computed(() => {
+  if (getEventsLoading.value || getEventsError.value) {
+    return [];
+  }
+  return getEventsResult.value.events;
+});
+
+// Helper functions
 const getDateSectionFormat = (date: string) => {
   const dateObj = DateTime.fromISO(date);
   // The date should be in the format "Thu Nov 9"
@@ -16,153 +55,98 @@ const getDateSectionFormat = (date: string) => {
   });
 };
 
-export default defineComponent({
-  name: "SidebarEventList",
-  props: {
-    eventChannelsAggregate: {
-      type: Number,
-      required: true,
-    },
-  },
-  setup() {
-    const route = useRoute();
+const happeningNow = (e: Event) => {
+  // We consider an event to be happening now if the start time is in the past
+  // and the end time is in the future
+  return (
+    e.startTime < new Date().toISOString() && // start time is in the past
+    e.endTime > new Date().toISOString()
+  ); // end time is in the future
+};
 
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-      return "";
-    });
+const happeningToday = (e: Event) => {
+  const startTime = DateTime.fromISO(e.startTime ?? "");
+  const now = DateTime.now();
+  return (
+    startTime.day === now.day &&
+    startTime.month === now.month &&
+    startTime.year === now.year
+  );
+};
 
-    const {
-      error: getEventsError,
-      result: getEventsResult,
-      loading: getEventsLoading,
-    } = useQuery(
-      GET_SOONEST_EVENTS_IN_CHANNEL,
-      {
-        uniqueName: channelId,
-        now: DateTime.local().startOf("hour").toISO(),
-      },
-      {
-        fetchPolicy: "cache-first",
-      }
-    );
+const happeningTomorrow = (e: Event) => {
+  const startTime = DateTime.fromISO(e.startTime ?? "");
+  const tomorrow = DateTime.now().startOf("day").plus({ days: 1 });
+  return (
+    startTime.day === tomorrow.day &&
+    startTime.month === tomorrow.month &&
+    startTime.year === tomorrow.year
+  );
+};
 
-    const soonestEventsInChannel = computed(() => {
-      if (getEventsLoading.value || getEventsError.value) {
-        return [];
-      }
-      return getEventsResult.value.events;
-    });
+const afterTomorrow = (e: Event) => {
+  const startTime = DateTime.fromISO(e.startTime ?? "");
+  const tomorrow = DateTime.now().startOf("day").plus({ days: 1 });
+  return startTime > tomorrow;
+};
 
-    const happeningNow = (e: Event) => {
-      // We consider an event to be happening now if the start time is in the past
-      // and the end time is in the future
-      return (
-        e.startTime < new Date().toISOString() && // start time is in the past
-        e.endTime > new Date().toISOString()
-      ); // end time is in the future
-    };
+const getSidebarLinkText = (event: Event) => {
+  // If event.isAllDay is true, simply return event?.title.
+  // Otherwise, state the title in this format: "10:00 AM · Event Title"
+  if (event.isAllDay) {
+    return event.title ?? "";
+  }
+  const startTime = DateTime.fromISO(event.startTime ?? "");
+  return `${startTime.toLocaleString(DateTime.TIME_SIMPLE)} · ${event.title}`;
+};
 
-    const happeningToday = (e: Event) => {
-      const startTime = DateTime.fromISO(e.startTime ?? "");
-      const now = DateTime.now();
-      return (
-        startTime.day === now.day &&
-        startTime.month === now.month &&
-        startTime.year === now.year
-      );
-    };
+const dateObj = computed(() => {
+  const res: Record<string, Event[]> = {
+    happeningNow: [],
+    happeningToday: [],
+    happeningTomorrow: [],
+    afterTomorrow: [],
+  };
 
-    const happeningTomorrow = (e: Event) => {
-      const startTime = DateTime.fromISO(e.startTime ?? "");
-      const tomorrow = DateTime.now().startOf("day").plus({ days: 1 });
-      return (
-        startTime.day === tomorrow.day &&
-        startTime.month === tomorrow.month &&
-        startTime.year === tomorrow.year
-      );
-    };
+  if (!soonestEventsInChannel.value) {
+    return res;
+  }
 
-    const afterTomorrow = (e: Event) => {
-      const startTime = DateTime.fromISO(e.startTime ?? "");
-      const tomorrow = DateTime.now().startOf("day").plus({ days: 1 });
-      return startTime > tomorrow;
-    };
+  for (let i = 0; i < soonestEventsInChannel.value.length; i++) {
+    const event = soonestEventsInChannel.value[i];
 
-    const dateObj: any = computed(() => {
-      const res: Record<string, Event[]> = {
-        happeningNow: [],
-        happeningToday: [],
-        happeningTomorrow: [],
-        afterTomorrow: [],
-      };
+    if (!event) {
+      continue;
+    }
 
-      if (!soonestEventsInChannel.value) {
-        return res;
-      }
+    if (happeningNow(event)) {
+      res.happeningNow.push(event);
+    } else if (happeningToday(event)) {
+      res.happeningToday.push(event);
+    } else if (happeningTomorrow(event)) {
+      res.happeningTomorrow.push(event);
+    } else if (afterTomorrow(event)) {
+      res.afterTomorrow.push(event);
+    }
+  }
 
-      for (let i = 0; i < soonestEventsInChannel.value.length; i++) {
-        const event = soonestEventsInChannel.value[i];
+  return res;
+});
 
-        if (!event) {
-          continue;
-        }
+const dateSectionObj = computed(() => {
+  const res: Record<string, Event[]> = {};
 
-        if (happeningNow(event)) {
-          res.happeningNow.push(event);
-        } else if (happeningToday(event)) {
-          res.happeningToday.push(event);
-        } else if (happeningTomorrow(event)) {
-          res.happeningTomorrow.push(event);
-        } else if (afterTomorrow(event)) {
-          res.afterTomorrow.push(event);
-        }
-      }
+  for (let i = 0; i < dateObj.value.afterTomorrow.length; i++) {
+    const event = dateObj.value.afterTomorrow[i];
 
-      return res;
-    });
+    const date = getDateSectionFormat(event.startTime ?? "");
+    if (!res[date]) {
+      res[date] = [];
+    }
+    res[date].push(event);
+  }
 
-    const dateSectionObj = computed(() => {
-      const res: any = {};
-
-      for (let i = 0; i < dateObj.value.afterTomorrow.length; i++) {
-        const event = dateObj.value.afterTomorrow[i];
-
-        const date = getDateSectionFormat(event.startTime ?? "");
-        if (!res[date]) {
-          res[date] = [];
-        }
-        res[date].push(event);
-      }
-
-      return res;
-    });
-
-    return {
-      dateSectionObj,
-      dateObj,
-      channelId,
-      soonestEventsInChannel,
-      afterTomorrow,
-    };
-  },
-  methods: {
-    getSidebarLinkText(event: Event) {
-      // If event.isAllDay is true,
-      // simply return event?.title.
-      // Otherwise, state the title in this format:
-      // "10:00 AM · Event Title"
-      if (event.isAllDay) {
-        return event.title ?? "";
-      }
-      const startTime = DateTime.fromISO(event.startTime ?? "");
-      return `${startTime.toLocaleString(DateTime.TIME_SIMPLE)} · ${
-        event.title
-      }`;
-    },
-  },
+  return res;
 });
 </script>
 
