@@ -246,7 +246,7 @@ export function encodeSpacesInURL(url: string) {
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
-  const { signedStorageURL, filename, file, fileType } = input;
+  const { signedStorageURL, filename, file } = input;
 
   const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
@@ -256,7 +256,7 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   
   if (!signedStorageURL) {
     console.error("No signedStorageURL provided");
-    throw new Error("No signedStorageURL provided");
+    return;
   }
   const { googleCloudStorageBucket } = config;
 
@@ -266,149 +266,22 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
     `https://storage.googleapis.com/${googleCloudStorageBucket}/${encodedFilename}`
   );
 
-  // Create an AbortController for the fetch request with a longer timeout for mobile
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 second timeout for mobile
+  console.log('File type:', file.type)
   
-  // Add retry logic for mobile networks
-  let retries = 5; // Increased from 3 to 5 retries
-  
-  try {
-    while (retries > 0) {
-      try {
-        // Add logging for debugging
-        console.log(`Starting upload attempt ${6-retries}/5 for ${filename}`);
-        
-        // Try a more compatible fetch approach with blob instead of raw file
-        let blob;
-        if (file instanceof Blob) {
-          blob = file; // Use the file directly if it's already a Blob
-        } else {
-          // Otherwise, create a properly typed blob
-          const actualFileType = file.type || fileType || "image/jpeg";
-          blob = new Blob([file], { type: actualFileType });
-        }
-        
-        const response = await fetch(signedStorageURL, {
-          method: "PUT",
-          body: blob,
-          headers: {
-            "Content-Type": file.type || fileType || "image/jpeg",
-            // Prevent mobile carrier transformations but allow caching
-            "Cache-Control": "no-transform",
-            // Prevent mobile browsers from modifying the request
-            "Pragma": "no-cache" 
-          },
-          // Add signal for timeout and more robust error handling
-          signal: controller.signal,
-          // Improve timeout handling for mobile networks
-          keepalive: true,
-          // Prevent mobile browsers from modifying the request
-          cache: 'no-store',
-          // Add credentials for consistent state
-          credentials: "same-origin",
-          // Tell fetch to avoid automatic redirection
-          redirect: "manual",
-          referrerPolicy: "no-referrer"
-        });
+  const response = await fetch(signedStorageURL, {
+    method: "PUT",
+    body: file,
+    headers: {
+      "Content-Type": file.type, // Example "image/png",
+    },
+  });
 
-        if (!response.ok) {
-          const errorMessage = `Error uploading file: ${response.status} ${response.statusText}`;
-          console.error(errorMessage);
-          throw new Error(errorMessage);
-        }
-        
-        console.log(`Upload appears successful, verifying file exists`);
 
-        // Verify the file exists with a HEAD request before returning the link
-        // This helps especially on mobile where the upload may appear to succeed but isn't finalized
-        const verified = await verifyFileExists(embeddedLink, 5);
-        
-        if (verified) {
-          console.log(`File verified successfully: ${embeddedLink}`);
-          return embeddedLink;
-        }
-        
-        // If verification failed but upload succeeded, wait and retry verification
-        throw new Error("Upload succeeded but verification failed. Retrying...");
-        
-      } catch (error) {
-        console.warn(`Upload attempt ${6-retries}/5 failed:`, error);
-        retries--;
-        
-        if (retries > 0) {
-          const delay = (6-retries) * 3000; // Increased delay between retries
-          console.log(`Retrying in ${delay/1000} seconds...`);
-          // Wait before retrying (increasing delay with each retry)
-          await new Promise(resolve => setTimeout(resolve, delay));
-        } else {
-          // Last retry failed
-          throw error;
-        }
-      }
-    }
-  } catch (error) {
-    console.error("Upload failed after retries:", error);
-    throw error;
-  } finally {
-    clearTimeout(timeoutId);
+  if (!response.ok) {
+    console.error("Error uploading file");
   }
-}
 
-// Helper function to verify the file has been successfully uploaded with retries
-async function verifyFileExists(url: string, maxRetries = 5): Promise<boolean> {
-  let retries = maxRetries;
-  
-  while (retries >= 0) {
-    try {
-      console.log(`Verification attempt ${maxRetries-retries+1}/${maxRetries+1} for ${url}`);
-      
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
-      try {
-        const response = await fetch(url, {
-          method: "HEAD",
-          cache: "no-store",
-          signal: controller.signal,
-          headers: {
-            "Cache-Control": "no-cache, no-store, must-revalidate",
-            "Pragma": "no-cache"
-          }
-        });
-        
-        if (response.ok) {
-          clearTimeout(timeoutId);
-          return true;
-        }
-        
-        console.warn(`File verification attempt failed, status: ${response.status}`);
-      } finally {
-        clearTimeout(timeoutId);
-      }
-      
-      retries--;
-      if (retries >= 0) {
-        const delay = (maxRetries - retries) * 2000; // Increased delay between retries
-        console.log(`Retrying verification in ${delay/1000} seconds...`);
-        // Wait before retrying with increasing delays - longer delays for mobile networks
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    } catch (error) {
-      console.warn("File verification attempt failed with error:", error);
-      retries--;
-      
-      if (retries >= 0) {
-        const delay = (maxRetries - retries) * 2000; // Increased delay between retries
-        console.log(`Retrying verification after error in ${delay/1000} seconds...`);
-        // Wait before retrying - longer delays for mobile networks
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-  
-  // After all retries, still failed
-  return false;
+  return embeddedLink;
 }
 
 export function getDuration(startTime: string, endTime: string) {

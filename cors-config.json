@@ -1,9 +1,18 @@
-[
+  [
     {
-      "origin": ["http://localhost:3000", "https://topical.space", "https://dev.topical.space"],
-      "responseHeader": ["Content-Type"],
-      "method": ["GET", "HEAD", "PUT", "POST", "DELETE"],
+      "origin": ["http://localhost:3000", "https://www.topical.space",
+  "https://dev.topical.space"],
+      "responseHeader": [
+        "Content-Type",
+        "Content-Length",
+        "ETag",
+        "Authorization",
+        "Accept-Ranges",
+        "Cache-Control",
+        "Access-Control-Allow-Origin"
+      ],
+      "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
       "maxAgeSeconds": 3600
     }
   ]
-  
+
