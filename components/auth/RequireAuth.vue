@@ -180,11 +180,13 @@ if (import.meta.env.SSR === false) {
     try {
       // Add debug statements for troubleshooting
       console.log("Login button clicked");
+
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
       
       // @ts-ignore
-      if (window?.parent?.Cypress) {
+      if (window?.parent?.Cypress || isMobile) {
         // Make sure to return early after redirect to prevent additional actions
-        console.log("Using redirect for Cypress");
+        console.log("Using redirect for Cypress or mobile");
         await loginWithRedirect();
         return;
       }

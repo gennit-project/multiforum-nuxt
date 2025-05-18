@@ -300,13 +300,19 @@ const upload = async (file: File) => {
   }
 
   try {
+    console.log("Getting signed URL for", file.name, "size:", file.size, "type:", file.type);
+    
     // For mobile devices, ensure the file type is correct even when it's sometimes missing
     const fileType = file.type || getFileTypeFromName(file.name) || "image/jpeg";
+    console.log("Using file type:", fileType);
     
     const filename = getUploadFileName({ username: usernameVar.value, file });
     const signedStorageURLInput = { filename, contentType: fileType };
 
+    console.log("Requesting signed URL with input:", JSON.stringify(signedStorageURLInput));
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
+    console.log("Signed URL result received");
+    
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
     
     if (!signedStorageURL) {
@@ -314,7 +320,12 @@ const upload = async (file: File) => {
     }
     
     // Log success of signed URL for debugging
-    console.log(`Got signed URL successfully for ${filename}: ${signedStorageURL.substring(0, 60)}...`);
+    console.log(`Got signed URL successfully for ${filename}`);
+    
+    // Test the signed URL parameters
+    const urlParts = signedStorageURL.split('?');
+    console.log("URL base:", urlParts[0]);
+    console.log("URL has params:", urlParts.length > 1);
 
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,

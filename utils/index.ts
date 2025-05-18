@@ -247,7 +247,15 @@ export function encodeSpacesInURL(url: string) {
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const { signedStorageURL, filename, file } = input;
-
+  
+  // Log debug info
+  console.log('File info:', {
+    name: file.name,
+    type: file.type,
+    size: file.size
+  });
+  
+  // Check validation
   const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
     console.error(sizeCheck.message);
@@ -258,30 +266,52 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
     console.error("No signedStorageURL provided");
     return;
   }
+  
   const { googleCloudStorageBucket } = config;
-
   const encodedFilename = encodeURIComponent(filename);
-
   const embeddedLink = encodeSpacesInURL(
     `https://storage.googleapis.com/${googleCloudStorageBucket}/${encodedFilename}`
   );
 
-  console.log('File type:', file.type)
+  // For mobile, sometimes we need to explicitly set the Content-Type
+  const contentType = file.type || 
+                     (file.name.endsWith('.jpg') || file.name.endsWith('.jpeg')) ? 'image/jpeg' :
+                     file.name.endsWith('.png') ? 'image/png' :
+                     file.name.endsWith('.gif') ? 'image/gif' :
+                     'application/octet-stream';
   
-  const response = await fetch(signedStorageURL, {
-    method: "PUT",
-    body: file,
-    headers: {
-      "Content-Type": file.type, // Example "image/png",
-    },
-  });
+  console.log('Using content type:', contentType);
+  console.log('Upload starting...');
+  console.log('SignedStorageURL prefix:', signedStorageURL.split('?')[0]);
+  
+  try {
+    const response = await fetch(signedStorageURL, {
+      method: "PUT",
+      body: file,
+      headers: {
+        "Content-Type": contentType,
+      },
+    });
 
+    console.log('Upload response:', {
+      status: response.status,
+      statusText: response.statusText,
+      ok: response.ok
+    });
 
-  if (!response.ok) {
-    console.error("Error uploading file");
+    if (!response.ok) {
+      console.error("Error uploading file:", response.status, response.statusText);
+      throw new Error(`Upload failed with status ${response.status}`);
+    }
+
+    // Verify the URL is accessible
+    console.log('Upload complete, URL should be:', embeddedLink);
+    
+    return embeddedLink;
+  } catch (error) {
+    console.error("Fetch error during upload:", error);
+    throw error;
   }
-
-  return embeddedLink;
 }
 
 export function getDuration(startTime: string, endTime: string) {

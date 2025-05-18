@@ -1,18 +1,24 @@
-  [
-    {
-      "origin": ["http://localhost:3000", "https://www.topical.space",
-  "https://dev.topical.space"],
-      "responseHeader": [
-        "Content-Type",
-        "Content-Length",
-        "ETag",
-        "Authorization",
-        "Accept-Ranges",
-        "Cache-Control",
-        "Access-Control-Allow-Origin"
-      ],
-      "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
-      "maxAgeSeconds": 3600
-    }
-  ]
-
+[
+  {
+    "origin": [
+      "http://localhost:3000",
+      "https://www.topical.space",
+      "https://dev.topical.space",
+      "https://topical.space",
+      "https://69f8-98-168-53-208.ngrok-free.app"
+    ],
+    "responseHeader": [
+      "Content-Type",
+      "x-goog-resumable",
+      "Content-Length",
+      "ETag",
+      "Authorization",
+      "Accept-Ranges",
+      "Cache-Control",
+      "Access-Control-Allow-Origin",
+      "Access-Control-Allow-Headers"
+    ],
+    "method": ["GET", "HEAD", "PUT", "POST", "DELETE", "OPTIONS"],
+    "maxAgeSeconds": 3600
+  }
+]

@@ -299,6 +299,10 @@ export default defineNuxtConfig({
         transformAssetUrls,
       },
     },
+    // Allow connections from ngrok for mobile testing
+    server: {
+      allowedHosts: ['localhost', '69f8-98-168-53-208.ngrok-free.app']
+    },
     build: {
       minify: 'terser',
       cssMinify: true,
