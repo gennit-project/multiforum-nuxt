@@ -343,7 +343,7 @@ export default defineComponent({
     />
     <button
       v-if="shouldShowMoreButton"
-      class="ml-4 text-sm font-bold text-blue-600 hover:underline dark:text-gray-300"
+      class="text-sm font-bold text-blue-600 hover:underline dark:text-gray-300"
       @click="toggleShowFullText"
     >
       {{ showFullText ? "Show Less" : "Show More" }}

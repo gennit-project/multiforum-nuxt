@@ -268,17 +268,30 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
 
   // Create an AbortController for the fetch request with a longer timeout for mobile
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 60000); // 60 second timeout for mobile
+  const timeoutId = setTimeout(() => controller.abort(), 120000); // 120 second timeout for mobile
   
   // Add retry logic for mobile networks
-  let retries = 3;
+  let retries = 5; // Increased from 3 to 5 retries
   
   try {
     while (retries > 0) {
       try {
+        // Add logging for debugging
+        console.log(`Starting upload attempt ${6-retries}/5 for ${filename}`);
+        
+        // Try a more compatible fetch approach with blob instead of raw file
+        let blob;
+        if (file instanceof Blob) {
+          blob = file; // Use the file directly if it's already a Blob
+        } else {
+          // Otherwise, create a properly typed blob
+          const actualFileType = file.type || fileType || "image/jpeg";
+          blob = new Blob([file], { type: actualFileType });
+        }
+        
         const response = await fetch(signedStorageURL, {
           method: "PUT",
-          body: file,
+          body: blob,
           headers: {
             "Content-Type": file.type || fileType || "image/jpeg",
             // Prevent mobile carrier transformations but allow caching
@@ -294,6 +307,9 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
           cache: 'no-store',
           // Add credentials for consistent state
           credentials: "same-origin",
+          // Tell fetch to avoid automatic redirection
+          redirect: "manual",
+          referrerPolicy: "no-referrer"
         });
 
         if (!response.ok) {
@@ -301,12 +317,15 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
           console.error(errorMessage);
           throw new Error(errorMessage);
         }
+        
+        console.log(`Upload appears successful, verifying file exists`);
 
         // Verify the file exists with a HEAD request before returning the link
         // This helps especially on mobile where the upload may appear to succeed but isn't finalized
-        const verified = await verifyFileExists(embeddedLink, 3);
+        const verified = await verifyFileExists(embeddedLink, 5);
         
         if (verified) {
+          console.log(`File verified successfully: ${embeddedLink}`);
           return embeddedLink;
         }
         
@@ -314,12 +333,14 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
         throw new Error("Upload succeeded but verification failed. Retrying...");
         
       } catch (error) {
-        console.warn(`Upload attempt ${4-retries}/3 failed:`, error);
+        console.warn(`Upload attempt ${6-retries}/5 failed:`, error);
         retries--;
         
         if (retries > 0) {
+          const delay = (6-retries) * 3000; // Increased delay between retries
+          console.log(`Retrying in ${delay/1000} seconds...`);
           // Wait before retrying (increasing delay with each retry)
-          await new Promise(resolve => setTimeout(resolve, (4-retries) * 2000));
+          await new Promise(resolve => setTimeout(resolve, delay));
         } else {
           // Last retry failed
           throw error;
@@ -335,38 +356,53 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
 }
 
 // Helper function to verify the file has been successfully uploaded with retries
-async function verifyFileExists(url: string, maxRetries = 1): Promise<boolean> {
+async function verifyFileExists(url: string, maxRetries = 5): Promise<boolean> {
   let retries = maxRetries;
   
   while (retries >= 0) {
     try {
-      const response = await fetch(url, {
-        method: "HEAD",
-        cache: "no-store",
-        headers: {
-          "Cache-Control": "no-cache, no-store, must-revalidate",
-          "Pragma": "no-cache"
+      console.log(`Verification attempt ${maxRetries-retries+1}/${maxRetries+1} for ${url}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
+      try {
+        const response = await fetch(url, {
+          method: "HEAD",
+          cache: "no-store",
+          signal: controller.signal,
+          headers: {
+            "Cache-Control": "no-cache, no-store, must-revalidate",
+            "Pragma": "no-cache"
+          }
+        });
+        
+        if (response.ok) {
+          clearTimeout(timeoutId);
+          return true;
         }
-      });
-      
-      if (response.ok) {
-        return true;
+        
+        console.warn(`File verification attempt failed, status: ${response.status}`);
+      } finally {
+        clearTimeout(timeoutId);
       }
-      
-      console.warn(`File verification attempt failed, status: ${response.status}`);
       
       retries--;
       if (retries >= 0) {
-        // Wait before retrying with increasing delays
-        await new Promise(resolve => setTimeout(resolve, (maxRetries - retries) * 1000));
+        const delay = (maxRetries - retries) * 2000; // Increased delay between retries
+        console.log(`Retrying verification in ${delay/1000} seconds...`);
+        // Wait before retrying with increasing delays - longer delays for mobile networks
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     } catch (error) {
       console.warn("File verification attempt failed with error:", error);
       retries--;
       
       if (retries >= 0) {
-        // Wait before retrying
-        await new Promise(resolve => setTimeout(resolve, (maxRetries - retries) * 1000));
+        const delay = (maxRetries - retries) * 2000; // Increased delay between retries
+        console.log(`Retrying verification after error in ${delay/1000} seconds...`);
+        // Wait before retrying - longer delays for mobile networks
+        await new Promise(resolve => setTimeout(resolve, delay));
       }
     }
   }

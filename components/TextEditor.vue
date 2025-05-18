@@ -206,7 +206,7 @@ const handleFormStateDuringUpload = async (file: File) => {
     const embeddedLink = await upload(file);
     if (!embeddedLink) {
       // Handle upload failure by modifying the placeholder
-      const errorMarkdownLink = `![Upload failed: ${file.name}](Error uploading image)`;
+      const errorMarkdownLink = `![Upload failed: ${file.name}](Error: Failed to fetch)`;
       const newText =
         textarea.value.slice(0, placeholderStart) +
         errorMarkdownLink +
@@ -312,6 +312,9 @@ const upload = async (file: File) => {
     if (!signedStorageURL) {
       throw new Error("Failed to get signed URL for upload");
     }
+    
+    // Log success of signed URL for debugging
+    console.log(`Got signed URL successfully for ${filename}: ${signedStorageURL.substring(0, 60)}...`);
 
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
@@ -323,6 +326,9 @@ const upload = async (file: File) => {
     if (!embeddedLink) {
       throw new Error("Upload completed but no URL was returned");
     }
+    
+    // Log final success for debugging
+    console.log(`Upload and link generation complete for ${filename}`);
     
     return embeddedLink;
   } catch (error) {
