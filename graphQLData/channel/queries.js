@@ -60,7 +60,9 @@ export const GET_CHANNEL = gql`
       }
       DiscussionChannelsAggregate(
         where: {
-          archived: false
+          NOT: {
+            archived: true
+          }
           Discussion: { 
             NOT: { title: null } 
           } 
@@ -77,8 +79,10 @@ export const GET_CHANNEL = gql`
       }
       EventChannelsAggregate(
         where: {
-          archived: false
-          NOT: { Event: null }
+          NOT: { 
+            archived: true,
+            Event: null
+          }
           Event: { 
             canceled: false, 
             endTime_GT: $now,
