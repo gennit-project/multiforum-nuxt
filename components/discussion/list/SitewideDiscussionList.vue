@@ -12,6 +12,8 @@ import {
   getTimeFrameFromQuery,
 } from "@/components/comments/getSortFromQuery";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 const DISCUSSION_PAGE_LIMIT = 15;
 
@@ -20,6 +22,8 @@ const emit = defineEmits(["filterByTag", "filterByChannel"]);
 
 // Setup function
 const route = useRoute();
+const uiStore = useUIStore();
+const { expandSitewideDiscussions } = storeToRefs(uiStore);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
@@ -188,12 +192,13 @@ const filterByChannel = (channel: string) => {
         <SitewideDiscussionListItem
           v-for="discussion in discussionResult.getSiteWideDiscussionList
             .discussions"
-          :key="discussion.id"
+          :key="`${discussion.id}-${expandSitewideDiscussions}`"
           :discussion="discussion"
           :score="discussion.score"
           :search-input="filterValues.searchInput"
           :selected-tags="filterValues.tags"
           :selected-channels="filterValues.channels"
+          :default-expanded="expandSitewideDiscussions"
           @filter-by-tag="filterByTag"
           @filter-by-channel="filterByChannel"
         />

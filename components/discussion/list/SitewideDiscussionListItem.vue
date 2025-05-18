@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent } from "vue";
+import { computed, defineAsyncComponent, ref } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "nuxt/app";
 import type {
@@ -13,8 +13,6 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
   import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -41,7 +39,7 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
-  showBodyByDefault: {
+  defaultExpanded: {
     type: Boolean,
     default: false,
   },
@@ -56,9 +54,11 @@ const forumId = computed(() => {
   return props.discussion.DiscussionChannels[0].channelUniqueName;
 })
 
-// Get UI store for expand/collapse functionality
-const uiStore = useUIStore();
-const { expandSitewideDiscussions } = storeToRefs(uiStore);
+// UI state is now handled via props
+
+// Local state for this specific discussion item's expanded/collapsed state
+// Initial value is based on the defaultExpanded prop
+const isExpanded = ref(props.defaultExpanded);
 
 const commentCount = computed(() => {
   let count = 0;
@@ -222,9 +222,9 @@ const relative = computed(() =>
               </div>
             </div>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && !expandSitewideDiscussions"
+              v-if="discussion && (discussion.body || discussion.Album) && !isExpanded"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-              @click="uiStore.toggleExpandDiscussions(true, false)"
+              @click="isExpanded = true"
             >
               <i
                 class="mr-1 fa-solid fa-expand text-md text-gray-600 dark:text-gray-300 hover:underline"
@@ -232,9 +232,9 @@ const relative = computed(() =>
               Expand
             </button>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && expandSitewideDiscussions"
+              v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-              @click="uiStore.toggleExpandDiscussions(false, false)"
+              @click="isExpanded = false"
             >
               <i
                 class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
@@ -242,7 +242,7 @@ const relative = computed(() =>
               Collapse
             </button>
             <div
-              v-if="discussion && (discussion.body || discussion.Album) && expandSitewideDiscussions"
+              v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
               class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
             >
               <MarkdownPreview

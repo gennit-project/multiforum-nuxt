@@ -100,6 +100,11 @@
 - **Testing**: Each feature requires Cypress tests, seed data before tests and clean up after
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
 - **Composables**: Extract reusable logic into composables under `composables/` directory
+- **Reactivity and Watchers**: 
+  - Avoid unnecessary watchers. Use Vue's built-in reactivity system (props, computed, refs) whenever possible
+  - Use watchers only when absolutely necessary (e.g., for router param changes or external API calls)
+  - When a component needs to react to prop changes, handle this through the component lifecycle or computed properties, not watchers
+  - For individual item state that doesn't need to be shared, use local `ref` variables instead of Pinia store state
 
 ## Cypress Testing Guidelines
 - **Always use URL constants**: Never use relative URLs like `cy.visit('/')` in tests

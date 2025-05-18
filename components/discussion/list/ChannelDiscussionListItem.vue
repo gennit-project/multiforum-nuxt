@@ -15,8 +15,7 @@ import type {
   Tag,
 } from "@/__generated__/graphql";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
+// UI state is now handled via props
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
   import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -48,6 +47,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  defaultExpanded: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 defineEmits(["filterByTag"]);
@@ -77,7 +80,12 @@ const authorIsMod = computed(() => {
 });
 
 const errorMessage = ref("");
-const { expandChannelDiscussions } = storeToRefs(uiStore);
+// Local state for this specific discussion item's expanded/collapsed state
+// Initial value is based on the defaultExpanded prop
+const isExpanded = ref(props.defaultExpanded);
+
+// Later in the lifecycle, clicking Expand/Collapse on this item only affects this item
+// Clicking Expand All/Collapse All will set the default for new items
 
 const authorDisplayName = computed(
   () => props.discussion?.Author?.displayName || ""
@@ -181,9 +189,9 @@ const filteredQuery = computed(() => {
               <!-- Expand/Collapse buttons -->
               <div class="mt-1">
                 <button
-                  v-if="discussion && (discussion.body || discussion.Album) && !expandChannelDiscussions"
+                  v-if="discussion && (discussion.body || discussion.Album) && !isExpanded"
                   class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                  @click="uiStore.toggleExpandDiscussions(true, true)"
+                  @click="isExpanded = true"
                 >
                   <i
                     class="mr-1 fa-solid fa-expand text-md text-gray-600 dark:text-gray-300 hover:underline"
@@ -191,9 +199,9 @@ const filteredQuery = computed(() => {
                   Expand
                 </button>
                 <button
-                  v-if="discussion && (discussion.body || discussion.Album) && expandChannelDiscussions"
+                  v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
                   class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                  @click="uiStore.toggleExpandDiscussions(false, true)"
+                  @click="isExpanded = false"
                 >
                   <i
                     class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
@@ -204,7 +212,7 @@ const filteredQuery = computed(() => {
             </div>
 
             <div
-              v-if="discussion?.body && expandChannelDiscussions"
+              v-if="discussion?.body && isExpanded"
               class="my-2 dark:bg-black bg-gray-100 px-2 pt-2 pb-4 rounded"
             >
               <MarkdownPreview
@@ -214,7 +222,7 @@ const filteredQuery = computed(() => {
                 class="ml-2"
               />
             </div>
-            <div v-if="discussion.Album && expandChannelDiscussions" class="my-4 overflow-x-auto bg-black">
+            <div v-if="discussion.Album && isExpanded" class="my-4 overflow-x-auto bg-black">
               <DiscussionAlbum
                 :album="discussion.Album"
                 :discussion-id="discussion.id"

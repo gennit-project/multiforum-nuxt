@@ -2,6 +2,8 @@
 import { computed, ref, onMounted, watch } from "vue";
 import { useRoute } from "nuxt/app";
 import { useQuery } from "@vue/apollo-composable";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 import ChannelDiscussionListItem from "./ChannelDiscussionListItem.vue";
 import LoadMore from "../../LoadMore.vue";
 import ErrorBanner from "../../ErrorBanner.vue";
@@ -19,6 +21,8 @@ const DISCUSSION_PAGE_LIMIT = 25;
 const emit = defineEmits(["filterByTag", "filterByChannel"]);
 
 const route = useRoute();
+const uiStore = useUIStore();
+const { expandChannelDiscussions } = storeToRefs(uiStore);
 
 const channelId = computed(() => {
   return typeof route.params.forumId === "string" ? route.params.forumId : "";
@@ -218,12 +222,13 @@ const reachedEndOfResults = computed(() => {
       <ChannelDiscussionListItem
         v-for="discussionChannel in discussionChannelResult
           .getDiscussionsInChannel.discussionChannels"
-        :key="discussionChannel.id"
+        :key="`${discussionChannel.id}-${expandChannelDiscussions}`"
         :discussion="discussionChannel.Discussion"
         :discussion-channel="discussionChannel"
         :search-input="searchInput"
         :selected-tags="selectedTags"
         :selected-channels="selectedChannels"
+        :default-expanded="expandChannelDiscussions"
         @open-mod-profile="showModProfileModal = true"
         @filter-by-tag="filterByTag"
         @filter-by-channel="filterByChannel"
