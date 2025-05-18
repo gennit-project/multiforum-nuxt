@@ -61,11 +61,9 @@ export const GET_CHANNEL = gql`
       DiscussionChannelsAggregate(
         where: {
           NOT: {
-            archived: true
+            archived: true,
+            Discussion: null
           }
-          Discussion: { 
-            NOT: { title: null } 
-          } 
         }
       ) {
         count
