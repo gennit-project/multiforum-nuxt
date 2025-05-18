@@ -190,7 +190,6 @@ const collapseAll = () => {
             </div>
           </template>
         </FilterChip>
-        <SortButtons />
         <!-- Expand/Collapse Button Group -->
         <div class="flex border border-gray-800 dark:border-gray-600 rounded-md overflow-hidden">
           <!-- Expand All Button -->
@@ -256,6 +255,7 @@ const collapseAll = () => {
         >
           <SearchIcon />
         </button>
+        <SortButtons />
         <CreateAnythingButton class="mx-2" :use-primary-button="true" />
       </div>
     </div>
