@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, defineAsyncComponent } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "nuxt/app";
 import type {
@@ -58,15 +58,7 @@ const forumId = computed(() => {
 
 // Get UI store for expand/collapse functionality
 const uiStore = useUIStore();
-const { expandAllDiscussions } = storeToRefs(uiStore);
-
-// Local state for showing body, default to the prop value
-const showBody = ref(props.showBodyByDefault);
-
-// Watch for changes in the global expand/collapse state
-watch(expandAllDiscussions, (newValue) => {
-  showBody.value = newValue;
-});
+const { expandSitewideDiscussions } = storeToRefs(uiStore);
 
 const commentCount = computed(() => {
   let count = 0;
@@ -230,29 +222,27 @@ const relative = computed(() =>
               </div>
             </div>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && !showBody"
+              v-if="discussion && (discussion.body || discussion.Album) && !expandSitewideDiscussions"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-              @click="showBody = true"
+              @click="uiStore.toggleExpandDiscussions(true, false)"
             >
               <i
                 class="mr-1 fa-solid fa-expand text-md text-gray-600 dark:text-gray-300 hover:underline"
-                @click="showBody = true"
               />
               Expand
             </button>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && showBody"
+              v-if="discussion && (discussion.body || discussion.Album) && expandSitewideDiscussions"
               class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-              @click="showBody = false"
+              @click="uiStore.toggleExpandDiscussions(false, false)"
             >
               <i
                 class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                @click="showBody = false"
               />
               Collapse
             </button>
             <div
-              v-if="discussion && (discussion.body || discussion.Album) && showBody"
+              v-if="discussion && (discussion.body || discussion.Album) && expandSitewideDiscussions"
               class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
             >
               <MarkdownPreview

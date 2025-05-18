@@ -12,8 +12,9 @@ export const useUIStore = defineStore('ui', () => {
   const enteredDevelopmentEnvironment = ref(config.environment === "development");
   const fontSize = ref<FontSize>('small');
   
-  // Discussion list states
-  const expandAllDiscussions = ref(false);
+  // Discussion list states - separate for channel view and sitewide view
+  const expandChannelDiscussions = ref(true); // Default expanded for channel view
+  const expandSitewideDiscussions = ref(false); // Default collapsed for sitewide view
   
   // Theme state
   const themeMode = ref<ThemeMode>('dark');
@@ -107,11 +108,21 @@ export const useUIStore = defineStore('ui', () => {
     }
   }
   
-  function toggleExpandDiscussions(expand?: boolean) {
-    if (expand !== undefined) {
-      expandAllDiscussions.value = expand;
+  function toggleExpandDiscussions(expand?: boolean, isChannelView: boolean = false) {
+    if (isChannelView) {
+      // For channel view
+      if (expand !== undefined) {
+        expandChannelDiscussions.value = expand;
+      } else {
+        expandChannelDiscussions.value = !expandChannelDiscussions.value;
+      }
     } else {
-      expandAllDiscussions.value = !expandAllDiscussions.value;
+      // For sitewide view
+      if (expand !== undefined) {
+        expandSitewideDiscussions.value = expand;
+      } else {
+        expandSitewideDiscussions.value = !expandSitewideDiscussions.value;
+      }
     }
   }
 
@@ -122,7 +133,8 @@ export const useUIStore = defineStore('ui', () => {
     fontSize,
     theme,
     themeMode,
-    expandAllDiscussions,
+    expandChannelDiscussions,
+    expandSitewideDiscussions,
     
     // Actions
     setSideNavIsOpen,

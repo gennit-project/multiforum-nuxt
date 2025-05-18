@@ -146,7 +146,7 @@ const showSearch = ref(false);
 
 // Get UI store for expand/collapse functionality
 const uiStore = useUIStore();
-const { expandAllDiscussions } = storeToRefs(uiStore);
+const { expandChannelDiscussions, expandSitewideDiscussions } = storeToRefs(uiStore);
 
 const toggleShowFilters = () => {
   showFilters.value = !showFilters.value;
@@ -157,11 +157,13 @@ const toggleShowSearch = () => {
 };
 
 const expandAll = () => {
-  uiStore.toggleExpandDiscussions(true);
+  // Pass true for expand and the appropriate isChannelView flag
+  uiStore.toggleExpandDiscussions(true, !!channelId.value);
 };
 
 const collapseAll = () => {
-  uiStore.toggleExpandDiscussions(false);
+  // Pass false for collapse and the appropriate isChannelView flag
+  uiStore.toggleExpandDiscussions(false, !!channelId.value);
 };
 </script>
 
@@ -198,7 +200,7 @@ const collapseAll = () => {
             :class="[
               'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300',
               'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-              expandAllDiscussions ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
+              (channelId ? expandChannelDiscussions : expandSitewideDiscussions) ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
             ]"
             aria-label="Expand all discussions"
             title="Expand all discussions"
@@ -212,7 +214,7 @@ const collapseAll = () => {
             :class="[
               'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300 border-l border-gray-800 dark:border-gray-600',
               'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-              !expandAllDiscussions ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
+              !(channelId ? expandChannelDiscussions : expandSitewideDiscussions) ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
             ]"
             aria-label="Collapse all discussions"
             title="Collapse all discussions"

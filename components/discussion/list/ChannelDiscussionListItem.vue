@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from "vue";
+import { ref, computed, defineAsyncComponent } from "vue";
 import type { PropType } from "vue";
 import { useRoute } from "nuxt/app";
 import TagComponent from "@/components/TagComponent.vue";
@@ -77,15 +77,7 @@ const authorIsMod = computed(() => {
 });
 
 const errorMessage = ref("");
-const { expandAllDiscussions } = storeToRefs(uiStore);
-
-// Local state for showing body - channel discussions are expanded by default
-const showBody = ref(true);
-
-// Watch for changes in the global expand/collapse state
-watch(expandAllDiscussions, (newValue) => {
-  showBody.value = newValue;
-});
+const { expandChannelDiscussions } = storeToRefs(uiStore);
 
 const authorDisplayName = computed(
   () => props.discussion?.Author?.displayName || ""
@@ -189,24 +181,22 @@ const filteredQuery = computed(() => {
               <!-- Expand/Collapse buttons -->
               <div class="mt-1">
                 <button
-                  v-if="discussion && (discussion.body || discussion.Album) && !showBody"
+                  v-if="discussion && (discussion.body || discussion.Album) && !expandChannelDiscussions"
                   class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                  @click="showBody = true"
+                  @click="uiStore.toggleExpandDiscussions(true, true)"
                 >
                   <i
                     class="mr-1 fa-solid fa-expand text-md text-gray-600 dark:text-gray-300 hover:underline"
-                    @click="showBody = true"
                   />
                   Expand
                 </button>
                 <button
-                  v-if="discussion && (discussion.body || discussion.Album) && showBody"
+                  v-if="discussion && (discussion.body || discussion.Album) && expandChannelDiscussions"
                   class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                  @click="showBody = false"
+                  @click="uiStore.toggleExpandDiscussions(false, true)"
                 >
                   <i
                     class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
-                    @click="showBody = false"
                   />
                   Collapse
                 </button>
@@ -214,7 +204,7 @@ const filteredQuery = computed(() => {
             </div>
 
             <div
-              v-if="discussion?.body && showBody"
+              v-if="discussion?.body && expandChannelDiscussions"
               class="my-2 dark:bg-black bg-gray-100 px-2 pt-2 pb-4 rounded"
             >
               <MarkdownPreview
@@ -224,7 +214,7 @@ const filteredQuery = computed(() => {
                 class="ml-2"
               />
             </div>
-            <div v-if="discussion.Album && showBody" class="my-4 overflow-x-auto bg-black">
+            <div v-if="discussion.Album && expandChannelDiscussions" class="my-4 overflow-x-auto bg-black">
               <DiscussionAlbum
                 :album="discussion.Album"
                 :discussion-id="discussion.id"
