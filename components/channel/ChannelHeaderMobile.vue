@@ -28,7 +28,7 @@ defineProps({
           {{ channel.displayName }}
         </h1>
         <h2
-          class="text-sm font-mono leading-6 text-black dark:text-gray-300 mt-4"
+          class="text-sm font-mono leading-6 text-black dark:text-gray-300"
         >
           {{ `${channel.uniqueName}` }}
         </h2>
