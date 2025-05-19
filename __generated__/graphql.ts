@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -17,6 +17,140 @@ export type Scalars = {
   DateTime: { input: any; output: any; }
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: { input: any; output: any; }
+};
+
+export type ActivitiesConnection = {
+  __typename?: 'ActivitiesConnection';
+  edges: Array<ActivityEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type Activity = {
+  __typename?: 'Activity';
+  Comments: Array<CommentInfo>;
+  Discussions: Array<DiscussionInfo>;
+  Events: Array<EventInfo>;
+  description: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
+export type ActivityAggregateSelection = {
+  __typename?: 'ActivityAggregateSelection';
+  count: Scalars['Int']['output'];
+  description: StringAggregateSelection;
+  id: StringAggregateSelection;
+  type: StringAggregateSelection;
+};
+
+export type ActivityCreateInput = {
+  description: Scalars['String']['input'];
+  id: Scalars['String']['input'];
+  type: Scalars['String']['input'];
+};
+
+export type ActivityCreatedEvent = {
+  __typename?: 'ActivityCreatedEvent';
+  createdActivity: ActivityEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ActivityDeletedEvent = {
+  __typename?: 'ActivityDeletedEvent';
+  deletedActivity: ActivityEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ActivityEdge = {
+  __typename?: 'ActivityEdge';
+  cursor: Scalars['String']['output'];
+  node: Activity;
+};
+
+export type ActivityEventPayload = {
+  __typename?: 'ActivityEventPayload';
+  description: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
+export type ActivityOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more ActivitySort objects to sort Activities by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<ActivitySort>>;
+};
+
+/** Fields to sort Activities by. The order in which sorts are applied is not guaranteed when specifying many fields in one ActivitySort object. */
+export type ActivitySort = {
+  description?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  type?: InputMaybe<SortDirection>;
+};
+
+export type ActivitySubscriptionWhere = {
+  AND?: InputMaybe<Array<ActivitySubscriptionWhere>>;
+  NOT?: InputMaybe<ActivitySubscriptionWhere>;
+  OR?: InputMaybe<Array<ActivitySubscriptionWhere>>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  id_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  id_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+  type_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  type_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  type_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  type_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  type_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ActivityUpdateInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ActivityUpdatedEvent = {
+  __typename?: 'ActivityUpdatedEvent';
+  event: EventType;
+  previousState: ActivityEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedActivity: ActivityEventPayload;
+};
+
+export type ActivityWhere = {
+  AND?: InputMaybe<Array<ActivityWhere>>;
+  NOT?: InputMaybe<ActivityWhere>;
+  OR?: InputMaybe<Array<ActivityWhere>>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  id_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  id_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+  type_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  type_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  type_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  type_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  type_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Album = {
@@ -120,6 +254,13 @@ export type AlbumConnectWhere = {
   node: AlbumWhere;
 };
 
+export type AlbumConnectedRelationships = {
+  __typename?: 'AlbumConnectedRelationships';
+  Discussions?: Maybe<AlbumDiscussionsConnectedRelationship>;
+  Images?: Maybe<AlbumImagesConnectedRelationship>;
+  Owner?: Maybe<AlbumOwnerConnectedRelationship>;
+};
+
 export type AlbumCreateInput = {
   Discussions?: InputMaybe<AlbumDiscussionsFieldInput>;
   Images?: InputMaybe<AlbumImagesFieldInput>;
@@ -127,10 +268,24 @@ export type AlbumCreateInput = {
   imageOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
+export type AlbumCreatedEvent = {
+  __typename?: 'AlbumCreatedEvent';
+  createdAlbum: AlbumEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type AlbumDeleteInput = {
   Discussions?: InputMaybe<Array<AlbumDiscussionsDeleteFieldInput>>;
   Images?: InputMaybe<Array<AlbumImagesDeleteFieldInput>>;
   Owner?: InputMaybe<AlbumOwnerDeleteFieldInput>;
+};
+
+export type AlbumDeletedEvent = {
+  __typename?: 'AlbumDeletedEvent';
+  deletedAlbum: AlbumEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type AlbumDisconnectInput = {
@@ -171,6 +326,11 @@ export type AlbumDiscussionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type AlbumDiscussionsConnectedRelationship = {
+  __typename?: 'AlbumDiscussionsConnectedRelationship';
+  node: DiscussionEventPayload;
 };
 
 export type AlbumDiscussionsConnection = {
@@ -272,6 +432,10 @@ export type AlbumDiscussionsRelationship = {
   node: Discussion;
 };
 
+export type AlbumDiscussionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
 export type AlbumDiscussionsUpdateConnectionInput = {
   node?: InputMaybe<DiscussionUpdateInput>;
 };
@@ -289,6 +453,12 @@ export type AlbumEdge = {
   __typename?: 'AlbumEdge';
   cursor: Scalars['String']['output'];
   node: Album;
+};
+
+export type AlbumEventPayload = {
+  __typename?: 'AlbumEventPayload';
+  id: Scalars['ID']['output'];
+  imageOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
 export type AlbumImageImagesAggregationSelection = {
@@ -325,6 +495,11 @@ export type AlbumImagesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ImageConnectWhere>;
+};
+
+export type AlbumImagesConnectedRelationship = {
+  __typename?: 'AlbumImagesConnectedRelationship';
+  node: ImageEventPayload;
 };
 
 export type AlbumImagesConnection = {
@@ -461,6 +636,10 @@ export type AlbumImagesRelationship = {
   node: Image;
 };
 
+export type AlbumImagesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ImageSubscriptionWhere>;
+};
+
 export type AlbumImagesUpdateConnectionInput = {
   node?: InputMaybe<ImageUpdateInput>;
 };
@@ -507,6 +686,11 @@ export type AlbumOwnerConnectOrCreateFieldInput = {
 
 export type AlbumOwnerConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type AlbumOwnerConnectedRelationship = {
+  __typename?: 'AlbumOwnerConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type AlbumOwnerConnection = {
@@ -744,6 +928,10 @@ export type AlbumOwnerRelationship = {
   node: User;
 };
 
+export type AlbumOwnerRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type AlbumOwnerUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -764,9 +952,62 @@ export type AlbumRelationInput = {
   Owner?: InputMaybe<AlbumOwnerCreateFieldInput>;
 };
 
+export type AlbumRelationshipCreatedEvent = {
+  __typename?: 'AlbumRelationshipCreatedEvent';
+  album: AlbumEventPayload;
+  createdRelationship: AlbumConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type AlbumRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<AlbumRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<AlbumRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<AlbumRelationshipCreatedSubscriptionWhere>>;
+  album?: InputMaybe<AlbumSubscriptionWhere>;
+  createdRelationship?: InputMaybe<AlbumRelationshipsSubscriptionWhere>;
+};
+
+export type AlbumRelationshipDeletedEvent = {
+  __typename?: 'AlbumRelationshipDeletedEvent';
+  album: AlbumEventPayload;
+  deletedRelationship: AlbumConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type AlbumRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<AlbumRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<AlbumRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<AlbumRelationshipDeletedSubscriptionWhere>>;
+  album?: InputMaybe<AlbumSubscriptionWhere>;
+  deletedRelationship?: InputMaybe<AlbumRelationshipsSubscriptionWhere>;
+};
+
+export type AlbumRelationshipsSubscriptionWhere = {
+  Discussions?: InputMaybe<AlbumDiscussionsRelationshipSubscriptionWhere>;
+  Images?: InputMaybe<AlbumImagesRelationshipSubscriptionWhere>;
+  Owner?: InputMaybe<AlbumOwnerRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Albums by. The order in which sorts are applied is not guaranteed when specifying many fields in one AlbumSort object. */
 export type AlbumSort = {
   id?: InputMaybe<SortDirection>;
+};
+
+export type AlbumSubscriptionWhere = {
+  AND?: InputMaybe<Array<AlbumSubscriptionWhere>>;
+  NOT?: InputMaybe<AlbumSubscriptionWhere>;
+  OR?: InputMaybe<Array<AlbumSubscriptionWhere>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  imageOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  imageOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AlbumUpdateInput = {
@@ -776,6 +1017,14 @@ export type AlbumUpdateInput = {
   imageOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   imageOrder_POP?: InputMaybe<Scalars['Int']['input']>;
   imageOrder_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+};
+
+export type AlbumUpdatedEvent = {
+  __typename?: 'AlbumUpdatedEvent';
+  event: EventType;
+  previousState: AlbumEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedAlbum: AlbumEventPayload;
 };
 
 export type AlbumUserOwnerAggregationSelection = {
@@ -1353,6 +1602,11 @@ export type ChannelAdminsConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
 };
 
+export type ChannelAdminsConnectedRelationship = {
+  __typename?: 'ChannelAdminsConnectedRelationship';
+  node: UserEventPayload;
+};
+
 export type ChannelAdminsConnection = {
   __typename?: 'ChannelAdminsConnection';
   edges: Array<ChannelAdminsRelationship>;
@@ -1588,6 +1842,10 @@ export type ChannelAdminsRelationship = {
   node: User;
 };
 
+export type ChannelAdminsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type ChannelAdminsUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -1687,6 +1945,11 @@ export type ChannelCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type ChannelCommentsConnectedRelationship = {
+  __typename?: 'ChannelCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type ChannelCommentsConnection = {
@@ -1793,6 +2056,10 @@ export type ChannelCommentsRelationship = {
   node: Comment;
 };
 
+export type ChannelCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type ChannelCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -1849,6 +2116,28 @@ export type ChannelConnectWhere = {
   node: ChannelWhere;
 };
 
+export type ChannelConnectedRelationships = {
+  __typename?: 'ChannelConnectedRelationships';
+  Admins?: Maybe<ChannelAdminsConnectedRelationship>;
+  Comments?: Maybe<ChannelCommentsConnectedRelationship>;
+  DefaultChannelRole?: Maybe<ChannelDefaultChannelRoleConnectedRelationship>;
+  DefaultModRole?: Maybe<ChannelDefaultModRoleConnectedRelationship>;
+  DiscussionChannels?: Maybe<ChannelDiscussionChannelsConnectedRelationship>;
+  ElevatedModRole?: Maybe<ChannelElevatedModRoleConnectedRelationship>;
+  EventChannels?: Maybe<ChannelEventChannelsConnectedRelationship>;
+  Issues?: Maybe<ChannelIssuesConnectedRelationship>;
+  Moderators?: Maybe<ChannelModeratorsConnectedRelationship>;
+  PendingModInvites?: Maybe<ChannelPendingModInvitesConnectedRelationship>;
+  PendingOwnerInvites?: Maybe<ChannelPendingOwnerInvitesConnectedRelationship>;
+  RelatedChannels?: Maybe<ChannelRelatedChannelsConnectedRelationship>;
+  SuspendedModRole?: Maybe<ChannelSuspendedModRoleConnectedRelationship>;
+  SuspendedMods?: Maybe<ChannelSuspendedModsConnectedRelationship>;
+  SuspendedRole?: Maybe<ChannelSuspendedRoleConnectedRelationship>;
+  SuspendedUsers?: Maybe<ChannelSuspendedUsersConnectedRelationship>;
+  Tags?: Maybe<ChannelTagsConnectedRelationship>;
+  WikiHomePage?: Maybe<ChannelWikiHomePageConnectedRelationship>;
+};
+
 export type ChannelCreateInput = {
   Admins?: InputMaybe<ChannelAdminsFieldInput>;
   Comments?: InputMaybe<ChannelCommentsFieldInput>;
@@ -1881,6 +2170,13 @@ export type ChannelCreateInput = {
   wikiEnabled?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type ChannelCreatedEvent = {
+  __typename?: 'ChannelCreatedEvent';
+  createdChannel: ChannelEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ChannelDefaultChannelRoleAggregateInput = {
   AND?: InputMaybe<Array<ChannelDefaultChannelRoleAggregateInput>>;
   NOT?: InputMaybe<ChannelDefaultChannelRoleAggregateInput>;
@@ -1906,6 +2202,11 @@ export type ChannelDefaultChannelRoleConnectOrCreateFieldInput = {
 
 export type ChannelDefaultChannelRoleConnectOrCreateFieldInputOnCreate = {
   node: ChannelRoleOnCreateInput;
+};
+
+export type ChannelDefaultChannelRoleConnectedRelationship = {
+  __typename?: 'ChannelDefaultChannelRoleConnectedRelationship';
+  node: ChannelRoleEventPayload;
 };
 
 export type ChannelDefaultChannelRoleConnection = {
@@ -2001,6 +2302,10 @@ export type ChannelDefaultChannelRoleRelationship = {
   node: ChannelRole;
 };
 
+export type ChannelDefaultChannelRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
 export type ChannelDefaultChannelRoleUpdateConnectionInput = {
   node?: InputMaybe<ChannelRoleUpdateInput>;
 };
@@ -2040,6 +2345,11 @@ export type ChannelDefaultModRoleConnectOrCreateFieldInput = {
 
 export type ChannelDefaultModRoleConnectOrCreateFieldInputOnCreate = {
   node: ModChannelRoleOnCreateInput;
+};
+
+export type ChannelDefaultModRoleConnectedRelationship = {
+  __typename?: 'ChannelDefaultModRoleConnectedRelationship';
+  node: ModChannelRoleEventPayload;
 };
 
 export type ChannelDefaultModRoleConnection = {
@@ -2135,6 +2445,10 @@ export type ChannelDefaultModRoleRelationship = {
   node: ModChannelRole;
 };
 
+export type ChannelDefaultModRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
 export type ChannelDefaultModRoleUpdateConnectionInput = {
   node?: InputMaybe<ModChannelRoleUpdateInput>;
 };
@@ -2168,6 +2482,13 @@ export type ChannelDeleteInput = {
   SuspendedUsers?: InputMaybe<Array<ChannelSuspendedUsersDeleteFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsDeleteFieldInput>>;
   WikiHomePage?: InputMaybe<ChannelWikiHomePageDeleteFieldInput>;
+};
+
+export type ChannelDeletedEvent = {
+  __typename?: 'ChannelDeletedEvent';
+  deletedChannel: ChannelEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ChannelDisconnectInput = {
@@ -2223,6 +2544,11 @@ export type ChannelDiscussionChannelsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
+};
+
+export type ChannelDiscussionChannelsConnectedRelationship = {
+  __typename?: 'ChannelDiscussionChannelsConnectedRelationship';
+  node: DiscussionChannelEventPayload;
 };
 
 export type ChannelDiscussionChannelsConnection = {
@@ -2319,6 +2645,10 @@ export type ChannelDiscussionChannelsRelationship = {
   node: DiscussionChannel;
 };
 
+export type ChannelDiscussionChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
 export type ChannelDiscussionChannelsUpdateConnectionInput = {
   node?: InputMaybe<DiscussionChannelUpdateInput>;
 };
@@ -2363,6 +2693,11 @@ export type ChannelElevatedModRoleConnectOrCreateFieldInput = {
 
 export type ChannelElevatedModRoleConnectOrCreateFieldInputOnCreate = {
   node: ModChannelRoleOnCreateInput;
+};
+
+export type ChannelElevatedModRoleConnectedRelationship = {
+  __typename?: 'ChannelElevatedModRoleConnectedRelationship';
+  node: ModChannelRoleEventPayload;
 };
 
 export type ChannelElevatedModRoleConnection = {
@@ -2458,6 +2793,10 @@ export type ChannelElevatedModRoleRelationship = {
   node: ModChannelRole;
 };
 
+export type ChannelElevatedModRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
 export type ChannelElevatedModRoleUpdateConnectionInput = {
   node?: InputMaybe<ModChannelRoleUpdateInput>;
 };
@@ -2503,6 +2842,11 @@ export type ChannelEventChannelsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventChannelConnectWhere>;
+};
+
+export type ChannelEventChannelsConnectedRelationship = {
+  __typename?: 'ChannelEventChannelsConnectedRelationship';
+  node: EventChannelEventPayload;
 };
 
 export type ChannelEventChannelsConnection = {
@@ -2579,6 +2923,10 @@ export type ChannelEventChannelsRelationship = {
   node: EventChannel;
 };
 
+export type ChannelEventChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
 export type ChannelEventChannelsUpdateConnectionInput = {
   node?: InputMaybe<EventChannelUpdateInput>;
 };
@@ -2590,6 +2938,171 @@ export type ChannelEventChannelsUpdateFieldInput = {
   disconnect?: InputMaybe<Array<ChannelEventChannelsDisconnectFieldInput>>;
   update?: InputMaybe<ChannelEventChannelsUpdateConnectionInput>;
   where?: InputMaybe<ChannelEventChannelsConnectionWhere>;
+};
+
+export type ChannelEventPayload = {
+  __typename?: 'ChannelEventPayload';
+  channelBannerURL?: Maybe<Scalars['String']['output']>;
+  channelIconURL?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayName?: Maybe<Scalars['String']['output']>;
+  eventsEnabled?: Maybe<Scalars['Boolean']['output']>;
+  feedbackEnabled?: Maybe<Scalars['Boolean']['output']>;
+  locked?: Maybe<Scalars['Boolean']['output']>;
+  rules?: Maybe<Scalars['JSON']['output']>;
+  uniqueName: Scalars['String']['output'];
+  wikiEnabled?: Maybe<Scalars['Boolean']['output']>;
+};
+
+export type ChannelInfo = {
+  __typename?: 'ChannelInfo';
+  channelIconURL?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayName?: Maybe<Scalars['String']['output']>;
+  uniqueName?: Maybe<Scalars['String']['output']>;
+};
+
+export type ChannelInfoAggregateSelection = {
+  __typename?: 'ChannelInfoAggregateSelection';
+  channelIconURL: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  description: StringAggregateSelection;
+  displayName: StringAggregateSelection;
+  uniqueName: StringAggregateSelection;
+};
+
+export type ChannelInfoCreateInput = {
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ChannelInfoCreatedEvent = {
+  __typename?: 'ChannelInfoCreatedEvent';
+  createdChannelInfo: ChannelInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ChannelInfoDeletedEvent = {
+  __typename?: 'ChannelInfoDeletedEvent';
+  deletedChannelInfo: ChannelInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ChannelInfoEdge = {
+  __typename?: 'ChannelInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: ChannelInfo;
+};
+
+export type ChannelInfoEventPayload = {
+  __typename?: 'ChannelInfoEventPayload';
+  channelIconURL?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  displayName?: Maybe<Scalars['String']['output']>;
+  uniqueName?: Maybe<Scalars['String']['output']>;
+};
+
+export type ChannelInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more ChannelInfoSort objects to sort ChannelInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<ChannelInfoSort>>;
+};
+
+/** Fields to sort ChannelInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one ChannelInfoSort object. */
+export type ChannelInfoSort = {
+  channelIconURL?: InputMaybe<SortDirection>;
+  description?: InputMaybe<SortDirection>;
+  displayName?: InputMaybe<SortDirection>;
+  uniqueName?: InputMaybe<SortDirection>;
+};
+
+export type ChannelInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<ChannelInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<ChannelInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<ChannelInfoSubscriptionWhere>>;
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelIconURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  uniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ChannelInfoUpdateInput = {
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ChannelInfoUpdatedEvent = {
+  __typename?: 'ChannelInfoUpdatedEvent';
+  event: EventType;
+  previousState: ChannelInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedChannelInfo: ChannelInfoEventPayload;
+};
+
+export type ChannelInfoWhere = {
+  AND?: InputMaybe<Array<ChannelInfoWhere>>;
+  NOT?: InputMaybe<ChannelInfoWhere>;
+  OR?: InputMaybe<Array<ChannelInfoWhere>>;
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelIconURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  uniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ChannelInfosConnection = {
+  __typename?: 'ChannelInfosConnection';
+  edges: Array<ChannelInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type ChannelIssueIssuesAggregationSelection = {
@@ -2631,6 +3144,11 @@ export type ChannelIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type ChannelIssuesConnectedRelationship = {
+  __typename?: 'ChannelIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type ChannelIssuesConnection = {
@@ -2792,6 +3310,10 @@ export type ChannelIssuesRelationship = {
   node: Issue;
 };
 
+export type ChannelIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type ChannelIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -2884,6 +3406,11 @@ export type ChannelModeratorsConnectOrCreateFieldInputOnCreate = {
   node: ModerationProfileOnCreateInput;
 };
 
+export type ChannelModeratorsConnectedRelationship = {
+  __typename?: 'ChannelModeratorsConnectedRelationship';
+  node: ModerationProfileEventPayload;
+};
+
 export type ChannelModeratorsConnection = {
   __typename?: 'ChannelModeratorsConnection';
   edges: Array<ChannelModeratorsRelationship>;
@@ -2959,6 +3486,10 @@ export type ChannelModeratorsRelationship = {
   node: ModerationProfile;
 };
 
+export type ChannelModeratorsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type ChannelModeratorsUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -3020,6 +3551,11 @@ export type ChannelPendingModInvitesConnectOrCreateFieldInput = {
 
 export type ChannelPendingModInvitesConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type ChannelPendingModInvitesConnectedRelationship = {
+  __typename?: 'ChannelPendingModInvitesConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type ChannelPendingModInvitesConnection = {
@@ -3257,6 +3793,10 @@ export type ChannelPendingModInvitesRelationship = {
   node: User;
 };
 
+export type ChannelPendingModInvitesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type ChannelPendingModInvitesUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -3297,6 +3837,11 @@ export type ChannelPendingOwnerInvitesConnectOrCreateFieldInput = {
 
 export type ChannelPendingOwnerInvitesConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type ChannelPendingOwnerInvitesConnectedRelationship = {
+  __typename?: 'ChannelPendingOwnerInvitesConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type ChannelPendingOwnerInvitesConnection = {
@@ -3534,6 +4079,10 @@ export type ChannelPendingOwnerInvitesRelationship = {
   node: User;
 };
 
+export type ChannelPendingOwnerInvitesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type ChannelPendingOwnerInvitesUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -3574,6 +4123,11 @@ export type ChannelRelatedChannelsConnectOrCreateFieldInput = {
 
 export type ChannelRelatedChannelsConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type ChannelRelatedChannelsConnectedRelationship = {
+  __typename?: 'ChannelRelatedChannelsConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type ChannelRelatedChannelsConnection = {
@@ -3711,6 +4265,10 @@ export type ChannelRelatedChannelsRelationship = {
   node: Channel;
 };
 
+export type ChannelRelatedChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type ChannelRelatedChannelsUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -3744,6 +4302,61 @@ export type ChannelRelationInput = {
   SuspendedUsers?: InputMaybe<Array<ChannelSuspendedUsersCreateFieldInput>>;
   Tags?: InputMaybe<Array<ChannelTagsCreateFieldInput>>;
   WikiHomePage?: InputMaybe<ChannelWikiHomePageCreateFieldInput>;
+};
+
+export type ChannelRelationshipCreatedEvent = {
+  __typename?: 'ChannelRelationshipCreatedEvent';
+  channel: ChannelEventPayload;
+  createdRelationship: ChannelConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ChannelRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ChannelRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ChannelRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ChannelRelationshipCreatedSubscriptionWhere>>;
+  channel?: InputMaybe<ChannelSubscriptionWhere>;
+  createdRelationship?: InputMaybe<ChannelRelationshipsSubscriptionWhere>;
+};
+
+export type ChannelRelationshipDeletedEvent = {
+  __typename?: 'ChannelRelationshipDeletedEvent';
+  channel: ChannelEventPayload;
+  deletedRelationship: ChannelConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ChannelRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ChannelRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ChannelRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ChannelRelationshipDeletedSubscriptionWhere>>;
+  channel?: InputMaybe<ChannelSubscriptionWhere>;
+  deletedRelationship?: InputMaybe<ChannelRelationshipsSubscriptionWhere>;
+};
+
+export type ChannelRelationshipsSubscriptionWhere = {
+  Admins?: InputMaybe<ChannelAdminsRelationshipSubscriptionWhere>;
+  Comments?: InputMaybe<ChannelCommentsRelationshipSubscriptionWhere>;
+  DefaultChannelRole?: InputMaybe<ChannelDefaultChannelRoleRelationshipSubscriptionWhere>;
+  DefaultModRole?: InputMaybe<ChannelDefaultModRoleRelationshipSubscriptionWhere>;
+  DiscussionChannels?: InputMaybe<ChannelDiscussionChannelsRelationshipSubscriptionWhere>;
+  ElevatedModRole?: InputMaybe<ChannelElevatedModRoleRelationshipSubscriptionWhere>;
+  EventChannels?: InputMaybe<ChannelEventChannelsRelationshipSubscriptionWhere>;
+  Issues?: InputMaybe<ChannelIssuesRelationshipSubscriptionWhere>;
+  Moderators?: InputMaybe<ChannelModeratorsRelationshipSubscriptionWhere>;
+  PendingModInvites?: InputMaybe<ChannelPendingModInvitesRelationshipSubscriptionWhere>;
+  PendingOwnerInvites?: InputMaybe<ChannelPendingOwnerInvitesRelationshipSubscriptionWhere>;
+  RelatedChannels?: InputMaybe<ChannelRelatedChannelsRelationshipSubscriptionWhere>;
+  SuspendedModRole?: InputMaybe<ChannelSuspendedModRoleRelationshipSubscriptionWhere>;
+  SuspendedMods?: InputMaybe<ChannelSuspendedModsRelationshipSubscriptionWhere>;
+  SuspendedRole?: InputMaybe<ChannelSuspendedRoleRelationshipSubscriptionWhere>;
+  SuspendedUsers?: InputMaybe<ChannelSuspendedUsersRelationshipSubscriptionWhere>;
+  Tags?: InputMaybe<ChannelTagsRelationshipSubscriptionWhere>;
+  WikiHomePage?: InputMaybe<ChannelWikiHomePageRelationshipSubscriptionWhere>;
 };
 
 export type ChannelRole = {
@@ -3791,10 +4404,39 @@ export type ChannelRoleCreateInput = {
   showModTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type ChannelRoleCreatedEvent = {
+  __typename?: 'ChannelRoleCreatedEvent';
+  createdChannelRole: ChannelRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ChannelRoleDeletedEvent = {
+  __typename?: 'ChannelRoleDeletedEvent';
+  deletedChannelRole: ChannelRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ChannelRoleEdge = {
   __typename?: 'ChannelRoleEdge';
   cursor: Scalars['String']['output'];
   node: ChannelRole;
+};
+
+export type ChannelRoleEventPayload = {
+  __typename?: 'ChannelRoleEventPayload';
+  canCreateComment?: Maybe<Scalars['Boolean']['output']>;
+  canCreateDiscussion?: Maybe<Scalars['Boolean']['output']>;
+  canCreateEvent?: Maybe<Scalars['Boolean']['output']>;
+  canUpdateChannel?: Maybe<Scalars['Boolean']['output']>;
+  canUploadFile?: Maybe<Scalars['Boolean']['output']>;
+  canUpvoteComment?: Maybe<Scalars['Boolean']['output']>;
+  canUpvoteDiscussion?: Maybe<Scalars['Boolean']['output']>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  showModTag?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ChannelRoleOnCreateInput = {
@@ -3833,6 +4475,38 @@ export type ChannelRoleSort = {
   showModTag?: InputMaybe<SortDirection>;
 };
 
+export type ChannelRoleSubscriptionWhere = {
+  AND?: InputMaybe<Array<ChannelRoleSubscriptionWhere>>;
+  NOT?: InputMaybe<ChannelRoleSubscriptionWhere>;
+  OR?: InputMaybe<Array<ChannelRoleSubscriptionWhere>>;
+  canCreateComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpdateChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  showModTag?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type ChannelRoleUniqueWhere = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -3849,6 +4523,14 @@ export type ChannelRoleUpdateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   showModTag?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ChannelRoleUpdatedEvent = {
+  __typename?: 'ChannelRoleUpdatedEvent';
+  event: EventType;
+  previousState: ChannelRoleEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedChannelRole: ChannelRoleEventPayload;
 };
 
 export type ChannelRoleWhere = {
@@ -3906,6 +4588,55 @@ export type ChannelSort = {
   wikiEnabled?: InputMaybe<SortDirection>;
 };
 
+export type ChannelSubscriptionWhere = {
+  AND?: InputMaybe<Array<ChannelSubscriptionWhere>>;
+  NOT?: InputMaybe<ChannelSubscriptionWhere>;
+  OR?: InputMaybe<Array<ChannelSubscriptionWhere>>;
+  channelBannerURL?: InputMaybe<Scalars['String']['input']>;
+  channelBannerURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelBannerURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelBannerURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelBannerURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelBannerURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelIconURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelIconURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventsEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  feedbackEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
+  rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  uniqueName?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  uniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  uniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  wikiEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type ChannelSuspendedModRoleAggregateInput = {
   AND?: InputMaybe<Array<ChannelSuspendedModRoleAggregateInput>>;
   NOT?: InputMaybe<ChannelSuspendedModRoleAggregateInput>;
@@ -3931,6 +4662,11 @@ export type ChannelSuspendedModRoleConnectOrCreateFieldInput = {
 
 export type ChannelSuspendedModRoleConnectOrCreateFieldInputOnCreate = {
   node: ModChannelRoleOnCreateInput;
+};
+
+export type ChannelSuspendedModRoleConnectedRelationship = {
+  __typename?: 'ChannelSuspendedModRoleConnectedRelationship';
+  node: ModChannelRoleEventPayload;
 };
 
 export type ChannelSuspendedModRoleConnection = {
@@ -4026,6 +4762,10 @@ export type ChannelSuspendedModRoleRelationship = {
   node: ModChannelRole;
 };
 
+export type ChannelSuspendedModRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
 export type ChannelSuspendedModRoleUpdateConnectionInput = {
   node?: InputMaybe<ModChannelRoleUpdateInput>;
 };
@@ -4057,6 +4797,11 @@ export type ChannelSuspendedModsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<SuspensionConnectWhere>;
+};
+
+export type ChannelSuspendedModsConnectedRelationship = {
+  __typename?: 'ChannelSuspendedModsConnectedRelationship';
+  node: SuspensionEventPayload;
 };
 
 export type ChannelSuspendedModsConnection = {
@@ -4173,6 +4918,10 @@ export type ChannelSuspendedModsRelationship = {
   node: Suspension;
 };
 
+export type ChannelSuspendedModsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
 export type ChannelSuspendedModsUpdateConnectionInput = {
   node?: InputMaybe<SuspensionUpdateInput>;
 };
@@ -4211,6 +4960,11 @@ export type ChannelSuspendedRoleConnectOrCreateFieldInput = {
 
 export type ChannelSuspendedRoleConnectOrCreateFieldInputOnCreate = {
   node: ChannelRoleOnCreateInput;
+};
+
+export type ChannelSuspendedRoleConnectedRelationship = {
+  __typename?: 'ChannelSuspendedRoleConnectedRelationship';
+  node: ChannelRoleEventPayload;
 };
 
 export type ChannelSuspendedRoleConnection = {
@@ -4306,6 +5060,10 @@ export type ChannelSuspendedRoleRelationship = {
   node: ChannelRole;
 };
 
+export type ChannelSuspendedRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
 export type ChannelSuspendedRoleUpdateConnectionInput = {
   node?: InputMaybe<ChannelRoleUpdateInput>;
 };
@@ -4337,6 +5095,11 @@ export type ChannelSuspendedUsersConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<SuspensionConnectWhere>;
+};
+
+export type ChannelSuspendedUsersConnectedRelationship = {
+  __typename?: 'ChannelSuspendedUsersConnectedRelationship';
+  node: SuspensionEventPayload;
 };
 
 export type ChannelSuspendedUsersConnection = {
@@ -4453,6 +5216,10 @@ export type ChannelSuspendedUsersRelationship = {
   node: Suspension;
 };
 
+export type ChannelSuspendedUsersRelationshipSubscriptionWhere = {
+  node?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
 export type ChannelSuspendedUsersUpdateConnectionInput = {
   node?: InputMaybe<SuspensionUpdateInput>;
 };
@@ -4537,6 +5304,11 @@ export type ChannelTagsConnectOrCreateFieldInputOnCreate = {
   node: TagOnCreateInput;
 };
 
+export type ChannelTagsConnectedRelationship = {
+  __typename?: 'ChannelTagsConnectedRelationship';
+  node: TagEventPayload;
+};
+
 export type ChannelTagsConnection = {
   __typename?: 'ChannelTagsConnection';
   edges: Array<ChannelTagsRelationship>;
@@ -4602,6 +5374,10 @@ export type ChannelTagsRelationship = {
   node: Tag;
 };
 
+export type ChannelTagsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TagSubscriptionWhere>;
+};
+
 export type ChannelTagsUpdateConnectionInput = {
   node?: InputMaybe<TagUpdateInput>;
 };
@@ -4651,6 +5427,14 @@ export type ChannelUpdateInput = {
   rules?: InputMaybe<Scalars['JSON']['input']>;
   uniqueName?: InputMaybe<Scalars['String']['input']>;
   wikiEnabled?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ChannelUpdatedEvent = {
+  __typename?: 'ChannelUpdatedEvent';
+  event: EventType;
+  previousState: ChannelEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedChannel: ChannelEventPayload;
 };
 
 export type ChannelUserAdminsAggregationSelection = {
@@ -5021,6 +5805,11 @@ export type ChannelWikiHomePageConnectFieldInput = {
   where?: InputMaybe<WikiPageConnectWhere>;
 };
 
+export type ChannelWikiHomePageConnectedRelationship = {
+  __typename?: 'ChannelWikiHomePageConnectedRelationship';
+  node: WikiPageEventPayload;
+};
+
 export type ChannelWikiHomePageConnection = {
   __typename?: 'ChannelWikiHomePageConnection';
   edges: Array<ChannelWikiHomePageRelationship>;
@@ -5133,6 +5922,10 @@ export type ChannelWikiHomePageRelationship = {
   __typename?: 'ChannelWikiHomePageRelationship';
   cursor: Scalars['String']['output'];
   node: WikiPage;
+};
+
+export type ChannelWikiHomePageRelationshipSubscriptionWhere = {
+  node?: InputMaybe<WikiPageSubscriptionWhere>;
 };
 
 export type ChannelWikiHomePageUpdateConnectionInput = {
@@ -5564,6 +6357,8 @@ export type CommentAggregateSelection = {
 
 export type CommentAuthor = ModerationProfile | User;
 
+export type CommentAuthorEventPayload = ModerationProfileEventPayload | UserEventPayload;
+
 export type CommentAuthorWhere = {
   ModerationProfile?: InputMaybe<ModerationProfileWhere>;
   User?: InputMaybe<UserWhere>;
@@ -5611,6 +6406,11 @@ export type CommentChannelConnectOrCreateFieldInput = {
 
 export type CommentChannelConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type CommentChannelConnectedRelationship = {
+  __typename?: 'CommentChannelConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type CommentChannelConnection = {
@@ -5748,6 +6548,10 @@ export type CommentChannelRelationship = {
   node: Channel;
 };
 
+export type CommentChannelRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type CommentChannelUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -5779,6 +6583,11 @@ export type CommentChildCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type CommentChildCommentsConnectedRelationship = {
+  __typename?: 'CommentChildCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type CommentChildCommentsConnection = {
@@ -5885,6 +6694,10 @@ export type CommentChildCommentsRelationship = {
   node: Comment;
 };
 
+export type CommentChildCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type CommentChildCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -5906,6 +6719,11 @@ export type CommentCommentAuthorConnectInput = {
 export type CommentCommentAuthorConnectOrCreateInput = {
   ModerationProfile?: InputMaybe<CommentCommentAuthorModerationProfileConnectOrCreateFieldInput>;
   User?: InputMaybe<CommentCommentAuthorUserConnectOrCreateFieldInput>;
+};
+
+export type CommentCommentAuthorConnectedRelationship = {
+  __typename?: 'CommentCommentAuthorConnectedRelationship';
+  node: CommentAuthorEventPayload;
 };
 
 export type CommentCommentAuthorConnection = {
@@ -5981,6 +6799,10 @@ export type CommentCommentAuthorModerationProfileFieldInput = {
   create?: InputMaybe<CommentCommentAuthorModerationProfileCreateFieldInput>;
 };
 
+export type CommentCommentAuthorModerationProfileSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type CommentCommentAuthorModerationProfileUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -5999,6 +6821,11 @@ export type CommentCommentAuthorRelationship = {
   __typename?: 'CommentCommentAuthorRelationship';
   cursor: Scalars['String']['output'];
   node: CommentAuthor;
+};
+
+export type CommentCommentAuthorRelationshipSubscriptionWhere = {
+  ModerationProfile?: InputMaybe<CommentCommentAuthorModerationProfileSubscriptionWhere>;
+  User?: InputMaybe<CommentCommentAuthorUserSubscriptionWhere>;
 };
 
 export type CommentCommentAuthorUpdateInput = {
@@ -6045,6 +6872,10 @@ export type CommentCommentAuthorUserFieldInput = {
   connect?: InputMaybe<CommentCommentAuthorUserConnectFieldInput>;
   connectOrCreate?: InputMaybe<CommentCommentAuthorUserConnectOrCreateFieldInput>;
   create?: InputMaybe<CommentCommentAuthorUserCreateFieldInput>;
+};
+
+export type CommentCommentAuthorUserSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
 };
 
 export type CommentCommentAuthorUserUpdateConnectionInput = {
@@ -6150,6 +6981,25 @@ export type CommentConnectWhere = {
   node: CommentWhere;
 };
 
+export type CommentConnectedRelationships = {
+  __typename?: 'CommentConnectedRelationships';
+  Channel?: Maybe<CommentChannelConnectedRelationship>;
+  ChildComments?: Maybe<CommentChildCommentsConnectedRelationship>;
+  CommentAuthor?: Maybe<CommentCommentAuthorConnectedRelationship>;
+  DiscussionChannel?: Maybe<CommentDiscussionChannelConnectedRelationship>;
+  Event?: Maybe<CommentEventConnectedRelationship>;
+  FeedbackComments?: Maybe<CommentFeedbackCommentsConnectedRelationship>;
+  GivesFeedbackOnComment?: Maybe<CommentGivesFeedbackOnCommentConnectedRelationship>;
+  GivesFeedbackOnDiscussion?: Maybe<CommentGivesFeedbackOnDiscussionConnectedRelationship>;
+  GivesFeedbackOnEvent?: Maybe<CommentGivesFeedbackOnEventConnectedRelationship>;
+  Issue?: Maybe<CommentIssueConnectedRelationship>;
+  ModerationAction?: Maybe<CommentModerationActionConnectedRelationship>;
+  ParentComment?: Maybe<CommentParentCommentConnectedRelationship>;
+  RelatedIssues?: Maybe<CommentRelatedIssuesConnectedRelationship>;
+  Tags?: Maybe<CommentTagsConnectedRelationship>;
+  UpvotedByUsers?: Maybe<CommentUpvotedByUsersConnectedRelationship>;
+};
+
 export type CommentCreateInput = {
   Channel?: InputMaybe<CommentChannelFieldInput>;
   ChildComments?: InputMaybe<CommentChildCommentsFieldInput>;
@@ -6176,6 +7026,13 @@ export type CommentCreateInput = {
   weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type CommentCreatedEvent = {
+  __typename?: 'CommentCreatedEvent';
+  createdComment: CommentEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type CommentDeleteInput = {
   Channel?: InputMaybe<CommentChannelDeleteFieldInput>;
   ChildComments?: InputMaybe<Array<CommentChildCommentsDeleteFieldInput>>;
@@ -6192,6 +7049,13 @@ export type CommentDeleteInput = {
   RelatedIssues?: InputMaybe<Array<CommentRelatedIssuesDeleteFieldInput>>;
   Tags?: InputMaybe<Array<CommentTagsDeleteFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersDeleteFieldInput>>;
+};
+
+export type CommentDeletedEvent = {
+  __typename?: 'CommentDeletedEvent';
+  deletedComment: CommentEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type CommentDisconnectInput = {
@@ -6229,6 +7093,11 @@ export type CommentDiscussionChannelConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
+};
+
+export type CommentDiscussionChannelConnectedRelationship = {
+  __typename?: 'CommentDiscussionChannelConnectedRelationship';
+  node: DiscussionChannelEventPayload;
 };
 
 export type CommentDiscussionChannelConnection = {
@@ -6340,6 +7209,10 @@ export type CommentDiscussionChannelRelationship = {
   node: DiscussionChannel;
 };
 
+export type CommentDiscussionChannelRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
 export type CommentDiscussionChannelUpdateConnectionInput = {
   node?: InputMaybe<DiscussionChannelUpdateInput>;
 };
@@ -6391,6 +7264,11 @@ export type CommentEventConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
+};
+
+export type CommentEventConnectedRelationship = {
+  __typename?: 'CommentEventConnectedRelationship';
+  node: EventEventPayload;
 };
 
 export type CommentEventConnection = {
@@ -6681,10 +7559,28 @@ export type CommentEventNodeAggregationWhereInput = {
   virtualEventUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type CommentEventPayload = {
+  __typename?: 'CommentEventPayload';
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  emoji?: Maybe<Scalars['JSON']['output']>;
+  id: Scalars['ID']['output'];
+  isFeedbackComment?: Maybe<Scalars['Boolean']['output']>;
+  isRootComment: Scalars['Boolean']['output'];
+  text?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  weightedVotesCount?: Maybe<Scalars['Float']['output']>;
+};
+
 export type CommentEventRelationship = {
   __typename?: 'CommentEventRelationship';
   cursor: Scalars['String']['output'];
   node: Event;
+};
+
+export type CommentEventRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventSubscriptionWhere>;
 };
 
 export type CommentEventUpdateConnectionInput = {
@@ -6717,6 +7613,11 @@ export type CommentFeedbackCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type CommentFeedbackCommentsConnectedRelationship = {
+  __typename?: 'CommentFeedbackCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type CommentFeedbackCommentsConnection = {
@@ -6823,6 +7724,10 @@ export type CommentFeedbackCommentsRelationship = {
   node: Comment;
 };
 
+export type CommentFeedbackCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type CommentFeedbackCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -6853,6 +7758,11 @@ export type CommentGivesFeedbackOnCommentConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type CommentGivesFeedbackOnCommentConnectedRelationship = {
+  __typename?: 'CommentGivesFeedbackOnCommentConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type CommentGivesFeedbackOnCommentConnection = {
@@ -6959,6 +7869,10 @@ export type CommentGivesFeedbackOnCommentRelationship = {
   node: Comment;
 };
 
+export type CommentGivesFeedbackOnCommentRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type CommentGivesFeedbackOnCommentUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -6989,6 +7903,11 @@ export type CommentGivesFeedbackOnDiscussionConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type CommentGivesFeedbackOnDiscussionConnectedRelationship = {
+  __typename?: 'CommentGivesFeedbackOnDiscussionConnectedRelationship';
+  node: DiscussionEventPayload;
 };
 
 export type CommentGivesFeedbackOnDiscussionConnection = {
@@ -7090,6 +8009,10 @@ export type CommentGivesFeedbackOnDiscussionRelationship = {
   node: Discussion;
 };
 
+export type CommentGivesFeedbackOnDiscussionRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
 export type CommentGivesFeedbackOnDiscussionUpdateConnectionInput = {
   node?: InputMaybe<DiscussionUpdateInput>;
 };
@@ -7120,6 +8043,11 @@ export type CommentGivesFeedbackOnEventConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
+};
+
+export type CommentGivesFeedbackOnEventConnectedRelationship = {
+  __typename?: 'CommentGivesFeedbackOnEventConnectedRelationship';
+  node: EventEventPayload;
 };
 
 export type CommentGivesFeedbackOnEventConnection = {
@@ -7366,6 +8294,10 @@ export type CommentGivesFeedbackOnEventRelationship = {
   node: Event;
 };
 
+export type CommentGivesFeedbackOnEventRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventSubscriptionWhere>;
+};
+
 export type CommentGivesFeedbackOnEventUpdateConnectionInput = {
   node?: InputMaybe<EventUpdateInput>;
 };
@@ -7377,6 +8309,139 @@ export type CommentGivesFeedbackOnEventUpdateFieldInput = {
   disconnect?: InputMaybe<CommentGivesFeedbackOnEventDisconnectFieldInput>;
   update?: InputMaybe<CommentGivesFeedbackOnEventUpdateConnectionInput>;
   where?: InputMaybe<CommentGivesFeedbackOnEventConnectionWhere>;
+};
+
+export type CommentInfo = {
+  __typename?: 'CommentInfo';
+  Channel?: Maybe<ChannelInfo>;
+  CommentAuthor?: Maybe<User>;
+  DiscussionChannel?: Maybe<DiscussionChannelInfo>;
+  Event?: Maybe<EventInfo>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  text?: Maybe<Scalars['String']['output']>;
+};
+
+export type CommentInfoAggregateSelection = {
+  __typename?: 'CommentInfoAggregateSelection';
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  text: StringAggregateSelection;
+};
+
+export type CommentInfoCreateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id: Scalars['ID']['input'];
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CommentInfoCreatedEvent = {
+  __typename?: 'CommentInfoCreatedEvent';
+  createdCommentInfo: CommentInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type CommentInfoDeletedEvent = {
+  __typename?: 'CommentInfoDeletedEvent';
+  deletedCommentInfo: CommentInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type CommentInfoEdge = {
+  __typename?: 'CommentInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: CommentInfo;
+};
+
+export type CommentInfoEventPayload = {
+  __typename?: 'CommentInfoEventPayload';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id: Scalars['ID']['output'];
+  text?: Maybe<Scalars['String']['output']>;
+};
+
+export type CommentInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more CommentInfoSort objects to sort CommentInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<CommentInfoSort>>;
+};
+
+/** Fields to sort CommentInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one CommentInfoSort object. */
+export type CommentInfoSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  text?: InputMaybe<SortDirection>;
+};
+
+export type CommentInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<CommentInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<CommentInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<CommentInfoSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CommentInfoUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CommentInfoUpdatedEvent = {
+  __typename?: 'CommentInfoUpdatedEvent';
+  event: EventType;
+  previousState: CommentInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedCommentInfo: CommentInfoEventPayload;
+};
+
+export type CommentInfoWhere = {
+  AND?: InputMaybe<Array<CommentInfoWhere>>;
+  NOT?: InputMaybe<CommentInfoWhere>;
+  OR?: InputMaybe<Array<CommentInfoWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CommentInfosConnection = {
+  __typename?: 'CommentInfosConnection';
+  edges: Array<CommentInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type CommentIssueAggregateInput = {
@@ -7396,6 +8461,11 @@ export type CommentIssueConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type CommentIssueConnectedRelationship = {
+  __typename?: 'CommentIssueConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type CommentIssueConnection = {
@@ -7601,6 +8671,10 @@ export type CommentIssueRelationship = {
   node: Issue;
 };
 
+export type CommentIssueRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type CommentIssueUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -7631,6 +8705,11 @@ export type CommentModerationActionConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ModerationActionConnectWhere>;
+};
+
+export type CommentModerationActionConnectedRelationship = {
+  __typename?: 'CommentModerationActionConnectedRelationship';
+  node: ModerationActionEventPayload;
 };
 
 export type CommentModerationActionConnection = {
@@ -7736,6 +8815,10 @@ export type CommentModerationActionRelationship = {
   node: ModerationAction;
 };
 
+export type CommentModerationActionRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
 export type CommentModerationActionUpdateConnectionInput = {
   node?: InputMaybe<ModerationActionUpdateInput>;
 };
@@ -7773,6 +8856,11 @@ export type CommentParentCommentConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type CommentParentCommentConnectedRelationship = {
+  __typename?: 'CommentParentCommentConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type CommentParentCommentConnection = {
@@ -7879,6 +8967,10 @@ export type CommentParentCommentRelationship = {
   node: Comment;
 };
 
+export type CommentParentCommentRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type CommentParentCommentUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -7909,6 +9001,11 @@ export type CommentRelatedIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type CommentRelatedIssuesConnectedRelationship = {
+  __typename?: 'CommentRelatedIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type CommentRelatedIssuesConnection = {
@@ -8070,6 +9167,10 @@ export type CommentRelatedIssuesRelationship = {
   node: Issue;
 };
 
+export type CommentRelatedIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type CommentRelatedIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -8101,6 +9202,58 @@ export type CommentRelationInput = {
   UpvotedByUsers?: InputMaybe<Array<CommentUpvotedByUsersCreateFieldInput>>;
 };
 
+export type CommentRelationshipCreatedEvent = {
+  __typename?: 'CommentRelationshipCreatedEvent';
+  comment: CommentEventPayload;
+  createdRelationship: CommentConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type CommentRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<CommentRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<CommentRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<CommentRelationshipCreatedSubscriptionWhere>>;
+  comment?: InputMaybe<CommentSubscriptionWhere>;
+  createdRelationship?: InputMaybe<CommentRelationshipsSubscriptionWhere>;
+};
+
+export type CommentRelationshipDeletedEvent = {
+  __typename?: 'CommentRelationshipDeletedEvent';
+  comment: CommentEventPayload;
+  deletedRelationship: CommentConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type CommentRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<CommentRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<CommentRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<CommentRelationshipDeletedSubscriptionWhere>>;
+  comment?: InputMaybe<CommentSubscriptionWhere>;
+  deletedRelationship?: InputMaybe<CommentRelationshipsSubscriptionWhere>;
+};
+
+export type CommentRelationshipsSubscriptionWhere = {
+  Channel?: InputMaybe<CommentChannelRelationshipSubscriptionWhere>;
+  ChildComments?: InputMaybe<CommentChildCommentsRelationshipSubscriptionWhere>;
+  CommentAuthor?: InputMaybe<CommentCommentAuthorRelationshipSubscriptionWhere>;
+  DiscussionChannel?: InputMaybe<CommentDiscussionChannelRelationshipSubscriptionWhere>;
+  Event?: InputMaybe<CommentEventRelationshipSubscriptionWhere>;
+  FeedbackComments?: InputMaybe<CommentFeedbackCommentsRelationshipSubscriptionWhere>;
+  GivesFeedbackOnComment?: InputMaybe<CommentGivesFeedbackOnCommentRelationshipSubscriptionWhere>;
+  GivesFeedbackOnDiscussion?: InputMaybe<CommentGivesFeedbackOnDiscussionRelationshipSubscriptionWhere>;
+  GivesFeedbackOnEvent?: InputMaybe<CommentGivesFeedbackOnEventRelationshipSubscriptionWhere>;
+  Issue?: InputMaybe<CommentIssueRelationshipSubscriptionWhere>;
+  ModerationAction?: InputMaybe<CommentModerationActionRelationshipSubscriptionWhere>;
+  ParentComment?: InputMaybe<CommentParentCommentRelationshipSubscriptionWhere>;
+  RelatedIssues?: InputMaybe<CommentRelatedIssuesRelationshipSubscriptionWhere>;
+  Tags?: InputMaybe<CommentTagsRelationshipSubscriptionWhere>;
+  UpvotedByUsers?: InputMaybe<CommentUpvotedByUsersRelationshipSubscriptionWhere>;
+};
+
 export type CommentRepliesFormat = {
   __typename?: 'CommentRepliesFormat';
   ChildComments: Array<Comment>;
@@ -8117,10 +9270,29 @@ export type CommentRepliesFormatCreateInput = {
   aggregateChildCommentCount: Scalars['Int']['input'];
 };
 
+export type CommentRepliesFormatCreatedEvent = {
+  __typename?: 'CommentRepliesFormatCreatedEvent';
+  createdCommentRepliesFormat: CommentRepliesFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type CommentRepliesFormatDeletedEvent = {
+  __typename?: 'CommentRepliesFormatDeletedEvent';
+  deletedCommentRepliesFormat: CommentRepliesFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type CommentRepliesFormatEdge = {
   __typename?: 'CommentRepliesFormatEdge';
   cursor: Scalars['String']['output'];
   node: CommentRepliesFormat;
+};
+
+export type CommentRepliesFormatEventPayload = {
+  __typename?: 'CommentRepliesFormatEventPayload';
+  aggregateChildCommentCount: Scalars['Int']['output'];
 };
 
 export type CommentRepliesFormatOptions = {
@@ -8135,10 +9307,30 @@ export type CommentRepliesFormatSort = {
   aggregateChildCommentCount?: InputMaybe<SortDirection>;
 };
 
+export type CommentRepliesFormatSubscriptionWhere = {
+  AND?: InputMaybe<Array<CommentRepliesFormatSubscriptionWhere>>;
+  NOT?: InputMaybe<CommentRepliesFormatSubscriptionWhere>;
+  OR?: InputMaybe<Array<CommentRepliesFormatSubscriptionWhere>>;
+  aggregateChildCommentCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChildCommentCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChildCommentCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChildCommentCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  aggregateChildCommentCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChildCommentCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type CommentRepliesFormatUpdateInput = {
   aggregateChildCommentCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateChildCommentCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CommentRepliesFormatUpdatedEvent = {
+  __typename?: 'CommentRepliesFormatUpdatedEvent';
+  event: EventType;
+  previousState: CommentRepliesFormatEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedCommentRepliesFormat: CommentRepliesFormatEventPayload;
 };
 
 export type CommentRepliesFormatWhere = {
@@ -8176,6 +9368,18 @@ export type CommentSectionFormatCreateInput = {
   _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type CommentSectionFormatCreatedEvent = {
+  __typename?: 'CommentSectionFormatCreatedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type CommentSectionFormatDeletedEvent = {
+  __typename?: 'CommentSectionFormatDeletedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type CommentSectionFormatEdge = {
   __typename?: 'CommentSectionFormatEdge';
   cursor: Scalars['String']['output'];
@@ -8190,6 +9394,12 @@ export type CommentSectionFormatOptions = {
 export type CommentSectionFormatUpdateInput = {
   /** Appears because this input type would be empty otherwise because this type is composed of just generated and/or relationship properties. See https://neo4j.com/docs/graphql-manual/current/troubleshooting/faqs/ */
   _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type CommentSectionFormatUpdatedEvent = {
+  __typename?: 'CommentSectionFormatUpdatedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type CommentSectionFormatWhere = {
@@ -8217,6 +9427,47 @@ export type CommentSort = {
   text?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   weightedVotesCount?: InputMaybe<SortDirection>;
+};
+
+export type CommentSubscriptionWhere = {
+  AND?: InputMaybe<Array<CommentSubscriptionWhere>>;
+  NOT?: InputMaybe<CommentSubscriptionWhere>;
+  OR?: InputMaybe<Array<CommentSubscriptionWhere>>;
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  emoji?: InputMaybe<Scalars['JSON']['input']>;
+  emoji_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isFeedbackComment?: InputMaybe<Scalars['Boolean']['input']>;
+  isRootComment?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
+  weightedVotesCount_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_LTE?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type CommentTagTagsAggregationSelection = {
@@ -8256,6 +9507,11 @@ export type CommentTagsConnectOrCreateFieldInput = {
 
 export type CommentTagsConnectOrCreateFieldInputOnCreate = {
   node: TagOnCreateInput;
+};
+
+export type CommentTagsConnectedRelationship = {
+  __typename?: 'CommentTagsConnectedRelationship';
+  node: TagEventPayload;
 };
 
 export type CommentTagsConnection = {
@@ -8323,6 +9579,10 @@ export type CommentTagsRelationship = {
   node: Tag;
 };
 
+export type CommentTagsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TagSubscriptionWhere>;
+};
+
 export type CommentTagsUpdateConnectionInput = {
   node?: InputMaybe<TagUpdateInput>;
 };
@@ -8367,6 +9627,14 @@ export type CommentUpdateInput = {
   weightedVotesCount_SUBTRACT?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type CommentUpdatedEvent = {
+  __typename?: 'CommentUpdatedEvent';
+  event: EventType;
+  previousState: CommentEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedComment: CommentEventPayload;
+};
+
 export type CommentUpvotedByUsersAggregateInput = {
   AND?: InputMaybe<Array<CommentUpvotedByUsersAggregateInput>>;
   NOT?: InputMaybe<CommentUpvotedByUsersAggregateInput>;
@@ -8393,6 +9661,11 @@ export type CommentUpvotedByUsersConnectOrCreateFieldInput = {
 
 export type CommentUpvotedByUsersConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type CommentUpvotedByUsersConnectedRelationship = {
+  __typename?: 'CommentUpvotedByUsersConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type CommentUpvotedByUsersConnection = {
@@ -8628,6 +9901,10 @@ export type CommentUpvotedByUsersRelationship = {
   __typename?: 'CommentUpvotedByUsersRelationship';
   cursor: Scalars['String']['output'];
   node: User;
+};
+
+export type CommentUpvotedByUsersRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
 };
 
 export type CommentUpvotedByUsersUpdateConnectionInput = {
@@ -8918,15 +10195,35 @@ export type ContactConnectWhere = {
   node: ContactWhere;
 };
 
+export type ContactConnectedRelationships = {
+  __typename?: 'ContactConnectedRelationships';
+  MessageAuthor?: Maybe<ContactMessageAuthorConnectedRelationship>;
+  Messages?: Maybe<ContactMessagesConnectedRelationship>;
+};
+
 export type ContactCreateInput = {
   MessageAuthor?: InputMaybe<ContactMessageAuthorCreateInput>;
   Messages?: InputMaybe<ContactMessagesFieldInput>;
   mostRecentMessageTimestamp?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type ContactCreatedEvent = {
+  __typename?: 'ContactCreatedEvent';
+  createdContact: ContactEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ContactDeleteInput = {
   MessageAuthor?: InputMaybe<ContactMessageAuthorDeleteInput>;
   Messages?: InputMaybe<Array<ContactMessagesDeleteFieldInput>>;
+};
+
+export type ContactDeletedEvent = {
+  __typename?: 'ContactDeletedEvent';
+  deletedContact: ContactEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ContactDisconnectInput = {
@@ -8940,6 +10237,13 @@ export type ContactEdge = {
   node: Contact;
 };
 
+export type ContactEventPayload = {
+  __typename?: 'ContactEventPayload';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  mostRecentMessageTimestamp?: Maybe<Scalars['DateTime']['output']>;
+};
+
 export type ContactMessageAuthorConnectInput = {
   ModerationProfile?: InputMaybe<ContactMessageAuthorModerationProfileConnectFieldInput>;
   User?: InputMaybe<ContactMessageAuthorUserConnectFieldInput>;
@@ -8948,6 +10252,11 @@ export type ContactMessageAuthorConnectInput = {
 export type ContactMessageAuthorConnectOrCreateInput = {
   ModerationProfile?: InputMaybe<ContactMessageAuthorModerationProfileConnectOrCreateFieldInput>;
   User?: InputMaybe<ContactMessageAuthorUserConnectOrCreateFieldInput>;
+};
+
+export type ContactMessageAuthorConnectedRelationship = {
+  __typename?: 'ContactMessageAuthorConnectedRelationship';
+  node: CommentAuthorEventPayload;
 };
 
 export type ContactMessageAuthorConnection = {
@@ -9023,6 +10332,10 @@ export type ContactMessageAuthorModerationProfileFieldInput = {
   create?: InputMaybe<ContactMessageAuthorModerationProfileCreateFieldInput>;
 };
 
+export type ContactMessageAuthorModerationProfileSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type ContactMessageAuthorModerationProfileUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -9041,6 +10354,11 @@ export type ContactMessageAuthorRelationship = {
   __typename?: 'ContactMessageAuthorRelationship';
   cursor: Scalars['String']['output'];
   node: CommentAuthor;
+};
+
+export type ContactMessageAuthorRelationshipSubscriptionWhere = {
+  ModerationProfile?: InputMaybe<ContactMessageAuthorModerationProfileSubscriptionWhere>;
+  User?: InputMaybe<ContactMessageAuthorUserSubscriptionWhere>;
 };
 
 export type ContactMessageAuthorUpdateInput = {
@@ -9089,6 +10407,10 @@ export type ContactMessageAuthorUserFieldInput = {
   create?: InputMaybe<ContactMessageAuthorUserCreateFieldInput>;
 };
 
+export type ContactMessageAuthorUserSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type ContactMessageAuthorUserUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -9133,6 +10455,11 @@ export type ContactMessagesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<MessageConnectWhere>;
+};
+
+export type ContactMessagesConnectedRelationship = {
+  __typename?: 'ContactMessagesConnectedRelationship';
+  node: MessageEventPayload;
 };
 
 export type ContactMessagesConnection = {
@@ -9209,6 +10536,10 @@ export type ContactMessagesRelationship = {
   node: Message;
 };
 
+export type ContactMessagesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<MessageSubscriptionWhere>;
+};
+
 export type ContactMessagesUpdateConnectionInput = {
   node?: InputMaybe<MessageUpdateInput>;
 };
@@ -9234,6 +10565,45 @@ export type ContactRelationInput = {
   Messages?: InputMaybe<Array<ContactMessagesCreateFieldInput>>;
 };
 
+export type ContactRelationshipCreatedEvent = {
+  __typename?: 'ContactRelationshipCreatedEvent';
+  contact: ContactEventPayload;
+  createdRelationship: ContactConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ContactRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ContactRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ContactRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ContactRelationshipCreatedSubscriptionWhere>>;
+  contact?: InputMaybe<ContactSubscriptionWhere>;
+  createdRelationship?: InputMaybe<ContactRelationshipsSubscriptionWhere>;
+};
+
+export type ContactRelationshipDeletedEvent = {
+  __typename?: 'ContactRelationshipDeletedEvent';
+  contact: ContactEventPayload;
+  deletedRelationship: ContactConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ContactRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ContactRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ContactRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ContactRelationshipDeletedSubscriptionWhere>>;
+  contact?: InputMaybe<ContactSubscriptionWhere>;
+  deletedRelationship?: InputMaybe<ContactRelationshipsSubscriptionWhere>;
+};
+
+export type ContactRelationshipsSubscriptionWhere = {
+  MessageAuthor?: InputMaybe<ContactMessageAuthorRelationshipSubscriptionWhere>;
+  Messages?: InputMaybe<ContactMessagesRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Contacts by. The order in which sorts are applied is not guaranteed when specifying many fields in one ContactSort object. */
 export type ContactSort = {
   createdAt?: InputMaybe<SortDirection>;
@@ -9241,11 +10611,42 @@ export type ContactSort = {
   mostRecentMessageTimestamp?: InputMaybe<SortDirection>;
 };
 
+export type ContactSubscriptionWhere = {
+  AND?: InputMaybe<Array<ContactSubscriptionWhere>>;
+  NOT?: InputMaybe<ContactSubscriptionWhere>;
+  OR?: InputMaybe<Array<ContactSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  mostRecentMessageTimestamp?: InputMaybe<Scalars['DateTime']['input']>;
+  mostRecentMessageTimestamp_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  mostRecentMessageTimestamp_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  mostRecentMessageTimestamp_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  mostRecentMessageTimestamp_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  mostRecentMessageTimestamp_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 export type ContactUpdateInput = {
   MessageAuthor?: InputMaybe<ContactMessageAuthorUpdateInput>;
   Messages?: InputMaybe<Array<ContactMessagesUpdateFieldInput>>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   mostRecentMessageTimestamp?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ContactUpdatedEvent = {
+  __typename?: 'ContactUpdatedEvent';
+  event: EventType;
+  previousState: ContactEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedContact: ContactEventPayload;
 };
 
 export type ContactWhere = {
@@ -9299,9 +10700,21 @@ export type ContactsConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type CreateActivitiesMutationResponse = {
+  __typename?: 'CreateActivitiesMutationResponse';
+  activities: Array<Activity>;
+  info: CreateInfo;
+};
+
 export type CreateAlbumsMutationResponse = {
   __typename?: 'CreateAlbumsMutationResponse';
   albums: Array<Album>;
+  info: CreateInfo;
+};
+
+export type CreateChannelInfosMutationResponse = {
+  __typename?: 'CreateChannelInfosMutationResponse';
+  channelInfos: Array<ChannelInfo>;
   info: CreateInfo;
 };
 
@@ -9314,6 +10727,12 @@ export type CreateChannelRolesMutationResponse = {
 export type CreateChannelsMutationResponse = {
   __typename?: 'CreateChannelsMutationResponse';
   channels: Array<Channel>;
+  info: CreateInfo;
+};
+
+export type CreateCommentInfosMutationResponse = {
+  __typename?: 'CreateCommentInfosMutationResponse';
+  commentInfos: Array<CommentInfo>;
   info: CreateInfo;
 };
 
@@ -9341,6 +10760,18 @@ export type CreateContactsMutationResponse = {
   info: CreateInfo;
 };
 
+export type CreateDayDataMutationResponse = {
+  __typename?: 'CreateDayDataMutationResponse';
+  dayData: Array<DayData>;
+  info: CreateInfo;
+};
+
+export type CreateDiscussionChannelInfosMutationResponse = {
+  __typename?: 'CreateDiscussionChannelInfosMutationResponse';
+  discussionChannelInfos: Array<DiscussionChannelInfo>;
+  info: CreateInfo;
+};
+
 export type CreateDiscussionChannelListFormatsMutationResponse = {
   __typename?: 'CreateDiscussionChannelListFormatsMutationResponse';
   discussionChannelListFormats: Array<DiscussionChannelListFormat>;
@@ -9350,6 +10781,12 @@ export type CreateDiscussionChannelListFormatsMutationResponse = {
 export type CreateDiscussionChannelsMutationResponse = {
   __typename?: 'CreateDiscussionChannelsMutationResponse';
   discussionChannels: Array<DiscussionChannel>;
+  info: CreateInfo;
+};
+
+export type CreateDiscussionInfosMutationResponse = {
+  __typename?: 'CreateDiscussionInfosMutationResponse';
+  discussionInfos: Array<DiscussionInfo>;
   info: CreateInfo;
 };
 
@@ -9383,6 +10820,12 @@ export type CreateEnvironmentInfosMutationResponse = {
   info: CreateInfo;
 };
 
+export type CreateEventChannelInfosMutationResponse = {
+  __typename?: 'CreateEventChannelInfosMutationResponse';
+  eventChannelInfos: Array<EventChannelInfo>;
+  info: CreateInfo;
+};
+
 export type CreateEventChannelsMutationResponse = {
   __typename?: 'CreateEventChannelsMutationResponse';
   eventChannels: Array<EventChannel>;
@@ -9392,6 +10835,12 @@ export type CreateEventChannelsMutationResponse = {
 export type CreateEventCommentsFormatsMutationResponse = {
   __typename?: 'CreateEventCommentsFormatsMutationResponse';
   eventCommentsFormats: Array<EventCommentsFormat>;
+  info: CreateInfo;
+};
+
+export type CreateEventInfosMutationResponse = {
+  __typename?: 'CreateEventInfosMutationResponse';
+  eventInfos: Array<EventInfo>;
   info: CreateInfo;
 };
 
@@ -9564,6 +11013,121 @@ export type DateTimeAggregateSelection = {
   __typename?: 'DateTimeAggregateSelection';
   max?: Maybe<Scalars['DateTime']['output']>;
   min?: Maybe<Scalars['DateTime']['output']>;
+};
+
+export type DayData = {
+  __typename?: 'DayData';
+  activities: Array<Activity>;
+  count: Scalars['Int']['output'];
+  date: Scalars['String']['output'];
+};
+
+export type DayDataAggregateSelection = {
+  __typename?: 'DayDataAggregateSelection';
+  count: IntAggregateSelection;
+  date: StringAggregateSelection;
+};
+
+export type DayDataConnection = {
+  __typename?: 'DayDataConnection';
+  edges: Array<DayDataEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type DayDataCreateInput = {
+  count: Scalars['Int']['input'];
+  date: Scalars['String']['input'];
+};
+
+export type DayDataCreatedEvent = {
+  __typename?: 'DayDataCreatedEvent';
+  createdDayData: DayDataEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DayDataDeletedEvent = {
+  __typename?: 'DayDataDeletedEvent';
+  deletedDayData: DayDataEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DayDataEdge = {
+  __typename?: 'DayDataEdge';
+  cursor: Scalars['String']['output'];
+  node: DayData;
+};
+
+export type DayDataEventPayload = {
+  __typename?: 'DayDataEventPayload';
+  count: Scalars['Int']['output'];
+  date: Scalars['String']['output'];
+};
+
+export type DayDataOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more DayDataSort objects to sort DayData by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<DayDataSort>>;
+};
+
+/** Fields to sort DayData by. The order in which sorts are applied is not guaranteed when specifying many fields in one DayDataSort object. */
+export type DayDataSort = {
+  count?: InputMaybe<SortDirection>;
+  date?: InputMaybe<SortDirection>;
+};
+
+export type DayDataSubscriptionWhere = {
+  AND?: InputMaybe<Array<DayDataSubscriptionWhere>>;
+  NOT?: InputMaybe<DayDataSubscriptionWhere>;
+  OR?: InputMaybe<Array<DayDataSubscriptionWhere>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+  date_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  date_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  date_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  date_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  date_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DayDataUpdateInput = {
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  count_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DayDataUpdatedEvent = {
+  __typename?: 'DayDataUpdatedEvent';
+  event: EventType;
+  previousState: DayDataEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDayData: DayDataEventPayload;
+};
+
+export type DayDataWhere = {
+  AND?: InputMaybe<Array<DayDataWhere>>;
+  NOT?: InputMaybe<DayDataWhere>;
+  OR?: InputMaybe<Array<DayDataWhere>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  date?: InputMaybe<Scalars['String']['input']>;
+  date_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  date_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  date_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  date_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  date_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 /** Information about the number of nodes and relationships deleted during a delete mutation */
@@ -9752,6 +11316,11 @@ export type DiscussionAlbumConnectFieldInput = {
   where?: InputMaybe<AlbumConnectWhere>;
 };
 
+export type DiscussionAlbumConnectedRelationship = {
+  __typename?: 'DiscussionAlbumConnectedRelationship';
+  node: AlbumEventPayload;
+};
+
 export type DiscussionAlbumConnection = {
   __typename?: 'DiscussionAlbumConnection';
   edges: Array<DiscussionAlbumRelationship>;
@@ -9801,6 +11370,10 @@ export type DiscussionAlbumRelationship = {
   node: Album;
 };
 
+export type DiscussionAlbumRelationshipSubscriptionWhere = {
+  node?: InputMaybe<AlbumSubscriptionWhere>;
+};
+
 export type DiscussionAlbumUpdateConnectionInput = {
   node?: InputMaybe<AlbumUpdateInput>;
 };
@@ -9840,6 +11413,11 @@ export type DiscussionAuthorConnectOrCreateFieldInput = {
 
 export type DiscussionAuthorConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type DiscussionAuthorConnectedRelationship = {
+  __typename?: 'DiscussionAuthorConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type DiscussionAuthorConnection = {
@@ -10077,6 +11655,10 @@ export type DiscussionAuthorRelationship = {
   node: User;
 };
 
+export type DiscussionAuthorRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type DiscussionAuthorUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -10283,6 +11865,11 @@ export type DiscussionChannelAnswersConnectFieldInput = {
   where?: InputMaybe<CommentConnectWhere>;
 };
 
+export type DiscussionChannelAnswersConnectedRelationship = {
+  __typename?: 'DiscussionChannelAnswersConnectedRelationship';
+  node: CommentEventPayload;
+};
+
 export type DiscussionChannelAnswersConnection = {
   __typename?: 'DiscussionChannelAnswersConnection';
   edges: Array<DiscussionChannelAnswersRelationship>;
@@ -10387,6 +11974,10 @@ export type DiscussionChannelAnswersRelationship = {
   node: Comment;
 };
 
+export type DiscussionChannelAnswersRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type DiscussionChannelAnswersUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -10442,6 +12033,11 @@ export type DiscussionChannelChannelConnectOrCreateFieldInput = {
 
 export type DiscussionChannelChannelConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type DiscussionChannelChannelConnectedRelationship = {
+  __typename?: 'DiscussionChannelChannelConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type DiscussionChannelChannelConnection = {
@@ -10579,6 +12175,10 @@ export type DiscussionChannelChannelRelationship = {
   node: Channel;
 };
 
+export type DiscussionChannelChannelRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type DiscussionChannelChannelUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -10640,6 +12240,11 @@ export type DiscussionChannelCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type DiscussionChannelCommentsConnectedRelationship = {
+  __typename?: 'DiscussionChannelCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type DiscussionChannelCommentsConnection = {
@@ -10746,6 +12351,10 @@ export type DiscussionChannelCommentsRelationship = {
   node: Comment;
 };
 
+export type DiscussionChannelCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type DiscussionChannelCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -10777,6 +12386,16 @@ export type DiscussionChannelConnectWhere = {
   node: DiscussionChannelWhere;
 };
 
+export type DiscussionChannelConnectedRelationships = {
+  __typename?: 'DiscussionChannelConnectedRelationships';
+  Answers?: Maybe<DiscussionChannelAnswersConnectedRelationship>;
+  Channel?: Maybe<DiscussionChannelChannelConnectedRelationship>;
+  Comments?: Maybe<DiscussionChannelCommentsConnectedRelationship>;
+  Discussion?: Maybe<DiscussionChannelDiscussionConnectedRelationship>;
+  RelatedIssues?: Maybe<DiscussionChannelRelatedIssuesConnectedRelationship>;
+  UpvotedByUsers?: Maybe<DiscussionChannelUpvotedByUsersConnectedRelationship>;
+};
+
 export type DiscussionChannelCreateInput = {
   Answers?: InputMaybe<DiscussionChannelAnswersFieldInput>;
   Channel?: InputMaybe<DiscussionChannelChannelFieldInput>;
@@ -10793,6 +12412,13 @@ export type DiscussionChannelCreateInput = {
   weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
 };
 
+export type DiscussionChannelCreatedEvent = {
+  __typename?: 'DiscussionChannelCreatedEvent';
+  createdDiscussionChannel: DiscussionChannelEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type DiscussionChannelDeleteInput = {
   Answers?: InputMaybe<Array<DiscussionChannelAnswersDeleteFieldInput>>;
   Channel?: InputMaybe<DiscussionChannelChannelDeleteFieldInput>;
@@ -10800,6 +12426,13 @@ export type DiscussionChannelDeleteInput = {
   Discussion?: InputMaybe<DiscussionChannelDiscussionDeleteFieldInput>;
   RelatedIssues?: InputMaybe<Array<DiscussionChannelRelatedIssuesDeleteFieldInput>>;
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersDeleteFieldInput>>;
+};
+
+export type DiscussionChannelDeletedEvent = {
+  __typename?: 'DiscussionChannelDeletedEvent';
+  deletedDiscussionChannel: DiscussionChannelEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type DiscussionChannelDisconnectInput = {
@@ -10828,6 +12461,11 @@ export type DiscussionChannelDiscussionConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type DiscussionChannelDiscussionConnectedRelationship = {
+  __typename?: 'DiscussionChannelDiscussionConnectedRelationship';
+  node: DiscussionEventPayload;
 };
 
 export type DiscussionChannelDiscussionConnection = {
@@ -10944,6 +12582,10 @@ export type DiscussionChannelDiscussionRelationship = {
   node: Discussion;
 };
 
+export type DiscussionChannelDiscussionRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
 export type DiscussionChannelDiscussionUpdateConnectionInput = {
   node?: InputMaybe<DiscussionUpdateInput>;
 };
@@ -10961,6 +12603,149 @@ export type DiscussionChannelEdge = {
   __typename?: 'DiscussionChannelEdge';
   cursor: Scalars['String']['output'];
   node: DiscussionChannel;
+};
+
+export type DiscussionChannelEventPayload = {
+  __typename?: 'DiscussionChannelEventPayload';
+  answered?: Maybe<Scalars['Boolean']['output']>;
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  channelUniqueName: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  discussionId: Scalars['ID']['output'];
+  emoji?: Maybe<Scalars['JSON']['output']>;
+  id: Scalars['ID']['output'];
+  locked?: Maybe<Scalars['Boolean']['output']>;
+  weightedVotesCount?: Maybe<Scalars['Float']['output']>;
+};
+
+export type DiscussionChannelInfo = {
+  __typename?: 'DiscussionChannelInfo';
+  Channel?: Maybe<ChannelInfo>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  discussionId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+};
+
+export type DiscussionChannelInfoAggregateSelection = {
+  __typename?: 'DiscussionChannelInfoAggregateSelection';
+  channelUniqueName: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  discussionId: StringAggregateSelection;
+  id: IdAggregateSelection;
+};
+
+export type DiscussionChannelInfoCreateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  discussionId?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+export type DiscussionChannelInfoCreatedEvent = {
+  __typename?: 'DiscussionChannelInfoCreatedEvent';
+  createdDiscussionChannelInfo: DiscussionChannelInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionChannelInfoDeletedEvent = {
+  __typename?: 'DiscussionChannelInfoDeletedEvent';
+  deletedDiscussionChannelInfo: DiscussionChannelInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionChannelInfoEdge = {
+  __typename?: 'DiscussionChannelInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: DiscussionChannelInfo;
+};
+
+export type DiscussionChannelInfoEventPayload = {
+  __typename?: 'DiscussionChannelInfoEventPayload';
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  discussionId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+};
+
+export type DiscussionChannelInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more DiscussionChannelInfoSort objects to sort DiscussionChannelInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<DiscussionChannelInfoSort>>;
+};
+
+/** Fields to sort DiscussionChannelInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionChannelInfoSort object. */
+export type DiscussionChannelInfoSort = {
+  channelUniqueName?: InputMaybe<SortDirection>;
+  discussionId?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+};
+
+export type DiscussionChannelInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelInfoSubscriptionWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  discussionId?: InputMaybe<Scalars['String']['input']>;
+  discussionId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  discussionId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  discussionId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  discussionId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  discussionId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type DiscussionChannelInfoUpdateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  discussionId?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type DiscussionChannelInfoUpdatedEvent = {
+  __typename?: 'DiscussionChannelInfoUpdatedEvent';
+  event: EventType;
+  previousState: DiscussionChannelInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDiscussionChannelInfo: DiscussionChannelInfoEventPayload;
+};
+
+export type DiscussionChannelInfoWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelInfoWhere>>;
+  NOT?: InputMaybe<DiscussionChannelInfoWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelInfoWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  discussionId?: InputMaybe<Scalars['String']['input']>;
+  discussionId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  discussionId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  discussionId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  discussionId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  discussionId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type DiscussionChannelInfosConnection = {
+  __typename?: 'DiscussionChannelInfosConnection';
+  edges: Array<DiscussionChannelInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type DiscussionChannelIssueRelatedIssuesAggregationSelection = {
@@ -11001,10 +12786,29 @@ export type DiscussionChannelListFormatCreateInput = {
   aggregateDiscussionChannelsCount: Scalars['Int']['input'];
 };
 
+export type DiscussionChannelListFormatCreatedEvent = {
+  __typename?: 'DiscussionChannelListFormatCreatedEvent';
+  createdDiscussionChannelListFormat: DiscussionChannelListFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionChannelListFormatDeletedEvent = {
+  __typename?: 'DiscussionChannelListFormatDeletedEvent';
+  deletedDiscussionChannelListFormat: DiscussionChannelListFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type DiscussionChannelListFormatEdge = {
   __typename?: 'DiscussionChannelListFormatEdge';
   cursor: Scalars['String']['output'];
   node: DiscussionChannelListFormat;
+};
+
+export type DiscussionChannelListFormatEventPayload = {
+  __typename?: 'DiscussionChannelListFormatEventPayload';
+  aggregateDiscussionChannelsCount: Scalars['Int']['output'];
 };
 
 export type DiscussionChannelListFormatOptions = {
@@ -11019,10 +12823,30 @@ export type DiscussionChannelListFormatSort = {
   aggregateDiscussionChannelsCount?: InputMaybe<SortDirection>;
 };
 
+export type DiscussionChannelListFormatSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelListFormatSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelListFormatSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelListFormatSubscriptionWhere>>;
+  aggregateDiscussionChannelsCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionChannelsCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionChannelsCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionChannelsCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  aggregateDiscussionChannelsCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionChannelsCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type DiscussionChannelListFormatUpdateInput = {
   aggregateDiscussionChannelsCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionChannelsCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type DiscussionChannelListFormatUpdatedEvent = {
+  __typename?: 'DiscussionChannelListFormatUpdatedEvent';
+  event: EventType;
+  previousState: DiscussionChannelListFormatEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDiscussionChannelListFormat: DiscussionChannelListFormatEventPayload;
 };
 
 export type DiscussionChannelListFormatWhere = {
@@ -11068,6 +12892,11 @@ export type DiscussionChannelRelatedIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type DiscussionChannelRelatedIssuesConnectedRelationship = {
+  __typename?: 'DiscussionChannelRelatedIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type DiscussionChannelRelatedIssuesConnection = {
@@ -11229,6 +13058,10 @@ export type DiscussionChannelRelatedIssuesRelationship = {
   node: Issue;
 };
 
+export type DiscussionChannelRelatedIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type DiscussionChannelRelatedIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -11251,6 +13084,49 @@ export type DiscussionChannelRelationInput = {
   UpvotedByUsers?: InputMaybe<Array<DiscussionChannelUpvotedByUsersCreateFieldInput>>;
 };
 
+export type DiscussionChannelRelationshipCreatedEvent = {
+  __typename?: 'DiscussionChannelRelationshipCreatedEvent';
+  createdRelationship: DiscussionChannelConnectedRelationships;
+  discussionChannel: DiscussionChannelEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionChannelRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<DiscussionChannelRelationshipsSubscriptionWhere>;
+  discussionChannel?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
+export type DiscussionChannelRelationshipDeletedEvent = {
+  __typename?: 'DiscussionChannelRelationshipDeletedEvent';
+  deletedRelationship: DiscussionChannelConnectedRelationships;
+  discussionChannel: DiscussionChannelEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionChannelRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<DiscussionChannelRelationshipsSubscriptionWhere>;
+  discussionChannel?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
+export type DiscussionChannelRelationshipsSubscriptionWhere = {
+  Answers?: InputMaybe<DiscussionChannelAnswersRelationshipSubscriptionWhere>;
+  Channel?: InputMaybe<DiscussionChannelChannelRelationshipSubscriptionWhere>;
+  Comments?: InputMaybe<DiscussionChannelCommentsRelationshipSubscriptionWhere>;
+  Discussion?: InputMaybe<DiscussionChannelDiscussionRelationshipSubscriptionWhere>;
+  RelatedIssues?: InputMaybe<DiscussionChannelRelatedIssuesRelationshipSubscriptionWhere>;
+  UpvotedByUsers?: InputMaybe<DiscussionChannelUpvotedByUsersRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort DiscussionChannels by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionChannelSort object. */
 export type DiscussionChannelSort = {
   answered?: InputMaybe<SortDirection>;
@@ -11262,6 +13138,45 @@ export type DiscussionChannelSort = {
   id?: InputMaybe<SortDirection>;
   locked?: InputMaybe<SortDirection>;
   weightedVotesCount?: InputMaybe<SortDirection>;
+};
+
+export type DiscussionChannelSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionChannelSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionChannelSubscriptionWhere>>;
+  answered?: InputMaybe<Scalars['Boolean']['input']>;
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionId?: InputMaybe<Scalars['ID']['input']>;
+  discussionId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  discussionId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  discussionId_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  discussionId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  emoji?: InputMaybe<Scalars['JSON']['input']>;
+  emoji_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  weightedVotesCount?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Float']['input']>>>;
+  weightedVotesCount_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_LTE?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type DiscussionChannelUpdateInput = {
@@ -11283,6 +13198,14 @@ export type DiscussionChannelUpdateInput = {
   weightedVotesCount_DIVIDE?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_MULTIPLY?: InputMaybe<Scalars['Float']['input']>;
   weightedVotesCount_SUBTRACT?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type DiscussionChannelUpdatedEvent = {
+  __typename?: 'DiscussionChannelUpdatedEvent';
+  event: EventType;
+  previousState: DiscussionChannelEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDiscussionChannel: DiscussionChannelEventPayload;
 };
 
 export type DiscussionChannelUpvotedByUsersAggregateInput = {
@@ -11311,6 +13234,11 @@ export type DiscussionChannelUpvotedByUsersConnectOrCreateFieldInput = {
 
 export type DiscussionChannelUpvotedByUsersConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type DiscussionChannelUpvotedByUsersConnectedRelationship = {
+  __typename?: 'DiscussionChannelUpvotedByUsersConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type DiscussionChannelUpvotedByUsersConnection = {
@@ -11548,6 +13476,10 @@ export type DiscussionChannelUpvotedByUsersRelationship = {
   node: User;
 };
 
+export type DiscussionChannelUpvotedByUsersRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type DiscussionChannelUpvotedByUsersUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -11740,6 +13672,15 @@ export type DiscussionConnectWhere = {
   node: DiscussionWhere;
 };
 
+export type DiscussionConnectedRelationships = {
+  __typename?: 'DiscussionConnectedRelationships';
+  Album?: Maybe<DiscussionAlbumConnectedRelationship>;
+  Author?: Maybe<DiscussionAuthorConnectedRelationship>;
+  DiscussionChannels?: Maybe<DiscussionDiscussionChannelsConnectedRelationship>;
+  FeedbackComments?: Maybe<DiscussionFeedbackCommentsConnectedRelationship>;
+  Tags?: Maybe<DiscussionTagsConnectedRelationship>;
+};
+
 export type DiscussionCreateInput = {
   Album?: InputMaybe<DiscussionAlbumFieldInput>;
   Author?: InputMaybe<DiscussionAuthorFieldInput>;
@@ -11759,12 +13700,26 @@ export type DiscussionCreateInputWithChannels = {
   discussionCreateInput: DiscussionCreateInput;
 };
 
+export type DiscussionCreatedEvent = {
+  __typename?: 'DiscussionCreatedEvent';
+  createdDiscussion: DiscussionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type DiscussionDeleteInput = {
   Album?: InputMaybe<DiscussionAlbumDeleteFieldInput>;
   Author?: InputMaybe<DiscussionAuthorDeleteFieldInput>;
   DiscussionChannels?: InputMaybe<Array<DiscussionDiscussionChannelsDeleteFieldInput>>;
   FeedbackComments?: InputMaybe<Array<DiscussionFeedbackCommentsDeleteFieldInput>>;
   Tags?: InputMaybe<Array<DiscussionTagsDeleteFieldInput>>;
+};
+
+export type DiscussionDeletedEvent = {
+  __typename?: 'DiscussionDeletedEvent';
+  deletedDiscussion: DiscussionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type DiscussionDisconnectInput = {
@@ -11807,6 +13762,11 @@ export type DiscussionDiscussionChannelsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
+};
+
+export type DiscussionDiscussionChannelsConnectedRelationship = {
+  __typename?: 'DiscussionDiscussionChannelsConnectedRelationship';
+  node: DiscussionChannelEventPayload;
 };
 
 export type DiscussionDiscussionChannelsConnection = {
@@ -11903,6 +13863,10 @@ export type DiscussionDiscussionChannelsRelationship = {
   node: DiscussionChannel;
 };
 
+export type DiscussionDiscussionChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
 export type DiscussionDiscussionChannelsUpdateConnectionInput = {
   node?: InputMaybe<DiscussionChannelUpdateInput>;
 };
@@ -11922,6 +13886,18 @@ export type DiscussionEdge = {
   node: Discussion;
 };
 
+export type DiscussionEventPayload = {
+  __typename?: 'DiscussionEventPayload';
+  body?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
+  hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
+  id: Scalars['ID']['output'];
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+};
+
 export type DiscussionFeedbackCommentsAggregateInput = {
   AND?: InputMaybe<Array<DiscussionFeedbackCommentsAggregateInput>>;
   NOT?: InputMaybe<DiscussionFeedbackCommentsAggregateInput>;
@@ -11939,6 +13915,11 @@ export type DiscussionFeedbackCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type DiscussionFeedbackCommentsConnectedRelationship = {
+  __typename?: 'DiscussionFeedbackCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type DiscussionFeedbackCommentsConnection = {
@@ -12045,6 +14026,10 @@ export type DiscussionFeedbackCommentsRelationship = {
   node: Comment;
 };
 
+export type DiscussionFeedbackCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type DiscussionFeedbackCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -12056,6 +14041,137 @@ export type DiscussionFeedbackCommentsUpdateFieldInput = {
   disconnect?: InputMaybe<Array<DiscussionFeedbackCommentsDisconnectFieldInput>>;
   update?: InputMaybe<DiscussionFeedbackCommentsUpdateConnectionInput>;
   where?: InputMaybe<DiscussionFeedbackCommentsConnectionWhere>;
+};
+
+export type DiscussionInfo = {
+  __typename?: 'DiscussionInfo';
+  Author?: Maybe<User>;
+  DiscussionChannels?: Maybe<Array<Maybe<DiscussionChannelInfo>>>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type DiscussionInfoAggregateSelection = {
+  __typename?: 'DiscussionInfoAggregateSelection';
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  title: StringAggregateSelection;
+};
+
+export type DiscussionInfoCreateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DiscussionInfoCreatedEvent = {
+  __typename?: 'DiscussionInfoCreatedEvent';
+  createdDiscussionInfo: DiscussionInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionInfoDeletedEvent = {
+  __typename?: 'DiscussionInfoDeletedEvent';
+  deletedDiscussionInfo: DiscussionInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionInfoEdge = {
+  __typename?: 'DiscussionInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: DiscussionInfo;
+};
+
+export type DiscussionInfoEventPayload = {
+  __typename?: 'DiscussionInfoEventPayload';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type DiscussionInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more DiscussionInfoSort objects to sort DiscussionInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<DiscussionInfoSort>>;
+};
+
+/** Fields to sort DiscussionInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionInfoSort object. */
+export type DiscussionInfoSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  title?: InputMaybe<SortDirection>;
+};
+
+export type DiscussionInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionInfoSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DiscussionInfoUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DiscussionInfoUpdatedEvent = {
+  __typename?: 'DiscussionInfoUpdatedEvent';
+  event: EventType;
+  previousState: DiscussionInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDiscussionInfo: DiscussionInfoEventPayload;
+};
+
+export type DiscussionInfoWhere = {
+  AND?: InputMaybe<Array<DiscussionInfoWhere>>;
+  NOT?: InputMaybe<DiscussionInfoWhere>;
+  OR?: InputMaybe<Array<DiscussionInfoWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DiscussionInfosConnection = {
+  __typename?: 'DiscussionInfosConnection';
+  edges: Array<DiscussionInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type DiscussionListOptions = {
@@ -12080,6 +14196,48 @@ export type DiscussionRelationInput = {
   Tags?: InputMaybe<Array<DiscussionTagsCreateFieldInput>>;
 };
 
+export type DiscussionRelationshipCreatedEvent = {
+  __typename?: 'DiscussionRelationshipCreatedEvent';
+  createdRelationship: DiscussionConnectedRelationships;
+  discussion: DiscussionEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<DiscussionRelationshipsSubscriptionWhere>;
+  discussion?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
+export type DiscussionRelationshipDeletedEvent = {
+  __typename?: 'DiscussionRelationshipDeletedEvent';
+  deletedRelationship: DiscussionConnectedRelationships;
+  discussion: DiscussionEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DiscussionRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<DiscussionRelationshipsSubscriptionWhere>;
+  discussion?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
+export type DiscussionRelationshipsSubscriptionWhere = {
+  Album?: InputMaybe<DiscussionAlbumRelationshipSubscriptionWhere>;
+  Author?: InputMaybe<DiscussionAuthorRelationshipSubscriptionWhere>;
+  DiscussionChannels?: InputMaybe<DiscussionDiscussionChannelsRelationshipSubscriptionWhere>;
+  FeedbackComments?: InputMaybe<DiscussionFeedbackCommentsRelationshipSubscriptionWhere>;
+  Tags?: InputMaybe<DiscussionTagsRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Discussions by. The order in which sorts are applied is not guaranteed when specifying many fields in one DiscussionSort object. */
 export type DiscussionSort = {
   body?: InputMaybe<SortDirection>;
@@ -12090,6 +14248,44 @@ export type DiscussionSort = {
   id?: InputMaybe<SortDirection>;
   title?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type DiscussionSubscriptionWhere = {
+  AND?: InputMaybe<Array<DiscussionSubscriptionWhere>>;
+  NOT?: InputMaybe<DiscussionSubscriptionWhere>;
+  OR?: InputMaybe<Array<DiscussionSubscriptionWhere>>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  body_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
+  hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type DiscussionTagTagsAggregationSelection = {
@@ -12129,6 +14325,11 @@ export type DiscussionTagsConnectOrCreateFieldInput = {
 
 export type DiscussionTagsConnectOrCreateFieldInputOnCreate = {
   node: TagOnCreateInput;
+};
+
+export type DiscussionTagsConnectedRelationship = {
+  __typename?: 'DiscussionTagsConnectedRelationship';
+  node: TagEventPayload;
 };
 
 export type DiscussionTagsConnection = {
@@ -12196,6 +14397,10 @@ export type DiscussionTagsRelationship = {
   node: Tag;
 };
 
+export type DiscussionTagsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TagSubscriptionWhere>;
+};
+
 export type DiscussionTagsUpdateConnectionInput = {
   node?: InputMaybe<TagUpdateInput>;
 };
@@ -12222,6 +14427,14 @@ export type DiscussionUpdateInput = {
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type DiscussionUpdatedEvent = {
+  __typename?: 'DiscussionUpdatedEvent';
+  event: EventType;
+  previousState: DiscussionEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDiscussion: DiscussionEventPayload;
 };
 
 export type DiscussionUserAuthorAggregationSelection = {
@@ -12369,10 +14582,30 @@ export type DropDataResponseCreateInput = {
   success?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type DropDataResponseCreatedEvent = {
+  __typename?: 'DropDataResponseCreatedEvent';
+  createdDropDataResponse: DropDataResponseEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type DropDataResponseDeletedEvent = {
+  __typename?: 'DropDataResponseDeletedEvent';
+  deletedDropDataResponse: DropDataResponseEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type DropDataResponseEdge = {
   __typename?: 'DropDataResponseEdge';
   cursor: Scalars['String']['output'];
   node: DropDataResponse;
+};
+
+export type DropDataResponseEventPayload = {
+  __typename?: 'DropDataResponseEventPayload';
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type DropDataResponseOptions = {
@@ -12388,9 +14621,30 @@ export type DropDataResponseSort = {
   success?: InputMaybe<SortDirection>;
 };
 
+export type DropDataResponseSubscriptionWhere = {
+  AND?: InputMaybe<Array<DropDataResponseSubscriptionWhere>>;
+  NOT?: InputMaybe<DropDataResponseSubscriptionWhere>;
+  OR?: InputMaybe<Array<DropDataResponseSubscriptionWhere>>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  message_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type DropDataResponseUpdateInput = {
   message?: InputMaybe<Scalars['String']['input']>;
   success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type DropDataResponseUpdatedEvent = {
+  __typename?: 'DropDataResponseUpdatedEvent';
+  event: EventType;
+  previousState: DropDataResponseEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedDropDataResponse: DropDataResponseEventPayload;
 };
 
 export type DropDataResponseWhere = {
@@ -12465,13 +14719,32 @@ export type EmailConnectWhere = {
   node: EmailWhere;
 };
 
+export type EmailConnectedRelationships = {
+  __typename?: 'EmailConnectedRelationships';
+  User?: Maybe<EmailUserConnectedRelationship>;
+};
+
 export type EmailCreateInput = {
   User?: InputMaybe<EmailUserFieldInput>;
   address: Scalars['String']['input'];
 };
 
+export type EmailCreatedEvent = {
+  __typename?: 'EmailCreatedEvent';
+  createdEmail: EmailEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type EmailDeleteInput = {
   User?: InputMaybe<EmailUserDeleteFieldInput>;
+};
+
+export type EmailDeletedEvent = {
+  __typename?: 'EmailDeletedEvent';
+  deletedEmail: EmailEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type EmailDisconnectInput = {
@@ -12482,6 +14755,11 @@ export type EmailEdge = {
   __typename?: 'EmailEdge';
   cursor: Scalars['String']['output'];
   node: Email;
+};
+
+export type EmailEventPayload = {
+  __typename?: 'EmailEventPayload';
+  address: Scalars['String']['output'];
 };
 
 export type EmailOnCreateInput = {
@@ -12499,9 +14777,59 @@ export type EmailRelationInput = {
   User?: InputMaybe<EmailUserCreateFieldInput>;
 };
 
+export type EmailRelationshipCreatedEvent = {
+  __typename?: 'EmailRelationshipCreatedEvent';
+  createdRelationship: EmailConnectedRelationships;
+  email: EmailEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EmailRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EmailRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<EmailRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EmailRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<EmailRelationshipsSubscriptionWhere>;
+  email?: InputMaybe<EmailSubscriptionWhere>;
+};
+
+export type EmailRelationshipDeletedEvent = {
+  __typename?: 'EmailRelationshipDeletedEvent';
+  deletedRelationship: EmailConnectedRelationships;
+  email: EmailEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EmailRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EmailRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<EmailRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EmailRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<EmailRelationshipsSubscriptionWhere>;
+  email?: InputMaybe<EmailSubscriptionWhere>;
+};
+
+export type EmailRelationshipsSubscriptionWhere = {
+  User?: InputMaybe<EmailUserRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Emails by. The order in which sorts are applied is not guaranteed when specifying many fields in one EmailSort object. */
 export type EmailSort = {
   address?: InputMaybe<SortDirection>;
+};
+
+export type EmailSubscriptionWhere = {
+  AND?: InputMaybe<Array<EmailSubscriptionWhere>>;
+  NOT?: InputMaybe<EmailSubscriptionWhere>;
+  OR?: InputMaybe<Array<EmailSubscriptionWhere>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  address_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  address_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  address_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  address_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  address_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EmailUniqueWhere = {
@@ -12511,6 +14839,14 @@ export type EmailUniqueWhere = {
 export type EmailUpdateInput = {
   User?: InputMaybe<EmailUserUpdateFieldInput>;
   address?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EmailUpdatedEvent = {
+  __typename?: 'EmailUpdatedEvent';
+  event: EventType;
+  previousState: EmailEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEmail: EmailEventPayload;
 };
 
 export type EmailUserAggregateInput = {
@@ -12539,6 +14875,11 @@ export type EmailUserConnectOrCreateFieldInput = {
 
 export type EmailUserConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type EmailUserConnectedRelationship = {
+  __typename?: 'EmailUserConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type EmailUserConnection = {
@@ -12776,6 +15117,10 @@ export type EmailUserRelationship = {
   node: User;
 };
 
+export type EmailUserRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type EmailUserUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -12884,13 +15229,32 @@ export type EmojiConnectOrCreateInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserConnectOrCreateFieldInput>;
 };
 
+export type EmojiConnectedRelationships = {
+  __typename?: 'EmojiConnectedRelationships';
+  PostedByUser?: Maybe<EmojiPostedByUserConnectedRelationship>;
+};
+
 export type EmojiCreateInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserFieldInput>;
   name: Scalars['String']['input'];
 };
 
+export type EmojiCreatedEvent = {
+  __typename?: 'EmojiCreatedEvent';
+  createdEmoji: EmojiEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type EmojiDeleteInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserDeleteFieldInput>;
+};
+
+export type EmojiDeletedEvent = {
+  __typename?: 'EmojiDeletedEvent';
+  deletedEmoji: EmojiEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type EmojiDisconnectInput = {
@@ -12901,6 +15265,13 @@ export type EmojiEdge = {
   __typename?: 'EmojiEdge';
   cursor: Scalars['String']['output'];
   node: Emoji;
+};
+
+export type EmojiEventPayload = {
+  __typename?: 'EmojiEventPayload';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
 };
 
 export type EmojiOptions = {
@@ -12936,6 +15307,11 @@ export type EmojiPostedByUserConnectOrCreateFieldInput = {
 
 export type EmojiPostedByUserConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type EmojiPostedByUserConnectedRelationship = {
+  __typename?: 'EmojiPostedByUserConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type EmojiPostedByUserConnection = {
@@ -13173,6 +15549,10 @@ export type EmojiPostedByUserRelationship = {
   node: User;
 };
 
+export type EmojiPostedByUserRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type EmojiPostedByUserUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -13191,6 +15571,44 @@ export type EmojiRelationInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserCreateFieldInput>;
 };
 
+export type EmojiRelationshipCreatedEvent = {
+  __typename?: 'EmojiRelationshipCreatedEvent';
+  createdRelationship: EmojiConnectedRelationships;
+  emoji: EmojiEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EmojiRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EmojiRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<EmojiRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EmojiRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<EmojiRelationshipsSubscriptionWhere>;
+  emoji?: InputMaybe<EmojiSubscriptionWhere>;
+};
+
+export type EmojiRelationshipDeletedEvent = {
+  __typename?: 'EmojiRelationshipDeletedEvent';
+  deletedRelationship: EmojiConnectedRelationships;
+  emoji: EmojiEventPayload;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EmojiRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EmojiRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<EmojiRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EmojiRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<EmojiRelationshipsSubscriptionWhere>;
+  emoji?: InputMaybe<EmojiSubscriptionWhere>;
+};
+
+export type EmojiRelationshipsSubscriptionWhere = {
+  PostedByUser?: InputMaybe<EmojiPostedByUserRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Emojis by. The order in which sorts are applied is not guaranteed when specifying many fields in one EmojiSort object. */
 export type EmojiSort = {
   createdAt?: InputMaybe<SortDirection>;
@@ -13198,10 +15616,41 @@ export type EmojiSort = {
   name?: InputMaybe<SortDirection>;
 };
 
+export type EmojiSubscriptionWhere = {
+  AND?: InputMaybe<Array<EmojiSubscriptionWhere>>;
+  NOT?: InputMaybe<EmojiSubscriptionWhere>;
+  OR?: InputMaybe<Array<EmojiSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type EmojiUpdateInput = {
   PostedByUser?: InputMaybe<EmojiPostedByUserUpdateFieldInput>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EmojiUpdatedEvent = {
+  __typename?: 'EmojiUpdatedEvent';
+  event: EventType;
+  previousState: EmojiEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEmoji: EmojiEventPayload;
 };
 
 export type EmojiUserPostedByUserAggregationSelection = {
@@ -13278,10 +15727,30 @@ export type EnvironmentInfoCreateInput = {
   isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type EnvironmentInfoCreatedEvent = {
+  __typename?: 'EnvironmentInfoCreatedEvent';
+  createdEnvironmentInfo: EnvironmentInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EnvironmentInfoDeletedEvent = {
+  __typename?: 'EnvironmentInfoDeletedEvent';
+  deletedEnvironmentInfo: EnvironmentInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type EnvironmentInfoEdge = {
   __typename?: 'EnvironmentInfoEdge';
   cursor: Scalars['String']['output'];
   node: EnvironmentInfo;
+};
+
+export type EnvironmentInfoEventPayload = {
+  __typename?: 'EnvironmentInfoEventPayload';
+  currentDatabase?: Maybe<Scalars['String']['output']>;
+  isTestEnvironment?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type EnvironmentInfoOptions = {
@@ -13297,9 +15766,30 @@ export type EnvironmentInfoSort = {
   isTestEnvironment?: InputMaybe<SortDirection>;
 };
 
+export type EnvironmentInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<EnvironmentInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<EnvironmentInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<EnvironmentInfoSubscriptionWhere>>;
+  currentDatabase?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  currentDatabase_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  currentDatabase_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type EnvironmentInfoUpdateInput = {
   currentDatabase?: InputMaybe<Scalars['String']['input']>;
   isTestEnvironment?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type EnvironmentInfoUpdatedEvent = {
+  __typename?: 'EnvironmentInfoUpdatedEvent';
+  event: EventType;
+  previousState: EnvironmentInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEnvironmentInfo: EnvironmentInfoEventPayload;
 };
 
 export type EnvironmentInfoWhere = {
@@ -13707,6 +16197,11 @@ export type EventChannelChannelConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
 };
 
+export type EventChannelChannelConnectedRelationship = {
+  __typename?: 'EventChannelChannelConnectedRelationship';
+  node: ChannelEventPayload;
+};
+
 export type EventChannelChannelConnection = {
   __typename?: 'EventChannelChannelConnection';
   edges: Array<EventChannelChannelRelationship>;
@@ -13842,6 +16337,10 @@ export type EventChannelChannelRelationship = {
   node: Channel;
 };
 
+export type EventChannelChannelRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type EventChannelChannelUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -13888,6 +16387,11 @@ export type EventChannelCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type EventChannelCommentsConnectedRelationship = {
+  __typename?: 'EventChannelCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type EventChannelCommentsConnection = {
@@ -13994,6 +16498,10 @@ export type EventChannelCommentsRelationship = {
   node: Comment;
 };
 
+export type EventChannelCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type EventChannelCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -14022,6 +16530,14 @@ export type EventChannelConnectWhere = {
   node: EventChannelWhere;
 };
 
+export type EventChannelConnectedRelationships = {
+  __typename?: 'EventChannelConnectedRelationships';
+  Channel?: Maybe<EventChannelChannelConnectedRelationship>;
+  Comments?: Maybe<EventChannelCommentsConnectedRelationship>;
+  Event?: Maybe<EventChannelEventConnectedRelationship>;
+  RelatedIssues?: Maybe<EventChannelRelatedIssuesConnectedRelationship>;
+};
+
 export type EventChannelCreateInput = {
   Channel?: InputMaybe<EventChannelChannelFieldInput>;
   Comments?: InputMaybe<EventChannelCommentsFieldInput>;
@@ -14033,11 +16549,25 @@ export type EventChannelCreateInput = {
   locked?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type EventChannelCreatedEvent = {
+  __typename?: 'EventChannelCreatedEvent';
+  createdEventChannel: EventChannelEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type EventChannelDeleteInput = {
   Channel?: InputMaybe<EventChannelChannelDeleteFieldInput>;
   Comments?: InputMaybe<Array<EventChannelCommentsDeleteFieldInput>>;
   Event?: InputMaybe<EventChannelEventDeleteFieldInput>;
   RelatedIssues?: InputMaybe<Array<EventChannelRelatedIssuesDeleteFieldInput>>;
+};
+
+export type EventChannelDeletedEvent = {
+  __typename?: 'EventChannelDeletedEvent';
+  deletedEventChannel: EventChannelEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type EventChannelDisconnectInput = {
@@ -14070,6 +16600,11 @@ export type EventChannelEventConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
+};
+
+export type EventChannelEventConnectedRelationship = {
+  __typename?: 'EventChannelEventConnectedRelationship';
+  node: EventEventPayload;
 };
 
 export type EventChannelEventConnection = {
@@ -14335,10 +16870,24 @@ export type EventChannelEventNodeAggregationWhereInput = {
   virtualEventUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type EventChannelEventPayload = {
+  __typename?: 'EventChannelEventPayload';
+  archived?: Maybe<Scalars['Boolean']['output']>;
+  channelUniqueName: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  eventId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  locked?: Maybe<Scalars['Boolean']['output']>;
+};
+
 export type EventChannelEventRelationship = {
   __typename?: 'EventChannelEventRelationship';
   cursor: Scalars['String']['output'];
   node: Event;
+};
+
+export type EventChannelEventRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventSubscriptionWhere>;
 };
 
 export type EventChannelEventUpdateConnectionInput = {
@@ -14352,6 +16901,136 @@ export type EventChannelEventUpdateFieldInput = {
   disconnect?: InputMaybe<EventChannelEventDisconnectFieldInput>;
   update?: InputMaybe<EventChannelEventUpdateConnectionInput>;
   where?: InputMaybe<EventChannelEventConnectionWhere>;
+};
+
+export type EventChannelInfo = {
+  __typename?: 'EventChannelInfo';
+  Channel?: Maybe<ChannelInfo>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  eventId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+};
+
+export type EventChannelInfoAggregateSelection = {
+  __typename?: 'EventChannelInfoAggregateSelection';
+  channelUniqueName: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  eventId: StringAggregateSelection;
+  id: IdAggregateSelection;
+};
+
+export type EventChannelInfoCreateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  eventId?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+};
+
+export type EventChannelInfoCreatedEvent = {
+  __typename?: 'EventChannelInfoCreatedEvent';
+  createdEventChannelInfo: EventChannelInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventChannelInfoDeletedEvent = {
+  __typename?: 'EventChannelInfoDeletedEvent';
+  deletedEventChannelInfo: EventChannelInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventChannelInfoEdge = {
+  __typename?: 'EventChannelInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: EventChannelInfo;
+};
+
+export type EventChannelInfoEventPayload = {
+  __typename?: 'EventChannelInfoEventPayload';
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  eventId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+};
+
+export type EventChannelInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more EventChannelInfoSort objects to sort EventChannelInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<EventChannelInfoSort>>;
+};
+
+/** Fields to sort EventChannelInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventChannelInfoSort object. */
+export type EventChannelInfoSort = {
+  channelUniqueName?: InputMaybe<SortDirection>;
+  eventId?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+};
+
+export type EventChannelInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventChannelInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<EventChannelInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventChannelInfoSubscriptionWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventId?: InputMaybe<Scalars['String']['input']>;
+  eventId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  eventId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  eventId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  eventId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type EventChannelInfoUpdateInput = {
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  eventId?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type EventChannelInfoUpdatedEvent = {
+  __typename?: 'EventChannelInfoUpdatedEvent';
+  event: EventType;
+  previousState: EventChannelInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEventChannelInfo: EventChannelInfoEventPayload;
+};
+
+export type EventChannelInfoWhere = {
+  AND?: InputMaybe<Array<EventChannelInfoWhere>>;
+  NOT?: InputMaybe<EventChannelInfoWhere>;
+  OR?: InputMaybe<Array<EventChannelInfoWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventId?: InputMaybe<Scalars['String']['input']>;
+  eventId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  eventId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  eventId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  eventId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type EventChannelInfosConnection = {
+  __typename?: 'EventChannelInfosConnection';
+  edges: Array<EventChannelInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type EventChannelIssueRelatedIssuesAggregationSelection = {
@@ -14400,6 +17079,11 @@ export type EventChannelRelatedIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type EventChannelRelatedIssuesConnectedRelationship = {
+  __typename?: 'EventChannelRelatedIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type EventChannelRelatedIssuesConnection = {
@@ -14561,6 +17245,10 @@ export type EventChannelRelatedIssuesRelationship = {
   node: Issue;
 };
 
+export type EventChannelRelatedIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type EventChannelRelatedIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -14581,6 +17269,47 @@ export type EventChannelRelationInput = {
   RelatedIssues?: InputMaybe<Array<EventChannelRelatedIssuesCreateFieldInput>>;
 };
 
+export type EventChannelRelationshipCreatedEvent = {
+  __typename?: 'EventChannelRelationshipCreatedEvent';
+  createdRelationship: EventChannelConnectedRelationships;
+  event: EventType;
+  eventChannel: EventChannelEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventChannelRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventChannelRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<EventChannelRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventChannelRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<EventChannelRelationshipsSubscriptionWhere>;
+  eventChannel?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
+export type EventChannelRelationshipDeletedEvent = {
+  __typename?: 'EventChannelRelationshipDeletedEvent';
+  deletedRelationship: EventChannelConnectedRelationships;
+  event: EventType;
+  eventChannel: EventChannelEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventChannelRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventChannelRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<EventChannelRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventChannelRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<EventChannelRelationshipsSubscriptionWhere>;
+  eventChannel?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
+export type EventChannelRelationshipsSubscriptionWhere = {
+  Channel?: InputMaybe<EventChannelChannelRelationshipSubscriptionWhere>;
+  Comments?: InputMaybe<EventChannelCommentsRelationshipSubscriptionWhere>;
+  Event?: InputMaybe<EventChannelEventRelationshipSubscriptionWhere>;
+  RelatedIssues?: InputMaybe<EventChannelRelatedIssuesRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort EventChannels by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventChannelSort object. */
 export type EventChannelSort = {
   archived?: InputMaybe<SortDirection>;
@@ -14589,6 +17318,36 @@ export type EventChannelSort = {
   eventId?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   locked?: InputMaybe<SortDirection>;
+};
+
+export type EventChannelSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventChannelSubscriptionWhere>>;
+  NOT?: InputMaybe<EventChannelSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventChannelSubscriptionWhere>>;
+  archived?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  eventId?: InputMaybe<Scalars['ID']['input']>;
+  eventId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  eventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  eventId_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  eventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type EventChannelUpdateInput = {
@@ -14601,6 +17360,14 @@ export type EventChannelUpdateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   eventId?: InputMaybe<Scalars['ID']['input']>;
   locked?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type EventChannelUpdatedEvent = {
+  __typename?: 'EventChannelUpdatedEvent';
+  event: EventType;
+  previousState: EventChannelEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEventChannel: EventChannelEventPayload;
 };
 
 export type EventChannelWhere = {
@@ -14733,6 +17500,11 @@ export type EventCommentsConnectFieldInput = {
   where?: InputMaybe<CommentConnectWhere>;
 };
 
+export type EventCommentsConnectedRelationship = {
+  __typename?: 'EventCommentsConnectedRelationship';
+  node: CommentEventPayload;
+};
+
 export type EventCommentsConnection = {
   __typename?: 'EventCommentsConnection';
   edges: Array<EventCommentsRelationship>;
@@ -14786,6 +17558,18 @@ export type EventCommentsFormatCreateInput = {
   _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type EventCommentsFormatCreatedEvent = {
+  __typename?: 'EventCommentsFormatCreatedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventCommentsFormatDeletedEvent = {
+  __typename?: 'EventCommentsFormatDeletedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type EventCommentsFormatEdge = {
   __typename?: 'EventCommentsFormatEdge';
   cursor: Scalars['String']['output'];
@@ -14800,6 +17584,12 @@ export type EventCommentsFormatOptions = {
 export type EventCommentsFormatUpdateInput = {
   /** Appears because this input type would be empty otherwise because this type is composed of just generated and/or relationship properties. See https://neo4j.com/docs/graphql-manual/current/troubleshooting/faqs/ */
   _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type EventCommentsFormatUpdatedEvent = {
+  __typename?: 'EventCommentsFormatUpdatedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type EventCommentsFormatWhere = {
@@ -14882,6 +17672,10 @@ export type EventCommentsRelationship = {
   node: Comment;
 };
 
+export type EventCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type EventCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -14912,6 +17706,17 @@ export type EventConnectOrCreateInput = {
 
 export type EventConnectWhere = {
   node: EventWhere;
+};
+
+export type EventConnectedRelationships = {
+  __typename?: 'EventConnectedRelationships';
+  Comments?: Maybe<EventCommentsConnectedRelationship>;
+  EventChannels?: Maybe<EventEventChannelsConnectedRelationship>;
+  FeedbackComments?: Maybe<EventFeedbackCommentsConnectedRelationship>;
+  Poster?: Maybe<EventPosterConnectedRelationship>;
+  RecurringEvent?: Maybe<EventRecurringEventConnectedRelationship>;
+  RelatedIssues?: Maybe<EventRelatedIssuesConnectedRelationship>;
+  Tags?: Maybe<EventTagsConnectedRelationship>;
 };
 
 export type EventCreateInput = {
@@ -14950,6 +17755,13 @@ export type EventCreateInputWithChannels = {
   eventCreateInput: EventCreateInput;
 };
 
+export type EventCreatedEvent = {
+  __typename?: 'EventCreatedEvent';
+  createdEvent: EventEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type EventDeleteInput = {
   Comments?: InputMaybe<Array<EventCommentsDeleteFieldInput>>;
   EventChannels?: InputMaybe<Array<EventEventChannelsDeleteFieldInput>>;
@@ -14958,6 +17770,13 @@ export type EventDeleteInput = {
   RecurringEvent?: InputMaybe<EventRecurringEventDeleteFieldInput>;
   RelatedIssues?: InputMaybe<Array<EventRelatedIssuesDeleteFieldInput>>;
   Tags?: InputMaybe<Array<EventTagsDeleteFieldInput>>;
+};
+
+export type EventDeletedEvent = {
+  __typename?: 'EventDeletedEvent';
+  deletedEvent: EventEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type EventDisconnectInput = {
@@ -15007,6 +17826,11 @@ export type EventEventChannelsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventChannelConnectWhere>;
+};
+
+export type EventEventChannelsConnectedRelationship = {
+  __typename?: 'EventEventChannelsConnectedRelationship';
+  node: EventChannelEventPayload;
 };
 
 export type EventEventChannelsConnection = {
@@ -15083,6 +17907,10 @@ export type EventEventChannelsRelationship = {
   node: EventChannel;
 };
 
+export type EventEventChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
 export type EventEventChannelsUpdateConnectionInput = {
   node?: InputMaybe<EventChannelUpdateInput>;
 };
@@ -15094,6 +17922,33 @@ export type EventEventChannelsUpdateFieldInput = {
   disconnect?: InputMaybe<Array<EventEventChannelsDisconnectFieldInput>>;
   update?: InputMaybe<EventEventChannelsUpdateConnectionInput>;
   where?: InputMaybe<EventEventChannelsConnectionWhere>;
+};
+
+export type EventEventPayload = {
+  __typename?: 'EventEventPayload';
+  address?: Maybe<Scalars['String']['output']>;
+  canceled: Scalars['Boolean']['output'];
+  cost?: Maybe<Scalars['String']['output']>;
+  coverImageURL?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  endTime: Scalars['DateTime']['output'];
+  free?: Maybe<Scalars['Boolean']['output']>;
+  id: Scalars['ID']['output'];
+  isAllDay?: Maybe<Scalars['Boolean']['output']>;
+  isHostedByOP?: Maybe<Scalars['Boolean']['output']>;
+  isInPrivateResidence?: Maybe<Scalars['Boolean']['output']>;
+  location?: Maybe<Point>;
+  locationName?: Maybe<Scalars['String']['output']>;
+  locked?: Maybe<Scalars['Boolean']['output']>;
+  placeId?: Maybe<Scalars['String']['output']>;
+  startTime: Scalars['DateTime']['output'];
+  startTimeDayOfWeek?: Maybe<Scalars['String']['output']>;
+  startTimeHourOfDay?: Maybe<Scalars['Int']['output']>;
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  virtualEventUrl?: Maybe<Scalars['String']['output']>;
 };
 
 export type EventFeedbackCommentsAggregateInput = {
@@ -15113,6 +17968,11 @@ export type EventFeedbackCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type EventFeedbackCommentsConnectedRelationship = {
+  __typename?: 'EventFeedbackCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type EventFeedbackCommentsConnection = {
@@ -15219,6 +18079,10 @@ export type EventFeedbackCommentsRelationship = {
   node: Comment;
 };
 
+export type EventFeedbackCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type EventFeedbackCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -15230,6 +18094,137 @@ export type EventFeedbackCommentsUpdateFieldInput = {
   disconnect?: InputMaybe<Array<EventFeedbackCommentsDisconnectFieldInput>>;
   update?: InputMaybe<EventFeedbackCommentsUpdateConnectionInput>;
   where?: InputMaybe<EventFeedbackCommentsConnectionWhere>;
+};
+
+export type EventInfo = {
+  __typename?: 'EventInfo';
+  EventChannels?: Maybe<Array<Maybe<EventChannelInfo>>>;
+  Poster?: Maybe<User>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type EventInfoAggregateSelection = {
+  __typename?: 'EventInfoAggregateSelection';
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  title: StringAggregateSelection;
+};
+
+export type EventInfoCreateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventInfoCreatedEvent = {
+  __typename?: 'EventInfoCreatedEvent';
+  createdEventInfo: EventInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventInfoDeletedEvent = {
+  __typename?: 'EventInfoDeletedEvent';
+  deletedEventInfo: EventInfoEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventInfoEdge = {
+  __typename?: 'EventInfoEdge';
+  cursor: Scalars['String']['output'];
+  node: EventInfo;
+};
+
+export type EventInfoEventPayload = {
+  __typename?: 'EventInfoEventPayload';
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type EventInfoOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more EventInfoSort objects to sort EventInfos by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<EventInfoSort>>;
+};
+
+/** Fields to sort EventInfos by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventInfoSort object. */
+export type EventInfoSort = {
+  createdAt?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  title?: InputMaybe<SortDirection>;
+};
+
+export type EventInfoSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventInfoSubscriptionWhere>>;
+  NOT?: InputMaybe<EventInfoSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventInfoSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventInfoUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventInfoUpdatedEvent = {
+  __typename?: 'EventInfoUpdatedEvent';
+  event: EventType;
+  previousState: EventInfoEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEventInfo: EventInfoEventPayload;
+};
+
+export type EventInfoWhere = {
+  AND?: InputMaybe<Array<EventInfoWhere>>;
+  NOT?: InputMaybe<EventInfoWhere>;
+  OR?: InputMaybe<Array<EventInfoWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventInfosConnection = {
+  __typename?: 'EventInfosConnection';
+  edges: Array<EventInfoEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 export type EventIssueRelatedIssuesAggregationSelection = {
@@ -15287,6 +18282,11 @@ export type EventPosterConnectOrCreateFieldInput = {
 
 export type EventPosterConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type EventPosterConnectedRelationship = {
+  __typename?: 'EventPosterConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type EventPosterConnection = {
@@ -15524,6 +18524,10 @@ export type EventPosterRelationship = {
   node: User;
 };
 
+export type EventPosterRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type EventPosterUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -15555,6 +18559,11 @@ export type EventRecurringEventConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<RecurringEventConnectWhere>;
+};
+
+export type EventRecurringEventConnectedRelationship = {
+  __typename?: 'EventRecurringEventConnectedRelationship';
+  node: RecurringEventEventPayload;
 };
 
 export type EventRecurringEventConnection = {
@@ -15617,6 +18626,10 @@ export type EventRecurringEventRelationship = {
   node: RecurringEvent;
 };
 
+export type EventRecurringEventRelationshipSubscriptionWhere = {
+  node?: InputMaybe<RecurringEventSubscriptionWhere>;
+};
+
 export type EventRecurringEventUpdateConnectionInput = {
   node?: InputMaybe<RecurringEventUpdateInput>;
 };
@@ -15647,6 +18660,11 @@ export type EventRelatedIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type EventRelatedIssuesConnectedRelationship = {
+  __typename?: 'EventRelatedIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type EventRelatedIssuesConnection = {
@@ -15808,6 +18826,10 @@ export type EventRelatedIssuesRelationship = {
   node: Issue;
 };
 
+export type EventRelatedIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type EventRelatedIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -15829,6 +18851,48 @@ export type EventRelationInput = {
   RecurringEvent?: InputMaybe<EventRecurringEventCreateFieldInput>;
   RelatedIssues?: InputMaybe<Array<EventRelatedIssuesCreateFieldInput>>;
   Tags?: InputMaybe<Array<EventTagsCreateFieldInput>>;
+};
+
+export type EventRelationshipCreatedEvent = {
+  __typename?: 'EventRelationshipCreatedEvent';
+  createdRelationship: EventConnectedRelationships;
+  event: EventEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<EventRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<EventRelationshipsSubscriptionWhere>;
+  event?: InputMaybe<EventSubscriptionWhere>;
+};
+
+export type EventRelationshipDeletedEvent = {
+  __typename?: 'EventRelationshipDeletedEvent';
+  deletedRelationship: EventConnectedRelationships;
+  event: EventEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type EventRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<EventRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<EventRelationshipsSubscriptionWhere>;
+  event?: InputMaybe<EventSubscriptionWhere>;
+};
+
+export type EventRelationshipsSubscriptionWhere = {
+  Comments?: InputMaybe<EventCommentsRelationshipSubscriptionWhere>;
+  EventChannels?: InputMaybe<EventEventChannelsRelationshipSubscriptionWhere>;
+  FeedbackComments?: InputMaybe<EventFeedbackCommentsRelationshipSubscriptionWhere>;
+  Poster?: InputMaybe<EventPosterRelationshipSubscriptionWhere>;
+  RecurringEvent?: InputMaybe<EventRecurringEventRelationshipSubscriptionWhere>;
+  RelatedIssues?: InputMaybe<EventRelatedIssuesRelationshipSubscriptionWhere>;
+  Tags?: InputMaybe<EventTagsRelationshipSubscriptionWhere>;
 };
 
 /** Fields to sort Events by. The order in which sorts are applied is not guaranteed when specifying many fields in one EventSort object. */
@@ -15856,6 +18920,115 @@ export type EventSort = {
   title?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
   virtualEventUrl?: InputMaybe<SortDirection>;
+};
+
+export type EventSubscriptionWhere = {
+  AND?: InputMaybe<Array<EventSubscriptionWhere>>;
+  NOT?: InputMaybe<EventSubscriptionWhere>;
+  OR?: InputMaybe<Array<EventSubscriptionWhere>>;
+  address?: InputMaybe<Scalars['String']['input']>;
+  address_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  address_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  address_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  address_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  address_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  canceled?: InputMaybe<Scalars['Boolean']['input']>;
+  cost?: InputMaybe<Scalars['String']['input']>;
+  cost_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  cost_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  cost_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  cost_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  cost_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  coverImageURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  coverImageURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  endTime?: InputMaybe<Scalars['DateTime']['input']>;
+  endTime_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  endTime_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  endTime_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  endTime_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  endTime_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  free?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isAllDay?: InputMaybe<Scalars['Boolean']['input']>;
+  isHostedByOP?: InputMaybe<Scalars['Boolean']['input']>;
+  isInPrivateResidence?: InputMaybe<Scalars['Boolean']['input']>;
+  location?: InputMaybe<PointInput>;
+  locationName?: InputMaybe<Scalars['String']['input']>;
+  locationName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  locationName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  locationName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  locationName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  locationName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  location_DISTANCE?: InputMaybe<PointDistance>;
+  location_GT?: InputMaybe<PointDistance>;
+  location_GTE?: InputMaybe<PointDistance>;
+  location_IN?: InputMaybe<Array<InputMaybe<PointInput>>>;
+  location_LT?: InputMaybe<PointDistance>;
+  location_LTE?: InputMaybe<PointDistance>;
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  placeId?: InputMaybe<Scalars['String']['input']>;
+  placeId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  placeId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  placeId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  placeId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  placeId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  startTime?: InputMaybe<Scalars['DateTime']['input']>;
+  startTimeDayOfWeek?: InputMaybe<Scalars['String']['input']>;
+  startTimeDayOfWeek_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  startTimeDayOfWeek_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  startTimeDayOfWeek_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  startTimeDayOfWeek_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  startTimeDayOfWeek_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  startTimeHourOfDay?: InputMaybe<Scalars['Int']['input']>;
+  startTimeHourOfDay_GT?: InputMaybe<Scalars['Int']['input']>;
+  startTimeHourOfDay_GTE?: InputMaybe<Scalars['Int']['input']>;
+  startTimeHourOfDay_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  startTimeHourOfDay_LT?: InputMaybe<Scalars['Int']['input']>;
+  startTimeHourOfDay_LTE?: InputMaybe<Scalars['Int']['input']>;
+  startTime_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  startTime_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  startTime_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  startTime_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  startTime_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  virtualEventUrl?: InputMaybe<Scalars['String']['input']>;
+  virtualEventUrl_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  virtualEventUrl_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  virtualEventUrl_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  virtualEventUrl_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  virtualEventUrl_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type EventTagTagsAggregationSelection = {
@@ -15895,6 +19068,11 @@ export type EventTagsConnectOrCreateFieldInput = {
 
 export type EventTagsConnectOrCreateFieldInputOnCreate = {
   node: TagOnCreateInput;
+};
+
+export type EventTagsConnectedRelationship = {
+  __typename?: 'EventTagsConnectedRelationship';
+  node: TagEventPayload;
 };
 
 export type EventTagsConnection = {
@@ -15962,6 +19140,10 @@ export type EventTagsRelationship = {
   node: Tag;
 };
 
+export type EventTagsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TagSubscriptionWhere>;
+};
+
 export type EventTagsUpdateConnectionInput = {
   node?: InputMaybe<TagUpdateInput>;
 };
@@ -15975,6 +19157,14 @@ export type EventTagsUpdateFieldInput = {
   update?: InputMaybe<EventTagsUpdateConnectionInput>;
   where?: InputMaybe<EventTagsConnectionWhere>;
 };
+
+export enum EventType {
+  Create = 'CREATE',
+  CreateRelationship = 'CREATE_RELATIONSHIP',
+  Delete = 'DELETE',
+  DeleteRelationship = 'DELETE_RELATIONSHIP',
+  Update = 'UPDATE'
+}
 
 export type EventUpdateInput = {
   Comments?: InputMaybe<Array<EventCommentsUpdateFieldInput>>;
@@ -16007,6 +19197,14 @@ export type EventUpdateInput = {
   startTimeHourOfDay_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
   virtualEventUrl?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type EventUpdatedEvent = {
+  __typename?: 'EventUpdatedEvent';
+  event: EventType;
+  previousState: EventEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedEvent: EventEventPayload;
 };
 
 export type EventUserPosterAggregationSelection = {
@@ -16322,6 +19520,12 @@ export type FeedConnectWhere = {
   node: FeedWhere;
 };
 
+export type FeedConnectedRelationships = {
+  __typename?: 'FeedConnectedRelationships';
+  Owner?: Maybe<FeedOwnerConnectedRelationship>;
+  Tags?: Maybe<FeedTagsConnectedRelationship>;
+};
+
 export type FeedCreateInput = {
   Owner?: InputMaybe<FeedOwnerFieldInput>;
   Tags?: InputMaybe<FeedTagsFieldInput>;
@@ -16330,9 +19534,23 @@ export type FeedCreateInput = {
   title?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type FeedCreatedEvent = {
+  __typename?: 'FeedCreatedEvent';
+  createdFeed: FeedEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type FeedDeleteInput = {
   Owner?: InputMaybe<FeedOwnerDeleteFieldInput>;
   Tags?: InputMaybe<Array<FeedTagsDeleteFieldInput>>;
+};
+
+export type FeedDeletedEvent = {
+  __typename?: 'FeedDeletedEvent';
+  deletedFeed: FeedEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type FeedDisconnectInput = {
@@ -16344,6 +19562,14 @@ export type FeedEdge = {
   __typename?: 'FeedEdge';
   cursor: Scalars['String']['output'];
   node: Feed;
+};
+
+export type FeedEventPayload = {
+  __typename?: 'FeedEventPayload';
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  title?: Maybe<Scalars['String']['output']>;
 };
 
 export type FeedOptions = {
@@ -16379,6 +19605,11 @@ export type FeedOwnerConnectOrCreateFieldInput = {
 
 export type FeedOwnerConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type FeedOwnerConnectedRelationship = {
+  __typename?: 'FeedOwnerConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type FeedOwnerConnection = {
@@ -16616,6 +19847,10 @@ export type FeedOwnerRelationship = {
   node: User;
 };
 
+export type FeedOwnerRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type FeedOwnerUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -16635,12 +19870,75 @@ export type FeedRelationInput = {
   Tags?: InputMaybe<Array<FeedTagsCreateFieldInput>>;
 };
 
+export type FeedRelationshipCreatedEvent = {
+  __typename?: 'FeedRelationshipCreatedEvent';
+  createdRelationship: FeedConnectedRelationships;
+  event: EventType;
+  feed: FeedEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type FeedRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<FeedRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<FeedRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<FeedRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<FeedRelationshipsSubscriptionWhere>;
+  feed?: InputMaybe<FeedSubscriptionWhere>;
+};
+
+export type FeedRelationshipDeletedEvent = {
+  __typename?: 'FeedRelationshipDeletedEvent';
+  deletedRelationship: FeedConnectedRelationships;
+  event: EventType;
+  feed: FeedEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type FeedRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<FeedRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<FeedRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<FeedRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<FeedRelationshipsSubscriptionWhere>;
+  feed?: InputMaybe<FeedSubscriptionWhere>;
+};
+
+export type FeedRelationshipsSubscriptionWhere = {
+  Owner?: InputMaybe<FeedOwnerRelationshipSubscriptionWhere>;
+  Tags?: InputMaybe<FeedTagsRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Feeds by. The order in which sorts are applied is not guaranteed when specifying many fields in one FeedSort object. */
 export type FeedSort = {
   deleted?: InputMaybe<SortDirection>;
   description?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   title?: InputMaybe<SortDirection>;
+};
+
+export type FeedSubscriptionWhere = {
+  AND?: InputMaybe<Array<FeedSubscriptionWhere>>;
+  NOT?: InputMaybe<FeedSubscriptionWhere>;
+  OR?: InputMaybe<Array<FeedSubscriptionWhere>>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type FeedTagTagsAggregationSelection = {
@@ -16680,6 +19978,11 @@ export type FeedTagsConnectOrCreateFieldInput = {
 
 export type FeedTagsConnectOrCreateFieldInputOnCreate = {
   node: TagOnCreateInput;
+};
+
+export type FeedTagsConnectedRelationship = {
+  __typename?: 'FeedTagsConnectedRelationship';
+  node: TagEventPayload;
 };
 
 export type FeedTagsConnection = {
@@ -16747,6 +20050,10 @@ export type FeedTagsRelationship = {
   node: Tag;
 };
 
+export type FeedTagsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TagSubscriptionWhere>;
+};
+
 export type FeedTagsUpdateConnectionInput = {
   node?: InputMaybe<TagUpdateInput>;
 };
@@ -16767,6 +20074,14 @@ export type FeedUpdateInput = {
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type FeedUpdatedEvent = {
+  __typename?: 'FeedUpdatedEvent';
+  event: EventType;
+  previousState: FeedEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedFeed: FeedEventPayload;
 };
 
 export type FeedUserOwnerAggregationSelection = {
@@ -16868,10 +20183,29 @@ export type GetSortedChannelsResponseCreateInput = {
   aggregateChannelCount?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type GetSortedChannelsResponseCreatedEvent = {
+  __typename?: 'GetSortedChannelsResponseCreatedEvent';
+  createdGetSortedChannelsResponse: GetSortedChannelsResponseEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type GetSortedChannelsResponseDeletedEvent = {
+  __typename?: 'GetSortedChannelsResponseDeletedEvent';
+  deletedGetSortedChannelsResponse: GetSortedChannelsResponseEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type GetSortedChannelsResponseEdge = {
   __typename?: 'GetSortedChannelsResponseEdge';
   cursor: Scalars['String']['output'];
   node: GetSortedChannelsResponse;
+};
+
+export type GetSortedChannelsResponseEventPayload = {
+  __typename?: 'GetSortedChannelsResponseEventPayload';
+  aggregateChannelCount?: Maybe<Scalars['Int']['output']>;
 };
 
 export type GetSortedChannelsResponseOptions = {
@@ -16886,10 +20220,30 @@ export type GetSortedChannelsResponseSort = {
   aggregateChannelCount?: InputMaybe<SortDirection>;
 };
 
+export type GetSortedChannelsResponseSubscriptionWhere = {
+  AND?: InputMaybe<Array<GetSortedChannelsResponseSubscriptionWhere>>;
+  NOT?: InputMaybe<GetSortedChannelsResponseSubscriptionWhere>;
+  OR?: InputMaybe<Array<GetSortedChannelsResponseSubscriptionWhere>>;
+  aggregateChannelCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  aggregateChannelCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateChannelCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type GetSortedChannelsResponseUpdateInput = {
   aggregateChannelCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateChannelCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateChannelCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type GetSortedChannelsResponseUpdatedEvent = {
+  __typename?: 'GetSortedChannelsResponseUpdatedEvent';
+  event: EventType;
+  previousState: GetSortedChannelsResponseEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedGetSortedChannelsResponse: GetSortedChannelsResponseEventPayload;
 };
 
 export type GetSortedChannelsResponseWhere = {
@@ -17022,6 +20376,11 @@ export type ImageAlbumConnectFieldInput = {
   where?: InputMaybe<AlbumConnectWhere>;
 };
 
+export type ImageAlbumConnectedRelationship = {
+  __typename?: 'ImageAlbumConnectedRelationship';
+  node: AlbumEventPayload;
+};
+
 export type ImageAlbumConnection = {
   __typename?: 'ImageAlbumConnection';
   edges: Array<ImageAlbumRelationship>;
@@ -17071,6 +20430,10 @@ export type ImageAlbumRelationship = {
   node: Album;
 };
 
+export type ImageAlbumRelationshipSubscriptionWhere = {
+  node?: InputMaybe<AlbumSubscriptionWhere>;
+};
+
 export type ImageAlbumUpdateConnectionInput = {
   node?: InputMaybe<AlbumUpdateInput>;
 };
@@ -17097,6 +20460,12 @@ export type ImageConnectWhere = {
   node: ImageWhere;
 };
 
+export type ImageConnectedRelationships = {
+  __typename?: 'ImageConnectedRelationships';
+  Album?: Maybe<ImageAlbumConnectedRelationship>;
+  Uploader?: Maybe<ImageUploaderConnectedRelationship>;
+};
+
 export type ImageCreateInput = {
   Album?: InputMaybe<ImageAlbumFieldInput>;
   Uploader?: InputMaybe<ImageUploaderFieldInput>;
@@ -17109,9 +20478,23 @@ export type ImageCreateInput = {
   url?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ImageCreatedEvent = {
+  __typename?: 'ImageCreatedEvent';
+  createdImage: ImageEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ImageDeleteInput = {
   Album?: InputMaybe<ImageAlbumDeleteFieldInput>;
   Uploader?: InputMaybe<ImageUploaderDeleteFieldInput>;
+};
+
+export type ImageDeletedEvent = {
+  __typename?: 'ImageDeletedEvent';
+  deletedImage: ImageEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ImageDisconnectInput = {
@@ -17125,6 +20508,19 @@ export type ImageEdge = {
   node: Image;
 };
 
+export type ImageEventPayload = {
+  __typename?: 'ImageEventPayload';
+  alt?: Maybe<Scalars['String']['output']>;
+  caption?: Maybe<Scalars['String']['output']>;
+  copyright?: Maybe<Scalars['String']['output']>;
+  createdAt?: Maybe<Scalars['DateTime']['output']>;
+  hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
+  hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
+  id: Scalars['ID']['output'];
+  longDescription?: Maybe<Scalars['String']['output']>;
+  url?: Maybe<Scalars['String']['output']>;
+};
+
 export type ImageOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -17135,6 +20531,45 @@ export type ImageOptions = {
 export type ImageRelationInput = {
   Album?: InputMaybe<ImageAlbumCreateFieldInput>;
   Uploader?: InputMaybe<ImageUploaderCreateFieldInput>;
+};
+
+export type ImageRelationshipCreatedEvent = {
+  __typename?: 'ImageRelationshipCreatedEvent';
+  createdRelationship: ImageConnectedRelationships;
+  event: EventType;
+  image: ImageEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ImageRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ImageRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ImageRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ImageRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<ImageRelationshipsSubscriptionWhere>;
+  image?: InputMaybe<ImageSubscriptionWhere>;
+};
+
+export type ImageRelationshipDeletedEvent = {
+  __typename?: 'ImageRelationshipDeletedEvent';
+  deletedRelationship: ImageConnectedRelationships;
+  event: EventType;
+  image: ImageEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ImageRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ImageRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ImageRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ImageRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<ImageRelationshipsSubscriptionWhere>;
+  image?: InputMaybe<ImageSubscriptionWhere>;
+};
+
+export type ImageRelationshipsSubscriptionWhere = {
+  Album?: InputMaybe<ImageAlbumRelationshipSubscriptionWhere>;
+  Uploader?: InputMaybe<ImageUploaderRelationshipSubscriptionWhere>;
 };
 
 /** Fields to sort Images by. The order in which sorts are applied is not guaranteed when specifying many fields in one ImageSort object. */
@@ -17150,6 +20585,55 @@ export type ImageSort = {
   url?: InputMaybe<SortDirection>;
 };
 
+export type ImageSubscriptionWhere = {
+  AND?: InputMaybe<Array<ImageSubscriptionWhere>>;
+  NOT?: InputMaybe<ImageSubscriptionWhere>;
+  OR?: InputMaybe<Array<ImageSubscriptionWhere>>;
+  alt?: InputMaybe<Scalars['String']['input']>;
+  alt_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  alt_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  alt_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  alt_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  alt_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  caption?: InputMaybe<Scalars['String']['input']>;
+  caption_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  caption_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  caption_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  caption_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  caption_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  copyright?: InputMaybe<Scalars['String']['input']>;
+  copyright_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  copyright_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  copyright_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  copyright_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  copyright_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
+  hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  longDescription?: InputMaybe<Scalars['String']['input']>;
+  longDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  longDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  longDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  longDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  longDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  url?: InputMaybe<Scalars['String']['input']>;
+  url_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  url_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  url_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  url_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  url_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ImageUpdateInput = {
   Album?: InputMaybe<ImageAlbumUpdateFieldInput>;
   Uploader?: InputMaybe<ImageUploaderUpdateFieldInput>;
@@ -17161,6 +20645,14 @@ export type ImageUpdateInput = {
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   longDescription?: InputMaybe<Scalars['String']['input']>;
   url?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ImageUpdatedEvent = {
+  __typename?: 'ImageUpdatedEvent';
+  event: EventType;
+  previousState: ImageEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedImage: ImageEventPayload;
 };
 
 export type ImageUploaderAggregateInput = {
@@ -17189,6 +20681,11 @@ export type ImageUploaderConnectOrCreateFieldInput = {
 
 export type ImageUploaderConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type ImageUploaderConnectedRelationship = {
+  __typename?: 'ImageUploaderConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type ImageUploaderConnection = {
@@ -17426,6 +20923,10 @@ export type ImageUploaderRelationship = {
   node: User;
 };
 
+export type ImageUploaderRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type ImageUploaderUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -17640,6 +21141,11 @@ export type IssueActivityFeedConnectFieldInput = {
   where?: InputMaybe<ModerationActionConnectWhere>;
 };
 
+export type IssueActivityFeedConnectedRelationship = {
+  __typename?: 'IssueActivityFeedConnectedRelationship';
+  node: ModerationActionEventPayload;
+};
+
 export type IssueActivityFeedConnection = {
   __typename?: 'IssueActivityFeedConnection';
   edges: Array<IssueActivityFeedRelationship>;
@@ -17729,6 +21235,10 @@ export type IssueActivityFeedRelationship = {
   node: ModerationAction;
 };
 
+export type IssueActivityFeedRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
 export type IssueActivityFeedUpdateConnectionInput = {
   node?: InputMaybe<ModerationActionUpdateInput>;
 };
@@ -17771,6 +21281,11 @@ export type IssueAuthorConnectOrCreateInput = {
   User?: InputMaybe<IssueAuthorUserConnectOrCreateFieldInput>;
 };
 
+export type IssueAuthorConnectedRelationship = {
+  __typename?: 'IssueAuthorConnectedRelationship';
+  node: IssueAuthorEventPayload;
+};
+
 export type IssueAuthorConnection = {
   __typename?: 'IssueAuthorConnection';
   edges: Array<IssueAuthorRelationship>;
@@ -17802,6 +21317,8 @@ export type IssueAuthorDisconnectInput = {
   ModerationProfile?: InputMaybe<IssueAuthorModerationProfileDisconnectFieldInput>;
   User?: InputMaybe<IssueAuthorUserDisconnectFieldInput>;
 };
+
+export type IssueAuthorEventPayload = ModerationProfileEventPayload | UserEventPayload;
 
 export type IssueAuthorModerationProfileConnectFieldInput = {
   connect?: InputMaybe<ModerationProfileConnectInput>;
@@ -17844,6 +21361,10 @@ export type IssueAuthorModerationProfileFieldInput = {
   create?: InputMaybe<IssueAuthorModerationProfileCreateFieldInput>;
 };
 
+export type IssueAuthorModerationProfileSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type IssueAuthorModerationProfileUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -17862,6 +21383,11 @@ export type IssueAuthorRelationship = {
   __typename?: 'IssueAuthorRelationship';
   cursor: Scalars['String']['output'];
   node: IssueAuthor;
+};
+
+export type IssueAuthorRelationshipSubscriptionWhere = {
+  ModerationProfile?: InputMaybe<IssueAuthorModerationProfileSubscriptionWhere>;
+  User?: InputMaybe<IssueAuthorUserSubscriptionWhere>;
 };
 
 export type IssueAuthorUpdateInput = {
@@ -17908,6 +21434,10 @@ export type IssueAuthorUserFieldInput = {
   connect?: InputMaybe<IssueAuthorUserConnectFieldInput>;
   connectOrCreate?: InputMaybe<IssueAuthorUserConnectOrCreateFieldInput>;
   create?: InputMaybe<IssueAuthorUserCreateFieldInput>;
+};
+
+export type IssueAuthorUserSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
 };
 
 export type IssueAuthorUserUpdateConnectionInput = {
@@ -17971,6 +21501,11 @@ export type IssueChannelConnectOrCreateFieldInput = {
 
 export type IssueChannelConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type IssueChannelConnectedRelationship = {
+  __typename?: 'IssueChannelConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type IssueChannelConnection = {
@@ -18108,6 +21643,10 @@ export type IssueChannelRelationship = {
   node: Channel;
 };
 
+export type IssueChannelRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type IssueChannelUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -18144,6 +21683,13 @@ export type IssueConnectWhere = {
   node: IssueWhere;
 };
 
+export type IssueConnectedRelationships = {
+  __typename?: 'IssueConnectedRelationships';
+  ActivityFeed?: Maybe<IssueActivityFeedConnectedRelationship>;
+  Author?: Maybe<IssueAuthorConnectedRelationship>;
+  Channel?: Maybe<IssueChannelConnectedRelationship>;
+};
+
 export type IssueCreateInput = {
   ActivityFeed?: InputMaybe<IssueActivityFeedFieldInput>;
   Author?: InputMaybe<IssueAuthorCreateInput>;
@@ -18162,10 +21708,24 @@ export type IssueCreateInput = {
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type IssueCreatedEvent = {
+  __typename?: 'IssueCreatedEvent';
+  createdIssue: IssueEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type IssueDeleteInput = {
   ActivityFeed?: InputMaybe<Array<IssueActivityFeedDeleteFieldInput>>;
   Author?: InputMaybe<IssueAuthorDeleteInput>;
   Channel?: InputMaybe<IssueChannelDeleteFieldInput>;
+};
+
+export type IssueDeletedEvent = {
+  __typename?: 'IssueDeletedEvent';
+  deletedIssue: IssueEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type IssueDisconnectInput = {
@@ -18178,6 +21738,24 @@ export type IssueEdge = {
   __typename?: 'IssueEdge';
   cursor: Scalars['String']['output'];
   node: Issue;
+};
+
+export type IssueEventPayload = {
+  __typename?: 'IssueEventPayload';
+  authorName?: Maybe<Scalars['String']['output']>;
+  body?: Maybe<Scalars['String']['output']>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  flaggedServerRuleViolation?: Maybe<Scalars['Boolean']['output']>;
+  id: Scalars['ID']['output'];
+  isOpen: Scalars['Boolean']['output'];
+  relatedCommentId?: Maybe<Scalars['ID']['output']>;
+  relatedDiscussionId?: Maybe<Scalars['ID']['output']>;
+  relatedEventId?: Maybe<Scalars['ID']['output']>;
+  relatedModProfileName?: Maybe<Scalars['String']['output']>;
+  relatedUsername?: Maybe<Scalars['String']['output']>;
+  title?: Maybe<Scalars['String']['output']>;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type IssueModerationActionActivityFeedAggregationSelection = {
@@ -18207,6 +21785,46 @@ export type IssueRelationInput = {
   Channel?: InputMaybe<IssueChannelCreateFieldInput>;
 };
 
+export type IssueRelationshipCreatedEvent = {
+  __typename?: 'IssueRelationshipCreatedEvent';
+  createdRelationship: IssueConnectedRelationships;
+  event: EventType;
+  issue: IssueEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type IssueRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<IssueRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<IssueRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<IssueRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<IssueRelationshipsSubscriptionWhere>;
+  issue?: InputMaybe<IssueSubscriptionWhere>;
+};
+
+export type IssueRelationshipDeletedEvent = {
+  __typename?: 'IssueRelationshipDeletedEvent';
+  deletedRelationship: IssueConnectedRelationships;
+  event: EventType;
+  issue: IssueEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type IssueRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<IssueRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<IssueRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<IssueRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<IssueRelationshipsSubscriptionWhere>;
+  issue?: InputMaybe<IssueSubscriptionWhere>;
+};
+
+export type IssueRelationshipsSubscriptionWhere = {
+  ActivityFeed?: InputMaybe<IssueActivityFeedRelationshipSubscriptionWhere>;
+  Author?: InputMaybe<IssueAuthorRelationshipSubscriptionWhere>;
+  Channel?: InputMaybe<IssueChannelRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Issues by. The order in which sorts are applied is not guaranteed when specifying many fields in one IssueSort object. */
 export type IssueSort = {
   authorName?: InputMaybe<SortDirection>;
@@ -18225,6 +21843,82 @@ export type IssueSort = {
   updatedAt?: InputMaybe<SortDirection>;
 };
 
+export type IssueSubscriptionWhere = {
+  AND?: InputMaybe<Array<IssueSubscriptionWhere>>;
+  NOT?: InputMaybe<IssueSubscriptionWhere>;
+  OR?: InputMaybe<Array<IssueSubscriptionWhere>>;
+  authorName?: InputMaybe<Scalars['String']['input']>;
+  authorName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  authorName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  authorName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  authorName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  authorName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  body_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  flaggedServerRuleViolation?: InputMaybe<Scalars['Boolean']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  isOpen?: InputMaybe<Scalars['Boolean']['input']>;
+  relatedCommentId?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedCommentId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedCommentId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedDiscussionId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedDiscussionId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedEventId_IN?: InputMaybe<Array<InputMaybe<Scalars['ID']['input']>>>;
+  relatedEventId_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  relatedModProfileName?: InputMaybe<Scalars['String']['input']>;
+  relatedModProfileName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  relatedModProfileName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  relatedModProfileName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  relatedModProfileName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  relatedModProfileName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  relatedUsername?: InputMaybe<Scalars['String']['input']>;
+  relatedUsername_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  relatedUsername_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  relatedUsername_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  relatedUsername_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  relatedUsername_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 export type IssueUpdateInput = {
   ActivityFeed?: InputMaybe<Array<IssueActivityFeedUpdateFieldInput>>;
   Author?: InputMaybe<IssueAuthorUpdateInput>;
@@ -18241,6 +21935,14 @@ export type IssueUpdateInput = {
   relatedModProfileName?: InputMaybe<Scalars['String']['input']>;
   relatedUsername?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type IssueUpdatedEvent = {
+  __typename?: 'IssueUpdatedEvent';
+  event: EventType;
+  previousState: IssueEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedIssue: IssueEventPayload;
 };
 
 export type IssueWhere = {
@@ -18373,10 +22075,31 @@ export type LinkFlairCreateInput = {
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type LinkFlairCreatedEvent = {
+  __typename?: 'LinkFlairCreatedEvent';
+  createdLinkFlair: LinkFlairEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type LinkFlairDeletedEvent = {
+  __typename?: 'LinkFlairDeletedEvent';
+  deletedLinkFlair: LinkFlairEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type LinkFlairEdge = {
   __typename?: 'LinkFlairEdge';
   cursor: Scalars['String']['output'];
   node: LinkFlair;
+};
+
+export type LinkFlairEventPayload = {
+  __typename?: 'LinkFlairEventPayload';
+  cssClass?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['String']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
 };
 
 export type LinkFlairOptions = {
@@ -18393,10 +22116,42 @@ export type LinkFlairSort = {
   text?: InputMaybe<SortDirection>;
 };
 
+export type LinkFlairSubscriptionWhere = {
+  AND?: InputMaybe<Array<LinkFlairSubscriptionWhere>>;
+  NOT?: InputMaybe<LinkFlairSubscriptionWhere>;
+  OR?: InputMaybe<Array<LinkFlairSubscriptionWhere>>;
+  cssClass?: InputMaybe<Scalars['String']['input']>;
+  cssClass_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  cssClass_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  cssClass_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  cssClass_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  cssClass_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  id_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  id_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type LinkFlairUpdateInput = {
   cssClass?: InputMaybe<Scalars['String']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type LinkFlairUpdatedEvent = {
+  __typename?: 'LinkFlairUpdatedEvent';
+  event: EventType;
+  previousState: LinkFlairEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedLinkFlair: LinkFlairEventPayload;
 };
 
 export type LinkFlairWhere = {
@@ -18478,6 +22233,11 @@ export type MessageConnectWhere = {
   node: MessageWhere;
 };
 
+export type MessageConnectedRelationships = {
+  __typename?: 'MessageConnectedRelationships';
+  Contact?: Maybe<MessageContactConnectedRelationship>;
+};
+
 export type MessageContactAggregateInput = {
   AND?: InputMaybe<Array<MessageContactAggregateInput>>;
   NOT?: InputMaybe<MessageContactAggregateInput>;
@@ -18495,6 +22255,11 @@ export type MessageContactConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ContactConnectWhere>;
+};
+
+export type MessageContactConnectedRelationship = {
+  __typename?: 'MessageContactConnectedRelationship';
+  node: ContactEventPayload;
 };
 
 export type MessageContactConnection = {
@@ -18579,6 +22344,10 @@ export type MessageContactRelationship = {
   node: Contact;
 };
 
+export type MessageContactRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ContactSubscriptionWhere>;
+};
+
 export type MessageContactUpdateConnectionInput = {
   node?: InputMaybe<ContactUpdateInput>;
 };
@@ -18597,8 +22366,22 @@ export type MessageCreateInput = {
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type MessageCreatedEvent = {
+  __typename?: 'MessageCreatedEvent';
+  createdMessage: MessageEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type MessageDeleteInput = {
   Contact?: InputMaybe<MessageContactDeleteFieldInput>;
+};
+
+export type MessageDeletedEvent = {
+  __typename?: 'MessageDeletedEvent';
+  deletedMessage: MessageEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type MessageDisconnectInput = {
@@ -18609,6 +22392,13 @@ export type MessageEdge = {
   __typename?: 'MessageEdge';
   cursor: Scalars['String']['output'];
   node: Message;
+};
+
+export type MessageEventPayload = {
+  __typename?: 'MessageEventPayload';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  text?: Maybe<Scalars['String']['output']>;
 };
 
 export type MessageOptions = {
@@ -18622,6 +22412,44 @@ export type MessageRelationInput = {
   Contact?: InputMaybe<MessageContactCreateFieldInput>;
 };
 
+export type MessageRelationshipCreatedEvent = {
+  __typename?: 'MessageRelationshipCreatedEvent';
+  createdRelationship: MessageConnectedRelationships;
+  event: EventType;
+  message: MessageEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type MessageRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<MessageRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<MessageRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<MessageRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<MessageRelationshipsSubscriptionWhere>;
+  message?: InputMaybe<MessageSubscriptionWhere>;
+};
+
+export type MessageRelationshipDeletedEvent = {
+  __typename?: 'MessageRelationshipDeletedEvent';
+  deletedRelationship: MessageConnectedRelationships;
+  event: EventType;
+  message: MessageEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type MessageRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<MessageRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<MessageRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<MessageRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<MessageRelationshipsSubscriptionWhere>;
+  message?: InputMaybe<MessageSubscriptionWhere>;
+};
+
+export type MessageRelationshipsSubscriptionWhere = {
+  Contact?: InputMaybe<MessageContactRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Messages by. The order in which sorts are applied is not guaranteed when specifying many fields in one MessageSort object. */
 export type MessageSort = {
   createdAt?: InputMaybe<SortDirection>;
@@ -18629,10 +22457,41 @@ export type MessageSort = {
   text?: InputMaybe<SortDirection>;
 };
 
+export type MessageSubscriptionWhere = {
+  AND?: InputMaybe<Array<MessageSubscriptionWhere>>;
+  NOT?: InputMaybe<MessageSubscriptionWhere>;
+  OR?: InputMaybe<Array<MessageSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type MessageUpdateInput = {
   Contact?: InputMaybe<MessageContactUpdateFieldInput>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type MessageUpdatedEvent = {
+  __typename?: 'MessageUpdatedEvent';
+  event: EventType;
+  previousState: MessageEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedMessage: MessageEventPayload;
 };
 
 export type MessageWhere = {
@@ -18715,10 +22574,39 @@ export type ModChannelRoleCreateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ModChannelRoleCreatedEvent = {
+  __typename?: 'ModChannelRoleCreatedEvent';
+  createdModChannelRole: ModChannelRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModChannelRoleDeletedEvent = {
+  __typename?: 'ModChannelRoleDeletedEvent';
+  deletedModChannelRole: ModChannelRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ModChannelRoleEdge = {
   __typename?: 'ModChannelRoleEdge';
   cursor: Scalars['String']['output'];
   node: ModChannelRole;
+};
+
+export type ModChannelRoleEventPayload = {
+  __typename?: 'ModChannelRoleEventPayload';
+  canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
+  canHideComment?: Maybe<Scalars['Boolean']['output']>;
+  canHideDiscussion?: Maybe<Scalars['Boolean']['output']>;
+  canHideEvent?: Maybe<Scalars['Boolean']['output']>;
+  canOpenSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canReport?: Maybe<Scalars['Boolean']['output']>;
+  canSuspendUser?: Maybe<Scalars['Boolean']['output']>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 export type ModChannelRoleOnCreateInput = {
@@ -18757,6 +22645,38 @@ export type ModChannelRoleSort = {
   name?: InputMaybe<SortDirection>;
 };
 
+export type ModChannelRoleSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModChannelRoleSubscriptionWhere>>;
+  NOT?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModChannelRoleSubscriptionWhere>>;
+  canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canReport?: InputMaybe<Scalars['Boolean']['input']>;
+  canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ModChannelRoleUniqueWhere = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -18773,6 +22693,14 @@ export type ModChannelRoleUpdateInput = {
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModChannelRoleUpdatedEvent = {
+  __typename?: 'ModChannelRoleUpdatedEvent';
+  event: EventType;
+  previousState: ModChannelRoleEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedModChannelRole: ModChannelRoleEventPayload;
 };
 
 export type ModChannelRoleWhere = {
@@ -18858,10 +22786,39 @@ export type ModServerRoleCreateInput = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ModServerRoleCreatedEvent = {
+  __typename?: 'ModServerRoleCreatedEvent';
+  createdModServerRole: ModServerRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModServerRoleDeletedEvent = {
+  __typename?: 'ModServerRoleDeletedEvent';
+  deletedModServerRole: ModServerRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ModServerRoleEdge = {
   __typename?: 'ModServerRoleEdge';
   cursor: Scalars['String']['output'];
   node: ModServerRole;
+};
+
+export type ModServerRoleEventPayload = {
+  __typename?: 'ModServerRoleEventPayload';
+  canCloseSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
+  canHideComment?: Maybe<Scalars['Boolean']['output']>;
+  canHideDiscussion?: Maybe<Scalars['Boolean']['output']>;
+  canHideEvent?: Maybe<Scalars['Boolean']['output']>;
+  canLockChannel?: Maybe<Scalars['Boolean']['output']>;
+  canOpenSupportTickets?: Maybe<Scalars['Boolean']['output']>;
+  canReport?: Maybe<Scalars['Boolean']['output']>;
+  canSuspendUser?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 export type ModServerRoleOnCreateInput = {
@@ -18900,6 +22857,33 @@ export type ModServerRoleSort = {
   name?: InputMaybe<SortDirection>;
 };
 
+export type ModServerRoleSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModServerRoleSubscriptionWhere>>;
+  NOT?: InputMaybe<ModServerRoleSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModServerRoleSubscriptionWhere>>;
+  canCloseSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canHideEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canLockChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canOpenSupportTickets?: InputMaybe<Scalars['Boolean']['input']>;
+  canReport?: InputMaybe<Scalars['Boolean']['input']>;
+  canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ModServerRoleUniqueWhere = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -18916,6 +22900,14 @@ export type ModServerRoleUpdateInput = {
   canSuspendUser?: InputMaybe<Scalars['Boolean']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModServerRoleUpdatedEvent = {
+  __typename?: 'ModServerRoleUpdatedEvent';
+  event: EventType;
+  previousState: ModServerRoleEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedModServerRole: ModServerRoleEventPayload;
 };
 
 export type ModServerRoleWhere = {
@@ -18960,6 +22952,9 @@ export type ModerationAction = {
   ModerationProfile?: Maybe<ModerationProfile>;
   ModerationProfileAggregate?: Maybe<ModerationActionModerationProfileModerationProfileAggregationSelection>;
   ModerationProfileConnection: ModerationActionModerationProfileConnection;
+  User?: Maybe<User>;
+  UserAggregate?: Maybe<ModerationActionUserUserAggregationSelection>;
+  UserConnection: ModerationActionUserConnection;
   actionDescription?: Maybe<Scalars['String']['output']>;
   actionType?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
@@ -19010,6 +23005,28 @@ export type ModerationActionModerationProfileConnectionArgs = {
   where?: InputMaybe<ModerationActionModerationProfileConnectionWhere>;
 };
 
+
+export type ModerationActionUserArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<UserOptions>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ModerationActionUserAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<UserWhere>;
+};
+
+
+export type ModerationActionUserConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ModerationActionUserConnectionSort>>;
+  where?: InputMaybe<ModerationActionUserConnectionWhere>;
+};
+
 export type ModerationActionAggregateSelection = {
   __typename?: 'ModerationActionAggregateSelection';
   actionDescription: StringAggregateSelection;
@@ -19051,6 +23068,11 @@ export type ModerationActionCommentConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type ModerationActionCommentConnectedRelationship = {
+  __typename?: 'ModerationActionCommentConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type ModerationActionCommentConnection = {
@@ -19157,6 +23179,10 @@ export type ModerationActionCommentRelationship = {
   node: Comment;
 };
 
+export type ModerationActionCommentRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type ModerationActionCommentUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -19173,37 +23199,71 @@ export type ModerationActionCommentUpdateFieldInput = {
 export type ModerationActionConnectInput = {
   Comment?: InputMaybe<ModerationActionCommentConnectFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileConnectFieldInput>;
+  User?: InputMaybe<ModerationActionUserConnectFieldInput>;
 };
 
 export type ModerationActionConnectOrCreateInput = {
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileConnectOrCreateFieldInput>;
+  User?: InputMaybe<ModerationActionUserConnectOrCreateFieldInput>;
 };
 
 export type ModerationActionConnectWhere = {
   node: ModerationActionWhere;
 };
 
+export type ModerationActionConnectedRelationships = {
+  __typename?: 'ModerationActionConnectedRelationships';
+  Comment?: Maybe<ModerationActionCommentConnectedRelationship>;
+  ModerationProfile?: Maybe<ModerationActionModerationProfileConnectedRelationship>;
+  User?: Maybe<ModerationActionUserConnectedRelationship>;
+};
+
 export type ModerationActionCreateInput = {
   Comment?: InputMaybe<ModerationActionCommentFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileFieldInput>;
+  User?: InputMaybe<ModerationActionUserFieldInput>;
   actionDescription?: InputMaybe<Scalars['String']['input']>;
   actionType?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ModerationActionCreatedEvent = {
+  __typename?: 'ModerationActionCreatedEvent';
+  createdModerationAction: ModerationActionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ModerationActionDeleteInput = {
   Comment?: InputMaybe<ModerationActionCommentDeleteFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileDeleteFieldInput>;
+  User?: InputMaybe<ModerationActionUserDeleteFieldInput>;
+};
+
+export type ModerationActionDeletedEvent = {
+  __typename?: 'ModerationActionDeletedEvent';
+  deletedModerationAction: ModerationActionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ModerationActionDisconnectInput = {
   Comment?: InputMaybe<ModerationActionCommentDisconnectFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileDisconnectFieldInput>;
+  User?: InputMaybe<ModerationActionUserDisconnectFieldInput>;
 };
 
 export type ModerationActionEdge = {
   __typename?: 'ModerationActionEdge';
   cursor: Scalars['String']['output'];
   node: ModerationAction;
+};
+
+export type ModerationActionEventPayload = {
+  __typename?: 'ModerationActionEventPayload';
+  actionDescription?: Maybe<Scalars['String']['output']>;
+  actionType?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
 };
 
 export type ModerationActionModerationProfileAggregateInput = {
@@ -19232,6 +23292,11 @@ export type ModerationActionModerationProfileConnectOrCreateFieldInput = {
 
 export type ModerationActionModerationProfileConnectOrCreateFieldInputOnCreate = {
   node: ModerationProfileOnCreateInput;
+};
+
+export type ModerationActionModerationProfileConnectedRelationship = {
+  __typename?: 'ModerationActionModerationProfileConnectedRelationship';
+  node: ModerationProfileEventPayload;
 };
 
 export type ModerationActionModerationProfileConnection = {
@@ -19321,6 +23386,10 @@ export type ModerationActionModerationProfileRelationship = {
   node: ModerationProfile;
 };
 
+export type ModerationActionModerationProfileRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type ModerationActionModerationProfileUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -19345,6 +23414,47 @@ export type ModerationActionOptions = {
 export type ModerationActionRelationInput = {
   Comment?: InputMaybe<ModerationActionCommentCreateFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileCreateFieldInput>;
+  User?: InputMaybe<ModerationActionUserCreateFieldInput>;
+};
+
+export type ModerationActionRelationshipCreatedEvent = {
+  __typename?: 'ModerationActionRelationshipCreatedEvent';
+  createdRelationship: ModerationActionConnectedRelationships;
+  event: EventType;
+  moderationAction: ModerationActionEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModerationActionRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModerationActionRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ModerationActionRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModerationActionRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<ModerationActionRelationshipsSubscriptionWhere>;
+  moderationAction?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
+export type ModerationActionRelationshipDeletedEvent = {
+  __typename?: 'ModerationActionRelationshipDeletedEvent';
+  deletedRelationship: ModerationActionConnectedRelationships;
+  event: EventType;
+  moderationAction: ModerationActionEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModerationActionRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModerationActionRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ModerationActionRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModerationActionRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<ModerationActionRelationshipsSubscriptionWhere>;
+  moderationAction?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
+export type ModerationActionRelationshipsSubscriptionWhere = {
+  Comment?: InputMaybe<ModerationActionCommentRelationshipSubscriptionWhere>;
+  ModerationProfile?: InputMaybe<ModerationActionModerationProfileRelationshipSubscriptionWhere>;
+  User?: InputMaybe<ModerationActionUserRelationshipSubscriptionWhere>;
 };
 
 /** Fields to sort ModerationActions by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModerationActionSort object. */
@@ -19355,12 +23465,358 @@ export type ModerationActionSort = {
   id?: InputMaybe<SortDirection>;
 };
 
+export type ModerationActionSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModerationActionSubscriptionWhere>>;
+  NOT?: InputMaybe<ModerationActionSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModerationActionSubscriptionWhere>>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  actionDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType?: InputMaybe<Scalars['String']['input']>;
+  actionType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  actionType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  actionType_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  actionType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  actionType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type ModerationActionUpdateInput = {
   Comment?: InputMaybe<ModerationActionCommentUpdateFieldInput>;
   ModerationProfile?: InputMaybe<ModerationActionModerationProfileUpdateFieldInput>;
+  User?: InputMaybe<ModerationActionUserUpdateFieldInput>;
   actionDescription?: InputMaybe<Scalars['String']['input']>;
   actionType?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ModerationActionUpdatedEvent = {
+  __typename?: 'ModerationActionUpdatedEvent';
+  event: EventType;
+  previousState: ModerationActionEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedModerationAction: ModerationActionEventPayload;
+};
+
+export type ModerationActionUserAggregateInput = {
+  AND?: InputMaybe<Array<ModerationActionUserAggregateInput>>;
+  NOT?: InputMaybe<ModerationActionUserAggregateInput>;
+  OR?: InputMaybe<Array<ModerationActionUserAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ModerationActionUserNodeAggregationWhereInput>;
+};
+
+export type ModerationActionUserConnectFieldInput = {
+  connect?: InputMaybe<UserConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<UserConnectWhere>;
+};
+
+export type ModerationActionUserConnectOrCreateFieldInput = {
+  onCreate: ModerationActionUserConnectOrCreateFieldInputOnCreate;
+  where: UserConnectOrCreateWhere;
+};
+
+export type ModerationActionUserConnectOrCreateFieldInputOnCreate = {
+  node: UserOnCreateInput;
+};
+
+export type ModerationActionUserConnectedRelationship = {
+  __typename?: 'ModerationActionUserConnectedRelationship';
+  node: UserEventPayload;
+};
+
+export type ModerationActionUserConnection = {
+  __typename?: 'ModerationActionUserConnection';
+  edges: Array<ModerationActionUserRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ModerationActionUserConnectionSort = {
+  node?: InputMaybe<UserSort>;
+};
+
+export type ModerationActionUserConnectionWhere = {
+  AND?: InputMaybe<Array<ModerationActionUserConnectionWhere>>;
+  NOT?: InputMaybe<ModerationActionUserConnectionWhere>;
+  OR?: InputMaybe<Array<ModerationActionUserConnectionWhere>>;
+  node?: InputMaybe<UserWhere>;
+};
+
+export type ModerationActionUserCreateFieldInput = {
+  node: UserCreateInput;
+};
+
+export type ModerationActionUserDeleteFieldInput = {
+  delete?: InputMaybe<UserDeleteInput>;
+  where?: InputMaybe<ModerationActionUserConnectionWhere>;
+};
+
+export type ModerationActionUserDisconnectFieldInput = {
+  disconnect?: InputMaybe<UserDisconnectInput>;
+  where?: InputMaybe<ModerationActionUserConnectionWhere>;
+};
+
+export type ModerationActionUserFieldInput = {
+  connect?: InputMaybe<ModerationActionUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ModerationActionUserConnectOrCreateFieldInput>;
+  create?: InputMaybe<ModerationActionUserCreateFieldInput>;
+};
+
+export type ModerationActionUserNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ModerationActionUserNodeAggregationWhereInput>>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  DefaultEmojiSkinTone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NOT?: InputMaybe<ModerationActionUserNodeAggregationWhereInput>;
+  NotificationBundleInterval_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  NotificationBundleInterval_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  OR?: InputMaybe<Array<ModerationActionUserNodeAggregationWhereInput>>;
+  PreferredTimeZone_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  PreferredTimeZone_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  bio_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  bio_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  bio_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  commentKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  discussionKarma_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  discussionKarma_MAX_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MAX_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_MIN_LTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_SUM_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  displayName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  displayName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  displayName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  location_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  location_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  location_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  profilePicURL_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  profilePicURL_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  pronouns_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  pronouns_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  username_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  username_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  username_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ModerationActionUserRelationship = {
+  __typename?: 'ModerationActionUserRelationship';
+  cursor: Scalars['String']['output'];
+  node: User;
+};
+
+export type ModerationActionUserRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type ModerationActionUserUpdateConnectionInput = {
+  node?: InputMaybe<UserUpdateInput>;
+};
+
+export type ModerationActionUserUpdateFieldInput = {
+  connect?: InputMaybe<ModerationActionUserConnectFieldInput>;
+  connectOrCreate?: InputMaybe<ModerationActionUserConnectOrCreateFieldInput>;
+  create?: InputMaybe<ModerationActionUserCreateFieldInput>;
+  delete?: InputMaybe<ModerationActionUserDeleteFieldInput>;
+  disconnect?: InputMaybe<ModerationActionUserDisconnectFieldInput>;
+  update?: InputMaybe<ModerationActionUserUpdateConnectionInput>;
+  where?: InputMaybe<ModerationActionUserConnectionWhere>;
+};
+
+export type ModerationActionUserUserAggregationSelection = {
+  __typename?: 'ModerationActionUserUserAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ModerationActionUserUserNodeAggregateSelection>;
+};
+
+export type ModerationActionUserUserNodeAggregateSelection = {
+  __typename?: 'ModerationActionUserUserNodeAggregateSelection';
+  DefaultEmojiSkinTone: StringAggregateSelection;
+  NotificationBundleInterval: StringAggregateSelection;
+  PreferredTimeZone: StringAggregateSelection;
+  bio: StringAggregateSelection;
+  commentKarma: IntAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  discussionKarma: IntAggregateSelection;
+  displayName: StringAggregateSelection;
+  location: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  pronouns: StringAggregateSelection;
+  username: StringAggregateSelection;
 };
 
 export type ModerationActionWhere = {
@@ -19377,6 +23833,11 @@ export type ModerationActionWhere = {
   ModerationProfile_NOT?: InputMaybe<ModerationProfileWhere>;
   NOT?: InputMaybe<ModerationActionWhere>;
   OR?: InputMaybe<Array<ModerationActionWhere>>;
+  User?: InputMaybe<UserWhere>;
+  UserAggregate?: InputMaybe<ModerationActionUserAggregateInput>;
+  UserConnection?: InputMaybe<ModerationActionUserConnectionWhere>;
+  UserConnection_NOT?: InputMaybe<ModerationActionUserConnectionWhere>;
+  User_NOT?: InputMaybe<UserWhere>;
   actionDescription?: InputMaybe<Scalars['String']['input']>;
   actionDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   actionDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -19609,6 +24070,11 @@ export type ModerationProfileActivityFeedConnectFieldInput = {
   where?: InputMaybe<ModerationActionConnectWhere>;
 };
 
+export type ModerationProfileActivityFeedConnectedRelationship = {
+  __typename?: 'ModerationProfileActivityFeedConnectedRelationship';
+  node: ModerationActionEventPayload;
+};
+
 export type ModerationProfileActivityFeedConnection = {
   __typename?: 'ModerationProfileActivityFeedConnection';
   edges: Array<ModerationProfileActivityFeedRelationship>;
@@ -19698,6 +24164,10 @@ export type ModerationProfileActivityFeedRelationship = {
   node: ModerationAction;
 };
 
+export type ModerationProfileActivityFeedRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
 export type ModerationProfileActivityFeedUpdateConnectionInput = {
   node?: InputMaybe<ModerationActionUpdateInput>;
 };
@@ -19735,6 +24205,11 @@ export type ModerationProfileAuthoredCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type ModerationProfileAuthoredCommentsConnectedRelationship = {
+  __typename?: 'ModerationProfileAuthoredCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type ModerationProfileAuthoredCommentsConnection = {
@@ -19841,6 +24316,10 @@ export type ModerationProfileAuthoredCommentsRelationship = {
   node: Comment;
 };
 
+export type ModerationProfileAuthoredCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type ModerationProfileAuthoredCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -19871,6 +24350,11 @@ export type ModerationProfileAuthoredIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type ModerationProfileAuthoredIssuesConnectedRelationship = {
+  __typename?: 'ModerationProfileAuthoredIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type ModerationProfileAuthoredIssuesConnection = {
@@ -20032,6 +24516,10 @@ export type ModerationProfileAuthoredIssuesRelationship = {
   node: Issue;
 };
 
+export type ModerationProfileAuthoredIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type ModerationProfileAuthoredIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -20084,6 +24572,17 @@ export type ModerationProfileConnectWhere = {
   node: ModerationProfileWhere;
 };
 
+export type ModerationProfileConnectedRelationships = {
+  __typename?: 'ModerationProfileConnectedRelationships';
+  ActivityFeed?: Maybe<ModerationProfileActivityFeedConnectedRelationship>;
+  AuthoredComments?: Maybe<ModerationProfileAuthoredCommentsConnectedRelationship>;
+  AuthoredIssues?: Maybe<ModerationProfileAuthoredIssuesConnectedRelationship>;
+  ModChannelRoles?: Maybe<ModerationProfileModChannelRolesConnectedRelationship>;
+  ModServerRoles?: Maybe<ModerationProfileModServerRolesConnectedRelationship>;
+  Suspensions?: Maybe<ModerationProfileSuspensionsConnectedRelationship>;
+  User?: Maybe<ModerationProfileUserConnectedRelationship>;
+};
+
 export type ModerationProfileCreateInput = {
   ActivityFeed?: InputMaybe<ModerationProfileActivityFeedFieldInput>;
   AuthoredComments?: InputMaybe<ModerationProfileAuthoredCommentsFieldInput>;
@@ -20095,6 +24594,13 @@ export type ModerationProfileCreateInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ModerationProfileCreatedEvent = {
+  __typename?: 'ModerationProfileCreatedEvent';
+  createdModerationProfile: ModerationProfileEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ModerationProfileDeleteInput = {
   ActivityFeed?: InputMaybe<Array<ModerationProfileActivityFeedDeleteFieldInput>>;
   AuthoredComments?: InputMaybe<Array<ModerationProfileAuthoredCommentsDeleteFieldInput>>;
@@ -20103,6 +24609,13 @@ export type ModerationProfileDeleteInput = {
   ModServerRoles?: InputMaybe<Array<ModerationProfileModServerRolesDeleteFieldInput>>;
   Suspensions?: InputMaybe<Array<ModerationProfileSuspensionsDeleteFieldInput>>;
   User?: InputMaybe<ModerationProfileUserDeleteFieldInput>;
+};
+
+export type ModerationProfileDeletedEvent = {
+  __typename?: 'ModerationProfileDeletedEvent';
+  deletedModerationProfile: ModerationProfileEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ModerationProfileDisconnectInput = {
@@ -20119,6 +24632,12 @@ export type ModerationProfileEdge = {
   __typename?: 'ModerationProfileEdge';
   cursor: Scalars['String']['output'];
   node: ModerationProfile;
+};
+
+export type ModerationProfileEventPayload = {
+  __typename?: 'ModerationProfileEventPayload';
+  createdAt: Scalars['DateTime']['output'];
+  displayName?: Maybe<Scalars['String']['output']>;
 };
 
 export type ModerationProfileIssueAuthoredIssuesAggregationSelection = {
@@ -20181,6 +24700,11 @@ export type ModerationProfileModChannelRolesConnectOrCreateFieldInput = {
 
 export type ModerationProfileModChannelRolesConnectOrCreateFieldInputOnCreate = {
   node: ModChannelRoleOnCreateInput;
+};
+
+export type ModerationProfileModChannelRolesConnectedRelationship = {
+  __typename?: 'ModerationProfileModChannelRolesConnectedRelationship';
+  node: ModChannelRoleEventPayload;
 };
 
 export type ModerationProfileModChannelRolesConnection = {
@@ -20276,6 +24800,10 @@ export type ModerationProfileModChannelRolesRelationship = {
   node: ModChannelRole;
 };
 
+export type ModerationProfileModChannelRolesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
 export type ModerationProfileModChannelRolesUpdateConnectionInput = {
   node?: InputMaybe<ModChannelRoleUpdateInput>;
 };
@@ -20327,6 +24855,11 @@ export type ModerationProfileModServerRolesConnectOrCreateFieldInput = {
 
 export type ModerationProfileModServerRolesConnectOrCreateFieldInputOnCreate = {
   node: ModServerRoleOnCreateInput;
+};
+
+export type ModerationProfileModServerRolesConnectedRelationship = {
+  __typename?: 'ModerationProfileModServerRolesConnectedRelationship';
+  node: ModServerRoleEventPayload;
 };
 
 export type ModerationProfileModServerRolesConnection = {
@@ -20407,6 +24940,10 @@ export type ModerationProfileModServerRolesRelationship = {
   node: ModServerRole;
 };
 
+export type ModerationProfileModServerRolesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
 export type ModerationProfileModServerRolesUpdateConnectionInput = {
   node?: InputMaybe<ModServerRoleUpdateInput>;
 };
@@ -20456,10 +24993,72 @@ export type ModerationProfileRelationInput = {
   User?: InputMaybe<ModerationProfileUserCreateFieldInput>;
 };
 
+export type ModerationProfileRelationshipCreatedEvent = {
+  __typename?: 'ModerationProfileRelationshipCreatedEvent';
+  createdRelationship: ModerationProfileConnectedRelationships;
+  event: EventType;
+  moderationProfile: ModerationProfileEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModerationProfileRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModerationProfileRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ModerationProfileRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModerationProfileRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<ModerationProfileRelationshipsSubscriptionWhere>;
+  moderationProfile?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+export type ModerationProfileRelationshipDeletedEvent = {
+  __typename?: 'ModerationProfileRelationshipDeletedEvent';
+  deletedRelationship: ModerationProfileConnectedRelationships;
+  event: EventType;
+  moderationProfile: ModerationProfileEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ModerationProfileRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModerationProfileRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ModerationProfileRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModerationProfileRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<ModerationProfileRelationshipsSubscriptionWhere>;
+  moderationProfile?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+export type ModerationProfileRelationshipsSubscriptionWhere = {
+  ActivityFeed?: InputMaybe<ModerationProfileActivityFeedRelationshipSubscriptionWhere>;
+  AuthoredComments?: InputMaybe<ModerationProfileAuthoredCommentsRelationshipSubscriptionWhere>;
+  AuthoredIssues?: InputMaybe<ModerationProfileAuthoredIssuesRelationshipSubscriptionWhere>;
+  ModChannelRoles?: InputMaybe<ModerationProfileModChannelRolesRelationshipSubscriptionWhere>;
+  ModServerRoles?: InputMaybe<ModerationProfileModServerRolesRelationshipSubscriptionWhere>;
+  Suspensions?: InputMaybe<ModerationProfileSuspensionsRelationshipSubscriptionWhere>;
+  User?: InputMaybe<ModerationProfileUserRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort ModerationProfiles by. The order in which sorts are applied is not guaranteed when specifying many fields in one ModerationProfileSort object. */
 export type ModerationProfileSort = {
   createdAt?: InputMaybe<SortDirection>;
   displayName?: InputMaybe<SortDirection>;
+};
+
+export type ModerationProfileSubscriptionWhere = {
+  AND?: InputMaybe<Array<ModerationProfileSubscriptionWhere>>;
+  NOT?: InputMaybe<ModerationProfileSubscriptionWhere>;
+  OR?: InputMaybe<Array<ModerationProfileSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ModerationProfileSuspensionSuspensionsAggregationSelection = {
@@ -20495,6 +25094,11 @@ export type ModerationProfileSuspensionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<SuspensionConnectWhere>;
+};
+
+export type ModerationProfileSuspensionsConnectedRelationship = {
+  __typename?: 'ModerationProfileSuspensionsConnectedRelationship';
+  node: SuspensionEventPayload;
 };
 
 export type ModerationProfileSuspensionsConnection = {
@@ -20611,6 +25215,10 @@ export type ModerationProfileSuspensionsRelationship = {
   node: Suspension;
 };
 
+export type ModerationProfileSuspensionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
 export type ModerationProfileSuspensionsUpdateConnectionInput = {
   node?: InputMaybe<SuspensionUpdateInput>;
 };
@@ -20640,6 +25248,14 @@ export type ModerationProfileUpdateInput = {
   displayName?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type ModerationProfileUpdatedEvent = {
+  __typename?: 'ModerationProfileUpdatedEvent';
+  event: EventType;
+  previousState: ModerationProfileEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedModerationProfile: ModerationProfileEventPayload;
+};
+
 export type ModerationProfileUserAggregateInput = {
   AND?: InputMaybe<Array<ModerationProfileUserAggregateInput>>;
   NOT?: InputMaybe<ModerationProfileUserAggregateInput>;
@@ -20666,6 +25282,11 @@ export type ModerationProfileUserConnectOrCreateFieldInput = {
 
 export type ModerationProfileUserConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type ModerationProfileUserConnectedRelationship = {
+  __typename?: 'ModerationProfileUserConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type ModerationProfileUserConnection = {
@@ -20903,6 +25524,10 @@ export type ModerationProfileUserRelationship = {
   node: User;
 };
 
+export type ModerationProfileUserRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type ModerationProfileUserUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -21082,15 +25707,21 @@ export type Mutation = {
   archiveEvent?: Maybe<Issue>;
   cancelInviteForumMod?: Maybe<Scalars['Boolean']['output']>;
   cancelInviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
+  createActivities: CreateActivitiesMutationResponse;
   createAlbums: CreateAlbumsMutationResponse;
+  createChannelInfos: CreateChannelInfosMutationResponse;
   createChannelRoles: CreateChannelRolesMutationResponse;
   createChannels: CreateChannelsMutationResponse;
+  createCommentInfos: CreateCommentInfosMutationResponse;
   createCommentRepliesFormats: CreateCommentRepliesFormatsMutationResponse;
   createCommentSectionFormats: CreateCommentSectionFormatsMutationResponse;
   createComments: CreateCommentsMutationResponse;
   createContacts: CreateContactsMutationResponse;
+  createDayData: CreateDayDataMutationResponse;
+  createDiscussionChannelInfos: CreateDiscussionChannelInfosMutationResponse;
   createDiscussionChannelListFormats: CreateDiscussionChannelListFormatsMutationResponse;
   createDiscussionChannels: CreateDiscussionChannelsMutationResponse;
+  createDiscussionInfos: CreateDiscussionInfosMutationResponse;
   createDiscussionWithChannelConnections: Array<Discussion>;
   createDiscussions: CreateDiscussionsMutationResponse;
   createDropDataResponses: CreateDropDataResponsesMutationResponse;
@@ -21098,8 +25729,10 @@ export type Mutation = {
   createEmails: CreateEmailsMutationResponse;
   createEmojis: CreateEmojisMutationResponse;
   createEnvironmentInfos: CreateEnvironmentInfosMutationResponse;
+  createEventChannelInfos: CreateEventChannelInfosMutationResponse;
   createEventChannels: CreateEventChannelsMutationResponse;
   createEventCommentsFormats: CreateEventCommentsFormatsMutationResponse;
+  createEventInfos: CreateEventInfosMutationResponse;
   createEventWithChannelConnections: Array<Event>;
   createEvents: CreateEventsMutationResponse;
   createFeeds: CreateFeedsMutationResponse;
@@ -21128,22 +25761,30 @@ export type Mutation = {
   createTextVersions: CreateTextVersionsMutationResponse;
   createUsers: CreateUsersMutationResponse;
   createWikiPages: CreateWikiPagesMutationResponse;
+  deleteActivities: DeleteInfo;
   deleteAlbums: DeleteInfo;
+  deleteChannelInfos: DeleteInfo;
   deleteChannelRoles: DeleteInfo;
   deleteChannels: DeleteInfo;
+  deleteCommentInfos: DeleteInfo;
   deleteCommentRepliesFormats: DeleteInfo;
   deleteCommentSectionFormats: DeleteInfo;
   deleteComments: DeleteInfo;
   deleteContacts: DeleteInfo;
+  deleteDayData: DeleteInfo;
+  deleteDiscussionChannelInfos: DeleteInfo;
   deleteDiscussionChannelListFormats: DeleteInfo;
   deleteDiscussionChannels: DeleteInfo;
+  deleteDiscussionInfos: DeleteInfo;
   deleteDiscussions: DeleteInfo;
   deleteDropDataResponses: DeleteInfo;
   deleteEmails: DeleteInfo;
   deleteEmojis: DeleteInfo;
   deleteEnvironmentInfos: DeleteInfo;
+  deleteEventChannelInfos: DeleteInfo;
   deleteEventChannels: DeleteInfo;
   deleteEventCommentsFormats: DeleteInfo;
+  deleteEventInfos: DeleteInfo;
   deleteEvents: DeleteInfo;
   deleteFeeds: DeleteInfo;
   deleteGetSortedChannelsResponses: DeleteInfo;
@@ -21190,23 +25831,31 @@ export type Mutation = {
   undoUpvoteDiscussionChannel?: Maybe<DiscussionChannel>;
   unsuspendMod?: Maybe<Issue>;
   unsuspendUser?: Maybe<Issue>;
+  updateActivities: UpdateActivitiesMutationResponse;
   updateAlbums: UpdateAlbumsMutationResponse;
+  updateChannelInfos: UpdateChannelInfosMutationResponse;
   updateChannelRoles: UpdateChannelRolesMutationResponse;
   updateChannels: UpdateChannelsMutationResponse;
+  updateCommentInfos: UpdateCommentInfosMutationResponse;
   updateCommentRepliesFormats: UpdateCommentRepliesFormatsMutationResponse;
   updateCommentSectionFormats: UpdateCommentSectionFormatsMutationResponse;
   updateComments: UpdateCommentsMutationResponse;
   updateContacts: UpdateContactsMutationResponse;
+  updateDayData: UpdateDayDataMutationResponse;
+  updateDiscussionChannelInfos: UpdateDiscussionChannelInfosMutationResponse;
   updateDiscussionChannelListFormats: UpdateDiscussionChannelListFormatsMutationResponse;
   updateDiscussionChannels: UpdateDiscussionChannelsMutationResponse;
+  updateDiscussionInfos: UpdateDiscussionInfosMutationResponse;
   updateDiscussionWithChannelConnections?: Maybe<Discussion>;
   updateDiscussions: UpdateDiscussionsMutationResponse;
   updateDropDataResponses: UpdateDropDataResponsesMutationResponse;
   updateEmails: UpdateEmailsMutationResponse;
   updateEmojis: UpdateEmojisMutationResponse;
   updateEnvironmentInfos: UpdateEnvironmentInfosMutationResponse;
+  updateEventChannelInfos: UpdateEventChannelInfosMutationResponse;
   updateEventChannels: UpdateEventChannelsMutationResponse;
   updateEventCommentsFormats: UpdateEventCommentsFormatsMutationResponse;
+  updateEventInfos: UpdateEventInfosMutationResponse;
   updateEventWithChannelConnections?: Maybe<Event>;
   updateEvents: UpdateEventsMutationResponse;
   updateFeeds: UpdateFeedsMutationResponse;
@@ -21303,8 +25952,18 @@ export type MutationCancelInviteForumOwnerArgs = {
 };
 
 
+export type MutationCreateActivitiesArgs = {
+  input: Array<ActivityCreateInput>;
+};
+
+
 export type MutationCreateAlbumsArgs = {
   input: Array<AlbumCreateInput>;
+};
+
+
+export type MutationCreateChannelInfosArgs = {
+  input: Array<ChannelInfoCreateInput>;
 };
 
 
@@ -21315,6 +25974,11 @@ export type MutationCreateChannelRolesArgs = {
 
 export type MutationCreateChannelsArgs = {
   input: Array<ChannelCreateInput>;
+};
+
+
+export type MutationCreateCommentInfosArgs = {
+  input: Array<CommentInfoCreateInput>;
 };
 
 
@@ -21338,6 +26002,16 @@ export type MutationCreateContactsArgs = {
 };
 
 
+export type MutationCreateDayDataArgs = {
+  input: Array<DayDataCreateInput>;
+};
+
+
+export type MutationCreateDiscussionChannelInfosArgs = {
+  input: Array<DiscussionChannelInfoCreateInput>;
+};
+
+
 export type MutationCreateDiscussionChannelListFormatsArgs = {
   input: Array<DiscussionChannelListFormatCreateInput>;
 };
@@ -21345,6 +26019,11 @@ export type MutationCreateDiscussionChannelListFormatsArgs = {
 
 export type MutationCreateDiscussionChannelsArgs = {
   input: Array<DiscussionChannelCreateInput>;
+};
+
+
+export type MutationCreateDiscussionInfosArgs = {
+  input: Array<DiscussionInfoCreateInput>;
 };
 
 
@@ -21384,6 +26063,11 @@ export type MutationCreateEnvironmentInfosArgs = {
 };
 
 
+export type MutationCreateEventChannelInfosArgs = {
+  input: Array<EventChannelInfoCreateInput>;
+};
+
+
 export type MutationCreateEventChannelsArgs = {
   input: Array<EventChannelCreateInput>;
 };
@@ -21391,6 +26075,11 @@ export type MutationCreateEventChannelsArgs = {
 
 export type MutationCreateEventCommentsFormatsArgs = {
   input: Array<EventCommentsFormatCreateInput>;
+};
+
+
+export type MutationCreateEventInfosArgs = {
+  input: Array<EventInfoCreateInput>;
 };
 
 
@@ -21535,9 +26224,19 @@ export type MutationCreateWikiPagesArgs = {
 };
 
 
+export type MutationDeleteActivitiesArgs = {
+  where?: InputMaybe<ActivityWhere>;
+};
+
+
 export type MutationDeleteAlbumsArgs = {
   delete?: InputMaybe<AlbumDeleteInput>;
   where?: InputMaybe<AlbumWhere>;
+};
+
+
+export type MutationDeleteChannelInfosArgs = {
+  where?: InputMaybe<ChannelInfoWhere>;
 };
 
 
@@ -21549,6 +26248,11 @@ export type MutationDeleteChannelRolesArgs = {
 export type MutationDeleteChannelsArgs = {
   delete?: InputMaybe<ChannelDeleteInput>;
   where?: InputMaybe<ChannelWhere>;
+};
+
+
+export type MutationDeleteCommentInfosArgs = {
+  where?: InputMaybe<CommentInfoWhere>;
 };
 
 
@@ -21574,6 +26278,16 @@ export type MutationDeleteContactsArgs = {
 };
 
 
+export type MutationDeleteDayDataArgs = {
+  where?: InputMaybe<DayDataWhere>;
+};
+
+
+export type MutationDeleteDiscussionChannelInfosArgs = {
+  where?: InputMaybe<DiscussionChannelInfoWhere>;
+};
+
+
 export type MutationDeleteDiscussionChannelListFormatsArgs = {
   where?: InputMaybe<DiscussionChannelListFormatWhere>;
 };
@@ -21582,6 +26296,11 @@ export type MutationDeleteDiscussionChannelListFormatsArgs = {
 export type MutationDeleteDiscussionChannelsArgs = {
   delete?: InputMaybe<DiscussionChannelDeleteInput>;
   where?: InputMaybe<DiscussionChannelWhere>;
+};
+
+
+export type MutationDeleteDiscussionInfosArgs = {
+  where?: InputMaybe<DiscussionInfoWhere>;
 };
 
 
@@ -21613,6 +26332,11 @@ export type MutationDeleteEnvironmentInfosArgs = {
 };
 
 
+export type MutationDeleteEventChannelInfosArgs = {
+  where?: InputMaybe<EventChannelInfoWhere>;
+};
+
+
 export type MutationDeleteEventChannelsArgs = {
   delete?: InputMaybe<EventChannelDeleteInput>;
   where?: InputMaybe<EventChannelWhere>;
@@ -21621,6 +26345,11 @@ export type MutationDeleteEventChannelsArgs = {
 
 export type MutationDeleteEventCommentsFormatsArgs = {
   where?: InputMaybe<EventCommentsFormatWhere>;
+};
+
+
+export type MutationDeleteEventInfosArgs = {
+  where?: InputMaybe<EventInfoWhere>;
 };
 
 
@@ -21908,9 +26637,21 @@ export type MutationUnsuspendUserArgs = {
 };
 
 
+export type MutationUpdateActivitiesArgs = {
+  update?: InputMaybe<ActivityUpdateInput>;
+  where?: InputMaybe<ActivityWhere>;
+};
+
+
 export type MutationUpdateAlbumsArgs = {
   update?: InputMaybe<AlbumUpdateInput>;
   where?: InputMaybe<AlbumWhere>;
+};
+
+
+export type MutationUpdateChannelInfosArgs = {
+  update?: InputMaybe<ChannelInfoUpdateInput>;
+  where?: InputMaybe<ChannelInfoWhere>;
 };
 
 
@@ -21923,6 +26664,12 @@ export type MutationUpdateChannelRolesArgs = {
 export type MutationUpdateChannelsArgs = {
   update?: InputMaybe<ChannelUpdateInput>;
   where?: InputMaybe<ChannelWhere>;
+};
+
+
+export type MutationUpdateCommentInfosArgs = {
+  update?: InputMaybe<CommentInfoUpdateInput>;
+  where?: InputMaybe<CommentInfoWhere>;
 };
 
 
@@ -21950,6 +26697,18 @@ export type MutationUpdateContactsArgs = {
 };
 
 
+export type MutationUpdateDayDataArgs = {
+  update?: InputMaybe<DayDataUpdateInput>;
+  where?: InputMaybe<DayDataWhere>;
+};
+
+
+export type MutationUpdateDiscussionChannelInfosArgs = {
+  update?: InputMaybe<DiscussionChannelInfoUpdateInput>;
+  where?: InputMaybe<DiscussionChannelInfoWhere>;
+};
+
+
 export type MutationUpdateDiscussionChannelListFormatsArgs = {
   update?: InputMaybe<DiscussionChannelListFormatUpdateInput>;
   where?: InputMaybe<DiscussionChannelListFormatWhere>;
@@ -21959,6 +26718,12 @@ export type MutationUpdateDiscussionChannelListFormatsArgs = {
 export type MutationUpdateDiscussionChannelsArgs = {
   update?: InputMaybe<DiscussionChannelUpdateInput>;
   where?: InputMaybe<DiscussionChannelWhere>;
+};
+
+
+export type MutationUpdateDiscussionInfosArgs = {
+  update?: InputMaybe<DiscussionInfoUpdateInput>;
+  where?: InputMaybe<DiscussionInfoWhere>;
 };
 
 
@@ -22000,6 +26765,12 @@ export type MutationUpdateEnvironmentInfosArgs = {
 };
 
 
+export type MutationUpdateEventChannelInfosArgs = {
+  update?: InputMaybe<EventChannelInfoUpdateInput>;
+  where?: InputMaybe<EventChannelInfoWhere>;
+};
+
+
 export type MutationUpdateEventChannelsArgs = {
   update?: InputMaybe<EventChannelUpdateInput>;
   where?: InputMaybe<EventChannelWhere>;
@@ -22009,6 +26780,12 @@ export type MutationUpdateEventChannelsArgs = {
 export type MutationUpdateEventCommentsFormatsArgs = {
   update?: InputMaybe<EventCommentsFormatUpdateInput>;
   where?: InputMaybe<EventCommentsFormatWhere>;
+};
+
+
+export type MutationUpdateEventInfosArgs = {
+  update?: InputMaybe<EventInfoUpdateInput>;
+  where?: InputMaybe<EventInfoWhere>;
 };
 
 
@@ -22217,10 +26994,32 @@ export type NotificationCreateInput = {
   text?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type NotificationCreatedEvent = {
+  __typename?: 'NotificationCreatedEvent';
+  createdNotification: NotificationEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type NotificationDeletedEvent = {
+  __typename?: 'NotificationDeletedEvent';
+  deletedNotification: NotificationEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type NotificationEdge = {
   __typename?: 'NotificationEdge';
   cursor: Scalars['String']['output'];
   node: Notification;
+};
+
+export type NotificationEventPayload = {
+  __typename?: 'NotificationEventPayload';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  read?: Maybe<Scalars['Boolean']['output']>;
+  text?: Maybe<Scalars['String']['output']>;
 };
 
 export type NotificationOptions = {
@@ -22238,10 +27037,42 @@ export type NotificationSort = {
   text?: InputMaybe<SortDirection>;
 };
 
+export type NotificationSubscriptionWhere = {
+  AND?: InputMaybe<Array<NotificationSubscriptionWhere>>;
+  NOT?: InputMaybe<NotificationSubscriptionWhere>;
+  OR?: InputMaybe<Array<NotificationSubscriptionWhere>>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  read?: InputMaybe<Scalars['Boolean']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type NotificationUpdateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   read?: InputMaybe<Scalars['Boolean']['input']>;
   text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type NotificationUpdatedEvent = {
+  __typename?: 'NotificationUpdatedEvent';
+  event: EventType;
+  previousState: NotificationEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedNotification: NotificationEventPayload;
 };
 
 export type NotificationWhere = {
@@ -22310,9 +27141,15 @@ export type PointInput = {
 
 export type Query = {
   __typename?: 'Query';
+  activities: Array<Activity>;
+  activitiesAggregate: ActivityAggregateSelection;
+  activitiesConnection: ActivitiesConnection;
   albums: Array<Album>;
   albumsAggregate: AlbumAggregateSelection;
   albumsConnection: AlbumsConnection;
+  channelInfos: Array<ChannelInfo>;
+  channelInfosAggregate: ChannelInfoAggregateSelection;
+  channelInfosConnection: ChannelInfosConnection;
   channelRoles: Array<ChannelRole>;
   channelRolesAggregate: ChannelRoleAggregateSelection;
   channelRolesConnection: ChannelRolesConnection;
@@ -22320,6 +27157,9 @@ export type Query = {
   channelsAggregate: ChannelAggregateSelection;
   channelsConnection: ChannelsConnection;
   commentAuthors: Array<CommentAuthor>;
+  commentInfos: Array<CommentInfo>;
+  commentInfosAggregate: CommentInfoAggregateSelection;
+  commentInfosConnection: CommentInfosConnection;
   commentRepliesFormats: Array<CommentRepliesFormat>;
   commentRepliesFormatsAggregate: CommentRepliesFormatAggregateSelection;
   commentRepliesFormatsConnection: CommentRepliesFormatsConnection;
@@ -22332,12 +27172,21 @@ export type Query = {
   contacts: Array<Contact>;
   contactsAggregate: ContactAggregateSelection;
   contactsConnection: ContactsConnection;
+  dayData: Array<DayData>;
+  dayDataAggregate: DayDataAggregateSelection;
+  dayDataConnection: DayDataConnection;
+  discussionChannelInfos: Array<DiscussionChannelInfo>;
+  discussionChannelInfosAggregate: DiscussionChannelInfoAggregateSelection;
+  discussionChannelInfosConnection: DiscussionChannelInfosConnection;
   discussionChannelListFormats: Array<DiscussionChannelListFormat>;
   discussionChannelListFormatsAggregate: DiscussionChannelListFormatAggregateSelection;
   discussionChannelListFormatsConnection: DiscussionChannelListFormatsConnection;
   discussionChannels: Array<DiscussionChannel>;
   discussionChannelsAggregate: DiscussionChannelAggregateSelection;
   discussionChannelsConnection: DiscussionChannelsConnection;
+  discussionInfos: Array<DiscussionInfo>;
+  discussionInfosAggregate: DiscussionInfoAggregateSelection;
+  discussionInfosConnection: DiscussionInfosConnection;
   discussions: Array<Discussion>;
   discussionsAggregate: DiscussionAggregateSelection;
   discussionsConnection: DiscussionsConnection;
@@ -22353,12 +27202,18 @@ export type Query = {
   environmentInfos: Array<EnvironmentInfo>;
   environmentInfosAggregate: EnvironmentInfoAggregateSelection;
   environmentInfosConnection: EnvironmentInfosConnection;
+  eventChannelInfos: Array<EventChannelInfo>;
+  eventChannelInfosAggregate: EventChannelInfoAggregateSelection;
+  eventChannelInfosConnection: EventChannelInfosConnection;
   eventChannels: Array<EventChannel>;
   eventChannelsAggregate: EventChannelAggregateSelection;
   eventChannelsConnection: EventChannelsConnection;
   eventCommentsFormats: Array<EventCommentsFormat>;
   eventCommentsFormatsAggregate: EventCommentsFormatAggregateSelection;
   eventCommentsFormatsConnection: EventCommentsFormatsConnection;
+  eventInfos: Array<EventInfo>;
+  eventInfosAggregate: EventInfoAggregateSelection;
+  eventInfosConnection: EventInfosConnection;
   events: Array<Event>;
   eventsAggregate: EventAggregateSelection;
   eventsConnection: EventsConnection;
@@ -22374,6 +27229,7 @@ export type Query = {
   getSortedChannelsResponses: Array<GetSortedChannelsResponse>;
   getSortedChannelsResponsesAggregate: GetSortedChannelsResponseAggregateSelection;
   getSortedChannelsResponsesConnection: GetSortedChannelsResponsesConnection;
+  getUserContributions: Array<DayData>;
   images: Array<Image>;
   imagesAggregate: ImageAggregateSelection;
   imagesConnection: ImagesConnection;
@@ -22450,6 +27306,25 @@ export type Query = {
 };
 
 
+export type QueryActivitiesArgs = {
+  options?: InputMaybe<ActivityOptions>;
+  where?: InputMaybe<ActivityWhere>;
+};
+
+
+export type QueryActivitiesAggregateArgs = {
+  where?: InputMaybe<ActivityWhere>;
+};
+
+
+export type QueryActivitiesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<ActivitySort>>>;
+  where?: InputMaybe<ActivityWhere>;
+};
+
+
 export type QueryAlbumsArgs = {
   options?: InputMaybe<AlbumOptions>;
   where?: InputMaybe<AlbumWhere>;
@@ -22466,6 +27341,25 @@ export type QueryAlbumsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<AlbumSort>>>;
   where?: InputMaybe<AlbumWhere>;
+};
+
+
+export type QueryChannelInfosArgs = {
+  options?: InputMaybe<ChannelInfoOptions>;
+  where?: InputMaybe<ChannelInfoWhere>;
+};
+
+
+export type QueryChannelInfosAggregateArgs = {
+  where?: InputMaybe<ChannelInfoWhere>;
+};
+
+
+export type QueryChannelInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<ChannelInfoSort>>>;
+  where?: InputMaybe<ChannelInfoWhere>;
 };
 
 
@@ -22510,6 +27404,25 @@ export type QueryChannelsConnectionArgs = {
 export type QueryCommentAuthorsArgs = {
   options?: InputMaybe<QueryOptions>;
   where?: InputMaybe<CommentAuthorWhere>;
+};
+
+
+export type QueryCommentInfosArgs = {
+  options?: InputMaybe<CommentInfoOptions>;
+  where?: InputMaybe<CommentInfoWhere>;
+};
+
+
+export type QueryCommentInfosAggregateArgs = {
+  where?: InputMaybe<CommentInfoWhere>;
+};
+
+
+export type QueryCommentInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<CommentInfoSort>>>;
+  where?: InputMaybe<CommentInfoWhere>;
 };
 
 
@@ -22588,6 +27501,44 @@ export type QueryContactsConnectionArgs = {
 };
 
 
+export type QueryDayDataArgs = {
+  options?: InputMaybe<DayDataOptions>;
+  where?: InputMaybe<DayDataWhere>;
+};
+
+
+export type QueryDayDataAggregateArgs = {
+  where?: InputMaybe<DayDataWhere>;
+};
+
+
+export type QueryDayDataConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<DayDataSort>>>;
+  where?: InputMaybe<DayDataWhere>;
+};
+
+
+export type QueryDiscussionChannelInfosArgs = {
+  options?: InputMaybe<DiscussionChannelInfoOptions>;
+  where?: InputMaybe<DiscussionChannelInfoWhere>;
+};
+
+
+export type QueryDiscussionChannelInfosAggregateArgs = {
+  where?: InputMaybe<DiscussionChannelInfoWhere>;
+};
+
+
+export type QueryDiscussionChannelInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<DiscussionChannelInfoSort>>>;
+  where?: InputMaybe<DiscussionChannelInfoWhere>;
+};
+
+
 export type QueryDiscussionChannelListFormatsArgs = {
   options?: InputMaybe<DiscussionChannelListFormatOptions>;
   where?: InputMaybe<DiscussionChannelListFormatWhere>;
@@ -22623,6 +27574,25 @@ export type QueryDiscussionChannelsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<DiscussionChannelSort>>>;
   where?: InputMaybe<DiscussionChannelWhere>;
+};
+
+
+export type QueryDiscussionInfosArgs = {
+  options?: InputMaybe<DiscussionInfoOptions>;
+  where?: InputMaybe<DiscussionInfoWhere>;
+};
+
+
+export type QueryDiscussionInfosAggregateArgs = {
+  where?: InputMaybe<DiscussionInfoWhere>;
+};
+
+
+export type QueryDiscussionInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<DiscussionInfoSort>>>;
+  where?: InputMaybe<DiscussionInfoWhere>;
 };
 
 
@@ -22721,6 +27691,25 @@ export type QueryEnvironmentInfosConnectionArgs = {
 };
 
 
+export type QueryEventChannelInfosArgs = {
+  options?: InputMaybe<EventChannelInfoOptions>;
+  where?: InputMaybe<EventChannelInfoWhere>;
+};
+
+
+export type QueryEventChannelInfosAggregateArgs = {
+  where?: InputMaybe<EventChannelInfoWhere>;
+};
+
+
+export type QueryEventChannelInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<EventChannelInfoSort>>>;
+  where?: InputMaybe<EventChannelInfoWhere>;
+};
+
+
 export type QueryEventChannelsArgs = {
   options?: InputMaybe<EventChannelOptions>;
   where?: InputMaybe<EventChannelWhere>;
@@ -22755,6 +27744,25 @@ export type QueryEventCommentsFormatsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<EventCommentsFormatWhere>;
+};
+
+
+export type QueryEventInfosArgs = {
+  options?: InputMaybe<EventInfoOptions>;
+  where?: InputMaybe<EventInfoWhere>;
+};
+
+
+export type QueryEventInfosAggregateArgs = {
+  where?: InputMaybe<EventInfoWhere>;
+};
+
+
+export type QueryEventInfosConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<EventInfoSort>>>;
+  where?: InputMaybe<EventInfoWhere>;
 };
 
 
@@ -22865,6 +27873,14 @@ export type QueryGetSortedChannelsResponsesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<GetSortedChannelsResponseSort>>>;
   where?: InputMaybe<GetSortedChannelsResponseWhere>;
+};
+
+
+export type QueryGetUserContributionsArgs = {
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
+  username: Scalars['String']['input'];
+  year?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -23372,12 +28388,31 @@ export type RecurringEventConnectWhere = {
   node: RecurringEventWhere;
 };
 
+export type RecurringEventConnectedRelationships = {
+  __typename?: 'RecurringEventConnectedRelationships';
+  Events?: Maybe<RecurringEventEventsConnectedRelationship>;
+};
+
 export type RecurringEventCreateInput = {
   Events?: InputMaybe<RecurringEventEventsFieldInput>;
 };
 
+export type RecurringEventCreatedEvent = {
+  __typename?: 'RecurringEventCreatedEvent';
+  createdRecurringEvent: RecurringEventEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type RecurringEventDeleteInput = {
   Events?: InputMaybe<Array<RecurringEventEventsDeleteFieldInput>>;
+};
+
+export type RecurringEventDeletedEvent = {
+  __typename?: 'RecurringEventDeletedEvent';
+  deletedRecurringEvent: RecurringEventEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type RecurringEventDisconnectInput = {
@@ -23415,6 +28450,11 @@ export type RecurringEventEventEventsNodeAggregateSelection = {
   virtualEventUrl: StringAggregateSelection;
 };
 
+export type RecurringEventEventPayload = {
+  __typename?: 'RecurringEventEventPayload';
+  id: Scalars['ID']['output'];
+};
+
 export type RecurringEventEventsAggregateInput = {
   AND?: InputMaybe<Array<RecurringEventEventsAggregateInput>>;
   NOT?: InputMaybe<RecurringEventEventsAggregateInput>;
@@ -23432,6 +28472,11 @@ export type RecurringEventEventsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
+};
+
+export type RecurringEventEventsConnectedRelationship = {
+  __typename?: 'RecurringEventEventsConnectedRelationship';
+  node: EventEventPayload;
 };
 
 export type RecurringEventEventsConnection = {
@@ -23678,6 +28723,10 @@ export type RecurringEventEventsRelationship = {
   node: Event;
 };
 
+export type RecurringEventEventsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventSubscriptionWhere>;
+};
+
 export type RecurringEventEventsUpdateConnectionInput = {
   node?: InputMaybe<EventUpdateInput>;
 };
@@ -23702,13 +28751,70 @@ export type RecurringEventRelationInput = {
   Events?: InputMaybe<Array<RecurringEventEventsCreateFieldInput>>;
 };
 
+export type RecurringEventRelationshipCreatedEvent = {
+  __typename?: 'RecurringEventRelationshipCreatedEvent';
+  createdRelationship: RecurringEventConnectedRelationships;
+  event: EventType;
+  recurringEvent: RecurringEventEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type RecurringEventRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<RecurringEventRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<RecurringEventRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<RecurringEventRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<RecurringEventRelationshipsSubscriptionWhere>;
+  recurringEvent?: InputMaybe<RecurringEventSubscriptionWhere>;
+};
+
+export type RecurringEventRelationshipDeletedEvent = {
+  __typename?: 'RecurringEventRelationshipDeletedEvent';
+  deletedRelationship: RecurringEventConnectedRelationships;
+  event: EventType;
+  recurringEvent: RecurringEventEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type RecurringEventRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<RecurringEventRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<RecurringEventRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<RecurringEventRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<RecurringEventRelationshipsSubscriptionWhere>;
+  recurringEvent?: InputMaybe<RecurringEventSubscriptionWhere>;
+};
+
+export type RecurringEventRelationshipsSubscriptionWhere = {
+  Events?: InputMaybe<RecurringEventEventsRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort RecurringEvents by. The order in which sorts are applied is not guaranteed when specifying many fields in one RecurringEventSort object. */
 export type RecurringEventSort = {
   id?: InputMaybe<SortDirection>;
 };
 
+export type RecurringEventSubscriptionWhere = {
+  AND?: InputMaybe<Array<RecurringEventSubscriptionWhere>>;
+  NOT?: InputMaybe<RecurringEventSubscriptionWhere>;
+  OR?: InputMaybe<Array<RecurringEventSubscriptionWhere>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+};
+
 export type RecurringEventUpdateInput = {
   Events?: InputMaybe<Array<RecurringEventEventsUpdateFieldInput>>;
+};
+
+export type RecurringEventUpdatedEvent = {
+  __typename?: 'RecurringEventUpdatedEvent';
+  event: EventType;
+  previousState: RecurringEventEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedRecurringEvent: RecurringEventEventPayload;
 };
 
 export type RecurringEventWhere = {
@@ -23775,10 +28881,32 @@ export type RepeatEndsCreateInput = {
   until?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type RepeatEndsCreatedEvent = {
+  __typename?: 'RepeatEndsCreatedEvent';
+  createdRepeatEnds: RepeatEndsEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type RepeatEndsDeletedEvent = {
+  __typename?: 'RepeatEndsDeletedEvent';
+  deletedRepeatEnds: RepeatEndsEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type RepeatEndsEdge = {
   __typename?: 'RepeatEndsEdge';
   cursor: Scalars['String']['output'];
   node: RepeatEnds;
+};
+
+export type RepeatEndsEventPayload = {
+  __typename?: 'RepeatEndsEventPayload';
+  count?: Maybe<Scalars['Int']['output']>;
+  type?: Maybe<Scalars['String']['output']>;
+  unit?: Maybe<RepeatUnit>;
+  until?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type RepeatEndsOptions = {
@@ -23796,6 +28924,32 @@ export type RepeatEndsSort = {
   until?: InputMaybe<SortDirection>;
 };
 
+export type RepeatEndsSubscriptionWhere = {
+  AND?: InputMaybe<Array<RepeatEndsSubscriptionWhere>>;
+  NOT?: InputMaybe<RepeatEndsSubscriptionWhere>;
+  OR?: InputMaybe<Array<RepeatEndsSubscriptionWhere>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  type?: InputMaybe<Scalars['String']['input']>;
+  type_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  type_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  type_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  type_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  type_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  unit?: InputMaybe<RepeatUnit>;
+  unit_IN?: InputMaybe<Array<InputMaybe<RepeatUnit>>>;
+  until?: InputMaybe<Scalars['DateTime']['input']>;
+  until_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  until_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  until_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  until_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  until_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 export type RepeatEndsUpdateInput = {
   count?: InputMaybe<Scalars['Int']['input']>;
   count_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
@@ -23803,6 +28957,14 @@ export type RepeatEndsUpdateInput = {
   type?: InputMaybe<Scalars['String']['input']>;
   unit?: InputMaybe<RepeatUnit>;
   until?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type RepeatEndsUpdatedEvent = {
+  __typename?: 'RepeatEndsUpdatedEvent';
+  event: EventType;
+  previousState: RepeatEndsEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedRepeatEnds: RepeatEndsEventPayload;
 };
 
 export type RepeatEndsWhere = {
@@ -23854,10 +29016,30 @@ export type RepeatEveryCreateInput = {
   unit?: InputMaybe<RepeatUnit>;
 };
 
+export type RepeatEveryCreatedEvent = {
+  __typename?: 'RepeatEveryCreatedEvent';
+  createdRepeatEvery: RepeatEveryEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type RepeatEveryDeletedEvent = {
+  __typename?: 'RepeatEveryDeletedEvent';
+  deletedRepeatEvery: RepeatEveryEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type RepeatEveryEdge = {
   __typename?: 'RepeatEveryEdge';
   cursor: Scalars['String']['output'];
   node: RepeatEvery;
+};
+
+export type RepeatEveryEventPayload = {
+  __typename?: 'RepeatEveryEventPayload';
+  count?: Maybe<Scalars['Int']['output']>;
+  unit?: Maybe<RepeatUnit>;
 };
 
 export type RepeatEveryOptions = {
@@ -23873,11 +29055,33 @@ export type RepeatEverySort = {
   unit?: InputMaybe<SortDirection>;
 };
 
+export type RepeatEverySubscriptionWhere = {
+  AND?: InputMaybe<Array<RepeatEverySubscriptionWhere>>;
+  NOT?: InputMaybe<RepeatEverySubscriptionWhere>;
+  OR?: InputMaybe<Array<RepeatEverySubscriptionWhere>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  unit?: InputMaybe<RepeatUnit>;
+  unit_IN?: InputMaybe<Array<InputMaybe<RepeatUnit>>>;
+};
+
 export type RepeatEveryUpdateInput = {
   count?: InputMaybe<Scalars['Int']['input']>;
   count_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   count_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
   unit?: InputMaybe<RepeatUnit>;
+};
+
+export type RepeatEveryUpdatedEvent = {
+  __typename?: 'RepeatEveryUpdatedEvent';
+  event: EventType;
+  previousState: RepeatEveryEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedRepeatEvery: RepeatEveryEventPayload;
 };
 
 export type RepeatEveryWhere = {
@@ -23916,6 +29120,18 @@ export type SafetyCheckResponseCreateInput = {
   _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type SafetyCheckResponseCreatedEvent = {
+  __typename?: 'SafetyCheckResponseCreatedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SafetyCheckResponseDeletedEvent = {
+  __typename?: 'SafetyCheckResponseDeletedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type SafetyCheckResponseEdge = {
   __typename?: 'SafetyCheckResponseEdge';
   cursor: Scalars['String']['output'];
@@ -23930,6 +29146,12 @@ export type SafetyCheckResponseOptions = {
 export type SafetyCheckResponseUpdateInput = {
   /** Appears because this input type would be empty otherwise because this type is composed of just generated and/or relationship properties. See https://neo4j.com/docs/graphql-manual/current/troubleshooting/faqs/ */
   _emptyInput?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SafetyCheckResponseUpdatedEvent = {
+  __typename?: 'SafetyCheckResponseUpdatedEvent';
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type SafetyCheckResponseWhere = {
@@ -23962,10 +29184,30 @@ export type SeedDataResponseCreateInput = {
   success?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type SeedDataResponseCreatedEvent = {
+  __typename?: 'SeedDataResponseCreatedEvent';
+  createdSeedDataResponse: SeedDataResponseEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SeedDataResponseDeletedEvent = {
+  __typename?: 'SeedDataResponseDeletedEvent';
+  deletedSeedDataResponse: SeedDataResponseEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type SeedDataResponseEdge = {
   __typename?: 'SeedDataResponseEdge';
   cursor: Scalars['String']['output'];
   node: SeedDataResponse;
+};
+
+export type SeedDataResponseEventPayload = {
+  __typename?: 'SeedDataResponseEventPayload';
+  message?: Maybe<Scalars['String']['output']>;
+  success?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type SeedDataResponseOptions = {
@@ -23981,9 +29223,30 @@ export type SeedDataResponseSort = {
   success?: InputMaybe<SortDirection>;
 };
 
+export type SeedDataResponseSubscriptionWhere = {
+  AND?: InputMaybe<Array<SeedDataResponseSubscriptionWhere>>;
+  NOT?: InputMaybe<SeedDataResponseSubscriptionWhere>;
+  OR?: InputMaybe<Array<SeedDataResponseSubscriptionWhere>>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  message_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type SeedDataResponseUpdateInput = {
   message?: InputMaybe<Scalars['String']['input']>;
   success?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type SeedDataResponseUpdatedEvent = {
+  __typename?: 'SeedDataResponseUpdatedEvent';
+  event: EventType;
+  previousState: SeedDataResponseEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedSeedDataResponse: SeedDataResponseEventPayload;
 };
 
 export type SeedDataResponseWhere = {
@@ -24163,6 +29426,15 @@ export type ServerConfigConnectOrCreateInput = {
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectOrCreateFieldInput>;
 };
 
+export type ServerConfigConnectedRelationships = {
+  __typename?: 'ServerConfigConnectedRelationships';
+  DefaultElevatedModRole?: Maybe<ServerConfigDefaultElevatedModRoleConnectedRelationship>;
+  DefaultModRole?: Maybe<ServerConfigDefaultModRoleConnectedRelationship>;
+  DefaultServerRole?: Maybe<ServerConfigDefaultServerRoleConnectedRelationship>;
+  DefaultSuspendedModRole?: Maybe<ServerConfigDefaultSuspendedModRoleConnectedRelationship>;
+  DefaultSuspendedRole?: Maybe<ServerConfigDefaultSuspendedRoleConnectedRelationship>;
+};
+
 export type ServerConfigCreateInput = {
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleFieldInput>;
@@ -24173,6 +29445,13 @@ export type ServerConfigCreateInput = {
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ServerConfigCreatedEvent = {
+  __typename?: 'ServerConfigCreatedEvent';
+  createdServerConfig: ServerConfigEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type ServerConfigDefaultElevatedModRoleAggregateInput = {
@@ -24200,6 +29479,11 @@ export type ServerConfigDefaultElevatedModRoleConnectOrCreateFieldInput = {
 
 export type ServerConfigDefaultElevatedModRoleConnectOrCreateFieldInputOnCreate = {
   node: ModServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultElevatedModRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultElevatedModRoleConnectedRelationship';
+  node: ModServerRoleEventPayload;
 };
 
 export type ServerConfigDefaultElevatedModRoleConnection = {
@@ -24280,6 +29564,10 @@ export type ServerConfigDefaultElevatedModRoleRelationship = {
   node: ModServerRole;
 };
 
+export type ServerConfigDefaultElevatedModRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
 export type ServerConfigDefaultElevatedModRoleUpdateConnectionInput = {
   node?: InputMaybe<ModServerRoleUpdateInput>;
 };
@@ -24319,6 +29607,11 @@ export type ServerConfigDefaultModRoleConnectOrCreateFieldInput = {
 
 export type ServerConfigDefaultModRoleConnectOrCreateFieldInputOnCreate = {
   node: ModServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultModRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultModRoleConnectedRelationship';
+  node: ModServerRoleEventPayload;
 };
 
 export type ServerConfigDefaultModRoleConnection = {
@@ -24399,6 +29692,10 @@ export type ServerConfigDefaultModRoleRelationship = {
   node: ModServerRole;
 };
 
+export type ServerConfigDefaultModRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
 export type ServerConfigDefaultModRoleUpdateConnectionInput = {
   node?: InputMaybe<ModServerRoleUpdateInput>;
 };
@@ -24438,6 +29735,11 @@ export type ServerConfigDefaultServerRoleConnectOrCreateFieldInput = {
 
 export type ServerConfigDefaultServerRoleConnectOrCreateFieldInputOnCreate = {
   node: ServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultServerRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultServerRoleConnectedRelationship';
+  node: ServerRoleEventPayload;
 };
 
 export type ServerConfigDefaultServerRoleConnection = {
@@ -24518,6 +29820,10 @@ export type ServerConfigDefaultServerRoleRelationship = {
   node: ServerRole;
 };
 
+export type ServerConfigDefaultServerRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
 export type ServerConfigDefaultServerRoleUpdateConnectionInput = {
   node?: InputMaybe<ServerRoleUpdateInput>;
 };
@@ -24557,6 +29863,11 @@ export type ServerConfigDefaultSuspendedModRoleConnectOrCreateFieldInput = {
 
 export type ServerConfigDefaultSuspendedModRoleConnectOrCreateFieldInputOnCreate = {
   node: ModServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultSuspendedModRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultSuspendedModRoleConnectedRelationship';
+  node: ModServerRoleEventPayload;
 };
 
 export type ServerConfigDefaultSuspendedModRoleConnection = {
@@ -24637,6 +29948,10 @@ export type ServerConfigDefaultSuspendedModRoleRelationship = {
   node: ModServerRole;
 };
 
+export type ServerConfigDefaultSuspendedModRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
 export type ServerConfigDefaultSuspendedModRoleUpdateConnectionInput = {
   node?: InputMaybe<ModServerRoleUpdateInput>;
 };
@@ -24676,6 +29991,11 @@ export type ServerConfigDefaultSuspendedRoleConnectOrCreateFieldInput = {
 
 export type ServerConfigDefaultSuspendedRoleConnectOrCreateFieldInputOnCreate = {
   node: ServerRoleOnCreateInput;
+};
+
+export type ServerConfigDefaultSuspendedRoleConnectedRelationship = {
+  __typename?: 'ServerConfigDefaultSuspendedRoleConnectedRelationship';
+  node: ServerRoleEventPayload;
 };
 
 export type ServerConfigDefaultSuspendedRoleConnection = {
@@ -24756,6 +30076,10 @@ export type ServerConfigDefaultSuspendedRoleRelationship = {
   node: ServerRole;
 };
 
+export type ServerConfigDefaultSuspendedRoleRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
 export type ServerConfigDefaultSuspendedRoleUpdateConnectionInput = {
   node?: InputMaybe<ServerRoleUpdateInput>;
 };
@@ -24778,6 +30102,13 @@ export type ServerConfigDeleteInput = {
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleDeleteFieldInput>;
 };
 
+export type ServerConfigDeletedEvent = {
+  __typename?: 'ServerConfigDeletedEvent';
+  deletedServerConfig: ServerConfigEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ServerConfigDisconnectInput = {
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleDisconnectFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleDisconnectFieldInput>;
@@ -24790,6 +30121,14 @@ export type ServerConfigEdge = {
   __typename?: 'ServerConfigEdge';
   cursor: Scalars['String']['output'];
   node: ServerConfig;
+};
+
+export type ServerConfigEventPayload = {
+  __typename?: 'ServerConfigEventPayload';
+  rules?: Maybe<Scalars['JSON']['output']>;
+  serverDescription?: Maybe<Scalars['String']['output']>;
+  serverIconURL?: Maybe<Scalars['String']['output']>;
+  serverName?: Maybe<Scalars['String']['output']>;
 };
 
 export type ServerConfigModServerRoleDefaultElevatedModRoleAggregationSelection = {
@@ -24843,6 +30182,48 @@ export type ServerConfigRelationInput = {
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleCreateFieldInput>;
 };
 
+export type ServerConfigRelationshipCreatedEvent = {
+  __typename?: 'ServerConfigRelationshipCreatedEvent';
+  createdRelationship: ServerConfigConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  serverConfig: ServerConfigEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ServerConfigRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ServerConfigRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<ServerConfigRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ServerConfigRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<ServerConfigRelationshipsSubscriptionWhere>;
+  serverConfig?: InputMaybe<ServerConfigSubscriptionWhere>;
+};
+
+export type ServerConfigRelationshipDeletedEvent = {
+  __typename?: 'ServerConfigRelationshipDeletedEvent';
+  deletedRelationship: ServerConfigConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  serverConfig: ServerConfigEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ServerConfigRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<ServerConfigRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<ServerConfigRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<ServerConfigRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<ServerConfigRelationshipsSubscriptionWhere>;
+  serverConfig?: InputMaybe<ServerConfigSubscriptionWhere>;
+};
+
+export type ServerConfigRelationshipsSubscriptionWhere = {
+  DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleRelationshipSubscriptionWhere>;
+  DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleRelationshipSubscriptionWhere>;
+  DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleRelationshipSubscriptionWhere>;
+  DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleRelationshipSubscriptionWhere>;
+  DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleRelationshipSubscriptionWhere>;
+};
+
 export type ServerConfigServerRoleDefaultServerRoleAggregationSelection = {
   __typename?: 'ServerConfigServerRoleDefaultServerRoleAggregationSelection';
   count: Scalars['Int']['output'];
@@ -24875,6 +30256,32 @@ export type ServerConfigSort = {
   serverName?: InputMaybe<SortDirection>;
 };
 
+export type ServerConfigSubscriptionWhere = {
+  AND?: InputMaybe<Array<ServerConfigSubscriptionWhere>>;
+  NOT?: InputMaybe<ServerConfigSubscriptionWhere>;
+  OR?: InputMaybe<Array<ServerConfigSubscriptionWhere>>;
+  rules?: InputMaybe<Scalars['JSON']['input']>;
+  rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+  serverDescription?: InputMaybe<Scalars['String']['input']>;
+  serverDescription_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  serverDescription_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverDescription_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  serverDescription_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  serverDescription_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  serverIconURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  serverIconURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverName?: InputMaybe<Scalars['String']['input']>;
+  serverName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  serverName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  serverName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  serverName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  serverName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type ServerConfigUpdateInput = {
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleUpdateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleUpdateFieldInput>;
@@ -24885,6 +30292,14 @@ export type ServerConfigUpdateInput = {
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
   serverName?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ServerConfigUpdatedEvent = {
+  __typename?: 'ServerConfigUpdatedEvent';
+  event: EventType;
+  previousState: ServerConfigEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedServerConfig: ServerConfigEventPayload;
 };
 
 export type ServerConfigWhere = {
@@ -24989,10 +30404,39 @@ export type ServerRoleCreateInput = {
   showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+export type ServerRoleCreatedEvent = {
+  __typename?: 'ServerRoleCreatedEvent';
+  createdServerRole: ServerRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ServerRoleDeletedEvent = {
+  __typename?: 'ServerRoleDeletedEvent';
+  deletedServerRole: ServerRoleEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type ServerRoleEdge = {
   __typename?: 'ServerRoleEdge';
   cursor: Scalars['String']['output'];
   node: ServerRole;
+};
+
+export type ServerRoleEventPayload = {
+  __typename?: 'ServerRoleEventPayload';
+  canCreateChannel?: Maybe<Scalars['Boolean']['output']>;
+  canCreateComment?: Maybe<Scalars['Boolean']['output']>;
+  canCreateDiscussion?: Maybe<Scalars['Boolean']['output']>;
+  canCreateEvent?: Maybe<Scalars['Boolean']['output']>;
+  canGiveFeedback?: Maybe<Scalars['Boolean']['output']>;
+  canUploadFile?: Maybe<Scalars['Boolean']['output']>;
+  canUpvoteComment?: Maybe<Scalars['Boolean']['output']>;
+  canUpvoteDiscussion?: Maybe<Scalars['Boolean']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  name?: Maybe<Scalars['String']['output']>;
+  showAdminTag?: Maybe<Scalars['Boolean']['output']>;
 };
 
 export type ServerRoleOnCreateInput = {
@@ -25031,6 +30475,33 @@ export type ServerRoleSort = {
   showAdminTag?: InputMaybe<SortDirection>;
 };
 
+export type ServerRoleSubscriptionWhere = {
+  AND?: InputMaybe<Array<ServerRoleSubscriptionWhere>>;
+  NOT?: InputMaybe<ServerRoleSubscriptionWhere>;
+  OR?: InputMaybe<Array<ServerRoleSubscriptionWhere>>;
+  canCreateChannel?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  canCreateEvent?: InputMaybe<Scalars['Boolean']['input']>;
+  canGiveFeedback?: InputMaybe<Scalars['Boolean']['input']>;
+  canUploadFile?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteComment?: InputMaybe<Scalars['Boolean']['input']>;
+  canUpvoteDiscussion?: InputMaybe<Scalars['Boolean']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  description_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  description_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  description_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  description_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  description_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
 export type ServerRoleUniqueWhere = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -25047,6 +30518,14 @@ export type ServerRoleUpdateInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   showAdminTag?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type ServerRoleUpdatedEvent = {
+  __typename?: 'ServerRoleUpdatedEvent';
+  event: EventType;
+  previousState: ServerRoleEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedServerRole: ServerRoleEventPayload;
 };
 
 export type ServerRoleWhere = {
@@ -25104,6 +30583,11 @@ export type SignedUrlEdge = {
   node: SignedUrl;
 };
 
+export type SignedUrlEventPayload = {
+  __typename?: 'SignedURLEventPayload';
+  url?: Maybe<Scalars['String']['output']>;
+};
+
 export type SignedUrlOptions = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
@@ -25114,6 +30598,18 @@ export type SignedUrlOptions = {
 /** Fields to sort SignedUrls by. The order in which sorts are applied is not guaranteed when specifying many fields in one SignedURLSort object. */
 export type SignedUrlSort = {
   url?: InputMaybe<SortDirection>;
+};
+
+export type SignedUrlSubscriptionWhere = {
+  AND?: InputMaybe<Array<SignedUrlSubscriptionWhere>>;
+  NOT?: InputMaybe<SignedUrlSubscriptionWhere>;
+  OR?: InputMaybe<Array<SignedUrlSubscriptionWhere>>;
+  url?: InputMaybe<Scalars['String']['input']>;
+  url_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  url_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  url_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  url_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  url_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SignedUrlUpdateInput = {
@@ -25130,6 +30626,28 @@ export type SignedUrlWhere = {
   url_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   url_MATCHES?: InputMaybe<Scalars['String']['input']>;
   url_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SignedUrlCreatedEvent = {
+  __typename?: 'SignedUrlCreatedEvent';
+  createdSignedUrl: SignedUrlEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SignedUrlDeletedEvent = {
+  __typename?: 'SignedUrlDeletedEvent';
+  deletedSignedUrl: SignedUrlEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SignedUrlUpdatedEvent = {
+  __typename?: 'SignedUrlUpdatedEvent';
+  event: EventType;
+  previousState: SignedUrlEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedSignedUrl: SignedUrlEventPayload;
 };
 
 export type SignedUrlsConnection = {
@@ -25155,10 +30673,29 @@ export type SiteWideDiscussionListFormatCreateInput = {
   aggregateDiscussionCount: Scalars['Int']['input'];
 };
 
+export type SiteWideDiscussionListFormatCreatedEvent = {
+  __typename?: 'SiteWideDiscussionListFormatCreatedEvent';
+  createdSiteWideDiscussionListFormat: SiteWideDiscussionListFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SiteWideDiscussionListFormatDeletedEvent = {
+  __typename?: 'SiteWideDiscussionListFormatDeletedEvent';
+  deletedSiteWideDiscussionListFormat: SiteWideDiscussionListFormatEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type SiteWideDiscussionListFormatEdge = {
   __typename?: 'SiteWideDiscussionListFormatEdge';
   cursor: Scalars['String']['output'];
   node: SiteWideDiscussionListFormat;
+};
+
+export type SiteWideDiscussionListFormatEventPayload = {
+  __typename?: 'SiteWideDiscussionListFormatEventPayload';
+  aggregateDiscussionCount: Scalars['Int']['output'];
 };
 
 export type SiteWideDiscussionListFormatOptions = {
@@ -25173,10 +30710,30 @@ export type SiteWideDiscussionListFormatSort = {
   aggregateDiscussionCount?: InputMaybe<SortDirection>;
 };
 
+export type SiteWideDiscussionListFormatSubscriptionWhere = {
+  AND?: InputMaybe<Array<SiteWideDiscussionListFormatSubscriptionWhere>>;
+  NOT?: InputMaybe<SiteWideDiscussionListFormatSubscriptionWhere>;
+  OR?: InputMaybe<Array<SiteWideDiscussionListFormatSubscriptionWhere>>;
+  aggregateDiscussionCount?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionCount_GT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionCount_GTE?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionCount_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  aggregateDiscussionCount_LT?: InputMaybe<Scalars['Int']['input']>;
+  aggregateDiscussionCount_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type SiteWideDiscussionListFormatUpdateInput = {
   aggregateDiscussionCount?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
   aggregateDiscussionCount_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type SiteWideDiscussionListFormatUpdatedEvent = {
+  __typename?: 'SiteWideDiscussionListFormatUpdatedEvent';
+  event: EventType;
+  previousState: SiteWideDiscussionListFormatEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedSiteWideDiscussionListFormat: SiteWideDiscussionListFormatEventPayload;
 };
 
 export type SiteWideDiscussionListFormatWhere = {
@@ -25216,6 +30773,1141 @@ export type StringAggregateSelection = {
   __typename?: 'StringAggregateSelection';
   longest?: Maybe<Scalars['String']['output']>;
   shortest?: Maybe<Scalars['String']['output']>;
+};
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  activityCreated: ActivityCreatedEvent;
+  activityDeleted: ActivityDeletedEvent;
+  activityUpdated: ActivityUpdatedEvent;
+  albumCreated: AlbumCreatedEvent;
+  albumDeleted: AlbumDeletedEvent;
+  albumRelationshipCreated: AlbumRelationshipCreatedEvent;
+  albumRelationshipDeleted: AlbumRelationshipDeletedEvent;
+  albumUpdated: AlbumUpdatedEvent;
+  channelCreated: ChannelCreatedEvent;
+  channelDeleted: ChannelDeletedEvent;
+  channelInfoCreated: ChannelInfoCreatedEvent;
+  channelInfoDeleted: ChannelInfoDeletedEvent;
+  channelInfoUpdated: ChannelInfoUpdatedEvent;
+  channelRelationshipCreated: ChannelRelationshipCreatedEvent;
+  channelRelationshipDeleted: ChannelRelationshipDeletedEvent;
+  channelRoleCreated: ChannelRoleCreatedEvent;
+  channelRoleDeleted: ChannelRoleDeletedEvent;
+  channelRoleUpdated: ChannelRoleUpdatedEvent;
+  channelUpdated: ChannelUpdatedEvent;
+  commentCreated: CommentCreatedEvent;
+  commentDeleted: CommentDeletedEvent;
+  commentInfoCreated: CommentInfoCreatedEvent;
+  commentInfoDeleted: CommentInfoDeletedEvent;
+  commentInfoUpdated: CommentInfoUpdatedEvent;
+  commentRelationshipCreated: CommentRelationshipCreatedEvent;
+  commentRelationshipDeleted: CommentRelationshipDeletedEvent;
+  commentRepliesFormatCreated: CommentRepliesFormatCreatedEvent;
+  commentRepliesFormatDeleted: CommentRepliesFormatDeletedEvent;
+  commentRepliesFormatUpdated: CommentRepliesFormatUpdatedEvent;
+  commentSectionFormatCreated: CommentSectionFormatCreatedEvent;
+  commentSectionFormatDeleted: CommentSectionFormatDeletedEvent;
+  commentSectionFormatUpdated: CommentSectionFormatUpdatedEvent;
+  commentUpdated: CommentUpdatedEvent;
+  contactCreated: ContactCreatedEvent;
+  contactDeleted: ContactDeletedEvent;
+  contactRelationshipCreated: ContactRelationshipCreatedEvent;
+  contactRelationshipDeleted: ContactRelationshipDeletedEvent;
+  contactUpdated: ContactUpdatedEvent;
+  dayDataCreated: DayDataCreatedEvent;
+  dayDataDeleted: DayDataDeletedEvent;
+  dayDataUpdated: DayDataUpdatedEvent;
+  discussionChannelCreated: DiscussionChannelCreatedEvent;
+  discussionChannelDeleted: DiscussionChannelDeletedEvent;
+  discussionChannelInfoCreated: DiscussionChannelInfoCreatedEvent;
+  discussionChannelInfoDeleted: DiscussionChannelInfoDeletedEvent;
+  discussionChannelInfoUpdated: DiscussionChannelInfoUpdatedEvent;
+  discussionChannelListFormatCreated: DiscussionChannelListFormatCreatedEvent;
+  discussionChannelListFormatDeleted: DiscussionChannelListFormatDeletedEvent;
+  discussionChannelListFormatUpdated: DiscussionChannelListFormatUpdatedEvent;
+  discussionChannelRelationshipCreated: DiscussionChannelRelationshipCreatedEvent;
+  discussionChannelRelationshipDeleted: DiscussionChannelRelationshipDeletedEvent;
+  discussionChannelUpdated: DiscussionChannelUpdatedEvent;
+  discussionCreated: DiscussionCreatedEvent;
+  discussionDeleted: DiscussionDeletedEvent;
+  discussionInfoCreated: DiscussionInfoCreatedEvent;
+  discussionInfoDeleted: DiscussionInfoDeletedEvent;
+  discussionInfoUpdated: DiscussionInfoUpdatedEvent;
+  discussionRelationshipCreated: DiscussionRelationshipCreatedEvent;
+  discussionRelationshipDeleted: DiscussionRelationshipDeletedEvent;
+  discussionUpdated: DiscussionUpdatedEvent;
+  dropDataResponseCreated: DropDataResponseCreatedEvent;
+  dropDataResponseDeleted: DropDataResponseDeletedEvent;
+  dropDataResponseUpdated: DropDataResponseUpdatedEvent;
+  emailCreated: EmailCreatedEvent;
+  emailDeleted: EmailDeletedEvent;
+  emailRelationshipCreated: EmailRelationshipCreatedEvent;
+  emailRelationshipDeleted: EmailRelationshipDeletedEvent;
+  emailUpdated: EmailUpdatedEvent;
+  emojiCreated: EmojiCreatedEvent;
+  emojiDeleted: EmojiDeletedEvent;
+  emojiRelationshipCreated: EmojiRelationshipCreatedEvent;
+  emojiRelationshipDeleted: EmojiRelationshipDeletedEvent;
+  emojiUpdated: EmojiUpdatedEvent;
+  environmentInfoCreated: EnvironmentInfoCreatedEvent;
+  environmentInfoDeleted: EnvironmentInfoDeletedEvent;
+  environmentInfoUpdated: EnvironmentInfoUpdatedEvent;
+  eventChannelCreated: EventChannelCreatedEvent;
+  eventChannelDeleted: EventChannelDeletedEvent;
+  eventChannelInfoCreated: EventChannelInfoCreatedEvent;
+  eventChannelInfoDeleted: EventChannelInfoDeletedEvent;
+  eventChannelInfoUpdated: EventChannelInfoUpdatedEvent;
+  eventChannelRelationshipCreated: EventChannelRelationshipCreatedEvent;
+  eventChannelRelationshipDeleted: EventChannelRelationshipDeletedEvent;
+  eventChannelUpdated: EventChannelUpdatedEvent;
+  eventCommentsFormatCreated: EventCommentsFormatCreatedEvent;
+  eventCommentsFormatDeleted: EventCommentsFormatDeletedEvent;
+  eventCommentsFormatUpdated: EventCommentsFormatUpdatedEvent;
+  eventCreated: EventCreatedEvent;
+  eventDeleted: EventDeletedEvent;
+  eventInfoCreated: EventInfoCreatedEvent;
+  eventInfoDeleted: EventInfoDeletedEvent;
+  eventInfoUpdated: EventInfoUpdatedEvent;
+  eventRelationshipCreated: EventRelationshipCreatedEvent;
+  eventRelationshipDeleted: EventRelationshipDeletedEvent;
+  eventUpdated: EventUpdatedEvent;
+  feedCreated: FeedCreatedEvent;
+  feedDeleted: FeedDeletedEvent;
+  feedRelationshipCreated: FeedRelationshipCreatedEvent;
+  feedRelationshipDeleted: FeedRelationshipDeletedEvent;
+  feedUpdated: FeedUpdatedEvent;
+  getSortedChannelsResponseCreated: GetSortedChannelsResponseCreatedEvent;
+  getSortedChannelsResponseDeleted: GetSortedChannelsResponseDeletedEvent;
+  getSortedChannelsResponseUpdated: GetSortedChannelsResponseUpdatedEvent;
+  imageCreated: ImageCreatedEvent;
+  imageDeleted: ImageDeletedEvent;
+  imageRelationshipCreated: ImageRelationshipCreatedEvent;
+  imageRelationshipDeleted: ImageRelationshipDeletedEvent;
+  imageUpdated: ImageUpdatedEvent;
+  issueCreated: IssueCreatedEvent;
+  issueDeleted: IssueDeletedEvent;
+  issueRelationshipCreated: IssueRelationshipCreatedEvent;
+  issueRelationshipDeleted: IssueRelationshipDeletedEvent;
+  issueUpdated: IssueUpdatedEvent;
+  linkFlairCreated: LinkFlairCreatedEvent;
+  linkFlairDeleted: LinkFlairDeletedEvent;
+  linkFlairUpdated: LinkFlairUpdatedEvent;
+  messageCreated: MessageCreatedEvent;
+  messageDeleted: MessageDeletedEvent;
+  messageRelationshipCreated: MessageRelationshipCreatedEvent;
+  messageRelationshipDeleted: MessageRelationshipDeletedEvent;
+  messageUpdated: MessageUpdatedEvent;
+  modChannelRoleCreated: ModChannelRoleCreatedEvent;
+  modChannelRoleDeleted: ModChannelRoleDeletedEvent;
+  modChannelRoleUpdated: ModChannelRoleUpdatedEvent;
+  modServerRoleCreated: ModServerRoleCreatedEvent;
+  modServerRoleDeleted: ModServerRoleDeletedEvent;
+  modServerRoleUpdated: ModServerRoleUpdatedEvent;
+  moderationActionCreated: ModerationActionCreatedEvent;
+  moderationActionDeleted: ModerationActionDeletedEvent;
+  moderationActionRelationshipCreated: ModerationActionRelationshipCreatedEvent;
+  moderationActionRelationshipDeleted: ModerationActionRelationshipDeletedEvent;
+  moderationActionUpdated: ModerationActionUpdatedEvent;
+  moderationProfileCreated: ModerationProfileCreatedEvent;
+  moderationProfileDeleted: ModerationProfileDeletedEvent;
+  moderationProfileRelationshipCreated: ModerationProfileRelationshipCreatedEvent;
+  moderationProfileRelationshipDeleted: ModerationProfileRelationshipDeletedEvent;
+  moderationProfileUpdated: ModerationProfileUpdatedEvent;
+  notificationCreated: NotificationCreatedEvent;
+  notificationDeleted: NotificationDeletedEvent;
+  notificationUpdated: NotificationUpdatedEvent;
+  recurringEventCreated: RecurringEventCreatedEvent;
+  recurringEventDeleted: RecurringEventDeletedEvent;
+  recurringEventRelationshipCreated: RecurringEventRelationshipCreatedEvent;
+  recurringEventRelationshipDeleted: RecurringEventRelationshipDeletedEvent;
+  recurringEventUpdated: RecurringEventUpdatedEvent;
+  repeatEndsCreated: RepeatEndsCreatedEvent;
+  repeatEndsDeleted: RepeatEndsDeletedEvent;
+  repeatEndsUpdated: RepeatEndsUpdatedEvent;
+  repeatEveryCreated: RepeatEveryCreatedEvent;
+  repeatEveryDeleted: RepeatEveryDeletedEvent;
+  repeatEveryUpdated: RepeatEveryUpdatedEvent;
+  safetyCheckResponseCreated: SafetyCheckResponseCreatedEvent;
+  safetyCheckResponseDeleted: SafetyCheckResponseDeletedEvent;
+  safetyCheckResponseUpdated: SafetyCheckResponseUpdatedEvent;
+  seedDataResponseCreated: SeedDataResponseCreatedEvent;
+  seedDataResponseDeleted: SeedDataResponseDeletedEvent;
+  seedDataResponseUpdated: SeedDataResponseUpdatedEvent;
+  serverConfigCreated: ServerConfigCreatedEvent;
+  serverConfigDeleted: ServerConfigDeletedEvent;
+  serverConfigRelationshipCreated: ServerConfigRelationshipCreatedEvent;
+  serverConfigRelationshipDeleted: ServerConfigRelationshipDeletedEvent;
+  serverConfigUpdated: ServerConfigUpdatedEvent;
+  serverRoleCreated: ServerRoleCreatedEvent;
+  serverRoleDeleted: ServerRoleDeletedEvent;
+  serverRoleUpdated: ServerRoleUpdatedEvent;
+  signedUrlCreated: SignedUrlCreatedEvent;
+  signedUrlDeleted: SignedUrlDeletedEvent;
+  signedUrlUpdated: SignedUrlUpdatedEvent;
+  siteWideDiscussionListFormatCreated: SiteWideDiscussionListFormatCreatedEvent;
+  siteWideDiscussionListFormatDeleted: SiteWideDiscussionListFormatDeletedEvent;
+  siteWideDiscussionListFormatUpdated: SiteWideDiscussionListFormatUpdatedEvent;
+  suspensionCreated: SuspensionCreatedEvent;
+  suspensionDeleted: SuspensionDeletedEvent;
+  suspensionRelationshipCreated: SuspensionRelationshipCreatedEvent;
+  suspensionRelationshipDeleted: SuspensionRelationshipDeletedEvent;
+  suspensionUpdated: SuspensionUpdatedEvent;
+  tagCreated: TagCreatedEvent;
+  tagDeleted: TagDeletedEvent;
+  tagRelationshipCreated: TagRelationshipCreatedEvent;
+  tagRelationshipDeleted: TagRelationshipDeletedEvent;
+  tagUpdated: TagUpdatedEvent;
+  textVersionCreated: TextVersionCreatedEvent;
+  textVersionDeleted: TextVersionDeletedEvent;
+  textVersionRelationshipCreated: TextVersionRelationshipCreatedEvent;
+  textVersionRelationshipDeleted: TextVersionRelationshipDeletedEvent;
+  textVersionUpdated: TextVersionUpdatedEvent;
+  userCreated: UserCreatedEvent;
+  userDeleted: UserDeletedEvent;
+  userRelationshipCreated: UserRelationshipCreatedEvent;
+  userRelationshipDeleted: UserRelationshipDeletedEvent;
+  userUpdated: UserUpdatedEvent;
+  wikiPageCreated: WikiPageCreatedEvent;
+  wikiPageDeleted: WikiPageDeletedEvent;
+  wikiPageRelationshipCreated: WikiPageRelationshipCreatedEvent;
+  wikiPageRelationshipDeleted: WikiPageRelationshipDeletedEvent;
+  wikiPageUpdated: WikiPageUpdatedEvent;
+};
+
+
+export type SubscriptionActivityCreatedArgs = {
+  where?: InputMaybe<ActivitySubscriptionWhere>;
+};
+
+
+export type SubscriptionActivityDeletedArgs = {
+  where?: InputMaybe<ActivitySubscriptionWhere>;
+};
+
+
+export type SubscriptionActivityUpdatedArgs = {
+  where?: InputMaybe<ActivitySubscriptionWhere>;
+};
+
+
+export type SubscriptionAlbumCreatedArgs = {
+  where?: InputMaybe<AlbumSubscriptionWhere>;
+};
+
+
+export type SubscriptionAlbumDeletedArgs = {
+  where?: InputMaybe<AlbumSubscriptionWhere>;
+};
+
+
+export type SubscriptionAlbumRelationshipCreatedArgs = {
+  where?: InputMaybe<AlbumRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionAlbumRelationshipDeletedArgs = {
+  where?: InputMaybe<AlbumRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionAlbumUpdatedArgs = {
+  where?: InputMaybe<AlbumSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelCreatedArgs = {
+  where?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelDeletedArgs = {
+  where?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelInfoCreatedArgs = {
+  where?: InputMaybe<ChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelInfoDeletedArgs = {
+  where?: InputMaybe<ChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelInfoUpdatedArgs = {
+  where?: InputMaybe<ChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelRelationshipCreatedArgs = {
+  where?: InputMaybe<ChannelRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelRelationshipDeletedArgs = {
+  where?: InputMaybe<ChannelRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelRoleCreatedArgs = {
+  where?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelRoleDeletedArgs = {
+  where?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelRoleUpdatedArgs = {
+  where?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionChannelUpdatedArgs = {
+  where?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentCreatedArgs = {
+  where?: InputMaybe<CommentSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentDeletedArgs = {
+  where?: InputMaybe<CommentSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentInfoCreatedArgs = {
+  where?: InputMaybe<CommentInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentInfoDeletedArgs = {
+  where?: InputMaybe<CommentInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentInfoUpdatedArgs = {
+  where?: InputMaybe<CommentInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentRelationshipCreatedArgs = {
+  where?: InputMaybe<CommentRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentRelationshipDeletedArgs = {
+  where?: InputMaybe<CommentRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentRepliesFormatCreatedArgs = {
+  where?: InputMaybe<CommentRepliesFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentRepliesFormatDeletedArgs = {
+  where?: InputMaybe<CommentRepliesFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentRepliesFormatUpdatedArgs = {
+  where?: InputMaybe<CommentRepliesFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionCommentUpdatedArgs = {
+  where?: InputMaybe<CommentSubscriptionWhere>;
+};
+
+
+export type SubscriptionContactCreatedArgs = {
+  where?: InputMaybe<ContactSubscriptionWhere>;
+};
+
+
+export type SubscriptionContactDeletedArgs = {
+  where?: InputMaybe<ContactSubscriptionWhere>;
+};
+
+
+export type SubscriptionContactRelationshipCreatedArgs = {
+  where?: InputMaybe<ContactRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionContactRelationshipDeletedArgs = {
+  where?: InputMaybe<ContactRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionContactUpdatedArgs = {
+  where?: InputMaybe<ContactSubscriptionWhere>;
+};
+
+
+export type SubscriptionDayDataCreatedArgs = {
+  where?: InputMaybe<DayDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionDayDataDeletedArgs = {
+  where?: InputMaybe<DayDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionDayDataUpdatedArgs = {
+  where?: InputMaybe<DayDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelCreatedArgs = {
+  where?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelDeletedArgs = {
+  where?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelInfoCreatedArgs = {
+  where?: InputMaybe<DiscussionChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelInfoDeletedArgs = {
+  where?: InputMaybe<DiscussionChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelInfoUpdatedArgs = {
+  where?: InputMaybe<DiscussionChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelListFormatCreatedArgs = {
+  where?: InputMaybe<DiscussionChannelListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelListFormatDeletedArgs = {
+  where?: InputMaybe<DiscussionChannelListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelListFormatUpdatedArgs = {
+  where?: InputMaybe<DiscussionChannelListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelRelationshipCreatedArgs = {
+  where?: InputMaybe<DiscussionChannelRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelRelationshipDeletedArgs = {
+  where?: InputMaybe<DiscussionChannelRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionChannelUpdatedArgs = {
+  where?: InputMaybe<DiscussionChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionCreatedArgs = {
+  where?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionDeletedArgs = {
+  where?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionInfoCreatedArgs = {
+  where?: InputMaybe<DiscussionInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionInfoDeletedArgs = {
+  where?: InputMaybe<DiscussionInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionInfoUpdatedArgs = {
+  where?: InputMaybe<DiscussionInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionRelationshipCreatedArgs = {
+  where?: InputMaybe<DiscussionRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionRelationshipDeletedArgs = {
+  where?: InputMaybe<DiscussionRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionDiscussionUpdatedArgs = {
+  where?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
+
+export type SubscriptionDropDataResponseCreatedArgs = {
+  where?: InputMaybe<DropDataResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionDropDataResponseDeletedArgs = {
+  where?: InputMaybe<DropDataResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionDropDataResponseUpdatedArgs = {
+  where?: InputMaybe<DropDataResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmailCreatedArgs = {
+  where?: InputMaybe<EmailSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmailDeletedArgs = {
+  where?: InputMaybe<EmailSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmailRelationshipCreatedArgs = {
+  where?: InputMaybe<EmailRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmailRelationshipDeletedArgs = {
+  where?: InputMaybe<EmailRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmailUpdatedArgs = {
+  where?: InputMaybe<EmailSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmojiCreatedArgs = {
+  where?: InputMaybe<EmojiSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmojiDeletedArgs = {
+  where?: InputMaybe<EmojiSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmojiRelationshipCreatedArgs = {
+  where?: InputMaybe<EmojiRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmojiRelationshipDeletedArgs = {
+  where?: InputMaybe<EmojiRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEmojiUpdatedArgs = {
+  where?: InputMaybe<EmojiSubscriptionWhere>;
+};
+
+
+export type SubscriptionEnvironmentInfoCreatedArgs = {
+  where?: InputMaybe<EnvironmentInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEnvironmentInfoDeletedArgs = {
+  where?: InputMaybe<EnvironmentInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEnvironmentInfoUpdatedArgs = {
+  where?: InputMaybe<EnvironmentInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelCreatedArgs = {
+  where?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelDeletedArgs = {
+  where?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelInfoCreatedArgs = {
+  where?: InputMaybe<EventChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelInfoDeletedArgs = {
+  where?: InputMaybe<EventChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelInfoUpdatedArgs = {
+  where?: InputMaybe<EventChannelInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelRelationshipCreatedArgs = {
+  where?: InputMaybe<EventChannelRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelRelationshipDeletedArgs = {
+  where?: InputMaybe<EventChannelRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventChannelUpdatedArgs = {
+  where?: InputMaybe<EventChannelSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventCreatedArgs = {
+  where?: InputMaybe<EventSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventDeletedArgs = {
+  where?: InputMaybe<EventSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventInfoCreatedArgs = {
+  where?: InputMaybe<EventInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventInfoDeletedArgs = {
+  where?: InputMaybe<EventInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventInfoUpdatedArgs = {
+  where?: InputMaybe<EventInfoSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventRelationshipCreatedArgs = {
+  where?: InputMaybe<EventRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventRelationshipDeletedArgs = {
+  where?: InputMaybe<EventRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionEventUpdatedArgs = {
+  where?: InputMaybe<EventSubscriptionWhere>;
+};
+
+
+export type SubscriptionFeedCreatedArgs = {
+  where?: InputMaybe<FeedSubscriptionWhere>;
+};
+
+
+export type SubscriptionFeedDeletedArgs = {
+  where?: InputMaybe<FeedSubscriptionWhere>;
+};
+
+
+export type SubscriptionFeedRelationshipCreatedArgs = {
+  where?: InputMaybe<FeedRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionFeedRelationshipDeletedArgs = {
+  where?: InputMaybe<FeedRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionFeedUpdatedArgs = {
+  where?: InputMaybe<FeedSubscriptionWhere>;
+};
+
+
+export type SubscriptionGetSortedChannelsResponseCreatedArgs = {
+  where?: InputMaybe<GetSortedChannelsResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionGetSortedChannelsResponseDeletedArgs = {
+  where?: InputMaybe<GetSortedChannelsResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionGetSortedChannelsResponseUpdatedArgs = {
+  where?: InputMaybe<GetSortedChannelsResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionImageCreatedArgs = {
+  where?: InputMaybe<ImageSubscriptionWhere>;
+};
+
+
+export type SubscriptionImageDeletedArgs = {
+  where?: InputMaybe<ImageSubscriptionWhere>;
+};
+
+
+export type SubscriptionImageRelationshipCreatedArgs = {
+  where?: InputMaybe<ImageRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionImageRelationshipDeletedArgs = {
+  where?: InputMaybe<ImageRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionImageUpdatedArgs = {
+  where?: InputMaybe<ImageSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueCreatedArgs = {
+  where?: InputMaybe<IssueSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueDeletedArgs = {
+  where?: InputMaybe<IssueSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueRelationshipCreatedArgs = {
+  where?: InputMaybe<IssueRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueRelationshipDeletedArgs = {
+  where?: InputMaybe<IssueRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionIssueUpdatedArgs = {
+  where?: InputMaybe<IssueSubscriptionWhere>;
+};
+
+
+export type SubscriptionLinkFlairCreatedArgs = {
+  where?: InputMaybe<LinkFlairSubscriptionWhere>;
+};
+
+
+export type SubscriptionLinkFlairDeletedArgs = {
+  where?: InputMaybe<LinkFlairSubscriptionWhere>;
+};
+
+
+export type SubscriptionLinkFlairUpdatedArgs = {
+  where?: InputMaybe<LinkFlairSubscriptionWhere>;
+};
+
+
+export type SubscriptionMessageCreatedArgs = {
+  where?: InputMaybe<MessageSubscriptionWhere>;
+};
+
+
+export type SubscriptionMessageDeletedArgs = {
+  where?: InputMaybe<MessageSubscriptionWhere>;
+};
+
+
+export type SubscriptionMessageRelationshipCreatedArgs = {
+  where?: InputMaybe<MessageRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionMessageRelationshipDeletedArgs = {
+  where?: InputMaybe<MessageRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionMessageUpdatedArgs = {
+  where?: InputMaybe<MessageSubscriptionWhere>;
+};
+
+
+export type SubscriptionModChannelRoleCreatedArgs = {
+  where?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModChannelRoleDeletedArgs = {
+  where?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModChannelRoleUpdatedArgs = {
+  where?: InputMaybe<ModChannelRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModServerRoleCreatedArgs = {
+  where?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModServerRoleDeletedArgs = {
+  where?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModServerRoleUpdatedArgs = {
+  where?: InputMaybe<ModServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationActionCreatedArgs = {
+  where?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationActionDeletedArgs = {
+  where?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationActionRelationshipCreatedArgs = {
+  where?: InputMaybe<ModerationActionRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationActionRelationshipDeletedArgs = {
+  where?: InputMaybe<ModerationActionRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationActionUpdatedArgs = {
+  where?: InputMaybe<ModerationActionSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationProfileCreatedArgs = {
+  where?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationProfileDeletedArgs = {
+  where?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationProfileRelationshipCreatedArgs = {
+  where?: InputMaybe<ModerationProfileRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationProfileRelationshipDeletedArgs = {
+  where?: InputMaybe<ModerationProfileRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionModerationProfileUpdatedArgs = {
+  where?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
+
+export type SubscriptionNotificationCreatedArgs = {
+  where?: InputMaybe<NotificationSubscriptionWhere>;
+};
+
+
+export type SubscriptionNotificationDeletedArgs = {
+  where?: InputMaybe<NotificationSubscriptionWhere>;
+};
+
+
+export type SubscriptionNotificationUpdatedArgs = {
+  where?: InputMaybe<NotificationSubscriptionWhere>;
+};
+
+
+export type SubscriptionRecurringEventCreatedArgs = {
+  where?: InputMaybe<RecurringEventSubscriptionWhere>;
+};
+
+
+export type SubscriptionRecurringEventDeletedArgs = {
+  where?: InputMaybe<RecurringEventSubscriptionWhere>;
+};
+
+
+export type SubscriptionRecurringEventRelationshipCreatedArgs = {
+  where?: InputMaybe<RecurringEventRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionRecurringEventRelationshipDeletedArgs = {
+  where?: InputMaybe<RecurringEventRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionRecurringEventUpdatedArgs = {
+  where?: InputMaybe<RecurringEventSubscriptionWhere>;
+};
+
+
+export type SubscriptionRepeatEndsCreatedArgs = {
+  where?: InputMaybe<RepeatEndsSubscriptionWhere>;
+};
+
+
+export type SubscriptionRepeatEndsDeletedArgs = {
+  where?: InputMaybe<RepeatEndsSubscriptionWhere>;
+};
+
+
+export type SubscriptionRepeatEndsUpdatedArgs = {
+  where?: InputMaybe<RepeatEndsSubscriptionWhere>;
+};
+
+
+export type SubscriptionRepeatEveryCreatedArgs = {
+  where?: InputMaybe<RepeatEverySubscriptionWhere>;
+};
+
+
+export type SubscriptionRepeatEveryDeletedArgs = {
+  where?: InputMaybe<RepeatEverySubscriptionWhere>;
+};
+
+
+export type SubscriptionRepeatEveryUpdatedArgs = {
+  where?: InputMaybe<RepeatEverySubscriptionWhere>;
+};
+
+
+export type SubscriptionSeedDataResponseCreatedArgs = {
+  where?: InputMaybe<SeedDataResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionSeedDataResponseDeletedArgs = {
+  where?: InputMaybe<SeedDataResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionSeedDataResponseUpdatedArgs = {
+  where?: InputMaybe<SeedDataResponseSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerConfigCreatedArgs = {
+  where?: InputMaybe<ServerConfigSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerConfigDeletedArgs = {
+  where?: InputMaybe<ServerConfigSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerConfigRelationshipCreatedArgs = {
+  where?: InputMaybe<ServerConfigRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerConfigRelationshipDeletedArgs = {
+  where?: InputMaybe<ServerConfigRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerConfigUpdatedArgs = {
+  where?: InputMaybe<ServerConfigSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerRoleCreatedArgs = {
+  where?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerRoleDeletedArgs = {
+  where?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerRoleUpdatedArgs = {
+  where?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionSignedUrlCreatedArgs = {
+  where?: InputMaybe<SignedUrlSubscriptionWhere>;
+};
+
+
+export type SubscriptionSignedUrlDeletedArgs = {
+  where?: InputMaybe<SignedUrlSubscriptionWhere>;
+};
+
+
+export type SubscriptionSignedUrlUpdatedArgs = {
+  where?: InputMaybe<SignedUrlSubscriptionWhere>;
+};
+
+
+export type SubscriptionSiteWideDiscussionListFormatCreatedArgs = {
+  where?: InputMaybe<SiteWideDiscussionListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionSiteWideDiscussionListFormatDeletedArgs = {
+  where?: InputMaybe<SiteWideDiscussionListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionSiteWideDiscussionListFormatUpdatedArgs = {
+  where?: InputMaybe<SiteWideDiscussionListFormatSubscriptionWhere>;
+};
+
+
+export type SubscriptionSuspensionCreatedArgs = {
+  where?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
+
+export type SubscriptionSuspensionDeletedArgs = {
+  where?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
+
+export type SubscriptionSuspensionRelationshipCreatedArgs = {
+  where?: InputMaybe<SuspensionRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionSuspensionRelationshipDeletedArgs = {
+  where?: InputMaybe<SuspensionRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionSuspensionUpdatedArgs = {
+  where?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
+
+export type SubscriptionTagCreatedArgs = {
+  where?: InputMaybe<TagSubscriptionWhere>;
+};
+
+
+export type SubscriptionTagDeletedArgs = {
+  where?: InputMaybe<TagSubscriptionWhere>;
+};
+
+
+export type SubscriptionTagRelationshipCreatedArgs = {
+  where?: InputMaybe<TagRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionTagRelationshipDeletedArgs = {
+  where?: InputMaybe<TagRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionTagUpdatedArgs = {
+  where?: InputMaybe<TagSubscriptionWhere>;
+};
+
+
+export type SubscriptionTextVersionCreatedArgs = {
+  where?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionTextVersionDeletedArgs = {
+  where?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionTextVersionRelationshipCreatedArgs = {
+  where?: InputMaybe<TextVersionRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionTextVersionRelationshipDeletedArgs = {
+  where?: InputMaybe<TextVersionRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionTextVersionUpdatedArgs = {
+  where?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserCreatedArgs = {
+  where?: InputMaybe<UserSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserDeletedArgs = {
+  where?: InputMaybe<UserSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserRelationshipCreatedArgs = {
+  where?: InputMaybe<UserRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserRelationshipDeletedArgs = {
+  where?: InputMaybe<UserRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserUpdatedArgs = {
+  where?: InputMaybe<UserSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageCreatedArgs = {
+  where?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageDeletedArgs = {
+  where?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageRelationshipCreatedArgs = {
+  where?: InputMaybe<WikiPageRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageRelationshipDeletedArgs = {
+  where?: InputMaybe<WikiPageRelationshipDeletedSubscriptionWhere>;
+};
+
+
+export type SubscriptionWikiPageUpdatedArgs = {
+  where?: InputMaybe<WikiPageSubscriptionWhere>;
 };
 
 export type Suspension = {
@@ -25330,6 +32022,13 @@ export type SuspensionConnectWhere = {
   node: SuspensionWhere;
 };
 
+export type SuspensionConnectedRelationships = {
+  __typename?: 'SuspensionConnectedRelationships';
+  RelatedIssue?: Maybe<SuspensionRelatedIssueConnectedRelationship>;
+  SuspendedMod?: Maybe<SuspensionSuspendedModConnectedRelationship>;
+  SuspendedUser?: Maybe<SuspensionSuspendedUserConnectedRelationship>;
+};
+
 export type SuspensionCreateInput = {
   RelatedIssue?: InputMaybe<SuspensionRelatedIssueFieldInput>;
   SuspendedMod?: InputMaybe<SuspensionSuspendedModFieldInput>;
@@ -25341,10 +32040,24 @@ export type SuspensionCreateInput = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type SuspensionCreatedEvent = {
+  __typename?: 'SuspensionCreatedEvent';
+  createdSuspension: SuspensionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type SuspensionDeleteInput = {
   RelatedIssue?: InputMaybe<SuspensionRelatedIssueDeleteFieldInput>;
   SuspendedMod?: InputMaybe<SuspensionSuspendedModDeleteFieldInput>;
   SuspendedUser?: InputMaybe<SuspensionSuspendedUserDeleteFieldInput>;
+};
+
+export type SuspensionDeletedEvent = {
+  __typename?: 'SuspensionDeletedEvent';
+  deletedSuspension: SuspensionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type SuspensionDisconnectInput = {
@@ -25357,6 +32070,17 @@ export type SuspensionEdge = {
   __typename?: 'SuspensionEdge';
   cursor: Scalars['String']['output'];
   node: Suspension;
+};
+
+export type SuspensionEventPayload = {
+  __typename?: 'SuspensionEventPayload';
+  channelUniqueName: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  modProfileName?: Maybe<Scalars['String']['output']>;
+  suspendedIndefinitely?: Maybe<Scalars['Boolean']['output']>;
+  suspendedUntil?: Maybe<Scalars['DateTime']['output']>;
+  username?: Maybe<Scalars['String']['output']>;
 };
 
 export type SuspensionIssueRelatedIssueAggregationSelection = {
@@ -25417,6 +32141,11 @@ export type SuspensionRelatedIssueConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type SuspensionRelatedIssueConnectedRelationship = {
+  __typename?: 'SuspensionRelatedIssueConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type SuspensionRelatedIssueConnection = {
@@ -25578,6 +32307,10 @@ export type SuspensionRelatedIssueRelationship = {
   node: Issue;
 };
 
+export type SuspensionRelatedIssueRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type SuspensionRelatedIssueUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -25597,6 +32330,46 @@ export type SuspensionRelationInput = {
   SuspendedUser?: InputMaybe<SuspensionSuspendedUserCreateFieldInput>;
 };
 
+export type SuspensionRelationshipCreatedEvent = {
+  __typename?: 'SuspensionRelationshipCreatedEvent';
+  createdRelationship: SuspensionConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  suspension: SuspensionEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SuspensionRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<SuspensionRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<SuspensionRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<SuspensionRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<SuspensionRelationshipsSubscriptionWhere>;
+  suspension?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
+export type SuspensionRelationshipDeletedEvent = {
+  __typename?: 'SuspensionRelationshipDeletedEvent';
+  deletedRelationship: SuspensionConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  suspension: SuspensionEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type SuspensionRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<SuspensionRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<SuspensionRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<SuspensionRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<SuspensionRelationshipsSubscriptionWhere>;
+  suspension?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
+export type SuspensionRelationshipsSubscriptionWhere = {
+  RelatedIssue?: InputMaybe<SuspensionRelatedIssueRelationshipSubscriptionWhere>;
+  SuspendedMod?: InputMaybe<SuspensionSuspendedModRelationshipSubscriptionWhere>;
+  SuspendedUser?: InputMaybe<SuspensionSuspendedUserRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Suspensions by. The order in which sorts are applied is not guaranteed when specifying many fields in one SuspensionSort object. */
 export type SuspensionSort = {
   channelUniqueName?: InputMaybe<SortDirection>;
@@ -25606,6 +32379,48 @@ export type SuspensionSort = {
   suspendedIndefinitely?: InputMaybe<SortDirection>;
   suspendedUntil?: InputMaybe<SortDirection>;
   username?: InputMaybe<SortDirection>;
+};
+
+export type SuspensionSubscriptionWhere = {
+  AND?: InputMaybe<Array<SuspensionSubscriptionWhere>>;
+  NOT?: InputMaybe<SuspensionSubscriptionWhere>;
+  OR?: InputMaybe<Array<SuspensionSubscriptionWhere>>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  modProfileName?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  modProfileName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  modProfileName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  suspendedIndefinitely?: InputMaybe<Scalars['Boolean']['input']>;
+  suspendedUntil?: InputMaybe<Scalars['DateTime']['input']>;
+  suspendedUntil_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  suspendedUntil_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  suspendedUntil_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  suspendedUntil_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  suspendedUntil_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  username_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SuspensionSuspendedModAggregateInput = {
@@ -25634,6 +32449,11 @@ export type SuspensionSuspendedModConnectOrCreateFieldInput = {
 
 export type SuspensionSuspendedModConnectOrCreateFieldInputOnCreate = {
   node: ModerationProfileOnCreateInput;
+};
+
+export type SuspensionSuspendedModConnectedRelationship = {
+  __typename?: 'SuspensionSuspendedModConnectedRelationship';
+  node: ModerationProfileEventPayload;
 };
 
 export type SuspensionSuspendedModConnection = {
@@ -25711,6 +32531,10 @@ export type SuspensionSuspendedModRelationship = {
   node: ModerationProfile;
 };
 
+export type SuspensionSuspendedModRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type SuspensionSuspendedModUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -25751,6 +32575,11 @@ export type SuspensionSuspendedUserConnectOrCreateFieldInput = {
 
 export type SuspensionSuspendedUserConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type SuspensionSuspendedUserConnectedRelationship = {
+  __typename?: 'SuspensionSuspendedUserConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type SuspensionSuspendedUserConnection = {
@@ -25988,6 +32817,10 @@ export type SuspensionSuspendedUserRelationship = {
   node: User;
 };
 
+export type SuspensionSuspendedUserRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type SuspensionSuspendedUserUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -26012,6 +32845,14 @@ export type SuspensionUpdateInput = {
   suspendedIndefinitely?: InputMaybe<Scalars['Boolean']['input']>;
   suspendedUntil?: InputMaybe<Scalars['DateTime']['input']>;
   username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type SuspensionUpdatedEvent = {
+  __typename?: 'SuspensionUpdatedEvent';
+  event: EventType;
+  previousState: SuspensionEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedSuspension: SuspensionEventPayload;
 };
 
 export type SuspensionUserSuspendedUserAggregationSelection = {
@@ -26280,6 +33121,11 @@ export type TagChannelsConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
 };
 
+export type TagChannelsConnectedRelationship = {
+  __typename?: 'TagChannelsConnectedRelationship';
+  node: ChannelEventPayload;
+};
+
 export type TagChannelsConnection = {
   __typename?: 'TagChannelsConnection';
   edges: Array<TagChannelsRelationship>;
@@ -26415,6 +33261,10 @@ export type TagChannelsRelationship = {
   node: Channel;
 };
 
+export type TagChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type TagChannelsUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -26461,6 +33311,11 @@ export type TagCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type TagCommentsConnectedRelationship = {
+  __typename?: 'TagCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type TagCommentsConnection = {
@@ -26567,6 +33422,10 @@ export type TagCommentsRelationship = {
   node: Comment;
 };
 
+export type TagCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type TagCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -26600,6 +33459,15 @@ export type TagConnectWhere = {
   node: TagWhere;
 };
 
+export type TagConnectedRelationships = {
+  __typename?: 'TagConnectedRelationships';
+  Channels?: Maybe<TagChannelsConnectedRelationship>;
+  Comments?: Maybe<TagCommentsConnectedRelationship>;
+  Discussions?: Maybe<TagDiscussionsConnectedRelationship>;
+  Events?: Maybe<TagEventsConnectedRelationship>;
+  Feeds?: Maybe<TagFeedsConnectedRelationship>;
+};
+
 export type TagCreateInput = {
   Channels?: InputMaybe<TagChannelsFieldInput>;
   Comments?: InputMaybe<TagCommentsFieldInput>;
@@ -26609,12 +33477,26 @@ export type TagCreateInput = {
   text: Scalars['String']['input'];
 };
 
+export type TagCreatedEvent = {
+  __typename?: 'TagCreatedEvent';
+  createdTag: TagEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type TagDeleteInput = {
   Channels?: InputMaybe<Array<TagChannelsDeleteFieldInput>>;
   Comments?: InputMaybe<Array<TagCommentsDeleteFieldInput>>;
   Discussions?: InputMaybe<Array<TagDiscussionsDeleteFieldInput>>;
   Events?: InputMaybe<Array<TagEventsDeleteFieldInput>>;
   Feeds?: InputMaybe<Array<TagFeedsDeleteFieldInput>>;
+};
+
+export type TagDeletedEvent = {
+  __typename?: 'TagDeletedEvent';
+  deletedTag: TagEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type TagDisconnectInput = {
@@ -26657,6 +33539,11 @@ export type TagDiscussionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type TagDiscussionsConnectedRelationship = {
+  __typename?: 'TagDiscussionsConnectedRelationship';
+  node: DiscussionEventPayload;
 };
 
 export type TagDiscussionsConnection = {
@@ -26758,6 +33645,10 @@ export type TagDiscussionsRelationship = {
   node: Discussion;
 };
 
+export type TagDiscussionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
 export type TagDiscussionsUpdateConnectionInput = {
   node?: InputMaybe<DiscussionUpdateInput>;
 };
@@ -26802,6 +33693,11 @@ export type TagEventEventsNodeAggregateSelection = {
   virtualEventUrl: StringAggregateSelection;
 };
 
+export type TagEventPayload = {
+  __typename?: 'TagEventPayload';
+  text: Scalars['String']['output'];
+};
+
 export type TagEventsAggregateInput = {
   AND?: InputMaybe<Array<TagEventsAggregateInput>>;
   NOT?: InputMaybe<TagEventsAggregateInput>;
@@ -26819,6 +33715,11 @@ export type TagEventsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
+};
+
+export type TagEventsConnectedRelationship = {
+  __typename?: 'TagEventsConnectedRelationship';
+  node: EventEventPayload;
 };
 
 export type TagEventsConnection = {
@@ -27065,6 +33966,10 @@ export type TagEventsRelationship = {
   node: Event;
 };
 
+export type TagEventsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventSubscriptionWhere>;
+};
+
 export type TagEventsUpdateConnectionInput = {
   node?: InputMaybe<EventUpdateInput>;
 };
@@ -27108,6 +34013,11 @@ export type TagFeedsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
+};
+
+export type TagFeedsConnectedRelationship = {
+  __typename?: 'TagFeedsConnectedRelationship';
+  node: FeedEventPayload;
 };
 
 export type TagFeedsConnection = {
@@ -27189,6 +34099,10 @@ export type TagFeedsRelationship = {
   node: Feed;
 };
 
+export type TagFeedsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<FeedSubscriptionWhere>;
+};
+
 export type TagFeedsUpdateConnectionInput = {
   node?: InputMaybe<FeedUpdateInput>;
 };
@@ -27221,9 +34135,63 @@ export type TagRelationInput = {
   Feeds?: InputMaybe<Array<TagFeedsCreateFieldInput>>;
 };
 
+export type TagRelationshipCreatedEvent = {
+  __typename?: 'TagRelationshipCreatedEvent';
+  createdRelationship: TagConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  tag: TagEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type TagRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<TagRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<TagRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<TagRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<TagRelationshipsSubscriptionWhere>;
+  tag?: InputMaybe<TagSubscriptionWhere>;
+};
+
+export type TagRelationshipDeletedEvent = {
+  __typename?: 'TagRelationshipDeletedEvent';
+  deletedRelationship: TagConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  tag: TagEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type TagRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<TagRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<TagRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<TagRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<TagRelationshipsSubscriptionWhere>;
+  tag?: InputMaybe<TagSubscriptionWhere>;
+};
+
+export type TagRelationshipsSubscriptionWhere = {
+  Channels?: InputMaybe<TagChannelsRelationshipSubscriptionWhere>;
+  Comments?: InputMaybe<TagCommentsRelationshipSubscriptionWhere>;
+  Discussions?: InputMaybe<TagDiscussionsRelationshipSubscriptionWhere>;
+  Events?: InputMaybe<TagEventsRelationshipSubscriptionWhere>;
+  Feeds?: InputMaybe<TagFeedsRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort Tags by. The order in which sorts are applied is not guaranteed when specifying many fields in one TagSort object. */
 export type TagSort = {
   text?: InputMaybe<SortDirection>;
+};
+
+export type TagSubscriptionWhere = {
+  AND?: InputMaybe<Array<TagSubscriptionWhere>>;
+  NOT?: InputMaybe<TagSubscriptionWhere>;
+  OR?: InputMaybe<Array<TagSubscriptionWhere>>;
+  text?: InputMaybe<Scalars['String']['input']>;
+  text_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  text_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  text_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  text_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  text_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type TagUniqueWhere = {
@@ -27237,6 +34205,14 @@ export type TagUpdateInput = {
   Events?: InputMaybe<Array<TagEventsUpdateFieldInput>>;
   Feeds?: InputMaybe<Array<TagFeedsUpdateFieldInput>>;
   text?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TagUpdatedEvent = {
+  __typename?: 'TagUpdatedEvent';
+  event: EventType;
+  previousState: TagEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedTag: TagEventPayload;
 };
 
 export type TagWhere = {
@@ -27411,6 +34387,11 @@ export type TextVersionAuthorConnectOrCreateFieldInput = {
 
 export type TextVersionAuthorConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type TextVersionAuthorConnectedRelationship = {
+  __typename?: 'TextVersionAuthorConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type TextVersionAuthorConnection = {
@@ -27648,6 +34629,10 @@ export type TextVersionAuthorRelationship = {
   node: User;
 };
 
+export type TextVersionAuthorRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type TextVersionAuthorUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -27674,14 +34659,33 @@ export type TextVersionConnectWhere = {
   node: TextVersionWhere;
 };
 
+export type TextVersionConnectedRelationships = {
+  __typename?: 'TextVersionConnectedRelationships';
+  Author?: Maybe<TextVersionAuthorConnectedRelationship>;
+};
+
 export type TextVersionCreateInput = {
   Author?: InputMaybe<TextVersionAuthorFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type TextVersionCreatedEvent = {
+  __typename?: 'TextVersionCreatedEvent';
+  createdTextVersion: TextVersionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type TextVersionDeleteInput = {
   Author?: InputMaybe<TextVersionAuthorDeleteFieldInput>;
+};
+
+export type TextVersionDeletedEvent = {
+  __typename?: 'TextVersionDeletedEvent';
+  deletedTextVersion: TextVersionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type TextVersionDisconnectInput = {
@@ -27692,6 +34696,14 @@ export type TextVersionEdge = {
   __typename?: 'TextVersionEdge';
   cursor: Scalars['String']['output'];
   node: TextVersion;
+};
+
+export type TextVersionEventPayload = {
+  __typename?: 'TextVersionEventPayload';
+  body?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type TextVersionOptions = {
@@ -27705,6 +34717,44 @@ export type TextVersionRelationInput = {
   Author?: InputMaybe<TextVersionAuthorCreateFieldInput>;
 };
 
+export type TextVersionRelationshipCreatedEvent = {
+  __typename?: 'TextVersionRelationshipCreatedEvent';
+  createdRelationship: TextVersionConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  textVersion: TextVersionEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type TextVersionRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<TextVersionRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<TextVersionRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<TextVersionRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<TextVersionRelationshipsSubscriptionWhere>;
+  textVersion?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+export type TextVersionRelationshipDeletedEvent = {
+  __typename?: 'TextVersionRelationshipDeletedEvent';
+  deletedRelationship: TextVersionConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  textVersion: TextVersionEventPayload;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type TextVersionRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<TextVersionRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<TextVersionRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<TextVersionRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<TextVersionRelationshipsSubscriptionWhere>;
+  textVersion?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+export type TextVersionRelationshipsSubscriptionWhere = {
+  Author?: InputMaybe<TextVersionAuthorRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort TextVersions by. The order in which sorts are applied is not guaranteed when specifying many fields in one TextVersionSort object. */
 export type TextVersionSort = {
   body?: InputMaybe<SortDirection>;
@@ -27713,10 +34763,47 @@ export type TextVersionSort = {
   updatedAt?: InputMaybe<SortDirection>;
 };
 
+export type TextVersionSubscriptionWhere = {
+  AND?: InputMaybe<Array<TextVersionSubscriptionWhere>>;
+  NOT?: InputMaybe<TextVersionSubscriptionWhere>;
+  OR?: InputMaybe<Array<TextVersionSubscriptionWhere>>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  body_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
 export type TextVersionUpdateInput = {
   Author?: InputMaybe<TextVersionAuthorUpdateFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type TextVersionUpdatedEvent = {
+  __typename?: 'TextVersionUpdatedEvent';
+  event: EventType;
+  previousState: TextVersionEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedTextVersion: TextVersionEventPayload;
 };
 
 export type TextVersionUserAuthorAggregationSelection = {
@@ -27790,9 +34877,21 @@ export enum TimeFrame {
   Year = 'year'
 }
 
+export type UpdateActivitiesMutationResponse = {
+  __typename?: 'UpdateActivitiesMutationResponse';
+  activities: Array<Activity>;
+  info: UpdateInfo;
+};
+
 export type UpdateAlbumsMutationResponse = {
   __typename?: 'UpdateAlbumsMutationResponse';
   albums: Array<Album>;
+  info: UpdateInfo;
+};
+
+export type UpdateChannelInfosMutationResponse = {
+  __typename?: 'UpdateChannelInfosMutationResponse';
+  channelInfos: Array<ChannelInfo>;
   info: UpdateInfo;
 };
 
@@ -27805,6 +34904,12 @@ export type UpdateChannelRolesMutationResponse = {
 export type UpdateChannelsMutationResponse = {
   __typename?: 'UpdateChannelsMutationResponse';
   channels: Array<Channel>;
+  info: UpdateInfo;
+};
+
+export type UpdateCommentInfosMutationResponse = {
+  __typename?: 'UpdateCommentInfosMutationResponse';
+  commentInfos: Array<CommentInfo>;
   info: UpdateInfo;
 };
 
@@ -27832,6 +34937,18 @@ export type UpdateContactsMutationResponse = {
   info: UpdateInfo;
 };
 
+export type UpdateDayDataMutationResponse = {
+  __typename?: 'UpdateDayDataMutationResponse';
+  dayData: Array<DayData>;
+  info: UpdateInfo;
+};
+
+export type UpdateDiscussionChannelInfosMutationResponse = {
+  __typename?: 'UpdateDiscussionChannelInfosMutationResponse';
+  discussionChannelInfos: Array<DiscussionChannelInfo>;
+  info: UpdateInfo;
+};
+
 export type UpdateDiscussionChannelListFormatsMutationResponse = {
   __typename?: 'UpdateDiscussionChannelListFormatsMutationResponse';
   discussionChannelListFormats: Array<DiscussionChannelListFormat>;
@@ -27841,6 +34958,12 @@ export type UpdateDiscussionChannelListFormatsMutationResponse = {
 export type UpdateDiscussionChannelsMutationResponse = {
   __typename?: 'UpdateDiscussionChannelsMutationResponse';
   discussionChannels: Array<DiscussionChannel>;
+  info: UpdateInfo;
+};
+
+export type UpdateDiscussionInfosMutationResponse = {
+  __typename?: 'UpdateDiscussionInfosMutationResponse';
+  discussionInfos: Array<DiscussionInfo>;
   info: UpdateInfo;
 };
 
@@ -27874,6 +34997,12 @@ export type UpdateEnvironmentInfosMutationResponse = {
   info: UpdateInfo;
 };
 
+export type UpdateEventChannelInfosMutationResponse = {
+  __typename?: 'UpdateEventChannelInfosMutationResponse';
+  eventChannelInfos: Array<EventChannelInfo>;
+  info: UpdateInfo;
+};
+
 export type UpdateEventChannelsMutationResponse = {
   __typename?: 'UpdateEventChannelsMutationResponse';
   eventChannels: Array<EventChannel>;
@@ -27883,6 +35012,12 @@ export type UpdateEventChannelsMutationResponse = {
 export type UpdateEventCommentsFormatsMutationResponse = {
   __typename?: 'UpdateEventCommentsFormatsMutationResponse';
   eventCommentsFormats: Array<EventCommentsFormat>;
+  info: UpdateInfo;
+};
+
+export type UpdateEventInfosMutationResponse = {
+  __typename?: 'UpdateEventInfosMutationResponse';
+  eventInfos: Array<EventInfo>;
   info: UpdateInfo;
 };
 
@@ -28799,6 +35934,11 @@ export type UserAdminOfChannelsConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
 };
 
+export type UserAdminOfChannelsConnectedRelationship = {
+  __typename?: 'UserAdminOfChannelsConnectedRelationship';
+  node: ChannelEventPayload;
+};
+
 export type UserAdminOfChannelsConnection = {
   __typename?: 'UserAdminOfChannelsConnection';
   edges: Array<UserAdminOfChannelsRelationship>;
@@ -28934,6 +36074,10 @@ export type UserAdminOfChannelsRelationship = {
   node: Channel;
 };
 
+export type UserAdminOfChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type UserAdminOfChannelsUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -28995,6 +36139,11 @@ export type UserAlbumsConnectFieldInput = {
   where?: InputMaybe<AlbumConnectWhere>;
 };
 
+export type UserAlbumsConnectedRelationship = {
+  __typename?: 'UserAlbumsConnectedRelationship';
+  node: AlbumEventPayload;
+};
+
 export type UserAlbumsConnection = {
   __typename?: 'UserAlbumsConnection';
   edges: Array<UserAlbumsRelationship>;
@@ -29044,6 +36193,10 @@ export type UserAlbumsRelationship = {
   node: Album;
 };
 
+export type UserAlbumsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<AlbumSubscriptionWhere>;
+};
+
 export type UserAlbumsUpdateConnectionInput = {
   node?: InputMaybe<AlbumUpdateInput>;
 };
@@ -29074,6 +36227,11 @@ export type UserAuthoredWikiPageVersionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TextVersionConnectWhere>;
+};
+
+export type UserAuthoredWikiPageVersionsConnectedRelationship = {
+  __typename?: 'UserAuthoredWikiPageVersionsConnectedRelationship';
+  node: TextVersionEventPayload;
 };
 
 export type UserAuthoredWikiPageVersionsConnection = {
@@ -29160,6 +36318,10 @@ export type UserAuthoredWikiPageVersionsRelationship = {
   node: TextVersion;
 };
 
+export type UserAuthoredWikiPageVersionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
 export type UserAuthoredWikiPageVersionsUpdateConnectionInput = {
   node?: InputMaybe<TextVersionUpdateInput>;
 };
@@ -29190,6 +36352,11 @@ export type UserAuthoredWikiPagesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<WikiPageConnectWhere>;
+};
+
+export type UserAuthoredWikiPagesConnectedRelationship = {
+  __typename?: 'UserAuthoredWikiPagesConnectedRelationship';
+  node: WikiPageEventPayload;
 };
 
 export type UserAuthoredWikiPagesConnection = {
@@ -29306,6 +36473,10 @@ export type UserAuthoredWikiPagesRelationship = {
   node: WikiPage;
 };
 
+export type UserAuthoredWikiPagesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
 export type UserAuthoredWikiPagesUpdateConnectionInput = {
   node?: InputMaybe<WikiPageUpdateInput>;
 };
@@ -29345,6 +36516,11 @@ export type UserBlockedConnectOrCreateFieldInput = {
 
 export type UserBlockedConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type UserBlockedConnectedRelationship = {
+  __typename?: 'UserBlockedConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type UserBlockedConnection = {
@@ -29582,6 +36758,10 @@ export type UserBlockedRelationship = {
   node: User;
 };
 
+export type UserBlockedRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type UserBlockedUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -29732,6 +36912,11 @@ export type UserChannelRolesConnectOrCreateFieldInputOnCreate = {
   node: ChannelRoleOnCreateInput;
 };
 
+export type UserChannelRolesConnectedRelationship = {
+  __typename?: 'UserChannelRolesConnectedRelationship';
+  node: ChannelRoleEventPayload;
+};
+
 export type UserChannelRolesConnection = {
   __typename?: 'UserChannelRolesConnection';
   edges: Array<UserChannelRolesRelationship>;
@@ -29825,6 +37010,10 @@ export type UserChannelRolesRelationship = {
   node: ChannelRole;
 };
 
+export type UserChannelRolesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelRoleSubscriptionWhere>;
+};
+
 export type UserChannelRolesUpdateConnectionInput = {
   node?: InputMaybe<ChannelRoleUpdateInput>;
 };
@@ -29901,6 +37090,11 @@ export type UserCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type UserCommentsConnectedRelationship = {
+  __typename?: 'UserCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type UserCommentsConnection = {
@@ -30007,6 +37201,10 @@ export type UserCommentsRelationship = {
   node: Comment;
 };
 
+export type UserCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type UserCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -30074,6 +37272,38 @@ export type UserConnectWhere = {
   node: UserWhere;
 };
 
+export type UserConnectedRelationships = {
+  __typename?: 'UserConnectedRelationships';
+  AdminOfChannels?: Maybe<UserAdminOfChannelsConnectedRelationship>;
+  Albums?: Maybe<UserAlbumsConnectedRelationship>;
+  AuthoredWikiPageVersions?: Maybe<UserAuthoredWikiPageVersionsConnectedRelationship>;
+  AuthoredWikiPages?: Maybe<UserAuthoredWikiPagesConnectedRelationship>;
+  Blocked?: Maybe<UserBlockedConnectedRelationship>;
+  ChannelRoles?: Maybe<UserChannelRolesConnectedRelationship>;
+  Comments?: Maybe<UserCommentsConnectedRelationship>;
+  CreatedFeeds?: Maybe<UserCreatedFeedsConnectedRelationship>;
+  DefaultFeed?: Maybe<UserDefaultFeedConnectedRelationship>;
+  Discussions?: Maybe<UserDiscussionsConnectedRelationship>;
+  Email?: Maybe<UserEmailConnectedRelationship>;
+  Events?: Maybe<UserEventsConnectedRelationship>;
+  FavoriteChannels?: Maybe<UserFavoriteChannelsConnectedRelationship>;
+  Feeds?: Maybe<UserFeedsConnectedRelationship>;
+  Images?: Maybe<UserImagesConnectedRelationship>;
+  IsBlockedBy?: Maybe<UserIsBlockedByConnectedRelationship>;
+  IssueComments?: Maybe<UserIssueCommentsConnectedRelationship>;
+  Issues?: Maybe<UserIssuesConnectedRelationship>;
+  ModOfChannels?: Maybe<UserModOfChannelsConnectedRelationship>;
+  ModerationProfile?: Maybe<UserModerationProfileConnectedRelationship>;
+  Notifications?: Maybe<UserNotificationsConnectedRelationship>;
+  PendingModInvites?: Maybe<UserPendingModInvitesConnectedRelationship>;
+  PendingOwnerInvites?: Maybe<UserPendingOwnerInvitesConnectedRelationship>;
+  RecentlyVisitedChannels?: Maybe<UserRecentlyVisitedChannelsConnectedRelationship>;
+  ServerRoles?: Maybe<UserServerRolesConnectedRelationship>;
+  Suspensions?: Maybe<UserSuspensionsConnectedRelationship>;
+  UpvotedComments?: Maybe<UserUpvotedCommentsConnectedRelationship>;
+  UpvotedDiscussionChannels?: Maybe<UserUpvotedDiscussionChannelsConnectedRelationship>;
+};
+
 export type UserCreateInput = {
   AdminOfChannels?: InputMaybe<UserAdminOfChannelsFieldInput>;
   Albums?: InputMaybe<UserAlbumsFieldInput>;
@@ -30118,6 +37348,13 @@ export type UserCreateInput = {
   username: Scalars['String']['input'];
 };
 
+export type UserCreatedEvent = {
+  __typename?: 'UserCreatedEvent';
+  createdUser: UserEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type UserCreatedFeedsAggregateInput = {
   AND?: InputMaybe<Array<UserCreatedFeedsAggregateInput>>;
   NOT?: InputMaybe<UserCreatedFeedsAggregateInput>;
@@ -30135,6 +37372,11 @@ export type UserCreatedFeedsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
+};
+
+export type UserCreatedFeedsConnectedRelationship = {
+  __typename?: 'UserCreatedFeedsConnectedRelationship';
+  node: FeedEventPayload;
 };
 
 export type UserCreatedFeedsConnection = {
@@ -30216,6 +37458,10 @@ export type UserCreatedFeedsRelationship = {
   node: Feed;
 };
 
+export type UserCreatedFeedsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<FeedSubscriptionWhere>;
+};
+
 export type UserCreatedFeedsUpdateConnectionInput = {
   node?: InputMaybe<FeedUpdateInput>;
 };
@@ -30246,6 +37492,11 @@ export type UserDefaultFeedConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
+};
+
+export type UserDefaultFeedConnectedRelationship = {
+  __typename?: 'UserDefaultFeedConnectedRelationship';
+  node: FeedEventPayload;
 };
 
 export type UserDefaultFeedConnection = {
@@ -30327,6 +37578,10 @@ export type UserDefaultFeedRelationship = {
   node: Feed;
 };
 
+export type UserDefaultFeedRelationshipSubscriptionWhere = {
+  node?: InputMaybe<FeedSubscriptionWhere>;
+};
+
 export type UserDefaultFeedUpdateConnectionInput = {
   node?: InputMaybe<FeedUpdateInput>;
 };
@@ -30369,6 +37624,13 @@ export type UserDeleteInput = {
   Suspensions?: InputMaybe<Array<UserSuspensionsDeleteFieldInput>>;
   UpvotedComments?: InputMaybe<Array<UserUpvotedCommentsDeleteFieldInput>>;
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsDeleteFieldInput>>;
+};
+
+export type UserDeletedEvent = {
+  __typename?: 'UserDeletedEvent';
+  deletedUser: UserEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type UserDisconnectInput = {
@@ -30449,6 +37711,11 @@ export type UserDiscussionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type UserDiscussionsConnectedRelationship = {
+  __typename?: 'UserDiscussionsConnectedRelationship';
+  node: DiscussionEventPayload;
 };
 
 export type UserDiscussionsConnection = {
@@ -30550,6 +37817,10 @@ export type UserDiscussionsRelationship = {
   node: Discussion;
 };
 
+export type UserDiscussionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
 export type UserDiscussionsUpdateConnectionInput = {
   node?: InputMaybe<DiscussionUpdateInput>;
 };
@@ -30595,6 +37866,11 @@ export type UserEmailConnectOrCreateFieldInput = {
 
 export type UserEmailConnectOrCreateFieldInputOnCreate = {
   node: EmailOnCreateInput;
+};
+
+export type UserEmailConnectedRelationship = {
+  __typename?: 'UserEmailConnectedRelationship';
+  node: EmailEventPayload;
 };
 
 export type UserEmailConnection = {
@@ -30673,6 +37949,10 @@ export type UserEmailRelationship = {
   node: Email;
 };
 
+export type UserEmailRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EmailSubscriptionWhere>;
+};
+
 export type UserEmailUpdateConnectionInput = {
   node?: InputMaybe<EmailUpdateInput>;
 };
@@ -30712,6 +37992,24 @@ export type UserEventEventsNodeAggregateSelection = {
   virtualEventUrl: StringAggregateSelection;
 };
 
+export type UserEventPayload = {
+  __typename?: 'UserEventPayload';
+  DefaultEmojiSkinTone?: Maybe<Scalars['String']['output']>;
+  NotificationBundleInterval?: Maybe<Scalars['String']['output']>;
+  PreferredTimeZone?: Maybe<Scalars['String']['output']>;
+  bio?: Maybe<Scalars['String']['output']>;
+  commentKarma?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  deleted?: Maybe<Scalars['Boolean']['output']>;
+  discussionKarma?: Maybe<Scalars['Int']['output']>;
+  displayName?: Maybe<Scalars['String']['output']>;
+  enableSensitiveContentByDefault?: Maybe<Scalars['Boolean']['output']>;
+  location?: Maybe<Scalars['String']['output']>;
+  profilePicURL?: Maybe<Scalars['String']['output']>;
+  pronouns?: Maybe<Scalars['String']['output']>;
+  username: Scalars['String']['output'];
+};
+
 export type UserEventsAggregateInput = {
   AND?: InputMaybe<Array<UserEventsAggregateInput>>;
   NOT?: InputMaybe<UserEventsAggregateInput>;
@@ -30729,6 +38027,11 @@ export type UserEventsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<EventConnectWhere>;
+};
+
+export type UserEventsConnectedRelationship = {
+  __typename?: 'UserEventsConnectedRelationship';
+  node: EventEventPayload;
 };
 
 export type UserEventsConnection = {
@@ -30975,6 +38278,10 @@ export type UserEventsRelationship = {
   node: Event;
 };
 
+export type UserEventsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<EventSubscriptionWhere>;
+};
+
 export type UserEventsUpdateConnectionInput = {
   node?: InputMaybe<EventUpdateInput>;
 };
@@ -31014,6 +38321,11 @@ export type UserFavoriteChannelsConnectOrCreateFieldInput = {
 
 export type UserFavoriteChannelsConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type UserFavoriteChannelsConnectedRelationship = {
+  __typename?: 'UserFavoriteChannelsConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type UserFavoriteChannelsConnection = {
@@ -31151,6 +38463,10 @@ export type UserFavoriteChannelsRelationship = {
   node: Channel;
 };
 
+export type UserFavoriteChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type UserFavoriteChannelsUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -31221,6 +38537,11 @@ export type UserFeedsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<FeedConnectWhere>;
+};
+
+export type UserFeedsConnectedRelationship = {
+  __typename?: 'UserFeedsConnectedRelationship';
+  node: FeedEventPayload;
 };
 
 export type UserFeedsConnection = {
@@ -31302,6 +38623,10 @@ export type UserFeedsRelationship = {
   node: Feed;
 };
 
+export type UserFeedsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<FeedSubscriptionWhere>;
+};
+
 export type UserFeedsUpdateConnectionInput = {
   node?: InputMaybe<FeedUpdateInput>;
 };
@@ -31349,6 +38674,11 @@ export type UserImagesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<ImageConnectWhere>;
+};
+
+export type UserImagesConnectedRelationship = {
+  __typename?: 'UserImagesConnectedRelationship';
+  node: ImageEventPayload;
 };
 
 export type UserImagesConnection = {
@@ -31485,6 +38815,10 @@ export type UserImagesRelationship = {
   node: Image;
 };
 
+export type UserImagesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ImageSubscriptionWhere>;
+};
+
 export type UserImagesUpdateConnectionInput = {
   node?: InputMaybe<ImageUpdateInput>;
 };
@@ -31524,6 +38858,11 @@ export type UserIsBlockedByConnectOrCreateFieldInput = {
 
 export type UserIsBlockedByConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type UserIsBlockedByConnectedRelationship = {
+  __typename?: 'UserIsBlockedByConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type UserIsBlockedByConnection = {
@@ -31761,6 +39100,10 @@ export type UserIsBlockedByRelationship = {
   node: User;
 };
 
+export type UserIsBlockedByRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
+};
+
 export type UserIsBlockedByUpdateConnectionInput = {
   node?: InputMaybe<UserUpdateInput>;
 };
@@ -31792,6 +39135,11 @@ export type UserIssueCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type UserIssueCommentsConnectedRelationship = {
+  __typename?: 'UserIssueCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type UserIssueCommentsConnection = {
@@ -31898,6 +39246,10 @@ export type UserIssueCommentsRelationship = {
   node: Comment;
 };
 
+export type UserIssueCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type UserIssueCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -31950,6 +39302,11 @@ export type UserIssuesConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<IssueConnectWhere>;
+};
+
+export type UserIssuesConnectedRelationship = {
+  __typename?: 'UserIssuesConnectedRelationship';
+  node: IssueEventPayload;
 };
 
 export type UserIssuesConnection = {
@@ -32111,6 +39468,10 @@ export type UserIssuesRelationship = {
   node: Issue;
 };
 
+export type UserIssuesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<IssueSubscriptionWhere>;
+};
+
 export type UserIssuesUpdateConnectionInput = {
   node?: InputMaybe<IssueUpdateInput>;
 };
@@ -32150,6 +39511,11 @@ export type UserModOfChannelsConnectOrCreateFieldInput = {
 
 export type UserModOfChannelsConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type UserModOfChannelsConnectedRelationship = {
+  __typename?: 'UserModOfChannelsConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type UserModOfChannelsConnection = {
@@ -32287,6 +39653,10 @@ export type UserModOfChannelsRelationship = {
   node: Channel;
 };
 
+export type UserModOfChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type UserModOfChannelsUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -32327,6 +39697,11 @@ export type UserModerationProfileConnectOrCreateFieldInput = {
 
 export type UserModerationProfileConnectOrCreateFieldInputOnCreate = {
   node: ModerationProfileOnCreateInput;
+};
+
+export type UserModerationProfileConnectedRelationship = {
+  __typename?: 'UserModerationProfileConnectedRelationship';
+  node: ModerationProfileEventPayload;
 };
 
 export type UserModerationProfileConnection = {
@@ -32416,6 +39791,10 @@ export type UserModerationProfileRelationship = {
   node: ModerationProfile;
 };
 
+export type UserModerationProfileRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ModerationProfileSubscriptionWhere>;
+};
+
 export type UserModerationProfileUpdateConnectionInput = {
   node?: InputMaybe<ModerationProfileUpdateInput>;
 };
@@ -32459,6 +39838,11 @@ export type UserNotificationsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<NotificationConnectWhere>;
+};
+
+export type UserNotificationsConnectedRelationship = {
+  __typename?: 'UserNotificationsConnectedRelationship';
+  node: NotificationEventPayload;
 };
 
 export type UserNotificationsConnection = {
@@ -32533,6 +39917,10 @@ export type UserNotificationsRelationship = {
   node: Notification;
 };
 
+export type UserNotificationsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<NotificationSubscriptionWhere>;
+};
+
 export type UserNotificationsUpdateConnectionInput = {
   node?: InputMaybe<NotificationUpdateInput>;
 };
@@ -32595,6 +39983,11 @@ export type UserPendingModInvitesConnectOrCreateFieldInput = {
 
 export type UserPendingModInvitesConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type UserPendingModInvitesConnectedRelationship = {
+  __typename?: 'UserPendingModInvitesConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type UserPendingModInvitesConnection = {
@@ -32732,6 +40125,10 @@ export type UserPendingModInvitesRelationship = {
   node: Channel;
 };
 
+export type UserPendingModInvitesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type UserPendingModInvitesUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -32772,6 +40169,11 @@ export type UserPendingOwnerInvitesConnectOrCreateFieldInput = {
 
 export type UserPendingOwnerInvitesConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type UserPendingOwnerInvitesConnectedRelationship = {
+  __typename?: 'UserPendingOwnerInvitesConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type UserPendingOwnerInvitesConnection = {
@@ -32909,6 +40311,10 @@ export type UserPendingOwnerInvitesRelationship = {
   node: Channel;
 };
 
+export type UserPendingOwnerInvitesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type UserPendingOwnerInvitesUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -32949,6 +40355,11 @@ export type UserRecentlyVisitedChannelsConnectOrCreateFieldInput = {
 
 export type UserRecentlyVisitedChannelsConnectOrCreateFieldInputOnCreate = {
   node: ChannelOnCreateInput;
+};
+
+export type UserRecentlyVisitedChannelsConnectedRelationship = {
+  __typename?: 'UserRecentlyVisitedChannelsConnectedRelationship';
+  node: ChannelEventPayload;
 };
 
 export type UserRecentlyVisitedChannelsConnection = {
@@ -33086,6 +40497,10 @@ export type UserRecentlyVisitedChannelsRelationship = {
   node: Channel;
 };
 
+export type UserRecentlyVisitedChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ChannelSubscriptionWhere>;
+};
+
 export type UserRecentlyVisitedChannelsUpdateConnectionInput = {
   node?: InputMaybe<ChannelUpdateInput>;
 };
@@ -33131,6 +40546,71 @@ export type UserRelationInput = {
   UpvotedDiscussionChannels?: InputMaybe<Array<UserUpvotedDiscussionChannelsCreateFieldInput>>;
 };
 
+export type UserRelationshipCreatedEvent = {
+  __typename?: 'UserRelationshipCreatedEvent';
+  createdRelationship: UserConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+  user: UserEventPayload;
+};
+
+export type UserRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<UserRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<UserRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<UserRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<UserRelationshipsSubscriptionWhere>;
+  user?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type UserRelationshipDeletedEvent = {
+  __typename?: 'UserRelationshipDeletedEvent';
+  deletedRelationship: UserConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+  user: UserEventPayload;
+};
+
+export type UserRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<UserRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<UserRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<UserRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<UserRelationshipsSubscriptionWhere>;
+  user?: InputMaybe<UserSubscriptionWhere>;
+};
+
+export type UserRelationshipsSubscriptionWhere = {
+  AdminOfChannels?: InputMaybe<UserAdminOfChannelsRelationshipSubscriptionWhere>;
+  Albums?: InputMaybe<UserAlbumsRelationshipSubscriptionWhere>;
+  AuthoredWikiPageVersions?: InputMaybe<UserAuthoredWikiPageVersionsRelationshipSubscriptionWhere>;
+  AuthoredWikiPages?: InputMaybe<UserAuthoredWikiPagesRelationshipSubscriptionWhere>;
+  Blocked?: InputMaybe<UserBlockedRelationshipSubscriptionWhere>;
+  ChannelRoles?: InputMaybe<UserChannelRolesRelationshipSubscriptionWhere>;
+  Comments?: InputMaybe<UserCommentsRelationshipSubscriptionWhere>;
+  CreatedFeeds?: InputMaybe<UserCreatedFeedsRelationshipSubscriptionWhere>;
+  DefaultFeed?: InputMaybe<UserDefaultFeedRelationshipSubscriptionWhere>;
+  Discussions?: InputMaybe<UserDiscussionsRelationshipSubscriptionWhere>;
+  Email?: InputMaybe<UserEmailRelationshipSubscriptionWhere>;
+  Events?: InputMaybe<UserEventsRelationshipSubscriptionWhere>;
+  FavoriteChannels?: InputMaybe<UserFavoriteChannelsRelationshipSubscriptionWhere>;
+  Feeds?: InputMaybe<UserFeedsRelationshipSubscriptionWhere>;
+  Images?: InputMaybe<UserImagesRelationshipSubscriptionWhere>;
+  IsBlockedBy?: InputMaybe<UserIsBlockedByRelationshipSubscriptionWhere>;
+  IssueComments?: InputMaybe<UserIssueCommentsRelationshipSubscriptionWhere>;
+  Issues?: InputMaybe<UserIssuesRelationshipSubscriptionWhere>;
+  ModOfChannels?: InputMaybe<UserModOfChannelsRelationshipSubscriptionWhere>;
+  ModerationProfile?: InputMaybe<UserModerationProfileRelationshipSubscriptionWhere>;
+  Notifications?: InputMaybe<UserNotificationsRelationshipSubscriptionWhere>;
+  PendingModInvites?: InputMaybe<UserPendingModInvitesRelationshipSubscriptionWhere>;
+  PendingOwnerInvites?: InputMaybe<UserPendingOwnerInvitesRelationshipSubscriptionWhere>;
+  RecentlyVisitedChannels?: InputMaybe<UserRecentlyVisitedChannelsRelationshipSubscriptionWhere>;
+  ServerRoles?: InputMaybe<UserServerRolesRelationshipSubscriptionWhere>;
+  Suspensions?: InputMaybe<UserSuspensionsRelationshipSubscriptionWhere>;
+  UpvotedComments?: InputMaybe<UserUpvotedCommentsRelationshipSubscriptionWhere>;
+  UpvotedDiscussionChannels?: InputMaybe<UserUpvotedDiscussionChannelsRelationshipSubscriptionWhere>;
+};
+
 export type UserServerRoleServerRolesAggregationSelection = {
   __typename?: 'UserServerRoleServerRolesAggregationSelection';
   count: Scalars['Int']['output'];
@@ -33168,6 +40648,11 @@ export type UserServerRolesConnectOrCreateFieldInput = {
 
 export type UserServerRolesConnectOrCreateFieldInputOnCreate = {
   node: ServerRoleOnCreateInput;
+};
+
+export type UserServerRolesConnectedRelationship = {
+  __typename?: 'UserServerRolesConnectedRelationship';
+  node: ServerRoleEventPayload;
 };
 
 export type UserServerRolesConnection = {
@@ -33248,6 +40733,10 @@ export type UserServerRolesRelationship = {
   node: ServerRole;
 };
 
+export type UserServerRolesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
 export type UserServerRolesUpdateConnectionInput = {
   node?: InputMaybe<ServerRoleUpdateInput>;
 };
@@ -33278,6 +40767,86 @@ export type UserSort = {
   profilePicURL?: InputMaybe<SortDirection>;
   pronouns?: InputMaybe<SortDirection>;
   username?: InputMaybe<SortDirection>;
+};
+
+export type UserSubscriptionWhere = {
+  AND?: InputMaybe<Array<UserSubscriptionWhere>>;
+  DefaultEmojiSkinTone?: InputMaybe<Scalars['String']['input']>;
+  DefaultEmojiSkinTone_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  DefaultEmojiSkinTone_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  DefaultEmojiSkinTone_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  DefaultEmojiSkinTone_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  DefaultEmojiSkinTone_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  NOT?: InputMaybe<UserSubscriptionWhere>;
+  NotificationBundleInterval?: InputMaybe<Scalars['String']['input']>;
+  NotificationBundleInterval_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  NotificationBundleInterval_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  NotificationBundleInterval_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  NotificationBundleInterval_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  NotificationBundleInterval_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  OR?: InputMaybe<Array<UserSubscriptionWhere>>;
+  PreferredTimeZone?: InputMaybe<Scalars['String']['input']>;
+  PreferredTimeZone_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  PreferredTimeZone_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  PreferredTimeZone_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  PreferredTimeZone_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  PreferredTimeZone_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  bio?: InputMaybe<Scalars['String']['input']>;
+  bio_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  bio_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  bio_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  bio_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  bio_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  commentKarma?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_GT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_GTE?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  commentKarma_LT?: InputMaybe<Scalars['Int']['input']>;
+  commentKarma_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  discussionKarma?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_GT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_GTE?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  discussionKarma_LT?: InputMaybe<Scalars['Int']['input']>;
+  discussionKarma_LTE?: InputMaybe<Scalars['Int']['input']>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  enableSensitiveContentByDefault?: InputMaybe<Scalars['Boolean']['input']>;
+  location?: InputMaybe<Scalars['String']['input']>;
+  location_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  location_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  location_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  location_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  location_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  profilePicURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pronouns?: InputMaybe<Scalars['String']['input']>;
+  pronouns_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pronouns_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pronouns_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pronouns_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pronouns_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  username_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserSuspensionSuspensionsAggregationSelection = {
@@ -33313,6 +40882,11 @@ export type UserSuspensionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<SuspensionConnectWhere>;
+};
+
+export type UserSuspensionsConnectedRelationship = {
+  __typename?: 'UserSuspensionsConnectedRelationship';
+  node: SuspensionEventPayload;
 };
 
 export type UserSuspensionsConnection = {
@@ -33429,6 +41003,10 @@ export type UserSuspensionsRelationship = {
   node: Suspension;
 };
 
+export type UserSuspensionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<SuspensionSubscriptionWhere>;
+};
+
 export type UserSuspensionsUpdateConnectionInput = {
   node?: InputMaybe<SuspensionUpdateInput>;
 };
@@ -33509,6 +41087,14 @@ export type UserUpdateInput = {
   username?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type UserUpdatedEvent = {
+  __typename?: 'UserUpdatedEvent';
+  event: EventType;
+  previousState: UserEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedUser: UserEventPayload;
+};
+
 export type UserUpvotedCommentsAggregateInput = {
   AND?: InputMaybe<Array<UserUpvotedCommentsAggregateInput>>;
   NOT?: InputMaybe<UserUpvotedCommentsAggregateInput>;
@@ -33526,6 +41112,11 @@ export type UserUpvotedCommentsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<CommentConnectWhere>;
+};
+
+export type UserUpvotedCommentsConnectedRelationship = {
+  __typename?: 'UserUpvotedCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
 export type UserUpvotedCommentsConnection = {
@@ -33632,6 +41223,10 @@ export type UserUpvotedCommentsRelationship = {
   node: Comment;
 };
 
+export type UserUpvotedCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
 export type UserUpvotedCommentsUpdateConnectionInput = {
   node?: InputMaybe<CommentUpdateInput>;
 };
@@ -33662,6 +41257,11 @@ export type UserUpvotedDiscussionChannelsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<DiscussionChannelConnectWhere>;
+};
+
+export type UserUpvotedDiscussionChannelsConnectedRelationship = {
+  __typename?: 'UserUpvotedDiscussionChannelsConnectedRelationship';
+  node: DiscussionChannelEventPayload;
 };
 
 export type UserUpvotedDiscussionChannelsConnection = {
@@ -33756,6 +41356,10 @@ export type UserUpvotedDiscussionChannelsRelationship = {
   __typename?: 'UserUpvotedDiscussionChannelsRelationship';
   cursor: Scalars['String']['output'];
   node: DiscussionChannel;
+};
+
+export type UserUpvotedDiscussionChannelsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionChannelSubscriptionWhere>;
 };
 
 export type UserUpvotedDiscussionChannelsUpdateConnectionInput = {
@@ -34474,6 +42078,11 @@ export type WikiPageChildPagesConnectFieldInput = {
   where?: InputMaybe<WikiPageConnectWhere>;
 };
 
+export type WikiPageChildPagesConnectedRelationship = {
+  __typename?: 'WikiPageChildPagesConnectedRelationship';
+  node: WikiPageEventPayload;
+};
+
 export type WikiPageChildPagesConnection = {
   __typename?: 'WikiPageChildPagesConnection';
   edges: Array<WikiPageChildPagesRelationship>;
@@ -34588,6 +42197,10 @@ export type WikiPageChildPagesRelationship = {
   node: WikiPage;
 };
 
+export type WikiPageChildPagesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
 export type WikiPageChildPagesUpdateConnectionInput = {
   node?: InputMaybe<WikiPageUpdateInput>;
 };
@@ -34616,6 +42229,14 @@ export type WikiPageConnectWhere = {
   node: WikiPageWhere;
 };
 
+export type WikiPageConnectedRelationships = {
+  __typename?: 'WikiPageConnectedRelationships';
+  ChildPages?: Maybe<WikiPageChildPagesConnectedRelationship>;
+  PastVersions?: Maybe<WikiPagePastVersionsConnectedRelationship>;
+  ProposedEdits?: Maybe<WikiPageProposedEditsConnectedRelationship>;
+  VersionAuthor?: Maybe<WikiPageVersionAuthorConnectedRelationship>;
+};
+
 export type WikiPageCreateInput = {
   ChildPages?: InputMaybe<WikiPageChildPagesFieldInput>;
   PastVersions?: InputMaybe<WikiPagePastVersionsFieldInput>;
@@ -34627,11 +42248,25 @@ export type WikiPageCreateInput = {
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
+export type WikiPageCreatedEvent = {
+  __typename?: 'WikiPageCreatedEvent';
+  createdWikiPage: WikiPageEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
 export type WikiPageDeleteInput = {
   ChildPages?: InputMaybe<Array<WikiPageChildPagesDeleteFieldInput>>;
   PastVersions?: InputMaybe<Array<WikiPagePastVersionsDeleteFieldInput>>;
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsDeleteFieldInput>>;
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorDeleteFieldInput>;
+};
+
+export type WikiPageDeletedEvent = {
+  __typename?: 'WikiPageDeletedEvent';
+  deletedWikiPage: WikiPageEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
 };
 
 export type WikiPageDisconnectInput = {
@@ -34645,6 +42280,16 @@ export type WikiPageEdge = {
   __typename?: 'WikiPageEdge';
   cursor: Scalars['String']['output'];
   node: WikiPage;
+};
+
+export type WikiPageEventPayload = {
+  __typename?: 'WikiPageEventPayload';
+  body?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  slug: Scalars['String']['output'];
+  title: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
 export type WikiPageOptions = {
@@ -34671,6 +42316,11 @@ export type WikiPagePastVersionsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TextVersionConnectWhere>;
+};
+
+export type WikiPagePastVersionsConnectedRelationship = {
+  __typename?: 'WikiPagePastVersionsConnectedRelationship';
+  node: TextVersionEventPayload;
 };
 
 export type WikiPagePastVersionsConnection = {
@@ -34757,6 +42407,10 @@ export type WikiPagePastVersionsRelationship = {
   node: TextVersion;
 };
 
+export type WikiPagePastVersionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
 export type WikiPagePastVersionsUpdateConnectionInput = {
   node?: InputMaybe<TextVersionUpdateInput>;
 };
@@ -34787,6 +42441,11 @@ export type WikiPageProposedEditsConnectFieldInput = {
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<TextVersionConnectWhere>;
+};
+
+export type WikiPageProposedEditsConnectedRelationship = {
+  __typename?: 'WikiPageProposedEditsConnectedRelationship';
+  node: TextVersionEventPayload;
 };
 
 export type WikiPageProposedEditsConnection = {
@@ -34873,6 +42532,10 @@ export type WikiPageProposedEditsRelationship = {
   node: TextVersion;
 };
 
+export type WikiPageProposedEditsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
 export type WikiPageProposedEditsUpdateConnectionInput = {
   node?: InputMaybe<TextVersionUpdateInput>;
 };
@@ -34893,6 +42556,47 @@ export type WikiPageRelationInput = {
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorCreateFieldInput>;
 };
 
+export type WikiPageRelationshipCreatedEvent = {
+  __typename?: 'WikiPageRelationshipCreatedEvent';
+  createdRelationship: WikiPageConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+  wikiPage: WikiPageEventPayload;
+};
+
+export type WikiPageRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<WikiPageRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<WikiPageRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<WikiPageRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<WikiPageRelationshipsSubscriptionWhere>;
+  wikiPage?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
+export type WikiPageRelationshipDeletedEvent = {
+  __typename?: 'WikiPageRelationshipDeletedEvent';
+  deletedRelationship: WikiPageConnectedRelationships;
+  event: EventType;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+  wikiPage: WikiPageEventPayload;
+};
+
+export type WikiPageRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<WikiPageRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<WikiPageRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<WikiPageRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<WikiPageRelationshipsSubscriptionWhere>;
+  wikiPage?: InputMaybe<WikiPageSubscriptionWhere>;
+};
+
+export type WikiPageRelationshipsSubscriptionWhere = {
+  ChildPages?: InputMaybe<WikiPageChildPagesRelationshipSubscriptionWhere>;
+  PastVersions?: InputMaybe<WikiPagePastVersionsRelationshipSubscriptionWhere>;
+  ProposedEdits?: InputMaybe<WikiPageProposedEditsRelationshipSubscriptionWhere>;
+  VersionAuthor?: InputMaybe<WikiPageVersionAuthorRelationshipSubscriptionWhere>;
+};
+
 /** Fields to sort WikiPages by. The order in which sorts are applied is not guaranteed when specifying many fields in one WikiPageSort object. */
 export type WikiPageSort = {
   body?: InputMaybe<SortDirection>;
@@ -34901,6 +42605,47 @@ export type WikiPageSort = {
   slug?: InputMaybe<SortDirection>;
   title?: InputMaybe<SortDirection>;
   updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type WikiPageSubscriptionWhere = {
+  AND?: InputMaybe<Array<WikiPageSubscriptionWhere>>;
+  NOT?: InputMaybe<WikiPageSubscriptionWhere>;
+  OR?: InputMaybe<Array<WikiPageSubscriptionWhere>>;
+  body?: InputMaybe<Scalars['String']['input']>;
+  body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  body_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  slug_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  slug_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  slug_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  slug_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  slug_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  title_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  title_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<InputMaybe<Scalars['DateTime']['input']>>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type WikiPageTextVersionPastVersionsAggregationSelection = {
@@ -34940,6 +42685,14 @@ export type WikiPageUpdateInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type WikiPageUpdatedEvent = {
+  __typename?: 'WikiPageUpdatedEvent';
+  event: EventType;
+  previousState: WikiPageEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedWikiPage: WikiPageEventPayload;
 };
 
 export type WikiPageUserVersionAuthorAggregationSelection = {
@@ -34990,6 +42743,11 @@ export type WikiPageVersionAuthorConnectOrCreateFieldInput = {
 
 export type WikiPageVersionAuthorConnectOrCreateFieldInputOnCreate = {
   node: UserOnCreateInput;
+};
+
+export type WikiPageVersionAuthorConnectedRelationship = {
+  __typename?: 'WikiPageVersionAuthorConnectedRelationship';
+  node: UserEventPayload;
 };
 
 export type WikiPageVersionAuthorConnection = {
@@ -35225,6 +42983,10 @@ export type WikiPageVersionAuthorRelationship = {
   __typename?: 'WikiPageVersionAuthorRelationship';
   cursor: Scalars['String']['output'];
   node: User;
+};
+
+export type WikiPageVersionAuthorRelationshipSubscriptionWhere = {
+  node?: InputMaybe<UserSubscriptionWhere>;
 };
 
 export type WikiPageVersionAuthorUpdateConnectionInput = {

@@ -5,7 +5,8 @@ import ActivityFeedListItem from "./ActivityFeedListItem.vue";
 
 const props = defineProps<{
   feedItems: ModerationAction[];
-  originalAuthorUsername?: string;
+  originalUserAuthorUsername: string;
+  originalModAuthorName: string;
 }>();
 
 const reversedFeedItems = computed(() => {
@@ -21,7 +22,7 @@ const reversedFeedItems = computed(() => {
         v-for="activityItem in reversedFeedItems"
         :key="activityItem.id"
         :activity-item="activityItem"
-        :original-author-username="props.originalAuthorUsername"
+        :is-original-poster="activityItem.User?.username === originalUserAuthorUsername || activityItem.ModerationProfile?.displayName === originalModAuthorName"
       />
     </ul>
   </div>

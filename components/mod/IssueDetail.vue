@@ -486,12 +486,12 @@ const originalModProfileName = ref('')
 
 // Determine if the current user is the original author via username
 const isOriginalUserAuthor = computed(() => {
-  return usernameVar.value && originalAuthorUsername.value === usernameVar.value;
+  return !!usernameVar.value && originalAuthorUsername.value === usernameVar.value;
 });
 
 // Determine if the current user is the original author via mod profile
 const isOriginalModAuthor = computed(() => {
-  return modProfileNameVar.value && originalModProfileName.value === modProfileNameVar.value;
+  return !!modProfileNameVar.value && originalModProfileName.value === modProfileNameVar.value;
 })
 
 const updateComment = (text: string) => {
@@ -667,7 +667,8 @@ const toggleCloseOpenIssue = async () => {
             :key="activeIssue.id"
             class="mb-6"
             :feed-items="activeIssue.ActivityFeed || []"
-            :original-author-username="isOriginalUserAuthor ? originalAuthorUsername : ''"
+            :original-user-author-username="originalAuthorUsername"
+            :original-mod-author-name="originalModProfileName"
           />
 
           <ErrorBanner

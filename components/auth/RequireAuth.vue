@@ -101,21 +101,41 @@ if (import.meta.env.SSR === false) {
         return true;
       }
       
-      // Get a fresh token
-      const freshToken = await getAccessTokenSilently({
-        detailedResponse: true,
-        cacheMode: 'off' // Force refresh
-      });
-      
-      if (freshToken && idTokenClaims.value) {
-        localStorage.setItem("token", idTokenClaims.value.__raw || '');
-        sessionStorage.setItem("tokenRefreshedAt", now.toString());
-        console.log("Token refreshed after session expired error");
-        return true;
+      try {
+        // Try to get a token using the cache first
+        const freshToken = await getAccessTokenSilently({
+          detailedResponse: true
+        });
+        
+        if (freshToken && idTokenClaims.value) {
+          localStorage.setItem("token", idTokenClaims.value.__raw || '');
+          sessionStorage.setItem("tokenRefreshedAt", now.toString());
+          console.log("Token refreshed after session expired error");
+          return true;
+        }
+        return false;
+      } catch (innerError) {
+        // If there's an error with the refresh token, we need to handle it
+        console.error("Error with token refresh attempt:", innerError);
+        
+        // If this is an invalid refresh token, we need to log the user out and re-authenticate
+        if (innerError.message && innerError.message.includes('Unknown or invalid refresh token')) {
+          console.log("Invalid refresh token detected, user needs to login again");
+          setIsAuthenticated(false); // Update local auth state
+          
+          // Clear any stored tokens to prevent further attempts with invalid tokens
+          localStorage.removeItem("token");
+          sessionStorage.removeItem("tokenRefreshedAt");
+          
+          // Optionally redirect to login or show login UI
+          return false;
+        }
+        
+        // For other errors, just return false
+        return false;
       }
-      return false;
     } catch (error) {
-      console.error("Error refreshing token:", error);
+      console.error("Error in refreshTokenAndRetry:", error);
       return false;
     }
   };
@@ -145,18 +165,29 @@ if (import.meta.env.SSR === false) {
       if (!hasRefreshedToken || parseInt(hasRefreshedToken) < fiveMinutesAgo) {
         // Force token refresh on page load/refresh if authenticated
         if (isAuthenticated.value) {
-          // Get a fresh token
-          const freshToken = await getAccessTokenSilently({
-            detailedResponse: true,
-            cacheMode: 'off' // Force a new token to be fetched
-          });
-          
-          if (freshToken) {
-            // Store the ID token in localStorage for Apollo client
-            localStorage.setItem("token", idTokenClaims.value?.__raw || '');
-            // Set the flag to prevent multiple refreshes
-            sessionStorage.setItem("tokenRefreshedAt", now.toString());
-            console.log("Token refreshed on page load");
+          try {
+            // First try with cacheMode: 'on' to use any existing valid tokens
+            const freshToken = await getAccessTokenSilently({
+              detailedResponse: true,
+              cacheMode: 'on' // Try to use cached token first
+            });
+            
+            if (freshToken) {
+              // Store the ID token in localStorage for Apollo client
+              localStorage.setItem("token", idTokenClaims.value?.__raw || '');
+              // Set the flag to prevent multiple refreshes
+              sessionStorage.setItem("tokenRefreshedAt", now.toString());
+              console.log("Token refreshed on page load");
+            }
+          } catch (innerError) {
+            // If using cached token fails, handle silently
+            console.log("Could not use cached token, will try login redirect if needed", innerError);
+            
+            // If this is an invalid refresh token, we need to log the user out and re-authenticate
+            if (innerError.message && innerError.message.includes('Unknown or invalid refresh token')) {
+              console.log("Invalid refresh token, will need to reauthenticate");
+              setIsAuthenticated(false); // Update local auth state
+            }
           }
         } else if (idTokenClaims.value) {
           // Handle case for returning from a redirect

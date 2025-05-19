@@ -48,6 +48,9 @@ export const ISSUE_FIELDS = gql`
         ModerationProfile {
           displayName
         }
+        User {
+          username
+        }
         Comment {
           id
           text

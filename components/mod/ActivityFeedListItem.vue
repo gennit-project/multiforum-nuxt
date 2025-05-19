@@ -14,7 +14,6 @@ import ArrowPath from "../icons/ArrowPath.vue";
 import FlagIcon from "../icons/FlagIcon.vue";
 import XCircleIcon from "../icons/XCircleIcon.vue";
 import { ActionType } from "@/types/Comment";
-import { computed } from "vue";
 
 const actionTypeToIcon = {
   [ActionType.Close]: XCircleIcon,
@@ -33,30 +32,14 @@ const props = defineProps({
     type: Object as PropType<ModerationAction>,
     required: true,
   },
-  originalAuthorUsername: {
-    type: String,
-    default: "",
-  }
+  isOriginalPoster: {
+    type: Boolean,
+    default: false,
+  },
 });
 const commentIdInParams = useRoute().params.commentId as string;
-const isPermalinked = commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
-
-// Check if the commenter is the original poster (author of the reported content)
-const isOriginalPoster = computed(() => {
-  if (!props.originalAuthorUsername) return false;
-  
-  // Check if the activity is from a ModerationProfile with displayName matching original author
-  if (props.activityItem.ModerationProfile?.displayName === props.originalAuthorUsername) {
-    return true;
-  }
-  
-  // Check if the activity is from a User with username matching original author
-  if (props.activityItem.User?.username === props.originalAuthorUsername) {
-    return true;
-  }
-  
-  return false;
-});
+const isPermalinked =
+  commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
 </script>
 
 <template>
@@ -89,34 +72,43 @@ const isOriginalPoster = computed(() => {
           </div>
         </div>
         <div class="min-w-0 flex-1 py-0">
-          <div class="text-sm leading-8 text-gray-500 dark:text-gray-300">
-            <span class="mr-0.5">
+          <div class="text-xs leading-8 text-gray-500 dark:text-gray-300">
+            <span class="mr-0.5 flex flex-row items-center gap-1">
               <!-- Link for ModerationProfile -->
+              <AvatarComponent
+                v-if="activityItem.ModerationProfile?.displayName"
+                :text="activityItem.ModerationProfile?.displayName"
+                :is-small="true"
+              />
               <nuxt-link
                 v-if="activityItem.ModerationProfile?.displayName"
                 :to="{
                   name: isOriginalPoster ? 'u-username' : 'mod-modId',
                   params: {
-                    [isOriginalPoster ? 'username' : 'modId']: activityItem.ModerationProfile.displayName,
+                    [isOriginalPoster ? 'username' : 'modId']:
+                      activityItem.ModerationProfile.displayName,
                   },
                 }"
                 class="font-medium text-gray-900 hover:underline dark:text-gray-200 flex items-center gap-1"
-                ><AvatarComponent
-                  :text="activityItem.ModerationProfile?.displayName"
-                  :is-small="true"
-                />
-                <span class="flex items-center gap-1">
+              >
+                <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
-                  <span 
+                  <span
                     v-if="isOriginalPoster"
                     class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-                  >OP</span>
+                    >OP</span
+                  >
                 </span>
               </nuxt-link>
-              
+
               <!-- Link for User -->
+              <AvatarComponent
+                v-if="activityItem.User?.username"
+                :text="activityItem.User.username"
+                :is-small="true"
+              />
               <nuxt-link
-                v-else-if="activityItem.User?.username"
+                v-if="activityItem.User?.username"
                 :to="{
                   name: 'u-username',
                   params: {
@@ -124,16 +116,14 @@ const isOriginalPoster = computed(() => {
                   },
                 }"
                 class="font-medium text-gray-900 hover:underline dark:text-gray-200 flex items-center gap-1"
-                ><AvatarComponent
-                  :text="activityItem.User.username"
-                  :is-small="true"
-                />
+              >
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
-                  <span 
+                  <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-                  >OP</span>
+                    class="rounded-md border border-gray-500 dark:border-gray-300 px-1 text-xs text-gray-500 dark:text-gray-300"
+                    >OP</span
+                  >
                 </span>
               </nuxt-link>
               {{ activityItem.actionDescription }}

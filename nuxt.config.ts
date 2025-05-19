@@ -144,6 +144,22 @@ export default defineNuxtConfig({
                 if (refreshSucceeded) {
                   console.log('Token refreshed, operation can be retried');
                   // The user will need to retry their action, but with a fresh token
+                } else {
+                  console.log('Token refresh failed, user may need to log in again');
+                  
+                  // Check if we still have a valid session by examining Auth0 state
+                  // Since we can't access the Auth0 object directly here, we'll check localStorage
+                  const auth0State = localStorage.getItem('auth0.is.authenticated');
+                  
+                  if (auth0State !== 'true') {
+                    // User is likely logged out or has invalid tokens
+                    console.log('Auth0 session is invalid, redirecting to home page');
+                    
+                    // If on a protected page, redirect to home
+                    if (window.location.pathname !== '/') {
+                      window.location.href = '/';
+                    }
+                  }
                 }
               }
             },
