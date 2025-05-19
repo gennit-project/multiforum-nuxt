@@ -70,6 +70,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['fetchedOriginalPosterUsername']);
+
 const route = useRoute();
 const offset = ref(0);
 
@@ -100,10 +102,18 @@ const {
   error: eventError,
   loading: eventLoading,
   refetch: loadEvent,
+  onResult: onEventResult,
 } = useQuery(GET_EVENT, {
   id: eventId,
   channelUniqueName: channelId.value,
   loggedInModName: loggedInUserModName.value,
+});
+
+onEventResult(({ data }) => {
+  if (data?.events?.length) {
+    const event = data.events[0];
+    emit('fetchedOriginalPosterUsername', event.Poster?.username || "");
+  }
 });
 
 const event = computed<EventData>(() => eventResult.value?.events?.[0] || null);

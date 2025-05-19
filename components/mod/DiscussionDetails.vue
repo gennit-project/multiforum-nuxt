@@ -1,71 +1,65 @@
-<script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import type { Issue } from "@/__generated__/graphql";
-import { DateTime } from "luxon";
-import MarkdownPreview from "../MarkdownPreview.vue";
-import { useRoute } from "nuxt/app";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { modProfileNameVar } from "@/cache";
+<script setup lang="ts">
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { DateTime } from 'luxon';
+import { useRoute } from 'nuxt/app';
+import { modProfileNameVar } from '@/cache';
+import type { Issue } from '@/__generated__/graphql';
 
-export default defineComponent({
-  components: {
-    ErrorBanner,
-    LoadingSpinner,
-    MarkdownPreview,
-  },
-  props: {
-    activeIssue: {
-      type: Object as () => Issue,
-      required: true,
-    },
-  },
-  setup(props) {
-    const route = useRoute();
+/* component imports that were previously declared in `components:`.
+   Adjust the paths if yours are different. */
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import MarkdownPreview from '../MarkdownPreview.vue';
+import AvatarComponent from '@/components/AvatarComponent.vue';
+import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 
-    const discussionId = computed(() => {
-      return props.activeIssue.relatedDiscussionId;
-    });
 
-    const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
-        return route.params.forumId;
-      }
-      return "";
-    });
+const props = defineProps<{
+  activeIssue: Issue;
+}>();
 
-    const {
-      result: getDiscussionResult,
-      error: getDiscussionError,
-      loading: getDiscussionLoading,
-    } = useQuery(GET_DISCUSSION, {
-      id: discussionId,
-      loggedInModName: modProfileNameVar.value,
-      channelUniqueName: channelId.value,
-    });
+const emit = defineEmits([
+  'fetchedOriginalAuthorUsername',
+])
 
-    const discussion = computed(() => {
-      if (getDiscussionLoading.value || getDiscussionError.value) {
-        return null;
-      }
-      return getDiscussionResult.value.discussions[0];
-    });
+/* ---------- route & variable helpers ---------- */
+const route = useRoute();
 
-    return {
-      channelId,
-      discussion,
-      getDiscussionError,
-      getDiscussionLoading,
-    };
-  },
-  methods: {
-    formatDate(date: string) {
-      return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
-    },
-  },
+const discussionId = computed(() => props.activeIssue.relatedDiscussionId);
+
+const channelId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : '',
+);
+
+/* ---------- GraphQL query ---------- */
+const {
+  result: getDiscussionResult,
+  error: getDiscussionError,
+  loading: getDiscussionLoading,
+  onResult: onGetDiscussionResult,
+} = useQuery(GET_DISCUSSION, () => ({
+  id: discussionId.value,
+  loggedInModName: modProfileNameVar.value,
+  channelUniqueName: channelId.value,
+}));
+
+const discussion = computed(() => {
+  if (getDiscussionLoading.value || getDiscussionError.value) return null;
+  return getDiscussionResult.value?.discussions?.[0] ?? null;
 });
+
+onGetDiscussionResult(({ data }) => {
+  if (data?.discussions?.length) {
+    const originalAuthorUsername = data.discussions[0].Author.username;
+    emit('fetchedOriginalAuthorUsername', originalAuthorUsername);
+  }
+});
+
+/* ---------- utilities ---------- */
+const formatDate = (iso: string) =>
+  DateTime.fromISO(iso).toLocaleString(DateTime.DATE_FULL);
 </script>
 
 <template>
@@ -74,12 +68,9 @@ export default defineComponent({
     <LoadingSpinner v-else-if="getDiscussionLoading" />
     <div v-if="discussion" class="mt-3 flex w-full flex-col gap-2">
       <nuxt-link
-        :to="{
-          name: 'u-username',
-          params: { username: discussion?.Author?.username },
-        }"
+        :to="{ name: 'u-username', params: { username: discussion?.Author?.username } }"
         class="flex items-center dark:text-white"
-      > 
+      >
         <AvatarComponent
           :text="discussion?.Author.username"
           :src="discussion?.Author.profilePicURL ?? ''"
@@ -93,18 +84,18 @@ export default defineComponent({
           :comment-karma="discussion?.Author.commentKarma ?? 0"
           :discussion-karma="discussion?.Author.discussionKarma ?? 0"
           :account-created="discussion?.Author.createdAt ?? ''"
-        /> 
-        <span class="ml-1">posted on {{ formatDate(discussion.createdAt) }}</span>
+        />
+        <span class="ml-1"
+          >posted on {{ formatDate(discussion.createdAt) }}</span
+        >
       </nuxt-link>
+
       <div class="border-l border-l-2 pl-6">
         <h3 v-if="discussion?.title">
           <nuxt-link
             :to="{
               name: 'forums-forumId-discussions-discussionId',
-              params: {
-                forumId: channelId,
-                discussionId: discussion.id,
-              },
+              params: { forumId: channelId, discussionId: discussion.id },
             }"
             class="text-blue-500 dark:text-blue-400"
             rel="noopener noreferrer"
@@ -112,6 +103,7 @@ export default defineComponent({
             {{ discussion.title }}
           </nuxt-link>
         </h3>
+
         <MarkdownPreview
           v-if="discussion?.body"
           class="max-w-none"

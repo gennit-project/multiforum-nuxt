@@ -15,6 +15,9 @@ const props = defineProps({
     required: true,
   },
 });
+
+const emit = defineEmits(["fetchedOriginalAuthorUsername"]);
+
 const route = useRoute();
 const channelId = computed(() => {
   if (typeof route.params.forumId === "string") {
@@ -27,6 +30,7 @@ const {
   result: commentResult,
   error: commentError,
   loading: commentLoading,
+  onResult: onCommentResult,
 } = useQuery(GET_COMMENT, {
   id: props.commentId,
 });
@@ -39,16 +43,35 @@ const originalComment = computed(() => {
   return commentResult.value?.comments && commentResult.value?.comments[0];
 });
 
+onCommentResult(({ data }) => {
+  if (data?.comments?.length) {
+    const originalAuthorUsername = data.comments[0].Author.username;
+    if (originalAuthorUsername) {
+      emit("fetchedOriginalAuthorUsername", originalAuthorUsername);
+    }
+
+    const originalAuthorModProfileName = data.comments[0].Author.modProfileName;
+    if (originalAuthorModProfileName) {
+      emit("fetchedOriginalAuthorUsername", originalAuthorModProfileName);
+    }
+  }
+});
+
 const permalinkObject = computed(() => {
   return getFeedbackPermalinkObject({
     routeName: route.name as string,
     forumId: channelId.value,
     commentId: originalComment.value?.id,
     // This discussionId parameter is used for permalinks to a feedback on a comment in a discussion.
-    discussionId: originalComment.value?.GivesFeedbackOnComment?.DiscussionChannel?.discussionId,
-    GivesFeedbackOnComment: originalComment.value?.GivesFeedbackOnComment || undefined,
-    GivesFeedbackOnDiscussion: originalComment.value?.GivesFeedbackOnDiscussion || undefined,
-    GivesFeedbackOnEvent: originalComment.value?.GivesFeedbackOnEvent || undefined,
+    discussionId:
+      originalComment.value?.GivesFeedbackOnComment?.DiscussionChannel
+        ?.discussionId,
+    GivesFeedbackOnComment:
+      originalComment.value?.GivesFeedbackOnComment || undefined,
+    GivesFeedbackOnDiscussion:
+      originalComment.value?.GivesFeedbackOnDiscussion || undefined,
+    GivesFeedbackOnEvent:
+      originalComment.value?.GivesFeedbackOnEvent || undefined,
   });
 });
 </script>

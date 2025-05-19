@@ -10,7 +10,8 @@ import {
   CLOSE_ISSUE,
   REOPEN_ISSUE,
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
-  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT,
+  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
+  ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
 } from "@/graphQLData/issue/mutations";
 import {
   COUNT_CLOSED_ISSUES,
@@ -27,7 +28,7 @@ import EventDetail from "@/components/event/detail/EventDetail.vue";
 import CommentDetails from "@/components/mod/CommentDetails.vue";
 import ModerationWizard from "@/components/mod/ModerationWizard.vue";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
-import { modProfileNameVar } from "@/cache";
+import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
 import XCircleIcon from "../icons/XCircleIcon.vue";
 import ArrowPathIcon from "../icons/ArrowPath.vue";
@@ -384,10 +385,50 @@ const { mutate: addIssueActivityFeedItem } = useMutation(
 );
 
 const {
-  mutate: addIssueActivityFeedItemWithComment,
-  loading: addIssueActivityFeedItemWithCommentLoading,
-  error: addIssueActivityFeedItemWithCommentError,
-} = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT, {
+  mutate: addIssueActivityFeedItemWithCommentAsMod,
+  loading: addIssueActivityFeedItemWithCommentAsModLoading,
+  error: addIssueActivityFeedItemWithCommentAsModError,
+} = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD, {
+  update: (cache, { data: { updateIssues } }) => {
+    const { issues } = updateIssues;
+    const updatedIssue: Issue = issues[0];
+
+    // Attempt to read the existing issues from the cache
+    const existingIssueData = cache.readQuery({
+      query: GET_ISSUE,
+      variables: { id: updatedIssue.id },
+    });
+
+    if (
+      existingIssueData &&
+      // @ts-ignore
+      existingIssueData.issues &&
+      // @ts-ignore
+      existingIssueData.issues.length > 0
+    ) {
+      // @ts-ignore
+      const existingIssues: Issue[] = existingIssueData.issues;
+
+      const newIssues = existingIssues.map((issue) =>
+        issue.id === updatedIssue.id ? updatedIssue : issue
+      );
+
+      cache.writeQuery({
+        query: GET_ISSUE,
+        variables: { id: updatedIssue.id },
+        data: {
+          issues: newIssues,
+        },
+      });
+    }
+  },
+});
+
+const {
+  mutate: addIssueActivityFeedItemWithCommentAsUser,
+  loading: addIssueActivityFeedItemWithCommentAsUserLoading,
+  error: addIssueActivityFeedItemWithCommentAsUserError,
+} = useMutation(ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER, {
   update: (cache, { data: { updateIssues } }) => {
     const { issues } = updateIssues;
     const updatedIssue: Issue = issues[0];
@@ -437,20 +478,53 @@ const issue = computed<Issue | null>(
   () => getIssueResult.value?.issues[0] || null
 );
 
+// Get the username of the original author of the reported content
+const originalAuthorUsername = ref('');
+
+// Get the mod profile name of the original author, if applicable
+const originalModProfileName = ref('')
+
+// Determine if the current user is the original author via username
+const isOriginalUserAuthor = computed(() => {
+  return usernameVar.value && originalAuthorUsername.value === usernameVar.value;
+});
+
+// Determine if the current user is the original author via mod profile
+const isOriginalModAuthor = computed(() => {
+  return modProfileNameVar.value && originalModProfileName.value === modProfileNameVar.value;
+})
+
 const updateComment = (text: string) => {
   createFormValues.value.text = text;
 };
 
 const handleCreateComment = async () => {
-  if (!activeIssue.value || !modProfileNameVar.value) return;
-  await addIssueActivityFeedItemWithComment({
-    issueId: activeIssue.value.id,
-    commentText: createFormValues.value.text,
-    displayName: modProfileNameVar.value,
-    actionDescription: "commented on the issue",
-    actionType: "comment",
-    channelUniqueName: channelId.value,
-  });
+  if (!activeIssue.value) return;
+
+  // Case 1: Current user is the original author who posted as a regular user
+  if (isOriginalUserAuthor.value) {
+    await addIssueActivityFeedItemWithCommentAsUser({
+      issueId: activeIssue.value.id,
+      commentText: createFormValues.value.text,
+      username: usernameVar.value,
+      actionDescription: "commented on the issue",
+      actionType: "comment",
+      channelUniqueName: channelId.value,
+    });
+  } 
+  // Case 2: Current user is the original author who posted as a mod OR current user is not the original author
+  else if (isOriginalModAuthor.value){
+    if (!modProfileNameVar.value) return;
+    await addIssueActivityFeedItemWithCommentAsMod({
+      issueId: activeIssue.value.id,
+      commentText: createFormValues.value.text,
+      displayName: modProfileNameVar.value,
+      actionDescription: "commented on the issue",
+      actionType: "comment",
+      channelUniqueName: channelId.value,
+    });
+  }
+  
   createFormValues.value.text = "";
 };
 
@@ -463,7 +537,7 @@ const toggleCloseOpenIssue = async () => {
       await closeIssue();
 
       if (createFormValues.value.text) {
-        await addIssueActivityFeedItemWithComment({
+        await addIssueActivityFeedItemWithCommentAsMod({
           issueId: activeIssue.value.id,
           displayName: modProfileNameVar.value,
           actionDescription: "closed the issue",
@@ -484,7 +558,7 @@ const toggleCloseOpenIssue = async () => {
       await reopenIssue();
       
       if (createFormValues.value.text) {
-        await addIssueActivityFeedItemWithComment({
+        await addIssueActivityFeedItemWithCommentAsMod({
           issueId: activeIssue.value.id,
           displayName: modProfileNameVar.value,
           actionDescription: "reopened the issue",
@@ -553,6 +627,9 @@ const toggleCloseOpenIssue = async () => {
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"
           :active-issue="activeIssue"
+          @fetched-original-author-username="
+            originalAuthorUsername = $event
+          "
         />
         <EventDetail
           v-if="activeIssue?.relatedEventId"
@@ -563,10 +640,19 @@ const toggleCloseOpenIssue = async () => {
           :show-add-to-calendar="false"
           :show-event-in-past-banner="false"
           :show-title="true"
+          @fetched-original-author-username="
+            originalAuthorUsername = $event
+          "
         />
         <CommentDetails
           v-if="activeIssue?.relatedCommentId"
           :comment-id="activeIssue.relatedCommentId"
+          @fetched-original-author-username="
+            originalAuthorUsername = $event
+          "
+          @fetched-original-mod-profile-name="
+            originalModProfileName = $event
+          "
         />
       </div>
     </div>
@@ -581,11 +667,16 @@ const toggleCloseOpenIssue = async () => {
             :key="activeIssue.id"
             class="mb-6"
             :feed-items="activeIssue.ActivityFeed || []"
+            :original-author-username="isOriginalUserAuthor ? originalAuthorUsername : ''"
           />
 
           <ErrorBanner
-            v-if="addIssueActivityFeedItemWithCommentError"
-            :text="addIssueActivityFeedItemWithCommentError.message"
+            v-if="addIssueActivityFeedItemWithCommentAsModError"
+            :text="addIssueActivityFeedItemWithCommentAsModError.message"
+          />
+          <ErrorBanner
+            v-if="addIssueActivityFeedItemWithCommentAsUserError"
+            :text="addIssueActivityFeedItemWithCommentAsUserError.message"
           />
           <ModerationWizard
             v-if="
@@ -635,7 +726,7 @@ const toggleCloseOpenIssue = async () => {
                 :data-testid="'createCommentButton'"
                 :label="'Comment'"
                 :disabled="createFormValues.text.length === 0"
-                :loading="addIssueActivityFeedItemWithCommentLoading"
+                :loading="addIssueActivityFeedItemWithCommentAsModLoading || addIssueActivityFeedItemWithCommentAsUserLoading"
                 @click.prevent="handleCreateComment"
               />
             </div>

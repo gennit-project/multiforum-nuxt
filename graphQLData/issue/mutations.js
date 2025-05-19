@@ -70,9 +70,9 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM = gql`
   }
 `;
 
-export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
+export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD = gql`
   ${ISSUE_FIELDS}
-  mutation addIssueActivityFeedItemWithComment(
+  mutation addIssueActivityFeedItemWithCommentAsMod(
     $issueId: ID!
     $actionDescription: String!
     $actionType: String!
@@ -112,6 +112,66 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT = gql`
                       ModerationProfile: {
                         connect: {
                           where: { node: { displayName: $displayName } }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    ) {
+      issues {
+        ...IssueFields
+      }
+    }
+  }
+`;
+
+export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER = gql`
+  ${ISSUE_FIELDS}
+  mutation addIssueActivityFeedItemWithCommentAsUser(
+    $issueId: ID!
+    $actionDescription: String!
+    $actionType: String!
+    $username: String!
+    $commentText: String!
+    $channelUniqueName: String!
+    $flaggedServerRuleViolation: Boolean
+  ) {
+    updateIssues(
+      where: { id: $issueId }
+      update: { flaggedServerRuleViolation: $flaggedServerRuleViolation }
+      create: {
+        ActivityFeed: [
+          {
+            node: {
+              actionDescription: $actionDescription
+              actionType: $actionType
+              User: {
+                connect: { where: { node: { username: $username } } }
+              }
+              Comment: {
+                create: {
+                  node: {
+                    isRootComment: false
+                    text: $commentText
+                    Channel: {
+                      connect: {
+                        where: { node: { uniqueName: $channelUniqueName } }
+                      }
+                    }
+                    Issue: { 
+                      connect: { 
+                        where: { node: { id: $issueId } } 
+                      } 
+                    }
+                    CommentAuthor: {
+                      User: {
+                        connect: {
+                          where: { node: { username: $username } }
                         }
                       }
                     }

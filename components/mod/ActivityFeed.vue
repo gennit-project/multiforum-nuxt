@@ -5,6 +5,7 @@ import ActivityFeedListItem from "./ActivityFeedListItem.vue";
 
 const props = defineProps<{
   feedItems: ModerationAction[];
+  originalAuthorUsername?: string;
 }>();
 
 const reversedFeedItems = computed(() => {
@@ -20,6 +21,7 @@ const reversedFeedItems = computed(() => {
         v-for="activityItem in reversedFeedItems"
         :key="activityItem.id"
         :activity-item="activityItem"
+        :original-author-username="props.originalAuthorUsername"
       />
     </ul>
   </div>
