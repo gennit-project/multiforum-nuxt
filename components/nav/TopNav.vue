@@ -13,12 +13,10 @@ import {
   sideNavIsOpenVar,
   notificationCountVar,
 } from "@/cache";
-import { config } from "@/config";
 
 defineEmits(["toggleDropdown"]);
 
 const route = useRoute();
-const isDevelopment = computed(() => config.environment === "development");
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -81,12 +79,6 @@ const isOnMapPage = computed(() => {
           <nuxt-link to="/" class="flex items-center gap-1">
             <LogoIcon class="h-5 w-5" />
             <span class="font-bold text-white logo-font">Topical</span>
-
-            <div
-              class="text-xs py-0.5 px-1 mx-1 rounded-md text-gray-300 !border-gray-400 !border"
-            >
-              {{ isDevelopment ? "DEV" : "ALPHA" }}
-            </div>
           </nuxt-link>
 
           <div

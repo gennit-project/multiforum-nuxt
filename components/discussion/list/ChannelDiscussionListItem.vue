@@ -15,6 +15,8 @@ import type {
   Tag,
 } from "@/__generated__/graphql";
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+import { storeToRefs } from "pinia";
+import { useUIStore } from "@/stores/uiStore";
 // UI state is now handled via props
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
