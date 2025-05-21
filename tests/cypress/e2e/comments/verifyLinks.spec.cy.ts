@@ -1,38 +1,31 @@
-import { CATS_FORUM } from "../constants";
-import { setupTestData } from "../../support/testSetup";
+import { CATS_FORUM, DISCUSSION_LIST } from "../constants";
+import { setupTestData, loginUser } from "../../support/testSetup";
 
 describe("Comment moderation link verification", () => {
   // Set up test data once for all tests in this file
   setupTestData();
+  // Login before each test
+  loginUser("loginWithCreateEventButton");
 
   it("verifies navigation links between archived comment, issue, and original context", () => {
     // Test data
     const discussionTitle = "Example topic 1";
     const commentText = "Test comment for link verification " + Date.now();
 
-    // Moderator credentials
-    const modUsername = Cypress.env("auth0_username_2");
-    const modPassword = Cypress.env("auth0_password_2");
-
     // Set up network interception
     cy.intercept("POST", "**/graphql").as("graphqlRequest");
 
-    // Login as moderator
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
-
     // Step 1: Navigate to discussion and create a test comment
-    cy.visit(CATS_FORUM);
+    cy.visit(DISCUSSION_LIST);
     cy.wait("@graphqlRequest");
 
-    cy.contains(discussionTitle).click();
+    cy.get("span").contains(discussionTitle).click();
     cy.wait("@graphqlRequest");
 
     // Create a new comment
-    cy.get('[data-testid="comment-input"]').type(commentText);
-    cy.get('[data-testid="submit-comment-button"]').click();
+    cy.get("textarea[data-testid='addComment']", { timeout: 10000 }).should("be.visible").click();
+    cy.get("textarea[data-testid='texteditor-textarea']").should("be.visible").type(commentText);
+    cy.get("button").contains("Save").click();
     cy.wait("@graphqlRequest");
 
     // Verify comment was created
@@ -40,18 +33,20 @@ describe("Comment moderation link verification", () => {
 
     // Step 2: Archive the comment
     // Find the specific comment and open its menu
-    cy.contains(commentText)
-      .closest('[data-testid="comment"]')
-      .find('[data-testid="comment-menu-button"]')
-      .click();
+    cy.get('div[data-testid="comment"]')
+      .contains(commentText)
+      .closest('div[data-testid="comment"]')
+      .within(() => {
+        cy.get('button[data-testid="commentMenu"]').click();
+      });
 
     // Select archive option
-    cy.get('[data-testid="comment-menu-button-item-Archive"]').click();
+    cy.get(".v-list-item").contains("Archive").click();
 
     // Complete archive form
     cy.contains("Archive Comment").should("be.visible");
     cy.get("h3").contains("Forum rules").parent().find('input[type="checkbox"]').first().check();
-    cy.get('[data-testid="report-comment-input"]').type("Testing link verification");
+    cy.get("textarea").type("Testing link verification");
     cy.get("button").contains("Submit").click();
     cy.wait("@graphqlRequest");
 
@@ -106,80 +101,58 @@ describe("Comment moderation link verification", () => {
     const commentText = "Test comment for feedback link verification " + Date.now();
     const feedbackText = "Test feedback for link verification";
 
-    // Credentials
-    const username = Cypress.env("auth0_username_1");
-    const password = Cypress.env("auth0_password_1");
-    const modUsername = Cypress.env("auth0_username_2");
-    const modPassword = Cypress.env("auth0_password_2");
-
     // Set up network interception
     cy.intercept("POST", "**/graphql").as("graphqlRequest");
 
-    // Login as normal user
-    cy.loginWithCreateEventButton({
-      username: username,
-      password: password,
-    });
-
     // Navigate to discussion and create a test comment
-    cy.visit(CATS_FORUM);
+    cy.visit(DISCUSSION_LIST);
     cy.wait("@graphqlRequest");
 
-    cy.contains(discussionTitle).click();
+    cy.get("span").contains(discussionTitle).click();
     cy.wait("@graphqlRequest");
 
     // Create a new comment
-    cy.get('[data-testid="comment-input"]').type(commentText);
-    cy.get('[data-testid="submit-comment-button"]').click();
+    cy.get("textarea[data-testid='addComment']", { timeout: 10000 }).should("be.visible").click();
+    cy.get("textarea[data-testid='texteditor-textarea']").should("be.visible").type(commentText);
+    cy.get("button").contains("Save").click();
     cy.wait("@graphqlRequest");
 
     // Verify comment was created
     cy.contains(commentText).should("be.visible");
 
-    // Switch to moderator account to give feedback
-    cy.get('[data-testid="logout-button"]').click();
-    cy.wait(2000);
-
-    cy.loginWithCreateEventButton({
-      username: modUsername,
-      password: modPassword,
-    });
-
-    // Navigate back to the discussion
-    cy.visit(CATS_FORUM);
-    cy.wait("@graphqlRequest");
-
-    cy.contains(discussionTitle).click();
-    cy.wait("@graphqlRequest");
-
     // Find the comment and open the menu
-    cy.contains(commentText)
-      .closest('[data-testid="comment"]')
-      .find('[data-testid="comment-menu-button"]')
-      .click();
+    cy.get('div[data-testid="comment"]')
+      .contains(commentText)
+      .closest('div[data-testid="comment"]')
+      .within(() => {
+        cy.get('button[data-testid="commentMenu"]').click();
+      });
 
     // Select give feedback option
-    cy.get('[data-testid="comment-menu-button-item-Give Feedback"]').click();
+    cy.get(".v-list-item").contains("Give Feedback").click();
 
     // Fill in the feedback form
     cy.contains("Give Feedback").should("be.visible");
-    cy.get('textarea[data-testid="report-comment-input"]').type(feedbackText);
+    cy.get("textarea").type(feedbackText);
     cy.get("button").contains("Submit").click();
     cy.wait("@graphqlRequest");
 
     // Verify feedback submitted
     cy.contains("Feedback submitted successfully").should("be.visible");
 
-    // Report the feedback (to create an issue)
+    // Find and report the feedback (to create an issue)
     cy.contains(feedbackText)
-      .closest('[data-testid="comment-feedback"]')
-      .find('[data-testid="report-feedback-button"]')
-      .click();
+      .closest('div[data-testid="commentFeedback"]')
+      .within(() => {
+        cy.get('button[data-testid="feedbackMenu"]').click();
+      });
+
+    cy.get(".v-list-item").contains("Report").click();
 
     // Complete report form
     cy.contains("Report Feedback").should("be.visible");
     cy.get("h3").contains("Forum rules").parent().find('input[type="checkbox"]').first().check();
-    cy.get('textarea[data-testid="report-input"]').type("Testing feedback link verification");
+    cy.get("textarea").type("Testing feedback link verification");
     cy.get("button").contains("Submit").click();
     cy.wait("@graphqlRequest");
 
