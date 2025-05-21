@@ -1,0 +1,10 @@
+{
+  "semi": true,
+  "tabWidth": 2,
+  "printWidth": 100,
+  "trailingComma": "es5",
+  "endOfLine": "lf",
+  "vueIndentScriptAndStyle": true,
+  "singleAttributePerLine": true,
+  "plugins": ["prettier-plugin-tailwindcss"]
+}

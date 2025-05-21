@@ -10,7 +10,7 @@ import { ALLOWED_ICONS } from "@/utils";
 /**
  * Determines which actions should be available in the discussion header menu
  * based on user permissions and the discussion state
- * 
+ *
  * @param params - Parameters to determine which menu items to show:
  *   - isOwnDiscussion - Whether the current user is the author of the discussion
  *   - isArchived - Whether the discussion is archived
@@ -27,7 +27,14 @@ export const getDiscussionHeaderMenuItems = (params: {
   discussionId: string;
   hasAlbum?: boolean;
 }): MenuItem[] => {
-  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false } = params;
+  const {
+    isOwnDiscussion,
+    isArchived,
+    userPermissions,
+    isLoggedIn,
+    discussionId,
+    hasAlbum = false,
+  } = params;
   let menuItems: MenuItem[] = [];
 
   // Always add these base items for authenticated or unauthenticated users
@@ -78,12 +85,12 @@ export const getDiscussionHeaderMenuItems = (params: {
 
   // Check if the user has any moderation permission (standard mod or above)
   // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions = 
-    !userPermissions.isSuspendedMod && 
-    (userPermissions.isChannelOwner || 
-     userPermissions.isElevatedMod || 
-     userPermissions.canReport || 
-     userPermissions.canGiveFeedback);
+  const canPerformModActions =
+    !userPermissions.isSuspendedMod &&
+    (userPermissions.isChannelOwner ||
+      userPermissions.isElevatedMod ||
+      userPermissions.canReport ||
+      userPermissions.canGiveFeedback);
 
   // Show mod actions if user has any mod permissions and isn't the discussion creator
   if (isLoggedIn && canPerformModActions && !isOwnDiscussion) {
@@ -156,7 +163,7 @@ export const getDiscussionHeaderMenuItems = (params: {
 /**
  * Determines which actions should be available in the event header menu
  * based on user permissions and the event state
- * 
+ *
  * @param params - Parameters to determine which menu items to show:
  *   - isOwnEvent - Whether the current user is the author of the event
  *   - isArchived - Whether the event is archived
@@ -176,16 +183,16 @@ export const getEventHeaderMenuItems = (params: {
   eventId: string;
   isOnFeedbackPage?: boolean;
 }): MenuItem[] => {
-  const { 
-    isOwnEvent, 
-    isArchived, 
-    isCanceled, 
-    userPermissions, 
-    isLoggedIn, 
+  const {
+    isOwnEvent,
+    isArchived,
+    isCanceled,
+    userPermissions,
+    isLoggedIn,
     eventId,
-    isOnFeedbackPage = false
+    isOnFeedbackPage = false,
   } = params;
-  
+
   // Debug log to see the permissions before making menu decisions
   console.log("EVENT HEADER MENU PERMISSIONS:", {
     canHideEvent: userPermissions?.canHideEvent,
@@ -194,9 +201,9 @@ export const getEventHeaderMenuItems = (params: {
     canGiveFeedback: userPermissions?.canGiveFeedback,
     isOwnEvent,
     isArchived,
-    isCanceled
+    isCanceled,
   });
-  
+
   let menuItems: MenuItem[] = [];
 
   // Base menu items that don't depend on being on the feedback page
@@ -234,7 +241,7 @@ export const getEventHeaderMenuItems = (params: {
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
-    
+
     // Only show Cancel option if event is not already canceled
     if (!isCanceled) {
       menuItems.push({
@@ -247,12 +254,12 @@ export const getEventHeaderMenuItems = (params: {
 
   // Check if the user has any moderation permission (standard mod or above)
   // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions = 
-    !userPermissions.isSuspendedMod && 
-    (userPermissions.isChannelOwner || 
-     userPermissions.isElevatedMod || 
-     userPermissions.canReport || 
-     userPermissions.canGiveFeedback);
+  const canPerformModActions =
+    !userPermissions.isSuspendedMod &&
+    (userPermissions.isChannelOwner ||
+      userPermissions.isElevatedMod ||
+      userPermissions.canReport ||
+      userPermissions.canGiveFeedback);
 
   // Show mod actions if user has any mod permissions and isn't the event creator
   if (isLoggedIn && canPerformModActions && !isOwnEvent) {
@@ -323,7 +330,7 @@ export const getEventHeaderMenuItems = (params: {
 /**
  * Determines the admin/mod status labels for a comment header
  * Based on the user roles embedded in the comment data
- * 
+ *
  * @param params - Parameters to determine the admin/mod status:
  *   - author - The comment author data
  * @returns Object with isAdmin and isMod booleans
@@ -332,25 +339,25 @@ export const getCommentAuthorStatus = (params: {
   author: any; // Using 'any' here because of the complex union type in the original component
 }): { isAdmin: boolean; isMod: boolean } => {
   const { author } = params;
-  
+
   if (!author) {
     return { isAdmin: false, isMod: false };
   }
-  
+
   let isAdmin = false;
   let isMod = false;
-  
+
   if (author.__typename === "User") {
     // Check admin status from ServerRoles
     if (author.ServerRoles && author.ServerRoles.length > 0) {
       isAdmin = !!author.ServerRoles[0].showAdminTag;
     }
-    
+
     // Check mod status from ChannelRoles
     if (author.ChannelRoles && author.ChannelRoles.length > 0) {
       isMod = !!author.ChannelRoles[0].showModTag;
     }
   }
-  
+
   return { isAdmin, isMod };
 };

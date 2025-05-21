@@ -1,39 +1,26 @@
-
 <script lang="ts">
-import { defineComponent } from "vue";
+  import { defineComponent } from "vue";
 
-export default defineComponent({
-  props: {
-    active: {
-      type: Boolean,
-      default: false,
+  export default defineComponent({
+    props: {
+      active: {
+        type: Boolean,
+        default: false,
+      },
+      text: {
+        type: String,
+        required: true,
+      },
     },
-    text: {
-      type: String,
-      required: true,
-    },
-  },
-  setup() {},
-});
+    setup() {},
+  });
 </script>
 
 <template>
   <button
+    class="hover:bg-gray-50 flex inline-flex rounded-full border px-3.5 py-2 text-xs font-medium text-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+    :class="[active ? 'border-blue-500 ring-1 ring-blue-500' : '']"
     type="button"
-    :class="[active ? 'ring-1 ring-blue-500 border-blue-500' : '']"
-    class="
-      flex inline-flex
-      px-3.5
-      py-2
-      border
-      text-xs
-      font-medium
-      rounded-full
-      text-gray-700
-       
-      hover:bg-gray-50
-      focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-    "
     @keydown.enter.prevent
   >
     <slot />

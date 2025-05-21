@@ -1,21 +1,24 @@
 <script lang="ts" setup>
-import InfoIcon from "@/components/icons/InfoIcon.vue";
-import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+  import InfoIcon from "@/components/icons/InfoIcon.vue";
+  import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
-defineProps({
-  testId: {
-    type: String,
-    default: "",
-  },
-  text: {
-    type: String,
-    required: true,
-  },
-});
+  defineProps({
+    testId: {
+      type: String,
+      default: "",
+    },
+    text: {
+      type: String,
+      required: true,
+    },
+  });
 </script>
 
 <template>
-  <div :data-testid="testId" class="rounded-md bg-blue-100 dark:bg-blue-900 p-4 dark:text-white">
+  <div
+    class="rounded-md bg-blue-100 p-4 dark:bg-blue-900 dark:text-white"
+    :data-testid="testId"
+  >
     <div class="flex">
       <div class="shrink-0">
         <slot>
@@ -29,9 +32,8 @@ defineProps({
   </div>
 </template>
 
-
 <style scoped>
-.text-wrap {
-  overflow-wrap: break-word;
-}
+  .text-wrap {
+    overflow-wrap: break-word;
+  }
 </style>

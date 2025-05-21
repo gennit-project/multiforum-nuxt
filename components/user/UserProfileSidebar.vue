@@ -1,69 +1,71 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import "md-editor-v3/lib/style.css";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { relativeTime } from "@/utils";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import { useRoute } from "nuxt/app";
-import { usernameVar, profilePicURLVar } from "@/cache";
+  import { computed } from "vue";
+  import { useQuery } from "@vue/apollo-composable";
+  import "md-editor-v3/lib/style.css";
+  import { GET_USER } from "@/graphQLData/user/queries";
+  import { relativeTime } from "@/utils";
+  import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import { useRoute } from "nuxt/app";
+  import { usernameVar, profilePicURLVar } from "@/cache";
 
-// Define props
-defineProps({
-  isAdmin: {
-    type: Boolean,
-    default: false,
-  },
-});
+  // Define props
+  defineProps({
+    isAdmin: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
-const route = useRoute();
+  const route = useRoute();
 
-const username = computed(() => {
-  if (typeof route.params.username === "string") {
-    return route.params.username;
-  }
-  return "";
-});
+  const username = computed(() => {
+    if (typeof route.params.username === "string") {
+      return route.params.username;
+    }
+    return "";
+  });
 
-// Fetch the user data
-const {
-  result,
-  loading: getUserLoading,
-  error: getUserError,
-} = useQuery(GET_USER, () => ({
-  username: username.value,
-}),{
-  enabled: !!usernameVar.value,
-});
+  // Fetch the user data
+  const {
+    result,
+    loading: getUserLoading,
+    error: getUserError,
+  } = useQuery(
+    GET_USER,
+    () => ({
+      username: username.value,
+    }),
+    {
+      enabled: !!usernameVar.value,
+    }
+  );
 
-const user = computed(() => {
-  if (getUserLoading.value || getUserError.value) {
-    return null;
-  }
-  return result.value?.users[0] || null;
-});
+  const user = computed(() => {
+    if (getUserLoading.value || getUserError.value) {
+      return null;
+    }
+    return result.value?.users[0] || null;
+  });
 
-// Use a computed property that prioritizes our global reactive state for profilePicURL
-const profilePic = computed(() => {
-  // For the current user viewing their own profile, use the reactive state variable
-  if (username.value === usernameVar.value && profilePicURLVar.value) {
-    return profilePicURLVar.value;
-  }
-  // Otherwise use the profile pic from query result
-  return user.value?.profilePicURL;
-});
-
-
+  // Use a computed property that prioritizes our global reactive state for profilePicURL
+  const profilePic = computed(() => {
+    // For the current user viewing their own profile, use the reactive state variable
+    if (username.value === usernameVar.value && profilePicURLVar.value) {
+      return profilePicURLVar.value;
+    }
+    // Otherwise use the profile pic from query result
+    return user.value?.profilePicURL;
+  });
 </script>
 
 <template>
   <div class="rounded-lg">
-    <div class="p-4 flex flex-col gap-2">
+    <div class="flex flex-col gap-2 p-4">
       <AvatarComponent
-        class="flex-1 max-w-72"
+        class="max-w-72 flex-1"
+        :is-square="false"
         :src="profilePic"
         :text="username"
-        :is-square="false"
       />
       <h1
         v-if="username && !user?.displayName"
@@ -72,8 +74,9 @@ const profilePic = computed(() => {
         {{ username }}
         <span
           v-if="isAdmin"
-          class="text-xs text-blue-500 px-2 py-1 border border-blue-500 rounded-md"
-        >Admin</span>
+          class="rounded-md border border-blue-500 px-2 py-1 text-xs text-blue-500"
+          >Admin</span
+        >
       </h1>
       <h1
         v-if="user?.displayName"
@@ -81,7 +84,10 @@ const profilePic = computed(() => {
       >
         {{ user.displayName }}
       </h1>
-      <span v-if="user?.displayName" class="text-gray-600 dark:text-gray-400">
+      <span
+        v-if="user?.displayName"
+        class="text-gray-600 dark:text-gray-400"
+      >
         {{ `u/${username}` }}
       </span>
 
@@ -95,12 +101,18 @@ const profilePic = computed(() => {
           />
         </div>
         <slot />
-        <div v-if="user && username" class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden">
+        <div
+          v-if="user && username"
+          class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden"
+        >
           {{ `Joined ${relativeTime(user.createdAt)}` }}
         </div>
       </div>
 
-      <ul v-if="user" class="m-4 list-disc">
+      <ul
+        v-if="user"
+        class="m-4 list-disc"
+      >
         <li>{{ `${user.commentKarma ?? 0} comment karma` }}</li>
         <li>{{ `${user.discussionKarma ?? 0} discussion karma` }}</li>
       </ul>
@@ -110,7 +122,10 @@ const profilePic = computed(() => {
   <div class="w-full">
     <p v-if="getUserLoading">Loading...</p>
     <div v-else-if="getUserError">
-      <div v-for="(error, i) of getUserError?.graphQLErrors" :key="i">
+      <div
+        v-for="(error, i) of getUserError?.graphQLErrors"
+        :key="i"
+      >
         {{ error.message }}
       </div>
     </div>
@@ -118,17 +133,17 @@ const profilePic = computed(() => {
 </template>
 
 <style lang="scss" scoped>
-@media (prefers-color-scheme: dark) {
-  #md-editor-v3-preview,
-  #md-editor-v3-preview-wrapper {
-    background-color: black;
+  @media (prefers-color-scheme: dark) {
+    #md-editor-v3-preview,
+    #md-editor-v3-preview-wrapper {
+      background-color: black;
+    }
   }
-}
 
-@media (prefers-color-scheme: light) {
-  #md-editor-v3-preview,
-  #md-editor-v3-preview-wrapper {
-    background-color: blue;
+  @media (prefers-color-scheme: light) {
+    #md-editor-v3-preview,
+    #md-editor-v3-preview-wrapper {
+      background-color: blue;
+    }
   }
-}
 </style>

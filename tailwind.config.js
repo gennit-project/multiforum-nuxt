@@ -178,12 +178,12 @@ module.exports = {
   },
   plugins: [require("@tailwindcss/forms"), require("@tailwindcss/typography")],
   safelist: [
-    'border',
-    'border-gray-400',
-    'border-blue-500',
-    'border-blue-600',
-    'border-blue-700',
-    'rounded-md',
-    'rounded-lg'
+    "border",
+    "border-gray-400",
+    "border-blue-500",
+    "border-blue-600",
+    "border-blue-700",
+    "rounded-md",
+    "rounded-lg",
   ],
 };

@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import type { ModerationAction } from "@/__generated__/graphql";
-import ActivityFeedListItem from "./ActivityFeedListItem.vue";
+  import { computed } from "vue";
+  import type { ModerationAction } from "@/__generated__/graphql";
+  import ActivityFeedListItem from "./ActivityFeedListItem.vue";
 
-const props = defineProps<{
-  feedItems: ModerationAction[];
-  originalUserAuthorUsername: string;
-  originalModAuthorName: string;
-}>();
+  const props = defineProps<{
+    feedItems: ModerationAction[];
+    originalUserAuthorUsername: string;
+    originalModAuthorName: string;
+  }>();
 
-const reversedFeedItems = computed(() => {
-  return props.feedItems.slice().reverse();
-});
+  const reversedFeedItems = computed(() => {
+    return props.feedItems.slice().reverse();
+  });
 </script>
 
 <template>
@@ -22,7 +22,10 @@ const reversedFeedItems = computed(() => {
         v-for="activityItem in reversedFeedItems"
         :key="activityItem.id"
         :activity-item="activityItem"
-        :is-original-poster="activityItem.User?.username === originalUserAuthorUsername || activityItem.ModerationProfile?.displayName === originalModAuthorName"
+        :is-original-poster="
+          activityItem.User?.username === originalUserAuthorUsername ||
+          activityItem.ModerationProfile?.displayName === originalModAuthorName
+        "
       />
     </ul>
   </div>

@@ -1,42 +1,45 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import type { Channel } from "@/__generated__/graphql";
-import ChannelListItem from "@/components/channel/ChannelListItem.vue";
-import LoadMore from "@/components/LoadMore.vue";
+  import type { PropType } from "vue";
+  import type { Channel } from "@/__generated__/graphql";
+  import ChannelListItem from "@/components/channel/ChannelListItem.vue";
+  import LoadMore from "@/components/LoadMore.vue";
 
-// Define props
-defineProps({
-  channels: {
-    type: Array as PropType<Array<Channel>>,
-    default: () => [],
-  },
-  resultCount: {
-    type: Number,
-    default: 0,
-  },
-  searchInput: {
-    type: String,
-    default: "",
-  },
-  selectedTags: {
-    type: Array as PropType<Array<string>>,
-    default: () => [],
-  },
-});
+  // Define props
+  defineProps({
+    channels: {
+      type: Array as PropType<Array<Channel>>,
+      default: () => [],
+    },
+    resultCount: {
+      type: Number,
+      default: 0,
+    },
+    searchInput: {
+      type: String,
+      default: "",
+    },
+    selectedTags: {
+      type: Array as PropType<Array<string>>,
+      default: () => [],
+    },
+  });
 
-const emit = defineEmits(["filterByTag", "loadMore"]);
+  const emit = defineEmits(["filterByTag", "loadMore"]);
 
-function filterByTag(tag: string) {
-  emit("filterByTag", tag);
-}
+  function filterByTag(tag: string) {
+    emit("filterByTag", tag);
+  }
 </script>
 
 <template>
   <div>
-    <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
+    <p
+      v-if="channels.length === 0"
+      class="mt-2 text-sm font-normal dark:text-white"
+    >
       There are no results.
     </p>
-    <div class="columns-1 sm:columns-2 lg:columns-3 gap-4">
+    <div class="columns-1 gap-4 sm:columns-2 lg:columns-3">
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"
@@ -56,5 +59,4 @@ function filterByTag(tag: string) {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

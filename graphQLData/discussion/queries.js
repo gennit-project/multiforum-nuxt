@@ -159,10 +159,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
 export const IS_DISCUSSION_ANSWERED = gql`
   query isDiscussionAnswered($channelUniqueName: String!, $discussionId: ID!) {
     discussionChannels(
-      where: {
-        channelUniqueName: $channelUniqueName
-        discussionId: $discussionId
-      }
+      where: { channelUniqueName: $channelUniqueName, discussionId: $discussionId }
     ) {
       id
       discussionId
@@ -180,11 +177,7 @@ export const IS_DISCUSSION_ANSWERED = gql`
 
 export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
-  query getDiscussion(
-    $id: ID!
-    $loggedInModName: String
-    $channelUniqueName: String!
-  ) {
+  query getDiscussion($id: ID!, $loggedInModName: String, $channelUniqueName: String!) {
     discussions(where: { id: $id }) {
       id
       title
@@ -251,12 +244,7 @@ export const GET_DISCUSSION = gql`
 `;
 
 export const GET_DISCUSSION_FEEDBACK = gql`
-  query getDiscussionFeedback(
-    $id: ID!
-    $limit: Int
-    $offset: Int
-    $loggedInModName: String!
-  ) {
+  query getDiscussionFeedback($id: ID!, $limit: Int, $offset: Int, $loggedInModName: String!) {
     discussions(where: { id: $id }) {
       id
       title
@@ -316,9 +304,7 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
     comments(
       where: {
         GivesFeedbackOnDiscussion: { id: $discussionId }
-        CommentAuthorConnection: {
-          ModerationProfile: { node: { displayName: $modName } }
-        }
+        CommentAuthorConnection: { ModerationProfile: { node: { displayName: $modName } } }
       }
     ) {
       id

@@ -1,13 +1,13 @@
 <script lang="ts">
-import { defineComponent } from 'vue'
+  import { defineComponent } from "vue";
 
-export default defineComponent({
+  export default defineComponent({
     name: "TableComponent",
-    setup(){}
-})
+    setup() {},
+  });
 </script>
 <template>
-  <table class="table-auto min-w-full divide-y divide-gray-200">
+  <table class="min-w-full table-auto divide-y divide-gray-200">
     <thead class="bg-gray-50">
       <slot name="head" />
     </thead>

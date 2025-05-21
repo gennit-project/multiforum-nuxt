@@ -1,58 +1,55 @@
 <script lang="ts">
-import { defineComponent } from "vue";
-import GenericModal from "@/components/GenericModal.vue";
-import FlagIcon from "@/components/icons/FlagIcon.vue";
-import TextEditor from "@/components/TextEditor.vue";
+  import { defineComponent } from "vue";
+  import GenericModal from "@/components/GenericModal.vue";
+  import FlagIcon from "@/components/icons/FlagIcon.vue";
+  import TextEditor from "@/components/TextEditor.vue";
 
-export default defineComponent({
-  name: "ReportEventModal",
-  components: {
-    GenericModal,
-    FlagIcon,
-    TextEditor,
-  },
-  props: {
-    body: {
-      type: String,
-      require: true,
-      default: "",
+  export default defineComponent({
+    name: "ReportEventModal",
+    components: {
+      GenericModal,
+      FlagIcon,
+      TextEditor,
     },
-    open: {
-      type: Boolean,
-      default: false,
+    props: {
+      body: {
+        type: String,
+        require: true,
+        default: "",
+      },
+      open: {
+        type: Boolean,
+        default: false,
+      },
     },
-  },
-  setup() {},
-  methods: {
-    updateFeedback() {
-    
-      
+    setup() {},
+    methods: {
+      updateFeedback() {},
     },
-  },
-});
+  });
 </script>
 <template>
   <GenericModal
-    :highlight-color="'red'"
-    :title="'Report Event'"
     :body="'Why should this event be removed? Please be specific about any rule violations.'"
+    :highlight-color="'red'"
     :open="open"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
+    :title="'Report Event'"
   >
     <template #icon>
       <FlagIcon
-        class="h-6 w-6 text-red-600 opacity-100"
         aria-hidden="true"
+        class="h-6 w-6 text-red-600 opacity-100"
       />
     </template>
     <template #content>
       <TextEditor
-        :test-id="'event-report-input'"
+        :allow-image-upload="false"
+        :disable-auto-focus="false"
         :initial-value="''"
         :placeholder="'Explain why this event should be removed'"
-        :disable-auto-focus="false"
-        :allow-image-upload="false"
+        :test-id="'event-report-input'"
         @update="updateFeedback"
       />
     </template>

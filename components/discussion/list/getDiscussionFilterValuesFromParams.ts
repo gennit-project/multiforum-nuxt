@@ -6,7 +6,7 @@ type GetFilterValuesInput = {
 };
 
 export const getFilterValuesFromParams = function (
-  input: GetFilterValuesInput,
+  input: GetFilterValuesInput
 ): SearchDiscussionValues {
   // Need to re-clean data when route values change
   // Take the default filter values from the query
@@ -69,4 +69,3 @@ export const getFilterValuesFromParams = function (
   };
   return filterValues;
 };
-

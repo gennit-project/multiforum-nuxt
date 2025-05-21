@@ -1,26 +1,41 @@
 <template>
   <div>
     <!-- Missing alt attribute on image -->
-    <img src="/logo.png" alt="Logo image">
-    
+    <img
+      alt="Logo image"
+      src="/logo.png"
+    />
+
     <!-- Missing form label -->
     <label for="test-input">Test input</label>
-    <input id="test-input" type="text">
-    
+    <input
+      id="test-input"
+      type="text"
+    />
+
     <!-- Incorrect ARIA attribute -->
     <div id="missing-id">Label</div>
     <div aria-labelledby="missing-id">Correctly labeled attribute</div>
-    
+
     <!-- Element with click handler and keyboard event -->
-    <div tabindex="0" @click="doSomething" @keyup.enter="doSomething">Click me</div>
-    
+    <div
+      tabindex="0"
+      @click="doSomething"
+      @keyup.enter="doSomething"
+    >
+      Click me
+    </div>
+
     <!-- Empty link with label -->
-    <a href="#" aria-label="Empty link" />
+    <a
+      aria-label="Empty link"
+      href="#"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-const doSomething = () => {
-  console.log('clicked')
-}
+  const doSomething = () => {
+    console.log("clicked");
+  };
 </script>

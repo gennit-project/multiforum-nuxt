@@ -37,7 +37,7 @@ export const sideNavIsOpenVar = ref(false);
 export const setSideNavIsOpenVar = (status: boolean) => {
   // Necessary to prevent a bug in which the event list
   // event listeners interfere with navigation to the links
-  // in the side nav. This state is used to turn off the 
+  // in the side nav. This state is used to turn off the
   // event listeners in the event list when the side nav is open.
   sideNavIsOpenVar.value = status;
 };
@@ -54,64 +54,64 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       keyFields: ["text"],
     },
     ServerConfig: {
-      keyFields: ["serverName"]
+      keyFields: ["serverName"],
     },
     ModerationProfile: {
       keyFields: ["displayName"],
       merge: true,
       fields: {
         ActivityFeed: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         AuthoredIssues: {
-          merge: (existing = [], incoming) => [...incoming]
-        }
-      }
+          merge: (existing = [], incoming) => [...incoming],
+        },
+      },
     },
     Channel: {
       keyFields: ["uniqueName"],
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Admins: {
-          merge: (existing = [], incoming) => [...incoming]
-        }
-      }
+          merge: (existing = [], incoming) => [...incoming],
+        },
+      },
     },
     Discussion: {
       keyFields: ["id"],
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         DiscussionChannels: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Author: {
-          merge: true
+          merge: true,
         },
         Channel: {
-          merge: true
-        }
-      }
+          merge: true,
+        },
+      },
     },
     Comment: {
       keyFields: ["id"],
       merge: true,
       fields: {
         CommentAuthor: {
-          merge: true
+          merge: true,
         },
         UpvotedByUsers: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         FeedbackComments: {
-          merge: (existing = [], incoming) => [...incoming]
-        }
-      }
+          merge: (existing = [], incoming) => [...incoming],
+        },
+      },
     },
     CommentsAggregate: {
       keyFields: false,
@@ -121,66 +121,66 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         EventChannels: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Channels: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Poster: {
-          merge: true
-        }
-      }
+          merge: true,
+        },
+      },
     },
     DiscussionChannel: {
       merge: true,
       fields: {
         UpvotedByUsers: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Channel: {
-          merge: true
+          merge: true,
         },
         Comments: {
-          merge: (existing = [], incoming) => [...incoming]
-        }
-      }
+          merge: (existing = [], incoming) => [...incoming],
+        },
+      },
     },
     User: {
       keyFields: ["username"],
       merge: true,
       fields: {
         Discussions: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Comments: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         Events: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         UpvotedComments: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         UpvotedDiscussions: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         UpvotedEvents: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         ModProfiles: {
-          merge: (existing = [], incoming) => [...incoming]
+          merge: (existing = [], incoming) => [...incoming],
         },
         ChannelRoles: {
-          merge: (existing = [], incoming) => [...incoming]
-        }
-      }
+          merge: (existing = [], incoming) => [...incoming],
+        },
+      },
     },
     ChannelRole: {
-      merge: true
+      merge: true,
     },
-    Query: {}
-  }
+    Query: {},
+  },
 };

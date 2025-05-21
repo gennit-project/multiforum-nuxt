@@ -1,31 +1,29 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL } from "@/graphQLData/mod/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
+  import { computed } from "vue";
+  import { GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL } from "@/graphQLData/mod/queries";
+  import { useQuery } from "@vue/apollo-composable";
+  import { useRoute } from "nuxt/app";
 
-const route = useRoute();
-const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
-    return route.params.forumId;
-  }
-  return "";
-});
+  const route = useRoute();
+  const forumId = computed(() => {
+    if (typeof route.params.forumId === "string") {
+      return route.params.forumId;
+    }
+    return "";
+  });
 
-const { result, loading, error } = useQuery(
-  GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
-  () => ({
-    channelUniqueName: forumId.value,
-  }),
-  {
-    fetchPolicy: "cache-first",
-  }
-);
-const invites = computed(
-  () => result.value?.channels[0]?.PendingOwnerInvites ?? []
-);
+  const { result, loading, error } = useQuery(
+    GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
+    () => ({
+      channelUniqueName: forumId.value,
+    }),
+    {
+      fetchPolicy: "cache-first",
+    }
+  );
+  const invites = computed(() => result.value?.channels[0]?.PendingOwnerInvites ?? []);
 
-defineEmits(["click-cancel-invite"]);
+  defineEmits(["click-cancel-invite"]);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -33,8 +31,7 @@ defineEmits(["click-cancel-invite"]);
     <div v-else-if="error">Error</div>
     <div
       v-else-if="
-        result?.channels?.length === 0 ||
-        result.channels[0]?.PendingOwnerInvites?.length === 0
+        result?.channels?.length === 0 || result.channels[0]?.PendingOwnerInvites?.length === 0
       "
       class="text-sm"
     >
@@ -47,31 +44,31 @@ defineEmits(["click-cancel-invite"]);
       <div
         v-for="invite in invites"
         :key="invite.username"
-        class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <nuxt-link
+          class="flex items-center font-bold dark:text-white"
           :to="{ name: 'u-username', params: { username: invite.username } }"
-          class="flex items-center dark:text-white font-bold"
         >
           <AvatarComponent
-            :text="invite.username"
-            :src="invite.profilePicURL ?? ''"
             class="mr-2 h-6 w-6"
+            :src="invite.profilePicURL ?? ''"
+            :text="invite.username"
           />
           <UsernameWithTooltip
             v-if="invite.username"
-            :username="invite.username"
-            :src="invite.profilePicURL ?? ''"
-            :display-name="invite.displayName ?? ''"
+            :account-created="invite.createdAt ?? ''"
             :comment-karma="invite.commentKarma ?? 0"
             :discussion-karma="invite.discussionKarma ?? 0"
-            :account-created="invite.createdAt ?? ''"
+            :display-name="invite.displayName ?? ''"
+            :src="invite.profilePicURL ?? ''"
+            :username="invite.username"
           />
         </nuxt-link>
 
         <button
+          class="flex items-center gap-1 rounded border border-blue-500 px-2 py-1 text-blue-500"
           type="button"
-          class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
           @click="$emit('click-cancel-invite', invite.username)"
         >
           Cancel Invite

@@ -1,41 +1,41 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { DateTime } from 'luxon';
-import DatePicker from '@/components/event/form/DatePicker.vue';
-import TimePicker from '@/components/event/form/TimePicker.vue';
+  import { ref, computed } from "vue";
+  import { DateTime } from "luxon";
+  import DatePicker from "@/components/event/form/DatePicker.vue";
+  import TimePicker from "@/components/event/form/TimePicker.vue";
 
-// Props for controlling visibility of pickers
-defineProps({
-  isAllDay: {
-    type: Boolean,
-    default: false
-  },
-  isMultiDay: {
-    type: Boolean,
-    default: false
-  }
-});
+  // Props for controlling visibility of pickers
+  defineProps({
+    isAllDay: {
+      type: Boolean,
+      default: false,
+    },
+    isMultiDay: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
-// Mock data for testing
-const startTime = ref(DateTime.now().toJSDate());
-const endTime = ref(DateTime.now().plus({ hours: 1 }).toJSDate());
+  // Mock data for testing
+  const startTime = ref(DateTime.now().toJSDate());
+  const endTime = ref(DateTime.now().plus({ hours: 1 }).toJSDate());
 
-// Formatted dates for display
-const formattedStartTimeDate = computed(() => {
-  const dateTime = DateTime.fromJSDate(startTime.value);
-  return dateTime.toFormat("yyyy-MM-dd");
-});
+  // Formatted dates for display
+  const formattedStartTimeDate = computed(() => {
+    const dateTime = DateTime.fromJSDate(startTime.value);
+    return dateTime.toFormat("yyyy-MM-dd");
+  });
 
-const formattedEndTimeDate = computed(() => {
-  const dateTime = DateTime.fromJSDate(endTime.value);
-  return dateTime.toFormat("yyyy-MM-dd");
-});
+  const formattedEndTimeDate = computed(() => {
+    const dateTime = DateTime.fromJSDate(endTime.value);
+    return dateTime.toFormat("yyyy-MM-dd");
+  });
 
-// Mock handlers
-const handleStartTimeDateChange = () => {};
-const handleEndTimeDateChange = () => {};
-const handleStartTimeTimeChange = () => {};
-const handleEndTimeTimeChange = () => {};
+  // Mock handlers
+  const handleStartTimeDateChange = () => {};
+  const handleEndTimeDateChange = () => {};
+  const handleStartTimeTimeChange = () => {};
+  const handleEndTimeTimeChange = () => {};
 </script>
 
 <template>
@@ -44,7 +44,7 @@ const handleEndTimeTimeChange = () => {};
     <div class="flex flex-col md:flex-row md:gap-6">
       <!-- Start Time Section -->
       <div class="w-full md:w-1/2">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
+        <label class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
           Start Time
         </label>
         <div class="flex items-center gap-2 dark:text-white">
@@ -54,7 +54,7 @@ const handleEndTimeTimeChange = () => {};
             data-testid="start-date-picker"
             @update="handleStartTimeDateChange"
           />
-          
+
           <!-- Use reusable time picker component -->
           <TimePicker
             v-if="!isAllDay"
@@ -65,10 +65,14 @@ const handleEndTimeTimeChange = () => {};
           />
         </div>
       </div>
-      
+
       <!-- End Time Section -->
-      <div class="w-full md:w-1/2 mt-3 md:mt-0">
-        <label v-if="!isAllDay" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" data-testid="end-time-label">
+      <div class="mt-3 w-full md:mt-0 md:w-1/2">
+        <label
+          v-if="!isAllDay"
+          class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300"
+          data-testid="end-time-label"
+        >
           End Time
         </label>
         <div class="flex items-center gap-2">
@@ -80,7 +84,7 @@ const handleEndTimeTimeChange = () => {};
             data-testid="end-date-picker"
             @update="handleEndTimeDateChange"
           />
-          
+
           <!-- Use reusable time picker component -->
           <TimePicker
             v-if="!isAllDay"

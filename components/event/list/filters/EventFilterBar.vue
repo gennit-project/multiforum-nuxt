@@ -1,330 +1,333 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
-import ChannelIcon from "@/components/icons/ChannelIcon.vue";
-import TagIcon from "@/components/icons/TagIcon.vue";
-import { getTagLabel, getChannelLabel } from "@/utils";
-import SearchBar from "../../../SearchBar.vue";
-import type { DistanceUnit, SearchEventValues } from "@/types/Event";
-import {
-  distanceOptionsForKilometers,
-  distanceOptionsForMiles,
-  MilesOrKm,
-} from "@/components/event/list/filters/eventSearchOptions";
-import LocationFilterTypes from "./locationFilterTypes";
-import FilterIcon from "@/components/icons/FilterIcon.vue";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
-import GenericButton from "@/components/GenericButton.vue";
-import FilterChip from "@/components/FilterChip.vue";
-import SelectCanceled from "./SelectCanceled.vue";
-import SelectFree from "./SelectFree.vue";
-import Popper from "vue3-popper";
-import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
-import SearchableForumList from "@/components/channel/SearchableForumList.vue";
-import SearchableTagList from "@/components/SearchableTagList.vue";
-import { updateFilters } from "@/utils/routerUtils";
-import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
+  import { computed, ref, watch } from "vue";
+  import { useRoute, useRouter } from "nuxt/app";
+  import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
+  import ChannelIcon from "@/components/icons/ChannelIcon.vue";
+  import TagIcon from "@/components/icons/TagIcon.vue";
+  import { getTagLabel, getChannelLabel } from "@/utils";
+  import SearchBar from "../../../SearchBar.vue";
+  import type { DistanceUnit, SearchEventValues } from "@/types/Event";
+  import {
+    distanceOptionsForKilometers,
+    distanceOptionsForMiles,
+    MilesOrKm,
+  } from "@/components/event/list/filters/eventSearchOptions";
+  import LocationFilterTypes from "./locationFilterTypes";
+  import FilterIcon from "@/components/icons/FilterIcon.vue";
+  import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
+  import GenericButton from "@/components/GenericButton.vue";
+  import FilterChip from "@/components/FilterChip.vue";
+  import SelectCanceled from "./SelectCanceled.vue";
+  import SelectFree from "./SelectFree.vue";
+  import Popper from "vue3-popper";
+  import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
+  import SearchableForumList from "@/components/channel/SearchableForumList.vue";
+  import SearchableTagList from "@/components/SearchableTagList.vue";
+  import { updateFilters } from "@/utils/routerUtils";
+  import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
 
-// Props
-const props = defineProps({
-  allowHidingMainFilters: {
-    type: Boolean,
-    default: false,
-  },
-  showMap: {
-    type: Boolean,
-    default: false,
-  },
-  resultCount: {
-    type: Number,
-    default: 0,
-  },
-  showMainFiltersByDefault: {
-    type: Boolean,
-    default: false,
-  },
-  toggleShowArchivedEnabled: {
-    type: Boolean,
-    default: false,
-  },
-});
+  // Props
+  const props = defineProps({
+    allowHidingMainFilters: {
+      type: Boolean,
+      default: false,
+    },
+    showMap: {
+      type: Boolean,
+      default: false,
+    },
+    resultCount: {
+      type: Number,
+      default: 0,
+    },
+    showMainFiltersByDefault: {
+      type: Boolean,
+      default: false,
+    },
+    toggleShowArchivedEnabled: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
-// Setup function
-const route = useRoute();
-const router = useRouter();
+  // Setup function
+  const route = useRoute();
+  const router = useRouter();
 
-const defaultFilterLabels = {
-  channels: "All Forums",
-  tags: "Tags",
-};
+  const defaultFilterLabels = {
+    channels: "All Forums",
+    tags: "Tags",
+  };
 
-const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
-});
+  const channelId = computed(() => {
+    return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  });
 
-const showOnlineOnly = computed(() => route.name === "SearchEventsList");
-const showInPersonOnly = computed(() => {
-  return route.name &&
-    typeof route.name === "string" &&
-    route.name.includes("map-search")
-    ? true
-    : undefined;
-});
+  const showOnlineOnly = computed(() => route.name === "SearchEventsList");
+  const showInPersonOnly = computed(() => {
+    return route.name && typeof route.name === "string" && route.name.includes("map-search")
+      ? true
+      : undefined;
+  });
 
-const filterValues = ref<SearchEventValues>(
-  getFilterValuesFromParams({
-    route,
-    channelId: channelId.value,
-    showOnlineOnly: showOnlineOnly.value,
-    showInPersonOnly: showInPersonOnly.value,
-  })
-);
-
-const channelLabel = computed(() => {
-  return getChannelLabel(filterValues.value.channels || []);
-});
-
-const tagLabel = computed(() => {
-  return getTagLabel(filterValues.value.tags || []);
-});
-
-const showLocationSearchBarAndDistanceButtons = computed(() => {
-  const path = route.path;
-  return path.includes("map") || channelId.value !== "";
-});
-
-const selectedDistanceUnit = ref(MilesOrKm.MI);
-
-const referencePointName = computed(() => {
-  return filterValues.value.placeName;
-});
-
-const radiusLabel = computed(() => {
-  const distance = filterValues.value.radius;
-  if (filterValues.value.radius === 0) {
-    return "Any distance";
-  }
-  const unit = selectedDistanceUnit.value;
-  if (unit === MilesOrKm.KM) {
-    return `${distance} km`;
-  }
-  return distance ? `${Math.round(distance / 1.609)} mi` : "";
-});
-
-// Watcher to update filters on query change
-watch(
-  () => route.query,
-  () => {
-    filterValues.value = getFilterValuesFromParams({
+  const filterValues = ref<SearchEventValues>(
+    getFilterValuesFromParams({
       route,
       channelId: channelId.value,
       showOnlineOnly: showOnlineOnly.value,
       showInPersonOnly: showInPersonOnly.value,
-    });
-  },
-  { immediate: true }
-);
+    })
+  );
 
-const setSelectedChannels = (channels: string[]) => {
-  updateFilters({
-    router,
-    route,
-    params: { channels },
+  const channelLabel = computed(() => {
+    return getChannelLabel(filterValues.value.channels || []);
   });
-};
 
-const setSelectedTags = (tags: string[]) => {
-  updateFilters({
-    router,
-    route,
-    params: { tags },
+  const tagLabel = computed(() => {
+    return getTagLabel(filterValues.value.tags || []);
   });
-};
 
-const updateSearchInput = (searchInput: string) => {
-  updateFilters({
-    router,
-    route,
-    params: { searchInput },
+  const showLocationSearchBarAndDistanceButtons = computed(() => {
+    const path = route.path;
+    return path.includes("map") || channelId.value !== "";
   });
-};
 
-const updateLocationInput = (placeData: UpdateLocationInput) => {
-  updateFilters({
-    router,
-    route,
-    params: {
-      latitude: placeData.lat,
-      longitude: placeData.lng,
-      placeName: placeData.name,
-      placeAddress: placeData.formatted_address,
+  const selectedDistanceUnit = ref(MilesOrKm.MI);
+
+  const referencePointName = computed(() => {
+    return filterValues.value.placeName;
+  });
+
+  const radiusLabel = computed(() => {
+    const distance = filterValues.value.radius;
+    if (filterValues.value.radius === 0) {
+      return "Any distance";
+    }
+    const unit = selectedDistanceUnit.value;
+    if (unit === MilesOrKm.KM) {
+      return `${distance} km`;
+    }
+    return distance ? `${Math.round(distance / 1.609)} mi` : "";
+  });
+
+  // Watcher to update filters on query change
+  watch(
+    () => route.query,
+    () => {
+      filterValues.value = getFilterValuesFromParams({
+        route,
+        channelId: channelId.value,
+        showOnlineOnly: showOnlineOnly.value,
+        showInPersonOnly: showInPersonOnly.value,
+      });
     },
-  });
-};
+    { immediate: true }
+  );
 
-const updateShowCanceled = (showCanceledEvents: boolean) => {
-  if (showCanceledEvents) {
+  const setSelectedChannels = (channels: string[]) => {
     updateFilters({
       router,
       route,
-      params: { showCanceledEvents },
+      params: { channels },
     });
-  } else {
-    updateFilters({
-      router,
-      route,
-      params: { showCanceledEvents: undefined },
-    });
-  }
-};
+  };
 
-const updateShowOnlyFree = (showOnlyFreeEvents: boolean) => {
-  if (showOnlyFreeEvents) {
+  const setSelectedTags = (tags: string[]) => {
     updateFilters({
       router,
       route,
-      params: { showOnlyFreeEvents },
+      params: { tags },
     });
-  } else {
-    updateFilters({
-      router,
-      route,
-      params: { showOnlyFreeEvents: undefined },
-    });
-  }
-};
+  };
 
-const updateSelectedDistance = (distance: DistanceUnit) => {
-  if (distance.value === 0) {
+  const updateSearchInput = (searchInput: string) => {
+    updateFilters({
+      router,
+      route,
+      params: { searchInput },
+    });
+  };
+
+  const updateLocationInput = (placeData: UpdateLocationInput) => {
     updateFilters({
       router,
       route,
       params: {
-        locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS,
-        radius: 0,
+        latitude: placeData.lat,
+        longitude: placeData.lng,
+        placeName: placeData.name,
+        placeAddress: placeData.formatted_address,
       },
     });
-  } else {
-    const d =
-      typeof distance.value === "string"
-        ? parseInt(distance.value, 10)
-        : distance.value;
+  };
+
+  const updateShowCanceled = (showCanceledEvents: boolean) => {
+    if (showCanceledEvents) {
+      updateFilters({
+        router,
+        route,
+        params: { showCanceledEvents },
+      });
+    } else {
+      updateFilters({
+        router,
+        route,
+        params: { showCanceledEvents: undefined },
+      });
+    }
+  };
+
+  const updateShowOnlyFree = (showOnlyFreeEvents: boolean) => {
+    if (showOnlyFreeEvents) {
+      updateFilters({
+        router,
+        route,
+        params: { showOnlyFreeEvents },
+      });
+    } else {
+      updateFilters({
+        router,
+        route,
+        params: { showOnlyFreeEvents: undefined },
+      });
+    }
+  };
+
+  const updateSelectedDistance = (distance: DistanceUnit) => {
+    if (distance.value === 0) {
+      updateFilters({
+        router,
+        route,
+        params: {
+          locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS,
+          radius: 0,
+        },
+      });
+    } else {
+      const d = typeof distance.value === "string" ? parseInt(distance.value, 10) : distance.value;
+      updateFilters({
+        route,
+        router,
+        params: { radius: d },
+      });
+    }
+  };
+
+  const showMainFilters = ref(props.showMainFiltersByDefault);
+
+  const toggleShowMainFilters = () => {
+    showMainFilters.value = !showMainFilters.value;
+  };
+
+  const toggleSelectedChannel = (channel: string) => {
+    if (!filterValues.value.channels) {
+      filterValues.value.channels = [];
+    }
+    const index = filterValues.value.channels.indexOf(channel);
+    if (index === -1) {
+      filterValues.value.channels.push(channel);
+    } else {
+      filterValues.value.channels.splice(index, 1);
+    }
+    setSelectedChannels(filterValues.value.channels);
+  };
+
+  const toggleSelectedTag = (tag: string) => {
+    if (!filterValues.value.tags) {
+      filterValues.value.tags = [];
+    }
+    const index = filterValues.value.tags.indexOf(tag);
+    if (index === -1) {
+      filterValues.value.tags.push(tag);
+    } else {
+      filterValues.value.tags.splice(index, 1);
+    }
+    setSelectedTags(filterValues.value.tags);
+  };
+
+  // Add a ref to track if the forum list is open
+  const forumListOpen = ref(false);
+
+  // Add a method to handle opening/closing
+  const toggleForumList = () => {
+    forumListOpen.value = !forumListOpen.value;
+  };
+
+  type ChannelOption = {
+    uniqueName: string;
+    displayName: string;
+    icon: string;
+    description: string;
+  };
+  const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
+    {
+      uniqueName: "free_events",
+      displayName: "Free Events",
+      icon: "",
+      description: "",
+    },
+    {
+      uniqueName: "family_friendly_events",
+      displayName: "Family Friendly Events",
+      icon: "",
+      description: "",
+    },
+    {
+      uniqueName: "phx_concerts",
+      displayName: "Live Music in Phoenix",
+      icon: "",
+      description: "",
+    },
+  ];
+  const updateShowArchived = (event: Event) => {
+    const checkbox = event.target as HTMLInputElement;
     updateFilters({
-      route,
       router,
-      params: { radius: d },
+      route,
+      params: { showArchived: checkbox.checked },
     });
-  }
-};
-
-const showMainFilters = ref(props.showMainFiltersByDefault);
-
-const toggleShowMainFilters = () => {
-  showMainFilters.value = !showMainFilters.value;
-};
-
-const toggleSelectedChannel = (channel: string) => {
-  if (!filterValues.value.channels) {
-    filterValues.value.channels = [];
-  }
-  const index = filterValues.value.channels.indexOf(channel);
-  if (index === -1) {
-    filterValues.value.channels.push(channel);
-  } else {
-    filterValues.value.channels.splice(index, 1);
-  }
-  setSelectedChannels(filterValues.value.channels);
-};
-
-const toggleSelectedTag = (tag: string) => {
-  if (!filterValues.value.tags) {
-    filterValues.value.tags = [];
-  }
-  const index = filterValues.value.tags.indexOf(tag);
-  if (index === -1) {
-    filterValues.value.tags.push(tag);
-  } else {
-    filterValues.value.tags.splice(index, 1);
-  }
-  setSelectedTags(filterValues.value.tags);
-};
-
-// Add a ref to track if the forum list is open
-const forumListOpen = ref(false);
-
-// Add a method to handle opening/closing
-const toggleForumList = () => {
-  forumListOpen.value = !forumListOpen.value;
-};
-
-type ChannelOption = {
-  uniqueName: string;
-  displayName: string;
-  icon: string;
-  description: string;
-};
-const IN_PERSON_FEATURED_FORUMS: ChannelOption[] = [
-  {
-    uniqueName: "free_events",
-    displayName: "Free Events",
-    icon: "",
-    description: "",
-  },
-  {
-    uniqueName: "family_friendly_events",
-    displayName: "Family Friendly Events",
-    icon: "",
-    description: "",
-  },
-  {
-    uniqueName: "phx_concerts",
-    displayName: "Live Music in Phoenix",
-    icon: "",
-    description: "",
-  },
-];
-const updateShowArchived = (event: Event) => {
-  const checkbox = event.target as HTMLInputElement;
-  updateFilters({
-    router,
-    route,
-    params: { showArchived: checkbox.checked },
-  });
-};
+  };
 </script>
 
 <template>
-  <div class="flex-1 flex-col space-y-1 dark:text-white mt-2 mx-4">
-    <div class="flex justify-end mb-2">
-      <CreateAnythingButton v-if="allowHidingMainFilters" class="mx-2" :use-primary-button="true" />
+  <div class="mx-4 mt-2 flex-1 flex-col space-y-1 dark:text-white">
+    <div class="mb-2 flex justify-end">
+      <CreateAnythingButton
+        v-if="allowHidingMainFilters"
+        class="mx-2"
+        :use-primary-button="true"
+      />
       <button
         v-if="allowHidingMainFilters"
-        data-testid="toggle-main-filters-button"
+        class="rounded-md border border-black px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700"
         :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
-        class="border border-black dark:border-gray-500 rounded-md text-xs px-2 py-1 text-gray-800 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+        data-testid="toggle-main-filters-button"
         @click="toggleShowMainFilters"
       >
         {{ showMainFilters ? "Hide filters" : "Show filters" }}
       </button>
     </div>
-    <hr v-if="allowHidingMainFilters" class="mb-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr
+      v-if="allowHidingMainFilters"
+      class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
+    />
     <div
       v-if="showMainFilters"
+      class="flex flex-col gap-2 rounded-lg p-4 dark:bg-gray-800"
       :class="[allowHidingMainFilters ? 'border border-gray-400 dark:border-gray-600' : '']"
-      class="flex flex-col gap-2  dark:bg-gray-800 p-4 rounded-lg"
     >
-      <div v-if="route.name !== 'EventDetail'" class="mb-2 w-full">
-        <div class="flex space-x-1 items-center">
-          <div
-            class="flex space-x-2 justify-center align-items hidden md:block"
-          >
+      <div
+        v-if="route.name !== 'EventDetail'"
+        class="mb-2 w-full"
+      >
+        <div class="flex items-center space-x-1">
+          <div class="align-items flex hidden justify-center space-x-2 md:block">
             <FilterChip
               v-if="!channelId"
               class="items-center align-middle"
               :data-testid="'forum-filter-button'"
-              :label="channelLabel"
               :highlighted="channelLabel !== defaultFilterLabels.channels"
+              :label="channelLabel"
               @click="toggleForumList"
             >
               <template #icon>
@@ -333,14 +336,12 @@ const updateShowArchived = (event: Event) => {
               <template #content>
                 <div
                   v-if="forumListOpen"
-                  class="relative bg-white dark:bg-gray-700 w-96"
+                  class="relative w-96 bg-white dark:bg-gray-700"
                   data-testid="forum-list-dropdown"
                 >
                   <SearchableForumList
+                    :featured-forums="showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : undefined"
                     :selected-channels="filterValues.channels"
-                    :featured-forums="
-                      showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : undefined
-                    "
                     @toggle-selection="toggleSelectedChannel"
                   />
                 </div>
@@ -348,32 +349,28 @@ const updateShowArchived = (event: Event) => {
             </FilterChip>
           </div>
           <SearchBar
-            class="flex-1"
-            :test-id="'event-search-bar'"
-            :initial-value="filterValues.searchInput"
-            :search-placeholder="'Search'"
-            :full-width="true"
-            :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
             :auto-focus="false"
+            class="flex-1"
+            :full-width="true"
+            :initial-value="filterValues.searchInput"
+            :right-side-is-rounded="!showLocationSearchBarAndDistanceButtons"
+            :search-placeholder="'Search'"
+            :test-id="'event-search-bar'"
             @update-search-input="updateSearchInput"
           >
             <client-only>
               <Popper v-if="!showLocationSearchBarAndDistanceButtons">
                 <button
+                  class="absolute inset-y-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
                   data-testid="more-filters-button"
-                  class="absolute inset-y-0 h-10 w-10 right-0 flex rounded-full cursor-pointer items-center justify-center dark:text-white p-2 hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   <FilterIcon class="h-4 w-4 dark:text-white" />
                 </button>
 
                 <template #content>
                   <div
-                    :class="[
-                      allowHidingMainFilters
-                        ? 'rounded-lg border border-gray-500'
-                        : '',
-                    ]"
                     class="flex flex-col gap-3 bg-white p-4 dark:bg-gray-700"
+                    :class="[allowHidingMainFilters ? 'rounded-lg border border-gray-500' : '']"
                   >
                     <div v-if="showLocationSearchBarAndDistanceButtons">
                       <div
@@ -383,19 +380,22 @@ const updateShowArchived = (event: Event) => {
                         <GenericButton
                           v-for="distance in distanceOptionsForKilometers"
                           :key="distance.value"
+                          :active="distance.value === filterValues.radius"
                           :data-testid="`distance-${distance.value}`"
                           :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
-                          :active="distance.value === filterValues.radius"
                           @click="updateSelectedDistance(distance)"
                         />
                       </div>
-                      <div v-else class="flex flex-wrap gap-x-1 gap-y-3">
+                      <div
+                        v-else
+                        class="flex flex-wrap gap-x-1 gap-y-3"
+                      >
                         <GenericButton
                           v-for="distance in distanceOptionsForMiles"
                           :key="distance.value"
+                          :active="distance.value === filterValues.radius"
                           :data-testid="`distance-${distance.value}`"
                           :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
-                          :active="distance.value === filterValues.radius"
                           @click="updateSelectedDistance(distance)"
                         />
                       </div>
@@ -417,23 +417,21 @@ const updateShowArchived = (event: Event) => {
           </SearchBar>
           <LocationSearchBar
             v-if="showLocationSearchBarAndDistanceButtons"
+            :auto-focus="false"
             class="flex-1"
             data-testid="event-drawer-location-search-bar"
-            :reference-point-address-name="referencePointName"
             :left-side-is-rounded="false"
             :radius="radiusLabel"
-            :auto-focus="false"
+            :reference-point-address-name="referencePointName"
             @update-location-input="updateLocationInput"
           >
             <client-only>
               <Popper v-if="showLocationSearchBarAndDistanceButtons">
                 <button
+                  class="absolute inset-y-0 right-2 m-1 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
                   data-testid="more-filters-button"
-                  class="m-1 absolute inset-y-0 right-2 flex rounded-full cursor-pointer items-center justify-center bg-white dark:text-white dark:bg-gray-700 p-2"
                 >
-                  <FilterIcon
-                    class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white"
-                  />
+                  <FilterIcon class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white" />
                 </button>
 
                 <template #content>
@@ -448,19 +446,22 @@ const updateShowArchived = (event: Event) => {
                         <GenericButton
                           v-for="distance in distanceOptionsForKilometers"
                           :key="distance.value"
+                          :active="distance.value === filterValues.radius"
                           :data-testid="`distance-${distance.value}`"
                           :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
-                          :active="distance.value === filterValues.radius"
                           @click="updateSelectedDistance(distance)"
                         />
                       </div>
-                      <div v-else class="flex flex-wrap gap-x-1 gap-y-3">
+                      <div
+                        v-else
+                        class="flex flex-wrap gap-x-1 gap-y-3"
+                      >
                         <GenericButton
                           v-for="distance in distanceOptionsForMiles"
                           :key="distance.value"
+                          :active="distance.value === filterValues.radius"
                           :data-testid="`distance-${distance.value}`"
                           :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
-                          :active="distance.value === filterValues.radius"
                           @click="updateSelectedDistance(distance)"
                         />
                       </div>
@@ -480,14 +481,12 @@ const updateShowArchived = (event: Event) => {
               </Popper>
             </client-only>
           </LocationSearchBar>
-          <div
-            class="flex space-x-2 items-center justify-center hidden md:block"
-          >
+          <div class="flex hidden items-center justify-center space-x-2 md:block">
             <FilterChip
               class="items-center align-middle"
               data-testid="tag-filter-button"
-              :label="tagLabel"
               :highlighted="tagLabel !== defaultFilterLabels.tags"
+              :label="tagLabel"
             >
               <template #icon>
                 <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
@@ -503,29 +502,30 @@ const updateShowArchived = (event: Event) => {
             </FilterChip>
           </div>
         </div>
-        <div class="flex items-center mt-4 md:hidden">
+        <div class="mt-4 flex items-center md:hidden">
           <FilterChip
             v-if="!channelId"
             class="items-center align-middle"
             :data-testid="'forum-filter-button'"
-            :label="channelLabel"
             :highlighted="channelLabel !== defaultFilterLabels.channels"
+            :label="channelLabel"
             @click="toggleForumList"
           >
             <template #icon>
-              <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" aria-hidden="true" />
+              <ChannelIcon
+                aria-hidden="true"
+                class="-ml-0.5 mr-2 h-4 w-4"
+              />
             </template>
             <template #content>
-              <div 
-                v-if="forumListOpen" 
-                class="relative bg-white dark:bg-gray-700 w-80 max-w-screen-sm"
+              <div
+                v-if="forumListOpen"
+                class="relative w-80 max-w-screen-sm bg-white dark:bg-gray-700"
                 data-testid="forum-list-dropdown-mobile"
               >
                 <SearchableForumList
+                  :featured-forums="showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : []"
                   :selected-channels="filterValues.channels"
-                  :featured-forums="
-                    showInPersonOnly ? IN_PERSON_FEATURED_FORUMS : []
-                  "
                   @toggle-selection="toggleSelectedChannel"
                 />
               </div>
@@ -534,8 +534,8 @@ const updateShowArchived = (event: Event) => {
           <FilterChip
             class="items-center align-middle"
             data-testid="tag-filter-button"
-            :label="tagLabel"
             :highlighted="tagLabel !== defaultFilterLabels.tags"
+            :label="tagLabel"
           >
             <template #icon>
               <TagIcon class="-ml-0.5 mr-2 h-4 w-4" />
@@ -557,9 +557,9 @@ const updateShowArchived = (event: Event) => {
         class="flex items-center justify-start gap-2 py-2 dark:text-gray-300"
       >
         <CheckBox
-          data-testid="show-archived-discussions"
-          class="align-middle"
           :checked="filterValues.showArchived"
+          class="align-middle"
+          data-testid="show-archived-discussions"
           @input="updateShowArchived"
         />
         Show archived events
@@ -568,10 +568,10 @@ const updateShowArchived = (event: Event) => {
   </div>
 </template>
 <style>
-.tagpicker {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 10px;
-  max-width: 600px;
-}
+  .tagpicker {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 10px;
+    max-width: 600px;
+  }
 </style>

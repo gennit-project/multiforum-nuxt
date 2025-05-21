@@ -1,12 +1,9 @@
 <script setup lang="ts">
-import {
-  enteredDevelopmentEnvironmentVar,
-  setEnteredDevelopmentEnvironment,
-} from "@/cache";
+  import { enteredDevelopmentEnvironmentVar, setEnteredDevelopmentEnvironment } from "@/cache";
 
-const hideOverlay = () => {
-  setEnteredDevelopmentEnvironment(true);
-};
+  const hideOverlay = () => {
+    setEnteredDevelopmentEnvironment(true);
+  };
 </script>
 
 <template>
@@ -15,13 +12,13 @@ const hideOverlay = () => {
       v-if="!enteredDevelopmentEnvironmentVar"
       class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-90"
     >
-      <div class="text-white text-2xl md:text-4xl font-bold mb-8">
+      <div class="mb-8 text-2xl font-bold text-white md:text-4xl">
         This is a remote development environment
       </div>
       <button
+        class="font-semibold rounded-lg bg-blue-600 px-8 py-3 text-lg text-white transition-colors hover:bg-blue-700"
         type="button"
         @click="hideOverlay"
-        class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-lg font-semibold transition-colors"
       >
         Enter
       </button>
@@ -30,13 +27,13 @@ const hideOverlay = () => {
 </template>
 
 <style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
+  .fade-enter-active,
+  .fade-leave-active {
+    transition: opacity 0.3s ease;
+  }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
+  .fade-enter-from,
+  .fade-leave-to {
+    opacity: 0;
+  }
 </style>

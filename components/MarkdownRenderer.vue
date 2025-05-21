@@ -1,265 +1,278 @@
 <script setup lang="ts">
-/* eslint-disable vue/no-v-html */
-import { computed, ref } from "vue";
-import MarkdownIt from "markdown-it";
-import hljs from "highlight.js";
-import "highlight.js/styles/github-dark.css";
+  /* eslint-disable vue/no-v-html */
+  import { computed, ref } from "vue";
+  import MarkdownIt from "markdown-it";
+  import hljs from "highlight.js";
+  import "highlight.js/styles/github-dark.css";
 
-const slotContainer = ref<HTMLElement | null>(null);
+  const slotContainer = ref<HTMLElement | null>(null);
 
-// Use DOMPurify only in the client environment
-let DOMPurify: typeof import("dompurify");
+  // Use DOMPurify only in the client environment
+  let DOMPurify: typeof import("dompurify");
 
-if (import.meta.client) {
-  DOMPurify = (await import("dompurify")).default;
-}
-
-const props = defineProps({
-  text: {
-    type: String,
-    required: true,
-  },
-  hasSlot: {
-    type: Boolean,
-    default: false
-  },
-  fontSize: {
-    type: String,
-    default: 'medium'
+  if (import.meta.client) {
+    DOMPurify = (await import("dompurify")).default;
   }
-});
 
-const md = new MarkdownIt({
-  highlight: (str, lang): any => {
-    if (lang && hljs.getLanguage(lang)) {
-      try {
-        return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
-      } catch (error) {
-        console.warn("Failed to highlight code block", error);
+  const props = defineProps({
+    text: {
+      type: String,
+      required: true,
+    },
+    hasSlot: {
+      type: Boolean,
+      default: false,
+    },
+    fontSize: {
+      type: String,
+      default: "medium",
+    },
+  });
+
+  const md = new MarkdownIt({
+    highlight: (str, lang): any => {
+      if (lang && hljs.getLanguage(lang)) {
+        try {
+          return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
+        } catch (error) {
+          console.warn("Failed to highlight code block", error);
+        }
       }
+      return `<pre class="hljs p-4 text-xs"><code>${md.utils.escapeHtml(str)}</code></pre>`;
+    },
+  });
+
+  // Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
+  md.renderer.rules.link_open = (tokens: any, idx: number, options: any, env: any, self: any) => {
+    const token = tokens[idx];
+    token.attrPush(["target", "_blank"]);
+    token.attrPush(["rel", "noopener noreferrer"]);
+    token.attrPush(["class", "external-link"]);
+    return self.renderToken(tokens, idx, options);
+  };
+
+  // Add external link icon after the link content
+  md.renderer.rules.link_close = () => {
+    return '</a><span class="external-link-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>';
+  };
+
+  const renderedMarkdown = computed(() => {
+    const rawHTML = md.render(props.text);
+
+    if (import.meta.client && DOMPurify) {
+      // Configure DOMPurify to allow target="_blank" attribute
+      const config = {
+        ADD_ATTR: ["target", "rel"],
+        ADD_TAGS: ["svg", "path", "polyline", "line"],
+      };
+      return DOMPurify.sanitize(rawHTML, config);
     }
-    return `<pre class="hljs p-4 text-xs"><code>${md.utils.escapeHtml(str)}</code></pre>`;
-  },
-});
-
-// Configure renderer to add target="_blank" and rel="noopener noreferrer" to all links
-md.renderer.rules.link_open = (
-  tokens: any,
-  idx: number,
-  options: any,
-  env: any,
-  self: any
-) => {
-  const token = tokens[idx];
-  token.attrPush(["target", "_blank"]);
-  token.attrPush(["rel", "noopener noreferrer"]);
-  token.attrPush(["class", "external-link"]);
-  return self.renderToken(tokens, idx, options);
-};
-
-// Add external link icon after the link content
-md.renderer.rules.link_close = () => {
-  return '</a><span class="external-link-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>';
-};
-
-const renderedMarkdown = computed(() => {
-  const rawHTML = md.render(props.text);
-
-  if (import.meta.client && DOMPurify) {
-    // Configure DOMPurify to allow target="_blank" attribute
-    const config = {
-      ADD_ATTR: ["target", "rel"],
-      ADD_TAGS: ["svg", "path", "polyline", "line"],
-    };
-    return DOMPurify.sanitize(rawHTML, config);
-  }
-  return rawHTML; // Return the raw HTML if on the server
-});
+    return rawHTML; // Return the raw HTML if on the server
+  });
 </script>
 
 <template>
   <div class="markdown-container">
     <!-- Use both classes and inline styles to ensure font size is applied -->
-    <div 
-      ref="slotContainer" 
-      class="markdown-body" 
-      :class="
-        {
-          'font-size-small': props.fontSize === 'small',
-          'font-size-medium': props.fontSize === 'medium',
-          'font-size-large': props.fontSize === 'large',
-        }
-      " 
-      v-html="renderedMarkdown" 
+    <div
+      ref="slotContainer"
+      class="markdown-body"
+      :class="{
+        'font-size-small': props.fontSize === 'small',
+        'font-size-medium': props.fontSize === 'medium',
+        'font-size-large': props.fontSize === 'large',
+      }"
+      v-html="renderedMarkdown"
     />
-    <div v-if="$slots.default" class="inline-slot">
-      <slot/>
+    <div
+      v-if="$slots.default"
+      class="inline-slot"
+    >
+      <slot />
     </div>
   </div>
 </template>
 
 <style lang="scss">
-/* ---------- layout wrappers ---------- */
-.markdown-container {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
+  /* ---------- layout wrappers ---------- */
+  .markdown-container {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
 
+    .markdown-body {
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
+      box-sizing: border-box;
+
+      // allow last paragraph to flow with the slotted element
+      &:last-child > p:last-child {
+        display: inline;
+        margin-right: 6px;
+      }
+    }
+
+    .inline-slot {
+      display: inline-flex;
+      align-items: center;
+      margin-left: 8px;
+      align-self: baseline;
+
+      // tweak button alignment with text
+      button {
+        margin-top: -4px;
+      }
+    }
+  }
+
+  /* ---------- markdown styles ---------- */
   .markdown-body {
     word-wrap: break-word;
     overflow-wrap: break-word;
-    max-width: 100%;
-    box-sizing: border-box;
+    width: 100%;
 
-    // allow last paragraph to flow with the slotted element
-    &:last-child > p:last-child {
-      display: inline;
-      margin-right: 6px;
+    /* ── font‑size variants ─────────────────────────────── */
+    &.font-size-small {
+      h1 {
+        font-size: 1rem !important;
+      }
+      h2 {
+        font-size: 0.9rem !important;
+      }
+      p,
+      li {
+        font-size: 0.8rem !important;
+      }
+    }
+
+    &.font-size-medium {
+      h1 {
+        font-size: 1.1rem !important;
+      }
+      h2 {
+        font-size: 1rem !important;
+      }
+      p,
+      li {
+        font-size: 0.9rem !important;
+      }
+    }
+
+    &.font-size-large {
+      h1 {
+        font-size: 1.4rem !important;
+      }
+      h2 {
+        font-size: 1.3rem !important;
+      }
+      p,
+      li {
+        font-size: 1.1rem !important;
+      }
+    }
+
+    /* ── general typography & elements ───────────────────── */
+    h1,
+    h2 {
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      margin-top: 1.5rem !important;
+      margin-bottom: 1rem !important;
+    }
+
+    p {
+      margin-bottom: 1rem !important;
+      margin-top: 0.25rem !important;
+    }
+
+    ul,
+    ol {
+      list-style-type: disc !important;
+      margin-left: 1rem !important;
+      margin-bottom: 0.5rem !important;
+    }
+
+    pre {
+      border-radius: 5px;
+      overflow-x: auto; // keep horizontal scroll for code blocks
+      padding-bottom: 0.25rem !important;
+      max-width: 100%;
+      white-space: pre-wrap;
+    }
+
+    code {
+      border-radius: 5px;
+      padding-bottom: 0.25rem !important;
+      max-width: 100%;
+      overflow-wrap: break-word;
+      white-space: pre-wrap;
+    }
+
+    a {
+      color: #3182ce !important;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      max-width: 100%;
+      word-break: break-all;
+      display: inline-block;
+    }
+
+    img {
+      margin-top: 1rem !important;
+      max-height: 350px !important;
+      max-width: 100% !important;
+      height: auto !important;
+      width: auto !important;
+      object-fit: contain !important;
+      cursor: pointer !important;
+      display: block !important;
+      word-wrap: break-word !important;
+    }
+
+    blockquote {
+      border-left: 4px solid #3182ce;
+      padding-left: 16px;
+      margin: 16px 0;
+      font-style: italic;
+      color: #555;
+
+      .dark & {
+        border-left-color: #63b3ed;
+        color: #ccc;
+      }
+    }
+
+    /* ── external‑link helper ───────────────────────────── */
+    .external-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .external-link-icon {
+      color: #3182ce !important;
+      display: inline-flex;
+      align-items: center;
+      margin-left: 4px;
+      opacity: 0.6;
+
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+
+    /* ── theme hack for code‑theme background ───────────── */
+    .dark {
+      background-color: transparent;
     }
   }
-
-  .inline-slot {
-    display: inline-flex;
-    align-items: center;
-    margin-left: 8px;
-    align-self: baseline;
-
-    // tweak button alignment with text
-    button {
-      margin-top: -4px;
-    }
-  }
-}
-
-/* ---------- markdown styles ---------- */
-.markdown-body {
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  width: 100%;
-
-  /* ── font‑size variants ─────────────────────────────── */
-  &.font-size-small {
-    h1 { font-size: 1rem !important; }
-    h2 { font-size: 0.9rem !important; }
-    p,
-    li { font-size: 0.8rem !important; }
-  }
-
-  &.font-size-medium {
-    h1 { font-size: 1.1rem !important; }
-    h2 { font-size: 1.0rem !important; }
-    p,
-    li { font-size: 0.9rem !important; }
-  }
-
-  &.font-size-large {
-    h1 { font-size: 1.4rem !important; }
-    h2 { font-size: 1.3rem !important; }
-    p,
-    li { font-size: 1.1rem !important; }
-  }
-
-  /* ── general typography & elements ───────────────────── */
-  h1,
-  h2 {
-    font-size: 1rem !important;
-    font-weight: 600 !important;
-    margin-top: 1.5rem !important;
-    margin-bottom: 1rem !important;
-  }
-
-  p {
-    margin-bottom: 1rem !important;
-    margin-top: 0.25rem !important;
-  }
-
-  ul,
-  ol {
-    list-style-type: disc !important;
-    margin-left: 1rem !important;
-    margin-bottom: 0.5rem !important;
-  }
-
-  pre {
-    border-radius: 5px;
-    overflow-x: auto;          // keep horizontal scroll for code blocks
-    padding-bottom: 0.25rem !important;
-    max-width: 100%;
-    white-space: pre-wrap;
-  }
-
-  code {
-    border-radius: 5px;
-    padding-bottom: 0.25rem !important;
-    max-width: 100%;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-  }
-
-  a {
-    color: #3182ce !important;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    max-width: 100%;
-    word-break: break-all;
-    display: inline-block;
-  }
-
-  img {
-    margin-top: 1rem !important;
-    max-height: 350px !important;
-    max-width: 100% !important;
-    height: auto !important;
-    width: auto !important;
-    object-fit: contain !important;
-    cursor: pointer !important;
-    display: block !important;
-    word-wrap: break-word !important;
-  }
-
-  blockquote {
-    border-left: 4px solid #3182ce;
-    padding-left: 16px;
-    margin: 16px 0;
-    font-style: italic;
-    color: #555;
-
-    .dark & {
-      border-left-color: #63b3ed;
-      color: #ccc;
-    }
-  }
-
-  /* ── external‑link helper ───────────────────────────── */
-  .external-link {
-    display: inline-flex;
-    align-items: center;
-    text-decoration: none;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .external-link-icon {
-    color: #3182ce !important;
-    display: inline-flex;
-    align-items: center;
-    margin-left: 4px;
-    opacity: 0.6;
-
-    svg {
-      width: 14px;
-      height: 14px;
-    }
-  }
-
-  /* ── theme hack for code‑theme background ───────────── */
-  .dark {
-    background-color: transparent;
-  }
-}
 </style>

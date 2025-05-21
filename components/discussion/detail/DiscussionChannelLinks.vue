@@ -1,81 +1,78 @@
 <script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent, computed } from "vue";
-import DiscussionChannelLink from "./DiscussionChannelLink.vue";
-import { useRoute } from "nuxt/app";
-import type { DiscussionChannel } from "@/__generated__/graphql";
+  import type { PropType } from "vue";
+  import { defineComponent, computed } from "vue";
+  import DiscussionChannelLink from "./DiscussionChannelLink.vue";
+  import { useRoute } from "nuxt/app";
+  import type { DiscussionChannel } from "@/__generated__/graphql";
 
-export default defineComponent({
-  name: "DiscussionChannelLinks",
-  components: {
-    DiscussionChannelLink,
-  },
-  props: {
-    channelId: {
-      type: String,
-      required: false,
-      default: ''
+  export default defineComponent({
+    name: "DiscussionChannelLinks",
+    components: {
+      DiscussionChannelLink,
     },
-    discussionChannels: {
-      type: Array as PropType<Array<DiscussionChannel>>,
-      required: true,
+    props: {
+      channelId: {
+        type: String,
+        required: false,
+        default: "",
+      },
+      discussionChannels: {
+        type: Array as PropType<Array<DiscussionChannel>>,
+        required: true,
+      },
     },
-  },
-  setup(props) {
-    const route = useRoute();
+    setup(props) {
+      const route = useRoute();
 
-    const getCommentCount = (channelId: string) => {
-      const discussionChannels = props.discussionChannels;
+      const getCommentCount = (channelId: string) => {
+        const discussionChannels = props.discussionChannels;
 
-      const activeDiscussionChannel = discussionChannels.find((cs: any) => {
-        return cs.Channel?.uniqueName === channelId;
-      });
+        const activeDiscussionChannel = discussionChannels.find((cs: any) => {
+          return cs.Channel?.uniqueName === channelId;
+        });
 
-      if (!activeDiscussionChannel) {
-        return 0;
-      }
-      return activeDiscussionChannel.CommentsAggregate?.count
-        ? activeDiscussionChannel.CommentsAggregate.count
-        : 0;
-    };
+        if (!activeDiscussionChannel) {
+          return 0;
+        }
+        return activeDiscussionChannel.CommentsAggregate?.count
+          ? activeDiscussionChannel.CommentsAggregate.count
+          : 0;
+      };
 
-    const getVoteCount = (channelId: string) => {
-      const discussionChannels = props.discussionChannels;
+      const getVoteCount = (channelId: string) => {
+        const discussionChannels = props.discussionChannels;
 
-      const activeDiscussionChannel = discussionChannels.find(
-        (dc: DiscussionChannel) => {
+        const activeDiscussionChannel = discussionChannels.find((dc: DiscussionChannel) => {
           return dc.channelUniqueName === channelId;
-        },
-      );
+        });
 
-      if (!activeDiscussionChannel || !activeDiscussionChannel.UpvotedByUsersAggregate?.count) {
-        return 0;
-      }
-      return activeDiscussionChannel.UpvotedByUsersAggregate.count;
-    };
+        if (!activeDiscussionChannel || !activeDiscussionChannel.UpvotedByUsersAggregate?.count) {
+          return 0;
+        }
+        return activeDiscussionChannel.UpvotedByUsersAggregate.count;
+      };
 
-    const activeDiscussionChannel = computed(() => {
-      return props.discussionChannels.filter((dc) => {
-            return  dc.channelUniqueName === props.channelId;
-          })[0]
-    })
-
-    const channelsExceptActive = computed(() => {
-      return props.discussionChannels.filter((dc) => {
-        return dc.channelUniqueName !== props.channelId;
+      const activeDiscussionChannel = computed(() => {
+        return props.discussionChannels.filter((dc) => {
+          return dc.channelUniqueName === props.channelId;
+        })[0];
       });
-    });
 
-    
-    return {
-      activeDiscussionChannel,
-      channelsExceptActive,
-      route,
-      getCommentCount,
-      getVoteCount
-    };
-  },
-});
+      const channelsExceptActive = computed(() => {
+        return props.discussionChannels.filter((dc) => {
+          return dc.channelUniqueName !== props.channelId;
+        });
+      });
+
+      return {
+        activeDiscussionChannel,
+        channelsExceptActive,
+        route,
+        getCommentCount,
+        getVoteCount,
+      };
+    },
+  });
 </script>
 
 <template>
@@ -84,40 +81,35 @@ export default defineComponent({
       v-if="!channelId"
       class="my-4"
     >
-      <h2 class="text-lg">
-        Comments in Forums
-      </h2>
+      <h2 class="text-lg">Comments in Forums</h2>
 
       <ul class="list-disc pl-3">
         <DiscussionChannelLink
           v-for="discussionChannel in discussionChannels"
           :key="discussionChannel.id"
-          :channel-id="discussionChannel.channelUniqueName"
-          :channel-icon="discussionChannel.Channel?.channelIconURL || ''"
           :channel-display-name="discussionChannel.Channel?.displayName || ''"
+          :channel-icon="discussionChannel.Channel?.channelIconURL || ''"
+          :channel-id="discussionChannel.channelUniqueName"
           :comment-count="discussionChannel.CommentsAggregate?.count || 0"
-          :upvote-count="discussionChannel.UpvotedByUsersAggregate?.count || 0"
           :discussion-id="discussionChannel.discussionId"
+          :upvote-count="discussionChannel.UpvotedByUsersAggregate?.count || 0"
         />
       </ul>
     </div>
 
-
     <div v-if="channelId && channelsExceptActive.length > 0">
       <div>
-        <h2 class="mt-4 text-lg">
-          Comments in Other Forums
-        </h2>
+        <h2 class="mt-4 text-lg">Comments in Other Forums</h2>
         <ul class="list-disc pl-4">
           <DiscussionChannelLink
             v-for="dc in channelsExceptActive"
             :key="dc.id"
-            :channel-id="dc.channelUniqueName"
-            :channel-icon="dc.Channel?.channelIconURL || ''"
             :channel-display-name="dc.Channel?.displayName || ''"
+            :channel-icon="dc.Channel?.channelIconURL || ''"
+            :channel-id="dc.channelUniqueName"
             :comment-count="dc.CommentsAggregate?.count || 0"
-            :upvote-count="dc.UpvotedByUsersAggregate?.count || 0"
             :discussion-id="dc.discussionId"
+            :upvote-count="dc.UpvotedByUsersAggregate?.count || 0"
           />
         </ul>
         <p

@@ -1,3 +1,3 @@
 export type TagData = {
-    text: string;
-}
+  text: string;
+};

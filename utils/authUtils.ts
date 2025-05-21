@@ -1,10 +1,10 @@
-import { FetchResult } from '@apollo/client';
-import { ApolloError } from '@apollo/client/errors';
+import type { FetchResult } from "@apollo/client";
+import type { ApolloError } from "@apollo/client/errors";
 
 /**
  * Helper function to handle GraphQL errors related to authentication
  * and automatically retry operations after refreshing the token
- * 
+ *
  * @param error - The Apollo error from a failed operation
  * @param retryFn - Function to retry the operation
  * @returns The result of the retry or throws the original error
@@ -14,19 +14,20 @@ export async function handleAuthError<T>(
   retryFn: () => Promise<FetchResult<T>>
 ): Promise<FetchResult<T>> {
   // Check if the error is related to authentication
-  const isAuthError = error.graphQLErrors?.some(e => 
-    e.message.includes('expired') || 
-    e.message.includes('authentication') ||
-    e.message.includes('unauthorized') ||
-    e.message.includes('session')
+  const isAuthError = error.graphQLErrors?.some(
+    (e) =>
+      e.message.includes("expired") ||
+      e.message.includes("authentication") ||
+      e.message.includes("unauthorized") ||
+      e.message.includes("session")
   );
 
   if (isAuthError && window.refreshAuthToken) {
-    console.log('Auth error detected in operation, attempting to refresh token');
+    console.log("Auth error detected in operation, attempting to refresh token");
     const refreshSucceeded = await window.refreshAuthToken();
-    
+
     if (refreshSucceeded) {
-      console.log('Token refreshed, retrying operation');
+      console.log("Token refreshed, retrying operation");
       // Retry the operation with the fresh token
       return await retryFn();
     }
@@ -38,7 +39,7 @@ export async function handleAuthError<T>(
 
 /**
  * Example usage:
- * 
+ *
  * try {
  *   const result = await createDiscussion({
  *     variables: { ... }
@@ -47,7 +48,7 @@ export async function handleAuthError<T>(
  *   if (error instanceof ApolloError) {
  *     try {
  *       // Try to refresh token and retry the mutation
- *       const retryResult = await handleAuthError(error, () => 
+ *       const retryResult = await handleAuthError(error, () =>
  *         createDiscussion({ variables: { ... } })
  *       );
  *       // Use retryResult if successful

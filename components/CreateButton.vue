@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { useRouter } from 'nuxt/app';
+  import { useRouter } from "nuxt/app";
 
-const props = defineProps({
-  to: {
-    type: String,
-    required: true
-  },
-  label: {
-    type: String,
-    required: true
-  }
-});
+  const props = defineProps({
+    to: {
+      type: String,
+      required: true,
+    },
+    label: {
+      type: String,
+      required: true,
+    },
+  });
 
-const router = useRouter();
+  const router = useRouter();
 
-const handleClick = () => {
-  router.push(props.to);
-};
+  const handleClick = () => {
+    router.push(props.to);
+  };
 </script>
 
 <template>

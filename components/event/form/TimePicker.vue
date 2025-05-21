@@ -1,108 +1,121 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { DateTime } from 'luxon';
+  import { ref, computed } from "vue";
+  import { DateTime } from "luxon";
 
-const props = defineProps({
-  value: {
-    type: String,
-    required: true
-  },
-  testId: {
-    type: String,
-    default: 'time-picker'
-  },
-  disabled: {
-    type: Boolean,
-    default: false
-  }
-});
+  const props = defineProps({
+    value: {
+      type: String,
+      required: true,
+    },
+    testId: {
+      type: String,
+      default: "time-picker",
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
-const emit = defineEmits(['update']);
+  const emit = defineEmits(["update"]);
 
-const isDropdownOpen = ref(false);
+  const isDropdownOpen = ref(false);
 
-// Format the display time in 12-hour clock format
-const formattedTime = computed(() => {
-  const time = DateTime.fromFormat(props.value, "HH:mm");
-  if (!time.isValid) return props.value;
-  return time.toFormat("h:mm a"); // 12-hour format with AM/PM, no leading zeros
-});
+  // Format the display time in 12-hour clock format
+  const formattedTime = computed(() => {
+    const time = DateTime.fromFormat(props.value, "HH:mm");
+    if (!time.isValid) return props.value;
+    return time.toFormat("h:mm a"); // 12-hour format with AM/PM, no leading zeros
+  });
 
-// Generate time options for the dropdown (15-minute intervals)
-const timeOptions = computed(() => {
-  const options = [];
-  
-  // Generate intervals of 15 minutes for a 24-hour period
-  for (let hour = 0; hour < 24; hour++) {
-    for (let minute = 0; minute < 60; minute += 15) {
-      const time = DateTime.fromObject({ hour, minute });
-      options.push({
-        value: time.toFormat('HH:mm'), // 24-hour format for internal use
-        display: time.toFormat('h:mm a'), // 12-hour format without leading zeros for display
-        hour12: time.hour > 11 ? (time.hour === 12 ? 12 : time.hour - 12) : (time.hour === 0 ? 12 : time.hour),
-        minute,
-        period: time.hour >= 12 ? 'PM' : 'AM',
-        dateTime: time
-      });
+  // Generate time options for the dropdown (15-minute intervals)
+  const timeOptions = computed(() => {
+    const options = [];
+
+    // Generate intervals of 15 minutes for a 24-hour period
+    for (let hour = 0; hour < 24; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        const time = DateTime.fromObject({ hour, minute });
+        options.push({
+          value: time.toFormat("HH:mm"), // 24-hour format for internal use
+          display: time.toFormat("h:mm a"), // 12-hour format without leading zeros for display
+          hour12:
+            time.hour > 11
+              ? time.hour === 12
+                ? 12
+                : time.hour - 12
+              : time.hour === 0
+                ? 12
+                : time.hour,
+          minute,
+          period: time.hour >= 12 ? "PM" : "AM",
+          dateTime: time,
+        });
+      }
     }
-  }
-  
-  return options;
-});
 
-const selectTime = (value: string) => {
-  emit('update', value);
-  isDropdownOpen.value = false;
-};
+    return options;
+  });
 
-const toggleDropdown = () => {
-  if (!props.disabled) {
-    isDropdownOpen.value = !isDropdownOpen.value;
-  }
-};
+  const selectTime = (value: string) => {
+    emit("update", value);
+    isDropdownOpen.value = false;
+  };
 
-const closeDropdown = () => {
-  isDropdownOpen.value = false;
-};
+  const toggleDropdown = () => {
+    if (!props.disabled) {
+      isDropdownOpen.value = !isDropdownOpen.value;
+    }
+  };
 
+  const closeDropdown = () => {
+    isDropdownOpen.value = false;
+  };
 </script>
 
 <template>
   <div class="relative">
     <!-- Custom input field instead of native time input -->
-    <div 
+    <div
+      class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-200 px-3 pr-8 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
+      :class="{ 'cursor-not-allowed opacity-60': disabled }"
       :data-testid="testId"
-      class="border rounded border-gray-200 text-sm focus:border-blue-500 focus:ring-blue-500 w-full sm:w-32 h-10 px-3 pr-8 flex items-center
-            dark:border-gray-700 dark:bg-gray-800 dark:text-white cursor-pointer"
-      :class="{ 'opacity-60 cursor-not-allowed': disabled }"
       @click="!disabled && toggleDropdown()"
     >
       {{ formattedTime }}
-      
+
       <!-- Time dropdown toggle button -->
-      <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
-        <i class="far fa-clock text-gray-500 dark:text-gray-400"/>
+      <div class="absolute right-3 top-1/2 -translate-y-1/2 transform">
+        <i class="far fa-clock text-gray-500 dark:text-gray-400" />
       </div>
     </div>
-    
+
     <!-- Custom dropdown for time selection -->
-    <div 
+    <div
       v-if="isDropdownOpen"
       v-click-outside="closeDropdown"
-      class="absolute z-10 left-0 top-full max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white touch-scroll-y"
-      style="-webkit-overflow-scrolling: touch; scrollbar-width: thin;"
+      class="touch-scroll-y absolute left-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+      style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
     >
-      <!-- Using generated time options -->                        
-      <template v-for="(option, index) in timeOptions" :key="'time-option-' + index">
+      <!-- Using generated time options -->
+      <template
+        v-for="(option, index) in timeOptions"
+        :key="'time-option-' + index"
+      >
         <!-- Create a new time group whenever we have a new hour (minutes === 0) -->
-        <div v-if="option.minute === 0" class="border-b border-black/5 last:border-b-0 dark:border-white/5">
+        <div
+          v-if="option.minute === 0"
+          class="border-b border-black/5 last:border-b-0 dark:border-white/5"
+        >
           <!-- For each group, render all options for that hour -->
-          <div 
-            v-for="hourOption in timeOptions.slice(index, index + 4)" 
-            :key="'hour-' + hourOption.hour12 + '-min-' + hourOption.minute + '-' + hourOption.period"
+          <div
+            v-for="hourOption in timeOptions.slice(index, index + 4)"
+            :key="
+              'hour-' + hourOption.hour12 + '-min-' + hourOption.minute + '-' + hourOption.period
+            "
             :class="[
-              'py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm', 
-              formattedTime === hourOption.display ? 'bg-blue-50 dark:bg-blue-900' : ''
+              'cursor-pointer px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700',
+              formattedTime === hourOption.display ? 'bg-blue-50 dark:bg-blue-900' : '',
             ]"
             @click="selectTime(hourOption.value)"
           >
