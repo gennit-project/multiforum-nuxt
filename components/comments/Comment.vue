@@ -516,10 +516,16 @@
       props.commentData?.CommentAuthor?.__typename === "User" &&
       props.commentData?.CommentAuthor?.username === usernameVar.value;
 
-    // Check if the user has admin or mod permissions
-    const hasModPermissions =
+    // Check if the user has standard or elevated mod permissions
+    const hasElevatedModPermissions =
       userPermissions.value.isChannelOwner ||
       (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
+
+    // Any authenticated user can have standard mod permissions
+    const hasStandardModPermissions =
+      !userPermissions.value.isSuspendedMod &&
+      !userPermissions.value.isSuspendedUser &&
+      (userPermissions.value.canReport || userPermissions.value.canGiveFeedback);
 
     if (isOwnComment) {
       // If user is the comment author, show edit/delete options
@@ -542,11 +548,11 @@
     // Show mod actions if:
     // 1. User is logged in
     // 2. User is not the comment author
-    // 3. User has mod permissions (channel owner or elevated mod and not suspended)
+    // 3. User has mod permissions (standard, elevated, or channel owner)
     if (
       usernameVar.value &&
       !isOwnComment &&
-      (hasModPermissions || userPermissions.value.isChannelOwner)
+      (hasElevatedModPermissions || hasStandardModPermissions)
     ) {
       // If you're not the author, show mod actions
       // This preserves the original logic that mod actions don't apply to your own comments
