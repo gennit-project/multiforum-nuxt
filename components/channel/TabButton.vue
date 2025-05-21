@@ -81,6 +81,6 @@
 
 <style>
   .link.currentPage {
-    @apply border-gray-500 text-black;
+    @apply border-gray-500 text-black dark:text-white;
   }
 </style>

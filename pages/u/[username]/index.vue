@@ -43,7 +43,7 @@
   <div class="w-full rounded-lg bg-gray-100 pt-6 dark:bg-gray-900 md:w-3/4">
     <UserProfileTabs
       v-if="user"
-      class="block border-b border-gray-200 dark:border-gray-600"
+      class="block border-b border-black dark:border-gray-600"
       :route="route"
       :show-counts="true"
       :user="user"

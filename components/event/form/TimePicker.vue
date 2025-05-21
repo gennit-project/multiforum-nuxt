@@ -77,7 +77,7 @@
   <div class="relative">
     <!-- Custom input field instead of native time input -->
     <div
-      class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-200 px-3 pr-8 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
+      class="flex h-10 w-full cursor-pointer items-center rounded border border-black px-3 pr-8 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
       :class="{ 'cursor-not-allowed opacity-60': disabled }"
       :data-testid="testId"
       @click="!disabled && toggleDropdown()"
@@ -94,7 +94,7 @@
     <div
       v-if="isDropdownOpen"
       v-click-outside="closeDropdown"
-      class="touch-scroll-y absolute left-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+      class="touch-scroll-y absolute left-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-black bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
     >
       <!-- Using generated time options -->

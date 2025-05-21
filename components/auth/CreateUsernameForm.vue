@@ -153,7 +153,7 @@
         <input
           ref="usernameInput"
           v-model="newUsername"
-          class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
+          class="block w-full flex-1 rounded border-black pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
           :class="[
             usernameIsTaken || usernameIsInvalid
               ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'

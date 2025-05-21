@@ -50,7 +50,7 @@
 
 <template>
   <ul
-    class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
+    class="divide-y border-t border-black dark:border-gray-800 dark:text-white"
     data-testid="issue-list"
   >
     <ModIssueListItem

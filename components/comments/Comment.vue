@@ -642,7 +642,7 @@
   <div>
     <div
       class="flex w-full"
-      :class="[depth > 1 ? 'ml-1 border-l border-gray-300 pl-4 pt-2 dark:border-gray-600' : '']"
+      :class="[depth > 1 ? 'ml-1 border-l border-black pl-4 pt-2 dark:border-gray-600' : '']"
     >
       <div
         class="w-full"
@@ -667,7 +667,7 @@
               :show-channel="props.showChannel"
               :show-context-link="props.showContextLink"
             />
-            <div class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600">
+            <div class="ml-4 flex-grow border-l border-black pl-4 dark:border-gray-600">
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
                   <ArchivedCommentText
@@ -841,7 +841,7 @@
         </div>
         <nuxt-link
           v-if="canShowPermalink && replyCount > 0 && props.depth + 1 > maxCommentDepth"
-          class="flex w-full cursor-pointer items-center gap-1 border-gray-300 pl-4 text-gray-400 underline dark:border-gray-500 dark:text-gray-300"
+          class="flex w-full cursor-pointer items-center gap-1 border-black pl-4 text-gray-400 underline dark:border-gray-500 dark:text-gray-300"
           :to="permalinkObject"
           @click.prevent="emit('scrollToTop')"
         >
@@ -851,7 +851,7 @@
         <div
           v-else-if="replyCount > 0 && showReplies"
           id="childComments"
-          class="ml-3 w-full border-gray-300 dark:border-gray-600"
+          class="ml-3 w-full border-black dark:border-gray-600"
         >
           <ChildComments
             v-slot="slotProps"

@@ -35,7 +35,7 @@
   >
     <div class="relative mt-1">
       <ListboxButton
-        class="relative w-full cursor-default rounded-md border border-gray-300 bg-white pl-3 pr-10 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+        class="relative w-full cursor-default rounded-md border border-black bg-white pl-3 pr-10 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
         :label="selected.label"
       >
         <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2" />

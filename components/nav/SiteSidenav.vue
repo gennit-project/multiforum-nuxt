@@ -120,7 +120,7 @@
     />
     <div
       v-click-outside="outside"
-      class="overlay-shade fixed left-0 top-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-200 dark:bg-gray-900"
+      class="overlay-shade fixed left-0 top-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-black bg-white py-2 dark:border-black dark:bg-gray-900"
     >
       <div>
         <div class="mt-2 block px-6">
@@ -179,7 +179,7 @@
       </div>
       <div
         v-if="recentForums.length > 0"
-        class="border-t border-gray-200 dark:border-gray-600"
+        class="border-t border-black dark:border-gray-600"
       >
         <div
           class="text-bold mb-2 mt-3 px-6 text-sm uppercase leading-6 text-gray-400 dark:text-gray-100"
@@ -213,7 +213,7 @@
               >
                 <AvatarComponent
                   v-if="forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
+                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-black shadow-sm dark:border-gray-800"
                   :is-small="true"
                   :is-square="false"
                   :src="forum?.channelIconURL ?? ''"
@@ -221,7 +221,7 @@
                 />
                 <AvatarComponent
                   v-if="!forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-200 shadow-sm dark:border-gray-800"
+                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-black shadow-sm dark:border-gray-800"
                   :is-small="true"
                   :is-square="false"
                   :src="forum?.channelIconURL ?? ''"

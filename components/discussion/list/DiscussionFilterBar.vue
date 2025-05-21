@@ -197,8 +197,8 @@
               'flex h-9 items-center px-2 text-gray-800 dark:text-gray-300',
               'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
               (channelId ? expandChannelDiscussions : expandSitewideDiscussions)
-                ? 'bg-blue-50 dark:bg-blue-900'
-                : 'dark:bg-gray-800',
+                ? 'bg-blue-100 dark:bg-blue-900'
+                : 'bg-gray-100 dark:bg-gray-800',
             ]"
             data-testid="expand-all-button"
             title="Expand all discussions"
