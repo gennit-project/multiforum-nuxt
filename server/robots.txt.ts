@@ -1,11 +1,11 @@
 export default defineEventHandler((_event) => {
   const env = process.env.VITE_ENVIRONMENT;
-  
-  if (env === 'development') {
+
+  if (env === "development") {
     return `User-agent: *
 Disallow: /`;
   }
-  
+
   return `User-agent: *
 Allow: /
 
@@ -17,4 +17,4 @@ Disallow: /_nuxt/*
 Disallow: /assets/*
 Disallow: /static/*
 Disallow: /issues/*`;
-}); 
+});

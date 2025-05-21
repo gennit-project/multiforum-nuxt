@@ -10,7 +10,7 @@ import type {
   ServerConfigCreateInput,
   ModChannelRoleCreateInput,
   CommentCreateInput,
-  NewUserInput
+  NewUserInput,
 } from "../../__generated__/graphql";
 import type { LoginInput } from "./commandFunctions/loginWithButtonClick";
 /* eslint-disable @typescript-eslint/no-namespace */
@@ -34,10 +34,7 @@ declare global {
     interface Chainable {
       loginWithCreateEventButton(input?: LoginInput): Chainable<Element>;
       loginAsAdmin(): Chainable<Element>;
-      authenticatedGraphQL(
-        query: string,
-        variables?: Record<string, unknown>
-      ): Chainable<any>;
+      authenticatedGraphQL(query: string, variables?: Record<string, unknown>): Chainable<any>;
       ensureAuth0Login(): Chainable<Element>;
       safetyCheck(): Chainable<Element>;
       dropDataForCypressTests(): Chainable<Element>;

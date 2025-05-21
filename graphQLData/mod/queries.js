@@ -2,9 +2,7 @@ import { gql } from "@apollo/client/core";
 
 export const COUNT_OPEN_ISSUES = gql`
   query countOpenIssues($channelUniqueName: String!) {
-    issuesAggregate(
-      where: { channelUniqueName: $channelUniqueName, isOpen: true }
-    ) {
+    issuesAggregate(where: { channelUniqueName: $channelUniqueName, isOpen: true }) {
       count
     }
   }
@@ -20,9 +18,7 @@ export const SERVER_SCOPED_ISSUE_COUNT = gql`
 
 export const COUNT_CLOSED_ISSUES = gql`
   query countClosedIssues($channelUniqueName: String!) {
-    issuesAggregate(
-      where: { channelUniqueName: $channelUniqueName, isOpen: false }
-    ) {
+    issuesAggregate(where: { channelUniqueName: $channelUniqueName, isOpen: false }) {
       count
     }
   }
@@ -50,9 +46,7 @@ export const GET_MOD = gql`
       ActivityFeedAggregate {
         count
       }
-      AuthoredComments(
-        options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
-      ) {
+      AuthoredComments(options: { limit: 25, offset: 0, sort: { createdAt: DESC } }) {
         id
         text
         createdAt
@@ -91,9 +85,7 @@ export const GET_MOD = gql`
           id
         }
       }
-      AuthoredIssues(
-        options: { limit: 25, offset: 0, sort: { createdAt: DESC } }
-      ) {
+      AuthoredIssues(options: { limit: 25, offset: 0, sort: { createdAt: DESC } }) {
         id
         title
         createdAt
@@ -119,9 +111,7 @@ export const GET_MOD_COMMENTS = gql`
   query getModComments($displayName: String!, $offset: Int!, $limit: Int!) {
     moderationProfiles(where: { displayName: $displayName }) {
       displayName
-      AuthoredComments(
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
-      ) {
+      AuthoredComments(options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }) {
         id
         text
         createdAt
@@ -168,9 +158,7 @@ export const GET_MOD_ISSUES = gql`
   query getModIssues($displayName: String!, $offset: Int!, $limit: Int!) {
     moderationProfiles(where: { displayName: $displayName }) {
       displayName
-      AuthoredIssues(
-        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
-      ) {
+      AuthoredIssues(options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }) {
         id
         title
         createdAt
@@ -309,15 +297,9 @@ export const PENDING_FORUM_MOD_INVITE_EXISTS = gql`
 `;
 
 export const GET_DISCUSSION_CHANNEL = gql`
-  query getDiscussionChannelID(
-    $discussionId: ID!
-    $channelUniqueName: String!
-  ) {
+  query getDiscussionChannelID($discussionId: ID!, $channelUniqueName: String!) {
     discussionChannels(
-      where: {
-        discussionId: $discussionId
-        channelUniqueName: $channelUniqueName
-      }
+      where: { discussionId: $discussionId, channelUniqueName: $channelUniqueName }
     ) {
       id
       archived
@@ -349,9 +331,7 @@ export const GET_EVENT_ISSUE = gql`
 
 export const GET_EVENT_CHANNEL = gql`
   query getEventChannelID($eventId: ID!, $channelUniqueName: String!) {
-    eventChannels(
-      where: { eventId: $eventId, channelUniqueName: $channelUniqueName }
-    ) {
+    eventChannels(where: { eventId: $eventId, channelUniqueName: $channelUniqueName }) {
       id
       archived
     }

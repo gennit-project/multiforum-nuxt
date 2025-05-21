@@ -21,10 +21,7 @@ export const CREATE_CHANNEL = gql`
 `;
 
 export const UPDATE_CHANNEL = gql`
-  mutation updateChannel(
-    $where: ChannelWhere
-    $update: ChannelUpdateInput
-  ) {
+  mutation updateChannel($where: ChannelWhere, $update: ChannelUpdateInput) {
     updateChannels(where: $where, update: $update) {
       channels {
         uniqueName
@@ -54,4 +51,3 @@ export const DELETE_CHANNEL = gql`
     }
   }
 `;
-

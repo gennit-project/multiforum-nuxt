@@ -1,33 +1,38 @@
 <script lang="ts" setup>
-defineProps({
-  sectionTitle: {
-    type: String,
-    default: "",
-  },
-  dangerous: {
-    type: Boolean,
-    default: false,
-  },
-  description: {
-    type: String,
-    default: "",
-  },
-  required: {
-    type: Boolean,
-    default: false,
-  },
-});
+  defineProps({
+    sectionTitle: {
+      type: String,
+      default: "",
+    },
+    dangerous: {
+      type: Boolean,
+      default: false,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    required: {
+      type: Boolean,
+      default: false,
+    },
+  });
 </script>
 
 <template>
   <div class="px-1 sm:px-2">
     <label
       v-if="sectionTitle"
-      :for="sectionTitle"
+      class="block text-sm font-medium leading-6"
       :class="dangerous ? 'text-red-400' : 'text-gray-900 dark:text-gray-200'"
-      class="font-medium block text-sm leading-6 "
+      :for="sectionTitle"
     >
-      {{ sectionTitle }}<span v-if="required" class="ml-1 text-red-400">*</span>
+      {{ sectionTitle
+      }}<span
+        v-if="required"
+        class="ml-1 text-red-400"
+        >*</span
+      >
     </label>
     <p
       v-if="description"
@@ -36,13 +41,16 @@ defineProps({
       {{ description }}
     </p>
     <div>
-      <slot name="content" v-bind="$attrs"  />
+      <slot
+        name="content"
+        v-bind="$attrs"
+      />
     </div>
   </div>
 </template>
 <style scoped>
-.align-right {
-  display: inline-block;
-  text-align: right;
-}
+  .align-right {
+    display: inline-block;
+    text-align: right;
+  }
 </style>

@@ -1,5 +1,5 @@
 const baseUrl = Cypress.env("baseUrl");
-const ONLINE_EVENT_LIST = `${baseUrl}/events/list/search`
+const ONLINE_EVENT_LIST = `${baseUrl}/events/list/search`;
 
 export type LoginInput = {
   username: string;
@@ -36,10 +36,10 @@ const login = (input: LoginInput) => {
 
   // Add a final wait for the redirect and page load to complete
   cy.wait(5000);
-  
+
   // Check for "redirecting" text and wait longer if present
-  cy.get('body').then($body => {
-    if ($body.text().includes('redirecting')) {
+  cy.get("body").then(($body) => {
+    if ($body.text().includes("redirecting")) {
       cy.log('Detected "redirecting" text, waiting longer for completion...');
       cy.wait(10000); // Wait an additional 10 seconds
     }

@@ -19,7 +19,7 @@ type DiscussionCommentPermalinkInput = {
   forumId: string;
   discussionId: string;
   commentId: string;
-}
+};
 export const getPermalinkToDiscussionComment = (input: DiscussionCommentPermalinkInput) => {
   const { forumId, discussionId, commentId } = input;
   return {
@@ -30,12 +30,12 @@ export const getPermalinkToDiscussionComment = (input: DiscussionCommentPermalin
       commentId,
     },
   };
-}
+};
 
 type DiscussionPermalinkInput = {
   forumId: string;
   discussionId: string;
-}
+};
 
 export const getPermalinkToDiscussion = (input: DiscussionPermalinkInput) => {
   const { forumId, discussionId } = input;
@@ -46,14 +46,13 @@ export const getPermalinkToDiscussion = (input: DiscussionPermalinkInput) => {
       discussionId,
     },
   };
-  
-}
+};
 
 type EventCommentPermalinkInput = {
   forumId: string;
   eventId: string;
   commentId: string;
-}
+};
 
 export const getPermalinkToEventComment = (input: EventCommentPermalinkInput) => {
   const { forumId, eventId, commentId } = input;
@@ -65,12 +64,12 @@ export const getPermalinkToEventComment = (input: EventCommentPermalinkInput) =>
       commentId,
     },
   };
-}
+};
 
 type EventPermalinkInput = {
   forumId: string;
   eventId: string;
-}
+};
 
 export const getPermalinkToEvent = (input: EventPermalinkInput) => {
   const { forumId, eventId } = input;
@@ -81,23 +80,26 @@ export const getPermalinkToEvent = (input: EventPermalinkInput) => {
       eventId,
     },
   };
-}
+};
 
 export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
-  const { 
-    routeName, 
-    forumId, 
-    discussionId, 
-    commentId, 
-    GivesFeedbackOnComment, 
+  const {
+    routeName,
+    forumId,
+    discussionId,
+    commentId,
+    GivesFeedbackOnComment,
     GivesFeedbackOnDiscussion,
     GivesFeedbackOnEvent,
   } = input;
   // If this is feedback on a discussion, give the discussion feedback permalink
-  if (routeName === "forums-forumId-discussions-feedback-discussionId" || GivesFeedbackOnDiscussion) {
+  if (
+    routeName === "forums-forumId-discussions-feedback-discussionId" ||
+    GivesFeedbackOnDiscussion
+  ) {
     if (!forumId || !commentId || !GivesFeedbackOnDiscussion) {
       console.error("Missing required parameters for permalink to feedback on discussion");
-      return null
+      return null;
     }
     return {
       name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
@@ -113,7 +115,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   if (routeName === "forums-forumId-events-feedback-eventId" || GivesFeedbackOnEvent) {
     if (!forumId || !commentId || !GivesFeedbackOnEvent) {
       console.error("Missing required parameters for permalink to feedback on event");
-      return null
+      return null;
     }
     return {
       name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
@@ -126,9 +128,9 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
 
   // If this is feedback on a comment, give the comment feedback permalink
-  if ( !commentId || !forumId || !GivesFeedbackOnComment) {
+  if (!commentId || !forumId || !GivesFeedbackOnComment) {
     console.error("Missing required parameters for permalink to feedback on comment");
-    return null
+    return null;
   }
   if (discussionId) {
     // For feedback on comments on a discussion
@@ -144,7 +146,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
   // Note: we do not handle the case to permalink to feedback on comments on an event
   // because feedback on event comments is not currently supported in the app.
-  return {}
+  return {};
 };
 
 export type UpdateStateInput = {
@@ -173,11 +175,7 @@ export const updateFilters = (input: UpdateFiltersInput) => {
   const updatedQuery: LocationQuery = Object.assign({}, route.query);
 
   Object.entries(params).forEach(([key, value]) => {
-    if (
-      value === undefined ||
-      value === "" ||
-      (Array.isArray(value) && value.length === 0)
-    ) {
+    if (value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) {
       delete updatedQuery[key];
     } else if (Array.isArray(value)) {
       updatedQuery[key] = [...value];

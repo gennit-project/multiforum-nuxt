@@ -1,12 +1,10 @@
 <script>
-import { defineComponent } from "vue";
+  import { defineComponent } from "vue";
 
-export default defineComponent({
-  setup() {},
-});
+  export default defineComponent({
+    setup() {},
+  });
 </script>
 <template>
-  <div class="flex-shrink-0">
-    search
-  </div>
+  <div class="flex-shrink-0">search</div>
 </template>

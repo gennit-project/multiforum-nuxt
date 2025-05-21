@@ -1,4 +1,4 @@
-import type { SearchEventValues, } from "@/types/Event";
+import type { SearchEventValues } from "@/types/Event";
 import { chronologicalOrder, reverseChronologicalOrder } from "./filterStrings";
 import LocationFilterTypes from "./locationFilterTypes";
 import { timeShortcutValues, resultOrderTypes } from "./eventSearchOptions";
@@ -19,9 +19,7 @@ type GetFilterValuesInput = {
   showInPersonOnly?: boolean;
 };
 
-const getFilterValuesFromParams = function (
-  input: GetFilterValuesInput
-): SearchEventValues {
+const getFilterValuesFromParams = function (input: GetFilterValuesInput): SearchEventValues {
   // Need to re-clean data when route values change
   // Take the default filter values from the query
   // in the URL if the values exist.
@@ -171,7 +169,7 @@ const getFilterValuesFromParams = function (
     resultsOrder,
     locationFilter,
     hasVirtualEventUrl,
-    showArchived
+    showArchived,
   } = cleanedValues;
 
   const defaultRadius = 160.934; // 100 miles

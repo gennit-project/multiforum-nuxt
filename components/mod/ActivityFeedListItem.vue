@@ -1,72 +1,67 @@
 <script lang="ts" setup>
-import MarkdownPreview from "../MarkdownPreview.vue";
-import type { PropType } from "vue";
-import { timeAgo } from "@/utils";
-import type { ModerationAction } from "@/__generated__/graphql";
-import { useRoute } from "nuxt/app";
-import ArchiveBox from "../icons/ArchiveBox.vue";
-import ArchiveBoxXMark from "../icons/ArchiveBoxXMark.vue";
-import ChatBubbleBottomCenter from "../icons/ChatBubbleBottomCenter.vue";
-import XmarkIcon from "../icons/XmarkIcon.vue";
-import UserPlus from "../icons/UserPlus.vue";
-import UserMinus from "../icons/UserMinus.vue";
-import ArrowPath from "../icons/ArrowPath.vue";
-import FlagIcon from "../icons/FlagIcon.vue";
-import XCircleIcon from "../icons/XCircleIcon.vue";
-import { ActionType } from "@/types/Comment";
+  import MarkdownPreview from "../MarkdownPreview.vue";
+  import type { PropType } from "vue";
+  import { timeAgo } from "@/utils";
+  import type { ModerationAction } from "@/__generated__/graphql";
+  import { useRoute } from "nuxt/app";
+  import ArchiveBox from "../icons/ArchiveBox.vue";
+  import ArchiveBoxXMark from "../icons/ArchiveBoxXMark.vue";
+  import ChatBubbleBottomCenter from "../icons/ChatBubbleBottomCenter.vue";
+  import XmarkIcon from "../icons/XmarkIcon.vue";
+  import UserPlus from "../icons/UserPlus.vue";
+  import UserMinus from "../icons/UserMinus.vue";
+  import ArrowPath from "../icons/ArrowPath.vue";
+  import FlagIcon from "../icons/FlagIcon.vue";
+  import XCircleIcon from "../icons/XCircleIcon.vue";
+  import { ActionType } from "@/types/Comment";
 
-const actionTypeToIcon = {
-  [ActionType.Close]: XCircleIcon,
-  [ActionType.Comment]: ChatBubbleBottomCenter,
-  [ActionType.Remove]: XmarkIcon,
-  [ActionType.Reopen]: ArrowPath,
-  [ActionType.Report]: FlagIcon,
-  [ActionType.Suspension]: UserMinus,
-  [ActionType.Unsuspend]: UserPlus,
-  [ActionType.Archive]: ArchiveBox,
-  [ActionType.Unarchive]: ArchiveBoxXMark,
-};
+  const actionTypeToIcon = {
+    [ActionType.Close]: XCircleIcon,
+    [ActionType.Comment]: ChatBubbleBottomCenter,
+    [ActionType.Remove]: XmarkIcon,
+    [ActionType.Reopen]: ArrowPath,
+    [ActionType.Report]: FlagIcon,
+    [ActionType.Suspension]: UserMinus,
+    [ActionType.Unsuspend]: UserPlus,
+    [ActionType.Archive]: ArchiveBox,
+    [ActionType.Unarchive]: ArchiveBoxXMark,
+  };
 
-const props = defineProps({
-  activityItem: {
-    type: Object as PropType<ModerationAction>,
-    required: true,
-  },
-  isOriginalPoster: {
-    type: Boolean,
-    default: false,
-  },
-});
-const commentIdInParams = useRoute().params.commentId as string;
-const isPermalinked =
-  commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
+  const props = defineProps({
+    activityItem: {
+      type: Object as PropType<ModerationAction>,
+      required: true,
+    },
+    isOriginalPoster: {
+      type: Boolean,
+      default: false,
+    },
+  });
+  const commentIdInParams = useRoute().params.commentId as string;
+  const isPermalinked = commentIdInParams && commentIdInParams === props.activityItem.Comment?.id;
 </script>
 
 <template>
   <li
-    class="list-none mt-4"
-    :class="[
-      isPermalinked
-        ? 'bg-blue-100 rounded-lg border border-blue-500 dark:bg-blue-900'
-        : '',
-    ]"
+    class="mt-4 list-none"
+    :class="[isPermalinked ? 'rounded-lg border border-blue-500 bg-blue-100 dark:bg-blue-900' : '']"
   >
     <div class="relative">
       <span
-        class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600"
         aria-hidden="true"
+        class="absolute left-5 top-5 -ml-px h-full w-0.5 bg-gray-200 dark:bg-gray-600"
       />
       <div class="relative flex items-start space-x-3">
         <div>
           <div class="relative px-1">
             <div
               v-if="activityItem.actionType"
-              class="flex h-8 w-8 items-center bg-gray-500 justify-center rounded-full ring-8 ring-white dark:text-white dark:ring-gray-800"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-500 ring-8 ring-white dark:text-white dark:ring-gray-800"
             >
               <component
                 :is="actionTypeToIcon[activityItem.actionType as ActionType]"
-                class="h-5 w-5 text-white"
                 aria-hidden="true"
+                class="h-5 w-5 text-white"
               />
             </div>
           </div>
@@ -77,11 +72,12 @@ const isPermalinked =
               <!-- Link for ModerationProfile -->
               <AvatarComponent
                 v-if="activityItem.ModerationProfile?.displayName"
-                :text="activityItem.ModerationProfile?.displayName"
                 :is-small="true"
+                :text="activityItem.ModerationProfile?.displayName"
               />
               <nuxt-link
                 v-if="activityItem.ModerationProfile?.displayName"
+                class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
                 :to="{
                   name: isOriginalPoster ? 'u-username' : 'mod-modId',
                   params: {
@@ -89,13 +85,12 @@ const isPermalinked =
                       activityItem.ModerationProfile.displayName,
                   },
                 }"
-                class="font-medium text-gray-900 hover:underline dark:text-gray-200 flex items-center gap-1"
               >
                 <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >OP</span
                   >
                 </span>
@@ -104,24 +99,24 @@ const isPermalinked =
               <!-- Link for User -->
               <AvatarComponent
                 v-if="activityItem.User?.username"
-                :text="activityItem.User.username"
                 :is-small="true"
+                :text="activityItem.User.username"
               />
               <nuxt-link
                 v-if="activityItem.User?.username"
+                class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
                 :to="{
                   name: 'u-username',
                   params: {
                     username: activityItem.User.username,
                   },
                 }"
-                class="font-medium text-gray-900 hover:underline dark:text-gray-200 flex items-center gap-1"
               >
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
                   <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 dark:border-gray-300 px-1 text-xs text-gray-500 dark:text-gray-300"
+                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >OP</span
                   >
                 </span>
@@ -135,12 +130,12 @@ const isPermalinked =
             }}</span>
           </div>
 
-          <div class="border-l-2 border-gray-200 dark:border-gray-500 pl-2">
+          <div class="border-l-2 border-gray-200 pl-2 dark:border-gray-500">
             <MarkdownPreview
               v-if="activityItem.Comment"
+              :disable-gallery="true"
               :text="activityItem.Comment.text || ''"
               :word-limit="1000"
-              :disable-gallery="true"
             />
           </div>
         </div>

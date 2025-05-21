@@ -1,46 +1,46 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+  import { defineComponent } from "vue";
 
-export default defineComponent({
-  name: "ChannelLink",
-  props: {
-    channelDisplayName: {
-      type: String,
-      default: "",
+  export default defineComponent({
+    name: "ChannelLink",
+    props: {
+      channelDisplayName: {
+        type: String,
+        default: "",
+      },
+      channelIcon: {
+        type: String,
+        default: "",
+      },
+      discussionId: {
+        type: String,
+        required: true,
+      },
+      channelId: {
+        type: String,
+        required: true,
+      },
+      commentCount: {
+        type: Number,
+        required: true,
+      },
+      upvoteCount: {
+        type: Number,
+        required: false,
+        default: 0,
+      },
     },
-    channelIcon: {
-      type: String,
-      default: "",
+    setup() {
+      return {};
     },
-    discussionId: {
-      type: String,
-      required: true,
-    },
-    channelId: {
-      type: String,
-      required: true,
-    },
-    commentCount: {
-      type: Number,
-      required: true,
-    },
-    upvoteCount: {
-      type: Number,
-      required: false,
-      default: 0,
-    },
-  },
-  setup() {
-    return {};
-  },
-});
+  });
 </script>
 <template>
   <li>
-    <div class="flex items-center flex-wrap gap-1">
+    <div class="flex flex-wrap items-center gap-1">
       <nuxt-link
-        :data-testid="`comments-in-${channelId}`"
         class="underline"
+        :data-testid="`comments-in-${channelId}`"
         :to="{
           name: 'forums-forumId-discussions-discussionId',
           params: { discussionId, forumId: channelId },
@@ -55,17 +55,26 @@ export default defineComponent({
           params: { discussionId, forumId: channelId },
         }"
       >
-        <div class="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-700">
+        <div
+          class="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-700"
+        >
           <AvatarComponent
             class="shadow-sm dark:border-gray-800"
-            :text="channelId"
-            :src="channelIcon ?? ''"
             :is-small="true"
             :is-square="false"
+            :src="channelIcon ?? ''"
+            :text="channelId"
           />
           <div class="flex flex-col text-xs">
-            <div v-if="channelDisplayName" class="font-bold">{{ channelDisplayName }}</div>
-            <div :class="[channelDisplayName ? 'font-mono' : 'font-mono font-bold']">{{ channelId }}</div>
+            <div
+              v-if="channelDisplayName"
+              class="font-bold"
+            >
+              {{ channelDisplayName }}
+            </div>
+            <div :class="[channelDisplayName ? 'font-mono' : 'font-mono font-bold']">
+              {{ channelId }}
+            </div>
           </div>
         </div>
       </nuxt-link>

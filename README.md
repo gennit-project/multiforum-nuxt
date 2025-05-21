@@ -3,20 +3,29 @@
 Multiforum is an online platform for communities to create forums for sharing discussions and events. Key features:
 
 1. Each forum has two main sections:
-  - Discussions: Content can be upvoted so best content rises to top
-  - Events: Calendar with upcoming community events
+
+- Discussions: Content can be upvoted so best content rises to top
+- Events: Calendar with upcoming community events
+
 2. Cross-posting capability:
-  - Events and discussions can be submitted to multiple forums for increased visibility
+
+- Events and discussions can be submitted to multiple forums for increased visibility
+
 3. Location-based event discovery:
-  - Map integration shows events across forums
-  - Events can be filtered by proximity, time, tags, and forums
+
+- Map integration shows events across forums
+- Events can be filtered by proximity, time, tags, and forums
+
 4. Responsive design:
-  - Works on both desktop and mobile
+
+- Works on both desktop and mobile
+
 5. Technology stack:
-  - Frontend: Vue/Nuxt.js with Apollo client
-  - Backend: Apollo server with Neo4j graph database
-  - Authentication: Auth0
-  - Maps: Google Maps integration
+
+- Frontend: Vue/Nuxt.js with Apollo client
+- Backend: Apollo server with Neo4j graph database
+- Authentication: Auth0
+- Maps: Google Maps integration
 
 This is a work in progress that intended to be an open-source, self-hosted platform.
 
@@ -61,7 +70,7 @@ If you click the map marker, more details about the event show up:
 
 ### Filtering the map by forums
 
-If I'm only interested in events from a few specific forums, I filter the 
+If I'm only interested in events from a few specific forums, I filter the
 map by those forums:
 
 ![Filtering map by multiple forums](./screenshots/filtering-map-by-multiple-forums2.png)
@@ -94,11 +103,10 @@ you click that, you can see the list of events that are taking place there at di
 
 ![Clicking different map marker with multiple events](./screenshots/clicking-different-map-marker-with-multiple-events.png)
 
-Here's a screenshot of how it looks when you click on a location with multiple events. In 
+Here's a screenshot of how it looks when you click on a location with multiple events. In
 this case, the events are both at the same place, the Phoenix Zoo:
 
 ![Clicking map marker with multiple events](./screenshots/clicking-map-marker-with-multiple-events.png)
-
 
 ### Event list within a forum
 
@@ -119,7 +127,6 @@ events within 10 miles of Tempe:
 
 ![Phoenix bird lovers events filtered by location](./screenshots/phx-bird-lovers-events-filtered-by-location.png)
 
-
 ### Discussion list within a forum
 
 A birdwatching forum is an example of a forum that could make use of both in-person events
@@ -136,7 +143,6 @@ the comments. In the case of a birdwatching group, maybe there's a comment ident
 
 ![Phoenix bird lovers discussion detail](./screenshots/phx-bird-lovers-discussion-detail.png)
 
-
 ### Forum without any events
 
 Events are optional for forums. I intend to make it possible for a forum to turn
@@ -151,7 +157,6 @@ have no need for events:
 You can share an event to one or more forums. In a typical use case, you would link to an official
 event page with the full details and information about how to buy tickets, if applicable.
 
-
 Submitting an event to multiple forums is a good way to increase the visibility of the event. This one will now be visible in the context of both of the selected forums:
 
 ![Submitting an event to multiple forums](./screenshots/submitting-event-to-multiple-forums.png)
@@ -160,18 +165,14 @@ If you add an address, the event will be discoverable from the sitewide event se
 
 ![Adding an address for so that the event shows up on the map](./screenshots/adding-an-address-makes-the-event-discoverable-from-sitewide-search.png)
 
-
 ### Recently visited forums
 
 If you click the menu button on the top left of any page, it shows recently visited forums
 to support easy context switching.
 
-
 ![Recently visited forums](./screenshots/recently-visited-forums.png)
 
-
 ## Screenshots - Mobile width
-
 
 ### Discussion list views within a forum
 
@@ -203,7 +204,6 @@ you come to it from within the context of an individual forum:
 
 ![Discussion detail page at mobile width](./screenshots/discussion-detail-at-mobile-width.png)
 
-
 ### Sitewide event list
 
 Here's the sitewide in-person event list with an active filter,
@@ -212,7 +212,6 @@ as well. Here, the events are filtered by the birdwatching forum,
 so not all of the map markers are displayed.
 
 ![Sitewide filtered event list at mobile width](./screenshots/sitewide-filtered-event-list-at-mobile-width.png)
-
 
 ### List of all forums
 
@@ -227,7 +226,6 @@ The list of forums can be filtered by tag:
 The forum list can be filtered by search terms as well:
 
 ![Forum list filtered by search terms](./screenshots/forum-list-filtered-by-search-terms.png)
-
 
 ## Technology Stack
 
@@ -250,13 +248,16 @@ We have implemented several performance optimizations to improve load times, red
 The application requires several environment variables to be set up. For a comprehensive list of environment variables with detailed descriptions, see the [Environment Variables section in CONTRIBUTING.md](CONTRIBUTING.md#environment-variables).
 
 ### Development Setup
+
 1. Create a `.env` file in the root directory
 2. Copy the variables from `.env.example` (if available)
 3. Fill in your values for each required variable
 4. Never commit the `.env` file to version control
 
 ### Docker Setup
+
 When using Docker Compose, these variables can be set in the environment or in a `.env` file. The `docker-compose.yml` file includes default values for some variables:
+
 - `NEO4J_AUTH`: defaults to "neo4j/neo4j"
 - `NEO4J_PASSWORD`: defaults to "neo4j"
 - `NEO4J_USERNAME`: defaults to "neo4j"
@@ -264,6 +265,27 @@ When using Docker Compose, these variables can be set in the environment or in a
 - `VITE_BASE_URL`: defaults to "http://localhost:3000"
 - `VITE_GRAPHQL_URL`: defaults to "http://localhost:4000"
 - `VITE_ENVIRONMENT`: defaults to "development"
+
+## Code Quality
+
+### Auto-Removal of Unused Variables and Attribute Sorting
+
+The codebase is configured with automatic code cleanup features that run when saving files in VS Code:
+
+Key features:
+
+- Unused imports are automatically removed
+- Unused variables are automatically removed
+- Vue template attributes are automatically sorted alphabetically within their groups
+- Works with Vue, TypeScript, and JavaScript files
+
+This functionality is powered by:
+
+- ESLint with the `eslint-plugin-unused-imports` plugin for cleaning up unused code
+- ESLint with `eslint-plugin-vue` rules for sorting Vue attributes
+- VS Code settings configured to apply fixes on save
+
+When editing files in VS Code, saving the file will trigger these cleanups automatically, maintaining consistent code style and readability without manual effort.
 
 ## Tests
 

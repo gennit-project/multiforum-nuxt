@@ -1,34 +1,37 @@
 <script setup lang="ts">
-import {
-  Dialog as DialogComponent,
-  DialogOverlay,
-  TransitionChild,
-  TransitionRoot,
-  DialogTitle,
-} from "@headlessui/vue";
-import XIcon from "@/components/icons/XmarkIcon.vue";
+  import {
+    Dialog as DialogComponent,
+    DialogOverlay,
+    TransitionChild,
+    TransitionRoot,
+    DialogTitle,
+  } from "@headlessui/vue";
+  import XIcon from "@/components/icons/XmarkIcon.vue";
 
-defineProps({
-  isOpen: {
-    type: Boolean,
-    required: true,
-  },
-  header: {
-    type: String,
-    default: "",
-  },
-  topLayer: {
-    type: Boolean,
-    default: false,
-  },
-});
+  defineProps({
+    isOpen: {
+      type: Boolean,
+      required: true,
+    },
+    header: {
+      type: String,
+      default: "",
+    },
+    topLayer: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
-defineEmits(["closePreview"]);
+  defineEmits(["closePreview"]);
 </script>
 
 <template>
   <client-only>
-    <TransitionRoot as="template" :show="isOpen">
+    <TransitionRoot
+      as="template"
+      :show="isOpen"
+    >
       <DialogComponent
         as="div"
         class="fixed inset-0 overflow-hidden"
@@ -49,26 +52,27 @@ defineEmits(["closePreview"]);
               leave-to="-translate-x-full"
             >
               <div class="w-screen max-w-3xl">
-                <div
-                  class="flex h-full flex-col divide-y divide-gray-200 shadow-xl"
-                >
+                <div class="flex h-full flex-col divide-y divide-gray-200 shadow-xl">
                   <div
                     class="flex min-h-0 flex-1 flex-col overflow-auto bg-white px-8 py-2 dark:bg-gray-800 dark:text-gray-200"
                   >
                     <div>
-                      <div class="flex gap-4 items-center">
+                      <div class="flex items-center gap-4">
                         <div class="ml-3 flex h-7 items-center">
                           <button
-                            type="button"
                             class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-200"
+                            type="button"
                             @click="$emit('closePreview')"
                           >
                             <span class="sr-only">Close panel</span>
-                            <XIcon class="h-6 w-6" aria-hidden="true" />
+                            <XIcon
+                              aria-hidden="true"
+                              class="h-6 w-6"
+                            />
                           </button>
                         </div>
                         <DialogTitle
-                          class="font-medium my-3 text-lg text-gray-900 dark:text-gray-200"
+                          class="my-3 text-lg font-medium text-gray-900 dark:text-gray-200"
                         >
                           {{ header }}
                         </DialogTitle>

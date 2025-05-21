@@ -12,8 +12,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "compile": "graphql-codegen",
-    "lint": "eslint",
-    "lint:a11y": "npx eslint \"components/**/*.vue\" --quiet",
+    "lint": "eslint --cache \"./{components,composables,graphQLData,layouts,middleware,pages,plugins,stores,types,utils}/**/*.{js,ts,vue}\"",
+    "lint:a11y": "eslint --cache \"components/**/*.vue\" --quiet",
     "prepare": "husky install",
     "start": "nuxt start",
     "test": "cypress open",
@@ -21,7 +21,11 @@
     "test:unit:run": "vitest run",
     "tsc": "tsc",
     "verify": "npm run tsc && npm run test:unit:run",
-    "lint-verify": "npm run test:unit:run && npm run lint:a11y"
+    "lint-verify": "npm run test:unit:run && npm run lint:a11y",
+    "format": "prettier --write \"**/*.{js,ts,vue,json,css,scss,md}\"",
+    "format:check": "prettier --check \"**/*.{js,ts,vue,json,css,scss,md}\"",
+    "lint:fix": "eslint --fix \"./{components,composables,graphQLData,layouts,middleware,pages,plugins,stores,types,utils}/**/*.{js,ts,vue}\"",
+    "format-all": "npm run format && npm run lint:fix"
   },
   "dependencies": {
     "@apollo/client": "^3.13.5",
@@ -91,7 +95,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
-    "@eslint/js": "^9.23.0",
+    "@eslint/js": "^9.27.0",
     "@graphql-codegen/cli": "5.0.5",
     "@graphql-codegen/client-preset": "^4.7.0",
     "@nuxt/components": "^2.2.1",
@@ -126,6 +130,9 @@
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-nuxt": "^4.0.0",
+    "eslint-plugin-perfectionist": "^4.13.0",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
     "eslint-plugin-vue": "^9.33.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^15.15.0",

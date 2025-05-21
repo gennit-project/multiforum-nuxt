@@ -13,7 +13,14 @@ export type FormatTextParams = {
 /**
  * Supported text formatting types
  */
-export type FormatType = 'bold' | 'italic' | 'underline' | 'header1' | 'header2' | 'header3' | 'quote';
+export type FormatType =
+  | "bold"
+  | "italic"
+  | "underline"
+  | "header1"
+  | "header2"
+  | "header3"
+  | "quote";
 
 /**
  * Formats text according to the specified format type
@@ -24,19 +31,19 @@ export function formatText(params: FormatTextParams): string {
   const { text, format } = params;
 
   switch (format) {
-    case 'bold':
+    case "bold":
       return formatBold({ text });
-    case 'italic':
+    case "italic":
       return formatItalic({ text });
-    case 'underline':
+    case "underline":
       return formatUnderline({ text });
-    case 'header1':
+    case "header1":
       return formatHeader1({ text });
-    case 'header2':
+    case "header2":
       return formatHeader2({ text });
-    case 'header3':
+    case "header3":
       return formatHeader3({ text });
-    case 'quote':
+    case "quote":
       return formatQuote({ text });
     default:
       return text;
@@ -103,7 +110,10 @@ export function formatHeader3(params: { text: string }): string {
  * @returns The formatted text
  */
 export function formatQuote(params: { text: string }): string {
-  return params.text.split('\n').map(line => `> ${line}`).join('\n');
+  return params.text
+    .split("\n")
+    .map((line) => `> ${line}`)
+    .join("\n");
 }
 
 /**
@@ -111,15 +121,15 @@ export function formatQuote(params: { text: string }): string {
  * @param params Object containing the original text, position, and text to insert
  * @returns The new text with the inserted content
  */
-export function insertTextAtPosition(params: { 
-  originalText: string; 
-  position: { start: number; end: number }; 
+export function insertTextAtPosition(params: {
+  originalText: string;
+  position: { start: number; end: number };
   textToInsert: string;
 }): string {
   const { originalText, position, textToInsert } = params;
-  return originalText.substring(0, position.start) + 
-         textToInsert + 
-         originalText.substring(position.end);
+  return (
+    originalText.substring(0, position.start) + textToInsert + originalText.substring(position.end)
+  );
 }
 
 /**

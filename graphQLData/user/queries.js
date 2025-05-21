@@ -26,9 +26,7 @@ export const GET_USER = gql`
       location
       pronouns
       bio
-      NotificationsAggregate(
-        where: { read: false }
-      ) {
+      NotificationsAggregate(where: { read: false }) {
         count
       }
       CommentsAggregate {
@@ -55,11 +53,7 @@ export const GET_USER_COMMENTS = gql`
     users(where: { username: $username }) {
       username
       profilePicURL
-      Comments(options: { 
-        limit: $limit, 
-        offset: $offset,
-        sort: { createdAt: DESC }
-      }) {
+      Comments(options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }) {
         id
         text
         createdAt
@@ -110,9 +104,7 @@ export const GET_USER_DISCUSSIONS = gql`
     users(where: { username: $username }) {
       username
       profilePicURL
-      Discussions(
-        options: { sort: { createdAt: DESC } }
-      ) {
+      Discussions(options: { sort: { createdAt: DESC } }) {
         id
         Author {
           username
@@ -365,106 +357,88 @@ export const GET_OWNED_CHANNELS = gql`
 `;
 
 export const GET_USER_CONTRIBUTIONS = gql`
-query getUserContributions($username: String!, $year: Int) {
-  getUserContributions(username: $username, year: $year) {
-    count
-    date
-    activities {
-      id
-      description
-      type
-      Comments {
+  query getUserContributions($username: String!, $year: Int) {
+    getUserContributions(username: $username, year: $year) {
+      count
+      date
+      activities {
         id
-        text
-        createdAt
-        CommentAuthor {
-          username
-          ... on User {
-            profilePicURL
+        description
+        type
+        Comments {
+          id
+          text
+          createdAt
+          CommentAuthor {
+            username
+            ... on User {
+              profilePicURL
+            }
+          }
+          Channel {
+            uniqueName
+          }
+          DiscussionChannel {
+            id
+            discussionId
+            channelUniqueName
+          }
+          Event {
+            id
           }
         }
-        Channel {
-          uniqueName
-        }
-        DiscussionChannel {
+        Discussions {
           id
-          discussionId
-          channelUniqueName
+          title
+          createdAt
+          Author {
+            username
+            profilePicURL
+          }
+          DiscussionChannels {
+            id
+            channelUniqueName
+            discussionId
+          }
         }
-        Event {
+        Events {
           id
-        }
-      }
-      Discussions {
-        id
-        title
-        createdAt
-        Author {
-          username
-          profilePicURL
-        }
-        DiscussionChannels {
-          id
-          channelUniqueName
-          discussionId
-        }
-      }
-      Events {
-        id
-        title
-        createdAt
-        Poster {
-          username
-        }
-        EventChannels {
-          id
-          channelUniqueName
-          eventId
+          title
+          createdAt
+          Poster {
+            username
+          }
+          EventChannels {
+            id
+            channelUniqueName
+            eventId
+          }
         }
       }
     }
   }
-}
-`
+`;
 
 export const USER_IS_MOD_OR_OWNER_IN_CHANNEL = gql`
-query userIsModInChannel(
-  $modDisplayName: String!,
-  $username: String!,
-  $channelUniqueName: String!
-) {
-  channels(where: {
-    uniqueName: $channelUniqueName,
-  }){
-    uniqueName
-    Admins (
-      where: {
-        username: $username
+  query userIsModInChannel(
+    $modDisplayName: String!
+    $username: String!
+    $channelUniqueName: String!
+  ) {
+    channels(where: { uniqueName: $channelUniqueName }) {
+      uniqueName
+      Admins(where: { username: $username }) {
+        username
       }
-    ){
-      username
-    }
-    SuspendedUsers(
-      where: {
-        username: $username
+      SuspendedUsers(where: { username: $username }) {
+        username
       }
-    ) {
-      username
-    }
-    Moderators(
-      where: {
-        displayName: $modDisplayName
+      Moderators(where: { displayName: $modDisplayName }) {
+        displayName
       }
-    ) {
-      displayName
-    }
-    SuspendedMods(
-      where: {
-        modProfileName: $modDisplayName
+      SuspendedMods(where: { modProfileName: $modDisplayName }) {
+        modProfileName
       }
-    ) {
-      modProfileName
     }
   }
-}
-`
+`;

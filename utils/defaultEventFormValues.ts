@@ -22,12 +22,14 @@ function getDefaultEventFormValues(channelId: string): CreateEditEventFormValues
     startTime: defaultStartTimeISO || "",
     startTimeDayOfWeek: "",
     startTimeHourOfDay: 0,
-    endTime: defaultStartTimeISO ? (DateTime.fromISO(defaultStartTimeISO).plus({ hours: 2 }).toISO() || '') : "",
+    endTime: defaultStartTimeISO
+      ? DateTime.fromISO(defaultStartTimeISO).plus({ hours: 2 }).toISO() || ""
+      : "",
     canceled: false,
     deleted: false,
     free: false,
     cost: "",
-  }
+  };
 }
 
 export default getDefaultEventFormValues;

@@ -1,16 +1,16 @@
 <script setup lang="ts">
-const props = defineProps({
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  reachedEndOfResults: {
-    type: Boolean,
-    required: true,
-  },
-});
+  const props = defineProps({
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    reachedEndOfResults: {
+      type: Boolean,
+      required: true,
+    },
+  });
 
-const emit = defineEmits(['loadMore']);
+  const emit = defineEmits(["loadMore"]);
 </script>
 
 <template>
@@ -29,9 +29,9 @@ const emit = defineEmits(['loadMore']);
     </p>
     <button
       v-else
-      type="button"
-      :class="!props.reachedEndOfResults ? 'underline' : ''"
       class="cursor-pointer justify-self-center dark:text-gray-200"
+      :class="!props.reachedEndOfResults ? 'underline' : ''"
+      type="button"
       @click="emit('loadMore')"
     >
       Load more

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, watch, onMounted, ref } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
-import { isAuthenticatedVar, setIsLoadingAuth, usernameVar, setIsAuthenticated } from "@/cache";
+  import { computed, watch, onMounted, ref } from "vue";
+  import { useAuth0 } from "@auth0/auth0-vue";
+  import { isAuthenticatedVar, setIsLoadingAuth, usernameVar, setIsAuthenticated } from "@/cache";
 
-/* 
+  /* 
 This component is a wrapper around content that requires authentication.
 It shows the content if the user is authenticated, and a login button 
 if they're not.
@@ -20,233 +20,249 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
  we flip to the "has-auth" content. That causes a normal Vue re-render, 
  not a hydration mismatch.
 */
-const props = defineProps({
-  requireOwnership: Boolean,
-  owners: {
-    type: Array,
-    default: () => [],
-  },
-  justifyLeft: Boolean,
-  fullWidth: Boolean,
-  loading: Boolean,
-});
+  const props = defineProps({
+    requireOwnership: Boolean,
+    owners: {
+      type: Array,
+      default: () => [],
+    },
+    justifyLeft: Boolean,
+    fullWidth: Boolean,
+    loading: Boolean,
+  });
 
-let handleLogin = () => {};
+  let handleLogin = () => {};
 
-const isMounted = ref(false);
-const isOwner = computed(() => {
-  if (!usernameVar.value) return false;
-  return props.owners?.includes(usernameVar.value);
-});
-const showAuthContent = computed(() => {
-  // IMPORTANT: During SSR or initial mount, match the server-rendered content
-  // This prevents hydration mismatches
-  if (import.meta.env.SSR || !isMounted.value) {
-    return false; // Assume not authenticated for SSR and initial render
-  }
-  
-  // If we have a username, the user is fully authenticated
-  if (usernameVar.value) {
-    // If ownership is required, check that too
-    if (props.requireOwnership) {
-      return isOwner.value;
+  const isMounted = ref(false);
+  const isOwner = computed(() => {
+    if (!usernameVar.value) return false;
+    return props.owners?.includes(usernameVar.value);
+  });
+  const showAuthContent = computed(() => {
+    // IMPORTANT: During SSR or initial mount, match the server-rendered content
+    // This prevents hydration mismatches
+    if (import.meta.env.SSR || !isMounted.value) {
+      return false; // Assume not authenticated for SSR and initial render
     }
-    return true;
-  }
-  
-  // If no username but authenticated, allow access to non-ownership content
-  if (isAuthenticatedVar.value && !props.requireOwnership) {
-    return true;
-  }
-  
-  // Default: not authenticated or doesn't meet requirements
-  return false;
-});
 
-// Only run client-side auth logic
-if (import.meta.env.SSR === false) {
-  const { loginWithPopup, idTokenClaims, isLoading, loginWithRedirect, isAuthenticated, getAccessTokenSilently } =
-    useAuth0();
-
-  setIsLoadingAuth(isLoading.value);
-  
-  // Sync Auth0's authentication state with our local state
-  watch(isAuthenticated, (newValue) => {
-    setIsAuthenticated(newValue);
-  }, { immediate: true });
-
-  const storeToken = async () => {
-    if (isAuthenticated.value && idTokenClaims.value) {
-      try {
-        const token = idTokenClaims.value.__raw;
-        localStorage.setItem("token", token);
-      } catch (error) {
-        console.error("Error storing token:", error);
+    // If we have a username, the user is fully authenticated
+    if (usernameVar.value) {
+      // If ownership is required, check that too
+      if (props.requireOwnership) {
+        return isOwner.value;
       }
+      return true;
     }
-  };
-  
-  // Export a function to refresh tokens that can be called when session expired errors occur
-  // This needs to be exposed to the global window object so it can be called from anywhere
-  const refreshTokenAndRetry = async () => {
-    try {
-      // Throttle refresh requests
-      const lastRefreshAt = sessionStorage.getItem("tokenRefreshedAt");
-      const now = Date.now();
-      const thirtySecondsAgo = now - (30 * 1000); // Only refresh once every 30 seconds max
-      
-      if (lastRefreshAt && parseInt(lastRefreshAt) > thirtySecondsAgo) {
-        // Already refreshed recently, use the existing token
-        console.log("Using recently refreshed token");
-        return true;
+
+    // If no username but authenticated, allow access to non-ownership content
+    if (isAuthenticatedVar.value && !props.requireOwnership) {
+      return true;
+    }
+
+    // Default: not authenticated or doesn't meet requirements
+    return false;
+  });
+
+  // Only run client-side auth logic
+  if (import.meta.env.SSR === false) {
+    const {
+      loginWithPopup,
+      idTokenClaims,
+      isLoading,
+      loginWithRedirect,
+      isAuthenticated,
+      getAccessTokenSilently,
+    } = useAuth0();
+
+    setIsLoadingAuth(isLoading.value);
+
+    // Sync Auth0's authentication state with our local state
+    watch(
+      isAuthenticated,
+      (newValue) => {
+        setIsAuthenticated(newValue);
+      },
+      { immediate: true }
+    );
+
+    const storeToken = async () => {
+      if (isAuthenticated.value && idTokenClaims.value) {
+        try {
+          const token = idTokenClaims.value.__raw;
+          localStorage.setItem("token", token);
+        } catch (error) {
+          console.error("Error storing token:", error);
+        }
       }
-      
+    };
+
+    // Export a function to refresh tokens that can be called when session expired errors occur
+    // This needs to be exposed to the global window object so it can be called from anywhere
+    const refreshTokenAndRetry = async () => {
       try {
-        // Try to get a token using the cache first
-        const freshToken = await getAccessTokenSilently({
-          detailedResponse: true
-        });
-        
-        if (freshToken && idTokenClaims.value) {
-          localStorage.setItem("token", idTokenClaims.value.__raw || '');
-          sessionStorage.setItem("tokenRefreshedAt", now.toString());
-          console.log("Token refreshed after session expired error");
+        // Throttle refresh requests
+        const lastRefreshAt = sessionStorage.getItem("tokenRefreshedAt");
+        const now = Date.now();
+        const thirtySecondsAgo = now - 30 * 1000; // Only refresh once every 30 seconds max
+
+        if (lastRefreshAt && parseInt(lastRefreshAt) > thirtySecondsAgo) {
+          // Already refreshed recently, use the existing token
+          console.log("Using recently refreshed token");
           return true;
         }
-        return false;
-      } catch (innerError) {
-        // If there's an error with the refresh token, we need to handle it
-        console.error("Error with token refresh attempt:", innerError);
-        
-        // If this is an invalid refresh token, we need to log the user out and re-authenticate
-        if (innerError.message && innerError.message.includes('Unknown or invalid refresh token')) {
-          console.log("Invalid refresh token detected, user needs to login again");
-          setIsAuthenticated(false); // Update local auth state
-          
-          // Clear any stored tokens to prevent further attempts with invalid tokens
-          localStorage.removeItem("token");
-          sessionStorage.removeItem("tokenRefreshedAt");
-          
-          // Optionally redirect to login or show login UI
+
+        try {
+          // Try to get a token using the cache first
+          const freshToken = await getAccessTokenSilently({
+            detailedResponse: true,
+          });
+
+          if (freshToken && idTokenClaims.value) {
+            localStorage.setItem("token", idTokenClaims.value.__raw || "");
+            sessionStorage.setItem("tokenRefreshedAt", now.toString());
+            console.log("Token refreshed after session expired error");
+            return true;
+          }
+          return false;
+        } catch (innerError) {
+          // If there's an error with the refresh token, we need to handle it
+          console.error("Error with token refresh attempt:", innerError);
+
+          // If this is an invalid refresh token, we need to log the user out and re-authenticate
+          if (
+            innerError.message &&
+            innerError.message.includes("Unknown or invalid refresh token")
+          ) {
+            console.log("Invalid refresh token detected, user needs to login again");
+            setIsAuthenticated(false); // Update local auth state
+
+            // Clear any stored tokens to prevent further attempts with invalid tokens
+            localStorage.removeItem("token");
+            sessionStorage.removeItem("tokenRefreshedAt");
+
+            // Optionally redirect to login or show login UI
+            return false;
+          }
+
+          // For other errors, just return false
           return false;
         }
-        
-        // For other errors, just return false
+      } catch (error) {
+        console.error("Error in refreshTokenAndRetry:", error);
         return false;
       }
-    } catch (error) {
-      console.error("Error in refreshTokenAndRetry:", error);
-      return false;
-    }
-  };
-  
-  // Expose the refresh function globally
-  if (typeof window !== 'undefined') {
-    window.refreshAuthToken = refreshTokenAndRetry;
-  }
+    };
 
-  // Watch for authentication state changes
-  watch(idTokenClaims, async (claims) => {
-    if (isAuthenticated.value && claims) {
-      await storeToken();
+    // Expose the refresh function globally
+    if (typeof window !== "undefined") {
+      window.refreshAuthToken = refreshTokenAndRetry;
     }
-  });
 
-  onMounted(async () => {
-    isMounted.value = true;
-    
-    try {
-      // Use a flag to prevent multiple refreshes on the same page load
-      const hasRefreshedToken = sessionStorage.getItem("tokenRefreshedAt");
-      const now = Date.now();
-      const fiveMinutesAgo = now - (5 * 60 * 1000);
-      
-      // Only refresh if we haven't already or if it's been more than 5 minutes
-      if (!hasRefreshedToken || parseInt(hasRefreshedToken) < fiveMinutesAgo) {
-        // Force token refresh on page load/refresh if authenticated
-        if (isAuthenticated.value) {
-          try {
-            // First try with cacheMode: 'on' to use any existing valid tokens
-            const freshToken = await getAccessTokenSilently({
-              detailedResponse: true,
-              cacheMode: 'on' // Try to use cached token first
-            });
-            
-            if (freshToken) {
-              // Store the ID token in localStorage for Apollo client
-              localStorage.setItem("token", idTokenClaims.value?.__raw || '');
+    // Watch for authentication state changes
+    watch(idTokenClaims, async (claims) => {
+      if (isAuthenticated.value && claims) {
+        await storeToken();
+      }
+    });
+
+    onMounted(async () => {
+      isMounted.value = true;
+
+      try {
+        // Use a flag to prevent multiple refreshes on the same page load
+        const hasRefreshedToken = sessionStorage.getItem("tokenRefreshedAt");
+        const now = Date.now();
+        const fiveMinutesAgo = now - 5 * 60 * 1000;
+
+        // Only refresh if we haven't already or if it's been more than 5 minutes
+        if (!hasRefreshedToken || parseInt(hasRefreshedToken) < fiveMinutesAgo) {
+          // Force token refresh on page load/refresh if authenticated
+          if (isAuthenticated.value) {
+            try {
+              // First try with cacheMode: 'on' to use any existing valid tokens
+              const freshToken = await getAccessTokenSilently({
+                detailedResponse: true,
+                cacheMode: "on", // Try to use cached token first
+              });
+
+              if (freshToken) {
+                // Store the ID token in localStorage for Apollo client
+                localStorage.setItem("token", idTokenClaims.value?.__raw || "");
+                // Set the flag to prevent multiple refreshes
+                sessionStorage.setItem("tokenRefreshedAt", now.toString());
+                console.log("Token refreshed on page load");
+              }
+            } catch (innerError) {
+              // If using cached token fails, handle silently
+              console.log(
+                "Could not use cached token, will try login redirect if needed",
+                innerError
+              );
+
+              // If this is an invalid refresh token, we need to log the user out and re-authenticate
+              if (
+                innerError.message &&
+                innerError.message.includes("Unknown or invalid refresh token")
+              ) {
+                console.log("Invalid refresh token, will need to reauthenticate");
+                setIsAuthenticated(false); // Update local auth state
+              }
+            }
+          } else if (idTokenClaims.value) {
+            // Handle case for returning from a redirect
+            const currentToken = localStorage.getItem("token");
+            const newToken = idTokenClaims.value.__raw;
+
+            if (currentToken !== newToken) {
+              storeToken();
               // Set the flag to prevent multiple refreshes
               sessionStorage.setItem("tokenRefreshedAt", now.toString());
-              console.log("Token refreshed on page load");
             }
-          } catch (innerError) {
-            // If using cached token fails, handle silently
-            console.log("Could not use cached token, will try login redirect if needed", innerError);
-            
-            // If this is an invalid refresh token, we need to log the user out and re-authenticate
-            if (innerError.message && innerError.message.includes('Unknown or invalid refresh token')) {
-              console.log("Invalid refresh token, will need to reauthenticate");
-              setIsAuthenticated(false); // Update local auth state
-            }
-          }
-        } else if (idTokenClaims.value) {
-          // Handle case for returning from a redirect
-          const currentToken = localStorage.getItem("token");
-          const newToken = idTokenClaims.value.__raw;
-          
-          if (currentToken !== newToken) {
-            storeToken();
-            // Set the flag to prevent multiple refreshes
-            sessionStorage.setItem("tokenRefreshedAt", now.toString());
           }
         }
+      } catch (error) {
+        console.error("Error refreshing token on mount:", error);
+        // If token refresh fails, don't crash but log it
       }
-    } catch (error) {
-      console.error("Error refreshing token on mount:", error);
-      // If token refresh fails, don't crash but log it
-    }
-  });
+    });
 
-  handleLogin = async () => {
-    try {
-      // Add debug statements for troubleshooting
-      console.log("Login button clicked");
+    handleLogin = async () => {
+      try {
+        // Add debug statements for troubleshooting
+        console.log("Login button clicked");
 
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      
-      // @ts-ignore
-      if (window?.parent?.Cypress || isMobile) {
-        // Make sure to return early after redirect to prevent additional actions
-        console.log("Using redirect for Cypress or mobile");
-        await loginWithRedirect();
-        return;
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+        // @ts-ignore
+        if (window?.parent?.Cypress || isMobile) {
+          // Make sure to return early after redirect to prevent additional actions
+          console.log("Using redirect for Cypress or mobile");
+          await loginWithRedirect();
+          return;
+        }
+
+        console.log("Attempting popup login");
+        await loginWithPopup();
+        console.log("Popup login completed");
+
+        // Ensure state is updated
+        if (isAuthenticated.value) {
+          setIsAuthenticated(true);
+          console.log("Authentication state updated");
+        }
+
+        await storeToken();
+      } catch (error) {
+        console.error("Login error:", error);
       }
-      
-      console.log("Attempting popup login");
-      await loginWithPopup();
-      console.log("Popup login completed");
-      
-      // Ensure state is updated
-      if (isAuthenticated.value) {
-        setIsAuthenticated(true);
-        console.log("Authentication state updated");
-      }
-      
-      await storeToken();
-    } catch (error) {
-      console.error("Login error:", error);
-    }
-  };
-}
+    };
+  }
 </script>
 
 <template>
   <div
-    class="flex items-center "
-    :class="[
-      fullWidth ? 'w-full' : '',
-      justifyLeft ? 'justify-start w-full' : 'justify-center',
-    ]"
+    class="flex items-center"
+    :class="[fullWidth ? 'w-full' : '', justifyLeft ? 'w-full justify-start' : 'justify-center']"
   >
     <client-only>
       <template #fallback>
@@ -258,7 +274,7 @@ if (import.meta.env.SSR === false) {
           <slot name="does-not-have-auth" />
         </div>
       </template>
-      
+
       <div
         v-if="!showAuthContent"
         class="w-full"

@@ -31,7 +31,9 @@ type BaseEvent = {
 const generateEventDates = (daysFromNow: number) => {
   const now = DateTime.now();
   const hoursToAdd = daysFromNow === 0 ? 1 : 0;
-  const startDate = now.plus({ days: daysFromNow, hours: hoursToAdd }).set({ minute: 0, second: 0, millisecond: 0 });
+  const startDate = now
+    .plus({ days: daysFromNow, hours: hoursToAdd })
+    .set({ minute: 0, second: 0, millisecond: 0 });
   const endDate = startDate.plus({ hours: 2 });
 
   return {
@@ -46,9 +48,9 @@ const timeZone = Cypress.env("TZ");
 const now = DateTime.now().setZone(timeZone);
 
 const getStartOfThisWeekend = () => {
-  const today = now.startOf('day');
+  const today = now.startOf("day");
   const saturday = today.set({ weekday: 6 }); // 6 is Saturday
-  
+
   // If today is already past this Saturday, get next Saturday
   if (today > saturday) {
     return saturday.plus({ weeks: 1 });
@@ -57,9 +59,9 @@ const getStartOfThisWeekend = () => {
 };
 
 const getStartOfNextWeek = () => {
-  const today = now.startOf('day');
+  const today = now.startOf("day");
   const nextSunday = today.set({ weekday: 7 }); // 7 is Sunday
-  
+
   // If today is already Sunday, get next Sunday
   // If today is Saturday, nextSunday will be tomorrow
   if (today >= nextSunday) {
@@ -98,7 +100,7 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Weekend Test Event",
-    startTime: startOfNextWeekend.toISO(),  // Start exactly on Saturday
+    startTime: startOfNextWeekend.toISO(), // Start exactly on Saturday
     endTime: startOfNextWeekend.plus({ days: 1 }).toISO(), // End on Sunday
     startTimeDayOfWeek: startOfNextWeekend.weekdayLong,
     startTimeHourOfDay: startOfNextWeekend.hour,
@@ -122,8 +124,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Weekend Test Event",
-    startTime: startOfNextWeek.plus({ days: 5 }).toISO(),  // Saturday of next week (removed the minute offset)
-    endTime: startOfNextWeek.plus({ days: 6 }).toISO(),    // Sunday of next week
+    startTime: startOfNextWeek.plus({ days: 5 }).toISO(), // Saturday of next week (removed the minute offset)
+    endTime: startOfNextWeek.plus({ days: 6 }).toISO(), // Sunday of next week
     startTimeDayOfWeek: startOfNextWeek.plus({ days: 5 }).weekdayLong,
     startTimeHourOfDay: startOfNextWeek.plus({ days: 5 }).hour,
     poster: "cluse",
@@ -135,7 +137,7 @@ const timeBasedEvents: BaseEvent[] = [
   {
     title: "This Month Test Event",
     startTime: now.plus({ hours: 1 }).toISO(), // Keep this to ensure it's in the future
-    endTime: now.plus({ hours: 3 }).toISO(),   // Just make it a 2-hour event
+    endTime: now.plus({ hours: 3 }).toISO(), // Just make it a 2-hour event
     startTimeDayOfWeek: now.weekdayLong,
     startTimeHourOfDay: now.hour,
     poster: "cluse",
@@ -146,8 +148,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Past Test Event",
-    startTime: now.minus({ months: 1 }).toISO(),     // One month ago
-    endTime: now.minus({ months: 1, hours: -2 }).toISO(),  // Event lasted 2 hours
+    startTime: now.minus({ months: 1 }).toISO(), // One month ago
+    endTime: now.minus({ months: 1, hours: -2 }).toISO(), // Event lasted 2 hours
     startTimeDayOfWeek: now.minus({ months: 1 }).weekdayLong,
     startTimeHourOfDay: now.minus({ months: 1 }).hour,
     poster: "cluse",
@@ -158,8 +160,8 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Month Test Event",
-    startTime: startOfNextMonth.toISO(),  // Start exactly at the beginning of next month
-    endTime: startOfNextMonth.plus({ hours: 2 }).toISO(),  // 2-hour event
+    startTime: startOfNextMonth.toISO(), // Start exactly at the beginning of next month
+    endTime: startOfNextMonth.plus({ hours: 2 }).toISO(), // 2-hour event
     startTimeDayOfWeek: startOfNextMonth.weekdayLong,
     startTimeHourOfDay: startOfNextMonth.hour,
     poster: "cluse",
@@ -367,7 +369,7 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
     canceled,
     tags,
     channels,
-    virtualEventUrl
+    virtualEventUrl,
   }) => ({
     eventCreateInput: {
       title,
@@ -393,11 +395,11 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
       ...(tags?.length > 0 && {
         Tags: {
           connect: tags.map((tag) => ({
-              where: { node: { text: tag } },
-            })),
-          },
-        }),
-      virtualEventUrl
+            where: { node: { text: tag } },
+          })),
+        },
+      }),
+      virtualEventUrl,
     },
     channelConnections: channels,
   })

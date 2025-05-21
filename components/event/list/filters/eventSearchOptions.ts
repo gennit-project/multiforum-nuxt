@@ -17,8 +17,8 @@ export const timeShortcutValues = {
   NEXT_WEEKEND: "NEXT_WEEKEND",
   THIS_MONTH: "THIS_MONTH",
   NEXT_MONTH: "NEXT_MONTH",
-  PAST_EVENTS: "PAST_EVENTS"
-}
+  PAST_EVENTS: "PAST_EVENTS",
+};
 
 export const timeFilterShortcuts = [
   {
@@ -157,13 +157,12 @@ export const createDefaultSelectedWeeklyHourRanges = () => {
 
   for (let i = 0; i < weekdays.length; i++) {
     const weekday = weekdays[i];
-    weeklyTimeSlots[weekday.number] = createDefaultSelectedHourRanges()
+    weeklyTimeSlots[weekday.number] = createDefaultSelectedHourRanges();
   }
   return weeklyTimeSlots;
 };
 
-export const defaultSelectedWeeklyHourRanges =
-  createDefaultSelectedWeeklyHourRanges();
+export const defaultSelectedWeeklyHourRanges = createDefaultSelectedWeeklyHourRanges();
 
 const createHourRangesObject = () => {
   // Used as a reference to build graphQL query from selected time slots
@@ -194,7 +193,7 @@ export const weekdayObject = createWeekdayObject();
 export const distanceOptionsForMiles: Array<DistanceUnit> = [
   {
     label: "5",
-    value: 8.04672 // Miles converted to kilometers for querying the database
+    value: 8.04672, // Miles converted to kilometers for querying the database
   },
   {
     label: "10",
@@ -210,13 +209,13 @@ export const distanceOptionsForMiles: Array<DistanceUnit> = [
   },
   {
     label: "100",
-    value: 160.934
+    value: 160.934,
   },
   {
     label: "Any distance",
     value: 0,
   },
-]
+];
 
 export const distanceOptionsForKilometers: Array<DistanceUnit> = [
   {
@@ -247,8 +246,8 @@ export const distanceOptionsForKilometers: Array<DistanceUnit> = [
 
 export const MilesOrKm = {
   MI: "mi",
-  KM: "km"
-}
+  KM: "km",
+};
 
 export const distanceUnitOptions: Array<DistanceUnit> = [
   { label: "km", value: "km" },
@@ -268,5 +267,5 @@ export const weekdayMap = createWeekdayMap();
 
 export const resultOrderTypes = {
   CHRONOLOGICAL: "CHRONOLOGICAL",
-  REVERSE_CHRONOLOGICAL: "REVERSE_CHRONOLOGICAL"
-}
+  REVERSE_CHRONOLOGICAL: "REVERSE_CHRONOLOGICAL",
+};

@@ -1,352 +1,360 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
-import type { PropType } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import type { Event } from "@/__generated__/graphql";
-import {
-  CANCEL_EVENT,
-  DELETE_EVENT,
-  ADD_FEEDBACK_COMMENT_TO_EVENT,
-} from "@/graphQLData/event/mutations";
-import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-import LinkIcon from "@/components/icons/LinkIcon.vue";
-import LocationIcon from "@/components/icons/LocationIcon.vue";
-import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import { DateTime } from "luxon";
-import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import WarningModal from "@/components/WarningModal.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { getDuration } from "@/utils";
-import { getAllPermissions } from "@/utils/permissionUtils";
-import { getEventHeaderMenuItems } from "@/utils/headerPermissionUtils";
-import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
-import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-import { modProfileNameVar, usernameVar } from "@/cache";
-import { useRoute, useRouter } from "nuxt/app";
-import InfoBanner from "@/components/InfoBanner.vue";
-import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
-import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-import { config } from "@/config";
+  import { computed, ref } from "vue";
+  import type { PropType } from "vue";
+  import { useMutation, useQuery } from "@vue/apollo-composable";
+  import type { Event } from "@/__generated__/graphql";
+  import {
+    CANCEL_EVENT,
+    DELETE_EVENT,
+    ADD_FEEDBACK_COMMENT_TO_EVENT,
+  } from "@/graphQLData/event/mutations";
+  import CalendarIcon from "@/components/icons/CalendarIcon.vue";
+  import LinkIcon from "@/components/icons/LinkIcon.vue";
+  import LocationIcon from "@/components/icons/LocationIcon.vue";
+  import ClipboardIcon from "@/components/icons/ClipboardIcon.vue";
+  import Notification from "@/components/NotificationComponent.vue";
+  import { DateTime } from "luxon";
+  import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
+  import WarningModal from "@/components/WarningModal.vue";
+  import ErrorBanner from "@/components/ErrorBanner.vue";
+  import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
+  import { getDuration } from "@/utils";
+  import { getAllPermissions } from "@/utils/permissionUtils";
+  import { getEventHeaderMenuItems } from "@/utils/headerPermissionUtils";
+  import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
+  import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
+  import { modProfileNameVar, usernameVar } from "@/cache";
+  import { useRoute, useRouter } from "nuxt/app";
+  import InfoBanner from "@/components/InfoBanner.vue";
+  import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+  import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
+  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+  import { config } from "@/config";
 
-const props = defineProps({
-  eventData: {
-    type: Object as PropType<Event>,
-    required: true,
-  },
-  showMenuButtons: {
-    type: Boolean,
-    default: true,
-  },
-  eventIsArchived: {
-    type: Boolean,
-    default: false,
-  },
-  eventChannelId: {
-    type: String,
-    default: "",
-  },
-});
-
-defineEmits(["archived-successfully"]);
-
-const route = useRoute();
-const router = useRouter();
-
-const showCopiedLinkNotification = ref(false);
-const showFeedbackFormModal = ref(false);
-const showFeedbackSubmittedSuccessfully = ref(false);
-const confirmDeleteIsOpen = ref(false);
-const confirmCancelIsOpen = ref(false);
-const showArchiveAndSuspendModal = ref(false);
-
-const showReportEventModal = ref(false);
-const showArchiveModal = ref(false);
-const showUnarchiveModal = ref(false);
-const showSuccessfullyArchived = ref(false);
-const showSuccessfullyUnarchived = ref(false);
-const showSuccessfullySuspended = ref(false);
-const showSuccessfullyArchivedAndSuspended = ref(false);
-const showSuccessfullyReported = ref(false);
-
-const eventId = computed(() => {
-  return typeof route.params.eventId === "string" ? route.params.eventId : "";
-});
-
-const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
-    return route.params.forumId;
-  }
-  return props.eventData?.EventChannels?.[0]?.channelUniqueName || "";
-});
-
-// Query the channel data to get roles
-const { result: getChannelResult } = useQuery(
-  GET_CHANNEL,
-  {
-    uniqueName: props.eventChannelId || channelId.value,
-    // Using luxon, round down to the nearest hour
-    now: DateTime.local().startOf("hour").toISO(),
-  },
-  {
-    fetchPolicy: "cache-first",
-    nextFetchPolicy: "cache-first",
-    enabled: computed(() => !!props.eventChannelId || !!channelId.value),
-  }
-);
-
-// Query server config to get default roles
-const { result: getServerResult } = useQuery(
-  GET_SERVER_CONFIG,
-  {
-    serverName: config.serverName,
-  },
-  {
-    fetchPolicy: "cache-first",
-  }
-);
-
-// Get the standard and elevated mod roles from the channel or server default
-const standardModRole = computed(() => {
-  // If the channel has a Default Mod Role, return that
-  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
-    return getChannelResult.value?.channels[0]?.DefaultModRole;
-  }
-  // Otherwise, return the default mod role from the server config
-  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
-  }
-  return null;
-});
-
-const elevatedModRole = computed(() => {
-  // If the channel has a Default Elevated Mod Role, return that
-  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
-    return getChannelResult.value?.channels[0]?.ElevatedModRole;
-  }
-  // Otherwise, return the default elevated mod role from server config
-  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
-    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
-  }
-  return null;
-});
-
-// Query user's permissions in the channel
-const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL, {
-  modDisplayName: modProfileNameVar.value,
-  username: usernameVar.value,
-  channelUniqueName: props.eventChannelId || channelId.value || "",
-}, {
-  enabled: computed(() => !!modProfileNameVar.value && !!usernameVar.value && (!!props.eventChannelId || !!channelId.value)),
-  fetchPolicy: "cache-first",
-});
-
-// Get permission data from the query result
-const permissionData = computed(() => {
-  if (getPermissionResult.value?.channels?.[0]) {
-    return getPermissionResult.value.channels[0];
-  }
-  return null;
-});
-
-// Get all permissions for the current user using our utility function
-const userPermissions = computed(() => {
-  return getAllPermissions({
-    permissionData: permissionData.value,
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value,
-    username: usernameVar.value,
-    modProfileName: modProfileNameVar.value
-  });
-});
-
-const permalinkObject = computed(() => {
-  if (!eventId.value) return {};
-  return {
-    name: "forums-forumId-events-eventId",
-    params: {
-      eventId: eventId.value,
-      forumId: channelId.value,
+  const props = defineProps({
+    eventData: {
+      type: Object as PropType<Event>,
+      required: true,
     },
-  };
-});
+    showMenuButtons: {
+      type: Boolean,
+      default: true,
+    },
+    eventIsArchived: {
+      type: Boolean,
+      default: false,
+    },
+    eventChannelId: {
+      type: String,
+      default: "",
+    },
+  });
 
-const {
-  mutate: deleteEvent,
-  error: deleteEventError,
-  loading: deleteEventLoading,
-  onDone: onDoneDeleting,
-} = useMutation(DELETE_EVENT, {
-  variables: { id: eventId.value },
-  update: (cache) => {
-    cache.modify({
-      fields: {
-        events(existingEventRefs = [], { readField }) {
-          return existingEventRefs.filter(
-            (ref: any) => readField("id", ref) !== eventId.value
-          );
+  defineEmits(["archived-successfully"]);
+
+  const route = useRoute();
+  const router = useRouter();
+
+  const showCopiedLinkNotification = ref(false);
+  const showFeedbackFormModal = ref(false);
+  const showFeedbackSubmittedSuccessfully = ref(false);
+  const confirmDeleteIsOpen = ref(false);
+  const confirmCancelIsOpen = ref(false);
+  const showArchiveAndSuspendModal = ref(false);
+
+  const showReportEventModal = ref(false);
+  const showArchiveModal = ref(false);
+  const showUnarchiveModal = ref(false);
+  const showSuccessfullyArchived = ref(false);
+  const showSuccessfullyUnarchived = ref(false);
+  const showSuccessfullySuspended = ref(false);
+  const showSuccessfullyArchivedAndSuspended = ref(false);
+  const showSuccessfullyReported = ref(false);
+
+  const eventId = computed(() => {
+    return typeof route.params.eventId === "string" ? route.params.eventId : "";
+  });
+
+  const channelId = computed(() => {
+    if (typeof route.params.forumId === "string") {
+      return route.params.forumId;
+    }
+    return props.eventData?.EventChannels?.[0]?.channelUniqueName || "";
+  });
+
+  // Query the channel data to get roles
+  const { result: getChannelResult } = useQuery(
+    GET_CHANNEL,
+    {
+      uniqueName: props.eventChannelId || channelId.value,
+      // Using luxon, round down to the nearest hour
+      now: DateTime.local().startOf("hour").toISO(),
+    },
+    {
+      fetchPolicy: "cache-first",
+      nextFetchPolicy: "cache-first",
+      enabled: computed(() => !!props.eventChannelId || !!channelId.value),
+    }
+  );
+
+  // Query server config to get default roles
+  const { result: getServerResult } = useQuery(
+    GET_SERVER_CONFIG,
+    {
+      serverName: config.serverName,
+    },
+    {
+      fetchPolicy: "cache-first",
+    }
+  );
+
+  // Get the standard and elevated mod roles from the channel or server default
+  const standardModRole = computed(() => {
+    // If the channel has a Default Mod Role, return that
+    if (getChannelResult.value?.channels[0]?.DefaultModRole) {
+      return getChannelResult.value?.channels[0]?.DefaultModRole;
+    }
+    // Otherwise, return the default mod role from the server config
+    if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
+      return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
+    }
+    return null;
+  });
+
+  const elevatedModRole = computed(() => {
+    // If the channel has a Default Elevated Mod Role, return that
+    if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
+      return getChannelResult.value?.channels[0]?.ElevatedModRole;
+    }
+    // Otherwise, return the default elevated mod role from server config
+    if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
+      return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
+    }
+    return null;
+  });
+
+  // Query user's permissions in the channel
+  const { result: getPermissionResult } = useQuery(
+    USER_IS_MOD_OR_OWNER_IN_CHANNEL,
+    {
+      modDisplayName: modProfileNameVar.value,
+      username: usernameVar.value,
+      channelUniqueName: props.eventChannelId || channelId.value || "",
+    },
+    {
+      enabled: computed(
+        () =>
+          !!modProfileNameVar.value &&
+          !!usernameVar.value &&
+          (!!props.eventChannelId || !!channelId.value)
+      ),
+      fetchPolicy: "cache-first",
+    }
+  );
+
+  // Get permission data from the query result
+  const permissionData = computed(() => {
+    if (getPermissionResult.value?.channels?.[0]) {
+      return getPermissionResult.value.channels[0];
+    }
+    return null;
+  });
+
+  // Get all permissions for the current user using our utility function
+  const userPermissions = computed(() => {
+    return getAllPermissions({
+      permissionData: permissionData.value,
+      standardModRole: standardModRole.value,
+      elevatedModRole: elevatedModRole.value,
+      username: usernameVar.value,
+      modProfileName: modProfileNameVar.value,
+    });
+  });
+
+  const permalinkObject = computed(() => {
+    if (!eventId.value) return {};
+    return {
+      name: "forums-forumId-events-eventId",
+      params: {
+        eventId: eventId.value,
+        forumId: channelId.value,
+      },
+    };
+  });
+
+  const {
+    mutate: deleteEvent,
+    error: deleteEventError,
+    loading: deleteEventLoading,
+    onDone: onDoneDeleting,
+  } = useMutation(DELETE_EVENT, {
+    variables: { id: eventId.value },
+    update: (cache) => {
+      cache.modify({
+        fields: {
+          events(existingEventRefs = [], { readField }) {
+            return existingEventRefs.filter((ref: any) => readField("id", ref) !== eventId.value);
+          },
         },
+      });
+    },
+  });
+
+  onDoneDeleting(() => {
+    if (channelId.value) {
+      router.push({
+        name: "forums-forumId-events",
+        params: { forumId: channelId.value },
+      });
+    }
+  });
+
+  const {
+    mutate: cancelEvent,
+    error: cancelEventError,
+    loading: cancelEventLoading,
+    onDone: onDoneCanceling,
+  } = useMutation(CANCEL_EVENT, {
+    variables: {
+      id: eventId.value,
+      updateEventInput: { canceled: true },
+      eventWhere: { id: eventId.value },
+    },
+  });
+
+  onDoneCanceling(() => {
+    confirmCancelIsOpen.value = false;
+  });
+
+  const {
+    mutate: addFeedbackCommentToEvent,
+    loading: addFeedbackCommentToEventLoading,
+    error: addFeedbackCommentToEventError,
+    onDone: onAddFeedbackCommentToEventDone,
+  } = useMutation(ADD_FEEDBACK_COMMENT_TO_EVENT);
+
+  onAddFeedbackCommentToEventDone(() => {
+    showFeedbackFormModal.value = false;
+    showFeedbackSubmittedSuccessfully.value = true;
+  });
+
+  const addressCopied = ref(false);
+
+  const copyAddress = async () => {
+    try {
+      const address = props.eventData.address || "";
+      await navigator.clipboard.writeText(address);
+      addressCopied.value = true;
+      setTimeout(() => {
+        addressCopied.value = false;
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const copyLink = async () => {
+    try {
+      const basePath = window.location.origin;
+      const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
+      await navigator.clipboard.writeText(permalink);
+      showCopiedLinkNotification.value = true;
+      setTimeout(() => {
+        showCopiedLinkNotification.value = false;
+      }, 2000);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const isAdmin = computed(() => {
+    const serverRoles = props.eventData.Poster?.ServerRoles;
+    return serverRoles && serverRoles?.length > 0 && serverRoles[0].showAdminTag;
+  });
+
+  const menuItems = computed(() => {
+    if (!props.eventData) {
+      return [];
+    }
+
+    // Use our utility function to get the menu items
+    return getEventHeaderMenuItems({
+      isOwnEvent: props.eventData?.Poster?.username === usernameVar.value,
+      isArchived: !!props.eventIsArchived,
+      isCanceled: !!props.eventData.canceled,
+      userPermissions: userPermissions.value,
+      isLoggedIn: !!usernameVar.value,
+      eventId: props.eventData.id,
+      isOnFeedbackPage: route.name === "EventFeedback",
+    });
+  });
+
+  function getFormattedDateString(startTime: string) {
+    // if the event is all day and spans multiple days,
+    // include start and end date but not time
+    if (props.eventData.isAllDay && props.eventData.endTime) {
+      const start = DateTime.fromISO(startTime);
+      const end = DateTime.fromISO(props.eventData.endTime);
+      if (start.hasSame(end, "day")) {
+        return start.toFormat("cccc LLLL d yyyy");
+      }
+      return `${start.toFormat("cccc LLLL d yyyy")} - ${end.toFormat("cccc LLLL d yyyy")}`;
+    }
+    return DateTime.fromISO(startTime).toFormat("cccc LLLL d yyyy h:mm a");
+  }
+
+  const feedbackText = ref("");
+
+  function handleSubmitFeedback() {
+    if (!feedbackText.value) {
+      console.error("Feedback text is required");
+      return;
+    }
+    if (!modProfileNameVar.value) {
+      console.error("Mod profile name is required to submit feedback");
+      return;
+    }
+    addFeedbackCommentToEvent({
+      eventId: eventId.value,
+      text: feedbackText.value,
+      channelId: channelId.value,
+      modProfileName: modProfileNameVar.value,
+    });
+  }
+
+  function handleViewFeedback() {
+    router.push({
+      name: "forums-forumId-events-feedback-eventId",
+      params: {
+        eventId: eventId.value,
+        forumId: channelId.value,
       },
     });
-  },
-});
-
-onDoneDeleting(() => {
-  if (channelId.value) {
-    router.push({
-      name: "forums-forumId-events",
-      params: { forumId: channelId.value },
-    });
   }
-});
 
-const {
-  mutate: cancelEvent,
-  error: cancelEventError,
-  loading: cancelEventLoading,
-  onDone: onDoneCanceling,
-} = useMutation(CANCEL_EVENT, {
-  variables: {
-    id: eventId.value,
-    updateEventInput: { canceled: true },
-    eventWhere: { id: eventId.value },
-  },
-});
-
-onDoneCanceling(() => {
-  confirmCancelIsOpen.value = false;
-});
-
-const {
-  mutate: addFeedbackCommentToEvent,
-  loading: addFeedbackCommentToEventLoading,
-  error: addFeedbackCommentToEventError,
-  onDone: onAddFeedbackCommentToEventDone,
-} = useMutation(ADD_FEEDBACK_COMMENT_TO_EVENT);
-
-onAddFeedbackCommentToEventDone(() => {
-  showFeedbackFormModal.value = false;
-  showFeedbackSubmittedSuccessfully.value = true;
-});
-
-const addressCopied = ref(false);
-
-const copyAddress = async () => {
-  try {
-    const address = props.eventData.address || "";
-    await navigator.clipboard.writeText(address);
-    addressCopied.value = true;
-    setTimeout(() => {
-      addressCopied.value = false;
-    }, 2000);
-  } catch (error) {
-    console.error(error);
+  function handleFeedbackInput(event: string) {
+    feedbackText.value = event;
   }
-};
-
-const copyLink = async () => {
-  try {
-    const basePath = window.location.origin;
-    const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
-    await navigator.clipboard.writeText(permalink);
-    showCopiedLinkNotification.value = true;
-    setTimeout(() => {
-      showCopiedLinkNotification.value = false;
-    }, 2000);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-const isAdmin = computed(() => {
-  const serverRoles = props.eventData.Poster?.ServerRoles;
-  return serverRoles && serverRoles?.length > 0 && serverRoles[0].showAdminTag;
-});
-
-const menuItems = computed(() => {  
-  if (!props.eventData) {
-    return [];
-  }
-  
-  // Use our utility function to get the menu items
-  return getEventHeaderMenuItems({
-    isOwnEvent: props.eventData?.Poster?.username === usernameVar.value,
-    isArchived: !!props.eventIsArchived,
-    isCanceled: !!props.eventData.canceled,
-    userPermissions: userPermissions.value,
-    isLoggedIn: !!usernameVar.value,
-    eventId: props.eventData.id,
-    isOnFeedbackPage: route.name === "EventFeedback"
-  });
-});
-
-function getFormattedDateString(startTime: string) {
-  // if the event is all day and spans multiple days,
-  // include start and end date but not time
-  if (props.eventData.isAllDay && props.eventData.endTime) {
-    const start = DateTime.fromISO(startTime);
-    const end = DateTime.fromISO(props.eventData.endTime);
-    if (start.hasSame(end, "day")) {
-      return start.toFormat("cccc LLLL d yyyy");
-    }
-    return `${start.toFormat("cccc LLLL d yyyy")} - ${end.toFormat(
-      "cccc LLLL d yyyy"
-    )}`;
-  }
-  return DateTime.fromISO(startTime).toFormat("cccc LLLL d yyyy h:mm a");
-}
-
-const feedbackText = ref("");
-
-function handleSubmitFeedback() {
-  if (!feedbackText.value) {
-    console.error("Feedback text is required");
-    return;
-  }
-  if (!modProfileNameVar.value) {
-    console.error("Mod profile name is required to submit feedback");
-    return;
-  }
-  addFeedbackCommentToEvent({
-    eventId: eventId.value,
-    text: feedbackText.value,
-    channelId: channelId.value,
-    modProfileName: modProfileNameVar.value,
-  });
-}
-
-function handleViewFeedback() {
-  router.push({
-    name: "forums-forumId-events-feedback-eventId",
-    params: {
-      eventId: eventId.value,
-      forumId: channelId.value,
+  // Enhanced debug log to diagnose why permissionData is null
+  console.log("EVENT HEADER DEBUG:", {
+    userPerms: userPermissions.value,
+    queryParams: {
+      modDisplayName: modProfileNameVar.value,
+      username: usernameVar.value,
+      channelUniqueName: props.eventChannelId || channelId.value || "",
+      queryEnabled:
+        !!modProfileNameVar.value &&
+        !!usernameVar.value &&
+        (!!props.eventChannelId || !!channelId.value),
+    },
+    permissionQueryResult: getPermissionResult.value,
+    permissionData: permissionData.value,
+    roles: {
+      standardModRole: standardModRole.value,
+      elevatedModRole: elevatedModRole.value,
     },
   });
-}
-
-function handleFeedbackInput(event: string) {
-  feedbackText.value = event;
-}
-// Enhanced debug log to diagnose why permissionData is null
-console.log("EVENT HEADER DEBUG:", { 
-  userPerms: userPermissions.value,
-  queryParams: {
-    modDisplayName: modProfileNameVar.value,
-    username: usernameVar.value,
-    channelUniqueName: props.eventChannelId || channelId.value || "",
-    queryEnabled: !!modProfileNameVar.value && !!usernameVar.value && (!!props.eventChannelId || !!channelId.value)
-  },
-  permissionQueryResult: getPermissionResult.value,
-  permissionData: permissionData.value,
-  roles: {
-    standardModRole: standardModRole.value,
-    elevatedModRole: elevatedModRole.value
-  }
-});
 </script>
 
 <template>
@@ -363,7 +371,7 @@ console.log("EVENT HEADER DEBUG:", {
     />
 
     <div
-      class="flex justify-between text-sm pt-2 text-gray-700 dark:text-gray-200 border-b pb-2 mb-4 dark:border-gray-500"
+      class="mb-4 flex justify-between border-b pb-2 pt-2 text-sm text-gray-700 dark:border-gray-500 dark:text-gray-200"
     >
       <ul class="space-y-2">
         <li class="hanging-indent flex items-start">
@@ -372,9 +380,7 @@ console.log("EVENT HEADER DEBUG:", {
           </div>
           <span>{{
             `${getFormattedDateString(eventData.startTime)}, ${
-              eventData.isAllDay
-                ? "all day"
-                : getDuration(eventData.startTime, eventData.endTime)
+              eventData.isAllDay ? "all day" : getDuration(eventData.startTime, eventData.endTime)
             }`
           }}</span>
         </li>
@@ -386,23 +392,29 @@ console.log("EVENT HEADER DEBUG:", {
             <LinkIcon />
           </div>
           <a
-            class="cursor-pointer underline break-all flex-1"
-            target="_blank"
-            rel="noreferrer"
+            class="flex-1 cursor-pointer break-all underline"
             :href="eventData.virtualEventUrl"
+            rel="noreferrer"
+            target="_blank"
           >
             {{ eventData.virtualEventUrl }}
           </a>
         </li>
-        <li v-if="eventData.address" class="hanging-indent flex items-start">
-          <div class="h-8 w-8 mr-4">
+        <li
+          v-if="eventData.address"
+          class="hanging-indent flex items-start"
+        >
+          <div class="mr-4 h-8 w-8">
             <LocationIcon />
           </div>
           <div class="inline">
             {{ eventData.address }}
-            <span v-if="!addressCopied" class="inline-flex items-center">
+            <span
+              v-if="!addressCopied"
+              class="inline-flex items-center"
+            >
               <ClipboardIcon
-                class="ml-1 h-4 w-4 cursor-pointer inline-block align-text-bottom"
+                class="ml-1 inline-block h-4 w-4 cursor-pointer align-text-bottom"
                 @click="copyAddress"
               />
             </span>
@@ -422,7 +434,7 @@ console.log("EVENT HEADER DEBUG:", {
             <i class="fa-solid fa-ticket h-5" />
           </div>
           <MarkdownPreview
-            class="flex-1 ml-3"
+            class="ml-3 flex-1"
             :disable-gallery="true"
             :text="eventData.cost"
           />
@@ -443,13 +455,13 @@ console.log("EVENT HEADER DEBUG:", {
             Hosted by
             <UsernameWithTooltip
               v-if="eventData.Poster.username"
-              :is-admin="isAdmin || false"
-              :username="eventData.Poster.username"
-              :src="eventData.Poster.profilePicURL ?? ''"
-              :display-name="eventData.Poster.displayName || ''"
+              :account-created="eventData.Poster.createdAt"
               :comment-karma="eventData.Poster.commentKarma ?? 0"
               :discussion-karma="eventData.Poster.discussionKarma ?? 0"
-              :account-created="eventData.Poster.createdAt"
+              :display-name="eventData.Poster.displayName || ''"
+              :is-admin="isAdmin || false"
+              :src="eventData.Poster.profilePicURL ?? ''"
+              :username="eventData.Poster.username"
             />
           </nuxt-link>
         </li>
@@ -460,17 +472,15 @@ console.log("EVENT HEADER DEBUG:", {
           :data-testid="'event-menu-button'"
           :items="menuItems"
           @copy-link="copyLink"
-          @handle-edit="
-            router.push(`/forums/${channelId}/events/edit/${eventId}`)
-          "
-          @handle-delete="confirmDeleteIsOpen = true"
           @handle-cancel="confirmCancelIsOpen = true"
-          @handle-report="showReportEventModal = true"
-          @handle-feedback="showFeedbackFormModal = true"
-          @handle-view-feedback="handleViewFeedback"
           @handle-click-archive="showArchiveModal = true"
           @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
           @handle-click-unarchive="showUnarchiveModal = true"
+          @handle-delete="confirmDeleteIsOpen = true"
+          @handle-edit="router.push(`/forums/${channelId}/events/edit/${eventId}`)"
+          @handle-feedback="showFeedbackFormModal = true"
+          @handle-report="showReportEventModal = true"
+          @handle-view-feedback="handleViewFeedback"
         >
           <EllipsisHorizontal
             class="h-6 w-6 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"
@@ -492,42 +502,42 @@ console.log("EVENT HEADER DEBUG:", {
           @close-notification="showCopiedLinkNotification = false"
         />
         <WarningModal
-          :title="'Delete Event'"
           :body="'Are you sure you want to delete this event?'"
-          :open="confirmDeleteIsOpen"
           :loading="deleteEventLoading"
+          :open="confirmDeleteIsOpen"
+          :title="'Delete Event'"
           @close="confirmDeleteIsOpen = false"
           @primary-button-click="deleteEvent"
         />
         <WarningModal
           v-if="confirmCancelIsOpen"
-          :title="'Cancel Event'"
           :body="'Are you sure you want to cancel this event? This action cannot be undone.'"
+          :error="cancelEventError?.message"
+          :loading="cancelEventLoading"
           :open="confirmCancelIsOpen"
           :primary-button-text="'Yes, cancel the event'"
           :secondary-button-text="'No'"
-          :loading="cancelEventLoading"
-          :error="cancelEventError?.message"
+          :title="'Cancel Event'"
           @close="confirmCancelIsOpen = false"
           @primary-button-click="cancelEvent"
         />
         <GenericFeedbackFormModal
-          :open="showFeedbackFormModal"
           :error="addFeedbackCommentToEventError?.message"
           :loading="addFeedbackCommentToEventLoading"
-          @update-feedback="handleFeedbackInput"
+          :open="showFeedbackFormModal"
           @close="showFeedbackFormModal = false"
           @primary-button-click="handleSubmitFeedback"
+          @update-feedback="handleFeedbackInput"
         />
         <BrokenRulesModal
           v-if="eventData"
-          :title="'Suspend Event Submitter'"
-          :open="showArchiveAndSuspendModal"
-          :event-title="eventData.title"
-          :event-id="eventData.id"
           :event-channel-id="eventChannelId"
+          :event-id="eventData.id"
+          :event-title="eventData.title"
+          :open="showArchiveAndSuspendModal"
           :suspend-user-enabled="true"
           :text-box-label="'(Optional) Explain why you are suspending the event submitter:'"
+          :title="'Suspend Event Submitter'"
           @close="showArchiveAndSuspendModal = false"
           @suspended-user-successfully="
             () => {
@@ -547,9 +557,9 @@ console.log("EVENT HEADER DEBUG:", {
           @close-notification="showFeedbackSubmittedSuccessfully = false"
         />
         <BrokenRulesModal
-          :open="showReportEventModal"
-          :event-title="eventData.title"
           :event-id="eventId"
+          :event-title="eventData.title"
+          :open="showReportEventModal"
           @close="showReportEventModal = false"
           @report-submitted-successfully="
             () => {
@@ -559,12 +569,12 @@ console.log("EVENT HEADER DEBUG:", {
           "
         />
         <BrokenRulesModal
-          :v-if="eventData && eventData.id"
-          :open="showArchiveModal"
-          :event-title="eventData?.title"
-          :event-id="eventData?.id"
           :archive-after-reporting="true"
           :event-channel-id="eventChannelId"
+          :event-id="eventData?.id"
+          :event-title="eventData?.title"
+          :open="showArchiveModal"
+          :v-if="eventData && eventData.id"
           @close="showArchiveModal = false"
           @reported-and-archived-successfully="
             () => {
@@ -576,9 +586,9 @@ console.log("EVENT HEADER DEBUG:", {
         />
         <UnarchiveModal
           v-if="eventChannelId && eventData?.id"
-          :open="showUnarchiveModal"
           :event-channel-id="eventChannelId"
           :event-id="eventData?.id"
+          :open="showUnarchiveModal"
           @close="showUnarchiveModal = false"
           @unarchived-successfully="
             () => {

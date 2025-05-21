@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import NotificationList from "@/components/user/NotificationList.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import NotificationList from "@/components/user/NotificationList.vue";
+  import RequireAuth from "@/components/auth/RequireAuth.vue";
 </script>
 
 <template>
