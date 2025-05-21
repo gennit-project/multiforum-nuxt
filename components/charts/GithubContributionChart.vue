@@ -376,9 +376,9 @@
           "
         >
           <option
-            v-for="year in availableYears"
-            :key="year"
-            :value="year"
+            v-for="y in availableYears"
+            :key="y"
+            :value="y"
           >
             {{ year }}
           </option>

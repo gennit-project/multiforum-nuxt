@@ -17,7 +17,9 @@
         class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
         type="checkbox"
         @change="
-          $emit('updateFormValues', { wikiEnabled: ($event.target as HTMLInputElement).checked })
+          $emit('updateFormValues', {
+            wikiEnabled: $event.target && ($event.target as HTMLInputElement).checked,
+          })
         "
       />
       <label
