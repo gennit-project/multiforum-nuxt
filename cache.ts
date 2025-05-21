@@ -61,10 +61,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         ActivityFeed: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         AuthoredIssues: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
       },
     },
@@ -73,10 +73,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Admins: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
       },
     },
@@ -85,10 +85,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         DiscussionChannels: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Author: {
           merge: true,
@@ -106,10 +106,10 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
           merge: true,
         },
         UpvotedByUsers: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         FeedbackComments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
       },
     },
@@ -121,13 +121,13 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Tags: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         EventChannels: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Channels: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Poster: {
           merge: true,
@@ -138,13 +138,13 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         UpvotedByUsers: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Channel: {
           merge: true,
         },
         Comments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
       },
     },
@@ -153,28 +153,28 @@ export const inMemoryCacheOptions: InMemoryCacheConfig = {
       merge: true,
       fields: {
         Discussions: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Comments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         Events: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         UpvotedComments: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         UpvotedDiscussions: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         UpvotedEvents: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         ModProfiles: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
         ChannelRoles: {
-          merge: (existing = [], incoming) => [...incoming],
+          merge: (_, incoming) => [...incoming],
         },
       },
     },

@@ -738,6 +738,12 @@
                     "
                     :show-replies="showReplies"
                     @click-edit-comment="handleEdit"
+                    @click-edit-feedback="
+                      () =>
+                        handleEditFeedback({
+                          commentData: props.commentData,
+                        })
+                    "
                     @click-feedback="
                       () =>
                         handleFeedback({
@@ -745,9 +751,6 @@
                           parentCommentId: props.parentCommentId,
                         })
                     "
-                    @create-comment="createComment"
-                    @handle-view-feedback="emit('handleViewFeedback', props.commentData.id)"
-                    @hide-edit-comment-editor="emit('hideEditCommentEditor')"
                     @click-undo-feedback="
                       () =>
                         handleUndoFeedback({
@@ -755,13 +758,10 @@
                           parentCommentId: props.parentCommentId,
                         })
                     "
+                    @create-comment="createComment"
+                    @handle-view-feedback="emit('handleViewFeedback', props.commentData.id)"
+                    @hide-edit-comment-editor="emit('hideEditCommentEditor')"
                     @hide-replies="showReplies = false"
-                    @click-edit-feedback="
-                      () =>
-                        handleEditFeedback({
-                          commentData: props.commentData,
-                        })
-                    "
                     @hide-reply-editor="emit('hideReplyEditor')"
                     @open-edit-comment-editor="emit('openEditCommentEditor', props.commentData.id)"
                     @open-mod-profile="emit('openModProfile')"
@@ -872,31 +872,31 @@
                 :parent-comment-id="props.commentData.id"
                 :reply-form-open-at-comment-i-d="props.replyFormOpenAtCommentID"
                 @click-edit-comment="handleEdit"
+                @click-feedback="handleFeedback"
                 @click-report="emit('clickReport', $event)"
+                @click-undo-feedback="handleUndoFeedback"
                 @create-comment="emit('createComment')"
                 @delete-comment="(input) => emit('delete-comment', input)"
-                @hide-edit-comment-editor="emit('hideEditCommentEditor')"
-                @click-feedback="handleFeedback"
-                @hide-reply-editor="emit('hideReplyEditor')"
-                @click-undo-feedback="handleUndoFeedback"
-                @open-edit-comment-editor="emit('openEditCommentEditor', childComment.id)"
-                @handle-view-feedback="(commentId: string) => emit('handleViewFeedback', commentId)"
-                @open-mod-profile="emit('openModProfile')"
                 @handle-click-archive="
                   (commentId: string) => {
                     emit('handleClickArchive', commentId);
                   }
                 "
-                @open-reply-editor="($event: string) => emit('openReplyEditor', $event)"
                 @handle-click-archive-and-suspend="
                   (commentId: string) => {
                     emit('handleClickArchiveAndSuspend', commentId);
                   }
                 "
-                @save-edit="emit('saveEdit')"
                 @handle-click-unarchive="
                   (commentId: string) => emit('handleClickUnarchive', commentId)
                 "
+                @handle-view-feedback="(commentId: string) => emit('handleViewFeedback', commentId)"
+                @hide-edit-comment-editor="emit('hideEditCommentEditor')"
+                @hide-reply-editor="emit('hideReplyEditor')"
+                @open-edit-comment-editor="emit('openEditCommentEditor', childComment.id)"
+                @open-mod-profile="emit('openModProfile')"
+                @open-reply-editor="($event: string) => emit('openReplyEditor', $event)"
+                @save-edit="emit('saveEdit')"
                 @scroll-to-top="emit('scrollToTop')"
                 @show-copied-link-notification="emit('showCopiedLinkNotification', $event)"
                 @start-comment-save="emit('startCommentSave')"
