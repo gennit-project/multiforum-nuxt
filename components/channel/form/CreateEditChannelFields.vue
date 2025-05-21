@@ -240,7 +240,7 @@
           <div class="flex w-full">
             <!-- Left Sidebar (hidden on mobile) -->
             <div
-              class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-200 dark:border-gray-500 lg:block"
+              class="bg-gray-50 mr-4 hidden w-1/4 border-r border-black dark:border-gray-500 lg:block"
             >
               <ul class="flex flex-col space-y-2">
                 <router-link

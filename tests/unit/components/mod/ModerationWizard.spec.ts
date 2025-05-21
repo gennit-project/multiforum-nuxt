@@ -35,7 +35,7 @@ const ModerationWizard = {
       
       <div 
         class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
-        :class="[issue.isOpen ? 'border-blue-500' : 'border-gray-300 dark:border-gray-700']"
+        :class="[issue.isOpen ? 'border-blue-500' : 'border-black dark:border-gray-700']"
       >
         <h1 v-if="issue.isOpen" class="text-xl font-bold text-blue-500">
           Mod Decision Needed
@@ -307,6 +307,6 @@ describe("ModerationWizard Component", () => {
     expect(coloredDiv.classes()).toContain("bg-gray-300");
 
     const borderDiv = wrapper.find(".rounded-lg + div");
-    expect(borderDiv.classes()).toContain("border-gray-300");
+    expect(borderDiv.classes()).toContain("border-black");
   });
 });

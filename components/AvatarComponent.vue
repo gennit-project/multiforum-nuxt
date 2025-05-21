@@ -72,7 +72,7 @@
     <img
       v-else
       :alt="text"
-      class="border dark:border-gray-600"
+      class="border border-black dark:border-gray-600"
       :class="[
         isLarge ? 'h-48 w-48' : '',
         isMedium ? 'h-12 w-12' : '',

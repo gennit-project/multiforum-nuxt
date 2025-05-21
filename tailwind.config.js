@@ -12,6 +12,10 @@ module.exports = {
   darkMode: "class",
   important: true,
   theme: {
+    borderColor: theme => ({
+      ...theme('colors'),
+      DEFAULT: '#000000',
+    }),
     fontWeight: {
       thin: "100",
       light: "300",

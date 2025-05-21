@@ -52,7 +52,7 @@
 </script>
 
 <template>
-  <div class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+  <div class="border-black bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white">
     <nav
       v-if="!issueId"
       class="flex items-center gap-4 py-3 pl-8"

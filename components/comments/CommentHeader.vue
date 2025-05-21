@@ -176,7 +176,7 @@
     />
 
     <div
-      class="flex-grow border-gray-300 pl-4 dark:border-gray-600"
+      class="flex-grow border-black pl-4 dark:border-gray-600"
       :class="!commentAuthorUsername ? '-ml-5' : '-ml-4 border-l'"
     >
       <div v-if="showContextLink && parentCommentId && commentData.DiscussionChannel">
@@ -216,17 +216,17 @@
 
               <span
                 v-if="isAdmin"
-                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-black dark:text-gray-300"
                 >Admin</span
               >
               <span
                 v-else-if="isMod"
-                class="rounded-md border border-blue-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="rounded-md border border-blue-500 px-1 py-0 text-xs text-gray-500 dark:border-black dark:text-gray-300"
                 >Mod</span
               >
               <span
                 v-if="commentAuthorUsername === originalPoster"
-                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-black dark:text-gray-300"
                 >OP</span
               >
             </span>
