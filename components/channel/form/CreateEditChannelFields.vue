@@ -8,6 +8,14 @@
   import { useRoute, useRouter } from "nuxt/app";
   import { MAX_CHARS_IN_CHANNEL_NAME } from "@/utils/constants";
 
+  // Import icons
+  import CogIcon from "@/components/icons/CogIcon.vue";
+  import BookIcon from "@/components/icons/BookIcon.vue";
+  import UserAddIcon from "@/components/icons/UserAddIcon.vue";
+  import IdentificationIcon from "@/components/icons/IdentificationIcon.vue";
+  import UserMinus from "@/components/icons/UserMinus.vue";
+  import PencilIcon from "@/components/icons/PencilIcon.vue";
+
   const route = useRoute();
   const props = defineProps({
     editMode: {
@@ -53,34 +61,50 @@
     {
       key: "basic",
       label: "Basic Settings",
+      icon: CogIcon,
+      fontAwesome: null,
     },
     {
       key: "rules",
       label: "Rules",
+      icon: BookIcon,
+      fontAwesome: null,
     },
     {
       key: "mods",
       label: "Moderators",
+      icon: UserAddIcon,
+      fontAwesome: null,
     },
     {
       key: "owners",
       label: "Forum Admins",
+      icon: null,
+      fontAwesome: "fa-solid fa-user-shield",
     },
     {
       key: "roles",
       label: "Roles",
+      icon: IdentificationIcon,
+      fontAwesome: null,
     },
     {
       key: "suspended-users",
       label: "User Suspensions",
+      icon: UserMinus,
+      fontAwesome: null,
     },
     {
       key: "suspended-mods",
       label: "Mod Suspensions",
+      icon: UserMinus,
+      fontAwesome: null,
     },
     {
       key: "wiki",
       label: "Wiki",
+      icon: PencilIcon,
+      fontAwesome: null,
     },
   ];
 
@@ -201,7 +225,41 @@
                 type="button"
                 @click="isDropdownOpen = !isDropdownOpen"
               >
-                <span>{{ getCurrentTabLabel }}</span>
+                <div class="flex items-center">
+                  <!-- For Font Awesome icons -->
+                  <i
+                    v-if="
+                      tabs.find(
+                        (tab) =>
+                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                      )?.fontAwesome
+                    "
+                    :class="[
+                      tabs.find(
+                        (tab) =>
+                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                      )?.fontAwesome,
+                      'mr-2 text-orange-500',
+                    ]"
+                  ></i>
+                  <!-- For component icons -->
+                  <component
+                    :is="
+                      tabs.find(
+                        (tab) =>
+                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                      )?.icon
+                    "
+                    v-else-if="
+                      tabs.find(
+                        (tab) =>
+                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                      )?.icon
+                    "
+                    class="mr-2 h-5 w-5 text-orange-500"
+                  />
+                  <span>{{ getCurrentTabLabel }}</span>
+                </div>
                 <i
                   class="fa-solid fa-chevron-down"
                   :class="{ 'rotate-180': isDropdownOpen }"
@@ -215,7 +273,7 @@
                 <router-link
                   v-for="tab in tabs"
                   :key="tab.key"
-                  class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="{
                     'bg-gray-50 text-orange-500 dark:bg-gray-700':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
@@ -230,6 +288,33 @@
                   }"
                   @click="isDropdownOpen = false"
                 >
+                  <!-- For Font Awesome icons -->
+                  <i
+                    v-if="tab.fontAwesome"
+                    :class="[
+                      tab.fontAwesome,
+                      'mr-2',
+                      {
+                        'text-orange-500':
+                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                        'text-gray-400 dark:text-gray-400':
+                          typeof route.name === 'string' &&
+                          !route.name?.includes(`edit-${tab.key}`),
+                      },
+                    ]"
+                  ></i>
+                  <!-- For component icons -->
+                  <component
+                    :is="tab.icon"
+                    v-else-if="tab.icon"
+                    class="mr-2 h-5 w-5"
+                    :class="{
+                      'text-orange-500':
+                        typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                      'text-gray-400 dark:text-gray-400':
+                        typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
+                    }"
+                  />
                   {{ tab.label }}
                 </router-link>
               </ul>
@@ -246,7 +331,7 @@
                 <router-link
                   v-for="tab in tabs"
                   :key="tab.key"
-                  class="cursor-pointer py-2"
+                  class="flex cursor-pointer items-center px-3 py-2"
                   :class="{
                     'border-r-2 border-orange-500 dark:text-white':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
@@ -262,6 +347,33 @@
                     },
                   }"
                 >
+                  <!-- For Font Awesome icons -->
+                  <i
+                    v-if="tab.fontAwesome"
+                    :class="[
+                      tab.fontAwesome,
+                      'mr-2',
+                      {
+                        'text-orange-500':
+                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                        'text-gray-400 dark:text-gray-400':
+                          typeof route.name === 'string' &&
+                          !route.name?.includes(`edit-${tab.key}`),
+                      },
+                    ]"
+                  ></i>
+                  <!-- For component icons -->
+                  <component
+                    :is="tab.icon"
+                    v-else-if="tab.icon"
+                    class="mr-2 h-5 w-5"
+                    :class="{
+                      'text-orange-500':
+                        typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                      'text-gray-400 dark:text-gray-400':
+                        typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
+                    }"
+                  />
                   {{ tab.label }}
                 </router-link>
               </ul>
