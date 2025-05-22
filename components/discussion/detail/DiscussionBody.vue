@@ -110,6 +110,7 @@
     <div class="my-2">
       <slot name="mark-answered-slot" />
     </div>
+    <slot name="activity-feed-slot" />
     <div class="flex items-center gap-2">
       <slot name="button-slot" />
       <NewEmojiButton
