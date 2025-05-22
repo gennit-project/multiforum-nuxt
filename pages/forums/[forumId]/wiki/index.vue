@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
-  import { GET_CHANNEL, GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
+  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
   import { useQuery } from "@vue/apollo-composable";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -13,30 +13,12 @@
   const route = useRoute();
   const router = useRouter();
   const forumId = route.params.forumId as string;
-  const wikiHomePageSlug = route.params.slug ? "home" : (route.params.slug as string);
 
-  // Query wiki page data for the home page
-  const {
-    result: wikiPageResult,
-    loading,
-    error,
-  } = useQuery(
-    GET_WIKI_PAGE,
-    {
-      channelUniqueName: forumId,
-      slug: wikiHomePageSlug,
-    },
-    { errorPolicy: "all" }
-  );
-
-  // Computed property for the wiki page data
-  const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
-
-  // Query channel to check if wiki is enabled
+  // Query channel data (includes WikiHomePage and wikiEnabled)
   const {
     result: channelResult,
-    loading: channelLoading,
-    error: channelError,
+    loading,
+    error,
   } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
 
   // Computed property for the channel data
@@ -45,8 +27,11 @@
   // Check if wiki is enabled
   const wikiEnabled = computed(() => channel.value?.wikiEnabled);
 
+  // Get wiki home page from channel relationship
+  const wikiHomePage = computed(() => channel.value?.WikiHomePage);
+
   // Check if we have a wiki home page already
-  const hasWikiHomePage = computed(() => !!wikiPage.value);
+  const hasWikiHomePage = computed(() => !!wikiHomePage.value);
 
   // Navigate to create wiki page
   function createWikiPage() {
@@ -57,18 +42,18 @@
 <template>
   <div>
     <div
-      v-if="loading || channelLoading"
+      v-if="loading"
       class="flex items-center justify-center p-8"
     >
       <LoadingSpinner size="lg" />
     </div>
 
     <div
-      v-else-if="error || channelError"
+      v-else-if="error"
       class="mx-auto max-w-2xl rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-900 dark:text-red-200"
     >
       <p>Sorry, there was an error loading the wiki data.</p>
-      <p class="mt-2 text-sm">{{ (error || channelError).message }}</p>
+      <p class="mt-2 text-sm">{{ error.message }}</p>
     </div>
 
     <div
@@ -102,39 +87,82 @@
 
     <div
       v-else
-      class="mx-auto max-w-3xl p-4"
+      class="mx-auto max-w-7xl p-4"
     >
       <!-- Wiki Home Page Content -->
       <div class="mb-4">
         <div class="flex items-center justify-between">
           <h1 class="text-2xl font-bold dark:text-white">
-            {{ wikiPage.title }}
+            {{ wikiHomePage.title }}
           </h1>
-          <PrimaryButton
-            :label="'Edit Wiki'"
-            @click="router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)"
-          >
-            <PencilIcon class="mr-2 h-5 w-5" />
-          </PrimaryButton>
+          <div class="flex space-x-3">
+            <PrimaryButton
+              :label="'Add Page'"
+              @click="router.push(`/forums/${forumId}/wiki/create-child`)"
+            >
+              <PencilIcon class="mr-2 h-5 w-5" />
+            </PrimaryButton>
+            <PrimaryButton
+              :label="'Edit Wiki'"
+              @click="router.push(`/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`)"
+            >
+              <PencilIcon class="mr-2 h-5 w-5" />
+            </PrimaryButton>
+          </div>
         </div>
         <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
           <span>
-            Last updated by {{ wikiPage.VersionAuthor?.username || "Unknown" }}
-            {{ timeAgo(new Date(wikiPage.updatedAt || wikiPage.createdAt)) }}
+            Last updated by {{ wikiHomePage.VersionAuthor?.username || "Unknown" }}
+            {{ timeAgo(new Date(wikiHomePage.updatedAt || wikiHomePage.createdAt)) }}
           </span>
-          <template v-if="wikiPage?.PastVersions?.length">
+          <template v-if="wikiHomePage?.PastVersions?.length">
             <span class="mx-2">·</span>
-            <WikiEditsDropdown :wiki-page="wikiPage" />
+            <WikiEditsDropdown :wiki-page="wikiHomePage" />
           </template>
         </div>
       </div>
 
-      <div class="prose prose-orange max-w-none dark:prose-invert">
-        <MarkdownPreview
-          :disable-gallery="false"
-          :text="wikiPage.body"
-          :word-limit="3000"
-        />
+      <div class="flex gap-8">
+        <!-- Main content -->
+        <div class="flex-1">
+          <div class="prose prose-orange max-w-none dark:prose-invert">
+            <MarkdownPreview
+              :disable-gallery="false"
+              :text="wikiHomePage.body"
+              :word-limit="3000"
+            />
+          </div>
+        </div>
+
+        <!-- Sidebar with child pages -->
+        <div
+          v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
+          class="w-80 flex-shrink-0"
+        >
+          <div
+            class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-800"
+          >
+            <h3 class="font-semibold mb-4 text-lg text-gray-900 dark:text-white">Wiki Pages</h3>
+            <div class="space-y-2">
+              <div
+                v-for="childPage in wikiHomePage.ChildPages"
+                :key="childPage.id"
+                class="group"
+              >
+                <a
+                  :href="`/forums/${forumId}/wiki/${childPage.slug}`"
+                  class="hover:bg-orange-50 block rounded px-2 py-1 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                  @click.prevent="router.push(`/forums/${forumId}/wiki/${childPage.slug}`)"
+                >
+                  {{ childPage.title }}
+                </a>
+                <p class="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                  Updated {{ timeAgo(new Date(childPage.updatedAt || childPage.createdAt)) }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

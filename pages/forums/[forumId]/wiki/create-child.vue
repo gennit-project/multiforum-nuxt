@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { ref, computed, watch } from "vue";
+  import { ref, computed } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { useMutation, useQuery } from "@vue/apollo-composable";
-  import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
-  import { UPDATE_WIKI_PAGE } from "@/graphQLData/channel/mutations";
+  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+  import { CREATE_CHILD_WIKI_PAGE } from "@/graphQLData/channel/mutations";
   import TextEditor from "@/components/TextEditor.vue";
   import TextInput from "@/components/TextInput.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -15,17 +15,17 @@
   const route = useRoute();
   const router = useRouter();
   const forumId = route.params.forumId as string;
-  const slug = route.params.slug as string;
 
-  // Query wiki page data
+  // Query channel to get the wiki home page
   const {
-    result: wikiPageResult,
-    loading,
-    error,
-  } = useQuery(GET_WIKI_PAGE, { channelUniqueName: forumId, slug: slug }, { errorPolicy: "all" });
+    result: channelResult,
+    loading: channelLoading,
+    error: channelError,
+  } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
 
-  // Computed property for the wiki page data
-  const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
+  // Computed property for the channel data
+  const channel = computed(() => channelResult.value?.channels[0]);
+  const wikiHomePage = computed(() => channel.value?.WikiHomePage);
 
   // Form data
   const formValues = ref({
@@ -34,38 +34,23 @@
     slug: "",
   });
 
-  // Initialize form with existing wiki data when available
-  const dataLoaded = ref(false);
-  watch(
-    wikiPage,
-    (newWikiPage) => {
-      if (newWikiPage && !dataLoaded.value) {
-        formValues.value = {
-          title: newWikiPage.title || "",
-          body: newWikiPage.body || "",
-          slug: newWikiPage.slug || "",
-        };
-        dataLoaded.value = true;
-      }
-    },
-    { immediate: true }
-  );
-
-  // Update wiki page mutation
+  // Create child wiki page mutation
   const {
-    mutate: updateWikiPage,
-    loading: isUpdating,
-    error: updateError,
+    mutate: createChildWikiPage,
+    loading: isCreating,
+    error: createError,
     onDone,
-  } = useMutation(UPDATE_WIKI_PAGE);
+  } = useMutation(CREATE_CHILD_WIKI_PAGE);
 
   // Handle form submission
   function handleSubmit() {
-    if (!formValues.value.title || !formValues.value.body) return;
+    if (!formValues.value.title || !formValues.value.body || !wikiHomePage.value) return;
 
-    const updateInput = {
+    const childPageInput = {
       title: formValues.value.title,
       body: formValues.value.body,
+      slug: formValues.value.slug,
+      channelUniqueName: forumId,
       VersionAuthor: {
         connect: {
           where: {
@@ -77,19 +62,24 @@
       },
     };
 
-    updateWikiPage({
+    createChildWikiPage({
       where: {
-        channelUniqueName: forumId,
-        slug: slug,
+        id: wikiHomePage.value.id, // Connect by parent page ID
       },
-      update: updateInput,
+      update: {
+        ChildPages: {
+          create: [
+            {
+              node: childPageInput,
+            },
+          ],
+        },
+      },
     });
   }
 
   // Derive slug from title
-  function updateSlug(value) {
-    if (!dataLoaded.value) return;
-
+  function updateSlug(value: string) {
     formValues.value.slug = value
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
@@ -98,61 +88,83 @@
 
   // Handle mutation completion
   onDone(() => {
-    // Navigate back to the correct wiki page based on the slug
-    if (slug === "home") {
-      // Navigate to wiki home page
-      router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
-    } else {
-      // Navigate to the child wiki page
-      router.push(`/forums/${forumId}/wiki/${slug}?t=${Date.now()}`);
-    }
+    // Navigate back to wiki home page
+    router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
   });
+
+  // Check if wiki is enabled
+  const wikiEnabled = computed(() => channel.value?.wikiEnabled);
+
+  // Check if we have a wiki home page
+  const hasWikiHomePage = computed(() => !!wikiHomePage.value);
 </script>
 
 <template>
   <div>
     <div
-      v-if="loading"
+      v-if="channelLoading"
       class="flex items-center justify-center p-8"
     >
       <LoadingSpinner size="lg" />
     </div>
 
     <div
-      v-else-if="error"
+      v-else-if="channelError"
       class="mx-auto max-w-2xl rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-900 dark:text-red-200"
     >
-      <p>Sorry, there was an error loading the wiki data.</p>
-      <p class="mt-2 text-sm">{{ error.message }}</p>
+      <p>Sorry, there was an error loading the channel data.</p>
+      <p class="mt-2 text-sm">{{ channelError.message }}</p>
     </div>
 
     <div
-      v-else-if="!wikiPage"
+      v-else-if="!wikiEnabled"
       class="mx-auto max-w-2xl p-4 text-center dark:text-white"
     >
-      <p>This wiki page doesn't exist or you don't have permission to view it.</p>
+      <p>The wiki feature is not enabled for this forum.</p>
       <PrimaryButton
-        :label="'Go to Wiki Home'"
+        :label="'Go Back'"
         @click="router.push(`/forums/${forumId}/wiki`)"
       >
       </PrimaryButton>
     </div>
 
     <div
+      v-else-if="!hasWikiHomePage"
+      class="mx-auto max-w-2xl p-4 text-center dark:text-white"
+    >
+      <p class="mb-4 text-lg">
+        You need to create a wiki home page first before adding child pages.
+      </p>
+      <div class="space-x-4">
+        <PrimaryButton
+          :label="'Create Wiki Home Page'"
+          @click="router.push(`/forums/${forumId}/wiki/create`)"
+        >
+        </PrimaryButton>
+        <PrimaryButton
+          :label="'Go Back'"
+          @click="router.push(`/forums/${forumId}/wiki`)"
+        >
+        </PrimaryButton>
+      </div>
+    </div>
+
+    <div
       v-else
       class="mx-auto max-w-3xl p-4"
     >
-      <GoBack
-        :to="slug === 'home' ? `/forums/${forumId}/wiki` : `/forums/${forumId}/wiki/${slug}`"
-      />
+      <GoBack :to="`/forums/${forumId}/wiki`" />
 
       <div class="mb-6">
-        <h1 class="text-2xl font-bold dark:text-white">Edit Wiki Page</h1>
+        <h1 class="text-2xl font-bold dark:text-white">Add Wiki Page</h1>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Create a new page in the {{ channel.displayName || forumId }} wiki.
+        </p>
       </div>
 
       <ErrorBanner
-        v-if="updateError"
-        :text="updateError.message"
+        v-if="createError"
+        :text="createError.message"
       />
 
       <form
@@ -163,7 +175,7 @@
           <TextInput
             id="wiki-title"
             :full-width="true"
-            label="Title"
+            label="Page Title"
             placeholder="Enter wiki page title"
             :test-id="'title-input'"
             :value="formValues.title"
@@ -205,13 +217,19 @@
           />
         </div>
 
-        <div class="flex justify-end">
+        <div class="flex justify-end space-x-3">
+          <PrimaryButton
+            type="button"
+            :label="'Cancel'"
+            @click="router.push(`/forums/${forumId}/wiki`)"
+          >
+          </PrimaryButton>
           <PrimaryButton
             type="submit"
-            :loading="isUpdating"
-            :disabled="!formValues.title || !formValues.body || isUpdating"
+            :loading="isCreating"
+            :disabled="!formValues.title || !formValues.body || isCreating"
           >
-            Update Wiki Page
+            Create Wiki Page
           </PrimaryButton>
         </div>
       </form>

@@ -142,3 +142,33 @@ export const UPDATE_WIKI_PAGE = gql`
     }
   }
 `;
+
+export const CREATE_CHILD_WIKI_PAGE = gql`
+  mutation createChildWikiPage($where: WikiPageWhere!, $update: WikiPageUpdateInput!) {
+    updateWikiPages(where: $where, update: $update) {
+      wikiPages {
+        id
+        title
+        body
+        slug
+        channelUniqueName
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
+        }
+        ChildPages {
+          id
+          title
+          body
+          slug
+          createdAt
+          updatedAt
+          VersionAuthor {
+            username
+          }
+        }
+      }
+    }
+  }
+`;
