@@ -6,6 +6,7 @@
   import PencilIcon from "@/components/icons/PencilIcon.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
+  import { timeAgo } from "@/utils";
 
   const route = useRoute();
   const router = useRouter();
@@ -82,16 +83,21 @@
       class="mx-auto max-w-3xl p-4"
     >
       <!-- Wiki Home Page Content -->
-      <div class="mb-4 flex items-center justify-between">
-        <h1 class="text-2xl font-bold dark:text-white">
-          {{ channel.WikiHomePage.title }}
-        </h1>
-        <PrimaryButton
-          @click="router.push(`/forums/${forumId}/wiki/edit/${channel.WikiHomePage.slug}`)"
-        >
-          <PencilIcon class="mr-2 h-5 w-5" />
-          Edit Wiki
-        </PrimaryButton>
+      <div class="mb-4">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-bold dark:text-white">
+            {{ channel.WikiHomePage.title }}
+          </h1>
+          <PrimaryButton
+            @click="router.push(`/forums/${forumId}/wiki/edit/${channel.WikiHomePage.slug}`)"
+          >
+            <PencilIcon class="mr-2 h-5 w-5" />
+            Edit Wiki
+          </PrimaryButton>
+        </div>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Last updated by {{ channel.WikiHomePage.VersionAuthor?.username || "Unknown" }} {{ timeAgo(new Date(channel.WikiHomePage.updatedAt || channel.WikiHomePage.createdAt)) }}
+        </p>
       </div>
 
       <div class="prose prose-orange max-w-none dark:prose-invert">
