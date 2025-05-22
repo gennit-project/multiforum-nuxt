@@ -291,7 +291,7 @@
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="flex w-full justify-center">
     <LoadingSpinner
       v-if="getDiscussionLoading && !discussion"
       class="flex justify-center py-4"
@@ -300,9 +300,9 @@
     <PageNotFound v-else-if="!discussion && !activeDiscussionChannel && !getDiscussionLoading" />
     <div
       v-else
-      class="flex max-w-full justify-center space-y-2 bg-white py-2 dark:bg-gray-800 sm:max-w-screen-2xl"
+      class="w-full max-w-4xl space-y-2 bg-white py-2 dark:bg-gray-800"
     >
-      <div class="w-full flex-col space-y-2 overflow-hidden">
+      <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
           v-if="getDiscussionError"
           class="mt-2 px-4"
@@ -321,8 +321,8 @@
           v-if="discussion"
           class="w-full"
         >
-          <div class="space-y-3 px-2">
-            <div class="rounded-lg pb-2 dark:border-gray-700">
+          <div class="w-full space-y-3 px-2">
+            <div class="w-full rounded-lg pb-2 dark:border-gray-700">
               <DiscussionHeader
                 :channel-id="channelId"
                 :compact-mode="compactMode"
@@ -335,7 +335,7 @@
                 @handle-click-edit-body="handleClickEditDiscussionBody"
                 @handle-click-give-feedback="handleClickGiveFeedback"
               />
-              <div class="flex-1">
+              <div class="w-full">
                 <DiscussionBodyEditForm
                   v-if="discussionBodyEditMode"
                   :discussion="discussion"
