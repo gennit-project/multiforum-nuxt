@@ -228,7 +228,7 @@
                   v-if="showChannelTabs"
                   :admin-list="adminList"
                   :channel="channel"
-                  class="mb-2 w-full border-b border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
+                  class="w-full border-b border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
                   :desktop="false"
                   :route="route"
                   :show-counts="true"
