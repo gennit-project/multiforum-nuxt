@@ -119,7 +119,7 @@
     <VuemojiPicker
       ref="emojiPickerRef"
       v-click-outside="outside"
-      class="rounded-lg border border-gray-500 !bg-white shadow-lg dark:border-gray-800 dark:bg-gray-700"
+      class="rounded-lg border border-gray-300 !bg-white shadow-lg dark:border-gray-800 dark:bg-gray-700"
       :picker-style="{
         inputBorderRadius: '0',
         borderColor: 'transparent',

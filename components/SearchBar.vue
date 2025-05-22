@@ -79,7 +79,7 @@
       </div>
       <input
         ref="searchInputRef"
-        class="focus:border-orange-500 focus:ring-orange-500 w-full border border-gray-500 pl-10 pr-12 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:ring-1 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+        class="focus:border-orange-500 focus:ring-orange-500 w-full border border-gray-300 pl-10 pr-12 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:ring-1 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : 'rounded-l-md',
           rightSideIsRounded ? 'rounded-r-full' : 'rounded-r-md',

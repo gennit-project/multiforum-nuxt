@@ -49,7 +49,7 @@
         :require-ownership="true"
       >
         <template #has-auth>
-          <div class="flex w-full justify-between border-b border-gray-500">
+          <div class="flex w-full justify-between border-b border-gray-300">
             <span
               class="my-2 mb-2 w-full text-sm font-bold leading-6 text-gray-600 dark:text-gray-100"
             >

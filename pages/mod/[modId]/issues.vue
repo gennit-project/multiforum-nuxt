@@ -96,7 +96,7 @@
 
     <ul
       v-else-if="issueResult && issueResult?.moderationProfiles?.length > 0"
-      class="divide-y border-t border-gray-500 dark:border-gray-800 dark:text-white"
+      class="divide-y border-t border-gray-300 dark:border-gray-800 dark:text-white"
       data-testid="issue-list"
     >
       <IssueListItem

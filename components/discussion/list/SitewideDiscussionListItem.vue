@@ -224,7 +224,7 @@
             </button>
             <div
               v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
-              class="my-2 w-full border-l-2 border-gray-500 bg-gray-100 pt-2 dark:bg-black"
+              class="my-2 w-full border-l-2 border-gray-300 bg-gray-100 pt-2 dark:bg-black"
             >
               <MarkdownPreview
                 class="ml-2 pb-2"

@@ -612,7 +612,7 @@
       </h2>
       <div
         id="original-post-container"
-        class="rounded-lg border border-gray-500 px-4 py-2 dark:border-gray-600"
+        class="rounded-lg border border-gray-300 px-4 py-2 dark:border-gray-600"
       >
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"

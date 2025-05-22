@@ -31,7 +31,7 @@
   <label class="flex cursor-pointer items-center space-x-3 p-2">
     <input
       :checked="selected.includes(channel.uniqueName)"
-      class="text-orange-600 h-4 w-4 border border-gray-500 dark:border-gray-600"
+      class="text-orange-600 h-4 w-4 border border-gray-300 dark:border-gray-600"
       type="checkbox"
       :value="channel.uniqueName"
       @change="() => emit('toggleSelection', channel.uniqueName)"

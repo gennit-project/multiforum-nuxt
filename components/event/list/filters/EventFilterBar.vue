@@ -299,7 +299,7 @@
       />
       <button
         v-if="allowHidingMainFilters"
-        class="rounded-md border border-gray-500 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-500 dark:text-gray-300 dark:hover:bg-gray-700"
+        class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
         :class="[showMainFilters ? 'bg-gray-200 dark:bg-gray-700' : '']"
         data-testid="toggle-main-filters-button"
         @click="toggleShowMainFilters"
@@ -370,7 +370,7 @@
                 <template #content>
                   <div
                     class="flex flex-col gap-3 bg-white p-4 dark:bg-gray-700"
-                    :class="[allowHidingMainFilters ? 'rounded-lg border border-gray-500' : '']"
+                    :class="[allowHidingMainFilters ? 'rounded-lg border border-gray-300' : '']"
                   >
                     <div v-if="showLocationSearchBarAndDistanceButtons">
                       <div
@@ -436,7 +436,7 @@
 
                 <template #content>
                   <div
-                    class="flex flex-col gap-3 rounded-lg border border-gray-500 bg-white p-4 dark:bg-gray-700"
+                    class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 dark:bg-gray-700"
                   >
                     <div v-if="showLocationSearchBarAndDistanceButtons">
                       <div

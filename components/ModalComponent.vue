@@ -97,7 +97,7 @@
                   class="mt-5 sm:mt-6 sm:grid sm:grid-flow-row-dense sm:grid-cols-2 sm:gap-3"
                 >
                   <button
-                    class="border-transparent bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 px-4py-2 inline-flex w-full justify-center rounded-full border border-gray-500 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
+                    class="border-transparent bg-indigo-600 hover:bg-indigo-700 focus:ring-indigo-500 px-4py-2 inline-flex w-full justify-center rounded-full border border-gray-300 text-base font-medium text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:col-start-2 sm:text-sm"
                     type="button"
                     @click="
                       () => {
@@ -110,7 +110,7 @@
                   </button>
                   <slot name="secondaryButton">
                     <button
-                      class="hover:bg-gray-50 focus:ring-indigo-500 mt-3 inline-flex w-full justify-center rounded-full border border-gray-500 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
+                      class="hover:bg-gray-50 focus:ring-indigo-500 mt-3 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:col-start-1 sm:mt-0 sm:text-sm"
                       type="button"
                       @click="
                         () => {

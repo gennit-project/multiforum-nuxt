@@ -541,7 +541,7 @@
   }
 
   body.light #texteditor {
-    @apply text-light bg-light border-gray-500;
+    @apply text-light bg-light border-gray-300;
   }
 
   .md-content .md-preview,

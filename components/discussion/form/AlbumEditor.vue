@@ -418,7 +418,7 @@
         <div class="flex items-center gap-2">
           <div class="ml-4 flex gap-1">
             <button
-              class="rounded border border-gray-500 px-2 py-1 text-gray-700 dark:border-gray-600 dark:text-gray-200"
+              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:border-gray-600 dark:text-gray-200"
               :class="{ 'cursor-not-allowed opacity-50': index === 0 }"
               :disabled="index === 0"
               type="button"
@@ -427,7 +427,7 @@
               ↑
             </button>
             <button
-              class="rounded border border-gray-500 px-2 py-1 text-gray-700 dark:border-gray-600 dark:text-gray-200"
+              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:border-gray-600 dark:text-gray-200"
               :class="{
                 'cursor-not-allowed opacity-50':
                   index === (formValues.album?.images?.length || 0) - 1,
@@ -440,7 +440,7 @@
             </button>
           </div>
           <button
-            class="flex items-center gap-1 rounded border border-gray-500 px-2 py-1 text-gray-500 dark:border-gray-600 dark:text-gray-200"
+            class="flex items-center gap-1 rounded border border-gray-300 px-2 py-1 text-gray-500 dark:border-gray-600 dark:text-gray-200"
             type="button"
             @click="deleteImage(index)"
           >
@@ -524,7 +524,7 @@
     </div>
     <div
       v-else
-      class="bg-gray-50 my-3 rounded-md border-2 border-dotted border-gray-500 p-4 text-center opacity-70 dark:bg-gray-800"
+      class="bg-gray-50 my-3 rounded-md border-2 border-dotted border-gray-300 p-4 text-center opacity-70 dark:bg-gray-800"
     >
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Maximum limit of {{ MAX_IMAGES }} images reached

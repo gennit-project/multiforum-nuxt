@@ -100,7 +100,7 @@
       <input
         v-model="searchQuery"
         :autofocus="autoFocus"
-        class="focus:border-orange-500 focus:ring-orange-500 h-10 w-full border border-gray-500 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+        class="focus:border-orange-500 focus:ring-orange-500 h-10 w-full border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:ring-1 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : '',
           rightSideIsRounded ? 'rounded-r-full' : '',
@@ -115,7 +115,7 @@
       <client-only>
         <ul
           v-if="searchResults.length"
-          class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-700 dark:text-white"
+          class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-700 dark:text-white"
           style="top: 100%"
         >
           <li
@@ -131,7 +131,7 @@
         <template #fallback>
           <ul
             v-if="searchResults.length"
-            class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-700"
+            class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-700"
             style="top: 100%"
           >
             <li class="cursor-pointer px-4 py-2">Loading...</li>

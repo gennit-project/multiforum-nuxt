@@ -19,7 +19,7 @@
 <template>
   <input
     :checked="checked"
-    class="focus:ring-orange-500 dark:focus:ring-orange-500 h-4 w-4 rounded border border-gray-500 dark:border-gray-400 dark:bg-gray-800"
+    class="focus:ring-orange-500 dark:focus:ring-orange-500 h-4 w-4 rounded border border-gray-300 dark:border-gray-400 dark:bg-gray-800"
     :class="[disabled ? 'text-orange-200' : 'text-orange-600']"
     :disabled="disabled"
     type="checkbox"

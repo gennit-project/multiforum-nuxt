@@ -248,7 +248,7 @@
         </h3>
         <div class="space-y-3 px-2">
           <div
-            class="dark:bg-gray-950 px-4pb-2 rounded-lg border border-gray-500 dark:border-gray-700 dark:bg-gray-700"
+            class="dark:bg-gray-950 px-4pb-2 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700"
           >
             <DiscussionHeader
               :channel-id="channelId"

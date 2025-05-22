@@ -36,14 +36,14 @@
 </script>
 
 <template>
-  <div class="border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+  <div class="border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white">
     <nav class="flex items-center gap-4 py-3 pl-8">
       <nuxt-link
         class="border-b-2 px-4 py-2"
         :class="{
-          'border-gray-500 text-black dark:border-white dark:text-white':
+          'border-gray-300 text-black dark:border-white dark:text-white':
             route.name === 'admin-issues',
-          'border-gray-500 text-gray-500 dark:text-gray-400': route.name !== 'admin-issues',
+          'border-gray-300 text-gray-500 dark:text-gray-400': route.name !== 'admin-issues',
         }"
         :to="{
           name: 'admin-issues',
@@ -54,9 +54,9 @@
       <nuxt-link
         class="border-b-2 px-4 py-2"
         :class="{
-          'border-gray-500 text-black dark:border-white dark:text-white':
+          'border-gray-300 text-black dark:border-white dark:text-white':
             route.name === 'admin-issues-closed',
-          'border-gray-500 text-gray-500 dark:text-gray-400': route.name !== 'admin-issues-closed',
+          'border-gray-300 text-gray-500 dark:text-gray-400': route.name !== 'admin-issues-closed',
         }"
         :to="{
           name: 'admin-issues-closed',

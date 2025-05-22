@@ -371,7 +371,7 @@
     />
 
     <div
-      class="mb-4 flex justify-between border-b pb-2 pt-2 text-sm text-gray-700 dark:border-gray-500 dark:text-gray-200"
+      class="mb-4 flex justify-between border-b pb-2 pt-2 text-sm text-gray-700 dark:border-gray-300 dark:text-gray-200"
     >
       <ul class="space-y-2">
         <li class="hanging-indent flex items-start">

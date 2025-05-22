@@ -547,7 +547,7 @@ ${reportText}
         >
         <select
           v-model="suspensionLength"
-          class="block w-60 rounded-md border border-gray-500 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+          class="block w-60 rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
         >
           <option
             disabled
