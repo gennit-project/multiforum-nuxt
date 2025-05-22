@@ -149,6 +149,22 @@ mutation updateDiscussion (
           caption
           copyright
         }
+        PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          Author {
+            username
+          }
+          body
+          createdAt
+        }
+        PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          Author {
+            username
+          }
+          body
+          createdAt
+        }
       }
     }
   }
