@@ -13,6 +13,7 @@
   const route = useRoute();
   const router = useRouter();
   const forumId = route.params.forumId as string;
+  const wikiHomePageSlug = route.params.slug ? "home" : (route.params.slug as string);
 
   // Query wiki page data for the home page
   const {
@@ -23,7 +24,7 @@
     GET_WIKI_PAGE,
     {
       channelUniqueName: forumId,
-      slug: "home",
+      slug: wikiHomePageSlug,
     },
     { errorPolicy: "all" }
   );
