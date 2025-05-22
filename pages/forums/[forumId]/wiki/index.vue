@@ -6,6 +6,7 @@
   import PencilIcon from "@/components/icons/PencilIcon.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
+  import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import { timeAgo } from "@/utils";
 
   const route = useRoute();
@@ -66,7 +67,7 @@
         <p class="text-lg">
           You don't have any wiki pages yet.
           <span
-            class="text-orange-600 dark:text-orange-400 cursor-pointer hover:underline"
+            class="cursor-pointer text-orange-600 hover:underline dark:text-orange-400"
             @click="createWikiPage"
             >Add one?</span
           >
@@ -89,15 +90,20 @@
             {{ channel.WikiHomePage.title }}
           </h1>
           <PrimaryButton
+            :label="'Edit Wiki'"
             @click="router.push(`/forums/${forumId}/wiki/edit/${channel.WikiHomePage.slug}`)"
           >
             <PencilIcon class="mr-2 h-5 w-5" />
-            Edit Wiki
           </PrimaryButton>
         </div>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Last updated by {{ channel.WikiHomePage.VersionAuthor?.username || "Unknown" }} {{ timeAgo(new Date(channel.WikiHomePage.updatedAt || channel.WikiHomePage.createdAt)) }}
-        </p>
+        <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
+          <span>
+            Last updated by {{ channel.WikiHomePage.VersionAuthor?.username || "Unknown" }}
+            {{ timeAgo(new Date(channel.WikiHomePage.updatedAt || channel.WikiHomePage.createdAt)) }}
+          </span>
+          <span class="mx-2">·</span>
+          <WikiEditsDropdown :wiki-page="channel.WikiHomePage" />
+        </div>
       </div>
 
       <div class="prose prose-orange max-w-none dark:prose-invert">

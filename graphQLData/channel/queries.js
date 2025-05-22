@@ -26,6 +26,15 @@ export const GET_CHANNEL_WIKI = gql`
         VersionAuthor {
           username
         }
+        PastVersions {
+          id
+          title
+          body
+          createdAt
+          Author {
+            username
+          }
+        }
       }
     }
   }
@@ -53,6 +62,15 @@ export const GET_CHANNEL = gql`
         updatedAt
         VersionAuthor {
           username
+        }
+        PastVersions {
+          id
+          title
+          body
+          createdAt
+          Author {
+            username
+          }
         }
       }
       Tags {
