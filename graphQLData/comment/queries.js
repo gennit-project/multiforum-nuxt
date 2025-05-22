@@ -127,6 +127,14 @@ export const GET_DISCUSSION_COMMENTS = gql`
         FeedbackComments {
           id
         }
+        PastVersions {
+          id
+          body
+          createdAt
+          Author {
+            username
+          }
+        }
         ...CommentVoteFields
       }
     }
@@ -389,6 +397,14 @@ export const GET_COMMENT = gql`
       }
       Channel {
         uniqueName
+      }
+      PastVersions {
+        id
+        body
+        createdAt
+        Author {
+          username
+        }
       }
     }
   }

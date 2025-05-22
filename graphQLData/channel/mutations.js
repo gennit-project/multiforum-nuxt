@@ -51,3 +51,25 @@ export const DELETE_CHANNEL = gql`
     }
   }
 `;
+
+export const ENABLE_CHANNEL_WIKI = gql`
+  mutation enableChannelWiki($uniqueName: String!) {
+    updateChannels(where: { uniqueName: $uniqueName }, update: { wikiEnabled: true }) {
+      channels {
+        uniqueName
+        wikiEnabled
+      }
+    }
+  }
+`;
+
+export const DISABLE_CHANNEL_WIKI = gql`
+  mutation disableChannelWiki($uniqueName: String!) {
+    updateChannels(where: { uniqueName: $uniqueName }, update: { wikiEnabled: false }) {
+      channels {
+        uniqueName
+        wikiEnabled
+      }
+    }
+  }
+`;

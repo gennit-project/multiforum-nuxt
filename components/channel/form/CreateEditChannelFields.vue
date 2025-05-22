@@ -331,7 +331,7 @@
                 <router-link
                   v-for="tab in tabs"
                   :key="tab.key"
-                  class="flex cursor-pointer items-center px-3 py-2"
+                  class="flex cursor-pointer items-center py-2"
                   :class="{
                     'border-r-2 border-orange-500 dark:text-white':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),

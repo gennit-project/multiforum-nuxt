@@ -183,7 +183,7 @@
         <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-300 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <DiscussionTitleEditForm>
@@ -196,7 +196,7 @@
           </div>
           <div
             v-else-if="showEventTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-300 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <EventTitleEditForm>
@@ -209,7 +209,7 @@
           </div>
           <div
             v-else-if="showIssueTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-300 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <IssueTitleEditForm>
