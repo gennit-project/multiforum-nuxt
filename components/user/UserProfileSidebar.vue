@@ -74,7 +74,7 @@
         {{ username }}
         <span
           v-if="isAdmin"
-          class="border-orange-500 text-orange-500 rounded-md border px-2 py-1 text-xs"
+          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
           >Admin</span
         >
       </h1>

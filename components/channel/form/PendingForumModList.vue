@@ -67,7 +67,7 @@
         </nuxt-link>
 
         <button
-          class="border-orange-500 text-orange-500 flex items-center gap-1 rounded border px-2 py-1"
+          class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
           type="button"
           @click="$emit('click-cancel-invite', invite.username)"
         >

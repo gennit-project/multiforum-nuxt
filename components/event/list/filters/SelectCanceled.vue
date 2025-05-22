@@ -27,7 +27,7 @@
         >
           <input
             :checked="copyOfShowCanceled"
-            class="text-orange-600 focus:ring-orange-500 mr-1 h-4 w-4 rounded border border-gray-400"
+            class="mr-1 h-4 w-4 rounded border border-gray-400 text-orange-600 focus:ring-orange-500"
             :data-testid="'canceled-checkbox'"
             type="checkbox"
             @input="() => toggleCanceled()"

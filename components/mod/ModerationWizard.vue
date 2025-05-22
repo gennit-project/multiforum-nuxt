@@ -76,7 +76,7 @@
         >
           <h1
             v-if="issue.isOpen"
-            class="text-orange-500 border-b border-gray-300 pb-2 text-xl font-bold dark:border-gray-600"
+            class="border-b border-gray-300 pb-2 text-xl font-bold text-orange-500 dark:border-gray-600"
           >
             Mod Decision Needed
           </h1>
@@ -119,7 +119,7 @@
                 />
                 <button
                   v-if="issue.isOpen"
-                  class="bg-orange-600 hover:bg-orange-500 flex w-full cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 text-white"
+                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-500"
                   :loading="closeIssueLoading"
                   @click="$emit('close-issue')"
                 >

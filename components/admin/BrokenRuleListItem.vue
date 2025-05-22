@@ -29,7 +29,7 @@
   <label class="flex cursor-pointer items-start space-x-3 py-2">
     <input
       :checked="selected.includes(rule.summary)"
-      class="text-orange-600 mt-1 border border-gray-300 dark:border-gray-600"
+      class="mt-1 border border-gray-300 text-orange-600 dark:border-gray-600"
       type="checkbox"
       :value="rule.summary"
       @change="() => emit('toggleSelection', rule.summary)"

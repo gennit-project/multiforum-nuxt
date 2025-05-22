@@ -32,7 +32,7 @@
       text-xs
       font-medium
       "
-    class="border-b-3 border-transparent hover:border-orange-500 hover:text-orange-500 group inline-flex items-center px-4 py-3 text-xs font-medium dark:text-white hover:dark:text-gray-200"
+    class="border-b-3 border-transparent group inline-flex items-center px-4 py-3 text-xs font-medium hover:border-orange-500 hover:text-orange-500 dark:text-white hover:dark:text-gray-200"
     :to="to"
   >
     <div>

@@ -248,7 +248,7 @@
                   :key="tab.key"
                   class="cursor-pointer py-2"
                   :class="{
-                    'border-orange-500 border-r-2 dark:text-white':
+                    'border-r-2 border-orange-500 dark:text-white':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
                     'text-gray-900':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),

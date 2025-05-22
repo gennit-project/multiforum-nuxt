@@ -97,7 +97,7 @@
               </nuxt-link>
               <nuxt-link
                 v-if="user.RelatedIssue"
-                class="border-orange-500 text-orange-500 flex items-center gap-1 rounded border px-2 py-1"
+                class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
                 :to="{
                   name: 'forums-forumId-issues-issueId',
                   params: { issueId: user.RelatedIssue?.id },

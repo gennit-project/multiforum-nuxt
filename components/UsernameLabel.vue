@@ -13,7 +13,7 @@
 </script>
 <template>
   <span
-    class="border-orange-500 bg-orange-100 text-orange-600 mx-2 rounded-md border px-3 pb-1 pt-1.5 text-sm"
+    class="mx-2 rounded-md border border-orange-500 bg-orange-100 px-3 pb-1 pt-1.5 text-sm text-orange-600"
     >{{ text }}</span
   >
 </template>

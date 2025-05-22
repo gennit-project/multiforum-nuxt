@@ -75,7 +75,7 @@
         <div
           v-for="(tag, index) in selected"
           :key="index"
-          class="bg-orange-100 text-orange-700 dark:bg-orange-700 dark:text-orange-100 mr-2 mt-1 inline-flex items-center rounded-full px-2"
+          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
           @click="removeSelection(tag)"
         >
           <span>{{ tag }}</span>

@@ -16,7 +16,7 @@
         This is a remote development environment
       </div>
       <button
-        class="font-semibold bg-orange-600 hover:bg-orange-700 rounded-lg px-8 py-3 text-lg text-white transition-colors"
+        class="font-semibold rounded-lg bg-orange-600 px-8 py-3 text-lg text-white transition-colors hover:bg-orange-700"
         type="button"
         @click="hideOverlay"
       >

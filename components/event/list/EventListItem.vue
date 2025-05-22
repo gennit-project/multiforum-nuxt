@@ -207,7 +207,7 @@
       />
       <div>
         <router-link
-          class="text-md hover:text-orange-700 mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 dark:text-gray-200"
+          class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
           :data-testid="'event-title'"
           :to="detailLink"
         >

@@ -52,8 +52,8 @@
         location="bottom"
       >
         <button
-          class="font-small align-items focus:border-orange-500 focus:ring-orange-500 flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:ring-1 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
-          :class="[highlighted ? 'border-orange-500 ring-orange-500 ring-1' : '']"
+          class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
+          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
           :data-testid="dataTestid"
           @click="handleClick"
         >
@@ -72,8 +72,8 @@
       </Popper>
       <template #fallback>
         <button
-          class="max-height-3 font-small focus:border-orange-500 focus:ring-orange-500 mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:ring-1 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          :class="[highlighted ? 'border-orange-500 ring-orange-500 ring-1' : '']"
+          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
           :data-testid="dataTestid"
         >
           <slot name="icon" />

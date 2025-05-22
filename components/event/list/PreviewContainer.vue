@@ -60,7 +60,7 @@
                       <div class="flex items-center gap-4">
                         <div class="ml-3 flex h-7 items-center">
                           <button
-                            class="focus:ring-orange-500 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 dark:text-gray-200"
+                            class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-gray-200"
                             type="button"
                             @click="$emit('closePreview')"
                           >

@@ -56,9 +56,9 @@
   <div>
     <label
       :class="[
-        'border-orange-400 dark:border-orange-800 my-1 inline-flex items-center rounded-md border px-3 py-1 py-1.5 text-sm transition-colors',
+        'my-1 inline-flex items-center rounded-md border border-orange-400 px-3 py-1 py-1.5 text-sm transition-colors dark:border-orange-800',
         !disabled
-          ? 'bg-orange-100 text-orange-600 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800 cursor-pointer'
+          ? 'cursor-pointer bg-orange-100 text-orange-600 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800'
           : 'cursor-not-allowed bg-gray-100 text-gray-500 opacity-60 dark:bg-gray-700 dark:text-gray-400',
       ]"
       :for="`file-input-${props.fieldName}`"

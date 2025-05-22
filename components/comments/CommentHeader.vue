@@ -221,7 +221,7 @@
               >
               <span
                 v-else-if="isMod"
-                class="border-orange-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                 >Mod</span
               >
               <span
@@ -258,13 +258,13 @@
           <span>{{ editedAtFormatted }}</span>
           <span
             v-if="isHighlighted"
-            class="bg-orange-500 rounded-lg px-2 py-1 text-black"
+            class="rounded-lg bg-orange-500 px-2 py-1 text-black"
           >
             Permalinked
           </span>
           <span
             v-if="label"
-            class="border-orange-500 bg-orange-100 text-orange-600 dark:bg-orange-900 dark:text-orange-400 rounded-lg border px-2 py-1"
+            class="rounded-lg border border-orange-500 bg-orange-100 px-2 py-1 text-orange-600 dark:bg-orange-900 dark:text-orange-400"
           >
             {{ label }}
           </span>
