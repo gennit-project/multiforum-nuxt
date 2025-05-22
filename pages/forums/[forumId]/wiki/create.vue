@@ -18,7 +18,7 @@
   const formValues = ref({
     title: "",
     body: "",
-    slug: ""
+    slug: "",
   });
 
   // Derive slug from title
@@ -87,7 +87,7 @@
 
         <ErrorBanner
           v-if="creationError"
-          :error="creationError"
+          :text="creationError.message"
         />
 
         <form

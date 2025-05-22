@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { computed, ref, watch } from "vue";
+  import { computed, defineAsyncComponent, ref, watch } from "vue";
   import { useQuery, useMutation } from "@vue/apollo-composable";
   import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
   import {
