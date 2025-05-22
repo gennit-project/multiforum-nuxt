@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { computed, defineAsyncComponent, ref } from "vue";
+  import { computed, ref } from "vue";
   import type { PropType } from "vue";
   import { useRoute } from "nuxt/app";
   import type { Discussion, DiscussionChannel, Tag } from "@/__generated__/graphql";
@@ -9,10 +9,7 @@
   import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
   import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
   import { relativeTime } from "@/utils";
-  // Lazy load the album component since it's not needed for initial render
-  const DiscussionAlbum = defineAsyncComponent(
-    () => import("@/components/discussion/detail/DiscussionAlbum.vue")
-  );
+  import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 
   const props = defineProps({
     discussion: {
