@@ -4,7 +4,8 @@
   import { GET_CHANNEL } from "@/graphQLData/channel/queries";
   import { useQuery } from "@vue/apollo-composable";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
-  import PrimaryButton from "@/components/PrimaryButton.vue";
+  import DocumentIcon from "@/components/icons/DocumentIcon.vue";
+  import GenericButton from "@/components/GenericButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import MarkdownPreview from "@/components/MarkdownPreview.vue";
@@ -77,12 +78,12 @@
           >
         </p>
       </div>
-      <PrimaryButton
+      <GenericButton
         :label="'Create Wiki Page'"
         @click="createWikiPage"
       >
-        <PencilIcon class="mr-2 h-5 w-5" />
-      </PrimaryButton>
+        <DocumentIcon class="mr-2 h-5 w-5" />
+      </GenericButton>
     </div>
 
     <div
@@ -96,18 +97,18 @@
             {{ wikiHomePage.title }}
           </h1>
           <div class="flex space-x-3">
-            <PrimaryButton
-              :label="'Add Page'"
+            <GenericButton
+              :text="'Add Page'"
               @click="router.push(`/forums/${forumId}/wiki/create-child`)"
             >
-              <PencilIcon class="mr-2 h-5 w-5" />
-            </PrimaryButton>
-            <PrimaryButton
-              :label="'Edit Wiki'"
+              <DocumentIcon class="mr-2 h-5 w-5" />
+            </GenericButton>
+            <GenericButton
+              :text="'Edit Wiki'"
               @click="router.push(`/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`)"
             >
               <PencilIcon class="mr-2 h-5 w-5" />
-            </PrimaryButton>
+            </GenericButton>
           </div>
         </div>
         <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
