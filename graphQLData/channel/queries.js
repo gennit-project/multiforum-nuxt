@@ -44,6 +44,17 @@ export const GET_CHANNEL = gql`
       wikiEnabled
       eventsEnabled
       feedbackEnabled
+      WikiHomePage {
+        id
+        title
+        body
+        slug
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
+        }
+      }
       Tags {
         text
       }
