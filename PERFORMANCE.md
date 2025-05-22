@@ -19,18 +19,7 @@ Based on Lighthouse performance reports, the following issues were identified:
 
 ### 1. Code Splitting and Lazy Loading
 
-Implemented dynamic imports for heavy components to reduce initial bundle size:
-
-```typescript
-// Example of lazy loading a component
-const DiscussionAlbum = defineAsyncComponent(
-  () => import("@/components/discussion/detail/DiscussionAlbum.vue")
-);
-```
-
-Components that were lazy loaded:
-
-- DiscussionAlbum (in SitewideDiscussionListItem, ChannelDiscussionListItem, and DiscussionDetailContent)
+Edit: This has been removed as part of debugging issues with 500 errors on the client side.
 
 ### 2. Performance Plugin
 

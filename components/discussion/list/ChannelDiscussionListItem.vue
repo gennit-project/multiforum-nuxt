@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { ref, computed, defineAsyncComponent } from "vue";
+  import { ref, computed } from "vue";
   import type { PropType } from "vue";
   import { useRoute } from "nuxt/app";
   import TagComponent from "@/components/TagComponent.vue";
@@ -13,11 +13,7 @@
   import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
   import { storeToRefs } from "pinia";
   import { useUIStore } from "@/stores/uiStore";
-  // UI state is now handled via props
-  // Lazy load the album component since it's not needed for initial render
-  const DiscussionAlbum = defineAsyncComponent(
-    () => import("@/components/discussion/detail/DiscussionAlbum.vue")
-  );
+  import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 
   // Define props
   const props = defineProps({
