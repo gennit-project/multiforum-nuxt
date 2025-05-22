@@ -17,6 +17,7 @@
   import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
   import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
   import { config } from "@/config";
+  import EditsDropdown from "./activityFeed/EditsDropdown.vue";
 
   const props = defineProps({
     discussion: {
@@ -325,7 +326,16 @@
           class="mx-2"
           >&#8226;</span
         >
-        <div>{{ editedAt }}</div>
+        <div class="flex items-center">
+          <span>{{ editedAt }}</span>
+          <EditsDropdown
+            v-if="
+              discussion?.PastTitleVersions?.length > 0 || discussion?.PastBodyVersions?.length > 0
+            "
+            class="ml-2"
+            :discussion="discussion"
+          />
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <div v-if="usernameVar === discussion?.Author?.username">

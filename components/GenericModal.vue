@@ -24,7 +24,7 @@
     },
     body: {
       type: String,
-      required: true,
+      required: false,
       default: "",
     },
     open: {
