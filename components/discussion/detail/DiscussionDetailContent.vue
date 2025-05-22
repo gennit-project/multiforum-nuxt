@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
+import { computed, defineAsyncComponent, ref, watch } from "vue";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import {
@@ -143,7 +143,6 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
     null
   );
 });
-
 const isArchived = computed(() => {
   return activeDiscussionChannel.value?.archived;
 });
@@ -382,6 +381,14 @@ const handleEditAlbum = () => {
                         @edit-album="handleEditAlbum"
                       />
                     </div>
+                  </template>
+                  <template #activity-feed-slot>
+                    <DiscussionTitleVersions
+                      v-if="
+                        discussion?.PastTitleVersions && discussion.PastTitleVersions.length > 0
+                      "
+                      :discussion="discussion"
+                    />
                   </template>
                   <template #mark-answered-slot>
                     <MarkAsAnsweredButton
