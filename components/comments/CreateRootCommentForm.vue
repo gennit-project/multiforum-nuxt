@@ -39,7 +39,7 @@
   ]);
 
   const writeReplyStyle =
-    "block h-10 w-full rounded-lg border border-gray-500 dark:bg-gray-700 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-800 dark:placeholder-gray-400 dark:focus:ring-gray-9";
+    "block h-10 w-full rounded-lg border border-gray-300 dark:bg-gray-700 text-sm shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-800 dark:placeholder-gray-400 dark:focus:ring-gray-9";
 </script>
 
 <template>
@@ -58,7 +58,7 @@
           <div class="align-items flex w-full gap-2">
             <LoggedInUserAvatar v-if="usernameVar" />
             <textarea
-              class="flex-1 overflow-hidden border border-gray-500"
+              class="flex-1 overflow-hidden dark:bg-gray-700"
               :class="writeReplyStyle"
               data-testid="addComment"
               name="addComment"
