@@ -113,7 +113,7 @@
             <span
               class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-book-open mr-2"></i>Forum Rules
+              <i class="fa-solid fa-scroll mr-2"></i>Forum Rules
             </span>
             <ChannelRules :rules="channelRules" />
           </div>
