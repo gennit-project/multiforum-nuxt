@@ -9,6 +9,7 @@
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import RequireAuth from "@/components/auth/RequireAuth.vue";
   import { timeAgo } from "@/utils";
 
   const route = useRoute();
@@ -78,12 +79,21 @@
           >
         </p>
       </div>
-      <GenericButton
-        :label="'Create Wiki Page'"
-        @click="createWikiPage"
-      >
-        <DocumentIcon class="mr-2 h-5 w-5" />
-      </GenericButton>
+      <RequireAuth>
+        <template #has-auth>
+          <GenericButton
+            :label="'Create Wiki Page'"
+            @click="createWikiPage"
+          >
+            <DocumentIcon class="mr-2 h-5 w-5" />
+          </GenericButton>
+        </template>
+        <template #does-not-have-auth>
+          <GenericButton :label="'Create Wiki Page'">
+            <DocumentIcon class="mr-2 h-5 w-5" />
+          </GenericButton>
+        </template>
+      </RequireAuth>
     </div>
 
     <div
@@ -97,18 +107,36 @@
             {{ wikiHomePage.title }}
           </h1>
           <div class="flex space-x-3">
-            <GenericButton
-              :text="'Add Page'"
-              @click="router.push(`/forums/${forumId}/wiki/create-child`)"
-            >
-              <DocumentIcon class="mr-2 h-5 w-5" />
-            </GenericButton>
-            <GenericButton
-              :text="'Edit Wiki'"
-              @click="router.push(`/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`)"
-            >
-              <PencilIcon class="mr-2 h-5 w-5" />
-            </GenericButton>
+            <RequireAuth>
+              <template #has-auth>
+                <GenericButton
+                  :text="'Add Page'"
+                  @click="router.push(`/forums/${forumId}/wiki/create-child`)"
+                >
+                  <DocumentIcon class="mr-2 h-5 w-5" />
+                </GenericButton>
+              </template>
+              <template #does-not-have-auth>
+                <GenericButton :text="'Add Page'">
+                  <DocumentIcon class="mr-2 h-5 w-5" />
+                </GenericButton>
+              </template>
+            </RequireAuth>
+            <RequireAuth>
+              <template #has-auth>
+                <GenericButton
+                  :text="'Edit Wiki'"
+                  @click="router.push(`/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`)"
+                >
+                  <PencilIcon class="mr-2 h-5 w-5" />
+                </GenericButton>
+              </template>
+              <template #does-not-have-auth>
+                <GenericButton :text="'Edit Wiki'">
+                  <PencilIcon class="mr-2 h-5 w-5" />
+                </GenericButton>
+              </template>
+            </RequireAuth>
           </div>
         </div>
         <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
