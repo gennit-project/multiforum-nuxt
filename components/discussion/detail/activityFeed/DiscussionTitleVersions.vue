@@ -53,7 +53,7 @@
     v-if="showActivityFeed"
     class="mb-6 mt-4"
   >
-    <h3 class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Title Edit History</h3>
+    <h3 class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">Title Edit History</h3>
     <ul
       role="list"
       class="flow-root"
@@ -82,7 +82,7 @@
 
           <!-- Activity content -->
           <div class="min-w-0 flex-1">
-            <div class="text-sm leading-6">
+            <div class="text-xs leading-6">
               <span class="font-medium text-gray-900 dark:text-gray-200">{{ item.author }}</span>
               <span class="text-gray-500 dark:text-gray-400"> changed the title </span>
               <span class="text-gray-500 line-through dark:text-gray-400">{{ item.oldTitle }}</span>

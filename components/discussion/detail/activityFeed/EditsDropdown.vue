@@ -40,6 +40,8 @@
         author: props.discussion.Author?.username || "[Deleted]",
         createdAt: props.discussion.updatedAt || props.discussion.createdAt,
         isCurrent: true,
+        body: props.discussion.body, // Add the current body text
+        Author: props.discussion.Author, // Add the full Author object to match the structure
       };
 
       // Add past body versions

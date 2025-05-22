@@ -1,8 +1,6 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
   import GenericModal from "@/components/GenericModal.vue";
-  import DiffIcon from "@/components/icons/DiffIcon.vue";
   import * as DiffMatchPatch from "diff-match-patch";
 
   const props = defineProps({
@@ -56,17 +54,17 @@
 
   const oldContent = computed(() => props.oldVersion.body || "");
   const newContent = computed(() => props.newVersion.body || "");
-  
+
   // Computed property that generates the diff HTML
   const diffHtml = computed(() => {
     const dmp = new DiffMatchPatch.diff_match_patch();
     const diffs = dmp.diff_main(oldContent.value, newContent.value);
     dmp.diff_cleanupSemantic(diffs);
-    
+
     // Create highlighted HTML for both sides
     let leftHtml = "";
     let rightHtml = "";
-    
+
     diffs.forEach((diff) => {
       const [operation, text] = diff;
       const escapedText = text
@@ -74,27 +72,27 @@
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
         .replace(/\n/g, "<br>");
-      
+
       // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
       if (operation === -1) {
         // Deletion - show in left column with red background
-        leftHtml += `<span class="bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">${escapedText}</span>`;
+        leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-100">${escapedText}</span>`;
       } else if (operation === 1) {
         // Insertion - show in right column with green background
-        rightHtml += `<span class="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">${escapedText}</span>`;
+        rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-100">${escapedText}</span>`;
       } else {
         // Equal - show in both columns
         leftHtml += escapedText;
         rightHtml += escapedText;
       }
     });
-    
+
     return {
       left: leftHtml,
       right: rightHtml,
     };
   });
-  
+
   const handleClose = () => {
     emit("close");
   };
@@ -107,7 +105,7 @@
     @close="handleClose"
   >
     <template #icon>
-      <DiffIcon class="h-6 w-6 text-orange-600 dark:text-orange-400" />
+      <i class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"></i>
     </template>
     <template #content>
       <div class="flex flex-col gap-4">
@@ -137,38 +135,44 @@
         <div class="rounded-md border dark:border-gray-700">
           <div class="flex flex-col md:flex-row">
             <!-- Old version (left side) -->
-            <div class="flex-1 bg-red-50 rounded-t-md md:rounded-l-md md:rounded-tr-none p-4 dark:bg-red-900/30 border-b md:border-b-0 md:border-r dark:border-gray-700">
-              <h3 class="mb-2 text-sm font-medium text-red-800 dark:text-red-300">
+            <div
+              class="flex-1 rounded-t-md border-b bg-red-500/10 p-4 dark:border-gray-700 dark:bg-red-500/20 md:rounded-l-md md:rounded-tr-none md:border-b-0 md:border-r"
+            >
+              <h3 class="mb-2 text-sm font-medium text-red-700 dark:text-red-200">
                 Previous Version
               </h3>
               <div
-                class="rounded border border-red-200 bg-white p-3 dark:border-red-900 dark:bg-gray-800 h-full min-h-[200px] overflow-auto"
+                class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-800"
               >
                 <div v-html="diffHtml.left"></div>
               </div>
             </div>
-            
+
             <!-- New version (right side) -->
-            <div class="flex-1 bg-green-50 rounded-b-md md:rounded-r-md md:rounded-bl-none p-4 dark:bg-green-900/30">
-              <h3 class="mb-2 text-sm font-medium text-green-800 dark:text-green-300">
+            <div
+              class="flex-1 rounded-b-md bg-green-500/10 p-4 dark:bg-green-500/20 md:rounded-r-md md:rounded-bl-none"
+            >
+              <h3 class="mb-2 text-sm font-medium text-green-700 dark:text-green-200">
                 Current Version
               </h3>
               <div
-                class="rounded border border-green-200 bg-white p-3 dark:border-green-900 dark:bg-gray-800 h-full min-h-[200px] overflow-auto"
+                class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800"
               >
                 <div v-html="diffHtml.right"></div>
               </div>
             </div>
           </div>
-          
+
           <!-- Legend -->
-          <div class="mt-4 p-2 text-xs text-gray-500 dark:text-gray-400 border-t dark:border-gray-700 flex flex-wrap gap-4 justify-center">
+          <div
+            class="mt-4 flex flex-wrap justify-center gap-4 border-t p-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400"
+          >
             <span class="flex items-center">
-              <span class="inline-block w-3 h-3 mr-1 bg-red-100 dark:bg-red-900/30"></span>
+              <span class="mr-1 inline-block h-3 w-3 bg-red-500/20 dark:bg-red-500/30"></span>
               Removed content
             </span>
             <span class="flex items-center">
-              <span class="inline-block w-3 h-3 mr-1 bg-green-100 dark:bg-green-900/30"></span>
+              <span class="mr-1 inline-block h-3 w-3 bg-green-500/20 dark:bg-green-500/30"></span>
               Added content
             </span>
           </div>
