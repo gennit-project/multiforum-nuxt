@@ -342,7 +342,10 @@ const handleEditAlbum = () => {
           v-else-if="locked"
           text="This discussion is locked. New comments cannot be added."
         />
-        <div v-if="discussion" class="w-full">
+        <div
+          v-if="discussion"
+          class="w-full"
+        >
           <div class="w-full space-y-3 px-2">
             <div class="w-full rounded-lg pb-2 dark:border-gray-700">
               <DiscussionHeader

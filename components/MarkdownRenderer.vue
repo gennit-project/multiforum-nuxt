@@ -175,20 +175,20 @@ const renderedMarkdown = computed(() => {
       margin-bottom: 1rem !important;
       margin-top: 0 !important;
     }
-    
+
     ul {
       list-style-type: disc !important;
     }
-    
+
     ol {
       list-style-type: decimal !important;
     }
-    
+
     li {
       margin: 0.25rem 0 !important;
       line-height: 1.5 !important;
     }
-    
+
     ul ul,
     ol ol,
     ul ol,
@@ -204,13 +204,9 @@ const renderedMarkdown = computed(() => {
       max-width: 100% !important;
       white-space: pre-wrap !important;
       margin-bottom: 1rem !important;
-      background-color: #f6f8fa !important;
-      border: 1px solid #e1e4e8 !important;
-      
-      .dark & {
-        background-color: #161b22 !important;
-        border-color: #30363d !important;
-      }
+
+      background-color: #161b22 !important;
+      border-color: #30363d !important;
     }
 
     code {
@@ -222,12 +218,12 @@ const renderedMarkdown = computed(() => {
       overflow-wrap: break-word !important;
       white-space: pre-wrap !important;
       background-color: rgba(175, 184, 193, 0.2) !important;
-      
+
       .dark & {
         background-color: rgba(110, 118, 129, 0.4) !important;
       }
     }
-    
+
     pre code {
       padding: 0 !important;
       background-color: transparent !important;
@@ -241,11 +237,11 @@ const renderedMarkdown = computed(() => {
       max-width: 100% !important;
       word-break: break-word !important;
       display: inline-block !important;
-      
+
       &:hover {
         text-decoration: underline !important;
       }
-      
+
       .dark & {
         color: #58a6ff !important;
       }
@@ -276,11 +272,11 @@ const renderedMarkdown = computed(() => {
         color: #8b949e !important;
         background-color: #161b22 !important;
       }
-      
+
       > :first-child {
         margin-top: 0 !important;
       }
-      
+
       > :last-child {
         margin-bottom: 0 !important;
       }
@@ -308,7 +304,7 @@ const renderedMarkdown = computed(() => {
         width: 12px !important;
         height: 12px !important;
       }
-      
+
       .dark & {
         color: #58a6ff !important;
       }
