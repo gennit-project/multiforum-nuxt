@@ -119,7 +119,7 @@
           <SidebarEventList :event-channels-aggregate="eventChannelsAggregate" />
 
           <div v-if="channel.Tags.length > 0">
-            <div class="flex justify-between border-black">
+            <div class="flex justify-between border-gray-500">
               <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
                 >Tags</span
               >

@@ -301,7 +301,7 @@
       </MenuButton>
     </div>
 
-    <div class="ml-12 border-l-2 border-black pl-2 dark:border-gray-500">
+    <div class="ml-12 border-l-2 border-gray-500 pl-2 dark:border-gray-500">
       <ArchivedCommentText
         v-if="comment?.archived"
         :channel-id="forumId as string"

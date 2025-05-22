@@ -71,18 +71,18 @@
           </div>
         </div>
         <div
-          class="px-4py-4 flex-1 flex-col space-y-4 rounded-lg border border-black"
-          :class="[issue.isOpen ? 'border-blue-500' : 'border-black dark:border-gray-700']"
+          class="px-4py-4 flex-1 flex-col space-y-4 rounded-lg border border-gray-500"
+          :class="[issue.isOpen ? 'border-blue-500' : 'border-gray-500 dark:border-gray-700']"
         >
           <h1
             v-if="issue.isOpen"
-            class="border-b border-black pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
+            class="border-b border-gray-500 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
           >
             Mod Decision Needed
           </h1>
           <h1
             v-else
-            class="border-b border-black pb-2 text-xl font-bold text-gray-500 dark:border-gray-600 dark:text-gray-300"
+            class="border-b border-gray-500 pb-2 text-xl font-bold text-gray-500 dark:border-gray-600 dark:text-gray-300"
           >
             Mod Actions
           </h1>
@@ -149,10 +149,10 @@
           </div>
         </div>
         <div
-          class="flex-1 flex-col space-y-4 rounded-lg border border-black px-4 py-4 dark:border-gray-700"
+          class="flex-1 flex-col space-y-4 rounded-lg border border-gray-500 px-4 py-4 dark:border-gray-700"
         >
           <h1
-            class="border-b border-black pb-2 text-xl font-bold text-gray-500 dark:border-gray-600 dark:text-gray-300"
+            class="border-b border-gray-500 pb-2 text-xl font-bold text-gray-500 dark:border-gray-600 dark:text-gray-300"
           >
             Mod Actions
           </h1>

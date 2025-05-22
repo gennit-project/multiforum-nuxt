@@ -454,7 +454,9 @@
 </script>
 
 <template>
-  <form class="relative rounded-md border border-black p-2 dark:border-gray-600">
+  <form
+    class="relative rounded-md border border-gray-500 bg-gray-100 p-2 dark:border-gray-600 dark:bg-gray-900"
+  >
     <ErrorBanner
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
@@ -473,7 +475,7 @@
     </div>
     <TabGroup as="div">
       <TabList
-        class="border-b border-black pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
+        class="border-b border-gray-500 pb-2 dark:border-gray-600 sm:flex-wrap md:flex md:justify-between"
       >
         <div class="flex items-center">
           <Tab
@@ -538,7 +540,7 @@
         <TabPanel class="-m-0.5 rounded-md px-0.5 py-1">
           <textarea
             ref="editorRef"
-            class="block w-full rounded-md border border-black text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+            class="block w-full rounded-md border border-gray-500 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
             :data-testid="props.testId"
             :placeholder="props.placeholder"
             :rows="props.rows"
@@ -565,7 +567,7 @@
         </TabPanel>
         <TabPanel class="-m-0.5 overflow-auto rounded-md p-0.5">
           <MarkdownRenderer
-            class="block w-full max-w-2xl rounded-md border-black text-xs shadow-sm dark:border-gray-800 dark:bg-gray-700 dark:text-gray-100"
+            class="block w-full max-w-2xl rounded-md border-gray-500 text-xs shadow-sm dark:border-gray-800 dark:bg-gray-700 dark:text-gray-100"
             :text="text"
           />
         </TabPanel>

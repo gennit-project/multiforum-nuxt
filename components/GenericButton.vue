@@ -25,7 +25,7 @@
 
 <template>
   <button
-    class="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-black px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    class="inline-flex items-center gap-1 whitespace-nowrap rounded-lg border border-gray-500 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
     :class="{
       'bg-blue-500 text-white hover:bg-gray-800 dark:text-black hover:dark:bg-blue-600': active,
       'bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600':

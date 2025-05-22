@@ -25,7 +25,7 @@
 </script>
 <template>
   <PrimaryButton
-    class="border-transparent px-4py-2 ml-3 inline-flex justify-center rounded-full border border-black text-sm font-medium shadow-sm dark:border-gray-700"
+    class="border-transparent px-4py-2 ml-3 inline-flex justify-center rounded-full border border-gray-500 text-sm font-medium shadow-sm dark:border-gray-700"
     :disabled="disabled"
     :label="text"
     :loading="loading"
