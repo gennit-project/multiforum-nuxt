@@ -70,7 +70,11 @@
   const formValues = ref({
     title: "",
     body: "",
-    slug: ""
+    slug: "",
+  });
+
+  const newChannel = computed(() => {
+    return channelResult.value?.channels[0] || {};
   });
 
   // Initialize form with existing wiki data when available
@@ -80,9 +84,9 @@
     (newWikiPage) => {
       if (newWikiPage && !dataLoaded.value) {
         formValues.value = {
-          title: newWikiPage.title || "",
-          body: newWikiPage.body || "",
-          slug: newWikiPage.slug || "",
+          title: newChannel.value.WikiHomePage.title || "",
+          body: newChannel.value.WikiHomePage.body || "",
+          slug: newChannel.value.WikiHomePage.slug || "",
         };
         dataLoaded.value = true;
       }
@@ -288,6 +292,7 @@
             :initial-value="formValues.body || ''"
             :placeholder="'Write your wiki page content here...'"
             :min-height="300"
+            :rows="20"
             :test-id="'content-input'"
             @update="formValues.body = $event"
           />

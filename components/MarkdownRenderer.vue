@@ -114,10 +114,209 @@ const renderedMarkdown = computed(() => {
     max-width: 100%;
     box-sizing: border-box;
 
-    // allow last paragraph to flow with the slotted element
-    &:last-child > p:last-child {
-      display: inline;
-      margin-right: 6px;
+    /* ── font‑size variants ─────────────────────────────── */
+    &.font-size-small {
+      h1 {
+        font-size: 1rem !important;
+      }
+      h2 {
+        font-size: 0.9rem !important;
+      }
+      p,
+      li {
+        font-size: 0.8rem !important;
+      }
+    }
+
+    &.font-size-medium {
+      h1 {
+        font-size: 1.1rem !important;
+      }
+      h2 {
+        font-size: 1rem !important;
+      }
+      p,
+      li {
+        font-size: 0.9rem !important;
+      }
+    }
+
+    &.font-size-large {
+      h1 {
+        font-size: 1.4rem !important;
+      }
+      h2 {
+        font-size: 1.3rem !important;
+      }
+      p,
+      li {
+        font-size: 1.1rem !important;
+      }
+    }
+
+    /* ── general typography & elements ───────────────────── */
+    h1,
+    h2 {
+      font-size: 1rem !important;
+      font-weight: 600 !important;
+      margin-top: 1.5rem !important;
+      margin-bottom: 1rem !important;
+    }
+
+    p {
+      margin-bottom: 1rem !important;
+      margin-top: 0.25rem !important;
+      line-height: 1.5 !important;
+    }
+
+    ul,
+    ol {
+      padding-left: 2rem !important;
+      margin-bottom: 1rem !important;
+      margin-top: 0 !important;
+    }
+    
+    ul {
+      list-style-type: disc !important;
+    }
+    
+    ol {
+      list-style-type: decimal !important;
+    }
+    
+    li {
+      margin: 0.25rem 0 !important;
+      line-height: 1.5 !important;
+    }
+    
+    ul ul,
+    ol ol,
+    ul ol,
+    ol ul {
+      margin-top: 0.25rem !important;
+      margin-bottom: 0 !important;
+    }
+
+    pre {
+      border-radius: 6px !important;
+      overflow-x: auto !important; // keep horizontal scroll for code blocks
+      padding: 1rem !important;
+      max-width: 100% !important;
+      white-space: pre-wrap !important;
+      margin-bottom: 1rem !important;
+      background-color: #f6f8fa !important;
+      border: 1px solid #e1e4e8 !important;
+      
+      .dark & {
+        background-color: #161b22 !important;
+        border-color: #30363d !important;
+      }
+    }
+
+    code {
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+      padding: 0.2em 0.4em !important;
+      margin: 0 !important;
+      border-radius: 6px !important;
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      white-space: pre-wrap !important;
+      background-color: rgba(175, 184, 193, 0.2) !important;
+      
+      .dark & {
+        background-color: rgba(110, 118, 129, 0.4) !important;
+      }
+    }
+    
+    pre code {
+      padding: 0 !important;
+      background-color: transparent !important;
+    }
+
+    a {
+      color: #0969da !important;
+      text-decoration: none !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      max-width: 100% !important;
+      word-break: break-word !important;
+      display: inline-block !important;
+      
+      &:hover {
+        text-decoration: underline !important;
+      }
+      
+      .dark & {
+        color: #58a6ff !important;
+      }
+    }
+
+    img {
+      margin-top: 1rem !important;
+      max-height: 350px !important;
+      max-width: 100% !important;
+      height: auto !important;
+      width: auto !important;
+      object-fit: contain !important;
+      cursor: pointer !important;
+      display: block !important;
+      word-wrap: break-word !important;
+    }
+
+    blockquote {
+      padding: 0.6em 1em !important;
+      border-left: 0.25em solid #d0d7de !important;
+      margin: 1em 0 !important;
+      color: #57606a !important;
+      background-color: #f6f8fa !important;
+      border-radius: 0 6px 6px 0 !important;
+
+      .dark & {
+        border-left-color: #30363d !important;
+        color: #8b949e !important;
+        background-color: #161b22 !important;
+      }
+      
+      > :first-child {
+        margin-top: 0 !important;
+      }
+      
+      > :last-child {
+        margin-bottom: 0 !important;
+      }
+    }
+
+    /* ── external‑link helper ───────────────────────────── */
+    .external-link {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+
+    .external-link-icon {
+      color: #0969da !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      margin-left: 4px !important;
+      opacity: 0.6 !important;
+
+      svg {
+        width: 12px !important;
+        height: 12px !important;
+      }
+      
+      .dark & {
+        color: #58a6ff !important;
+      }
+    }
+
+    /* ── theme hack for code‑theme background ───────────── */
+    .dark {
+      background-color: transparent;
     }
   }
 
