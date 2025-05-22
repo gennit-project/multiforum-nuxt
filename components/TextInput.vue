@@ -63,7 +63,7 @@
         v-model="text"
         class="block min-w-0 flex-1 rounded-lg border border-gray-300 pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 sm:text-sm"
         :class="[
-          disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
+          disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-500 dark:text-gray-300' : '',
           invalid
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
             : 'focus:border-orange-500 focus:ring-orange-500',

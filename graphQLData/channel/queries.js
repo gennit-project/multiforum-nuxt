@@ -34,6 +34,16 @@ export const GET_CHANNEL_WIKI = gql`
             username
           }
         }
+        ChildPages {
+          id
+          title
+          slug
+          createdAt
+          updatedAt
+          VersionAuthor {
+            username
+          }
+        }
       }
     }
   }
@@ -50,6 +60,16 @@ export const GET_WIKI_PAGE = gql`
       updatedAt
       VersionAuthor {
         username
+      }
+      ChildPages {
+        id
+        title
+        slug
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
+        }
       }
       PastVersions(options: { sort: [{ createdAt: DESC }] }) {
         id
@@ -91,6 +111,16 @@ export const GET_CHANNEL = gql`
           body
           createdAt
           Author {
+            username
+          }
+        }
+        ChildPages {
+          id
+          title
+          slug
+          createdAt
+          updatedAt
+          VersionAuthor {
             username
           }
         }
