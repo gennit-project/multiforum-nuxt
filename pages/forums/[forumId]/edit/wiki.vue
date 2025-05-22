@@ -13,9 +13,9 @@ defineEmits(["updateFormValues"]);
     <div class="flex items-center">
       <input
         id="wiki-enabled"
-        type="checkbox"
         :checked="formValues.wikiEnabled"
-        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
+        class="h-4 w-4 rounded border border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-600"
+        type="checkbox"
         @change="$emit('updateFormValues', { wikiEnabled: ($event.target as HTMLInputElement).checked })"
       >
       <label for="wiki-enabled" class="ml-2 block text-sm text-gray-900 dark:text-gray-100">
