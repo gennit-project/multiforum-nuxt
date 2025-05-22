@@ -103,7 +103,7 @@
 </script>
 
 <template>
-  <li class="mb-2 flex border-gray-800 pt-2 dark:bg-gray-800 md:rounded-lg">
+  <li class="mb-2 flex border-gray-300 pt-2 dark:bg-gray-800 md:rounded-lg">
     <div class="flex w-full flex-row justify-start gap-4 overflow-hidden rounded-lg">
       <div
         v-if="discussion"

@@ -15,7 +15,7 @@
 </script>
 
 <template>
-  <li class="border-bottom flex flex-col border-gray-300 p-3 pl-8 dark:border-gray-800">
+  <li class="border-bottom flex flex-col border-gray-300 p-3 pl-8 dark:border-gray-300">
     <div class="flex space-x-2 text-lg">
       <i
         v-if="issue.isOpen"

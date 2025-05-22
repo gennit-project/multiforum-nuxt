@@ -213,7 +213,7 @@
               >
                 <AvatarComponent
                   v-if="forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-800"
+                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-300"
                   :is-small="true"
                   :is-square="false"
                   :src="forum?.channelIconURL ?? ''"
@@ -221,7 +221,7 @@
                 />
                 <AvatarComponent
                   v-if="!forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-800"
+                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-300"
                   :is-small="true"
                   :is-square="false"
                   :src="forum?.channelIconURL ?? ''"

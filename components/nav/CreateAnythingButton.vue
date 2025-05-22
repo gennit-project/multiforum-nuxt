@@ -106,7 +106,7 @@
           <template #activator="{ props }">
             <button
               v-bind="props"
-              class="inline-flex items-center gap-1 rounded-md border border-gray-800 px-2 py-2 text-xs focus:outline-none dark:border-gray-600"
+              class="inline-flex items-center gap-1 rounded-md border border-gray-300 px-2 py-2 text-xs focus:outline-none dark:border-gray-600"
               :class="[
                 backgroundColor === 'light'
                   ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
@@ -157,10 +157,10 @@
         </v-menu>
         <template #fallback>
           <button
-            class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-800 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
+            class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-300 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
             :class="[
               usePrimaryButton
-                ? '!border !border-gray-800 dark:!border-gray-600'
+                ? '!border !border-gray-300 dark:!border-gray-600'
                 : backgroundColor === 'light'
                   ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
                   : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
@@ -179,10 +179,10 @@
 
     <template #does-not-have-auth>
       <button
-        class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-800 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
+        class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-300 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
         :class="[
           usePrimaryButton
-            ? '!border !border-gray-800 dark:!border-gray-600'
+            ? '!border !border-gray-300 dark:!border-gray-600'
             : backgroundColor === 'light'
               ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
               : 'bg-gray-800 text-gray-100 hover:bg-gray-700',

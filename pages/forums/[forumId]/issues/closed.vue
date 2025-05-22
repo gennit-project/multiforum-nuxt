@@ -56,7 +56,7 @@
 
 <template>
   <ul
-    class="divide-y divide-gray-200 border-t border-gray-300 dark:divide-gray-800 dark:border-gray-800 dark:text-white"
+    class="divide-y divide-gray-200 border-t border-gray-300 dark:divide-gray-800 dark:border-gray-300 dark:text-white"
     data-testid="issue-list"
   >
     <IssueListItem

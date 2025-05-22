@@ -59,7 +59,7 @@
           class="inline-flex items-center gap-2 rounded-md bg-gray-100 px-2 py-1 dark:bg-gray-700"
         >
           <AvatarComponent
-            class="shadow-sm dark:border-gray-800"
+            class="shadow-sm dark:border-gray-300"
             :is-small="true"
             :is-square="false"
             :src="channelIcon ?? ''"

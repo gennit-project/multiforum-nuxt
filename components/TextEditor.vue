@@ -567,7 +567,7 @@
         </TabPanel>
         <TabPanel class="-m-0.5 overflow-auto rounded-md p-0.5">
           <MarkdownRenderer
-            class="block w-full max-w-2xl rounded-md border-gray-300 text-xs shadow-sm dark:border-gray-800 dark:bg-gray-700 dark:text-gray-100"
+            class="block w-full max-w-2xl rounded-md border-gray-300 text-xs shadow-sm dark:border-gray-300 dark:bg-gray-700 dark:text-gray-100"
             :text="text"
           />
         </TabPanel>

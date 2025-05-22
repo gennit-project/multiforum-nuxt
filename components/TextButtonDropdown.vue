@@ -41,7 +41,7 @@
     >
       <div>
         <MenuButton
-          class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-800 bg-white py-2 pl-3 pr-4 text-xs text-black hover:bg-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-700"
+          class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-black hover:bg-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-900 dark:text-white hover:dark:bg-gray-700"
           :data-testid="`text-dropdown-${label}`"
         >
           <SortIcon

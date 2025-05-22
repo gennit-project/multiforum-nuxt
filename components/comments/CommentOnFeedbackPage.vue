@@ -248,7 +248,7 @@
     <div class="flex flex-wrap items-center gap-x-1 text-sm text-gray-500 dark:text-gray-300">
       <AvatarComponent
         v-if="comment.CommentAuthor?.displayName"
-        class="mr-1 shadow-sm dark:border-gray-800"
+        class="mr-1 shadow-sm dark:border-gray-300"
         :is-small="true"
         :is-square="false"
         :text="comment.CommentAuthor.displayName"
