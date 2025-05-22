@@ -50,6 +50,7 @@
         displayName: formValues.value.displayName,
         channelIconURL: formValues.value.channelIconURL,
         channelBannerURL: formValues.value.channelBannerURL,
+        wikiEnabled: true,
         rules: JSON.stringify(formValues.value.rules),
         Tags: {
           connectOrCreate: tagConnections,

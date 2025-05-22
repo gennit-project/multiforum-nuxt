@@ -213,8 +213,8 @@
               'flex h-9 items-center border-l border-gray-300 px-2 text-gray-800 dark:border-gray-600 dark:text-gray-300',
               'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
               !(channelId ? expandChannelDiscussions : expandSitewideDiscussions)
-                ? 'bg-orange-50 dark:bg-orange-900'
-                : 'dark:bg-gray-800',
+                ? 'bg-orange-100 dark:bg-orange-900'
+                : 'bg-gray-100 dark:bg-gray-800',
             ]"
             data-testid="collapse-all-button"
             title="Collapse all discussions"
