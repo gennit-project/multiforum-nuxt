@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { computed } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
-  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+  import { GET_CHANNEL, GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
   import { useQuery } from "@vue/apollo-composable";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -19,27 +19,31 @@
     result: wikiPageResult,
     loading,
     error,
-  } = useQuery(GET_WIKI_PAGE, { 
-    channelUniqueName: forumId, 
-    slug: "home" 
-  }, { errorPolicy: "all" });
+  } = useQuery(
+    GET_WIKI_PAGE,
+    {
+      channelUniqueName: forumId,
+      slug: "home",
+    },
+    { errorPolicy: "all" }
+  );
 
   // Computed property for the wiki page data
   const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
-  
+
   // Query channel to check if wiki is enabled
   const {
     result: channelResult,
     loading: channelLoading,
     error: channelError,
   } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
-  
+
   // Computed property for the channel data
   const channel = computed(() => channelResult.value?.channels[0]);
-  
+
   // Check if wiki is enabled
   const wikiEnabled = computed(() => channel.value?.wikiEnabled);
-  
+
   // Check if we have a wiki home page already
   const hasWikiHomePage = computed(() => !!wikiPage.value);
 
@@ -115,9 +119,7 @@
         <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
           <span>
             Last updated by {{ wikiPage.VersionAuthor?.username || "Unknown" }}
-            {{
-              timeAgo(new Date(wikiPage.updatedAt || wikiPage.createdAt))
-            }}
+            {{ timeAgo(new Date(wikiPage.updatedAt || wikiPage.createdAt)) }}
           </span>
           <template v-if="wikiPage?.PastVersions?.length">
             <span class="mx-2">·</span>
