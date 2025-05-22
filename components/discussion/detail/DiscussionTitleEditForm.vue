@@ -154,7 +154,7 @@
           <span
             v-if="answered"
             aria-label="This discussion has been answered"
-            class="mr-1 flex items-center gap-1 rounded-full border border-green-500 px-2 py-1 text-xs text-green-500 dark:border-green-400 dark:text-green-400"
+            class="mr-1 flex items-center gap-1 rounded-full border border-green-500 bg-green-100 px-2 py-1 text-xs text-green-500 dark:border-green-400 dark:bg-green-900 dark:text-green-400"
           >
             <CheckCircleIcon class="h-4 w-4" /> Answered
           </span>
