@@ -12,7 +12,7 @@
   import { GET_EVENT } from "@/graphQLData/event/queries";
   import { modProfileNameVar, usernameVar } from "@/cache";
   import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
-  import { useTheme } from "@/composables/useTheme";
+  import { useAppTheme } from "@/composables/useTheme";
   import { useRoute } from "nuxt/app";
 
   const route = useRoute();
@@ -88,7 +88,7 @@
       year: "numeric",
     });
   });
-  const { theme } = useTheme();
+  const { theme } = useAppTheme();
 </script>
 
 <template>

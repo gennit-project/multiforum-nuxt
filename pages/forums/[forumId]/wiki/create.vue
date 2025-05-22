@@ -18,15 +18,13 @@
   const formValues = ref({
     title: "",
     body: "",
-    slug: "",
+    slug: "home", // Default slug for the wiki home page
   });
 
-  // Derive slug from title
+  // No need to derive slug for home page as it's always "home"
   function updateSlug(value) {
-    formValues.value.slug = value
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "");
+    // We're keeping the slug as "home" for the wiki home page
+    // This is intentional - the home page must have the slug "home"
   }
 
   // Create wiki page mutation
@@ -41,30 +39,26 @@
   function handleSubmit() {
     if (!formValues.value.title || !formValues.value.body) return;
 
-    const updateInput = {
-      WikiHomePage: {
-        create: {
-          node: {
-            title: formValues.value.title,
-            body: formValues.value.body,
-            slug: formValues.value.slug,
-            VersionAuthor: {
-              connect: {
-                where: {
-                  node: {
-                    username: usernameVar.value,
-                  },
-                },
+    const createInput = [
+      {
+        title: formValues.value.title,
+        body: formValues.value.body,
+        slug: formValues.value.slug,
+        channelUniqueName: forumId,
+        VersionAuthor: {
+          connect: {
+            where: {
+              node: {
+                username: usernameVar.value,
               },
             },
           },
         },
-      },
-    };
+      }
+    ];
 
     createWikiPage({
-      where: { uniqueName: forumId },
-      update: updateInput,
+      input: createInput,
     });
   }
 

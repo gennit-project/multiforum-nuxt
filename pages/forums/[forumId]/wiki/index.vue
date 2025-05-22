@@ -7,27 +7,41 @@
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
+  import MarkdownPreview from "@/components/MarkdownPreview.vue";
   import { timeAgo } from "@/utils";
 
   const route = useRoute();
   const router = useRouter();
   const forumId = route.params.forumId as string;
 
-  // Query channel to get wiki data
+  // Query wiki page data for the home page
   const {
-    result: channelResult,
+    result: wikiPageResult,
     loading,
     error,
-  } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
+  } = useQuery(GET_WIKI_PAGE, { 
+    channelUniqueName: forumId, 
+    slug: "home" 
+  }, { errorPolicy: "all" });
 
+  // Computed property for the wiki page data
+  const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
+  
+  // Query channel to check if wiki is enabled
+  const {
+    result: channelResult,
+    loading: channelLoading,
+    error: channelError,
+  } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
+  
   // Computed property for the channel data
   const channel = computed(() => channelResult.value?.channels[0]);
-
+  
   // Check if wiki is enabled
   const wikiEnabled = computed(() => channel.value?.wikiEnabled);
-
+  
   // Check if we have a wiki home page already
-  const hasWikiHomePage = computed(() => !!channel.value?.WikiHomePage);
+  const hasWikiHomePage = computed(() => !!wikiPage.value);
 
   // Navigate to create wiki page
   function createWikiPage() {
@@ -38,18 +52,18 @@
 <template>
   <div>
     <div
-      v-if="loading"
+      v-if="loading || channelLoading"
       class="flex items-center justify-center p-8"
     >
       <LoadingSpinner size="lg" />
     </div>
 
     <div
-      v-else-if="error"
+      v-else-if="error || channelError"
       class="mx-auto max-w-2xl rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-900 dark:text-red-200"
     >
       <p>Sorry, there was an error loading the wiki data.</p>
-      <p class="mt-2 text-sm">{{ error.message }}</p>
+      <p class="mt-2 text-sm">{{ (error || channelError).message }}</p>
     </div>
 
     <div
@@ -73,9 +87,11 @@
           >
         </p>
       </div>
-      <PrimaryButton @click="createWikiPage">
+      <PrimaryButton
+        :label="'Create Wiki Page'"
+        @click="createWikiPage"
+      >
         <PencilIcon class="mr-2 h-5 w-5" />
-        Create Wiki Page
       </PrimaryButton>
     </div>
 
@@ -87,29 +103,33 @@
       <div class="mb-4">
         <div class="flex items-center justify-between">
           <h1 class="text-2xl font-bold dark:text-white">
-            {{ channel.WikiHomePage.title }}
+            {{ wikiPage.title }}
           </h1>
           <PrimaryButton
             :label="'Edit Wiki'"
-            @click="router.push(`/forums/${forumId}/wiki/edit/${channel.WikiHomePage.slug}`)"
+            @click="router.push(`/forums/${forumId}/wiki/edit/${wikiPage.slug}`)"
           >
             <PencilIcon class="mr-2 h-5 w-5" />
           </PrimaryButton>
         </div>
         <div class="mt-1 flex items-center text-sm text-gray-500 dark:text-gray-400">
           <span>
-            Last updated by {{ channel.WikiHomePage.VersionAuthor?.username || "Unknown" }}
-            {{ timeAgo(new Date(channel.WikiHomePage.updatedAt || channel.WikiHomePage.createdAt)) }}
+            Last updated by {{ wikiPage.VersionAuthor?.username || "Unknown" }}
+            {{
+              timeAgo(new Date(wikiPage.updatedAt || wikiPage.createdAt))
+            }}
           </span>
-          <span class="mx-2">·</span>
-          <WikiEditsDropdown :wiki-page="channel.WikiHomePage" />
+          <template v-if="wikiPage?.PastVersions?.length">
+            <span class="mx-2">·</span>
+            <WikiEditsDropdown :wiki-page="wikiPage" />
+          </template>
         </div>
       </div>
 
       <div class="prose prose-orange max-w-none dark:prose-invert">
         <MarkdownPreview
           :disable-gallery="false"
-          :text="channel.WikiHomePage.body"
+          :text="wikiPage.body"
           :word-limit="3000"
         />
       </div>

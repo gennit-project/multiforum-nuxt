@@ -5,7 +5,7 @@
   import { config } from "@/config";
   import nightModeMapStyles from "@/components/event/map/nightModeMapStyles";
   import placeIcon from "@/assets/images/place-icon.svg";
-  import { useTheme } from "@/composables/useTheme";
+  import { useAppTheme } from "@/composables/useTheme";
   import type { Event } from "@/__generated__/graphql";
 
   // The Google map requires that the styles have to be set
@@ -47,9 +47,10 @@
     },
   });
 
+  const { theme: appTheme } = useAppTheme();
   const currentTheme = ref("light");
   onMounted(() => {
-    currentTheme.value = theme.value;
+    currentTheme.value = appTheme.value;
 
     const observer = new MutationObserver((mutations) => {
       mutations.forEach((mutation) => {

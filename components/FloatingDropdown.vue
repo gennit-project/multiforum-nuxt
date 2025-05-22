@@ -1,12 +1,12 @@
 <script setup lang="ts">
-  import { useTheme } from "@/composables/useTheme";
+  import { useAppTheme } from "@/composables/useTheme";
 
   // Set inheritAttrs to false so we can handle attribute inheritance manually
   defineOptions({
     inheritAttrs: false,
   });
 
-  const { theme } = useTheme();
+  const { theme } = useAppTheme();
   const props = defineProps({
     modelValue: {
       type: Boolean,

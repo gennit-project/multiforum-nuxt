@@ -1,7 +1,7 @@
 import { computed, ref, watch, nextTick } from "vue";
 import { useCookie, useRoute, useRouter } from "nuxt/app";
 
-export const useTheme = () => {
+export const useAppTheme = () => {
   const themeCookie = useCookie("theme", {
     default: () => "system",
   });
