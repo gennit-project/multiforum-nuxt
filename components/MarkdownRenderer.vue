@@ -187,38 +187,89 @@
     p {
       margin-bottom: 1rem !important;
       margin-top: 0.25rem !important;
+      line-height: 1.5 !important;
     }
 
     ul,
     ol {
+      padding-left: 2rem !important;
+      margin-bottom: 1rem !important;
+      margin-top: 0 !important;
+    }
+    
+    ul {
       list-style-type: disc !important;
-      margin-left: 1rem !important;
-      margin-bottom: 0.5rem !important;
+    }
+    
+    ol {
+      list-style-type: decimal !important;
+    }
+    
+    li {
+      margin: 0.25rem 0 !important;
+      line-height: 1.5 !important;
+    }
+    
+    ul ul,
+    ol ol,
+    ul ol,
+    ol ul {
+      margin-top: 0.25rem !important;
+      margin-bottom: 0 !important;
     }
 
     pre {
-      border-radius: 5px;
-      overflow-x: auto; // keep horizontal scroll for code blocks
-      padding-bottom: 0.25rem !important;
-      max-width: 100%;
-      white-space: pre-wrap;
+      border-radius: 6px !important;
+      overflow-x: auto !important; // keep horizontal scroll for code blocks
+      padding: 1rem !important;
+      max-width: 100% !important;
+      white-space: pre-wrap !important;
+      margin-bottom: 1rem !important;
+      background-color: #f6f8fa !important;
+      border: 1px solid #e1e4e8 !important;
+      
+      .dark & {
+        background-color: #161b22 !important;
+        border-color: #30363d !important;
+      }
     }
 
     code {
-      border-radius: 5px;
-      padding-bottom: 0.25rem !important;
-      max-width: 100%;
-      overflow-wrap: break-word;
-      white-space: pre-wrap;
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+      padding: 0.2em 0.4em !important;
+      margin: 0 !important;
+      border-radius: 6px !important;
+      max-width: 100% !important;
+      overflow-wrap: break-word !important;
+      white-space: pre-wrap !important;
+      background-color: rgba(175, 184, 193, 0.2) !important;
+      
+      .dark & {
+        background-color: rgba(110, 118, 129, 0.4) !important;
+      }
+    }
+    
+    pre code {
+      padding: 0 !important;
+      background-color: transparent !important;
     }
 
     a {
-      color: #3182ce !important;
-      word-wrap: break-word;
-      overflow-wrap: break-word;
-      max-width: 100%;
-      word-break: break-all;
-      display: inline-block;
+      color: #0969da !important;
+      text-decoration: none !important;
+      word-wrap: break-word !important;
+      overflow-wrap: break-word !important;
+      max-width: 100% !important;
+      word-break: break-word !important;
+      display: inline-block !important;
+      
+      &:hover {
+        text-decoration: underline !important;
+      }
+      
+      .dark & {
+        color: #58a6ff !important;
+      }
     }
 
     img {
@@ -234,15 +285,25 @@
     }
 
     blockquote {
-      border-left: 4px solid #3182ce;
-      padding-left: 16px;
-      margin: 16px 0;
-      font-style: italic;
-      color: #555;
+      padding: 0.6em 1em !important;
+      border-left: 0.25em solid #d0d7de !important;
+      margin: 1em 0 !important;
+      color: #57606a !important;
+      background-color: #f6f8fa !important;
+      border-radius: 0 6px 6px 0 !important;
 
       .dark & {
-        border-left-color: #63b3ed;
-        color: #ccc;
+        border-left-color: #30363d !important;
+        color: #8b949e !important;
+        background-color: #161b22 !important;
+      }
+      
+      > :first-child {
+        margin-top: 0 !important;
+      }
+      
+      > :last-child {
+        margin-bottom: 0 !important;
       }
     }
 
@@ -258,15 +319,19 @@
     }
 
     .external-link-icon {
-      color: #3182ce !important;
-      display: inline-flex;
-      align-items: center;
-      margin-left: 4px;
-      opacity: 0.6;
+      color: #0969da !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      margin-left: 4px !important;
+      opacity: 0.6 !important;
 
       svg {
-        width: 14px;
-        height: 14px;
+        width: 12px !important;
+        height: 12px !important;
+      }
+      
+      .dark & {
+        color: #58a6ff !important;
       }
     }
 
