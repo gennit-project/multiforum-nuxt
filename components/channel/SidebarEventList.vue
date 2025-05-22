@@ -156,12 +156,12 @@
     <span
       class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-circle-play text-orange-500 mr-2"></i>Happening Now
+      <i class="fa-solid fa-circle-play mr-2 text-orange-500"></i>Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
       :key="event?.id"
-      class="border-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -179,7 +179,7 @@
       </nuxt-link>
       <nuxt-link
         v-if="event?.virtualEventUrl"
-        class="bg-orange-600 text-orange-100 w-fit rounded-sm px-4 py-1"
+        class="w-fit rounded-sm bg-orange-600 px-4 py-1 text-orange-100"
         target="_blank"
         :to="event?.virtualEventUrl"
       >
@@ -201,7 +201,7 @@
     <div
       v-for="event in dateObj.happeningToday"
       :key="event?.id"
-      class="border-l-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -232,7 +232,7 @@
     <div
       v-for="event in dateObj.happeningTomorrow"
       :key="event?.id"
-      class="border-l-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -263,7 +263,7 @@
       <div
         v-for="event in events"
         :key="event?.id"
-        class="border-l-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+        class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
       >
         <nuxt-link
           class="flex items-center"
