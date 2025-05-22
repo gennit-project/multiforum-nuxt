@@ -110,6 +110,26 @@
   const closeRevisionDiff = () => {
     activeRevision.value = null;
   };
+
+  // Handle revision deleted event
+  const handleRevisionDeleted = (deletedId) => {
+    // Close the modal
+    closeRevisionDiff();
+
+    // If the deleted revision is in the body versions, refetch the discussion data
+    // This will be handled by the cache update in the mutation, but we can optimize the UI
+    // by filtering out the deleted revision from our local state
+    if (props.discussion?.PastBodyVersions) {
+      const index = props.discussion.PastBodyVersions.findIndex(
+        (version) => version.id === deletedId
+      );
+      if (index !== -1) {
+        // We'll let Apollo Client handle the actual cache update, but we can update our UI immediately
+        // by recalculating the allEdits computed property
+        isOpen.value = false; // Close the dropdown as we've modified the list
+      }
+    }
+  };
 </script>
 
 <template>
@@ -186,6 +206,7 @@
       :new-version="activeRevision.newVersion"
       :is-most-recent="activeRevision === allEdits[0]"
       @close="closeRevisionDiff"
+      @deleted="handleRevisionDeleted"
     />
   </div>
 </template>

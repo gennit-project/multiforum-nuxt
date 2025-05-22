@@ -1,7 +1,9 @@
 <script setup lang="ts">
-  import { computed } from "vue";
+  import { computed, ref } from "vue";
   import GenericModal from "@/components/GenericModal.vue";
   import * as DiffMatchPatch from "diff-match-patch";
+  import { useMutation } from "@vue/apollo-composable";
+  import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
 
   const props = defineProps({
     open: {
@@ -22,7 +24,10 @@
     },
   });
 
-  const emit = defineEmits(["close"]);
+  const emit = defineEmits(["close", "deleted"]);
+
+  // Deletion state
+  const isDeleting = ref(false);
 
   const oldVersionUsername = computed(() => {
     return props.oldVersion.Author?.username || "[Deleted]";
@@ -93,6 +98,52 @@
     };
   });
 
+  // Set up delete mutation with dynamic variables
+  const {
+    mutate: deleteTextVersion,
+    loading,
+    error,
+    onDone,
+  } = useMutation(DELETE_TEXT_VERSION, {
+    // Don't set variables here, as they won't update if props change
+    update: (cache, { data }) => {
+      if (data?.deleteTextVersions?.nodesDeleted) {
+        // Clear cache for this revision
+        cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
+        cache.gc();
+      }
+    },
+    onCompleted: () => {
+      isDeleting.value = false;
+      emit("deleted", props.oldVersion.id);
+      emit("close");
+    },
+    onError: (err) => {
+      isDeleting.value = false;
+      // Error will be handled by the error ref from useMutation
+    },
+  });
+
+  const handleDelete = async () => {
+    if (confirm("Are you sure you want to delete this revision? This action cannot be undone.")) {
+      isDeleting.value = true;
+      try {
+        // Pass variables at call time to ensure we use the current props value
+        await deleteTextVersion({
+          id: props.oldVersion.id,
+        });
+      } catch (err) {
+        isDeleting.value = false;
+        // Error will be handled by the error ref from useMutation
+      }
+    }
+  };
+
+  onDone(() => {
+    isDeleting.value = false;
+    emit("close");
+  });
+
   const handleClose = () => {
     emit("close");
   };
@@ -102,7 +153,13 @@
   <GenericModal
     :open="open"
     title="Revision History"
+    :error="error ? error.message : ''"
+    :loading="isDeleting || loading"
+    primary-button-text="Delete"
+    :primary-button-disabled="!oldVersion.id || oldVersion.id === 'current'"
+    highlight-color="red"
     @close="handleClose"
+    @primary-button-click="handleDelete"
   >
     <template #icon>
       <i class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"></i>
@@ -125,6 +182,7 @@
             <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
               From version by {{ oldVersionUsername }} ({{ oldVersionDate }})
             </div>
+
             <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
               To version by {{ newVersionUsername }} ({{ newVersionDate }})
             </div>
