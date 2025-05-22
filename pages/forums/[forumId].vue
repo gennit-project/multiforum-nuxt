@@ -36,6 +36,11 @@
     );
   });
 
+  const showChannelSidebar = computed(() => {
+    // Hide sidebar on wiki pages to give more reading space
+    return !`${String(route.name)}`.includes("wiki");
+  });
+
   const channelId = computed(() => {
     return typeof route.params.forumId === "string" ? route.params.forumId : "";
   });
@@ -237,7 +242,7 @@
                 <NuxtPage />
               </div>
               <aside
-                v-if="channelId"
+                v-if="channelId && showChannelSidebar"
                 class="flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
               >
                 <ChannelSidebar
