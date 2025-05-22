@@ -168,7 +168,7 @@ const collapseAll = () => {
 </script>
 
 <template>
-  <div class="pt-2 pb-2 px-2 lg:px-4 2xl:px-0">
+  <div class="pb-2 pt-2">
     <div>
       <div class="flex flex-wrap items-center justify-end space-x-2">
         <FilterChip

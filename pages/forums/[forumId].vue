@@ -237,13 +237,13 @@ definePageMeta({
               <div class="flex-1 p-0 md:px-2 bg-white dark:bg-gray-800">
                 <ChannelTabs
                   v-if="showChannelTabs"
-                  class="mb-2 w-full border-b border-gray-200 bg-white md:ml-2 dark:border-gray-600 dark:bg-gray-800"
-                  :vertical="false"
-                  :show-counts="true"
                   :admin-list="adminList"
-                  :route="route"
                   :channel="channel"
+                  class="w-full border-b border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
                   :desktop="false"
+                  :route="route"
+                  :show-counts="true"
+                  :vertical="false"
                 />
                 <NuxtPage />
               </div>
