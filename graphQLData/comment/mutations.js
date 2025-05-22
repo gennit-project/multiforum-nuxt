@@ -304,3 +304,11 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
     }
   }
 `;
+
+export const DELETE_TEXT_VERSION = gql`
+  mutation deleteTextVersion($id: ID!) {
+    deleteTextVersions(where: { id: $id }) {
+      nodesDeleted
+    }
+  }
+`;

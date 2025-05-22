@@ -37,12 +37,11 @@
   });
 
   const classes = computed(() => ({
-    "border-orange-500 dark:text-gray-100": isActive.value,
+    "border-b-2 border-orange-500 dark:text-gray-100": isActive.value,
     "bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700": isActive.value && props.vertical,
-    "border-b-2 dark:text-gray-400": isActive.value && !props.vertical,
-    "text-gray-500": !isActive.value,
+    "dark:text-gray-400": isActive.value && !props.vertical,
+    "text-gray-500 border-transparent": !isActive.value,
     "pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700": !isActive.value && props.vertical,
-    "border-b-2 border-transparent": !isActive.value && !props.vertical,
   }));
 
   const isHovered = ref(false);

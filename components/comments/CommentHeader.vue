@@ -10,6 +10,7 @@
     getPermalinkToEventComment,
     getPermalinkToEvent,
   } from "@/utils/routerUtils";
+  import CommentEditsDropdown from "./CommentEditsDropdown.vue";
 
   // Props definition using defineProps
   const props = defineProps({
@@ -77,6 +78,11 @@
       return "";
     }
     return `Edited ${relativeTime(props.commentData.updatedAt)}`;
+  });
+
+  // Check if the comment has past versions
+  const hasRevisionHistory = computed(() => {
+    return props.commentData?.PastVersions && props.commentData.PastVersions.length > 0;
   });
 
   const contextLinkObject = computed(() => {
@@ -255,7 +261,14 @@
             class="mx-2"
             >&middot;</span
           >
-          <span>{{ editedAtFormatted }}</span>
+          <span class="flex items-center">
+            {{ editedAtFormatted }}
+            <CommentEditsDropdown
+              v-if="hasRevisionHistory"
+              class="ml-2"
+              :comment="commentData"
+            />
+          </span>
           <span
             v-if="isHighlighted"
             class="rounded-lg bg-orange-500 px-2 py-1 text-black"
