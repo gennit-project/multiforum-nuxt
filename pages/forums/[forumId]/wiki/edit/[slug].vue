@@ -36,7 +36,7 @@
   const formValues = ref({
     title: "",
     body: "",
-    slug: ""
+    slug: "",
   });
 
   // Initialize form with existing wiki data when available
@@ -48,7 +48,7 @@
         formValues.value = {
           title: newChannel.WikiHomePage.title || "",
           body: newChannel.WikiHomePage.body || "",
-          slug: newChannel.WikiHomePage.slug || ""
+          slug: newChannel.WikiHomePage.slug || "",
         };
         dataLoaded.value = true;
       }
@@ -204,6 +204,7 @@
             :initial-value="formValues.body || ''"
             :placeholder="'Write your wiki page content here...'"
             :min-height="300"
+            :rows="20"
             :test-id="'content-input'"
             @update="formValues.body = $event"
           />
