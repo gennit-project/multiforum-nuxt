@@ -372,3 +372,11 @@ export const UPDATE_IMAGE = gql`
     }
   }
 `;
+
+export const DELETE_TEXT_VERSION = gql`
+  mutation deleteTextVersion($id: ID!) {
+    deleteTextVersions(where: { id: $id }) {
+      nodesDeleted
+    }
+  }
+`;
