@@ -22,11 +22,7 @@
     result: wikiPageResult,
     loading,
     error,
-  } = useQuery(
-    GET_WIKI_PAGE, 
-    { channelUniqueName: forumId, slug: slug }, 
-    { errorPolicy: "all" }
-  );
+  } = useQuery(GET_WIKI_PAGE, { channelUniqueName: forumId, slug: slug }, { errorPolicy: "all" });
 
   // Computed property for the wiki page data
   const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
@@ -82,9 +78,9 @@
     };
 
     updateWikiPage({
-      where: { 
+      where: {
         channelUniqueName: forumId,
-        slug: slug
+        slug: slug,
       },
       update: updateInput,
     });
@@ -102,7 +98,8 @@
 
   // Handle mutation completion
   onDone(() => {
-    router.push(`/forums/${forumId}/wiki`);
+    // Navigate to the wiki page with a query parameter to avoid cached data
+    router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
   });
 </script>
 
@@ -128,8 +125,10 @@
       class="mx-auto max-w-2xl p-4 text-center dark:text-white"
     >
       <p>This wiki page doesn't exist or you don't have permission to view it.</p>
-      <PrimaryButton @click="router.push(`/forums/${forumId}/wiki`)">
-        Go to Wiki Home
+      <PrimaryButton
+        :label="'Go to Wiki Home'"
+        @click="router.push(`/forums/${forumId}/wiki`)"
+      >
       </PrimaryButton>
     </div>
 
@@ -145,7 +144,7 @@
 
       <ErrorBanner
         v-if="updateError"
-        :error="updateError"
+        :text="updateError.message"
       />
 
       <form

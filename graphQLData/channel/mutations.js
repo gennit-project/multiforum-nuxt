@@ -36,6 +36,26 @@ export const UPDATE_CHANNEL = gql`
         Tags {
           text
         }
+        WikiHomePage {
+          id
+          title
+          body
+          slug
+          createdAt
+          updatedAt
+          VersionAuthor {
+            username
+          }
+          PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+            id
+            body
+            createdAt
+            Author {
+              username
+            }
+          }
+        }
+
         rules
       }
     }
@@ -75,18 +95,29 @@ export const DISABLE_CHANNEL_WIKI = gql`
 `;
 
 export const CREATE_WIKI_PAGE = gql`
-  mutation createWikiPage($input: [WikiPageCreateInput!]!) {
-    createWikiPages(input: $input) {
-      wikiPages {
-        id
-        title
-        body
-        slug
-        channelUniqueName
-        createdAt
-        updatedAt
-        VersionAuthor {
-          username
+  mutation createWikiPage($where: ChannelWhere!, $update: ChannelUpdateInput!) {
+    updateChannels(where: $where, update: $update) {
+      channels {
+        uniqueName
+        wikiEnabled
+        WikiHomePage {
+          id
+          title
+          body
+          slug
+          createdAt
+          updatedAt
+          VersionAuthor {
+            username
+          }
+          PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+            id
+            body
+            createdAt
+            Author {
+              username
+            }
+          }
         }
       }
     }
