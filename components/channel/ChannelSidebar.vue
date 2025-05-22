@@ -110,9 +110,11 @@
             v-if="channelRules && channelRules !== '[]'"
             :key="channelRules"
           >
-            <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-              >Forum Rules</span
+            <span
+              class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
+              <i class="fa-solid fa-book-open mr-2"></i>Forum Rules
+            </span>
             <ChannelRules :rules="channelRules" />
           </div>
 
@@ -120,9 +122,11 @@
 
           <div v-if="channel.Tags.length > 0">
             <div class="flex justify-between border-gray-300">
-              <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-                >Tags</span
+              <span
+                class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
               >
+                <i class="fa-solid fa-tags mr-2"></i>Tags
+              </span>
             </div>
             <div class="mb-6 mt-2 flex flex-wrap gap-2">
               <Tag
@@ -138,9 +142,11 @@
           <FontSizeControl class="mb-6" />
 
           <div class="flex justify-between">
-            <span class="my-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-              >Admins</span
+            <span
+              class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
+              <i class="fa-solid fa-user-shield mr-2"></i>Admins
+            </span>
           </div>
 
           <div
