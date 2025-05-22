@@ -77,7 +77,7 @@
   <div class="relative">
     <!-- Custom input field instead of native time input -->
     <div
-      class="focus:border-orange-500 focus:ring-orange-500 flex h-10 w-full cursor-pointer items-center rounded border border-gray-300 px-3 pr-8 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
+      class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-300 px-3 pr-8 text-sm focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
       :class="{ 'cursor-not-allowed opacity-60': disabled }"
       :data-testid="testId"
       @click="!disabled && toggleDropdown()"

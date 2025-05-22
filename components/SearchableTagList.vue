@@ -133,7 +133,7 @@
       <label class="flex cursor-pointer items-center space-x-3 p-2">
         <input
           :checked="selected.includes(tag.text)"
-          class="text-orange-600 border border-gray-300 dark:border-gray-600"
+          class="border border-gray-300 text-orange-600 dark:border-gray-600"
           type="checkbox"
           :value="tag.text"
           @change="() => emit('toggleSelection', tag.text)"

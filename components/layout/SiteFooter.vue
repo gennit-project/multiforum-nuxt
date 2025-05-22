@@ -31,13 +31,13 @@
     <div class="w-full items-center justify-center text-wrap bg-gray-800 p-4 text-xs text-white">
       If you have feedback or technical problems, please open an issue in the
       <a
-        class="text-orange-500 ml-1 underline"
+        class="ml-1 text-orange-500 underline"
         href="https://github.com/gennit-project/multiforum-nuxt/issues"
         target="_blank"
         >GitHub repo</a
       >, or email support at
       <a
-        class="text-orange-500 ml-1"
+        class="ml-1 text-orange-500"
         href="mailto:gennitdev@gmail.com"
         >gennitdev@gmail.com</a
       >.

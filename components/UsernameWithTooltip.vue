@@ -97,7 +97,7 @@
               >
               <span
                 v-else-if="isMod"
-                class="border-orange-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
               >
                 Mod
               </span>
@@ -183,7 +183,7 @@
           >
           <span
             v-else-if="isMod"
-            class="border-orange-500 rounded-md border px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+            class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
           >
             Mod
           </span>

@@ -505,7 +505,7 @@
           Drag and drop, or tap to add files
         </p>
         <button
-          class="bg-orange-500 hover:bg-orange-600 rounded px-4 py-2 text-white transition-colors"
+          class="rounded bg-orange-500 px-4 py-2 text-white transition-colors hover:bg-orange-600"
           type="button"
           @click="selectFiles"
         >

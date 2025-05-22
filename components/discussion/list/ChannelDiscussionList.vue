@@ -187,7 +187,7 @@
           </nuxt-link>
         </template>
         <template #does-not-have-auth>
-          <span class="text-orange-500 cursor-pointer underline">Create one?</span>
+          <span class="cursor-pointer text-orange-500 underline">Create one?</span>
         </template>
       </RequireAuth>
     </p>

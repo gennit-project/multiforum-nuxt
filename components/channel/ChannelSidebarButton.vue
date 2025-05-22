@@ -27,11 +27,11 @@
 
 <template>
   <button
-    class="focus:ring-orange-500 inline-flex items-center whitespace-nowrap px-4 py-2 text-sm font-medium focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100"
+    class="inline-flex items-center whitespace-nowrap px-4 py-2 text-sm font-medium focus:outline-none focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-100"
     :class="[
       disabled
         ? 'cursor-default bg-gray-200 text-gray-600'
-        : 'text-white-700 dark:bg-orange-700 dark:hover:bg-orange-600 w-full rounded-md hover:bg-gray-200 dark:text-white',
+        : 'text-white-700 w-full rounded-md hover:bg-gray-200 dark:bg-orange-700 dark:text-white dark:hover:bg-orange-600',
       'dark:bg-opacity-60',
     ]"
     :disabled="disabled"

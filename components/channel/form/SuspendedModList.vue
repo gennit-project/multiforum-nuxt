@@ -74,7 +74,7 @@
             </nuxt-link>
             <nuxt-link
               v-if="suspension.RelatedIssue"
-              class="border-orange-500 text-orange-500 items-center gap-1 rounded border px-2 py-1"
+              class="items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
               :to="{
                 name: 'forums-forumId-issues-issueId',
                 params: { issueId: suspension.RelatedIssue?.id },

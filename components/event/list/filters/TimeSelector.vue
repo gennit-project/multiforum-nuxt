@@ -70,7 +70,7 @@
           <input
             :id="'timeRange-' + range['12-hour-label']"
             :checked="workingCopyOfSelectedHourRanges[range['12-hour-label']]"
-            class="text-orange-600 focus:ring-orange-500 mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 dark:bg-gray-300"
+            class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-600 focus:ring-orange-500 dark:bg-gray-300"
             :data-testid="`timeRange-${range['12-hour-label']}`"
             type="checkbox"
             @input="() => toggleSelectTimeRange(range)"

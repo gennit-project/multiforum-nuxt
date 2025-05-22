@@ -29,7 +29,9 @@
 <template>
   <div class="font-size-control">
     <div class="flex justify-between">
-      <span class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">
+      <span
+        class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      >
         <i class="fa-solid fa-text-height mr-2"></i>Font Size
       </span>
     </div>

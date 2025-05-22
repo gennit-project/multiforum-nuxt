@@ -19,7 +19,7 @@
 </script>
 <template>
   <button
-    class="max-height-4 focus:ring-orange-500 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100"
+    class="max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-100"
     :class="[
       disabled
         ? 'cursor-default bg-gray-200 text-gray-600'
