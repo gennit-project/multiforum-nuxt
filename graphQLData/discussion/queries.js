@@ -246,7 +246,7 @@ export const GET_DISCUSSION = gql`
       ) {
         id
       }
-      PastTitleVersions {
+      PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
         id
         Author {
           username
@@ -254,7 +254,7 @@ export const GET_DISCUSSION = gql`
         body
         createdAt
       }
-      PastBodyVersions {
+      PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
         id
         Author {
           username
