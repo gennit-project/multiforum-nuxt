@@ -76,7 +76,7 @@
                         <div class="flex h-7 items-center">
                           <button
                             :ref="cancelButtonRef"
-                            class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                            class="focus:ring-orange-500 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 dark:text-white"
                             :class="smAndDown ? 'ml-2' : 'ml-4'"
                             type="button"
                             @click="closePreview"
@@ -105,7 +105,7 @@
                   </div>
                   <div class="flex flex-shrink-0 justify-end px-4 py-4">
                     <button
-                      class="hover:bg-gray-50 rounded-full border border-gray-500 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-200"
+                      class="hover:bg-gray-50 focus:ring-orange-500 rounded-full border border-gray-500 px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-700 dark:bg-gray-700 dark:text-gray-200"
                       data-testid="close-drawer-bottom-button"
                       type="button"
                       @click="closePreview"

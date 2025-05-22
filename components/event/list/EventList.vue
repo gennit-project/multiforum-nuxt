@@ -134,7 +134,7 @@
       >
         Could not find any events.
         <nuxt-link
-          class="text-blue-500 underline"
+          class="text-orange-500 underline"
           :to="createEventLink"
         >
           Create one?

@@ -58,7 +58,7 @@
       :class="[
         'inline-flex items-center rounded-md px-3 py-1.5 text-sm transition-colors',
         !disabled
-          ? 'bg-blue-50 cursor-pointer text-blue-600 hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800'
+          ? 'bg-orange-50 text-orange-600 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800 cursor-pointer'
           : 'cursor-not-allowed bg-gray-100 text-gray-500 opacity-60 dark:bg-gray-700 dark:text-gray-400',
       ]"
       :for="`file-input-${props.fieldName}`"

@@ -70,7 +70,7 @@
 
   function getButtonStyles() {
     if (props.active) {
-      return "bg-blue-500 text-white hover:bg-blue-600";
+      return "bg-orange-500 text-white hover:bg-orange-600";
     } else {
       if (props.channelMode) {
         return "bg-gray-200 text-gray-900 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-50 dark:hover:bg-gray-600 dark:hover:text-white";

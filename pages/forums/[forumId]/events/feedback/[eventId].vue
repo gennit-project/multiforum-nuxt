@@ -127,7 +127,7 @@
       </div>
       <router-link
         v-if="event"
-        class="text-sm text-blue-500 hover:underline dark:text-blue-400"
+        class="text-orange-500 dark:text-orange-400 text-sm hover:underline"
         :to="`/forums/${channelId}/events/${event.id}`"
         >View Event</router-link
       >

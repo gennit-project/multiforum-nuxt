@@ -197,7 +197,7 @@
               'flex h-9 items-center px-2 text-gray-800 dark:text-gray-300',
               'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
               (channelId ? expandChannelDiscussions : expandSitewideDiscussions)
-                ? 'bg-blue-100 dark:bg-blue-900'
+                ? 'bg-orange-100 dark:bg-orange-900'
                 : 'bg-gray-100 dark:bg-gray-800',
             ]"
             data-testid="expand-all-button"
@@ -213,7 +213,7 @@
               'flex h-9 items-center border-l border-gray-800 px-2 text-gray-800 dark:border-gray-600 dark:text-gray-300',
               'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
               !(channelId ? expandChannelDiscussions : expandSitewideDiscussions)
-                ? 'bg-blue-50 dark:bg-blue-900'
+                ? 'bg-orange-50 dark:bg-orange-900'
                 : 'dark:bg-gray-800',
             ]"
             data-testid="collapse-all-button"
@@ -227,7 +227,7 @@
           class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           :class="
             showFilters
-              ? 'border-blue-500'
+              ? 'border-orange-500'
               : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           data-testid="discussion-filter-button"
@@ -244,7 +244,7 @@
           class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           :class="
             showSearch
-              ? 'border-blue-500'
+              ? 'border-orange-500'
               : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           data-testid="discussion-search-button"

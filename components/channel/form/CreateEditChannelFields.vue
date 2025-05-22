@@ -217,7 +217,7 @@
                   :key="tab.key"
                   class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="{
-                    'bg-gray-50 text-blue-500 dark:bg-gray-700':
+                    'bg-gray-50 text-orange-500 dark:bg-gray-700':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
                     'text-gray-700 dark:text-gray-300':
                       typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
@@ -248,7 +248,7 @@
                   :key="tab.key"
                   class="cursor-pointer py-2"
                   :class="{
-                    'border-r-2 border-blue-500 dark:text-white':
+                    'border-orange-500 border-r-2 dark:text-white':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
                     'text-gray-900':
                       typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),

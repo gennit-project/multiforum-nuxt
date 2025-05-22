@@ -19,7 +19,7 @@
 </script>
 
 <template>
-  <div class="rounded-md border border-blue-500 px-4 py-2">
+  <div class="border-orange-500 rounded-md border px-4 py-2">
     <div v-if="commentLoading">Loading...</div>
     <ErrorBanner
       v-if="commentError"

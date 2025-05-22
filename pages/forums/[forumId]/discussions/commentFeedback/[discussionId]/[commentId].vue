@@ -301,7 +301,7 @@
             />
           </div>
           <nuxt-link
-            class="text-blue-500 underline"
+            class="text-orange-500 underline"
             :to="contextLink"
           >
             View original context

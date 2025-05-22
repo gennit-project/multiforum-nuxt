@@ -652,7 +652,7 @@
           class="flex w-full"
           :class="[
             isHighlighted
-              ? 'rounded-md border border-blue-600 bg-blue-100 p-2 dark:bg-blue-900'
+              ? 'border-orange-600 bg-orange-100 dark:bg-orange-900 rounded-md border p-2'
               : 'dark:bg-gray-950',
           ]"
           data-testid="comment"

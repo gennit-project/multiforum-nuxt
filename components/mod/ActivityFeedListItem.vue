@@ -44,7 +44,9 @@
 <template>
   <li
     class="mt-4 list-none"
-    :class="[isPermalinked ? 'rounded-lg border border-blue-500 bg-blue-100 dark:bg-blue-900' : '']"
+    :class="[
+      isPermalinked ? 'border-orange-500 bg-orange-100 dark:bg-orange-900 rounded-lg border' : '',
+    ]"
   >
     <div class="relative">
       <span

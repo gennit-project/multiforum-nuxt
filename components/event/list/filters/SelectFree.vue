@@ -27,7 +27,7 @@
         >
           <input
             :checked="copyOfShowOnlyFree"
-            class="mr-1 h-4 w-4 rounded border border-gray-400 text-blue-600 focus:ring-blue-500"
+            class="text-orange-600 focus:ring-orange-500 mr-1 h-4 w-4 rounded border border-gray-400"
             :data-testid="'free-checkbox'"
             type="checkbox"
             @input="() => toggleShowOnlyFree()"

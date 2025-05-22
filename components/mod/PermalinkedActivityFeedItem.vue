@@ -25,7 +25,7 @@
 
 <template>
   <div class="my-2 rounded-md px-4 py-2">
-    <span class="font-semibold text-sm text-blue-500">Permalinked Comment</span>
+    <span class="font-semibold text-orange-500 text-sm">Permalinked Comment</span>
     <div v-if="commentLoading">Loading...</div>
     <ErrorBanner
       v-if="commentError"

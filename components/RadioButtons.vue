@@ -30,7 +30,7 @@
       >
         <input
           :checked="selectedOption.value === option.value"
-          class="h-4 w-4 border border-gray-500 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700"
+          class="text-orange-600 focus:ring-orange-500 h-4 w-4 border border-gray-500 dark:border-gray-600 dark:bg-gray-700"
           name="showBothVirtualAndInPerson"
           type="radio"
           @input="
