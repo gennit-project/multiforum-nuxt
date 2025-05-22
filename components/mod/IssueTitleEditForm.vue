@@ -12,11 +12,11 @@
   import { GET_ISSUE } from "@/graphQLData/issue/queries";
   import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
   import { modProfileNameVar } from "@/cache";
-  import { useTheme } from "@/composables/useTheme";
+  import { useAppTheme } from "@/composables/useTheme";
   import { useRoute } from "nuxt/app";
   import IssueBadge from "@/components/mod/IssueBadge.vue";
 
-  const { theme } = useTheme();
+  const { theme } = useAppTheme();
 
   const route = useRoute();
   const titleEditMode = ref(false);

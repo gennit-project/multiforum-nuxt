@@ -75,21 +75,37 @@ export const DISABLE_CHANNEL_WIKI = gql`
 `;
 
 export const CREATE_WIKI_PAGE = gql`
-  mutation createWikiPage($where: ChannelWhere!, $update: ChannelUpdateInput!) {
-    updateChannels(where: $where, update: $update) {
-      channels {
-        uniqueName
-        wikiEnabled
-        WikiHomePage {
-          id
-          title
-          body
-          slug
-          createdAt
-          updatedAt
-          VersionAuthor {
-            username
-          }
+  mutation createWikiPage($input: [WikiPageCreateInput!]!) {
+    createWikiPages(input: $input) {
+      wikiPages {
+        id
+        title
+        body
+        slug
+        channelUniqueName
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
+        }
+      }
+    }
+  }
+`;
+
+export const UPDATE_WIKI_PAGE = gql`
+  mutation updateWikiPage($where: WikiPageWhere!, $update: WikiPageUpdateInput!) {
+    updateWikiPages(where: $where, update: $update) {
+      wikiPages {
+        id
+        title
+        body
+        slug
+        channelUniqueName
+        createdAt
+        updatedAt
+        VersionAuthor {
+          username
         }
       }
     }

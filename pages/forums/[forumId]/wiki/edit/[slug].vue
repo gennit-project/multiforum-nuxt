@@ -1,9 +1,9 @@
 <script setup lang="ts">
-  import { ref, computed } from "vue";
+  import { ref, computed, watch } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { useMutation, useQuery } from "@vue/apollo-composable";
-  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-  import { CREATE_WIKI_PAGE } from "@/graphQLData/channel/mutations";
+  import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
+  import { UPDATE_WIKI_PAGE } from "@/graphQLData/channel/mutations";
   import TextEditor from "@/components/TextEditor.vue";
   import TextInput from "@/components/TextInput.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -15,22 +15,21 @@
   const route = useRoute();
   const router = useRouter();
   const forumId = route.params.forumId as string;
+  const slug = route.params.slug as string;
 
-  // Query channel to get wiki data
+  // Query wiki page data
   const {
-    result: channelResult,
+    result: wikiPageResult,
     loading,
     error,
-  } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
+  } = useQuery(
+    GET_WIKI_PAGE, 
+    { channelUniqueName: forumId, slug: slug }, 
+    { errorPolicy: "all" }
+  );
 
-  // Computed property for the channel data
-  const channel = computed(() => channelResult.value?.channels[0]);
-
-  // Check if wiki is enabled
-  const wikiEnabled = computed(() => channel.value?.wikiEnabled);
-
-  // Check if we have a wiki home page already
-  const hasWikiHomePage = computed(() => !!channel.value?.WikiHomePage);
+  // Computed property for the wiki page data
+  const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
 
   // Form data
   const formValues = ref({
@@ -42,13 +41,13 @@
   // Initialize form with existing wiki data when available
   const dataLoaded = ref(false);
   watch(
-    channel,
-    (newChannel) => {
-      if (newChannel?.WikiHomePage && !dataLoaded.value) {
+    wikiPage,
+    (newWikiPage) => {
+      if (newWikiPage && !dataLoaded.value) {
         formValues.value = {
-          title: newChannel.WikiHomePage.title || "",
-          body: newChannel.WikiHomePage.body || "",
-          slug: newChannel.WikiHomePage.slug || "",
+          title: newWikiPage.title || "",
+          body: newWikiPage.body || "",
+          slug: newWikiPage.slug || "",
         };
         dataLoaded.value = true;
       }
@@ -62,27 +61,20 @@
     loading: isUpdating,
     error: updateError,
     onDone,
-  } = useMutation(CREATE_WIKI_PAGE);
+  } = useMutation(UPDATE_WIKI_PAGE);
 
   // Handle form submission
   function handleSubmit() {
     if (!formValues.value.title || !formValues.value.body) return;
 
     const updateInput = {
-      WikiHomePage: {
-        update: {
-          node: {
-            title: formValues.value.title,
-            body: formValues.value.body,
-            slug: formValues.value.slug,
-            VersionAuthor: {
-              connect: {
-                where: {
-                  node: {
-                    username: usernameVar.value,
-                  },
-                },
-              },
+      title: formValues.value.title,
+      body: formValues.value.body,
+      VersionAuthor: {
+        connect: {
+          where: {
+            node: {
+              username: usernameVar.value,
             },
           },
         },
@@ -90,7 +82,10 @@
     };
 
     updateWikiPage({
-      where: { uniqueName: forumId },
+      where: { 
+        channelUniqueName: forumId,
+        slug: slug
+      },
       update: updateInput,
     });
   }
@@ -129,19 +124,12 @@
     </div>
 
     <div
-      v-else-if="!wikiEnabled"
+      v-else-if="!wikiPage"
       class="mx-auto max-w-2xl p-4 text-center dark:text-white"
     >
-      <p>The wiki feature is not enabled for this forum.</p>
-    </div>
-
-    <div
-      v-else-if="!hasWikiHomePage"
-      class="mx-auto max-w-2xl p-4 text-center dark:text-white"
-    >
-      <p>You don't have a wiki home page yet. Please create one first.</p>
-      <PrimaryButton @click="router.push(`/forums/${forumId}/wiki/create`)">
-        Create Wiki Page
+      <p>This wiki page doesn't exist or you don't have permission to view it.</p>
+      <PrimaryButton @click="router.push(`/forums/${forumId}/wiki`)">
+        Go to Wiki Home
       </PrimaryButton>
     </div>
 

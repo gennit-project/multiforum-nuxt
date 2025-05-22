@@ -13,11 +13,11 @@
   import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
   import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
   import { modProfileNameVar, usernameVar } from "@/cache";
-  import { useTheme } from "@/composables/useTheme";
+  import { useAppTheme } from "@/composables/useTheme";
   import { useRoute } from "nuxt/app";
   import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 
-  const { theme } = useTheme();
+  const { theme } = useAppTheme();
 
   const route = useRoute();
   const titleEditMode = ref(false);
