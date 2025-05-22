@@ -33,7 +33,7 @@
     const baseClasses = ["inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1"];
 
     const defaultClasses = properties.active
-      ? "border-orange-500 bg-orange-100 text-black dark:border-orange-200 dark:bg-orange-900 dark:hover:bg-orange-500"
+      ? "border-orange-500 bg-orange-500 text-black dark:border-orange-200 dark:bg-orange-900 dark:hover:bg-orange-500"
       : "border-gray-300 bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-black dark:hover:bg-gray-600";
 
     const permalinkClasses = properties.isPermalinked
