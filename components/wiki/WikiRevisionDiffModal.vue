@@ -1,144 +1,144 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import GenericModal from "@/components/GenericModal.vue";
-import * as DiffMatchPatch from "diff-match-patch";
-import { useMutation } from "@vue/apollo-composable";
-import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
+  import { computed, ref } from "vue";
+  import GenericModal from "@/components/GenericModal.vue";
+  import * as DiffMatchPatch from "diff-match-patch";
+  import { useMutation } from "@vue/apollo-composable";
+  import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
 
-const props = defineProps({
-  open: {
-    type: Boolean,
-    required: true,
-  },
-  oldVersion: {
-    type: Object,
-    required: true,
-  },
-  newVersion: {
-    type: Object,
-    required: true,
-  },
-  isMostRecent: {
-    type: Boolean,
-    default: false,
-  },
-});
-
-const emit = defineEmits(["close", "deleted"]);
-
-// Deletion state
-const isDeleting = ref(false);
-
-const oldVersionUsername = computed(() => {
-  return props.oldVersion.Author?.username || "[Deleted]";
-});
-
-const newVersionUsername = computed(() => {
-  return props.newVersion.Author?.username || "[Deleted]";
-});
-
-const oldVersionDate = computed(() => {
-  return new Date(props.oldVersion.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  const props = defineProps({
+    open: {
+      type: Boolean,
+      required: true,
+    },
+    oldVersion: {
+      type: Object,
+      required: true,
+    },
+    newVersion: {
+      type: Object,
+      required: true,
+    },
+    isMostRecent: {
+      type: Boolean,
+      default: false,
+    },
   });
-});
 
-const newVersionDate = computed(() => {
-  return new Date(props.newVersion.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  const emit = defineEmits(["close", "deleted"]);
+
+  // Deletion state
+  const isDeleting = ref(false);
+
+  const oldVersionUsername = computed(() => {
+    return props.oldVersion.Author?.username || "[Deleted]";
   });
-});
 
-const oldContent = computed(() => props.oldVersion.body || "");
-const newContent = computed(() => props.newVersion.body || "");
+  const newVersionUsername = computed(() => {
+    return props.newVersion.Author?.username || "[Deleted]";
+  });
 
-// Computed property that generates the diff HTML
-const diffHtml = computed(() => {
-  const dmp = new DiffMatchPatch.diff_match_patch();
-  const diffs = dmp.diff_main(oldContent.value, newContent.value);
-  dmp.diff_cleanupSemantic(diffs);
+  const oldVersionDate = computed(() => {
+    return new Date(props.oldVersion.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    });
+  });
 
-  // Create highlighted HTML for both sides
-  let leftHtml = "";
-  let rightHtml = "";
+  const newVersionDate = computed(() => {
+    return new Date(props.newVersion.createdAt).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+    });
+  });
 
-  diffs.forEach((diff) => {
-    const [operation, text] = diff;
-    const escapedText = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\n/g, "<br>");
+  const oldContent = computed(() => props.oldVersion.body || "");
+  const newContent = computed(() => props.newVersion.body || "");
 
-    // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
-    if (operation === -1) {
-      // Deletion - show in left column with red background
-      leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-300">${escapedText}</span>`;
-    } else if (operation === 1) {
-      // Insertion - show in right column with green background
-      rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-300">${escapedText}</span>`;
-    } else {
-      // Equal - show in both columns
-      leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
-      rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
+  // Computed property that generates the diff HTML
+  const diffHtml = computed(() => {
+    const dmp = new DiffMatchPatch.diff_match_patch();
+    const diffs = dmp.diff_main(oldContent.value, newContent.value);
+    dmp.diff_cleanupSemantic(diffs);
+
+    // Create highlighted HTML for both sides
+    let leftHtml = "";
+    let rightHtml = "";
+
+    diffs.forEach((diff) => {
+      const [operation, text] = diff;
+      const escapedText = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/\n/g, "<br>");
+
+      // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
+      if (operation === -1) {
+        // Deletion - show in left column with red background
+        leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-300">${escapedText}</span>`;
+      } else if (operation === 1) {
+        // Insertion - show in right column with green background
+        rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-300">${escapedText}</span>`;
+      } else {
+        // Equal - show in both columns
+        leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
+        rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
+      }
+    });
+
+    return {
+      left: leftHtml,
+      right: rightHtml,
+    };
+  });
+
+  // Set up delete mutation with dynamic variables
+  const {
+    mutate: deleteTextVersion,
+    loading,
+    error,
+    onDone,
+  } = useMutation(DELETE_TEXT_VERSION, {
+    // Don't set variables here, as they won't update if props change
+    update: (cache, { data }) => {
+      if (data?.deleteTextVersions?.nodesDeleted) {
+        // Clear cache for this revision
+        cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
+        cache.gc();
+      }
+    },
+  });
+
+  onDone(() => {
+    isDeleting.value = false;
+    emit("deleted", props.oldVersion.id);
+    emit("close");
+  });
+
+  const handleDelete = async () => {
+    if (confirm("Are you sure you want to delete this revision? This action cannot be undone.")) {
+      isDeleting.value = true;
+      try {
+        // Pass variables at call time to ensure we use the current props value
+        await deleteTextVersion({
+          id: props.oldVersion.id,
+        });
+      } catch (err) {
+        isDeleting.value = false;
+        // Error will be handled by the error ref from useMutation
+      }
     }
-  });
-
-  return {
-    left: leftHtml,
-    right: rightHtml,
   };
-});
 
-// Set up delete mutation with dynamic variables
-const {
-  mutate: deleteTextVersion,
-  loading,
-  error,
-  onDone
-} = useMutation(DELETE_TEXT_VERSION, {
-  // Don't set variables here, as they won't update if props change
-  update: (cache, { data }) => {
-    if (data?.deleteTextVersions?.nodesDeleted) {
-      // Clear cache for this revision
-      cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
-      cache.gc();
-    }
-  },
-});
-
-onDone(() => {
-  isDeleting.value = false;
-  emit("deleted", props.oldVersion.id);
-  emit("close");
-});
-
-const handleDelete = async () => {
-  if (confirm("Are you sure you want to delete this revision? This action cannot be undone.")) {
-    isDeleting.value = true;
-    try {
-      // Pass variables at call time to ensure we use the current props value
-      await deleteTextVersion({
-        id: props.oldVersion.id,
-      });
-    } catch (err) {
-      isDeleting.value = false;
-      // Error will be handled by the error ref from useMutation
-    }
-  }
-};
-
-const handleClose = () => {
-  emit("close");
-};
+  const handleClose = () => {
+    emit("close");
+  };
 </script>
 
 <template>

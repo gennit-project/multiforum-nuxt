@@ -404,7 +404,7 @@
           v-if="eventData.address"
           class="hanging-indent flex items-start"
         >
-          <div class="mr-4 h-8 w-8">
+          <div class="mr-4 h-5 w-5">
             <LocationIcon />
           </div>
           <div class="inline">

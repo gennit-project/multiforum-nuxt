@@ -38,33 +38,39 @@
   // Handle form submission
   function handleSubmit() {
     if (!formValues.value.title || !formValues.value.body) return;
-
-    const createInput = [
-      {
-        title: formValues.value.title,
-        body: formValues.value.body,
-        slug: formValues.value.slug,
-        channelUniqueName: forumId,
-        VersionAuthor: {
-          connect: {
-            where: {
-              node: {
-                username: usernameVar.value,
+    const channelUpdateInput = {
+      WikiHomePage: {
+        create: {
+          node: {
+            title: formValues.value.title,
+            body: formValues.value.body,
+            slug: formValues.value.slug,
+            VersionAuthor: {
+              connect: {
+                where: {
+                  node: {
+                    username: usernameVar.value,
+                  },
+                },
               },
             },
           },
         },
-      }
-    ];
+      },
+    };
 
     createWikiPage({
-      input: createInput,
+      where: {
+        uniqueName: forumId,
+      },
+      update: channelUpdateInput,
     });
   }
 
   // Handle mutation completion
   onDone(() => {
-    router.push(`/forums/${forumId}/wiki`);
+    // Navigate to the wiki page with a query parameter to avoid cached data
+    router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
   });
 </script>
 
