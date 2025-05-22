@@ -66,7 +66,7 @@
           disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
           invalid
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-            : 'focus:border-blue-500 focus:ring-blue-500',
+            : 'focus:border-orange-500 focus:ring-orange-500',
         ]"
         :data-testid="testId"
         :disabled="disabled"
@@ -83,7 +83,7 @@
           disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
           invalid
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-            : 'focus:border-blue-500 focus:ring-blue-500',
+            : 'focus:border-orange-500 focus:ring-orange-500',
         ]"
         :data-testid="testId"
         :disabled="disabled"

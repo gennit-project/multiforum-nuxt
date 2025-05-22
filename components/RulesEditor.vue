@@ -45,7 +45,7 @@
       <div class="flex justify-between">
         <span class="mt-3 font-bold dark:text-white">Rule {{ index + 1 }}</span>
         <button
-          class="mt-2 flex items-center gap-1 rounded border border-blue-500 px-2 py-1 text-blue-500"
+          class="border-orange-500 text-orange-500 mt-2 flex items-center gap-1 rounded border px-2 py-1"
           type="button"
           @click="deleteRule(index)"
         >
@@ -72,7 +72,7 @@
     </div>
   </div>
   <button
-    class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500"
+    class="border-orange-500 text-orange-500 mt-2 rounded border px-2 py-1"
     @click="addNewRule"
   >
     + Add New Rule

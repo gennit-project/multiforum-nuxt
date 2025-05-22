@@ -535,7 +535,7 @@
                 :class="[
                   'cursor-pointer rounded-md px-4 py-2 transition-colors',
                   selectedEventType === option.value
-                    ? 'bg-blue-500 text-black'
+                    ? 'bg-orange-500 text-black'
                     : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600',
                 ]"
                 data-testid="event-type-option"
@@ -794,7 +794,7 @@
     border: 0 !important;
     padding: 0 !important;
     margin: 0, 0, 0, 0;
-    border-color: blue;
+    border-color: orange;
     &::focus {
       border: 0 !important;
       outline: 0 !important;
@@ -808,7 +808,7 @@
     margin: 0, 0, 0, 0;
     font-family: "Inter", sans-serif;
     color: #000000;
-    border-color: blue;
+    border-color: orange;
     font-size: 0.875rem;
   }
 

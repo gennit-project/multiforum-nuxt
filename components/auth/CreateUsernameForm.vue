@@ -157,7 +157,7 @@
           :class="[
             usernameIsTaken || usernameIsInvalid
               ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-              : 'focus:border-blue-500 focus:ring-blue-500',
+              : 'focus:border-orange-500 focus:ring-orange-500',
           ]"
           type="text"
           @update:model-value="updateUsername"

@@ -64,7 +64,7 @@
       >
         <div
           class="flex h-10 w-10 items-center justify-center rounded-lg"
-          :class="[issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700']"
+          :class="[issue.isOpen ? 'bg-orange-600' : 'bg-gray-300 dark:bg-gray-700']"
         >
           <div class="">
             <EyeIcon class="h-6 w-6 text-white" />
@@ -72,11 +72,11 @@
         </div>
         <div
           class="px-4py-4 flex-1 flex-col space-y-4 rounded-lg border border-gray-500"
-          :class="[issue.isOpen ? 'border-blue-500' : 'border-gray-500 dark:border-gray-700']"
+          :class="[issue.isOpen ? 'border-orange-500' : 'border-gray-500 dark:border-gray-700']"
         >
           <h1
             v-if="issue.isOpen"
-            class="border-b border-gray-500 pb-2 text-xl font-bold text-blue-500 dark:border-gray-600"
+            class="text-orange-500 border-b border-gray-500 pb-2 text-xl font-bold dark:border-gray-600"
           >
             Mod Decision Needed
           </h1>
@@ -119,7 +119,7 @@
                 />
                 <button
                   v-if="issue.isOpen"
-                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-blue-500"
+                  class="bg-orange-600 hover:bg-orange-500 flex w-full cursor-pointer items-center justify-center gap-2 rounded px-4 py-2 text-white"
                   :loading="closeIssueLoading"
                   @click="$emit('close-issue')"
                 >

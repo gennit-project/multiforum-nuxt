@@ -16,7 +16,7 @@
 
 <template>
   <div
-    class="rounded-md bg-blue-100 p-4 dark:bg-blue-900 dark:text-white"
+    class="bg-orange-100 dark:bg-orange-900 rounded-md p-4 dark:text-white"
     :data-testid="testId"
   >
     <div class="flex">

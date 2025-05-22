@@ -90,7 +90,7 @@
         :show-context-link="true"
       />
       <nuxt-link
-        class="text-blue-500 underline"
+        class="text-orange-500 underline"
         :to="permalinkObject"
       >
         Context

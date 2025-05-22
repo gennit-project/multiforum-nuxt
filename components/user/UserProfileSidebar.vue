@@ -74,7 +74,7 @@
         {{ username }}
         <span
           v-if="isAdmin"
-          class="rounded-md border border-blue-500 px-2 py-1 text-xs text-blue-500"
+          class="border-orange-500 text-orange-500 rounded-md border px-2 py-1 text-xs"
           >Admin</span
         >
       </h1>
@@ -143,7 +143,7 @@
   @media (prefers-color-scheme: light) {
     #md-editor-v3-preview,
     #md-editor-v3-preview-wrapper {
-      background-color: blue;
+      background-color: orange;
     }
   }
 </style>

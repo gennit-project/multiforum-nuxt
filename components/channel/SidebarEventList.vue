@@ -159,7 +159,7 @@
     <div
       v-for="event in dateObj.happeningNow"
       :key="event?.id"
-      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
+      class="border-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -177,7 +177,7 @@
       </nuxt-link>
       <nuxt-link
         v-if="event?.virtualEventUrl"
-        class="w-fit rounded-sm bg-blue-600 px-4 py-1 font-medium text-blue-100"
+        class="bg-orange-600 text-orange-100 w-fit rounded-sm px-4 py-1 font-medium"
         target="_blank"
         :to="event?.virtualEventUrl"
       >
@@ -197,7 +197,7 @@
     <div
       v-for="event in dateObj.happeningToday"
       :key="event?.id"
-      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
+      class="border-l-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -226,7 +226,7 @@
     <div
       v-for="event in dateObj.happeningTomorrow"
       :key="event?.id"
-      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
+      class="border-l-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -257,7 +257,7 @@
       <div
         v-for="event in events"
         :key="event?.id"
-        class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-blue-500 pl-2 text-sm leading-6 text-gray-500 dark:text-gray-300"
+        class="border-l-orange-500 my-1 mb-2 flex flex-col gap-2 border-l-4 pl-2 text-sm leading-6 text-gray-500 dark:text-gray-300"
       >
         <nuxt-link
           class="flex items-center"

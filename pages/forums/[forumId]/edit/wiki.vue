@@ -14,7 +14,7 @@
       <input
         id="wiki-enabled"
         :checked="formValues.wikiEnabled"
-        class="h-4 w-4 rounded border-gray-500 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
+        class="text-orange-600 focus:ring-orange-500 h-4 w-4 rounded border-gray-500 dark:border-gray-600"
         type="checkbox"
         @change="
           $emit('updateFormValues', {

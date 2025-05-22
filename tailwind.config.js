@@ -12,9 +12,9 @@ module.exports = {
   darkMode: "class",
   important: true,
   theme: {
-    borderColor: theme => ({
-      ...theme('colors'),
-      DEFAULT: '#000000',
+    borderColor: (theme) => ({
+      ...theme("colors"),
+      DEFAULT: "#000000",
     }),
     fontWeight: {
       thin: "100",
@@ -107,6 +107,17 @@ module.exports = {
         300: "#b5f4b5",
         200: "#e3f9e3",
         100: "#f5fdf5",
+      },
+      orange: {
+        900: "#6e2600", // burnt orange, still warm but brighter
+        800: "#b34300", // tangerine peel
+        700: "#e85c0b", // vivid orange
+        600: "#ff832b", // bright creamsicle orange
+        500: "#ffab5c", // light orange sherbet
+        400: "#ffd1a6", // peachy cream
+        300: "#ffe6cc", // soft peach
+        200: "#fff2e1", // creamsicle glaze
+        100: "#fffaf4", // nearly white with a peach tint
       },
     },
     container: {

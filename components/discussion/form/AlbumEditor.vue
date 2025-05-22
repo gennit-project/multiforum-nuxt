@@ -505,7 +505,7 @@
           Drag and drop, or tap to add files
         </p>
         <button
-          class="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
+          class="bg-orange-500 hover:bg-orange-600 rounded px-4 py-2 text-white transition-colors"
           type="button"
           @click="selectFiles"
         >
@@ -532,7 +532,7 @@
     </div>
     <!-- <button
       type="button"
-      class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500"
+      class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
       @click="() => addNewImage()"
     >
       + Add New Image

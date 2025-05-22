@@ -83,7 +83,7 @@
           <div
             v-for="(channelName, index) in selected"
             :key="index"
-            class="mr-2 flex items-center rounded-full bg-blue-100 pr-2 text-blue-700 dark:bg-gray-600 dark:text-white"
+            class="bg-orange-100 text-orange-700 mr-2 flex items-center rounded-full pr-2 dark:bg-gray-600 dark:text-white"
             @click="removeSelection(channelName)"
           >
             <AvatarComponent

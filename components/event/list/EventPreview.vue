@@ -58,7 +58,7 @@
                       <div class="flex items-start justify-between">
                         <div class="flex h-7 items-center">
                           <button
-                            class="ml-8 rounded-full bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-900 dark:text-gray-200"
+                            class="focus:ring-orange-500 ml-8 rounded-full bg-white text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 dark:bg-gray-900 dark:text-gray-200"
                             type="button"
                             @click="$emit('closePreview')"
                           >
@@ -83,7 +83,7 @@
                   </div>
                   <div class="flex flex-shrink-0 justify-end px-4 py-4">
                     <button
-                      class="hover:bg-gray-50 rounded-full border bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 dark:bg-gray-900 dark:text-gray-200"
+                      class="hover:bg-gray-50 focus:ring-orange-600 rounded-full border bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:bg-gray-900 dark:text-gray-200"
                       type="button"
                       @click="$emit('closePreview')"
                     >

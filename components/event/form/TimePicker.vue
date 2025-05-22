@@ -77,7 +77,7 @@
   <div class="relative">
     <!-- Custom input field instead of native time input -->
     <div
-      class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-500 px-3 pr-8 text-sm focus:border-blue-500 focus:ring-blue-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
+      class="focus:border-orange-500 focus:ring-orange-500 flex h-10 w-full cursor-pointer items-center rounded border border-gray-500 px-3 pr-8 text-sm dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
       :class="{ 'cursor-not-allowed opacity-60': disabled }"
       :data-testid="testId"
       @click="!disabled && toggleDropdown()"
@@ -115,7 +115,7 @@
             "
             :class="[
               'cursor-pointer px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700',
-              formattedTime === hourOption.display ? 'bg-blue-50 dark:bg-blue-900' : '',
+              formattedTime === hourOption.display ? 'bg-orange-50 dark:bg-orange-900' : '',
             ]"
             @click="selectTime(hourOption.value)"
           >

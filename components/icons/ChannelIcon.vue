@@ -20,7 +20,7 @@
     xmlns="http://www.w3.org/2000/svg"
   >
     <linearGradient
-      id="pinkToLightBlueGradient"
+      id="pinkToLightorangeGradient"
       x1="0%"
       x2="100%"
       y1="0%"

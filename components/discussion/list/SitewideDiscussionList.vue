@@ -160,14 +160,14 @@
         <RequireAuth :full-width="false">
           <template #has-auth>
             <nuxt-link
-              class="text-blue-500 underline"
+              class="text-orange-500 underline"
               :to="{ name: 'discussions-create' }"
             >
               Create one?
             </nuxt-link>
           </template>
           <template #does-not-have-auth>
-            <span class="cursor-pointer text-blue-500 underline">Create one?</span>
+            <span class="text-orange-500 cursor-pointer underline">Create one?</span>
           </template>
         </RequireAuth>
       </p>

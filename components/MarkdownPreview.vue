@@ -337,7 +337,7 @@
     />
     <button
       v-if="shouldShowMoreButton"
-      class="text-sm font-bold text-blue-600 hover:underline dark:text-gray-300"
+      class="text-orange-600 text-sm font-bold hover:underline dark:text-gray-300"
       @click="toggleShowFullText"
     >
       {{ showFullText ? "Show Less" : "Show More" }}

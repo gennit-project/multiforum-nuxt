@@ -68,7 +68,7 @@
         <input
           :id="'weekday-' + weekday.number"
           :checked="workingCopyOfSelectedWeekdays[weekday.number] === true"
-          class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-blue-500 dark:bg-gray-300"
+          class="text-orange-600 focus:ring-orange-500 mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 dark:bg-gray-300"
           :data-testid="`weekday-${weekday.number}-checkbox`"
           type="checkbox"
           @input="() => toggleSelectWeekday(weekday)"

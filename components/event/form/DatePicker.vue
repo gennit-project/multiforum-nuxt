@@ -27,7 +27,7 @@
   // Styles derived from the existing component
   const baseStyles = computed(() => {
     return [
-      "border cursor-pointer rounded border-gray-500 text-sm focus:border-blue-500 focus:ring-blue-500 w-full sm:w-36 h-10",
+      "border cursor-pointer rounded border-gray-500 text-sm focus:border-orange-500 focus:ring-orange-500 w-full sm:w-36 h-10",
       "dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:[color-scheme:dark]",
       props.disabled ? "opacity-60 cursor-not-allowed" : "",
     ].join(" ");

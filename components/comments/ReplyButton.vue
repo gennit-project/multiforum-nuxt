@@ -38,7 +38,7 @@
       ...baseClasses,
       ...defaultClasses,
       props.isPermalinked
-        ? "hover:bg-blue-300 dark:hover:bg-blue-700"
+        ? "hover:bg-orange-300 dark:hover:bg-orange-700"
         : "hover:bg-gray-200 dark:hover:bg-gray-600 dark:bg-gray-700",
     ];
   });

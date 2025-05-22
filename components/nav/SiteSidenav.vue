@@ -126,7 +126,7 @@
         <div class="mt-2 block px-6">
           <div class="flex h-7">
             <button
-              class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-200"
+              class="focus:ring-orange-500 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 dark:text-gray-200"
               type="button"
               @click="outside"
             >
@@ -169,7 +169,7 @@
                 <component
                   :is="item.icon"
                   aria-hidden="true"
-                  class="list-item-icon h-6 w-6 shrink-0 dark:text-blue-500"
+                  class="list-item-icon dark:text-orange-500 h-6 w-6 shrink-0"
                 />
                 {{ item.name }}
               </nuxt-link>

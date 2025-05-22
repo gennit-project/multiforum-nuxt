@@ -35,7 +35,7 @@
   >
     <div class="relative mt-1">
       <ListboxButton
-        class="relative w-full cursor-default rounded-md border border-gray-500 bg-white pl-3 pr-10 text-left shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-gray-200"
+        class="focus:border-orange-500 focus:ring-orange-500 relative w-full cursor-default rounded-md border border-gray-500 bg-white pl-3 pr-10 text-left shadow-sm focus:outline-none focus:ring-1 dark:bg-gray-800 dark:text-gray-200"
         :label="selected.label"
       >
         <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2" />
@@ -52,7 +52,7 @@
         >
           <li
             :class="[
-              active ? 'bg-blue-600 text-white' : 'text-gray-900 dark:text-gray-200',
+              active ? 'bg-orange-600 text-white' : 'text-gray-900 dark:text-gray-200',
               'relative cursor-default select-none py-1 pl-3 pr-9',
             ]"
           >
@@ -63,7 +63,7 @@
             <span
               v-if="isSelected"
               :class="[
-                active ? 'text-white' : 'text-blue-600',
+                active ? 'text-white' : 'text-orange-600',
                 'absolute inset-y-0 right-0 flex items-center pr-4',
               ]"
             >

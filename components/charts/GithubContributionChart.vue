@@ -450,7 +450,7 @@
                   :class="[
                     darkMode ? 'hover:stroke-green-600' : 'hover:stroke-green-400',
                     selectedDay && selectedDay.week === weekIndex && selectedDay.day === dayIndex
-                      ? 'stroke-blue-500 stroke-2'
+                      ? 'stroke-orange-500 stroke-2'
                       : '',
                   ]"
                   :data-count="dayData.count"
@@ -495,7 +495,7 @@
     <div
       v-if="selectedDay"
       class="mt-4 rounded-lg border p-4"
-      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-blue-500'"
+      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-orange-500'"
     >
       <div class="flex gap-3">
         <Calendar

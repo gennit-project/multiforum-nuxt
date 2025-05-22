@@ -134,7 +134,7 @@
           class="-ml-0.5 mb-1 flex items-center gap-2 text-xs dark:text-white"
           :to="getDetailLink()"
         >
-          <div class="flex items-center text-blue-700 dark:text-white">
+          <div class="text-orange-700 flex items-center dark:text-white">
             <AvatarComponent
               class="mr-1 h-6 w-6"
               :is-square="true"

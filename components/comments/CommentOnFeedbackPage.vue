@@ -274,7 +274,7 @@
       }}</span>
       <span
         v-if="isHighlighted"
-        class="rounded-lg bg-blue-500 px-2 text-black"
+        class="bg-orange-500 rounded-lg px-2 text-black"
         >Permalinked</span
       >
       <MenuButton

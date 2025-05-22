@@ -388,7 +388,7 @@
                 <h2 class="text-wrap px-1 text-2xl font-bold sm:tracking-tight">
                   <template v-if="props.issueEventId && channelId && event">
                     <nuxt-link
-                      class="text-blue-500 dark:text-blue-400"
+                      class="text-orange-500 dark:text-orange-400"
                       rel="noopener noreferrer"
                       :to="{
                         name: 'forums-forumId-events-eventId',

@@ -93,7 +93,7 @@
       <div class="border-l border-l-2 pl-6">
         <h3 v-if="discussion?.title">
           <nuxt-link
-            class="text-blue-500 dark:text-blue-400"
+            class="text-orange-500 dark:text-orange-400"
             rel="noopener noreferrer"
             :to="{
               name: 'forums-forumId-discussions-discussionId',
