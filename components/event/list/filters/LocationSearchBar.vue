@@ -100,7 +100,7 @@
       <input
         v-model="searchQuery"
         :autofocus="autoFocus"
-        class="h-10 w-full border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+        class="h-10 w-full border border-gray-300 bg-white py-3 pl-10 pr-3 text-sm leading-5 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400"
         :class="[
           leftSideIsRounded ? 'rounded-l-full' : '',
           rightSideIsRounded ? 'rounded-r-full' : '',
