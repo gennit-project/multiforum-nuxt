@@ -97,7 +97,7 @@
 
 <template>
   <div
-    class="touch-scroll-y absolute left-0 right-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+    class="touch-scroll-y absolute left-0 right-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
   >
     <SearchBar
       :auto-focus="true"
@@ -133,7 +133,7 @@
       <label class="flex cursor-pointer items-center space-x-3 p-2">
         <input
           :checked="selected.includes(tag.text)"
-          class="text-orange-600 border border-gray-500 dark:border-gray-600"
+          class="text-orange-600 border border-gray-300 dark:border-gray-600"
           type="checkbox"
           :value="tag.text"
           @change="() => emit('toggleSelection', tag.text)"

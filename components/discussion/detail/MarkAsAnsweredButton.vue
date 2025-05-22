@@ -57,7 +57,7 @@
   <div>
     <button
       v-if="!answered"
-      class="align-items flex gap-1 rounded-full border border-gray-500 px-2 py-1 text-xs hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
+      class="align-items flex gap-1 rounded-full border border-gray-300 px-2 py-1 text-xs hover:bg-gray-200 dark:border-gray-600 dark:text-white dark:hover:bg-gray-700"
       @click="clickMarkAsAnswered"
     >
       <LoadingSpinner

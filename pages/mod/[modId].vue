@@ -40,7 +40,7 @@
       <div class="min-w-0 flex-1">
         <ModProfileTabs
           v-if="mod"
-          class="block border-b border-gray-500 dark:border-gray-600"
+          class="block border-b border-gray-300 dark:border-gray-600"
           :mod="mod"
           :route="route"
           :show-counts="true"

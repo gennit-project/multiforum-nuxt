@@ -526,7 +526,7 @@
         <FormRow :required="true">
           <template #content>
             <div
-              class="flex flex-wrap items-center gap-2 rounded-md border border-gray-500 p-2 dark:border-gray-600"
+              class="flex flex-wrap items-center gap-2 rounded-md border border-gray-300 p-2 dark:border-gray-600"
             >
               <!-- Mimic Zoom's UI for meeting type selection -->
               <div
@@ -615,7 +615,7 @@
               class="mb-3"
             >
               <div
-                class="relative overflow-hidden rounded-md border border-gray-500 dark:border-gray-600"
+                class="relative overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
               >
                 <img
                   alt="Cover Image"
@@ -677,7 +677,7 @@
 
             <div
               v-else-if="coverImageLoading"
-              class="bg-gray-50 mb-3 rounded-md border border-gray-500 p-6 dark:border-gray-600 dark:bg-gray-700"
+              class="bg-gray-50 mb-3 rounded-md border border-gray-300 p-6 dark:border-gray-600 dark:bg-gray-700"
             >
               <div
                 class="flex flex-col items-center justify-center space-y-2 text-gray-500 dark:text-gray-300"
@@ -710,7 +710,7 @@
               class="mb-3"
             >
               <div
-                class="bg-gray-50 rounded-md border border-dashed border-gray-500 p-8 text-center dark:border-gray-600 dark:bg-gray-800"
+                class="bg-gray-50 rounded-md border border-dashed border-gray-300 p-8 text-center dark:border-gray-600 dark:bg-gray-800"
               >
                 <i class="fa fa-image mb-3 text-3xl text-gray-400 dark:text-gray-500" />
                 <span class="mb-3 block text-sm text-gray-500 dark:text-gray-400">

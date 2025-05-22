@@ -34,11 +34,11 @@
 
     const defaultClasses = properties.active
       ? "border-orange-500 bg-orange-100 text-black dark:border-orange-200 dark:bg-orange-900 dark:hover:bg-orange-500"
-      : "border-gray-500 bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-black dark:hover:bg-gray-600";
+      : "border-gray-300 bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-black dark:hover:bg-gray-600";
 
     const permalinkClasses = properties.isPermalinked
       ? "border-orange-500 hover:bg-orange-300 dark:border-orange-200 dark:hover:bg-orange-600"
-      : "border-gray-500 dark:border-gray-600 hover:bg-gray-200";
+      : "border-gray-300 dark:border-gray-600 hover:bg-gray-200";
 
     // Include external class passed from parent component
     const externalClass = properties.class || "";

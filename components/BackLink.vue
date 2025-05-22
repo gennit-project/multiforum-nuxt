@@ -27,7 +27,7 @@
 
 <template>
   <nuxt-link
-    class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-500 bg-white px-2 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
+    class="inline-flex items-center justify-center gap-2 rounded-lg border border-gray-300 bg-white px-2 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
     :data-testid="dataTestid"
     :to="link"
   >

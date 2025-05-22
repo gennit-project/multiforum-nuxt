@@ -197,7 +197,7 @@
           <div class="mb-4 lg:hidden">
             <div class="relative">
               <button
-                class="bg-gray-50 flex w-full items-center justify-between rounded-md border border-gray-500 px-4 py-2 text-sm dark:text-white"
+                class="bg-gray-50 flex w-full items-center justify-between rounded-md border border-gray-300 px-4 py-2 text-sm dark:text-white"
                 type="button"
                 @click="isDropdownOpen = !isDropdownOpen"
               >
@@ -240,7 +240,7 @@
           <div class="flex w-full">
             <!-- Left Sidebar (hidden on mobile) -->
             <div
-              class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-500 dark:border-gray-500 lg:block"
+              class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-300 dark:border-gray-300 lg:block"
             >
               <ul class="flex flex-col space-y-2">
                 <router-link

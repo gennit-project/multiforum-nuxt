@@ -52,7 +52,7 @@
 </script>
 
 <template>
-  <div class="border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white">
+  <div class="border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white">
     <nav
       v-if="!issueId"
       class="flex items-center gap-4 py-3 pl-8"
@@ -60,9 +60,9 @@
       <nuxt-link
         class="border-b-2 px-4 py-2"
         :class="{
-          'border-gray-500 text-black dark:border-white dark:text-white':
+          'border-gray-300 text-black dark:border-white dark:text-white':
             route.name === 'forums-forumId-issues',
-          'border-gray-500 text-gray-500 dark:text-gray-400':
+          'border-gray-300 text-gray-500 dark:text-gray-400':
             route.name !== 'forums-forumId-issues',
         }"
         :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
@@ -72,9 +72,9 @@
       <nuxt-link
         class="border-b-2 px-4 py-2"
         :class="{
-          'border-gray-500 text-black dark:border-white dark:text-white':
+          'border-gray-300 text-black dark:border-white dark:text-white':
             route.name === 'forums-forumId-issues-closed',
-          'border-gray-500 text-gray-500 dark:text-gray-400':
+          'border-gray-300 text-gray-500 dark:text-gray-400':
             route.name !== 'forums-forumId-issues-closed',
         }"
         :to="{ name: 'forums-forumId-issues-closed', params: { forumId: channelId } }"

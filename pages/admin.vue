@@ -34,7 +34,7 @@
     >
       <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
         <ServerTabs
-          class="mb-2 w-full border-b border-gray-500 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
+          class="mb-2 w-full border-b border-gray-300 bg-white px-3 dark:border-gray-600 dark:bg-gray-800"
           :desktop="false"
           :route="route"
           :server-config="serverConfig"
