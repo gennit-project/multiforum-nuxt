@@ -254,6 +254,14 @@ export const GET_DISCUSSION = gql`
         body
         createdAt
       }
+      PastBodyVersions {
+        id
+        Author {
+          username
+        }
+        body
+        createdAt
+      }
     }
   }
 `;

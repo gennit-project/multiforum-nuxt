@@ -8,50 +8,50 @@ import {
 } from "@headlessui/vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 
-defineProps({
-  dataTestid: {
-    type: String,
-    default: "",
-  },
-  title: {
-    type: String,
-    required: true,
-    default: "Are you sure?",
-  },
-  highlightColor: {
-    type: String,
-    default: "yellow",
-  },
-  body: {
-    type: String,
-    required: true,
-    default: "",
-  },
-  open: {
-    type: Boolean,
-    default: false,
-  },
-  primaryButtonText: {
-    type: String,
-    default: "Delete",
-  },
-  secondaryButtonText: {
-    type: String,
-    default: "Cancel",
-  },
-  loading: {
-    type: Boolean,
-    default: false,
-  },
-  error: {
-    type: String,
-    default: "",
-  },
-  primaryButtonDisabled: {
-    type: Boolean,
-    default: false,
-  },
-});
+  defineProps({
+    dataTestid: {
+      type: String,
+      default: "",
+    },
+    title: {
+      type: String,
+      required: true,
+      default: "Are you sure?",
+    },
+    highlightColor: {
+      type: String,
+      default: "yellow",
+    },
+    body: {
+      type: String,
+      required: false,
+      default: "",
+    },
+    open: {
+      type: Boolean,
+      default: false,
+    },
+    primaryButtonText: {
+      type: String,
+      default: "Delete",
+    },
+    secondaryButtonText: {
+      type: String,
+      default: "Cancel",
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    error: {
+      type: String,
+      default: "",
+    },
+    primaryButtonDisabled: {
+      type: Boolean,
+      default: false,
+    },
+  });
 
 const emit = defineEmits(["close", "primaryButtonClick"]);
 </script>

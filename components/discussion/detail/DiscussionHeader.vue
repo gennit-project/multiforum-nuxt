@@ -1,22 +1,23 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "nuxt/app";
-import { DateTime } from "luxon";
-import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
-import WarningModal from "@/components/WarningModal.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import { getAllPermissions } from "@/utils/permissionUtils";
-import { getDiscussionHeaderMenuItems } from "@/utils/headerPermissionUtils";
-import { usernameVar, modProfileNameVar } from "@/cache";
-import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
-import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-import { config } from "@/config";
+  import { ref, computed } from "vue";
+  import { useMutation, useQuery } from "@vue/apollo-composable";
+  import { useRoute, useRouter } from "nuxt/app";
+  import { DateTime } from "luxon";
+  import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
+  import WarningModal from "@/components/WarningModal.vue";
+  import ErrorBanner from "@/components/ErrorBanner.vue";
+  import Notification from "@/components/NotificationComponent.vue";
+  import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
+  import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
+  import { getAllPermissions } from "@/utils/permissionUtils";
+  import { getDiscussionHeaderMenuItems } from "@/utils/headerPermissionUtils";
+  import { usernameVar, modProfileNameVar } from "@/cache";
+  import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+  import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
+  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+  import { config } from "@/config";
+  import EditsDropdown from "./activityFeed/EditsDropdown.vue";
 
 const props = defineProps({
   discussion: {
@@ -310,8 +311,21 @@ const authorIsMod = computed(
         </nuxt-link>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
-        <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
-        <div>{{ editedAt }}</div>
+        <span
+          v-if="discussion?.updatedAt"
+          class="mx-2"
+          >&#8226;</span
+        >
+        <div class="flex items-center">
+          <span>{{ editedAt }}</span>
+          <EditsDropdown
+            v-if="
+              discussion?.PastTitleVersions?.length > 0 || discussion?.PastBodyVersions?.length > 0
+            "
+            class="ml-2"
+            :discussion="discussion"
+          />
+        </div>
       </div>
       <div class="flex items-center gap-2">
         <div v-if="usernameVar === discussion?.Author?.username">
