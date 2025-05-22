@@ -40,7 +40,7 @@
     "border-orange-500 dark:border-gray-300 dark:text-gray-100": isActive.value,
     "bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700": isActive.value && props.vertical,
     "border-b-2 dark:text-gray-400 dark:border-gray-300": isActive.value && !props.vertical,
-    "text-gray-500 border-white dark:border-gray-800": !isActive.value,
+    "text-gray-500 border-white dark:border-gray-300": !isActive.value,
     "pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700": !isActive.value && props.vertical,
     "border-b-2 border-transparent": !isActive.value && !props.vertical,
   }));

@@ -54,14 +54,14 @@
         <ExpandableImage
           v-if="channel?.channelIconURL"
           :alt="channelId"
-          class="h-20 w-20 dark:border-gray-800"
+          class="h-20 w-20 dark:border-gray-300"
           :full-width="true"
           :rounded="true"
           :src="channel?.channelIconURL ?? ''"
         />
         <AvatarComponent
           v-if="!channel?.channelIconURL"
-          class="h-20 w-20 dark:border-gray-800"
+          class="h-20 w-20 dark:border-gray-300"
           :full-width="true"
           :is-square="false"
           :src="channel?.channelIconURL ?? ''"

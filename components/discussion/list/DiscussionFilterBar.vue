@@ -189,7 +189,7 @@
           </template>
         </FilterChip>
         <!-- Expand/Collapse Button Group -->
-        <div class="flex overflow-hidden rounded-md border border-gray-800 dark:border-gray-600">
+        <div class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600">
           <!-- Expand All Button -->
           <button
             aria-label="Expand all discussions"
@@ -210,7 +210,7 @@
           <button
             aria-label="Collapse all discussions"
             :class="[
-              'flex h-9 items-center border-l border-gray-800 px-2 text-gray-800 dark:border-gray-600 dark:text-gray-300',
+              'flex h-9 items-center border-l border-gray-300 px-2 text-gray-800 dark:border-gray-600 dark:text-gray-300',
               'hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-gray-700 dark:hover:text-gray-200',
               !(channelId ? expandChannelDiscussions : expandSitewideDiscussions)
                 ? 'bg-orange-50 dark:bg-orange-900'
@@ -228,7 +228,7 @@
           :class="
             showFilters
               ? 'border-orange-500'
-              : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
+              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           data-testid="discussion-filter-button"
           @click="
@@ -245,7 +245,7 @@
           :class="
             showSearch
               ? 'border-orange-500'
-              : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
+              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           data-testid="discussion-search-button"
           @click="

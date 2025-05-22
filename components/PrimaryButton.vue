@@ -23,7 +23,7 @@
     :class="[
       disabled
         ? 'cursor-default bg-gray-200 text-gray-300 dark:bg-gray-800 dark:text-gray-300'
-        : 'bg-orange-600 hover:bg-orange-700 dark:border-orange-600 dark:bg-orange-500 dark:hover:bg-orange-400 text-black dark:border dark:text-black',
+        : 'bg-orange-500 hover:bg-orange-700 dark:bg-orange-500 dark:hover:bg-orange-400 text-black dark:text-black',
       '',
     ]"
     :disabled="disabled"
