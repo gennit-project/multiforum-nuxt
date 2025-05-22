@@ -76,7 +76,7 @@
       </div>
       <div class="relative">
         <div
-          class="px-4text-left flex h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border border-black dark:border-gray-700 dark:bg-gray-700"
+          class="px-4text-left flex h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border border-gray-500 dark:border-gray-700 dark:bg-gray-700"
           :data-testid="testId"
           @click="toggleDropdown"
         >

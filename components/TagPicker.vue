@@ -63,7 +63,7 @@
     </div>
     <div class="relative">
       <div
-        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border border-black px-4 text-left text-sm dark:border-gray-700 dark:bg-gray-700"
+        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border border-gray-500 px-4 text-left text-sm dark:border-gray-700 dark:bg-gray-700"
         @click="toggleDropdown"
       >
         <div

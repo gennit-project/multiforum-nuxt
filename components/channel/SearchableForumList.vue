@@ -102,7 +102,7 @@
 
 <template>
   <div
-    class="touch-scroll-y absolute left-0 right-0 top-full z-50 max-h-60 w-full overflow-y-auto rounded-md border border-black bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
+    class="touch-scroll-y absolute left-0 right-0 top-full z-50 max-h-60 w-full overflow-y-auto rounded-md border border-gray-500 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
   >
     <SearchBar
       :auto-focus="true"

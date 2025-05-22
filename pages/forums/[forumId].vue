@@ -179,11 +179,11 @@
         :route="route"
         :show-create-button="true"
       />
-      <main class="flex w-full justify-center">
+      <main class="flex w-full justify-center bg-gray-100 dark:bg-gray-900">
         <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
           <div
             v-if="showDiscussionTitle"
-            class="flex w-full items-start gap-2 border-b border-black px-2 dark:border-gray-500 lg:px-4 2xl:px-0"
+            class="flex w-full items-start gap-2 border border-gray-200 px-2 dark:border-gray-500 lg:px-4 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <DiscussionTitleEditForm>
@@ -228,7 +228,7 @@
                   v-if="showChannelTabs"
                   :admin-list="adminList"
                   :channel="channel"
-                  class="mb-2 w-full border-b border-black bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
+                  class="mb-2 w-full border-b border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
                   :desktop="false"
                   :route="route"
                   :show-counts="true"

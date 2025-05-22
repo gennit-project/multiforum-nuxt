@@ -78,7 +78,7 @@
 
 <template>
   <div
-    class="w-full rounded-md border-black bg-white dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+    class="w-full rounded-md border-gray-500 bg-white dark:border-gray-600 dark:bg-gray-800 dark:text-white"
   >
     <div v-if="channelRulesLoading || serverRulesLoading">Loading...</div>
 

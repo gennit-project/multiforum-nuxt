@@ -372,7 +372,7 @@
           :class="
             darkMode
               ? 'border-gray-600 bg-gray-800 text-white'
-              : 'border-black bg-white text-gray-800'
+              : 'border-gray-500 bg-white text-gray-800'
           "
         >
           <option

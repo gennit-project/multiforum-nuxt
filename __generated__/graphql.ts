@@ -11362,14 +11362,12 @@ export type Discussion = {
   TagsAggregate?: Maybe<DiscussionTagTagsAggregationSelection>;
   TagsConnection: DiscussionTagsConnection;
   body?: Maybe<Scalars['String']['output']>;
-  bodyVersionOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   createdAt: Scalars['DateTime']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
   hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
   hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   title: Scalars['String']['output'];
-  titleVersionOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -13945,12 +13943,10 @@ export type DiscussionCreateInput = {
   PastTitleVersions?: InputMaybe<DiscussionPastTitleVersionsFieldInput>;
   Tags?: InputMaybe<DiscussionTagsFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
-  bodyVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title: Scalars['String']['input'];
-  titleVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
@@ -14152,14 +14148,12 @@ export type DiscussionEdge = {
 export type DiscussionEventPayload = {
   __typename?: 'DiscussionEventPayload';
   body?: Maybe<Scalars['String']['output']>;
-  bodyVersionOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   createdAt: Scalars['DateTime']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
   hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
   hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
   title: Scalars['String']['output'];
-  titleVersionOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -14774,8 +14768,6 @@ export type DiscussionSubscriptionWhere = {
   NOT?: InputMaybe<DiscussionSubscriptionWhere>;
   OR?: InputMaybe<Array<DiscussionSubscriptionWhere>>;
   body?: InputMaybe<Scalars['String']['input']>;
-  bodyVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  bodyVersionOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -14796,8 +14788,6 @@ export type DiscussionSubscriptionWhere = {
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
-  titleVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  titleVersionOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -14975,17 +14965,11 @@ export type DiscussionUpdateInput = {
   PastTitleVersions?: InputMaybe<Array<DiscussionPastTitleVersionsUpdateFieldInput>>;
   Tags?: InputMaybe<Array<DiscussionTagsUpdateFieldInput>>;
   body?: InputMaybe<Scalars['String']['input']>;
-  bodyVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  bodyVersionOrder_POP?: InputMaybe<Scalars['Int']['input']>;
-  bodyVersionOrder_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
-  titleVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  titleVersionOrder_POP?: InputMaybe<Scalars['Int']['input']>;
-  titleVersionOrder_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
 };
 
 export type DiscussionUpdatedEvent = {
@@ -15118,8 +15102,6 @@ export type DiscussionWhere = {
   /** Return Discussions where some of the related Tags match this filter */
   Tags_SOME?: InputMaybe<TagWhere>;
   body?: InputMaybe<Scalars['String']['input']>;
-  bodyVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  bodyVersionOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   body_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   body_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -15140,8 +15122,6 @@ export type DiscussionWhere = {
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
-  titleVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  titleVersionOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   title_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   title_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   title_IN?: InputMaybe<Array<Scalars['String']['input']>>;
@@ -42552,7 +42532,6 @@ export type WikiPage = {
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  pastVersionOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   slug: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -42841,7 +42820,6 @@ export type WikiPageCreateInput = {
   ProposedEdits?: InputMaybe<WikiPageProposedEditsFieldInput>;
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
-  pastVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   slug: Scalars['String']['input'];
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -42886,7 +42864,6 @@ export type WikiPageEventPayload = {
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
-  pastVersionOrder?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   slug: Scalars['String']['output'];
   title: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -43228,8 +43205,6 @@ export type WikiPageSubscriptionWhere = {
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  pastVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  pastVersionOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   slug_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   slug_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -43285,9 +43260,6 @@ export type WikiPageUpdateInput = {
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorUpdateFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
-  pastVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  pastVersionOrder_POP?: InputMaybe<Scalars['Int']['input']>;
-  pastVersionOrder_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   slug?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
 };
@@ -43685,8 +43657,6 @@ export type WikiPageWhere = {
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
   id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
   id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
-  pastVersionOrder?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  pastVersionOrder_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   slug_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   slug_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;

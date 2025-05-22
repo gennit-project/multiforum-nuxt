@@ -308,12 +308,12 @@
 
             <span
               v-if="authorIsAdmin"
-              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-black dark:text-gray-300"
+              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-500 dark:text-gray-300"
               >Admin</span
             >
             <span
               v-else-if="authorIsMod"
-              class="rounded-md border border-blue-500 px-1 py-0 text-xs text-gray-500 dark:border-black dark:text-gray-300"
+              class="rounded-md border border-blue-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-500 dark:text-gray-300"
               >Mod</span
             >
           </span>

@@ -114,7 +114,7 @@
           </client-only>
           <UserProfileTabs
             v-if="user"
-            class="block border-b border-black dark:border-gray-600"
+            class="block border-b border-gray-500 dark:border-gray-600"
             :show-counts="true"
             :user="user"
             :vertical="false"

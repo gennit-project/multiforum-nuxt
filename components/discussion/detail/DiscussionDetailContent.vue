@@ -399,7 +399,7 @@
         </div>
 
         <div>
-          <div class="mx-2 my-6 rounded-lg">
+          <div class="my-6 px-2 pt-2">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
               :aggregate-comment-count="aggregateCommentCount || 0"

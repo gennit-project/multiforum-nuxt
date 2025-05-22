@@ -90,7 +90,7 @@
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-black dark:text-gray-300"
+                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-500 dark:text-gray-300"
                     >OP</span
                   >
                 </span>
@@ -116,7 +116,7 @@
                   {{ activityItem.User.username }}
                   <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-black dark:text-gray-300"
+                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-500 dark:text-gray-300"
                     >OP</span
                   >
                 </span>
@@ -130,7 +130,7 @@
             }}</span>
           </div>
 
-          <div class="border-l-2 border-black pl-2 dark:border-gray-500">
+          <div class="border-l-2 border-gray-500 pl-2 dark:border-gray-500">
             <MarkdownPreview
               v-if="activityItem.Comment"
               :disable-gallery="true"

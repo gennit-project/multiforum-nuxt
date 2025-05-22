@@ -29,7 +29,7 @@
 
 <template>
   <div
-    class="mb-4 break-inside-avoid rounded-lg border border-black bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-900 dark:text-gray-200"
+    class="mb-4 break-inside-avoid rounded-lg border border-gray-500 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-900 dark:text-gray-200"
   >
     <nuxt-link
       class="mb-2 block"

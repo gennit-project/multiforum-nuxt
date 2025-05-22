@@ -37,7 +37,7 @@
   });
 
   const classes = computed(() => ({
-    "border-black dark:border-gray-500 dark:text-gray-100": isActive.value,
+    "border-gray-500 dark:border-gray-500 dark:text-gray-100": isActive.value,
     "bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700": isActive.value && props.vertical,
     "border-b-2 dark:text-gray-400 dark:border-gray-500": isActive.value && !props.vertical,
     "text-gray-500 border-white dark:border-gray-800": !isActive.value,
