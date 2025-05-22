@@ -29,6 +29,7 @@
   import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
   import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
+  import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
   // Lazy load the album component since it's not needed for initial render
   const DiscussionAlbum = defineAsyncComponent(
     () => import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -368,6 +369,14 @@
                         @edit-album="handleEditAlbum"
                       />
                     </div>
+                  </template>
+                  <template #activity-feed-slot>
+                    <DiscussionTitleVersions
+                      v-if="
+                        discussion?.PastTitleVersions && discussion.PastTitleVersions.length > 0
+                      "
+                      :discussion="discussion"
+                    />
                   </template>
                   <template #mark-answered-slot>
                     <MarkAsAnsweredButton
