@@ -2,8 +2,8 @@
   import { ref, computed, watch } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { useMutation, useQuery } from "@vue/apollo-composable";
-  import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
-  import { UPDATE_WIKI_PAGE } from "@/graphQLData/channel/mutations";
+  import { GET_WIKI_PAGE, GET_CHANNEL } from "@/graphQLData/channel/queries";
+  import { UPDATE_WIKI_PAGE, UPDATE_CHANNEL } from "@/graphQLData/channel/mutations";
   import TextEditor from "@/components/TextEditor.vue";
   import TextInput from "@/components/TextInput.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -17,15 +17,54 @@
   const forumId = route.params.forumId as string;
   const slug = route.params.slug as string;
 
-  // Query wiki page data
+  // Determine if we're editing the home page
+  const isHomePage = computed(() => slug === "home");
+
+  // Query wiki page data for non-home pages
   const {
     result: wikiPageResult,
-    loading,
-    error,
-  } = useQuery(GET_WIKI_PAGE, { channelUniqueName: forumId, slug: slug }, { errorPolicy: "all" });
+    loading: wikiPageLoading,
+    error: wikiPageError,
+  } = useQuery(
+    GET_WIKI_PAGE,
+    { channelUniqueName: forumId, slug: slug },
+    {
+      errorPolicy: "all",
+      skip: isHomePage.value, // Skip this query for home page
+    }
+  );
+
+  // Query channel data for home page
+  const {
+    result: channelResult,
+    loading: channelLoading,
+    error: channelError,
+  } = useQuery(
+    GET_CHANNEL,
+    { uniqueName: forumId },
+    {
+      errorPolicy: "all",
+      skip: !isHomePage.value, // Skip this query for non-home pages
+    }
+  );
 
   // Computed property for the wiki page data
-  const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0]);
+  const wikiPage = computed(() => {
+    if (isHomePage.value) {
+      return channelResult.value?.channels[0]?.WikiHomePage;
+    } else {
+      return wikiPageResult.value?.wikiPages[0];
+    }
+  });
+
+  // Computed loading and error states
+  const loading = computed(() => {
+    return isHomePage.value ? channelLoading.value : wikiPageLoading.value;
+  });
+
+  const error = computed(() => {
+    return isHomePage.value ? channelError.value : wikiPageError.value;
+  });
 
   // Form data
   const formValues = ref({
@@ -51,39 +90,87 @@
     { immediate: true }
   );
 
-  // Update wiki page mutation
+  // Update wiki page mutation (for non-home pages)
   const {
     mutate: updateWikiPage,
-    loading: isUpdating,
-    error: updateError,
-    onDone,
+    loading: isUpdatingWikiPage,
+    error: updateWikiPageError,
+    onDone: onWikiPageDone,
   } = useMutation(UPDATE_WIKI_PAGE);
+
+  // Update channel mutation (for home page)
+  const {
+    mutate: updateChannel,
+    loading: isUpdatingChannel,
+    error: updateChannelError,
+    onDone: onChannelDone,
+  } = useMutation(UPDATE_CHANNEL);
+
+  // Computed loading and error states for mutations
+  const isUpdating = computed(() => {
+    return isHomePage.value ? isUpdatingChannel.value : isUpdatingWikiPage.value;
+  });
+
+  const updateError = computed(() => {
+    return isHomePage.value ? updateChannelError.value : updateWikiPageError.value;
+  });
 
   // Handle form submission
   function handleSubmit() {
     if (!formValues.value.title || !formValues.value.body) return;
 
-    const updateInput = {
-      title: formValues.value.title,
-      body: formValues.value.body,
-      VersionAuthor: {
-        connect: {
-          where: {
+    if (isHomePage.value) {
+      // Update home page via channel
+      const updateInput = {
+        WikiHomePage: {
+          update: {
             node: {
-              username: usernameVar.value,
+              title: formValues.value.title,
+              body: formValues.value.body,
+              VersionAuthor: {
+                connect: {
+                  where: {
+                    node: {
+                      username: usernameVar.value,
+                    },
+                  },
+                },
+              },
             },
           },
         },
-      },
-    };
+      };
 
-    updateWikiPage({
-      where: {
-        channelUniqueName: forumId,
-        slug: slug,
-      },
-      update: updateInput,
-    });
+      updateChannel({
+        where: {
+          uniqueName: forumId,
+        },
+        update: updateInput,
+      });
+    } else {
+      // Update regular wiki page
+      const updateInput = {
+        title: formValues.value.title,
+        body: formValues.value.body,
+        VersionAuthor: {
+          connect: {
+            where: {
+              node: {
+                username: usernameVar.value,
+              },
+            },
+          },
+        },
+      };
+
+      updateWikiPage({
+        where: {
+          channelUniqueName: forumId,
+          slug: slug,
+        },
+        update: updateInput,
+      });
+    }
   }
 
   // Derive slug from title
@@ -97,7 +184,7 @@
   }
 
   // Handle mutation completion
-  onDone(() => {
+  const handleDone = () => {
     // Navigate back to the correct wiki page based on the slug
     if (slug === "home") {
       // Navigate to wiki home page
@@ -106,7 +193,10 @@
       // Navigate to the child wiki page
       router.push(`/forums/${forumId}/wiki/${slug}?t=${Date.now()}`);
     }
-  });
+  };
+
+  onWikiPageDone(handleDone);
+  onChannelDone(handleDone);
 </script>
 
 <template>
