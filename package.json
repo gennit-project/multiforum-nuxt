@@ -36,6 +36,7 @@
     "@fortawesome/free-regular-svg-icons": "6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/vue-fontawesome": "^3.0.8",
+    "@google/model-viewer": "^4.1.0",
     "@googlemaps/js-api-loader": "^1.16.8",
     "@headlessui/vue": "^1.7.23",
     "@heroicons/vue": "^2.2.0",

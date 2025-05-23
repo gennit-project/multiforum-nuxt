@@ -19,9 +19,9 @@
     return props.wikiPage?.PastVersions?.length || 0;
   });
 
-  // Check if there are any edits to show
+  // Check if there are any edits to show (need at least 2 revisions - original + at least 1 edit)
   const hasEdits = computed(() => {
-    return totalEdits.value > 0;
+    return totalEdits.value >= 2;
   });
 
   // Process all versions and sort by timestamp (newest first)

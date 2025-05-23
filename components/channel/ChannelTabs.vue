@@ -3,6 +3,7 @@
   import TabButton from "@/components/channel/TabButton.vue";
   import CalendarIcon from "@/components/icons/CalendarIcon.vue";
   import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
+  import DownloadIcon from "@/components/icons/DownloadIcon.vue";
   import FlagIcon from "@/components/icons/FlagIcon.vue";
   import CogIcon from "@/components/icons/CogIcon.vue";
   import InfoIcon from "@/components/icons/InfoIcon.vue";
@@ -64,6 +65,7 @@
   const tabRoutes = computed(() => {
     const routes: TabRoutes = {
       discussions: `/forums/${forumId.value}/discussions`,
+      downloads: `/forums/${forumId.value}/downloads`,
       events: `/forums/${forumId.value}/events`,
       about: `/forums/${forumId.value}/about`,
       settings: `/forums/${forumId.value}/edit`,
@@ -84,6 +86,13 @@
         routeSuffix: "discussions",
         label: "Discussions",
         icon: DiscussionIcon,
+        countProperty: "DiscussionChannelsAggregate",
+      },
+      {
+        name: "downloads",
+        routeSuffix: "downloads",
+        label: "Downloads",
+        icon: DownloadIcon,
         countProperty: "DiscussionChannelsAggregate",
       },
       {
