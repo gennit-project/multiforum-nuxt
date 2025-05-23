@@ -5866,6 +5866,21 @@ export type ChannelWikiHomePageNodeAggregationWhereInput = {
   body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -5950,6 +5965,7 @@ export type ChannelWikiPageWikiHomePageAggregationSelection = {
 export type ChannelWikiPageWikiHomePageNodeAggregateSelection = {
   __typename?: 'ChannelWikiPageWikiHomePageNodeAggregateSelection';
   body: StringAggregateSelection;
+  channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
@@ -36068,6 +36084,21 @@ export type UserAuthoredWikiPagesNodeAggregationWhereInput = {
   body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -41577,6 +41608,7 @@ export type UserWikiPageAuthoredWikiPagesAggregationSelection = {
 export type UserWikiPageAuthoredWikiPagesNodeAggregateSelection = {
   __typename?: 'UserWikiPageAuthoredWikiPagesNodeAggregateSelection';
   body: StringAggregateSelection;
+  channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
@@ -41606,6 +41638,7 @@ export type WikiPage = {
   VersionAuthorAggregate?: Maybe<WikiPageUserVersionAuthorAggregationSelection>;
   VersionAuthorConnection: WikiPageVersionAuthorConnection;
   body?: Maybe<Scalars['String']['output']>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   slug: Scalars['String']['output'];
@@ -41704,6 +41737,7 @@ export type WikiPageVersionAuthorConnectionArgs = {
 export type WikiPageAggregateSelection = {
   __typename?: 'WikiPageAggregateSelection';
   body: StringAggregateSelection;
+  channelUniqueName: StringAggregateSelection;
   count: Scalars['Int']['output'];
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
@@ -41792,6 +41826,21 @@ export type WikiPageChildPagesNodeAggregationWhereInput = {
   body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  channelUniqueName_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -41896,6 +41945,7 @@ export type WikiPageCreateInput = {
   ProposedEdits?: InputMaybe<WikiPageProposedEditsFieldInput>;
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   slug: Scalars['String']['input'];
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -41938,6 +41988,7 @@ export type WikiPageEdge = {
 export type WikiPageEventPayload = {
   __typename?: 'WikiPageEventPayload';
   body?: Maybe<Scalars['String']['output']>;
+  channelUniqueName?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   slug: Scalars['String']['output'];
@@ -42253,6 +42304,7 @@ export type WikiPageRelationshipsSubscriptionWhere = {
 /** Fields to sort WikiPages by. The order in which sorts are applied is not guaranteed when specifying many fields in one WikiPageSort object. */
 export type WikiPageSort = {
   body?: InputMaybe<SortDirection>;
+  channelUniqueName?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   slug?: InputMaybe<SortDirection>;
@@ -42270,6 +42322,12 @@ export type WikiPageSubscriptionWhere = {
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   body_MATCHES?: InputMaybe<Scalars['String']['input']>;
   body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -42335,6 +42393,7 @@ export type WikiPageUpdateInput = {
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsUpdateFieldInput>>;
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorUpdateFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -42722,6 +42781,12 @@ export type WikiPageWhere = {
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   body_MATCHES?: InputMaybe<Scalars['String']['input']>;
   body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -42762,6 +42827,7 @@ export type WikiPageWikiPageChildPagesAggregationSelection = {
 export type WikiPageWikiPageChildPagesNodeAggregateSelection = {
   __typename?: 'WikiPageWikiPageChildPagesNodeAggregateSelection';
   body: StringAggregateSelection;
+  channelUniqueName: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
   slug: StringAggregateSelection;
