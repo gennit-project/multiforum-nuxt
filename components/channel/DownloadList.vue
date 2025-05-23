@@ -67,6 +67,7 @@
     searchInput,
     selectedTags,
     showArchived,
+    hasDownload: true,
     options: {
       limit: DOWNLOAD_PAGE_LIMIT,
       offset: 0,

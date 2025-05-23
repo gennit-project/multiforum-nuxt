@@ -45,6 +45,7 @@
     const result: DiscussionCreateInput = {
       title: formValues.value.title,
       body: formValues.value.body,
+      hasDownload: false,
       Tags: { connectOrCreate: tagConnections },
       Author: {
         connect: {

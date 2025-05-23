@@ -4,8 +4,9 @@
   import { useMutation } from "@vue/apollo-composable";
   import FormTitle from "@/components/FormTitle.vue";
   import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
-  import { CREATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
+  import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
   import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
+  import { usernameVar } from "@/cache";
 
   const router = useRouter();
   const route = useRoute();
@@ -27,7 +28,7 @@
     mutate: createDownload,
     loading: createDownloadLoading,
     error: createDownloadError,
-  } = useMutation(CREATE_DISCUSSION);
+  } = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
 
   const updateFormValues = (newValues: Partial<CreateEditDiscussionFormValues>) => {
     formValues.value = { ...formValues.value, ...newValues };
@@ -35,23 +36,44 @@
 
   const submitForm = async () => {
     try {
-      const result = await createDownload({
-        input: {
-          title: formValues.value.title,
-          body: formValues.value.body,
-          selectedChannels: formValues.value.selectedChannels,
-          selectedTags: formValues.value.selectedTags,
-          linkPreviews: formValues.value.linkPreviews,
-          images: formValues.value.images,
+      const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
+        onCreate: {
+          node: { text: tag },
         },
+        where: {
+          node: { text: tag },
+        },
+      }));
+
+      const discussionCreateInput = {
+        title: formValues.value.title,
+        body: formValues.value.body,
+        hasDownload: true,
+        Tags: { connectOrCreate: tagConnections },
+        Author: {
+          connect: {
+            where: {
+              node: { username: usernameVar.value },
+            },
+          },
+        },
+      };
+
+      const result = await createDownload({
+        input: [
+          {
+            discussionCreateInput,
+            channelConnections: formValues.value.selectedChannels,
+          },
+        ],
       });
 
-      if (result?.data?.createDiscussion?.id) {
+      if (result?.data?.createDiscussionWithChannelConnections?.id) {
         router.push({
           name: "forums-forumId-downloads-downloadId",
           params: {
             forumId: channelId.value,
-            downloadId: result.data.createDiscussion.id,
+            downloadId: result.data.createDiscussionWithChannelConnections.id,
           },
         });
       }
