@@ -30,7 +30,7 @@
     { channelUniqueName: forumId, slug: slug },
     {
       errorPolicy: "all",
-      skip: isHomePage.value, // Skip this query for home page
+      enabled: !isHomePage.value, // Only run this query for non-home pages
     }
   );
 
@@ -44,7 +44,7 @@
     { uniqueName: forumId },
     {
       errorPolicy: "all",
-      skip: !isHomePage.value, // Skip this query for non-home pages
+      enabled: isHomePage.value, // Only run this query for home page
     }
   );
 
