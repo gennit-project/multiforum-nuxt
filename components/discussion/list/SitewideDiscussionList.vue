@@ -59,6 +59,7 @@
     selectedChannels: selectedChannelsComputed,
     selectedTags: selectedTagsComputed,
     showArchived: false,
+    hasDownload: false,
     options: {
       limit: DISCUSSION_PAGE_LIMIT,
       offset: 0,

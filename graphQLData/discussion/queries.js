@@ -24,6 +24,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
     $selectedTags: [String!]
     $showArchived: Boolean!
     $options: DiscussionListOptions
+    $hasDownload: Boolean
   ) {
     getDiscussionsInChannel(
       channelUniqueName: $channelUniqueName
@@ -31,6 +32,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
       selectedTags: $selectedTags
       searchInput: $searchInput
       showArchived: $showArchived
+      hasDownload: $hasDownload
     ) {
       aggregateDiscussionChannelsCount
       discussionChannels {
@@ -103,6 +105,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
     $selectedTags: [String!]
     $showArchived: Boolean!
     $options: DiscussionListOptions
+    $hasDownload: Boolean
   ) {
     getSiteWideDiscussionList(
       searchInput: $searchInput
@@ -110,6 +113,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
       selectedTags: $selectedTags
       showArchived: $showArchived
       options: $options
+      hasDownload: $hasDownload
     ) {
       aggregateDiscussionCount
       discussions {
