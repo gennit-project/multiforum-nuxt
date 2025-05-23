@@ -21,6 +21,7 @@ export default defineNuxtConfig({
   vue: {
     compilerOptions: {
       whitespace: "preserve",
+      isCustomElement: (tag) => tag === "model-viewer",
     },
   },
   build: {

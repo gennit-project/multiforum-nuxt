@@ -4,6 +4,7 @@
   import EmojiButtons from "@/components/comments/EmojiButtons.vue";
   import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
   import Tag from "../../TagComponent.vue";
+  import ModelViewer from "@/components/ModelViewer.vue";
   import "md-editor-v3/lib/preview.css";
   import type { PropType } from "vue";
   import type { Discussion } from "@/__generated__/graphql";
@@ -89,6 +90,10 @@
         :word-limit="wordLimit"
       />
     </div>
+
+    <!-- 3D Model Viewer (Experiment) -->
+    <ModelViewer v-if="discussion?.hasDownload" />
+
     <slot name="album-slot" />
     <div class="mt-2 flex">
       <EmojiButtons
