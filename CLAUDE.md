@@ -233,6 +233,10 @@ When testing moderator permissions:
 - Types in `types/` directory
 - Utility functions in `utils/` directory (including permission utilities)
 
+## Data Model Notes
+
+- **Downloads**: There is no separate Download type. Downloads are discussions with the `hasDownload` field set to true. They use the Discussion type and are displayed with a different frontend skin in download-specific components.
+
 ## Working with Claude
 
 - **Incremental Changes**: Make small, focused changes rather than large sweeping changes

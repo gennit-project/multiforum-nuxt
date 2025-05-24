@@ -14,6 +14,7 @@
 
   const props = defineProps<{
     editMode: boolean;
+    downloadMode: boolean;
     createDiscussionError?: ApolloError | null;
     formValues: CreateEditDiscussionFormValues | null;
     getDiscussionError?: ApolloError | null;

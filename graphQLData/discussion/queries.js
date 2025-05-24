@@ -188,6 +188,7 @@ export const GET_DISCUSSION = gql`
       body
       createdAt
       updatedAt
+      hasDownload
       Author {
         ...AuthorFields
         ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {

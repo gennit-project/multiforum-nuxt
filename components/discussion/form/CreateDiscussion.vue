@@ -220,6 +220,7 @@
         :create-discussion-loading="createDiscussionLoading"
         :edit-mode="false"
         :form-values="formValues"
+        :download-mode="false"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

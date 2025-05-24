@@ -93,7 +93,7 @@
         routeSuffix: "downloads",
         label: "Downloads",
         icon: DownloadIcon,
-        countProperty: "DiscussionChannelsAggregate",
+        countProperty: null,
       },
       {
         name: "events",
