@@ -22,15 +22,16 @@
   const { result: getUserResult } = useQuery(
     GET_USER,
     {
-      username: usernameVar.value,
+      username: usernameVar.value || "",
     },
     {
-      enabled: !!usernameVar.value,
+      enabled: !!usernameVar.value && !!props.username,
     }
   );
 
   const profilePicURL = computed(() => {
-    return getUserResult.value?.users[0]?.profilePicURL || "";
+    if (!getUserResult.value?.users?.length) return "";
+    return getUserResult.value.users[0]?.profilePicURL || "";
   });
   const router = useRouter();
 
