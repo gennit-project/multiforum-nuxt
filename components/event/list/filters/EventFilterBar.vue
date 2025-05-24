@@ -302,7 +302,7 @@
       >
         {{ showMainFilters ? "Hide filters" : "Show filters" }}
       </button>
-      <RequireAuth 
+      <RequireAuth
         v-if="allowHidingMainFilters"
         :full-width="false"
       >
