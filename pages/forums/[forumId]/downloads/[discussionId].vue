@@ -20,10 +20,10 @@
   const discussionId = ref(updateDiscussionId());
 
   // Redirect to description tab if on the base download page
-  if (route.name === 'forums-forumId-downloads-discussionId') {
+  if (route.name === "forums-forumId-downloads-discussionId") {
     router.push({
-      name: 'forums-forumId-downloads-discussionId-description',
-      params: route.params
+      name: "forums-forumId-downloads-discussionId-description",
+      params: route.params,
     });
   }
 

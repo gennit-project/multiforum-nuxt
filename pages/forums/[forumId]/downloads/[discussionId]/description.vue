@@ -18,7 +18,11 @@
     return typeof route.params.forumId === "string" ? route.params.forumId : "";
   });
 
-  const { result: getDiscussionResult, loading, error } = useQuery(GET_DISCUSSION, {
+  const {
+    result: getDiscussionResult,
+    loading,
+    error,
+  } = useQuery(GET_DISCUSSION, {
     id: discussionId,
     loggedInModName: modProfileNameVar.value,
     channelUniqueName: channelId.value,
@@ -51,7 +55,7 @@
     </div>
     <div
       v-else
-      class="text-gray-500 dark:text-gray-400 py-8 text-center"
+      class="py-8 text-center text-gray-500 dark:text-gray-400"
     >
       No description available for this download.
     </div>

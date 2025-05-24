@@ -196,7 +196,7 @@
 
     <div
       v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
-      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+      class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
       data-testid="channel-download-list"
     >
       <ChannelDownloadListItem

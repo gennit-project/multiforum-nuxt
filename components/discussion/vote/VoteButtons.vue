@@ -138,9 +138,7 @@
           :is-permalinked="isPermalinked"
           :loading="upvoteLoading"
           :test-id="'upvote-discussion-button'"
-          :tooltip-text="
-            upvoteActive ? upvoteTooltipActive : upvoteTooltipInactive
-          "
+          :tooltip-text="upvoteActive ? upvoteTooltipActive : upvoteTooltipInactive"
           @vote="clickUp"
         >
           <span class="flex items-center gap-1">

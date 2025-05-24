@@ -40,8 +40,10 @@
 
   const showChannelSidebar = computed(() => {
     // Hide sidebar on wiki pages and download detail pages to give more reading space
-    return !`${String(route.name)}`.includes("wiki") && 
-           !`${String(route.name)}`.includes("forums-forumId-downloads-discussionId");
+    return (
+      !`${String(route.name)}`.includes("wiki") &&
+      !`${String(route.name)}`.includes("forums-forumId-downloads-discussionId")
+    );
   });
 
   const channelId = computed(() => {
