@@ -1,13 +1,11 @@
 <script>
-  import { defineComponent, ref, computed } from "vue";
+  import { defineComponent, ref, computed, onMounted, onUnmounted } from "vue";
   import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
   import { useUIStore } from "@/stores/uiStore";
-  import Popper from "vue3-popper";
 
   export default defineComponent({
     components: {
       ChevronDownIcon,
-      Popper,
     },
     props: {
       dataTestid: {
@@ -34,6 +32,20 @@
         emit("click");
       };
 
+      const handleClickOutside = (event) => {
+        if (isOpen.value && !event.target.closest('.relative')) {
+          isOpen.value = false;
+        }
+      };
+
+      onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+      });
+
+      onUnmounted(() => {
+        document.removeEventListener('click', handleClickOutside);
+      });
+
       return {
         theme,
         isOpen,
@@ -44,46 +56,26 @@
 </script>
 
 <template>
-  <div class="align-items flex">
-    <client-only>
-      <Popper
-        v-model="isOpen"
-        :close-on-content-click="false"
-        location="bottom"
-      >
-        <button
-          class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
-          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
-          :data-testid="dataTestid"
-          @click="handleClick"
-        >
-          <slot name="icon" />
-          {{ label }}
-          <ChevronDownIcon
-            aria-hidden="true"
-            class="-mr-1 ml-1 mt-0.5 h-3 w-3"
-          />
-        </button>
-        <template #content>
-          <div class="rounded-md border bg-white dark:bg-gray-700">
-            <slot name="content" />
-          </div>
-        </template>
-      </Popper>
-      <template #fallback>
-        <button
-          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
-          :data-testid="dataTestid"
-        >
-          <slot name="icon" />
-          {{ label }}
-          <ChevronDownIcon
-            aria-hidden="true"
-            class="-mr-1 ml-1 mt-0.5 h-3 w-3"
-          />
-        </button>
-      </template>
-    </client-only>
+  <div class="align-items flex relative">
+    <button
+      class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
+      :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
+      :data-testid="dataTestid"
+      @click="handleClick"
+    >
+      <slot name="icon" />
+      {{ label }}
+      <ChevronDownIcon
+        aria-hidden="true"
+        class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+      />
+    </button>
+    <div
+      v-if="isOpen"
+      class="absolute top-full left-0 z-50 mt-1 rounded-md border bg-white shadow-lg dark:bg-gray-700"
+      @click.stop
+    >
+      <slot name="content" />
+    </div>
   </div>
 </template>
