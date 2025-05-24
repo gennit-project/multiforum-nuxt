@@ -65,32 +65,22 @@ const setActiveImage = (index: number) => {
           speed: 500,
           plugins: plugins,
           licenseKey: lightGalleryLicenseKey,
-          selector: '.lg-item',
         }"
         class="flex items-center justify-center"
       >
-        <!-- Hidden gallery items for lightgallery -->
+        <!-- Gallery items for lightgallery -->
         <a
-          v-for="image in album.Images"
+          v-for="(image, index) in album.Images"
           :key="image.id"
           :href="image.url || ''"
-          class="lg-item hidden"
+          :class="{ hidden: index !== activeIndex }"
         >
           <img
             :src="image.url || ''"
             :alt="image.alt || ''"
+            class="max-h-96 max-w-96 shadow-sm object-contain cursor-pointer"
           />
         </a>
-        
-        <!-- Visible active image -->
-        <div class="lg-trigger cursor-pointer">
-          <img
-            v-if="album.Images[activeIndex]"
-            :src="album.Images[activeIndex].url || ''"
-            :alt="album.Images[activeIndex].alt || ''"
-            class="max-h-96 max-w-96 shadow-sm object-contain"
-          />
-        </div>
       </lightgallery>
 
       <!-- Thumbnails for all images -->
