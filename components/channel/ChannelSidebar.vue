@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import {  computed } from "vue";
+import { computed } from "vue";
 import type { PropType } from "vue";
 import Tag from "@/components/TagComponent.vue";
 import type { Channel } from "@/__generated__/graphql";
 import ChannelRules from "@/components/channel/Rules.vue";
 import SidebarEventList from "@/components/channel/SidebarEventList.vue";
-import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRouter, useRoute } from "nuxt/app";
 import FontSizeControl from "@/components/channel/FontSizeControl.vue";
 
@@ -31,6 +31,12 @@ const channelId = computed(() => {
 });
 
 const channelRules = computed(() => props.channel?.rules ?? "");
+
+// Check if we're on the downloads list view
+const isDownloadListView = computed(() => {
+  return route.name === "forums-forumId-downloads";
+});
+
 const filterChannelsByTag = (tag: string) => {
   router.push({
     name: "forums",
@@ -40,30 +46,32 @@ const filterChannelsByTag = (tag: string) => {
 </script>
 
 <template>
-  <div :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']" class="bg-white pb-8 pt-4 dark:bg-gray-800">
+  <div
+    :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
+    class="bg-white pb-8 pt-4 dark:bg-gray-800"
+  >
     <div v-if="channelId && channel" class="items-center gap-2" />
-    
+
     <div>
       <div class="flex justify-between">
-      <ExpandableImage
-        v-if="channel?.channelIconURL"
-        class="h-20 w-20 dark:border-gray-800"
-        :rounded="true"
-        :full-width="true"
-        :alt="channelId"
-        :src="channel?.channelIconURL ?? ''"
-      />
-      <AvatarComponent
-        v-if="!channel?.channelIconURL"
-        class="h-20 w-20 dark:border-gray-800"
-        :text="channelId"
-        :src="channel?.channelIconURL ?? ''"
-        :full-width="true"
-        :is-square="false"
-      />
-    </div>
+        <ExpandableImage
+          v-if="channel?.channelIconURL"
+          class="h-20 w-20 dark:border-gray-800"
+          :rounded="true"
+          :full-width="true"
+          :alt="channelId"
+          :src="channel?.channelIconURL ?? ''"
+        />
+        <AvatarComponent
+          v-if="!channel?.channelIconURL"
+          class="h-20 w-20 dark:border-gray-800"
+          :text="channelId"
+          :src="channel?.channelIconURL ?? ''"
+          :full-width="true"
+          :is-square="false"
+        />
+      </div>
       <div class="flex items-center w-full gap-4">
-       
         <div v-if="channelId" class="flex items-center">
           <div class="mt-3 mb-1">
             <span
@@ -87,32 +95,31 @@ const filterChannelsByTag = (tag: string) => {
       />
       <p v-else class="text-xs dark:text-white">Welcome to {{ channelId }}!</p>
     </div>
-    
+
     <slot />
 
     <div class="w-full">
       <div v-if="channel">
         <div class="mt-6 flex w-full flex-col gap-6">
-          <div
-            v-if="channelRules && channelRules !== '[]'"
-            :key="channelRules"
-          >
+          <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
             <span
               class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-scroll mr-2"/>Forum Rules
+              <i class="fa-solid fa-scroll mr-2" />Forum Rules
             </span>
             <ChannelRules :rules="channelRules" />
           </div>
-          
-          <SidebarEventList :event-channels-aggregate="eventChannelsAggregate" />
+
+          <SidebarEventList
+            :event-channels-aggregate="eventChannelsAggregate"
+          />
 
           <div v-if="channel.Tags.length > 0">
             <div class="flex justify-between border-gray-300">
               <span
                 class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
               >
-                <i class="fa-solid fa-tags mr-2"/>Tags
+                <i class="fa-solid fa-tags mr-2" />Tags
               </span>
             </div>
             <div class="mb-6 mt-2 flex flex-wrap gap-2">
@@ -126,32 +133,48 @@ const filterChannelsByTag = (tag: string) => {
             </div>
           </div>
 
-          <FontSizeControl class="mb-6" />
+          <FontSizeControl v-if="!isDownloadListView" class="mb-6" />
 
           <div class="flex justify-between">
             <span
               class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-user-shield mr-2"/>Admins
+              <i class="fa-solid fa-user-shield mr-2" />Admins
             </span>
           </div>
-          
-          <div v-if="channel.Admins.length > 0" class="flex-col space-y-2 text-sm font-bold">
+
+          <div
+            v-if="channel.Admins.length > 0"
+            class="flex-col space-y-2 text-sm font-bold"
+          >
             <div v-for="admin in channel.Admins" :key="admin.username">
               <nuxt-link
-                :to="{ name: 'u-username', params: { username: admin.username } }"
+                :to="{
+                  name: 'u-username',
+                  params: { username: admin.username },
+                }"
                 class="flex items-center dark:text-white"
               >
-                <AvatarComponent :text="admin.username" :src="admin.profilePicURL ?? ''" class="mr-2 h-6 w-6" />
+                <AvatarComponent
+                  :text="admin.username"
+                  :src="admin.profilePicURL ?? ''"
+                  class="mr-2 h-6 w-6"
+                />
                 <span class="flex flex-row items-center gap-1">
-                  <span v-if="!admin.displayName" class="font-bold">{{ admin.username }}</span>
+                  <span v-if="!admin.displayName" class="font-bold">{{
+                    admin.username
+                  }}</span>
                   <span v-else class="font-bold">{{ admin.displayName }}</span>
-                  <span v-if="admin.displayName" class="text-gray-500 dark:text-gray-300">{{ `(u/${admin.username})` }}</span>
+                  <span
+                    v-if="admin.displayName"
+                    class="text-gray-500 dark:text-gray-300"
+                    >{{ `(u/${admin.username})` }}</span
+                  >
                 </span>
               </nuxt-link>
             </div>
           </div>
-          
+
           <p v-else class="my-3 mb-6 text-sm dark:text-gray-400">
             This forum does not have any admins.
           </p>
