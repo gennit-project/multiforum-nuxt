@@ -12797,10 +12797,10 @@ thenify-all@^1.0.0:
   dependencies:
     any-promise "^1.0.0"
 
-three@^0.172.0, "three@>= 0.159.0":
-  version "0.172.0"
-  resolved "https://registry.npmjs.org/three/-/three-0.172.0.tgz"
-  integrity sha512-6HMgMlzU97MsV7D/tY8Va38b83kz8YJX+BefKjspMNAv0Vx6dxMogHOrnRl/sbMIs3BPUKijPqDqJ/+UwJbIow==
+three@^0.172.0, three@^0.176.0, "three@>= 0.159.0":
+  version "0.176.0"
+  resolved "https://registry.npmjs.org/three/-/three-0.176.0.tgz"
+  integrity sha512-PWRKYWQo23ojf9oZSlRGH8K09q7nRSWx6LY/HF/UUrMdYgN9i1e2OwJYHoQjwc6HF/4lvvYLC5YC1X8UJL2ZpA==
 
 throttle-debounce@^2.1.0:
   version "2.3.0"

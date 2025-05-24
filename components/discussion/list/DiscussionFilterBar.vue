@@ -56,6 +56,11 @@
     return "";
   });
 
+  // Check if we're on the downloads page
+  const isDownloadPage = computed(() => {
+    return route.name && route.name.toString().includes("downloads");
+  });
+
   // Local reactive state for filter values
   const filterValues = ref<SearchDiscussionValues>(
     getFilterValuesFromParams({
@@ -189,8 +194,11 @@
             </div>
           </template>
         </FilterChip>
-        <!-- Expand/Collapse Button Group -->
-        <div class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600">
+        <!-- Expand/Collapse Button Group (hidden in download mode) -->
+        <div
+          v-if="!isDownloadPage"
+          class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
+        >
           <!-- Expand All Button -->
           <button
             aria-label="Expand all discussions"
@@ -263,14 +271,14 @@
           <template #has-auth>
             <PrimaryButton
               class="mx-2"
-              :label="'New Discussion'"
+              :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
               @click="$router.push(`/forums/${channelId}/discussions/create`)"
             />
           </template>
           <template #does-not-have-auth>
             <PrimaryButton
               class="mx-2"
-              :label="'New Discussion'"
+              :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
             />
           </template>
         </RequireAuth>
