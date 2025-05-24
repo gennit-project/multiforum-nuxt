@@ -31,7 +31,7 @@
       shadow-intensity="0.4"
       environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
       tone-mapping="neutral"
-      style="width: 100%; height: 400px; border-radius: 8px"
+      style="width: 100%; height: 300px; border-radius: 8px"
     >
     </model-viewer>
 
@@ -43,9 +43,11 @@
     >
       <!-- Close button -->
       <button
-        class="z-60 absolute right-4 top-4 rounded-md bg-black bg-opacity-50 p-3 text-white transition-all duration-200 hover:bg-opacity-70"
+        class="absolute right-4 top-4 z-[100] rounded-md bg-black bg-opacity-50 p-3 text-white transition-all duration-200 hover:bg-opacity-70"
         title="Close fullscreen"
-        @click="closeFullscreen"
+        @click.stop="closeFullscreen"
+        @mousedown.stop
+        @touchstart.stop
       >
         <svg
           class="h-6 w-6"
@@ -74,7 +76,7 @@
           "
           alt="3D Model Preview - Fullscreen"
           camera-controls
-          style="width: 100%; height: 100%; border-radius: 8px"
+          style="width: 100%; height: 95%; border-radius: 8px"
           exposure="0.8"
           shadow-intensity="0.4"
           environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
