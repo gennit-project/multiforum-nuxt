@@ -72,7 +72,6 @@ export const getDiscussionHeaderMenuItems = (params: {
         label: "Add Album",
         event: "handleAddAlbum",
         icon: ALLOWED_ICONS.ADD_ALBUM,
-        value: discussionId,
       });
     }
     menuItems.push({
