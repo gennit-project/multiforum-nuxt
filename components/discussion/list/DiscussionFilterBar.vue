@@ -322,7 +322,7 @@
           </div>
         </template>
       </FilterChip>
-      <div class="flex items-center gap-2 pr-2 text-sm">
+      <div v-if="isForumScoped" class="flex items-center gap-2 pr-2 text-sm">
         <CheckBox
           :checked="filterValues.showArchived"
           class="align-middle"
