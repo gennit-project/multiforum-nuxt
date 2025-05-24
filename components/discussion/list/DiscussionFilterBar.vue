@@ -106,6 +106,10 @@ const updateSearchInput = (searchInput: string) => {
     params: { searchInput },
   });
 };
+// Check if we're on the downloads page
+const isDownloadPage = computed(() => {
+  return route.name && route.name.toString().includes("downloads");
+});
 
 const toggleSelectedChannel = (channel: string) => {
   if (!filterValues.value.channels) {
@@ -194,9 +198,10 @@ const collapseAll = () => {
             </div>
           </template>
         </FilterChip>
-        <!-- Expand/Collapse Button Group -->
+        <!-- Expand/Collapse Button Group (hidden in download mode) -->
         <div
-          class="flex border border-gray-800 dark:border-gray-600 rounded-md overflow-hidden"
+          v-if="!isDownloadPage"
+          class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
         >
           <!-- Expand All Button -->
           <button
@@ -271,12 +276,15 @@ const collapseAll = () => {
           <template #has-auth>
             <PrimaryButton
               class="mx-2"
-              :label="'New Discussion'"
+              :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
               @click="$router.push(`/forums/${channelId}/discussions/create`)"
             />
           </template>
           <template #does-not-have-auth>
-            <PrimaryButton class="mx-2" :label="'New Discussion'" />
+            <PrimaryButton
+              class="mx-2"
+              :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
+            />
           </template>
         </RequireAuth>
       </div>
