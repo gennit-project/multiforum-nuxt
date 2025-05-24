@@ -381,6 +381,12 @@
                             @album-updated="refetchDiscussion"
                             @edit-album="handleEditAlbum"
                           />
+                          <div
+                            v-else
+                            class="flex h-48 w-full items-center justify-center border border-gray-300 bg-gray-100 text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                          >
+                            No image available
+                          </div>
                         </div>
                       </template>
                       <template #activity-feed-slot>
@@ -446,6 +452,12 @@
                         @album-updated="refetchDiscussion"
                         @edit-album="handleEditAlbum"
                       />
+                      <div
+                        v-else
+                        class="flex h-48 w-full items-center justify-center border border-gray-300 bg-gray-100 text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
+                      >
+                        No image available
+                      </div>
                     </div>
                   </template>
                   <template #activity-feed-slot>

@@ -70,7 +70,10 @@ export default defineNuxtConfig({
                       });
                     }
 
-                    return forward(operation);
+                    return forward(operation).map((result) => {
+                      // Handle successful responses
+                      return result;
+                    });
                   });
 
                   // Return the combined link
@@ -85,10 +88,12 @@ export default defineNuxtConfig({
               watchQuery: {
                 errorPolicy: "all",
                 notifyOnNetworkStatusChange: true,
+                fetchPolicy: "cache-first",
               },
               query: {
                 errorPolicy: "all",
                 notifyOnNetworkStatusChange: true,
+                fetchPolicy: "cache-first",
               },
               mutation: {
                 errorPolicy: "all",
@@ -96,6 +101,13 @@ export default defineNuxtConfig({
             },
             // Add global error handler to detect expired tokens and retry operations
             onError: async (error) => {
+              // Ignore canceled requests to prevent console spam
+              if (error.networkError?.name === "AbortError" || 
+                  error.networkError?.message?.includes("aborted") ||
+                  error.networkError?.message?.includes("canceled")) {
+                return;
+              }
+
               // Check if the error is related to authentication
               const isAuthError = error.graphQLErrors?.some(
                 (e) =>
