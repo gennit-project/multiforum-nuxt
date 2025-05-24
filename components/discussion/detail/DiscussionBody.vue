@@ -85,7 +85,10 @@
 <template>
   <div class="flex flex-col gap-2">
     <!-- 3D Model Viewer (Experiment) -->
-    <ModelViewer v-if="discussion?.hasDownload" />
+    <ModelViewer
+      v-if="discussion?.hasDownload && discussion?.downloadPreviewUrl"
+      :model-url="discussion.downloadPreviewUrl"
+    />
     <div
       v-if="discussion?.body && !downloadMode"
       class="rounded"

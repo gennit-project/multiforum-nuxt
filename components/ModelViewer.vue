@@ -22,7 +22,8 @@
     </button>
 
     <model-viewer
-      src="https://storage.googleapis.com/listical-dev/models/Tiny_Khopesh_Warrior_Posed_and_Rigged.glb"
+      v-if="modelUrl"
+      :src="modelUrl"
       alt="3D Model Preview"
       auto-rotate
       camera-controls
@@ -86,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, ref } from "vue";
+  import { onMounted, onUnmounted, ref } from "vue";
 
   const props = defineProps<{
     modelUrl?: string;
