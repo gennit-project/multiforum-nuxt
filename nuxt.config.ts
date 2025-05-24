@@ -1,5 +1,6 @@
 import { defineNuxtConfig } from "nuxt/config";
 import { config } from "./config";
+import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 import path from "path";
 import { inMemoryCacheOptions } from "./cache";
 
@@ -194,7 +195,6 @@ export default defineNuxtConfig({
     ],
     // Light/dark mode support
     "@nuxtjs/color-mode",
-    ["vuetify-nuxt-module"],
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
     [
@@ -249,6 +249,7 @@ export default defineNuxtConfig({
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
+    { src: "@/plugins/vuetify", mode: "all" },
     { src: "@/plugins/performance.client", mode: "client" },
   ],
   runtimeConfig: {
@@ -275,10 +276,16 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
   vite: {
+    plugins: [vuetify({ autoImport: true })],
     resolve: {
       alias: {
         "@": path.resolve(__dirname),
         "fast-deep-equal": "fast-deep-equal/es6/index.js",
+      },
+    },
+    vue: {
+      template: {
+        transformAssetUrls,
       },
     },
     // Allow connections from ngrok for mobile testing
