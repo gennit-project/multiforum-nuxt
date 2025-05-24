@@ -321,6 +321,7 @@
         :get-discussion-error="getDiscussionError"
         :update-discussion-error="updateDiscussionError"
         :update-discussion-loading="updateDiscussionLoading"
+        :download-mode="false"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

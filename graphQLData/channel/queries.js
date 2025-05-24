@@ -139,7 +139,11 @@ export const GET_CHANNEL = gql`
       Moderators {
         displayName
       }
-      DiscussionChannelsAggregate(where: { NOT: { archived: true, Discussion: null } }) {
+      DiscussionChannelsAggregate(
+        where: {
+          NOT: { archived: true, OR: [{ Discussion: null }, { Discussion: { hasDownload: true } }] }
+        }
+      ) {
         count
       }
       IssuesAggregate(where: { isOpen: true }) {

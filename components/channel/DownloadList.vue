@@ -4,7 +4,7 @@
   import { useQuery } from "@vue/apollo-composable";
   import { useUIStore } from "@/stores/uiStore";
   import { storeToRefs } from "pinia";
-  import ChannelDiscussionListItem from "../discussion/list/ChannelDiscussionListItem.vue";
+  import ChannelDownloadListItem from "../discussion/list/ChannelDownloadListItem.vue";
   import LoadMore from "../LoadMore.vue";
   import ErrorBanner from "../ErrorBanner.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
@@ -194,12 +194,12 @@
       </RequireAuth>
     </p>
 
-    <ul
+    <div
       v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
-      class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
       data-testid="channel-download-list"
     >
-      <ChannelDiscussionListItem
+      <ChannelDownloadListItem
         v-for="discussionChannel in downloadChannelResult.getDiscussionsInChannel
           .discussionChannels"
         :key="`${discussionChannel.id}-${expandChannelDiscussions}`"
@@ -213,7 +213,7 @@
         @filter-by-tag="filterByTag"
         @open-mod-profile="showModProfileModal = true"
       />
-    </ul>
+    </div>
     <div v-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0">
       <LoadMore
         class="mb-6 justify-self-center"
