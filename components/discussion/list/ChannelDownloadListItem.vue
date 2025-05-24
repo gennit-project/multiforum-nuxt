@@ -108,7 +108,7 @@
             query: filteredQuery,
           }"
         >
-          <div class="h-72 w-72 border"/>
+          <div class="aspect-square w-full border bg-gray-100 dark:bg-gray-700"/>
         </nuxt-link>
         <div class="flex gap-3">
           <div class="w-full flex-col">
