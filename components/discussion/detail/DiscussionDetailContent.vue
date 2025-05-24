@@ -30,9 +30,12 @@
   import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
-  // Lazy load the album component since it's not needed for initial render
+  // Lazy load the album components since they're not needed for initial render
   const DiscussionAlbum = defineAsyncComponent(
     () => import("@/components/discussion/detail/DiscussionAlbum.vue")
+  );
+  const LightgalleryAlbum = defineAsyncComponent(
+    () => import("@/components/discussion/detail/LightgalleryAlbum.vue")
   );
   import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
 
@@ -368,7 +371,7 @@
                     >
                       <template #album-slot>
                         <div class="bg-black text-white">
-                          <DiscussionAlbum
+                          <LightgalleryAlbum
                             v-if="
                               discussion?.Album &&
                               discussion?.Album?.Images &&
@@ -376,37 +379,12 @@
                             "
                             :album="discussion.Album"
                             :carousel-format="true"
-                            :discussion-author="discussion.Author?.username || ''"
-                            :discussion-id="discussionId"
-                            @album-updated="refetchDiscussion"
-                            @edit-album="handleEditAlbum"
                           />
                           <div
                             v-else
                             class="flex h-48 w-full items-center justify-center border border-gray-300 bg-gray-100 text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
                           >
                             No image available
-                          </div>
-                        </div>
-                        <!-- Thumbnails for 2nd-5th images (download mode only) -->
-                        <div
-                          v-if="
-                            discussion?.Album &&
-                            discussion?.Album?.Images &&
-                            discussion?.Album?.Images.length > 1
-                          "
-                          class="mt-4 grid grid-cols-4 gap-2"
-                        >
-                          <div
-                            v-for="(image, index) in discussion.Album.Images.slice(1, 5)"
-                            :key="`thumbnail-${index}`"
-                            class="aspect-square overflow-hidden rounded border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700"
-                          >
-                            <img
-                              :src="image.url"
-                              :alt="`Thumbnail ${index + 2}`"
-                              class="h-full w-full cursor-pointer object-cover transition-opacity hover:opacity-80"
-                            />
                           </div>
                         </div>
                       </template>
