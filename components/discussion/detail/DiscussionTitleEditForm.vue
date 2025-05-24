@@ -108,6 +108,14 @@
       year: "numeric",
     });
   });
+
+  const isDownloadDetailPage = computed(() => {
+    return (
+      route.name &&
+      typeof route.name === "string" &&
+      route.name.includes("forums-forumId-downloads-discussionId")
+    );
+  });
 </script>
 
 <template>
@@ -174,9 +182,15 @@
             @click="onClickEdit"
           />
           <CreateButton
-            v-if="!titleEditMode"
+            v-if="!titleEditMode && !isDownloadDetailPage"
             class="ml-2"
             :label="'New Discussion'"
+            :to="`/forums/${channelId}/discussions/create`"
+          />
+          <CreateButton
+            v-if="!titleEditMode && isDownloadDetailPage"
+            class="ml-2"
+            :label="'New Upload'"
             :to="`/forums/${channelId}/discussions/create`"
           />
           <PrimaryButton
@@ -197,8 +211,14 @@
         </template>
         <template #does-not-have-auth>
           <PrimaryButton
+            v-if="!isDownloadDetailPage"
             class="ml-2"
             :label="'New Discussion'"
+          />
+          <PrimaryButton
+            v-else
+            class="ml-2"
+            :label="'New Upload'"
           />
         </template>
       </RequireAuth>
