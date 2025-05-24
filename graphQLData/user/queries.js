@@ -32,9 +32,7 @@ export const GET_USER = gql`
       CommentsAggregate(where: { NOT: { archived: true } }) {
         count
       }
-      DiscussionsAggregate(
-        where: { NOT: { archived: true, Discussion: null, hasDownload: true } }
-      ) {
+      DiscussionsAggregate(where: { NOT: { hasDownload: true } }) {
         count
       }
       EventsAggregate {
