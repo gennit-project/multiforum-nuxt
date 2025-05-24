@@ -277,7 +277,10 @@
               />
             </span>
             <template #fallback>
-              <span v-if="commentData.updatedAt" class="flex items-center">
+              <span
+                v-if="commentData.updatedAt"
+                class="flex items-center"
+              >
                 Edited recently
                 <CommentEditsDropdown
                   v-if="hasRevisionHistory"

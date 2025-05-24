@@ -322,14 +322,17 @@
           </div>
         </template>
       </FilterChip>
-      <div v-if="isForumScoped" class="flex items-center gap-2 pr-2 text-sm">
+      <div
+        v-if="isForumScoped"
+        class="flex items-center gap-2 pr-2 text-sm"
+      >
         <CheckBox
           :checked="filterValues.showArchived"
           class="align-middle"
           data-testid="show-archived-discussions"
           @input="updateShowArchived"
         />
-        {{ isDownloadPage ? 'Show archived downloads' : 'Show archived discussions' }}
+        {{ isDownloadPage ? "Show archived downloads" : "Show archived discussions" }}
       </div>
     </div>
   </div>
