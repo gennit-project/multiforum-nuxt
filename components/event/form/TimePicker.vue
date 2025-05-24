@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, computed } from "vue";
+  import { ref, computed, onMounted, onUnmounted } from "vue";
   import { DateTime } from "luxon";
 
   const props = defineProps({
@@ -20,12 +20,21 @@
   const emit = defineEmits(["update"]);
 
   const isDropdownOpen = ref(false);
+  const dropdownRef = ref<HTMLElement | null>(null);
 
-  // Format the display time in 12-hour clock format
+  // Format the display time in 12-hour clock format with error handling
   const formattedTime = computed(() => {
-    const time = DateTime.fromFormat(props.value, "HH:mm");
-    if (!time.isValid) return props.value;
-    return time.toFormat("h:mm a"); // 12-hour format with AM/PM, no leading zeros
+    try {
+      const time = DateTime.fromFormat(props.value, "HH:mm");
+      if (!time.isValid) {
+        console.warn("Invalid time format:", props.value);
+        return props.value;
+      }
+      return time.toFormat("h:mm a"); // 12-hour format with AM/PM, no leading zeros
+    } catch (error) {
+      console.error("Error formatting time:", error);
+      return props.value;
+    }
   });
 
   // Generate time options for the dropdown (15-minute intervals)
@@ -71,6 +80,22 @@
   const closeDropdown = () => {
     isDropdownOpen.value = false;
   };
+
+  // Handle clicks outside the dropdown to close it
+  const handleClickOutside = (event: MouseEvent) => {
+    if (dropdownRef.value && !dropdownRef.value.contains(event.target as Node)) {
+      closeDropdown();
+    }
+  };
+
+  // Add/remove event listeners for click outside functionality
+  onMounted(() => {
+    document.addEventListener("click", handleClickOutside);
+  });
+
+  onUnmounted(() => {
+    document.removeEventListener("click", handleClickOutside);
+  });
 </script>
 
 <template>
@@ -93,7 +118,7 @@
     <!-- Custom dropdown for time selection -->
     <div
       v-if="isDropdownOpen"
-      v-click-outside="closeDropdown"
+      ref="dropdownRef"
       class="touch-scroll-y absolute left-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
       style="-webkit-overflow-scrolling: touch; scrollbar-width: thin"
     >
