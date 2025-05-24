@@ -388,6 +388,27 @@
                             No image available
                           </div>
                         </div>
+                        <!-- Thumbnails for 2nd-5th images (download mode only) -->
+                        <div
+                          v-if="
+                            discussion?.Album &&
+                            discussion?.Album?.Images &&
+                            discussion?.Album?.Images.length > 1
+                          "
+                          class="mt-4 grid grid-cols-4 gap-2"
+                        >
+                          <div
+                            v-for="(image, index) in discussion.Album.Images.slice(1, 5)"
+                            :key="`thumbnail-${index}`"
+                            class="aspect-square overflow-hidden rounded border border-gray-300 bg-gray-100 dark:border-gray-600 dark:bg-gray-700"
+                          >
+                            <img
+                              :src="image.url"
+                              :alt="`Thumbnail ${index + 2}`"
+                              class="h-full w-full cursor-pointer object-cover transition-opacity hover:opacity-80"
+                            />
+                          </div>
+                        </div>
                       </template>
                       <template #activity-feed-slot>
                         <DiscussionTitleVersions
@@ -452,12 +473,6 @@
                         @album-updated="refetchDiscussion"
                         @edit-album="handleEditAlbum"
                       />
-                      <div
-                        v-else
-                        class="flex h-48 w-full items-center justify-center border border-gray-300 bg-gray-100 text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                      >
-                        No image available
-                      </div>
                     </div>
                   </template>
                   <template #activity-feed-slot>
