@@ -34,9 +34,13 @@ export const GET_USER = gql`
       CommentsAggregate(where: { NOT: { archived: true } }) {
         count
       }
+<<<<<<< HEAD
       DiscussionsAggregate(
         where: { NOT: { Discussion: null, hasDownload: true } }
       ) {
+=======
+      DiscussionsAggregate(where: { NOT: { hasDownload: true } }) {
+>>>>>>> edaf87c (No longer have graphql error on GET_USER)
         count
       }
       EventsAggregate {
