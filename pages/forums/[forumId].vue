@@ -241,6 +241,7 @@
                   class="w-full border-b border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
                   :desktop="false"
                   :route="route"
+                  :show-about-tab="!showChannelSidebar"
                   :show-counts="true"
                   :vertical="false"
                 />
