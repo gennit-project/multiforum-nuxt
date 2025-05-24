@@ -31,6 +31,7 @@
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
   import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
+  import MarkdownPreview from "@/components/MarkdownPreview.vue";
 
   const COMMENT_LIMIT = 50;
 
@@ -40,6 +41,10 @@
       required: true,
     },
     compactMode: {
+      type: Boolean,
+      default: false,
+    },
+    downloadMode: {
       type: Boolean,
       default: false,
     },
@@ -119,6 +124,7 @@
 
   const discussionBodyEditMode = ref(false);
   const albumEditMode = ref(false);
+  const activeTab = ref("description");
 
   const discussion = computed<Discussion | null>(() => {
     const currentDiscussion = getDiscussionResult.value?.discussions[0];
@@ -348,7 +354,9 @@
                   :channel-id="channelId"
                   :discussion="discussion"
                   :discussion-channel-id="activeDiscussionChannel?.id"
+                  :download-mode="downloadMode"
                   :emoji-json="activeDiscussionChannel?.emoji"
+                  :show-emoji-button="!downloadMode"
                 >
                   <template #album-slot>
                     <div class="bg-black text-white">
@@ -392,6 +400,7 @@
                         :discussion="discussion"
                         :discussion-channel="activeDiscussionChannel"
                         :show-downvote="!loggedInUserIsAuthor"
+                        :use-heart-icon="downloadMode"
                         @handle-click-edit-feedback="handleClickEditFeedback"
                         @handle-click-give-feedback="handleClickGiveFeedback"
                         @handle-click-undo-feedback="handleClickUndoFeedback"
@@ -404,7 +413,44 @@
           </div>
         </div>
 
-        <div>
+        <div v-if="downloadMode">
+          <!-- Download mode tabs -->
+          <div class="border-b border-gray-200 dark:border-gray-700">
+            <nav class="flex space-x-8 px-2">
+              <nuxt-link
+                :to="{
+                  name: 'forums-forumId-downloads-discussionId-description',
+                  params: { forumId: channelId, discussionId: props.discussionId }
+                }"
+                class="border-b-2 py-2 px-1 text-sm font-medium"
+                :class="$route.name?.includes('description') 
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400' 
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+              >
+                Description
+              </nuxt-link>
+              <nuxt-link
+                :to="{
+                  name: 'forums-forumId-downloads-discussionId-comments',
+                  params: { forumId: channelId, discussionId: props.discussionId }
+                }"
+                class="border-b-2 py-2 px-1 text-sm font-medium"
+                :class="$route.name?.includes('comments')
+                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+              >
+                Comments ({{ commentCount }})
+              </nuxt-link>
+            </nav>
+          </div>
+          
+          <!-- Tab content via router-view -->
+          <div class="mt-4">
+            <NuxtPage />
+          </div>
+        </div>
+        
+        <div v-else>
           <div class="my-6 px-2 pt-2">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
