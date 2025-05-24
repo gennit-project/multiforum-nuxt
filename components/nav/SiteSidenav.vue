@@ -9,6 +9,7 @@
   import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
   import ChannelIcon from "@/components/icons/ChannelIcon.vue";
   import XIcon from "@/components/icons/XmarkIcon.vue";
+  import AvatarComponent from "@/components/AvatarComponent.vue";
   import { GET_USER } from "@/graphQLData/user/queries";
   import { useDisplay } from "vuetify";
   import CreateAnythingButton from "./CreateAnythingButton.vue";
@@ -212,15 +213,6 @@
                 "
               >
                 <AvatarComponent
-                  v-if="forum?.channelIconURL"
-                  class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-300"
-                  :is-small="true"
-                  :is-square="false"
-                  :src="forum?.channelIconURL ?? ''"
-                  :text="forum.uniqueName || ''"
-                />
-                <AvatarComponent
-                  v-if="!forum?.channelIconURL"
                   class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-300"
                   :is-small="true"
                   :is-square="false"
