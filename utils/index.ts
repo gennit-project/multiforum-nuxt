@@ -279,13 +279,17 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   // Set the content type based on the file type or extension
   const contentType =
     file.type ||
-    (file.name.endsWith(".jpg") || file.name.endsWith(".jpeg")
-      ? "image/jpeg"
-      : file.name.endsWith(".png")
-        ? "image/png"
-        : file.name.endsWith(".gif")
-          ? "image/gif"
-          : "application/octet-stream");
+    (() => {
+      if (file.name.endsWith(".jpg") || file.name.endsWith(".jpeg")) {
+        return "image/jpeg";
+      } else if (file.name.endsWith(".png")) {
+        return "image/png";
+      } else if (file.name.endsWith(".gif")) {
+        return "image/gif";
+      } else {
+        return "application/octet-stream";
+      }
+    })();
 
   console.log("Using content type:", contentType);
   console.log("Upload starting...");
