@@ -42,6 +42,7 @@ export const discussions: DiscussionCreateInputWithChannels[] = baseDiscussions.
     discussionCreateInput: {
       title,
       ...(body && { body }),
+      hasDownload: false,
       Author: {
         connect: {
           where: {
