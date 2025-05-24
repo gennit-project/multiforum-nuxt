@@ -38,12 +38,12 @@
   <div class="relative">
     <input
       ref="inputRef"
-      class="dark:[&::-webkit-calendar-picker-indicator]:filter-invert-[0.8] [color-scheme:light_dark]"
       :class="baseStyles"
       :data-testid="testId"
       :disabled="disabled"
       type="date"
       :value="value"
+      style="color-scheme: light dark"
       @input="handleChange"
     />
     <!-- Using only the native calendar icon -->
