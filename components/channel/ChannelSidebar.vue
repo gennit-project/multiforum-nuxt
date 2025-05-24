@@ -31,12 +31,12 @@
   });
 
   const channelRules = computed(() => props.channel?.rules ?? "");
-  
+
   // Check if we're on the downloads list view
   const isDownloadListView = computed(() => {
     return route.name === "forums-forumId-downloads";
   });
-  
+
   const filterChannelsByTag = (tag: string) => {
     router.push({
       name: "forums",
