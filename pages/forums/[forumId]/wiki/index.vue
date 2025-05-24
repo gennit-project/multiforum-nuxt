@@ -82,14 +82,14 @@
       <RequireAuth>
         <template #has-auth>
           <GenericButton
-            :label="'Create Wiki Page'"
+            :text="'Create Wiki Page'"
             @click="createWikiPage"
           >
             <DocumentIcon class="mr-2 h-5 w-5" />
           </GenericButton>
         </template>
         <template #does-not-have-auth>
-          <GenericButton :label="'Create Wiki Page'">
+          <GenericButton :text="'Create Wiki Page'">
             <DocumentIcon class="mr-2 h-5 w-5" />
           </GenericButton>
         </template>

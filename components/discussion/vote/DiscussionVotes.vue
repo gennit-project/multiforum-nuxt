@@ -23,6 +23,10 @@
       type: Boolean,
       default: true,
     },
+    useHeartIcon: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   const emit = defineEmits([
@@ -61,6 +65,27 @@
   );
   const upvoteCount = computed(() => props.discussionChannel?.UpvotedByUsersAggregate?.count || 0);
   const downvoteCount = computed(() => props.discussion?.FeedbackCommentsAggregate?.count || 0);
+  const upvoteIcon = computed(() => {
+    if (props.useHeartIcon) {
+      return loggedInUserUpvoted.value ? "fa-solid fa-heart" : "fa-regular fa-heart";
+    }
+    return "fa-solid fa-arrow-up";
+  });
+
+  const upvoteTooltips = computed(() => {
+    if (props.useHeartIcon) {
+      return {
+        active: "Undo like",
+        inactive: "Like this post",
+        unauthenticated: "Like this post",
+      };
+    }
+    return {
+      active: "Undo upvote",
+      inactive: "Upvote to make this discussion more visible",
+      unauthenticated: "Make this discussion more visible to others",
+    };
+  });
 
   async function handleClickUp() {
     if (loggedInUserUpvoted.value) {
@@ -121,7 +146,11 @@
     :show-downvote="showDownvote"
     :upvote-active="loggedInUserUpvoted"
     :upvote-count="upvoteCount"
+    :upvote-icon="upvoteIcon"
     :upvote-loading="upvoteDiscussionChannelLoading || undoUpvoteDiscussionChannelLoading"
+    :upvote-tooltip-active="upvoteTooltips.active"
+    :upvote-tooltip-inactive="upvoteTooltips.inactive"
+    :upvote-tooltip-unauthenticated="upvoteTooltips.unauthenticated"
     @click-up="handleClickUp"
     @edit-feedback="handleClickEditFeedback"
     @give-feedback="handleClickGiveFeedback"

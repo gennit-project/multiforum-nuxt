@@ -141,7 +141,11 @@ export const GET_CHANNEL = gql`
       }
       DiscussionChannelsAggregate(
         where: {
-          NOT: { archived: true, OR: [{ Discussion: null }, { Discussion: { hasDownload: true } }] }
+          AND: [
+            { NOT: { archived: true } }
+            { NOT: { Discussion: null } }
+            { NOT: { Discussion: { hasDownload: true } } }
+          ]
         }
       ) {
         count
@@ -259,7 +263,15 @@ export const GET_CHANNELS = gql`
         EventChannelsAggregate {
           count
         }
-        DiscussionChannelsAggregate {
+        DiscussionChannelsAggregate(
+          where: {
+            AND: [
+              { NOT: { archived: true } }
+              { NOT: { Discussion: null } }
+              { NOT: { Discussion: { hasDownload: true } } }
+            ]
+          }
+        ) {
           count
         }
       }
