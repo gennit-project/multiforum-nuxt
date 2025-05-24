@@ -332,6 +332,7 @@ export default defineComponent({
         :update-discussion-error="updateDiscussionError"
         :form-values="formValues"
         :update-discussion-loading="updateDiscussionLoading"
+        :download-mode="false"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

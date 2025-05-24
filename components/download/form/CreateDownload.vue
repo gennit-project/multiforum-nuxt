@@ -101,6 +101,7 @@
       :form-values="formValues"
       :create-discussion-error="createDownloadError"
       :create-discussion-loading="createDownloadLoading"
+      :download-mode="true"
       @submit="submitForm"
       @update-form-values="updateFormValues"
     />

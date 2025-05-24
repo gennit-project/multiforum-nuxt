@@ -110,7 +110,7 @@
   };
 
   onMounted(async () => {
-    if (process.client) {
+    if (import.meta.env) {
       await import("@google/model-viewer");
     }
   });

@@ -31,10 +31,12 @@ export const GET_USER = gql`
       ) {
         count
       }
-      CommentsAggregate {
+      CommentsAggregate(where: { NOT: { archived: true } }) {
         count
       }
-      DiscussionsAggregate {
+      DiscussionsAggregate(
+        where: { NOT: { archived: true, Discussion: null, hasDownload: true } }
+      ) {
         count
       }
       EventsAggregate {

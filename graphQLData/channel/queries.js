@@ -141,6 +141,16 @@ export const GET_CHANNEL = gql`
       }
       DiscussionChannelsAggregate(
         where: {
+          NOT: { archived: true, OR: [{ Discussion: null }, { Discussion: { hasDownload: true } }] }
+        }
+      ) {
+        count
+      }
+      IssuesAggregate(where: { isOpen: true }) {
+        count
+      }
+      EventChannelsAggregate(
+        where: {
           NOT: {
             archived: true,
             Discussion: null

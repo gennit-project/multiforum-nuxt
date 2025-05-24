@@ -12,16 +12,17 @@ import TailwindForm from "@/components/FormComponent.vue";
 import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 import AlbumEditForm from "../detail/AlbumEditForm.vue";
 
-const props = defineProps<{
-  editMode: boolean;
-  createDiscussionError?: ApolloError | null;
-  formValues: CreateEditDiscussionFormValues | null;
-  getDiscussionError?: ApolloError | null;
-  updateDiscussionError?: ApolloError | null;
-  discussionLoading?: boolean;
-  createDiscussionLoading?: boolean;
-  updateDiscussionLoading?: boolean;
-}>();
+  const props = defineProps<{
+    editMode: boolean;
+    downloadMode: boolean;
+    createDiscussionError?: ApolloError | null;
+    formValues: CreateEditDiscussionFormValues | null;
+    getDiscussionError?: ApolloError | null;
+    updateDiscussionError?: ApolloError | null;
+    discussionLoading?: boolean;
+    createDiscussionLoading?: boolean;
+    updateDiscussionLoading?: boolean;
+  }>();
 
 defineEmits(["submit", "updateFormValues"]);
 
