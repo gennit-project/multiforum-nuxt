@@ -327,7 +327,7 @@ const collapseAll = () => {
           </div>
         </template>
       </FilterChip>
-      <div class="flex items-center gap-2 text-sm pr-2">
+      <div v-if="isForumScoped" class="flex items-center gap-2 pr-2 text-sm">
         <CheckBox
           data-testid="show-archived-discussions"
           class="align-middle"
