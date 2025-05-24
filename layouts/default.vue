@@ -86,8 +86,21 @@
               console.log("Token refreshed successfully");
               isSessionExpired.value = false;
             } catch (refreshError) {
-              console.error("Failed to refresh token, logging out locally:", refreshError);
+              console.error("Failed to refresh token:", refreshError);
               isSessionExpired.value = true;
+
+              // If it's an invalid_grant error, clear auth state immediately
+              if (
+                refreshError.error === "invalid_grant" ||
+                (refreshError.error_description &&
+                  refreshError.error_description.includes("refresh token"))
+              ) {
+                setIsAuthenticated(false);
+                setUsername("");
+                setModProfileName("");
+                setNotificationCount(0);
+                setProfilePicURL("");
+              }
             }
           }
         }
@@ -150,9 +163,18 @@
           error &&
           (error.error === "login_required" ||
             error.error === "unauthorized" ||
-            (error.message && error.message.includes("expired")))
+            error.error === "invalid_grant" ||
+            (error.message && error.message.includes("expired")) ||
+            (error.error_description && error.error_description.includes("refresh token")))
         ) {
           console.error("Auth0 error detected:", error);
+          // Clear any cached authentication state
+          setIsAuthenticated(false);
+          setUsername("");
+          setModProfileName("");
+          setNotificationCount(0);
+          setProfilePicURL("");
+
           auth0.logout({
             logoutParams: {
               returnTo: window.location.href,
