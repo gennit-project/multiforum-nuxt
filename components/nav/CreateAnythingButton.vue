@@ -123,13 +123,6 @@
                 aria-hidden="true"
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3"
               />
-              <v-tooltip
-                v-if="showTooltip && !usePrimaryButton"
-                activator="parent"
-                location="bottom"
-              >
-                Create new...
-              </v-tooltip>
             </button>
           </template>
 
@@ -195,15 +188,6 @@
           class="-mr-1 ml-1 mt-0.5 h-3 w-3"
         />
       </button>
-      <client-only>
-        <v-tooltip
-          v-if="showFooter"
-          activator="parent"
-          location="bottom"
-        >
-          Create new...
-        </v-tooltip>
-      </client-only>
     </template>
   </RequireAuth>
 </template>
