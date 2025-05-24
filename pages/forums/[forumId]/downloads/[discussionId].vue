@@ -4,11 +4,12 @@
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import "md-editor-v3/lib/style.css";
   import { modProfileNameVar } from "@/cache";
-  import { useRoute, useHead } from "nuxt/app";
+  import { useRoute, useRouter, useHead } from "nuxt/app";
   import { useQuery } from "@vue/apollo-composable";
   import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 
   const route = useRoute();
+  const router = useRouter();
 
   const updateDiscussionId = () => {
     if (typeof route.params.discussionId === "string") {
@@ -17,6 +18,14 @@
     return "";
   };
   const discussionId = ref(updateDiscussionId());
+
+  // Redirect to description tab if on the base download page
+  if (route.name === 'forums-forumId-downloads-discussionId') {
+    router.push({
+      name: 'forums-forumId-downloads-discussionId-description',
+      params: route.params
+    });
+  }
 
   const channelId = computed(() => {
     if (typeof route.params.forumId === "string") {
@@ -133,6 +142,7 @@
         :key="discussionId"
         :discussion-id="discussionId"
         :logged-in-user-mod-name="modProfileNameVar || ''"
+        :download-mode="true"
       />
     </div>
   </div>

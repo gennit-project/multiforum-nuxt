@@ -47,6 +47,11 @@
       required: false,
       default: 1000,
     },
+    downloadMode: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   });
 
   // Computed properties for discussion body and links
@@ -78,9 +83,11 @@
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col gap-2">
+    <!-- 3D Model Viewer (Experiment) -->
+    <ModelViewer v-if="discussion?.hasDownload" />
     <div
-      v-if="discussion?.body"
+      v-if="discussion?.body && !downloadMode"
       class="rounded"
       :class="[shaded ? 'bg-gray-100 dark:bg-gray-700' : '']"
     >
@@ -91,11 +98,11 @@
       />
     </div>
 
-    <!-- 3D Model Viewer (Experiment) -->
-    <ModelViewer v-if="discussion?.hasDownload" />
-
     <slot name="album-slot" />
-    <div class="mt-2 flex">
+    <div
+      v-if="showEmojiButton"
+      class="mt-2 flex"
+    >
       <EmojiButtons
         :key="emojiJson"
         :discussion-channel-id="discussionChannelId"
@@ -112,14 +119,17 @@
       />
     </div>
 
-    <div class="my-2">
+    <div
+      v-if="!downloadMode"
+      class="my-2"
+    >
       <slot name="mark-answered-slot" />
     </div>
     <slot name="activity-feed-slot" />
     <div class="flex items-center gap-2">
       <slot name="button-slot" />
       <NewEmojiButton
-        v-if="showEmojiButton"
+        v-if="showEmojiButton && !downloadMode"
         :discussion-channel-id="discussionChannelId"
       />
     </div>

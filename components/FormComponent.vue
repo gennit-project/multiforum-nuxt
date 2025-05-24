@@ -42,7 +42,7 @@
 <template>
   <form
     autocomplete="off"
-    class="space-y-3 divide-y divide-gray-200 rounded-lg border-gray-300 bg-white px-2 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 sm:px-4"
+    class="space-y-3 divide-y divide-gray-200 rounded-lg border-gray-300 bg-white p-2 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 sm:px-4"
   >
     <div>
       <div class="flex justify-between">

@@ -24,7 +24,8 @@
   import SearchableForumList from "@/components/channel/SearchableForumList.vue";
   import SearchableTagList from "@/components/SearchableTagList.vue";
   import { updateFilters } from "@/utils/routerUtils";
-  import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
+  import PrimaryButton from "@/components/PrimaryButton.vue";
+  import RequireAuth from "@/components/auth/RequireAuth.vue";
 
   // Props
   const props = defineProps({
@@ -292,11 +293,6 @@
 <template>
   <div class="mx-4 mt-2 flex-1 flex-col space-y-1 dark:text-white">
     <div class="mb-2 flex justify-end">
-      <CreateAnythingButton
-        v-if="allowHidingMainFilters"
-        class="mx-2"
-        :use-primary-button="true"
-      />
       <button
         v-if="allowHidingMainFilters"
         class="rounded-md border border-gray-300 px-2 py-1 text-xs text-gray-800 hover:bg-gray-200 dark:border-gray-300 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -306,6 +302,24 @@
       >
         {{ showMainFilters ? "Hide filters" : "Show filters" }}
       </button>
+      <RequireAuth 
+        v-if="allowHidingMainFilters"
+        :full-width="false"
+      >
+        <template #has-auth>
+          <PrimaryButton
+            class="mx-2"
+            :label="'New Event'"
+            @click="$router.push(`/forums/${channelId}/events/create`)"
+          />
+        </template>
+        <template #does-not-have-auth>
+          <PrimaryButton
+            class="mx-2"
+            :label="'New Event'"
+          />
+        </template>
+      </RequireAuth>
     </div>
     <hr
       v-if="allowHidingMainFilters"
