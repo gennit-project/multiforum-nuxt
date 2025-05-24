@@ -11,7 +11,6 @@
   import type { Channel } from "@/__generated__/graphql";
   import { modProfileNameVar, usernameVar } from "@/cache";
   import { useRoute } from "nuxt/app";
-  import { useDisplay } from "vuetify";
 
   type Tab = {
     name: string;
@@ -46,6 +45,10 @@
       type: Boolean,
       default: false,
     },
+    showAboutTab: {
+      type: Boolean,
+      default: false,
+    },
   });
 
   const route = useRoute();
@@ -76,8 +79,6 @@
   });
 
   const iconSize = computed(() => (props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"));
-
-  const { smAndDown } = useDisplay();
 
   const tabs = computed((): Tab[] => {
     const baseTabs: Tab[] = [
@@ -138,7 +139,7 @@
         countProperty: "IssuesAggregate",
       });
     }
-    if (smAndDown.value) {
+    if (props.showAboutTab) {
       baseTabs.push({
         name: "about",
         routeSuffix: "about",
