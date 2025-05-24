@@ -63,6 +63,24 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
     return false;
   });
 
+  // Helper function to clear auth state safely
+  const clearAuthState = () => {
+    try {
+      setIsAuthenticated(false);
+      localStorage.removeItem("token");
+      sessionStorage.removeItem("tokenRefreshedAt");
+      // Clear Auth0 stored data
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("auth0.sPA.")) {
+          localStorage.removeItem(key);
+        }
+      });
+      console.log("Auth state cleared due to invalid tokens");
+    } catch (error) {
+      console.error("Error clearing auth state:", error);
+    }
+  };
+
   // Only run client-side auth logic
   if (import.meta.env.SSR === false) {
     const {
@@ -131,16 +149,11 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
           // If this is an invalid refresh token, we need to log the user out and re-authenticate
           if (
             innerError.message &&
-            innerError.message.includes("Unknown or invalid refresh token")
+            (innerError.message.includes("Unknown or invalid refresh token") ||
+              innerError.error === "invalid_grant")
           ) {
-            console.log("Invalid refresh token detected, user needs to login again");
-            setIsAuthenticated(false); // Update local auth state
-
-            // Clear any stored tokens to prevent further attempts with invalid tokens
-            localStorage.removeItem("token");
-            sessionStorage.removeItem("tokenRefreshedAt");
-
-            // Optionally redirect to login or show login UI
+            console.log("Invalid refresh token detected, clearing auth state");
+            clearAuthState();
             return false;
           }
 
@@ -166,8 +179,10 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
     });
 
     onMounted(async () => {
+      // Set mounted first to prevent reactivity issues
       isMounted.value = true;
 
+      // Wrap all auth logic in try-catch to prevent app crashes
       try {
         // Use a flag to prevent multiple refreshes on the same page load
         const hasRefreshedToken = sessionStorage.getItem("tokenRefreshedAt");
@@ -192,42 +207,64 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
                 sessionStorage.setItem("tokenRefreshedAt", now.toString());
                 console.log("Token refreshed on page load");
               }
-            } catch (innerError) {
-              // If using cached token fails, handle silently
-              console.log(
-                "Could not use cached token, will try login redirect if needed",
-                innerError
-              );
+            } catch (tokenError) {
+              // Handle token refresh errors gracefully
+              console.log("Token refresh failed on mount:", tokenError);
 
-              // If this is an invalid refresh token, we need to log the user out and re-authenticate
+              // Check for invalid grant specifically
               if (
-                innerError.message &&
-                innerError.message.includes("Unknown or invalid refresh token")
+                tokenError.error === "invalid_grant" ||
+                (tokenError.message &&
+                  tokenError.message.includes("Unknown or invalid refresh token"))
               ) {
-                console.log("Invalid refresh token, will need to reauthenticate");
-                setIsAuthenticated(false); // Update local auth state
+                console.log("Invalid refresh token detected on mount, clearing auth state");
+                clearAuthState();
+
+                // Prevent further auth attempts in this session
+                sessionStorage.setItem("authFailure", "true");
+                return;
               }
+
+              // For other token errors, just log and continue
+              console.log("Non-critical token error, continuing without refresh");
             }
           } else if (idTokenClaims.value) {
             // Handle case for returning from a redirect
-            const currentToken = localStorage.getItem("token");
-            const newToken = idTokenClaims.value.__raw;
+            try {
+              const currentToken = localStorage.getItem("token");
+              const newToken = idTokenClaims.value.__raw;
 
-            if (currentToken !== newToken) {
-              storeToken();
-              // Set the flag to prevent multiple refreshes
-              sessionStorage.setItem("tokenRefreshedAt", now.toString());
+              if (currentToken !== newToken) {
+                storeToken();
+                // Set the flag to prevent multiple refreshes
+                sessionStorage.setItem("tokenRefreshedAt", now.toString());
+              }
+            } catch (storeError) {
+              console.error("Error storing token on redirect return:", storeError);
             }
           }
         }
-      } catch (error) {
-        console.error("Error refreshing token on mount:", error);
-        // If token refresh fails, don't crash but log it
+      } catch (mountError) {
+        console.error("Critical error in auth mount logic:", mountError);
+
+        // Clear auth state on any critical error to prevent app crashes
+        clearAuthState();
+
+        // Set a flag to prevent infinite retry loops
+        sessionStorage.setItem("authFailure", "true");
       }
     });
 
     handleLogin = async () => {
       try {
+        // Check if we had an auth failure this session
+        const hadAuthFailure = sessionStorage.getItem("authFailure");
+        if (hadAuthFailure) {
+          // Clear the failure flag and try fresh
+          sessionStorage.removeItem("authFailure");
+          clearAuthState();
+        }
+
         // Add debug statements for troubleshooting
         console.log("Login button clicked");
 
@@ -254,6 +291,7 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
         await storeToken();
       } catch (error) {
         console.error("Login error:", error);
+        // Don't let login errors crash the app
       }
     };
   }
