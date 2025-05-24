@@ -17,8 +17,10 @@
   const route = useRoute();
   const router = useRouter();
 
-  const showDiscussionTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-discussions-discussionId")
+  const showDiscussionTitle = computed(
+    () =>
+      route.name?.toString().includes("forums-forumId-discussions-discussionId") ||
+      route.name?.toString().includes("forums-forumId-downloads-discussionId")
   );
   const showEventTitle = computed(() =>
     route.name?.toString().includes("forums-forumId-events-eventId")
@@ -37,8 +39,9 @@
   });
 
   const showChannelSidebar = computed(() => {
-    // Hide sidebar on wiki pages to give more reading space
-    return !`${String(route.name)}`.includes("wiki");
+    // Hide sidebar on wiki pages and download detail pages to give more reading space
+    return !`${String(route.name)}`.includes("wiki") && 
+           !`${String(route.name)}`.includes("forums-forumId-downloads-discussionId");
   });
 
   const channelId = computed(() => {
