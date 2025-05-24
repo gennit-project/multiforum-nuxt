@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { ref, watchEffect, computed } from "vue";
+  import { ref, computed } from "vue";
   import DiscussionDetailContent from "@/components/discussion/detail/DiscussionDetailContent.vue";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import "md-editor-v3/lib/style.css";
@@ -10,17 +10,13 @@
 
   const route = useRoute();
 
-  const updateDownloadId = () => {
-    if (typeof route.params.downloadId === "string") {
-      return route.params.downloadId;
+  const updateDiscussionId = () => {
+    if (typeof route.params.discussionId === "string") {
+      return route.params.discussionId;
     }
     return "";
   };
-  const downloadId = ref(updateDownloadId());
-
-  watchEffect(() => {
-    downloadId.value = updateDownloadId();
-  });
+  const discussionId = ref(updateDiscussionId());
 
   const channelId = computed(() => {
     if (typeof route.params.forumId === "string") {
@@ -30,7 +26,7 @@
   });
 
   const { onResult: onGetDownloadResult } = useQuery(GET_DISCUSSION, {
-    id: downloadId,
+    id: discussionId,
     loggedInModName: modProfileNameVar.value,
     channelUniqueName: channelId.value,
   });
@@ -69,7 +65,7 @@
             { property: "og:type", content: "article" },
             {
               property: "og:url",
-              content: `${baseUrl}/forums/${channelId.value}/downloads/${downloadId.value}`,
+              content: `${baseUrl}/forums/${channelId.value}/downloads/${discussionId.value}`,
             },
             { property: "og:site_name", content: serverName },
             ...(imageUrl ? [{ property: "og:image", content: imageUrl }] : []),
@@ -101,7 +97,7 @@
                 },
                 mainEntityOfPage: {
                   "@type": "WebPage",
-                  "@id": `${baseUrl}/forums/${channelId.value}/downloads/${downloadId.value}`,
+                  "@id": `${baseUrl}/forums/${channelId.value}/downloads/${discussionId.value}`,
                 },
               }),
             },
@@ -129,13 +125,13 @@
   >
     <div class="flex w-full justify-center space-y-4 overflow-x-hidden">
       <ErrorBanner
-        v-if="!downloadId"
+        v-if="!discussionId"
         text="Download not found"
       />
       <DiscussionDetailContent
         v-else
-        :key="downloadId"
-        :discussion-id="downloadId"
+        :key="discussionId"
+        :discussion-id="discussionId"
         :logged-in-user-mod-name="modProfileNameVar || ''"
       />
     </div>
