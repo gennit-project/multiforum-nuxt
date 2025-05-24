@@ -7,7 +7,6 @@
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import DiscussionVotes from "../vote/DiscussionVotes.vue";
   import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-  import MarkdownPreview from "@/components/MarkdownPreview.vue";
   import { relativeTime } from "@/utils";
   import type { Discussion, DiscussionChannel, Tag } from "@/__generated__/graphql";
   import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
@@ -41,10 +40,6 @@
       type: Array,
       default: () => [],
     },
-    defaultExpanded: {
-      type: Boolean,
-      default: true,
-    },
   });
 
   defineEmits(["filterByTag"]);
@@ -72,9 +67,6 @@
   });
 
   const errorMessage = ref("");
-  // Local state for this specific discussion item's expanded/collapsed state
-  // Initial value is based on the defaultExpanded prop
-  const isExpanded = ref(props.defaultExpanded);
 
   // Later in the lifecycle, clicking Expand/Collapse on this item only affects this item
   // Clicking Expand All/Collapse All will set the default for new items
@@ -175,42 +167,6 @@
                   :username="authorUsername"
                 />
               </div>
-
-              <!-- Expand/Collapse buttons -->
-              <div class="mt-1">
-                <button
-                  v-if="discussion && (discussion.body || discussion.Album) && !isExpanded"
-                  class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-                  @click="isExpanded = true"
-                >
-                  <i
-                    class="fa-solid fa-expand text-md mr-1 text-gray-600 hover:underline dark:text-gray-300"
-                  />
-                  Expand
-                </button>
-                <button
-                  v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
-                  class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-                  @click="isExpanded = false"
-                >
-                  <i
-                    class="fa-solid fa-x mr-1 text-xs text-gray-600 hover:underline dark:text-gray-300"
-                  />
-                  Collapse
-                </button>
-              </div>
-            </div>
-
-            <div
-              v-if="discussion?.body && isExpanded"
-              class="my-2 rounded bg-gray-100 px-2 pb-4 pt-2 dark:bg-black"
-            >
-              <MarkdownPreview
-                class="ml-2"
-                :disable-gallery="false"
-                :text="discussion.body"
-                :word-limit="50"
-              />
             </div>
             <div
               v-if="discussion.Album && isExpanded"

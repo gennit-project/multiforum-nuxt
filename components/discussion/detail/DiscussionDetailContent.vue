@@ -31,7 +31,7 @@
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
   import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
-  import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
 
   const COMMENT_LIMIT = 50;
 
@@ -349,6 +349,76 @@
                   :discussion="discussion"
                   @close-editor="albumEditMode = false"
                 />
+                <!-- Download mode layout with sidebar -->
+                <div
+                  v-else-if="downloadMode"
+                  class="flex gap-6"
+                >
+                  <div class="flex-1">
+                    <DiscussionBody
+                      :channel-id="channelId"
+                      :discussion="discussion"
+                      :discussion-channel-id="activeDiscussionChannel?.id"
+                      :download-mode="downloadMode"
+                      :emoji-json="activeDiscussionChannel?.emoji"
+                      :show-emoji-button="!downloadMode"
+                    >
+                      <template #album-slot>
+                        <div class="bg-black text-white">
+                          <DiscussionAlbum
+                            v-if="
+                              discussion?.Album &&
+                              discussion?.Album?.Images &&
+                              discussion?.Album?.Images.length > 0
+                            "
+                            :album="discussion.Album"
+                            :carousel-format="true"
+                            :discussion-author="discussion.Author?.username || ''"
+                            :discussion-id="discussionId"
+                            @album-updated="refetchDiscussion"
+                            @edit-album="handleEditAlbum"
+                          />
+                        </div>
+                      </template>
+                      <template #activity-feed-slot>
+                        <DiscussionTitleVersions
+                          v-if="
+                            discussion?.PastTitleVersions && discussion.PastTitleVersions.length > 0
+                          "
+                          :discussion="discussion"
+                        />
+                      </template>
+                      <template #mark-answered-slot>
+                        <MarkAsAnsweredButton
+                          v-if="loggedInUserIsAuthor"
+                          :answered="activeDiscussionChannel?.answered || false"
+                          :channel-id="channelId"
+                          :discussion-channel-id="activeDiscussionChannel?.id"
+                          :discussion-id="discussionId"
+                          @mark-unanswered="refetchDiscussionChannel"
+                        />
+                      </template>
+                      <template #button-slot>
+                        <div class="flex-col items-center">
+                          <DiscussionVotes
+                            v-if="activeDiscussionChannel"
+                            :discussion="discussion"
+                            :discussion-channel="activeDiscussionChannel"
+                            :show-downvote="!loggedInUserIsAuthor"
+                            :use-heart-icon="downloadMode"
+                            @handle-click-edit-feedback="handleClickEditFeedback"
+                            @handle-click-give-feedback="handleClickGiveFeedback"
+                            @handle-click-undo-feedback="handleClickUndoFeedback"
+                          />
+                        </div>
+                      </template>
+                    </DiscussionBody>
+                  </div>
+                  <div class="flex-shrink-0">
+                    <DownloadSidebar />
+                  </div>
+                </div>
+                <!-- Regular discussion mode layout -->
                 <DiscussionBody
                   v-else
                   :channel-id="channelId"
@@ -420,36 +490,40 @@
               <nuxt-link
                 :to="{
                   name: 'forums-forumId-downloads-discussionId-description',
-                  params: { forumId: channelId, discussionId: props.discussionId }
+                  params: { forumId: channelId, discussionId: props.discussionId },
                 }"
-                class="border-b-2 py-2 px-1 text-sm font-medium"
-                :class="$route.name?.includes('description') 
-                  ? 'border-orange-500 text-orange-600 dark:text-orange-400' 
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                class="border-b-2 px-1 py-2 text-sm font-medium"
+                :class="
+                  $route.name?.includes('description')
+                    ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                "
               >
                 Description
               </nuxt-link>
               <nuxt-link
                 :to="{
                   name: 'forums-forumId-downloads-discussionId-comments',
-                  params: { forumId: channelId, discussionId: props.discussionId }
+                  params: { forumId: channelId, discussionId: props.discussionId },
                 }"
-                class="border-b-2 py-2 px-1 text-sm font-medium"
-                :class="$route.name?.includes('comments')
-                  ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'"
+                class="border-b-2 px-1 py-2 text-sm font-medium"
+                :class="
+                  $route.name?.includes('comments')
+                    ? 'border-orange-500 text-orange-600 dark:text-orange-400'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
+                "
               >
                 Comments ({{ commentCount }})
               </nuxt-link>
             </nav>
           </div>
-          
+
           <!-- Tab content via router-view -->
           <div class="mt-4">
             <NuxtPage />
           </div>
         </div>
-        
+
         <div v-else>
           <div class="my-6 px-2 pt-2">
             <DiscussionCommentsWrapper

@@ -75,6 +75,7 @@
     "random-word-slugs": "^0.1.7",
     "roboto-fontface": "*",
     "swiper": "^11.2.6",
+    "three": "^0.176.0",
     "tippy.js": "^6.3.7",
     "v-tooltip": "^4.0.0-beta.17",
     "vue": "^3.5.13",
