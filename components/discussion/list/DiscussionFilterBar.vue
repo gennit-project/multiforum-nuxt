@@ -329,7 +329,7 @@
           data-testid="show-archived-discussions"
           @input="updateShowArchived"
         />
-        Show archived discussions
+        {{ isDownloadPage ? 'Show archived downloads' : 'Show archived discussions' }}
       </div>
     </div>
   </div>
