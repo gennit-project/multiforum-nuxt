@@ -334,7 +334,7 @@ const collapseAll = () => {
           :checked="filterValues.showArchived"
           @input="updateShowArchived"
         />
-        Show archived discussions
+        {{ isDownloadPage ? 'Show archived downloads' : 'Show archived discussions' }}
       </div>
     </div>
   </div>
