@@ -81,6 +81,11 @@
   const relativeTimeAgo = computed(() => relativeTime(props.discussionChannel.createdAt));
   const tags = computed(() => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []);
 
+  // Get the first image from the album if available
+  const firstAlbumImage = computed(() => {
+    return props.discussion?.Album?.Images?.[0]?.url || null;
+  });
+
   const filteredQuery = computed(() => {
     const query = { ...route.query };
     for (const key in query) {
@@ -108,7 +113,20 @@
             query: filteredQuery,
           }"
         >
-          <div class="aspect-square w-full border bg-gray-100 dark:bg-gray-700"></div>
+          <div class="aspect-square w-full overflow-hidden border bg-gray-100 dark:bg-gray-700">
+            <img
+              v-if="firstAlbumImage"
+              :src="firstAlbumImage"
+              :alt="title"
+              class="h-full w-full object-cover"
+            />
+            <div
+              v-else
+              class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
+            >
+              No image available
+            </div>
+          </div>
         </nuxt-link>
         <div class="flex gap-3">
           <div class="w-full flex-col">

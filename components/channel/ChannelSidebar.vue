@@ -31,6 +31,12 @@
   });
 
   const channelRules = computed(() => props.channel?.rules ?? "");
+  
+  // Check if we're on the downloads list view
+  const isDownloadListView = computed(() => {
+    return route.name === "forums-forumId-downloads";
+  });
+  
   const filterChannelsByTag = (tag: string) => {
     router.push({
       name: "forums",
@@ -139,7 +145,10 @@
             </div>
           </div>
 
-          <FontSizeControl class="mb-6" />
+          <FontSizeControl
+            v-if="!isDownloadListView"
+            class="mb-6"
+          />
 
           <div class="flex justify-between">
             <span
