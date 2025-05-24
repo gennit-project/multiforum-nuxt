@@ -1,6 +1,7 @@
 <script lang="ts">
   import { defineComponent } from "vue";
   import { timeAgo } from "@/utils";
+  import AvatarComponent from "@/components/AvatarComponent.vue";
 
   export default defineComponent({
     name: "UsernameWithTooltip",
@@ -112,31 +113,23 @@
       </template>
       <template #default>
         <div>
-          <div
-            v-if="!displayName"
-            class="text-md flex w-full flex-col"
-          >
-            <AvatarComponent
-              :is-medium="true"
-              :src="src"
-              :text="username"
-            />{{ username }}
-          </div>
-          <div
-            v-if="displayName"
-            class="text-md flex w-full flex-col"
-          >
+          <div class="text-md flex w-full flex-col">
             <AvatarComponent
               :is-medium="true"
               :src="src"
               :text="username"
             />
-            <p class="text-xs font-bold">
-              {{ displayName }}
-            </p>
-            <p class="text-xs text-gray-600 dark:text-white">
-              {{ `u/${username}` }}
-            </p>
+            <template v-if="!displayName">
+              {{ username }}
+            </template>
+            <template v-else>
+              <p class="text-xs font-bold">
+                {{ displayName }}
+              </p>
+              <p class="text-xs text-gray-600 dark:text-white">
+                {{ `u/${username}` }}
+              </p>
+            </template>
           </div>
           <ul class="text-xs">
             <li>

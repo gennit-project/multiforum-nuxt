@@ -8,6 +8,8 @@
   import MarkdownPreview from "@/components/MarkdownPreview.vue";
   import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
   import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
+  import AvatarComponent from "@/components/AvatarComponent.vue";
+  import MenuButton from "@/components/MenuButton.vue";
   import { relativeTime } from "@/utils";
   import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 
@@ -200,24 +202,22 @@
               </div>
             </div>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && !isExpanded"
+              v-if="discussion && (discussion.body || discussion.Album)"
               class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-              @click="isExpanded = true"
+              @click="isExpanded = !isExpanded"
             >
-              <i
-                class="fa-solid fa-expand text-md mr-1 text-gray-600 hover:underline dark:text-gray-300"
-              />
-              Expand
-            </button>
-            <button
-              v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
-              class="text-xs text-gray-600 hover:underline dark:text-gray-300"
-              @click="isExpanded = false"
-            >
-              <i
-                class="fa-solid fa-x mr-1 text-xs text-gray-600 hover:underline dark:text-gray-300"
-              />
-              Collapse
+              <template v-if="!isExpanded">
+                <i
+                  class="fa-solid fa-expand text-md mr-1 text-gray-600 hover:underline dark:text-gray-300"
+                />
+                Expand
+              </template>
+              <template v-else>
+                <i
+                  class="fa-solid fa-x mr-1 text-xs text-gray-600 hover:underline dark:text-gray-300"
+                />
+                Collapse
+              </template>
             </button>
             <div
               v-if="discussion && (discussion.body || discussion.Album) && isExpanded"

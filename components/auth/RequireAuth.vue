@@ -275,20 +275,20 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
         </div>
       </template>
 
-      <div
-        v-if="!showAuthContent"
-        class="w-full"
-        data-auth-state="unauthenticated"
-        @click="handleLogin"
-      >
-        <slot name="does-not-have-auth" />
-      </div>
-      <div
-        v-else
-        class="w-full"
-        data-auth-state="authenticated"
-      >
-        <slot name="has-auth" />
+      <div class="w-full">
+        <div
+          v-if="!showAuthContent"
+          data-auth-state="unauthenticated"
+          @click="handleLogin"
+        >
+          <slot name="does-not-have-auth" />
+        </div>
+        <div
+          v-else
+          data-auth-state="authenticated"
+        >
+          <slot name="has-auth" />
+        </div>
       </div>
     </client-only>
   </div>

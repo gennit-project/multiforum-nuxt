@@ -11,6 +11,7 @@
     getPermalinkToEvent,
   } from "@/utils/routerUtils";
   import CommentEditsDropdown from "./CommentEditsDropdown.vue";
+  import AvatarComponent from "@/components/AvatarComponent.vue";
 
   // Props definition using defineProps
   const props = defineProps({
@@ -255,20 +256,37 @@
             [Deleted]
           </span>
           <span class="mx-2">&middot;</span>
-          <span>{{ createdAtFormatted }}</span>
+          <ClientOnly>
+            <span>{{ createdAtFormatted }}</span>
+            <template #fallback>
+              <span>posted recently</span>
+            </template>
+          </ClientOnly>
           <span
             v-if="commentData.updatedAt"
             class="mx-2"
             >&middot;</span
           >
-          <span class="flex items-center">
-            {{ editedAtFormatted }}
-            <CommentEditsDropdown
-              v-if="hasRevisionHistory"
-              class="ml-2"
-              :comment="commentData"
-            />
-          </span>
+          <ClientOnly>
+            <span class="flex items-center">
+              {{ editedAtFormatted }}
+              <CommentEditsDropdown
+                v-if="hasRevisionHistory"
+                class="ml-2"
+                :comment="commentData"
+              />
+            </span>
+            <template #fallback>
+              <span v-if="commentData.updatedAt" class="flex items-center">
+                Edited recently
+                <CommentEditsDropdown
+                  v-if="hasRevisionHistory"
+                  class="ml-2"
+                  :comment="commentData"
+                />
+              </span>
+            </template>
+          </ClientOnly>
           <span
             v-if="isHighlighted"
             class="rounded-lg bg-orange-500 px-2 py-1 text-black"
