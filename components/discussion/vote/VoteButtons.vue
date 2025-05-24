@@ -43,6 +43,22 @@
       type: Boolean,
       default: false,
     },
+    upvoteIcon: {
+      type: String,
+      default: "fa-solid fa-arrow-up",
+    },
+    upvoteTooltipActive: {
+      type: String,
+      default: "Undo upvote",
+    },
+    upvoteTooltipInactive: {
+      type: String,
+      default: "Upvote to make this discussion more visible",
+    },
+    upvoteTooltipUnauthenticated: {
+      type: String,
+      default: "Make this discussion more visible to others",
+    },
   });
   const emit = defineEmits([
     "editFeedback",
@@ -123,12 +139,12 @@
           :loading="upvoteLoading"
           :test-id="'upvote-discussion-button'"
           :tooltip-text="
-            upvoteActive ? 'Undo upvote' : 'Upvote to make this discussion more visible'
+            upvoteActive ? upvoteTooltipActive : upvoteTooltipInactive
           "
           @vote="clickUp"
         >
           <span class="flex items-center gap-1">
-            <i class="fa-solid fa-arrow-up mr-1" />
+            <i :class="upvoteIcon + ' mr-1'" />
             <span class="text-sm">{{ upvoteCount }}</span>
           </span>
         </VoteButton>
@@ -163,10 +179,10 @@
           :count="upvoteCount"
           :is-permalinked="isPermalinked"
           :test-id="'upvote-discussion-button'"
-          :tooltip-text="'Make this discussion more visible to others'"
+          :tooltip-text="upvoteTooltipUnauthenticated"
         >
           <span class="flex items-center gap-1">
-            <i class="fa-solid fa-arrow-up mr-1" />
+            <i :class="upvoteIcon + ' mr-1'" />
             <span class="text-sm">{{ upvoteCount }}</span>
           </span>
         </VoteButton>

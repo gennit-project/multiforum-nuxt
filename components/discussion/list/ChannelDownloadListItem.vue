@@ -240,6 +240,7 @@
                 :discussion="discussion"
                 :discussion-channel="discussionChannel"
                 :show-downvote="false"
+                :use-heart-icon="true"
               />
               <div class="flex items-center justify-start gap-6">
                 <nuxt-link
