@@ -13,7 +13,7 @@
   >
     <!-- 3D Model Viewer (Experiment) -->
     <ModelViewer
-      v-if="false"
+      v-if="true"
       :model-url="'https://storage.googleapis.com/listical-dev/models/Tiny_Khopesh_Warrior_Posed_and_Rigged.glb'"
     />
     <div class="p-6">
