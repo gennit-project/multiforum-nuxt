@@ -1,23 +1,26 @@
 <script lang="ts" setup>
-  import { ref, nextTick, computed } from "vue";
-  import type { Discussion } from "@/__generated__/graphql";
-  import RequireAuth from "@/components/auth/RequireAuth.vue";
-  import CreateButton from "@/components/CreateButton.vue";
-  import PrimaryButton from "@/components/PrimaryButton.vue";
-  import GenericButton from "@/components/GenericButton.vue";
-  import TextInput from "@/components/TextInput.vue";
-  import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
-  import { useMutation, useQuery } from "@vue/apollo-composable";
-  import ErrorBanner from "@/components/ErrorBanner.vue";
-  import InfoBanner from "@/components/InfoBanner.vue";
-  import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
-  import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
-  import { modProfileNameVar, usernameVar } from "@/cache";
-  import { useAppTheme } from "@/composables/useTheme";
-  import { useRoute } from "nuxt/app";
-  import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+import { ref, nextTick, computed } from "vue";
+import type { Discussion } from "@/__generated__/graphql";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
+import CreateButton from "@/components/CreateButton.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import GenericButton from "@/components/GenericButton.vue";
+import TextInput from "@/components/TextInput.vue";
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
+import { useMutation, useQuery } from "@vue/apollo-composable";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import InfoBanner from "@/components/InfoBanner.vue";
+import {
+  GET_DISCUSSION,
+  IS_DISCUSSION_ANSWERED,
+} from "@/graphQLData/discussion/queries";
+import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+import { modProfileNameVar, usernameVar } from "@/cache";
+import { useAppTheme } from "@/composables/useTheme";
+import { useRoute } from "nuxt/app";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 
-  const { theme } = useAppTheme();
+const { theme } = useAppTheme();
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -36,13 +39,15 @@ const {
 } = useQuery(IS_DISCUSSION_ANSWERED, {
   discussionId: discussionId.value,
   channelUniqueName: channelId.value,
-})
+});
 
 const answered = computed(() => {
   if (isDiscussionAnsweredLoading.value) return false;
   if (isDiscussionAnsweredError.value) return false;
-  return isDiscussionAnsweredResult.value?.discussionChannels[0]?.answered || false;
-})
+  return (
+    isDiscussionAnsweredResult.value?.discussionChannels[0]?.answered || false
+  );
+});
 
 const {
   result: getDiscussionResult,
@@ -55,15 +60,15 @@ const {
   channelUniqueName: channelId.value,
 });
 
-const discussion = computed<Discussion | null>(() =>{
+const discussion = computed<Discussion | null>(() => {
   const discussion = getDiscussionResult.value?.discussions[0];
   if (getDiscussionLoading.value && !discussion) {
-    return null
-  } 
-  if (getDiscussionError.value){
-    return null
+    return null;
   }
-  return discussion || null
+  if (getDiscussionError.value) {
+    return null;
+  }
+  return discussion || null;
 });
 const authorIsLoggedInUser = computed(
   () => discussion.value?.Author?.username === usernameVar.value
@@ -109,6 +114,13 @@ const formattedDate = computed(() => {
     year: "numeric",
   });
 });
+const isDownloadDetailPage = computed(() => {
+  return (
+    route.name &&
+    typeof route.name === "string" &&
+    route.name.includes("forums-forumId-downloads-discussionId")
+  );
+});
 </script>
 
 <template>
@@ -127,7 +139,11 @@ const formattedDate = computed(() => {
           v-if="!titleEditMode"
           class="text-wrap px-1 text-md md:text-2xl lg:text-3xl sm:tracking-tight"
         >
-          {{ discussion && discussion.title ? discussion.title : "Couldn't find the discussion" }}
+          {{
+            discussion && discussion.title
+              ? discussion.title
+              : "Couldn't find the discussion"
+          }}
         </h2>
 
         <TextInput
@@ -147,16 +163,16 @@ const formattedDate = computed(() => {
           v-if="!titleEditMode"
           class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm flex items-center space-x-2"
         >
-          <slot/>
+          <slot />
           <span
             v-if="answered"
             class="text-green-500 dark:text-green-400 mr-1 border dark:border-green-400 border-green-500 rounded-full text-xs flex gap-1 items-center py-1 px-2"
             aria-label="This discussion has been answered"
-          > 
+          >
             <CheckCircleIcon class="h-4 w-4" /> Answered
           </span>
           <span>{{
-            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ''} in ${channelId}`
+            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
           }}</span>
         </p>
       </div>
@@ -168,14 +184,23 @@ const formattedDate = computed(() => {
             @click="onClickEdit"
           />
           <CreateButton
-            v-if="!titleEditMode"
+            v-if="!titleEditMode && !isDownloadDetailPage"
             class="ml-2"
             :to="`/forums/${channelId}/discussions/create`"
             :label="'New Discussion'"
           />
+          <CreateButton
+            v-if="!titleEditMode && isDownloadDetailPage"
+            class="ml-2"
+            :label="'New Upload'"
+            :to="`/forums/${channelId}/discussions/create`"
+          />
           <PrimaryButton
             v-if="titleEditMode"
-            :disabled="formValues.title.length === 0 || formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT"
+            :disabled="
+              formValues.title.length === 0 ||
+              formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT
+            "
             :label="'Save'"
             :loading="updateDiscussionLoading"
             @click="updateDiscussion"
@@ -188,7 +213,12 @@ const formattedDate = computed(() => {
           />
         </template>
         <template #does-not-have-auth>
-          <PrimaryButton class="ml-2" :label="'New Discussion'" />
+          <PrimaryButton
+            v-if="!isDownloadDetailPage"
+            class="ml-2"
+            :label="'New Discussion'"
+          />
+          <PrimaryButton v-else class="ml-2" :label="'New Upload'" />
         </template>
       </RequireAuth>
     </div>
