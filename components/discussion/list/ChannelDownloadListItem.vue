@@ -12,7 +12,6 @@
   import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
   import { storeToRefs } from "pinia";
   import { useUIStore } from "@/stores/uiStore";
-  import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
 
   // Define props
   const props = defineProps({
@@ -185,18 +184,6 @@
                   :username="authorUsername"
                 />
               </div>
-            </div>
-            <div
-              v-if="discussion.Album && isExpanded"
-              class="my-4 overflow-x-auto bg-black"
-            >
-              <DiscussionAlbum
-                :album="discussion.Album"
-                :carousel-format="true"
-                :discussion-author="authorUsername"
-                :discussion-id="discussion.id"
-                :show-edit-album="false"
-              />
             </div>
             <div class="my-1 flex space-x-1 text-xs font-medium text-gray-600 hover:no-underline">
               <TagComponent
