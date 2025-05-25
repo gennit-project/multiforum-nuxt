@@ -20,6 +20,7 @@
   } from "@/cache";
   import { config } from "@/config";
   import DevOverlay from "@/components/nav/DevOverlay.vue";
+  import ErrorBoundary from "@/components/nav/ErrorBoundary.vue";
 
   const isDevelopment = computed(() => config.environment === "development");
 
@@ -253,41 +254,51 @@
 
 <template>
   <v-app>
-    <DevOverlay v-if="isDevelopment" />
-    <main class="flex min-h-screen flex-col">
-      <div
-        v-if="isSessionExpired"
-        class="bg-red-500 p-4 text-center text-white"
-      >
-        Your session has expired. Please
-        <button
-          class="font-bold underline hover:text-red-100"
-          @click="
-            () => {
-              if (auth0) auth0.loginWithRedirect();
-            }
-          "
+    <ErrorBoundary>
+      <DevOverlay v-if="isDevelopment" />
+      <main class="flex min-h-screen flex-col">
+        <div
+          v-if="isSessionExpired"
+          class="bg-red-500 p-4 text-center text-white"
         >
-          click here to log in again
-        </button>
-      </div>
-      <div class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200">
-        <TopNav
-          :show-user-profile-dropdown="showUserProfileDropdown"
-          :side-nav-is-open="sideNavIsOpenVar"
-          @close-user-profile-dropdown="closeUserProfileDropdown"
-          @toggle-dropdown="toggleDropdown"
-          @toggle-user-profile-dropdown="toggleUserProfileDropdown"
-        />
-        <div class="relative flex flex-grow flex-col">
-          <SiteSidenav
-            :key="`${sideNavIsOpenVar}`"
-            :show-dropdown="sideNavIsOpenVar"
-            @close="setSideNavIsOpenVar(false)"
+          Your session has expired. Please
+          <button
+            class="font-bold underline hover:text-red-100"
+            @click="
+              () => {
+                if (auth0) auth0.loginWithRedirect();
+              }
+            "
+          >
+            click here to log in again
+          </button>
+        </div>
+        <div class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200">
+          <TopNav
+            :show-user-profile-dropdown="showUserProfileDropdown"
+            :side-nav-is-open="sideNavIsOpenVar"
+            @close-user-profile-dropdown="closeUserProfileDropdown"
+            @toggle-dropdown="toggleDropdown"
+            @toggle-user-profile-dropdown="toggleUserProfileDropdown"
           />
-          <!-- During SSR and initial render, always show content -->
-          <client-only>
-            <template #fallback>
+          <div class="relative flex flex-grow flex-col">
+            <SiteSidenav
+              :key="`${sideNavIsOpenVar}`"
+              :show-dropdown="sideNavIsOpenVar"
+              @close="setSideNavIsOpenVar(false)"
+            />
+            <!-- During SSR and initial render, always show content -->
+            <client-only>
+              <template #fallback>
+                <div class="flex w-full flex-grow flex-col">
+                  <slot />
+                  <SiteFooter
+                    v-if="showFooter"
+                    class="mt-auto"
+                  />
+                </div>
+              </template>
+
               <div class="flex w-full flex-grow flex-col">
                 <slot />
                 <SiteFooter
@@ -295,18 +306,10 @@
                   class="mt-auto"
                 />
               </div>
-            </template>
-
-            <div class="flex w-full flex-grow flex-col">
-              <slot />
-              <SiteFooter
-                v-if="showFooter"
-                class="mt-auto"
-              />
-            </div>
-          </client-only>
+            </client-only>
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+    </ErrorBoundary>
   </v-app>
 </template>
