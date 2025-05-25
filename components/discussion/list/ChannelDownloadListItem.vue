@@ -195,29 +195,33 @@
                 @click="$emit('filterByTag', tag)"
               />
             </div>
-            <div class="flex items-center gap-2 dark:text-white">
-              <DiscussionVotes
-                v-if="discussionChannel"
-                :discussion="discussion"
-                :discussion-channel="discussionChannel"
-                :show-downvote="false"
-                :use-heart-icon="true"
-              />
-              <div class="flex items-center justify-start gap-6">
-                <nuxt-link
-                  class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
-                  :to="{
-                    name: 'forums-forumId-downloads-discussionId',
-                    params: {
-                      forumId: defaultUniqueName,
-                      discussionId: discussionChannel.discussionId,
-                    },
-                    query: filteredQuery,
-                  }"
-                >
-                  <i class="fa-regular fa-comment text-xs" />
-                  <span class="text-sm">{{ commentCount }}</span>
-                </nuxt-link>
+            <div class="flex items-center justify-between gap-2 dark:text-white">
+              <div class="text-gray-900 dark:text-white"><sup>$</sup>0.<sup>00</sup></div>
+              <div class="flex items-center gap-1">
+                <DiscussionVotes
+                  v-if="discussionChannel"
+                  :discussion="discussion"
+                  :discussion-channel="discussionChannel"
+                  :show-downvote="false"
+                  :use-heart-icon="true"
+                />
+
+                <div class="flex items-center justify-start gap-6">
+                  <nuxt-link
+                    class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
+                    :to="{
+                      name: 'forums-forumId-downloads-discussionId',
+                      params: {
+                        forumId: defaultUniqueName,
+                        discussionId: discussionChannel.discussionId,
+                      },
+                      query: filteredQuery,
+                    }"
+                  >
+                    <i class="fa-regular fa-comment text-xs" />
+                    <span class="text-sm">{{ commentCount }}</span>
+                  </nuxt-link>
+                </div>
               </div>
             </div>
           </div>
