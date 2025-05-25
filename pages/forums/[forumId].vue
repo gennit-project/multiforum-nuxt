@@ -2,9 +2,6 @@
   import ChannelTabs from "@/components/channel/ChannelTabs.vue";
   import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
   import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
-  import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
-  import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
-  import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
   import { GET_CHANNEL } from "@/graphQLData/channel/queries";
   import type { Channel, User } from "@/__generated__/graphql";
   import { computed } from "vue";
@@ -17,27 +14,48 @@
   const route = useRoute();
   const router = useRouter();
 
-  const showDiscussionTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-discussions-discussionId")
-  );
-  const showDownloadTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-downloads-discussionId")
-  );
-  const showEventTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-events-eventId")
-  );
-  const showIssueTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-issues-issueId")
-  );
+  const currentPageType = computed(() => {
+    const routeName = route.name?.toString() || "";
+
+    if (routeName.includes("forums-forumId-discussions-discussionId")) {
+      return {
+        type: "discussion",
+        component: "DiscussionTitleEditForm",
+        backLink: `/forums/${channelId.value}/discussions`,
+        testId: "discussion-detail-back-link",
+      };
+    }
+    if (routeName.includes("forums-forumId-downloads-discussionId")) {
+      return {
+        type: "download",
+        component: "DiscussionTitleEditForm",
+        backLink: `/forums/${channelId.value}/downloads`,
+        testId: "download-detail-back-link",
+      };
+    }
+    if (routeName.includes("forums-forumId-events-eventId")) {
+      return {
+        type: "event",
+        component: "EventTitleEditForm",
+        backLink: `/forums/${channelId.value}/events`,
+        testId: "event-detail-back-link",
+      };
+    }
+    if (routeName.includes("forums-forumId-issues-issueId")) {
+      return {
+        type: "issue",
+        component: "IssueTitleEditForm",
+        backLink: `/forums/${channelId.value}/issues`,
+        testId: "issue-detail-back-link",
+      };
+    }
+    return null;
+  });
+
+  const showDetailTitle = computed(() => currentPageType.value !== null);
 
   const showChannelTabs = computed(() => {
-    return (
-      !showDiscussionTitle.value &&
-      !showDownloadTitle.value &&
-      !showEventTitle.value &&
-      !showIssueTitle.value &&
-      !`${String(route.name)}`.includes("feedback")
-    );
+    return !showDetailTitle.value && !`${String(route.name)}`.includes("feedback");
   });
 
   const showChannelSidebar = computed(() => {
@@ -175,15 +193,13 @@
       class="flex flex-col bg-white dark:bg-black dark:text-white md:min-h-screen"
     >
       <ChannelHeaderMobile
-        v-if="!showDiscussionTitle && !showDownloadTitle && !showEventTitle && !showIssueTitle"
+        v-if="!showDetailTitle"
         :channel="channel"
         :channel-id="channelId"
         class="block md:hidden"
       />
       <ChannelHeaderDesktop
-        v-if="
-          channel.channelBannerURL && !showDiscussionTitle && !showDownloadTitle && !showEventTitle && !showIssueTitle
-        "
+        v-if="channel.channelBannerURL && !showDetailTitle"
         :admin-list="adminList"
         :channel="channel"
         :channel-id="channelId"
@@ -194,55 +210,19 @@
       <main class="flex w-full justify-center bg-gray-100 dark:bg-gray-900">
         <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
           <div
-            v-if="showDiscussionTitle"
+            v-if="showDetailTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
-              <DiscussionTitleEditForm>
+              <component
+                :is="currentPageType.component"
+                v-if="currentPageType"
+              >
                 <BackLink
-                  :data-testid="'discussion-detail-back-link'"
-                  :link="`/forums/${channelId}/discussions`"
+                  :data-testid="currentPageType.testId"
+                  :link="currentPageType.backLink"
                 />
-              </DiscussionTitleEditForm>
-            </div>
-          </div>
-          <div
-            v-else-if="showDownloadTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
-          >
-            <div class="max-w-screen-2xl flex-1 pr-1">
-              <DiscussionTitleEditForm>
-                <BackLink
-                  :data-testid="'download-detail-back-link'"
-                  :link="`/forums/${channelId}/downloads`"
-                />
-              </DiscussionTitleEditForm>
-            </div>
-          </div>
-          <div
-            v-else-if="showEventTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
-          >
-            <div class="max-w-screen-2xl flex-1 pr-1">
-              <EventTitleEditForm>
-                <BackLink
-                  :data-testid="'event-detail-back-link'"
-                  :link="`/forums/${channelId}/events`"
-                />
-              </EventTitleEditForm>
-            </div>
-          </div>
-          <div
-            v-else-if="showIssueTitle"
-            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
-          >
-            <div class="max-w-screen-2xl flex-1 pr-1">
-              <IssueTitleEditForm>
-                <BackLink
-                  :data-testid="'issue-detail-back-link'"
-                  :link="`/forums/${channelId}/issues`"
-                />
-              </IssueTitleEditForm>
+              </component>
             </div>
           </div>
 
