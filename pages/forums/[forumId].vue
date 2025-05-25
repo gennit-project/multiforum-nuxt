@@ -17,10 +17,11 @@
   const route = useRoute();
   const router = useRouter();
 
-  const showDiscussionTitle = computed(
-    () =>
-      route.name?.toString().includes("forums-forumId-discussions-discussionId") ||
-      route.name?.toString().includes("forums-forumId-downloads-discussionId")
+  const showDiscussionTitle = computed(() =>
+    route.name?.toString().includes("forums-forumId-discussions-discussionId")
+  );
+  const showDownloadTitle = computed(() =>
+    route.name?.toString().includes("forums-forumId-downloads-discussionId")
   );
   const showEventTitle = computed(() =>
     route.name?.toString().includes("forums-forumId-events-eventId")
@@ -32,6 +33,7 @@
   const showChannelTabs = computed(() => {
     return (
       !showDiscussionTitle.value &&
+      !showDownloadTitle.value &&
       !showEventTitle.value &&
       !showIssueTitle.value &&
       !`${String(route.name)}`.includes("feedback")
@@ -173,14 +175,14 @@
       class="flex flex-col bg-white dark:bg-black dark:text-white md:min-h-screen"
     >
       <ChannelHeaderMobile
-        v-if="!showDiscussionTitle && !showEventTitle && !showIssueTitle"
+        v-if="!showDiscussionTitle && !showDownloadTitle && !showEventTitle && !showIssueTitle"
         :channel="channel"
         :channel-id="channelId"
         class="block md:hidden"
       />
       <ChannelHeaderDesktop
         v-if="
-          channel.channelBannerURL && !showDiscussionTitle && !showEventTitle && !showIssueTitle
+          channel.channelBannerURL && !showDiscussionTitle && !showDownloadTitle && !showEventTitle && !showIssueTitle
         "
         :admin-list="adminList"
         :channel="channel"
@@ -200,6 +202,19 @@
                 <BackLink
                   :data-testid="'discussion-detail-back-link'"
                   :link="`/forums/${channelId}/discussions`"
+                />
+              </DiscussionTitleEditForm>
+            </div>
+          </div>
+          <div
+            v-else-if="showDownloadTitle"
+            class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
+          >
+            <div class="max-w-screen-2xl flex-1 pr-1">
+              <DiscussionTitleEditForm>
+                <BackLink
+                  :data-testid="'download-detail-back-link'"
+                  :link="`/forums/${channelId}/downloads`"
                 />
               </DiscussionTitleEditForm>
             </div>
