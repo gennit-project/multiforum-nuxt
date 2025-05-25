@@ -9,6 +9,8 @@
   import "lightgallery/css/lg-thumbnail.css";
   import "lightgallery/css/lg-zoom.css";
   import type { Album } from "@/__generated__/graphql";
+  import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
+  import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 
   const props = defineProps({
     album: {
