@@ -2,6 +2,9 @@
   import ChannelTabs from "@/components/channel/ChannelTabs.vue";
   import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
   import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
+  import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
+  import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
+  import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
   import { GET_CHANNEL } from "@/graphQLData/channel/queries";
   import type { Channel, User } from "@/__generated__/graphql";
   import { computed } from "vue";
@@ -20,7 +23,7 @@
     if (routeName.includes("forums-forumId-discussions-discussionId")) {
       return {
         type: "discussion",
-        component: "DiscussionTitleEditForm",
+        component: DiscussionTitleEditForm,
         backLink: `/forums/${channelId.value}/discussions`,
         testId: "discussion-detail-back-link",
       };
@@ -28,7 +31,7 @@
     if (routeName.includes("forums-forumId-downloads-discussionId")) {
       return {
         type: "download",
-        component: "DiscussionTitleEditForm",
+        component: DiscussionTitleEditForm,
         backLink: `/forums/${channelId.value}/downloads`,
         testId: "download-detail-back-link",
       };
@@ -36,7 +39,7 @@
     if (routeName.includes("forums-forumId-events-eventId")) {
       return {
         type: "event",
-        component: "EventTitleEditForm",
+        component: EventTitleEditForm,
         backLink: `/forums/${channelId.value}/events`,
         testId: "event-detail-back-link",
       };
@@ -44,7 +47,7 @@
     if (routeName.includes("forums-forumId-issues-issueId")) {
       return {
         type: "issue",
-        component: "IssueTitleEditForm",
+        component: IssueTitleEditForm,
         backLink: `/forums/${channelId.value}/issues`,
         testId: "issue-detail-back-link",
       };
