@@ -1,14 +1,16 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import { ref, computed } from "vue";
-import Lightgallery from "lightgallery/vue";
-import lgThumbnail from "lightgallery/plugins/thumbnail";
-import lgZoom from "lightgallery/plugins/zoom";
-import { config } from "@/config";
-import "lightgallery/css/lightgallery.css";
-import "lightgallery/css/lg-thumbnail.css";
-import "lightgallery/css/lg-zoom.css";
-import type { Album } from "@/__generated__/graphql";
+  import type { PropType } from "vue";
+  import { ref, computed } from "vue";
+  import Lightgallery from "lightgallery/vue";
+  import lgThumbnail from "lightgallery/plugins/thumbnail";
+  import lgZoom from "lightgallery/plugins/zoom";
+  import { config } from "@/config";
+  import "lightgallery/css/lightgallery.css";
+  import "lightgallery/css/lg-thumbnail.css";
+  import "lightgallery/css/lg-zoom.css";
+  import type { Album } from "@/__generated__/graphql";
+  import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
+  import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
 
 const props = defineProps({
   album: {
