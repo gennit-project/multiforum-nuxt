@@ -198,6 +198,9 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
   vite: {
+    ssr: {
+      noExternal: ['vuetify']
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname),
