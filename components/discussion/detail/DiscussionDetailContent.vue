@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { computed, ref, watch, defineAsyncComponent } from "vue";
+  import { computed, ref, watch } from "vue";
   import { useQuery, useMutation } from "@vue/apollo-composable";
   import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
   import {
@@ -31,13 +31,8 @@
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
   import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
-  // Lazy load the album components since they're not needed for initial render
-  const DiscussionAlbum = defineAsyncComponent(
-    () => import("@/components/discussion/detail/DiscussionAlbum.vue")
-  );
-  const LightgalleryAlbum = defineAsyncComponent(
-    () => import("@/components/discussion/detail/LightgalleryAlbum.vue")
-  );
+  import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
+  import LightgalleryAlbum from "@/components/discussion/detail/LightgalleryAlbum.vue";
 
   const COMMENT_LIMIT = 50;
 
