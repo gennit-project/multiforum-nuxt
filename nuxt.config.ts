@@ -310,17 +310,6 @@ export default defineNuxtConfig({
           drop_debugger: process.env.NODE_ENV === "production",
         },
       },
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            "vue-libs": ["vue", "vue-router", "pinia"],
-            "ui-libs": ["vuetify"],
-            apollo: ["@apollo/client", "@vue/apollo-composable"],
-            "date-libs": ["luxon"],
-            "map-libs": ["@googlemaps/js-api-loader"],
-          },
-        },
-      },
     },
     optimizeDeps: {
       include: ["vue", "vue-router", "@vue/apollo-composable", "luxon"],
