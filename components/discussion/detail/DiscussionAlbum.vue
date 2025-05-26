@@ -4,7 +4,6 @@
   import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
   import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
   import type { Album } from "@/__generated__/graphql";
-  // Removed useDisplay from vuetify
   import DownloadIcon from "@/components/icons/DownloadIcon.vue";
   import XmarkIcon from "@/components/icons/XmarkIcon.vue";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
@@ -37,8 +36,6 @@
       default: true, // Default to true for backward compatibility
     },
   });
-
-  // Use Vuetify's display utilities for responsive design
   // Use a simple window width check
   const mdAndDown = ref(false);
   if (import.meta.client) {
@@ -497,7 +494,7 @@
             :alt="image.alt || ''"
             class="shadow-sm"
             :src="image.url || ''"
-          >
+          />
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -623,7 +620,7 @@
                   class="max-h-96 max-w-96 shadow-sm"
                   :class="{ hidden: idx !== activeIndex }"
                   :src="image.url || ''"
-                >
+                />
                 <div
                   v-if="editingCaptionIndex === idx && idx === activeIndex"
                   class="mt-1 text-center text-xs"
@@ -796,7 +793,7 @@
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
-          >
+          />
 
           <button
             v-if="orderedImages.length > 1"

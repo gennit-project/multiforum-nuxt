@@ -100,7 +100,6 @@ Configured proper minification in `nuxt.config.ts`:
 
 ```typescript
 build: {
-  transpile: ["vuetify"],
   minify: true,
   cssMinify: true,
   chunkSizeWarningLimit: 1000,
@@ -132,7 +131,6 @@ vite: {
       output: {
         manualChunks: {
           'vue-libs': ['vue', 'vue-router', 'pinia'],
-          'ui-libs': ['vuetify'],
           'apollo': ['@apollo/client', '@vue/apollo-composable'],
           'date-libs': ['luxon'],
           'map-libs': ['@googlemaps/js-api-loader']

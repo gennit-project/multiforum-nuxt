@@ -8,7 +8,6 @@
     TransitionRoot,
   } from "@headlessui/vue";
   import XIcon from "@/components/icons/XmarkIcon.vue";
-  // Removed useDisplay from vuetify
 
   const props = defineProps({
     isOpen: {
@@ -28,11 +27,10 @@
   const emit = defineEmits(["closePreview"]);
 
   const cancelButtonRef = ref<VNodeRef | null>(null);
-  // Use a simple window width check instead of vuetify's useDisplay
   const smAndDown = ref(false);
   if (import.meta.client) {
     smAndDown.value = window.innerWidth < 640;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       smAndDown.value = window.innerWidth < 640;
     });
   }

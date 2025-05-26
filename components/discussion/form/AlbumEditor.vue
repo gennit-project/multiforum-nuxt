@@ -8,7 +8,6 @@
   import TextInput from "@/components/TextInput.vue";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
-  // Removed useDisplay from vuetify
   import ExpandableImage from "@/components/ExpandableImage.vue";
   import { isFileSizeValid } from "@/utils/index";
 
@@ -30,11 +29,10 @@
 
   const emit = defineEmits(["updateFormValues"]);
 
-  // Use a simple window width check instead of vuetify's useDisplay
   const mdAndDown = ref(false);
   if (import.meta.client) {
     mdAndDown.value = window.innerWidth < 768;
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
       mdAndDown.value = window.innerWidth < 768;
     });
   }
@@ -527,7 +525,7 @@
         style="display: none"
         type="file"
         @change="handleFileInputChange"
-      >
+      />
     </div>
     <div
       v-else

@@ -11,7 +11,6 @@
   import XIcon from "@/components/icons/XmarkIcon.vue";
   import AvatarComponent from "@/components/AvatarComponent.vue";
   import { GET_USER } from "@/graphQLData/user/queries";
-  // Removed useDisplay from vuetify
   import CreateAnythingButton from "./CreateAnythingButton.vue";
   import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from "@/cache";
   import SiteSidenavLogout from "./SiteSidenavLogout.vue";
