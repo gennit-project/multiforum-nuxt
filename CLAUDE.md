@@ -237,6 +237,32 @@ When testing moderator permissions:
 
 - **Downloads**: There is no separate Download type. Downloads are discussions with the `hasDownload` field set to true. They use the Discussion type and are displayed with a different frontend skin in download-specific components.
 
+## Production Build Safety
+
+**Critical Rule: Production Build Changes Must Be Isolated**
+
+Any change that affects the production build configuration should be treated as potentially dangerous and must be committed separately. This includes:
+
+- Build optimization settings (minification, compression, chunking)
+- Module additions/removals (especially SSR-related modules like image optimization)
+- Bundler configuration changes (Vite, Webpack, Rollup settings)
+- Experimental features or flags
+- Performance optimization configurations
+
+**Why This Matters:**
+- Production builds behave differently than development builds
+- Build optimizations can cause SSR/hydration mismatches
+- Bundle splitting can create race conditions during component loading
+- Module changes can interfere with Vue's internal systems (e.g., transition classes)
+- Debugging becomes impossible when multiple build changes are bundled together
+
+**Best Practices:**
+- Make each build-related change in a separate commit
+- Test each change individually in production before proceeding
+- Include clear commit messages explaining what the change does and why
+- Revert changes one at a time if issues arise
+- Never bundle build configuration changes with feature development
+
 ## Working with Claude
 
 - **Incremental Changes**: Make small, focused changes rather than large sweeping changes
