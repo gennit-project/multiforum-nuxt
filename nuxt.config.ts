@@ -25,11 +25,11 @@ export default defineNuxtConfig({
     },
   },
   build: {
-    transpile: ["vuetify"],
+    transpile: [],
   },
   compatibilityDate: "2024-04-03",
   components: true,
-  css: ["vuetify/styles", "@fortawesome/fontawesome-free/css/all.css", "@/assets/css/index.css"],
+  css: ["@fortawesome/fontawesome-free/css/all.css", "@/assets/css/index.css"],
   devtools: { enabled: true },
   imports: {
     autoImport: true,
@@ -144,8 +144,6 @@ export default defineNuxtConfig({
     ],
     // Light/dark mode support
     "@nuxtjs/color-mode",
-    // Vuetify module for proper component/directive registration
-    ["vuetify-nuxt-module"],
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
     [
@@ -199,9 +197,6 @@ export default defineNuxtConfig({
     typeCheck: false,
   },
   vite: {
-    ssr: {
-      noExternal: ['vuetify']
-    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname),

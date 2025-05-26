@@ -4,7 +4,7 @@
   import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
   import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
   import type { Album } from "@/__generated__/graphql";
-  import { useDisplay } from "vuetify";
+  // Removed useDisplay from vuetify
   import DownloadIcon from "@/components/icons/DownloadIcon.vue";
   import XmarkIcon from "@/components/icons/XmarkIcon.vue";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
@@ -39,7 +39,14 @@
   });
 
   // Use Vuetify's display utilities for responsive design
-  const { mdAndDown } = useDisplay();
+  // Use a simple window width check
+  const mdAndDown = ref(false);
+  if (import.meta.client) {
+    mdAndDown.value = window.innerWidth < 768;
+    window.addEventListener("resize", () => {
+      mdAndDown.value = window.innerWidth < 768;
+    });
+  }
 
   // Carousel navigation state
   const activeIndex = ref(0);

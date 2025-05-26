@@ -38,8 +38,12 @@
 
 <template>
   <div class="w-fit">
-    <FloatingDropdown v-model="showMenu">
-      <template #button>
+    <FloatingDropdown 
+      :close-on-click="false"
+      content-class="p-0"
+      @update:open="(open) => showMenu = open"
+    >
+      <template #trigger>
         <VoteButton
           class="space-x-3"
           :is-permalinked="isPermalinked"
@@ -51,14 +55,14 @@
           <i class="fa-regular fa-face-smile" />
         </VoteButton>
       </template>
-      <template #content>
+      <template #content="{ close }">
         <client-only>
           <EmojiPicker
             :comment-id="commentId"
             :discussion-channel-id="discussionChannelId"
             :emoji-json="emojiJson"
-            @close="showMenu = false"
-            @emoji-click="showMenu = false"
+            @close="close"
+            @emoji-click="close"
           />
         </client-only>
       </template>

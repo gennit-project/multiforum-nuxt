@@ -11,7 +11,7 @@
   import XIcon from "@/components/icons/XmarkIcon.vue";
   import AvatarComponent from "@/components/AvatarComponent.vue";
   import { GET_USER } from "@/graphQLData/user/queries";
-  import { useDisplay } from "vuetify";
+  // Removed useDisplay from vuetify
   import CreateAnythingButton from "./CreateAnythingButton.vue";
   import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from "@/cache";
   import SiteSidenavLogout from "./SiteSidenavLogout.vue";
@@ -89,7 +89,14 @@
 
   const profilePicURL = computed(() => user.value?.profilePicURL || "");
 
-  const { smAndDown } = useDisplay();
+  // Use a simple window width check
+  const smAndDown = ref(false);
+  if (import.meta.client) {
+    smAndDown.value = window.innerWidth < 640;
+    window.addEventListener("resize", () => {
+      smAndDown.value = window.innerWidth < 640;
+    });
+  }
 
   const router = useRouter();
 
