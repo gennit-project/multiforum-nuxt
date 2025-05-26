@@ -8,7 +8,7 @@
   import TextInput from "@/components/TextInput.vue";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
-  import { useDisplay } from "vuetify";
+  // Removed useDisplay from vuetify
   import ExpandableImage from "@/components/ExpandableImage.vue";
   import { isFileSizeValid } from "@/utils/index";
 
@@ -30,7 +30,14 @@
 
   const emit = defineEmits(["updateFormValues"]);
 
-  const { mdAndDown } = useDisplay();
+  // Use a simple window width check instead of vuetify's useDisplay
+  const mdAndDown = ref(false);
+  if (import.meta.client) {
+    mdAndDown.value = window.innerWidth < 768;
+    window.addEventListener('resize', () => {
+      mdAndDown.value = window.innerWidth < 768;
+    });
+  }
 
   // Maximum number of images allowed
   const MAX_IMAGES = 25;

@@ -2,7 +2,7 @@
   import { ref, computed, watch } from "vue";
   import { useQuery } from "@vue/apollo-composable";
   import { useRouter, useRoute } from "nuxt/app";
-  import { useDisplay } from "vuetify";
+  // Removed useDisplay from vuetify
   import EventPreview from "../list/EventPreview.vue";
   import EventList from "../list/EventList.vue";
   import EventMap, { type MarkerMap } from "./Map.vue";
@@ -44,7 +44,14 @@
 
   defineEmits(["filterByTag", "filterByChannel", "highlightEvent", "openPreview", "unhighlight"]);
 
-  const { mdAndUp } = useDisplay();
+  // Use a simple window width check instead of vuetify's useDisplay
+  const mdAndUp = ref(true);
+  if (import.meta.client) {
+    mdAndUp.value = window.innerWidth >= 768;
+    window.addEventListener('resize', () => {
+      mdAndUp.value = window.innerWidth >= 768;
+    });
+  }
   const route = useRoute();
   const router = useRouter();
   const showOnlineOnly = route.name === "events-list-search";
