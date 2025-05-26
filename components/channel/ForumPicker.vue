@@ -3,6 +3,7 @@
   import type { PropType } from "vue";
   import SearchableForumList from "@/components/channel/SearchableForumList.vue";
   import AvatarComponent from "@/components/AvatarComponent.vue";
+  import FloatingDropdown from "@/components/FloatingDropdown.vue";
   import type { Channel } from "@/__generated__/graphql";
 
   // Props definition
@@ -29,14 +30,10 @@
   const emit = defineEmits(["setSelectedChannels"]);
 
   // Refs and state
-  const isDropdownOpen = ref(false);
   const selected = ref([...props.selectedChannels]);
   const channelOptions = ref<Channel[]>([]);
 
   // Methods
-  const toggleDropdown = () => {
-    isDropdownOpen.value = !isDropdownOpen.value;
-  };
 
   const toggleSelection = (channel: string) => {
     const index = selected.value.indexOf(channel);
@@ -48,9 +45,6 @@
     emit("setSelectedChannels", selected.value);
   };
 
-  const outside = () => {
-    isDropdownOpen.value = false;
-  };
 
   const removeSelection = (channel: string) => {
     selected.value = selected.value.filter((c) => c !== channel);
@@ -75,43 +69,45 @@
       >
         {{ description }}
       </div>
-      <div class="relative">
-        <div
-          class="px-4text-left flex h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700"
-          :data-testid="testId"
-          @click="toggleDropdown"
-        >
+      <FloatingDropdown placement="bottom-start">
+        <template #trigger>
           <div
-            v-for="(channelName, index) in selected"
-            :key="index"
-            class="mr-2 flex items-center rounded-full bg-orange-100 pr-2 text-orange-700 dark:bg-gray-600 dark:text-white"
-            @click="removeSelection(channelName)"
+            class="px-4text-left flex h-12 w-full cursor-pointer flex-wrap items-center rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-700"
+            :data-testid="testId"
           >
-            <AvatarComponent
-              class="mr-1 h-8 w-8"
-              :src="
-                channelOptions.find((channel: Channel) => channel?.uniqueName === channelName)
-                  ?.channelIconURL || ''
-              "
-              :text="channelName"
-            />
-            <span>{{ channelName }}</span>
-            <span
-              class="ml-1 cursor-pointer"
-              @click.stop="removeSelection(channelName)"
+            <div
+              v-for="(channelName, index) in selected"
+              :key="index"
+              class="mr-2 flex items-center rounded-full bg-orange-100 pr-2 text-orange-700 dark:bg-gray-600 dark:text-white"
+              @click="removeSelection(channelName)"
             >
-              &times;
-            </span>
+              <AvatarComponent
+                class="mr-1 h-8 w-8"
+                :src="
+                  channelOptions.find((channel: Channel) => channel?.uniqueName === channelName)
+                    ?.channelIconURL || ''
+                "
+                :text="channelName"
+              />
+              <span>{{ channelName }}</span>
+              <span
+                class="ml-1 cursor-pointer"
+                @click.stop="removeSelection(channelName)"
+              >
+                &times;
+              </span>
+            </div>
           </div>
-        </div>
-        <SearchableForumList
-          v-if="isDropdownOpen"
-          v-click-outside="outside"
-          :selected-channels="selected"
-          @set-channel-options="(channels: Channel[]) => (channelOptions = channels)"
-          @toggle-selection="toggleSelection"
-        />
-      </div>
+        </template>
+
+        <template #content>
+          <SearchableForumList
+            :selected-channels="selected"
+            @set-channel-options="(channels: Channel[]) => (channelOptions = channels)"
+            @toggle-selection="toggleSelection"
+          />
+        </template>
+      </FloatingDropdown>
     </div>
   </div>
 </template>

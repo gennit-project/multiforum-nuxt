@@ -2,6 +2,7 @@
   import { ref, watch } from "vue";
   import type { PropType } from "vue";
   import SearchableTagList from "@/components/SearchableTagList.vue";
+  import FloatingDropdown from "@/components/FloatingDropdown.vue";
 
   const props = defineProps({
     hideSelected: {
@@ -19,12 +20,7 @@
   });
   const emit = defineEmits(["setSelectedTags"]);
 
-  const isDropdownOpen = ref(false);
   const selected = ref([...props.selectedTags]);
-
-  const toggleDropdown = () => {
-    isDropdownOpen.value = !isDropdownOpen.value;
-  };
 
   const toggleSelectedTag = (tag: string) => {
     const index = selected.value.indexOf(tag);
@@ -43,9 +39,6 @@
     }
   );
 
-  const outside = () => {
-    isDropdownOpen.value = false;
-  };
 
   const removeSelection = (tag: string) => {
     selected.value = selected.value.filter((c) => c !== tag);
@@ -61,43 +54,45 @@
     >
       {{ description }}
     </div>
-    <div class="relative">
-      <div
-        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border border-gray-300 px-4 text-left text-sm dark:border-gray-700 dark:bg-gray-700"
-        @click="toggleDropdown"
-      >
+    <FloatingDropdown placement="bottom-start">
+      <template #trigger>
         <div
-          v-if="selected.length === 0"
-          class="text-gray-500 dark:text-gray-400"
+          class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border border-gray-300 px-4 text-left text-sm dark:border-gray-700 dark:bg-gray-700"
         >
-          There are no tags yet
-        </div>
-        <div
-          v-for="(tag, index) in selected"
-          :key="index"
-          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
-          @click="removeSelection(tag)"
-        >
-          <span>{{ tag }}</span>
-          <span
-            class="ml-1 cursor-pointer"
-            @click.stop="removeSelection(tag)"
+          <div
+            v-if="selected.length === 0"
+            class="text-gray-500 dark:text-gray-400"
           >
-            &times;
-          </span>
+            There are no tags yet
+          </div>
+          <div
+            v-for="(tag, index) in selected"
+            :key="index"
+            class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
+            @click="removeSelection(tag)"
+          >
+            <span>{{ tag }}</span>
+            <span
+              class="ml-1 cursor-pointer"
+              @click.stop="removeSelection(tag)"
+            >
+              &times;
+            </span>
+          </div>
+          <input
+            class="bg-transparent flex-1 border-none text-sm focus:outline-none dark:text-white"
+            data-testid="tag-picker"
+            placeholder="Add a tag..."
+          >
         </div>
-        <input
-          class="bg-transparent flex-1 border-none text-sm focus:outline-none dark:text-white"
-          data-testid="tag-picker"
-          placeholder="Add a tag..."
-        >
-      </div>
-      <SearchableTagList
-        v-if="isDropdownOpen"
-        v-click-outside="outside"
-        :selected-tags="selected"
-        @toggle-selection="toggleSelectedTag"
-      />
-    </div>
+      </template>
+
+      <template #content>
+        <SearchableTagList
+          :selected-tags="selected"
+          @toggle-selection="toggleSelectedTag"
+        />
+      </template>
+    </FloatingDropdown>
   </div>
 </template>
