@@ -156,10 +156,3 @@
   </div>
 </template>
 
-<style>
-  .custom-tooltip {
-    opacity: var(--v-tooltip-opacity, 1) !important;
-    border: 1px solid #30363e !important;
-    background-color: black !important;
-  }
-</style>
