@@ -323,7 +323,7 @@
     <hr
       v-if="allowHidingMainFilters"
       class="mb-2 border border-t-gray-500 dark:border-t-gray-600"
-    />
+    >
     <div
       v-if="showMainFilters"
       class="flex flex-col gap-2 rounded-lg p-4 dark:bg-gray-800"
@@ -376,9 +376,9 @@
               :close-on-content-click="false"
               offset-y
             >
-              <template #activator="{ props }">
+              <template #activator="{ props: searchBarProps }">
                 <button
-                  v-bind="props"
+                  v-bind="searchBarProps"
                   class="absolute inset-y-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
                   data-testid="more-filters-button"
                 >
@@ -445,9 +445,9 @@
               :close-on-content-click="false"
               offset-y
             >
-              <template #activator="{ props }">
+              <template #activator="{ props: locationBarProps }">
                 <button
-                  v-bind="props"
+                  v-bind="locationBarProps"
                   class="absolute inset-y-0 right-2 m-1 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
                   data-testid="more-filters-button"
                 >

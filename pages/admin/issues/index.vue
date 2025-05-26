@@ -94,7 +94,7 @@
         data-testid="show-only-server-rule-violations"
         type="checkbox"
         @change="toggleShowOnlyServerRuleViolations"
-      />
+      >
       <label
         class="mr-2"
         for="show-only-server-rule-violations"

@@ -36,7 +36,7 @@
       :class="{ 'rounded-full': rounded }"
       :src="src"
       @click="handleImageClick"
-    />
+    >
     <vue-easy-lightbox
       v-if="visible"
       :imgs="images"

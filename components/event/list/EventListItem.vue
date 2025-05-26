@@ -204,7 +204,7 @@
         alt="Event cover image"
         class="mb-4 block max-h-48 rounded-lg md:hidden"
         :src="event.coverImageURL"
-      />
+      >
       <div>
         <router-link
           class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
@@ -320,7 +320,7 @@
             :alt="event.title"
             class="h-44 w-44 rounded-lg"
             :src="event.coverImageURL"
-          />
+          >
         </div>
       </div>
     </div>

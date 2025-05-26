@@ -33,7 +33,7 @@
       type="checkbox"
       :value="rule.summary"
       @change="() => emit('toggleSelection', rule.summary)"
-    />
+    >
     <div class="flex flex-col text-sm">
       <!-- Summary and See More (inline and wrapping) -->
       <div class="flex flex-wrap items-center gap-x-2">

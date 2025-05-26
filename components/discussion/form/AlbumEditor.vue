@@ -520,7 +520,7 @@
         style="display: none"
         type="file"
         @change="handleFileInputChange"
-      />
+      >
     </div>
     <div
       v-else

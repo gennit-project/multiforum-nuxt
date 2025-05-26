@@ -74,7 +74,7 @@
           :src="image.url || ''"
           :alt="image.alt || ''"
           class="shadow-sm"
-        />
+        >
         <span class="text-center">
           {{ image.alt }}
         </span>
@@ -106,7 +106,7 @@
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="max-h-96 max-w-96 cursor-pointer object-contain shadow-sm"
-          />
+          >
         </a>
       </lightgallery>
 
@@ -143,7 +143,7 @@
               :src="image.url"
               :alt="`Thumbnail ${thumbnailStartIndex + index + 1}`"
               class="h-full w-full object-cover transition-opacity hover:opacity-80"
-            />
+            >
           </div>
         </div>
 

@@ -490,7 +490,7 @@
             :alt="image.alt || ''"
             class="shadow-sm"
             :src="image.url || ''"
-          />
+          >
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -616,7 +616,7 @@
                   class="max-h-96 max-w-96 shadow-sm"
                   :class="{ hidden: idx !== activeIndex }"
                   :src="image.url || ''"
-                />
+                >
                 <div
                   v-if="editingCaptionIndex === idx && idx === activeIndex"
                   class="mt-1 text-center text-xs"
@@ -789,7 +789,7 @@
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
-          />
+          >
 
           <button
             v-if="orderedImages.length > 1"

@@ -4,6 +4,9 @@
   import * as DiffMatchPatch from "diff-match-patch";
   import { useMutation } from "@vue/apollo-composable";
   import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
+  // Import DOMPurify for sanitizing HTML
+  // @ts-ignore
+  import DOMPurify from "dompurify";
 
   const props = defineProps({
     open: {
@@ -92,9 +95,10 @@
       }
     });
 
+    // Sanitize the HTML before returning
     return {
-      left: leftHtml,
-      right: rightHtml,
+      left: DOMPurify.sanitize(leftHtml),
+      right: DOMPurify.sanitize(rightHtml),
     };
   });
 
@@ -130,6 +134,7 @@
           id: props.oldVersion.id,
         });
       } catch (err) {
+        console.error("Error deleting revision:", err);
         isDeleting.value = false;
         // Error will be handled by the error ref from useMutation
       }
@@ -154,7 +159,7 @@
     @primary-button-click="handleDelete"
   >
     <template #icon>
-      <i class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"></i>
+      <i class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400" />
     </template>
     <template #content>
       <div class="flex flex-col gap-4 dark:text-gray-200">
@@ -189,12 +194,15 @@
               class="flex-1 rounded-t-md border-b bg-red-500/10 p-4 dark:border-gray-700 dark:bg-red-500/20 md:rounded-l-md md:rounded-tr-none md:border-b-0 md:border-r"
             >
               <h3 class="mb-2 text-sm font-medium text-red-700 dark:text-red-200">
-                Previous Version
+                <!-- diffHtml.left is sanitized with DOMPurify in script setup -->
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-html="diffHtml.left" />
               </h3>
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-900 dark:text-gray-200"
               >
-                <div v-html="diffHtml.left"></div>
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-html="diffHtml.left" />
               </div>
             </div>
 
@@ -208,7 +216,9 @@
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-900 dark:text-gray-200"
               >
-                <div v-html="diffHtml.right"></div>
+                <!-- diffHtml.right is sanitized with DOMPurify in script setup -->
+                <!-- eslint-disable-next-line vue/no-v-html -->
+                <div v-html="diffHtml.right" />
               </div>
             </div>
           </div>
@@ -218,11 +228,11 @@
             class="mt-4 flex flex-wrap justify-center gap-4 border-t p-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400"
           >
             <span class="flex items-center">
-              <span class="mr-1 inline-block h-3 w-3 bg-red-500/20 dark:bg-red-500/30"></span>
+              <span class="mr-1 inline-block h-3 w-3 bg-red-500/20 dark:bg-red-500/30" />
               Removed content
             </span>
             <span class="flex items-center">
-              <span class="mr-1 inline-block h-3 w-3 bg-green-500/20 dark:bg-green-500/30"></span>
+              <span class="mr-1 inline-block h-3 w-3 bg-green-500/20 dark:bg-green-500/30" />
               Added content
             </span>
           </div>

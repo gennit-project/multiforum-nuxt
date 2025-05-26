@@ -23,5 +23,5 @@
     :class="[disabled ? 'text-orange-200' : 'text-orange-600']"
     :disabled="disabled"
     type="checkbox"
-  />
+  >
 </template>

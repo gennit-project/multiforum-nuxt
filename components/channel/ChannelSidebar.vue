@@ -119,7 +119,7 @@
             <span
               class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-scroll mr-2"></i>Forum Rules
+              <i class="fa-solid fa-scroll mr-2"/>Forum Rules
             </span>
             <ChannelRules :rules="channelRules" />
           </div>
@@ -131,7 +131,7 @@
               <span
                 class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
               >
-                <i class="fa-solid fa-tags mr-2"></i>Tags
+                <i class="fa-solid fa-tags mr-2"/>Tags
               </span>
             </div>
             <div class="mb-6 mt-2 flex flex-wrap gap-2">
@@ -154,7 +154,7 @@
             <span
               class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
             >
-              <i class="fa-solid fa-user-shield mr-2"></i>Admins
+              <i class="fa-solid fa-user-shield mr-2"/>Admins
             </span>
           </div>
 

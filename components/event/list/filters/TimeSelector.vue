@@ -74,7 +74,7 @@
             :data-testid="`timeRange-${range['12-hour-label']}`"
             type="checkbox"
             @input="() => toggleSelectTimeRange(range)"
-          />
+          >
           <span class="ml-2 whitespace-nowrap text-sm font-medium">{{
             range["12-hour-label"]
           }}</span>

@@ -32,8 +32,7 @@
       environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
       tone-mapping="neutral"
       style="width: 100%; height: 300px; border-radius: 8px"
-    >
-    </model-viewer>
+    />
 
     <!-- Fullscreen modal -->
     <div
@@ -81,8 +80,7 @@
           shadow-intensity="0.4"
           environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
           tone-mapping="neutral"
-        >
-        </model-viewer>
+        />
       </div>
     </div>
   </div>
@@ -91,7 +89,7 @@
 <script setup lang="ts">
   import { onMounted, onUnmounted, ref } from "vue";
 
-  const props = defineProps<{
+  defineProps<{
     modelUrl?: string;
     height?: string;
     width?: string;
@@ -113,7 +111,7 @@
   };
 
   onMounted(async () => {
-    if (process.client) {
+    if (import.meta.client) {
       await import("@google/model-viewer");
     }
   });

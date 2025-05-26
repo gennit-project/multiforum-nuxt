@@ -621,7 +621,7 @@
                   alt="Cover Image"
                   class="h-auto max-h-64 w-full object-cover"
                   :src="formValues.coverImageURL"
-                />
+                >
 
                 <!-- Image overlay when loading -->
                 <div

@@ -176,6 +176,7 @@ export const updateFilters = (input: UpdateFiltersInput) => {
 
   Object.entries(params).forEach(([key, value]) => {
     if (value === undefined || value === "" || (Array.isArray(value) && value.length === 0)) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete updatedQuery[key];
     } else if (Array.isArray(value)) {
       updatedQuery[key] = [...value];

@@ -137,7 +137,7 @@
           type="checkbox"
           :value="tag.text"
           @change="() => emit('toggleSelection', tag.text)"
-        />
+        >
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span

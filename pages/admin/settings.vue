@@ -11,7 +11,6 @@
 
   const dataLoaded = ref(false);
   const {
-    result: getServerResult,
     error: getServerError,
     loading: getServerLoading,
     onResult: onGetServerResult,
@@ -25,12 +24,6 @@
     }
   );
 
-  const serverConfig = computed(() => {
-    if (getServerError.value || !getServerResult.value?.serverConfigs) {
-      return null;
-    }
-    return getServerResult.value?.serverConfigs[0] || null;
-  });
   const formValues = ref<ServerConfigUpdateInput>({
     serverDescription: "",
     rules: [],

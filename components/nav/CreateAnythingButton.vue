@@ -81,9 +81,6 @@
 
   const isMenuOpen = ref(false);
   const showTooltip = ref(false);
-  const showFooter = computed(() => {
-    return route.name && typeof route.name === "string" && !route.name.includes("map");
-  });
 
   const handleItemClick = (item: any) => {
     item.action();

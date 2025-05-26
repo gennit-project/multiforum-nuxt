@@ -161,7 +161,7 @@
           ]"
           type="text"
           @update:model-value="updateUsername"
-        />
+        >
         <div
           v-if="usernameIsTaken || usernameIsInvalid"
           class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"

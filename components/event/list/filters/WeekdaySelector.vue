@@ -72,7 +72,7 @@
           :data-testid="`weekday-${weekday.number}-checkbox`"
           type="checkbox"
           @input="() => toggleSelectWeekday(weekday)"
-        />
+        >
         <span>{{ weekday.shortName }}</span>
       </label>
     </div>

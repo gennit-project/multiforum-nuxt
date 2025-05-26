@@ -90,7 +90,7 @@
           class="bg-transparent flex-1 border-none text-sm focus:outline-none dark:text-white"
           data-testid="tag-picker"
           placeholder="Add a tag..."
-        />
+        >
       </div>
       <SearchableTagList
         v-if="isDropdownOpen"

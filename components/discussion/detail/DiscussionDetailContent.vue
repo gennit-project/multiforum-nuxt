@@ -30,6 +30,7 @@
   import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
+  import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
   // Lazy load the album components since they're not needed for initial render
   const DiscussionAlbum = defineAsyncComponent(
     () => import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -37,7 +38,6 @@
   const LightgalleryAlbum = defineAsyncComponent(
     () => import("@/components/discussion/detail/LightgalleryAlbum.vue")
   );
-  import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
 
   const COMMENT_LIMIT = 50;
 
@@ -130,7 +130,6 @@
 
   const discussionBodyEditMode = ref(false);
   const albumEditMode = ref(false);
-  const activeTab = ref("description");
 
   const discussion = computed<Discussion | null>(() => {
     const currentDiscussion = getDiscussionResult.value?.discussions[0];

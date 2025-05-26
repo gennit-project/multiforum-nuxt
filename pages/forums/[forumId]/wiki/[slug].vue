@@ -76,8 +76,7 @@
       <PrimaryButton
         :label="'Go Back'"
         @click="router.back()"
-      >
-      </PrimaryButton>
+      />
     </div>
 
     <div
@@ -89,13 +88,11 @@
         <PrimaryButton
           :label="'Go to Wiki Home'"
           @click="goToWikiHome"
-        >
-        </PrimaryButton>
+        />
         <PrimaryButton
           :label="'Create This Page'"
           @click="router.push(`/forums/${forumId}/wiki/create?slug=${slug}`)"
-        >
-        </PrimaryButton>
+        />
       </div>
     </div>
 

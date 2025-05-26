@@ -224,8 +224,7 @@
       <PrimaryButton
         :label="'Go to Wiki Home'"
         @click="router.push(`/forums/${forumId}/wiki`)"
-      >
-      </PrimaryButton>
+      />
     </div>
 
     <div
