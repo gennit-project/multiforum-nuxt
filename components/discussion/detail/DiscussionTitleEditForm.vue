@@ -171,8 +171,10 @@ const isDownloadDetailPage = computed(() => {
           >
             <CheckCircleIcon class="h-4 w-4" /> Answered
           </span>
-          <span>{{
-            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
+          <span class="text-gray-500 dark:text-gray-300">{{
+            isDownloadDetailPage
+              ? `published by ${discussion?.Author ? discussion.Author.username : "[Deleted]"} ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
+              : `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
           }}</span>
         </p>
       </div>
