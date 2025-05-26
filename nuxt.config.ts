@@ -143,65 +143,6 @@ export default defineNuxtConfig({
         },
       },
     ],
-    // Add image optimization
-    [
-      "@nuxt/image",
-      {
-        // Image quality options
-        quality: 80,
-        // Use WebP and AVIF formats where supported
-        format: ["webp", "avif", "jpg", "png"],
-        // Provider for image generation
-        provider: "ipx",
-        // Responsive image breakpoints
-        screens: {
-          xs: 320,
-          sm: 640,
-          md: 768,
-          lg: 1024,
-          xl: 1280,
-          xxl: 1536,
-          "2xl": 1536,
-        },
-        // Default image optimization options
-        modifiers: {
-          format: "webp",
-          quality: 80,
-          width: "auto",
-          height: "auto",
-        },
-        // Domains to allow for remote images
-        domains: ["storage.googleapis.com"],
-        // Adjust placeholder behavior
-        placeholder: {
-          size: 10,
-        },
-        // Presets for common image types
-        presets: {
-          avatar: {
-            modifiers: {
-              format: "webp",
-              width: 50,
-              height: 50,
-            },
-          },
-          thumbnail: {
-            modifiers: {
-              format: "webp",
-              width: 320,
-              height: 180,
-            },
-          },
-          cover: {
-            modifiers: {
-              format: "webp",
-              width: 1200,
-              height: 630,
-            },
-          },
-        },
-      },
-    ],
     // Light/dark mode support
     "@nuxtjs/color-mode",
     // The order matters in this list. Tailwind must come last
