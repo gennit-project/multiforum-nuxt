@@ -6,13 +6,13 @@
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import GenericButton from "@/components/GenericButton.vue";
   import TextInput from "@/components/TextInput.vue";
+  import CharCounter from "@/components/CharCounter.vue";
   import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
   import { useMutation, useQuery } from "@vue/apollo-composable";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import { GET_EVENT } from "@/graphQLData/event/queries";
   import { modProfileNameVar, usernameVar } from "@/cache";
   import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
-  import { useAppTheme } from "@/composables/useTheme";
   import { useRoute } from "nuxt/app";
 
   const route = useRoute();
@@ -88,17 +88,14 @@
       year: "numeric",
     });
   });
-  const { theme } = useAppTheme();
 </script>
 
 <template>
   <div class="mt-4 w-full lg:px-4">
     <div class="flex space-x-0 md:flex-row md:items-center md:justify-between md:space-x-2">
-      <v-skeleton-loader
+      <div
         v-if="getEventLoading"
-        class="flex-1 dark:bg-gray-800"
-        :theme="theme"
-        type="text"
+        class="flex-1 animate-pulse bg-gray-200 dark:bg-gray-700 h-8 rounded"
       />
       <div
         v-else

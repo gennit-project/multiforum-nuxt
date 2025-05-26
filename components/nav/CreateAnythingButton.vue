@@ -23,8 +23,8 @@
   const router = useRouter();
 
   const channelId = computed(() => {
-    if (typeof route.params.forumId !== "string") {
-      return "";
+    if (typeof route.params.forumId !== "string" || !route.params.forumId) {
+      return null;
     }
     return route.params.forumId;
   });
