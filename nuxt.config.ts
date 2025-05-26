@@ -15,7 +15,7 @@ export default defineNuxtConfig({
         { name: "color-scheme", content: "dark light" },
       ],
       htmlAttrs: {
-        class: "dark dark-mode-ready", // Default to dark mode for initial SSR
+        class: "dark-mode-ready", // Remove forced dark mode to prevent SSR hydration mismatch
       },
     },
   },
