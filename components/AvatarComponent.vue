@@ -68,7 +68,7 @@
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
       :src="src"
-    />
+    >
     <img
       v-else
       :alt="text"
@@ -80,6 +80,6 @@
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
       :src="identiconData"
-    />
+    >
   </div>
 </template>

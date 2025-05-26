@@ -52,5 +52,5 @@
     :alt="alt"
     :class="[isLarge ? '' : 'h-8 w-8', isSquare ? 'rounded-lg' : 'rounded-full']"
     :src="src"
-  />
+  >
 </template>

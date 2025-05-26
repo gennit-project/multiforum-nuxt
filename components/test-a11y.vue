@@ -4,14 +4,14 @@
     <img
       alt="Logo image"
       src="/logo.png"
-    />
+    >
 
     <!-- Missing form label -->
     <label for="test-input">Test input</label>
     <input
       id="test-input"
       type="text"
-    />
+    >
 
     <!-- Incorrect ARIA attribute -->
     <div id="missing-id">Label</div>

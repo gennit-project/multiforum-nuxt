@@ -27,7 +27,7 @@
     >
       {{ sectionTitle }}
     </h2>
-    <hr class="mb-4" />
+    <hr class="mb-4" >
     <div class="bg-gray-50 rounded-lg py-2 dark:bg-gray-800">
       <h3 class="font-medium">
         {{ roleTitle }}

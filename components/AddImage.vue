@@ -73,7 +73,7 @@
         type="file"
         @change="onFileSelected"
         @click="clearFileInput"
-      />
+      >
     </label>
   </div>
 </template>

@@ -241,7 +241,7 @@
                       )?.fontAwesome,
                       'mr-2 text-orange-500',
                     ]"
-                  ></i>
+                  />
                   <!-- For component icons -->
                   <component
                     :is="
@@ -302,7 +302,7 @@
                           !route.name?.includes(`edit-${tab.key}`),
                       },
                     ]"
-                  ></i>
+                  />
                   <!-- For component icons -->
                   <component
                     :is="tab.icon"
@@ -361,7 +361,7 @@
                           !route.name?.includes(`edit-${tab.key}`),
                       },
                     ]"
-                  ></i>
+                  />
                   <!-- For component icons -->
                   <component
                     :is="tab.icon"

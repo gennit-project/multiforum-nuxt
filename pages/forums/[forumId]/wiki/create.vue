@@ -22,7 +22,7 @@
   });
 
   // No need to derive slug for home page as it's always "home"
-  function updateSlug(value) {
+  function updateSlug() {
     // We're keeping the slug as "home" for the wiki home page
     // This is intentional - the home page must have the slug "home"
   }

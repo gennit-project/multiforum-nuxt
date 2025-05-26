@@ -56,7 +56,7 @@
         class="m-4 w-20 object-cover"
         :src="imageUrl"
         @error="showImage = false"
-      />
+      >
     </a>
     <div class="px-6 py-4">
       <a

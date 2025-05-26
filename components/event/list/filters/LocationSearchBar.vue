@@ -110,7 +110,7 @@
         :placeholder="searchPlaceholder"
         type="text"
         @input="searchLocations"
-      />
+      >
       <slot />
       <client-only>
         <ul

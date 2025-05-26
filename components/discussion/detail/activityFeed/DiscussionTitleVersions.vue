@@ -76,7 +76,7 @@
               <i
                 class="fa-solid fa-pencil text-gray-500 dark:text-gray-300"
                 aria-hidden="true"
-              ></i>
+              />
             </div>
           </div>
 

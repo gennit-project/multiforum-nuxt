@@ -31,7 +31,7 @@
             :data-testid="'canceled-checkbox'"
             type="checkbox"
             @input="() => toggleCanceled()"
-          />
+          >
           <span class="ml-2 whitespace-nowrap text-sm font-medium dark:text-white"
             >Include canceled events</span
           >

@@ -192,7 +192,7 @@
           :alt="formValues.uniqueName"
           class="w-full shadow-sm"
           :src="formValues.channelBannerURL"
-        />
+        >
         <AddImage
           key="channel-banner-url"
           :field-name="'channelBannerURL'"

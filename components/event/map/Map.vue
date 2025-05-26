@@ -81,8 +81,6 @@
     version: "weekly",
   });
 
-  const { theme } = useTheme();
-
   const mobileMapDiv = ref<HTMLElement | null>(null);
   const desktopMapDiv = ref<HTMLElement | null>(null);
   const map = ref<google.maps.Map | null>(null);

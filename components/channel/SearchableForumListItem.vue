@@ -35,7 +35,7 @@
       type="checkbox"
       :value="channel.uniqueName"
       @change="() => emit('toggleSelection', channel.uniqueName)"
-    />
+    >
     <div class="flex items-center space-x-2">
       <AvatarComponent
         v-if="channel.icon"

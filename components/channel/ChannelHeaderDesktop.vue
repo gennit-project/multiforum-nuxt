@@ -30,6 +30,6 @@
       :alt="'channel banner'"
       class="max-h-36 w-full object-cover"
       :src="channel?.channelBannerURL"
-    />
+    >
   </div>
 </template>

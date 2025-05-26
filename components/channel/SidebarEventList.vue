@@ -156,7 +156,7 @@
     <span
       class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-circle-play mr-2 text-orange-500"></i>Happening Now
+      <i class="fa-solid fa-circle-play mr-2 text-orange-500"/>Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
@@ -196,7 +196,7 @@
     <span
       class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-calendar-day mr-2"></i>Today
+      <i class="fa-solid fa-calendar-day mr-2"/>Today
     </span>
     <div
       v-for="event in dateObj.happeningToday"
@@ -227,7 +227,7 @@
     <span
       class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-calendar-plus mr-2"></i>Tomorrow
+      <i class="fa-solid fa-calendar-plus mr-2"/>Tomorrow
     </span>
     <div
       v-for="event in dateObj.happeningTomorrow"
@@ -258,7 +258,7 @@
       class="flex flex-col"
     >
       <span class="my-2 mb-2 flex items-center text-sm leading-6 text-gray-500 dark:text-gray-400">
-        <i class="fa-solid fa-calendar-week mr-2"></i>{{ date }}
+        <i class="fa-solid fa-calendar-week mr-2"/>{{ date }}
       </span>
       <div
         v-for="event in events"

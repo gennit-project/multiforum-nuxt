@@ -124,8 +124,7 @@
       <PrimaryButton
         :label="'Go Back'"
         @click="router.push(`/forums/${forumId}/wiki`)"
-      >
-      </PrimaryButton>
+      />
     </div>
 
     <div
@@ -139,13 +138,11 @@
         <PrimaryButton
           :label="'Create Wiki Home Page'"
           @click="router.push(`/forums/${forumId}/wiki/create`)"
-        >
-        </PrimaryButton>
+        />
         <PrimaryButton
           :label="'Go Back'"
           @click="router.push(`/forums/${forumId}/wiki`)"
-        >
-        </PrimaryButton>
+        />
       </div>
     </div>
 
@@ -222,8 +219,7 @@
             type="button"
             :label="'Cancel'"
             @click="router.push(`/forums/${forumId}/wiki`)"
-          >
-          </PrimaryButton>
+          />
           <PrimaryButton
             type="submit"
             :loading="isCreating"

@@ -91,7 +91,7 @@
         type="text"
         :value="initialValue"
         @input="updateSearchInput"
-      />
+      >
       <div
         v-if="initialValue"
         class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center"
