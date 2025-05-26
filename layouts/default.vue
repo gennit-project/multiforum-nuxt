@@ -253,7 +253,7 @@
 </script>
 
 <template>
-  <v-app>
+  <div>
     <ErrorBoundary>
       <DevOverlay v-if="isDevelopment" />
       <main class="flex min-h-screen flex-col">
@@ -311,5 +311,5 @@
         </div>
       </main>
     </ErrorBoundary>
-  </v-app>
+  </div>
 </template>
