@@ -200,7 +200,6 @@ export default defineNuxtConfig({
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },
-    { src: "@/plugins/performance.client", mode: "client" },
   ],
   runtimeConfig: {
     public: {
