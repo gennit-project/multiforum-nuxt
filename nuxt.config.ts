@@ -28,9 +28,6 @@ export default defineNuxtConfig({
   build: {
     transpile: ["vuetify"],
   },
-  experimental: {
-    payloadExtraction: true,
-  },
   compatibilityDate: "2024-04-03",
   components: true,
   css: ["vuetify/styles", "@fortawesome/fontawesome-free/css/all.css", "@/assets/css/index.css"],
