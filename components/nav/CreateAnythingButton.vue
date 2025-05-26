@@ -53,9 +53,14 @@
     },
   ];
 
-  const handleItemClick = (item: any, close: () => void) => {
-    item.action();
-    close();
+  const handleItemClick = async (item: any, close: () => void) => {
+    try {
+      await item.action();
+      close();
+    } catch (error) {
+      console.error("Navigation error:", error);
+      close();
+    }
   };
 </script>
 

@@ -1,8 +1,6 @@
 <script setup lang="ts">
   import { ref, computed } from "vue";
-  import { useRouter } from "nuxt/app";
   import { useQuery } from "@vue/apollo-composable";
-  import type { RouteLocationAsRelativeGeneric } from "vue-router";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
   import CalendarIcon from "@/components/icons/CalendarIcon.vue";
   import LocationIcon from "@/components/icons/LocationIcon.vue";
@@ -97,8 +95,6 @@
     });
   }
 
-  const router = useRouter();
-
   const outside = () => {
     emit("close");
   };
@@ -106,14 +102,6 @@
   const navLinkClasses =
     "pl-6 font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700";
 
-  const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
-    try {
-      await router.push(route);
-      setSideNavIsOpenVar(false);
-    } catch (error) {
-      console.error("Navigation error:", error);
-    }
-  };
 </script>
 
 <template>
@@ -164,13 +152,7 @@
                 :class="navLinkClasses"
                 :data-testid="`nav-link-${item.name}`"
                 :to="item.href"
-                @click.prevent="
-                  () => {
-                    routeAndClose({
-                      name: item.routerName,
-                    });
-                  }
-                "
+                @click="setSideNavIsOpenVar(false)"
               >
                 <component
                   :is="item.icon"
@@ -208,14 +190,7 @@
                   name: 'forums-forumId-discussions',
                   params: { forumId: forum.uniqueName },
                 }"
-                @click.prevent="
-                  () => {
-                    routeAndClose({
-                      name: 'forums-forumId-discussions',
-                      params: { forumId: forum.uniqueName },
-                    });
-                  }
-                "
+                @click="setSideNavIsOpenVar(false)"
               >
                 <AvatarComponent
                   class="list-item-icon border-1 h-8 w-8 shrink-0 border-gray-300 shadow-sm dark:border-gray-300"
@@ -257,14 +232,7 @@
             name: 'u-username',
             params: { username: usernameVar },
           }"
-          @click.prevent="
-            () => {
-              routeAndClose({
-                name: 'u-username',
-                params: { username: usernameVar },
-              });
-            }
-          "
+          @click="setSideNavIsOpenVar(false)"
         >
           <AvatarComponent
             v-if="profilePicURL"
@@ -281,14 +249,7 @@
             name: 'u-username-settings',
             params: { username: usernameVar },
           }"
-          @click.prevent="
-            () => {
-              routeAndClose({
-                name: 'u-username-settings',
-                params: { username: usernameVar },
-              });
-            }
-          "
+          @click="setSideNavIsOpenVar(false)"
         >
           Account Settings
         </nuxt-link>
@@ -297,13 +258,7 @@
           :to="{
             name: 'admin-issues',
           }"
-          @click.prevent="
-            () => {
-              routeAndClose({
-                name: 'admin-issues',
-              });
-            }
-          "
+          @click="setSideNavIsOpenVar(false)"
         >
           Admin Dashboard
         </nuxt-link>
