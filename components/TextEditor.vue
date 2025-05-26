@@ -444,13 +444,6 @@
     showEmojiPicker.value = false;
   };
 
-  const onTextareaInput = (e: Event) => {
-    updateText((e.target as HTMLTextAreaElement).value);
-  };
-
-  const onFileChange = (input: FileChangeInput) => {
-    handleFileChange(input);
-  };
 </script>
 
 <template>
@@ -547,7 +540,7 @@
             :value="text"
             @dragover.prevent
             @drop="handleDrop"
-            @input="onTextareaInput"
+            @input="updateText(($event.target as HTMLInputElement).value)"
           />
           <div class="mt-2 flex-col divide-gray-400 dark:divide-gray-300">
             <a
@@ -561,7 +554,11 @@
               v-if="props.allowImageUpload"
               :field-name="fieldName"
               label="Paste, drop, or click to add files"
-              @file-change="onFileChange"
+              @file-change="
+                (input: FileChangeInput) => {
+                  handleFileChange(input);
+                }
+              "
             />
           </div>
         </TabPanel>
