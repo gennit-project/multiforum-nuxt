@@ -126,7 +126,6 @@
       @click="outside"
     />
     <div
-      v-click-outside="outside"
       class="overlay-shade fixed left-0 top-0 flex h-full w-[275px] flex-col justify-between overflow-y-auto border-gray-300 bg-white py-2 dark:border-gray-300 dark:bg-gray-900"
     >
       <div>
