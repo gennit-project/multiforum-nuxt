@@ -216,8 +216,8 @@ export default defineNuxtConfig({
       allowedHosts: ["localhost", "69f8-98-168-53-208.ngrok-free.app"],
     },
     build: {
-      minify: true,
-      cssMinify: true,
+      minify: false, // Disable minification to prevent symbol mangling of Vue transition classes
+      cssMinify: false,
     },
     optimizeDeps: {
       include: ["vue", "vue-router", "@vue/apollo-composable", "luxon"],
