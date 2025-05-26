@@ -231,7 +231,7 @@ export default defineNuxtConfig({
     ],
   ],
   nitro: {
-    preset: "vercel",
+    preset: "node-server",
     // Enable CDN caching
     cdn: true,
     // Enable server-side caching

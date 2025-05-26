@@ -1,15 +1,1 @@
-{
-  "projectId": "prj_v2Cv1CkngCO24Wm1UQpEp8uCeyq0",
-  "orgId": "team_iZTd6NPgopqrwCFmaEDuJ96S",
-  "settings": {
-    "createdAt": 1730242177957,
-    "framework": "nuxtjs",
-    "devCommand": null,
-    "installCommand": null,
-    "buildCommand": "yarn generate",
-    "outputDirectory": ".output/public",
-    "rootDirectory": null,
-    "directoryListing": false,
-    "nodeVersion": "20.x"
-  }
-}
+{"projectId":"prj_9VDSmMCwIFU4lvldAm3KcSHbGtob","orgId":"team_iZTd6NPgopqrwCFmaEDuJ96S"}
