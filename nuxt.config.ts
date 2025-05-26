@@ -144,6 +144,8 @@ export default defineNuxtConfig({
     ],
     // Light/dark mode support
     "@nuxtjs/color-mode",
+    // Vuetify module for proper component/directive registration
+    ["vuetify-nuxt-module"],
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
     [
@@ -172,7 +174,6 @@ export default defineNuxtConfig({
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/sentry", mode: "client" },
     { src: "@/plugins/google-maps", mode: "client" },
-    { src: "@/plugins/vuetify", mode: "all" },
   ],
   runtimeConfig: {
     public: {
