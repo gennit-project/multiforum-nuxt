@@ -2,7 +2,7 @@
   import { ref, onMounted, watch, computed, onUnmounted } from "vue";
   import { useAuth0 } from "@auth0/auth0-vue";
   import { useLazyQuery } from "@vue/apollo-composable";
-  import TopNav from "@/components/nav/TopNav.vue";
+  import TopNav from "@/components/nav/Topnav.vue";
   import SiteSidenav from "@/components/nav/SiteSidenav.vue";
   import SiteFooter from "@/components/layout/SiteFooter.vue";
   import { GET_EMAIL } from "@/graphQLData/email/queries";
@@ -273,7 +273,7 @@
             click here to log in again
           </button>
         </div>
-        <div class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200">
+        <div class="flex flex-grow list-disc flex-col bg-gray-200 text-gray-900 dark:bg-black dark:text-gray-200">
           <TopNav
             :show-user-profile-dropdown="showUserProfileDropdown"
             :side-nav-is-open="sideNavIsOpenVar"

@@ -1,5 +1,9 @@
 <script lang="ts" setup>
   import { computed } from "vue";
+  import FloatingTooltip from "@/components/FloatingTooltip.vue";
+  import AuthButton from "@/components/AuthButton.vue";
+  import TooltipContent from "@/components/TooltipContent.vue";
+  
   const properties = defineProps({
     active: Boolean,
     count: {
@@ -48,36 +52,10 @@
 </script>
 
 <template>
-  <div v-if="tooltipText">
-    <client-only>
-      <v-tooltip
-        content-class="custom-tooltip"
-        location="top"
-      >
-        <template #activator="{ props }">
-          <div v-bind="props">
-            <AuthButton
-              :button-classes="buttonClasses"
-              :count="count"
-              :loading="loading"
-              :show-count="showCount"
-              :test-id="testId"
-              @click="emit('vote')"
-            >
-              <slot />
-            </AuthButton>
-          </div>
-        </template>
-        <template #default>
-          <TooltipContent
-            :tooltip-text="tooltipText"
-            :tooltip-unicode="tooltipUnicode"
-          />
-        </template>
-      </v-tooltip>
-    </client-only>
-  </div>
-  <template v-else>
+  <FloatingTooltip
+    v-if="tooltipText"
+    placement="top"
+  >
     <AuthButton
       :button-classes="buttonClasses"
       :count="count"
@@ -88,5 +66,22 @@
     >
       <slot />
     </AuthButton>
-  </template>
+    <template #tooltip>
+      <TooltipContent
+        :tooltip-text="tooltipText"
+        :tooltip-unicode="tooltipUnicode"
+      />
+    </template>
+  </FloatingTooltip>
+  <AuthButton
+    v-else
+    :button-classes="buttonClasses"
+    :count="count"
+    :loading="loading"
+    :show-count="showCount"
+    :test-id="testId"
+    @click="emit('vote')"
+  >
+    <slot />
+  </AuthButton>
 </template>
