@@ -168,33 +168,7 @@ export default defineNuxtConfig({
       },
     ],
   ],
-  nitro: {
-    preset: "vercel",
-    // Enable CDN caching
-    cdn: true,
-    // Enable server-side caching
-    routeRules: {
-      // Cache API routes
-      "/api/**": {
-        cache: {
-          // Let middleware handle specific cache times
-          headers: ["cache-control"],
-        },
-      },
-      // Cache static assets
-      "/_nuxt/**": {
-        headers: {
-          "cache-control": "public, max-age=31536000, immutable",
-        },
-      },
-      // Cache public assets
-      "/assets/**": {
-        headers: {
-          "cache-control": "public, max-age=31536000, immutable",
-        },
-      },
-    },
-  },
+  nitro: { preset: "vercel" },
   plugins: [
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/sentry", mode: "client" },
