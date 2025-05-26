@@ -50,7 +50,7 @@
         :is-small="true"
         :text="channel.uniqueName"
       />
-      <div class="flex-1 flex-col text-sm">
+      <div class="flex-1 flex-col text-sm text-gray-900 dark:text-gray-100">
         <span
           v-if="!channel.displayName"
           class="font-mono font-bold"
@@ -67,7 +67,7 @@
             >{{ channel.uniqueName }}</span
           >
         </div>
-        <div>{{ truncate(channel.description || "") }}</div>
+        <div class="text-gray-600 dark:text-gray-400">{{ truncate(channel.description || "") }}</div>
       </div>
     </div>
   </label>
