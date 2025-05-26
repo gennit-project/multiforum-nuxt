@@ -141,7 +141,7 @@
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span
-              class="font-bold"
+              class="font-bold text-gray-900 dark:text-gray-100"
               :data-testid="`tag-picker-${tag.text}`"
               >{{ tag.text }}</span
             >

@@ -2,6 +2,7 @@
   import { ref, watch } from "vue";
   import type { PropType } from "vue";
   import SearchableForumList from "@/components/channel/SearchableForumList.vue";
+  import AvatarComponent from "@/components/AvatarComponent.vue";
   import type { Channel } from "@/__generated__/graphql";
 
   // Props definition

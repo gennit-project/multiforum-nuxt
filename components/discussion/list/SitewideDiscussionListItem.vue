@@ -149,8 +149,8 @@
               :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
             >
               <span
-                class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
-                :class="discussionIdInParams === discussionId ? 'text-black' : ''"
+                class="cursor-pointer text-sm text-gray-900 hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                :class="discussionIdInParams === discussionId ? 'text-black dark:text-white' : ''"
               >
                 <HighlightedSearchTerms
                   :search-input="searchInput"
