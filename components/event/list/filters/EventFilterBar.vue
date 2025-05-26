@@ -387,7 +387,7 @@
 
               <template #content>
                 <div
-                  class="flex flex-col gap-3 bg-white p-4 dark:bg-gray-700"
+                  class="flex flex-col gap-3 bg-white p-4 text-gray-900 dark:bg-gray-700 dark:text-gray-100"
                   :class="[allowHidingMainFilters ? 'rounded-lg border border-gray-300' : '']"
                 >
                   <div v-if="showLocationSearchBarAndDistanceButtons">
@@ -448,16 +448,16 @@
             >
               <template #trigger>
                 <button
-                  class="absolute inset-y-0 right-2 m-1 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
+                  class="absolute top-1/2 right-2 -translate-y-1/2 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
                   data-testid="more-filters-button"
                 >
-                  <FilterIcon class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white" />
+                  <FilterIcon class="h-4 w-4 text-gray-600 dark:text-white" />
                 </button>
               </template>
 
               <template #content>
                 <div
-                  class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 dark:bg-gray-700"
+                  class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 text-gray-900 dark:bg-gray-700 dark:text-gray-100"
                 >
                   <div v-if="showLocationSearchBarAndDistanceButtons">
                     <div
