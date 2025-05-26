@@ -6,17 +6,15 @@
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import GenericButton from "@/components/GenericButton.vue";
   import TextInput from "@/components/TextInput.vue";
+  import CharCounter from "@/components/CharCounter.vue";
   import { UPDATE_ISSUE } from "@/graphQLData/issue/mutations";
   import { useMutation, useQuery } from "@vue/apollo-composable";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import { GET_ISSUE } from "@/graphQLData/issue/queries";
   import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
   import { modProfileNameVar } from "@/cache";
-  import { useAppTheme } from "@/composables/useTheme";
   import { useRoute } from "nuxt/app";
   import IssueBadge from "@/components/mod/IssueBadge.vue";
-
-  const { theme } = useAppTheme();
 
   const route = useRoute();
   const titleEditMode = ref(false);
@@ -97,11 +95,9 @@
     <div
       class="mb-3 mt-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
-      <v-skeleton-loader
+      <div
         v-if="getIssueLoading"
-        class="flex-1"
-        :theme="theme"
-        type="text"
+        class="flex-1 animate-pulse bg-gray-200 dark:bg-gray-700 h-8 rounded"
       />
       <div
         v-else

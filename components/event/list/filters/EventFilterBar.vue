@@ -25,6 +25,7 @@
   import { updateFilters } from "@/utils/routerUtils";
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import FloatingDropdown from "@/components/FloatingDropdown.vue";
 
   // Props
   const props = defineProps({
@@ -371,64 +372,65 @@
             :test-id="'event-search-bar'"
             @update-search-input="updateSearchInput"
           >
-            <v-menu
+            <FloatingDropdown
               v-if="!showLocationSearchBarAndDistanceButtons"
-              :close-on-content-click="false"
-              offset-y
+              placement="bottom-end"
             >
-              <template #activator="{ props: searchBarProps }">
+              <template #trigger>
                 <button
-                  v-bind="searchBarProps"
                   class="absolute inset-y-0 right-0 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full p-2 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700"
                   data-testid="more-filters-button"
                 >
                   <FilterIcon class="h-4 w-4 dark:text-white" />
                 </button>
               </template>
-              <div
-                class="flex flex-col gap-3 bg-white p-4 dark:bg-gray-700"
-                :class="[allowHidingMainFilters ? 'rounded-lg border border-gray-300' : '']"
-              >
-                <div v-if="showLocationSearchBarAndDistanceButtons">
-                  <div
-                    v-if="selectedDistanceUnit === MilesOrKm.KM"
-                    class="flex flex-wrap gap-x-1 gap-y-3"
-                  >
-                    <GenericButton
-                      v-for="distance in distanceOptionsForKilometers"
-                      :key="distance.value"
-                      :active="distance.value === filterValues.radius"
-                      :data-testid="`distance-${distance.value}`"
-                      :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
-                      @click="updateSelectedDistance(distance)"
-                    />
+
+              <template #content>
+                <div
+                  class="flex flex-col gap-3 bg-white p-4 dark:bg-gray-700"
+                  :class="[allowHidingMainFilters ? 'rounded-lg border border-gray-300' : '']"
+                >
+                  <div v-if="showLocationSearchBarAndDistanceButtons">
+                    <div
+                      v-if="selectedDistanceUnit === MilesOrKm.KM"
+                      class="flex flex-wrap gap-x-1 gap-y-3"
+                    >
+                      <GenericButton
+                        v-for="distance in distanceOptionsForKilometers"
+                        :key="distance.value"
+                        :active="distance.value === filterValues.radius"
+                        :data-testid="`distance-${distance.value}`"
+                        :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
+                        @click="updateSelectedDistance(distance)"
+                      />
+                    </div>
+                    <div
+                      v-else
+                      class="flex flex-wrap gap-x-1 gap-y-3"
+                    >
+                      <GenericButton
+                        v-for="distance in distanceOptionsForMiles"
+                        :key="distance.value"
+                        :active="distance.value === filterValues.radius"
+                        :data-testid="`distance-${distance.value}`"
+                        :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
+                        @click="updateSelectedDistance(distance)"
+                      />
+                    </div>
                   </div>
-                  <div
-                    v-else
-                    class="flex flex-wrap gap-x-1 gap-y-3"
-                  >
-                    <GenericButton
-                      v-for="distance in distanceOptionsForMiles"
-                      :key="distance.value"
-                      :active="distance.value === filterValues.radius"
-                      :data-testid="`distance-${distance.value}`"
-                      :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
-                      @click="updateSelectedDistance(distance)"
-                    />
-                  </div>
+
+                  <SelectCanceled
+                    :show-canceled="filterValues.showCanceledEvents || false"
+                    @update-show-canceled="updateShowCanceled"
+                  />
+
+                  <SelectFree
+                    :show-only-free="filterValues.free || false"
+                    @update-show-only-free="updateShowOnlyFree"
+                  />
                 </div>
-
-                <SelectCanceled
-                  :show-canceled="filterValues.showCanceledEvents || false"
-                  @update-show-canceled="updateShowCanceled"
-                />
-
-                <SelectFree
-                  :show-only-free="filterValues.free || false"
-                  @update-show-only-free="updateShowOnlyFree"
-                />
-              </div>
-            </v-menu>
+              </template>
+            </FloatingDropdown>
           </SearchBar>
           <LocationSearchBar
             v-if="showLocationSearchBarAndDistanceButtons"
@@ -440,63 +442,64 @@
             :reference-point-address-name="referencePointName"
             @update-location-input="updateLocationInput"
           >
-            <v-menu
+            <FloatingDropdown
               v-if="showLocationSearchBarAndDistanceButtons"
-              :close-on-content-click="false"
-              offset-y
+              placement="bottom-end"
             >
-              <template #activator="{ props: locationBarProps }">
+              <template #trigger>
                 <button
-                  v-bind="locationBarProps"
                   class="absolute inset-y-0 right-2 m-1 flex cursor-pointer items-center justify-center rounded-full bg-white p-2 dark:bg-gray-700 dark:text-white"
                   data-testid="more-filters-button"
                 >
                   <FilterIcon class="h-4 w-4 bg-white dark:bg-gray-700 dark:text-white" />
                 </button>
               </template>
-              <div
-                class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 dark:bg-gray-700"
-              >
-                <div v-if="showLocationSearchBarAndDistanceButtons">
-                  <div
-                    v-if="selectedDistanceUnit === MilesOrKm.KM"
-                    class="flex flex-wrap gap-x-1 gap-y-3"
-                  >
-                    <GenericButton
-                      v-for="distance in distanceOptionsForKilometers"
-                      :key="distance.value"
-                      :active="distance.value === filterValues.radius"
-                      :data-testid="`distance-${distance.value}`"
-                      :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
-                      @click="updateSelectedDistance(distance)"
-                    />
+
+              <template #content>
+                <div
+                  class="flex flex-col gap-3 rounded-lg border border-gray-300 bg-white p-4 dark:bg-gray-700"
+                >
+                  <div v-if="showLocationSearchBarAndDistanceButtons">
+                    <div
+                      v-if="selectedDistanceUnit === MilesOrKm.KM"
+                      class="flex flex-wrap gap-x-1 gap-y-3"
+                    >
+                      <GenericButton
+                        v-for="distance in distanceOptionsForKilometers"
+                        :key="distance.value"
+                        :active="distance.value === filterValues.radius"
+                        :data-testid="`distance-${distance.value}`"
+                        :text="`${distance.label} ${distance.value !== 0 ? 'km' : ''}`"
+                        @click="updateSelectedDistance(distance)"
+                      />
+                    </div>
+                    <div
+                      v-else
+                      class="flex flex-wrap gap-x-1 gap-y-3"
+                    >
+                      <GenericButton
+                        v-for="distance in distanceOptionsForMiles"
+                        :key="distance.value"
+                        :active="distance.value === filterValues.radius"
+                        :data-testid="`distance-${distance.value}`"
+                        :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
+                        @click="updateSelectedDistance(distance)"
+                      />
+                    </div>
                   </div>
-                  <div
-                    v-else
-                    class="flex flex-wrap gap-x-1 gap-y-3"
-                  >
-                    <GenericButton
-                      v-for="distance in distanceOptionsForMiles"
-                      :key="distance.value"
-                      :active="distance.value === filterValues.radius"
-                      :data-testid="`distance-${distance.value}`"
-                      :text="`${distance.label} ${distance.value !== 0 ? 'mi' : ''}`"
-                      @click="updateSelectedDistance(distance)"
-                    />
-                  </div>
+
+                  <SelectCanceled
+                    :show-canceled="filterValues.showCanceledEvents || false"
+                    @update-show-canceled="updateShowCanceled"
+                  />
+
+                  <SelectFree
+                    :show-only-free="filterValues.free || false"
+                    @update-show-only-free="updateShowOnlyFree"
+                  />
                 </div>
-
-                <SelectCanceled
-                  :show-canceled="filterValues.showCanceledEvents || false"
-                  @update-show-canceled="updateShowCanceled"
-                />
-
-                <SelectFree
-                  :show-only-free="filterValues.free || false"
-                  @update-show-only-free="updateShowOnlyFree"
-                />
-              </div>
-            </v-menu>
+              </template>
+            </FloatingDropdown>
           </LocationSearchBar>
           <div class="flex hidden items-center justify-center space-x-2 md:block">
             <FilterChip
