@@ -3,9 +3,9 @@
 </script>
 
 <template>
-  <div class="min-h-screen bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-200">
+  <NuxtLayout>
     <SearchDiscussions :is-forum-scoped="false" />
-  </div>
+  </NuxtLayout>
 </template>
 
 <style scoped></style>
