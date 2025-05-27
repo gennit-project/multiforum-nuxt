@@ -244,7 +244,7 @@ describe('routerUtils', () => {
 
       const result = getFeedbackPermalinkObject(input);
 
-      expect(result).toBeNull();
+      expect(result).toEqual({});
       expect(console.error).toHaveBeenCalledWith(
         'Missing required parameters for permalink to feedback on discussion'
       );
@@ -262,7 +262,7 @@ describe('routerUtils', () => {
 
       const result = getFeedbackPermalinkObject(input);
 
-      expect(result).toBeNull();
+      expect(result).toEqual({});
       expect(console.error).toHaveBeenCalledWith(
         'Missing required parameters for permalink to feedback on event'
       );
