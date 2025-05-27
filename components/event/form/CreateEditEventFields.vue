@@ -476,7 +476,7 @@ const touched = ref(false);
               @update="emit('updateFormValues', { title: $event })"
             />
             <CharCounter
-              data-testid="title-char-counter"
+              test-id="title-char-counter"
               :current="formValues.title?.length || 0"
               :max="EVENT_TITLE_CHAR_LIMIT"
             />
@@ -621,7 +621,7 @@ const touched = ref(false);
               @update="emit('updateFormValues', { description: $event })"
             />
             <CharCounter
-              data-testid="description-char-counter"
+              test-id="description-char-counter"
               :current="formValues.description?.length || 0"
               :max="MAX_CHARS_IN_EVENT_DESCRIPTION"
             />

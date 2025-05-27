@@ -278,6 +278,7 @@ export default defineNuxtConfig({
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },
     { src: "@/plugins/performance.client", mode: "client" },
+    { src: "@/plugins/click-outside.client", mode: "client" },
   ],
   runtimeConfig: {
     public: {

@@ -24,6 +24,7 @@ import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
 import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
 import { DateTime } from "luxon";
 import { config } from "@/config";
+import { useQuery } from "@vue/apollo-composable";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -238,13 +239,13 @@ const permissionData = computed(() => {
 
 // Use the utility function to get all permissions at once
 const userPermissions = computed(() => {
-  return getAllPermissions(
-    permissionData.value,
-    standardModRole.value,
-    elevatedModRole.value,
-    usernameVar.value,
-    modProfileNameVar.value
-  );
+  return getAllPermissions({
+    permissionData: permissionData.value,
+    standardModRole: standardModRole.value,
+    elevatedModRole: elevatedModRole.value,
+    username: usernameVar.value,
+    modProfileName: modProfileNameVar.value,
+  });
 });
 
 const permalinkedCommentId = route.params.commentId;
@@ -362,10 +363,10 @@ if (import.meta.client) {
 }
 
 const permalink = computed(() => {
-  if (!Object.keys(permalinkObject.value).length) {
+  if (!Object.keys(permalinkObject.value ?? {}).length) {
     return '';
   }
-  return `${basePath}${router.resolve(permalinkObject.value).href}`;
+  return `${basePath}${router.resolve(permalinkObject.value ?? {}).href}`;
 });
 
 const copyLink = async () => {
@@ -451,8 +452,19 @@ const availableModActions = computed(() => {
         },
       ]);
     }
-  } else {
-    if (userPermissions.value.canHideComment) {
+
+    // Need to be logged in for edit/delete or mod actions
+    if (!usernameVar.value) {
+      return out;
+    }
+
+    const isOwnComment =
+      props.commentData?.CommentAuthor?.__typename === "User" &&
+      props.commentData?.CommentAuthor?.username === usernameVar.value;
+
+
+    if (isOwnComment) {
+      // If user is the comment author, show edit/delete options
       out = out.concat([
         {
           label: "Unarchive",
@@ -463,23 +475,14 @@ const availableModActions = computed(() => {
       ]);
     }
   }
-
-  // If there are actions, add a divider at the beginning
-  if (out.length > 0) {
-    out.unshift({
-      value: "Moderation Actions",
-      isDivider: true,
-    });
-  }
-  
   return out;
-})
+});
 
 const commentMenuItems = computed(() => {
   let out: any[] = [];
   
   // Only show Copy Link when we have a valid permalink
-  if (canShowPermalink.value && Object.keys(permalinkObject.value).length > 0) {
+  if (canShowPermalink.value && Object.keys(permalinkObject.value ?? {}).length > 0) {
     out.unshift({
       label: "Copy Link",
       value: "",

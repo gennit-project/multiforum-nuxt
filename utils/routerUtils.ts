@@ -97,7 +97,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   if (routeName === "forums-forumId-discussions-feedback-discussionId" || GivesFeedbackOnDiscussion) {
     if (!forumId || !commentId || !GivesFeedbackOnDiscussion) {
       console.error("Missing required parameters for permalink to feedback on discussion");
-      return null
+      return {}
     }
     return {
       name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
@@ -113,7 +113,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   if (routeName === "forums-forumId-events-feedback-eventId" || GivesFeedbackOnEvent) {
     if (!forumId || !commentId || !GivesFeedbackOnEvent) {
       console.error("Missing required parameters for permalink to feedback on event");
-      return null
+      return {}
     }
     return {
       name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
@@ -178,6 +178,7 @@ export const updateFilters = (input: UpdateFiltersInput) => {
       value === "" ||
       (Array.isArray(value) && value.length === 0)
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
       delete updatedQuery[key];
     } else if (Array.isArray(value)) {
       updatedQuery[key] = [...value];
