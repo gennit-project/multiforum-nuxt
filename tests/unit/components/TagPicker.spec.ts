@@ -112,8 +112,10 @@ describe("TagPicker", () => {
     await wrapper.find('[data-testid="tag-picker"]').trigger("click");
     expect(wrapper.findComponent({ name: "SearchableTagList" }).exists()).toBe(true);
 
-    // Simulate outside click by directly calling the outside method
-    await wrapper.vm.outside();
+    // Simulate outside click by clicking outside the dropdown
+    const floatingDropdown = wrapper.findComponent({ name: "FloatingDropdown" });
+    // Access the closeDropdown method through the component instance
+    await floatingDropdown.vm.closeDropdown();
 
     // Dropdown should now be closed
     expect(wrapper.findComponent({ name: "SearchableTagList" }).exists()).toBe(false);

@@ -117,7 +117,8 @@ describe("ForumPicker", () => {
     ]);
 
     // Close the dropdown
-    await wrapper.vm.outside();
+    const floatingDropdown = wrapper.findComponent({ name: "FloatingDropdown" });
+    await floatingDropdown.vm.closeDropdown();
 
     // Click the × on the first chip
     const chips = wrapper.findAll(".flex.items-center.rounded-full");
@@ -135,8 +136,9 @@ describe("ForumPicker", () => {
     await wrapper.find('[data-testid="forum-picker"]').trigger("click");
     expect(wrapper.findComponent({ name: "SearchableForumList" }).exists()).toBe(true);
 
-    // Simulate outside click by directly calling the outside method
-    await wrapper.vm.outside();
+    // Simulate outside click by closing the dropdown
+    const floatingDropdown = wrapper.findComponent({ name: "FloatingDropdown" });
+    await floatingDropdown.vm.closeDropdown();
 
     // Dropdown should now be closed
     expect(wrapper.findComponent({ name: "SearchableForumList" }).exists()).toBe(false);
