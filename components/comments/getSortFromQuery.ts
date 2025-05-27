@@ -28,7 +28,7 @@ export const commentSortTypes = {
 
 export const capitalizeCase = function (str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase();
-};
+}
 
 export const getSortFromQuery = function (query: LocationQuery): string {
   // Need to re-clean data when route values change

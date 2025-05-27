@@ -12,20 +12,19 @@ const baseChannels: BaseChannel[] = [
     uniqueName: "cats",
     admins: ["cluse"],
     mods: ["testModProfile2"],
-    rules: '[{"summary":"Focus on cats","detail":"Non-cat-related content will be removed."}]',
+    rules: "[{\"summary\":\"Focus on cats\",\"detail\":\"Non-cat-related content will be removed.\"}]"
   },
   {
     uniqueName: "phx_music",
     admins: ["alice"],
     mods: ["testModProfile1"],
-    rules: '[{"summary":"Focus on music","detail":"Non-music-related content will be removed."}]',
+    rules: "[{\"summary\":\"Focus on music\",\"detail\":\"Non-music-related content will be removed.\"}]"
   },
   {
     uniqueName: "phx_concerts",
     admins: ["alice"],
     mods: ["testModProfile1"],
-    rules:
-      '[{"summary":"Focus on concerts","detail":"Non-concert-related content will be removed."}]',
+    rules: "[{\"summary\":\"Focus on concerts\",\"detail\":\"Non-concert-related content will be removed.\"}]"
   },
 ];
 
@@ -36,10 +35,10 @@ const channels: ChannelCreateInput[] = baseChannels.map(
     wikiEnabled: true,
     Admins: {
       connect: admins.map((admin) => ({
-        where: {
-          node: {
-            username: admin,
-          },
+          where: {
+            node: {
+              username: admin,
+          }
         },
       })),
     },
@@ -47,8 +46,8 @@ const channels: ChannelCreateInput[] = baseChannels.map(
       connect: mods.map((mod) => ({
         where: {
           node: {
-            displayName: mod,
-          },
+             displayName: mod,
+          }
         },
       })),
     },

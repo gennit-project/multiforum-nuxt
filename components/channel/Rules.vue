@@ -1,57 +1,57 @@
 <script lang="ts">
-  import { defineComponent, ref, computed } from "vue";
-  import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import { defineComponent, ref, computed } from "vue";
+import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
 
-  type Rule = {
-    detail: string;
-    summary: string;
-  };
+type Rule = {
+  detail: string;
+  summary: string;
+};
 
-  export default defineComponent({
-    name: "RulesComponent",
-    components: {
-      MarkdownRenderer,
+export default defineComponent({
+  name: "RulesComponent",
+  components: {
+    MarkdownRenderer,
+  },
+  props: {
+    rules: {
+      type: String,
+      default: "",
     },
-    props: {
-      rules: {
-        type: String,
-        default: "",
-      },
-    },
-    setup(props) {
-      const channelRules = computed(() => {
-        const rules: Rule[] = [];
-        try {
-          const rulesArray = JSON.parse(props.rules) || [];
-          for (const rule of rulesArray) {
-            rules.push({
-              detail: rule.detail,
-              summary: rule.summary,
-            });
-          }
-        } catch (e) {
-          console.error("Error parsing channel rules", e);
+  },
+  setup(props) {
+    const channelRules = computed(() => {
+      const rules: Rule[] = [];
+      try {
+        const rulesArray = JSON.parse(props.rules) || [];
+        for (const rule of rulesArray) {
+          rules.push({
+            detail: rule.detail,
+            summary: rule.summary,
+          });
         }
-        return rules;
-      });
-      return {
-        openRules: ref<Rule[]>(channelRules.value),
-      };
+      } catch (e) {
+        console.error("Error parsing channel rules", e);
+      }
+      return rules;
+    });
+    return {
+      openRules: ref<Rule[]>(channelRules.value),
+    };
+  },
+  methods: {
+    toggleRule(ruleName: string) {
+      const index = this.openRules.indexOf(ruleName);
+      if (index > -1) {
+        this.openRules.splice(index, 1); // Remove rule name from array if it's already there (collapse the panel)
+      } else {
+        this.openRules.push(ruleName); // Add rule name to array to expand the panel
+      }
     },
-    methods: {
-      toggleRule(ruleName: string) {
-        const index = this.openRules.indexOf(ruleName);
-        if (index > -1) {
-          this.openRules.splice(index, 1); // Remove rule name from array if it's already there (collapse the panel)
-        } else {
-          this.openRules.push(ruleName); // Add rule name to array to expand the panel
-        }
-      },
-      isOpen(ruleName: string) {
-        return this.openRules.includes(ruleName);
-      },
+    isOpen(ruleName: string) {
+      return this.openRules.includes(ruleName);
     },
-  });
+  },
+});
 </script>
 
 <template>
@@ -59,7 +59,7 @@
     <div
       v-for="(rule, i) in openRules"
       :key="rule.summary"
-      class="my-2 pt-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
+      class="my-2 pt-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" 
     >
       <div
         v-if="rule.summary"
@@ -87,10 +87,7 @@
           ]"
         />
       </div>
-      <div
-        v-if="isOpen(rule.summary)"
-        class="mt-2"
-      >
+      <div v-if="isOpen(rule.summary)" class="mt-2">
         <MarkdownRenderer
           class="text-gray-600 dark:text-gray-300"
           :text="rule.detail"

@@ -1,11 +1,13 @@
 <script setup lang="ts">
-  import PendingInvite from "@/components/mod/PendingInvite.vue";
-  import RequireAuth from "@/components/auth/RequireAuth.vue";
+import PendingInvite from "@/components/mod/PendingInvite.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
+
+
 </script>
 <template>
   <RequireAuth>
     <template #has-auth>
-      <PendingInvite />
+        <PendingInvite />
     </template>
     <template #does-not-have-auth>
       <div class="flex flex-col items-center justify-center dark:text-white">

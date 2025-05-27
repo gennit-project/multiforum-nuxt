@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import SearchDiscussions from "@/components/discussion/list/SearchDiscussions.vue";
+import SearchDiscussions from '@/components/discussion/list/SearchDiscussions.vue';
 </script>
 
 <template>

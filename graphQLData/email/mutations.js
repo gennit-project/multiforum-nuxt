@@ -6,7 +6,11 @@ export const GET_EMAIL = gql`
       address
       User {
         username
-        NotificationsAggregate(where: { read: false }) {
+        NotificationsAggregate(
+          where: {
+            read: false
+          }
+        ) {
           count
         }
       }

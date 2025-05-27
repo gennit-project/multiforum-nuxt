@@ -1,15 +1,15 @@
 <script lang="ts">
-  import { defineComponent } from "vue";
-  import MarkdownLoader from "@/components/MarkdownLoader.vue";
+import { defineComponent } from "vue";
+import MarkdownLoader from "@/components/MarkdownLoader.vue";
 
-  export default defineComponent({
-    components: {
-      MarkdownLoader,
-    },
-    setup() {
-      return {};
-    },
-  });
+export default defineComponent({
+  components: {
+    MarkdownLoader,
+  },
+  setup() {
+    return {};
+  },
+});
 </script>
 
 <template>

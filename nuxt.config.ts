@@ -8,12 +8,13 @@ export default defineNuxtConfig({
     head: {
       title: config.serverDisplayName,
       meta: [
-        { charset: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
-        { name: "description", content: `Welcome to ${config.serverDisplayName}` },
-        { name: "color-scheme", content: "dark light" },
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: `Welcome to ${config.serverDisplayName}` },
+        { name: 'color-scheme', content: 'dark light' }
       ],
       htmlAttrs: {
+<<<<<<< HEAD
         class: "dark-mode-ready", // Remove forced dark mode to prevent SSR hydration mismatch
       },
     },
@@ -30,6 +31,61 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   components: true,
   css: ["@fortawesome/fontawesome-free/css/all.css", "@/assets/css/index.css"],
+=======
+        class: 'dark dark-mode-ready'  // Default to dark mode for initial SSR
+      }
+    }
+  },
+  vue: {
+    compilerOptions: {
+      whitespace: 'preserve',
+      warnExplicitImportCheck: false // This suppresses warnings about explicit imports of compiler macros
+    }
+  },
+  build: {
+    transpile: ["vuetify"],
+    minify: true,
+    // Extract CSS
+    cssMinify: true,
+    // Improve chunking strategy
+    chunkSizeWarningLimit: 1000,
+    optimization: {
+      splitChunks: {
+        maxSize: 300000,
+        cacheGroups: {
+          styles: {
+            name: 'styles',
+            test: /\.(css|vue)$/,
+            chunks: 'all',
+            enforce: true
+          }
+        }
+      }
+    }
+  },
+  experimental: {
+    payloadExtraction: true,
+  },
+  optimization: {
+    splitChunks: {
+      maxSize: 300000,
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          priority: -10,
+          reuseExistingChunk: true,
+        },
+      },
+    },
+  },
+  compatibilityDate: "2024-04-03",
+  components: true,
+  css: [
+    "vuetify/styles",
+    "@fortawesome/fontawesome-free/css/all.css",
+    "@/assets/css/index.css",
+  ],
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   devtools: { enabled: true },
   imports: {
     autoImport: true,
@@ -41,58 +97,63 @@ export default defineNuxtConfig({
         clients: {
           default: {
             httpEndpoint: config?.graphqlUrl || "",
-            tokenName: "token",
+            tokenName: "token", 
             tokenStorage: "localStorage",
             inMemoryCacheOptions,
             // Always get fresh token from localStorage on each request
             apolloLink: ({ uri }) => {
               // Only run client-side
               if (import.meta.client) {
-                return import("@apollo/client/core").then(({ ApolloLink, HttpLink, from }) => {
+                return import('@apollo/client/core').then(({ ApolloLink, HttpLink, from }) => {
                   // Create regular HTTP link
                   const httpLink = new HttpLink({ uri });
-
+                  
                   // Create auth middleware that adds the token to each request
                   const authMiddleware = new ApolloLink((operation, forward) => {
                     // Get the latest token from localStorage on every request
-                    const token = localStorage.getItem("token");
-
+                    const token = localStorage.getItem('token');
+                    
                     // Set auth header if token exists
                     if (token) {
                       operation.setContext({
                         headers: {
-                          Authorization: `Bearer ${token}`,
-                        },
+                          Authorization: `Bearer ${token}`
+                        }
                       });
                     }
+<<<<<<< HEAD
 
                     return forward(operation).map((result) => {
                       // Handle successful responses
                       return result;
                     });
+=======
+                    
+                    return forward(operation);
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
                   });
-
+                  
                   // Return the combined link
                   return from([authMiddleware, httpLink]);
                 });
               }
-
+              
               // Server-side, use regular link
               return { uri };
             },
             defaultOptions: {
               watchQuery: {
-                errorPolicy: "all",
+                errorPolicy: 'all',
                 notifyOnNetworkStatusChange: true,
                 fetchPolicy: "cache-first",
               },
               query: {
-                errorPolicy: "all",
+                errorPolicy: 'all',
                 notifyOnNetworkStatusChange: true,
                 fetchPolicy: "cache-first",
               },
               mutation: {
-                errorPolicy: "all",
+                errorPolicy: 'all',
               },
             },
             // Add global error handler to detect expired tokens and retry operations
@@ -105,34 +166,33 @@ export default defineNuxtConfig({
               }
 
               // Check if the error is related to authentication
-              const isAuthError = error.graphQLErrors?.some(
-                (e) =>
-                  e.message.includes("expired") ||
-                  e.message.includes("authentication") ||
-                  e.message.includes("unauthorized") ||
-                  e.message.includes("session")
+              const isAuthError = error.graphQLErrors?.some(e => 
+                e.message.includes('expired') || 
+                e.message.includes('authentication') ||
+                e.message.includes('unauthorized') ||
+                e.message.includes('session')
               );
-
+              
               if (isAuthError && window.refreshAuthToken) {
-                console.log("Auth error detected, attempting to refresh token");
+                console.log('Auth error detected, attempting to refresh token');
                 const refreshSucceeded = await window.refreshAuthToken();
                 if (refreshSucceeded) {
-                  console.log("Token refreshed, operation can be retried");
+                  console.log('Token refreshed, operation can be retried');
                   // The user will need to retry their action, but with a fresh token
                 } else {
-                  console.log("Token refresh failed, user may need to log in again");
-
+                  console.log('Token refresh failed, user may need to log in again');
+                  
                   // Check if we still have a valid session by examining Auth0 state
                   // Since we can't access the Auth0 object directly here, we'll check localStorage
-                  const auth0State = localStorage.getItem("auth0.is.authenticated");
-
-                  if (auth0State !== "true") {
+                  const auth0State = localStorage.getItem('auth0.is.authenticated');
+                  
+                  if (auth0State !== 'true') {
                     // User is likely logged out or has invalid tokens
-                    console.log("Auth0 session is invalid, redirecting to home page");
-
+                    console.log('Auth0 session is invalid, redirecting to home page');
+                    
                     // If on a protected page, redirect to home
-                    if (window.location.pathname !== "/") {
-                      window.location.href = "/";
+                    if (window.location.pathname !== '/') {
+                      window.location.href = '/';
                     }
                   }
                 }
@@ -142,6 +202,65 @@ export default defineNuxtConfig({
         },
       },
     ],
+<<<<<<< HEAD
+=======
+    // Add image optimization
+    ['@nuxt/image', {
+      // Image quality options
+      quality: 80,
+      // Use WebP and AVIF formats where supported
+      format: ['webp', 'avif', 'jpg', 'png'],
+      // Provider for image generation
+      provider: 'ipx',
+      // Responsive image breakpoints
+      screens: {
+        xs: 320,
+        sm: 640,
+        md: 768,
+        lg: 1024,
+        xl: 1280,
+        xxl: 1536,
+        '2xl': 1536
+      },
+      // Default image optimization options
+      modifiers: {
+        format: 'webp',
+        quality: 80,
+        width: 'auto',
+        height: 'auto'
+      },
+      // Domains to allow for remote images
+      domains: ['storage.googleapis.com'],
+      // Adjust placeholder behavior
+      placeholder: {
+        size: 10,
+      },
+      // Presets for common image types
+      presets: {
+        avatar: {
+          modifiers: {
+            format: 'webp',
+            width: 50,
+            height: 50,
+          }
+        },
+        thumbnail: {
+          modifiers: {
+            format: 'webp',
+            width: 320,
+            height: 180,
+          }
+        },
+        cover: {
+          modifiers: {
+            format: 'webp',
+            width: 1200,
+            height: 630,
+          }
+        }
+      }
+    }],
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
     // Light/dark mode support
     "@nuxtjs/color-mode",
     // The order matters in this list. Tailwind must come last
@@ -153,21 +272,48 @@ export default defineNuxtConfig({
         configPath: "tailwind.config.js",
       },
     ],
-    [
-      "@nuxtjs/google-fonts",
-      {
-        families: {
-          Roboto: true,
-          Inter: [400, 700],
-          Montserrat: [400, 700],
-        },
-        display: "swap",
-        prefetch: true,
-        preconnect: true,
+    ['@nuxtjs/google-fonts', {
+      families: {
+        Roboto: true,
+        Inter: [400, 700],
+        Montserrat: [400, 700],
       },
-    ],
+      display: 'swap',
+      prefetch: true,
+      preconnect: true,
+  }],
   ],
+<<<<<<< HEAD
   nitro: { preset: "vercel" },
+=======
+  nitro: { 
+    preset: "vercel",
+    // Enable CDN caching
+    cdn: true,
+    // Enable server-side caching
+    routeRules: {
+      // Cache API routes
+      '/api/**': { 
+        cache: { 
+          // Let middleware handle specific cache times
+          headers: ['cache-control']
+        }
+      },
+      // Cache static assets
+      '/_nuxt/**': { 
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      },
+      // Cache public assets
+      '/assets/**': { 
+        headers: {
+          'cache-control': 'public, max-age=31536000, immutable'
+        }
+      }
+    }
+  },
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   plugins: [
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/sentry", mode: "client" },
@@ -205,14 +351,36 @@ export default defineNuxtConfig({
     },
     // Allow connections from ngrok for mobile testing
     server: {
-      allowedHosts: ["localhost", "69f8-98-168-53-208.ngrok-free.app"],
+      allowedHosts: ['localhost', '69f8-98-168-53-208.ngrok-free.app']
     },
     build: {
+<<<<<<< HEAD
       minify: false, // Disable minification to prevent symbol mangling of Vue transition classes
       cssMinify: false,
+=======
+      minify: 'terser',
+      cssMinify: true,
+      terserOptions: {
+        compress: {
+          drop_console: process.env.NODE_ENV === 'production',
+          drop_debugger: process.env.NODE_ENV === 'production'
+        }
+      },
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vue-libs': ['vue', 'vue-router', 'pinia'],
+            'ui-libs': ['vuetify'],
+            'apollo': ['@apollo/client', '@vue/apollo-composable'],
+            'date-libs': ['luxon'],
+            'map-libs': ['@googlemaps/js-api-loader']
+          }
+        }
+      }
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
     },
     optimizeDeps: {
-      include: ["vue", "vue-router", "@vue/apollo-composable", "luxon"],
-    },
+      include: ['vue', 'vue-router', '@vue/apollo-composable', 'luxon']
+    }
   },
 });

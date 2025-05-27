@@ -1,3 +1,4 @@
+
 export interface Image {
   url: string;
   caption: string;
@@ -7,27 +8,29 @@ export interface Image {
   isCoverImage: boolean;
 }
 
+
 export interface CreateEditDiscussionFormValues {
-  title: string;
-  body: string;
-  selectedTags: Array<string>;
-  selectedChannels: Array<string>;
-  author: string;
-  album: {
-    images: {
-      id?: string;
-      url: string;
-      alt: string;
-      caption: string;
-      copyright: string;
-    }[];
-    imageOrder: string[];
-  };
+    title: string;
+    body: string;
+    selectedTags: Array<string>;
+    selectedChannels: Array<string>;
+    author: string;
+    album: {
+      images: {
+        id?: string;
+        url: string;
+        alt: string;
+        caption: string;
+        copyright: string;
+      }[];
+      imageOrder: string[];
+    };
 }
 
 export type SearchDiscussionValues = {
-  tags?: Array<string>;
-  channels?: Array<string>;
-  searchInput?: string;
-  showArchived?: boolean;
-};
+    tags?: Array<string>
+    channels?: Array<string>
+    searchInput?: string;
+    showArchived?: boolean;
+  };
+  

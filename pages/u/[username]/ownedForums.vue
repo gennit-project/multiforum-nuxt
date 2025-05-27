@@ -1,34 +1,39 @@
 <script setup lang="ts">
-  import { computed } from "vue";
-  import { GET_OWNED_CHANNELS } from "@/graphQLData/user/queries";
-  import { useQuery } from "@vue/apollo-composable";
-  import ChannelList from "@/components/channel/ChannelList.vue";
-  import { useRoute } from "nuxt/app";
+import { computed } from "vue";
+import { GET_OWNED_CHANNELS } from "@/graphQLData/user/queries";
+import { useQuery } from "@vue/apollo-composable";
+import ChannelList from "@/components/channel/ChannelList.vue";
+import { useRoute } from "nuxt/app";
 
-  const route = useRoute();
+const route = useRoute();
 
-  const username = computed(() => {
-    if (typeof route.params.username === "string") {
-      return route.params.username;
-    }
-    return "";
-  });
+const username = computed(() => {
+  if (typeof route.params.username === "string") {
+    return route.params.username;
+  }
+  return "";
+});
 
-  const { result, loading, error } = useQuery(
-    GET_OWNED_CHANNELS,
-    () => ({
-      username: username.value,
-    }),
-    {
-      fetchPolicy: "cache-first",
-    }
-  );
+const { result, loading, error } = useQuery(
+  GET_OWNED_CHANNELS,
+  () => ({
+    username: username.value,
+  }),
+  {
+    fetchPolicy: "cache-first",
+  }
+);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
     <div v-if="loading">Loading...</div>
     <div v-else-if="error">Error</div>
-    <div v-else-if="result?.users?.length === 0 || result.users[0]?.AdminOfChannels?.length === 0">
+    <div
+      v-else-if="
+        result?.users?.length === 0 ||
+        result.users[0]?.AdminOfChannels?.length === 0
+      "
+    >
       This user is not a forum owner.
     </div>
     <ChannelList

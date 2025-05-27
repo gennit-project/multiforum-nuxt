@@ -4,10 +4,10 @@ import { setUsername } from "@/cache";
 
 export default defineNuxtPlugin(() => {
   // This plugin runs only on the client
-  if (typeof window !== "undefined") {
+  if (typeof window !== 'undefined') {
     // Try to load username from localStorage
-    const storedUsername = localStorage.getItem("username");
-
+    const storedUsername = localStorage.getItem('username');
+    
     if (storedUsername) {
       // Set the username in the reactive state
       setUsername(storedUsername);

@@ -1,55 +1,58 @@
 <script lang="ts">
-  import { defineComponent } from "vue";
-  import GenericModal from "@/components/GenericModal.vue";
-  import FlagIcon from "@/components/icons/FlagIcon.vue";
-  import TextEditor from "@/components/TextEditor.vue";
+import { defineComponent } from "vue";
+import GenericModal from "@/components/GenericModal.vue";
+import FlagIcon from "@/components/icons/FlagIcon.vue";
+import TextEditor from "@/components/TextEditor.vue";
 
-  export default defineComponent({
-    name: "ReportEventModal",
-    components: {
-      GenericModal,
-      FlagIcon,
-      TextEditor,
+export default defineComponent({
+  name: "ReportEventModal",
+  components: {
+    GenericModal,
+    FlagIcon,
+    TextEditor,
+  },
+  props: {
+    body: {
+      type: String,
+      require: true,
+      default: "",
     },
-    props: {
-      body: {
-        type: String,
-        require: true,
-        default: "",
-      },
-      open: {
-        type: Boolean,
-        default: false,
-      },
+    open: {
+      type: Boolean,
+      default: false,
     },
-    setup() {},
-    methods: {
-      updateFeedback() {},
+  },
+  setup() {},
+  methods: {
+    updateFeedback() {
+    
+      
     },
-  });
+  },
+});
 </script>
 <template>
   <GenericModal
-    :body="'Why should this event be removed? Please be specific about any rule violations.'"
     :highlight-color="'red'"
+    :title="'Report Event'"
+    :body="'Why should this event be removed? Please be specific about any rule violations.'"
     :open="open"
     :primary-button-text="'Submit'"
     :secondary-button-text="'Cancel'"
-    :title="'Report Event'"
   >
     <template #icon>
       <FlagIcon
-        aria-hidden="true"
         class="h-6 w-6 text-red-600 opacity-100"
+        aria-hidden="true"
       />
     </template>
     <template #content>
       <TextEditor
-        :allow-image-upload="false"
-        :disable-auto-focus="false"
+        :test-id="'event-report-input'"
         :initial-value="''"
         :placeholder="'Explain why this event should be removed'"
-        :test-id="'event-report-input'"
+        :disable-auto-focus="false"
+        :allow-image-upload="false"
         @update="updateFeedback"
       />
     </template>

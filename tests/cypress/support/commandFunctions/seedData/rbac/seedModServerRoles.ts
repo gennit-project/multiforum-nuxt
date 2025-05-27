@@ -12,7 +12,7 @@ const modServerRoles: ModServerRoleCreateInput[] = [
     canSuspendUser: false,
     canHideComment: false,
     canHideEvent: false,
-    canHideDiscussion: false,
+    canHideDiscussion: false
   },
   {
     name: "DefaultElevatedModRole",
@@ -24,7 +24,7 @@ const modServerRoles: ModServerRoleCreateInput[] = [
     canHideComment: true,
     canHideEvent: true,
     canHideDiscussion: true,
-    canGiveFeedback: true,
+    canGiveFeedback: true
   },
   {
     name: "DefaultSuspendedModRole",
@@ -36,8 +36,10 @@ const modServerRoles: ModServerRoleCreateInput[] = [
     canHideComment: false,
     canHideEvent: false,
     canHideDiscussion: false,
-    canGiveFeedback: false,
-  },
+    canGiveFeedback: false
+  }
 ];
+
+
 
 export default modServerRoles;

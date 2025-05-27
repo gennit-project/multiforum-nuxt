@@ -1,34 +1,34 @@
 <script lang="ts">
-  import type { PropType } from "vue";
-  import { defineComponent } from "vue";
+import type { PropType } from "vue";
+import { defineComponent } from "vue";
 
-  interface Link {
-    path: string;
-    label: string;
-  }
+interface Link {
+  path: string;
+  label: string;
+}
 
-  export default defineComponent({
-    name: "BreadCrumbs",
-    props: {
-      links: {
-        type: Array as PropType<Link[]>,
-        required: true,
-      },
+export default defineComponent({
+  name: "BreadCrumbs",
+  props: {
+    links: {
+      type: Array as PropType<Link[]>,
+      required: true,
     },
-    setup() {
-      return {};
-    },
-  });
+  },
+  setup() {
+    return {};
+  },
+});
 </script>
 
 <template>
   <nav
-    aria-label="Breadcrumb"
     class="mb-1 mt-2 flex"
+    aria-label="Breadcrumb"
   >
     <ol
-      class="flex items-center space-x-4"
       role="list"
+      class="flex items-center space-x-4"
     >
       <li
         v-for="(link, i) in links"
@@ -38,23 +38,23 @@
           <!-- Heroicon name: solid/chevron-right -->
           <svg
             v-if="i !== 0"
-            aria-hidden="true"
             class="mr-4 h-5 w-5 flex-shrink-0 text-gray-400"
-            fill="currentColor"
-            viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            aria-hidden="true"
           >
             <path
-              clip-rule="evenodd"
-              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
               fill-rule="evenodd"
+              d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+              clip-rule="evenodd"
             />
           </svg>
           <nuxt-link
             v-if="link.path"
-            active-class="text-gray-700"
-            class="text-xs text-gray-500 underline hover:text-gray-700"
             :to="`/${link.path}/`"
+            class="text-xs text-gray-500 underline hover:text-gray-700"
+            active-class="text-gray-700"
           >
             {{ link.label }}
           </nuxt-link>

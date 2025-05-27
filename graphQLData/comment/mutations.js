@@ -20,8 +20,16 @@ export const ADD_EMOJI_TO_COMMENT = gql`
 `;
 
 export const REMOVE_EMOJI_FROM_COMMENT = gql`
-  mutation removeEmojiFromComment($commentId: ID!, $emojiLabel: String!, $username: String!) {
-    removeEmojiFromComment(commentId: $commentId, emojiLabel: $emojiLabel, username: $username) {
+  mutation removeEmojiFromComment(
+    $commentId: ID!
+    $emojiLabel: String!
+    $username: String!
+  ) {
+    removeEmojiFromComment(
+      commentId: $commentId
+      emojiLabel: $emojiLabel
+      username: $username
+    ) {
       id
       emoji
     }
@@ -186,7 +194,10 @@ export const CREATE_DISCUSSION_CHANNEL = gql`
 `;
 
 export const UPDATE_COMMENT = gql`
-  mutation updateComment($updateCommentInput: CommentUpdateInput, $commentWhere: CommentWhere) {
+  mutation updateComment(
+    $updateCommentInput: CommentUpdateInput
+    $commentWhere: CommentWhere
+  ) {
     updateComments(update: $updateCommentInput, where: $commentWhere) {
       comments {
         id
@@ -210,7 +221,7 @@ export const UPDATE_COMMENT = gql`
           count
         }
         FeedbackComments {
-          id
+          id 
           CommentAuthor {
             ... on ModerationProfile {
               displayName
@@ -232,7 +243,9 @@ export const SOFT_DELETE_COMMENT = gql`
   mutation updateComments($id: ID!) {
     updateComments(
       update: { text: "[Deleted]" }
-      disconnect: { CommentAuthor: { User: { where: { node_NOT: { username: "null" } } } } }
+      disconnect: {
+        CommentAuthor: { User: { where: { node_NOT: { username: "null" } } } }
+      }
       where: { id: $id }
     ) {
       comments {
@@ -274,10 +287,14 @@ export const ADD_FEEDBACK_COMMENT_TO_COMMENT = gql`
           isFeedbackComment: true
           text: $text
           CommentAuthor: {
-            ModerationProfile: { connect: { where: { node: { displayName: $modProfileName } } } }
+            ModerationProfile: {
+              connect: { where: { node: { displayName: $modProfileName } } }
+            }
           }
           Channel: { connect: { where: { node: { uniqueName: $channelId } } } }
-          GivesFeedbackOnComment: { connect: { where: { node: { id: $commentId } } } }
+          GivesFeedbackOnComment: {
+            connect: { where: { node: { id: $commentId } } }
+          }
         }
       ]
     ) {

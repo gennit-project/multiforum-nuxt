@@ -1,23 +1,14 @@
-import { describe, it, expect } from "vitest";
-import {
-  getFilterValuesFromParams,
-  defaultPlace,
-} from "@/components/event/list/filters/getEventFilterValuesFromParams";
-import {
-  chronologicalOrder,
-  reverseChronologicalOrder,
-} from "@/components/event/list/filters/filterStrings";
-import LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
-import {
-  timeShortcutValues,
-  resultOrderTypes,
-} from "@/components/event/list/filters/eventSearchOptions";
+import { describe, it, expect } from 'vitest';
+import { getFilterValuesFromParams, defaultPlace } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import { chronologicalOrder, reverseChronologicalOrder } from '@/components/event/list/filters/filterStrings';
+import LocationFilterTypes from '@/components/event/list/filters/locationFilterTypes';
+import { timeShortcutValues, resultOrderTypes } from '@/components/event/list/filters/eventSearchOptions';
 
-describe("getEventFilterValuesFromParams", () => {
-  it("returns default values when route has no query parameters", () => {
+describe('getEventFilterValuesFromParams', () => {
+  it('returns default values when route has no query parameters', () => {
     const input = {
       route: { query: {} },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -26,7 +17,7 @@ describe("getEventFilterValuesFromParams", () => {
       timeShortcut: timeShortcutValues.NONE,
       tags: [],
       channels: [],
-      searchInput: "",
+      searchInput: '',
       showCanceledEvents: false,
       free: false,
       resultsOrder: chronologicalOrder,
@@ -36,13 +27,13 @@ describe("getEventFilterValuesFromParams", () => {
     });
   });
 
-  it("sets hasVirtualEventUrl to true for events-list-search route", () => {
+  it('sets hasVirtualEventUrl to true for events-list-search route', () => {
     const input = {
-      route: {
+      route: { 
         query: {},
-        name: "events-list-search",
+        name: 'events-list-search'
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -50,10 +41,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.hasVirtualEventUrl).toBe(true);
   });
 
-  it("sets locationFilter to ONLY_VIRTUAL when showOnlineOnly is true", () => {
+  it('sets locationFilter to ONLY_VIRTUAL when showOnlineOnly is true', () => {
     const input = {
       route: { query: {} },
-      channelId: "",
+      channelId: '',
       showOnlineOnly: true,
     };
 
@@ -62,10 +53,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_VIRTUAL);
   });
 
-  it("sets locationFilter to ONLY_WITH_ADDRESS when showInPersonOnly is true", () => {
+  it('sets locationFilter to ONLY_WITH_ADDRESS when showInPersonOnly is true', () => {
     const input = {
       route: { query: {} },
-      channelId: "",
+      channelId: '',
       showInPersonOnly: true,
     };
 
@@ -74,10 +65,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_WITH_ADDRESS);
   });
 
-  it("parses timeShortcut correctly", () => {
+  it('parses timeShortcut correctly', () => {
     const input = {
       route: { query: { timeShortcut: timeShortcutValues.THIS_WEEKEND } },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -85,10 +76,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.timeShortcut).toBe(timeShortcutValues.THIS_WEEKEND);
   });
 
-  it("parses radius and sets locationFilter to WITHIN_RADIUS", () => {
+  it('parses radius and sets locationFilter to WITHIN_RADIUS', () => {
     const input = {
-      route: { query: { radius: "25" } },
-      channelId: "",
+      route: { query: { radius: '25' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -97,47 +88,47 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.locationFilter).toBe(LocationFilterTypes.WITHIN_RADIUS);
   });
 
-  it("parses placeName but requires locationFilter=WITHIN_RADIUS to include it in result", () => {
+  it('parses placeName but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: {
-        query: {
-          placeName: "New York City",
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-        },
+      route: { 
+        query: { 
+          placeName: 'New York City',
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS 
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.placeName).toBe("New York City");
+    expect(result.placeName).toBe('New York City');
   });
 
-  it("parses placeAddress but requires locationFilter=WITHIN_RADIUS to include it in result", () => {
+  it('parses placeAddress but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: {
-        query: {
-          placeAddress: "123 Main St, New York, NY 10001",
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-        },
+      route: { 
+        query: { 
+          placeAddress: '123 Main St, New York, NY 10001',
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.placeAddress).toBe("123 Main St, New York, NY 10001");
+    expect(result.placeAddress).toBe('123 Main St, New York, NY 10001');
   });
 
-  it("parses latitude but requires locationFilter=WITHIN_RADIUS to include it in result", () => {
+  it('parses latitude but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: {
-        query: {
-          latitude: "40.7128",
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-        },
+      route: { 
+        query: { 
+          latitude: '40.7128',
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -145,10 +136,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.latitude).toBe(40.7128);
   });
 
-  it("ignores invalid latitude values", () => {
+  it('ignores invalid latitude values', () => {
     const input = {
-      route: { query: { latitude: "invalid" } },
-      channelId: "",
+      route: { query: { latitude: 'invalid' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -156,26 +147,26 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.latitude).toBe(undefined);
   });
 
-  it("parses longitude but requires locationFilter=WITHIN_RADIUS to include it in result", () => {
+  it('parses longitude but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: {
-        query: {
-          longitude: "-74.0060",
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-        },
+      route: { 
+        query: { 
+          longitude: '-74.0060',
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.longitude).toBe(-74.006);
+    expect(result.longitude).toBe(-74.0060);
   });
 
-  it("ignores invalid longitude values", () => {
+  it('ignores invalid longitude values', () => {
     const input = {
-      route: { query: { longitude: "invalid" } },
-      channelId: "",
+      route: { query: { longitude: 'invalid' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -183,32 +174,32 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.longitude).toBe(undefined);
   });
 
-  it("parses tags correctly as comma-separated string", () => {
+  it('parses tags correctly as comma-separated string', () => {
     const input = {
-      route: { query: { tags: "music,concert,live" } },
-      channelId: "",
+      route: { query: { tags: 'music,concert,live' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.tags).toEqual(["music", "concert", "live"]);
+    expect(result.tags).toEqual(['music', 'concert', 'live']);
   });
 
-  it("parses tags correctly as array", () => {
+  it('parses tags correctly as array', () => {
     const input = {
-      route: { query: { tags: ["music", "concert", "live"] } },
-      channelId: "",
+      route: { query: { tags: ['music', 'concert', 'live'] } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.tags).toEqual(["music", "concert", "live"]);
+    expect(result.tags).toEqual(['music', 'concert', 'live']);
   });
 
-  it("defaults to empty array for invalid tags type", () => {
+  it('defaults to empty array for invalid tags type', () => {
     const input = {
       route: { query: { tags: 123 } }, // Invalid type
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -216,43 +207,43 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.tags).toEqual([]);
   });
 
-  it("parses channels as string correctly", () => {
+  it('parses channels as string correctly', () => {
     const input = {
-      route: { query: { channels: "music-events" } },
-      channelId: "",
+      route: { query: { channels: 'music-events' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.channels).toEqual(["music-events"]);
+    expect(result.channels).toEqual(['music-events']);
   });
 
-  it("parses channels as array correctly", () => {
+  it('parses channels as array correctly', () => {
     const input = {
-      route: { query: { channels: ["music-events", "outdoor-events"] } },
-      channelId: "",
+      route: { query: { channels: ['music-events', 'outdoor-events'] } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.channels).toEqual(["music-events", "outdoor-events"]);
+    expect(result.channels).toEqual(['music-events', 'outdoor-events']);
   });
 
-  it("parses searchInput correctly", () => {
+  it('parses searchInput correctly', () => {
     const input = {
-      route: { query: { searchInput: "jazz concert" } },
-      channelId: "",
+      route: { query: { searchInput: 'jazz concert' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.searchInput).toBe("jazz concert");
+    expect(result.searchInput).toBe('jazz concert');
   });
 
-  it("parses showCanceledEvents as true correctly", () => {
+  it('parses showCanceledEvents as true correctly', () => {
     const input = {
-      route: { query: { showCanceledEvents: "true" } },
-      channelId: "",
+      route: { query: { showCanceledEvents: 'true' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -260,10 +251,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.showCanceledEvents).toBe(true);
   });
 
-  it("parses showCanceledEvents as false correctly", () => {
+  it('parses showCanceledEvents as false correctly', () => {
     const input = {
-      route: { query: { showCanceledEvents: "false" } },
-      channelId: "",
+      route: { query: { showCanceledEvents: 'false' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -271,10 +262,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.showCanceledEvents).toBe(false);
   });
 
-  it("parses showOnlyFreeEvents as free=true correctly", () => {
+  it('parses showOnlyFreeEvents as free=true correctly', () => {
     const input = {
-      route: { query: { showOnlyFreeEvents: "true" } },
-      channelId: "",
+      route: { query: { showOnlyFreeEvents: 'true' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -282,10 +273,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.free).toBe(true);
   });
 
-  it("parses showOnlyFreeEvents as free=false correctly", () => {
+  it('parses showOnlyFreeEvents as free=false correctly', () => {
     const input = {
-      route: { query: { showOnlyFreeEvents: "false" } },
-      channelId: "",
+      route: { query: { showOnlyFreeEvents: 'false' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -293,10 +284,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.free).toBe(false);
   });
 
-  it("parses resultsOrder as chronological correctly", () => {
+  it('parses resultsOrder as chronological correctly', () => {
     const input = {
       route: { query: { resultsOrder: resultOrderTypes.CHRONOLOGICAL } },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -304,10 +295,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.resultsOrder).toEqual(chronologicalOrder);
   });
 
-  it("parses resultsOrder as reverse chronological correctly", () => {
+  it('parses resultsOrder as reverse chronological correctly', () => {
     const input = {
       route: { query: { resultsOrder: resultOrderTypes.REVERSE_CHRONOLOGICAL } },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -315,10 +306,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.resultsOrder).toEqual(reverseChronologicalOrder);
   });
 
-  it("parses locationFilter correctly", () => {
+  it('parses locationFilter correctly', () => {
     const input = {
       route: { query: { locationFilter: LocationFilterTypes.ONLY_VIRTUAL } },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -326,10 +317,10 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.locationFilter).toBe(LocationFilterTypes.ONLY_VIRTUAL);
   });
 
-  it("parses showArchived as true correctly", () => {
+  it('parses showArchived as true correctly', () => {
     const input = {
-      route: { query: { showArchived: "true" } },
-      channelId: "",
+      route: { query: { showArchived: 'true' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -337,14 +328,14 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.showArchived).toBe(true);
   });
 
-  it("uses default radius of 0 when channelId is provided", () => {
+  it('uses default radius of 0 when channelId is provided', () => {
     const input = {
-      route: {
+      route: { 
         query: {
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-        },
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS
+        } 
       },
-      channelId: "test-channel",
+      channelId: 'test-channel',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -352,15 +343,15 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.radius).toBe(0);
   });
 
-  it("uses provided radius when specified in query", () => {
+  it('uses provided radius when specified in query', () => {
     const input = {
-      route: {
+      route: { 
         query: {
           locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-          radius: "25",
-        },
+          radius: '25'
+        } 
       },
-      channelId: "test-channel",
+      channelId: 'test-channel',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -368,14 +359,14 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.radius).toBe(25);
   });
 
-  it("returns WITHIN_RADIUS location filter with default place values when locationFilter is WITHIN_RADIUS", () => {
+  it('returns WITHIN_RADIUS location filter with default place values when locationFilter is WITHIN_RADIUS', () => {
     const input = {
-      route: {
+      route: { 
         query: {
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-        },
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -387,14 +378,14 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.longitude).toBe(defaultPlace.longitude);
   });
 
-  it("returns ONLY_VIRTUAL location filter when specified", () => {
+  it('returns ONLY_VIRTUAL location filter when specified', () => {
     const input = {
-      route: {
+      route: { 
         query: {
-          locationFilter: LocationFilterTypes.ONLY_VIRTUAL,
-        },
+          locationFilter: LocationFilterTypes.ONLY_VIRTUAL
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -406,14 +397,14 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.longitude).toBeUndefined();
   });
 
-  it("returns ONLY_WITH_ADDRESS location filter when specified", () => {
+  it('returns ONLY_WITH_ADDRESS location filter when specified', () => {
     const input = {
-      route: {
+      route: { 
         query: {
-          locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS,
-        },
+          locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS
+        } 
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -425,29 +416,29 @@ describe("getEventFilterValuesFromParams", () => {
     expect(result.longitude).toBeUndefined();
   });
 
-  it("handles multiple query parameters correctly", () => {
+  it('handles multiple query parameters correctly', () => {
     const input = {
       route: {
         query: {
           timeShortcut: timeShortcutValues.THIS_WEEKEND,
-          tags: ["music", "festival"],
-          searchInput: "jazz",
-          showCanceledEvents: "false",
-          showOnlyFreeEvents: "true",
+          tags: ['music', 'festival'],
+          searchInput: 'jazz',
+          showCanceledEvents: 'false',
+          showOnlyFreeEvents: 'true',
           locationFilter: LocationFilterTypes.ONLY_VIRTUAL,
-          showArchived: "true",
+          showArchived: 'true'
         },
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
     expect(result).toEqual({
       timeShortcut: timeShortcutValues.THIS_WEEKEND,
-      tags: ["music", "festival"],
+      tags: ['music', 'festival'],
       channels: [],
-      searchInput: "jazz",
+      searchInput: 'jazz',
       showCanceledEvents: false,
       free: true,
       resultsOrder: chronologicalOrder,
@@ -457,20 +448,20 @@ describe("getEventFilterValuesFromParams", () => {
     });
   });
 
-  it("ignores invalid query parameters", () => {
+  it('ignores invalid query parameters', () => {
     const input = {
       route: {
         query: {
-          invalidParam: "value",
-          tags: "music",
+          invalidParam: 'value',
+          tags: 'music',
         },
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.tags).toEqual(["music"]);
+    expect(result.tags).toEqual(['music']);
     expect(result.invalidParam).toBeUndefined();
   });
 });

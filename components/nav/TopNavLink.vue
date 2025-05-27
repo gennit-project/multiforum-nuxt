@@ -1,23 +1,39 @@
 <script lang="ts">
-  import { defineComponent } from "vue";
+import { defineComponent } from "vue";
 
-  export default defineComponent({
-    props: {
-      to: {
-        type: String,
-        required: true,
-      },
-      label: {
-        type: String,
-        required: true,
-      },
+export default defineComponent({
+  props: {
+    to: {
+      type: String,
+      required: true,
     },
-    setup() {},
-  });
+    label: {
+      type: String,
+      required: true,
+    },
+  },
+  setup() {},
+});
 </script>
 
 <template>
   <nuxt-link
+    :to="to"
+    class="
+      group 
+      inline-flex 
+      items-center 
+      px-4 
+      py-3 
+      text-xs 
+      font-medium 
+      border-b-3
+      border-transparent
+      dark:text-white 
+      hover:text-blue-500 
+      hover:border-blue-500
+      hover:dark:text-gray-200
+    "
     active-class="
       inline-flex
       items-center
@@ -32,8 +48,11 @@
       text-xs
       font-medium
       "
+<<<<<<< HEAD
     class="border-b-3 border-transparent group inline-flex items-center px-4 py-3 text-xs font-medium hover:border-orange-500 hover:text-orange-500 dark:text-white hover:dark:text-gray-200"
     :to="to"
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   >
     <div>
       <slot />

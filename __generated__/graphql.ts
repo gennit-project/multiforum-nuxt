@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 /* eslint-disable */
+=======
+ 
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -401,6 +405,7 @@ export type AlbumDiscussionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -431,6 +436,8 @@ export type AlbumDiscussionsNodeAggregationWhereInput = {
   downloadPreviewUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -5898,6 +5905,7 @@ export type ChannelWikiHomePageNodeAggregationWhereInput = {
   body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+<<<<<<< HEAD
   channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -5913,6 +5921,8 @@ export type ChannelWikiHomePageNodeAggregationWhereInput = {
   channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -6331,6 +6341,7 @@ export type CommentParentCommentConnectionArgs = {
 };
 
 
+<<<<<<< HEAD
 export type CommentPastVersionsArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<TextVersionOptions>;
@@ -6353,6 +6364,8 @@ export type CommentPastVersionsConnectionArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type CommentRelatedIssuesArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<IssueOptions>;
@@ -8056,6 +8069,7 @@ export type CommentGivesFeedbackOnDiscussionNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -8086,6 +8100,8 @@ export type CommentGivesFeedbackOnDiscussionNodeAggregationWhereInput = {
   downloadPreviewUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -11455,9 +11471,12 @@ export type Discussion = {
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl?: Maybe<Scalars['String']['output']>;
   downloadPreviewUrl?: Maybe<Scalars['String']['output']>;
   hasDownload?: Maybe<Scalars['Boolean']['output']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
   hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
@@ -11554,6 +11573,7 @@ export type DiscussionFeedbackCommentsConnectionArgs = {
 };
 
 
+<<<<<<< HEAD
 export type DiscussionMainFilesArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<FileOptions>;
@@ -11664,6 +11684,8 @@ export type DiscussionPastTitleVersionsConnectionArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type DiscussionTagsArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<TagOptions>;
@@ -12962,6 +12984,7 @@ export type DiscussionChannelDiscussionNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -12992,6 +13015,8 @@ export type DiscussionChannelDiscussionNodeAggregationWhereInput = {
   downloadPreviewUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -14147,9 +14172,12 @@ export type DiscussionCreateInput = {
   Tags?: InputMaybe<DiscussionTagsFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl?: InputMaybe<Scalars['String']['input']>;
   downloadPreviewUrl?: InputMaybe<Scalars['String']['input']>;
   hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title: Scalars['String']['input'];
@@ -14362,9 +14390,12 @@ export type DiscussionEventPayload = {
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl?: Maybe<Scalars['String']['output']>;
   downloadPreviewUrl?: Maybe<Scalars['String']['output']>;
   hasDownload?: Maybe<Scalars['Boolean']['output']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
   hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
@@ -15880,6 +15911,7 @@ export type DiscussionSubscriptionWhere = {
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl?: InputMaybe<Scalars['String']['input']>;
   downloadListItemCoverImageUrl_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   downloadListItemCoverImageUrl_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -15893,6 +15925,8 @@ export type DiscussionSubscriptionWhere = {
   downloadPreviewUrl_MATCHES?: InputMaybe<Scalars['String']['input']>;
   downloadPreviewUrl_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -16083,9 +16117,12 @@ export type DiscussionUpdateInput = {
   body?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl?: InputMaybe<Scalars['String']['input']>;
   downloadPreviewUrl?: InputMaybe<Scalars['String']['input']>;
   hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -16284,6 +16321,7 @@ export type DiscussionWhere = {
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl?: InputMaybe<Scalars['String']['input']>;
   downloadListItemCoverImageUrl_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   downloadListItemCoverImageUrl_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -16297,6 +16335,8 @@ export type DiscussionWhere = {
   downloadPreviewUrl_MATCHES?: InputMaybe<Scalars['String']['input']>;
   downloadPreviewUrl_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -21917,6 +21957,7 @@ export type FeedsConnection = {
   edges: Array<FeedEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+<<<<<<< HEAD
 };
 
 export type File = {
@@ -23029,6 +23070,8 @@ export type FilesConnection = {
   edges: Array<FileEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 };
 
 export type FloatAggregateSelection = {
@@ -24924,6 +24967,7 @@ export type IssuesConnection = {
   edges: Array<IssueEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+<<<<<<< HEAD
 };
 
 export type License = {
@@ -25072,6 +25116,8 @@ export type LicensesConnection = {
   edges: Array<LicenseEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 };
 
 export type LinkFlair = {
@@ -29124,11 +29170,14 @@ export type MutationCreateFeedsArgs = {
 };
 
 
+<<<<<<< HEAD
 export type MutationCreateFilesArgs = {
   input: Array<FileCreateInput>;
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type MutationCreateGetSortedChannelsResponsesArgs = {
   input: Array<GetSortedChannelsResponseCreateInput>;
 };
@@ -29144,11 +29193,14 @@ export type MutationCreateIssuesArgs = {
 };
 
 
+<<<<<<< HEAD
 export type MutationCreateLicensesArgs = {
   input: Array<LicenseCreateInput>;
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type MutationCreateLinkFlairsArgs = {
   input: Array<LinkFlairCreateInput>;
 };
@@ -29401,12 +29453,15 @@ export type MutationDeleteFeedsArgs = {
 };
 
 
+<<<<<<< HEAD
 export type MutationDeleteFilesArgs = {
   delete?: InputMaybe<FileDeleteInput>;
   where?: InputMaybe<FileWhere>;
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type MutationDeleteGetSortedChannelsResponsesArgs = {
   where?: InputMaybe<GetSortedChannelsResponseWhere>;
 };
@@ -29424,11 +29479,14 @@ export type MutationDeleteIssuesArgs = {
 };
 
 
+<<<<<<< HEAD
 export type MutationDeleteLicensesArgs = {
   where?: InputMaybe<LicenseWhere>;
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type MutationDeleteLinkFlairsArgs = {
   where?: InputMaybe<LinkFlairWhere>;
 };
@@ -29856,12 +29914,15 @@ export type MutationUpdateFeedsArgs = {
 };
 
 
+<<<<<<< HEAD
 export type MutationUpdateFilesArgs = {
   update?: InputMaybe<FileUpdateInput>;
   where?: InputMaybe<FileWhere>;
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type MutationUpdateGetSortedChannelsResponsesArgs = {
   update?: InputMaybe<GetSortedChannelsResponseUpdateInput>;
   where?: InputMaybe<GetSortedChannelsResponseWhere>;
@@ -29880,12 +29941,15 @@ export type MutationUpdateIssuesArgs = {
 };
 
 
+<<<<<<< HEAD
 export type MutationUpdateLicensesArgs = {
   update?: InputMaybe<LicenseUpdateInput>;
   where?: InputMaybe<LicenseWhere>;
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type MutationUpdateLinkFlairsArgs = {
   update?: InputMaybe<LinkFlairUpdateInput>;
   where?: InputMaybe<LinkFlairWhere>;
@@ -30869,6 +30933,7 @@ export type QueryFeedsConnectionArgs = {
 };
 
 
+<<<<<<< HEAD
 export type QueryFilesArgs = {
   options?: InputMaybe<FileOptions>;
   where?: InputMaybe<FileWhere>;
@@ -30888,6 +30953,8 @@ export type QueryFilesConnectionArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type QueryGetCommentRepliesArgs = {
   commentId: Scalars['ID']['input'];
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -30909,7 +30976,10 @@ export type QueryGetCommentSectionArgs = {
 
 export type QueryGetDiscussionsInChannelArgs = {
   channelUniqueName: Scalars['String']['input'];
+<<<<<<< HEAD
   hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   options?: InputMaybe<DiscussionListOptions>;
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -31025,6 +31095,7 @@ export type QueryIssuesConnectionArgs = {
 };
 
 
+<<<<<<< HEAD
 export type QueryLicensesArgs = {
   options?: InputMaybe<LicenseOptions>;
   where?: InputMaybe<LicenseWhere>;
@@ -31044,6 +31115,8 @@ export type QueryLicensesConnectionArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type QueryLinkFlairsArgs = {
   options?: InputMaybe<LinkFlairOptions>;
   where?: InputMaybe<LinkFlairWhere>;
@@ -34559,6 +34632,7 @@ export type SubscriptionFeedUpdatedArgs = {
 };
 
 
+<<<<<<< HEAD
 export type SubscriptionFileCreatedArgs = {
   where?: InputMaybe<FileSubscriptionWhere>;
 };
@@ -34584,6 +34658,8 @@ export type SubscriptionFileUpdatedArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type SubscriptionGetSortedChannelsResponseCreatedArgs = {
   where?: InputMaybe<GetSortedChannelsResponseSubscriptionWhere>;
 };
@@ -34649,6 +34725,7 @@ export type SubscriptionIssueUpdatedArgs = {
 };
 
 
+<<<<<<< HEAD
 export type SubscriptionLicenseCreatedArgs = {
   where?: InputMaybe<LicenseSubscriptionWhere>;
 };
@@ -34664,6 +34741,8 @@ export type SubscriptionLicenseUpdatedArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type SubscriptionLinkFlairCreatedArgs = {
   where?: InputMaybe<LinkFlairSubscriptionWhere>;
 };
@@ -36767,6 +36846,7 @@ export type TagDiscussionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -36797,6 +36877,8 @@ export type TagDiscussionsNodeAggregationWhereInput = {
   downloadPreviewUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -38714,6 +38796,7 @@ export type UserDiscussionsConnectionArgs = {
 };
 
 
+<<<<<<< HEAD
 export type UserDownloadedFilesArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<FileOptions>;
@@ -38736,6 +38819,8 @@ export type UserDownloadedFilesConnectionArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type UserEmailArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<EmailOptions>;
@@ -39088,6 +39173,7 @@ export type UserSuspensionsConnectionArgs = {
 };
 
 
+<<<<<<< HEAD
 export type UserUploadedFilesArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<FileOptions>;
@@ -39110,6 +39196,8 @@ export type UserUploadedFilesConnectionArgs = {
 };
 
 
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 export type UserUpvotedCommentsArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<CommentOptions>;
@@ -39662,6 +39750,7 @@ export type UserAuthoredWikiPagesNodeAggregationWhereInput = {
   body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+<<<<<<< HEAD
   channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -39677,6 +39766,8 @@ export type UserAuthoredWikiPagesNodeAggregationWhereInput = {
   channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -41058,6 +41149,7 @@ export type UserDiscussionsNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+<<<<<<< HEAD
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   downloadListItemCoverImageUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -41088,6 +41180,8 @@ export type UserDiscussionsNodeAggregationWhereInput = {
   downloadPreviewUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   downloadPreviewUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -45882,7 +45976,10 @@ export type WikiPage = {
   VersionAuthorAggregate?: Maybe<WikiPageUserVersionAuthorAggregationSelection>;
   VersionAuthorConnection: WikiPageVersionAuthorConnection;
   body?: Maybe<Scalars['String']['output']>;
+<<<<<<< HEAD
   channelUniqueName?: Maybe<Scalars['String']['output']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   slug: Scalars['String']['output'];
@@ -45981,7 +46078,10 @@ export type WikiPageVersionAuthorConnectionArgs = {
 export type WikiPageAggregateSelection = {
   __typename?: 'WikiPageAggregateSelection';
   body: StringAggregateSelection;
+<<<<<<< HEAD
   channelUniqueName: StringAggregateSelection;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   count: Scalars['Int']['output'];
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
@@ -46070,6 +46170,7 @@ export type WikiPageChildPagesNodeAggregationWhereInput = {
   body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+<<<<<<< HEAD
   channelUniqueName_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
   channelUniqueName_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
   channelUniqueName_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
@@ -46085,6 +46186,8 @@ export type WikiPageChildPagesNodeAggregationWhereInput = {
   channelUniqueName_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
   channelUniqueName_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -46189,7 +46292,10 @@ export type WikiPageCreateInput = {
   ProposedEdits?: InputMaybe<WikiPageProposedEditsFieldInput>;
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
+<<<<<<< HEAD
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   slug: Scalars['String']['input'];
   title: Scalars['String']['input'];
   updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
@@ -46232,7 +46338,10 @@ export type WikiPageEdge = {
 export type WikiPageEventPayload = {
   __typename?: 'WikiPageEventPayload';
   body?: Maybe<Scalars['String']['output']>;
+<<<<<<< HEAD
   channelUniqueName?: Maybe<Scalars['String']['output']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   slug: Scalars['String']['output'];
@@ -46566,12 +46675,15 @@ export type WikiPageSubscriptionWhere = {
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   body_MATCHES?: InputMaybe<Scalars['String']['input']>;
   body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+<<<<<<< HEAD
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -46637,7 +46749,10 @@ export type WikiPageUpdateInput = {
   ProposedEdits?: InputMaybe<Array<WikiPageProposedEditsUpdateFieldInput>>;
   VersionAuthor?: InputMaybe<WikiPageVersionAuthorUpdateFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
+<<<<<<< HEAD
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   slug?: InputMaybe<Scalars['String']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -47025,12 +47140,15 @@ export type WikiPageWhere = {
   body_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   body_MATCHES?: InputMaybe<Scalars['String']['input']>;
   body_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+<<<<<<< HEAD
   channelUniqueName?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   channelUniqueName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   channelUniqueName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;

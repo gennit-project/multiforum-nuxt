@@ -1,299 +1,308 @@
 <script lang="ts" setup>
-  import { ref, computed, watchEffect } from "vue";
-  import { useMutation } from "@vue/apollo-composable";
-  import Comment from "./Comment.vue";
-  import LoadMore from "../LoadMore.vue";
-  import WarningModal from "../WarningModal.vue";
-  import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-  import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
-  import SortButtons from "@/components/SortButtons.vue";
-  import Notification from "@/components/NotificationComponent.vue";
-  import LoadingSpinner from "@/components/LoadingSpinner.vue";
-  import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
-  import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
-  import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
-  import {
-    DELETE_COMMENT,
-    UPDATE_COMMENT,
-    SOFT_DELETE_COMMENT,
-    CREATE_COMMENT,
-    ADD_FEEDBACK_COMMENT_TO_COMMENT,
-  } from "@/graphQLData/comment/mutations";
-  import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-  import type { CommentCreateInput, Comment as CommentType } from "@/__generated__/graphql";
-  import type {
-    CreateEditCommentFormValues,
-    CreateReplyInputData,
-    DeleteCommentInputData,
-  } from "@/types/Comment";
-  import type { Ref, PropType } from "vue";
-  import { modProfileNameVar } from "@/cache";
-  import { useRouter, useRoute } from "nuxt/app";
-  import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
-  import LockIcon from "@/components/icons/LockIcon.vue";
+import { ref, computed, watchEffect } from "vue";
+import { useMutation } from "@vue/apollo-composable";
+import Comment from "./Comment.vue";
+import LoadMore from "../LoadMore.vue";
+import WarningModal from "../WarningModal.vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
+import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
+import SortButtons from "@/components/SortButtons.vue";
+import Notification from "@/components/NotificationComponent.vue";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
+import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
+import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
+import {
+  DELETE_COMMENT,
+  UPDATE_COMMENT,
+  SOFT_DELETE_COMMENT,
+  CREATE_COMMENT,
+  ADD_FEEDBACK_COMMENT_TO_COMMENT,
+} from "@/graphQLData/comment/mutations";
+import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
+import type {
+  CommentCreateInput,
+  Comment as CommentType,
+} from "@/__generated__/graphql";
+import type {
+  CreateEditCommentFormValues,
+  CreateReplyInputData,
+  DeleteCommentInputData,
+} from "@/types/Comment";
+import type { Ref, PropType } from "vue";
+import { modProfileNameVar } from "@/cache";
+import { useRouter, useRoute } from "nuxt/app";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+import LockIcon from "@/components/icons/LockIcon.vue";
 
-  type CommentSectionQueryVariablesType = {
-    discussionId?: string;
-    eventId?: string;
-    channelUniqueName?: string;
-    limit: number;
-    offset: number;
-    sort: string;
-  };
+type CommentSectionQueryVariablesType = {
+  discussionId?: string;
+  eventId?: string;
+  channelUniqueName?: string;
+  limit: number;
+  offset: number;
+  sort: string;
+};
 
-  type GiveFeedbackInput = {
-    commentData: CommentType;
-    parentCommentId: string;
-  };
+type GiveFeedbackInput = {
+  commentData: CommentType;
+  parentCommentId: string;
+};
 
-  type EditFeedbackInput = {
-    commentData: CommentType;
-  };
+type EditFeedbackInput = {
+  commentData: CommentType;
+};
 
-  // Props
-  const props = defineProps({
-    aggregateCommentCount: {
-      type: Number,
-      default: 0,
-    },
-    commentSectionQueryVariables: {
-      type: Object as PropType<CommentSectionQueryVariablesType>,
-      required: true,
-    },
-    comments: {
-      type: Array as PropType<CommentType[]>,
-      default: () => [],
-    },
-    createCommentInput: {
-      type: Object as PropType<CommentCreateInput>,
-      required: true,
-    },
-    createFormValues: {
-      type: Object as PropType<CreateEditCommentFormValues>,
-      required: true,
-    },
-    enableFeedback: {
-      type: Boolean,
-      default: true,
-    },
-    loading: {
-      type: Boolean,
-      default: false,
-    },
-    locked: {
-      type: Boolean,
-      default: false,
-    },
-    archived: {
-      type: Boolean,
-      default: false,
-    },
-    reachedEndOfResults: {
-      type: Boolean,
-      required: true,
-    },
-    previousOffset: {
-      type: Number,
-      required: true,
-    },
-    originalPoster: {
-      type: String,
-      required: true,
-    },
-    showCommentSortButtons: {
-      type: Boolean,
-      default: true,
-    },
-    showNuxtPage: {
-      type: Boolean,
-      default: false,
-    },
-  });
+// Props
+const props = defineProps({
+  aggregateCommentCount: {
+    type: Number,
+    default: 0,
+  },
+  commentSectionQueryVariables: {
+    type: Object as PropType<CommentSectionQueryVariablesType>,
+    required: true,
+  },
+  comments: {
+    type: Array as PropType<CommentType[]>,
+    default: () => [],
+  },
+  createCommentInput: {
+    type: Object as PropType<CommentCreateInput>,
+    required: true,
+  },
+  createFormValues: {
+    type: Object as PropType<CreateEditCommentFormValues>,
+    required: true,
+  },
+  enableFeedback: {
+    type: Boolean,
+    default: true,
+  },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
+  locked: {
+    type: Boolean,
+    default: false,
+  },
+  archived: {
+    type: Boolean,
+    default: false,
+  },
+  reachedEndOfResults: {
+    type: Boolean,
+    required: true,
+  },
+  previousOffset: {
+    type: Number,
+    required: true,
+  },
+  originalPoster: {
+    type: String,
+    required: true,
+  },
+  showCommentSortButtons: {
+    type: Boolean,
+    default: true,
+  },
+  showNuxtPage: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-  // Emits
-  const emit = defineEmits([
-    "updateCommentSectionQueryResult",
-    "decrementCommentCount",
-    "incrementCommentCount",
-    "updateCreateReplyCommentInput",
-    "updateCreateFormValues",
-    "loadMore",
-  ]);
+// Emits
+const emit = defineEmits([
+  "updateCommentSectionQueryResult",
+  "decrementCommentCount",
+  "incrementCommentCount",
+  "updateCreateReplyCommentInput",
+  "updateCreateFormValues",
+  "loadMore",
+]);
 
-  // Route and router
-  const route = useRoute();
-  const router = useRouter();
+// Route and router
+const route = useRoute();
+const router = useRouter();
 
-  // Computed properties
-  const channelId = computed(() =>
-    typeof route.params.forumId === "string" ? route.params.forumId : ""
-  );
-  const activeSort = computed(() => getSortFromQuery(route.query));
-  const permalinkedCommentId = ref(`${route.params.commentId}`);
+// Computed properties
+const channelId = computed(() =>
+  typeof route.params.forumId === "string" ? route.params.forumId : ""
+);
+const activeSort = computed(() => getSortFromQuery(route.query));
+const permalinkedCommentId = ref(`${route.params.commentId}`);
 
-  // Comment form state
-  const commentToDeleteId = ref("");
+// Comment form state
+const commentToDeleteId = ref("");
 
-  const commentToDeleteReplyCount = ref(0);
-  const commentToEdit: Ref<CommentType | null> = ref(null);
-  const showFeedbackSubmittedSuccessfully = ref(false);
-  const showFeedbackFormModal = ref(false);
-  const commentToGiveFeedbackOn: Ref<CommentType | null> = ref(null);
-  const commentToRemoveFeedbackFrom: Ref<CommentType | null> = ref(null);
-  const commentToReport: Ref<CommentType | null> = ref(null);
-  const showDeleteCommentModal = ref(false);
-  const showConfirmUndoFeedbackModal = ref(false);
-  const showEditCommentFeedbackModal = ref(false);
-  const parentOfCommentToDelete = ref("");
-  const parentIdOfCommentToGiveFeedbackOn = ref("");
-  const commentInProcess = ref(false);
-  const replyFormOpenAtCommentID = ref("");
-  const editFormOpenAtCommentID = ref("");
-  const showCopiedLinkNotification = ref(false);
+const commentToDeleteReplyCount = ref(0);
+const commentToEdit: Ref<CommentType | null> = ref(null);
+const showFeedbackSubmittedSuccessfully = ref(false);
+const showFeedbackFormModal = ref(false);
+const commentToGiveFeedbackOn: Ref<CommentType | null> = ref(null);
+const commentToRemoveFeedbackFrom: Ref<CommentType | null> = ref(null);
+const commentToReport: Ref<CommentType | null> = ref(null);
+const showDeleteCommentModal = ref(false);
+const showConfirmUndoFeedbackModal = ref(false);
+const showEditCommentFeedbackModal = ref(false);
+const parentOfCommentToDelete = ref("");
+const parentIdOfCommentToGiveFeedbackOn = ref("");
+const commentInProcess = ref(false);
+const replyFormOpenAtCommentID = ref("");
+const editFormOpenAtCommentID = ref("");
+const showCopiedLinkNotification = ref(false);
 
-  // Moderation related state
-  const commentToArchiveId = ref("");
-  const commentToArchiveAndSuspendId = ref("");
-  const commentToUnarchiveId = ref("");
-  const showArchiveModal = ref(false);
-  const showArchiveAndSuspendModal = ref(false);
-  const showUnarchiveModal = ref(false);
-  const showModProfileModal = ref(false);
-  const showBrokenRulesModal = ref(false);
-  const showSuccessfullyReported = ref(false);
-  const showSuccessfullyArchived = ref(false);
-  const showSuccessfullyArchivedAndSuspended = ref(false);
-  const showSuccessfullyUnarchived = ref(false);
-  const locked = ref(props.locked);
+// Moderation related state
+const commentToArchiveId = ref("");
+const commentToArchiveAndSuspendId = ref("");
+const commentToUnarchiveId = ref("");
+const showArchiveModal = ref(false);
+const showArchiveAndSuspendModal = ref(false);
+const showUnarchiveModal = ref(false);
+const showModProfileModal = ref(false);
+const showBrokenRulesModal = ref(false);
+const showSuccessfullyReported = ref(false);
+const showSuccessfullyArchived = ref(false);
+const showSuccessfullyArchivedAndSuspended = ref(false);
+const showSuccessfullyUnarchived = ref(false);
+const locked = ref(props.locked);
 
-  const editFormValues = ref<CreateEditCommentFormValues>({
-    text: commentToEdit.value?.text || "",
-    isRootComment: true,
-    depth: 1,
-  });
+const editFormValues = ref<CreateEditCommentFormValues>({
+  text: commentToEdit.value?.text || "",
+  isRootComment: true,
+  depth: 1,
+});
 
-  const {
-    mutate: addFeedbackCommentToComment,
-    loading: addFeedbackCommentToCommentLoading,
-    error: addFeedbackCommentToCommentError,
-    onDone: onAddFeedbackCommentToCommentDone,
-  } = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
-    update: (cache, result) => {
-      const parentId = JSON.parse(JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value));
-      const newFeedbackComment = result.data.createComments.comments[0];
-      const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
+const {
+  mutate: addFeedbackCommentToComment,
+  loading: addFeedbackCommentToCommentLoading,
+  error: addFeedbackCommentToCommentError,
+  onDone: onAddFeedbackCommentToCommentDone,
+} = useMutation(ADD_FEEDBACK_COMMENT_TO_COMMENT, {
+  update: (cache, result) => {
+    const parentId = JSON.parse(
+      JSON.stringify(parentIdOfCommentToGiveFeedbackOn.value)
+    );
+    const newFeedbackComment = result.data.createComments.comments[0];
+    const commentWeGaveFeedbackOn = commentToGiveFeedbackOn.value;
 
-      if (parentId && commentWeGaveFeedbackOn) {
-        // Modify the comment to add feedback
-        cache.modify({
-          id: cache.identify({
-            __typename: "Comment",
-            id: commentWeGaveFeedbackOn.id,
-          }),
-          fields: {
-            FeedbackComments(existing = []) {
-              return [...existing, newFeedbackComment];
-            },
-          },
-        });
-      } else {
-        emit("updateCommentSectionQueryResult", {
-          cache,
-          commentToAddFeedbackTo: commentToGiveFeedbackOn.value,
-          newFeedbackComment,
-        });
-      }
-    },
-  });
+    if (parentId && commentWeGaveFeedbackOn) {
+      // Modify the comment to add feedback
+      cache.modify({
+        id: cache.identify({ 
+          __typename: "Comment", 
+          id: commentWeGaveFeedbackOn.id 
+        }),
+        fields: {
+          FeedbackComments(existing = []) {
+            return [...existing, newFeedbackComment];
+          }
+        }
+      });
+    } else {
+      emit("updateCommentSectionQueryResult", {
+        cache,
+        commentToAddFeedbackTo: commentToGiveFeedbackOn.value,
+        newFeedbackComment,
+      });
+    }
+  },
+});
 
-  onAddFeedbackCommentToCommentDone(() => {
-    showFeedbackFormModal.value = false;
-    showFeedbackSubmittedSuccessfully.value = true;
-  });
+onAddFeedbackCommentToCommentDone(() => {
+  showFeedbackFormModal.value = false;
+  showFeedbackSubmittedSuccessfully.value = true;
+});
 
-  const {
-    mutate: editComment,
-    error: editCommentError,
-    onDone: onDoneUpdatingComment,
-  } = useMutation(UPDATE_COMMENT);
+const {
+  mutate: editComment,
+  error: editCommentError,
+  onDone: onDoneUpdatingComment,
+} = useMutation(UPDATE_COMMENT);
 
-  const {
-    mutate: deleteComment,
-    onDone: onDoneDeletingComment,
-    loading: deleteCommentLoading,
-  } = useMutation(DELETE_COMMENT, {
-    update: (cache) => {
-      // First evict the comment itself
-      cache.evict({
+const {
+  mutate: deleteComment,
+  onDone: onDoneDeletingComment,
+  loading: deleteCommentLoading,
+} = useMutation(DELETE_COMMENT, {
+  update: (cache) => {
+    // First evict the comment itself
+    cache.evict({
+      id: cache.identify({
+        __typename: "Comment",
+        id: commentToDeleteId.value
+      })
+    });
+
+    if (parentOfCommentToDelete.value) {
+      // For replies, update the parent's child comments and count
+      cache.modify({
         id: cache.identify({
           __typename: "Comment",
-          id: commentToDeleteId.value,
+          id: parentOfCommentToDelete.value
         }),
+        fields: {
+          ChildComments(existing = []) {
+            return existing.filter(
+              (reply: CommentType) => reply.id !== commentToDeleteId.value
+            );
+          },
+          ChildCommentsAggregate(existing = { count: 0 }) {
+            return {
+              ...existing,
+              count: Math.max(0, (existing.count || 0) - 1)
+            };
+          }
+        }
       });
-
-      if (parentOfCommentToDelete.value) {
-        // For replies, update the parent's child comments and count
-        cache.modify({
-          id: cache.identify({
-            __typename: "Comment",
-            id: parentOfCommentToDelete.value,
-          }),
-          fields: {
-            ChildComments(existing = []) {
-              return existing.filter((reply: CommentType) => reply.id !== commentToDeleteId.value);
-            },
-            ChildCommentsAggregate(existing = { count: 0 }) {
-              return {
-                ...existing,
-                count: Math.max(0, (existing.count || 0) - 1),
-              };
-            },
+    } else {
+      // For root comments, update the DiscussionChannel's comments
+      cache.modify({
+        id: cache.identify({
+          __typename: "DiscussionChannel",
+          id: props.commentSectionQueryVariables.discussionId,
+        }),
+        fields: {
+          Comments(existing = []) {
+            return existing.filter(
+              (comment: CommentType) => comment.id !== commentToDeleteId.value
+            );
           },
-        });
-      } else {
-        // For root comments, update the DiscussionChannel's comments
-        cache.modify({
-          id: cache.identify({
-            __typename: "DiscussionChannel",
-            id: props.commentSectionQueryVariables.discussionId,
-          }),
-          fields: {
-            Comments(existing = []) {
-              return existing.filter(
-                (comment: CommentType) => comment.id !== commentToDeleteId.value
-              );
-            },
-            CommentsAggregate(existing = { count: 0 }) {
-              return {
-                ...existing,
-                count: Math.max(0, (existing.count || 0) - 1),
-              };
-            },
-          },
-        });
-      }
+          CommentsAggregate(existing = { count: 0 }) {
+            return {
+              ...existing,
+              count: Math.max(0, (existing.count || 0) - 1)
+            };
+          }
+        }
+      });
+    }
 
-      // Clean up any dangling references
-      cache.gc();
+    // Clean up any dangling references
+    cache.gc();
+    
+    emit("decrementCommentCount", cache);
+  },
+});
 
-      emit("decrementCommentCount", cache);
-    },
-  });
+onDoneDeletingComment(() => {
+  commentToDeleteId.value = "";
+  showDeleteCommentModal.value = false;
+});
 
-  onDoneDeletingComment(() => {
-    commentToDeleteId.value = "";
-    showDeleteCommentModal.value = false;
-  });
+const { mutate: softDeleteComment, onDone: onDoneSoftDeletingComment } =
+  useMutation(SOFT_DELETE_COMMENT);
 
-  const { mutate: softDeleteComment, onDone: onDoneSoftDeletingComment } =
-    useMutation(SOFT_DELETE_COMMENT);
+onDoneSoftDeletingComment(() => {
+  commentToDeleteId.value = "";
+  showDeleteCommentModal.value = false;
+});
 
-  onDoneSoftDeletingComment(() => {
-    commentToDeleteId.value = "";
-    showDeleteCommentModal.value = false;
-  });
-
-  const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(CREATE_COMMENT, {
+const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
+  CREATE_COMMENT,
+  {
     errorPolicy: "all",
     update: (cache, result) => {
       const newComment: CommentType = result.data?.createComments?.comments[0];
@@ -313,10 +322,10 @@
             CommentsAggregate(existing = { count: 0 }) {
               return {
                 ...existing,
-                count: (existing?.count || 0) + 1,
+                count: (existing?.count || 0) + 1
               };
-            },
-          },
+            }
+          }
         });
         emit("incrementCommentCount", cache);
         return;
@@ -352,9 +361,9 @@
             getCommentReplies: {
               __typename: "CommentReplies",
               ChildComments: [newComment, ...existingReplies],
-              aggregateChildCommentCount: existingCount + 1,
-            },
-          },
+              aggregateChildCommentCount: existingCount + 1
+            }
+          }
         });
 
         // Update the parent comment's counts
@@ -367,13 +376,13 @@
             ChildCommentsAggregate(existing = { count: 0 }) {
               return {
                 __typename: "CommentsAggregate",
-                count: (existing.count || 0) + 1,
+                count: (existing.count || 0) + 1
               };
             },
             replyCount(existing = 0) {
               return (existing || 0) + 1;
-            },
-          },
+            }
+          }
         });
 
         emit("incrementCommentCount", cache);
@@ -381,236 +390,231 @@
         console.error("Error updating cache:", error);
       }
     },
+  }
+);
+
+onDoneCreatingComment(() => {
+  commentInProcess.value = false;
+  replyFormOpenAtCommentID.value = "";
+  emit("updateCreateFormValues", {
+    text: "",
+    isRootComment: true,
+    depth: 1,
+    parentCommentId: "",
   });
+});
 
-  onDoneCreatingComment(() => {
-    commentInProcess.value = false;
-    replyFormOpenAtCommentID.value = "";
-    emit("updateCreateFormValues", {
-      text: "",
-      isRootComment: true,
-      depth: 1,
-      parentCommentId: "",
-    });
+onDoneUpdatingComment(() => {
+  commentInProcess.value = false;
+  editFormOpenAtCommentID.value = "";
+  commentToEdit.value = null;
+  editFormValues.value = {
+    text: "",
+    isRootComment: true,
+    depth: 1,
+  };
+});
+
+watchEffect(() => {
+  if (typeof route.params.commentId === "string") {
+    permalinkedCommentId.value = route.params.commentId;
+  }
+});
+
+function handleClickCreate() {
+  // Simply trigger the mutation with the properly structured input from props
+  createComment({
+    createCommentInput: props.createCommentInput
   });
+}
 
-  onDoneUpdatingComment(() => {
-    commentInProcess.value = false;
-    editFormOpenAtCommentID.value = "";
-    commentToEdit.value = null;
-    editFormValues.value = {
-      text: "",
-      isRootComment: true,
-      depth: 1,
-    };
+function updateCreateInputValuesForReply(input: CreateReplyInputData) {
+  const { text, parentCommentId, depth } = input;
+  if (!parentCommentId) {
+    throw new Error("parentCommentId is required to reply to a comment");
+  }
+  // Emit to parent to update the form values
+  emit("updateCreateReplyCommentInput", {
+    text,
+    isRootComment: false,
+    parentCommentId,
+    depth,
   });
+}
 
-  watchEffect(() => {
-    if (typeof route.params.commentId === "string") {
-      permalinkedCommentId.value = route.params.commentId;
-    }
-  });
+function handleClickEdit(commentData: CommentType) {
+  commentToEdit.value = commentData;
+  editFormOpenAtCommentID.value = commentData.id;
+  editFormValues.value = {
+    text: commentData.text || "",
+    isRootComment: !commentData.ParentComment,
+    depth: 1,
+  };
+}
 
-  function handleClickCreate() {
-    // Simply trigger the mutation with the properly structured input from props
-    createComment({
-      createCommentInput: props.createCommentInput,
-    });
+function updateEditInputValues(text: string, isRootComment: boolean) {
+  editFormValues.value = {
+    ...editFormValues.value,
+    text,
+    isRootComment,
+  };
+}
+
+function handleClickDelete(input: DeleteCommentInputData) {
+  const { commentId, parentCommentId, replyCount } = input;
+  showDeleteCommentModal.value = true;
+  commentToDeleteId.value = commentId;
+  commentToDeleteReplyCount.value = replyCount;
+  parentOfCommentToDelete.value = parentCommentId;
+}
+
+function handleSaveEdit() {
+  if (!commentToEdit.value?.id) {
+    console.error("No comment to edit");
+    return;
   }
-
-  function updateCreateInputValuesForReply(input: CreateReplyInputData) {
-    const { text, parentCommentId, depth } = input;
-    if (!parentCommentId) {
-      throw new Error("parentCommentId is required to reply to a comment");
-    }
-    // Emit to parent to update the form values
-    emit("updateCreateReplyCommentInput", {
-      text,
-      isRootComment: false,
-      parentCommentId,
-      depth,
-    });
-  }
-
-  function handleClickEdit(commentData: CommentType) {
-    commentToEdit.value = commentData;
-    editFormOpenAtCommentID.value = commentData.id;
-    editFormValues.value = {
-      text: commentData.text || "",
-      isRootComment: !commentData.ParentComment,
-      depth: 1,
-    };
-  }
-
-  function updateEditInputValues(text: string, isRootComment: boolean) {
-    editFormValues.value = {
-      ...editFormValues.value,
-      text,
-      isRootComment,
-    };
-  }
-
-  function handleClickDelete(input: DeleteCommentInputData) {
-    const { commentId, parentCommentId, replyCount } = input;
-    showDeleteCommentModal.value = true;
-    commentToDeleteId.value = commentId;
-    commentToDeleteReplyCount.value = replyCount;
-    parentOfCommentToDelete.value = parentCommentId;
-  }
-
-  function handleSaveEdit() {
-    if (!commentToEdit.value?.id) {
-      console.error("No comment to edit");
-      return;
-    }
-
-    editComment({
-      commentWhere: {
-        id: commentToEdit.value.id,
-      },
-      updateCommentInput: {
-        text: editFormValues.value.text,
-        isRootComment: editFormValues.value.isRootComment,
-      },
-    });
-  }
-
-  function handleDeleteComment() {
-    if (!commentToDeleteId.value) {
-      throw new Error("commentId is required to delete a comment");
-    }
-    if (commentToDeleteReplyCount.value > 0) {
-      softDeleteComment({ id: commentToDeleteId.value });
-    } else {
-      deleteComment({ id: commentToDeleteId.value });
-    }
-  }
-
-  function scrollToTop() {
-    window.scrollTo(0, 0);
-  }
-
-  function openReplyEditor(commentId: string) {
-    replyFormOpenAtCommentID.value = commentId;
-    editFormOpenAtCommentID.value = ""; // Close edit form if open
-  }
-
-  function hideReplyEditor() {
-    replyFormOpenAtCommentID.value = "";
-  }
-
-  function openEditCommentEditor(commentId: string) {
-    editFormOpenAtCommentID.value = commentId;
-    replyFormOpenAtCommentID.value = ""; // Close reply form if open
-  }
-
-  function hideEditCommentEditor() {
-    editFormOpenAtCommentID.value = "";
-    commentToEdit.value = null; // Clear edited comment data
-  }
-
-  function handleClickGiveFeedback(input: GiveFeedbackInput) {
-    const { commentData, parentCommentId } = input;
-    showFeedbackFormModal.value = true;
-    parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
-    commentToGiveFeedbackOn.value = commentData;
-  }
-
-  function handleClickUndoFeedback(input: GiveFeedbackInput) {
-    const { commentData, parentCommentId } = input;
-    showConfirmUndoFeedbackModal.value = true;
-    parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
-    commentToRemoveFeedbackFrom.value = commentData;
-  }
-
-  function handleClickEditFeedback(input: EditFeedbackInput) {
-    const { commentData } = input;
-    commentToGiveFeedbackOn.value = commentData;
-    showEditCommentFeedbackModal.value = true;
-  }
-
-  function handleClickReport(commentData: CommentType) {
-    commentToReport.value = commentData;
-    showBrokenRulesModal.value = true;
-  }
-
-  function handleClickArchive(commentId: string) {
-    commentToArchiveId.value = commentId;
-    showArchiveModal.value = true;
-  }
-
-  function handleClickArchiveAndSuspend(commentId: string) {
-    commentToArchiveAndSuspendId.value = commentId;
-    showArchiveAndSuspendModal.value = true;
-  }
-
-  function handleClickUnarchive(commentId: string) {
-    commentToUnarchiveId.value = commentId;
-    showUnarchiveModal.value = true;
-  }
-
-  function handleSubmitFeedback() {
-    if (!commentToGiveFeedbackOn.value?.id) {
-      console.error("commentId is required to submit feedback");
-      return;
-    }
-    if (!modProfileNameVar.value) {
-      console.error("modName is required to submit feedback");
-      return;
-    }
-    const feedbackInput = {
-      commentId: commentToGiveFeedbackOn.value?.id,
+  
+  editComment({
+    commentWhere: {
+      id: commentToEdit.value.id,
+    },
+    updateCommentInput: {
       text: editFormValues.value.text,
-      modProfileName: modProfileNameVar.value,
-      channelId: channelId.value,
-    };
-    addFeedbackCommentToComment(feedbackInput);
-  }
-
-  function updateFeedback(text: string) {
-    editFormValues.value.text = text;
-  }
-
-  function handleViewFeedback(commentId: string) {
-    router.push({
-      name: "forums-forumId-discussions-commentFeedback-discussionId-commentId",
-      params: {
-        forumId: channelId.value,
-        discussionId: route.params.discussionId,
-        commentId,
-      },
-    });
-  }
-
-  // Update the lengthOfCommentInProgress computed to be more defensive
-  const lengthOfCommentInProgress = computed(() => {
-    if (editFormOpenAtCommentID.value) {
-      return editFormValues.value.text.length;
-    }
-    if (replyFormOpenAtCommentID.value && props.createFormValues?.text) {
-      return props.createFormValues.text.length;
-    }
-    return 0;
+      isRootComment: editFormValues.value.isRootComment,
+    },
   });
+}
+
+function handleDeleteComment() {
+  if (!commentToDeleteId.value) {
+    throw new Error("commentId is required to delete a comment");
+  }
+  if (commentToDeleteReplyCount.value > 0) {
+    softDeleteComment({ id: commentToDeleteId.value });
+  } else {
+    deleteComment({ id: commentToDeleteId.value });
+  }
+}
+
+function scrollToTop() {
+  window.scrollTo(0, 0);
+}
+
+function openReplyEditor(commentId: string) {
+  replyFormOpenAtCommentID.value = commentId;
+  editFormOpenAtCommentID.value = ""; // Close edit form if open
+}
+
+function hideReplyEditor() {
+  replyFormOpenAtCommentID.value = "";
+}
+
+function openEditCommentEditor(commentId: string) {
+  editFormOpenAtCommentID.value = commentId;
+  replyFormOpenAtCommentID.value = ""; // Close reply form if open
+}
+
+function hideEditCommentEditor() {
+  editFormOpenAtCommentID.value = "";
+  commentToEdit.value = null; // Clear edited comment data
+}
+
+function handleClickGiveFeedback(input: GiveFeedbackInput) {
+  const { commentData, parentCommentId } = input;
+  showFeedbackFormModal.value = true;
+  parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
+  commentToGiveFeedbackOn.value = commentData;
+}
+
+function handleClickUndoFeedback(input: GiveFeedbackInput) {
+  const { commentData, parentCommentId } = input;
+  showConfirmUndoFeedbackModal.value = true;
+  parentIdOfCommentToGiveFeedbackOn.value = parentCommentId;
+  commentToRemoveFeedbackFrom.value = commentData;
+}
+
+function handleClickEditFeedback(input: EditFeedbackInput) {
+  const { commentData } = input;
+  commentToGiveFeedbackOn.value = commentData;
+  showEditCommentFeedbackModal.value = true;
+}
+
+function handleClickReport(commentData: CommentType) {
+  commentToReport.value = commentData;
+  showBrokenRulesModal.value = true;
+}
+
+function handleClickArchive(commentId: string) {
+  commentToArchiveId.value = commentId;
+  showArchiveModal.value = true;
+}
+
+function handleClickArchiveAndSuspend(commentId: string) {
+  commentToArchiveAndSuspendId.value = commentId;
+  showArchiveAndSuspendModal.value = true;
+}
+
+function handleClickUnarchive(commentId: string) {
+  commentToUnarchiveId.value = commentId;
+  showUnarchiveModal.value = true;
+}
+
+function handleSubmitFeedback() {
+  if (!commentToGiveFeedbackOn.value?.id) {
+    console.error("commentId is required to submit feedback");
+    return;
+  }
+  if (!modProfileNameVar.value) {
+    console.error("modName is required to submit feedback");
+    return;
+  }
+  const feedbackInput = {
+    commentId: commentToGiveFeedbackOn.value?.id,
+    text: editFormValues.value.text,
+    modProfileName: modProfileNameVar.value,
+    channelId: channelId.value,
+  };
+  addFeedbackCommentToComment(feedbackInput);
+}
+
+function updateFeedback(text: string) {
+  editFormValues.value.text = text;
+}
+
+function handleViewFeedback(commentId: string) {
+  router.push({
+    name: "forums-forumId-discussions-commentFeedback-discussionId-commentId",
+    params: {
+      forumId: channelId.value,
+      discussionId: route.params.discussionId,
+      commentId,
+    },
+  });
+}
+
+// Update the lengthOfCommentInProgress computed to be more defensive
+const lengthOfCommentInProgress = computed(() => {
+  if (editFormOpenAtCommentID.value) {
+    return editFormValues.value.text.length;
+  }
+  if (replyFormOpenAtCommentID.value && props.createFormValues?.text) {
+    return props.createFormValues.text.length;
+  }
+  return 0;
+});
 </script>
 
 <template>
-  <div class="bg-white pr-2 dark:bg-gray-800">
+  <div class="bg-white dark:bg-gray-800 pr-2">
     <div>
       <div class="align-items flex justify-between">
-        <h2
-          id="comments"
-          class="px-1 text-lg dark:text-white"
-        >
+        <h2 id="comments" class="px-1 text-lg dark:text-white">
           {{ `Comments (${aggregateCommentCount})` }}
         </h2>
-        <SortButtons
-          v-if="showCommentSortButtons"
-          :show-top-options="false"
-        />
+        <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />
       </div>
       <div class="my-2">
-        <slot />
+        <slot/>
       </div>
       <InfoBanner
         v-if="locked || archived"
@@ -619,22 +623,16 @@
       >
         <LockIcon class="h-5 w-5" />
       </InfoBanner>
-      <LoadingSpinner
-        v-if="loading"
-        class="ml-2"
-      />
+      <LoadingSpinner v-if="loading" class="ml-2" />
       <NuxtPage
         v-if="showNuxtPage"
         :aggregate-comment-count="aggregateCommentCount"
-        :comment-in-process="commentInProcess"
-        :edit-comment-error="editCommentError"
-        :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
         :enable-feedback="enableFeedback"
-        :length-of-comment-in-progress="lengthOfCommentInProgress"
         :locked="locked || archived"
+        :comment-in-process="commentInProcess"
         :logged-in-user-mod-name="modProfileNameVar"
-        :original-poster="originalPoster"
         :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
+<<<<<<< HEAD
         @click-edit-comment="handleClickEdit"
         @click-edit-feedback="handleClickEditFeedback"
         @click-feedback="handleClickGiveFeedback"
@@ -654,9 +652,34 @@
         @scroll-to-top="scrollToTop"
         @show-copied-link-notification="showCopiedLinkNotification = $event"
         @start-comment-save="commentInProcess = true"
+=======
+        :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
+        :edit-comment-error="editCommentError"
+        :original-poster="originalPoster"
+        :length-of-comment-in-progress="lengthOfCommentInProgress"
+        @start-comment-save="commentInProcess = true"
+        @open-reply-editor="openReplyEditor"
+        @hide-reply-editor="hideReplyEditor"
+        @open-edit-comment-editor="openEditCommentEditor"
+        @hide-edit-comment-editor="hideEditCommentEditor"
+        @click-edit-comment="handleClickEdit"
+        @delete-comment="handleClickDelete"
+        @create-comment="handleClickCreate"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
         @update-create-reply-comment-input="updateCreateInputValuesForReply"
         @update-edit-comment-input="updateEditInputValues"
+        @save-edit="handleSaveEdit"
+        @scroll-to-top="scrollToTop"
+        @click-report="handleClickReport"
+        @click-feedback="handleClickGiveFeedback"
+        @click-undo-feedback="handleClickUndoFeedback"
+        @click-edit-feedback="handleClickEditFeedback"
         @update-feedback="updateFeedback"
+        @handle-view-feedback="handleViewFeedback"
+        @show-copied-link-notification="showCopiedLinkNotification = $event"
+        @handle-click-archive="handleClickArchive"
+        @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
+        @handle-click-unarchive="handleClickUnarchive"
       />
       <div class="my-4">
         <div
@@ -666,24 +689,22 @@
           There are no comments yet.
         </div>
         <div :key="activeSort">
-          <div
-            v-for="(comment, index) in comments || []"
-            :key="comment?.id || index"
-          >
+          <div v-for="(comment, index) in comments || []" :key="comment?.id || index">
             <Comment
               v-if="comment?.id !== permalinkedCommentId"
               :aggregate-comment-count="aggregateCommentCount"
-              :comment-data="comment"
-              :comment-in-process="commentInProcess"
               :compact="true"
-              :depth="1"
-              :edit-comment-error="editCommentError"
-              :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
+              :comment-data="comment"
               :enable-feedback="enableFeedback"
-              :length-of-comment-in-progress="lengthOfCommentInProgress"
+              :depth="1"
               :locked="locked || archived"
+              :comment-in-process="commentInProcess"
+              :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
+              :edit-form-open-at-comment-i-d="editFormOpenAtCommentID"
+              :edit-comment-error="editCommentError"
               :mod-profile-name="modProfileNameVar"
               :original-poster="originalPoster"
+<<<<<<< HEAD
               :reply-form-open-at-comment-i-d="replyFormOpenAtCommentID"
               @click-edit-comment="handleClickEdit"
               @click-edit-feedback="handleClickEditFeedback"
@@ -705,9 +726,34 @@
               @scroll-to-top="scrollToTop"
               @show-copied-link-notification="showCopiedLinkNotification = $event"
               @start-comment-save="commentInProcess = true"
+=======
+              :length-of-comment-in-progress="lengthOfCommentInProgress"
+              @start-comment-save="commentInProcess = true"
+              @open-reply-editor="openReplyEditor"
+              @hide-reply-editor="hideReplyEditor"
+              @open-edit-comment-editor="openEditCommentEditor"
+              @hide-edit-comment-editor="hideEditCommentEditor"
+              @click-edit-comment="handleClickEdit"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
               @update-create-reply-comment-input="updateCreateInputValuesForReply"
-              @update-edit-comment-input="updateEditInputValues"
+              @create-comment="handleClickCreate"
+              @show-copied-link-notification="
+                showCopiedLinkNotification = $event
+              "
+              @open-mod-profile-modal="showModProfileModal = true"
+              @scroll-to-top="scrollToTop"
+              @click-report="handleClickReport"
+              @click-feedback="handleClickGiveFeedback"
+              @click-undo-feedback="handleClickUndoFeedback"
+              @click-edit-feedback="handleClickEditFeedback"
               @update-feedback="updateEditInputValues"
+              @save-edit="handleSaveEdit"
+              @update-edit-comment-input="updateEditInputValues"
+              @delete-comment="handleClickDelete"
+              @handle-click-archive="handleClickArchive"
+              @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
+              @handle-click-unarchive="handleClickUnarchive"
+              @handle-view-feedback="handleViewFeedback"
             />
           </div>
         </div>
@@ -720,18 +766,18 @@
       @load-more="$emit('loadMore')"
     />
     <WarningModal
-      :body="'Are you sure you want to delete this comment?'"
-      :loading="deleteCommentLoading"
-      :open="showDeleteCommentModal"
       :title="'Delete Comment'"
+      :body="'Are you sure you want to delete this comment?'"
+      :open="showDeleteCommentModal"
+      :loading="deleteCommentLoading"
       @close="showDeleteCommentModal = false"
       @primary-button-click="handleDeleteComment"
     />
     <BrokenRulesModal
       v-if="showBrokenRulesModal"
-      :comment="commentToReport"
-      :comment-id="commentToReport?.id"
       :open="showBrokenRulesModal"
+      :comment-id="commentToReport?.id"
+      :comment="commentToReport"
       @close="showBrokenRulesModal = false"
       @report-submitted-successfully="
         () => {
@@ -742,9 +788,9 @@
     />
     <BrokenRulesModal
       v-if="commentToArchiveId"
-      :archive-after-reporting="true"
-      :comment-id="commentToArchiveId"
       :open="showArchiveModal"
+      :comment-id="commentToArchiveId"
+      :archive-after-reporting="true"
       @close="showArchiveModal = false"
       @reported-and-archived-successfully="
         () => {
@@ -755,8 +801,8 @@
     />
     <UnarchiveModal
       v-if="commentToUnarchiveId"
-      :comment-id="commentToUnarchiveId"
       :open="showUnarchiveModal"
+      :comment-id="commentToUnarchiveId"
       @close="showUnarchiveModal = false"
       @unarchived-successfully="
         () => {
@@ -767,11 +813,11 @@
     />
     <BrokenRulesModal
       v-if="commentToArchiveAndSuspendId"
-      :comment-id="commentToArchiveAndSuspendId"
       :open="showArchiveAndSuspendModal"
+      :title="'Suspend Author'"
+      :comment-id="commentToArchiveAndSuspendId"
       :suspend-user-enabled="true"
       :text-box-label="'(Optional) Explain why you are suspending this author:'"
-      :title="'Suspend Author'"
       @close="showArchiveAndSuspendModal = false"
       @suspended-user-successfully="
         () => {
@@ -786,27 +832,27 @@
       @close-notification="showCopiedLinkNotification = false"
     />
     <GenericFeedbackFormModal
-      :error="addFeedbackCommentToCommentError?.message || ''"
-      :loading="addFeedbackCommentToCommentLoading"
       :open="showFeedbackFormModal"
+      :loading="addFeedbackCommentToCommentLoading"
+      :error="addFeedbackCommentToCommentError?.message || ''"
       @close="showFeedbackFormModal = false"
-      @primary-button-click="handleSubmitFeedback"
       @update-feedback="updateFeedback"
+      @primary-button-click="handleSubmitFeedback"
     />
     <ConfirmUndoCommentFeedbackModal
       v-if="showConfirmUndoFeedbackModal && commentToRemoveFeedbackFrom"
       :key="modProfileNameVar"
+      :open="showConfirmUndoFeedbackModal"
       :comment-id="commentToRemoveFeedbackFrom.id"
       :comment-to-remove-feedback-from="commentToRemoveFeedbackFrom"
       :mod-name="modProfileNameVar"
-      :open="showConfirmUndoFeedbackModal"
       @close="showConfirmUndoFeedbackModal = false"
     />
     <EditCommentFeedbackModal
       v-if="showEditCommentFeedbackModal"
+      :open="showEditCommentFeedbackModal"
       :comment-id="commentToGiveFeedbackOn?.id || ''"
       :mod-name="modProfileNameVar"
-      :open="showEditCommentFeedbackModal"
       @close="showEditCommentFeedbackModal = false"
     />
     <Notification
@@ -838,7 +884,7 @@
 </template>
 
 <style scoped>
-  h2 {
-    padding-bottom: 0.3em;
-  }
+h2 {
+  padding-bottom: 0.3em;
+}
 </style>

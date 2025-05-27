@@ -1,4 +1,5 @@
 <script setup lang="ts">
+<<<<<<< HEAD
   import { ref, computed, watch } from "vue";
   import { useRoute } from "nuxt/app";
   import { useMutation } from "@vue/apollo-composable";
@@ -81,6 +82,15 @@
       wikiEnabled: enabled,
     });
   }
+=======
+defineProps({
+  formValues: {
+    type: Object,
+    required: true,
+  },
+});
+defineEmits(["updateFormValues"]);
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 </script>
 
 <template>
@@ -88,6 +98,7 @@
     <div class="flex items-center">
       <input
         id="wiki-enabled"
+<<<<<<< HEAD
         :checked="isWikiEnabled"
         :disabled="isLoading"
         class="h-4 w-4 rounded border border-gray-300 text-orange-600 focus:ring-orange-500 dark:border-gray-600"
@@ -97,7 +108,14 @@
       <label
         class="ml-2 block text-sm text-gray-900 dark:text-gray-100"
         for="wiki-enabled"
+=======
+        type="checkbox"
+        :checked="formValues.wikiEnabled"
+        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600"
+        @change="$emit('updateFormValues', { wikiEnabled: ($event.target as HTMLInputElement).checked })"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
       >
+      <label for="wiki-enabled" class="ml-2 block text-sm text-gray-900 dark:text-gray-100">
         Enable wiki for this forum
       </label>
       <span

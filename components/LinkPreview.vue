@@ -1,72 +1,71 @@
 <script>
-  import { config } from "@/config";
-  export default {
-    name: "LinkPreview",
-    props: {
-      url: {
-        type: String,
-        required: true,
-      },
+import { config } from "@/config";
+export default {
+  name: "LinkPreview",
+  props: {
+    url: {
+      type: String,
+      required: true,
     },
-    data() {
-      return {
-        title: "",
-        description: "",
-        imageUrl: "",
-        htmlInferredImages: [],
-        apiKey: config.openGraphApiKey,
-        showImage: true,
-      };
-    },
-    mounted() {
-      this.fetchData();
-    },
-    methods: {
-      fetchData() {
-        const endpoint = `https://opengraph.io/api/1.1/site/${encodeURIComponent(
-          this.url
-        )}?app_id=${this.apiKey}`;
-        fetch(endpoint)
-          .then((response) => response.json())
-          .then((data) => {
-            this.title = data.hybridGraph.title || data.hybridGraph.url;
-            this.description = data.hybridGraph.description || "";
-            this.imageUrl = data.hybridGraph.image || "";
+  },
+  data() {
+    return {
+      title: "",
+      description: "",
+      imageUrl: "",
+      htmlInferredImages: [],
+      apiKey: config.openGraphApiKey,
+      showImage: true,
+    };
+  },
+  mounted() {
+    this.fetchData();
+  },
+  methods: {
+    fetchData() {
+      const endpoint = `https://opengraph.io/api/1.1/site/${encodeURIComponent(
+        this.url
+      )}?app_id=${this.apiKey}`;
+      fetch(endpoint)
+        .then((response) => response.json())
+        .then((data) => {
+          this.title = data.hybridGraph.title || data.hybridGraph.url;
+          this.description = data.hybridGraph.description || "";
+          this.imageUrl = data.hybridGraph.image || "";
 
-            if (data.htmlInferred.images) {
-              this.htmlInferredImages = data.htmlInferred.images;
-            }
-          })
-          .catch((error) => console.error(error));
-      },
+          if (data.htmlInferred.images) {
+            this.htmlInferredImages = data.htmlInferred.images;
+          }
+        })
+        .catch((error) => console.error(error));
     },
-  };
+  },
+};
 </script>
 
 <template>
-  <div class="my-1 overflow-hidden rounded border shadow-lg">
+  <div class="rounded overflow-hidden shadow-lg my-1 border">
     <a
       :href="url"
-      rel="noopener"
       target="_blank"
+      rel="noopener"
     >
       <img
         v-if="imageUrl && showImage"
-        :alt="title"
-        class="m-4 w-20 object-cover"
+        class="w-20 m-4 object-cover"
         :src="imageUrl"
+        :alt="title"
         @error="showImage = false"
       >
     </a>
     <div class="px-6 py-4">
       <a
         :href="url"
-        rel="noopener"
         target="_blank"
-        ><div class="mb-2 text-xl font-bold hover:text-gray-400">{{ title }}</div></a
-      >
+        rel="noopener"
+      ><div class="font-bold text-xl mb-2 hover:text-gray-400">{{ title }}</div></a>
       <p
-        class="text-base text-gray-700"
+        class="text-gray-700 text-base"
         :class="!showImage ? 'mt-4' : ''"
       >
         {{ description }}

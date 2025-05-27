@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  defineProps({
-    formValues: {
-      type: Object,
-      required: true,
-    },
-  });
-  defineEmits(["updateFormValues"]);
+defineProps({
+  formValues: {
+    type: Object,
+    required: true,
+  },
+});
+defineEmits(["updateFormValues"]);
 </script>
 
 <template>

@@ -1,12 +1,12 @@
 export type UserData = {
-  username: string;
-};
+    username: string
+}
 export type ModeratorData = {
-  displayName: string;
-};
+    displayName: string
+}
 
 export type EditAccountSettingsFormValues = {
-  profilePicURL: string;
-  displayName: string;
-  bio: string;
-};
+    profilePicURL: string;
+    displayName: string;
+    bio: string;
+}

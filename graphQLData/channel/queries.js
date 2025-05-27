@@ -140,6 +140,7 @@ export const GET_CHANNEL = gql`
         displayName
       }
       DiscussionChannelsAggregate(
+<<<<<<< HEAD
         where: {
           AND: [
             { NOT: { archived: true } }
@@ -154,14 +155,39 @@ export const GET_CHANNEL = gql`
         count
       }
       EventChannelsAggregate(
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
         where: {
-          NOT: { archived: true, Event: null }
-          Event: { canceled: false, endTime_GT: $now }
+          NOT: {
+            archived: true,
+            Discussion: null
+          }
         }
       ) {
         count
       }
-      DefaultModRole {
+      IssuesAggregate(
+        where: {
+         isOpen: true 
+        }
+      ) {
+        count
+      }
+      EventChannelsAggregate(
+        where: {
+          NOT: { 
+            archived: true,
+            Event: null
+          }
+          Event: { 
+            canceled: false, 
+            endTime_GT: $now,
+          }
+        }
+      ) {
+        count
+      }
+      DefaultModRole { 
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -230,7 +256,12 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
       options: { limit: 4, sort: [{ startTime: ASC }] }
       where: {
         AND: [
-          { EventChannels_SOME: { channelUniqueName: $uniqueName, archived: false } }
+          { 
+            EventChannels_SOME: { 
+              channelUniqueName: $uniqueName,
+              archived: false
+            } 
+          }
           {
             OR: [
               { canceled: false, endTime_GT: $now }
@@ -250,8 +281,18 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
 `;
 
 export const GET_CHANNELS = gql`
-  query getSortedChannels($offset: Int, $limit: Int, $tags: [String], $searchInput: String) {
-    getSortedChannels(offset: $offset, limit: $limit, tags: $tags, searchInput: $searchInput) {
+  query getSortedChannels(
+    $offset: Int
+    $limit: Int
+    $tags: [String]
+    $searchInput: String
+  ) {
+    getSortedChannels(
+      offset: $offset
+      limit: $limit
+      tags: $tags
+      searchInput: $searchInput
+    ) {
       channels {
         uniqueName
         displayName

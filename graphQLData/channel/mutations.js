@@ -21,7 +21,10 @@ export const CREATE_CHANNEL = gql`
 `;
 
 export const UPDATE_CHANNEL = gql`
-  mutation updateChannel($where: ChannelWhere, $update: ChannelUpdateInput) {
+  mutation updateChannel(
+    $where: ChannelWhere
+    $update: ChannelUpdateInput
+  ) {
     updateChannels(where: $where, update: $update) {
       channels {
         uniqueName
@@ -72,6 +75,7 @@ export const DELETE_CHANNEL = gql`
   }
 `;
 
+<<<<<<< HEAD
 export const ENABLE_CHANNEL_WIKI = gql`
   mutation enableChannelWiki($uniqueName: String!) {
     updateChannels(where: { uniqueName: $uniqueName }, update: { wikiEnabled: true }) {
@@ -172,3 +176,5 @@ export const CREATE_CHILD_WIKI_PAGE = gql`
     }
   }
 `;
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)

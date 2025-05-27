@@ -27,7 +27,10 @@ export const REOPEN_ISSUE = gql`
 
 export const UPDATE_ISSUE = gql`
   ${ISSUE_FIELDS}
-  mutation updateIssue($issueWhere: IssueWhere!, $updateIssueInput: IssueUpdateInput!) {
+  mutation updateIssue(
+    $issueWhere: IssueWhere!
+    $updateIssueInput: IssueUpdateInput!
+  ) {
     updateIssues(where: $issueWhere, update: $updateIssueInput) {
       issues {
         ...IssueFields
@@ -52,7 +55,9 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM = gql`
             node: {
               actionDescription: $actionDescription
               actionType: $actionType
-              ModerationProfile: { connect: { where: { node: { displayName: $displayName } } } }
+              ModerationProfile: {
+                connect: { where: { node: { displayName: $displayName } } }
+              }
             }
           }
         ]
@@ -85,17 +90,29 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD = gql`
             node: {
               actionDescription: $actionDescription
               actionType: $actionType
-              ModerationProfile: { connect: { where: { node: { displayName: $displayName } } } }
+              ModerationProfile: {
+                connect: { where: { node: { displayName: $displayName } } }
+              }
               Comment: {
                 create: {
                   node: {
                     isRootComment: false
                     text: $commentText
-                    Channel: { connect: { where: { node: { uniqueName: $channelUniqueName } } } }
-                    Issue: { connect: { where: { node: { id: $issueId } } } }
+                    Channel: {
+                      connect: {
+                        where: { node: { uniqueName: $channelUniqueName } }
+                      }
+                    }
+                    Issue: { 
+                      connect: { 
+                        where: { node: { id: $issueId } } 
+                      } 
+                    }
                     CommentAuthor: {
                       ModerationProfile: {
-                        connect: { where: { node: { displayName: $displayName } } }
+                        connect: {
+                          where: { node: { displayName: $displayName } }
+                        }
                       }
                     }
                   }
@@ -133,16 +150,30 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER = gql`
             node: {
               actionDescription: $actionDescription
               actionType: $actionType
-              User: { connect: { where: { node: { username: $username } } } }
+              User: {
+                connect: { where: { node: { username: $username } } }
+              }
               Comment: {
                 create: {
                   node: {
                     isRootComment: false
                     text: $commentText
-                    Channel: { connect: { where: { node: { uniqueName: $channelUniqueName } } } }
-                    Issue: { connect: { where: { node: { id: $issueId } } } }
+                    Channel: {
+                      connect: {
+                        where: { node: { uniqueName: $channelUniqueName } }
+                      }
+                    }
+                    Issue: { 
+                      connect: { 
+                        where: { node: { id: $issueId } } 
+                      } 
+                    }
                     CommentAuthor: {
-                      User: { connect: { where: { node: { username: $username } } } }
+                      User: {
+                        connect: {
+                          where: { node: { username: $username } }
+                        }
+                      }
                     }
                   }
                 }
@@ -199,6 +230,7 @@ export const ARCHIVE_DISCUSSION = gql`
   }
 `;
 
+
 export const UNARCHIVE_DISCUSSION = gql`
   mutation unarchiveDiscussion(
     $discussionId: ID!
@@ -213,7 +245,8 @@ export const UNARCHIVE_DISCUSSION = gql`
       id
     }
   }
-`;
+`
+
 
 export const REPORT_EVENT = gql`
   mutation reportEvent(
@@ -236,7 +269,11 @@ export const REPORT_EVENT = gql`
 `;
 
 export const UNARCHIVE_EVENT = gql`
-  mutation unarchiveEvent($eventId: ID!, $channelUniqueName: String!, $explanation: String!) {
+  mutation unarchiveEvent(
+    $eventId: ID!
+    $channelUniqueName: String!
+    $explanation: String!
+  ) {
     unarchiveEvent(
       eventId: $eventId
       channelUniqueName: $channelUniqueName
@@ -245,7 +282,7 @@ export const UNARCHIVE_EVENT = gql`
       id
     }
   }
-`;
+`
 
 export const ARCHIVE_EVENT = gql`
   mutation archiveEvent(
@@ -306,9 +343,15 @@ export const ARCHIVE_COMMENT = gql`
 `;
 
 export const UNARCHIVE_COMMENT = gql`
-  mutation unarchiveComment($commentId: ID!, $explanation: String!) {
-    unarchiveComment(commentId: $commentId, explanation: $explanation) {
+  mutation unarchiveComment(
+    $commentId: ID!
+    $explanation: String!
+  ) {
+    unarchiveComment(
+      commentId: $commentId
+      explanation: $explanation
+    ) {
       id
     }
   }
-`;
+`
