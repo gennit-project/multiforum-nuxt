@@ -151,11 +151,12 @@ const dateSectionObj = computed(() => {
 </script>
 
 <template>
-  <div v-if="dateObj.happeningNow.length > 0" class="flex flex-col">
-    <span
-      class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-    >
-      Happening Now
+  <div
+    v-if="dateObj.happeningNow.length > 0"
+    class="flex flex-col"
+  >
+    <span class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">
+      <i class="fa-solid fa-circle-play mr-2 text-orange-500"/>Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
@@ -190,11 +191,12 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.happeningToday.length > 0" class="flex flex-col">
-    <span
-      class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-    >
-      Today
+  <div
+    v-if="dateObj.happeningToday.length > 0"
+    class="flex flex-col"
+  >
+    <span class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">
+      <i class="fa-solid fa-calendar-day mr-2"/>Today
     </span>
     <div
       v-for="event in dateObj.happeningToday"
@@ -220,11 +222,12 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.happeningTomorrow.length > 0" class="flex flex-col">
-    <span
-      class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-    >
-      Tomorrow
+  <div
+    v-if="dateObj.happeningTomorrow.length > 0"
+    class="flex flex-col"
+  >
+    <span class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">
+      <i class="fa-solid fa-calendar-plus mr-2"/>Tomorrow
     </span>
     <div
       v-for="event in dateObj.happeningTomorrow"
@@ -256,10 +259,8 @@ const dateSectionObj = computed(() => {
       :key="date"
       class="flex flex-col"
     >
-      <span
-        class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
-      >
-        {{ date }}
+      <span class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">
+        <i class="fa-solid fa-calendar-week mr-2"/>{{ date }}
       </span>
       <div
         v-for="event in events"

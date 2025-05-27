@@ -54,13 +54,14 @@ const onFileSelected = (event: Event) => {
 <template>
   <div>
     <label
-      :for="`file-input-${props.fieldName}`"
       :class="[
-        'text-sm inline-flex items-center px-3 py-1.5 rounded-md transition-colors',
-        !disabled ? 
-          'cursor-pointer bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900 dark:text-blue-200 dark:hover:bg-blue-800' : 
-          'opacity-60 cursor-not-allowed bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
+        'border-orange-400 dark:border-orange-800 my-1 inline-flex items-center rounded-md border px-3 py-1 py-1.5 text-sm transition-colors',
+        !disabled
+          ? 'bg-orange-100 text-orange-600 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800 cursor-pointer'
+          : 'cursor-not-allowed bg-gray-100 text-gray-500 opacity-60 dark:bg-gray-700 dark:text-gray-400',
       ]"
+      :for="`file-input-${props.fieldName}`"
+     
     >
       <i class="fa fa-image mr-2" /> {{ props.label }}
       <input

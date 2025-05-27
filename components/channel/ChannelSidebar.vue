@@ -93,8 +93,15 @@ const filterChannelsByTag = (tag: string) => {
     <div class="w-full">
       <div v-if="channel">
         <div class="mt-6 flex w-full flex-col gap-6">
-          <div v-if="channelRules && channelRules !== '[]'" :key="channelRules">
-            <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Forum Rules</span>
+          <div
+            v-if="channelRules && channelRules !== '[]'"
+            :key="channelRules"
+          >
+            <span
+              class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+            >
+              <i class="fa-solid fa-book-open mr-2"/>Forum Rules
+            </span>
             <ChannelRules :rules="channelRules" />
           </div>
           
@@ -102,7 +109,11 @@ const filterChannelsByTag = (tag: string) => {
 
           <div v-if="channel.Tags.length > 0">
             <div class="flex justify-between border-gray-300">
-              <span class="my-2 mb-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Tags</span>
+              <span
+                class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+              >
+                <i class="fa-solid fa-tags mr-2"/>Tags
+              </span>
             </div>
             <div class="mb-6 mt-2 flex flex-wrap gap-2">
               <Tag
@@ -118,7 +129,11 @@ const filterChannelsByTag = (tag: string) => {
           <FontSizeControl class="mb-6" />
 
           <div class="flex justify-between">
-            <span class="my-2 text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">Admins</span>
+            <span
+              class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+            >
+              <i class="fa-solid fa-user-shield mr-2"/>Admins
+            </span>
           </div>
           
           <div v-if="channel.Admins.length > 0" class="flex-col space-y-2 text-sm font-bold">
