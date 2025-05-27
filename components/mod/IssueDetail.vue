@@ -639,11 +639,11 @@
       </div>
     </div>
 
-    <v-row
+    <div
       v-if="issue"
       class="flex justify-center dark:text-white"
     >
-      <v-col>
+      <div class="w-full max-w-4xl">
         <div class="px-4">
           <h2
             v-if="activeIssue"
@@ -729,7 +729,7 @@
             </div>
           </div>
         </div>
-      </v-col>
-    </v-row>
+      </div>
+    </div>
   </div>
 </template>

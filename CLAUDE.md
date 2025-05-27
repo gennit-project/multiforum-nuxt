@@ -117,6 +117,10 @@
   - Use watchers only when absolutely necessary (e.g., for router param changes or external API calls)
   - When a component needs to react to prop changes, handle this through the component lifecycle or computed properties, not watchers
   - For individual item state that doesn't need to be shared, use local `ref` variables instead of Pinia store state
+- **Client-Only Components**: Avoid `<client-only>` for pages where SEO is critical
+  - Discussion detail pages, comment sections, and other content-rich pages must be server-side rendered for SEO
+  - Use `<client-only>` only for interactive widgets that don't affect SEO (e.g., theme toggles, user preferences)
+  - Content that needs to be indexed by search engines should render on the server
 
 ## Cypress Testing Guidelines
 
