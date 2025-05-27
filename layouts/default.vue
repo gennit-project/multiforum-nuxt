@@ -287,26 +287,13 @@
               :show-dropdown="sideNavIsOpenVar"
               @close="setSideNavIsOpenVar(false)"
             />
-            <!-- During SSR and initial render, always show content -->
-            <client-only>
-              <template #fallback>
-                <div class="flex w-full flex-grow flex-col">
-                  <slot />
-                  <SiteFooter
-                    v-if="showFooter"
-                    class="mt-auto"
-                  />
-                </div>
-              </template>
-
-              <div class="flex w-full flex-grow flex-col">
-                <slot />
-                <SiteFooter
-                  v-if="showFooter"
-                  class="mt-auto"
-                />
-              </div>
-            </client-only>
+            <div class="flex w-full flex-grow flex-col">
+              <slot />
+              <SiteFooter
+                v-if="showFooter"
+                class="mt-auto"
+              />
+            </div>
           </div>
         </div>
       </main>
