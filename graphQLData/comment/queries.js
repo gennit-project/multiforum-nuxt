@@ -144,8 +144,18 @@ export const GET_DISCUSSION_COMMENTS = gql`
 `;
 
 export const GET_EVENT_COMMENTS = gql`
-  query getEventComments($eventId: ID!, $offset: Int, $limit: Int, $sort: SortType) {
-    getEventComments(eventId: $eventId, offset: $offset, limit: $limit, sort: $sort) {
+  query getEventComments(
+    $eventId: ID!
+    $offset: Int
+    $limit: Int
+    $sort: SortType
+  ) {
+    getEventComments(
+      eventId: $eventId
+      offset: $offset
+      limit: $limit
+      sort: $sort
+    ) {
       Event {
         id
         title
@@ -221,9 +231,15 @@ export const GET_DISCUSSION_CHANNEL_BY_ID = gql`
 `;
 
 export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
-  query getDiscussionChannelRootCommentAggregate($channelUniqueName: String!, $discussionId: ID!) {
+  query getDiscussionChannelRootCommentAggregate(
+    $channelUniqueName: String!
+    $discussionId: ID!
+  ) {
     discussionChannels(
-      where: { channelUniqueName: $channelUniqueName, discussionId: $discussionId }
+      where: {
+        channelUniqueName: $channelUniqueName
+        discussionId: $discussionId
+      }
     ) {
       id
       discussionId
@@ -243,9 +259,15 @@ export const GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE = gql`
   }
 `;
 export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
-  query getDiscussionChannelRootCommentAggregate($channelUniqueName: String!, $discussionId: ID!) {
+  query getDiscussionChannelRootCommentAggregate(
+    $channelUniqueName: String!
+    $discussionId: ID!
+  ) {
     discussionChannels(
-      where: { channelUniqueName: $channelUniqueName, discussionId: $discussionId }
+      where: {
+        channelUniqueName: $channelUniqueName
+        discussionId: $discussionId
+      }
     ) {
       id
       discussionId
@@ -254,7 +276,9 @@ export const GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE = gql`
       answered
       locked
       CommentsAggregate(
-        where: { OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }] }
+        where: {
+          OR: [{ isFeedbackComment: null }, { isFeedbackComment: false }]
+        }
       ) {
         count
       }
@@ -449,7 +473,12 @@ export const GET_COMMENT_REPLIES = gql`
 `;
 
 export const GET_FEEDBACK_ON_COMMENT = gql`
-  query getFeedbackOnComment($commentId: ID!, $limit: Int, $offset: Int, $loggedInModName: String) {
+  query getFeedbackOnComment(
+    $commentId: ID!
+    $limit: Int
+    $offset: Int
+    $loggedInModName: String
+  ) {
     comments(where: { id: $commentId }) {
       id
       CommentAuthor {
@@ -534,7 +563,9 @@ export const GET_SPECIFIC_COMMENT_FEEDBACK = gql`
     comments(
       where: {
         GivesFeedbackOnComment: { id: $commentId }
-        CommentAuthorConnection: { ModerationProfile: { node: { displayName: $modName } } }
+        CommentAuthorConnection: {
+          ModerationProfile: { node: { displayName: $modName } }
+        }
       }
     ) {
       id

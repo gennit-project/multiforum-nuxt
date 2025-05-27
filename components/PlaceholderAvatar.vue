@@ -1,18 +1,18 @@
 <script setup lang="ts">
-  import { User } from "lucide-vue-next";
+import { User } from "lucide-vue-next";
 
-  defineProps({
-    size: {
-      type: String,
-      default: "md",
-    },
-  });
+defineProps({
+  size: {
+    type: String,
+    default: "md",
+  },
+});
 
-  const sizeClasses: Record<string, string> = {
-    sm: "h-8 w-8",
-    md: "h-10 w-10",
-    lg: "h-12 w-12",
-  };
+const sizeClasses: Record<string, string> = {
+  sm: "h-8 w-8",
+  md: "h-10 w-10",
+  lg: "h-12 w-12",
+};
 </script>
 
 <template>

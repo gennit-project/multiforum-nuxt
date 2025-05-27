@@ -1,65 +1,56 @@
 <script setup lang="ts">
-  import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-  import type { PropType } from "vue";
-  import { useRouter } from "nuxt/app";
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
+import type { PropType } from "vue";
+import { useRouter } from "nuxt/app";
 
-  export type MenuItemType = {
-    value: string;
-    icon?: string;
-    label: string;
-    event?: string;
-    isDivider?: boolean;
-  };
+export type MenuItemType = {
+  value: string;
+  icon?: string;
+  label: string;
+  event?: string;
+  isDivider?: boolean;
+};
 
-  defineProps({
-    darkBackground: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    items: {
-      type: Array as PropType<MenuItemType[]>,
-      required: true,
-    },
-    menuButtonIcon: {
-      type: String,
-      required: false,
-      default: "",
-    },
-  });
+defineProps({
+  darkBackground: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  items: {
+    type: Array as PropType<MenuItemType[]>,
+    required: true,
+  },
+  menuButtonIcon: {
+    type: String,
+    required: false,
+    default: "",
+  },
+});
 
-  // Allow emitting any string event
-  const emit = defineEmits<(event: string, ...args: any[]) => void>();
-  const router = useRouter();
+// Allow emitting any string event
+const emit = defineEmits<(event: string, ...args: any[]) => void>();
+const router = useRouter();
 
-  const handleItemClick = (item: MenuItemType) => {
-    if (item.event) {
-      emit(item.event);
-    }
-    router.push(item.value);
-  };
+const handleItemClick = (item: MenuItemType) => {
+  if (item.event) {
+    emit(item.event);
+  }
+  router.push(item.value);
+};
 </script>
 
 <template>
   <client-only>
-    <Menu
-      as="div"
-      class="relative flex items-center text-left"
-    >
+    <Menu as="div" class="relative text-left flex items-center">
       <MenuButton
         :class="[
           'font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-gray-300 dark:hover:text-white',
           darkBackground ? 'text-gray-200 hover:text-white' : '',
         ]"
       >
-        <i
-          v-if="menuButtonIcon"
-          :class="` ${menuButtonIcon} `"
-        />
-        <div
-          v-else
-          class="flex items-center"
-        >
+        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />
+        <div v-else class="flex items-center">
           <slot />
         </div>
       </MenuButton>
@@ -76,14 +67,11 @@
           style="top: calc(100% + 8px)"
         >
           <div class="py-1">
-            <template
-              v-for="(item, i) in items"
-              :key="i"
-            >
+            <template v-for="(item, i) in items" :key="i">
               <!-- Divider -->
               <div
                 v-if="item.isDivider"
-                class="font-semibold px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider"
               >
                 {{ item.value }}
               </div>
@@ -102,11 +90,7 @@
                     'block px-4 py-2 text-sm',
                   ]"
                 >
-                  <i
-                    v-if="item.icon"
-                    :class="item.icon"
-                  />
-                  {{ item.label }}
+                  <i v-if="item.icon" :class="item.icon" /> {{ item.label }}
                 </span>
               </MenuItem>
             </template>
@@ -118,14 +102,8 @@
       <button
         class="font-semibold inline-flex h-10 w-full items-center justify-center gap-x-1.5 rounded-full px-2 text-sm text-black focus:outline-none dark:text-white"
       >
-        <i
-          v-if="menuButtonIcon"
-          :class="` ${menuButtonIcon} `"
-        />
-        <div
-          v-else
-          class="flex items-center"
-        >
+        <i v-if="menuButtonIcon" :class="` ${menuButtonIcon} `" />
+        <div v-else class="flex items-center">
           <slot />
         </div>
       </button>

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+<<<<<<< HEAD
   import { ref, computed } from "vue";
   import { useMutation, useQuery } from "@vue/apollo-composable";
   import { useRoute, useRouter } from "nuxt/app";
@@ -18,269 +19,293 @@
   import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
   import { config } from "@/config";
   import EditsDropdown from "./activityFeed/EditsDropdown.vue";
+=======
+import { ref, computed } from "vue";
+import { useMutation, useQuery } from "@vue/apollo-composable";
+import { useRoute, useRouter } from "nuxt/app";
+import { DateTime } from "luxon";
+import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
+import WarningModal from "@/components/WarningModal.vue";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import Notification from "@/components/NotificationComponent.vue";
+import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
+import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
+import { getAllPermissions } from "@/utils/permissionUtils";
+import { getDiscussionHeaderMenuItems } from "@/utils/headerPermissionUtils";
+import { usernameVar, modProfileNameVar } from "@/cache";
+import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
+import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+import { config } from "@/config";
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 
-  const props = defineProps({
-    discussion: {
-      type: Object,
-      required: false,
-      default: null,
-    },
-    discussionChannelId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    compactMode: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    channelId: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    showActionMenu: {
-      type: Boolean,
-      required: false,
-      default: true,
-    },
-    discussionBodyEditMode: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    discussionIsArchived: {
-      type: Boolean || undefined || null,
-      // boolean or undefined or null
-      default: false,
-    },
-  });
+const props = defineProps({
+  discussion: {
+    type: Object,
+    required: false,
+    default: null,
+  },
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  compactMode: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  channelId: {
+    type: String,
+    required: false,
+    default: null,
+  },
+  showActionMenu: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
+  discussionBodyEditMode: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  discussionIsArchived: {
+    type: Boolean || undefined || null,
+    // boolean or undefined or null
+    default: false,
+  },
+});
 
-  const emit = defineEmits([
-    "handleClickGiveFeedback",
-    "handleClickEditBody",
-    "cancelEditDiscussionBody",
-    "handleClickAddAlbum",
-  ]);
+const emit = defineEmits([
+  "handleClickGiveFeedback",
+  "handleClickEditBody",
+  "cancelEditDiscussionBody",
+  "handleClickAddAlbum",
+]);
 
-  const route = useRoute();
-  const router = useRouter();
+const route = useRoute();
+const router = useRouter();
 
-  const relativeTime = (date: string) => DateTime.fromISO(date).toRelative();
+const relativeTime = (date: string) => DateTime.fromISO(date).toRelative();
 
-  const editedAt = computed(() => {
-    if (!props.discussion?.updatedAt) return "";
-    return `Edited ${relativeTime(props.discussion.updatedAt)}`;
-  });
+const editedAt = computed(() => {
+  if (!props.discussion?.updatedAt) return "";
+  return `Edited ${relativeTime(props.discussion.updatedAt)}`;
+});
 
-  const createdAt = computed(() => {
-    if (!props.discussion?.createdAt) return "";
-    return `Posted ${relativeTime(props.discussion.createdAt)}`;
-  });
+const createdAt = computed(() => {
+  if (!props.discussion?.createdAt) return "";
+  return `Posted ${relativeTime(props.discussion.createdAt)}`;
+});
 
-  const {
-    mutate: deleteDiscussion,
-    loading: deleteDiscussionLoading,
-    error: deleteDiscussionError,
-    onDone: onDoneDeleting,
-  } = useMutation(DELETE_DISCUSSION, {
-    variables: { id: props.discussion?.id },
-    update: (cache, { data }) => {
-      if (data?.deleteDiscussions?.nodesDeleted > 0) {
-        cache.evict({
-          id: cache.identify({
-            __typename: "Discussion",
-            id: props.discussion?.id,
-          }),
-        });
-      }
-    },
-  });
-
-  onDoneDeleting(() => {
-    if (props.channelId) {
-      router.push({
-        name: "forums-forumId-discussions",
-        params: { forumId: props.channelId },
+const {
+  mutate: deleteDiscussion,
+  loading: deleteDiscussionLoading,
+  error: deleteDiscussionError,
+  onDone: onDoneDeleting,
+} = useMutation(DELETE_DISCUSSION, {
+  variables: { id: props.discussion?.id },
+  update: (cache, { data }) => {
+    if (data?.deleteDiscussions?.nodesDeleted > 0) {
+      cache.evict({
+        id: cache.identify({
+          __typename: "Discussion",
+          id: props.discussion?.id,
+        }),
       });
     }
-  });
+  },
+});
 
-  const defaultChannel = computed(() => {
-    if (!props.discussion) {
-      return "";
-    }
-    const channelInRoute = route.params.forumId;
-    return channelInRoute || props.discussion?.DiscussionChannels[0].channelUniqueName;
-  });
-
-  // Query the channel data to get roles
-  const { result: getChannelResult } = useQuery(
-    GET_CHANNEL,
-    {
-      uniqueName: props.channelId || defaultChannel.value,
-      // Using luxon, round down to the nearest hour
-      now: DateTime.local().startOf("hour").toISO(),
-    },
-    {
-      fetchPolicy: "cache-first",
-      nextFetchPolicy: "cache-first",
-      enabled: computed(() => !!props.channelId || !!defaultChannel.value),
-    }
-  );
-
-  // Query server config to get default roles
-  const { result: getServerResult } = useQuery(
-    GET_SERVER_CONFIG,
-    {
-      serverName: config.serverName,
-    },
-    {
-      fetchPolicy: "cache-first",
-    }
-  );
-
-  // Get the standard and elevated mod roles from the channel or server default
-  const standardModRole = computed(() => {
-    // If the channel has a Default Mod Role, return that
-    if (getChannelResult.value?.channels[0]?.DefaultModRole) {
-      return getChannelResult.value?.channels[0]?.DefaultModRole;
-    }
-    // Otherwise, return the default mod role from the server config
-    if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
-      return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
-    }
-    return null;
-  });
-
-  const elevatedModRole = computed(() => {
-    // If the channel has a Default Elevated Mod Role, return that
-    if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
-      return getChannelResult.value?.channels[0]?.ElevatedModRole;
-    }
-    // Otherwise, return the default elevated mod role from server config
-    if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
-      return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
-    }
-    return null;
-  });
-
-  // Query user's permissions in the channel
-  const { result: getPermissionResult } = useQuery(
-    USER_IS_MOD_OR_OWNER_IN_CHANNEL,
-    {
-      modDisplayName: modProfileNameVar,
-      username: usernameVar,
-      channelUniqueName: props.channelId || defaultChannel.value || "",
-    },
-    {
-      // enable if the username and modDisplayName are set
-      enabled: computed(
-        () =>
-          !!usernameVar.value &&
-          !!modProfileNameVar.value &&
-          !!props.channelId &&
-          !!defaultChannel.value
-      ),
-      fetchPolicy: "cache-first",
-    }
-  );
-
-  // Get permission data from the query result
-  const permissionData = computed(() => {
-    if (getPermissionResult.value?.channels?.[0]) {
-      return getPermissionResult.value.channels[0];
-    }
-    return null;
-  });
-
-  // Get all permissions for the current user using our utility function
-  const userPermissions = computed(() => {
-    return getAllPermissions({
-      permissionData: permissionData.value,
-      standardModRole: standardModRole.value,
-      elevatedModRole: elevatedModRole.value,
-      username: usernameVar.value,
-      modProfileName: modProfileNameVar.value,
+onDoneDeleting(() => {
+  if (props.channelId) {
+    router.push({
+      name: "forums-forumId-discussions",
+      params: { forumId: props.channelId },
     });
+  }
+});
+
+const defaultChannel = computed(() => {
+  if (!props.discussion) {
+    return "";
+  }
+  const channelInRoute = route.params.forumId;
+  return (
+    channelInRoute || props.discussion?.DiscussionChannels[0].channelUniqueName
+  );
+});
+
+// Query the channel data to get roles
+const { result: getChannelResult } = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: props.channelId || defaultChannel.value,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
+    enabled: computed(() => !!props.channelId || !!defaultChannel.value),
+  }
+);
+
+// Query server config to get default roles
+const { result: getServerResult } = useQuery(
+  GET_SERVER_CONFIG,
+  {
+    serverName: config.serverName,
+  },
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+
+// Get the standard and elevated mod roles from the channel or server default
+const standardModRole = computed(() => {
+  // If the channel has a Default Mod Role, return that
+  if (getChannelResult.value?.channels[0]?.DefaultModRole) {
+    return getChannelResult.value?.channels[0]?.DefaultModRole;
+  }
+  // Otherwise, return the default mod role from the server config
+  if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
+  }
+  return null;
+});
+
+const elevatedModRole = computed(() => {
+  // If the channel has a Default Elevated Mod Role, return that
+  if (getChannelResult.value?.channels[0]?.ElevatedModRole) {
+    return getChannelResult.value?.channels[0]?.ElevatedModRole;
+  }
+  // Otherwise, return the default elevated mod role from server config
+  if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
+    return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
+  }
+  return null;
+});
+
+// Query user's permissions in the channel
+const { result: getPermissionResult } = useQuery(
+  USER_IS_MOD_OR_OWNER_IN_CHANNEL,
+  {
+    modDisplayName: modProfileNameVar,
+    username: usernameVar,
+    channelUniqueName: props.channelId || defaultChannel.value || "",
+  },
+  {
+    // enable if the username and modDisplayName are set
+    enabled: computed(
+      () =>
+        !!usernameVar.value &&
+        !!modProfileNameVar.value &&
+        !!props.channelId &&
+        !!defaultChannel.value
+    ),
+    fetchPolicy: "cache-first",
+  }
+);
+
+// Get permission data from the query result
+const permissionData = computed(() => {
+  if (getPermissionResult.value?.channels?.[0]) {
+    return getPermissionResult.value.channels[0];
+  }
+  return null;
+});
+
+// Get all permissions for the current user using our utility function
+const userPermissions = computed(() => {
+  return getAllPermissions({
+    permissionData: permissionData.value,
+    standardModRole: standardModRole.value,
+    elevatedModRole: elevatedModRole.value,
+    username: usernameVar.value,
+    modProfileName: modProfileNameVar.value,
   });
+});
 
-  const permalinkObject = computed(() => {
-    if (!props.discussion) return {};
-    return {
-      name: "forums-forumId-discussions-discussionId",
-      params: {
-        discussionId: props.discussion.id,
-        forumId: defaultChannel.value,
-      },
-    };
-  });
-
-  const showCopiedLinkNotification = ref(false);
-
-  const copyLink = async (event: any) => {
-    try {
-      let basePath = "";
-      if (import.meta.client) {
-        basePath = window.location.origin;
-      } else {
-        basePath = process.env.BASE_URL || "";
-      }
-      const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
-      await navigator.clipboard.writeText(permalink);
-      showCopiedLinkNotification.value = event;
-    } catch (e) {
-      console.error(e);
-    }
-    setTimeout(() => {
-      showCopiedLinkNotification.value = false;
-    }, 2000);
-  };
-  const deleteModalIsOpen = ref(false);
-
-  const showBrokenRulesModal = ref(false);
-  const showArchiveModal = ref(false);
-  const showUnarchiveModal = ref(false);
-  const showArchiveAndSuspendModal = ref(false);
-
-  const showSuccessfullyReported = ref(false);
-  const showSuccessfullyArchived = ref(false);
-  const showSuccessfullyUnarchived = ref(false);
-  const showSuccessfullyArchivedAndSuspended = ref(false);
-
-  const menuItems = computed(() => {
-    if (!props.discussion) {
-      return [];
-    }
-
-    // Use our utility function to get the menu items
-    return getDiscussionHeaderMenuItems({
-      isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
-      isArchived: !!props.discussionIsArchived,
-      userPermissions: userPermissions.value,
-      isLoggedIn: !!usernameVar.value,
+const permalinkObject = computed(() => {
+  if (!props.discussion) return {};
+  return {
+    name: "forums-forumId-discussions-discussionId",
+    params: {
       discussionId: props.discussion.id,
-      hasAlbum: !!props.discussion?.Album?.Images?.length,
-    });
-  });
+      forumId: defaultChannel.value,
+    },
+  };
+});
 
-  const authorIsAdmin = computed(
-    () => props.discussion?.Author?.ServerRoles?.[0]?.showAdminTag || false
-  );
-  const authorIsMod = computed(
-    () => props.discussion?.Author?.ChannelRoles?.[0]?.showModTag || false
-  );
+const showCopiedLinkNotification = ref(false);
+
+const copyLink = async (event: any) => {
+  try {
+    let basePath = "";
+    if (import.meta.client) {
+      basePath = window.location.origin;
+    } else {
+      basePath = process.env.BASE_URL || "";
+    }
+    const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
+    await navigator.clipboard.writeText(permalink);
+    showCopiedLinkNotification.value = event;
+  } catch (e) {
+    console.error(e);
+  }
+  setTimeout(() => {
+    showCopiedLinkNotification.value = false;
+  }, 2000);
+};
+const deleteModalIsOpen = ref(false);
+
+const showBrokenRulesModal = ref(false);
+const showArchiveModal = ref(false);
+const showUnarchiveModal = ref(false);
+const showArchiveAndSuspendModal = ref(false);
+
+const showSuccessfullyReported = ref(false);
+const showSuccessfullyArchived = ref(false);
+const showSuccessfullyUnarchived = ref(false);
+const showSuccessfullyArchivedAndSuspended = ref(false);
+
+const menuItems = computed(() => {
+  if (!props.discussion) {
+    return [];
+  }
+
+  // Use our utility function to get the menu items
+  return getDiscussionHeaderMenuItems({
+    isOwnDiscussion: props.discussion?.Author?.username === usernameVar.value,
+    isArchived: !!props.discussionIsArchived,
+    userPermissions: userPermissions.value,
+    isLoggedIn: !!usernameVar.value,
+    discussionId: props.discussion.id,
+    hasAlbum: !!props.discussion?.Album?.Images?.length
+  });
+});
+
+const authorIsAdmin = computed(
+  () => props.discussion?.Author?.ServerRoles?.[0]?.showAdminTag || false
+);
+const authorIsMod = computed(
+  () => props.discussion?.Author?.ChannelRoles?.[0]?.showModTag || false
+);
 </script>
 
 <template>
   <div class="mb-4">
     <div class="mt-2 flex justify-between">
-      <div class="flex flex-wrap items-center space-x-2 text-xs dark:text-white">
+      <div
+        class="flex flex-wrap items-center space-x-2 text-xs dark:text-white"
+      >
         <AvatarComponent
-          :is-small="true"
-          :src="discussion?.Author?.profilePicURL ?? ''"
           :text="discussion?.Author?.username ?? '[Deleted]'"
+          :src="discussion?.Author?.profilePicURL ?? ''"
+          :is-small="true"
         />
         <nuxt-link
           v-if="discussion?.Author"
@@ -291,24 +316,13 @@
           }"
         >
           <span class="flex flex-row items-center gap-1">
-            <span
-              v-if="!discussion.Author.displayName"
-              class="font-bold"
-              >{{ discussion.Author.username }}</span
-            >
-            <span
-              v-else
-              class="font-bold"
-              >{{ discussion.Author.displayName }}</span
-            >
-            <span
-              v-if="discussion.Author.displayName"
-              class="text-gray-500 dark:text-gray-300"
-              >{{ `(u/${discussion.Author.username})` }}</span
-            >
+            <span v-if="!discussion.Author.displayName" class="font-bold">{{ discussion.Author.username }}</span>
+            <span v-else class="font-bold">{{ discussion.Author.displayName }}</span>
+            <span v-if="discussion.Author.displayName" class="text-gray-500 dark:text-gray-300">{{ `(u/${discussion.Author.username})` }}</span>
 
             <span
               v-if="authorIsAdmin"
+<<<<<<< HEAD
               class="rounded-md border border-gray-300 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
               >Admin</span
             >
@@ -317,10 +331,19 @@
               class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
               >Mod</span
             >
+=======
+              class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+            >Admin</span>
+            <span
+              v-else-if="authorIsMod"
+              class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+            >Mod</span>
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
           </span>
         </nuxt-link>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
+<<<<<<< HEAD
         <span
           v-if="discussion?.updatedAt"
           class="mx-2"
@@ -336,21 +359,25 @@
             :discussion="discussion"
           />
         </div>
+=======
+        <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
+        <div>{{ editedAt }}</div>
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
       </div>
       <div class="flex items-center gap-2">
         <div v-if="usernameVar === discussion?.Author?.username">
           <button
             v-if="!discussionBodyEditMode"
-            class="align-items flex gap-2 text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
             type="button"
+            class="flex align-items gap-2 text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
             @click="$emit('handleClickEditBody')"
           >
             Edit
           </button>
           <button
             v-else-if="usernameVar"
-            class="text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
             type="button"
+            class="text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
             @click="$emit('cancelEditDiscussionBody')"
           >
             Cancel
@@ -358,17 +385,21 @@
         </div>
         <MenuButton
           v-if="showActionMenu && discussion && menuItems.length > 0"
-          :data-testid="'discussion-menu-button'"
           :items="menuItems"
+          :data-testid="'discussion-menu-button'"
           @copy-link="copyLink"
-          @handle-add-album="emit('handleClickAddAlbum')"
+          @handle-edit="
+            router.push(
+              `/forums/${channelId}/discussions/edit/${discussion.id}`
+            )
+          "
+          @handle-delete="deleteModalIsOpen = true"
+          @handle-click-report="showBrokenRulesModal = true"
           @handle-click-archive="showArchiveModal = true"
           @handle-click-archive-and-suspend="showArchiveAndSuspendModal = true"
-          @handle-click-report="showBrokenRulesModal = true"
           @handle-click-unarchive="showUnarchiveModal = true"
-          @handle-delete="deleteModalIsOpen = true"
-          @handle-edit="router.push(`/forums/${channelId}/discussions/edit/${discussion.id}`)"
           @handle-feedback="emit('handleClickGiveFeedback')"
+          @handle-add-album="emit('handleClickAddAlbum')"
           @handle-view-feedback="
             router.push({
               name: 'forums-forumId-discussions-feedback-discussionId',
@@ -386,20 +417,20 @@
       </div>
     </div>
     <WarningModal
+      :title="'Delete Discussion'"
       :body="'Are you sure you want to delete this discussion?'"
+      :open="deleteModalIsOpen"
       :icon="'trash'"
       :loading="deleteDiscussionLoading"
-      :open="deleteModalIsOpen"
-      :title="'Delete Discussion'"
       @close="deleteModalIsOpen = false"
       @primary-button-click="deleteDiscussion"
     />
     <BrokenRulesModal
       v-if="discussion"
-      :archive-after-reporting="false"
-      :discussion-id="discussion?.id"
-      :discussion-title="discussion?.title"
       :open="showBrokenRulesModal"
+      :discussion-title="discussion?.title"
+      :discussion-id="discussion?.id"
+      :archive-after-reporting="false"
       @close="showBrokenRulesModal = false"
       @report-submitted-successfully="
         () => {
@@ -409,12 +440,12 @@
       "
     />
     <BrokenRulesModal
+      :v-if="discussion"
+      :open="showArchiveModal"
+      :discussion-title="discussion?.title"
+      :discussion-id="discussion?.id"
       :archive-after-reporting="true"
       :discussion-channel-id="discussionChannelId"
-      :discussion-id="discussion?.id"
-      :discussion-title="discussion?.title"
-      :open="showArchiveModal"
-      :v-if="discussion"
       @close="showArchiveModal = false"
       @reported-and-archived-successfully="
         () => {
@@ -425,9 +456,9 @@
     />
     <UnarchiveModal
       v-if="discussionChannelId && discussion?.id"
+      :open="showUnarchiveModal"
       :discussion-channel-id="discussionChannelId"
       :discussion-id="discussion?.id"
-      :open="showUnarchiveModal"
       @close="showUnarchiveModal = false"
       @unarchived-successfully="
         () => {
@@ -438,13 +469,13 @@
     />
     <BrokenRulesModal
       v-if="discussion"
-      :discussion-channel-id="discussionChannelId"
-      :discussion-id="discussion.id"
-      :discussion-title="discussion.title"
+      :title="'Suspend Author'"
       :open="showArchiveAndSuspendModal"
+      :discussion-title="discussion.title"
+      :discussion-id="discussion.id"
+      :discussion-channel-id="discussionChannelId"
       :suspend-user-enabled="true"
       :text-box-label="'(Optional) Explain why you are suspending this author:'"
-      :title="'Suspend Author'"
       @close="showArchiveAndSuspendModal = false"
       @suspended-user-successfully="
         () => {

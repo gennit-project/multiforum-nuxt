@@ -1,11 +1,11 @@
-import { describe, it, expect } from "vitest";
-import { getFilterValuesFromParams } from "@/components/discussion/list/getDiscussionFilterValuesFromParams";
+import { describe, it, expect } from 'vitest';
+import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
 
-describe("getDiscussionFilterValuesFromParams", () => {
-  it("returns default values when route has no query parameters", () => {
+describe('getDiscussionFilterValuesFromParams', () => {
+  it('returns default values when route has no query parameters', () => {
     const input = {
       route: { query: {} },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -13,81 +13,81 @@ describe("getDiscussionFilterValuesFromParams", () => {
     expect(result).toEqual({
       tags: [],
       channels: [],
-      searchInput: "",
+      searchInput: '',
       showArchived: false,
     });
   });
 
-  it("uses channelId from input if provided", () => {
+  it('uses channelId from input if provided', () => {
     const input = {
       route: { query: {} },
-      channelId: "test-channel",
+      channelId: 'test-channel',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.channels).toEqual(["test-channel"]);
+    expect(result.channels).toEqual(['test-channel']);
   });
 
-  it("parses string tag value correctly", () => {
+  it('parses string tag value correctly', () => {
     const input = {
-      route: { query: { tags: "javascript" } },
-      channelId: "",
+      route: { query: { tags: 'javascript' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.tags).toEqual(["javascript"]);
+    expect(result.tags).toEqual(['javascript']);
   });
 
-  it("parses array of tags correctly", () => {
+  it('parses array of tags correctly', () => {
     const input = {
-      route: { query: { tags: ["javascript", "react", "vue"] } },
-      channelId: "",
+      route: { query: { tags: ['javascript', 'react', 'vue'] } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.tags).toEqual(["javascript", "react", "vue"]);
+    expect(result.tags).toEqual(['javascript', 'react', 'vue']);
   });
 
-  it("parses string channel value correctly", () => {
+  it('parses string channel value correctly', () => {
     const input = {
-      route: { query: { channels: "frontend" } },
-      channelId: "",
+      route: { query: { channels: 'frontend' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.channels).toEqual(["frontend"]);
+    expect(result.channels).toEqual(['frontend']);
   });
 
-  it("parses array of channels correctly", () => {
+  it('parses array of channels correctly', () => {
     const input = {
-      route: { query: { channels: ["frontend", "backend", "devops"] } },
-      channelId: "",
+      route: { query: { channels: ['frontend', 'backend', 'devops'] } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.channels).toEqual(["frontend", "backend", "devops"]);
+    expect(result.channels).toEqual(['frontend', 'backend', 'devops']);
   });
 
-  it("parses searchInput correctly", () => {
+  it('parses searchInput correctly', () => {
     const input = {
-      route: { query: { searchInput: "test query" } },
-      channelId: "",
+      route: { query: { searchInput: 'test query' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.searchInput).toEqual("test query");
+    expect(result.searchInput).toEqual('test query');
   });
 
-  it("parses showArchived as true correctly", () => {
+  it('parses showArchived as true correctly', () => {
     const input = {
-      route: { query: { showArchived: "true" } },
-      channelId: "",
+      route: { query: { showArchived: 'true' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -95,10 +95,10 @@ describe("getDiscussionFilterValuesFromParams", () => {
     expect(result.showArchived).toBe(true);
   });
 
-  it("parses showArchived as false correctly", () => {
+  it('parses showArchived as false correctly', () => {
     const input = {
-      route: { query: { showArchived: "false" } },
-      channelId: "",
+      route: { query: { showArchived: 'false' } },
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
@@ -106,63 +106,63 @@ describe("getDiscussionFilterValuesFromParams", () => {
     expect(result.showArchived).toBe(false);
   });
 
-  it("handles multiple query parameters correctly", () => {
+  it('handles multiple query parameters correctly', () => {
     const input = {
       route: {
         query: {
-          tags: ["javascript", "react"],
-          channels: "frontend",
-          searchInput: "component",
-          showArchived: "true",
+          tags: ['javascript', 'react'],
+          channels: 'frontend',
+          searchInput: 'component',
+          showArchived: 'true',
         },
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
     expect(result).toEqual({
-      tags: ["javascript", "react"],
-      channels: ["frontend"],
-      searchInput: "component",
+      tags: ['javascript', 'react'],
+      channels: ['frontend'],
+      searchInput: 'component',
       showArchived: true,
     });
   });
 
-  it("includes channelId in channels array even with query params", () => {
+  it('includes channelId in channels array even with query params', () => {
     const input = {
       route: {
         query: {
-          channels: ["cats", "phx_music"],
+          channels: ['cats', 'phx_music'],
         },
       },
-      channelId: "main-channel",
+      channelId: 'main-channel',
     };
 
     const result = getFilterValuesFromParams(input);
 
     // For this function, when both channelId and query channels are provided,
     // the behavior is to keep the query channels, not replace them with channelId
-    expect(result.channels).toEqual(["cats", "phx_music"]);
+    expect(result.channels).toEqual(['cats', 'phx_music']);
   });
 
-  it("ignores invalid query parameters", () => {
+  it('ignores invalid query parameters', () => {
     const input = {
       route: {
         query: {
-          invalidParam: "value",
-          tags: "javascript",
+          invalidParam: 'value',
+          tags: 'javascript',
         },
       },
-      channelId: "",
+      channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
     expect(result).toEqual({
-      tags: ["javascript"],
+      tags: ['javascript'],
       channels: [],
-      searchInput: "",
+      searchInput: '',
       showArchived: false,
     });
   });

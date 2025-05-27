@@ -1,20 +1,20 @@
 <script setup lang="ts">
-  import CheckIcon from "@/components/icons/CheckIcon.vue";
-  import XmarkIcon from "@/components/icons/XmarkIcon.vue";
+import CheckIcon from "@/components/icons/CheckIcon.vue";
+import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 
-  interface Props {
-    permissions: Record<string, any>;
-  }
+interface Props {
+  permissions: Record<string, any>;
+}
 
-  defineProps<Props>();
+defineProps<Props>();
 
-  const formatPermissionName = (name: string) => {
-    if (!name || typeof name !== "string") return "";
-    return name
-      .split(/(?=[A-Z])/)
-      .map((word) => word.toLowerCase())
-      .join(" ");
-  };
+const formatPermissionName = (name: string) => {
+  if (!name || typeof name !== "string") return "";
+  return name
+    .split(/(?=[A-Z])/)
+    .map((word) => word.toLowerCase())
+    .join(" ");
+};
 </script>
 
 <template>
@@ -22,18 +22,20 @@
     <div
       v-for="(value, key) in permissions"
       :key="key"
+      :class="[
+        ['__typename', 'name', 'description'].includes(key) ? 'hidden' : '',
+      ]"
       class="flex items-center"
-      :class="[['__typename', 'name', 'description'].includes(key) ? 'hidden' : '']"
     >
       <CheckIcon
         v-if="value"
+        class="w-4 h-4 text-green-500"
         aria-label="Permission granted"
-        class="h-4 w-4 text-green-500"
       />
       <XmarkIcon
         v-else
+        class="w-4 h-4 text-red-500"
         aria-label="Permission denied"
-        class="h-4 w-4 text-red-500"
       />
       <span class="ml-2 text-sm">{{ formatPermissionName(key) }}</span>
     </div>

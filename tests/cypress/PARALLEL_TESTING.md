@@ -11,7 +11,6 @@ The setup creates three separate, isolated environments:
 3. **Comments Environment**: For running tests in `cypress/e2e/comments/` and `cypress/e2e/channels/`
 
 Each environment has its own:
-
 - Neo4j database
 - Backend server
 - Frontend application
@@ -27,7 +26,6 @@ This isolation ensures that tests running in one environment don't interfere wit
 ## Setting Up the Environment
 
 1. Copy the example environment file and customize it:
-
    ```
    cp .env.cypress.example .env.cypress
    ```
@@ -50,7 +48,6 @@ Use the provided script to run tests in parallel:
 ### Options
 
 - **Run specific test groups**:
-
   ```bash
   ./run-parallel-tests.sh -t discussions  # Only run discussion tests
   ./run-parallel-tests.sh -t events       # Only run event tests
@@ -58,19 +55,16 @@ Use the provided script to run tests in parallel:
   ```
 
 - **Force rebuild of Docker images**:
-
   ```bash
   ./run-parallel-tests.sh -b
   ```
 
 - **Force kill processes using required ports**:
-
   ```bash
   ./run-parallel-tests.sh -f
   ```
 
 - **Use a different environment file**:
-
   ```bash
   ./run-parallel-tests.sh --env-file .env.custom
   ```
@@ -89,7 +83,6 @@ If you encounter issues with ports or containers not stopping properly, you can 
 ```
 
 This script will:
-
 1. Stop all relevant containers (frontend, backend, database, cypress)
 2. Remove these containers
 3. Remove related Docker networks
@@ -100,7 +93,6 @@ This script will:
 After the tests complete:
 
 - **Videos** are saved to:
-
   - `cypress/videos/discussions/`
   - `cypress/videos/events/`
   - `cypress/videos/comments/`
@@ -119,7 +111,6 @@ After the tests complete:
 ## Troubleshooting
 
 1. **Port conflicts**:
-
    - The script automatically checks for port conflicts before starting
    - Required ports: 3000-3002, 4001-4003, 7474-7476, 7687-7689
    - If you have port conflicts, you can:
@@ -128,19 +119,16 @@ After the tests complete:
      - Run with only one test group at a time: `./run-parallel-tests.sh -t events`
 
 2. **Container startup failures**:
-
    - Check the logs for specific errors: `docker-compose -f docker-compose.cypress.yml logs`
    - Ensure all required environment variables are set
    - Verify that Docker has enough resources allocated (memory, CPU)
 
 3. **Test failures**:
-
    - Check the Cypress videos and screenshots for visual evidence of failures
    - Examine the container logs for each service
    - Verify your Auth0 test credentials are correct
 
 4. **Database issues**:
-
    - To reset databases, remove the volumes:
      ```bash
      docker-compose -f docker-compose.cypress.yml down -v

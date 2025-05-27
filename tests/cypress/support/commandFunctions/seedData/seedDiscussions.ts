@@ -37,8 +37,8 @@ const baseDiscussions: BaseDiscussion[] = [
   },
 ];
 
-export const discussions: DiscussionCreateInputWithChannels[] = baseDiscussions.map(
-  ({ title, body, author, tags, channels }) => ({
+export const discussions: DiscussionCreateInputWithChannels[] =
+  baseDiscussions.map(({ title, body, author, tags, channels }) => ({
     discussionCreateInput: {
       title,
       ...(body && { body }),
@@ -70,7 +70,6 @@ export const discussions: DiscussionCreateInputWithChannels[] = baseDiscussions.
       }),
     },
     channelConnections: channels,
-  })
-);
+  }));
 
 export default discussions;

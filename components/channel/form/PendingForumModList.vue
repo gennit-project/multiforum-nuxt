@@ -1,29 +1,31 @@
 <script setup lang="ts">
-  import { computed } from "vue";
-  import { GET_PENDING_CHANNEL_MODS_BY_CHANNEL } from "@/graphQLData/mod/queries";
-  import { useQuery } from "@vue/apollo-composable";
-  import { useRoute } from "nuxt/app";
+import { computed } from "vue";
+import { GET_PENDING_CHANNEL_MODS_BY_CHANNEL } from "@/graphQLData/mod/queries";
+import { useQuery } from "@vue/apollo-composable";
+import { useRoute } from "nuxt/app";
 
-  const route = useRoute();
-  const forumId = computed(() => {
-    if (typeof route.params.forumId === "string") {
-      return route.params.forumId;
-    }
-    return "";
-  });
+const route = useRoute();
+const forumId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
 
-  const { result, loading, error } = useQuery(
-    GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
-    () => ({
-      channelUniqueName: forumId.value,
-    }),
-    {
-      fetchPolicy: "cache-first",
-    }
-  );
-  const invites = computed(() => result.value?.channels[0]?.PendingModInvites ?? []);
+const { result, loading, error } = useQuery(
+  GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
+  () => ({
+    channelUniqueName: forumId.value,
+  }),
+  {
+    fetchPolicy: "cache-first",
+  }
+);
+const invites = computed(
+  () => result.value?.channels[0]?.PendingModInvites ?? []
+);
 
-  defineEmits(["click-cancel-invite"]);
+defineEmits(["click-cancel-invite"]);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -31,7 +33,8 @@
     <div v-else-if="error">Error</div>
     <div
       v-else-if="
-        result?.channels?.length === 0 || result.channels[0]?.PendingModInvites?.length === 0
+        result?.channels?.length === 0 ||
+        result.channels[0]?.PendingModInvites?.length === 0
       "
       class="text-sm"
     >
@@ -44,31 +47,35 @@
       <div
         v-for="invite in invites"
         :key="invite.username"
-        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+        class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
       >
         <nuxt-link
-          class="flex items-center font-bold dark:text-white"
           :to="{ name: 'u-username', params: { username: invite.username } }"
+          class="flex items-center dark:text-white font-bold"
         >
           <AvatarComponent
-            class="mr-2 h-6 w-6"
-            :src="invite.profilePicURL ?? ''"
             :text="invite.username"
+            :src="invite.profilePicURL ?? ''"
+            class="mr-2 h-6 w-6"
           />
           <UsernameWithTooltip
             v-if="invite.username"
-            :account-created="invite.createdAt ?? ''"
+            :username="invite.username"
+            :src="invite.profilePicURL ?? ''"
+            :display-name="invite.displayName ?? ''"
             :comment-karma="invite.commentKarma ?? 0"
             :discussion-karma="invite.discussionKarma ?? 0"
-            :display-name="invite.displayName ?? ''"
-            :src="invite.profilePicURL ?? ''"
-            :username="invite.username"
+            :account-created="invite.createdAt ?? ''"
           />
         </nuxt-link>
 
         <button
+<<<<<<< HEAD
           class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
+=======
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
           type="button"
+          class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
           @click="$emit('click-cancel-invite', invite.username)"
         >
           Cancel Invite

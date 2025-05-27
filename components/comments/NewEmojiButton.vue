@@ -1,39 +1,39 @@
 <script lang="ts" setup>
-  import { ref } from "vue";
-  import VoteButton from "@/components/VoteButton.vue";
-  import FloatingDropdown from "@/components/FloatingDropdown.vue";
-  import EmojiPicker from "@/components/comments/EmojiPicker.vue";
+import { ref } from "vue";
+import VoteButton from "@/components/VoteButton.vue";
+import FloatingDropdown from "@/components/FloatingDropdown.vue";
+import EmojiPicker from "@/components/comments/EmojiPicker.vue";
 
-  defineProps({
-    commentId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    discussionChannelId: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    emojiJson: {
-      type: String,
-      required: false,
-      default: "",
-    },
-    isPermalinked: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  });
+defineProps({
+  commentId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  discussionChannelId: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  emojiJson: {
+    type: String,
+    required: false,
+    default: "",
+  },
+  isPermalinked: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+});
 
-  const showMenu = ref(false);
+const showMenu = ref(false);
 
-  const emit = defineEmits(["toggleEmojiPicker"]);
+const emit = defineEmits(["toggleEmojiPicker"]);
 
-  function handleClick() {
-    emit("toggleEmojiPicker");
-  }
+function handleClick() {
+  emit("toggleEmojiPicker");
+}
 </script>
 
 <template>
@@ -46,10 +46,10 @@
       <template #trigger>
         <VoteButton
           class="space-x-3"
-          :is-permalinked="isPermalinked"
-          :show-count="false"
           :test-id="'emoji-button'"
+          :show-count="false"
           :tooltip-text="'Add reaction...'"
+          :is-permalinked="isPermalinked"
           @vote="handleClick"
         >
           <i class="fa-regular fa-face-smile" />
@@ -58,11 +58,16 @@
       <template #content="{ close }">
         <client-only>
           <EmojiPicker
-            :comment-id="commentId"
             :discussion-channel-id="discussionChannelId"
+            :comment-id="commentId"
             :emoji-json="emojiJson"
+<<<<<<< HEAD
             @close="close"
             @emoji-click="close"
+=======
+            @emoji-click="showMenu = false"
+            @close="showMenu = false"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
           />
         </client-only>
       </template>

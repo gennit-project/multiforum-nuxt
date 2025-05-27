@@ -1,8 +1,10 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const GET_EMAIL = gql`
   query getEmail($emailAddress: String!) {
-    emails(where: { address: $emailAddress }) {
+    emails(where: {
+        address: $emailAddress
+    }) {
       address
       User {
         username
@@ -10,7 +12,11 @@ export const GET_EMAIL = gql`
         ModerationProfile {
           displayName
         }
-        NotificationsAggregate(where: { read: false }) {
+        NotificationsAggregate (
+          where: {
+            read: false
+          }
+        ) {
           count
         }
       }

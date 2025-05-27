@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+<<<<<<< HEAD
   import { ref, nextTick, computed } from "vue";
   import type { Discussion } from "@/__generated__/graphql";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
@@ -19,93 +20,118 @@
 
   const route = useRoute();
   const titleEditMode = ref(false);
+=======
+import { ref, nextTick, computed } from "vue";
+import type { Discussion } from "@/__generated__/graphql";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
+import CreateButton from "@/components/CreateButton.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import GenericButton from "@/components/GenericButton.vue";
+import TextInput from "@/components/TextInput.vue";
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
+import { useMutation, useQuery } from "@vue/apollo-composable";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import InfoBanner from "@/components/InfoBanner.vue";
+import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
+import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+import { modProfileNameVar, usernameVar } from "@/cache";
+import { useTheme } from "@/composables/useTheme";
+import { useRoute } from "nuxt/app";
+import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 
-  const channelId = computed(() =>
-    typeof route.params.forumId === "string" ? route.params.forumId : ""
-  );
-  const discussionId = computed(() =>
-    typeof route.params.discussionId === "string" ? route.params.discussionId : ""
-  );
+const { theme } = useTheme()
 
-  const {
-    result: isDiscussionAnsweredResult,
-    error: isDiscussionAnsweredError,
-    loading: isDiscussionAnsweredLoading,
-  } = useQuery(IS_DISCUSSION_ANSWERED, {
-    discussionId: discussionId.value,
-    channelUniqueName: channelId.value,
+const route = useRoute();
+const titleEditMode = ref(false);
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
+
+const channelId = computed(() =>
+  typeof route.params.forumId === "string" ? route.params.forumId : ""
+);
+const discussionId = computed(() =>
+  typeof route.params.discussionId === "string" ? route.params.discussionId : ""
+);
+
+const {
+  result: isDiscussionAnsweredResult,
+  error: isDiscussionAnsweredError,
+  loading: isDiscussionAnsweredLoading,
+} = useQuery(IS_DISCUSSION_ANSWERED, {
+  discussionId: discussionId.value,
+  channelUniqueName: channelId.value,
+})
+
+const answered = computed(() => {
+  if (isDiscussionAnsweredLoading.value) return false;
+  if (isDiscussionAnsweredError.value) return false;
+  return isDiscussionAnsweredResult.value?.discussionChannels[0]?.answered || false;
+})
+
+const {
+  result: getDiscussionResult,
+  error: getDiscussionError,
+  loading: getDiscussionLoading,
+  onResult: onGetDiscussionResult,
+} = useQuery(GET_DISCUSSION, {
+  id: discussionId,
+  loggedInModName: modProfileNameVar.value || "",
+  channelUniqueName: channelId.value,
+});
+
+const discussion = computed<Discussion | null>(() =>{
+  const discussion = getDiscussionResult.value?.discussions[0];
+  if (getDiscussionLoading.value && !discussion) {
+    return null
+  } 
+  if (getDiscussionError.value){
+    return null
+  }
+  return discussion || null
+});
+const authorIsLoggedInUser = computed(
+  () => discussion.value?.Author?.username === usernameVar.value
+);
+
+const titleInputRef = ref<HTMLElement | null>(null);
+const formValues = ref({
+  title: getDiscussionResult.value?.discussion?.title || "",
+});
+onGetDiscussionResult(
+  (result) =>
+    (formValues.value.title = result?.data?.discussions[0]?.title || "")
+);
+
+const {
+  mutate: updateDiscussion,
+  error: updateDiscussionError,
+  loading: updateDiscussionLoading,
+  onDone,
+} = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
+  variables: {
+    where: { id: discussionId.value },
+    updateDiscussionInput: formValues.value,
+  },
+}));
+
+onDone(() => (titleEditMode.value = false));
+
+const onClickEdit = () => {
+  titleEditMode.value = true;
+  nextTick(() => {
+    if (!titleEditMode.value) return;
+    titleInputRef.value?.focus();
   });
+};
 
-  const answered = computed(() => {
-    if (isDiscussionAnsweredLoading.value) return false;
-    if (isDiscussionAnsweredError.value) return false;
-    return isDiscussionAnsweredResult.value?.discussionChannels[0]?.answered || false;
+const formattedDate = computed(() => {
+  if (!discussion.value?.createdAt) return "";
+  // Date should be in this format: Mar 30, 2023
+  return new Date(discussion.value.createdAt).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
   });
-
-  const {
-    result: getDiscussionResult,
-    error: getDiscussionError,
-    loading: getDiscussionLoading,
-    onResult: onGetDiscussionResult,
-  } = useQuery(GET_DISCUSSION, {
-    id: discussionId,
-    loggedInModName: modProfileNameVar.value || "",
-    channelUniqueName: channelId.value,
-  });
-
-  const discussion = computed<Discussion | null>(() => {
-    const discussion = getDiscussionResult.value?.discussions[0];
-    if (getDiscussionLoading.value && !discussion) {
-      return null;
-    }
-    if (getDiscussionError.value) {
-      return null;
-    }
-    return discussion || null;
-  });
-  const authorIsLoggedInUser = computed(
-    () => discussion.value?.Author?.username === usernameVar.value
-  );
-
-  const titleInputRef = ref<HTMLElement | null>(null);
-  const formValues = ref({
-    title: getDiscussionResult.value?.discussion?.title || "",
-  });
-  onGetDiscussionResult(
-    (result) => (formValues.value.title = result?.data?.discussions[0]?.title || "")
-  );
-
-  const {
-    mutate: updateDiscussion,
-    error: updateDiscussionError,
-    loading: updateDiscussionLoading,
-    onDone,
-  } = useMutation(UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS, () => ({
-    variables: {
-      where: { id: discussionId.value },
-      updateDiscussionInput: formValues.value,
-    },
-  }));
-
-  onDone(() => (titleEditMode.value = false));
-
-  const onClickEdit = () => {
-    titleEditMode.value = true;
-    nextTick(() => {
-      if (!titleEditMode.value) return;
-      titleInputRef.value?.focus();
-    });
-  };
-
-  const formattedDate = computed(() => {
-    if (!discussion.value?.createdAt) return "";
-    // Date should be in this format: Mar 30, 2023
-    return new Date(discussion.value.createdAt).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  });
+<<<<<<< HEAD
 
   const isDownloadDetailPage = computed(() => {
     return (
@@ -114,25 +140,30 @@
       route.name.includes("forums-forumId-downloads-discussionId")
     );
   });
+=======
+});
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 </script>
 
 <template>
   <div class="w-full">
     <div
-      class="mb-3 mt-4 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
+      class="mb-3 mt-4 w-full flex flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <div
         v-if="getDiscussionLoading"
+<<<<<<< HEAD
         class="flex-1 animate-pulse bg-gray-200 dark:bg-gray-700 h-8 rounded"
-      />
-      <div
-        v-else
-        ref="discussionDetail"
+=======
         class="flex-1"
-      >
+        type="text"
+        :theme="theme"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
+      />
+      <div v-else ref="discussionDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-md text-wrap px-1 sm:tracking-tight md:text-2xl lg:text-3xl"
+          class="text-wrap px-1 text-md md:text-2xl lg:text-3xl sm:tracking-tight"
         >
           {{ discussion && discussion.title ? discussion.title : "Couldn't find the discussion" }}
         </h2>
@@ -140,9 +171,9 @@
         <TextInput
           v-if="titleEditMode"
           ref="titleInputRef"
-          :full-width="true"
           :test-id="'title-input'"
           :value="formValues.title"
+          :full-width="true"
           @update="formValues.title = $event"
         />
         <CharCounter
@@ -152,12 +183,14 @@
         />
         <p
           v-if="!titleEditMode"
-          class="ml-1 mt-1 flex items-center space-x-2 text-sm text-gray-500 dark:text-gray-400"
+          class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm flex items-center space-x-2"
         >
-          <slot />
+          <slot/>
           <span
             v-if="answered"
+            class="text-green-500 dark:text-green-400 mr-1 border dark:border-green-400 border-green-500 rounded-full text-xs flex gap-1 items-center py-1 px-2"
             aria-label="This discussion has been answered"
+<<<<<<< HEAD
             class="mr-1 flex items-center gap-1 rounded-full border border-green-500 bg-green-100 px-2 py-1 text-xs text-green-500 dark:border-green-400 dark:bg-green-900 dark:text-green-400"
           >
             <CheckCircleIcon class="h-4 w-4" /> Answered
@@ -166,13 +199,17 @@
             isDownloadDetailPage
               ? `published by ${discussion?.Author ? discussion.Author.username : "[Deleted]"} ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
               : `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
+=======
+          > 
+            <CheckCircleIcon class="h-4 w-4" /> Answered
+          </span>
+          <span>{{
+            `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ''} in ${channelId}`
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
           }}</span>
         </p>
       </div>
-      <RequireAuth
-        class="hidden md:block"
-        :full-width="false"
-      >
+      <RequireAuth class="hidden md:block" :full-width="false">
         <template #has-auth>
           <GenericButton
             v-if="!titleEditMode && authorIsLoggedInUser"
@@ -182,8 +219,8 @@
           <CreateButton
             v-if="!titleEditMode && !isDownloadDetailPage"
             class="ml-2"
-            :label="'New Discussion'"
             :to="`/forums/${channelId}/discussions/create`"
+            :label="'New Discussion'"
           />
           <CreateButton
             v-if="!titleEditMode && isDownloadDetailPage"
@@ -193,21 +230,20 @@
           />
           <PrimaryButton
             v-if="titleEditMode"
-            :disabled="
-              formValues.title.length === 0 || formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT
-            "
+            :disabled="formValues.title.length === 0 || formValues.title.length > DISCUSSION_TITLE_CHAR_LIMIT"
             :label="'Save'"
             :loading="updateDiscussionLoading"
             @click="updateDiscussion"
           />
           <GenericButton
             v-if="titleEditMode"
-            class="ml-2"
             :text="'Cancel'"
+            class="ml-2"
             @click="titleEditMode = false"
           />
         </template>
         <template #does-not-have-auth>
+<<<<<<< HEAD
           <PrimaryButton
             v-if="!isDownloadDetailPage"
             class="ml-2"
@@ -218,6 +254,9 @@
             class="ml-2"
             :label="'New Upload'"
           />
+=======
+          <PrimaryButton class="ml-2" :label="'New Discussion'" />
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
         </template>
       </RequireAuth>
     </div>

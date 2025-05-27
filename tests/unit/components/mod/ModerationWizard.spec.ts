@@ -1,11 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { mount } from "@vue/test-utils";
-import { nextTick } from "vue";
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { mount } from '@vue/test-utils';
+import { nextTick } from 'vue';
 
 // Mock dependencies before importing
-vi.mock("@/components/auth/RequireAuth.vue", () => ({
+vi.mock('@/components/auth/RequireAuth.vue', () => ({
   default: {
-    name: "RequireAuth",
+    name: 'RequireAuth',
     template: `
       <div>
         <slot name="has-auth"></slot>
@@ -16,14 +16,14 @@ vi.mock("@/components/auth/RequireAuth.vue", () => ({
       owners: Array,
       justifyLeft: Boolean,
       fullWidth: Boolean,
-      loading: Boolean,
-    },
-  },
+      loading: Boolean
+    }
+  }
 }));
 
 // Create a fake ModerationWizard component for testing
 const ModerationWizard = {
-  name: "ModerationWizard",
+  name: 'ModerationWizard',
   template: `
     <div>
       <div v-if="issue.isOpen" class="flex justify-center items-center w-10 h-10 rounded-lg bg-blue-600">
@@ -128,185 +128,193 @@ const ModerationWizard = {
     "suspended-user-successfully",
     "suspended-mod-successfully",
     "unsuspended-user-successfully",
-    "unsuspended-mod-successfully",
-  ],
+    "unsuspended-mod-successfully"
+  ]
 };
 
-describe("ModerationWizard Component", () => {
+describe('ModerationWizard Component', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
   // Mock data for testing
   const openIssue = {
-    id: "issue-123",
+    id: 'issue-123',
     isOpen: true,
-    title: "Test Issue",
+    title: 'Test Issue',
   };
-
+  
   const closedIssue = {
-    id: "issue-456",
+    id: 'issue-456',
     isOpen: false,
-    title: "Closed Issue",
+    title: 'Closed Issue',
   };
 
   const mountComponent = (props = {}) => {
     return mount(ModerationWizard, {
       props: {
         issue: openIssue,
-        channelUniqueName: "test-channel",
-        ...props,
-      },
+        channelUniqueName: 'test-channel',
+        ...props
+      }
     });
   };
 
-  it("renders with an open issue", async () => {
+  it('renders with an open issue', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
+    
     // Check if the component renders with the correct title for an open issue
-    expect(wrapper.text()).toContain("Mod Decision Needed");
-
+    expect(wrapper.text()).toContain('Mod Decision Needed');
+    
     // Check if buttons are present
     expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="suspend-user-button"]').exists()).toBe(true);
-
+    
     // Check if close issue button is present
-    const closeButton = wrapper.find("button");
+    const closeButton = wrapper.find('button');
     expect(closeButton.exists()).toBe(true);
-    expect(closeButton.text()).toContain("Close Issue (No Action Needed)");
+    expect(closeButton.text()).toContain('Close Issue (No Action Needed)');
   });
 
-  it("renders with a closed issue", async () => {
+  it('renders with a closed issue', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
-
+    
     // Check if the component renders with the correct title for a closed issue
-    expect(wrapper.text()).toContain("Mod Actions");
-    expect(wrapper.text()).toContain("Mod actions are disabled because the issue is closed.");
-
+    expect(wrapper.text()).toContain('Mod Actions');
+    expect(wrapper.text()).toContain('Mod actions are disabled because the issue is closed.');
+    
     // Check if close issue button is not present
-    const closeButton = wrapper.find("button");
+    const closeButton = wrapper.find('button');
     expect(closeButton.exists()).toBe(false);
   });
 
-  it("passes the disabled prop to ArchiveButton when the issue is closed", async () => {
+  it('passes the disabled prop to ArchiveButton when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
-
+    
     const archiveButton = wrapper.find('[data-testid="archive-button"]');
-    expect(archiveButton.attributes("data-disabled")).toBe("true");
+    expect(archiveButton.attributes('data-disabled')).toBe('true');
   });
 
-  it("passes the disabled prop to SuspendUserButton when the issue is closed", async () => {
+  it('passes the disabled prop to SuspendUserButton when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
-
+    
     const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
-    expect(suspendButton.attributes("data-disabled")).toBe("true");
+    expect(suspendButton.attributes('data-disabled')).toBe('true');
   });
 
-  it("emits close-issue event when the close button is clicked", async () => {
+  it('emits close-issue event when the close button is clicked', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
-    const closeButton = wrapper.find("button");
-    await closeButton.trigger("click");
-
-    expect(wrapper.emitted("close-issue")).toBeTruthy();
+    
+    const closeButton = wrapper.find('button');
+    await closeButton.trigger('click');
+    
+    expect(wrapper.emitted('close-issue')).toBeTruthy();
   });
 
-  it("passes correct props to ArchiveButton", async () => {
+  it('passes correct props to ArchiveButton', async () => {
     const wrapper = mountComponent({
       issue: openIssue,
-      discussionId: "disc-123",
-      eventId: "event-456",
-      commentId: "comment-789",
-      contextText: "Test Context",
-      channelUniqueName: "test-channel",
+      discussionId: 'disc-123',
+      eventId: 'event-456',
+      commentId: 'comment-789',
+      contextText: 'Test Context',
+      channelUniqueName: 'test-channel'
     });
-
+    
     const archiveButton = wrapper.find('[data-testid="archive-button"]');
-    expect(JSON.parse(archiveButton.attributes("data-issue"))).toEqual(openIssue);
-    expect(archiveButton.attributes("data-discussion-id")).toBe("disc-123");
-    expect(archiveButton.attributes("data-event-id")).toBe("event-456");
-    expect(archiveButton.attributes("data-comment-id")).toBe("comment-789");
-    expect(archiveButton.attributes("data-context-text")).toBe("Test Context");
-    expect(archiveButton.attributes("data-channel-unique-name")).toBe("test-channel");
-    expect(archiveButton.attributes("data-disabled")).toBe("false");
+    expect(JSON.parse(archiveButton.attributes('data-issue'))).toEqual(openIssue);
+    expect(archiveButton.attributes('data-discussion-id')).toBe('disc-123');
+    expect(archiveButton.attributes('data-event-id')).toBe('event-456');
+    expect(archiveButton.attributes('data-comment-id')).toBe('comment-789');
+    expect(archiveButton.attributes('data-context-text')).toBe('Test Context');
+    expect(archiveButton.attributes('data-channel-unique-name')).toBe('test-channel');
+    expect(archiveButton.attributes('data-disabled')).toBe('false');
   });
 
-  it("passes correct props to SuspendUserButton", async () => {
+  it('passes correct props to SuspendUserButton', async () => {
     const wrapper = mountComponent({
       issue: openIssue,
-      discussionId: "disc-123",
-      eventId: "event-456",
-      contextText: "Test Context",
-      channelUniqueName: "test-channel",
+      discussionId: 'disc-123',
+      eventId: 'event-456',
+      contextText: 'Test Context',
+      channelUniqueName: 'test-channel'
     });
-
+    
     const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
-    expect(JSON.parse(suspendButton.attributes("data-issue"))).toEqual(openIssue);
-    expect(suspendButton.attributes("data-discussion-id")).toBe("disc-123");
-    expect(suspendButton.attributes("data-event-id")).toBe("event-456");
-    expect(suspendButton.attributes("data-discussion-title")).toBe("Test Context");
-    expect(suspendButton.attributes("data-event-title")).toBe("Test Context");
-    expect(suspendButton.attributes("data-channel-unique-name")).toBe("test-channel");
-    expect(suspendButton.attributes("data-disabled")).toBe("false");
+    expect(JSON.parse(suspendButton.attributes('data-issue'))).toEqual(openIssue);
+    expect(suspendButton.attributes('data-discussion-id')).toBe('disc-123');
+    expect(suspendButton.attributes('data-event-id')).toBe('event-456');
+    expect(suspendButton.attributes('data-discussion-title')).toBe('Test Context');
+    expect(suspendButton.attributes('data-event-title')).toBe('Test Context');
+    expect(suspendButton.attributes('data-channel-unique-name')).toBe('test-channel');
+    expect(suspendButton.attributes('data-disabled')).toBe('false');
   });
 
-  it("forwards archived-successfully event from ArchiveButton", async () => {
+  it('forwards archived-successfully event from ArchiveButton', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
+    
     const archiveButton = wrapper.find('[data-testid="archive-button"]');
-    await archiveButton.trigger("click");
-
-    expect(wrapper.emitted("archived-successfully")).toBeTruthy();
+    await archiveButton.trigger('click');
+    
+    expect(wrapper.emitted('archived-successfully')).toBeTruthy();
   });
 
-  it("forwards unarchived-successfully event from ArchiveButton", async () => {
+  it('forwards unarchived-successfully event from ArchiveButton', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
+    
     // Emit the event directly since our mock doesn't have a separate trigger for this
-    wrapper.vm.$emit("unarchived-successfully");
+    wrapper.vm.$emit('unarchived-successfully');
     await nextTick();
-
-    expect(wrapper.emitted("unarchived-successfully")).toBeTruthy();
+    
+    expect(wrapper.emitted('unarchived-successfully')).toBeTruthy();
   });
 
-  it("forwards suspended-user-successfully event from SuspendUserButton", async () => {
+  it('forwards suspended-user-successfully event from SuspendUserButton', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
+    
     const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
-    await suspendButton.trigger("click");
-
-    expect(wrapper.emitted("suspended-user-successfully")).toBeTruthy();
+    await suspendButton.trigger('click');
+    
+    expect(wrapper.emitted('suspended-user-successfully')).toBeTruthy();
   });
 
-  it("forwards unsuspended-successfully event from SuspendUserButton", async () => {
+  it('forwards unsuspended-successfully event from SuspendUserButton', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
+    
     // Emit the event directly since our mock doesn't have a separate trigger for this
-    wrapper.vm.$emit("unsuspended-user-successfully");
+    wrapper.vm.$emit('unsuspended-user-successfully');
     await nextTick();
-
-    expect(wrapper.emitted("unsuspended-user-successfully")).toBeTruthy();
+    
+    expect(wrapper.emitted('unsuspended-user-successfully')).toBeTruthy();
   });
 
-  it("renders with the correct classes for an open issue", async () => {
+  it('renders with the correct classes for an open issue', async () => {
     const wrapper = mountComponent({ issue: openIssue });
-
+    
     // Check the styling for an open issue
-    const coloredDiv = wrapper.find(".rounded-lg");
-    expect(coloredDiv.classes()).toContain("bg-blue-600");
-
-    const borderDiv = wrapper.find(".rounded-lg + div");
-    expect(borderDiv.classes()).toContain("border-blue-500");
+    const coloredDiv = wrapper.find('.rounded-lg');
+    expect(coloredDiv.classes()).toContain('bg-blue-600');
+    
+    const borderDiv = wrapper.find('.rounded-lg + div');
+    expect(borderDiv.classes()).toContain('border-blue-500');
   });
 
-  it("renders with the correct classes for a closed issue", async () => {
+  it('renders with the correct classes for a closed issue', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
-
+    
     // Check the styling for a closed issue
+<<<<<<< HEAD
     const coloredDiv = wrapper.find(".rounded-lg");
     expect(coloredDiv.classes()).toContain("bg-gray-300");
 
     const borderDiv = wrapper.find(".rounded-lg + div");
     expect(borderDiv.classes()).toContain("border-gray-500");
+=======
+    const coloredDiv = wrapper.find('.rounded-lg');
+    expect(coloredDiv.classes()).toContain('bg-gray-300');
+    
+    const borderDiv = wrapper.find('.rounded-lg + div');
+    expect(borderDiv.classes()).toContain('border-gray-300');
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
   });
 });

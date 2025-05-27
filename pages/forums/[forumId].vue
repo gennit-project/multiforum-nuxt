@@ -1,22 +1,23 @@
 <script setup lang="ts">
-  import ChannelTabs from "@/components/channel/ChannelTabs.vue";
-  import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
-  import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
-  import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
-  import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
-  import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
-  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-  import type { Channel, User } from "@/__generated__/graphql";
-  import { computed } from "vue";
-  import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
-  import { useRoute, useRouter, useHead } from "nuxt/app";
-  import { useQuery } from "@vue/apollo-composable";
-  import { DateTime } from "luxon";
-  import BackLink from "@/components/BackLink.vue";
+import ChannelTabs from "@/components/channel/ChannelTabs.vue";
+import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
+import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
+import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
+import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
+import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import type { Channel, User } from "@/__generated__/graphql";
+import { computed } from "vue";
+import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
+import { useRoute, useRouter, useHead } from "nuxt/app";
+import { useQuery } from "@vue/apollo-composable";
+import { DateTime } from "luxon";
+import BackLink from "@/components/BackLink.vue";
 
-  const route = useRoute();
-  const router = useRouter();
+const route = useRoute();
+const router = useRouter();
 
+<<<<<<< HEAD
   const currentPageType = computed(() => {
     const routeName = route.name?.toString() || "";
 
@@ -68,153 +69,201 @@
       !`${String(route.name)}`.includes("forums-forumId-downloads-discussionId")
     );
   });
+=======
+const showDiscussionTitle = computed(() =>
+  route.name?.toString().includes("forums-forumId-discussions-discussionId")
+);
+const showEventTitle = computed(() =>
+  route.name?.toString().includes("forums-forumId-events-eventId")
+);
+const showIssueTitle = computed(() =>
+  route.name?.toString().includes("forums-forumId-issues-issueId")
+);
 
-  const channelId = computed(() => {
-    return typeof route.params.forumId === "string" ? route.params.forumId : "";
-  });
+const showChannelTabs = computed(() => {
+  return (
+    !showDiscussionTitle.value &&
+    !showEventTitle.value &&
+    !showIssueTitle.value &&
+    !`${String(route.name)}`.includes("feedback")
+  );
+});
 
-  const { result: getChannelResult, onResult: onGetChannelResult } = useQuery(
-    GET_CHANNEL,
-    {
-      uniqueName: channelId,
-      // Using luxon, round down to the nearest hour
-      now: DateTime.local().startOf("hour").toISO(),
-    },
-    {
-      fetchPolicy: "cache-first",
-      nextFetchPolicy: "cache-first",
-      enabled: !!channelId.value,
-    }
+const channelId = computed(() => {
+  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+});
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
+
+const { result: getChannelResult, onResult: onGetChannelResult } = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: channelId,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf("hour").toISO(),
+  },
+  {
+    fetchPolicy: "cache-first",
+    nextFetchPolicy: "cache-first",
+    enabled: !!channelId.value,
+  }
+);
+
+const channel = computed(() => {
+  return getChannelResult.value?.channels?.[0] ?? null;
+});
+
+const addForumToLocalStorage = (channel: Channel) => {
+  if (!import.meta.client) {
+    return;
+  }
+  let recentForums =
+    JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
+
+  const sideNavItem = {
+    uniqueName: channelId.value,
+    displayName: channel.displayName,
+    channelIconURL: channel.channelIconURL,
+    timestamp: Date.now(),
+  };
+
+  recentForums = recentForums.filter(
+    (forum: any) => forum.uniqueName !== channelId.value
   );
 
-  const channel = computed(() => {
-    return getChannelResult.value?.channels?.[0] ?? null;
-  });
+  recentForums.unshift(sideNavItem);
 
-  const addForumToLocalStorage = (channel: Channel) => {
-    if (!import.meta.client) {
-      return;
-    }
-    let recentForums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
+  // Limit to 20 items after adding the new one
+  recentForums = recentForums.slice(0, 20);
 
-    const sideNavItem = {
-      uniqueName: channelId.value,
-      displayName: channel.displayName,
-      channelIconURL: channel.channelIconURL,
-      timestamp: Date.now(),
-    };
+  // Clean up invalid entries
+  recentForums = recentForums.filter((forum: any) => typeof forum === "object");
 
-    recentForums = recentForums.filter((forum: any) => forum.uniqueName !== channelId.value);
-
-    recentForums.unshift(sideNavItem);
-
-    // Limit to 20 items after adding the new one
-    recentForums = recentForums.slice(0, 20);
-
-    // Clean up invalid entries
-    recentForums = recentForums.filter((forum: any) => typeof forum === "object");
-
-    localStorage.setItem("recentForums", JSON.stringify(recentForums));
-  };
-  onGetChannelResult((result) => {
-    const loadedChannel = result.data?.channels[0];
-    if (!loadedChannel) {
-      return;
-    }
-    addForumToLocalStorage(loadedChannel);
-    // redirect to /discussions if we are at the channel root
-    if (route.name === "forums-forumId") {
-      router.push({
-        name: "forums-forumId-discussions",
-        params: {
-          forumId: channelId.value,
-        },
-      });
-    }
-    const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
-    const forumDescription = loadedChannel.description
-      ? loadedChannel.description.substring(0, 160) +
-        (loadedChannel.description.length > 160 ? "..." : "")
-      : `${forumName} - Community Forum`;
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-    const imageUrl = loadedChannel.channelIconURL || loadedChannel.channelBannerURL || "";
-
-    // Set basic SEO meta tags
-    useHead({
-      title: `${forumName} | ${serverName}`,
-      description: forumDescription,
-      image: imageUrl,
-      type: "website",
-    });
-
-    // Add structured data for rich results
-    useHead({
-      script: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "DiscussionForumPosting",
-            name: forumName,
-            description: forumDescription,
-            image: imageUrl,
-            url: `${baseUrl}/forums/${channelId.value}`,
-            publisher: {
-              "@type": "Organization",
-              name: serverName,
-              url: baseUrl,
-            },
-          }),
-        },
-      ],
-    });
-  });
-  const adminList = computed(() => {
-    return channel.value ? channel.value.Admins.map((user: User) => user?.username) : [];
-  });
-  if (!channelId.value) {
-    if (import.meta.client) {
-      router.push({
-        name: "forums-forumId-discussions",
-        params: {
-          forumId: channelId.value,
-        },
-      });
-    }
+  localStorage.setItem("recentForums", JSON.stringify(recentForums));
+};
+onGetChannelResult((result) => {
+  const loadedChannel = result.data?.channels[0];
+  if (!loadedChannel) {
+    return;
   }
+  addForumToLocalStorage(loadedChannel);
+  // redirect to /discussions if we are at the channel root
+  if (route.name === "forums-forumId") {
+    router.push({
+      name: "forums-forumId-discussions",
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
+  const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
+  const forumDescription = loadedChannel.description 
+    ? loadedChannel.description.substring(0, 160) + (loadedChannel.description.length > 160 ? '...' : '')
+    : `${forumName} - Community Forum`;
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const imageUrl = loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
 
-  definePageMeta({
-    middleware: "forum-redirect",
+  // Set basic SEO meta tags
+  useHead({
+    title: `${forumName} | ${serverName}`,
+    description: forumDescription,
+    image: imageUrl,
+    type: 'website'
   });
+
+  // Add structured data for rich results
+  useHead({
+    script: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'DiscussionForumPosting',
+          name: forumName,
+          description: forumDescription,
+          image: imageUrl,
+          url: `${baseUrl}/forums/${channelId.value}`,
+          publisher: {
+            '@type': 'Organization',
+            name: serverName,
+            url: baseUrl
+          }
+        })
+      }
+    ]
+  });
+});
+const adminList = computed(() => {
+  return channel.value
+    ? channel.value.Admins.map((user: User) => user?.username)
+    : [];
+});
+if (!channelId.value) {
+  if (import.meta.client) {
+    router.push({
+      name: "forums-forumId-discussions",
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
+}
+
+definePageMeta({
+  middleware: "forum-redirect",
+});
 </script>
 
 <template>
   <NuxtLayout>
     <div
       v-if="channel"
-      class="flex flex-col bg-white dark:bg-black dark:text-white md:min-h-screen"
+      class="flex flex-col md:min-h-screen dark:bg-black bg-white dark:text-white"
     >
       <ChannelHeaderMobile
+<<<<<<< HEAD
         v-if="!showDetailTitle"
+=======
+        v-if="!showDiscussionTitle && !showEventTitle && !showIssueTitle"
+        class="block md:hidden"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
         :channel="channel"
         :channel-id="channelId"
-        class="block md:hidden"
       />
       <ChannelHeaderDesktop
+<<<<<<< HEAD
         v-if="channel.channelBannerURL && !showDetailTitle"
         :admin-list="adminList"
+=======
+        v-if="
+          channel.channelBannerURL &&
+          !showDiscussionTitle &&
+          !showEventTitle &&
+          !showIssueTitle
+        "
+        class="hidden md:block"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
         :channel="channel"
         :channel-id="channelId"
-        class="hidden md:block"
+        :admin-list="adminList"
         :route="route"
         :show-create-button="true"
       />
+<<<<<<< HEAD
       <main class="flex w-full justify-center bg-gray-100 dark:bg-gray-900">
         <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
           <div
             v-if="showDetailTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
+=======
+      <main class="flex justify-center w-full">
+        <article
+          class="w-full max-w-screen-2xl rounded-lg dark:bg-black focus:outline-none"
+        >
+          <div
+            v-if="showDiscussionTitle"
+            class="flex w-full items-start gap-2 px-2 lg:px-4 2xl:px-0 border-b dark:border-gray-500"
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
           >
             <div class="max-w-screen-2xl flex-1 pr-1">
               <component
@@ -222,14 +271,48 @@
                 v-if="currentPageType"
               >
                 <BackLink
+<<<<<<< HEAD
                   :data-testid="currentPageType.testId"
                   :link="currentPageType.backLink"
                 />
               </component>
+=======
+                  :link="`/forums/${channelId}/discussions`"
+                  :data-testid="'discussion-detail-back-link'"
+                />
+              </DiscussionTitleEditForm>
+            </div>
+          </div>
+          <div
+            v-else-if="showEventTitle"
+            class="flex w-full items-start gap-2 pl-3"
+          >
+            <div class="max-w-screen-2xl flex-1 pr-1">
+              <EventTitleEditForm>
+                <BackLink
+                  :link="`/forums/${channelId}/events`"
+                  :data-testid="'event-detail-back-link'"
+                />
+              </EventTitleEditForm>
+            </div>
+          </div>
+          <div
+            v-else-if="showIssueTitle"
+            class="flex w-full items-start gap-2 px-2"
+          >
+            <div class="max-w-screen-2xl flex-1 pr-1">
+              <IssueTitleEditForm>
+                <BackLink
+                  :link="`/forums/${channelId}/issues`"
+                  :data-testid="'issue-detail-back-link'"
+                />
+              </IssueTitleEditForm>
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
             </div>
           </div>
 
           <div class="relative w-full">
+<<<<<<< HEAD
             <client-only>
               <template #fallback>
                 <!-- SSR fallback: single column layout -->
@@ -277,6 +360,35 @@
                 </aside>
               </div>
             </client-only>
+=======
+            <div
+              class="flex flex-col md:flex-row divide-x dark:divide-gray-500"
+            >
+              <div class="flex-1 p-0 md:px-2 bg-white dark:bg-gray-800">
+                <ChannelTabs
+                  v-if="showChannelTabs"
+                  class="mb-2 w-full border-b border-gray-200 bg-white md:ml-2 dark:border-gray-600 dark:bg-gray-800"
+                  :vertical="false"
+                  :show-counts="true"
+                  :admin-list="adminList"
+                  :route="route"
+                  :channel="channel"
+                  :desktop="false"
+                />
+                <NuxtPage />
+              </div>
+              <aside
+                v-if="channelId"
+                class="md:w-1/4 flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:overflow-y-auto md:max-h-screen"
+              >
+                <ChannelSidebar
+                  v-if="channel"
+                  :channel="channel"
+                  class="px-4"
+                />
+              </aside>
+            </div>
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
           </div>
         </article>
       </main>

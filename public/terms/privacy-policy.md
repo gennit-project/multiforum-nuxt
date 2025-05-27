@@ -64,7 +64,7 @@ We may use and store information about your location if you give us permission t
 
 We use cookies and similar tracking technologies to track the activity on our Service and we hold certain information.
 
-Cookies are files with a small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device.
+Cookies are files with a small amount of data which may include an anonymous unique identifier. Cookies are sent to your browser from a website and stored on your device. 
 
 You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. However, if you do not accept cookies, you may not be able to use some portions of our Service.
 
@@ -144,7 +144,7 @@ If we or our subsidiaries are involved in a merger, acquisition or asset sale, y
 
 (v) for any other purpose disclosed by us when you provide the information;
 
-(vi) with your consent in any other cases;
+(vi) with your consent in any other cases; 
 
 (vii) if we believe disclosure is necessary or appropriate to protect the rights, property, or safety of the Company, our customers, or others.
 

@@ -15,7 +15,7 @@ let dataInitialized = false;
 export const setupTestData = () => {
   // Only perform expensive setup once per test file
   before(() => {
-    cy.log("🔄 Performing one-time data setup for all tests in this file");
+    cy.log('🔄 Performing one-time data setup for all tests in this file');
     deleteAll();
     seedAll();
     dataInitialized = true;
@@ -24,12 +24,12 @@ export const setupTestData = () => {
   // Verify test environment is ready before each test
   beforeEach(() => {
     // Skip login if we're preserving sessions
-    cy.log("✅ Using shared test data");
+    cy.log('✅ Using shared test data');
   });
-
+  
   // Clean up after all tests in the file are done
   after(() => {
-    cy.log("🧹 Cleaning up test data");
+    cy.log('🧹 Cleaning up test data');
     dataInitialized = false;
   });
 };
@@ -38,16 +38,16 @@ export const setupTestData = () => {
  * Login as a user and ensure necessary setup has been done
  * This is more efficient than logging in for each test case
  */
-export const loginUser = (loginMethod = "loginWithCreateEventButton") => {
+export const loginUser = (loginMethod = 'loginWithCreateEventButton') => {
   beforeEach(() => {
     // Make sure data is initialized even if setupTestData wasn't called
     if (!dataInitialized) {
-      cy.log("⚠️ Test data not initialized, setting up now");
+      cy.log('⚠️ Test data not initialized, setting up now');
       deleteAll();
       seedAll();
       dataInitialized = true;
     }
-
+    
     // Login with the specified method
     cy[loginMethod]();
   });

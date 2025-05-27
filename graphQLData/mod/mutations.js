@@ -1,26 +1,50 @@
 import { gql } from "@apollo/client/core";
 
 export const INVITE_FORUM_OWNER = gql`
-  mutation inviteForumOwner($inviteeUsername: String!, $channelUniqueName: String!) {
-    inviteForumOwner(inviteeUsername: $inviteeUsername, channelUniqueName: $channelUniqueName)
+  mutation inviteForumOwner(
+    $inviteeUsername: String!
+    $channelUniqueName: String!
+  ) {
+    inviteForumOwner(
+      inviteeUsername: $inviteeUsername
+      channelUniqueName: $channelUniqueName
+    )
   }
 `;
 
 export const INVITE_FORUM_MOD = gql`
-  mutation inviteForumMod($inviteeUsername: String!, $channelUniqueName: String!) {
-    inviteForumMod(inviteeUsername: $inviteeUsername, channelUniqueName: $channelUniqueName)
+  mutation inviteForumMod(
+    $inviteeUsername: String!
+    $channelUniqueName: String!
+  ) {
+    inviteForumMod(
+      inviteeUsername: $inviteeUsername
+      channelUniqueName: $channelUniqueName
+    )
   }
 `;
 
 export const CANCEL_INVITE_FORUM_OWNER = gql`
-  mutation cancelInviteForumOwner($inviteeUsername: String!, $channelUniqueName: String!) {
-    cancelInviteForumOwner(inviteeUsername: $inviteeUsername, channelUniqueName: $channelUniqueName)
+  mutation cancelInviteForumOwner(
+    $inviteeUsername: String!
+    $channelUniqueName: String!
+  ) {
+    cancelInviteForumOwner(
+      inviteeUsername: $inviteeUsername
+      channelUniqueName: $channelUniqueName
+    )
   }
 `;
 
 export const CANCEL_INVITE_FORUM_MOD = gql`
-  mutation cancelInviteForumMod($inviteeUsername: String!, $channelUniqueName: String!) {
-    cancelInviteForumMod(inviteeUsername: $inviteeUsername, channelUniqueName: $channelUniqueName)
+  mutation cancelInviteForumMod(
+    $inviteeUsername: String!
+    $channelUniqueName: String!
+  ) {
+    cancelInviteForumMod(
+      inviteeUsername: $inviteeUsername
+      channelUniqueName: $channelUniqueName
+    )
   }
 `;
 

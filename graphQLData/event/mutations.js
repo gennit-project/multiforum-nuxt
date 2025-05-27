@@ -2,8 +2,12 @@ import { gql } from "@apollo/client/core";
 import { EVENT_FIELDS } from "./queries";
 
 export const CREATE_EVENT_WITH_CHANNEL_CONNECTIONS = gql`
-  mutation createEvent($input: [EventCreateInputWithChannels!]!) {
-    createEventWithChannelConnections(input: $input) {
+  mutation createEvent(
+    $input: [EventCreateInputWithChannels!]!
+  ) {
+    createEventWithChannelConnections(
+      input: $input
+    ) {
       ...EventFields
       EventChannels {
         id
@@ -66,6 +70,7 @@ export const CANCEL_EVENT = gql`
   }
 `;
 
+
 export const DELETE_EVENTS = gql`
   mutation deleteEvent($id: [ID!]) {
     deleteEvent(filter: { id: $id }) {
@@ -78,30 +83,30 @@ export const DELETE_EVENTS = gql`
 
 export const DELETE_EVENT = gql`
   mutation deleteEvent($id: ID!) {
-    deleteEvents(where: { id: $id }) {
+      deleteEvents(
+        where: {
+          id: $id
+        }
+    ) {
       nodesDeleted
-      relationshipsDeleted
+      relationshipsDeleted    
     }
   }
 `;
 
 export const GIVE_FEEDBACK_ON_EVENT = gql`
-  mutation giveFeedbackOnEvent(
-    $eventId: ID!
-    $modProfileName: String!
-    $commentText: String!
-    $channelUniqueName: String!
-  ) {
-    giveFeedbackOnEvent(
-      eventId: $eventId
-      modProfileName: $modProfileName
-      commentText: $commentText
-      channelUniqueName: $channelUniqueName
+mutation giveFeedbackOnEvent($eventId: ID!, $modProfileName: String!, $commentText: String!,
+$channelUniqueName: String!) {
+  giveFeedbackOnEvent(
+    eventId: $eventId, 
+    modProfileName: $modProfileName, 
+    commentText: $commentText,
+    channelUniqueName: $channelUniqueName
     ) {
-      text
-    }
+    text
   }
-`;
+}
+`
 
 export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
   mutation addFeedbackCommentToEvent(
@@ -118,9 +123,13 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
           text: $text
           Channel: { connect: { where: { node: { uniqueName: $channelId } } } }
           CommentAuthor: {
-            ModerationProfile: { connect: { where: { node: { displayName: $modProfileName } } } }
+            ModerationProfile: {
+              connect: { where: { node: { displayName: $modProfileName } } }
+            }
           }
-          GivesFeedbackOnEvent: { connect: { where: { node: { id: $eventId } } } }
+          GivesFeedbackOnEvent: {
+            connect: { where: { node: { id: $eventId } } }
+          }
         }
       ]
     ) {

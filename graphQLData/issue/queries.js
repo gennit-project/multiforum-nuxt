@@ -2,15 +2,20 @@ import { COMMENT_VOTE_FIELDS } from "../comment/queries";
 import { gql } from "@apollo/client/core";
 
 export const GET_ISSUE_FOR_COMMENT = gql`
-  query getIssueForComment($commentId: ID!) {
-    comments(where: { id: $commentId }) {
+query getIssueForComment(
+  $commentId: ID!
+) {
+  comments(
+    where: {
+      id: $commentId
+    }) {
       id
       RelatedIssues {
         id
       }
     }
-  }
-`;
+}
+`
 
 export const ISSUE_FIELDS = gql`
   # ${COMMENT_VOTE_FIELDS}
@@ -91,7 +96,12 @@ export const GET_ISSUE = gql`
 
 export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
   query getIssue($discussionId: ID!, $channelUniqueName: String!) {
-    issues(where: { relatedDiscussionId: $discussionId, channelUniqueName: $channelUniqueName }) {
+    issues(
+      where: {
+        relatedDiscussionId: $discussionId
+        channelUniqueName: $channelUniqueName
+      }
+    ) {
       id
       flaggedServerRuleViolation
     }
@@ -100,7 +110,9 @@ export const CHECK_DISCUSSION_ISSUE_EXISTENCE = gql`
 
 export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
   query getIssue($eventId: ID!, $channelUniqueName: String!) {
-    issues(where: { relatedEventId: $eventId, channelUniqueName: $channelUniqueName }) {
+    issues(
+      where: { relatedEventId: $eventId, channelUniqueName: $channelUniqueName }
+    ) {
       id
       flaggedServerRuleViolation
     }
@@ -109,7 +121,12 @@ export const CHECK_EVENT_ISSUE_EXISTENCE = gql`
 
 export const CHECK_COMMENT_ISSUE_EXISTENCE = gql`
   query getIssue($commentId: ID!, $channelUniqueName: String!) {
-    issues(where: { relatedCommentId: $commentId, channelUniqueName: $channelUniqueName }) {
+    issues(
+      where: {
+        relatedCommentId: $commentId
+        channelUniqueName: $channelUniqueName
+      }
+    ) {
       id
       flaggedServerRuleViolation
     }
@@ -267,8 +284,14 @@ export const GET_ISSUES_BY_COMMENT = gql`
 `;
 
 export const GET_ISSUES = gql`
-  query getIssues($issueWhere: IssueWhere) {
-    issues(where: $issueWhere, options: { sort: { createdAt: DESC } }) {
+  query getIssues (
+    $issueWhere: IssueWhere
+  ){
+    issues(where: $issueWhere, options: { 
+      sort: { 
+        createdAt: DESC 
+      } 
+    }) {
       id
       title
       body

@@ -1,53 +1,53 @@
 <script>
-  import { defineComponent } from "vue";
-  import GenericModal from "../GenericModal.vue";
-  import ExclamationIcon from "@/components/icons/ExclamationIcon.vue";
+import { defineComponent } from "vue";
+import GenericModal from "../GenericModal.vue";
+import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
-  export default defineComponent({
-    name: "FeedbackFormModal",
-    components: {
-      GenericModal,
-      ExclamationIcon,
+export default defineComponent({
+  name: "FeedbackFormModal",
+  components: {
+    GenericModal,
+    ExclamationIcon,
+  },
+  props: {
+    title: {
+      type: String,
+      require: true,
+      default: "Are you sure?",
     },
-    props: {
-      title: {
-        type: String,
-        require: true,
-        default: "Are you sure?",
-      },
-      body: {
-        type: String,
-        require: true,
-        default: "",
-      },
-      open: {
-        type: Boolean,
-        default: false,
-      },
-      primaryButtonText: {
-        type: String,
-        default: "Delete",
-      },
-      secondaryButtonText: {
-        type: String,
-        default: "Cancel",
-      },
+    body: {
+      type: String,
+      require: true,
+      default: ''
     },
-    setup() {},
-  });
+    open: {
+      type: Boolean,
+      default: false,
+    },
+    primaryButtonText: {
+      type: String,
+      default: "Delete",
+    },
+    secondaryButtonText: {
+      type: String,
+      default: "Cancel",
+    },
+  },
+  setup() {},
+});
 </script>
 <template>
   <GenericModal
-    :body="body"
     :highlight-color="'yellow'"
+    :title="title"
+    :body="body"
     :open="open"
     :primary-button-text="primaryButtonText"
     :secondary-button-text="secondaryButtonText"
-    :title="title"
   >
     <ExclamationIcon
-      aria-hidden="true"
       class="h-6 w-6 text-yellow-600 opacity-100"
+      aria-hidden="true"
     />
   </GenericModal>
 </template>

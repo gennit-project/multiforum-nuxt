@@ -1,7 +1,7 @@
-import * as Sentry from "@sentry/vue";
+import * as Sentry from '@sentry/vue'
 
 export default defineNuxtPlugin((nuxtApp) => {
-  const config = useRuntimeConfig();
+  const config = useRuntimeConfig()
 
   // Initialize Sentry
   Sentry.init({
@@ -10,12 +10,12 @@ export default defineNuxtPlugin((nuxtApp) => {
     tracesSampleRate: 1.0, // Adjust as needed for performance monitoring
     replaysSessionSampleRate: 0.1, // Adjust sample rates for replay
     replaysOnErrorSampleRate: 1.0, // Capture 100% of sessions with an error
-  });
+  })
 
   // Capture and log errors in development
-  if (process.env.NODE_ENV === "development") {
-    nuxtApp.hook("vue:error", (err) => {
-      console.error("Captured Vue error:", err);
-    });
+  if (process.env.NODE_ENV === 'development') {
+    nuxtApp.hook('vue:error', (err) => {
+      console.error('Captured Vue error:', err)
+    })
   }
-});
+})

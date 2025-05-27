@@ -19,12 +19,25 @@ Based on Lighthouse performance reports, the following issues were identified:
 
 ### 1. Code Splitting and Lazy Loading
 
+<<<<<<< HEAD
 Edit: This has been removed as part of debugging issues with 500 errors on the client side.
+=======
+Implemented dynamic imports for heavy components to reduce initial bundle size:
+
+```typescript
+// Example of lazy loading a component
+const DiscussionAlbum = defineAsyncComponent(() => 
+  import("@/components/discussion/detail/DiscussionAlbum.vue")
+);
+```
+
+Components that were lazy loaded:
+- DiscussionAlbum (in SitewideDiscussionListItem, ChannelDiscussionListItem, and DiscussionDetailContent)
+>>>>>>> parent of 666ae3d (Use automated formatting tools)
 
 ### 2. Performance Plugin
 
 Created a client-side performance plugin that:
-
 - Detects slow network connections
 - Provides utilities for deferring non-critical operations
 - Uses requestIdleCallback for operations that can wait
@@ -33,33 +46,34 @@ Created a client-side performance plugin that:
 // plugins/performance.client.ts
 export default defineNuxtPlugin(() => {
   // Detect slow network connections
-  const connection =
-    navigator.connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
-
-  const isSlowConnection = connection
-    ? connection.effectiveType === "2g" || connection.effectiveType === "slow-2g"
-    : false;
-
+  const connection = navigator.connection || 
+    (navigator as any).mozConnection || 
+    (navigator as any).webkitConnection;
+  
+  const isSlowConnection = connection ? 
+    (connection.effectiveType === '2g' || connection.effectiveType === 'slow-2g') : 
+    false;
+  
   // Set a global value that components can check
-  useState("slowConnection", () => isSlowConnection);
-
+  useState('slowConnection', () => isSlowConnection);
+  
   // Queue non-critical operations to run when the browser is idle
   const queueIdleTask = (callback: () => void, timeout = 2000) => {
-    if ("requestIdleCallback" in window) {
+    if ('requestIdleCallback' in window) {
       window.requestIdleCallback(callback, { timeout });
     } else {
       // Fallback for browsers that don't support requestIdleCallback
       setTimeout(callback, 1);
     }
   };
-
+  
   return {
     provide: {
       performance: {
         isSlowConnection,
-        queueIdleTask,
-      },
-    },
+        queueIdleTask
+      }
+    }
   };
 });
 ```
@@ -148,53 +162,50 @@ Implemented `@nuxt/image` for automatic image optimization:
 ```typescript
 // In nuxt.config.ts
 modules: [
-  [
-    "@nuxt/image",
-    {
-      quality: 80,
-      format: ["webp", "avif", "jpg", "png"],
-      provider: "ipx",
-      screens: {
-        xs: 320,
-        sm: 640,
-        md: 768,
-        lg: 1024,
-        xl: 1280,
-        xxl: 1536,
-        "2xl": 1536,
-      },
-      modifiers: {
-        format: "webp",
-        quality: 80,
-        width: "auto",
-        height: "auto",
-      },
-      presets: {
-        avatar: {
-          modifiers: {
-            format: "webp",
-            width: 50,
-            height: 50,
-          },
-        },
-        thumbnail: {
-          modifiers: {
-            format: "webp",
-            width: 320,
-            height: 180,
-          },
-        },
-        cover: {
-          modifiers: {
-            format: "webp",
-            width: 1200,
-            height: 630,
-          },
-        },
-      },
+  ['@nuxt/image', {
+    quality: 80,
+    format: ['webp', 'avif', 'jpg', 'png'],
+    provider: 'ipx',
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+      '2xl': 1536
     },
-  ],
-];
+    modifiers: {
+      format: 'webp',
+      quality: 80,
+      width: 'auto',
+      height: 'auto'
+    },
+    presets: {
+      avatar: {
+        modifiers: {
+          format: 'webp',
+          width: 50,
+          height: 50,
+        }
+      },
+      thumbnail: {
+        modifiers: {
+          format: 'webp',
+          width: 320,
+          height: 180,
+        }
+      },
+      cover: {
+        modifiers: {
+          format: 'webp',
+          width: 1200,
+          height: 630,
+        }
+      }
+    }
+  }],
+]
 ```
 
 ### 6. Server Response Time Optimization
@@ -202,79 +213,74 @@ modules: [
 Implemented several optimizations to improve server response time:
 
 1. **API Route Caching:**
-
 ```typescript
 // server/routes/api/cache-config.ts
 export default {
   default: {
     maxAge: 60 * 5, // 5 minutes
-    staleWhileRevalidate: 60 * 60, // 1 hour
+    staleWhileRevalidate: 60 * 60 // 1 hour
   },
   routes: {
-    "/api/discussions": {
+    '/api/discussions': {
       maxAge: 60 * 2, // 2 minutes
-      staleWhileRevalidate: 60 * 30, // 30 minutes
+      staleWhileRevalidate: 60 * 30 // 30 minutes
     },
-    "/api/events": {
+    '/api/events': {
       maxAge: 60 * 3, // 3 minutes
-      staleWhileRevalidate: 60 * 30, // 30 minutes
+      staleWhileRevalidate: 60 * 30 // 30 minutes
     },
     // More route-specific cache settings...
-  },
-};
+  }
+}
 ```
 
 2. **Caching Middleware:**
-
 ```typescript
 // server/middleware/1.cache-control.ts
-import cacheConfig from "../routes/api/cache-config";
+import cacheConfig from '../routes/api/cache-config';
 
 export default defineEventHandler((event) => {
   // Only apply caching for GET requests
-  if (event.method !== "GET") return;
-
+  if (event.method !== 'GET') return;
+  
   // Skip caching for authenticated requests
-  const authHeader = getRequestHeader(event, "Authorization");
+  const authHeader = getRequestHeader(event, 'Authorization');
   if (authHeader) return;
-
+  
   // Apply appropriate cache control headers
   const path = getRequestPath(event);
   const routeConfig = cacheConfig.routes[path] || cacheConfig.default;
-
-  setResponseHeader(
-    event,
-    "Cache-Control",
+  
+  setResponseHeader(event, 'Cache-Control', 
     `public, max-age=${routeConfig.maxAge}, s-maxage=${routeConfig.maxAge * 2}, stale-while-revalidate=${routeConfig.staleWhileRevalidate}`
   );
-});
+})
 ```
 
 3. **Nitro Configuration:**
-
 ```typescript
 // In nuxt.config.ts
-nitro: {
+nitro: { 
   preset: "vercel",
   // Enable CDN caching
   cdn: true,
   // Enable server-side caching
   routeRules: {
     // Cache API routes
-    '/api/**': {
-      cache: {
+    '/api/**': { 
+      cache: { 
         // Let middleware handle specific cache times
         headers: ['cache-control']
       }
     },
     // Cache static assets
-    '/_nuxt/**': {
+    '/_nuxt/**': { 
       headers: {
         'cache-control': 'public, max-age=31536000, immutable'
       }
     },
     // Cache public assets
-    '/assets/**': {
+    '/assets/**': { 
       headers: {
         'cache-control': 'public, max-age=31536000, immutable'
       }

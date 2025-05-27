@@ -1,26 +1,12 @@
 {
-  "cSpell.words": ["lightgallery", "Multiforum", "permalinked", "Topnav"],
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[vue]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "explicit",
-    "source.removeUnusedImports": "explicit",
-    "source.fixAll": "explicit",
-    "source.organizeAttributes": "explicit"
-  },
-  "eslint.validate": ["javascript", "typescript", "vue"],
-  "editor.lightbulb.enabled": "on",
-  "eslint.format.enable": true,
-  "eslint.lintTask.enable": true,
-  "eslint.run": "onSave",
-  "eslint.fixAll.enable": true
+    "cSpell.words": [
+        "lightgallery",
+        "Multiforum",
+        "permalinked",
+        "Topnav"
+    ],
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
 }

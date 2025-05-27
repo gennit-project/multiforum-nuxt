@@ -1,28 +1,28 @@
 <script setup>
-  import RequireAuth from "@/components/auth/RequireAuth.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 
-  const props = defineProps({
-    props: {
-      type: Object,
-      default: () => ({}),
-    },
-    testId: {
-      type: String,
-      default: "",
-    },
-    buttonClasses: {
-      type: String,
-      default: "",
-    },
-    loading: Boolean,
-    showCount: Boolean,
-    count: {
-      type: Number,
-      default: 0,
-    },
-  });
+const props = defineProps({
+  props: {
+    type: Object,
+    default: () => ({}),
+  },
+  testId: {
+    type: String,
+    default: "",
+  },
+  buttonClasses: {
+    type: String,
+    default: "",
+  },
+  loading: Boolean,
+  showCount: Boolean,
+  count: {
+    type: Number,
+    default: 0,
+  },
+});
 
-  defineEmits(["click"]);
+defineEmits(["click"]);
 </script>
 
 <template>
@@ -30,30 +30,18 @@
     <template #has-auth>
       <button
         v-bind="props"
-        :class="buttonClasses"
         :data-testid="testId"
+        :class="buttonClasses"
         @click="$emit('click')"
       >
-        <ButtonContent
-          :count="count"
-          :loading="loading"
-          :show-count="showCount"
-        >
+        <ButtonContent :loading="loading" :show-count="showCount" :count="count">
           <slot />
         </ButtonContent>
       </button>
     </template>
     <template #does-not-have-auth>
-      <button
-        v-bind="props"
-        :class="buttonClasses"
-        :data-testid="testId"
-      >
-        <ButtonContent
-          :count="count"
-          :loading="false"
-          :show-count="showCount"
-        >
+      <button v-bind="props" :data-testid="testId" :class="buttonClasses">
+        <ButtonContent :loading="false" :show-count="showCount" :count="count">
           <slot />
         </ButtonContent>
       </button>

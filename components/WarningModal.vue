@@ -1,67 +1,67 @@
 <script>
-  import { defineComponent } from "vue";
-  import GenericModal from "./GenericModal.vue";
-  import ExclamationIcon from "@/components/icons/ExclamationIcon.vue";
+import { defineComponent } from "vue";
+import GenericModal from "./GenericModal.vue";
+import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
-  export default defineComponent({
-    components: {
-      GenericModal,
-      ExclamationIcon,
+export default defineComponent({
+  components: {
+    GenericModal,
+    ExclamationIcon,
+  },
+  props: {
+    title: {
+      type: String,
+      require: true,
+      default: "Are you sure?",
     },
-    props: {
-      title: {
-        type: String,
-        require: true,
-        default: "Are you sure?",
-      },
-      body: {
-        type: String,
-        require: true,
-        default: "",
-      },
-      open: {
-        type: Boolean,
-        default: false,
-      },
-      primaryButtonText: {
-        type: String,
-        default: "Delete",
-      },
-      secondaryButtonText: {
-        type: String,
-        default: "Cancel",
-      },
-      icon: {
-        type: String,
-        default: "ExclamationIcon",
-      },
-      error: {
-        type: String,
-        default: "",
-      },
-      loading: {
-        type: Boolean,
-        default: false,
-      },
-      dataTestid: {
-        type: String,
-        default: "",
-      },
+    body: {
+      type: String,
+      require: true,
+      default: "",
     },
-    setup() {},
-  });
+    open: {
+      type: Boolean,
+      default: false,
+    },
+    primaryButtonText: {
+      type: String,
+      default: "Delete",
+    },
+    secondaryButtonText: {
+      type: String,
+      default: "Cancel",
+    },
+    icon: {
+      type: String,
+      default: "ExclamationIcon",
+    },
+    error: {
+      type: String,
+      default: "",
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    dataTestid: {
+      type: String,
+      default: "",
+    },
+  },
+  setup() {},
+});
 </script>
 <template>
   <GenericModal
-    :body="body"
     :data-testid="dataTestid"
-    :error="error"
     :highlight-color="'yellow'"
-    :loading="loading"
+    :title="title"
+    :body="body"
     :open="open"
     :primary-button-text="primaryButtonText"
     :secondary-button-text="secondaryButtonText"
-    :title="title"
+    :error="error"
+    :loading="loading"
   >
     <template #icon>
       <i

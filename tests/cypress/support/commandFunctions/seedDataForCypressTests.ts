@@ -64,7 +64,9 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
   ).then((response) => {
     const data = response?.body?.data?.seedDataForCypressTests;
     if (!data) {
-      throw new Error(`🚨 seedDataForCypressTests failed: ${JSON.stringify(response)}`);
+      throw new Error(
+        `🚨 seedDataForCypressTests failed: ${JSON.stringify(response)}`
+      );
     }
   });
 };
