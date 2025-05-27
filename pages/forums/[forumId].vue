@@ -230,32 +230,53 @@
           </div>
 
           <div class="relative w-full">
-            <div class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row">
-              <div class="flex-1 bg-white p-0 dark:bg-gray-800 md:px-2">
-                <ChannelTabs
-                  v-if="showChannelTabs"
-                  :admin-list="adminList"
-                  :channel="channel"
-                  class="w-full border-b border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
-                  :desktop="false"
-                  :route="route"
-                  :show-about-tab="!showChannelSidebar"
-                  :show-counts="true"
-                  :vertical="false"
-                />
-                <NuxtPage />
+            <client-only>
+              <template #fallback>
+                <!-- SSR fallback: single column layout -->
+                <div class="bg-white dark:bg-gray-800">
+                  <ChannelTabs
+                    v-if="showChannelTabs"
+                    :admin-list="adminList"
+                    :channel="channel"
+                    class="w-full border-b border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
+                    :desktop="false"
+                    :route="route"
+                    :show-about-tab="!showChannelSidebar"
+                    :show-counts="true"
+                    :vertical="false"
+                  />
+                  <NuxtPage />
+                </div>
+              </template>
+
+              <!-- Client-side: responsive layout with sidebar -->
+              <div class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 lg:flex-row">
+                <div class="flex-1 bg-white p-0 dark:bg-gray-800 md:px-2">
+                  <ChannelTabs
+                    v-if="showChannelTabs"
+                    :admin-list="adminList"
+                    :channel="channel"
+                    class="w-full border-b border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
+                    :desktop="false"
+                    :route="route"
+                    :show-about-tab="!showChannelSidebar"
+                    :show-counts="true"
+                    :vertical="false"
+                  />
+                  <NuxtPage />
+                </div>
+                <aside
+                  v-if="channelId && showChannelSidebar"
+                  class="flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+                >
+                  <ChannelSidebar
+                    v-if="channel"
+                    :channel="channel"
+                    class="px-4"
+                  />
+                </aside>
               </div>
-              <aside
-                v-if="channelId && showChannelSidebar"
-                class="flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
-              >
-                <ChannelSidebar
-                  v-if="channel"
-                  :channel="channel"
-                  class="px-4"
-                />
-              </aside>
-            </div>
+            </client-only>
           </div>
         </article>
       </main>
