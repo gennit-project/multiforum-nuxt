@@ -256,7 +256,7 @@
   <div>
     <ErrorBoundary>
       <DevOverlay v-if="isDevelopment" />
-      <main class="flex min-h-screen flex-col">
+      <main class="min-h-screen flex flex-col">
         <div
           v-if="isSessionExpired"
           class="bg-red-500 p-4 text-center text-white"
@@ -273,7 +273,7 @@
             click here to log in again
           </button>
         </div>
-        <div class="flex flex-grow list-disc flex-col bg-gray-200 text-gray-900 dark:bg-black dark:text-gray-200">
+        <div class="bg-gray-200 dark:bg-black dark:text-gray-200 list-disc flex-grow flex flex-col">
           <TopNav
             :show-user-profile-dropdown="showUserProfileDropdown"
             :side-nav-is-open="sideNavIsOpenVar"
@@ -281,13 +281,13 @@
             @toggle-dropdown="toggleDropdown"
             @toggle-user-profile-dropdown="toggleUserProfileDropdown"
           />
-          <div class="relative flex flex-grow flex-col">
+          <div class="flex-col relative flex-grow flex">
             <SiteSidenav
               :key="`${sideNavIsOpenVar}`"
               :show-dropdown="sideNavIsOpenVar"
               @close="setSideNavIsOpenVar(false)"
             />
-            <div class="flex w-full flex-grow flex-col">
+            <div class="w-full flex-grow flex flex-col">
               <slot />
               <SiteFooter
                 v-if="showFooter"

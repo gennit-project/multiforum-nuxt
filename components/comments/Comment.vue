@@ -641,13 +641,14 @@
 <template>
   <div>
     <div
+      :class="[
+        depth > 1
+          ? 'border-l border-gray-300 pl-4 ml-1 pt-2 dark:border-gray-600'
+          : '',
+      ]"
       class="flex w-full"
-      :class="[depth > 1 ? 'ml-1 border-l border-gray-300 pl-4 pt-2 dark:border-gray-600' : '']"
     >
-      <div
-        class="w-full"
-        :class="'text-sm'"
-      >
+      <div :class="'text-sm'" class="w-full">
         <div
           class="flex w-full"
           :class="[

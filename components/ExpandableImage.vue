@@ -31,10 +31,10 @@
 <template>
   <div>
     <img
+      :src="src"
       :alt="alt"
       class="cursor-pointer"
       :class="{ 'rounded-full': rounded }"
-      :src="src"
       @click="handleImageClick"
     >
     <vue-easy-lightbox
