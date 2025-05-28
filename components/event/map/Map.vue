@@ -5,7 +5,7 @@ import { useRouter } from "nuxt/app";
 import { config } from "@/config";
 import nightModeMapStyles from "@/components/event/map/nightModeMapStyles";
 import placeIcon from "@/assets/images/place-icon.svg";
-import { useTheme } from "@/composables/useTheme";
+import { useAppTheme } from "@/composables/useTheme";
 import type { Event } from "@/__generated__/graphql";
 
 // The Google map requires that the styles have to be set
@@ -47,22 +47,23 @@ const props = defineProps({
   },
 });
 
-const currentTheme = ref('light');
+const { theme: appTheme } = useAppTheme();
+const currentTheme = ref("light");
 onMounted(() => {
-  currentTheme.value = theme.value;
-  
+  currentTheme.value = appTheme.value;
+
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      if (mutation.attributeName === 'class') {
-        const isDark = document.documentElement.classList.contains('dark');
-        currentTheme.value = isDark ? 'dark' : 'light';
+      if (mutation.attributeName === "class") {
+        const isDark = document.documentElement.classList.contains("dark");
+        currentTheme.value = isDark ? "dark" : "light";
       }
     });
   });
 
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ['class']
+    attributeFilter: ["class"],
   });
 });
 
@@ -79,8 +80,6 @@ const loader = new Loader({
   apiKey: config.googleMapsApiKey,
   version: "weekly",
 });
-
-const { theme } = useTheme();
 
 const mobileMapDiv = ref<HTMLElement | null>(null);
 const desktopMapDiv = ref<HTMLElement | null>(null);
@@ -106,8 +105,8 @@ const clearMarkers = () => {
 };
 
 const getMapStyles = () => {
-  return currentTheme.value === 'dark' ? nightModeMapStyles : [];
-}
+  return currentTheme.value === "dark" ? nightModeMapStyles : [];
+};
 
 const renderMap = async () => {
   await loader.load();
@@ -150,10 +149,10 @@ const renderMap = async () => {
         draggable: false,
         icon: {
           url: placeIcon,
-          scaledSize: { 
-            width: props.useMobileStyles ? 30 : 20, 
-            height: props.useMobileStyles ? 30 : 20, 
-            equals: () => false 
+          scaledSize: {
+            width: props.useMobileStyles ? 30 : 20,
+            height: props.useMobileStyles ? 30 : 20,
+            equals: () => false,
           },
         },
       });
@@ -188,16 +187,18 @@ const renderMap = async () => {
         marker.addListener("mouseout", () => {
           const unhighlight = () => {
             if (!props.colorLocked) {
-              if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
+              if (
+                router.currentRoute.value.fullPath.includes(eventLocationId)
+              ) {
                 emit("unHighlight");
               }
 
               marker.setIcon({
                 url: placeIcon,
-                scaledSize: { 
-                  width: props.useMobileStyles ? 30 : 20, 
+                scaledSize: {
+                  width: props.useMobileStyles ? 30 : 20,
                   height: props.useMobileStyles ? 30 : 20,
-                  equals: () => false
+                  equals: () => false,
                 },
               });
               infowindow.close();
@@ -244,14 +245,11 @@ onMounted(async () => {
 });
 
 // Watch the theme value from the composable
-watch(
-  currentTheme,
-  (newTheme, oldTheme) => {
-    if (newTheme !== oldTheme) {
-      renderMap();
-    }
+watch(currentTheme, (newTheme, oldTheme) => {
+  if (newTheme !== oldTheme) {
+    renderMap();
   }
-);
+});
 // Watch for mobile/desktop switch
 watch(
   () => props.useMobileStyles,
@@ -271,7 +269,7 @@ watch(
         v-else-if="useMobileStyles"
         ref="mobileMapDiv"
         class="mt-8 w-full"
-        style="width: 100vw; height: 60vw; touch-action: pan-x pan-y;"
+        style="width: 100vw; height: 60vw; touch-action: pan-x pan-y"
       />
       <div
         v-else-if="!useMobileStyles"

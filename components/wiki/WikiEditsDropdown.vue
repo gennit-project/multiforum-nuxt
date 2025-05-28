@@ -1,0 +1,125 @@
+<script setup lang="ts">
+  import { ref, computed } from "vue";
+  import type { PropType } from "vue";
+  import { timeAgo } from "@/utils";
+
+  const props = defineProps({
+    wikiPage: {
+      type: Object as PropType<any>, // Using any since we don't have a specific WikiPage type
+      required: true,
+    },
+  });
+
+  const isOpen = ref(false);
+
+  // Check if there are any edits to show
+  const hasEdits = computed(() => {
+    return props.wikiPage?.PastVersions?.length > 0;
+  });
+
+  // Total number of edits
+  const totalEdits = computed(() => {
+    return props.wikiPage?.PastVersions?.length || 0;
+  });
+
+  // Combine current version and past versions, sorted by timestamp (newest first)
+  const allEdits = computed(() => {
+    const edits = [];
+
+    if (props.wikiPage?.PastVersions?.length) {
+      // Create current version entry
+      const currentVersion = {
+        id: "current",
+        author: props.wikiPage.VersionAuthor?.username || "[Deleted]",
+        createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
+        isCurrent: true,
+        body: props.wikiPage.body,
+        Author: props.wikiPage.VersionAuthor,
+      };
+
+      // Add current version as the first edit
+      edits.push(currentVersion);
+
+      // Add past versions
+      props.wikiPage.PastVersions.forEach((version: any) => {
+        edits.push({
+          id: version.id,
+          author: version.Author?.username || "[Deleted]",
+          createdAt: version.createdAt,
+          isCurrent: false,
+          body: version.body,
+          Author: version.Author,
+        });
+      });
+    }
+
+    return edits;
+  });
+
+  // Toggle dropdown
+  const toggleDropdown = () => {
+    isOpen.value = !isOpen.value;
+  };
+
+  // Close dropdown when clicking outside
+  const closeDropdown = () => {
+    isOpen.value = false;
+  };
+</script>
+
+<template>
+  <div
+    v-if="hasEdits"
+    v-click-outside="closeDropdown"
+    class="relative"
+  >
+    <!-- Dropdown toggle button -->
+    <button
+      class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+      @click="toggleDropdown"
+    >
+      Edits
+    </button>
+
+    <!-- Dropdown content -->
+    <div
+      v-if="isOpen"
+      class="absolute right-0 z-50 mt-2 w-64 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
+    >
+      <div
+        class="border-b border-gray-200 p-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
+      >
+        Edited {{ totalEdits }} time{{ totalEdits > 1 ? "s" : "" }}
+      </div>
+
+      <ul class="max-h-80 overflow-y-auto py-1">
+        <li
+          v-for="edit in allEdits"
+          :key="edit.id"
+          class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+        >
+          <div class="flex flex-col">
+            <div class="flex items-center text-sm">
+              <span class="font-medium text-gray-900 dark:text-gray-200">{{ edit.author }}</span>
+            </div>
+            <div class="text-xs text-gray-500 dark:text-gray-400">
+              {{ timeAgo(new Date(edit.createdAt)) }}
+              <span
+                v-if="edit.isCurrent"
+                class="ml-1 text-green-600 dark:text-green-400"
+              >
+                (Current)
+              </span>
+              <span
+                v-else-if="edit === allEdits[1]"
+                class="ml-1 text-blue-600 dark:text-blue-400"
+              >
+                Most recent edit
+              </span>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</template>

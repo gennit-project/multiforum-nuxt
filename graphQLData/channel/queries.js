@@ -26,6 +26,38 @@ export const GET_CHANNEL_WIKI = gql`
         VersionAuthor {
           username
         }
+        PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          body
+          createdAt
+          Author {
+            username
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_WIKI_PAGE = gql`
+  query getWikiPage($channelUniqueName: String!, $slug: String!) {
+    wikiPages(where: { channelUniqueName: $channelUniqueName, slug: $slug }) {
+      id
+      title
+      body
+      slug
+      createdAt
+      updatedAt
+      VersionAuthor {
+        username
+      }
+      PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        body
+        createdAt
+        Author {
+          username
+        }
       }
     }
   }
@@ -53,6 +85,14 @@ export const GET_CHANNEL = gql`
         updatedAt
         VersionAuthor {
           username
+        }
+        PastVersions(options: { sort: [{ createdAt: DESC }] }) {
+          id
+          body
+          createdAt
+          Author {
+            username
+          }
         }
       }
       Tags {

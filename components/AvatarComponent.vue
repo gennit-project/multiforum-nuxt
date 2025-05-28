@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import Identicon from "identicon.js";
-import sha256 from "crypto-js/sha256";
-import { useTheme } from "@/composables/useTheme";
-const { theme } = useTheme()
+  import { computed } from "vue";
+  import Identicon from "identicon.js";
+  import sha256 from "crypto-js/sha256";
+  import { useAppTheme } from "@/composables/useTheme";
+  const { theme } = useAppTheme();
 
 const props = defineProps({
   text: {

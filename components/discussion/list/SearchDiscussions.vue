@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import ChannelDiscussionList from "./ChannelDiscussionList.vue";
-import SitewideDiscussionList from "./SitewideDiscussionList.vue";
-import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
-import type { SearchDiscussionValues } from "@/types/Discussion";
+  import { computed, ref, watch } from "vue";
+  import { useRoute, useRouter } from "nuxt/app";
+  import ChannelDiscussionList from "./ChannelDiscussionList.vue";
+  import SitewideDiscussionList from "./SitewideDiscussionList.vue";
+  import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
+  import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
+  import type { SearchDiscussionValues } from "@/types/Discussion";
 
 // Props and Emits
 defineEmits(["filterByTag", "filterByChannel"]);

@@ -50,10 +50,10 @@ describe('useTheme composable - Core functionality', () => {
     vi.restoreAllMocks();
   });
 
-  it('should allow toggling between themes', async () => {
-    // Import useTheme inside test to ensure mocks are applied
-    const { useTheme } = await import('@/composables/useTheme');
-    
+  it("should allow toggling between themes", async () => {
+    // Import useAppTheme inside test to ensure mocks are applied
+    const { useAppTheme } = await import("@/composables/useTheme");
+
     // Create a simple test component
     const TestComponent = defineComponent({
       template: `
@@ -64,8 +64,8 @@ describe('useTheme composable - Core functionality', () => {
         </div>
       `,
       setup() {
-        const { theme, setTheme } = useTheme();
-        
+        const { theme, setTheme } = useAppTheme();
+
         // Force light theme initially
         setTheme('light');
         

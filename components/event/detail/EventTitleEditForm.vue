@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { ref, nextTick, computed } from "vue";
-import type { Event } from "@/__generated__/graphql";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import CreateButton from "@/components/CreateButton.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import GenericButton from "@/components/GenericButton.vue";
-import TextInput from "@/components/TextInput.vue";
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { GET_EVENT } from "@/graphQLData/event/queries";
-import { modProfileNameVar, usernameVar } from "@/cache";
-import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
-import { useTheme } from "@/composables/useTheme";
-import { useRoute } from "nuxt/app";
+  import { ref, nextTick, computed } from "vue";
+  import type { Event } from "@/__generated__/graphql";
+  import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import CreateButton from "@/components/CreateButton.vue";
+  import PrimaryButton from "@/components/PrimaryButton.vue";
+  import GenericButton from "@/components/GenericButton.vue";
+  import TextInput from "@/components/TextInput.vue";
+  import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
+  import { useMutation, useQuery } from "@vue/apollo-composable";
+  import ErrorBanner from "@/components/ErrorBanner.vue";
+  import { GET_EVENT } from "@/graphQLData/event/queries";
+  import { modProfileNameVar, usernameVar } from "@/cache";
+  import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
+  import { useAppTheme } from "@/composables/useTheme";
+  import { useRoute } from "nuxt/app";
 
 const route = useRoute();
 const titleEditMode = ref(false);
@@ -90,7 +90,7 @@ const formattedDate = computed(() => {
     year: "numeric",
   });
 });
-const { theme } = useTheme();
+  const { theme } = useAppTheme();
 </script>
 
 <template>

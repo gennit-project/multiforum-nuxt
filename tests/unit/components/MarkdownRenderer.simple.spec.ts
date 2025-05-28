@@ -24,10 +24,10 @@ const createMockComponent = () => ({
 });
 
 // Mock dependencies before the test body
-vi.mock('@/composables/useTheme', () => ({
-  useTheme: () => ({
-    theme: 'light'
-  })
+vi.mock("@/composables/useTheme", () => ({
+  useAppTheme: () => ({
+    theme: "light",
+  }),
 }));
 
 vi.mock('markdown-it', () => {

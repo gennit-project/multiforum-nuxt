@@ -1,22 +1,22 @@
 <script lang="ts" setup>
-import { ref, nextTick, computed } from "vue";
-import type { Issue } from "@/__generated__/graphql";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import CreateButton from "@/components/CreateButton.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import GenericButton from "@/components/GenericButton.vue";
-import TextInput from "@/components/TextInput.vue";
-import { UPDATE_ISSUE } from "@/graphQLData/issue/mutations";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { GET_ISSUE } from "@/graphQLData/issue/queries";
-import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
-import { modProfileNameVar } from "@/cache";
-import { useTheme } from "@/composables/useTheme";
-import { useRoute } from "nuxt/app";
-import IssueBadge from "@/components/mod/IssueBadge.vue";
+  import { ref, nextTick, computed } from "vue";
+  import type { Issue } from "@/__generated__/graphql";
+  import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import CreateButton from "@/components/CreateButton.vue";
+  import PrimaryButton from "@/components/PrimaryButton.vue";
+  import GenericButton from "@/components/GenericButton.vue";
+  import TextInput from "@/components/TextInput.vue";
+  import { UPDATE_ISSUE } from "@/graphQLData/issue/mutations";
+  import { useMutation, useQuery } from "@vue/apollo-composable";
+  import ErrorBanner from "@/components/ErrorBanner.vue";
+  import { GET_ISSUE } from "@/graphQLData/issue/queries";
+  import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+  import { modProfileNameVar } from "@/cache";
+  import { useAppTheme } from "@/composables/useTheme";
+  import { useRoute } from "nuxt/app";
+  import IssueBadge from "@/components/mod/IssueBadge.vue";
 
-const { theme } = useTheme()
+  const { theme } = useAppTheme();
 
 const route = useRoute();
 const titleEditMode = ref(false);

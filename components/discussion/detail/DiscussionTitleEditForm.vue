@@ -1,23 +1,23 @@
 <script lang="ts" setup>
-import { ref, nextTick, computed } from "vue";
-import type { Discussion } from "@/__generated__/graphql";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import CreateButton from "@/components/CreateButton.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import GenericButton from "@/components/GenericButton.vue";
-import TextInput from "@/components/TextInput.vue";
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import InfoBanner from "@/components/InfoBanner.vue";
-import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
-import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
-import { modProfileNameVar, usernameVar } from "@/cache";
-import { useTheme } from "@/composables/useTheme";
-import { useRoute } from "nuxt/app";
-import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+  import { ref, nextTick, computed } from "vue";
+  import type { Discussion } from "@/__generated__/graphql";
+  import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import CreateButton from "@/components/CreateButton.vue";
+  import PrimaryButton from "@/components/PrimaryButton.vue";
+  import GenericButton from "@/components/GenericButton.vue";
+  import TextInput from "@/components/TextInput.vue";
+  import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
+  import { useMutation, useQuery } from "@vue/apollo-composable";
+  import ErrorBanner from "@/components/ErrorBanner.vue";
+  import InfoBanner from "@/components/InfoBanner.vue";
+  import { GET_DISCUSSION, IS_DISCUSSION_ANSWERED } from "@/graphQLData/discussion/queries";
+  import { DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+  import { modProfileNameVar, usernameVar } from "@/cache";
+  import { useAppTheme } from "@/composables/useTheme";
+  import { useRoute } from "nuxt/app";
+  import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 
-const { theme } = useTheme()
+  const { theme } = useAppTheme();
 
 const route = useRoute();
 const titleEditMode = ref(false);
