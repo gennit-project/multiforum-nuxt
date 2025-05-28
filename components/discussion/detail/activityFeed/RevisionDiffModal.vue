@@ -132,7 +132,7 @@
         await deleteTextVersion({
           id: props.oldVersion.id,
         });
-      } catch (_err) {
+      } catch {
         isDeleting.value = false;
         // Error will be handled by the error ref from useMutation
       }
@@ -202,6 +202,7 @@
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-800"
               >
+                <!-- eslint-disable-next-line vue/no-v-html -->
                 <div v-html="diffHtml.left"></div>
               </div>
             </div>
@@ -216,6 +217,7 @@
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800"
               >
+                <!-- eslint-disable-next-line vue/no-v-html -->
                 <div v-html="diffHtml.right"></div>
               </div>
             </div>

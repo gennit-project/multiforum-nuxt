@@ -134,8 +134,7 @@ const handleDelete = async () => {
       await deleteTextVersion({
         id: props.oldVersion.id,
       });
-    } catch (err) {
-      console.error("Error deleting revision:", err);
+    } catch {
       isDeleting.value = false;
       // Error will be handled by the error ref from useMutation
     }
@@ -211,6 +210,7 @@ onDone(() => {
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-900 dark:text-gray-200"
               >
+                <!-- eslint-disable-next-line vue/no-v-html -->
                 <div v-html="sanitizedDiffHtml.left"/>
               </div>
             </div>
@@ -227,6 +227,7 @@ onDone(() => {
               <div
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800 dark:text-gray-200"
               >
+                <!-- eslint-disable-next-line vue/no-v-html -->
                 <div v-html="sanitizedDiffHtml.right"/>
               </div>
             </div>
