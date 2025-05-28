@@ -31,7 +31,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
       selectedTags: $selectedTags
       searchInput: $searchInput
       showArchived: $showArchived
-      hasDownload: true
+      hasDownload: false
     ) {
       aggregateDiscussionChannelsCount
       discussionChannels {
