@@ -33,6 +33,7 @@ import AlbumEditForm from "./AlbumEditForm.vue";
 import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
 import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
   import("@/components/discussion/detail/DiscussionAlbum.vue")
