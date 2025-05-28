@@ -43,6 +43,14 @@ export const COMMENT_FIELDS = gql`
     ParentComment {
       id
     }
+    PastVersions {
+      id
+      body
+      createdAt
+      Author {
+        username
+      }
+    }
     ...CommentVoteFields
   }
 `;
@@ -126,6 +134,14 @@ export const GET_DISCUSSION_COMMENTS = gql`
         }
         FeedbackComments {
           id
+        }
+        PastVersions {
+          id
+          body
+          createdAt
+          Author {
+            username
+          }
         }
         ...CommentVoteFields
       }
