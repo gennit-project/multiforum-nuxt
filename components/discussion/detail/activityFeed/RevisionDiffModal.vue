@@ -118,7 +118,7 @@
       emit("deleted", props.oldVersion.id);
       emit("close");
     },
-    onError: (err) => {
+    onError: (_err) => {
       isDeleting.value = false;
       // Error will be handled by the error ref from useMutation
     },
@@ -132,7 +132,7 @@
         await deleteTextVersion({
           id: props.oldVersion.id,
         });
-      } catch (err) {
+      } catch (_err) {
         isDeleting.value = false;
         // Error will be handled by the error ref from useMutation
       }
