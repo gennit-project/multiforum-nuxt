@@ -323,13 +323,14 @@ export default defineNuxtConfig({
             'ui-libs': ['vuetify'],
             'apollo': ['@apollo/client', '@vue/apollo-composable'],
             'date-libs': ['luxon'],
-            'map-libs': ['@googlemaps/js-api-loader']
+            'map-libs': ['@googlemaps/js-api-loader'],
+            '3d-libs': ['three', '@google/model-viewer']
           }
         }
       }
     },
     optimizeDeps: {
-      include: ['vue', 'vue-router', '@vue/apollo-composable', 'luxon']
+      include: ['vue', 'vue-router', '@vue/apollo-composable', 'luxon', 'three', '@google/model-viewer']
     }
   },
 });
