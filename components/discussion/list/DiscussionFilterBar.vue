@@ -13,7 +13,8 @@ import type { SearchDiscussionValues } from "@/types/Discussion";
 import { updateFilters } from "@/utils/routerUtils";
 import { useRoute, useRouter } from "nuxt/app";
 import FilterIcon from "@/components/icons/FilterIcon.vue";
-import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import SearchIcon from "@/components/icons/SearchIcon.vue";
 import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
@@ -146,7 +147,8 @@ const showSearch = ref(false);
 
 // Get UI store for expand/collapse functionality
 const uiStore = useUIStore();
-const { expandChannelDiscussions, expandSitewideDiscussions } = storeToRefs(uiStore);
+const { expandChannelDiscussions, expandSitewideDiscussions } =
+  storeToRefs(uiStore);
 
 const toggleShowFilters = () => {
   showFilters.value = !showFilters.value;
@@ -193,20 +195,24 @@ const collapseAll = () => {
           </template>
         </FilterChip>
         <!-- Expand/Collapse Button Group -->
-        <div class="flex border border-gray-800 dark:border-gray-600 rounded-md overflow-hidden">
+        <div
+          class="flex border border-gray-800 dark:border-gray-600 rounded-md overflow-hidden"
+        >
           <!-- Expand All Button -->
           <button
             data-testid="expand-all-button"
             :class="[
               'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300',
               'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-              (channelId ? expandChannelDiscussions : expandSitewideDiscussions) ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
+              (channelId ? expandChannelDiscussions : expandSitewideDiscussions)
+                ? 'bg-blue-50 dark:bg-blue-900'
+                : 'dark:bg-gray-800',
             ]"
             aria-label="Expand all discussions"
             title="Expand all discussions"
             @click="expandAll"
           >
-            <i class="fa-solid fa-expand text-xs"/>
+            <i class="fa-solid fa-expand text-xs" />
           </button>
           <!-- Collapse All Button -->
           <button
@@ -214,12 +220,16 @@ const collapseAll = () => {
             :class="[
               'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300 border-l border-gray-800 dark:border-gray-600',
               'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-              !(channelId ? expandChannelDiscussions : expandSitewideDiscussions) ? 'bg-blue-50 dark:bg-blue-900' : 'dark:bg-gray-800'
+              !(channelId
+                ? expandChannelDiscussions
+                : expandSitewideDiscussions)
+                ? 'bg-blue-50 dark:bg-blue-900'
+                : 'dark:bg-gray-800',
             ]"
             title="Collapse all discussions"
             @click="collapseAll"
           >
-            <i class="fa-solid fa-compress text-xs"/>
+            <i class="fa-solid fa-compress text-xs" />
           </button>
         </div>
         <button
@@ -257,10 +267,21 @@ const collapseAll = () => {
           <SearchIcon />
         </button>
         <SortButtons />
-        <CreateAnythingButton class="mx-2" :use-primary-button="true" />
+        <RequireAuth :full-width="false">
+          <template #has-auth>
+            <PrimaryButton
+              class="mx-2"
+              :label="'New Discussion'"
+              @click="$router.push(`/forums/${channelId}/discussions/create`)"
+            />
+          </template>
+          <template #does-not-have-auth>
+            <PrimaryButton class="mx-2" :label="'New Discussion'" />
+          </template>
+        </RequireAuth>
       </div>
     </div>
-     <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"

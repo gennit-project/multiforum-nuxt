@@ -41,8 +41,8 @@ function handleCancel() {
 
 <template>
   <form
-    class="rounded-lg space-y-3 divide-y divide-gray-200 border-gray-200 bg-white dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 px-2 sm:px-4"
     autocomplete="off"
+    class="space-y-3 divide-y divide-gray-200 rounded-lg border-gray-300 bg-white p-2 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 sm:px-4"
   >
     <div>
       <div class="flex justify-between">
