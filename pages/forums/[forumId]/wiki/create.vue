@@ -45,6 +45,7 @@
             title: formValues.value.title,
             body: formValues.value.body,
             slug: formValues.value.slug,
+            channelUniqueName: forumId,
             VersionAuthor: {
               connect: {
                 where: {
@@ -87,7 +88,7 @@
 
         <ErrorBanner
           v-if="creationError"
-          :error="creationError"
+          :text="creationError.message"
         />
 
         <form

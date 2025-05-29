@@ -57,7 +57,7 @@ if (import.meta.env.SSR === false) {
     <template #does-not-have-auth>
       <button
         data-testid="login-button"
-        class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-400 rounded-full hover:text-black hover:dark:text-white mr-2"
+        class="inline-flex items-center px-3 py-1 text-xs font-medium text-gray-400 hover:text-white rounded-full hover:text-black hover:dark:text-white mr-2"
       >
         Log In
       </button>
