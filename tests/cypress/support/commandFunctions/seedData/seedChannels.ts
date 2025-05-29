@@ -32,6 +32,7 @@ const channels: ChannelCreateInput[] = baseChannels.map(
   ({ uniqueName, admins, mods, rules }): ChannelCreateInput => ({
     uniqueName,
     rules,
+    wikiEnabled: true,
     Admins: {
       connect: admins.map((admin) => ({
           where: {
