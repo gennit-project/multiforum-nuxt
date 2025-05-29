@@ -22,9 +22,9 @@
     return titleEdits + bodyEdits;
   });
 
-  // Check if there are any edits to show
+  // Check if there are any edits to show (need at least 2 revisions total - original + at least 1 edit)
   const hasEdits = computed(() => {
-    return totalEdits.value > 0;
+    return totalEdits.value >= 2;
   });
 
   // Combine both types of edits and sort by timestamp (newest first)

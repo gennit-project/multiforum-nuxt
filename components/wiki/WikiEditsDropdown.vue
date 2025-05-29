@@ -12,17 +12,17 @@
 
   const isOpen = ref(false);
 
-  // Check if there are any edits to show
-  const hasEdits = computed(() => {
-    return props.wikiPage?.PastVersions?.length > 0;
-  });
-
   // Total number of edits
   const totalEdits = computed(() => {
     return props.wikiPage?.PastVersions?.length || 0;
   });
 
-  // Combine current version and past versions, sorted by timestamp (newest first)
+  // Check if there are any edits to show (need at least 2 revisions - original + at least 1 edit)
+  const hasEdits = computed(() => {
+    return totalEdits.value >= 2;
+  });
+
+  // Process all versions and sort by timestamp (newest first)
   const allEdits = computed(() => {
     const edits = [];
 
