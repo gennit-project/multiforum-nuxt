@@ -13,6 +13,7 @@
   import { useQuery } from "@vue/apollo-composable";
   import { DateTime } from "luxon";
   import BackLink from "@/components/BackLink.vue";
+  import PageNotFound from "@/components/PageNotFound.vue";
 
   const route = useRoute();
   const router = useRouter();
@@ -50,7 +51,7 @@
     return typeof route.params.forumId === "string" ? route.params.forumId : "";
   });
 
-  const { result: getChannelResult, onResult: onGetChannelResult } = useQuery(
+  const { result: getChannelResult, onResult: onGetChannelResult, loading: channelLoading } = useQuery(
     GET_CHANNEL,
     {
       uniqueName: channelId,
@@ -66,6 +67,11 @@
 
   const channel = computed(() => {
     return getChannelResult.value?.channels?.[0] ?? null;
+  });
+
+  const showNotFound = computed(() => {
+    // Only show 404 if query has completed and no channel was found
+    return !channelLoading.value && channelId.value && !channel.value;
   });
 
   const addForumToLocalStorage = (channel: Channel) => {
@@ -168,8 +174,9 @@
 
 <template>
   <NuxtLayout>
+    <PageNotFound v-if="showNotFound" />
     <div
-      v-if="channel"
+      v-else-if="channel"
       class="flex flex-col bg-white dark:bg-black dark:text-white md:min-h-screen"
     >
       <ChannelHeaderMobile
