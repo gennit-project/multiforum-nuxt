@@ -74,6 +74,7 @@
     class="relative"
   >
     <!-- Dropdown toggle button -->
+    <span class="mx-2">·</span>
     <button
       class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
       @click="toggleDropdown"

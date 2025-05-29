@@ -153,17 +153,7 @@ export const GET_CHANNEL = gql`
       IssuesAggregate(where: { isOpen: true }) {
         count
       }
-      allEventsAggregate: EventChannelsAggregate(
-        where: {
-          NOT: {
-            archived: true,
-            Event: null
-          }
-        }
-      ) {
-        count
-      }
-      upcomingEventsAggregate: EventChannelsAggregate(
+      EventChannelsAggregate(
         where: {
           NOT: { 
             archived: true,

@@ -10,26 +10,22 @@ export const CREATE_SIGNED_STORAGE_URL = gql`
 
 export const CREATE_IMAGE = gql`
   mutation createImage(
-    $url: String!, 
-    $alt: String, 
-    $caption: String, 
-    $copyright: String, 
+    $url: String!
+    $alt: String
+    $caption: String
+    $copyright: String
     $username: String!
   ) {
     createImages(
       input: [
         {
-          url: $url,
-          alt: $alt,
-          caption: $caption,
-          copyright: $copyright,
-          hasSensitiveContent: false,
-          hasSpoiler: false,
-          Uploader: {
-            connect: { 
-              where: { node: { username: $username } } 
-            }
-          }
+          url: $url
+          alt: $alt
+          caption: $caption
+          copyright: $copyright
+          hasSensitiveContent: false
+          hasSpoiler: false
+          Uploader: { connect: { where: { node: { username: $username } } } }
         }
       ]
     ) {
@@ -126,28 +122,26 @@ export const CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
   }
 `;
 export const UPDATE_DISCUSSION = gql`
-mutation updateDiscussion (
-  $where: DiscussionWhere!,
-  $updateDiscussionInput: DiscussionUpdateInput!
-) {
-  updateDiscussions(
-    where: $where,
-    update: $updateDiscussionInput
+  mutation updateDiscussion(
+    $where: DiscussionWhere!
+    $updateDiscussionInput: DiscussionUpdateInput!
   ) {
-    discussions {
-      id
-      title
-      body
-      createdAt
-      updatedAt
-      Album {
+    updateDiscussions(where: $where, update: $updateDiscussionInput) {
+      discussions {
         id
-        imageOrder
-        Images {
-          id 
-          url
-          caption
-          copyright
+        title
+        body
+        createdAt
+        updatedAt
+        Album {
+          id
+          imageOrder
+          Images {
+            id
+            url
+            caption
+            copyright
+          }
         }
         PastTitleVersions(options: { sort: [{ createdAt: DESC }] }) {
           id
@@ -168,8 +162,7 @@ mutation updateDiscussion (
       }
     }
   }
-}
-`
+`;
 export const UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS = gql`
   mutation updateDiscussionWithChannelConnections(
     $updateDiscussionInput: DiscussionUpdateInput!
@@ -319,15 +312,10 @@ export const ADD_FEEDBACK_COMMENT_TO_DISCUSSION = gql`
 `;
 
 export const MARK_AS_ANSWERED = gql`
-  mutation markAsAnswered(
-    $channelId: String!
-    $discussionId: ID!
-  ){
+  mutation markAsAnswered($channelId: String!, $discussionId: ID!) {
     updateDiscussionChannels(
       where: { channelUniqueName: $channelId, discussionId: $discussionId }
-      update: {
-        answered: true
-      }
+      update: { answered: true }
     ) {
       discussionChannels {
         id
@@ -354,14 +342,12 @@ export const MARK_AS_ANSWERED_BY_COMMENT = gql`
     $commentId: ID!
     $channelId: String!
     $discussionId: ID!
-  ){
+  ) {
     updateDiscussionChannels(
       where: { channelUniqueName: $channelId, discussionId: $discussionId }
       update: {
         answered: true
-        Answers: { 
-          connect: [{ where: { node: { id: $commentId } } }]
-        }
+        Answers: { connect: [{ where: { node: { id: $commentId } } }] }
       }
     ) {
       discussionChannels {
@@ -406,10 +392,7 @@ export const MARK_AS_UNANSWERED = gql`
 
 export const UPDATE_IMAGE = gql`
   mutation updateImage($imageId: ID!, $caption: String) {
-    updateImages(
-      where: { id: $imageId },
-      update: { caption: $caption }
-    ) {
+    updateImages(where: { id: $imageId }, update: { caption: $caption }) {
       images {
         id
         caption

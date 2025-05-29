@@ -144,10 +144,7 @@
             Last updated by {{ wikiHomePage.VersionAuthor?.username || "Unknown" }}
             {{ timeAgo(new Date(wikiHomePage.updatedAt || wikiHomePage.createdAt)) }}
           </span>
-          <template v-if="wikiHomePage?.PastVersions?.length">
-            <span class="mx-2">·</span>
-            <WikiEditsDropdown :wiki-page="wikiHomePage" />
-          </template>
+          <WikiEditsDropdown :wiki-page="wikiHomePage" />
         </div>
       </div>
 

@@ -130,10 +130,8 @@
             Last updated by {{ wikiPage.VersionAuthor?.username || "Unknown" }}
             {{ timeAgo(new Date(wikiPage.updatedAt || wikiPage.createdAt)) }}
           </span>
-          <template v-if="wikiPage?.PastVersions?.length">
-            <span class="mx-2">·</span>
-            <WikiEditsDropdown :wiki-page="wikiPage" />
-          </template>
+          
+          <WikiEditsDropdown :wiki-page="wikiPage" />
         </div>
       </div>
 
