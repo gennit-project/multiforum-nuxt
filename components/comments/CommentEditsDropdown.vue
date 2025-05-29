@@ -20,38 +20,48 @@ const totalEdits = computed(() => {
   return props.comment?.PastVersions?.length || 0;
 });
 
-// Check if there are any edits to show (need at least 2 revisions - original + at least 1 edit)
+// Check if there are any edits to show (need at least 1 past version, meaning it has been edited)
 const hasEdits = computed(() => {
-  return totalEdits.value >= 2;
+  return totalEdits.value >= 1;
 });
 
 // Process all versions and sort by timestamp (newest first)
 const allEdits = computed(() => {
   const edits = [];
 
-  // Only process if we have past versions
   if (props.comment?.PastVersions?.length) {
-    // Create current version entry
+    // Create current version entry (as TextVersion structure)
     const currentVersion = {
       id: "current",
+      body: props.comment.text,
+      createdAt: props.comment.updatedAt || props.comment.createdAt,
+      Author: props.comment.CommentAuthor,
+    };
+
+    // First item: most recent edit (current vs most recent past version)
+    edits.push({
+      id: "most-recent-edit",
       author: props.comment.CommentAuthor?.username || "[Deleted]",
       createdAt: props.comment.updatedAt || props.comment.createdAt,
       isCurrent: true,
-      body: props.comment.text, // Current comment text
-      Author: props.comment.CommentAuthor, // Add the full Author object
-    };
+      oldVersionData: props.comment.PastVersions[0], // Most recent past version
+      newVersionData: currentVersion, // Current version
+    });
 
-    // Add past versions
+    // Subsequent items: compare each past version with the next one
     props.comment.PastVersions.forEach((version, index) => {
-      const nextVersion = index === 0 ? currentVersion : props.comment.PastVersions[index - 1];
-
+      // Skip the most recent past version since it's already handled above
+      if (index === 0) return;
+      
+      const nextVersion = props.comment.PastVersions[index - 1]; // Next version (more recent)
+      
       edits.push({
         id: version.id,
         author: version.Author?.username || "[Deleted]",
         createdAt: version.createdAt,
         isCurrent: false,
-        oldVersion: version,
-        newVersion: nextVersion,
+        oldVersionData: version,
+        newVersionData: nextVersion,
       });
     });
   }
@@ -156,8 +166,8 @@ const handleRevisionDeleted = (deletedId) => {
     <CommentRevisionDiffModal
       v-if="activeRevision"
       :open="!!activeRevision"
-      :old-version="activeRevision.oldVersion"
-      :new-version="activeRevision.newVersion"
+      :old-version="activeRevision.oldVersionData"
+      :new-version="activeRevision.newVersionData"
       :is-most-recent="activeRevision === allEdits[0]"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"

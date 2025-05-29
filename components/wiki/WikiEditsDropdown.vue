@@ -92,7 +92,7 @@
   };
 
   // Handle revision deleted event
-  const handleRevisionDeleted = (deletedId: string) => {
+  const handleRevisionDeleted = () => {
     closeRevisionDiff();
     // The cache will be updated by the mutation
   };
