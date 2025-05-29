@@ -36,14 +36,33 @@ const isActive = computed(() => {
   return route.path === props.to;
 });
 
-  const classes = computed(() => ({
-    "border-orange-500 dark:text-gray-100": isActive.value,
-    "bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700": isActive.value && props.vertical,
-    "border-b-2 dark:text-gray-400": isActive.value && !props.vertical,
-    "text-gray-500": !isActive.value,
-    "pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700": !isActive.value && props.vertical,
-    "border-b-2 border-transparent": !isActive.value && !props.vertical,
-  }));
+const classes = computed(() => {
+  const baseClasses = [];
+  
+  // Active state styling
+  if (isActive.value) {
+    if (props.vertical) {
+      // Vertical active tab: background highlight
+      baseClasses.push("bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700 dark:text-gray-100");
+    } else {
+      // Horizontal active tab: orange bottom border
+      baseClasses.push("border-b-2 border-orange-500 text-gray-900 dark:text-gray-100");
+    }
+  } else {
+    // Inactive state styling
+    baseClasses.push("text-gray-500 dark:text-gray-400");
+    
+    if (props.vertical) {
+      // Vertical inactive tab: padding and hover effects
+      baseClasses.push("pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700");
+    } else {
+      // Horizontal inactive tab: transparent border
+      baseClasses.push("border-b-2 border-transparent");
+    }
+  }
+  
+  return baseClasses.join(" ");
+});
 
 const isHovered = ref(false);
 </script>
