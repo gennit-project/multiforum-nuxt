@@ -224,7 +224,7 @@ const filteredQuery = computed(() => {
                 class="ml-2"
               />
             </div>
-            <div v-if="discussion.Album && isExpanded" class="my-4 overflow-x-auto bg-black">
+            <div v-if="discussion.Album && isExpanded && discussion.Album?.Images.length > 0" class="my-4 overflow-x-auto bg-black">
               <DiscussionAlbum
                 :album="discussion.Album"
                 :discussion-id="discussion.id"
