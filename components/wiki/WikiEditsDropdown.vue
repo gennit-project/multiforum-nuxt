@@ -2,6 +2,7 @@
   import { ref, computed } from "vue";
   import type { PropType } from "vue";
   import { timeAgo } from "@/utils";
+  import WikiRevisionDiffModal from "./WikiRevisionDiffModal.vue";
 
   const props = defineProps({
     wikiPage: {
@@ -11,15 +12,16 @@
   });
 
   const isOpen = ref(false);
+  const activeRevision = ref(null);
 
   // Total number of edits
   const totalEdits = computed(() => {
     return props.wikiPage?.PastVersions?.length || 0;
   });
 
-  // Check if there are any edits to show (need at least 2 revisions - original + at least 1 edit)
+  // Check if there are any edits to show (need at least 1 past version, meaning it has been edited)
   const hasEdits = computed(() => {
-    return totalEdits.value >= 2;
+    return totalEdits.value >= 1;
   });
 
   // Process all versions and sort by timestamp (newest first)
@@ -27,28 +29,40 @@
     const edits = [];
 
     if (props.wikiPage?.PastVersions?.length) {
-      // Create current version entry
+      // Create current version entry (as TextVersion structure)
       const currentVersion = {
         id: "current",
-        author: props.wikiPage.VersionAuthor?.username || "[Deleted]",
-        createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
-        isCurrent: true,
         body: props.wikiPage.body,
+        createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
         Author: props.wikiPage.VersionAuthor,
       };
 
-      // Add current version as the first edit
-      edits.push(currentVersion);
+      // First item: most recent edit (current vs most recent past version)
+      edits.push({
+        id: "most-recent-edit",
+        author: props.wikiPage.VersionAuthor?.username || "[Deleted]",
+        createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
+        isCurrent: true,
+        // Store the versions for the modal
+        oldVersionData: props.wikiPage.PastVersions[0], // Most recent past version
+        newVersionData: currentVersion, // Current version
+      });
 
-      // Add past versions
-      props.wikiPage.PastVersions.forEach((version: any) => {
+      // Subsequent items: compare each past version with the next one
+      props.wikiPage.PastVersions.forEach((version: any, index: number) => {
+        // Skip the most recent past version since it's already handled above
+        if (index === 0) return;
+        
+        const nextVersion = props.wikiPage.PastVersions[index - 1]; // Next version (more recent)
+        
         edits.push({
           id: version.id,
           author: version.Author?.username || "[Deleted]",
           createdAt: version.createdAt,
           isCurrent: false,
-          body: version.body,
-          Author: version.Author,
+          // Store the versions for the modal
+          oldVersionData: version,
+          newVersionData: nextVersion,
         });
       });
     }
@@ -64,6 +78,23 @@
   // Close dropdown when clicking outside
   const closeDropdown = () => {
     isOpen.value = false;
+  };
+
+  // Open diff modal for a specific revision
+  const openRevisionDiff = (revision: any) => {
+    activeRevision.value = revision;
+    closeDropdown();
+  };
+
+  // Close diff modal
+  const closeRevisionDiff = () => {
+    activeRevision.value = null;
+  };
+
+  // Handle revision deleted event
+  const handleRevisionDeleted = (deletedId: string) => {
+    closeRevisionDiff();
+    // The cache will be updated by the mutation
   };
 </script>
 
@@ -97,7 +128,8 @@
         <li
           v-for="edit in allEdits"
           :key="edit.id"
-          class="px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          class="cursor-pointer px-3 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
+          @click="openRevisionDiff(edit)"
         >
           <div class="flex flex-col">
             <div class="flex items-center text-sm">
@@ -122,5 +154,16 @@
         </li>
       </ul>
     </div>
+
+    <!-- Wiki revision diff modal -->
+    <WikiRevisionDiffModal
+      v-if="activeRevision"
+      :open="!!activeRevision"
+      :old-version="activeRevision.oldVersionData"
+      :new-version="activeRevision.newVersionData"
+      :is-most-recent="activeRevision === allEdits[0]"
+      @close="closeRevisionDiff"
+      @deleted="handleRevisionDeleted"
+    />
   </div>
 </template>
