@@ -157,7 +157,7 @@ export const GET_CHANNEL = gql`
         where: {
           NOT: {
             archived: true,
-            Discussion: null
+            Event: null
           }
         }
       ) {
