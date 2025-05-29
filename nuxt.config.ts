@@ -21,13 +21,12 @@ export default defineNuxtConfig({
   },
   vue: {
     compilerOptions: {
-      whitespace: 'preserve',
-      warnExplicitImportCheck: false // This suppresses warnings about explicit imports of compiler macros
-    }
+      whitespace: "preserve",
+      isCustomElement: (tag) => tag === "model-viewer",
+    },
   },
   build: {
     transpile: ["vuetify"],
-    minify: true,
     // Extract CSS
     cssMinify: true,
     // Improve chunking strategy
@@ -48,18 +47,6 @@ export default defineNuxtConfig({
   },
   experimental: {
     payloadExtraction: true,
-  },
-  optimization: {
-    splitChunks: {
-      maxSize: 300000,
-      cacheGroups: {
-        vendors: {
-          test: /[\\/]node_modules[\\/]/,
-          priority: -10,
-          reuseExistingChunk: true,
-        },
-      },
-    },
   },
   compatibilityDate: "2024-04-03",
   components: true,

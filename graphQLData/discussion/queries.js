@@ -112,7 +112,6 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
       selectedChannels: $selectedChannels
       selectedTags: $selectedTags
       showArchived: $showArchived
-      hasDownload: false
       options: $options
       hasDownload: $hasDownload
     ) {

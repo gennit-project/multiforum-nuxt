@@ -11175,6 +11175,7 @@ export type Discussion = {
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
+  hasDownload?: Maybe<Scalars['Boolean']['output']>;
   hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
   hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
@@ -13705,6 +13706,7 @@ export type DiscussionCreateInput = {
   Tags?: InputMaybe<DiscussionTagsFieldInput>;
   body?: InputMaybe<Scalars['String']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title: Scalars['String']['input'];
@@ -13907,6 +13909,7 @@ export type DiscussionEventPayload = {
   body?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   deleted?: Maybe<Scalars['Boolean']['output']>;
+  hasDownload?: Maybe<Scalars['Boolean']['output']>;
   hasSensitiveContent?: Maybe<Scalars['Boolean']['output']>;
   hasSpoiler?: Maybe<Scalars['Boolean']['output']>;
   id: Scalars['ID']['output'];
@@ -14259,6 +14262,7 @@ export type DiscussionSort = {
   body?: InputMaybe<SortDirection>;
   createdAt?: InputMaybe<SortDirection>;
   deleted?: InputMaybe<SortDirection>;
+  hasDownload?: InputMaybe<SortDirection>;
   hasSensitiveContent?: InputMaybe<SortDirection>;
   hasSpoiler?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
@@ -14283,6 +14287,7 @@ export type DiscussionSubscriptionWhere = {
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -14440,6 +14445,7 @@ export type DiscussionUpdateInput = {
   body?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
@@ -14553,6 +14559,7 @@ export type DiscussionWhere = {
   createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
   deleted?: InputMaybe<Scalars['Boolean']['input']>;
+  hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
   hasSensitiveContent?: InputMaybe<Scalars['Boolean']['input']>;
   hasSpoiler?: InputMaybe<Scalars['Boolean']['input']>;
   id?: InputMaybe<Scalars['ID']['input']>;
@@ -27494,6 +27501,7 @@ export type QueryGetCommentSectionArgs = {
 
 export type QueryGetDiscussionsInChannelArgs = {
   channelUniqueName: Scalars['String']['input'];
+  hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<DiscussionListOptions>;
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -27510,6 +27518,7 @@ export type QueryGetEventCommentsArgs = {
 
 
 export type QueryGetSiteWideDiscussionListArgs = {
+  hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
   options?: InputMaybe<DiscussionListOptions>;
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedChannels?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;

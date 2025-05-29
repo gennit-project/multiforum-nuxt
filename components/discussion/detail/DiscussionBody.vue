@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import EmojiButtons from "@/components/comments/EmojiButtons.vue";
-import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
-import Tag from "../../TagComponent.vue";
-import "md-editor-v3/lib/preview.css";
-import type { PropType } from "vue";
-import type { Discussion } from "@/__generated__/graphql";
-import { useRouter } from "nuxt/app";
+  import { ref, computed, onMounted } from "vue";
+  import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import EmojiButtons from "@/components/comments/EmojiButtons.vue";
+  import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
+  import Tag from "../../TagComponent.vue";
+  import ModelViewer from "@/components/ModelViewer.vue";
+  import "md-editor-v3/lib/preview.css";
+  import type { PropType } from "vue";
+  import type { Discussion } from "@/__generated__/graphql";
+  import { useRouter } from "nuxt/app";
 
 const router = useRouter();
 
@@ -89,6 +90,10 @@ const filterByTag = (tag: string) => {
         :word-limit="wordLimit"
       />
     </div>
+
+    <!-- 3D Model Viewer (Experiment) -->
+    <ModelViewer v-if="discussion?.hasDownload" />
+
     <slot name="album-slot" />
     <div class="flex mt-2">
       <EmojiButtons
