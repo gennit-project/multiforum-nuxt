@@ -1,4 +1,5 @@
 import { gql } from "@apollo/client/core";
+import { DateTime } from 'luxon';
 
 export const GET_CHANNEL_NAMES = gql`
   query getChannelNames($channelWhere: ChannelWhere) {
@@ -260,12 +261,16 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
   }
 `;
 
+
+const now = DateTime.now().toISO();
+
 export const GET_CHANNELS = gql`
   query getSortedChannels(
     $offset: Int
     $limit: Int
     $tags: [String]
     $searchInput: String
+    $now: DateTime = "${now}"
   ) {
     getSortedChannels(
       offset: $offset
@@ -281,7 +286,18 @@ export const GET_CHANNELS = gql`
         Tags {
           text
         }
-        EventChannelsAggregate {
+        EventChannelsAggregate(
+          where: {
+            NOT: { 
+              archived: true,
+              Event: null
+            }
+            Event: { 
+              canceled: false, 
+              endTime_GT: $now,
+            }
+          }
+        ) {
           count
         }
         DiscussionChannelsAggregate(
