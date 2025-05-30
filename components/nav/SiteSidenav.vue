@@ -123,7 +123,7 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
           <div class="flex h-7">
             <button
               type="button"
-              class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-200"
+              class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-gray-200"
               @click="outside"
             >
               <span class="sr-only">Close panel</span>
@@ -153,7 +153,7 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
               >
                 <component
                   :is="item.icon"
-                  class="list-item-icon h-6 w-6 shrink-0 dark:text-blue-500"
+                  class="list-item-icon h-6 w-6 shrink-0 dark:text-orange-500"
                   aria-hidden="true"
                 />
                 {{ item.name }}

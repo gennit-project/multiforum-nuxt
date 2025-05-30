@@ -86,7 +86,7 @@ watch(
   (newValue) => {
     if (newValue) {
       // This makes it so that items upvoted by the logged
-      // in user show the blue active upvote button.
+      // in user show the orange active upvote button.
       refetchDiscussions();
     }
   }
@@ -199,13 +199,13 @@ const reachedEndOfResults = computed(() => {
                 forumId: channelId,
               },
             }"
-            class="text-blue-500 underline"
+            class="text-orange-500 underline"
           >
             Create one?
           </nuxt-link>
         </template>
         <template #does-not-have-auth>
-          <span class="cursor-pointer text-blue-500 underline"
+          <span class="cursor-pointer text-orange-500 underline"
             >Create one?</span
           >
         </template>

@@ -158,7 +158,7 @@ const canSave = computed(() => {
           :class="[
             usernameIsTaken || usernameIsInvalid
               ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-              : 'focus:border-blue-500 focus:ring-blue-500',
+              : 'focus:border-orange-500 focus:ring-orange-500',
           ]"
           class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
           @update:model-value="updateUsername"

@@ -15,7 +15,7 @@ defineProps({
 </script>
 
 <template>
-  <div :data-testid="testId" class="rounded-md bg-blue-100 dark:bg-blue-900 p-4 dark:text-white">
+  <div :data-testid="testId" class="rounded-md bg-orange-100 dark:bg-orange-900 p-4 dark:text-white">
     <div class="flex">
       <div class="shrink-0">
         <slot>

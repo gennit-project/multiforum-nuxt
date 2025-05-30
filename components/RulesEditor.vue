@@ -50,7 +50,7 @@ const deleteRule = (index: number) => {
         <span class="font-bold mt-3 dark:text-white">Rule {{ index + 1 }}</span>
         <button
           type="button"
-          class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500 flex items-center gap-1"
+          class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500 flex items-center gap-1"
           @click="deleteRule(index)"
         >
           <XmarkIcon class="h-4" />
@@ -76,7 +76,7 @@ const deleteRule = (index: number) => {
     </div>
   </div>
   <button
-    class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500"
+    class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
     @click="addNewRule"
   >
     + Add New Rule

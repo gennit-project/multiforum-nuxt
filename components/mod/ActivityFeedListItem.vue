@@ -47,7 +47,7 @@ const isPermalinked =
     class="list-none mt-4"
     :class="[
       isPermalinked
-        ? 'bg-blue-100 rounded-lg border border-blue-500 dark:bg-blue-900'
+        ? 'bg-orange-100 rounded-lg border border-orange-500 dark:bg-orange-900'
         : '',
     ]"
   >

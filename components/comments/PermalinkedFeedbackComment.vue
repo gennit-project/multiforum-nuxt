@@ -21,7 +21,7 @@ const {
 </script>
 
 <template>
-  <div class="border border-blue-500 px-4 py-2 rounded-md">
+  <div class="border border-orange-500 px-4 py-2 rounded-md">
     <div v-if="commentLoading">Loading...</div>
     <ErrorBanner v-if="commentError" :text="commentError.message" />
     <div

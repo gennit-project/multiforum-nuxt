@@ -25,7 +25,7 @@ const moderationAction = computed(() => {
 
 <template>
   <div class="px-4 py-2 my-2 rounded-md">
-    <span class="text-sm text-blue-500 font-semibold">Permalinked Comment</span>
+    <span class="text-sm text-orange-500 font-semibold">Permalinked Comment</span>
     <div v-if="commentLoading">Loading...</div>
     <ErrorBanner v-if="commentError" :text="commentError.message" />
 

@@ -53,8 +53,8 @@ export default defineComponent({
       >
         <button
           :data-testid="dataTestid"
-          :class="[highlighted ? 'border-blue-500 ring-1 ring-blue-500' : '']"
-          class="font-small flex align-items whitespace-nowrap rounded-md bg-white px-3 py-2 text-xs text-gray-700 border hover:bg-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
+          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
+          class="font-small flex align-items whitespace-nowrap rounded-md bg-white px-3 py-2 text-xs text-gray-700 border hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
           @click="handleClick"
         >
           <slot name="icon" />
@@ -75,8 +75,8 @@ export default defineComponent({
       <template #fallback>
         <button
           :data-testid="dataTestid"
-          :class="[highlighted ? 'border-blue-500 ring-1 ring-blue-500' : '']"
-          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md bg-white px-3 py-2.5 text-xs text-gray-700 border hover:bg-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
+          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md bg-white px-3 py-2.5 text-xs text-gray-700 border hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
         >
           <slot name="icon" />
           {{ label }}

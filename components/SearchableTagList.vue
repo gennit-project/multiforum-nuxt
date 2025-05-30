@@ -132,7 +132,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
           type="checkbox"
           :value="tag.text"
           :checked="selected.includes(tag.text)"
-          class="border border-gray-300 text-blue-600 dark:border-gray-600"
+          class="border border-gray-300 text-orange-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', tag.text)"
         >
         <div class="flex items-center space-x-2">

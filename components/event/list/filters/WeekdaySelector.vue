@@ -66,7 +66,7 @@ const reset = () => {
           :id="'weekday-' + weekday.number"
           type="checkbox"
           :data-testid="`weekday-${weekday.number}-checkbox`"
-          class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-blue-600 focus:ring-blue-500 dark:bg-gray-300"
+          class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-600 focus:ring-orange-500 dark:bg-gray-300"
           :checked="workingCopyOfSelectedWeekdays[weekday.number] === true"
           @input="() => toggleSelectWeekday(weekday)"
         >

@@ -188,7 +188,7 @@
               </span>
               <span
                 v-else-if="edit === allEdits[0]"
-                class="ml-1 text-blue-600 dark:text-blue-400"
+                class="ml-1 text-orange-600 dark:text-orange-400"
               >
                 Most recent
               </span>

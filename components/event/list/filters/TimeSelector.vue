@@ -71,7 +71,7 @@ const hourRangesDataComputed = computed(() => hourRangesData);
             :id="'timeRange-' + range['12-hour-label']"
             type="checkbox"
             :data-testid="`timeRange-${range['12-hour-label']}`"
-            class="cursor-pointer text-blue-600 focus:ring-blue-500 h-4 w-4 mr-1 border-gray-400 rounded dark:bg-gray-300"
+            class="cursor-pointer text-orange-600 focus:ring-orange-500 h-4 w-4 mr-1 border-gray-400 rounded dark:bg-gray-300"
             :checked="workingCopyOfSelectedHourRanges[range['12-hour-label']]"
             @input="() => toggleSelectTimeRange(range)"
           >

@@ -499,7 +499,7 @@ const addNewImage = (input: Partial<AddImageInput>) => {
         </p>
         <button 
           type="button" 
-          class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
           @click="selectFiles"
         >
           Choose Files
@@ -525,7 +525,7 @@ const addNewImage = (input: Partial<AddImageInput>) => {
     </div>
     <!-- <button
       type="button"
-      class="mt-2 rounded border border-blue-500 px-2 py-1 text-blue-500"
+      class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
       @click="() => addNewImage()"
     >
       + Add New Image

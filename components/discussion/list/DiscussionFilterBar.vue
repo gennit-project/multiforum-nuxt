@@ -210,7 +210,7 @@ const collapseAll = () => {
               'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300',
               'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
               (channelId ? expandChannelDiscussions : expandSitewideDiscussions)
-                ? 'bg-blue-50 dark:bg-blue-900'
+                ? 'bg-orange-50 dark:bg-orange-900'
                 : 'dark:bg-gray-800',
             ]"
             aria-label="Expand all discussions"
@@ -228,7 +228,7 @@ const collapseAll = () => {
               !(channelId
                 ? expandChannelDiscussions
                 : expandSitewideDiscussions)
-                ? 'bg-blue-50 dark:bg-blue-900'
+                ? 'bg-orange-50 dark:bg-orange-900'
                 : 'dark:bg-gray-800',
             ]"
             title="Collapse all discussions"
@@ -241,7 +241,7 @@ const collapseAll = () => {
           data-testid="discussion-filter-button"
           :class="
             showFilters
-              ? 'border-blue-500'
+              ? 'border-orange-500'
               : 'text-gray-800 border-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
@@ -258,7 +258,7 @@ const collapseAll = () => {
           data-testid="discussion-search-button"
           :class="
             showSearch
-              ? 'border-blue-500'
+              ? 'border-orange-500'
               : 'text-gray-800 border-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-800 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"

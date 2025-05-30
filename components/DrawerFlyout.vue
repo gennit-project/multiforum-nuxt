@@ -73,7 +73,7 @@ function closePreview() {
                           :ref="cancelButtonRef"
                           type="button"
                           :class="smAndDown ? 'ml-2' : 'ml-4'"
-                          class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-white"
+                          class="rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-white"
                           @click="closePreview"
                         >
                           <span data-testid="close-drawer-top-button" class="sr-only">
@@ -93,7 +93,7 @@ function closePreview() {
                   <button
                     type="button"
                     data-testid="close-drawer-bottom-button"
-                    class="py-2 px-4 border border-gray-300 dark:bg-gray-700 dark:border-gray-700 dark:text-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    class="py-2 px-4 border border-gray-300 dark:bg-gray-700 dark:border-gray-700 dark:text-gray-200 rounded-full shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500"
                     @click="closePreview"
                   >
                     Close

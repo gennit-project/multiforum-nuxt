@@ -310,7 +310,7 @@ onAddFeedbackCommentToCommentDone(() => {
               :disable-gallery="true"
             />
           </div>
-          <nuxt-link :to="contextLink" class="text-blue-500 underline">
+          <nuxt-link :to="contextLink" class="text-orange-500 underline">
             View original context
           </nuxt-link>
         </div>

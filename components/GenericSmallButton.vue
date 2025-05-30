@@ -20,7 +20,7 @@ export default defineComponent({
 <template>
   <button
     type="button"
-    :class="[active ? 'ring-1 ring-blue-500 border-blue-500' : '']"
+    :class="[active ? 'ring-1 ring-orange-500 border-orange-500' : '']"
     class="
       flex inline-flex
       px-3.5
@@ -32,7 +32,7 @@ export default defineComponent({
       text-gray-700
        
       hover:bg-gray-50
-      focus:ring-1 focus:ring-blue-500 focus:border-blue-500
+      focus:ring-1 focus:ring-orange-500 focus:border-orange-500
     "
     @keydown.enter.prevent
   >

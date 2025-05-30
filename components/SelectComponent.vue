@@ -50,8 +50,8 @@ function handleSelect(event: SelectOptionData) {
           cursor-default
           focus:outline-none
           focus:ring-1
-          focus:ring-blue-500
-          focus:border-blue-500
+          focus:ring-orange-500
+          focus:border-orange-500
         "
         :label="selected.label"
       >
@@ -95,7 +95,7 @@ function handleSelect(event: SelectOptionData) {
         >
           <li
             :class="[
-              active ? 'text-white bg-blue-600' : 'text-gray-900 dark:text-gray-200',
+              active ? 'text-white bg-orange-600' : 'text-gray-900 dark:text-gray-200',
               'cursor-default select-none relative py-1 pl-3 pr-9',
             ]"
           >
@@ -111,7 +111,7 @@ function handleSelect(event: SelectOptionData) {
             <span
               v-if="isSelected"
               :class="[
-                active ? 'text-white' : 'text-blue-600',
+                active ? 'text-white' : 'text-orange-600',
                 'absolute inset-y-0 right-0 flex items-center pr-4',
               ]"
             >

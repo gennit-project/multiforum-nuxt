@@ -72,7 +72,7 @@ const profilePic = computed(() => {
         {{ username }}
         <span
           v-if="isAdmin"
-          class="text-xs text-blue-500 px-2 py-1 border border-blue-500 rounded-md"
+          class="text-xs text-orange-500 px-2 py-1 border border-orange-500 rounded-md"
         >Admin</span>
       </h1>
       <h1
@@ -128,7 +128,7 @@ const profilePic = computed(() => {
 @media (prefers-color-scheme: light) {
   #md-editor-v3-preview,
   #md-editor-v3-preview-wrapper {
-    background-color: blue;
+    background-color: orange;
   }
 }
 </style>

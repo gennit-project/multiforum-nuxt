@@ -143,9 +143,9 @@ const emit = defineEmits(["close", "primaryButtonClick"]);
                     class="max-h-10"
                     :class="[
                       !primaryButtonDisabled
-                        ? `border-transparent border bg-blue-600 text-white hover:bg-blue-500`
+                        ? `border-transparent border bg-orange-600 text-white hover:bg-orange-500`
                         : 'bg-gray-300 text-black dark:bg-gray-700 dark:text-gray-200',
-                      `inline-flex w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm  focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm`,
+                      `inline-flex w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm  focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm`,
                     ]"
                     @click="emit('primaryButtonClick')"
                   >
@@ -154,7 +154,7 @@ const emit = defineEmits(["close", "primaryButtonClick"]);
                   <button
                     ref="cancelButtonRef"
                     type="button"
-                    class="hover:bg-gray-50 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-gray-200 sm:mt-0 sm:w-auto sm:text-sm"
+                    class="hover:bg-gray-50 inline-flex w-full justify-center rounded-full border border-gray-300 px-4 py-2 text-base font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:text-gray-200 sm:mt-0 sm:w-auto sm:text-sm"
                     @click="emit('close')"
                   >
                     {{ secondaryButtonText }}

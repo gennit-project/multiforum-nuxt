@@ -26,7 +26,7 @@ export default defineComponent({
         : 'text-gray-700 hover:bg-gray-400 dark:text-white dark:hover:bg-gray-600',
       'dark:bg-opacity-60', // class for controlling the background opacity in dark mode
     ]"
-    class="inline-flex whitespace-nowrap items-center max-height-4 px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-blue-500"
+    class="inline-flex whitespace-nowrap items-center max-height-4 px-4 py-2 text-sm font-medium rounded-md focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100 focus:ring-orange-500"
   >
     <slot />{{ label }}
   </button>

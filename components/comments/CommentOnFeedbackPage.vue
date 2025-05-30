@@ -279,7 +279,7 @@ function handleUnarchive() {
       <span class="whitespace-nowrap">{{
         `gave feedback ${timeAgo(new Date(comment.createdAt))}`
       }}</span>
-      <span v-if="isHighlighted" class="rounded-lg bg-blue-500 px-2 text-black"
+      <span v-if="isHighlighted" class="rounded-lg bg-orange-500 px-2 text-black"
         >Permalinked</span
       >
       <MenuButton

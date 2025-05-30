@@ -34,7 +34,7 @@ const emit = defineEmits(["updateSelected"]);
           name="showBothVirtualAndInPerson"
           type="radio"
           :checked="selectedOption.value === option.value"
-          class="focus:ring-blue-500 h-4 w-4 text-blue-600 border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
+          class="focus:ring-orange-500 h-4 w-4 text-orange-600 border border-gray-300 dark:border-gray-600 dark:bg-gray-700"
           @input="
             () => {
               emit('updateSelected', option);

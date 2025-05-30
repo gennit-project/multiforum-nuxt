@@ -31,7 +31,7 @@ const toggleExpandDetail = () => {
       type="checkbox"
       :value="rule.summary"
       :checked="selected.includes(rule.summary)"
-      class="border border-gray-300 text-blue-600 dark:border-gray-600 mt-1"
+      class="border border-gray-300 text-orange-600 dark:border-gray-600 mt-1"
       @change="() => emit('toggleSelection', rule.summary)"
     >
     <div class="text-sm flex flex-col">

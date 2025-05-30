@@ -416,7 +416,7 @@ watchEffect(() => {
                           eventId: event.id,
                         },
                       }"
-                      class="text-blue-500 dark:text-blue-400"
+                      class="text-orange-500 dark:text-orange-400"
                       rel="noopener noreferrer"
                     >
                       {{ event.title }}

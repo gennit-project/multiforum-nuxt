@@ -76,7 +76,7 @@ defineEmits(["click-remove-mod"]);
             </nuxt-link>
             <nuxt-link
               v-if="suspension.RelatedIssue"
-              class="rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
+              class="rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
               :to="{
                 name: 'forums-forumId-issues-issueId',
                 params: { issueId: suspension.RelatedIssue?.id },

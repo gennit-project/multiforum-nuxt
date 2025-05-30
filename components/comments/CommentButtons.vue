@@ -168,7 +168,7 @@ function toggleEmojiPicker() {
         :class="[
           saveDisabled
             ? 'text-gray-400 dark:text-gray-500 bg-gray-100 dark:bg-gray-800 rounded-lg'
-            : 'cursor-pointer text-white hover:text-black dark:hover:text-white rounded-full bg-blue-600 dark:text-gray-100',
+            : 'cursor-pointer text-white hover:text-black dark:hover:text-white rounded-full bg-orange-600 dark:text-gray-100',
         ]"
         class="px-2 py-1"
         @click="

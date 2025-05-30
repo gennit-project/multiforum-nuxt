@@ -56,7 +56,7 @@ defineEmits(["closePreview"]);
                       <div class="h-7 flex items-center">
                         <button
                           type="button"
-                          class="bg-white dark:bg-gray-900 ml-8 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:text-gray-200"
+                          class="bg-white dark:bg-gray-900 ml-8 rounded-full text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-500 dark:text-gray-200"
                           @click="$emit('closePreview')"
                         >
                           <span class="sr-only">Close panel</span>
@@ -72,7 +72,7 @@ defineEmits(["closePreview"]);
                 <div class="flex-shrink-0 px-4 py-4 flex justify-end">
                   <button
                     type="button"
-                    class="bg-white dark:bg-gray-900 py-2 px-4 border rounded-full shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-600"
+                    class="bg-white dark:bg-gray-900 py-2 px-4 border rounded-full shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-600"
                     @click="$emit('closePreview')"
                   >
                     Close

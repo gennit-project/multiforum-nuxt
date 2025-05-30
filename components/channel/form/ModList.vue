@@ -55,7 +55,7 @@ defineEmits(["click-remove-mod"]);
         </nuxt-link>
         <button
           type="button"
-          class="flex rounded border border-blue-500 px-2 py-1 text-blue-500 items-center gap-1"
+          class="flex rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
           @click="$emit('click-remove-mod', mod.User?.username)"
         >
           Remove Mod

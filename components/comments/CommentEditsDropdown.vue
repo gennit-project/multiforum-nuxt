@@ -33,7 +33,7 @@ const allEdits = computed(() => {
     // Create current version entry (as TextVersion structure)
     const currentVersion = {
       id: "current",
-      body: props.comment.text,
+      body: props.comment.text, // Current comment text
       createdAt: props.comment.updatedAt || props.comment.createdAt,
       Author: props.comment.CommentAuthor,
     };
@@ -152,7 +152,7 @@ const handleRevisionDeleted = (deletedId) => {
               </span>
               <span
                 v-else-if="edit === allEdits[0]"
-                class="ml-1 text-blue-600 dark:text-blue-400"
+                class="ml-1 text-orange-600 dark:text-orange-400"
               >
                 Most recent
               </span>

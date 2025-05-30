@@ -225,7 +225,7 @@ const contextLinkObject = computed(() => {
               >Admin</span>
               <span
                 v-else-if="isMod"
-                class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+                class="rounded-md border border-orange-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
               >Mod</span>
               <span
                 v-if="commentAuthorUsername === originalPoster"
@@ -262,13 +262,13 @@ const contextLinkObject = computed(() => {
           </span>
           <span
             v-if="isHighlighted"
-            class="rounded-lg bg-blue-500 px-2 py-1 text-black"
+            class="rounded-lg bg-orange-500 px-2 py-1 text-black"
           >
             Permalinked
           </span>
           <span
             v-if="label"
-            class="rounded-lg border border-blue-500 px-2 py-1 text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900"
+            class="rounded-lg border border-orange-500 px-2 py-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900"
           >
             {{ label }}
           </span>

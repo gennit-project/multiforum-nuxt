@@ -85,7 +85,7 @@ const ownerList = computed(() =>
 @media (prefers-color-scheme: light) {
   #md-editor-v3-preview,
   #md-editor-v3-preview-wrapper {
-    background-color: blue;
+    background-color: orange;
   }
 }
 </style>

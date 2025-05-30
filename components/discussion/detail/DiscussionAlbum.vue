@@ -529,7 +529,7 @@ v-if="editingCaptionIndex === idx"
             <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
             <span
               v-else
-              class="text-blue-400 hover:text-blue-300 flex items-center justify-center gap-1 w-full cursor-pointer"
+              class="text-orange-400 hover:text-orange-300 flex items-center justify-center gap-1 w-full cursor-pointer"
               role="button"
               tabindex="0"
               @click.stop="startEditingCaption(idx)"
@@ -846,7 +846,7 @@ v-if="editingCaptionIndex === lightboxIndex"
             <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
             <span
               v-else
-              class="text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors cursor-pointer"
+              class="text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors cursor-pointer"
               role="button"
               tabindex="0"
               @click="startEditingCaption(lightboxIndex)"

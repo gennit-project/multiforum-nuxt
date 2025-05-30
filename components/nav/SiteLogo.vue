@@ -9,12 +9,12 @@ export default defineComponent({
   <div class="flex-shrink-0">
     <img
       class="block lg:hidden h-8 w-auto"
-      src="https://tailwindui.com/img/logos/workflow-mark-blue-500.svg"
+      src="https://tailwindui.com/img/logos/workflow-mark-orange-500.svg"
       alt="Workflow"
     >
     <img
       class="hidden lg:block h-8 w-auto"
-      src="https://tailwindui.com/img/logos/workflow-logo-blue-500-mark-white-text.svg"
+      src="https://tailwindui.com/img/logos/workflow-logo-orange-500-mark-white-text.svg"
       alt="Workflow"
     >
   </div>

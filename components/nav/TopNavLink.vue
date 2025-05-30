@@ -30,19 +30,19 @@ export default defineComponent({
       border-b-3
       border-transparent
       dark:text-white 
-      hover:text-blue-500 
-      hover:border-blue-500
+      hover:text-orange-500 
+      hover:border-orange-500
       hover:dark:text-gray-200
     "
     active-class="
       inline-flex
       items-center
       border-b-2
-      border-blue-500
-      text-blue-500
-      dark:text-blue-400
-      dark:border-blue-400
-      hover:dark:text-blue-400
+      border-orange-500
+      text-orange-500
+      dark:text-orange-400
+      dark:border-orange-400
+      hover:dark:text-orange-400
       px-4
       py-3
       text-xs

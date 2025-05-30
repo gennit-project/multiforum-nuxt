@@ -87,7 +87,7 @@ const handleInput = (value: string) => {
           disabled ? ' bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
           invalid
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
-            : 'focus:border-blue-500 focus:ring-blue-500',
+            : 'focus:border-orange-500 focus:ring-orange-500',
         ]"
         class="block min-w-0 flex-1 rounded-lg border-gray-200 pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-200 sm:text-sm"
         @input="handleInput(($event.target as HTMLTextAreaElement).value)"

@@ -19,8 +19,8 @@ export default defineComponent({
 <template>
   <input
     type="checkbox"
-    :class="[disabled ? 'text-blue-200' : 'text-blue-600']"
-    class="focus:ring-blue-500 h-4 w-4 border border-gray-500 rounded dark:bg-gray-800 dark:border-gray-400 dark:focus:ring-blue-500"
+    :class="[disabled ? 'text-orange-200' : 'text-orange-600']"
+    class="focus:ring-orange-500 h-4 w-4 border border-gray-500 rounded dark:bg-gray-800 dark:border-gray-400 dark:focus:ring-orange-500"
     :checked="checked"
     :disabled="disabled"
   >

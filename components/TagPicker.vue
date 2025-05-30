@@ -70,8 +70,8 @@ const removeSelection = (tag: string) => {
         <div
           v-for="(tag, index) in selected"
           :key="index"
-          class="mr-2 mt-1 inline-flex items-center rounded-full bg-blue-100 
-                 px-2 text-blue-700 dark:bg-blue-700 dark:text-blue-100"
+          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 
+                 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
           @click="removeSelection(tag)"
         >
           <span>{{ tag }}</span>

@@ -448,7 +448,7 @@ const cellCount = computed(() => {
                     selectedDay &&
                     selectedDay.week === weekIndex &&
                     selectedDay.day === dayIndex
-                      ? 'stroke-2 stroke-blue-500'
+                      ? 'stroke-2 stroke-orange-500'
                       : '',
                   ]"
                   @click="selectDay(weekIndex, dayIndex)"
@@ -484,7 +484,7 @@ const cellCount = computed(() => {
     <div
       v-if="selectedDay"
       class="mt-4 p-4 rounded-lg border"
-      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-blue-500'"
+      :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-orange-500'"
     >
       <div class="flex gap-3">
         <Calendar

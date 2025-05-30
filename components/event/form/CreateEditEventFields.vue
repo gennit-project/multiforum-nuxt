@@ -552,7 +552,7 @@ const touched = ref(false);
                 :class="[
                   'py-2 px-4 rounded-md cursor-pointer transition-colors',
                   selectedEventType === option.value 
-                    ? 'bg-blue-500 text-black' 
+                    ? 'bg-orange-500 text-black' 
                     : 'bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-white'
                 ]"
                 data-testid="event-type-option"
@@ -798,7 +798,7 @@ sl-input {
   border: 0 !important;
   padding: 0 !important;
   margin: 0, 0, 0, 0;
-  border-color: blue;
+  border-color: orange;
   &::focus {
     border: 0 !important;
     outline: 0 !important;
@@ -812,7 +812,7 @@ sl-input {
   margin: 0, 0, 0, 0;
   font-family: "Inter", sans-serif;
   color: #000000;
-  border-color: blue;
+  border-color: orange;
   font-size: 0.875rem;
 }
 

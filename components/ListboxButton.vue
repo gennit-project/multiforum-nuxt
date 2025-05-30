@@ -34,8 +34,8 @@ export default defineComponent({
       cursor-default
       focus:outline-none
       focus:ring-1
-      focus:ring-blue-500
-      focus:border-blue-500
+      focus:ring-orange-500
+      focus:border-orange-500
       sm:text-sm
     "
   >

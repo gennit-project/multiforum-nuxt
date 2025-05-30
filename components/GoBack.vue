@@ -21,7 +21,7 @@ const router = useRouter();
       shadow
       hover:text-gray-800
       focus:outline-none
-      focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+      focus:ring-2 focus:ring-offset-2 focus:ring-orange-500
     "
     @click="router.go(-1)"
   >

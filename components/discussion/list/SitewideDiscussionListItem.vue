@@ -146,7 +146,7 @@ const relative = computed(() =>
           "
           class="-ml-0.5 mb-1 flex items-center gap-2 dark:text-white text-xs"
         >
-          <div class="flex items-center text-blue-700 dark:text-white">
+          <div class="flex items-center text-orange-700 dark:text-white">
             <AvatarComponent
               :text="discussion.DiscussionChannels[0].channelUniqueName || ''"
               :is-square="true"

@@ -305,7 +305,7 @@ const authorIsMod = computed(
             >Admin</span>
             <span
               v-else-if="authorIsMod"
-              class="rounded-md border border-blue-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+              class="rounded-md border border-orange-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
             >Mod</span>
           </span>
         </nuxt-link>

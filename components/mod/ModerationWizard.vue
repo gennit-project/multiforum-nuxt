@@ -62,7 +62,7 @@ defineEmits([
       <div class="flex pt-12 gap-x-2" data-test="mod-wizard">
         <div
           class="flex justify-center items-center w-10 h-10  rounded-lg"
-          :class="[issue.isOpen ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-700']"
+          :class="[issue.isOpen ? 'bg-orange-600' : 'bg-gray-300 dark:bg-gray-700']"
         >
           <div class="">
             <EyeIcon class="h-6 w-6 text-white" />
@@ -72,13 +72,13 @@ defineEmits([
           class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
           :class="[
             issue.isOpen
-              ? 'border-blue-500'
+              ? 'border-orange-500'
               : 'border-gray-300 dark:border-gray-700',
           ]"
         >
           <h1
             v-if="issue.isOpen"
-            class="text-xl font-bold text-blue-500 border-b border-gray-300 dark:border-gray-600 pb-2"
+            class="text-xl font-bold text-orange-500 border-b border-gray-300 dark:border-gray-600 pb-2"
           >
             Mod Decision Needed
           </h1>
@@ -118,7 +118,7 @@ defineEmits([
                 />
                 <button
                   v-if="issue.isOpen"
-                  class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+                  class="w-full cursor-pointer bg-orange-600 hover:bg-orange-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
                   :loading="closeIssueLoading"
                   @click="$emit('close-issue')"
                 >

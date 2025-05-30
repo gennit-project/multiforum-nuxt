@@ -89,7 +89,7 @@ const clear = () => {
           rightSideIsRounded ? 'rounded-r-full' : 'rounded-r-md',
           small ? 'h-9' : 'h-10',
         ]"
-        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
         :placeholder="searchPlaceholder"
         type="text"
         @input="updateSearchInput"

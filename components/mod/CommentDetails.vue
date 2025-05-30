@@ -88,7 +88,7 @@ const permalinkObject = computed(() => {
         :show-context-link="true"
         :show-channel="false"
       />
-      <nuxt-link :to="permalinkObject" class="text-blue-500 underline">
+      <nuxt-link :to="permalinkObject" class="text-orange-500 underline">
         Context
       </nuxt-link>
     </div>
