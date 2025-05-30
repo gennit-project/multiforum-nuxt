@@ -36,7 +36,7 @@ const needsChanges = computed(() => {
   return !(
     props.formValues?.selectedChannels && props.formValues.selectedChannels.length > 0 &&
     props.formValues?.title &&
-    props.formValues?.body.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
+    props.formValues?.body?.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
     props.formValues?.title.length <= DISCUSSION_TITLE_CHAR_LIMIT
   );
 });
@@ -46,7 +46,7 @@ const changesRequiredMessage = computed(() => {
     return "A title is required.";
   } else if (props.formValues?.selectedChannels.length === 0) {
     return "Must select at least one channel.";
-  } else if (props.formValues?.body.length > MAX_CHARS_IN_DISCUSSION_BODY) {
+  } else if (props.formValues?.body?.length > MAX_CHARS_IN_DISCUSSION_BODY) {
     return `Body cannot exceed ${MAX_CHARS_IN_DISCUSSION_BODY} characters.`;
   } else if (props.formValues?.title.length > DISCUSSION_TITLE_CHAR_LIMIT) {
     return `Title cannot exceed ${DISCUSSION_TITLE_CHAR_LIMIT} characters.`;

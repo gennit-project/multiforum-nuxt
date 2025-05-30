@@ -2,7 +2,7 @@
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { defineComponent, computed, ref } from "vue";
-import { useRouter, useRoute } from "nuxt/app";
+import { useRouter, useRoute, useHead } from "nuxt/app";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
@@ -142,6 +142,15 @@ export default defineComponent({
         return;
       }
       const discussion = value.data.discussions[0];
+
+      // Set page title and meta tags
+      const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+      useHead({
+        title: `Edit Discussion | ${channelId.value} | ${serverName}`,
+        meta: [
+          { name: 'description', content: `Edit discussion: ${discussion.title}` },
+        ],
+      });
 
       // Create a map of valid images with their IDs
       const validImages = (discussion.Album?.Images ?? [])
