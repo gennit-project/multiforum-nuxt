@@ -171,6 +171,13 @@ const collapseAll = () => {
   // Pass false for collapse and the appropriate isChannelView flag
   uiStore.toggleExpandDiscussions(false, !!channelId.value);
 };
+
+const isExpanded = computed(() => {
+  if (channelId.value) {
+    return expandChannelDiscussions.value;
+  }
+  return expandSitewideDiscussions.value;
+});
 </script>
 
 <template>
@@ -203,36 +210,36 @@ const collapseAll = () => {
           v-if="!isDownloadPage"
           class="flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600"
         >
-          <!-- Expand All Button -->
           <button
             data-testid="expand-all-button"
+            :aria-pressed="isExpanded"
             :class="[
-              'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300',
-              'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-              (channelId ? expandChannelDiscussions : expandSitewideDiscussions)
-                ? 'bg-orange-50 dark:bg-orange-900'
-                : 'dark:bg-gray-800',
+              // layout
+              'flex px-2 h-9 items-center border-l first:border-none transition-colors',
+              // base (non‑active) colours
+              !isExpanded
+                ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+                : 'bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-white',
+              // hover shade (one step darker) – always present
+              'hover:bg-orange-200 hover:text-orange-900 dark:hover:bg-orange-600 dark:hover:text-white',
             ]"
-            aria-label="Expand all discussions"
-            title="Expand all discussions"
             @click="expandAll"
+            title="Expand all discussions"
           >
             <i class="fa-solid fa-expand text-xs" />
           </button>
-          <!-- Collapse All Button -->
           <button
             aria-label="Collapse all discussions"
+            :aria-pressed="!isExpanded"
             :class="[
-              'flex px-2 h-9 items-center text-gray-800 dark:text-gray-300 border-l border-gray-800 dark:border-gray-600',
-              'hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700',
-              !(channelId
-                ? expandChannelDiscussions
-                : expandSitewideDiscussions)
-                ? 'bg-orange-50 dark:bg-orange-900'
-                : 'dark:bg-gray-800',
+              'flex px-2 h-9 items-center border-l transition-colors',
+              isExpanded
+                ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
+                : 'bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-white',
+              'hover:bg-orange-200 hover:text-orange-900 dark:hover:bg-orange-600 dark:hover:text-white',
             ]"
-            title="Collapse all discussions"
             @click="collapseAll"
+            title="Collapse all discussions"
           >
             <i class="fa-solid fa-compress text-xs" />
           </button>
@@ -289,7 +296,7 @@ const collapseAll = () => {
         </RequireAuth>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
@@ -334,7 +341,11 @@ const collapseAll = () => {
           :checked="filterValues.showArchived"
           @input="updateShowArchived"
         />
-        {{ isDownloadPage ? 'Show archived downloads' : 'Show archived discussions' }}
+        {{
+          isDownloadPage
+            ? "Show archived downloads"
+            : "Show archived discussions"
+        }}
       </div>
     </div>
   </div>

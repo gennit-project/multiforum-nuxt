@@ -177,7 +177,7 @@
         <template #has-auth>
           <nuxt-link
             v-if="channelId"
-            class="text-orange-500 underline"
+            class="text-orange-500 underline dark:text-white"
             :to="{
               name: 'forums-forumId-downloads-create',
               params: {
@@ -189,7 +189,7 @@
           </nuxt-link>
         </template>
         <template #does-not-have-auth>
-          <span class="cursor-pointer text-orange-500 underline">Create one?</span>
+          <span class="cursor-pointer text-orange-500 underline dark:text-white">Create one?</span>
         </template>
       </RequireAuth>
     </p>
