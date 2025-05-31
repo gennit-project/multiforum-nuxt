@@ -386,104 +386,14 @@ const copyLink = async () => {
   }, 2000);
 };
 
-const availableModActions = computed(() => {
-  let out: any[] = [];
-  
-  // Don't show mod actions if user isn't a mod or is suspended
-  if (!props.modProfileName || userPermissions.value.isSuspendedMod) {
-    return out;
-  }
- 
-  if (userPermissions.value.canReport) {
-    out = out.concat([
-      {
-        label: "Report",
-        value: "",
-        event: "clickReport",
-        icon: ALLOWED_ICONS.REPORT,
-      },
-    ]);
-  }
-  
-  if (props.enableFeedback) {
-    if (userPermissions.value.canGiveFeedback) {
-      out.push({
-        label: "Give Feedback",
-        value: "",
-        event: "clickFeedback",
-        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
-      });
-    }
-    
-    if (props.commentData.FeedbackComments?.length > 0) {
-      out.push({
-        label: "Undo Feedback",
-        value: "",
-        event: "clickUndoFeedback",
-        icon: ALLOWED_ICONS.UNDO,
-      });
-      out.push({
-        label: "Edit Feedback",
-        value: "",
-        event: "clickEditFeedback",
-        icon: ALLOWED_ICONS.EDIT,
-      });
-    }
-  }
-
-  if (!props.commentData.archived) {
-    if (userPermissions.value.canHideComment) {
-      out = out.concat([
-        {
-          label: "Archive",
-          event: "handleClickArchive",
-          icon: ALLOWED_ICONS.ARCHIVE,
-          value: '',
-        }
-      ]);
-    }
-    if (userPermissions.value.canSuspendUser) {
-      out = out.concat([
-        {
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
-          icon: ALLOWED_ICONS.SUSPEND,
-          value: '',
-        },
-      ]);
-    }
-
-    // Need to be logged in for edit/delete or mod actions
-    if (!usernameVar.value) {
-      return out;
-    }
-
-    const isOwnComment =
-      props.commentData?.CommentAuthor?.__typename === "User" &&
-      props.commentData?.CommentAuthor?.username === usernameVar.value;
-
-
-    if (isOwnComment) {
-      // If user is the comment author, show edit/delete options
-      out = out.concat([
-        {
-          label: "Unarchive",
-          event: "handleClickUnarchive",
-          icon: ALLOWED_ICONS.UNARCHIVE,
-          value: '',
-        },
-      ]);
-    }
-  }
-  return out;
-});
-
 const commentMenuItems = computed(() => {
-  let out: any[] = [];
+  let menuItems: any[] = [];
+  
+  // Always add these base items for authenticated or unauthenticated users
   
   // Only show Copy Link when we have a valid permalink
   if (canShowPermalink.value && Object.keys(permalinkObject.value ?? {}).length > 0) {
-    out.unshift({
+    menuItems.push({
       label: "Copy Link",
       value: "",
       event: "copyLink",
@@ -493,57 +403,129 @@ const commentMenuItems = computed(() => {
 
   // Always show feedback option if enabled
   if (props.enableFeedback) {
-    out = out.concat([
-      {
-        label: "View Feedback",
-        value: "",
-        event: "handleViewFeedback",
-        icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-      },
-    ]);
+    menuItems.push({
+      label: "View Feedback",
+      value: "",
+      event: "handleViewFeedback",
+      icon: ALLOWED_ICONS.VIEW_FEEDBACK,
+    });
   }
   
-  // Need to be logged in for edit/delete or mod actions
+  // Return early if user is not logged in
   if (!usernameVar.value) {
-    return out;
+    return menuItems;
   }
 
   const isOwnComment = props.commentData?.CommentAuthor?.__typename === "User" &&
                       props.commentData?.CommentAuthor?.username === usernameVar.value;
-                      
-  // Check if the user has admin or mod permissions
-  const hasModPermissions = userPermissions.value.isChannelOwner || 
-                           (userPermissions.value.isElevatedMod && !userPermissions.value.isSuspendedMod);
 
+  // If user is the author of the comment
   if (isOwnComment) {
-    // If user is the comment author, show edit/delete options
-    out = out.concat([
-      {
-        label: "Edit",
+    menuItems.push({
+      label: "Edit",
+      value: "",
+      event: "handleEdit",
+      icon: ALLOWED_ICONS.EDIT,
+    });
+    menuItems.push({
+      label: "Delete",
+      value: "",
+      event: "handleDelete",
+      icon: ALLOWED_ICONS.DELETE,
+    });
+  }
+
+  // Check if the user has any moderation permission (standard mod or above)
+  // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
+  const canPerformModActions = 
+    !userPermissions.value.isSuspendedMod && 
+    (userPermissions.value.isChannelOwner || 
+     userPermissions.value.isElevatedMod || 
+     userPermissions.value.canReport || 
+     userPermissions.value.canGiveFeedback);
+
+  // Show mod actions if user has any mod permissions and isn't the comment author
+  if (usernameVar.value && canPerformModActions && !isOwnComment) {
+    // Create a list for mod actions
+    const modActions: any[] = [];
+
+    // Add report action if user has permission
+    if (userPermissions.value.canReport) {
+      modActions.push({
+        label: "Report",
         value: "",
-        event: "handleEdit",
+        event: "clickReport",
+        icon: ALLOWED_ICONS.REPORT,
+      });
+    }
+
+    // Add feedback action if user has permission and feedback is enabled
+    if (userPermissions.value.canGiveFeedback && props.enableFeedback) {
+      modActions.push({
+        label: "Give Feedback",
+        value: "",
+        event: "clickFeedback",
+        icon: ALLOWED_ICONS.GIVE_FEEDBACK,
+      });
+    }
+
+    // Add feedback management actions if comment has feedback
+    if (props.enableFeedback && props.commentData.FeedbackComments?.length > 0) {
+      modActions.push({
+        label: "Undo Feedback",
+        value: "",
+        event: "clickUndoFeedback",
+        icon: ALLOWED_ICONS.UNDO,
+      });
+      modActions.push({
+        label: "Edit Feedback",
+        value: "",
+        event: "clickEditFeedback",
         icon: ALLOWED_ICONS.EDIT,
-      },
-      {
-        label: "Delete",
-        value: "",
-        event: "handleDelete",
-        icon: ALLOWED_ICONS.DELETE,
-      },
-    ]);
+      });
+    }
+
+    // Add archive/unarchive actions based on current state and permissions
+    if (!props.commentData.archived) {
+      if (userPermissions.value.canHideComment) {
+        modActions.push({
+          label: "Archive",
+          event: "handleClickArchive",
+          icon: ALLOWED_ICONS.ARCHIVE,
+          value: '',
+        });
+      }
+
+      if (userPermissions.value.canSuspendUser) {
+        modActions.push({
+          label: "Archive and Suspend",
+          event: "handleClickArchiveAndSuspend",
+          icon: ALLOWED_ICONS.SUSPEND,
+          value: '',
+        });
+      }
+    } else {
+      if (userPermissions.value.canHideComment) {
+        modActions.push({
+          label: "Unarchive",
+          event: "handleClickUnarchive",
+          icon: ALLOWED_ICONS.UNARCHIVE,
+          value: '',
+        });
+      }
+    }
+
+    // Only add the mod actions section if there are actually actions to show
+    if (modActions.length > 0) {
+      menuItems.push({
+        value: "Moderation Actions",
+        isDivider: true,
+      });
+      menuItems = menuItems.concat(modActions);
+    }
   }
   
-  // Show mod actions if:
-  // 1. User is logged in
-  // 2. User is not the comment author
-  // 3. User has mod permissions (channel owner or elevated mod and not suspended)
-  if (usernameVar.value && !isOwnComment && (hasModPermissions || userPermissions.value.isChannelOwner)) {
-    // If you're not the author, show mod actions
-    // This preserves the original logic that mod actions don't apply to your own comments
-    out = out.concat(availableModActions.value);
-  }
-  
-  return out;
+  return menuItems;
 });
 
 const showReplies = ref(true);
