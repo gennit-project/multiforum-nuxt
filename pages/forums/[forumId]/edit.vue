@@ -29,6 +29,8 @@ const formValues = ref<CreateEditChannelFormValues>({
   channelIconURL: "",
   channelBannerURL: "",
   wikiEnabled: false,
+  eventsEnabled: true,
+  feedbackEnabled: true,
 });
 
 const dataLoaded = ref(false);
@@ -54,6 +56,8 @@ watch(getChannelResult, (newVal) => {
       channelIconURL: channelData.channelIconURL,
       channelBannerURL: channelData.channelBannerURL,
       wikiEnabled: channelData.wikiEnabled,
+      eventsEnabled: channelData.eventsEnabled,
+      feedbackEnabled: channelData.feedbackEnabled,
       rules,
     };
 
@@ -89,6 +93,8 @@ const channelUpdateInput = computed(() => {
     channelBannerURL: formValues.value.channelBannerURL,
     rules: JSON.stringify(formValues.value.rules),
     wikiEnabled: formValues.value.wikiEnabled,
+    eventsEnabled: formValues.value.eventsEnabled,
+    feedbackEnabled: formValues.value.feedbackEnabled,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     Admins: [{ connect: [{ where: { node: { username: usernameVar.value } } }] }],
   };

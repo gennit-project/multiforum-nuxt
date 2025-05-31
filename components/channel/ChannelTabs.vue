@@ -95,14 +95,17 @@
         icon: DownloadIcon,
         countProperty: null,
       },
-      {
+    ];
+
+    if (props.channel?.eventsEnabled !== false) {
+      baseTabs.push({
         name: "events",
         routeSuffix: "events",
         label: "Calendar",
         icon: CalendarIcon,
         countProperty: "EventChannelsAggregate",
-      },
-    ];
+      });
+    }
 
     if (props.channel?.wikiEnabled) {
       baseTabs.push({

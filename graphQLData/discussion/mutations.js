@@ -409,3 +409,22 @@ export const DELETE_TEXT_VERSION = gql`
     }
   }
 `;
+
+
+// mutation {
+//   createFilterGroups(input: [{
+//     key: "lot_size",
+//     displayName: "Lot Size",
+//     mode: INCLUDE,
+//     order: 1,
+//     channel: { connect: { where: { node: { uniqueName: "sims4_builds" }}} },
+//     options: {
+//       create: [
+//         { node: { value: "10x20", displayName: "10 × 20", order: 1 }},
+//         { node: { value: "20x30", displayName: "20 × 30", order: 2 }}
+//       ]
+//     }
+//   }]) {
+//     filterGroups { id }
+//   }
+// }

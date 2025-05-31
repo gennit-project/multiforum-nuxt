@@ -32,12 +32,14 @@
   );
 
   const showChannelTabs = computed(() => {
+    const routeName = String(route.name);
+    const isFeedbackPage = routeName.includes("feedback") && !routeName.includes("edit-feedback");
     return (
       !showDiscussionTitle.value &&
       !showDownloadTitle.value &&
       !showEventTitle.value &&
       !showIssueTitle.value &&
-      !`${String(route.name)}`.includes("feedback")
+      !isFeedbackPage
     );
   });
 

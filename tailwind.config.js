@@ -107,10 +107,10 @@ module.exports = {
       orange: {
         // Bright creamsicle orange
         900: "#2b1c0e", // almost burnt‑umber for deep shadows
-        800: "#3c2712",
-        700: "#703100", // deep, vivid orange (hints of pumpkin)
-        600: "#a34400", // strong, saturated orange
-        500: "#d85a00", // classic “creamsicle” pop
+        800: "#703100", // deep, vivid orange (hints of pumpkin)
+        700: "#a34400", // strong, saturated orange
+        600: "#d85a00", // classic “creamsicle” pop
+        500: "#ff6f00", // bright creamsicle orange
         400: "#efb36b", // light apricot (kept for smooth gradient)
         300: "#f4dcb5", // pale peach
         200: "#f9f1e3", // very light cream

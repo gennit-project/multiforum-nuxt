@@ -51,6 +51,8 @@ const createChannelInput = computed(() => {
       channelIconURL: formValues.value.channelIconURL,
       channelBannerURL: formValues.value.channelBannerURL,
       rules: JSON.stringify(formValues.value.rules),
+      eventsEnabled: true,
+      feedbackEnabled: true,
       Tags: {
         connectOrCreate: tagConnections,
       },

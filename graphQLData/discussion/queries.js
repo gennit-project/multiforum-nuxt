@@ -360,3 +360,26 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
     }
   }
 `;
+
+
+
+
+
+// # Retrieve everything needed to render the sidebar
+// query GetChannelFilters($name: String!) {
+//   channel(where: { uniqueName: $name }) {
+//     filterGroups(orderBy: order_ASC) {
+//       id
+//       key
+//       displayName
+//       mode
+//       order
+//       options(orderBy: order_ASC) {
+//         id
+//         value
+//         displayName
+//         order
+//       }
+//     }
+//   }
+// }

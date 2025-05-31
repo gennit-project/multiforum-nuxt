@@ -57,7 +57,7 @@ const classes = computed(() => {
       baseClasses.push("pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700");
     } else {
       // Horizontal inactive tab: transparent border
-      baseClasses.push("border-b-2 border-transparent");
+      baseClasses.push("border-transparent");
     }
   }
   

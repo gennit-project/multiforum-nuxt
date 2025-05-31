@@ -15,6 +15,8 @@
   import IdentificationIcon from "@/components/icons/IdentificationIcon.vue";
   import UserMinus from "@/components/icons/UserMinus.vue";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
+  import CalendarIcon from "@/components/icons/CalendarIcon.vue";
+  import AnnotationIcon from "@/components/icons/AnnotationIcon.vue";
 
   const route = useRoute();
   const props = defineProps({
@@ -98,6 +100,18 @@
       key: "suspended-mods",
       label: "Mod Suspensions",
       icon: UserMinus,
+      fontAwesome: null,
+    },
+    {
+      key: "events",
+      label: "Events",
+      icon: CalendarIcon,
+      fontAwesome: null,
+    },
+    {
+      key: "feedback",
+      label: "Feedback",
+      icon: AnnotationIcon,
       fontAwesome: null,
     },
     {
