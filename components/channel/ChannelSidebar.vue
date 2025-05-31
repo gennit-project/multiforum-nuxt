@@ -32,9 +32,9 @@ const channelId = computed(() => {
 
 const channelRules = computed(() => props.channel?.rules ?? "");
 
-// Check if we're on the downloads list view
-const isDownloadListView = computed(() => {
-  return route.name === "forums-forumId-downloads";
+// Check if we're on the discussion detail page (including comment permalinks)
+const isDiscussionDetailPage = computed(() => {
+  return typeof route.name === "string" && route.name.includes("forums-forumId-discussions-discussionId");
 });
 
 const filterChannelsByTag = (tag: string) => {
@@ -133,7 +133,7 @@ const filterChannelsByTag = (tag: string) => {
             </div>
           </div>
 
-          <FontSizeControl v-if="!isDownloadListView" class="mb-6" />
+          <FontSizeControl v-if="isDiscussionDetailPage" class="mb-6" />
 
           <div class="flex justify-between">
             <span
