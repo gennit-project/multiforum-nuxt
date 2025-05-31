@@ -576,7 +576,7 @@ v-if="editingCaptionIndex === idx"
         <!-- Image container -->
         <div class="flex items-center justify-center">
           <div 
-            class="mb-4 flex rounded dark:text-white max-h-96 max-w-96"
+            class="mb-4 flex rounded dark:text-white max-h-96 max-w-96 overflow-x-auto touch-pan-x"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
           >
