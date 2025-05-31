@@ -75,6 +75,14 @@ export const CREATE_COMMENT = gql`
         Channel {
           uniqueName
         }
+        Event {
+          id
+        }
+        DiscussionChannel {
+          id
+          channelUniqueName
+          discussionId
+        }
         UpvotedByUsers {
           username
         }
@@ -115,12 +123,26 @@ export const CREATE_COMMENT = gql`
         FeedbackComments {
           id
         }
+        PastVersions {
+          id
+        }
         ChildComments {
           id
           text
           createdAt
           emoji
           weightedVotesCount
+          PastVersions {
+            id
+          }
+          Event {
+            id
+          }
+          DiscussionChannel {
+            id
+            channelUniqueName
+            discussionId
+          }
           CommentAuthor {
             ... on User {
               username

@@ -51,6 +51,14 @@ export const COMMENT_FIELDS = gql`
         username
       }
     }
+    Event {
+      id
+    }
+    DiscussionChannel {
+      id
+      channelUniqueName
+      discussionId
+    }
     ...CommentVoteFields
   }
 `;

@@ -8,7 +8,7 @@ import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import type { Event, Comment } from "@/__generated__/graphql";
+import type { Event } from "@/__generated__/graphql";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
 
@@ -91,87 +91,28 @@ const {
   onDone,
 } = useMutation(CREATE_COMMENT, {
   errorPolicy: "all",
-  update(cache, result) {
-    try {
-      console.log('result', result);
-      // Get the new comment from the result
-      if (result.errors?.length) {
-        console.error("Error creating comment:", result.errors);
-        createCommentPermissionError.value = result.errors[0].message;
-        return;
-      }
-      const newComment: Comment = result.data?.createComments?.comments[0];
-      if (!newComment) {
-        console.error("No new comment returned from createComments mutation");
-        return;
-      }
-
-      // Define the query variables
-      const eventCommentsQueryVariables = {
+  refetchQueries: () => [
+    {
+      query: GET_EVENT_COMMENTS,
+      variables: {
         eventId: props.event?.id,
         limit: COMMENT_LIMIT,
         offset: props.previousOffset,
         sort: getSortFromQuery(route.query),
-      };
-
-      // Try to read the existing query result
-      try {
-        const readEventCommentsQueryResult = cache.readQuery({
-          query: GET_EVENT_COMMENTS,
-          variables: eventCommentsQueryVariables,
-        });
-
-        if (readEventCommentsQueryResult) {
-          // If we get a result, update it
-          cache.writeQuery({
-            query: GET_EVENT_COMMENTS,
-            variables: eventCommentsQueryVariables,
-            data: {
-              ...readEventCommentsQueryResult,
-              getEventComments: {
-                ...readEventCommentsQueryResult.getEventComments,
-                Comments: [
-                  newComment,
-                  ...(readEventCommentsQueryResult.getEventComments?.Comments || [])
-                ]
-              }
-            }
-          });
-        }
-      } catch (err) {
-        console.warn("Error reading or writing event comments query", err);
-      }
-
-      // Update the event comment count
-      // This uses the safer cache.modify approach
-      if (props.event?.id) {
-        const eventId = cache.identify({
-          __typename: "Event",
-          id: props.event.id
-        });
-
-        if (eventId) {
-          cache.modify({
-            id: eventId,
-            fields: {
-              CommentsAggregate(existing = {}) {
-                return {
-                  ...existing,
-                  count: (existing.count || 0) + 1
-                };
-              }
-            }
-          });
-        }
-      }
-    } catch (error) {
-      console.error("Error updating cache after creating event comment:", error);
-    }
-  },
+      },
+    },
+  ],
+  awaitRefetchQueries: true,
 });
 
 // After mutation completion
-onDone(() => {
+onDone((result) => {
+  if (result.errors?.length) {
+    console.error("Error creating comment:", result.errors);
+    createCommentPermissionError.value = result.errors[0].message;
+    createCommentLoading.value = false;
+    return;
+  }
   createFormValues.value = createCommentDefaultValues;
   createCommentLoading.value = false;
   commentEditorOpen.value = false;
