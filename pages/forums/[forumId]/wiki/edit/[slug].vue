@@ -84,9 +84,9 @@
     (newWikiPage) => {
       if (newWikiPage && !dataLoaded.value) {
         formValues.value = {
-          title: newChannel.value.WikiHomePage.title || "",
-          body: newChannel.value.WikiHomePage.body || "",
-          slug: newChannel.value.WikiHomePage.slug || "",
+          title: newChannel.value?.WikiHomePage?.title || "",
+          body: newChannel.value?.WikiHomePage?.body || "",
+          slug: newChannel.value?.WikiHomePage?.slug || "",
         };
         dataLoaded.value = true;
       }
@@ -221,7 +221,7 @@
     </div>
 
     <div
-      v-else-if="!wikiPage"
+      v-else-if="!wikiPage || !usernameVar"
       class="mx-auto max-w-2xl p-4 text-center dark:text-white"
     >
       <p>This wiki page doesn't exist or you don't have permission to view it.</p>
@@ -230,7 +230,6 @@
         @click="router.push(`/forums/${forumId}/wiki`)"
       />
     </div>
-
     <div
       v-else
       class="mx-auto max-w-3xl p-4"
