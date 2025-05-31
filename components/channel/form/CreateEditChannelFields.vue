@@ -227,6 +227,7 @@
         form-title="Forum Settings"
         :loading="editChannelLoading"
         :needs-changes="titleIsInvalid"
+        :show-cancel-button="false"
         @input="touched = true"
         @submit="emit('submit')"
       >
