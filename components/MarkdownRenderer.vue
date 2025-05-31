@@ -217,11 +217,7 @@ const renderedMarkdown = computed(() => {
       max-width: 100% !important;
       overflow-wrap: break-word !important;
       white-space: pre-wrap !important;
-      background-color: rgba(175, 184, 193, 0.2) !important;
 
-      .dark & {
-        background-color: rgba(110, 118, 129, 0.4) !important;
-      }
     }
 
     pre code {
