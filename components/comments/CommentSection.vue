@@ -611,7 +611,7 @@ const lengthOfCommentInProgress = computed(() => {
         <h2 id="comments" class="px-1 text-lg dark:text-white">
           {{ `Comments (${aggregateCommentCount})` }}
         </h2>
-        <SortButtons v-if="showCommentSortButtons" :show-top-options="false" />
+        <SortButtons v-if="showCommentSortButtons && aggregateCommentCount > 0" :show-top-options="false" />
       </div>
       <div class="my-2">
         <slot/>
