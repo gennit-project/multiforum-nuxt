@@ -45,7 +45,7 @@ const closedCount = computed(() => {
 
 <template>
   <div class="bg-white dark:bg-gray-900 dark:text-white border-gray-200 dark:border-gray-600">
-    <nav v-if="!issueId" class="flex items-center gap-4 py-3 pl-8">
+    <nav v-if="!issueId" class="flex items-center gap-4 py-3 pl-4">
       <nuxt-link
         :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
         class="px-4 py-2 border-b-2"

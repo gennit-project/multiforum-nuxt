@@ -16,9 +16,9 @@ const formatDate = (date: string) => {
 
 <template>
   <li
-    class="border-bottom flex flex-col border-gray-200 p-3 pl-8 dark:border-gray-800"
+    class="border-bottom flex flex-col border-gray-200 p-3 pl-4 dark:border-gray-800"
   >
-    <div class="text-lg flex space-x-2">
+    <div class="text-sm md:text-lg flex space-x-2">
       <i v-if="issue.isOpen" class="mt-1 far fa-dot-circle list-item-icon" />
       <i v-else class="mt-1 fa-solid fa-circle-check text-purple-500" />
 
