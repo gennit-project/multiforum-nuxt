@@ -27,23 +27,6 @@ export default defineNuxtConfig({
   },
   build: {
     transpile: ["vuetify"],
-    // Extract CSS
-    cssMinify: true,
-    // Improve chunking strategy
-    chunkSizeWarningLimit: 1000,
-    optimization: {
-      splitChunks: {
-        maxSize: 300000,
-        cacheGroups: {
-          styles: {
-            name: 'styles',
-            test: /\.(css|vue)$/,
-            chunks: 'all',
-            enforce: true
-          }
-        }
-      }
-    }
   },
   experimental: {
     payloadExtraction: true,
@@ -71,40 +54,71 @@ export default defineNuxtConfig({
             inMemoryCacheOptions,
             // Always get fresh token from localStorage on each request
             apolloLink: ({ uri }) => {
-              // Only run client-side
+              // SSR path: build an HttpLink instead of `{ uri }`
               if (import.meta.client) {
-                return import('@apollo/client/core').then(({ ApolloLink, HttpLink, from }) => {
-                  // Create regular HTTP link
-                  const httpLink = new HttpLink({ uri });
-                  
-                  // Create auth middleware that adds the token to each request
-                  const authMiddleware = new ApolloLink((operation, forward) => {
-                    // Get the latest token from localStorage on every request
-                    const token = localStorage.getItem('token');
-                    
-                    // Set auth header if token exists
-                    if (token) {
-                      operation.setContext({
-                        headers: {
-                          Authorization: `Bearer ${token}`
-                        }
-                      });
+                return import('@apollo/client/core').then(
+                  async ({ HttpLink, from }) => {
+                    const { setContext } = await import('@apollo/client/link/context')
+                    const { onError }   = await import('@apollo/client/link/error')
+
+                    /* helper that returns a token or null */
+                    const getToken = async (force = false): Promise<string | null> => {
+                      const fn = (globalThis as any).__auth0_getToken
+                      if (!fn) return null
+                      try {
+                        return await fn(force ? { cacheMode: 'off' } : {})
+                      } catch {
+                        return null
+                      }
                     }
 
-                    return forward(operation).map((result) => {
-                      // Handle successful responses
-                      return result;
+                    /* ---- authLink: attach a (fresh) token to every request ---- */
+                    const authLink = setContext(async (_, { headers }) => {
+                      const token = (await getToken()) || localStorage.getItem('token')
+                      return {
+                        headers: {
+                          ...headers,
+                          ...(token && { Authorization: `Bearer ${token}` }),
+                        },
+                      }
+                    })
+
+                    /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
+                    const { fromPromise } = await import('@apollo/client/link/utils');
+                    const errorLink = onError(({ graphQLErrors, networkError, forward, operation }) => {
+                      const unauth =
+                        (networkError && (networkError as any).statusCode === 401) ||
+                        graphQLErrors?.some(e => e.extensions?.code === 'UNAUTHENTICATED');
+
+                      if (!unauth) return;
+
+                      // Force‑refresh, bypassing the SDK cache
+                      return fromPromise(
+                        getToken(true).then(newToken => {
+                          if (!newToken) throw new Error('silent refresh failed');
+                          localStorage.setItem('token', newToken);
+
+                          operation.setContext(({ headers = {} }) => ({
+                            headers: { ...headers, Authorization: `Bearer ${newToken}` },
+                          }));
+                        }).catch(() => {
+                          // SSO cookie is gone → just reload; user either comes back in
+                          // silently or is sent to /authorize.
+                          window.location.reload();
+                        })
+                      ).flatMap(() => forward(operation));
                     });
-                  });
-                  
-                  // Return the combined link
-                  return from([authMiddleware, httpLink]);
-                });
+
+                    const httpLink = new HttpLink({ uri })
+                    return from([errorLink, authLink, httpLink])
+                  }
+                )
               }
-              
-              // Server-side, use regular link
-              return { uri };
+
+              // SSR path: plain link, no token
+              return { uri }
             },
+
             defaultOptions: {
               watchQuery: {
                 errorPolicy: 'all',
@@ -120,48 +134,7 @@ export default defineNuxtConfig({
                 errorPolicy: 'all',
               },
             },
-            // Add global error handler to detect expired tokens and retry operations
-            onError: async (error) => {
-              // Ignore canceled requests to prevent console spam
-              if (error.networkError?.name === "AbortError" || 
-                  error.networkError?.message?.includes("aborted") ||
-                  error.networkError?.message?.includes("canceled")) {
-                return;
-              }
-
-              // Check if the error is related to authentication
-              const isAuthError = error.graphQLErrors?.some(e => 
-                e.message.includes('expired') || 
-                e.message.includes('authentication') ||
-                e.message.includes('unauthorized') ||
-                e.message.includes('session')
-              );
-              
-              if (isAuthError && window.refreshAuthToken) {
-                console.log('Auth error detected, attempting to refresh token');
-                const refreshSucceeded = await window.refreshAuthToken();
-                if (refreshSucceeded) {
-                  console.log('Token refreshed, operation can be retried');
-                  // The user will need to retry their action, but with a fresh token
-                } else {
-                  console.log('Token refresh failed, user may need to log in again');
-                  
-                  // Check if we still have a valid session by examining Auth0 state
-                  // Since we can't access the Auth0 object directly here, we'll check localStorage
-                  const auth0State = localStorage.getItem('auth0.is.authenticated');
-                  
-                  if (auth0State !== 'true') {
-                    // User is likely logged out or has invalid tokens
-                    console.log('Auth0 session is invalid, redirecting to home page');
-                    
-                    // If on a protected page, redirect to home
-                    if (window.location.pathname !== '/') {
-                      window.location.href = '/';
-                    }
-                  }
-                }
-              }
-            },
+            
           },
         },
       },
