@@ -235,6 +235,20 @@ export const GET_DISCUSSION = gql`
         CommentsAggregate(where: { isFeedbackComment: false }) {
           count
         }
+        Answers {
+          id
+          text
+          createdAt
+          CommentAuthor {
+            ... on User {
+              username
+              displayName
+            }
+            ... on ModerationProfile {
+              displayName
+            }
+          }
+        }
       }
       Tags {
         text

@@ -113,6 +113,20 @@ export const GET_DISCUSSION_COMMENTS = gql`
         UpvotedByUsersAggregate {
           count
         }
+        Answers {
+          id
+          text
+          createdAt
+          CommentAuthor {
+            ... on User {
+              username
+              displayName
+            }
+            ... on ModerationProfile {
+              displayName
+            }
+          }
+        }
       }
       Comments {
         id

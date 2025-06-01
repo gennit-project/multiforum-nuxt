@@ -22,9 +22,10 @@ import ArchivedCommentText from "./ArchivedCommentText.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
 import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+import { MARK_AS_ANSWERED_BY_COMMENT, MARK_AS_UNANSWERED } from "@/graphQLData/discussion/mutations";
 import { DateTime } from "luxon";
 import { config } from "@/config";
-import { useQuery } from "@vue/apollo-composable";
+import { useQuery, useMutation } from "@vue/apollo-composable";
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -230,6 +231,15 @@ const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL
   fetchPolicy: "cache-first",
 });
 
+// Mutations for marking comments as best answers
+const {
+  mutate: markAsAnsweredByComment,
+} = useMutation(MARK_AS_ANSWERED_BY_COMMENT);
+
+const {
+  mutate: markAsUnanswered,
+} = useMutation(MARK_AS_UNANSWERED);
+
 const permissionData = computed(() => {
   if (getPermissionResult.value?.channels?.[0]) {
     return getPermissionResult.value.channels[0];
@@ -386,6 +396,52 @@ const copyLink = async () => {
   }, 2000);
 };
 
+// Check if the current user is the discussion author
+const isDiscussionAuthor = computed(() => {
+  return props.originalPoster === usernameVar.value;
+});
+
+// Check if this comment is currently marked as an answer
+const isMarkedAsAnswer = computed(() => {
+  const discussionChannel = props.commentData.DiscussionChannel;
+  if (!discussionChannel?.Answers) {
+    return false;
+  }
+  
+  // Check if this comment's ID is in the Answers array
+  return discussionChannel.Answers.some((answer: any) => answer.id === props.commentData.id);
+});
+
+// Functions for marking/unmarking as best answer
+const handleMarkAsBestAnswer = async () => {
+  
+  try {
+    await markAsAnsweredByComment({
+      commentId: props.commentData.id,
+      channelId: forumId.value,
+      discussionId: discussionId 
+    });
+  } catch (error) {
+    console.error("Error marking comment as best answer:", error);
+  }
+};
+
+const handleUnmarkAsBestAnswer = async () => {
+  if (!props.commentData.DiscussionChannel) {
+    console.warn("No discussion channel found for comment");
+    return;
+  }
+  
+  try {
+    await markAsUnanswered({
+      channelId: forumId.value,
+      discussionId: props.commentData.DiscussionChannel.discussionId,
+    });
+  } catch (error) {
+    console.error("Error unmarking comment as best answer:", error);
+  }
+};
+
 const commentMenuItems = computed(() => {
   let menuItems: any[] = [];
   
@@ -433,6 +489,25 @@ const commentMenuItems = computed(() => {
       event: "handleDelete",
       icon: ALLOWED_ICONS.DELETE,
     });
+  }
+
+  // If user is the discussion author and this is a root comment in a discussion
+  if (isDiscussionAuthor.value && discussionId && props.depth === 1 && !isOwnComment) {
+    if (!isMarkedAsAnswer.value) {
+      menuItems.push({
+        label: "Mark as Best Answer",
+        value: "",
+        event: "handleMarkAsBestAnswer",
+        icon: ALLOWED_ICONS.MARK_BEST_ANSWER,
+      });
+    } else {
+      menuItems.push({
+        label: "Undo Mark as Best Answer",
+        value: "",
+        event: "handleUnmarkAsBestAnswer",
+        icon: ALLOWED_ICONS.UNDO,
+      });
+    }
   }
 
   // Check if the user has any moderation permission (standard mod or above)
@@ -621,6 +696,8 @@ const label = computed(() => {
           :class="[
             isHighlighted
               ? 'rounded-md bg-orange-100 dark:bg-orange-900 border border-orange-600 p-2'
+              : isMarkedAsAnswer
+              ? 'rounded-md bg-green-100 dark:bg-green-900 border border-green-600 p-2'
               : 'dark:bg-gray-950 ',
           ]"
           class="flex w-full"
@@ -635,6 +712,7 @@ const label = computed(() => {
               :show-channel="props.showChannel"
               :original-poster="props.originalPoster"
               :label="label"
+              :is-answer="isMarkedAsAnswer"
             />
             <div
               class="ml-4 flex-grow border-l border-gray-300 pl-4 dark:border-gray-600"
@@ -811,6 +889,8 @@ const label = computed(() => {
                           emit('handleClickUnarchive', props.commentData.id);
                         }
                       "
+                      @handle-mark-as-best-answer="handleMarkAsBestAnswer"
+                      @handle-unmark-as-best-answer="handleUnmarkAsBestAnswer"
                     >
                       <EllipsisHorizontal
                         class="h-5 w-5 cursor-pointer hover:text-black dark:text-gray-300 dark:hover:text-white"

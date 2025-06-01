@@ -68,6 +68,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  answers: {
+    type: Array as PropType<CommentType[]>,
+    required: false,
+    default: () => [],
+  },
 });
 
 const route = useRoute();
@@ -264,6 +269,7 @@ const decrementCommentCount = (cache: any) => {
     :locked="locked"
     :archived="archived"
     :show-nuxt-page="true"
+    :answers="answers"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"

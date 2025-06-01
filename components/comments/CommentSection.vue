@@ -34,6 +34,8 @@ import { modProfileNameVar } from "@/cache";
 import { useRouter, useRoute } from "nuxt/app";
 import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
 import LockIcon from "@/components/icons/LockIcon.vue";
+import PinnedAnswers from "@/components/comments/PinnedAnswers.vue";
+import InfoBanner from "@/components/InfoBanner.vue";
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -110,6 +112,10 @@ const props = defineProps({
   showNuxtPage: {
     type: Boolean,
     default: false,
+  },
+  answers: {
+    type: Array as PropType<CommentType[]>,
+    default: () => [],
   },
 });
 
@@ -616,6 +622,36 @@ const lengthOfCommentInProgress = computed(() => {
       <div class="my-2">
         <slot/>
       </div>
+      <PinnedAnswers 
+        v-if="answers?.length > 0"
+        :answers="answers"
+        :enable-feedback="enableFeedback"
+        :locked="locked || archived"
+        :archived="archived"
+        :original-poster="originalPoster"
+        @create-comment="handleClickCreate"
+        @delete-comment="handleClickDelete"
+        @click-edit-comment="handleClickEdit"
+        @open-edit-comment-editor="openEditCommentEditor"
+        @hide-edit-comment-editor="hideEditCommentEditor"
+        @save-edit="handleSaveEdit"
+        @start-comment-save="commentInProcess = true"
+        @open-reply-editor="openReplyEditor"
+        @hide-reply-editor="hideReplyEditor"
+        @click-report="handleClickReport"
+        @click-feedback="handleClickGiveFeedback"
+        @click-undo-feedback="handleClickUndoFeedback"
+        @click-edit-feedback="handleClickEditFeedback"
+        @handle-view-feedback="handleViewFeedback"
+        @handle-click-archive="handleClickArchive"
+        @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
+        @handle-click-unarchive="handleClickUnarchive"
+        @show-copied-link-notification="showCopiedLinkNotification = $event"
+        @open-mod-profile="showModProfileModal = true"
+        @scroll-to-top="scrollToTop"
+        @update-edit-comment-input="updateEditInputValues"
+        @update-create-reply-comment-input="updateCreateInputValuesForReply"
+      />
       <InfoBanner
         v-if="locked || archived"
         class="mr-10 mt-2"

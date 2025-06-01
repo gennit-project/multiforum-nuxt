@@ -360,6 +360,9 @@ export const MARK_AS_ANSWERED_BY_COMMENT = gql`
             ... on User {
               username
             }
+            ... on ModerationProfile {
+              displayName
+            }
           }
         }
       }

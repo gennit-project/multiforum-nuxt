@@ -42,6 +42,10 @@ const props = defineProps({
     type: String,
     default: "",
   },
+  isAnswer: {
+    type: Boolean,
+    default: false,
+  },
 });
 // Use the utility function to determine admin/mod status
 const authorStatus = computed(() => {
@@ -271,6 +275,12 @@ const contextLinkObject = computed(() => {
             class="rounded-lg border border-orange-500 px-2 py-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900"
           >
             {{ label }}
+          </span>
+          <span
+            v-if="isAnswer"
+            class="rounded-lg border border-green-500 px-2 py-1 text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900"
+          >
+            Best Answer
           </span>
         </div>
       </div>

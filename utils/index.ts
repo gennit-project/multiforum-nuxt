@@ -15,6 +15,7 @@ import UserPlus from "@/components/icons/UserPlus.vue";
 import UserMinus from "@/components/icons/UserMinus.vue";
 import type { Event, Tag as TagData } from "@/__generated__/graphql"
 import ImageIcon from "@/components/icons/ImageIcon.vue";
+import CheckCircle from "@/components/icons/CheckCircle.vue";
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_PROFILE_PIC_SIZE_MB = 1;
@@ -466,6 +467,7 @@ const ALLOWED_ICONS = {
   SUSPEND: 'SUSPEND',
   UNSUSPEND: 'UNSUSPEND',
   ADD_ALBUM: 'ADD_ALBUM',
+  MARK_BEST_ANSWER: 'MARK_BEST_ANSWER',
 }
 
 const actionIconMap = {
@@ -482,6 +484,7 @@ const actionIconMap = {
   [ALLOWED_ICONS.SUSPEND]: UserMinus,
   [ALLOWED_ICONS.UNSUSPEND]: UserPlus,
   [ALLOWED_ICONS.ADD_ALBUM]: ImageIcon,
+  [ALLOWED_ICONS.MARK_BEST_ANSWER]: CheckCircle,
 }
 
 export {

@@ -153,6 +153,12 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
   );
 });
 
+const answers = computed(() => {
+  return (
+    activeDiscussionChannel.value ? activeDiscussionChannel.value.Answers : []
+  );
+});
+
 const isArchived = computed(() => {
   return activeDiscussionChannel.value?.archived;
 });
@@ -572,6 +578,7 @@ const handleEditAlbum = () => {
               :mod-name="loggedInUserModName"
               :previous-offset="previousOffset"
               :reached-end-of-results="reachedEndOfResults"
+              :answers="answers"
               @load-more="loadMore"
             >
               <DiscussionRootCommentFormWrapper
