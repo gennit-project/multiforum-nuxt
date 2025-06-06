@@ -26,6 +26,14 @@ export const GET_USER = gql`
       location
       pronouns
       bio
+      notifyOnReplyToCommentByDefault
+      notifyOnReplyToDiscussionByDefault
+      notifyOnReplyToEventByDefault
+      notifyWhenTagged
+      notifyOnFeedback
+      notificationBundleInterval
+      notificationBundleEnabled
+      notificationBundleContent
       NotificationsAggregate(
         where: { read: false }
       ) {

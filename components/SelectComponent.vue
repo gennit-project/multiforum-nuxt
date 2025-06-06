@@ -7,6 +7,10 @@ import CheckIcon from '@/components/icons/CheckIcon.vue';
 import type { SelectOptionData } from "@/types/GenericFormTypes";
 
 const props = defineProps({
+  label: {
+    type: String,
+    required: true,
+  },
   defaultOption: {
     type: Object as PropType<SelectOptionData | null>,
     required: false,
@@ -53,7 +57,7 @@ function handleSelect(event: SelectOptionData) {
           focus:ring-orange-500
           focus:border-orange-500
         "
-        :label="selected.label"
+        :label="props.label ?? selected.label"
       >
         <span
           class="

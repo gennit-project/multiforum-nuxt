@@ -21,6 +21,14 @@ export const UPDATE_USER = gql`
         displayName 
         bio 
         profilePicURL
+        notifyOnReplyToCommentByDefault
+        notifyOnReplyToDiscussionByDefault
+        notifyOnReplyToEventByDefault
+        notifyWhenTagged
+        notifyOnFeedback
+        notificationBundleInterval
+        notificationBundleEnabled
+        notificationBundleContent
       }
     }
   }

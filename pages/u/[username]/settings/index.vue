@@ -6,6 +6,9 @@ import { UPDATE_USER } from "@/graphQLData/user/mutations";
 import EditAccountSettingsFields from "@/components/user/EditAccountSettingsFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import NotificationComponent from "@/components/NotificationComponent.vue";
+import TabButton from "@/components/channel/TabButton.vue";
+import CogIcon from "@/components/icons/CogIcon.vue";
+import MessageIcon from "@/components/icons/MessageIcon.vue";
 import type { EditAccountSettingsFormValues } from "@/types/User";
 import type { UserUpdateInput } from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";
@@ -46,15 +49,25 @@ watch(
     if (newVal && newVal.users.length > 0) {
       const user = newVal.users[0];
       formValues.value = {
-        profilePicURL: user.profilePicURL,
-        displayName: user.displayName,
-        bio: user.bio,
+        profilePicURL: user.profilePicURL || "",
+        displayName: user.displayName || "",
+        bio: user.bio || "",
       };
       dataLoaded.value = true;
     }
-  },
-  { immediate: true }
+  }
 );
+
+// Handle initial data load
+if (getUserResult.value && getUserResult.value.users.length > 0) {
+  const user = getUserResult.value.users[0];
+  formValues.value = {
+    profilePicURL: user.profilePicURL || "",
+    displayName: user.displayName || "",
+    bio: user.bio || "",
+  };
+  dataLoaded.value = true;
+}
 
 const userUpdateInput = computed(() => {
   return {
@@ -85,9 +98,25 @@ async function submit() {
     username: usernameVar.value,
   });
 }
+
 function updateFormValues(data: EditAccountSettingsFormValues) {
   formValues.value = { ...formValues.value, ...data };
 }
+
+const tabs = computed(() => [
+  {
+    name: "basic",
+    href: `/u/${usernameInParams.value}/settings`,
+    label: "Basic Settings",
+    icon: CogIcon,
+  },
+  {
+    name: "notifications",
+    href: `/u/${usernameInParams.value}/settings/notifications`,
+    label: "Notifications",
+    icon: MessageIcon,
+  },
+]);
 </script>
 
 <template>
@@ -98,9 +127,20 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
     :full-width="true"
   >
     <template #has-auth>
-      <div
-        class="bg-white dark:bg-gray-900 dark:text-white w-full px-6 lg:px-12"
-      >
+      <div class="bg-white dark:bg-gray-900 dark:text-white w-full px-6 lg:px-12">
+        <!-- Tab Navigation -->
+        <nav class="flex space-x-2 pt-1 text-sm border-b border-gray-200 dark:border-gray-700 mb-6" aria-label="Settings Tabs">
+          <TabButton
+            v-for="tab in tabs"
+            :key="tab.name"
+            :to="tab.href"
+            :label="tab.label"
+          >
+            <component :is="tab.icon" class="h-5 w-5 shrink-0" />
+          </TabButton>
+        </nav>
+
+        <!-- Current Settings Form -->
         <EditAccountSettingsFields
           :key="dataLoaded.toString()"
           :edit-mode="true"
@@ -112,6 +152,7 @@ function updateFormValues(data: EditAccountSettingsFormValues) {
           @submit="submit"
           @update-form-values="updateFormValues"
         />
+        
         <NotificationComponent
           v-if="showSavedChangesNotification"
           title="Your changes have been saved."
