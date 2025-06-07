@@ -369,6 +369,7 @@ const handleSubscriptionToggle = () => {
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
+    @load-more="$emit('loadMore')"
   >
     <template #subscription-button>
       <SubscribeButton
