@@ -64,6 +64,13 @@
     return typeof route.params.forumId === "string" ? route.params.forumId : "";
   });
 
+  const createEventLink = computed(() => {
+    if (channelId.value) {
+      return `/forums/${channelId.value}/events/create`;
+    }
+    return "/events/create";
+  });
+
   const showOnlineOnly = computed(() => route.name === "SearchEventsList");
   const showInPersonOnly = computed(() => {
     return route.name && typeof route.name === "string" && route.name.includes("map-search")
@@ -310,7 +317,7 @@
           <PrimaryButton
             class="mx-2"
             :label="'New Event'"
-            @click="$router.push(`/forums/${channelId}/events/create`)"
+            @click="$router.push(createEventLink)"
           />
         </template>
         <template #does-not-have-auth>
