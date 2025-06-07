@@ -11,11 +11,12 @@ import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import { usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
-import { useMutation } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import { 
   SUBSCRIBE_TO_DISCUSSION_CHANNEL, 
   UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL 
 } from "@/graphQLData/discussion/mutations";
+import { GET_USER } from "@/graphQLData/user/queries";
 import Notification from "@/components/NotificationComponent.vue";
 import SubscribeButton from "@/components/SubscribeButton.vue";
 
@@ -109,6 +110,20 @@ const channelId = computed(() => {
   return "";
 });
 
+// Query for user data to get notification preferences
+const {
+  result: getUserResult,
+} = useQuery(GET_USER, {
+  username: usernameVar.value,
+}, {
+  enabled: !!usernameVar.value,
+});
+
+// Get user's notification preference for comment replies
+const notifyOnReplyToCommentByDefault = computed(() => {
+  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+});
+
 const createCommentInput = computed(() => {
   const input: CommentCreateInput = {
     isRootComment: false,
@@ -163,6 +178,18 @@ const createCommentInput = computed(() => {
       ],
     },
   };
+
+  // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
+  if (notifyOnReplyToCommentByDefault.value) {
+    input.SubscribedToNotifications = {
+      connect: {
+        where: {
+          node: { username: usernameVar.value }
+        }
+      }
+    };
+  }
+
   return input;
 });
 

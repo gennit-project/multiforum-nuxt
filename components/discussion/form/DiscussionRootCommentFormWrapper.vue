@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
 import type { Comment, DiscussionChannel } from "@/__generated__/graphql";
 import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
+import { GET_USER } from "@/graphQLData/user/queries";
 import { usernameVar } from "@/cache";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { useRoute } from "nuxt/app";
@@ -41,6 +42,20 @@ const COMMENT_LIMIT = 50;
 
 // Setup
 const route = useRoute();
+
+// Query for user data to get notification preferences
+const {
+  result: getUserResult,
+} = useQuery(GET_USER, {
+  username: usernameVar.value,
+}, {
+  enabled: !!usernameVar.value,
+});
+
+// Get user's notification preference for comment replies
+const notifyOnReplyToCommentByDefault = computed(() => {
+  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+});
 
 const createCommentDefaultValues = {
   text: "",
@@ -94,6 +109,18 @@ const createCommentInput = computed(() => {
       },
     },
   };
+
+  // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
+  if (notifyOnReplyToCommentByDefault.value) {
+    input.SubscribedToNotifications = {
+      connect: {
+        where: {
+          node: { username: usernameVar.value }
+        }
+      }
+    };
+  }
+
   return [input];
 });
 

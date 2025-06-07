@@ -2,10 +2,11 @@
 import { ref, computed } from "vue";
 import { useRoute } from "nuxt/app";
 import type { PropType } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import { useMutation, useQuery } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
 import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
+import { GET_USER } from "@/graphQLData/user/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import type { Event } from "@/__generated__/graphql";
@@ -34,6 +35,20 @@ const channelId = computed(() => {
   return "";
 });
 
+// Query for user data to get notification preferences
+const {
+  result: getUserResult,
+} = useQuery(GET_USER, {
+  username: usernameVar.value,
+}, {
+  enabled: !!usernameVar.value,
+});
+
+// Get user's notification preference for comment replies
+const notifyOnReplyToCommentByDefault = computed(() => {
+  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+});
+
 const createCommentDefaultValues: CreateEditCommentFormValues = {
   text: "",
   isRootComment: true,
@@ -44,8 +59,8 @@ const createFormValues = ref<CreateEditCommentFormValues>(
   createCommentDefaultValues
 );
 
-const createCommentInput = computed(() => [
-  {
+const createCommentInput = computed(() => {
+  const baseInput = {
     isRootComment: true,
     isFeedbackComment: false,
     text: createFormValues.value.text || "",
@@ -77,8 +92,21 @@ const createCommentInput = computed(() => [
         where: { node: { username: usernameVar.value } },
       },
     },
-  },
-]);
+  };
+
+  // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
+  if (notifyOnReplyToCommentByDefault.value) {
+    baseInput.SubscribedToNotifications = {
+      connect: {
+        where: {
+          node: { username: usernameVar.value }
+        }
+      }
+    };
+  }
+
+  return [baseInput];
+});
 
 const createCommentLoading = ref(false);
 const commentEditorOpen = ref(false);

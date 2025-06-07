@@ -7,6 +7,8 @@ import CommentSection from "@/components/comments/CommentSection.vue";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
+import { useQuery } from "@vue/apollo-composable";
+import { GET_USER } from "@/graphQLData/user/queries";
 
 const COMMENT_LIMIT = 50;
 
@@ -83,59 +85,88 @@ const channelId = computed(() => {
   return "";
 });
 
-const createCommentInput = computed(() => ({
-  isRootComment: false,
-  Event: {
-    connect: {
-      where: {
-        node: {
-          id: props.event?.id,
-        },
-      },
-    },
-  },
-  Channel: {
-    connect: {
-      where: {
-        node: {
-          uniqueName: channelId.value,
-        },
-      },
-    },
-  },
-  ParentComment: {
-    connect: {
-      where: {
-        node: {
-          id: createFormValues.value.parentCommentId,
-        },
-      },
-    },
-  },
-  text: createFormValues.value.text || "",
-  CommentAuthor: {
-    User: {
+// Query for user data to get notification preferences
+const {
+  result: getUserResult,
+} = useQuery(GET_USER, {
+  username: usernameVar.value,
+}, {
+  enabled: !!usernameVar.value,
+});
+
+// Get user's notification preference for comment replies
+const notifyOnReplyToCommentByDefault = computed(() => {
+  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+});
+
+const createCommentInput = computed(() => {
+  const input = {
+    isRootComment: false,
+    Event: {
       connect: {
         where: {
           node: {
-            username: usernameVar.value,
+            id: props.event?.id,
           },
         },
       },
     },
-  },
-  UpvotedByUsers: {
-    connect: [
-      {
+    Channel: {
+      connect: {
         where: {
           node: {
-            username: usernameVar.value,
+            uniqueName: channelId.value,
           },
         },
       },
-    ],
-  },
-}));
+    },
+    ParentComment: {
+      connect: {
+        where: {
+          node: {
+            id: createFormValues.value.parentCommentId,
+          },
+        },
+      },
+    },
+    text: createFormValues.value.text || "",
+    CommentAuthor: {
+      User: {
+        connect: {
+          where: {
+            node: {
+              username: usernameVar.value,
+            },
+          },
+        },
+      },
+    },
+    UpvotedByUsers: {
+      connect: [
+        {
+          where: {
+            node: {
+              username: usernameVar.value,
+            },
+          },
+        },
+      ],
+    },
+  };
+
+  // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
+  if (notifyOnReplyToCommentByDefault.value) {
+    input.SubscribedToNotifications = {
+      connect: {
+        where: {
+          node: { username: usernameVar.value }
+        }
+      }
+    };
+  }
+
+  return input;
+});
 
 // Methods for handling comment section updates
 function updateCreateReplyCommentInput(event: CreateEditCommentFormValues) {
