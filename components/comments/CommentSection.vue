@@ -614,10 +614,13 @@ const lengthOfCommentInProgress = computed(() => {
   <div class="bg-white dark:bg-gray-800 pr-2">
     <div>
       <div class="align-items flex justify-between">
-        <h2 id="comments" class="px-1 text-lg dark:text-white">
-          {{ `Comments (${aggregateCommentCount})` }}
-        </h2>
-        <SortButtons v-if="showCommentSortButtons && aggregateCommentCount > 0" :show-top-options="false" />
+        <div class="flex items-center justify-between space-x-4 w-full">
+          <h2 id="comments" class="px-1 text-lg dark:text-white">
+            {{ `Comments (${aggregateCommentCount})` }}
+          </h2>
+          <slot name="subscription-button" />
+        </div>
+        <SortButtons v-if="showCommentSortButtons && aggregateCommentCount > 0" class="ml-2" :show-top-options="false" />
       </div>
       <div class="my-2">
         <slot/>

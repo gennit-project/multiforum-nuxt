@@ -11,6 +11,13 @@ import type { CreateEditCommentFormValues } from "@/types/Comment";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import { usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
+import { useMutation } from "@vue/apollo-composable";
+import { 
+  SUBSCRIBE_TO_DISCUSSION_CHANNEL, 
+  UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL 
+} from "@/graphQLData/discussion/mutations";
+import Notification from "@/components/NotificationComponent.vue";
+import SubscribeButton from "@/components/SubscribeButton.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -167,6 +174,10 @@ const updateCreateReplyCommentInput = (event: CreateEditCommentFormValues) => {
   createFormValues.value = event;
 };
 
+defineEmits<{
+  loadMore: []
+}>();
+
 const updateCommentSectionQueryResult = (
   input: CommentSectionQueryUpdateInput
 ) => {
@@ -253,6 +264,90 @@ const decrementCommentCount = (cache: any) => {
     console.error("Error decrementing comment count:", error);
   }
 };
+
+// Subscription functionality
+const showSubscribedNotification = ref(false);
+const showUnsubscribedNotification = ref(false);
+
+const isSubscribed = computed(() => {
+  if (!props.discussionChannel?.SubscribedToNotifications || !usernameVar.value) {
+    return false;
+  }
+  return props.discussionChannel.SubscribedToNotifications.some(
+    (user) => user.username === usernameVar.value
+  );
+});
+
+const {
+  mutate: subscribeToDiscussionChannel,
+  loading: subscribeLoading,
+  onDone: onSubscribeComplete,
+} = useMutation(SUBSCRIBE_TO_DISCUSSION_CHANNEL, {
+  update: (cache, result) => {
+    if (result.data?.subscribeToDiscussionChannel && props.discussionChannel?.id) {
+      cache.modify({
+        id: cache.identify({
+          __typename: "DiscussionChannel",
+          id: props.discussionChannel.id
+        }),
+        fields: {
+          SubscribedToNotifications(_) {
+            return result.data.subscribeToDiscussionChannel.SubscribedToNotifications;
+          }
+        }
+      });
+    }
+  }
+});
+
+onSubscribeComplete(() => {
+  showSubscribedNotification.value = true;
+});
+
+const {
+  mutate: unsubscribeFromDiscussionChannel,
+  loading: unsubscribeLoading,
+  onDone: onUnsubscribeComplete,
+} = useMutation(UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL, {
+  update: (cache, result) => {
+    if (result.data?.unsubscribeFromDiscussionChannel && props.discussionChannel?.id) {
+      cache.modify({
+        id: cache.identify({
+          __typename: "DiscussionChannel",
+          id: props.discussionChannel.id
+        }),
+        fields: {
+          SubscribedToNotifications(_) {
+            return result.data.unsubscribeFromDiscussionChannel.SubscribedToNotifications;
+          }
+        }
+      });
+    }
+  }
+});
+
+onUnsubscribeComplete(() => {
+  showUnsubscribedNotification.value = true;
+});
+
+const subscriptionLoading = computed(() => subscribeLoading.value || unsubscribeLoading.value);
+
+const handleSubscriptionToggle = () => {
+  if (!props.discussionChannel?.id) {
+    console.error("No discussion channel ID found");
+    return;
+  }
+
+  if (isSubscribed.value) {
+    unsubscribeFromDiscussionChannel({
+      discussionChannelId: props.discussionChannel.id
+    });
+  } else {
+    subscribeToDiscussionChannel({
+      discussionChannelId: props.discussionChannel.id
+    });
+  }
+};
 </script>
 
 <template>
@@ -275,6 +370,25 @@ const decrementCommentCount = (cache: any) => {
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
   >
+    <template #subscription-button>
+      <SubscribeButton
+        :is-subscribed="isSubscribed"
+        :loading="subscriptionLoading"
+        @toggle="handleSubscriptionToggle"
+      />
+    </template>
     <slot />
   </CommentSection>
+
+  <!-- Notification toasts -->
+  <Notification
+    :show="showSubscribedNotification"
+    :title="'Successfully subscribed to notifications for this discussion'"
+    @close-notification="showSubscribedNotification = false"
+  />
+  <Notification
+    :show="showUnsubscribedNotification" 
+    :title="'Successfully unsubscribed from notifications for this discussion'"
+    @close-notification="showUnsubscribedNotification = false"
+  />
 </template>

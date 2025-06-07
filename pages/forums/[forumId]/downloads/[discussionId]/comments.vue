@@ -8,7 +8,7 @@
     GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
     GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
   } from "@/graphQLData/comment/queries";
-  import { modProfileNameVar } from "@/cache";
+  import { modProfileNameVar, usernameVar } from "@/cache";
   import DiscussionCommentsWrapper from "@/components/discussion/detail/DiscussionCommentsWrapper.vue";
   import DiscussionRootCommentFormWrapper from "@/components/discussion/form/DiscussionRootCommentFormWrapper.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
@@ -51,12 +51,13 @@
     fetchMore: fetchMoreComments,
   } = useQuery(
     GET_DISCUSSION_COMMENTS,
-    {
-      discussionId,
-      channelUniqueName: channelId,
+    () => ({
+      discussionId: discussionId.value,
+      channelUniqueName: channelId.value,
+      username: usernameVar.value,
       offset: 0,
       limit: COMMENT_LIMIT,
-    },
+    }),
     {
       fetchPolicy: "cache-first",
     }

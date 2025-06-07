@@ -39,7 +39,7 @@ function handleClick(item: MenuItemType) {
       <div>
         <MenuButton
           :data-testid="`text-dropdown-${label}`"
-          class="inline-flex border border-gray-800 dark:border-gray-600 hover:dark:bg-gray-700 py-2 w-full items-center justify-center gap-x-1.5 rounded-md bg-white pr-4 pl-3 text-xs text-black hover:bg-gray-200 focus:outline-none dark:bg-gray-900 dark:text-white"
+          class="text-gray-700 inline-flex border border-gray-300 dark:border-gray-600 hover:dark:bg-gray-700 py-2 w-full items-center justify-center gap-x-1.5 rounded-md bg-white pr-4 pl-3 text-xs hover:bg-gray-200 focus:outline-none dark:bg-gray-900 dark:text-white"
         >
           <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
           {{ label }}
@@ -87,7 +87,7 @@ function handleClick(item: MenuItemType) {
     <template #fallback>
       <button
         :data-testid="`text-dropdown-${label}`"
-        class="inline-flex border dark:border-gray-600 hover:dark:bg-gray-600 h-10 w-full items-center justify-center gap-x-1.5 rounded-md bg-white pr-4 pl-3 text-xs text-black hover:bg-gray-200 focus:outline-none dark:bg-gray-700 dark:text-white"
+        class="text-gray-700 inline-flex border dark:border-gray-600 hover:dark:bg-gray-600 h-10 w-full items-center justify-center gap-x-1.5 rounded-md bg-white pr-4 pl-3 text-xs hover:bg-gray-200 focus:outline-none dark:bg-gray-700 dark:text-white"
       >
         <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
         {{ label }}

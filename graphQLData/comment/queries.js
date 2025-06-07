@@ -66,6 +66,7 @@ export const COMMENT_FIELDS = gql`
 export const GET_DISCUSSION_COMMENTS = gql`
   query getCommentSection(
     $channelUniqueName: String!
+    $username: String
     $discussionId: ID!
     $modName: String
     $offset: Int
@@ -74,6 +75,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
   ) {
     getCommentSection(
       channelUniqueName: $channelUniqueName
+      username: $username
       discussionId: $discussionId
       modName: $modName
       offset: $offset
@@ -112,6 +114,9 @@ export const GET_DISCUSSION_COMMENTS = gql`
         }
         UpvotedByUsersAggregate {
           count
+        }
+        SubscribedToNotifications {
+          username
         }
         Answers {
           id

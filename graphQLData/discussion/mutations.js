@@ -413,6 +413,28 @@ export const DELETE_TEXT_VERSION = gql`
   }
 `;
 
+export const SUBSCRIBE_TO_DISCUSSION_CHANNEL = gql`
+  mutation subscribeToDiscussionChannel($discussionChannelId: ID!) {
+    subscribeToDiscussionChannel(discussionChannelId: $discussionChannelId) {
+      id
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
+export const UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL = gql`
+  mutation unsubscribeFromDiscussionChannel($discussionChannelId: ID!) {
+    unsubscribeFromDiscussionChannel(discussionChannelId: $discussionChannelId) {
+      id
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
 
 // mutation {
 //   createFilterGroups(input: [{

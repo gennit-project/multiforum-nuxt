@@ -119,14 +119,15 @@ const {
   refetch: refetchDiscussionChannel,
 } = useQuery(
   GET_DISCUSSION_COMMENTS,
-  {
+  () => ({
     discussionId: props.discussionId,
     channelUniqueName: channelId.value,
+    username: usernameVar.value,
     modName: loggedInUserModName.value,
     offset: offset.value,
     limit: COMMENT_LIMIT,
     sort: commentSort.value,
-  },
+  }),
   {
     fetchPolicy: "cache-first",
   }
