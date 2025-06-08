@@ -155,3 +155,25 @@ export const ADD_FEEDBACK_COMMENT_TO_EVENT = gql`
     }
   }
 `;
+
+export const SUBSCRIBE_TO_EVENT = gql`
+  mutation subscribeToEvent($eventId: ID!) {
+    subscribeToEvent(eventId: $eventId) {
+      id
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;
+
+export const UNSUBSCRIBE_FROM_EVENT = gql`
+  mutation unsubscribeFromEvent($eventId: ID!) {
+    unsubscribeFromEvent(eventId: $eventId) {
+      id
+      SubscribedToNotifications {
+        username
+      }
+    }
+  }
+`;

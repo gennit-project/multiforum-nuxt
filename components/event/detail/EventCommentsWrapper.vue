@@ -7,8 +7,11 @@ import CommentSection from "@/components/comments/CommentSection.vue";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
+import { useQuery, useMutation } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
+import { SUBSCRIBE_TO_EVENT, UNSUBSCRIBE_FROM_EVENT } from "@/graphQLData/event/mutations";
+import Notification from "@/components/NotificationComponent.vue";
+import SubscribeButton from "@/components/SubscribeButton.vue";
 
 const COMMENT_LIMIT = 50;
 
@@ -266,6 +269,90 @@ function decrementCommentCount(cache: any) {
     console.error("Error decrementing comment count:", error);
   }
 }
+
+// Subscription functionality
+const showSubscribedNotification = ref(false);
+const showUnsubscribedNotification = ref(false);
+
+const isSubscribed = computed(() => {
+  if (!props.event?.SubscribedToNotifications || !usernameVar.value) {
+    return false;
+  }
+  return props.event.SubscribedToNotifications.some(
+    (user) => user.username === usernameVar.value
+  );
+});
+
+const {
+  mutate: subscribeToEvent,
+  loading: subscribeLoading,
+  onDone: onSubscribeComplete,
+} = useMutation(SUBSCRIBE_TO_EVENT, {
+  update: (cache, result) => {
+    if (result.data?.subscribeToEvent && props.event?.id) {
+      cache.modify({
+        id: cache.identify({
+          __typename: "Event",
+          id: props.event.id
+        }),
+        fields: {
+          SubscribedToNotifications(_) {
+            return result.data.subscribeToEvent.SubscribedToNotifications;
+          }
+        }
+      });
+    }
+  }
+});
+
+onSubscribeComplete(() => {
+  showSubscribedNotification.value = true;
+});
+
+const {
+  mutate: unsubscribeFromEvent,
+  loading: unsubscribeLoading,
+  onDone: onUnsubscribeComplete,
+} = useMutation(UNSUBSCRIBE_FROM_EVENT, {
+  update: (cache, result) => {
+    if (result.data?.unsubscribeFromEvent && props.event?.id) {
+      cache.modify({
+        id: cache.identify({
+          __typename: "Event",
+          id: props.event.id
+        }),
+        fields: {
+          SubscribedToNotifications(_) {
+            return result.data.unsubscribeFromEvent.SubscribedToNotifications;
+          }
+        }
+      });
+    }
+  }
+});
+
+onUnsubscribeComplete(() => {
+  showUnsubscribedNotification.value = true;
+});
+
+const subscriptionLoading = computed(() => subscribeLoading.value || unsubscribeLoading.value);
+
+const handleSubscriptionToggle = () => {
+  if (!props.event?.id) {
+    console.error("No event ID found");
+    return;
+  }
+
+  if (isSubscribed.value) {
+    unsubscribeFromEvent({
+      eventId: props.event.id
+    });
+  } else {
+    subscribeToEvent({
+      eventId: props.event.id
+    });
+  }
+};
 </script>
 
 <template>
@@ -289,6 +376,25 @@ function decrementCommentCount(cache: any) {
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
   >
+    <template #subscription-button>
+      <SubscribeButton
+        :is-subscribed="isSubscribed"
+        :loading="subscriptionLoading"
+        @toggle="handleSubscriptionToggle"
+      />
+    </template>
     <slot />
   </CommentSection>
+
+  <!-- Notification toasts -->
+  <Notification
+    :show="showSubscribedNotification"
+    :title="'Successfully subscribed to notifications for this event'"
+    @close-notification="showSubscribedNotification = false"
+  />
+  <Notification
+    :show="showUnsubscribedNotification" 
+    :title="'Successfully unsubscribed from notifications for this event'"
+    @close-notification="showUnsubscribedNotification = false"
+  />
 </template>

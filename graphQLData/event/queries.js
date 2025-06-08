@@ -55,6 +55,9 @@ export const EVENT_FIELDS = gql`
         channelIconURL
       }
     }
+    SubscribedToNotifications {
+      username
+    }
   }
 `;
 
