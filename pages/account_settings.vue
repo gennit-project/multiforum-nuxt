@@ -6,9 +6,6 @@ import { UPDATE_USER } from "@/graphQLData/user/mutations";
 import EditAccountSettingsFields from "@/components/user/EditAccountSettingsFields.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import NotificationComponent from "@/components/NotificationComponent.vue";
-import TabButton from "@/components/channel/TabButton.vue";
-import CogIcon from "@/components/icons/CogIcon.vue";
-import MessageIcon from "@/components/icons/MessageIcon.vue";
 import FormRow from "@/components/FormRow.vue";
 import CheckBox from "@/components/CheckBox.vue";
 import SaveButton from "@/components/SaveButton.vue";
@@ -29,11 +26,6 @@ type NotificationFormValues = {
 
 const route = useRoute();
 const router = useRouter();
-
-// Get active tab from query param, default to basic
-const activeTab = computed(() => {
-  return (route.query.tab as string) || 'basic';
-});
 
 const {
   result: getUserResult,
@@ -175,25 +167,6 @@ async function submitNotificationSettings() {
 function updateBasicFormValues(data: EditAccountSettingsFormValues) {
   basicFormValues.value = { ...basicFormValues.value, ...data };
 }
-
-const tabs = computed(() => [
-  {
-    name: "basic",
-    href: "/account_settings?tab=basic",
-    label: "Basic Settings",
-    icon: CogIcon,
-  },
-  {
-    name: "notifications", 
-    href: "/account_settings?tab=notifications",
-    label: "Notifications",
-    icon: MessageIcon,
-  },
-]);
-
-function changeTab(tabName: string) {
-  router.push(`/account_settings?tab=${tabName}`);
-}
 </script>
 
 <template>
@@ -206,38 +179,23 @@ function changeTab(tabName: string) {
       <template #has-auth>
         <div class="bg-white dark:bg-gray-900 dark:text-white min-h-screen">
           <div class="max-w-4xl mx-auto px-6 lg:px-12 py-8">
-            <h1 class="text-2xl font-bold mb-8">Account Settings</h1>
             
-            <!-- Tab Navigation -->
-            <nav class="flex space-x-2 pt-1 text-sm border-b border-gray-200 dark:border-gray-700 mb-6" aria-label="Settings Tabs">
-              <TabButton
-                v-for="tab in tabs"
-                :key="tab.name"
-                :to="tab.href"
-                :label="tab.label"
-                :is-active="activeTab === tab.name"
-              >
-                <component :is="tab.icon" class="h-5 w-5 shrink-0" />
-              </TabButton>
-            </nav>
+            <!-- Basic Settings Section -->
+            <div class="mb-12">
+              <EditAccountSettingsFields
+                :key="dataLoaded.toString()"
+                :edit-mode="true"
+                :user-loading="getUserLoading"
+                :get-user-error="getUserError"
+                :update-user-error="updateUserError"
+                :update-user-loading="updateUserLoading"
+                :form-values="basicFormValues"
+                @submit="submitBasicSettings"
+                @update-form-values="updateBasicFormValues"
+              />
+            </div>
 
-          <!-- Basic Settings Tab -->
-          <div v-if="activeTab === 'basic'">
-            <EditAccountSettingsFields
-              :key="dataLoaded.toString()"
-              :edit-mode="true"
-              :user-loading="getUserLoading"
-              :get-user-error="getUserError"
-              :update-user-error="updateUserError"
-              :update-user-loading="updateUserLoading"
-              :form-values="basicFormValues"
-              @submit="submitBasicSettings"
-              @update-form-values="updateBasicFormValues"
-            />
-          </div>
-
-          <!-- Notification Settings Tab -->
-          <div v-if="activeTab === 'notifications'">
+            <!-- Notification Settings Section -->
             <div v-if="dataLoaded" class="space-y-6">
               <h2 class="text-xl font-semibold mb-4">Notification Settings</h2>
               
@@ -303,7 +261,7 @@ function changeTab(tabName: string) {
                 </template>
               </FormRow>
 
-              <!-- Save Button -->
+              <!-- Save Button for Notifications -->
               <div class="pt-4">
                 <SaveButton
                   :test-id="'save-notification-settings'"
@@ -318,17 +276,16 @@ function changeTab(tabName: string) {
               </div>
             </div>
 
-            <!-- Loading State -->
+            <!-- Loading State for Notifications -->
             <div v-else-if="getUserLoading" class="text-center py-8">
               <div class="text-gray-500 dark:text-gray-400">Loading notification settings...</div>
             </div>
-          </div>
           
-          <NotificationComponent
-            v-if="showSavedChangesNotification"
-            :title="activeTab === 'basic' ? 'Your changes have been saved.' : 'Your notification settings have been saved.'"
-            @close-notification="showSavedChangesNotification = false"
-          />
+            <NotificationComponent
+              v-if="showSavedChangesNotification"
+              title="Your settings have been saved."
+              @close-notification="showSavedChangesNotification = false"
+            />
           </div>
         </div>
       </template>
