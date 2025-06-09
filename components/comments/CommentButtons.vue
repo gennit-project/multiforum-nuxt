@@ -66,6 +66,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isMarkedAsAnswer: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -136,6 +140,7 @@ function toggleEmojiPicker() {
         :comment-data="commentData"
         :show-downvote="enableFeedback && !loggedInUserIsAuthor"
         :is-permalinked="isPermalinked"
+        :is-marked-as-answer="isMarkedAsAnswer"
         @open-mod-profile="emit('openModProfile')"
         @click-feedback="emit('clickFeedback')"
         @click-undo-feedback="emit('clickUndoFeedback')"
@@ -145,6 +150,7 @@ function toggleEmojiPicker() {
       <NewEmojiButton
         :comment-id="commentData.id"
         :is-permalinked="isPermalinked"
+        :is-marked-as-answer="isMarkedAsAnswer"
         @toggle-emoji-picker="toggleEmojiPicker"
       />
       <ReplyButton
@@ -154,6 +160,7 @@ function toggleEmojiPicker() {
         :parent-comment-id="parentCommentId"
         :depth="depth"
         :is-permalinked="isPermalinked"
+        :is-marked-as-answer="isMarkedAsAnswer"
         @click="emit('openReplyEditor', commentData.id)"
       />
       <span

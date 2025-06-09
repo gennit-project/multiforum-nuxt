@@ -21,6 +21,10 @@ const properties = defineProps({
     default: "",
   },
   isPermalinked: Boolean,
+  isMarkedAsAnswer: {
+    type: Boolean,
+    default: false,
+  },
   class: {
     type: String,
     default: "",
@@ -33,6 +37,18 @@ const buttonClasses = computed(() => {
   const baseClasses = [
     "inline-flex max-h-6 cursor-pointer items-center rounded-full px-2 py-1",
   ];
+
+  // Use green styling for best answer comments
+  if (properties.isMarkedAsAnswer) {
+    const bestAnswerClasses = properties.active
+      ? "border-green-500 bg-green-500 text-white dark:border-green-600 dark:bg-green-600 dark:hover:bg-green-500"
+      : "border-green-200 bg-green-100 text-green-700 hover:border-green-400 hover:bg-green-200 dark:border-green-600 dark:bg-green-800 dark:text-green-300 dark:hover:bg-green-700";
+    
+    // Include external class passed from parent component
+    const externalClass = properties.class || "";
+    
+    return [...baseClasses, bestAnswerClasses, externalClass].join(" ");
+  }
 
   const defaultClasses = properties.active
     ? "border-orange-500 bg-orange-500 text-white dark:border-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500"

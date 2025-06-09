@@ -25,6 +25,11 @@ defineProps({
     required: false,
     default: false,
   },
+  isMarkedAsAnswer: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const showMenu = ref(false);
@@ -46,6 +51,7 @@ function handleClick() {
           :show-count="false"
           :tooltip-text="'Add reaction...'"
           :is-permalinked="isPermalinked"
+          :is-marked-as-answer="isMarkedAsAnswer"
           @vote="handleClick"
         >
           <i class="fa-regular fa-face-smile" />

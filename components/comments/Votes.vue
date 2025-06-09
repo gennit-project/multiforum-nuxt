@@ -46,6 +46,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isMarkedAsAnswer: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -135,6 +139,7 @@ function viewFeedback() {
           : 'Upvote to make this comment more visible'
       "
       :is-permalinked="isPermalinked"
+      :is-marked-as-answer="isMarkedAsAnswer"
       @vote="clickUpvote"
     >
       <i class="fa-solid fa-arrow-up mr-1 w-3" />
@@ -157,6 +162,7 @@ function viewFeedback() {
         :loading="false"
         :active="downvoteActive"
         :is-permalinked="isPermalinked"
+        :is-marked-as-answer="isMarkedAsAnswer"
       >
         <HandThumbDownIcon class="h-4 w-4" />
       </VoteButton>

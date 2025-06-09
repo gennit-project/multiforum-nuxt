@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { ref, nextTick, onMounted } from "vue";
+import { ref, nextTick, onMounted, computed } from "vue";
 import type { PropType } from "vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import { actionIconMap } from "@/utils";
 
 import type { MenuItemType } from "./IconButtonDropdown.vue";
 
-defineProps({
+const props = defineProps({
   dataTestid: {
     type: String,
     default: "",
@@ -15,6 +15,10 @@ defineProps({
     type: Array as PropType<MenuItemType[]>,
     default: () => [],
   },
+  isMarkedAsAnswer: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emits = defineEmits<(e: string) => void>(); // Accept any event type
@@ -22,6 +26,17 @@ const emits = defineEmits<(e: string) => void>(); // Accept any event type
 const emitEvent = (eventName: string) => {
   emits(eventName);
 };
+
+// Computed class for green styling when comment is marked as best answer
+const buttonClasses = computed(() => {
+  const baseClasses = "shadow-none focus:ring-indigo-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100";
+  
+  if (props.isMarkedAsAnswer) {
+    return `${baseClasses} text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300`;
+  }
+  
+  return baseClasses;
+});
 
 // Setup function
 const uniqueID = ref(Math.random().toString(36).substring(7));
@@ -73,7 +88,7 @@ const menuStyles = {
           :data-testid="dataTestid"
           variant="text"
           v-bind="props"
-          class="shadow-none focus:ring-indigo-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100"
+          :class="buttonClasses"
           @click="adjustMenuPosition"
         >
           <slot>

@@ -25,6 +25,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isMarkedAsAnswer: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['toggleShowReplyEditor']);
@@ -34,6 +38,14 @@ const buttonClasses = computed(() => {
   const baseClasses = [
     "flex gap-1 max-h-6 cursor-pointer items-center rounded-full px-2 py-1",
   ];
+
+  // Use green styling for best answer comments
+  if (props.isMarkedAsAnswer) {
+    return [
+      ...baseClasses,
+      "bg-green-100 text-green-700 hover:border-green-400 hover:bg-green-200 dark:text-white dark:hover:bg-green-700 dark:bg-green-800",
+    ];
+  }
 
   const defaultClasses = "bg-gray-100 text-black hover:border-gray-400 hover:bg-gray-200 dark:text-white dark:hover:bg-gray-700";
   return [

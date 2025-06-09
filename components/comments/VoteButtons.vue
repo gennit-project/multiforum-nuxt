@@ -25,6 +25,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  isMarkedAsAnswer: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -93,6 +97,7 @@ const { mutate: undoUpvoteComment, error: undoUpvoteError, loading: undoUpvoteLo
       :show-downvote="showDownvote"
       :show-upvote="showUpvote"
       :is-permalinked="isPermalinked"
+      :is-marked-as-answer="isMarkedAsAnswer"
       @upvote="upvoteComment"
       @undo-upvote="undoUpvoteComment"
       @undo-downvote="emit('clickUndoFeedback')"
