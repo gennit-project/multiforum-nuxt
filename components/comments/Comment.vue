@@ -3,6 +3,7 @@ import { ref, computed } from "vue";
 import { useRoute, useRouter } from "nuxt/app";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/core";
+import { gql } from "@apollo/client/core";
 import type { Comment } from "@/__generated__/graphql";
 import type { CreateReplyInputData } from "@/types/Comment";
 import TextEditor from "../TextEditor.vue";
@@ -22,7 +23,7 @@ import ArchivedCommentText from "./ArchivedCommentText.vue";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
 import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-import { MARK_AS_ANSWERED_BY_COMMENT, MARK_AS_UNANSWERED } from "@/graphQLData/discussion/mutations";
+import { MARK_AS_ANSWERED_BY_COMMENT, UNMARK_COMMENT_AS_ANSWER } from "@/graphQLData/discussion/mutations";
 import { DateTime } from "luxon";
 import { config } from "@/config";
 import { useQuery, useMutation } from "@vue/apollo-composable";
@@ -133,6 +134,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  answers: {
+    type: Array as PropType<Comment[]>,
+    default: () => [],
+  },
 });
 
 const emit = defineEmits([
@@ -159,6 +164,8 @@ const emit = defineEmits([
   "handleClickArchiveAndSuspend",
   "handleClickUnarchive",
   "update-edit-comment-input",
+  "showMarkedAsBestAnswerNotification",
+  "showUnmarkedAsBestAnswerNotification",
 ]);
 
 const route = useRoute();
@@ -234,11 +241,100 @@ const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL
 // Mutations for marking comments as best answers
 const {
   mutate: markAsAnsweredByComment,
-} = useMutation(MARK_AS_ANSWERED_BY_COMMENT);
+} = useMutation(MARK_AS_ANSWERED_BY_COMMENT, {
+  update: (cache, { data }) => {
+    // The mutation response contains the updated discussionChannel with new Answers array
+    if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
+      const updatedChannel = data.updateDiscussionChannels.discussionChannels[0];
+      
+      // Update any cached queries that might contain this data
+      cache.modify({
+        fields: {
+          discussionChannels(existingChannels = [], { readField }) {
+            return existingChannels.map((channelRef: any) => {
+              const channelId = readField('id', channelRef);
+              if (channelId === updatedChannel.id) {
+                cache.writeFragment({
+                  id: cache.identify(channelRef),
+                  fragment: gql`
+                    fragment UpdatedAnswers on DiscussionChannel {
+                      id
+                      answered
+                      Answers {
+                        id
+                        text
+                        CommentAuthor {
+                          ... on User {
+                            username
+                          }
+                          ... on ModerationProfile {
+                            displayName
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  data: updatedChannel,
+                });
+              }
+              return channelRef;
+            });
+          },
+        },
+      });
+    }
+  },
+});
 
 const {
-  mutate: markAsUnanswered,
-} = useMutation(MARK_AS_UNANSWERED);
+  mutate: unmarkCommentAsAnswer,
+} = useMutation(UNMARK_COMMENT_AS_ANSWER, {
+  update: (cache, { data }) => {
+    // The mutation response contains the updated discussionChannel with new Answers array
+    if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
+      const updatedChannel = data.updateDiscussionChannels.discussionChannels[0];
+      
+      // Update any cached queries that might contain this data
+      // This will trigger reactivity and update the UI immediately
+      cache.modify({
+        fields: {
+          // Force a refresh of any queries that depend on the answers
+          discussionChannels(existingChannels = [], { readField }) {
+            return existingChannels.map((channelRef: any) => {
+              const channelId = readField('id', channelRef);
+              if (channelId === updatedChannel.id) {
+                // Update this channel with the new answers
+                cache.writeFragment({
+                  id: cache.identify(channelRef),
+                  fragment: gql`
+                    fragment UpdatedAnswers on DiscussionChannel {
+                      id
+                      answered
+                      Answers {
+                        id
+                        text
+                        CommentAuthor {
+                          ... on User {
+                            username
+                          }
+                          ... on ModerationProfile {
+                            displayName
+                          }
+                        }
+                      }
+                    }
+                  `,
+                  data: updatedChannel,
+                });
+              }
+              return channelRef;
+            });
+          },
+        },
+      });
+    }
+  },
+});
 
 const permissionData = computed(() => {
   if (getPermissionResult.value?.channels?.[0]) {
@@ -403,40 +499,60 @@ const isDiscussionAuthor = computed(() => {
 
 // Check if this comment is currently marked as an answer
 const isMarkedAsAnswer = computed(() => {
-  const discussionChannel = props.commentData.DiscussionChannel;
-  if (!discussionChannel?.Answers) {
+  if (!props.answers || props.answers.length === 0) {
     return false;
   }
   
   // Check if this comment's ID is in the Answers array
-  return discussionChannel.Answers.some((answer: any) => answer.id === props.commentData.id);
+  return props.answers.some((answer: any) => answer.id === props.commentData.id);
 });
 
 // Functions for marking/unmarking as best answer
 const handleMarkAsBestAnswer = async () => {
+  // Get discussionId from route params or comment data
+  const discussionIdFromRoute = typeof discussionId === 'string' ? discussionId : Array.isArray(discussionId) ? discussionId[0] : undefined;
+  const discussionIdToUse = discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
+  
+  if (!discussionIdToUse) {
+    console.warn("No discussion ID found for comment");
+    return;
+  }
   
   try {
     await markAsAnsweredByComment({
       commentId: props.commentData.id,
       channelId: forumId.value,
-      discussionId: discussionId 
+      discussionId: discussionIdToUse 
     });
+    emit("showMarkedAsBestAnswerNotification", true);
+    setTimeout(() => {
+      emit("showMarkedAsBestAnswerNotification", false);
+    }, 3000);
   } catch (error) {
     console.error("Error marking comment as best answer:", error);
   }
 };
 
 const handleUnmarkAsBestAnswer = async () => {
-  if (!props.commentData.DiscussionChannel) {
-    console.warn("No discussion channel found for comment");
+  // Get discussionId from route params or comment data
+  const discussionIdFromRoute = typeof discussionId === 'string' ? discussionId : Array.isArray(discussionId) ? discussionId[0] : undefined;
+  const discussionIdToUse = discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
+  
+  if (!discussionIdToUse) {
+    console.warn("No discussion ID found for comment");
     return;
   }
   
   try {
-    await markAsUnanswered({
+    await unmarkCommentAsAnswer({
+      commentId: props.commentData.id,
       channelId: forumId.value,
-      discussionId: props.commentData.DiscussionChannel.discussionId,
+      discussionId: discussionIdToUse,
     });
+    emit("showUnmarkedAsBestAnswerNotification", true);
+    setTimeout(() => {
+      emit("showUnmarkedAsBestAnswerNotification", false);
+    }, 3000);
   } catch (error) {
     console.error("Error unmarking comment as best answer:", error);
   }
@@ -944,6 +1060,7 @@ const label = computed(() => {
                 :mod-profile-name="props.modProfileName"
                 :original-poster="props.originalPoster"
                 :length-of-comment-in-progress="props.lengthOfCommentInProgress"
+                :answers="props.answers"
                 @start-comment-save="emit('startCommentSave')"
                 @click-edit-comment="handleEdit"
                 @click-report="emit('clickReport', $event)"

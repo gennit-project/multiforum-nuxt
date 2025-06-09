@@ -393,6 +393,38 @@ export const MARK_AS_UNANSWERED = gql`
   }
 `;
 
+export const UNMARK_COMMENT_AS_ANSWER = gql`
+  mutation unmarkCommentAsAnswer(
+    $commentId: ID!
+    $channelId: String!
+    $discussionId: ID!
+  ) {
+    updateDiscussionChannels(
+      where: { channelUniqueName: $channelId, discussionId: $discussionId }
+      update: {
+        Answers: { disconnect: [{ where: { node: { id: $commentId } } }] }
+      }
+    ) {
+      discussionChannels {
+        id
+        answered
+        Answers {
+          id
+          text
+          CommentAuthor {
+            ... on User {
+              username
+            }
+            ... on ModerationProfile {
+              displayName
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const UPDATE_IMAGE = gql`
   mutation updateImage($imageId: ID!, $caption: String) {
     updateImages(where: { id: $imageId }, update: { caption: $caption }) {

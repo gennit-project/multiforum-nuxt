@@ -159,6 +159,8 @@ const commentInProcess = ref(false);
 const replyFormOpenAtCommentID = ref("");
 const editFormOpenAtCommentID = ref("");
 const showCopiedLinkNotification = ref(false);
+const showMarkedAsBestAnswerNotification = ref(false);
+const showUnmarkedAsBestAnswerNotification = ref(false);
 
 // Moderation related state
 const commentToArchiveId = ref("");
@@ -650,6 +652,8 @@ const lengthOfCommentInProgress = computed(() => {
         @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
         @handle-click-unarchive="handleClickUnarchive"
         @show-copied-link-notification="showCopiedLinkNotification = $event"
+        @show-marked-as-best-answer-notification="showMarkedAsBestAnswerNotification = $event"
+        @show-unmarked-as-best-answer-notification="showUnmarkedAsBestAnswerNotification = $event"
         @open-mod-profile="showModProfileModal = true"
         @scroll-to-top="scrollToTop"
         @update-edit-comment-input="updateEditInputValues"
@@ -694,6 +698,8 @@ const lengthOfCommentInProgress = computed(() => {
         @update-feedback="updateFeedback"
         @handle-view-feedback="handleViewFeedback"
         @show-copied-link-notification="showCopiedLinkNotification = $event"
+        @show-marked-as-best-answer-notification="showMarkedAsBestAnswerNotification = $event"
+        @show-unmarked-as-best-answer-notification="showUnmarkedAsBestAnswerNotification = $event"
         @handle-click-archive="handleClickArchive"
         @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
         @handle-click-unarchive="handleClickUnarchive"
@@ -722,6 +728,7 @@ const lengthOfCommentInProgress = computed(() => {
               :mod-profile-name="modProfileNameVar"
               :original-poster="originalPoster"
               :length-of-comment-in-progress="lengthOfCommentInProgress"
+              :answers="answers"
               @start-comment-save="commentInProcess = true"
               @open-reply-editor="openReplyEditor"
               @hide-reply-editor="hideReplyEditor"
@@ -732,6 +739,12 @@ const lengthOfCommentInProgress = computed(() => {
               @create-comment="handleClickCreate"
               @show-copied-link-notification="
                 showCopiedLinkNotification = $event
+              "
+              @show-marked-as-best-answer-notification="
+                showMarkedAsBestAnswerNotification = $event
+              "
+              @show-unmarked-as-best-answer-notification="
+                showUnmarkedAsBestAnswerNotification = $event
               "
               @open-mod-profile-modal="showModProfileModal = true"
               @scroll-to-top="scrollToTop"
@@ -823,6 +836,16 @@ const lengthOfCommentInProgress = computed(() => {
       :show="showCopiedLinkNotification"
       :title="'Copied to clipboard!'"
       @close-notification="showCopiedLinkNotification = false"
+    />
+    <Notification
+      :show="showMarkedAsBestAnswerNotification"
+      :title="'Comment marked as best answer!'"
+      @close-notification="showMarkedAsBestAnswerNotification = false"
+    />
+    <Notification
+      :show="showUnmarkedAsBestAnswerNotification"
+      :title="'Best answer mark removed!'"
+      @close-notification="showUnmarkedAsBestAnswerNotification = false"
     />
     <GenericFeedbackFormModal
       :open="showFeedbackFormModal"

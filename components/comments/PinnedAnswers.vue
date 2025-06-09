@@ -51,6 +51,8 @@ const emit = defineEmits([
   "handleClickArchiveAndSuspend",
   "handleClickUnarchive",
   "update-edit-comment-input",
+  "showMarkedAsBestAnswerNotification",
+  "showUnmarkedAsBestAnswerNotification",
 ]);
 
 const hasAnswers = computed(() => {
@@ -86,6 +88,7 @@ const hasAnswers = computed(() => {
           :enable-feedback="enableFeedback"
           :locked="locked || archived"
           :original-poster="originalPoster"
+          :answers="answers"
           :show-comment-buttons="true"
           :show-header="true"
           @create-comment="emit('createComment', $event)"
@@ -98,6 +101,12 @@ const hasAnswers = computed(() => {
           "
           @show-copied-link-notification="
             emit('showCopiedLinkNotification', $event)
+          "
+          @show-marked-as-best-answer-notification="
+            emit('showMarkedAsBestAnswerNotification', $event)
+          "
+          @show-unmarked-as-best-answer-notification="
+            emit('showUnmarkedAsBestAnswerNotification', $event)
           "
           @click-report="emit('clickReport', $event)"
           @click-feedback="emit('clickFeedback', $event)"
