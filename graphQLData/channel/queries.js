@@ -256,6 +256,7 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
       title
       startTime
       endTime
+      isAllDay
       virtualEventUrl
     }
   }

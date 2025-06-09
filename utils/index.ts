@@ -107,8 +107,8 @@ const formatDuration = (eventDurationObj: Duration) => {
   }
 };
 
-const getDatePieces = (startTimeObj: any) => {
-  const timeOfDay = startTimeObj.toLocaleString(DateTime.TIME_SIMPLE);
+const getDatePieces = (startTimeObj: any, isAllDay?: boolean) => {
+  const timeOfDay = isAllDay ? "all day" : startTimeObj.toLocaleString(DateTime.TIME_SIMPLE);
   const zone = startTimeObj.zoneName;
   const weekday = startTimeObj.weekdayLong;
   const month = startTimeObj.monthLong;

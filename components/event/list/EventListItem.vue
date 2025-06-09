@@ -49,7 +49,7 @@ const route = useRoute();
 const router = useRouter();
 const startTimeObj = DateTime.fromISO(props.event.startTime);
 
-const { timeOfDay } = getDatePieces(startTimeObj);
+const { timeOfDay } = getDatePieces(startTimeObj, props.event.isAllDay);
 
 const defaultUniqueName = computed(() => {
   if (props.currentChannelId) {

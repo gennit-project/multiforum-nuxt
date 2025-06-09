@@ -89,10 +89,10 @@
   };
 
   const getSidebarLinkText = (event: Event) => {
-    // If event.isAllDay is true, simply return event?.title.
+    // If event.isAllDay is true, simply return "All Day · Event Title"
     // Otherwise, state the title in this format: "10:00 AM · Event Title"
     if (event.isAllDay) {
-      return event.title ?? "";
+      return `All Day · ${event.title}`;
     }
     const startTime = DateTime.fromISO(event.startTime ?? "");
     return `${startTime.toLocaleString(DateTime.TIME_SIMPLE)} · ${event.title}`;
@@ -174,7 +174,7 @@
         }"
       >
         <span class="text-xs leading-6 text-gray-500 dark:text-gray-300">
-          {{ event?.title }}
+          {{ getSidebarLinkText(event) }}
         </span>
       </nuxt-link>
       <nuxt-link
