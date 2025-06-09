@@ -93,6 +93,7 @@ export const GET_DISCUSSION_COMMENTS = gql`
         answered
         Channel {
           uniqueName
+          feedbackEnabled
         }
         Discussion {
           id

@@ -81,6 +81,11 @@ const props = defineProps({
     required: false,
     default: () => [],
   },
+  enableFeedback: {
+    type: Boolean,
+    required: false,
+    default: true,
+  },
 });
 
 const route = useRoute();
@@ -392,6 +397,7 @@ const handleSubscriptionToggle = () => {
     :archived="archived"
     :show-nuxt-page="true"
     :answers="answers"
+    :enable-feedback="enableFeedback"
     @decrement-comment-count="decrementCommentCount"
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
