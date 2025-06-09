@@ -51,6 +51,25 @@ describe('headerPermissionUtils', () => {
       const modActionsDivider = menuItems.find(item => item.isDivider === true)
       expect(modActionsDivider).toBeUndefined()
     })
+
+    it('should not show View Feedback when feedbackEnabled is false', () => {
+      const menuItems = getDiscussionHeaderMenuItems({
+        isOwnDiscussion: false,
+        isArchived: false,
+        userPermissions: basePermissions,
+        isLoggedIn: false,
+        discussionId,
+        feedbackEnabled: false
+      })
+      
+      // Should only have copy link option
+      expect(menuItems.length).toBe(1)
+      expect(menuItems[0].event).toBe('copyLink')
+      
+      // Should not have view feedback
+      const viewFeedbackOption = menuItems.find(item => item.event === 'handleViewFeedback')
+      expect(viewFeedbackOption).toBeUndefined()
+    })
     
     it('should include edit and delete options for discussion author', () => {
       const menuItems = getDiscussionHeaderMenuItems({
@@ -280,6 +299,26 @@ describe('headerPermissionUtils', () => {
       // Should not have edit/delete/cancel or moderation actions
       const modActionsDivider = menuItems.find(item => item.isDivider === true)
       expect(modActionsDivider).toBeUndefined()
+    })
+
+    it('should not show View Feedback when feedbackEnabled is false', () => {
+      const menuItems = getEventHeaderMenuItems({
+        isOwnEvent: false,
+        isArchived: false,
+        isCanceled: false,
+        userPermissions: basePermissions,
+        isLoggedIn: false,
+        eventId,
+        feedbackEnabled: false
+      })
+      
+      // Should only have copy link option
+      expect(menuItems.length).toBe(1)
+      expect(menuItems[0].event).toBe('copyLink')
+      
+      // Should not have view feedback
+      const viewFeedbackOption = menuItems.find(item => item.event === 'handleViewFeedback')
+      expect(viewFeedbackOption).toBeUndefined()
     })
     
     it('should include edit, delete and cancel options for event author', () => {

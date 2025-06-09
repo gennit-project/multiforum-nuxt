@@ -263,7 +263,8 @@ const menuItems = computed(() => {
     userPermissions: userPermissions.value,
     isLoggedIn: !!usernameVar.value,
     discussionId: props.discussion.id,
-    hasAlbum: !!props.discussion?.Album?.Images?.length
+    hasAlbum: !!props.discussion?.Album?.Images?.length,
+    feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true
   });
 });
 

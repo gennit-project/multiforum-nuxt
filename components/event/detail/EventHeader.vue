@@ -279,7 +279,8 @@ const menuItems = computed(() => {
     userPermissions: userPermissions.value,
     isLoggedIn: !!usernameVar.value,
     eventId: props.eventData.id,
-    isOnFeedbackPage: route.name === "EventFeedback"
+    isOnFeedbackPage: route.name === "EventFeedback",
+    feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true
   });
 });
 

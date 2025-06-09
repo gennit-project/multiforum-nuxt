@@ -26,25 +26,28 @@ export const getDiscussionHeaderMenuItems = (params: {
   isLoggedIn: boolean;
   discussionId: string;
   hasAlbum?: boolean;
+  feedbackEnabled?: boolean;
 }): MenuItem[] => {
-  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false } = params;
+  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false, feedbackEnabled = true } = params;
   let menuItems: MenuItem[] = [];
 
-  // Always add these base items for authenticated or unauthenticated users
-  menuItems = menuItems.concat([
-    {
+  // Only add "View Feedback" if feedback is enabled on the channel
+  if (feedbackEnabled) {
+    menuItems.push({
       label: "View Feedback",
       event: "handleViewFeedback",
       icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       value: discussionId,
-    },
-    {
-      label: "Copy Link",
-      event: "copyLink",
-      icon: ALLOWED_ICONS.COPY_LINK,
-      value: discussionId,
-    },
-  ]);
+    });
+  }
+
+  // Always add copy link
+  menuItems.push({
+    label: "Copy Link",
+    event: "copyLink",
+    icon: ALLOWED_ICONS.COPY_LINK,
+    value: discussionId,
+  });
 
   // Return early if user is not logged in
   if (!isLoggedIn) {
@@ -174,6 +177,7 @@ export const getEventHeaderMenuItems = (params: {
   isLoggedIn: boolean;
   eventId: string;
   isOnFeedbackPage?: boolean;
+  feedbackEnabled?: boolean;
 }): MenuItem[] => {
   const { 
     isOwnEvent, 
@@ -182,7 +186,8 @@ export const getEventHeaderMenuItems = (params: {
     userPermissions, 
     isLoggedIn, 
     eventId,
-    isOnFeedbackPage = false
+    isOnFeedbackPage = false,
+    feedbackEnabled = true
   } = params;
   
   // Debug log to see the permissions before making menu decisions
@@ -200,18 +205,20 @@ export const getEventHeaderMenuItems = (params: {
 
   // Base menu items that don't depend on being on the feedback page
   if (!isOnFeedbackPage) {
-    menuItems = menuItems.concat([
-      {
-        label: "Copy Link",
-        event: "copyLink",
-        icon: ALLOWED_ICONS.COPY_LINK,
-      },
-      {
+    menuItems.push({
+      label: "Copy Link",
+      event: "copyLink",
+      icon: ALLOWED_ICONS.COPY_LINK,
+    });
+
+    // Only add "View Feedback" if feedback is enabled on the channel
+    if (feedbackEnabled) {
+      menuItems.push({
         label: "View Feedback",
         event: "handleViewFeedback",
         icon: ALLOWED_ICONS.VIEW_FEEDBACK,
-      },
-    ]);
+      });
+    }
   }
 
   // Return early if user is not logged in
