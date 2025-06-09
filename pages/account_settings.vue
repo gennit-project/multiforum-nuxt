@@ -210,7 +210,7 @@ function updateBasicFormValues(data: EditAccountSettingsFormValues) {
                         @update="notificationFormValues.notifyOnReplyToCommentByDefault = $event"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        Notify me when someone replies to my comments
+                        Email me when someone replies to my comments
                       </label>
                     </div>
                     
@@ -221,7 +221,7 @@ function updateBasicFormValues(data: EditAccountSettingsFormValues) {
                         @update="notificationFormValues.notifyOnReplyToDiscussionByDefault = $event"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        Notify me when someone replies to my discussions
+                        Email me when someone replies to my discussions
                       </label>
                     </div>
                     
@@ -232,7 +232,7 @@ function updateBasicFormValues(data: EditAccountSettingsFormValues) {
                         @update="notificationFormValues.notifyOnReplyToEventByDefault = $event"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        Notify me when someone replies to my events
+                        Email me when someone replies to my events
                       </label>
                     </div>
                     
@@ -243,7 +243,7 @@ function updateBasicFormValues(data: EditAccountSettingsFormValues) {
                         @update="notificationFormValues.notifyWhenTagged = $event"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        Notify me when someone tags me in a comment
+                        Email me when someone tags me in a comment
                       </label>
                     </div>
                     
@@ -254,7 +254,7 @@ function updateBasicFormValues(data: EditAccountSettingsFormValues) {
                         @update="notificationFormValues.notifyOnFeedback = $event"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                        Notify me when I receive feedback from moderators
+                        Email me when I receive feedback from moderators
                       </label>
                     </div>
                   </div>
