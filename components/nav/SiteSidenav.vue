@@ -255,15 +255,11 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
         </nuxt-link>
         <nuxt-link
           v-if="isAuthenticatedVar && usernameVar"
-          :to="{
-            name: 'u-username-settings',
-            params: { username: usernameVar },
-          }"
+          to="/account_settings"
           :class="navLinkClasses"
           @click.prevent="() => {
             routeAndClose({
-              name: 'u-username-settings',
-              params: { username: usernameVar },
+              path: '/account_settings',
             })
           }"
         >

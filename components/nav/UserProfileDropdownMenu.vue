@@ -43,7 +43,7 @@
     },
     {
       label: "Account Settings",
-      value: `/u/${props.username}/settings`,
+      value: "/account_settings",
       icon: "",
     },
     {

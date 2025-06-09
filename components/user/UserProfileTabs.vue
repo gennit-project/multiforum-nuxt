@@ -76,17 +76,6 @@ const tabs = computed(() => {
     },
   ];
 
-  if (
-    isAuthenticatedVar.value &&
-    usernameVar.value === usernameInParams.value
-  ) {
-    tabList.push({
-      name: "Settings",
-      href: `/u/${usernameInParams.value}/settings`,
-      current: false,
-      count: null,
-    });
-  }
   return tabList;
 });
 </script>
