@@ -12,6 +12,10 @@ const links = [
   {
     text: "About",
     to: "/about",
+  },
+  {
+    text: "Report a Bug",
+    to: "/support",
   }
 ];
 </script>
