@@ -14,15 +14,6 @@ const emailNotInSystem = ref(false);
 const initialCheckComplete = ref(false);
 const loading = ref(true);
 
-// Function to skip username creation and return to previous page
-const skipUsernameCreation = () => {
-  // Set the flag to prevent rechecking for username
-  sessionStorage.setItem('hasCheckedUsername', 'true');
-  
-  // Redirect to home or previous page
-  const previousPath = sessionStorage.getItem('previousPath') || '/';
-  router.push(previousPath);
-};
 
 // Handle redirects when mounted
 if (import.meta.client) {
@@ -76,8 +67,6 @@ if (import.meta.client) {
 <template>
   <div class="flex justify-center items-center min-h-screen">
     <div class="max-w-md w-full">
-      <h1 class="text-2xl font-bold text-center mb-8">Create Your Username</h1>
-
       <!-- Show loading state while checking email -->
       <div v-if="loading" class="text-center py-8">
         <LoadingSpinner />
@@ -91,18 +80,6 @@ if (import.meta.client) {
             :email="user.email"
             @email-and-user-created="router.push('/')"
           />
-          
-          <div class="text-center mt-6">
-            <button 
-              @click="skipUsernameCreation" 
-              class="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 underline"
-            >
-              Skip for now
-            </button>
-            <p class="text-xs text-gray-500 mt-2">
-              You can create a username later in your account settings.
-            </p>
-          </div>
         </div>
       </client-only>
     </div>

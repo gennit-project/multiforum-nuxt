@@ -4,6 +4,8 @@ import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import ExclamationIcon from "@/components/icons/ExclamationIcon.vue";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import DatePicker from "@/components/event/form/DatePicker.vue";
+import CharCounter from "@/components/CharCounter.vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
 import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
@@ -17,6 +19,7 @@ const props = defineProps({
   },
 });
 const newUsername = ref(props.email?.split("@")[0]);
+const birthday = ref("");
 
 const {
   error: getUserError,
@@ -77,6 +80,41 @@ const validationErrorMessage = computed(() => {
 
 const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value));
 
+// Age validation logic
+const calculateAge = (birthDate: string): number => {
+  if (!birthDate) return 0;
+  
+  const today = new Date();
+  const birth = new Date(birthDate);
+  let age = today.getFullYear() - birth.getFullYear();
+  const monthDiff = today.getMonth() - birth.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+    age--;
+  }
+  
+  return age;
+};
+
+const userAge = computed(() => calculateAge(birthday.value));
+
+const birthdayIsEmpty = computed(() => !birthday.value || birthday.value.length === 0);
+
+const isUnderAge = computed(() => {
+  if (birthdayIsEmpty.value) return false;
+  return userAge.value < 13;
+});
+
+const birthdayValidationMessage = computed(() => {
+  if (birthdayIsEmpty.value) {
+    return "Birthday is required.";
+  }
+  if (isUnderAge.value) {
+    return "You must be at least 13 years old to create an account.";
+  }
+  return "";
+});
+
 const confirmedAvailable = computed(
   () => !usernameIsTaken.value && !usernameIsEmpty.value && !usernameIsInvalid.value
 );
@@ -115,6 +153,10 @@ const updateUsername = (newUsernameString: string) => {
   newUsername.value = newUsernameString;
 };
 
+const updateBirthday = (newBirthdayString: string) => {
+  birthday.value = newBirthdayString;
+};
+
 const usernameInput = ref<HTMLInputElement | null>(null);
 
 nextTick(() => {
@@ -134,8 +176,14 @@ const canSave = computed(() => {
   if (newUsername.value.length > MAX_CHARS_IN_USERNAME) {
     return false;
   }
+  if (birthdayIsEmpty.value) {
+    return false;
+  }
+  if (isUnderAge.value) {
+    return false;
+  }
 
-  return true
+  return true;
 });
 
 
@@ -185,6 +233,29 @@ const canSave = computed(() => {
             This username is available
           </p>
         </div>
+      </div>
+
+      <!-- Birthday Field -->
+      <div class="mt-6">
+        <label for="birthday" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          Birthday
+        </label>
+        <div class="relative mt-1 flex rounded-full shadow-sm">
+          <DatePicker
+            :value="birthday"
+            test-id="birthday-picker"
+            @update="updateBirthday"
+          />
+          <div v-if="isUnderAge" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+            <ExclamationIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
+          </div>
+        </div>
+        <p class="my-1 text-xs text-red-500">
+          {{ birthdayValidationMessage }}
+        </p>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          You must be at least 13 years old to create an account
+        </p>
       </div>
 
       <PrimaryButton
