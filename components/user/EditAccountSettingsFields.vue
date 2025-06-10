@@ -9,10 +9,9 @@ import FormRow from "@/components/FormRow.vue";
 import TextEditor from "@/components/TextEditor.vue";
 import AddImage from "@/components/AddImage.vue";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
-
+import { usernameVar } from "@/cache";
 import type { EditAccountSettingsFormValues } from "@/types/User";
 import FormComponent from "../FormComponent.vue";
-import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
 import { isFileSizeValid } from "@/utils/index";
@@ -160,7 +159,7 @@ const needsChanges = computed(() => {
                 ref="titleInputRef"
                 :test-id="'username-input'"
                 :disabled="true"
-                :value="usernameInParams"
+                :value="usernameVar"
                 :placeholder="'Add unique name'"
                 :full-width="true"
               />

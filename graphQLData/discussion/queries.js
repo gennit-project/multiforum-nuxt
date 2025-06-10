@@ -123,6 +123,7 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
         body
         createdAt
         updatedAt
+        hasSensitiveContent
         Author {
           ...AuthorFields
         }
