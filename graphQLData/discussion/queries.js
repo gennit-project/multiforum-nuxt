@@ -62,6 +62,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
           body
           createdAt
           updatedAt
+          hasSensitiveContent
           Author {
             ... on User {
               displayName
@@ -196,6 +197,7 @@ export const GET_DISCUSSION = gql`
       createdAt
       updatedAt
       hasDownload
+      hasSensitiveContent
       Author {
         ...AuthorFields
         ChannelRoles(where: { channelUniqueName: $channelUniqueName }) {

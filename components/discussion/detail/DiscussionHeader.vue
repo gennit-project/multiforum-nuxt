@@ -3,7 +3,7 @@
   import { useMutation, useQuery } from "@vue/apollo-composable";
   import { useRoute, useRouter } from "nuxt/app";
   import { DateTime } from "luxon";
-  import { DELETE_DISCUSSION } from "@/graphQLData/discussion/mutations";
+  import { DELETE_DISCUSSION, UPDATE_DISCUSSION_SENSITIVE_CONTENT } from "@/graphQLData/discussion/mutations";
   import WarningModal from "@/components/WarningModal.vue";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import Notification from "@/components/NotificationComponent.vue";
@@ -106,6 +106,26 @@ onDoneDeleting(() => {
     });
   }
 });
+
+const {
+  mutate: updateSensitiveContent,
+  loading: updateSensitiveContentLoading,
+  error: updateSensitiveContentError,
+} = useMutation(UPDATE_DISCUSSION_SENSITIVE_CONTENT);
+
+const handleToggleSensitiveContent = async () => {
+  if (!props.discussion?.id) return;
+  
+  try {
+    await updateSensitiveContent({
+      discussionId: props.discussion.id,
+      hasSensitiveContent: !props.discussion.hasSensitiveContent,
+    });
+    showSuccessfullyUpdatedSensitiveContent.value = true;
+  } catch (error) {
+    console.error("Error updating sensitive content:", error);
+  }
+};
 
 const defaultChannel = computed(() => {
   if (!props.discussion) {
@@ -250,6 +270,7 @@ const showSuccessfullyReported = ref(false);
 const showSuccessfullyArchived = ref(false);
 const showSuccessfullyUnarchived = ref(false);
 const showSuccessfullyArchivedAndSuspended = ref(false);
+const showSuccessfullyUpdatedSensitiveContent = ref(false);
 
 const menuItems = computed(() => {
   if (!props.discussion) {
@@ -264,7 +285,8 @@ const menuItems = computed(() => {
     isLoggedIn: !!usernameVar.value,
     discussionId: props.discussion.id,
     hasAlbum: !!props.discussion?.Album?.Images?.length,
-    feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true
+    feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
+    hasSensitiveContent: !!props.discussion?.hasSensitiveContent
   });
 });
 
@@ -364,6 +386,7 @@ const authorIsMod = computed(
           @handle-click-unarchive="showUnarchiveModal = true"
           @handle-feedback="emit('handleClickGiveFeedback')"
           @handle-add-album="emit('handleClickAddAlbum')"
+          @handle-toggle-sensitive-content="handleToggleSensitiveContent"
           @handle-view-feedback="
             router.push({
               name: 'forums-forumId-discussions-feedback-discussionId',
@@ -468,10 +491,20 @@ const authorIsMod = computed(
       :title="'The content was unarchived successfully.'"
       @close-notification="showSuccessfullyUnarchived = false"
     />
+    <Notification
+      :show="showSuccessfullyUpdatedSensitiveContent"
+      :title="'Sensitive content setting updated successfully.'"
+      @close-notification="showSuccessfullyUpdatedSensitiveContent = false"
+    />
     <ErrorBanner
       v-if="deleteDiscussionError"
       class="mt-2"
       :text="deleteDiscussionError.message"
+    />
+    <ErrorBanner
+      v-if="updateSensitiveContentError"
+      class="mt-2"
+      :text="updateSensitiveContentError.message"
     />
     <Notification
       :show="showCopiedLinkNotification"

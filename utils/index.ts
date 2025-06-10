@@ -468,6 +468,7 @@ const ALLOWED_ICONS = {
   UNSUSPEND: 'UNSUSPEND',
   ADD_ALBUM: 'ADD_ALBUM',
   MARK_BEST_ANSWER: 'MARK_BEST_ANSWER',
+  MARK_SENSITIVE: 'MARK_SENSITIVE',
 }
 
 const actionIconMap = {
@@ -485,6 +486,7 @@ const actionIconMap = {
   [ALLOWED_ICONS.UNSUSPEND]: UserPlus,
   [ALLOWED_ICONS.ADD_ALBUM]: ImageIcon,
   [ALLOWED_ICONS.MARK_BEST_ANSWER]: CheckCircle,
+  [ALLOWED_ICONS.MARK_SENSITIVE]: EyeIcon,
 }
 
 export {

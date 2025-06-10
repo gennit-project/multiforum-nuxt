@@ -467,6 +467,20 @@ export const UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL = gql`
   }
 `;
 
+export const UPDATE_DISCUSSION_SENSITIVE_CONTENT = gql`
+  mutation updateDiscussionSensitiveContent($discussionId: ID!, $hasSensitiveContent: Boolean!) {
+    updateDiscussions(
+      where: { id: $discussionId }
+      update: { hasSensitiveContent: $hasSensitiveContent }
+    ) {
+      discussions {
+        id
+        hasSensitiveContent
+      }
+    }
+  }
+`;
+
 
 // mutation {
 //   createFilterGroups(input: [{

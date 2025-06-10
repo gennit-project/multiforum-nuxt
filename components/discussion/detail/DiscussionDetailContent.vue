@@ -382,6 +382,7 @@ const handleEditAlbum = () => {
                 <div v-else-if="downloadMode" class="flex gap-6">
                   <div class="flex-1">
                     <DiscussionBody
+                      :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
                       :channel-id="channelId"
                       :discussion="discussion"
                       :discussion-channel-id="activeDiscussionChannel?.id"
@@ -456,6 +457,7 @@ const handleEditAlbum = () => {
                 <!-- Regular discussion mode layout -->
                 <DiscussionBody
                   v-else
+                  :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
                   :channel-id="channelId"
                   :discussion="discussion"
                   :discussion-channel-id="activeDiscussionChannel?.id"

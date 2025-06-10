@@ -27,8 +27,9 @@ export const getDiscussionHeaderMenuItems = (params: {
   discussionId: string;
   hasAlbum?: boolean;
   feedbackEnabled?: boolean;
+  hasSensitiveContent?: boolean;
 }): MenuItem[] => {
-  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false, feedbackEnabled = true } = params;
+  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false, feedbackEnabled = true, hasSensitiveContent = false } = params;
   let menuItems: MenuItem[] = [];
 
   // Only add "View Feedback" if feedback is enabled on the channel
@@ -62,6 +63,15 @@ export const getDiscussionHeaderMenuItems = (params: {
       icon: ALLOWED_ICONS.EDIT,
       value: discussionId,
     });
+    
+    // Add sensitive content toggle
+    menuItems.push({
+      label: hasSensitiveContent ? "Mark as non-sensitive content" : "Mark as sensitive content",
+      event: "handleToggleSensitiveContent",
+      icon: ALLOWED_ICONS.MARK_SENSITIVE,
+      value: discussionId,
+    });
+    
     // Add "Add album" action if the discussion doesn't have an album
     if (!hasAlbum) {
       menuItems.push({

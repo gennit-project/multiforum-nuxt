@@ -61,6 +61,19 @@ const bodyText = computed(() => {
 // Scroll element setup, ensure document.documentElement is accessed only on the client-side
 const scrollElement = ref<HTMLElement | null>(null);
 
+// State for showing/hiding sensitive content
+const sensitiveContentRevealed = ref(false);
+
+const hasSensitiveContent = computed(() => !!props.discussion?.hasSensitiveContent);
+
+const shouldShowContent = computed(() => {
+  return !hasSensitiveContent.value || sensitiveContentRevealed.value;
+});
+
+const revealSensitiveContent = () => {
+  sensitiveContentRevealed.value = true;
+};
+
 onMounted(() => {
   if (import.meta.client) {
     scrollElement.value = document.documentElement;
@@ -83,8 +96,26 @@ const filterByTag = (tag: string) => {
 
 <template>
   <div class="flex flex-col gap-2">
+    <!-- Sensitive content concealment box -->
     <div
-      v-if="discussion?.body && !downloadMode"
+      v-if="hasSensitiveContent && !sensitiveContentRevealed"
+      class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center"
+    >
+      <p class="text-gray-600 dark:text-gray-300 mb-3">
+        This content has been marked as potentially sensitive.
+      </p>
+      <button
+        type="button"
+        class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
+        @click="revealSensitiveContent"
+      >
+        Reveal sensitive content
+      </button>
+    </div>
+
+    <!-- Discussion body (hidden when sensitive and not revealed) -->
+    <div
+      v-if="discussion?.body && !downloadMode && shouldShowContent"
       class="rounded"
       :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
     >
@@ -95,7 +126,10 @@ const filterByTag = (tag: string) => {
       />
     </div>
 
-    <slot name="album-slot" />
+    <!-- Album slot (hidden when sensitive and not revealed) -->
+    <div v-if="shouldShowContent">
+      <slot name="album-slot" />
+    </div>
     <div v-if="showEmojiButton" class="mt-2 flex">
       <EmojiButtons
         :key="emojiJson"
