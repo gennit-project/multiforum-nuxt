@@ -128,6 +128,17 @@ const authorUsername = computed(
 const relative = computed(() =>
   props.discussion ? relativeTime(props.discussion.createdAt) : ""
 );
+
+// Sensitive content logic
+const sensitiveContentRevealed = ref(false);
+const hasSensitiveContent = computed(() => !!props.discussion?.hasSensitiveContent);
+const shouldShowContent = computed(() => {
+  return !hasSensitiveContent.value || sensitiveContentRevealed.value;
+});
+
+const revealSensitiveContent = () => {
+  sensitiveContentRevealed.value = true;
+};
 </script>
 
 <template>
@@ -245,24 +256,45 @@ const relative = computed(() =>
               v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
               class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
             >
-              <MarkdownPreview
-                :text="discussion.body"
-                :word-limit="50"
-                :disable-gallery="false"
-                class="ml-2 pb-2"
-              />
+              <!-- Sensitive content concealment box -->
               <div
-                v-if="discussion.Album"
-                class="my-4 overflow-x-auto bg-black"
+                v-if="hasSensitiveContent && !sensitiveContentRevealed"
+                class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center ml-2 mr-2 mb-2"
               >
-                <DiscussionAlbum
-                  :album="discussion.Album"
-                  :carousel-format="true"
-                  :discussion-author="authorUsername"
-                  :discussion-id="discussion.id"
-                  :show-edit-album="false"
-                />
+                <p class="text-gray-600 dark:text-gray-300 mb-3 text-sm">
+                  This content has been marked as potentially sensitive.
+                </p>
+                <button
+                  type="button"
+                  class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded text-sm"
+                  @click="revealSensitiveContent"
+                >
+                  Reveal sensitive content
+                </button>
               </div>
+              
+              <!-- Discussion content (hidden when sensitive and not revealed) -->
+              <template v-if="shouldShowContent">
+                <MarkdownPreview
+                  v-if="discussion.body"
+                  :text="discussion.body"
+                  :word-limit="50"
+                  :disable-gallery="false"
+                  class="ml-2 pb-2"
+                />
+                <div
+                  v-if="discussion.Album"
+                  class="my-4 overflow-x-auto bg-black"
+                >
+                  <DiscussionAlbum
+                    :album="discussion.Album"
+                    :carousel-format="true"
+                    :discussion-author="authorUsername"
+                    :discussion-id="discussion.id"
+                    :show-edit-album="false"
+                  />
+                </div>
+              </template>
             </div>
             <div
               class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline"
