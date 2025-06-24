@@ -154,14 +154,14 @@
     class="flex flex-col"
   >
     <span
-      class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
       <i class="fa-solid fa-circle-play mr-2 text-orange-500"/>Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
       :key="event?.id"
-      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="mb-1 flex flex-col gap-1 border-l-2 border-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -194,14 +194,14 @@
     class="flex flex-col"
   >
     <span
-      class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
       <i class="fa-solid fa-calendar-day mr-2"/>Today
     </span>
     <div
       v-for="event in dateObj.happeningToday"
       :key="event?.id"
-      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="mb-1 flex flex-col gap-1 border-l-2 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -225,14 +225,14 @@
     class="flex flex-col"
   >
     <span
-      class="my-2 mb-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
       <i class="fa-solid fa-calendar-plus mr-2"/>Tomorrow
     </span>
     <div
       v-for="event in dateObj.happeningTomorrow"
       :key="event?.id"
-      class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+      class="mb-1 flex flex-col gap-1 border-l-2 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
     >
       <nuxt-link
         class="flex items-center"
@@ -257,13 +257,13 @@
       :key="date"
       class="flex flex-col"
     >
-      <span class="my-2 mb-2 flex items-center text-sm leading-6 text-gray-500 dark:text-gray-400">
+      <span class="my-1 mb-1 flex items-center text-sm leading-6 text-gray-500 dark:text-gray-400">
         <i class="fa-solid fa-calendar-week mr-2"/>{{ date }}
       </span>
       <div
         v-for="event in events"
         :key="event?.id"
-        class="my-1 mb-2 flex flex-col gap-2 border-l-4 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
+        class="mb-1 flex flex-col gap-1 border-l-2 border-l-orange-500 pl-2 text-xs leading-6 text-gray-500 dark:text-gray-300"
       >
         <nuxt-link
           class="flex items-center"
