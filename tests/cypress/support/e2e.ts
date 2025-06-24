@@ -18,9 +18,8 @@ Cypress.on('fail', (error) => {
 });
 
 const performSafetyCheck = () => {
-  cy.loginAsAdmin(); // Ensure the admin login runs before the query
-
-  // Chainable Cypress flow
+  // Use programmatic authentication instead of loginAsAdmin
+  cy.authenticateOnCurrentPage();
   cy.authenticatedGraphQL(`
     query SafetyCheck {
       safetyCheck {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { ref, onMounted, watch, computed, onUnmounted } from "vue";
+  import { ref, onMounted, watch, computed, onUnmounted, nextTick } from "vue";
   import { useAuth0 } from "@auth0/auth0-vue";
   import { useLazyQuery } from "@vue/apollo-composable";
   import TopNav from "@/components/nav/Topnav.vue";
@@ -24,6 +24,44 @@ import { useRoute, useRouter } from "nuxt/app";
 import { useTestAuth } from "@/composables/useTestAuth";
 
   const isDevelopment = computed(() => config.environment === "development");
+  const isTest = computed(() => config.environment === "test");
+
+  // IMPROVED: Expose test helpers in both development AND test environments
+  // Also check for Cypress specifically
+  const shouldExposeTestHelpers = isDevelopment.value || isTest.value || (typeof window !== 'undefined' && (window as any).Cypress);
+
+  if (shouldExposeTestHelpers) {
+    console.log('🔧 Exposing test auth helpers for environment:', config.environment);
+    
+    // Expose auth state setter for Cypress tests
+    const __SET_AUTH_STATE_DIRECT__ = (authState: { username: string; authenticated?: boolean }) => {
+      console.log('🔧 Direct auth state update:', authState);
+      
+      // Update reactive variables directly
+      if (authState.authenticated !== false) {
+        setIsAuthenticated(true);
+        setUsername(authState.username);
+        isAuthenticatedVar.value = true;
+        console.log('🔧 Auth state set to TRUE for user:', authState.username);
+      } else {
+        setIsAuthenticated(false);
+        setUsername('');
+        isAuthenticatedVar.value = false;
+        console.log('🔧 Auth state set to FALSE');
+      }
+      
+      // Force UI reactivity update
+      nextTick(() => {
+        console.log('🔧 After nextTick - isAuthenticated:', isAuthenticatedVar.value, 'username:', authState.username);
+      });
+    };
+
+    // Expose this function globally for Cypress - do this immediately
+    if (typeof window !== 'undefined') {
+      (window as any).__SET_AUTH_STATE_DIRECT__ = __SET_AUTH_STATE_DIRECT__;
+      console.log('🔧 __SET_AUTH_STATE_DIRECT__ exposed to window');
+    }
+  }
 
   // UI states
   const showUserProfileDropdown = ref(false);
@@ -125,6 +163,32 @@ import { useTestAuth } from "@/composables/useTestAuth";
 
   // Setup token checks and event listeners only on client
   onMounted(() => {
+    // IMPROVED: Re-expose test helpers after mount to ensure they're available
+    if (shouldExposeTestHelpers && typeof window !== 'undefined') {
+      const __SET_AUTH_STATE_DIRECT__ = (authState: { username: string; authenticated?: boolean }) => {
+        console.log('🔧 Direct auth state update (mounted):', authState);
+        
+        if (authState.authenticated !== false) {
+          setIsAuthenticated(true);
+          setUsername(authState.username);
+          isAuthenticatedVar.value = true;
+          console.log('🔧 Auth state set to TRUE for user:', authState.username);
+        } else {
+          setIsAuthenticated(false);
+          setUsername('');
+          isAuthenticatedVar.value = false;
+          console.log('🔧 Auth state set to FALSE');
+        }
+        
+        nextTick(() => {
+          console.log('🔧 After nextTick (mounted) - isAuthenticated:', isAuthenticatedVar.value);
+        });
+      };
+      
+      (window as any).__SET_AUTH_STATE_DIRECT__ = __SET_AUTH_STATE_DIRECT__;
+      console.log('🔧 __SET_AUTH_STATE_DIRECT__ re-exposed after mount');
+    }
+
     if (!auth0) return;
 
     const { user, isAuthenticated } = auth0;

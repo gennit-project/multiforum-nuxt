@@ -11,7 +11,7 @@ import type {
   ModChannelRoleCreateInput,
   CommentCreateInput,
   NewUserInput
-} from "../../__generated__/graphql";
+} from "../../../__generated__/graphql";
 import type { LoginInput } from "./commandFunctions/loginWithButtonClick";
 /* eslint-disable @typescript-eslint/no-namespace */
 
@@ -43,10 +43,11 @@ declare global {
       dropDataForCypressTests(): Chainable<Element>;
       seedDataForCypressTests(input: SeedDataInput): Chainable<Element>;
       getClipboardText: () => Chainable<string>;
-      writeClipboardText: () => Chainable<Element>;
+      writeClipboardText: () => Chainable<void>;
       authenticateOnCurrentPage(): Chainable<Element>;
       loginAsUser(userCredentials: { username: string; password: string }): Chainable<Element>;
       authenticateAsUserOnCurrentPage(userCredentials: { username: string; password: string; displayName?: string }): Chainable<Element>;
+      clearAllAuthState(): Chainable<Element>;
     }
   }
 }

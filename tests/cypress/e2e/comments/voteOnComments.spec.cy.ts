@@ -2,10 +2,13 @@ import { DISCUSSION_LIST } from "../constants";
 import { setupTestData } from "../../support/testSetup";
 
 describe("Comment voting operations", () => {
-   // User 1 logs in
-    cy.loginWithCreateEventButton();
   // Set up test data once for all tests in this file
   setupTestData();
+
+  beforeEach(() => {
+    // Clear all auth state before each test to prevent interference
+    cy.clearAllAuthState();
+  });
 
   it("User 1 can undo upvote on their own comment", () => {
     const TEST_COMMENT_TEXT = "Test comment";
@@ -22,10 +25,9 @@ describe("Comment voting operations", () => {
       }
     });
 
-   
-
-    // Go to the discussion list
+    // User 1 logs in programmatically
     cy.visit(DISCUSSION_LIST);
+    cy.authenticateOnCurrentPage();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Click on the first discussion
@@ -56,7 +58,7 @@ describe("Comment voting operations", () => {
       .contains("1");
       
     // Wait for hydration to complete and username to be available
-    cy.wait(6000);
+    cy.wait(3000);
     
     // Now click the upvote button directly by data-testid
     cy.get('button[data-testid="upvote-comment-button"]')
@@ -108,16 +110,20 @@ describe("Comment voting operations", () => {
       }
     });
 
-    // User 2 logs in
+    // User 2 logs in with different credentials
     const username2 = Cypress.env("auth0_username_2");
     const password2 = Cypress.env("auth0_password_2");
     
+    // Visit the page first
     cy.visit(DISCUSSION_LIST);
+    
+    // Then authenticate as User 2
     cy.authenticateAsUserOnCurrentPage({
       username: username2,
       password: password2,
       displayName: 'testuser2'
     });
+    
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Navigate to the same discussion
@@ -125,19 +131,19 @@ describe("Comment voting operations", () => {
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
     
     // Wait for hydration to complete and username to be available
-    cy.wait(6000);
+    cy.wait(3000);
     
-    // Upvote the comment as User 2
+    // Verify we can see the comment from the previous test
     cy.get('div[data-testid="comment"]')
       .should("be.visible")
       .and("contain", TEST_COMMENT_TEXT);
-      
-    // Click the upvote button directly
+    
+    // Upvote the comment as User 2
     cy.get('button[data-testid="upvote-comment-button"]')
       .first()
       .click({force: true});
       
-    // Wait outside the 'within' to avoid context restrictions
+    // Wait for the upvote request
     cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
     
     // Verify the upvote count increased to 2
@@ -155,7 +161,7 @@ describe("Comment voting operations", () => {
       .first()
       .click({force: true});
       
-    // Wait outside the 'within' to avoid context restrictions
+    // Wait for the upvote removal request
     cy.wait('@upvoteCommentRequest').its('response.statusCode').should('eq', 200);
     
     // Verify the upvote count decreased back to 1

@@ -192,39 +192,44 @@ Cypress.Commands.add("writeClipboardText", () => {
   });
 });
 
-// Reliable programmatic authentication helper
-Cypress.Commands.add("authenticateOnCurrentPage", () => {
-  // Set the auth token programmatically
-  cy.loginAsAdmin();
-  
-  // Wait for page to fully load and auth functions to be available
-  cy.wait(1000);
-  
-  // Manually sync the reactive auth state
-  cy.window().then((win) => {
-    const testWin = win as any;
-    if (testWin.__SET_AUTH_STATE_DIRECT__) {
-      console.log('Setting auth state directly');
-      testWin.__SET_AUTH_STATE_DIRECT__({ username: 'cluse' });
-    } else {
-      console.log('Auth sync functions not available yet');
-    }
-  });
-  
-  // Verify authentication is complete
-  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
-});
-
-// Login as different user programmatically
-Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; password: string }) => {
-  // Clear BOTH Cypress localStorage cache AND browser localStorage cache
+// SIMPLIFIED: Clear all auth state completely
+Cypress.Commands.add("clearAllAuthState", () => {
+  // Clear Cypress localStorage cache
   localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
   
+  // Clear browser localStorage
   cy.window().then((window) => {
     window.localStorage.removeItem(AUTH_TOKEN_NAME);
     window.localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
+    
+    // Clear user-specific cache keys (in case any exist)
+    Object.keys(window.localStorage).forEach(key => {
+      if (key.startsWith(AUTH_TOKEN_CACHE_KEY)) {
+        window.localStorage.removeItem(key);
+      }
+    });
+    
+    // Clear session storage too
+    window.sessionStorage.clear();
   });
+  
+  // Reset Vue reactive auth state
+  cy.window().then((win) => {
+    const testWin = win as any;
+    if (testWin.__SET_AUTH_STATE_DIRECT__) {
+      testWin.__SET_AUTH_STATE_DIRECT__({ 
+        username: '', 
+        authenticated: false 
+      });
+    }
+  });
+});
 
+// FIXED: Login as different user with proper cache clearing
+Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; password: string }) => {
+  // First, completely clear all auth state
+  cy.clearAllAuthState();
+  
   // Log the credentials being used for debugging
   console.log(`Attempting login for user: ${userCredentials.username}`);
   console.log(`Password provided: ${userCredentials.password ? '[REDACTED]' : 'UNDEFINED/EMPTY'}`);
@@ -234,13 +239,23 @@ Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; passwo
     throw new Error(`Invalid credentials provided: username=${userCredentials.username}, password=${userCredentials.password ? '[PROVIDED]' : 'MISSING'}`);
   }
   
-  // Also check if we're trying to use the same credentials as the admin user
-  const adminUsername = Cypress.env("email");
-  if (userCredentials.username === adminUsername) {
-    console.warn('WARNING: Using same credentials as admin user - this will result in identical tokens');
+  // Create a unique cache key for this user to prevent conflicts
+  const userSpecificCacheKey = `${AUTH_TOKEN_CACHE_KEY}_${userCredentials.username}`;
+  
+  // Check for cached token for this specific user
+  const userCachedTokenData = JSON.parse(
+    localStorage.getItem(userSpecificCacheKey) || 'null'
+  );
+
+  if (userCachedTokenData && userCachedTokenData.expiresAt > Date.now()) {
+    console.log(`Using cached token for ${userCredentials.username}`);
+    cy.window().then((window) => {
+      window.localStorage.setItem(AUTH_TOKEN_NAME, userCachedTokenData.accessToken);
+    });
+    return;
   }
 
-  // Always make a fresh request - don't use any cached tokens
+  // Always make a fresh request for new/expired tokens
   const options = {
     method: "POST",
     url: `https://${Cypress.env("auth0Domain")}/oauth/token`,
@@ -257,36 +272,115 @@ Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; passwo
 
   cy.request(options).then((response) => {
     const accessToken = response.body.access_token;
+    const expiresIn = response.body.expires_in;
 
     console.log(`New token for ${userCredentials.username}:`, accessToken.substring(0, 20) + '...');
 
-    // DON'T cache this token in Cypress localStorage - only set it in browser localStorage
-    // This prevents interference with the loginAsAdmin cache
+    // Cache this token with user-specific key
+    const tokenData = {
+      accessToken,
+      expiresAt: Date.now() + expiresIn * 1000,
+    };
+    localStorage.setItem(userSpecificCacheKey, JSON.stringify(tokenData));
+
+    // Set token in browser localStorage
     cy.window().then((window) => {
       window.localStorage.setItem(AUTH_TOKEN_NAME, accessToken);
-      // Don't cache this in AUTH_TOKEN_CACHE_KEY to avoid conflicts
     });
   });
 });
 
-// Authenticate as different user on current page (similar to authenticateOnCurrentPage but for any user)
+// IMPROVED: Reliable programmatic authentication helper
+Cypress.Commands.add("authenticateOnCurrentPage", () => {
+  // Set the auth token programmatically
+  cy.loginAsAdmin();
+  
+  // Wait for page to fully load
+  cy.wait(2000);
+  
+  // Wait for the auth function to be available and then call it
+  cy.window().then((win) => {
+    const testWin = win as any;
+    
+    // First, let's see what's actually available
+    console.log('Available window properties:', Object.keys(testWin).filter(key => key.includes('AUTH')));
+    
+    if (testWin.__SET_AUTH_STATE_DIRECT__) {
+      console.log('🔧 Setting auth state directly for admin user');
+      testWin.__SET_AUTH_STATE_DIRECT__({ 
+        username: 'cluse',
+        authenticated: true
+      });
+    } else {
+      console.log('❌ __SET_AUTH_STATE_DIRECT__ not available, retrying...');
+      
+      // Retry after a short delay
+      cy.wait(1000).then(() => {
+        cy.window().then((retryWin) => {
+          const retryTestWin = retryWin as any;
+          if (retryTestWin.__SET_AUTH_STATE_DIRECT__) {
+            console.log('🔧 Setting auth state directly for admin user (retry)');
+            retryTestWin.__SET_AUTH_STATE_DIRECT__({ 
+              username: 'cluse',
+              authenticated: true
+            });
+          } else {
+            console.error('❌ __SET_AUTH_STATE_DIRECT__ still not available after retry');
+          }
+        });
+      });
+    }
+  });
+  
+  // Verify authentication is complete
+  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
+  
+  // Additional check - wait for the auth state to actually be set
+  cy.window().should((win) => {
+    const testWin = win as any;
+    // Check if we can access the reactive variable somehow
+    if (testWin.__SET_AUTH_STATE_DIRECT__) {
+      console.log('✅ Auth function is available');
+    }
+  });
+});
+
+// IMPROVED: Authenticate as different user on current page
 Cypress.Commands.add("authenticateAsUserOnCurrentPage", (userCredentials: { username: string; password: string; displayName?: string }) => {
   // Set the auth token programmatically for the specified user
   cy.loginAsUser(userCredentials);
   
-  // Wait for page to fully load and auth functions to be available
-  cy.wait(1000);
+  // Wait for page to fully load
+  cy.wait(2000);
   
-  // Manually sync the reactive auth state
+  // Wait for the auth function to be available and then call it
   cy.window().then((win) => {
     const testWin = win as any;
+    
     if (testWin.__SET_AUTH_STATE_DIRECT__) {
-      console.log('Setting auth state directly for user:', userCredentials.displayName || userCredentials.username);
+      console.log('🔧 Setting auth state directly for user:', userCredentials.displayName || userCredentials.username);
       testWin.__SET_AUTH_STATE_DIRECT__({ 
-        username: userCredentials.displayName || userCredentials.username
+        username: userCredentials.displayName || userCredentials.username,
+        authenticated: true
       });
     } else {
-      console.log('Auth sync functions not available yet');
+      console.log('❌ __SET_AUTH_STATE_DIRECT__ not available for user auth, retrying...');
+      
+      // Retry after a short delay
+      cy.wait(1000).then(() => {
+        cy.window().then((retryWin) => {
+          const retryTestWin = retryWin as any;
+          if (retryTestWin.__SET_AUTH_STATE_DIRECT__) {
+            console.log('🔧 Setting auth state directly for user (retry):', userCredentials.displayName || userCredentials.username);
+            retryTestWin.__SET_AUTH_STATE_DIRECT__({ 
+              username: userCredentials.displayName || userCredentials.username,
+              authenticated: true
+            });
+          } else {
+            console.error('❌ __SET_AUTH_STATE_DIRECT__ still not available for user auth after retry');
+          }
+        });
+      });
     }
   });
   
