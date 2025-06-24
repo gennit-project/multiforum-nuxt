@@ -95,7 +95,7 @@ const reachedEndOfResults = computed(() => {
 
 <template>
   <div
-    class="w-full max-w-screen-2xl space-y-4 rounded-lg bg-white dark:text-white py-2 dark:bg-gray-800 sm:px-2 md:px-5"
+    class="w-full max-w-screen-2xl space-y-4 rounded-lg dark:text-white py-2 sm:px-2 md:px-5"
   >
     <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">
       Feedback

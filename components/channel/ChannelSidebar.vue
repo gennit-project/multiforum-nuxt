@@ -48,7 +48,7 @@ const filterChannelsByTag = (tag: string) => {
 <template>
   <div
     :class="[useScrollbar ? 'max-h-screen overflow-auto' : '']"
-    class="bg-white pb-8 pt-4 dark:bg-gray-800"
+    class="pb-8 pt-4"
   >
     <div v-if="channelId && channel" class="items-center gap-2" />
 

@@ -332,7 +332,7 @@ const handleEditAlbum = () => {
     />
     <div
       v-else
-      class="w-full max-w-4xl space-y-2 bg-white py-2 dark:bg-gray-800"
+      class="w-full max-w-4xl space-y-2 py-2"
     >
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner

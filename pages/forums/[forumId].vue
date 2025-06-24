@@ -203,7 +203,7 @@
         :route="route"
         :show-create-button="true"
       />
-      <main class="flex w-full justify-center bg-gray-100 dark:bg-gray-900">
+      <main class="flex w-full justify-center">
         <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
           <div
             v-if="showDiscussionTitle"
@@ -260,12 +260,12 @@
 
           <div class="relative w-full">
             <div class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row">
-              <div class="flex-1 bg-white p-0 dark:bg-gray-800 md:px-2">
+              <div class="flex-1 md:px-2">
                 <ChannelTabs
                   v-if="showChannelTabs"
                   :admin-list="adminList"
                   :channel="channel"
-                  class="w-full border-b border-gray-300 bg-white dark:border-gray-600 dark:bg-gray-800 md:ml-2"
+                  class="w-full border-b border-gray-300  dark:border-gray-600  md:ml-2"
                   :desktop="false"
                   :route="route"
                   :show-counts="true"
@@ -275,7 +275,7 @@
               </div>
               <aside
                 v-if="channelId && showChannelSidebar"
-                class="flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+                class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
               >
                 <ChannelSidebar
                   v-if="channel"

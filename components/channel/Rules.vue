@@ -59,7 +59,7 @@ export default defineComponent({
     <div
       v-for="(rule, i) in openRules"
       :key="rule.summary"
-      class="my-2 pt-2 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100" 
+      class="my-2 pt-2 dark:border-gray-700 dark:text-gray-100" 
     >
       <div
         v-if="rule.summary"
