@@ -32,6 +32,8 @@ export default defineConfig({
     password: process.env.VITE_AUTH0_PASSWORD,
     // Other cypress variables
     graphqlUrl: process.env.VITE_GRAPHQL_URL,
-    baseUrl: process.env.VITE_BASE_URL || 'http://localhost:3000'
+    baseUrl: process.env.VITE_BASE_URL || 'http://localhost:3000',
+    // Test environment flag
+    NODE_ENV: 'test'
   }
 });

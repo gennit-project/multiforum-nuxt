@@ -44,6 +44,7 @@ declare global {
       seedDataForCypressTests(input: SeedDataInput): Chainable<Element>;
       getClipboardText: () => Chainable<string>;
       writeClipboardText: () => Chainable<Element>;
+      authenticateOnCurrentPage(): Chainable<Element>;
     }
   }
 }

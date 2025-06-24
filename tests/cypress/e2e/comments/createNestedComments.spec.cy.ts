@@ -1,11 +1,9 @@
 import { DISCUSSION_LIST } from "../constants";
-import { setupTestData, loginUser } from "../../support/testSetup";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Basic nested comment operations", () => {
   // Set up test data once for all tests in this file
   setupTestData();
-  // Login before each test
-  loginUser('loginWithCreateEventButton');
 
   it("creates nested comments at multiple levels", () => {
     const TEST_COMMENT_TEXT_1 = "Test comment 1";
@@ -26,6 +24,10 @@ describe("Basic nested comment operations", () => {
 
     // Go to the discussion list
     cy.visit(DISCUSSION_LIST);
+    
+    // Authenticate programmatically on current page
+    cy.authenticateOnCurrentPage();
+    
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Click on the first discussion

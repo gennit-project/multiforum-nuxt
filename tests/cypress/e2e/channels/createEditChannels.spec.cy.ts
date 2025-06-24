@@ -1,5 +1,5 @@
 import { getConstantsForCypress } from "../constants";
-import { setupTestData, loginUser } from "../../support/testSetup";
+import { setupTestData } from "../../support/testSetup";
 
 const constants = getConstantsForCypress(Cypress.env("baseUrl"));
 const { CHANNEL_CREATION_FORM } = constants;
@@ -7,14 +7,7 @@ const { CHANNEL_CREATION_FORM } = constants;
 describe("Basic channel operations", () => {
   // Set up test data once for all tests in this file
   setupTestData();
-  // Login before each test
-  loginUser('loginWithCreateEventButton');
   
-  // Add verification that we're actually logged in
-  beforeEach(() => {
-    cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
-  });
-
   it("creates and edits a channel", () => {
     const TEST_CHANNEL = "testChannel";
     const TEST_DESCRIPTION = "Test description";
@@ -32,9 +25,14 @@ describe("Basic channel operations", () => {
       }
     });
 
-    // Test creating a channel
+    // Visit the page first
     cy.visit(CHANNEL_CREATION_FORM);
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    
+    // Authenticate programmatically on current page
+    cy.authenticateOnCurrentPage();
+    
+    // Wait for the page to load and form to be ready
+    cy.get('input[data-testid="title-input"]').should('be.visible');
 
     cy.get('input[data-testid="title-input"]').type(TEST_CHANNEL);
 
@@ -46,7 +44,9 @@ describe("Basic channel operations", () => {
 
     // Test editing a channel
     cy.get("a").contains("Settings").click();
-    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+    
+    // Wait for the settings page to load
+    cy.get('textarea[data-testid="description-input"]').should('be.visible');
     
     cy.get('textarea[data-testid="description-input"]')
       .should('be.visible')

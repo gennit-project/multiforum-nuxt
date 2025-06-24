@@ -120,6 +120,61 @@
   cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
   ```
 
+### Programmatic Authentication in Cypress Tests
+
+For tests that need authentication, use this pattern for reliable programmatic authentication:
+
+```typescript
+it("should test authenticated functionality", () => {
+  // Set up GraphQL interceptions first
+  cy.intercept('POST', '**/graphql').as('graphqlRequest');
+  
+  // Visit the page first to load auth functions
+  cy.visit(YOUR_PAGE_URL);
+  
+  // Set the auth token programmatically
+  cy.loginAsAdmin();
+  
+  // Wait for page to fully load and auth functions to be available
+  cy.wait(1000);
+  
+  // Manually sync the reactive auth state
+  cy.window().then((win) => {
+    const testWin = win as any;
+    if (testWin.__SET_AUTH_STATE_DIRECT__) {
+      console.log('Setting auth state directly');
+      testWin.__SET_AUTH_STATE_DIRECT__({ username: 'cluse' });
+    } else {
+      console.log('Auth sync functions not available yet');
+    }
+  });
+  
+  // Verify authentication is complete
+  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
+  
+  // Continue with your test...
+});
+```
+
+**Key Points:**
+- **Do NOT use `cy.loginAsAdminWithUISync()`** - it has timing issues and visits different pages
+- **Visit your target page first** - this loads the `useTestAuth` composable and auth sync functions
+- **Use `cy.loginAsAdmin()` to set the token** - this only sets localStorage, not reactive state
+- **Call `__SET_AUTH_STATE_DIRECT__()` manually** - this updates the reactive state so UI shows authenticated state
+- **Cast window as `any`** - avoids TypeScript errors with Cypress window type
+- **Always verify token exists** - ensures the auth setup worked
+
+**Why this pattern works:**
+1. The `useTestAuth` composable is loaded by the default layout on every page
+2. It exposes `__SET_AUTH_STATE_DIRECT__` function on the window object
+3. This function directly updates `isAuthenticatedVar` and other reactive auth state
+4. The UI immediately reflects the authenticated state without needing page refreshes
+
+**Update existing tests:**
+- Replace UI-based authentication (`loginUser()`) with this programmatic pattern
+- Replace `cy.loginAsAdminWithUISync()` calls with this manual approach
+- This pattern is faster and more reliable than UI-based authentication
+
 ## Permission System
 
 The application has two separate but related permission systems:

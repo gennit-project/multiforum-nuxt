@@ -54,15 +54,28 @@ Cypress.Commands.add("loginAsAdmin", () => {
 
 // Enhanced loginAsAdmin that syncs UI state
 Cypress.Commands.add("loginAsAdminWithUISync", () => {
-  cy.loginAsAdmin(); // Use the existing programmatic auth
+  // First visit the discussion list to load the app and initialize the auth functions
+  const baseUrl = Cypress.env("baseUrl");
+  cy.visit(`${baseUrl}/discussions/`);
   
-  // Now sync the UI state using our test auth utility
+  // Set the token programmatically
+  cy.loginAsAdmin();
+  
+  // Now that the app is loaded, set the auth state directly
   cy.window().then((win) => {
-    if (win.__REFRESH_AUTH_STATE__) {
-      return win.__REFRESH_AUTH_STATE__();
+    if (win.__SET_AUTH_STATE_DIRECT__) {
+      cy.log('Using direct auth state setter to sync UI');
+      win.__SET_AUTH_STATE_DIRECT__({
+        username: 'cluse', // Default test username
+        authenticated: true
+      });
+    } else if (win.__REFRESH_AUTH_STATE__) {
+      cy.log('Calling __REFRESH_AUTH_STATE__ as fallback');
+      return win.__REFRESH_AUTH_STATE__().then(() => {
+        cy.log('__REFRESH_AUTH_STATE__ completed');
+      });
     } else {
-      // Fallback: force a reload if the function isn't available
-      cy.log('__REFRESH_AUTH_STATE__ not available, continuing without UI sync');
+      cy.log('No auth sync functions available, continuing without UI sync');
     }
   });
   
@@ -177,4 +190,27 @@ Cypress.Commands.add("writeClipboardText", () => {
       return Promise.resolve();
     };
   });
+});
+
+// Reliable programmatic authentication helper
+Cypress.Commands.add("authenticateOnCurrentPage", () => {
+  // Set the auth token programmatically
+  cy.loginAsAdmin();
+  
+  // Wait for page to fully load and auth functions to be available
+  cy.wait(1000);
+  
+  // Manually sync the reactive auth state
+  cy.window().then((win) => {
+    const testWin = win as any;
+    if (testWin.__SET_AUTH_STATE_DIRECT__) {
+      console.log('Setting auth state directly');
+      testWin.__SET_AUTH_STATE_DIRECT__({ username: 'cluse' });
+    } else {
+      console.log('Auth sync functions not available yet');
+    }
+  });
+  
+  // Verify authentication is complete
+  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
 });

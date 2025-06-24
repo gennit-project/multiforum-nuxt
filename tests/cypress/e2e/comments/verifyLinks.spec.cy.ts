@@ -1,11 +1,9 @@
 import { CATS_FORUM, DISCUSSION_LIST } from "../constants";
-import { setupTestData, loginUser } from "../../support/testSetup";
+import { setupTestData } from "../../support/testSetup";
 
 describe("Comment moderation link verification", () => {
   // Set up test data once for all tests in this file
   setupTestData();
-  // Login before each test
-  loginUser("loginWithCreateEventButton");
 
   it("verifies navigation links between archived comment, issue, and original context", () => {
     // Test data

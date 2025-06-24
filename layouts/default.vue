@@ -121,7 +121,7 @@ import { useTestAuth } from "@/composables/useTestAuth";
   };
 
   // Initialize test auth utilities
-  useTestAuth();
+  const testAuth = useTestAuth();
 
   // Setup token checks and event listeners only on client
   onMounted(() => {

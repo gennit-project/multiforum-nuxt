@@ -4,7 +4,9 @@ import { config } from "./config";
 
 export const usernameVar = ref("");
 export const setUsername = (username: string) => {
+  console.log('🔧 setUsername called with:', username, 'current value:', usernameVar.value);
   usernameVar.value = username;
+  console.log('🔧 setUsername result:', usernameVar.value);
 };
 export const profilePicURLVar = ref("");
 export const setProfilePicURL = (url: string) => {
@@ -20,7 +22,9 @@ export const setModProfileName = (modProfileName: string) => {
 };
 export const isAuthenticatedVar = ref(false);
 export const setIsAuthenticated = (status: boolean) => {
+  console.log('🔧 setIsAuthenticated called with:', status, 'current value:', isAuthenticatedVar.value);
   isAuthenticatedVar.value = status;
+  console.log('🔧 setIsAuthenticated result:', isAuthenticatedVar.value);
 };
 
 export const isLoadingAuthVar = ref(false);

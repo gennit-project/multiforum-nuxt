@@ -15,12 +15,63 @@ import {
  * This helps Cypress tests sync programmatic authentication with UI state
  */
 export const useTestAuth = () => {
-  const refreshAuthState = async () => {
-    // Only available in test/dev environment
-    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development') {
-      console.warn('Test auth utilities should only be used in test/development environment');
-      return;
+  // Expose debug functions when composable is used
+  if (typeof window !== 'undefined') {
+    // Check if we're in a test environment
+    const isTestEnv = process.env.NODE_ENV === 'test' || 
+                     process.env.NODE_ENV === 'development' ||
+                     window.Cypress;
+    
+    if (isTestEnv) {
+      console.log('🔧 Exposing test auth functions');
+      
+      // Debug function to monitor reactive state
+      window.__DEBUG_AUTH_STATE__ = () => {
+        console.log('=== AUTH STATE DEBUG ===');
+        console.log('localStorage token:', localStorage.getItem('token') ? 'EXISTS' : 'NOT_FOUND');
+        console.log('========================');
+        
+        return {
+          hasToken: !!localStorage.getItem('token')
+        };
+      };
+
+      // Direct auth state setter for testing
+      window.__SET_AUTH_STATE_DIRECT__ = (userData = {}) => {
+        console.log('=== BEFORE SETTING AUTH STATE ===');
+        window.__DEBUG_AUTH_STATE__();
+        
+        console.log('Setting auth state directly for testing');
+        
+        // Force set all auth-related reactive variables
+        setIsAuthenticated(true);
+        setIsLoadingAuth(false);
+        setUsername(userData.username || 'cluse');
+        setNotificationCount(0);
+        
+        if (userData.profilePicURL) setProfilePicURL(userData.profilePicURL);
+        if (userData.modProfileName) setModProfileName(userData.modProfileName);
+        
+        console.log('=== AFTER SETTING AUTH STATE ===');
+        window.__DEBUG_AUTH_STATE__();
+        console.log('Auth state setters have been called');
+      };
+
+      // Also expose the refresh function (defined below)
+      window.__REFRESH_AUTH_STATE__ = async () => {
+        await refreshAuthState();
+      };
     }
+  }
+
+  const refreshAuthState = async () => {
+    // Log environment for debugging
+    console.log('Running auth state refresh, NODE_ENV:', process.env.NODE_ENV);
+    
+    // Check if we're in a test environment (Cypress or NODE_ENV)
+    const isTestEnv = process.env.NODE_ENV === 'test' || 
+                     process.env.NODE_ENV === 'development' ||
+                     (typeof window !== 'undefined' && window.Cypress);
 
     try {
       // Get the token from localStorage (set by Cypress)
@@ -97,9 +148,9 @@ export const useTestAuth = () => {
           if (userEmail) {
             console.log('Manually refreshing auth state for:', userEmail);
             
-            // Set loading state
-            setIsLoadingAuth(true);
+            // Set basic auth state immediately
             setIsAuthenticated(true);
+            setIsLoadingAuth(true);
             
             // Load user data using GraphQL
             const { load: loadUserData, onResult } = useLazyQuery(GET_EMAIL, {
@@ -116,7 +167,6 @@ export const useTestAuth = () => {
                   setProfilePicURL(userData.profilePicURL);
                 }
                 setIsLoadingAuth(false);
-                setIsAuthenticated(true);
                 setModProfileName(modProfileData?.displayName || "");
                 setNotificationCount(userData.NotificationsAggregate?.count || 0);
                 
@@ -128,13 +178,16 @@ export const useTestAuth = () => {
             });
             
             loadUserData();
+            return; // Exit early since we're handling it manually
           }
         }
       } catch (parseError) {
         console.error('Failed to parse token for manual auth sync:', parseError);
-        // As a last resort, just set authenticated to true
-        setIsAuthenticated(true);
       }
+      
+      // Final fallback: just set basic auth state
+      console.log('Setting basic auth state as fallback');
+      setIsAuthenticated(true);
       
     } catch (error) {
       console.error('Error refreshing auth state:', error);
@@ -146,10 +199,3 @@ export const useTestAuth = () => {
   };
 };
 
-// Expose global function for Cypress tests
-if (typeof window !== 'undefined' && (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development')) {
-  window.__REFRESH_AUTH_STATE__ = async () => {
-    const { refreshAuthState } = useTestAuth();
-    await refreshAuthState();
-  };
-}
