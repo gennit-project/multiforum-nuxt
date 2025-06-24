@@ -192,25 +192,51 @@ Cypress.Commands.add("writeClipboardText", () => {
   });
 });
 
-// SIMPLIFIED: Clear all auth state completely
+// FIXED: Clear all auth state completely including Auth0's internal cache
 Cypress.Commands.add("clearAllAuthState", () => {
-  // Clear Cypress localStorage cache
-  localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
-  
-  // Clear browser localStorage
+  // Clear browser localStorage - including Auth0's cache
   cy.window().then((window) => {
+    // Clear our app's auth tokens
     window.localStorage.removeItem(AUTH_TOKEN_NAME);
     window.localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
     
-    // Clear user-specific cache keys (in case any exist)
+    // Clear ALL Auth0-related localStorage entries
+    // Auth0 stores tokens with keys like: @@auth0spajs@@::CLIENT_ID::AUDIENCE::scope
     Object.keys(window.localStorage).forEach(key => {
-      if (key.startsWith(AUTH_TOKEN_CACHE_KEY)) {
+      if (key.includes('@@auth0spajs@@') || 
+          key.includes('auth0') || 
+          key.startsWith('auth0.') ||
+          key.startsWith(AUTH_TOKEN_CACHE_KEY)) {
+        console.log('Clearing Auth0 cache key:', key);
         window.localStorage.removeItem(key);
       }
     });
     
-    // Clear session storage too
+    // Clear session storage too (Auth0 might use this)
+    Object.keys(window.sessionStorage).forEach(key => {
+      if (key.includes('@@auth0spajs@@') || 
+          key.includes('auth0') || 
+          key.startsWith('auth0.')) {
+        console.log('Clearing Auth0 session key:', key);
+        window.sessionStorage.removeItem(key);
+      }
+    });
+    
+    // Clear the rest of session storage
     window.sessionStorage.clear();
+  });
+  
+  // Clear Cypress localStorage cache
+  localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
+  
+  // Clear ALL Cypress localStorage that might be Auth0 related
+  Object.keys(localStorage).forEach(key => {
+    if (key.includes('@@auth0spajs@@') || 
+        key.includes('auth0') || 
+        key.startsWith('auth0.') ||
+        key.startsWith(AUTH_TOKEN_CACHE_KEY)) {
+      localStorage.removeItem(key);
+    }
   });
   
   // Reset Vue reactive auth state
@@ -227,9 +253,6 @@ Cypress.Commands.add("clearAllAuthState", () => {
 
 // FIXED: Login as different user with proper cache clearing
 Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; password: string }) => {
-  // First, completely clear all auth state
-  cy.clearAllAuthState();
-  
   // Log the credentials being used for debugging
   console.log(`Attempting login for user: ${userCredentials.username}`);
   console.log(`Password provided: ${userCredentials.password ? '[REDACTED]' : 'UNDEFINED/EMPTY'}`);
@@ -239,23 +262,8 @@ Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; passwo
     throw new Error(`Invalid credentials provided: username=${userCredentials.username}, password=${userCredentials.password ? '[PROVIDED]' : 'MISSING'}`);
   }
   
-  // Create a unique cache key for this user to prevent conflicts
-  const userSpecificCacheKey = `${AUTH_TOKEN_CACHE_KEY}_${userCredentials.username}`;
-  
-  // Check for cached token for this specific user
-  const userCachedTokenData = JSON.parse(
-    localStorage.getItem(userSpecificCacheKey) || 'null'
-  );
-
-  if (userCachedTokenData && userCachedTokenData.expiresAt > Date.now()) {
-    console.log(`Using cached token for ${userCredentials.username}`);
-    cy.window().then((window) => {
-      window.localStorage.setItem(AUTH_TOKEN_NAME, userCachedTokenData.accessToken);
-    });
-    return;
-  }
-
-  // Always make a fresh request for new/expired tokens
+  // ALWAYS make a fresh request - NO CACHING for different users
+  // This ensures each user gets their own unique token
   const options = {
     method: "POST",
     url: `https://${Cypress.env("auth0Domain")}/oauth/token`,
@@ -272,18 +280,10 @@ Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; passwo
 
   cy.request(options).then((response) => {
     const accessToken = response.body.access_token;
-    const expiresIn = response.body.expires_in;
 
-    console.log(`New token for ${userCredentials.username}:`, accessToken.substring(0, 20) + '...');
+    console.log(`Fresh token for ${userCredentials.username}:`, accessToken.substring(0, 20) + '...');
 
-    // Cache this token with user-specific key
-    const tokenData = {
-      accessToken,
-      expiresAt: Date.now() + expiresIn * 1000,
-    };
-    localStorage.setItem(userSpecificCacheKey, JSON.stringify(tokenData));
-
-    // Set token in browser localStorage
+    // Set token directly in browser localStorage - no caching
     cy.window().then((window) => {
       window.localStorage.setItem(AUTH_TOKEN_NAME, accessToken);
     });
@@ -347,6 +347,12 @@ Cypress.Commands.add("authenticateOnCurrentPage", () => {
 
 // IMPROVED: Authenticate as different user on current page
 Cypress.Commands.add("authenticateAsUserOnCurrentPage", (userCredentials: { username: string; password: string; displayName?: string }) => {
+  // First, completely clear all previous auth state
+  cy.clearAllAuthState();
+  
+  // Wait a moment for the clear to take effect
+  cy.wait(500);
+  
   // Set the auth token programmatically for the specified user
   cy.loginAsUser(userCredentials);
   
@@ -384,6 +390,8 @@ Cypress.Commands.add("authenticateAsUserOnCurrentPage", (userCredentials: { user
     }
   });
   
-  // Verify authentication is complete
-  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
+  // Verify authentication is complete and token is different
+  cy.window().its('localStorage').invoke('getItem', 'token').should('exist').then((token) => {
+    console.log(`Token set for ${userCredentials.username}:`, (token as string).substring(0, 20) + '...');
+  });
 });
