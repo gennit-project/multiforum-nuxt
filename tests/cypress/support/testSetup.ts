@@ -37,8 +37,13 @@ export const setupTestData = () => {
 /**
  * Login as a user and ensure necessary setup has been done
  * This is more efficient than logging in for each test case
+ * 
+ * @param loginMethod - Authentication method to use:
+ *   - 'loginWithCreateEventButton' (default) - UI-based login
+ *   - 'loginAsAdminWithUISync' - Programmatic login with UI state sync
+ *   - 'loginProgrammatically' - Programmatic login with session caching (fastest)
  */
-export const loginUser = (loginMethod = 'loginWithCreateEventButton') => {
+export const loginUser = (loginMethod: 'loginWithCreateEventButton' | 'loginAsAdminWithUISync' | 'loginProgrammatically' = 'loginWithCreateEventButton') => {
   beforeEach(() => {
     // Make sure data is initialized even if setupTestData wasn't called
     if (!dataInitialized) {

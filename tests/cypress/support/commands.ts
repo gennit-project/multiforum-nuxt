@@ -2,7 +2,7 @@ import loginWithButtonClick from "./commandFunctions/loginWithButtonClick";
 import dropDataForCypressTests from "./commandFunctions/dropDataForCypressTests";
 import seedDataForCypressTests from "./commandFunctions/seedDataForCypressTests";
 
-const AUTH_TOKEN_NAME = "authToken";
+const AUTH_TOKEN_NAME = "token"; // This should match what the app expects
 const AUTH_TOKEN_CACHE_KEY = "auth_token_cache";
 
 Cypress.Commands.add("loginWithCreateEventButton", loginWithButtonClick);
@@ -49,6 +49,36 @@ Cypress.Commands.add("loginAsAdmin", () => {
     cy.window().then((window) => {
       window.localStorage.setItem(AUTH_TOKEN_NAME, accessToken);
     });
+  });
+});
+
+// Enhanced loginAsAdmin that syncs UI state
+Cypress.Commands.add("loginAsAdminWithUISync", () => {
+  cy.loginAsAdmin(); // Use the existing programmatic auth
+  
+  // Now sync the UI state using our test auth utility
+  cy.window().then((win) => {
+    if (win.__REFRESH_AUTH_STATE__) {
+      return win.__REFRESH_AUTH_STATE__();
+    } else {
+      // Fallback: force a reload if the function isn't available
+      cy.log('__REFRESH_AUTH_STATE__ not available, continuing without UI sync');
+    }
+  });
+  
+  // Give the UI time to update after auth state refresh
+  cy.wait(1000);
+  
+  // Verify that the auth state has been set correctly
+  cy.window().should(() => {
+    expect(localStorage.getItem('token')).to.exist;
+  });
+});
+
+// Session-cached version of programmatic login for better performance
+Cypress.Commands.add("loginProgrammatically", () => {
+  cy.session('admin-user', () => {
+    cy.loginAsAdminWithUISync();
   });
 });
 

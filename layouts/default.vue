@@ -21,6 +21,7 @@
   import { config } from "@/config";
   import DevOverlay from "@/components/nav/DevOverlay.vue";
 import { useRoute, useRouter } from "nuxt/app";
+import { useTestAuth } from "@/composables/useTestAuth";
 
   const isDevelopment = computed(() => config.environment === "development");
 
@@ -118,6 +119,9 @@ import { useRoute, useRouter } from "nuxt/app";
       checkTokenExpiration();
     }
   };
+
+  // Initialize test auth utilities
+  useTestAuth();
 
   // Setup token checks and event listeners only on client
   onMounted(() => {
