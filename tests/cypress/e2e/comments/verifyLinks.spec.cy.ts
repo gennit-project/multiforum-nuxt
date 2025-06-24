@@ -15,6 +15,10 @@ describe("Comment moderation link verification", () => {
 
     // Step 1: Navigate to discussion and create a test comment
     cy.visit(DISCUSSION_LIST);
+    
+    // Authenticate programmatically on current page
+    cy.authenticateOnCurrentPage();
+    
     cy.wait("@graphqlRequest");
 
     cy.get("span").contains(discussionTitle).click();
@@ -104,6 +108,10 @@ describe("Comment moderation link verification", () => {
 
     // Navigate to discussion and create a test comment
     cy.visit(DISCUSSION_LIST);
+    
+    // Authenticate programmatically on current page
+    cy.authenticateOnCurrentPage();
+    
     cy.wait("@graphqlRequest");
 
     cy.get("span").contains(discussionTitle).click();

@@ -214,3 +214,82 @@ Cypress.Commands.add("authenticateOnCurrentPage", () => {
   // Verify authentication is complete
   cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
 });
+
+// Login as different user programmatically
+Cypress.Commands.add("loginAsUser", (userCredentials: { username: string; password: string }) => {
+  // Clear BOTH Cypress localStorage cache AND browser localStorage cache
+  localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
+  
+  cy.window().then((window) => {
+    window.localStorage.removeItem(AUTH_TOKEN_NAME);
+    window.localStorage.removeItem(AUTH_TOKEN_CACHE_KEY);
+  });
+
+  // Log the credentials being used for debugging
+  console.log(`Attempting login for user: ${userCredentials.username}`);
+  console.log(`Password provided: ${userCredentials.password ? '[REDACTED]' : 'UNDEFINED/EMPTY'}`);
+
+  // Check if credentials are actually provided
+  if (!userCredentials.username || !userCredentials.password) {
+    throw new Error(`Invalid credentials provided: username=${userCredentials.username}, password=${userCredentials.password ? '[PROVIDED]' : 'MISSING'}`);
+  }
+  
+  // Also check if we're trying to use the same credentials as the admin user
+  const adminUsername = Cypress.env("email");
+  if (userCredentials.username === adminUsername) {
+    console.warn('WARNING: Using same credentials as admin user - this will result in identical tokens');
+  }
+
+  // Always make a fresh request - don't use any cached tokens
+  const options = {
+    method: "POST",
+    url: `https://${Cypress.env("auth0Domain")}/oauth/token`,
+    body: {
+      grant_type: "password",
+      username: userCredentials.username,
+      password: userCredentials.password,
+      audience: Cypress.env("auth0Audience"),
+      scope: "openid profile email",
+      client_id: Cypress.env("auth0ClientId"),
+      client_secret: Cypress.env("auth0ClientSecret"),
+    },
+  };
+
+  cy.request(options).then((response) => {
+    const accessToken = response.body.access_token;
+
+    console.log(`New token for ${userCredentials.username}:`, accessToken.substring(0, 20) + '...');
+
+    // DON'T cache this token in Cypress localStorage - only set it in browser localStorage
+    // This prevents interference with the loginAsAdmin cache
+    cy.window().then((window) => {
+      window.localStorage.setItem(AUTH_TOKEN_NAME, accessToken);
+      // Don't cache this in AUTH_TOKEN_CACHE_KEY to avoid conflicts
+    });
+  });
+});
+
+// Authenticate as different user on current page (similar to authenticateOnCurrentPage but for any user)
+Cypress.Commands.add("authenticateAsUserOnCurrentPage", (userCredentials: { username: string; password: string; displayName?: string }) => {
+  // Set the auth token programmatically for the specified user
+  cy.loginAsUser(userCredentials);
+  
+  // Wait for page to fully load and auth functions to be available
+  cy.wait(1000);
+  
+  // Manually sync the reactive auth state
+  cy.window().then((win) => {
+    const testWin = win as any;
+    if (testWin.__SET_AUTH_STATE_DIRECT__) {
+      console.log('Setting auth state directly for user:', userCredentials.displayName || userCredentials.username);
+      testWin.__SET_AUTH_STATE_DIRECT__({ 
+        username: userCredentials.displayName || userCredentials.username
+      });
+    } else {
+      console.log('Auth sync functions not available yet');
+    }
+  });
+  
+  // Verify authentication is complete
+  cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
+});

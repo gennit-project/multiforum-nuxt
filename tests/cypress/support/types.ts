@@ -45,6 +45,8 @@ declare global {
       getClipboardText: () => Chainable<string>;
       writeClipboardText: () => Chainable<Element>;
       authenticateOnCurrentPage(): Chainable<Element>;
+      loginAsUser(userCredentials: { username: string; password: string }): Chainable<Element>;
+      authenticateAsUserOnCurrentPage(userCredentials: { username: string; password: string; displayName?: string }): Chainable<Element>;
     }
   }
 }

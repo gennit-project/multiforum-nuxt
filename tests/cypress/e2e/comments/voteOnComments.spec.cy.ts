@@ -2,6 +2,8 @@ import { DISCUSSION_LIST } from "../constants";
 import { setupTestData } from "../../support/testSetup";
 
 describe("Comment voting operations", () => {
+   // User 1 logs in
+    cy.loginWithCreateEventButton();
   // Set up test data once for all tests in this file
   setupTestData();
 
@@ -20,8 +22,7 @@ describe("Comment voting operations", () => {
       }
     });
 
-    // User 1 logs in
-    cy.loginWithCreateEventButton();
+   
 
     // Go to the discussion list
     cy.visit(DISCUSSION_LIST);
@@ -110,13 +111,13 @@ describe("Comment voting operations", () => {
     // User 2 logs in
     const username2 = Cypress.env("auth0_username_2");
     const password2 = Cypress.env("auth0_password_2");
-    cy.loginWithCreateEventButton({
+    
+    cy.visit(DISCUSSION_LIST);
+    cy.authenticateAsUserOnCurrentPage({
       username: username2,
       password: password2,
+      displayName: 'testuser2'
     });
-
-    // Go to the discussion list
-    cy.visit(DISCUSSION_LIST);
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Navigate to the same discussion
