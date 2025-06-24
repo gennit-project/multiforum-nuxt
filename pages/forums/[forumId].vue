@@ -34,12 +34,17 @@
   const showChannelTabs = computed(() => {
     const routeName = String(route.name);
     const isFeedbackPage = routeName.includes("feedback") && !routeName.includes("edit-feedback");
+    const isCreatePage = routeName.includes("create");
+    const isEditPage = routeName.includes("edit") && !routeName.includes("edit-feedback");
+    
     return (
       !showDiscussionTitle.value &&
       !showDownloadTitle.value &&
       !showEventTitle.value &&
       !showIssueTitle.value &&
-      !isFeedbackPage
+      !isFeedbackPage &&
+      !isCreatePage &&
+      !isEditPage
     );
   });
 
