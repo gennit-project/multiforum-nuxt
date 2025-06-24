@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import type { EventCreateInput } from "../../../../__generated__/graphql";
+import type { EventCreateInput } from "../../../../../__generated__/graphql";
 
 export type EventCreateInputWithChannels = {
   eventCreateInput: EventCreateInput;
@@ -35,9 +35,9 @@ const generateEventDates = (daysFromNow: number) => {
   const endDate = startDate.plus({ hours: 2 });
 
   return {
-    startTime: startDate.toISO(),
-    endTime: endDate.toISO(),
-    startTimeDayOfWeek: startDate.weekdayLong,
+    startTime: startDate.toISO()!,
+    endTime: endDate.toISO()!,
+    startTimeDayOfWeek: startDate.weekdayLong!,
     startTimeHourOfDay: startDate.hour,
   };
 };
@@ -98,9 +98,9 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Weekend Test Event",
-    startTime: startOfNextWeekend.toISO(),  // Start exactly on Saturday
-    endTime: startOfNextWeekend.plus({ days: 1 }).toISO(), // End on Sunday
-    startTimeDayOfWeek: startOfNextWeekend.weekdayLong,
+    startTime: startOfNextWeekend.toISO()!,  // Start exactly on Saturday
+    endTime: startOfNextWeekend.plus({ days: 1 }).toISO()!, // End on Sunday
+    startTimeDayOfWeek: startOfNextWeekend.weekdayLong!,
     startTimeHourOfDay: startOfNextWeekend.hour,
     poster: "cluse",
     cost: "0",
@@ -110,9 +110,9 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Week Test Event",
-    startTime: startOfNextWeek.toISO(),
-    endTime: startOfNextWeek.plus({ days: 1 }).toISO(),
-    startTimeDayOfWeek: startOfNextWeek.weekdayLong,
+    startTime: startOfNextWeek.toISO()!,
+    endTime: startOfNextWeek.plus({ days: 1 }).toISO()!,
+    startTimeDayOfWeek: startOfNextWeek.weekdayLong!,
     startTimeHourOfDay: startOfNextWeek.hour,
     poster: "cluse",
     cost: "0",
@@ -122,9 +122,9 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Weekend Test Event",
-    startTime: startOfNextWeek.plus({ days: 5 }).toISO(),  // Saturday of next week (removed the minute offset)
-    endTime: startOfNextWeek.plus({ days: 6 }).toISO(),    // Sunday of next week
-    startTimeDayOfWeek: startOfNextWeek.plus({ days: 5 }).weekdayLong,
+    startTime: startOfNextWeek.plus({ days: 5 }).toISO()!,  // Saturday of next week (removed the minute offset)
+    endTime: startOfNextWeek.plus({ days: 6 }).toISO()!,    // Sunday of next week
+    startTimeDayOfWeek: startOfNextWeek.plus({ days: 5 }).weekdayLong!,
     startTimeHourOfDay: startOfNextWeek.plus({ days: 5 }).hour,
     poster: "cluse",
     cost: "0",
@@ -134,9 +134,9 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "This Month Test Event",
-    startTime: now.plus({ hours: 1 }).toISO(), // Keep this to ensure it's in the future
-    endTime: now.plus({ hours: 3 }).toISO(),   // Just make it a 2-hour event
-    startTimeDayOfWeek: now.weekdayLong,
+    startTime: now.plus({ hours: 1 }).toISO()!, // Keep this to ensure it's in the future
+    endTime: now.plus({ hours: 3 }).toISO()!,   // Just make it a 2-hour event
+    startTimeDayOfWeek: now.weekdayLong!,
     startTimeHourOfDay: now.hour,
     poster: "cluse",
     cost: "0",
@@ -146,9 +146,9 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Past Test Event",
-    startTime: now.minus({ months: 1 }).toISO(),     // One month ago
-    endTime: now.minus({ months: 1, hours: -2 }).toISO(),  // Event lasted 2 hours
-    startTimeDayOfWeek: now.minus({ months: 1 }).weekdayLong,
+    startTime: now.minus({ months: 1 }).toISO()!,     // One month ago
+    endTime: now.minus({ months: 1, hours: -2 }).toISO()!,  // Event lasted 2 hours
+    startTimeDayOfWeek: now.minus({ months: 1 }).weekdayLong!,
     startTimeHourOfDay: now.minus({ months: 1 }).hour,
     poster: "cluse",
     cost: "0",
@@ -158,9 +158,9 @@ const timeBasedEvents: BaseEvent[] = [
   },
   {
     title: "Next Month Test Event",
-    startTime: startOfNextMonth.toISO(),  // Start exactly at the beginning of next month
-    endTime: startOfNextMonth.plus({ hours: 2 }).toISO(),  // 2-hour event
-    startTimeDayOfWeek: startOfNextMonth.weekdayLong,
+    startTime: startOfNextMonth.toISO()!,  // Start exactly at the beginning of next month
+    endTime: startOfNextMonth.plus({ hours: 2 }).toISO()!,  // 2-hour event
+    startTimeDayOfWeek: startOfNextMonth.weekdayLong!,
     startTimeHourOfDay: startOfNextMonth.hour,
     poster: "cluse",
     cost: "0",
@@ -390,9 +390,9 @@ export const events: EventCreateInputWithChannels[] = baseEvents.map(
       startTimeDayOfWeek,
       startTimeHourOfDay,
       canceled,
-      ...(tags?.length > 0 && {
+      ...(tags?.length && tags.length > 0 && {
         Tags: {
-          connect: tags.map((tag) => ({
+          connect: tags!.map((tag) => ({
               where: { node: { text: tag } },
             })),
           },

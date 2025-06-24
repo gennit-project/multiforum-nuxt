@@ -78,7 +78,7 @@ describe('Topnav Component', () => {
     }));
     
     // Get component after mocks are set up
-    const Topnav = await import('@/components/nav/Topnav.vue').then(m => m.default);
+    const Topnav = await import('../../../components/nav/Topnav.vue').then(m => m.default);
     
     const wrapper = mount(Topnav, {
       global: {
@@ -115,7 +115,7 @@ describe('Topnav Component', () => {
     }));
     
     // Get component after mocks are set up
-    const Topnav = await import('@/components/nav/Topnav.vue').then(m => m.default);
+    const Topnav = await import('../../../components/nav/Topnav.vue').then(m => m.default);
     
     const wrapper = mount(Topnav, {
       global: {

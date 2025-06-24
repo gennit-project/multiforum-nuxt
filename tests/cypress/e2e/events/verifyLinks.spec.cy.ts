@@ -8,8 +8,8 @@ describe("Event moderation link verification", () => {
 
   it("verifies navigation links between archived event, issue, and original context", () => {
     // Format dates for event creation
-    const formatDate = (dt) => dt.toFormat("yyyy-MM-dd");
-    const formatTime = (dt) => dt.toFormat("HH:mm");
+    const formatDate = (dt: DateTime) => dt.toFormat("yyyy-MM-dd");
+    const formatTime = (dt: DateTime) => dt.toFormat("HH:mm");
 
     // Generate future date for the event
     const startDateTime = DateTime.now().plus({ months: 1, hours: 2 }).startOf("hour");
@@ -137,8 +137,8 @@ describe("Event moderation link verification", () => {
 
   it("verifies links between reported event feedback, issue, and original event", () => {
     // Format dates for event creation
-    const formatDate = (dt) => dt.toFormat("yyyy-MM-dd");
-    const formatTime = (dt) => dt.toFormat("HH:mm");
+    const formatDate = (dt: DateTime) => dt.toFormat("yyyy-MM-dd");
+    const formatTime = (dt: DateTime) => dt.toFormat("HH:mm");
 
     // Generate future date for the event
     const startDateTime = DateTime.now().plus({ months: 1, hours: 2 }).startOf("hour");

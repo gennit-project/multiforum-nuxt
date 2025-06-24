@@ -17,7 +17,7 @@ export const deleteAll = () => {
 };
 
 // Helper function to validate the response
-const validateResponse = (response, commandName) => {
+const validateResponse = (response: any, commandName: string) => {
   if (
     !response ||
     response.status >= 400 ||
@@ -25,7 +25,7 @@ const validateResponse = (response, commandName) => {
   ) {
     const errorDetails =
       response.body?.errors
-        ?.map((error) => {
+        ?.map((error: any) => {
           return `Message: ${error.message}, Path: ${JSON.stringify(error.path)}, Extensions: ${JSON.stringify(error.extensions)}`;
         })
         .join("\n") || "No detailed error available";

@@ -1,4 +1,4 @@
-import type { ChannelCreateInput } from "../../../../__generated__/graphql";
+import type { ChannelCreateInput } from "../../../../../__generated__/graphql";
 
 type BaseChannel = {
   uniqueName: string;

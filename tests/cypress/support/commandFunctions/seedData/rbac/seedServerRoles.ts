@@ -1,4 +1,4 @@
-import type { ServerRoleCreateInput } from "../../../../../__generated__/graphql";
+import type { ServerRoleCreateInput } from "../../../../../../__generated__/graphql";
 
 const serverRoles: ServerRoleCreateInput[] = [
   {

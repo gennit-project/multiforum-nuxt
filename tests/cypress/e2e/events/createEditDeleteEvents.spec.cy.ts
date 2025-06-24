@@ -10,9 +10,9 @@ describe("Basic event operations", () => {
 
   it("creates, edits and deletes an online event with virtual event type", () => {
     // Helper function to format dates for input fields
-    const formatDate = (dt) => dt.toFormat('yyyy-MM-dd');
-    const formatTime = (dt) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
-    const formatDisplayTime = (dt) => dt.toFormat('h:mm');  // 12-hour format for assertions
+    const formatDate = (dt: DateTime) => dt.toFormat('yyyy-MM-dd');
+    const formatTime = (dt: DateTime) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
+    const formatDisplayTime = (dt: DateTime) => dt.toFormat('h:mm');  // 12-hour format for assertions
 
     // Generate future dates for testing
     const startDateTime = DateTime.now().plus({ months: 1, hours: 2 }).startOf('hour');
@@ -137,8 +137,8 @@ describe("Basic event operations", () => {
 
   it("supports hybrid event type selection", () => {
     // Helper function to format dates for input fields
-    const formatDate = (dt) => dt.toFormat('yyyy-MM-dd');
-    const formatTime = (dt) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
+    const formatDate = (dt: DateTime) => dt.toFormat('yyyy-MM-dd');
+    const formatTime = (dt: DateTime) => dt.toFormat('HH:mm');  // Use 24-hour format for input fields
     
     // Generate future dates for testing
     const startDateTime = DateTime.now().plus({ months: 1, hours: 2 }).startOf('hour');

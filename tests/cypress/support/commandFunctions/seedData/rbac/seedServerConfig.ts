@@ -1,4 +1,4 @@
-import type { ServerConfigCreateInput } from "../../../../../__generated__/graphql";
+import type { ServerConfigCreateInput } from "../../../../../../__generated__/graphql";
 
 const serverConfigs: ServerConfigCreateInput[] = [
   {
