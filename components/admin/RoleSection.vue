@@ -25,7 +25,7 @@ defineProps({
       {{ sectionTitle }}
     </h2>
     <hr class="mb-4" >
-    <div class="bg-gray-50 dark:bg-gray-800 py-2 rounded-lg">
+    <div class="py-2 rounded-lg">
       <h3 class="font-medium">
         {{ roleTitle }}
       </h3>

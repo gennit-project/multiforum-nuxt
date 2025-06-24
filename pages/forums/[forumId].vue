@@ -33,25 +33,42 @@
 
   const showChannelTabs = computed(() => {
     const routeName = String(route.name);
-    const isFeedbackPage = routeName.includes("feedback") && !routeName.includes("edit-feedback");
     const isCreatePage = routeName.includes("create");
-    const isEditPage = routeName.includes("edit") && !routeName.includes("edit-feedback");
+    
+    // Forum settings pages where we want to show channel tabs
+    const isForumSettingsPage = routeName.startsWith("forums-forumId-edit") && 
+      (routeName === "forums-forumId-edit" || 
+       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|feedback|wiki)$/));
+    
+    // Only hide tabs for content editing (discussions, events, etc), not forum settings
+    const isContentEditPage = routeName.includes("edit") && !isForumSettingsPage;
     
     return (
       !showDiscussionTitle.value &&
       !showDownloadTitle.value &&
       !showEventTitle.value &&
       !showIssueTitle.value &&
-      !isFeedbackPage &&
       !isCreatePage &&
-      !isEditPage
+      !isContentEditPage
     );
   });
 
   const showChannelSidebar = computed(() => {
-    // Hide sidebar on wiki pages and download detail pages to give more reading space
-    return !`${String(route.name)}`.includes("wiki") && 
-           !`${String(route.name)}`.includes("forums-forumId-downloads-discussionId");
+    const routeName = String(route.name);
+    
+    // Always show sidebar on forum settings pages (including wiki settings)
+    const isForumSettingsPage = routeName.startsWith("forums-forumId-edit") && 
+      (routeName === "forums-forumId-edit" || 
+       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|feedback|wiki)$/));
+    
+    if (isForumSettingsPage) {
+      return true;
+    }
+    
+    // Hide sidebar on wiki content pages and download detail pages to give more reading space
+    // (but not wiki settings pages which are handled above)
+    return !routeName.includes("forums-forumId-wiki") && 
+           !routeName.includes("forums-forumId-downloads-discussionId");
   });
 
   const channelId = computed(() => {
