@@ -100,7 +100,7 @@ const CommentSectionTest = {
       onDone: vi.fn(),
     };
     
-    useMutation.mockImplementation((mutation) => {
+    (useMutation as any).mockImplementation((mutation: any) => {
       if (mutation.name && mutation.name.includes('CREATE_COMMENT')) {
         return createCommentMutation;
       } else if (mutation.name && mutation.name.includes('UPDATE_COMMENT')) {
@@ -128,13 +128,13 @@ const CommentSectionTest = {
     handleClickCreate() {
       this.$emit('createComment');
     },
-    updateCreateInputValuesForReply(input) {
+    updateCreateInputValuesForReply(input: any) {
       this.$emit('updateCreateReplyCommentInput', input);
     },
-    handleClickEdit(commentData) {
+    handleClickEdit(commentData: any) {
       this.$emit('click-edit-comment', commentData);
     },
-    handleClickDelete(input) {
+    handleClickDelete(input: any) {
       this.$emit('delete-comment', input);
     },
     handleDeleteComment() {
@@ -220,8 +220,8 @@ describe('CommentSection.vue', () => {
       go: vi.fn(),
     };
     
-    useRoute.mockReturnValue(mockRoute);
-    useRouter.mockReturnValue(mockRouter);
+    (useRoute as any).mockReturnValue(mockRoute);
+    (useRouter as any).mockReturnValue(mockRouter);
   });
   
   it('renders the comment section with correct header and comments', async () => {
@@ -336,10 +336,10 @@ describe('CommentSection.vue', () => {
       depth: 2,
     };
     
-    await wrapper.vm.updateCreateInputValuesForReply(inputData);
+    await (wrapper.vm as any).updateCreateInputValuesForReply(inputData);
     
-    expect(wrapper.emitted().updateCreateReplyCommentInput).toBeTruthy();
-    expect(wrapper.emitted().updateCreateReplyCommentInput[0][0]).toEqual(inputData);
+    expect((wrapper.emitted() as any).updateCreateReplyCommentInput).toBeTruthy();
+    expect((wrapper.emitted() as any).updateCreateReplyCommentInput[0][0]).toEqual(inputData);
   });
   
   it('emits click-edit-comment event when handleClickEdit is called', async () => {
@@ -349,10 +349,10 @@ describe('CommentSection.vue', () => {
     
     const commentData = { id: 'comment-1', text: 'Comment text' };
     
-    await wrapper.vm.handleClickEdit(commentData);
+    await (wrapper.vm as any).handleClickEdit(commentData);
     
-    expect(wrapper.emitted()['click-edit-comment']).toBeTruthy();
-    expect(wrapper.emitted()['click-edit-comment'][0][0]).toEqual(commentData);
+    expect((wrapper.emitted() as any)['click-edit-comment']).toBeTruthy();
+    expect((wrapper.emitted() as any)['click-edit-comment'][0][0]).toEqual(commentData);
   });
   
   it('emits delete-comment event when handleClickDelete is called', async () => {

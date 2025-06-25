@@ -128,7 +128,7 @@ describe('BrokenRulesModal Component', () => {
       archiveAfterReporting: false
     });
     
-    expect(wrapper.vm.modalTitle).toBe('Report Discussion');
+    expect((wrapper.vm as any).modalTitle).toBe('Report Discussion');
   });
 
   it('renders the correct title for archiving a discussion', async () => {
@@ -137,7 +137,7 @@ describe('BrokenRulesModal Component', () => {
       archiveAfterReporting: true
     });
     
-    expect(wrapper.vm.modalTitle).toBe('Archive Discussion');
+    expect((wrapper.vm as any).modalTitle).toBe('Archive Discussion');
   });
 
   it('renders the correct title for reporting a comment', async () => {
@@ -147,7 +147,7 @@ describe('BrokenRulesModal Component', () => {
       archiveAfterReporting: false
     });
     
-    expect(wrapper.vm.modalTitle).toBe('Report Comment');
+    expect((wrapper.vm as any).modalTitle).toBe('Report Comment');
   });
 
   it('renders the correct title for archiving a comment', async () => {
@@ -157,7 +157,7 @@ describe('BrokenRulesModal Component', () => {
       archiveAfterReporting: true
     });
     
-    expect(wrapper.vm.modalTitle).toBe('Archive Comment');
+    expect((wrapper.vm as any).modalTitle).toBe('Archive Comment');
   });
 
   it('renders the correct title for reporting an event', async () => {
@@ -167,7 +167,7 @@ describe('BrokenRulesModal Component', () => {
       archiveAfterReporting: false
     });
     
-    expect(wrapper.vm.modalTitle).toBe('Report Event');
+    expect((wrapper.vm as any).modalTitle).toBe('Report Event');
   });
 
   it('renders the correct title for archiving an event', async () => {
@@ -177,58 +177,58 @@ describe('BrokenRulesModal Component', () => {
       archiveAfterReporting: true
     });
     
-    expect(wrapper.vm.modalTitle).toBe('Archive Event');
+    expect((wrapper.vm as any).modalTitle).toBe('Archive Event');
   });
 
   it('toggles forum rule selection correctly', async () => {
     const wrapper = await mountComponent();
     
-    expect(wrapper.vm.selectedForumRules).toEqual([]);
+    expect((wrapper.vm as any).selectedForumRules).toEqual([]);
     
     // Add a rule
-    wrapper.vm.toggleForumRuleSelection('rule1');
-    expect(wrapper.vm.selectedForumRules).toEqual(['rule1']);
+    (wrapper.vm as any).toggleForumRuleSelection('rule1');
+    expect((wrapper.vm as any).selectedForumRules).toEqual(['rule1']);
     
     // Add another rule
-    wrapper.vm.toggleForumRuleSelection('rule2');
-    expect(wrapper.vm.selectedForumRules).toEqual(['rule1', 'rule2']);
+    (wrapper.vm as any).toggleForumRuleSelection('rule2');
+    expect((wrapper.vm as any).selectedForumRules).toEqual(['rule1', 'rule2']);
     
     // Toggle off a rule
-    wrapper.vm.toggleForumRuleSelection('rule1');
-    expect(wrapper.vm.selectedForumRules).toEqual(['rule2']);
+    (wrapper.vm as any).toggleForumRuleSelection('rule1');
+    expect((wrapper.vm as any).selectedForumRules).toEqual(['rule2']);
   });
 
   it('toggles server rule selection correctly', async () => {
     const wrapper = await mountComponent();
     
-    expect(wrapper.vm.selectedServerRules).toEqual([]);
+    expect((wrapper.vm as any).selectedServerRules).toEqual([]);
     
     // Add a rule
-    wrapper.vm.toggleServerRuleSelection('server-rule1');
-    expect(wrapper.vm.selectedServerRules).toEqual(['server-rule1']);
+    (wrapper.vm as any).toggleServerRuleSelection('server-rule1');
+    expect((wrapper.vm as any).selectedServerRules).toEqual(['server-rule1']);
     
     // Add another rule
-    wrapper.vm.toggleServerRuleSelection('server-rule2');
-    expect(wrapper.vm.selectedServerRules).toEqual(['server-rule1', 'server-rule2']);
+    (wrapper.vm as any).toggleServerRuleSelection('server-rule2');
+    expect((wrapper.vm as any).selectedServerRules).toEqual(['server-rule1', 'server-rule2']);
     
     // Toggle off a rule
-    wrapper.vm.toggleServerRuleSelection('server-rule1');
-    expect(wrapper.vm.selectedServerRules).toEqual(['server-rule2']);
+    (wrapper.vm as any).toggleServerRuleSelection('server-rule1');
+    expect((wrapper.vm as any).selectedServerRules).toEqual(['server-rule2']);
   });
 
   it('emits close event when close method is called', async () => {
     const wrapper = await mountComponent();
     
-    wrapper.vm.close();
+    (wrapper.vm as any).close();
     await nextTick();
     
     expect(wrapper.emitted()).toHaveProperty('close');
     
     // Also check that fields are reset
-    expect(wrapper.vm.selectedForumRules).toEqual([]);
-    expect(wrapper.vm.selectedServerRules).toEqual([]);
-    expect(wrapper.vm.reportText).toBe('');
-    expect(wrapper.vm.suspensionLength).toBe('');
+    expect((wrapper.vm as any).selectedForumRules).toEqual([]);
+    expect((wrapper.vm as any).selectedServerRules).toEqual([]);
+    expect((wrapper.vm as any).reportText).toBe('');
+    expect((wrapper.vm as any).suspensionLength).toBe('');
   });
 
   it('generates correct formatted comment text', async () => {
@@ -240,7 +240,7 @@ describe('BrokenRulesModal Component', () => {
       reportText: 'This is a test report'
     };
     
-    const result = wrapper.vm.getFinalCommentText(input);
+    const result = (wrapper.vm as any).getFinalCommentText(input);
     
     // Check that all rules are included in the result
     expect(result).toContain('Forum Rule 1');

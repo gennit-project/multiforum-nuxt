@@ -462,6 +462,6 @@ describe('getEventFilterValuesFromParams', () => {
     const result = getFilterValuesFromParams(input);
 
     expect(result.tags).toEqual(['music']);
-    expect(result.invalidParam).toBeUndefined();
+    expect((result as any).invalidParam).toBeUndefined();
   });
 });

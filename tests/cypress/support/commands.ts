@@ -8,9 +8,8 @@ const AUTH_TOKEN_CACHE_KEY = "auth_token_cache";
 Cypress.Commands.add("loginWithCreateEventButton", loginWithButtonClick);
 
 Cypress.Commands.add("loginAsAdmin", () => {
-  const cachedTokenData = JSON.parse(
-    localStorage.getItem(AUTH_TOKEN_CACHE_KEY)
-  );
+  const cachedToken = localStorage.getItem(AUTH_TOKEN_CACHE_KEY);
+  const cachedTokenData = cachedToken ? JSON.parse(cachedToken) : null;
 
   if (cachedTokenData && cachedTokenData.expiresAt > Date.now()) {
     // If possible, use cached token to avoid rate limiting problems with the Auth0 API
@@ -99,9 +98,8 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
   // Ensure the token is up-to-date before making the GraphQL request
   const getToken = () => {
     return cy.window().then((window) => {
-      const cachedTokenData = JSON.parse(
-        window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY)
-      );
+      const cachedToken = window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY);
+      const cachedTokenData = cachedToken ? JSON.parse(cachedToken) : null;
       if (cachedTokenData && cachedTokenData.expiresAt > Date.now()) {
         // Return the valid cached token
         return cachedTokenData.accessToken;
@@ -109,9 +107,8 @@ Cypress.Commands.add("authenticatedGraphQL", (query, variables = {}) => {
 
       // If no valid cached token, refresh it using the login command
       return cy.loginAsAdmin().then(() => {
-        const newTokenData = JSON.parse(
-          window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY)
-        );
+        const newToken = window.localStorage.getItem(AUTH_TOKEN_CACHE_KEY);
+        const newTokenData = newToken ? JSON.parse(newToken) : null;
         return newTokenData.accessToken;
       });
     });

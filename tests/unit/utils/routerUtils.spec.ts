@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
 import { 
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
@@ -6,7 +6,7 @@ import {
   getPermalinkToEvent,
   getFeedbackPermalinkObject,
   updateFilters
-} from '@/utils/routerUtils';
+} from '../../../utils/routerUtils';
 
 // Mock console.error to prevent log pollution during tests
 const originalConsoleError = console.error;
@@ -351,9 +351,9 @@ describe('routerUtils', () => {
 
       const params = {
         // These should remove the corresponding parameters
-        emptyString: '',
-        emptyArray: [],
-        undefinedValue: undefined,
+        searchInput: '',
+        channels: [],
+        tags: undefined,
       };
 
       updateFilters({

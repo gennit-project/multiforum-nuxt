@@ -6,7 +6,7 @@ export type LoginInput = {
   password: string;
 };
 
-const login = (input: LoginInput) => {
+const login = (input?: LoginInput) => {
   const username = input?.username || Cypress.env("auth0_username");
   const password = input?.password || Cypress.env("auth0_password");
 

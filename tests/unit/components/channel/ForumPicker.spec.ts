@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { mount } from '@vue/test-utils'
-import ForumPicker from '@/components/channel/ForumPicker.vue'
+import ForumPicker from '../../../../components/channel/ForumPicker.vue'
 
 // Mock components used in ForumPicker
-vi.mock('@/components/channel/SearchableForumList.vue', () => ({
+vi.mock('../../../../components/channel/SearchableForumList.vue', () => ({
   default: {
     name: 'SearchableForumList',
     props: ['selectedChannels'],
@@ -12,7 +12,7 @@ vi.mock('@/components/channel/SearchableForumList.vue', () => ({
   }
 }))
 
-vi.mock('@/components/AvatarComponent.vue', () => ({
+vi.mock('../../../../components/AvatarComponent.vue', () => ({
   default: {
     name: 'AvatarComponent',
     props: ['src', 'text'],

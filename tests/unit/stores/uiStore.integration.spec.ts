@@ -162,7 +162,7 @@ describe('UIStore Component Integration Tests', () => {
         writable: true
       });
     } else {
-      document.documentElement.classList = classListMock;
+      document.documentElement.classList = classListMock as any;
     }
     
     // Mock import.meta
