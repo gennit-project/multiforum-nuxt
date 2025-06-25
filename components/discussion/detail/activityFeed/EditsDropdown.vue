@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref, computed } from "vue";
   import type { PropType } from "vue";
-  import type { Discussion } from "@/__generated__/graphql";
+  import type { Discussion, TextVersion } from "@/__generated__/graphql";
   import { timeAgo } from "@/utils";
   import RevisionDiffModal from "./RevisionDiffModal.vue";
 
@@ -29,7 +29,15 @@
 
   // Combine both types of edits and sort by timestamp (newest first)
   const allEdits = computed(() => {
-    const edits = [];
+    const edits: Array<{
+      id: string;
+      type: string;
+      author: string;
+      createdAt: string;
+      isCurrent?: boolean;
+      oldVersion?: TextVersion;
+      newVersion?: TextVersion;
+    }> = [];
 
     // Add body revisions
     if (props.discussion?.PastBodyVersions?.length) {
@@ -102,7 +110,7 @@
   };
 
   // Open diff modal for a specific revision
-  const openRevisionDiff = (revision) => {
+  const openRevisionDiff = (revision: { id: string; type: string; author: string; createdAt: string; isCurrent?: boolean; oldVersion?: TextVersion; newVersion?: TextVersion; }) => {
     activeRevision.value = revision;
   };
 
@@ -112,7 +120,7 @@
   };
 
   // Handle revision deleted event
-  const handleRevisionDeleted = (deletedId) => {
+  const handleRevisionDeleted = (deletedId: string) => {
     // Close the modal
     closeRevisionDiff();
 

@@ -80,6 +80,10 @@
 
 ## Code Style Guidelines
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
+  - **Import GraphQL Types**: When fixing TypeScript errors, prefer importing proper types from `@/__generated__/graphql` over using `any`
+  - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
+  - **Avoid `any`**: Only use `any` as a last resort when proper types are not available
+  - **Type Checking**: Use `npm run tsc` (which runs `vue-tsc --noEmit`) for proper Vue component type checking
 - **Function Parameters**: For functions with more than one parameter, use a typed object instead of positional arguments
   ```typescript
   // Avoid:

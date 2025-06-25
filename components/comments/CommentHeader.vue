@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import type { PropType } from "vue";
-import type { Comment } from "@/__generated__/graphql";
+import type { Comment, User } from "@/__generated__/graphql";
 import { relativeTime } from "@/utils";
 import { getCommentAuthorStatus } from "@/utils/headerPermissionUtils";
 import {
@@ -58,10 +58,10 @@ const isAdmin = computed(() => authorStatus.value.isAdmin);
 const isMod = computed(() => authorStatus.value.isMod);
 
 const commentAuthorUsername = computed(
-  () => props.commentData.CommentAuthor?.username
+  () => (props.commentData.CommentAuthor as User)?.username
 );
 const commentAuthorProfilePic = computed(
-  () => props.commentData.CommentAuthor?.profilePicURL
+  () => (props.commentData.CommentAuthor as User)?.profilePicURL
 );
 const commentAuthorDisplayName = computed(
   () => props.commentData.CommentAuthor?.displayName

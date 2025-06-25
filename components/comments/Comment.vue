@@ -853,13 +853,13 @@ const label = computed(() => {
                     ]"
                   >
                     <MarkdownPreview
-                      v-if="!goToPermalinkOnClick || !Object.keys(permalinkObject).length"
+                      v-if="!goToPermalinkOnClick || !Object.keys(permalinkObject ?? {}).length"
                       :key="textCopy || ''"
                       :text="textCopy || ''"
                       :word-limit="SHOW_MORE_THRESHOLD"
                       :disable-gallery="false"
                     />
-                    <router-link v-else-if="Object.keys(permalinkObject).length" :to="permalinkObject">
+                    <router-link v-else-if="Object.keys(permalinkObject ?? {}).length" :to="permalinkObject || {}">
                       <MarkdownPreview
                         :key="textCopy || ''"
                         :text="textCopy || ''"

@@ -170,7 +170,7 @@ const availableYears = computed(() => {
 
 // Generate month labels data with improved calculation
 const monthLabels = computed(() => {
-  const labels = [];
+  const labels: Array<{ month: string; x: number; position?: number }> = [];
 
   // Only process if we have data
   if (!gridData.value || gridData.value.length === 0) {
@@ -198,6 +198,7 @@ const monthLabels = computed(() => {
         addedMonths.add(monthName);
         labels.push({
           month: monthName,
+          x: weekIndex, 
           position: weekIndex,
         });
       }
@@ -239,7 +240,7 @@ const getColorScheme = computed(() => {
 
 // Get color based on contribution count and theme
 const getColor = (count: number) => {
-  const colors = getColorScheme.value;
+  const colors = getColorScheme.value as Record<number, string>;
   const level = Math.min(count, 4);
   return colors[level];
 };
@@ -395,7 +396,7 @@ const cellCount = computed(() => {
               v-for="(label, index) in monthLabels"
               :key="'month-' + index"
               class="absolute text-xs font-medium"
-              :style="{ left: `${label.position * 14}px` }"
+              :style="{ left: `${(label.position || 0) * 14}px` }"
             >
               <span v-if="index > 0">{{ label.month }}</span>
             </div>

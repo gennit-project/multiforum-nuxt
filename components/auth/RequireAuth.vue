@@ -148,9 +148,9 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
 
           // If this is an invalid refresh token, we need to log the user out and re-authenticate
           if (
-            innerError.message &&
-            (innerError.message.includes("Unknown or invalid refresh token") ||
-              innerError.error === "invalid_grant")
+            (innerError as any)?.message &&
+            ((innerError as any).message.includes("Unknown or invalid refresh token") ||
+              (innerError as any).error === "invalid_grant")
           ) {
             console.log("Invalid refresh token detected, clearing auth state");
             clearAuthState();
@@ -213,9 +213,9 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
 
               // Check for invalid grant specifically
               if (
-                tokenError.error === "invalid_grant" ||
-                (tokenError.message &&
-                  tokenError.message.includes("Unknown or invalid refresh token"))
+                (tokenError as any)?.error === "invalid_grant" ||
+                ((tokenError as any)?.message &&
+                  (tokenError as any).message.includes("Unknown or invalid refresh token"))
               ) {
                 console.log("Invalid refresh token detected on mount, clearing auth state");
                 clearAuthState();
