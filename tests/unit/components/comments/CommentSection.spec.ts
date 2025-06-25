@@ -321,8 +321,8 @@ describe('CommentSection.vue', () => {
     
     await wrapper.find('[data-testid="load-more"]').trigger('click');
     
-    expect(wrapper.emitted().loadMore).toBeTruthy();
-    expect(wrapper.emitted().loadMore.length).toBe(1);
+    expect((wrapper.emitted() as any).loadMore).toBeTruthy();
+    expect((wrapper.emitted() as any).loadMore.length).toBe(1);
   });
   
   it('emits updateCreateReplyCommentInput event when updateCreateInputValuesForReply is called', async () => {
@@ -366,10 +366,10 @@ describe('CommentSection.vue', () => {
       replyCount: 0,
     };
     
-    await wrapper.vm.handleClickDelete(deleteInput);
+    await (wrapper.vm as any).handleClickDelete(deleteInput);
     
-    expect(wrapper.emitted()['delete-comment']).toBeTruthy();
-    expect(wrapper.emitted()['delete-comment'][0][0]).toEqual(deleteInput);
+    expect((wrapper.emitted() as any)['delete-comment']).toBeTruthy();
+    expect((wrapper.emitted() as any)['delete-comment'][0][0]).toEqual(deleteInput);
   });
   
   it('calls deleteCommentMutation.mutate when handleDeleteComment is called', async () => {
@@ -377,9 +377,9 @@ describe('CommentSection.vue', () => {
       props: defaultProps,
     });
     
-    const spy = vi.spyOn(wrapper.vm.deleteCommentMutation, 'mutate');
+    const spy = vi.spyOn((wrapper.vm as any).deleteCommentMutation, 'mutate');
     
-    await wrapper.vm.handleDeleteComment();
+    await (wrapper.vm as any).handleDeleteComment();
     
     expect(spy).toHaveBeenCalled();
   });
@@ -389,9 +389,9 @@ describe('CommentSection.vue', () => {
       props: defaultProps,
     });
     
-    const spy = vi.spyOn(wrapper.vm.editCommentMutation, 'mutate');
+    const spy = vi.spyOn((wrapper.vm as any).editCommentMutation, 'mutate');
     
-    await wrapper.vm.handleSaveEdit();
+    await (wrapper.vm as any).handleSaveEdit();
     
     expect(spy).toHaveBeenCalled();
   });

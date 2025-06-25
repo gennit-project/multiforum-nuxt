@@ -31,7 +31,7 @@ describe('FontSizeControl Component', () => {
   
   it('should display the current font size from the store', async () => {
     // Import component after mocks are set up
-    const FontSizeControl = await import('../../../components/channel/FontSizeControl.vue').then(m => m.default);
+    const FontSizeControl = await import('@/components/channel/FontSizeControl.vue').then(m => m.default);
     
     // Create pinia with initial state
     const wrapper = mount(FontSizeControl, {
@@ -54,7 +54,7 @@ describe('FontSizeControl Component', () => {
   
   it('should update the store when a different font size is selected', async () => {
     // Import component after mocks are set up
-    const FontSizeControl = await import('../../../components/channel/FontSizeControl.vue').then(m => m.default);
+    const FontSizeControl = await import('@/components/channel/FontSizeControl.vue').then(m => m.default);
     
     // Create pinia with mock actions
     const wrapper = mount(FontSizeControl, {
@@ -189,7 +189,7 @@ describe('FontSize Integration with MarkdownRenderer', () => {
     };
     
     // Get the MarkdownRenderer component
-    const MarkdownRenderer = await import('../../../components/MarkdownRenderer.vue').then(m => m.default);
+    const MarkdownRenderer = await import('@/components/MarkdownRenderer.vue').then(m => m.default);
     
     // Mount with Pinia and component registration
     const wrapper = mount(TestComponent, {

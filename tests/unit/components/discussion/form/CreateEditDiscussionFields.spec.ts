@@ -337,7 +337,7 @@ describe('CreateEditDiscussionFields Component', () => {
       
       expect(wrapper.emitted()).toHaveProperty('updateFormValues');
       const updateEvents = wrapper.emitted('updateFormValues');
-      expect(updateEvents[0][0]).toEqual({ title: 'New Discussion Title' });
+      expect(updateEvents![0][0]).toEqual({ title: 'New Discussion Title' });
     });
 
     it('emits updateFormValues event when body is updated', async () => {
@@ -349,7 +349,7 @@ describe('CreateEditDiscussionFields Component', () => {
       
       expect(wrapper.emitted()).toHaveProperty('updateFormValues');
       const updateEvents = wrapper.emitted('updateFormValues');
-      expect(updateEvents[0][0]).toEqual({ body: 'This is the discussion body content' });
+      expect(updateEvents![0][0]).toEqual({ body: 'This is the discussion body content' });
     });
 
     it('emits submit event when form is submitted', async () => {

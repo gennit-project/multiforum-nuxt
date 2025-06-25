@@ -87,7 +87,7 @@ const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
     <div v-if="channelRulesLoading || serverRulesLoading">Loading...</div>
 
     <div v-else-if="channelRulesError || serverRulesError">
-      <ErrorBanner :text="serverRulesError" />
+      <ErrorBanner :text="serverRulesError?.message || 'Unknown error'" />
       <div v-for="(error, i) of channelRulesError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>

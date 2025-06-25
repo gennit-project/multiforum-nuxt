@@ -337,7 +337,7 @@ describe('CreateEditEventFields Component', () => {
       
       // Check that at least one update event contains the title
       const hasUpdateWithTitle = updateEvents?.some(event => 
-        event[0]?.title === 'New Event Title'
+        (event[0] as any)?.title === 'New Event Title'
       );
       
       expect(hasUpdateWithTitle).toBe(true);

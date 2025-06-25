@@ -1,7 +1,7 @@
 import { describe, it, expect, vi } from 'vitest';
 import { mount, flushPromises } from '@vue/test-utils';
-import GithubContributionChart from '../../../../components/charts/GithubContributionChart.vue';
-import ContributionChartSkeleton from '../../../../components/charts/ContributionChartSkeleton.vue';
+import GithubContributionChart from '@/components/charts/GithubContributionChart.vue';
+import ContributionChartSkeleton from '@/components/charts/ContributionChartSkeleton.vue';
 import { 
   contributionDataFixture, 
   emptyContributionData, 
@@ -10,21 +10,21 @@ import {
 } from './fixtures/contributionData';
 
 // Mock the child components to simplify testing
-vi.mock('../../../../components/comments/Comment.vue', () => ({
+vi.mock('@/components/comments/Comment.vue', () => ({
   default: {
     props: ['commentData', 'parentCommentId', 'depth', 'showChannel', 'showContextLink', 'goToPermalinkOnClick'],
     template: '<div data-test="mock-comment">Comment Component</div>'
   }
 }));
 
-vi.mock('../../../../components/user/DiscussionItemInProfile.vue', () => ({
+vi.mock('@/components/user/DiscussionItemInProfile.vue', () => ({
   default: {
     props: ['discussion'],
     template: '<div data-test="mock-discussion-item">Discussion Item</div>'
   }
 }));
 
-vi.mock('../../../../components/user/EventItemInProfile.vue', () => ({
+vi.mock('@/components/user/EventItemInProfile.vue', () => ({
   default: {
     props: ['currentChannelId', 'event'],
     template: '<div data-test="mock-event-item">Event Item</div>'

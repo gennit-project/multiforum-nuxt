@@ -6,7 +6,7 @@ import {
   getPermalinkToEvent,
   getFeedbackPermalinkObject,
   updateFilters
-} from '../../../utils/routerUtils';
+} from '@/utils/routerUtils';
 
 // Mock console.error to prevent log pollution during tests
 const originalConsoleError = console.error;

@@ -19,7 +19,7 @@
     "test": "cypress open",
     "test:unit": "vitest",
     "test:unit:run": "vitest run",
-    "tsc": "tsc",
+    "tsc": "vue-tsc --noEmit",
     "verify": "npm run tsc && npm run test:unit:run",
     "lint-verify": "npm run test:unit:run && npm run lint:a11y"
   },
