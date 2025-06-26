@@ -17,6 +17,7 @@
   import PencilIcon from "@/components/icons/PencilIcon.vue";
   import CalendarIcon from "@/components/icons/CalendarIcon.vue";
   import AnnotationIcon from "@/components/icons/AnnotationIcon.vue";
+  import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 
   const route = useRoute();
   const props = defineProps({
@@ -106,6 +107,12 @@
       key: "events",
       label: "Events",
       icon: CalendarIcon,
+      fontAwesome: null,
+    },
+    {
+      key: "downloads",
+      label: "Downloads",
+      icon: DownloadIcon,
       fontAwesome: null,
     },
     {

@@ -136,7 +136,7 @@ const revealSensitiveContent = () => {
 </script>
 
 <template>
-  <li class="mb-2 pt-2 flex md:rounded-lg border-gray-800 dark:bg-gray-800">
+  <li class="mb-2 pt-2 flex md:rounded-lg border-gray-800">
     <div
       class="flex w-full flex-row justify-start gap-4 rounded-lg overflow-hidden"
     >
@@ -247,7 +247,7 @@ const revealSensitiveContent = () => {
               <template v-if="shouldShowContent">
                 <div
                   v-if="discussion.body"
-                  class="my-2 dark:bg-black bg-gray-100 px-2 pt-2 pb-4 rounded"
+                  class="my-2 dark:bg-black bg-gray-100 px-2 border-l pt-2 pb-4 dark:border-gray-600"
                 >
                   <MarkdownPreview
                     :text="discussion.body"

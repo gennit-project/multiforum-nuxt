@@ -31,6 +31,8 @@ const formValues = ref<CreateEditChannelFormValues>({
   wikiEnabled: false,
   eventsEnabled: true,
   feedbackEnabled: true,
+  downloadsEnabled: false,
+  allowedFileTypes: [],
 });
 
 const dataLoaded = ref(false);
@@ -58,6 +60,8 @@ watch(getChannelResult, (newVal) => {
       wikiEnabled: channelData.wikiEnabled,
       eventsEnabled: channelData.eventsEnabled,
       feedbackEnabled: channelData.feedbackEnabled,
+      downloadsEnabled: channelData.downloadsEnabled,
+      allowedFileTypes: channelData.allowedFileTypes || [],
       rules,
     };
 
@@ -95,6 +99,8 @@ const channelUpdateInput = computed(() => {
     wikiEnabled: formValues.value.wikiEnabled,
     eventsEnabled: formValues.value.eventsEnabled,
     feedbackEnabled: formValues.value.feedbackEnabled,
+    downloadsEnabled: formValues.value.downloadsEnabled,
+    allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     Admins: [{ connect: [{ where: { node: { username: usernameVar.value } } }] }],
   };

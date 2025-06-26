@@ -97,6 +97,8 @@ export const GET_CHANNEL = gql`
       wikiEnabled
       eventsEnabled
       feedbackEnabled
+      downloadsEnabled
+      allowedFileTypes
       WikiHomePage {
         id
         title
