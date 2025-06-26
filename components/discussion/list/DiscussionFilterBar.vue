@@ -284,7 +284,7 @@ const isExpanded = computed(() => {
             <PrimaryButton
               class="mx-2"
               :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
-              @click="$router.push(isForumScoped ? `/forums/${channelId}/discussions/create` : '/discussions/create')"
+              @click="$router.push(isForumScoped ? (isDownloadPage ? `/forums/${channelId}/downloads/create` : `/forums/${channelId}/discussions/create`) : '/discussions/create')"
             />
           </template>
           <template #does-not-have-auth>
