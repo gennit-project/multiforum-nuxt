@@ -67,8 +67,8 @@
             // Use the explicit imageOrder if it's valid, otherwise generate from image IDs
             imageOrder:
               formValues.value.album.imageOrder.length === imageIds.length
-                ? formValues.value.album.imageOrder
-                : imageIds,
+                ? formValues.value.album.imageOrder.filter((id) => id !== undefined)
+                : imageIds.filter((id) => id !== undefined),
             Images: {
               connect: formValues.value.album.images.map((image) => ({
                 where: { node: { id: image.id } },

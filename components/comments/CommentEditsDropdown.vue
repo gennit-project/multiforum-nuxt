@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import type { Comment, User, Revision } from "@/__generated__/graphql";
+import type { Comment, User, TextVersion } from "@/__generated__/graphql";
 import { timeAgo } from "@/utils";
 import CommentRevisionDiffModal from "./CommentRevisionDiffModal.vue";
 
@@ -18,8 +18,8 @@ const activeRevision = ref<{
   author: string; 
   createdAt: string; 
   isCurrent: boolean; 
-  oldVersionData?: Revision; 
-  newVersionData?: Revision; 
+  oldVersionData?: TextVersion; 
+  newVersionData?: TextVersion; 
 } | null>(null);
 
 // Total number of edits
@@ -88,7 +88,7 @@ const closeDropdown = () => {
 };
 
 // Open diff modal for a specific revision
-const openRevisionDiff = (revision: Revision) => {
+const openRevisionDiff = (revision: { id: string; author: string; createdAt: string; isCurrent: boolean; oldVersionData?: TextVersion; newVersionData?: TextVersion; }) => {
   activeRevision.value = revision;
 };
 

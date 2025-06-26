@@ -11,6 +11,7 @@ import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
 import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
 import AlbumEditForm from "../detail/AlbumEditForm.vue";
+import type { Album, Image } from "@/__generated__/graphql";
 
   const props = defineProps<{
     editMode: boolean;
@@ -154,8 +155,8 @@ onMounted(() => {
                     id: 'temp-id', 
                     Album: {
                       id: '',
-                      Images: formValues.album?.images || [],
-                      imageOrder: formValues.album?.imageOrder || []
+                      Images: formValues.album?.images as Image[] || [],
+                      imageOrder: formValues.album?.imageOrder || [],
                     }
                   }"
                   @close-editor="() => {}"

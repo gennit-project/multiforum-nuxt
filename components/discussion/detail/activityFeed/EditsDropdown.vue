@@ -1,7 +1,7 @@
 <script setup lang="ts">
   import { ref, computed } from "vue";
   import type { PropType } from "vue";
-  import type { Discussion, TextVersion } from "@/__generated__/graphql";
+  import type { Discussion, TextVersion, User } from "@/__generated__/graphql";
   import { timeAgo } from "@/utils";
   import RevisionDiffModal from "./RevisionDiffModal.vue";
 
@@ -37,6 +37,8 @@
       isCurrent?: boolean;
       oldVersion?: TextVersion;
       newVersion?: TextVersion;
+      body?: string;
+      Author?: User;
     }> = [];
 
     // Add body revisions

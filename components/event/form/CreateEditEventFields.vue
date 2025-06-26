@@ -787,8 +787,29 @@ const touched = ref(false);
         v-if="needsChanges && touched"
         :text="changesRequiredMessage"
       />
-      <ErrorBanner v-if="createEventError" :text="createEventError.message" />
-      <ErrorBanner v-if="updateEventError" :text="updateEventError.message" />
+      <!-- Create Event Errors -->
+      <div v-if="createEventError">
+        <ErrorBanner v-if="createEventError.message" :text="createEventError.message" />
+        <ErrorBanner
+          v-for="(error, i) in createEventError.graphQLErrors"
+          v-else-if="createEventError.graphQLErrors?.length"
+          :key="`create-${i}`"
+          :text="error.message"
+        />
+        <ErrorBanner v-else :text="'An error occurred while creating the event.'" />
+      </div>
+
+      <!-- Update Event Errors -->
+      <div v-if="updateEventError">
+        <ErrorBanner v-if="updateEventError.message" :text="updateEventError.message" />
+        <ErrorBanner
+          v-for="(error, i) in updateEventError.graphQLErrors"
+          v-else-if="updateEventError.graphQLErrors?.length"
+          :key="`update-${i}`"
+          :text="error.message"
+        />
+        <ErrorBanner v-else :text="'An error occurred while updating the event.'" />
+      </div>
     </FormComponent>
   </div>
 </template>
