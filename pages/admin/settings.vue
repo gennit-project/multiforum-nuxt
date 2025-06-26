@@ -4,7 +4,7 @@ import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
 import { UPDATE_SERVER_CONFIG } from "@/graphQLData/admin/mutations";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import Notification from "@/components/NotificationComponent.vue";
-import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
+import type { ServerConfigUpdateInput, GetServerConfigQuery } from "@/__generated__/graphql";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { config } from "@/config";
 import CreateEditServerFields from "@/components/admin/CreateEditServerFields.vue";
@@ -35,6 +35,7 @@ const formValues = ref<ServerConfigUpdateInput>({
   serverDescription: "",
   rules: [],
   allowedFileTypes: [],
+  enableDownloads: false,
 });
 
 onGetServerResult((result) => {
@@ -50,6 +51,7 @@ onGetServerResult((result) => {
     serverDescription: serverConfig.serverDescription || "",
     rules,
     allowedFileTypes: serverConfig.allowedFileTypes || [],
+    enableDownloads: serverConfig.enableDownloads || false,
   };
 });
 
@@ -61,10 +63,12 @@ const serverUpdateInput = computed(() => {
     serverDescription: formValues.value.serverDescription,
     rules: JSON.stringify(formValues.value.rules) || "[]",
     allowedFileTypes: formValues.value.allowedFileTypes || [],
+    enableDownloads: formValues.value.enableDownloads || false,
   };
 });
 
 const showSavedChangesNotification = ref(false);
+
 const {
   mutate: updateServer,
   loading: editServerLoading,
@@ -74,15 +78,46 @@ const {
   update: (cache, { data }) => {
     const newServerConfig = data?.updateServerConfigs.serverConfigs[0];
     if (newServerConfig) {
-      cache.writeQuery({
-        query: GET_SERVER_CONFIG,
-        variables: {
-          serverName: config.serverName,
-        },
-        data: {
-          serverConfigs: [newServerConfig],
-        },
-      });
+      // Read the existing cache data first
+      try {
+        const existingData = cache.readQuery<GetServerConfigQuery>({
+          query: GET_SERVER_CONFIG,
+          variables: {
+            serverName: config.serverName,
+          },
+        });
+        
+        if (existingData?.serverConfigs?.[0]) {
+          // Merge the updated fields with the existing data
+          const updatedServerConfig = {
+            ...existingData.serverConfigs[0],
+            ...newServerConfig,
+          };
+          
+          cache.writeQuery({
+            query: GET_SERVER_CONFIG,
+            variables: {
+              serverName: config.serverName,
+            },
+            data: {
+              serverConfigs: [updatedServerConfig],
+            },
+          });
+        }
+      } catch (error) {
+        console.error('Cache update error:', error);
+        // Fallback to refetch if cache update fails
+        try {
+          cache.evict({ 
+            id: cache.identify({ 
+              __typename: 'ServerConfig', 
+              serverName: config.serverName 
+            }) 
+          });
+        } catch (evictError) {
+          console.error('Cache eviction error:', evictError);
+        }
+      }
     }
   },
 });

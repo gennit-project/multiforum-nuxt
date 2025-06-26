@@ -66,6 +66,8 @@ export const GET_SERVER_CONFIG = gql`
       }
       rules
       allowedFileTypes
+      enableDownloads
+      enableEvents
     }
   }
 `;

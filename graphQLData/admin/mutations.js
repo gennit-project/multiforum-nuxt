@@ -7,6 +7,9 @@ export const UPDATE_SERVER_CONFIG = gql`
         serverName
         serverDescription
         rules
+        enableDownloads
+        enableEvents
+        allowedFileTypes
       }
     }
   }

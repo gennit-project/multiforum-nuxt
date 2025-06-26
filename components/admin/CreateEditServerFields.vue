@@ -103,6 +103,11 @@ const getCurrentTabLabel = computed(() => {
       <!-- Error Displays -->
       <div v-if="updateServerError" class="mt-6">
         <ErrorBanner :text="updateServerError.message" />
+        <ErrorBanner
+          v-for="(error, i) in updateServerError?.graphQLErrors"
+          :key="i"
+          :text="error.message"
+        />
       </div>
       <div v-if="getServerError">
         <ErrorBanner
