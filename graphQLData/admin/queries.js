@@ -65,6 +65,7 @@ export const GET_SERVER_CONFIG = gql`
         canSuspendUser
       }
       rules
+      allowedFileTypes
     }
   }
 `;

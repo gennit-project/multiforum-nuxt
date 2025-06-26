@@ -34,6 +34,7 @@ const serverConfig = computed(() => {
 const formValues = ref<ServerConfigUpdateInput>({
   serverDescription: "",
   rules: [],
+  allowedFileTypes: [],
 });
 
 onGetServerResult((result) => {
@@ -48,6 +49,7 @@ onGetServerResult((result) => {
   formValues.value = {
     serverDescription: serverConfig.serverDescription || "",
     rules,
+    allowedFileTypes: serverConfig.allowedFileTypes || [],
   };
 });
 
@@ -58,6 +60,7 @@ const serverUpdateInput = computed(() => {
   return {
     serverDescription: formValues.value.serverDescription,
     rules: JSON.stringify(formValues.value.rules) || "[]",
+    allowedFileTypes: formValues.value.allowedFileTypes || [],
   };
 });
 
