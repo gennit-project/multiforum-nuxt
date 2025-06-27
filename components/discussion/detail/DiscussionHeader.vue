@@ -376,7 +376,9 @@ const authorIsMod = computed(
           @copy-link="copyLink"
           @handle-edit="
             router.push(
-              `/forums/${channelId}/discussions/edit/${discussion.id}`
+              discussion.hasDownload 
+                ? `/forums/${channelId}/downloads/edit/${discussion.id}`
+                : `/forums/${channelId}/discussions/edit/${discussion.id}`
             )
           "
           @handle-delete="deleteModalIsOpen = true"
