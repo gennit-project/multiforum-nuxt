@@ -512,8 +512,20 @@ const handleCreateComment = async () => {
       channelUniqueName: channelId.value,
     });
   } 
-  // Case 2: Current user is the original author who posted as a mod OR current user is not the original author
+  // Case 2: Current user is the original author who posted as a mod
   else if (isOriginalModAuthor.value){
+    if (!modProfileNameVar.value) return;
+    await addIssueActivityFeedItemWithCommentAsMod({
+      issueId: activeIssue.value.id,
+      commentText: createFormValues.value.text,
+      displayName: modProfileNameVar.value,
+      actionDescription: "commented on the issue",
+      actionType: "comment",
+      channelUniqueName: channelId.value,
+    });
+  }
+  // Case 3: Current user is not the original author - comment as mod
+  else {
     if (!modProfileNameVar.value) return;
     await addIssueActivityFeedItemWithCommentAsMod({
       issueId: activeIssue.value.id,
