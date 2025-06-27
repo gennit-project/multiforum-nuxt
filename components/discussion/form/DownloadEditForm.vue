@@ -11,7 +11,7 @@ import GenericButton from "@/components/GenericButton.vue";
 import FormRow from "@/components/FormRow.vue";
 import { useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import { UPDATE_DISCUSSION, CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import { UPDATE_DISCUSSION, CREATE_SIGNED_STORAGE_URL, CREATE_DOWNLOADABLE_FILE } from "@/graphQLData/discussion/mutations";
 import Notification from "@/components/NotificationComponent.vue";
 import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import { usernameVar } from "@/cache";
@@ -88,6 +88,9 @@ const licenseOptions = [
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
   useMutation(CREATE_SIGNED_STORAGE_URL);
 
+const { mutate: createDownloadableFile, error: createDownloadableFileError } =
+  useMutation(CREATE_DOWNLOADABLE_FILE);
+
 const {
   mutate: updateDiscussion,
   error: updateDiscussionError,
@@ -162,75 +165,115 @@ const handleFileUpload = async (event: Event) => {
     return;
   }
 
-  // Validate file size
-  const sizeValidation = validateFileSize(file);
-  if (!sizeValidation.valid) {
-    uploadError.value = sizeValidation.message;
-    return;
-  }
-
   uploadError.value = "";
   uploadingFile.value = true;
 
   try {
-    const uploadedUrl = await uploadFile(file);
+    const success = await uploadFile(file);
     
-    if (uploadedUrl) {
-      // Add the uploaded file to our form values
-      const newFile = {
-        id: "", // New file, no ID yet
-        fileName: file.name,
-        url: uploadedUrl,
-        kind: getFileKind(file),
-        size: file.size,
-        license: "",
-        priceModel: "FREE",
-        priceCents: 0,
-        priceCurrency: "USD",
-      };
-      
-      formValues.value.downloadableFiles = [newFile];
+    if (!success) {
+      // Error message is already set in uploadFile function
+      console.error("Upload failed");
     }
   } catch (error) {
     console.error("Upload failed:", error);
     uploadError.value = error instanceof Error ? error.message : "Upload failed";
   } finally {
     uploadingFile.value = false;
+    // Reset the input so user can re-upload the same file if needed
+    (event.target as HTMLInputElement).value = "";
   }
 };
 
-const uploadFile = async (file: File): Promise<string | null> => {
+/**
+ * Adds a downloadable file to the form values
+ */
+const addNewFile = (fileData: any) => {
+  const updatedFiles = [...formValues.value.downloadableFiles, fileData];
+  formValues.value.downloadableFiles = updatedFiles;
+};
+
+/**
+ * Upload a single file and return success status.
+ * This handles uploading the file to storage, creating the DownloadableFile record in the database,
+ * and adding it to the form values.
+ */
+const uploadFile = async (file: File): Promise<boolean> => {
   if (!usernameVar.value) {
-    throw new Error("Not logged in or username not found");
+    console.error("No username found, cannot upload.");
+    return false;
+  }
+
+  // Validate file size
+  const sizeValidation = validateFileSize(file);
+  if (!sizeValidation.valid) {
+    uploadError.value = sizeValidation.message;
+    return false;
   }
 
   try {
-    const fileType = file.type || getFileTypeFromName(file.name) || "application/octet-stream";
+    // Generate a unique filename
     const filename = getUploadFileName({ username: usernameVar.value, file });
+    const fileType = file.type || getFileTypeFromName(file.name) || "application/octet-stream";
     const signedStorageURLInput = { filename, contentType: fileType };
 
+    // Ask the server for a signed storage URL
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
-    
+
     if (!signedStorageURL) {
-      throw new Error("Failed to get signed URL for upload");
+      throw new Error("No signed storage URL returned");
     }
 
-    const embeddedLink = await uploadAndGetEmbeddedLink({
+    // Upload the file using the signed URL
+    const fileUrl = await uploadAndGetEmbeddedLink({
       file,
       filename,
       fileType,
       signedStorageURL,
     });
     
-    if (!embeddedLink) {
-      throw new Error("Upload completed but no URL was returned");
+    if (!fileUrl) {
+      throw new Error("No file URL returned from upload");
     }
     
-    return embeddedLink;
-  } catch (error) {
-    console.error("Error uploading file:", error);
-    throw error;
+    // Now create the DownloadableFile record in the database
+    const createFileResult = await createDownloadableFile({
+      fileName: file.name,
+      url: fileUrl,
+      kind: getFileKind(file),
+      size: file.size,
+      priceModel: "FREE",
+      priceCents: 0,
+      priceCurrency: "USD",
+      licenseId: null // No license selected initially
+    });
+    
+    // Get the created file from the result
+    const createdFile = createFileResult?.data?.createDownloadableFiles?.downloadableFiles?.[0];
+    
+    if (!createdFile || !createdFile.id) {
+      throw new Error("Failed to create downloadable file record in database");
+    }
+    
+    // Add the file to our form values using the addNewFile helper
+    addNewFile({
+      id: createdFile.id,
+      fileName: createdFile.fileName,
+      url: createdFile.url,
+      kind: createdFile.kind,
+      size: createdFile.size,
+      license: createdFile.license?.id || "",
+      priceModel: createdFile.priceModel,
+      priceCents: createdFile.priceCents || 0,
+      priceCurrency: createdFile.priceCurrency || "USD"
+    });
+    
+    return true;
+  } catch (err) {
+    console.error("Error uploading file and creating downloadable file:", err);
+    uploadError.value = err instanceof Error ? err.message : "Upload failed";
+    return false;
   }
 };
 
@@ -292,13 +335,56 @@ const updateLicense = (fileIndex: number, licenseId: string) => {
 };
 
 function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
-  // This is simplified - in a real implementation, you'd need to handle
-  // creating, updating, and deleting downloadable files similar to how
-  // AlbumEditForm handles images
+  // 1) If no downloadable files exist yet in the original discussion, CREATE connections
+  if (!props.discussion?.DownloadableFiles || props.discussion.DownloadableFiles.length === 0) {
+    const newFiles = formValues.value.downloadableFiles || [];
+    
+    // All files should already have IDs since they're created when uploaded
+    return {
+      hasDownload: newFiles.length > 0,
+      DownloadableFiles: {
+        connect: newFiles
+          .filter(file => file.id) // Only connect files that have database IDs
+          .map(file => ({
+            where: { node: { id: file.id } }
+          }))
+      },
+    };
+  }
+
+  // 2) If downloadable files already exist, we build the connect/disconnect arrays
+  const oldFiles = props.discussion.DownloadableFiles ?? [];
+  const newFiles = formValues.value.downloadableFiles;
+
+  // CONNECT array: any new file in `newFiles` that has NO matching ID in `oldFiles`
+  // These are files that already exist in the database but need to be connected to this discussion
+  const connectFileArray = newFiles
+    .filter((file) => file.id && !oldFiles.some((old) => old.id === file.id))
+    .map((file) => ({
+      connect: {
+        where: { node: { id: file.id } }
+      }
+    }));
+
+  // DISCONNECT array: any old file that is no longer present in `newFiles`
+  const disconnectFileArray = oldFiles
+    .filter((old) => !newFiles.some((file) => file.id === old.id))
+    .map((old) => ({
+      disconnect: {
+        where: { node: { id: old.id } },
+      },
+    }));
+    
+  // Combine all operations into a single array
+  const fileOps = [
+    ...connectFileArray,
+    ...disconnectFileArray,
+  ];
+
+  // Return the update input
   return {
-    hasDownload: true,
-    // Note: The actual implementation would need proper GraphQL mutations
-    // for creating/updating DownloadableFile objects
+    hasDownload: newFiles.length > 0,
+    DownloadableFiles: fileOps.length > 0 ? fileOps : undefined,
   };
 }
 
@@ -340,6 +426,12 @@ function handleSave() {
       <ErrorBanner
         v-if="createSignedStorageUrlError"
         :text="createSignedStorageUrlError.message"
+        class="mb-4"
+      />
+      
+      <ErrorBanner
+        v-if="createDownloadableFileError"
+        :text="createDownloadableFileError.message"
         class="mb-4"
       />
       

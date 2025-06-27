@@ -43,6 +43,49 @@ export const CREATE_IMAGE = gql`
   }
 `;
 
+export const CREATE_DOWNLOADABLE_FILE = gql`
+  mutation createDownloadableFile(
+    $fileName: String!
+    $url: String!
+    $kind: String!
+    $size: Int
+    $priceModel: String
+    $priceCents: Int
+    $priceCurrency: String
+    $licenseId: String
+  ) {
+    createDownloadableFiles(
+      input: [
+        {
+          fileName: $fileName
+          url: $url
+          kind: $kind
+          size: $size
+          priceModel: $priceModel
+          priceCents: $priceCents
+          priceCurrency: $priceCurrency
+          license: $licenseId ? { connect: { where: { node: { id: $licenseId } } } } : null
+        }
+      ]
+    ) {
+      downloadableFiles {
+        id
+        fileName
+        url
+        kind
+        size
+        priceModel
+        priceCents
+        priceCurrency
+        license {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
 export const ADD_EMOJI_TO_DISCUSSION_CHANNEL = gql`
   mutation addEmojiToDiscussionChannel(
     $discussionChannelId: ID!
