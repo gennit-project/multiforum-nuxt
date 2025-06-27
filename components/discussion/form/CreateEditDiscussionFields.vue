@@ -140,7 +140,9 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow>
+            <FormRow
+              :section-title="downloadMode ? 'Description' : ''"
+            >
               <template #content>
                 <TextEditor
                   class="mb-3"
