@@ -56,6 +56,13 @@
         },
       }));
 
+      // Build downloadable files connections
+      const downloadableFileConnections = (formValues.value.downloadableFiles || [])
+        .filter(file => file.id) // Only connect files that have database IDs
+        .map(file => ({
+          where: { node: { id: file.id } }
+        }));
+
       const discussionCreateInput = {
         title: formValues.value.title,
         body: formValues.value.body,
@@ -68,6 +75,11 @@
             },
           },
         },
+        ...(downloadableFileConnections.length > 0 && {
+          DownloadableFiles: {
+            connect: downloadableFileConnections
+          }
+        }),
       };
 
       const result = await createDownload({
