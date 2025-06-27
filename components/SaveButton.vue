@@ -6,6 +6,7 @@ export default defineComponent({
   components: {
     PrimaryButton,
   },
+  emits: ['click'],
   props: {
     disabled: {
       type: Boolean,
@@ -31,5 +32,6 @@ export default defineComponent({
     :loading="loading"
     class="border-transparent font-medium ml-3 inline-flex justify-center rounded-full border dark:border-gray-700 px-4 py-2 text-sm shadow-sm"
     @keydown.enter.prevent
+    @click="$emit('click', $event)"
   />
 </template>
