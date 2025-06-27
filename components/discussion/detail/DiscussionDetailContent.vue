@@ -451,7 +451,7 @@ const handleEditAlbum = () => {
                     </DiscussionBody>
                   </div>
                   <div class="flex-shrink-0">
-                    <DownloadSidebar />
+                    <DownloadSidebar :discussion="discussion" />
                   </div>
                 </div>
                 <!-- Regular discussion mode layout -->

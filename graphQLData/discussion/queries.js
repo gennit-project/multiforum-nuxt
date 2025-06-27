@@ -256,6 +256,20 @@ export const GET_DISCUSSION = gql`
       Tags {
         text
       }
+      DownloadableFiles {
+        id
+        fileName
+        url
+        kind
+        size
+        priceModel
+        priceCents
+        priceCurrency
+        license {
+          id
+          name
+        }
+      }
       FeedbackCommentsAggregate {
         count
       }

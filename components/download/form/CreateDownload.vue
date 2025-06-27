@@ -2,7 +2,6 @@
   import { computed, ref, watch } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { useMutation, useQuery } from "@vue/apollo-composable";
-  import FormTitle from "@/components/FormTitle.vue";
   import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
   import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
   import { GET_CHANNEL } from "@/graphQLData/channel/queries";
