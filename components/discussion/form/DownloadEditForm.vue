@@ -5,6 +5,13 @@ import type {
   Discussion,
   DownloadableFile,
   DiscussionUpdateInput,
+  DiscussionDownloadableFilesConnectFieldInput,
+  DiscussionDownloadableFilesDisconnectFieldInput,
+  DiscussionDownloadableFilesUpdateFieldInput,
+} from "@/__generated__/graphql";
+import {
+  FileKind,
+  PriceModel,
 } from "@/__generated__/graphql";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import GenericButton from "@/components/GenericButton.vue";
@@ -51,10 +58,10 @@ const downloadableFiles = computed(() => {
       id: file.id || "",
       fileName: file.fileName || "",
       url: file.url || "",
-      kind: file.kind || "OTHER",
+      kind: file.kind || FileKind.Other,
       size: file.size || 0,
       license: file.license?.id || "",
-      priceModel: file.priceModel || "FREE",
+      priceModel: file.priceModel || PriceModel.Free,
       priceCents: file.priceCents || 0,
       priceCurrency: file.priceCurrency || "USD",
     };
@@ -243,10 +250,9 @@ const uploadFile = async (file: File): Promise<boolean> => {
       url: fileUrl,
       kind: getFileKind(file),
       size: file.size,
-      priceModel: "FREE",
+      priceModel: PriceModel.Free,
       priceCents: 0,
-      priceCurrency: "USD",
-      licenseId: null // No license selected initially
+      priceCurrency: "USD"
     });
     
     // Get the created file from the result
@@ -264,7 +270,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
       kind: createdFile.kind,
       size: createdFile.size,
       license: createdFile.license?.id || "",
-      priceModel: createdFile.priceModel,
+      priceModel: createdFile.priceModel || PriceModel.Free,
       priceCents: createdFile.priceCents || 0,
       priceCurrency: createdFile.priceCurrency || "USD"
     });
@@ -302,24 +308,27 @@ const getFileTypeFromName = (filename: string): string | null => {
   return mimeTypes[extension] || 'application/octet-stream';
 };
 
-const getFileKind = (file: File): string => {
+const getFileKind = (file: File): FileKind => {
   const extension = file.name.toLowerCase().split('.').pop();
   
-  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension || '')) {
-    return 'ARCHIVE';
-  } else if (['exe', 'dmg', 'pkg', 'deb', 'rpm', 'msi'].includes(extension || '')) {
-    return 'EXECUTABLE';
-  } else if (['pdf', 'doc', 'docx', 'txt', 'md'].includes(extension || '')) {
-    return 'DOCUMENT';
-  } else if (file.type.startsWith('image/')) {
-    return 'IMAGE';
-  } else if (file.type.startsWith('video/')) {
-    return 'VIDEO';
-  } else if (file.type.startsWith('audio/')) {
-    return 'AUDIO';
+  // Map to actual FileKind enum values: ZIP, RAR, PNG, JPG, BLEND, STL, GLB, OTHER
+  if (extension === 'zip') {
+    return FileKind.Zip;
+  } else if (extension === 'rar') {
+    return FileKind.Rar;
+  } else if (['png'].includes(extension || '')) {
+    return FileKind.Png;
+  } else if (['jpg', 'jpeg'].includes(extension || '')) {
+    return FileKind.Jpg;
+  } else if (extension === 'blend') {
+    return FileKind.Blend;
+  } else if (extension === 'stl') {
+    return FileKind.Stl;
+  } else if (extension === 'glb') {
+    return FileKind.Glb;
   }
   
-  return 'OTHER';
+  return FileKind.Other;
 };
 
 // Remove file
@@ -339,16 +348,18 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   if (!props.discussion?.DownloadableFiles || props.discussion.DownloadableFiles.length === 0) {
     const newFiles = formValues.value.downloadableFiles || [];
     
-    // All files should already have IDs since they're created when uploaded
+    // Build connect array for new files
+    const connectArray: DiscussionDownloadableFilesConnectFieldInput[] = newFiles
+      .filter(file => file.id) // Only connect files that have database IDs
+      .map(file => ({
+        where: { node: { id: file.id } }
+      }));
+    
     return {
       hasDownload: newFiles.length > 0,
-      DownloadableFiles: {
-        connect: newFiles
-          .filter(file => file.id) // Only connect files that have database IDs
-          .map(file => ({
-            where: { node: { id: file.id } }
-          }))
-      },
+      DownloadableFiles: connectArray.length > 0 ? [{
+        connect: connectArray
+      }] : undefined,
     };
   }
 
@@ -357,29 +368,32 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   const newFiles = formValues.value.downloadableFiles;
 
   // CONNECT array: any new file in `newFiles` that has NO matching ID in `oldFiles`
-  // These are files that already exist in the database but need to be connected to this discussion
-  const connectFileArray = newFiles
+  const connectArray: DiscussionDownloadableFilesConnectFieldInput[] = newFiles
     .filter((file) => file.id && !oldFiles.some((old) => old.id === file.id))
     .map((file) => ({
       where: { node: { id: file.id } }
     }));
 
   // DISCONNECT array: any old file that is no longer present in `newFiles`
-  const disconnectFileArray = oldFiles
+  const disconnectArray: DiscussionDownloadableFilesDisconnectFieldInput[] = oldFiles
     .filter((old) => !newFiles.some((file) => file.id === old.id))
     .map((old) => ({
       where: { node: { id: old.id } }
     }));
 
+  // Build the update field input object
+  const updateFieldInput: DiscussionDownloadableFilesUpdateFieldInput = {};
+  if (connectArray.length > 0) {
+    updateFieldInput.connect = connectArray;
+  }
+  if (disconnectArray.length > 0) {
+    updateFieldInput.disconnect = disconnectArray;
+  }
+
   // Return the update input
   return {
     hasDownload: newFiles.length > 0,
-    DownloadableFiles: [
-      {
-        ...(connectFileArray.length > 0 && { connect: connectFileArray }),
-        ...(disconnectFileArray.length > 0 && { disconnect: disconnectFileArray }),
-      }
-    ],
+    DownloadableFiles: Object.keys(updateFieldInput).length > 0 ? [updateFieldInput] : undefined,
   };
 }
 
@@ -419,13 +433,13 @@ function handleSave() {
       />
       
       <ErrorBanner
-        v-if="createSignedStorageUrlError"
+        v-else-if="createSignedStorageUrlError"
         :text="createSignedStorageUrlError.message"
         class="mb-4"
       />
       
       <ErrorBanner
-        v-if="createDownloadableFileError"
+        v-else-if="createDownloadableFileError"
         :text="createDownloadableFileError.message"
         class="mb-4"
       />

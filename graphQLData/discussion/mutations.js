@@ -47,12 +47,11 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
   mutation createDownloadableFile(
     $fileName: String!
     $url: String!
-    $kind: String!
+    $kind: FileKind!
     $size: Int
-    $priceModel: String
+    $priceModel: PriceModel!
     $priceCents: Int
     $priceCurrency: String
-    $licenseId: String
   ) {
     createDownloadableFiles(
       input: [
@@ -64,7 +63,6 @@ export const CREATE_DOWNLOADABLE_FILE = gql`
           priceModel: $priceModel
           priceCents: $priceCents
           priceCurrency: $priceCurrency
-          license: $licenseId ? { connect: { where: { node: { id: $licenseId } } } } : null
         }
       ]
     ) {
