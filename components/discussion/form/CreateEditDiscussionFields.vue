@@ -27,9 +27,20 @@ import type { Album, Image } from "@/__generated__/graphql";
 
 defineEmits(["submit", "updateFormValues"]);
 
-const formTitle = computed(() =>
-  props.editMode ? "Edit Discussion" : "Start Discussion"
-);
+const formTitle = computed(() => {
+  // handle edit mode
+  if (props.editMode) {
+     if (props.downloadMode) {
+      return "Edit Download";
+    }
+    return "Edit Discussion";
+  }
+  // handle create mode
+  if (props.downloadMode) {
+    return "Create Download";
+  }
+  return "Create Discussion";
+})
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
 
