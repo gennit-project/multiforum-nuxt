@@ -3,7 +3,8 @@ import type { PropType } from "vue";
 import type { Discussion } from "@/__generated__/graphql";
 import { PriceModel } from "@/__generated__/graphql";
 import PrimaryButton from "@/components/PrimaryButton.vue";
-import { computed } from "vue";
+import DownloadSuccessPopover from "@/components/download/DownloadSuccessPopover.vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
   discussion: {
@@ -11,6 +12,9 @@ const props = defineProps({
     required: false,
   },
 });
+
+// Popover state
+const showSuccessPopover = ref(false);
 
 // Get the primary downloadable file (first one)
 const primaryFile = computed(() => {
@@ -74,6 +78,11 @@ const handleDownload = () => {
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+  
+  // Show success popover after a short delay to ensure download started
+  setTimeout(() => {
+    showSuccessPopover.value = true;
+  }, 500);
 };
 </script>
 
@@ -137,4 +146,12 @@ const handleDownload = () => {
       </div>
     </div>
   </div>
+
+  <!-- Download Success Popover -->
+  <DownloadSuccessPopover
+    v-if="discussion"
+    :discussion="discussion"
+    :visible="showSuccessPopover"
+    @close="showSuccessPopover = false"
+  />
 </template>
