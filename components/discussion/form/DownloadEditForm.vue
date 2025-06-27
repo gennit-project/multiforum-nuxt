@@ -361,30 +361,25 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   const connectFileArray = newFiles
     .filter((file) => file.id && !oldFiles.some((old) => old.id === file.id))
     .map((file) => ({
-      connect: {
-        where: { node: { id: file.id } }
-      }
+      where: { node: { id: file.id } }
     }));
 
   // DISCONNECT array: any old file that is no longer present in `newFiles`
   const disconnectFileArray = oldFiles
     .filter((old) => !newFiles.some((file) => file.id === old.id))
     .map((old) => ({
-      disconnect: {
-        where: { node: { id: old.id } },
-      },
+      where: { node: { id: old.id } }
     }));
-    
-  // Combine all operations into a single array
-  const fileOps = [
-    ...connectFileArray,
-    ...disconnectFileArray,
-  ];
 
   // Return the update input
   return {
     hasDownload: newFiles.length > 0,
-    DownloadableFiles: fileOps.length > 0 ? fileOps : undefined,
+    DownloadableFiles: [
+      {
+        ...(connectFileArray.length > 0 && { connect: connectFileArray }),
+        ...(disconnectFileArray.length > 0 && { disconnect: disconnectFileArray }),
+      }
+    ],
   };
 }
 
