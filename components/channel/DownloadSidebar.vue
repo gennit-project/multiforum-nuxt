@@ -19,10 +19,10 @@ const primaryFile = computed(() => {
 
 // Format price display
 const priceDisplay = computed(() => {
-  if (!primaryFile.value) return { main: "$0", sub: "00", label: "Free Download" };
+  if (!primaryFile.value) return { main: "$0", sub: "00", label: null };
   
   if (primaryFile.value.priceModel === PriceModel.Free) {
-    return { main: "$0", sub: "00", label: "Free Download" };
+    return { main: "$0", sub: "00", label: null };
   }
   
   const cents = primaryFile.value.priceCents || 0;
@@ -51,7 +51,6 @@ const handleDownload = () => {
   const link = document.createElement('a');
   link.href = primaryFile.value.url;
   link.download = primaryFile.value.fileName || 'download';
-  link.target = '_blank';
   
   // Append to body, click, and remove
   document.body.appendChild(link);
@@ -65,23 +64,30 @@ const handleDownload = () => {
     class="flex w-80 flex-col space-y-4 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="p-6">
-      <!-- File Info Section -->
-      <div v-if="primaryFile" class="mb-4 text-left">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-2">
+      <!-- Boxed Info Section -->
+      <div v-if="primaryFile" class="mb-4 p-4 rounded-lg border border-orange-400 bg-gray-50 dark:border-orange-500 dark:bg-gray-700">
+        <!-- File Name -->
+        <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">
           {{ primaryFile.fileName }}
         </h3>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <!-- File Type and Size -->
+        <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
           {{ primaryFile.kind }} • {{ (primaryFile.size / (1024 * 1024)).toFixed(2) }}MB
         </div>
-      </div>
-
-      <!-- Price Section -->
-      <div class="text-left">
-        <div class="text-3xl font-bold text-gray-900 dark:text-white">
-          <sup class="text-lg">{{ priceDisplay.main.charAt(0) }}</sup>{{ priceDisplay.main.slice(1) }}<sup class="text-lg">.{{ priceDisplay.sub }}</sup>
+        
+        <!-- Price Section -->
+        <div class="text-left mb-3">
+          <div class="text-3xl font-bold text-gray-900 dark:text-white">
+            <sup class="text-lg">{{ priceDisplay.main.charAt(0) }}</sup>{{ priceDisplay.main.slice(1) }}<sup class="text-lg">.{{ priceDisplay.sub }}</sup>
+          </div>
+          <div v-if="priceDisplay.label" class="py-1 text-sm text-gray-500 dark:text-gray-400">
+            {{ priceDisplay.label }}
+          </div>
         </div>
-        <div class="py-2 text-sm text-gray-500 dark:text-gray-400">
-          {{ priceDisplay.label }}
+
+        <!-- Available Instantly -->
+        <div class="text-sm font-medium text-green-600 dark:text-green-400">
+          Available Instantly
         </div>
       </div>
 
