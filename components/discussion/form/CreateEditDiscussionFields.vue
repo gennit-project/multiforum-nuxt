@@ -9,28 +9,32 @@ import TextInput from "@/components/TextInput.vue";
 import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
 import ForumPicker from "@/components/channel/ForumPicker.vue";
 import TailwindForm from "@/components/FormComponent.vue";
-import { MAX_CHARS_IN_DISCUSSION_BODY, DISCUSSION_TITLE_CHAR_LIMIT } from "@/utils/constants";
+import {
+  MAX_CHARS_IN_DISCUSSION_BODY,
+  DISCUSSION_TITLE_CHAR_LIMIT,
+} from "@/utils/constants";
 import AlbumEditForm from "../detail/AlbumEditForm.vue";
+import DownloadEditForm from "./DownloadEditForm.vue";
 import type { Album, Image } from "@/__generated__/graphql";
 
-  const props = defineProps<{
-    editMode: boolean;
-    downloadMode: boolean;
-    createDiscussionError?: ApolloError | null;
-    formValues: CreateEditDiscussionFormValues | null;
-    getDiscussionError?: ApolloError | null;
-    updateDiscussionError?: ApolloError | null;
-    discussionLoading?: boolean;
-    createDiscussionLoading?: boolean;
-    updateDiscussionLoading?: boolean;
-  }>();
+const props = defineProps<{
+  editMode: boolean;
+  downloadMode: boolean;
+  createDiscussionError?: ApolloError | null;
+  formValues: CreateEditDiscussionFormValues | null;
+  getDiscussionError?: ApolloError | null;
+  updateDiscussionError?: ApolloError | null;
+  discussionLoading?: boolean;
+  createDiscussionLoading?: boolean;
+  updateDiscussionLoading?: boolean;
+}>();
 
 defineEmits(["submit", "updateFormValues"]);
 
 const formTitle = computed(() => {
   // handle edit mode
   if (props.editMode) {
-     if (props.downloadMode) {
+    if (props.downloadMode) {
       return "Edit Download";
     }
     return "Edit Discussion";
@@ -40,13 +44,14 @@ const formTitle = computed(() => {
     return "Create Download";
   }
   return "Create Discussion";
-})
+});
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
 
 const needsChanges = computed(() => {
   return !(
-    props.formValues?.selectedChannels && props.formValues.selectedChannels.length > 0 &&
+    props.formValues?.selectedChannels &&
+    props.formValues.selectedChannels.length > 0 &&
     props.formValues?.title &&
     props.formValues?.body?.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
     props.formValues?.title.length <= DISCUSSION_TITLE_CHAR_LIMIT
@@ -111,7 +116,10 @@ onMounted(() => {
         />
         <div class="divide-y divide-gray-200">
           <div class="mt-6 space-y-4">
-            <FormRow  :required="true">
+            <FormRow
+              :section-title="downloadMode ? 'Title' : ''"
+              :required="true"
+            >
               <template #content>
                 <TextInput
                   ref="titleInputRef"
@@ -128,21 +136,35 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow  :required="true">
+            <FormRow v-if="downloadMode" :section-title="'Downloadable File'">
               <template #content>
-                <ForumPicker
-                  :test-id="'channel-input'"
-                  :selected-channels="formValues.selectedChannels"
-                  @set-selected-channels="
-                    $emit('updateFormValues', { selectedChannels: $event })
+                <DownloadEditForm
+                  v-if="formValues"
+                  :discussion="
+                    {
+                      id: 'temp-id',
+                      DownloadableFiles: (formValues.downloadableFiles ||
+                        []) as any,
+                    } as any
+                  "
+                  :channel-data="{ allowedFileTypes: [] }"
+                  @close-editor="() => {}"
+                  @update-form-values="
+                    (downloadData) => {
+                      console.log(
+                        'CreateEditDiscussionFields received updateFormValues:',
+                        downloadData
+                      );
+                      $emit('updateFormValues', {
+                        downloadableFiles: downloadData.downloadableFiles,
+                      });
+                    }
                   "
                 />
               </template>
             </FormRow>
 
-            <FormRow
-              :section-title="downloadMode ? 'Description' : ''"
-            >
+            <FormRow :section-title="downloadMode ? 'Description' : ''">
               <template #content>
                 <TextEditor
                   class="mb-3"
@@ -160,28 +182,45 @@ onMounted(() => {
               </template>
             </FormRow>
 
-            <FormRow >
+            <FormRow>
               <template #content>
                 <AlbumEditForm
                   v-if="formValues"
-                  :discussion="{ 
-                    id: 'temp-id', 
+                  :discussion="{
+                    id: 'temp-id',
                     Album: {
                       id: '',
-                      Images: formValues.album?.images as Image[] || [],
+                      Images: (formValues.album?.images as Image[]) || [],
                       imageOrder: formValues.album?.imageOrder || [],
-                    }
+                    },
                   }"
                   @close-editor="() => {}"
-                  @update-form-values="(albumData) => {
-                    console.log('CreateEditDiscussionFields received updateFormValues:', albumData);
-                    $emit('updateFormValues', { album: albumData.album });
-                  }"
+                  @update-form-values="
+                    (albumData) => {
+                      console.log(
+                        'CreateEditDiscussionFields received updateFormValues:',
+                        albumData
+                      );
+                      $emit('updateFormValues', { album: albumData.album });
+                    }
+                  "
                 />
               </template>
             </FormRow>
 
-            <FormRow >
+            <FormRow :required="true">
+              <template #content>
+                <ForumPicker
+                  :test-id="'channel-input'"
+                  :selected-channels="formValues.selectedChannels"
+                  @set-selected-channels="
+                    $emit('updateFormValues', { selectedChannels: $event })
+                  "
+                />
+              </template>
+            </FormRow>
+
+            <FormRow>
               <template #content>
                 <TagPicker
                   data-testid="tag-input"

@@ -25,6 +25,17 @@ export interface CreateEditDiscussionFormValues {
       }[];
       imageOrder: string[];
     };
+    downloadableFiles?: {
+      id?: string;
+      fileName: string;
+      url: string;
+      kind: string;
+      size: number;
+      license: string;
+      priceModel: string;
+      priceCents: number;
+      priceCurrency: string;
+    }[];
 }
 
 export type SearchDiscussionValues = {

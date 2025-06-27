@@ -1,0 +1,463 @@
+<script lang="ts" setup>
+import { ref, computed, onMounted } from "vue";
+import type { PropType } from "vue";
+import type {
+  Discussion,
+  DownloadableFile,
+  DiscussionUpdateInput,
+} from "@/__generated__/graphql";
+import PrimaryButton from "@/components/PrimaryButton.vue";
+import GenericButton from "@/components/GenericButton.vue";
+import FormRow from "@/components/FormRow.vue";
+import { useMutation } from "@vue/apollo-composable";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import { UPDATE_DISCUSSION, CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import Notification from "@/components/NotificationComponent.vue";
+import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
+import { usernameVar } from "@/cache";
+
+const MAX_DOWNLOAD_FILE_SIZE_MB = 10;
+const MAX_DOWNLOAD_FILE_SIZE_BYTES = MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
+
+const props = defineProps({
+  discussion: {
+    type: Object as PropType<Discussion>,
+    required: true,
+  },
+  // Channel data to get allowed file types
+  channelData: {
+    type: Object as PropType<{ allowedFileTypes?: string[] }>,
+    default: () => ({ allowedFileTypes: [] }),
+  },
+});
+
+const emit = defineEmits(["closeEditor", "updateFormValues"]);
+
+// Check if we're in create mode (using a temporary ID) or edit mode
+const isCreateMode = computed(() => {
+  if (props.discussion.id !== 'temp-id') {
+    return false;
+  }
+  
+  // If we have files with IDs, we're editing an existing download (not in create mode)
+  const hasExistingFiles = props.discussion?.DownloadableFiles?.some(file => file.id);
+  return !hasExistingFiles;
+});
+
+const downloadableFiles = computed(() => {
+  if (!props.discussion?.DownloadableFiles) return [];
+  return props.discussion.DownloadableFiles.map((file: DownloadableFile) => {
+    return {
+      id: file.id || "",
+      fileName: file.fileName || "",
+      url: file.url || "",
+      kind: file.kind || "OTHER",
+      size: file.size || 0,
+      license: file.license?.id || "",
+      priceModel: file.priceModel || "FREE",
+      priceCents: file.priceCents || 0,
+      priceCurrency: file.priceCurrency || "USD",
+    };
+  });
+});
+
+// Form values
+const formValues = ref({
+  downloadableFiles: [] as any[],
+});
+
+// Upload state
+const uploadingFile = ref(false);
+const uploadError = ref("");
+
+// Notification state
+const savedSuccessfully = ref(false);
+
+// License options (placeholder as requested)
+const licenseOptions = [
+  { id: "mit", name: "MIT License" },
+  { id: "apache-2", name: "Apache License 2.0" },
+  { id: "gpl-3", name: "GNU General Public License v3.0" },
+  { id: "bsd-3", name: "BSD 3-Clause License" },
+  { id: "creative-commons", name: "Creative Commons" },
+  { id: "proprietary", name: "Proprietary" },
+  { id: "other", name: "Other" },
+];
+
+// GraphQL mutations
+const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
+  useMutation(CREATE_SIGNED_STORAGE_URL);
+
+const {
+  mutate: updateDiscussion,
+  error: updateDiscussionError,
+  loading: updateDiscussionLoading,
+  onDone,
+} = useMutation(UPDATE_DISCUSSION, () => ({
+  variables: {
+    where: { id: props.discussion.id },
+    updateDiscussionInput: getUpdateDiscussionInputForDownloadableFiles(),
+  },
+}));
+
+onDone(() => {
+  emit("closeEditor");
+});
+
+// Initialize form values after component is mounted
+onMounted(() => {
+  console.log("DownloadEditForm mounted, initializing formValues");
+  console.log("Files:", downloadableFiles.value);
+  
+  formValues.value.downloadableFiles = [...downloadableFiles.value];
+  
+  console.log("Initialized formValues:", formValues.value);
+});
+
+// File validation
+const validateFileType = (file: File): { valid: boolean; message: string } => {
+  const allowedTypes = props.channelData?.allowedFileTypes || [];
+  
+  if (allowedTypes.length === 0) {
+    return { valid: true, message: "" };
+  }
+
+  const fileExtension = file.name.toLowerCase().split('.').pop();
+  const isAllowed = allowedTypes.some(type => 
+    type.toLowerCase().includes(fileExtension || '') || 
+    file.type.toLowerCase().includes(type.toLowerCase())
+  );
+
+  if (!isAllowed) {
+    return {
+      valid: false,
+      message: `File type not allowed. Allowed types: ${allowedTypes.join(', ')}`
+    };
+  }
+
+  return { valid: true, message: "" };
+};
+
+const validateFileSize = (file: File): { valid: boolean; message: string } => {
+  if (file.size > MAX_DOWNLOAD_FILE_SIZE_BYTES) {
+    return {
+      valid: false,
+      message: `File size must be less than ${MAX_DOWNLOAD_FILE_SIZE_MB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+    };
+  }
+  return { valid: true, message: '' };
+};
+
+// File upload handling
+const handleFileUpload = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  const file = target.files?.[0];
+  
+  if (!file) return;
+
+  // Validate file type
+  const typeValidation = validateFileType(file);
+  if (!typeValidation.valid) {
+    uploadError.value = typeValidation.message;
+    return;
+  }
+
+  // Validate file size
+  const sizeValidation = validateFileSize(file);
+  if (!sizeValidation.valid) {
+    uploadError.value = sizeValidation.message;
+    return;
+  }
+
+  uploadError.value = "";
+  uploadingFile.value = true;
+
+  try {
+    const uploadedUrl = await uploadFile(file);
+    
+    if (uploadedUrl) {
+      // Add the uploaded file to our form values
+      const newFile = {
+        id: "", // New file, no ID yet
+        fileName: file.name,
+        url: uploadedUrl,
+        kind: getFileKind(file),
+        size: file.size,
+        license: "",
+        priceModel: "FREE",
+        priceCents: 0,
+        priceCurrency: "USD",
+      };
+      
+      formValues.value.downloadableFiles = [newFile];
+    }
+  } catch (error) {
+    console.error("Upload failed:", error);
+    uploadError.value = error instanceof Error ? error.message : "Upload failed";
+  } finally {
+    uploadingFile.value = false;
+  }
+};
+
+const uploadFile = async (file: File): Promise<string | null> => {
+  if (!usernameVar.value) {
+    throw new Error("Not logged in or username not found");
+  }
+
+  try {
+    const fileType = file.type || getFileTypeFromName(file.name) || "application/octet-stream";
+    const filename = getUploadFileName({ username: usernameVar.value, file });
+    const signedStorageURLInput = { filename, contentType: fileType };
+
+    const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
+    const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
+    
+    if (!signedStorageURL) {
+      throw new Error("Failed to get signed URL for upload");
+    }
+
+    const embeddedLink = await uploadAndGetEmbeddedLink({
+      file,
+      filename,
+      fileType,
+      signedStorageURL,
+    });
+    
+    if (!embeddedLink) {
+      throw new Error("Upload completed but no URL was returned");
+    }
+    
+    return embeddedLink;
+  } catch (error) {
+    console.error("Error uploading file:", error);
+    throw error;
+  }
+};
+
+const getFileTypeFromName = (filename: string): string | null => {
+  if (!filename) return null;
+  
+  const extension = filename.toLowerCase().split('.').pop();
+  if (!extension) return null;
+  
+  const mimeTypes: Record<string, string> = {
+    'zip': 'application/zip',
+    'rar': 'application/x-rar-compressed',
+    '7z': 'application/x-7z-compressed',
+    'tar': 'application/x-tar',
+    'gz': 'application/gzip',
+    'pdf': 'application/pdf',
+    'doc': 'application/msword',
+    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'exe': 'application/x-msdownload',
+    'dmg': 'application/x-apple-diskimage',
+    'pkg': 'application/x-newton-compatible-pkg',
+    'deb': 'application/vnd.debian.binary-package',
+    'rpm': 'application/x-rpm',
+  };
+  
+  return mimeTypes[extension] || 'application/octet-stream';
+};
+
+const getFileKind = (file: File): string => {
+  const extension = file.name.toLowerCase().split('.').pop();
+  
+  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension || '')) {
+    return 'ARCHIVE';
+  } else if (['exe', 'dmg', 'pkg', 'deb', 'rpm', 'msi'].includes(extension || '')) {
+    return 'EXECUTABLE';
+  } else if (['pdf', 'doc', 'docx', 'txt', 'md'].includes(extension || '')) {
+    return 'DOCUMENT';
+  } else if (file.type.startsWith('image/')) {
+    return 'IMAGE';
+  } else if (file.type.startsWith('video/')) {
+    return 'VIDEO';
+  } else if (file.type.startsWith('audio/')) {
+    return 'AUDIO';
+  }
+  
+  return 'OTHER';
+};
+
+// Remove file
+const removeFile = (index: number) => {
+  formValues.value.downloadableFiles.splice(index, 1);
+};
+
+// Update license
+const updateLicense = (fileIndex: number, licenseId: string) => {
+  if (formValues.value.downloadableFiles[fileIndex]) {
+    formValues.value.downloadableFiles[fileIndex].license = licenseId;
+  }
+};
+
+function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
+  // This is simplified - in a real implementation, you'd need to handle
+  // creating, updating, and deleting downloadable files similar to how
+  // AlbumEditForm handles images
+  return {
+    hasDownload: true,
+    // Note: The actual implementation would need proper GraphQL mutations
+    // for creating/updating DownloadableFile objects
+  };
+}
+
+// For handling save
+function handleSave() {
+  console.log("handleSave called, isCreateMode:", isCreateMode.value);
+  console.log("Current downloadable files data:", JSON.stringify(formValues.value.downloadableFiles));
+  
+  // For both cases where we're inside CreateEditDiscussionFields (temp-id)
+  if (props.discussion.id === 'temp-id') {
+    // Always emit the form values to update the parent component
+    console.log("Emitting updateFormValues in CreateEditDiscussionFields context");
+    emit("updateFormValues", {
+      downloadableFiles: formValues.value.downloadableFiles
+    });
+    // Add a success notification
+    savedSuccessfully.value = true;
+    setTimeout(() => {
+      savedSuccessfully.value = false;
+    }, 3000); // Hide after 3 seconds
+  } else {
+    // In actual edit mode for an existing discussion, perform the API mutation
+    console.log("Calling updateDiscussion in edit mode");
+    updateDiscussion();
+  }
+}
+</script>
+
+<template>
+  <div class="w-full">
+    <div class="mb-3 mt-3 w-full flex flex-col">
+      
+      <ErrorBanner
+        v-if="uploadError"
+        :text="uploadError"
+        class="mb-4"
+      />
+      
+      <ErrorBanner
+        v-if="createSignedStorageUrlError"
+        :text="createSignedStorageUrlError.message"
+        class="mb-4"
+      />
+      
+      <!-- File Upload Section -->
+      <FormRow section-title="File Upload" :required="true">
+        <template #content>
+          <div class="space-y-4">
+            <div v-if="formValues.downloadableFiles.length === 0">
+              <input
+                id="downloadable-file-input"
+                type="file"
+                class="hidden"
+                :disabled="uploadingFile"
+                @change="handleFileUpload"
+              >
+              <label
+                for="downloadable-file-input"
+                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 cursor-pointer"
+                :class="{ 'opacity-50 cursor-not-allowed': uploadingFile }"
+              >
+                <span v-if="uploadingFile">Uploading...</span>
+                <span v-else>Choose File</span>
+              </label>
+              <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <span v-if="channelData?.allowedFileTypes?.length">
+                  Allowed file types: {{ channelData.allowedFileTypes.join(', ') }}
+                </span>
+                <br>
+                Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
+              </p>
+            </div>
+            
+            <!-- Display uploaded files -->
+            <div v-if="formValues.downloadableFiles.length > 0" class="space-y-4">
+              <div
+                v-for="(file, index) in formValues.downloadableFiles"
+                :key="index"
+                class="border border-gray-200 rounded-lg p-4 dark:border-gray-600"
+              >
+                <div class="flex items-center justify-between mb-3">
+                  <div>
+                    <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ file.fileName }}</h4>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">
+                      {{ (file.size / (1024 * 1024)).toFixed(2) }}MB • {{ file.kind }}
+                    </p>
+                  </div>
+                  <button
+                    class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
+                    @click="removeFile(index)"
+                  >
+                    Remove
+                  </button>
+                </div>
+                
+                <!-- License Selection -->
+                <FormRow section-title="License">
+                  <template #content>
+                    <select
+                      :value="file.license"
+                      class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
+                      @change="updateLicense(index, ($event.target as HTMLSelectElement).value)"
+                    >
+                      <option value="">Select a license...</option>
+                      <option
+                        v-for="license in licenseOptions"
+                        :key="license.id"
+                        :value="license.id"
+                      >
+                        {{ license.name }}
+                      </option>
+                    </select>
+                  </template>
+                </FormRow>
+              </div>
+              
+              <!-- Option to add another file -->
+              <div>
+                <input
+                  id="additional-file-input"
+                  type="file"
+                  class="hidden"
+                  :disabled="uploadingFile"
+                  @change="handleFileUpload"
+                >
+                <label
+                  for="additional-file-input"
+                  class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 cursor-pointer"
+                  :class="{ 'opacity-50 cursor-not-allowed': uploadingFile }"
+                >
+                  <span v-if="uploadingFile">Uploading...</span>
+                  <span v-else>+ Add Another File</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </template>
+      </FormRow>
+      
+      <div class="flex align-items gap-2 justify-end mt-4">
+        <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
+        <PrimaryButton
+          :label="'Save Download'"
+          :loading="updateDiscussionLoading && !isCreateMode"
+          @click="handleSave"
+        />
+      </div>
+    </div>
+    
+    <ErrorBanner
+      v-if="updateDiscussionError"
+      class="mx-auto my-3 max-w-5xl"
+      :text="updateDiscussionError.message"
+    />
+    
+    <Notification
+      :show="savedSuccessfully"
+      :title="'Download saved successfully'"
+      @close-notification="savedSuccessfully = false"
+    />
+  </div>
+</template>
