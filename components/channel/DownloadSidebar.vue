@@ -88,7 +88,7 @@ const handleDownload = () => {
 
 <template>
   <div
-    class="flex w-80 flex-col space-y-4 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
+    class="flex w-full lg:w-80 flex-col space-y-4 rounded-lg border border-gray-200 bg-white dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="p-6">
       <!-- Boxed Info Section -->
