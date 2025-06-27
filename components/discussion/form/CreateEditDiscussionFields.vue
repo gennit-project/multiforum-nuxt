@@ -27,6 +27,7 @@ const props = defineProps<{
   discussionLoading?: boolean;
   createDiscussionLoading?: boolean;
   updateDiscussionLoading?: boolean;
+  channelData?: any;
 }>();
 
 defineEmits(["submit", "updateFormValues"]);
@@ -147,7 +148,7 @@ onMounted(() => {
                         []) as any,
                     } as any
                   "
-                  :channel-data="{ allowedFileTypes: [] }"
+                  :channel-data="channelData"
                   @close-editor="() => {}"
                   @update-form-values="
                     (downloadData) => {
@@ -172,7 +173,7 @@ onMounted(() => {
                   :disable-auto-focus="true"
                   :initial-value="formValues.body || ''"
                   :placeholder="'Add details'"
-                  :rows="10"
+                  :rows="7"
                   @update="$emit('updateFormValues', { body: $event })"
                 />
                 <CharCounter

@@ -364,11 +364,11 @@ function handleSave() {
                 <span v-else>Choose File</span>
               </label>
               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
+                <br>
                 <span v-if="channelData?.allowedFileTypes?.length">
                   Allowed file types: {{ channelData.allowedFileTypes.join(', ') }}
                 </span>
-                <br>
-                Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
               </p>
             </div>
             
