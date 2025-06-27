@@ -41,6 +41,24 @@ const licenseInfo = computed(() => {
   return primaryFile.value?.license?.name || "No license specified";
 });
 
+// Format file size with appropriate units
+const formatFileSize = (sizeInBytes: number | null | undefined): string => {
+  if (!sizeInBytes || sizeInBytes === 0) return "0 B";
+  
+  const units = ["B", "KB", "MB", "GB"];
+  let size = sizeInBytes;
+  let unitIndex = 0;
+  
+  while (size >= 1024 && unitIndex < units.length - 1) {
+    size /= 1024;
+    unitIndex++;
+  }
+  
+  // Show decimals for values >= 1, no decimals for bytes
+  const decimals = unitIndex === 0 ? 0 : size >= 10 ? 1 : 2;
+  return `${size.toFixed(decimals)} ${units[unitIndex]}`;
+};
+
 const handleDownload = () => {
   if (!primaryFile.value?.url) {
     console.error("No download URL available");
@@ -72,7 +90,7 @@ const handleDownload = () => {
         </h3>
         <!-- File Type and Size -->
         <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
-          {{ primaryFile.kind }} • {{ (primaryFile.size / (1024 * 1024)).toFixed(2) }}MB
+          {{ primaryFile.kind }} • {{ formatFileSize(primaryFile.size) }}
         </div>
         
         <!-- Price Section -->
