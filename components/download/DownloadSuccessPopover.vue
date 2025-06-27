@@ -106,7 +106,7 @@ const copyLink = async () => {
 <template>
   <div
     v-if="visible"
-    class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md mx-4"
+    class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-2xl mx-4"
   >
     <!-- Backdrop for mobile -->
     <div 
