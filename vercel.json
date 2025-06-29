@@ -2,7 +2,7 @@
     "framework": "nuxtjs",
     "devCommand": "npm run dev",
     "buildCommand": "npm run build",
-    "installCommand": "npm install --legacy-peer-deps",
+    "installCommand": "rm -rf package-lock.json node_modules && npm install --legacy-peer-deps",
     "outputDirectory": ".output",
     "headers": [
       {
