@@ -28,7 +28,6 @@ cypress.env.json
 config
 
 # Generated files
-__generated__
 /src/__generated__
 cypress/videos
 cypress/screenshots
