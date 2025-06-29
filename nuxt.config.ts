@@ -42,22 +42,7 @@ export default defineNuxtConfig({
   imports: {
     autoImport: true,
   },
-  sentry: {
-    dsn: config?.sentryDsn || "",
-    serverIntegrations: {
-      logErrors: true
-    },
-    clientIntegrations: {
-      browserTracing: true,
-      replay: false
-    },
-    tracesSampleRate: 1.0,
-    config: {
-      environment: config?.environment || "development",
-    },
-  },
   modules: [
-    '@sentry/nuxt',
     [
       "@nuxtjs/apollo",
       {

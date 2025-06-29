@@ -8,7 +8,6 @@ type ConfigType = {
     clientId: string;
     clientSecret: string;
     callbackUrl: string;
-    dsn: string;
     environment: string;
     googleCloudStorageBucket: string;
     googleMapsApiKey: string;
@@ -17,8 +16,6 @@ type ConfigType = {
     logoutUrl: string;
     openCageApiKey: string;
     openGraphApiKey: string;
-    sentryDsn: string;
-    sentryAuthToken: string;
     serverName: string;
     serverDisplayName: string;
 }
@@ -29,7 +26,6 @@ const config: ConfigType = {
     auth0Audience: import.meta.env.VITE_AUTH0_AUDIENCE,
     baseUrl: import.meta.env.VITE_BASE_URL,
     domain: import.meta.env.VITE_AUTH0_DOMAIN,
-    dsn: import.meta.env.VITE_SENTRY_DSN,
     clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
     clientSecret: import.meta.env.VITE_AUTH0_CLIENT_SECRET,
     callbackUrl: import.meta.env.VITE_AUTH0_CALLBACK_URL,
@@ -41,8 +37,6 @@ const config: ConfigType = {
     logoutUrl: import.meta.env.VITE_LOGOUT_URL,
     openCageApiKey: import.meta.env.VITE_OPEN_CAGE_API_KEY,
     openGraphApiKey: import.meta.env.VITE_OPEN_GRAPH_API_KEY,
-    sentryDsn: import.meta.env.VITE_SENTRY_DSN,
-    sentryAuthToken: import.meta.env.VITE_SENTRY_AUTH_TOKEN,
     serverName: import.meta.env.VITE_SERVER_NAME,
     serverDisplayName: import.meta.env.VITE_SERVER_DISPLAY_NAME,
 }
