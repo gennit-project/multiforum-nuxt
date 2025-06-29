@@ -8,6 +8,7 @@ type ConfigType = {
     clientId: string;
     clientSecret: string;
     callbackUrl: string;
+    dsn: string;
     environment: string;
     googleCloudStorageBucket: string;
     googleMapsApiKey: string;
@@ -28,6 +29,7 @@ const config: ConfigType = {
     auth0Audience: import.meta.env.VITE_AUTH0_AUDIENCE,
     baseUrl: import.meta.env.VITE_BASE_URL,
     domain: import.meta.env.VITE_AUTH0_DOMAIN,
+    dsn: import.meta.env.VITE_SENTRY_DSN,
     clientId: import.meta.env.VITE_AUTH0_CLIENT_ID,
     clientSecret: import.meta.env.VITE_AUTH0_CLIENT_SECRET,
     callbackUrl: import.meta.env.VITE_AUTH0_CALLBACK_URL,
