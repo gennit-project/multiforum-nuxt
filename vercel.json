@@ -2,6 +2,7 @@
     "framework": "nuxtjs",
     "devCommand": "npm run dev",
     "buildCommand": "npm run build",
+    "installCommand": "npm install --legacy-peer-deps",
     "outputDirectory": ".output",
     "headers": [
       {
