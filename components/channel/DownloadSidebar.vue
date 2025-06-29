@@ -94,17 +94,17 @@ const handleDownload = () => {
       <div v-if="primaryFile" class="mb-4 p-4 rounded-lg border border-orange-400 bg-gray-50 dark:border-orange-500 dark:bg-gray-700">
         <!-- File Name -->
         <h3 class="text-lg font-medium text-gray-900 dark:text-white mb-3">
-          {{ primaryFile.fileName }}
+          {{ primaryFile.fileName || 'Untitled File' }}
         </h3>
         <!-- File Type and Size -->
         <div class="text-sm text-gray-600 dark:text-gray-300 mb-3">
-          {{ primaryFile.kind }} • {{ formatFileSize(primaryFile.size) }}
+          {{ primaryFile.kind || 'OTHER' }} • {{ formatFileSize(primaryFile.size) }}
         </div>
         
         <!-- Price Section -->
         <div class="text-left mb-3">
           <div class="text-3xl font-bold text-gray-900 dark:text-white">
-            <sup class="text-lg">{{ priceDisplay.main.charAt(0) }}</sup>{{ priceDisplay.main.slice(1) }}<sup class="text-lg">.{{ priceDisplay.sub }}</sup>
+            <sup class="text-lg">{{ priceDisplay.main?.charAt(0) || '$' }}</sup>{{ priceDisplay.main?.slice(1) || '0' }}<sup class="text-lg">.{{ priceDisplay.sub || '00' }}</sup>
           </div>
           <div v-if="priceDisplay.label" class="py-1 text-sm text-gray-500 dark:text-gray-400">
             {{ priceDisplay.label }}

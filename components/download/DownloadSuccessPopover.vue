@@ -30,15 +30,15 @@ const primaryFile = computed(() => {
 
 // Generate attribution text
 const attributionText = computed(() => {
-  const title = props.discussion.title;
+  const title = props.discussion.title || 'Untitled';
   const author = props.discussion.Author?.username || 'Unknown';
-  const url = window.location.href;
+  const url = typeof window !== 'undefined' ? window.location.href : '';
   return `"${title}" by ${author} - ${url}`;
 });
 
 // Generate share URL (current page)
 const shareUrl = computed(() => {
-  return window.location.href;
+  return typeof window !== 'undefined' ? window.location.href : '';
 });
 
 const copyAttribution = async () => {

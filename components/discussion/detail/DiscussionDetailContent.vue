@@ -379,7 +379,7 @@ const handleEditAlbum = () => {
                   @close-editor="albumEditMode = false"
                 />
                 <!-- Download mode layout with sidebar -->
-                <div v-else-if="downloadMode" class="flex flex-col gap-4 lg:flex-row lg:gap-6">
+                <div v-else-if="downloadMode && discussion" key="download-layout" class="flex flex-col gap-4 lg:flex-row lg:gap-6">
                   <div class="flex-1">
                     <DiscussionBody
                       :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
@@ -451,7 +451,7 @@ const handleEditAlbum = () => {
                     </DiscussionBody>
                   </div>
                   <div class="flex-shrink-0">
-                    <DownloadSidebar :discussion="discussion" />
+                    <DownloadSidebar v-if="discussion" :discussion="discussion" />
                   </div>
                 </div>
                 <!-- Regular discussion mode layout -->
