@@ -6,7 +6,7 @@
     "node": "22.x"
   },
   "scripts": {
-    "build": "npm run compile && nuxt build",
+    "build": "nuxt build",
     "dev": "nuxt dev --host 127.0.0.1",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
