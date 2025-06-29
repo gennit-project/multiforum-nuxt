@@ -31,6 +31,10 @@ export default createConfigForNuxt({
       argsIgnorePattern: "^_",
       varsIgnorePattern: "^_"
     }],
+    "@typescript-eslint/consistent-type-imports": ["error", {
+      prefer: "type-imports",
+      fixStyle: "separate-type-imports"
+    }],
     // Accessibility rules
     "vuejs-accessibility/alt-text": ["error", { 
       "elements": ["img", "object", "area", "input[type=\"image\"]"],
@@ -83,6 +87,10 @@ export default createConfigForNuxt({
         ignoreRestSiblings: true,
         argsIgnorePattern: "^_",
         varsIgnorePattern: "^_"
+      }],
+      "@typescript-eslint/consistent-type-imports": ["error", {
+        prefer: "type-imports",
+        fixStyle: "separate-type-imports"
       }]
     },
   }

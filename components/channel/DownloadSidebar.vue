@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { PropType } from "vue";
 import type { Discussion } from "@/__generated__/graphql";
-import { PriceModel } from "@/__generated__/graphql";
 import PrimaryButton from "@/components/PrimaryButton.vue";
 import DownloadSuccessPopover from "@/components/download/DownloadSuccessPopover.vue";
 import { computed, ref } from "vue";
@@ -25,7 +24,7 @@ const primaryFile = computed(() => {
 const priceDisplay = computed(() => {
   if (!primaryFile.value) return { main: "$0", sub: "00", label: null };
   
-  if (primaryFile.value.priceModel === PriceModel.Free) {
+  if (primaryFile.value.priceModel === "FREE") {
     return { main: "$0", sub: "00", label: null };
   }
   
