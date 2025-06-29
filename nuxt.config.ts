@@ -292,14 +292,14 @@ export default defineNuxtConfig({
       allowedHosts: ['localhost', '69f8-98-168-53-208.ngrok-free.app']
     },
     build: {
-      minify: 'terser',
-      cssMinify: true,
-      terserOptions: {
-        compress: {
-          drop_console: process.env.NODE_ENV === 'production',
-          drop_debugger: process.env.NODE_ENV === 'production'
-        }
-      },
+      minify: false,
+      cssMinify: false,
+      // terserOptions: {
+      //   compress: {
+      //     drop_console: process.env.NODE_ENV === 'production',
+      //     drop_debugger: process.env.NODE_ENV === 'production'
+      //   }
+      // },
       rollupOptions: {
         output: {
           manualChunks: {
