@@ -14,6 +14,7 @@ import type {
 } from "@/__generated__/graphql";
 import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import InfoBanner from "@/components/InfoBanner.vue";
 import DiscussionBody from "@/components/discussion/detail/DiscussionBody.vue";
 import DiscussionHeader from "@/components/discussion/detail/DiscussionHeader.vue";
 import DiscussionCommentsWrapper from "@/components/discussion/detail/DiscussionCommentsWrapper.vue";
@@ -535,7 +536,7 @@ const handleEditAlbum = () => {
                 }"
                 class="border-b-2 px-1 py-2 text-sm font-medium"
                 :class="
-                  $route.name?.includes('description')
+                  typeof $route.name === 'string' && $route.name.includes('description')
                     ? 'border-orange-500 text-orange-600 dark:text-orange-400'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 "
@@ -552,7 +553,7 @@ const handleEditAlbum = () => {
                 }"
                 class="border-b-2 px-1 py-2 text-sm font-medium"
                 :class="
-                  $route.name?.includes('comments')
+                  typeof $route.name === 'string' && $route.name.includes('comments')
                     ? 'border-orange-500 text-orange-600 dark:text-orange-400'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 "

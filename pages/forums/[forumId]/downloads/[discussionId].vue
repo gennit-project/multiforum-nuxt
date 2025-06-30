@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { ref, computed } from "vue";
+  import { ref, computed, onMounted } from "vue";
   import DiscussionDetailContent from "@/components/discussion/detail/DiscussionDetailContent.vue";
   import ErrorBanner from "@/components/ErrorBanner.vue";
   import "md-editor-v3/lib/style.css";
@@ -20,12 +20,15 @@
   const discussionId = ref(updateDiscussionId());
 
   // Redirect to description tab if on the base download page
-  if (route.name === 'forums-forumId-downloads-discussionId') {
-    router.push({
-      name: 'forums-forumId-downloads-discussionId-description',
-      params: route.params
-    });
-  }
+  // Use onMounted to ensure this runs only on client side
+  onMounted(() => {
+    if (route.name === 'forums-forumId-downloads-discussionId') {
+      router.push({
+        name: 'forums-forumId-downloads-discussionId-description',
+        params: route.params
+      });
+    }
+  });
 
   const channelId = computed(() => {
     if (typeof route.params.forumId === "string") {

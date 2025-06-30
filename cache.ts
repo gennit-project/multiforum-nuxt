@@ -22,9 +22,10 @@ export const setModProfileName = (modProfileName: string) => {
 };
 export const isAuthenticatedVar = ref(false);
 export const setIsAuthenticated = (status: boolean) => {
-  console.log('🔧 setIsAuthenticated called with:', status, 'current value:', isAuthenticatedVar.value);
+  if (status === isAuthenticatedVar.value) {
+    return; // No change in authentication status, skip update
+  }
   isAuthenticatedVar.value = status;
-  console.log('🔧 setIsAuthenticated result:', isAuthenticatedVar.value);
 };
 
 export const isLoadingAuthVar = ref(false);
