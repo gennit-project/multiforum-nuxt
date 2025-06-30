@@ -35,7 +35,7 @@ import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
 import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
-// import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
+import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
 // Lazy load the album components since they're not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
   () => import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -452,7 +452,7 @@ const handleEditAlbum = () => {
                     </DiscussionBody>
                   </div>
                   <div class="flex-shrink-0">
-                    <!-- <DownloadSidebar v-if="discussion" :discussion="discussion" /> -->
+                    <DownloadSidebar v-if="discussion" :discussion="discussion" />
                   </div>
                 </div>
                 <!-- Regular discussion mode layout -->
