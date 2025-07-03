@@ -3,8 +3,10 @@ import { config } from "@/config";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useRoute } from "nuxt/app";
 import { useAuth0 } from "@auth0/auth0-vue";
+import { useSSRAuth } from "@/composables/useSSRAuth";
 
 let handleLogout = () => {};
+const { clearAuthHints } = useSSRAuth();
 
 // Only initialize auth0 on client side
 if (import.meta.env.SSR === false) {
@@ -25,6 +27,9 @@ if (import.meta.env.SSR === false) {
       
       // Clear any Auth0 token from localStorage
       localStorage.removeItem("token");
+      
+      // Clear auth hint cookies
+      clearAuthHints();
       
       // Logout and redirect
       logout({

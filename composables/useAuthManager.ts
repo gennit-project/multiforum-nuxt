@@ -14,12 +14,14 @@ import {
   setNotificationCount,
   setProfilePicURL,
 } from "@/cache";
+import { useSSRAuth } from "@/composables/useSSRAuth";
 
 export function useAuthManager() {
   const router = useRouter();
   const userEmail = ref("");
   const isSessionExpired = ref(false);
   const tokenCheckInterval = ref<number | null>(null);
+  const { setAuthHint, setUsernameHint, clearAuthHints } = useSSRAuth();
 
   // Auth0 setup (client-side only)
   let auth0 = null;
@@ -97,6 +99,8 @@ export function useAuthManager() {
     setModProfileName("");
     setNotificationCount(0);
     setProfilePicURL("");
+    // Clear auth hint cookies
+    clearAuthHints();
   };
 
   // Handle visibility change (tab focus)
@@ -118,6 +122,10 @@ export function useAuthManager() {
       setIsAuthenticated(true);
       setModProfileName(modProfileData?.displayName || "");
       setNotificationCount(userData.NotificationsAggregate?.count || 0);
+      
+      // Set auth hint cookies for SSR
+      setAuthHint(true);
+      setUsernameHint(userData.username);
       
       if (userData.profilePicURL) {
         setProfilePicURL(userData.profilePicURL);
@@ -157,6 +165,11 @@ export function useAuthManager() {
 
     // Set initial authentication state
     isAuthenticatedVar.value = isAuthenticated.value === true;
+    
+    // Set auth hint cookie on initial auth
+    if (isAuthenticated.value === true) {
+      setAuthHint(true);
+    }
 
     // Watch for user changes
     watch(

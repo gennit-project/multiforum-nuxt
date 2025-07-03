@@ -2,6 +2,7 @@
   import { computed, watch, onMounted, ref } from "vue";
   import { useAuth0 } from "@auth0/auth0-vue";
   import { isAuthenticatedVar, setIsLoadingAuth, usernameVar, setIsAuthenticated } from "@/cache";
+  import { useSSRAuth } from "@/composables/useSSRAuth";
 
   /* 
 This component is a wrapper around content that requires authentication.
@@ -34,15 +35,33 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
   let handleLogin = () => {};
 
   const isMounted = ref(false);
+  const { hasAuthHint, usernameHint, setAuthHint } = useSSRAuth();
+  
+  // Remove loading state - we'll render immediately for SEO
+  // const isCheckingAuth = ref(true);
+  
   const isOwner = computed(() => {
     if (!usernameVar.value) return false;
     return props.owners?.includes(usernameVar.value);
   });
+  
   const showAuthContent = computed(() => {
-    // IMPORTANT: During SSR or initial mount, match the server-rendered content
-    // This prevents hydration mismatches
-    if (import.meta.env.SSR || !isMounted.value) {
-      return false; // Assume not authenticated for SSR and initial render
+    // During SSR, use the auth hint cookie
+    if (import.meta.env.SSR) {
+      // If we have an auth hint, show authenticated content
+      if (hasAuthHint.value) {
+        // For ownership checks during SSR, use the username hint
+        if (props.requireOwnership && usernameHint.value) {
+          return props.owners?.includes(usernameHint.value);
+        }
+        return !props.requireOwnership; // Show auth content for non-ownership cases
+      }
+      return false; // No auth hint means not authenticated
+    }
+    
+    // During initial client mount, check auth hint to match SSR
+    if (!isMounted.value) {
+      return hasAuthHint.value && (!props.requireOwnership || props.owners?.includes(usernameHint.value));
     }
 
     // If we have a username, the user is fully authenticated
@@ -285,6 +304,7 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
         // Ensure state is updated
         if (isAuthenticated.value) {
           setIsAuthenticated(true);
+          setAuthHint(true); // Set auth hint cookie after successful login
           console.log("Authentication state updated");
         }
 
@@ -302,32 +322,23 @@ Client After Mount: We check usernameVar.value. If it's non-empty,
     class="flex items-center"
     :class="[fullWidth ? 'w-full' : '', justifyLeft ? 'w-full justify-start' : 'justify-center']"
   >
-    <client-only>
-      <template #fallback>
-        <!-- SSR Fallback - Always show unauthenticated state to prevent hydration mismatch -->
-        <div
-          class="w-full"
-          data-auth-state="unauthenticated"
-        >
-          <slot name="does-not-have-auth" />
-        </div>
-      </template>
-
-      <div class="w-full">
-        <div
-          v-if="!showAuthContent"
-          data-auth-state="unauthenticated"
-          @click="handleLogin"
-        >
-          <slot name="does-not-have-auth" />
-        </div>
-        <div
-          v-else
-          data-auth-state="authenticated"
-        >
-          <slot name="has-auth" />
-        </div>
+    <div class="w-full">
+      <!-- Always render content immediately for SEO, no loading states -->
+      <div
+        v-if="!showAuthContent"
+        class="w-full"
+        data-auth-state="unauthenticated"
+        @click="handleLogin"
+      >
+        <slot name="does-not-have-auth" />
       </div>
-    </client-only>
+      <div
+        v-else
+        class="w-full"
+        data-auth-state="authenticated"
+      >
+        <slot name="has-auth" />
+      </div>
+    </div>
   </div>
 </template>
