@@ -284,6 +284,36 @@ To prevent UI flash and hydration issues, the application uses a two-layer authe
 - **`RequireAuth` component**: Conditionally renders content based on auth state
 - **Auth hint cookies**: `isLoggedIn`, `username`, `modProfileName`
 
+### Important Implementation Details
+
+**Cookie Synchronization Requirements:**
+- Auth hint cookies MUST be updated whenever auth state changes
+- Both login and logout flows must clear/set cookies consistently
+- GraphQL user data fetching should also update auth hints for consistency
+
+**SSR vs Client-side State:**
+- SSR uses ONLY auth hint cookies (no localStorage access)
+- Client-side uses BOTH cookies and localStorage tokens
+- The `RequireAuth` component handles this dual-state checking automatically
+
+**Testing Considerations:**
+- Test auth flows in SSR mode (disable JavaScript) to verify server rendering
+- Test with cleared cookies to ensure proper fallback behavior
+- Verify no hydration mismatches between server and client rendering
+
+**Common Pitfalls to Avoid:**
+- Don't add auth token logic to SSR-rendered components
+- Don't rely on localStorage during initial render
+- Always update auth hints when modifying auth state
+- Ensure cookie domain/path settings work across all deployment environments
+
+### Debugging Auth Issues
+
+1. **UI Flash Problems**: Check if auth hint cookies match actual auth state
+2. **Hydration Errors**: Verify server and client render identical initial state  
+3. **Login/Logout Issues**: Ensure all auth state updates include cookie synchronization
+4. **Missing Auth UI**: Check both cookie and localStorage token presence
+
 ### Benefits
 
 - **No UI Flash**: Server and client render identical initial state
