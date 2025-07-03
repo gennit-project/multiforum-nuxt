@@ -14,6 +14,7 @@ import CancelButton from "@/components/CancelButton.vue";
 import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
+import ModelViewer from "@/components/ModelViewer.vue";
 
 const props = defineProps({
   album: {
@@ -322,6 +323,11 @@ const handleKeyDown = (e: KeyboardEvent) => {
   }
 };
 
+// Check if a URL has a .glb extension
+const hasGlbExtension = (url: string) => {
+  return url?.toLowerCase().endsWith('.glb');
+};
+
 // Custom event handler for mouseup that checks for text editor
 const handleMouseUp = (event: MouseEvent) => {
   // If we're editing a caption and the click is in the editor area, don't close
@@ -479,8 +485,14 @@ const handleTouchEnd = (event: TouchEvent) => {
           class="cursor-pointer"
           @click="openLightbox(idx)"
         >
+          <ModelViewer
+            v-if="image && hasGlbExtension(image.url)"
+            :model-url="image.url"
+            height="200px"
+            width="100%"
+          />
           <img
-            v-if="image"
+            v-else-if="image"
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
@@ -589,8 +601,15 @@ v-if="editingCaptionIndex === idx"
                 class="max-h-96 max-w-96 min-h-10 cursor-pointer"
                 @click="openLightbox(idx)"
               >
+                <ModelViewer
+                  v-if="image && hasGlbExtension(image.url)"
+                  :model-url="image.url"
+                  height="384px"
+                  width="384px"
+                  :class="{ hidden: idx !== activeIndex }"
+                />
                 <img
-                  v-if="image"
+                  v-else-if="image"
                   :src="image.url || ''"
                   :alt="image.alt || ''"
                   class="shadow-sm max-h-96 max-w-96"
@@ -746,7 +765,14 @@ v-if="editingCaptionIndex === idx"
             <LeftArrowIcon class="h-6 w-6" />
           </button>
 
+          <ModelViewer
+            v-if="hasGlbExtension(currentImage.url)"
+            :model-url="currentImage.url"
+            :height="isPanelVisible ? '90%' : '95%'"
+            :width="isPanelVisible ? '90%' : '95%'"
+          />
           <img
+            v-else
             :src="currentImage.url || ''"
             :alt="currentImage.alt || ''"
             class="object-contain transition-all duration-300 ease-in-out"

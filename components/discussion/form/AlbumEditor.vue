@@ -137,6 +137,11 @@ const uploadFile = async (file: File): Promise<boolean> => {
 // Status message for upload feedback
 const uploadStatus = ref('');
 
+// State for URL input form
+const showUrlInput = ref(false);
+const imageUrl = ref('');
+const urlInputError = ref('');
+
 /**
  * Handle uploading multiple files at once
  * Each file is uploaded and added to the album immediately after successful creation
@@ -348,6 +353,53 @@ const updateImageOrderAfterChange = (images: ImageInput[]) => {
   return images.map(img => img.id).filter(id => id !== undefined);
 };
 
+// Function to show URL input form
+const showUrlInputForm = () => {
+  if (isImageLimitReached.value) {
+    alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
+    return;
+  }
+  showUrlInput.value = true;
+  imageUrl.value = '';
+  urlInputError.value = '';
+};
+
+// Function to cancel URL input
+const cancelUrlInput = () => {
+  showUrlInput.value = false;
+  imageUrl.value = '';
+  urlInputError.value = '';
+};
+
+// Function to validate and add image from URL
+const addImageFromUrl = () => {
+  if (!imageUrl.value.trim()) {
+    urlInputError.value = 'Please enter a valid URL';
+    return;
+  }
+  
+  // Basic URL validation
+  try {
+    new URL(imageUrl.value);
+  } catch {
+    urlInputError.value = 'Please enter a valid URL';
+    return;
+  }
+  
+  // Add the image
+  addNewImage({
+    url: imageUrl.value.trim(),
+    alt: '',
+    caption: '',
+    copyright: ''
+  });
+  
+  // Reset form
+  showUrlInput.value = false;
+  imageUrl.value = '';
+  urlInputError.value = '';
+};
+
 /**
  * Adds an image to the album, either from upload or manual URL entry
  */
@@ -494,16 +546,26 @@ const addNewImage = (input: Partial<AddImageInput>) => {
       @dragover="handleDragOver"
     >
       <label for="album-file-input" class="w-full h-full flex flex-col items-center justify-center cursor-pointer">
-        <p class="text-sm text-gray-500 dark:text-gray-300 mb-2">
-          Drag and drop, or tap to add files
+        <p class="text-sm text-gray-500 dark:text-gray-300 mb-3">
+          Drag and drop, tap to add files, or paste a link to an image
         </p>
-        <button 
-          type="button" 
-          class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
-          @click="selectFiles"
-        >
-          Choose Files
-        </button>
+        <div class="flex items-center gap-4">
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+            @click="selectFiles"
+          >
+            Choose Files
+          </button>
+          <div class="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+          <button 
+            type="button" 
+            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            @click="showUrlInputForm"
+          >
+            Link to Image
+          </button>
+        </div>
       </label>
       <input
         id="album-file-input"
@@ -523,12 +585,36 @@ const addNewImage = (input: Partial<AddImageInput>) => {
         Maximum limit of {{ MAX_IMAGES }} images reached
       </p>
     </div>
-    <!-- <button
-      type="button"
-      class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
-      @click="() => addNewImage()"
-    >
-      + Add New Image
-    </button> -->
+    
+    <!-- URL Input Form -->
+    <div v-if="showUrlInput" class="mt-4 p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800">
+      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Add Image from URL</h3>
+      <div class="mb-3">
+        <TextInput
+          label="Image URL"
+          :value="imageUrl"
+          placeholder="https://example.com/image.jpg or https://example.com/model.glb"
+          :full-width="true"
+          @update="(val) => imageUrl = val"
+        />
+        <p v-if="urlInputError" class="text-red-500 text-sm mt-1">{{ urlInputError }}</p>
+      </div>
+      <div class="flex gap-2">
+        <button
+          type="button"
+          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          @click="addImageFromUrl"
+        >
+          Add Image
+        </button>
+        <button
+          type="button"
+          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+          @click="cancelUrlInput"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   </div>
 </template>
