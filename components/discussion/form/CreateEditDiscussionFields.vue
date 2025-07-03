@@ -28,6 +28,7 @@ const props = defineProps<{
   createDiscussionLoading?: boolean;
   updateDiscussionLoading?: boolean;
   channelData?: any;
+  discussion?: any;
 }>();
 
 defineEmits(["submit", "updateFormValues"]);
@@ -142,11 +143,13 @@ onMounted(() => {
                 <DownloadEditForm
                   v-if="formValues"
                   :discussion="
-                    {
-                      id: 'temp-id',
-                      DownloadableFiles: (formValues.downloadableFiles ||
-                        []) as any,
-                    } as any
+                    editMode && discussion
+                      ? discussion
+                      : {
+                          id: 'temp-id',
+                          DownloadableFiles: (formValues.downloadableFiles ||
+                            []) as any,
+                        }
                   "
                   :channel-data="channelData"
                   @close-editor="() => {}"

@@ -116,6 +116,17 @@ export default defineComponent({
             images: orderedImages.value,
             imageOrder: imageOrder.value,
           },
+          downloadableFiles: discussion.value.DownloadableFiles?.map((file) => ({
+            id: file.id || "",
+            fileName: file.fileName || "",
+            url: file.url || "",
+            kind: file.kind || "OTHER",
+            size: file.size || 0,
+            license: file.license?.id || "",
+            priceModel: file.priceModel || "FREE",
+            priceCents: file.priceCents || 0,
+            priceCurrency: file.priceCurrency || "USD",
+          })) || [],
         };
       }
       return {
@@ -128,6 +139,7 @@ export default defineComponent({
           images: [],
           imageOrder: [],
         },
+        downloadableFiles: [],
       };
     };
 
@@ -187,6 +199,17 @@ export default defineComponent({
           images: validImages,
           imageOrder: validImageOrder,
         },
+        downloadableFiles: discussion.DownloadableFiles?.map((file) => ({
+          id: file.id || "",
+          fileName: file.fileName || "",
+          url: file.url || "",
+          kind: file.kind || "OTHER",
+          size: file.size || 0,
+          license: file.license?.id || "",
+          priceModel: file.priceModel || "FREE",
+          priceCents: file.priceCents || 0,
+          priceCurrency: file.priceCurrency || "USD",
+        })) || [],
       };
       formValues.value = formFields;
       dataLoaded.value = true;
@@ -313,7 +336,7 @@ export default defineComponent({
     async submit() {
       this.updateDiscussion();
     },
-    updateFormValues(data: CreateEditDiscussionFormValues) {
+    updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
       const existingValues = this.formValues;
       this.formValues = {
         ...existingValues,
@@ -339,6 +362,7 @@ export default defineComponent({
         :form-values="formValues"
         :update-discussion-loading="updateDiscussionLoading"
         :download-mode="true"
+        :discussion="discussion"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

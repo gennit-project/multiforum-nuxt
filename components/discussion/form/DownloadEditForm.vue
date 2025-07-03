@@ -478,13 +478,34 @@ function handleSave() {
                 class="border border-gray-200 rounded-lg p-4 dark:border-gray-600"
               >
                 <div class="flex items-center justify-between mb-3">
-                  <div>
+                  <div class="flex-1">
                     <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ file.fileName }}</h4>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
                       {{ (file.size / (1024 * 1024)).toFixed(2) }}MB • {{ file.kind }}
                     </p>
+                    <!-- Show URL for existing files (non-editable) -->
+                    <div v-if="file.url" class="mt-2">
+                      <label class="text-xs font-medium text-gray-700 dark:text-gray-300">File URL:</label>
+                      <div class="flex items-center gap-2 mt-1">
+                        <input
+                          :value="file.url"
+                          readonly
+                          class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded px-2 py-1 text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 cursor-not-allowed"
+                          type="text"
+                        >
+                        <button
+                          class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+                          title="Delete this file"
+                          @click="removeFile(index)"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
                   </div>
+                  <!-- For newly uploaded files without URL yet, show regular Remove button -->
                   <button
+                    v-if="!file.url"
                     class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                     @click="removeFile(index)"
                   >
