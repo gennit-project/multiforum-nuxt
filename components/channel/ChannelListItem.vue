@@ -44,8 +44,8 @@ defineEmits(["filterByTag"]);
       />
       <div>
         <h3
-          class="font-bold text-gray-700 dark:text-gray-200"
           v-if="channel.displayName"
+          class="font-bold text-gray-700 dark:text-gray-200"
         >
           <HighlightedSearchTerms
             :text="channel.displayName"
@@ -61,8 +61,8 @@ defineEmits(["filterByTag"]);
       </div>
     </nuxt-link>
     <p
-      class="text-gray-500 dark:text-gray-400 text-sm mb-2"
       v-if="channel.description"
+      class="text-gray-500 dark:text-gray-400 text-sm mb-2"
     >
       <HighlightedSearchTerms
         :text="channel.description"

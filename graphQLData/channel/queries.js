@@ -265,7 +265,11 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
 `;
 
 
-const now = DateTime.now().toISO();
+// Round down to nearest 10 seconds to ensure SSR and client use same timestamp
+const now = DateTime.now().set({ 
+  second: Math.floor(DateTime.now().second / 10) * 10, 
+  millisecond: 0 
+}).toISO();
 
 export const GET_CHANNELS = gql`
   query getSortedChannels(
