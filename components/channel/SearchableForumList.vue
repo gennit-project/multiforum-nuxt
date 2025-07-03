@@ -119,7 +119,7 @@ const updateSearchResult = (input: string) => {
       @keydown.enter.prevent
       @update-search-input="updateSearchResult"
     />
-    <div v-if="channelsLoading && regularChannels.length === 0">Loading...</div>
+    <div v-if="channelsLoading && regularChannels?.length === 0">Loading...</div>
     <div v-else-if="channelsError">
       <div v-for="(error, i) of channelsError?.graphQLErrors" :key="i">
         {{ error.message }}
