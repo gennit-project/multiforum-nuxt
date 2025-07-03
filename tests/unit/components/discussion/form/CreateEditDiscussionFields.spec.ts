@@ -128,6 +128,7 @@ describe('CreateEditDiscussionFields Component', () => {
     return mount(CreateEditDiscussionFields, {
       props: {
         editMode,
+        downloadMode: false,
         createDiscussionError: null,
         formValues,
         getDiscussionError: null,
@@ -236,7 +237,7 @@ describe('CreateEditDiscussionFields Component', () => {
       const wrapper = mountComponent(defaultFormValues, false);
       
       // Access the form title directly through the component's computed property
-      expect(wrapper.vm.formTitle).toBe('Start Discussion');
+      expect(wrapper.vm.formTitle).toBe('Create Discussion');
     });
 
     it('renders the correct form title for edit mode', async () => {
@@ -250,6 +251,7 @@ describe('CreateEditDiscussionFields Component', () => {
       const wrapper = mount(CreateEditDiscussionFields, {
         props: {
           editMode: false,
+          downloadMode: false,
           createDiscussionError: null,
           formValues: defaultFormValues,
           getDiscussionError: null,
@@ -276,6 +278,7 @@ describe('CreateEditDiscussionFields Component', () => {
       const wrapper = mount(CreateEditDiscussionFields, {
         props: {
           editMode: true,
+          downloadMode: false,
           createDiscussionError: null,
           formValues: defaultFormValues,
           getDiscussionError: { 
@@ -305,6 +308,7 @@ describe('CreateEditDiscussionFields Component', () => {
       const wrapper = mount(CreateEditDiscussionFields, {
         props: {
           editMode: false,
+          downloadMode: false,
           createDiscussionError: { message: errorMessage },
           formValues: defaultFormValues,
           getDiscussionError: null,
@@ -370,6 +374,7 @@ describe('CreateEditDiscussionFields Component', () => {
       const wrapper = mount(CreateEditDiscussionFields, {
         props: {
           editMode: false,
+          downloadMode: false,
           createDiscussionError: null,
           formValues: {
             ...defaultFormValues,
@@ -391,7 +396,7 @@ describe('CreateEditDiscussionFields Component', () => {
         }
       });
       
-      expect(wrapper.vm.formTitle).toBe('Start Discussion');
+      expect(wrapper.vm.formTitle).toBe('Create Discussion');
       expect(wrapper.props('createDiscussionLoading')).toBe(true);
     });
 

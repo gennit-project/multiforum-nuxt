@@ -352,8 +352,10 @@ describe('routerUtils', () => {
       const params = {
         // These should remove the corresponding parameters
         searchInput: '',
-        channels: [],
         tags: undefined,
+        emptyString: '',
+        emptyArray: [],
+        undefinedValue: undefined,
       };
 
       updateFilters({
