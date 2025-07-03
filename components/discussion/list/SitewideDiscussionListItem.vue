@@ -7,6 +7,7 @@ import type {
   DiscussionChannel,
   Tag,
 } from "@/__generated__/graphql";
+import { safeArrayFirst } from "@/utils/ssrSafetyUtils";
 import TagComponent from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
@@ -51,7 +52,8 @@ const route = useRoute();
 
 const forumId = computed(() => {
   if (!props.discussion) return "";
-  return props.discussion.DiscussionChannels[0].channelUniqueName;
+  const firstChannel = safeArrayFirst(props.discussion.DiscussionChannels);
+  return firstChannel?.channelUniqueName || "";
 })
 
 // UI state is now handled via props
@@ -159,12 +161,12 @@ const revealSensitiveContent = () => {
         >
           <div class="flex items-center text-orange-700 dark:text-white">
             <AvatarComponent
-              :text="discussion.DiscussionChannels[0].channelUniqueName || ''"
+              :text="discussion.DiscussionChannels?.[0]?.channelUniqueName || ''"
               :is-square="true"
               class="mr-1 h-6 w-6"
             />
             <span>{{
-              discussion.DiscussionChannels[0].channelUniqueName || ""
+              discussion.DiscussionChannels?.[0]?.channelUniqueName || ""
             }}</span>
           </div>
         </nuxt-link>
@@ -174,7 +176,7 @@ const revealSensitiveContent = () => {
               v-if="discussion"
               :to="
                 getDetailLink(
-                  discussion.DiscussionChannels[0].channelUniqueName
+                  discussion.DiscussionChannels?.[0]?.channelUniqueName
                 )
               "
             >
@@ -198,7 +200,7 @@ const revealSensitiveContent = () => {
                 <!-- Comment count -->
                 <nuxt-link
                   v-if="discussion && !submittedToMultipleChannels"
-                  :to="getDetailLink(discussion.DiscussionChannels[0].channelUniqueName)"
+                  :to="getDetailLink(discussion.DiscussionChannels?.[0]?.channelUniqueName)"
                   class="inline"
                 >
                   {{ commentCount }} {{ commentCount === 1 ? "comment" : "comments" }}

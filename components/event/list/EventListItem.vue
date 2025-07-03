@@ -56,7 +56,7 @@ const defaultUniqueName = computed(() => {
     return props.currentChannelId;
   }
   if (props.event.EventChannels.length > 0) {
-    return props.event.EventChannels[0].channelUniqueName || "";
+    return props.event.EventChannels?.[0]?.channelUniqueName || "";
   }
   return "";
 });
@@ -303,7 +303,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
                 `${commentCount}`
               }}</span>
               <span v-if="!isWithinChannel" class="ml-1 text-xs">{{
-                `in c/${event.EventChannels[0].channelUniqueName}`
+                `in c/${event.EventChannels?.[0]?.channelUniqueName}`
               }}</span>
             </button>
           </nuxt-link>

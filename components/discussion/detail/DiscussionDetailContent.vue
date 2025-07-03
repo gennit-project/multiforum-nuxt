@@ -233,12 +233,12 @@ const loadMore = () => {
   fetchMoreComments({
     variables: {
       offset:
-        getDiscussionChannelResult.value?.getCommentSection?.Comments.length ||
+        getDiscussionChannelResult.value?.getCommentSection?.Comments?.length ||
         0,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
-      offset.value += fetchMoreResult.getCommentSection.Comments.length;
+      offset.value += fetchMoreResult.getCommentSection?.Comments?.length || 0;
       return {
         ...previousResult,
         getCommentSection: {

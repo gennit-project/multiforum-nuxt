@@ -62,7 +62,7 @@ const needsChanges = computed(() => {
 const changesRequiredMessage = computed(() => {
   if (!props.formValues?.title) {
     return "A title is required.";
-  } else if (props.formValues?.selectedChannels.length === 0) {
+  } else if (props.formValues?.selectedChannels?.length === 0) {
     return "Must select at least one channel.";
   } else if (props.formValues?.body?.length > MAX_CHARS_IN_DISCUSSION_BODY) {
     return `Body cannot exceed ${MAX_CHARS_IN_DISCUSSION_BODY} characters.`;

@@ -342,7 +342,7 @@ const updateLicense = (fileIndex: number, licenseId: string) => {
 
 function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   // 1) If no downloadable files exist yet in the original discussion, CREATE connections
-  if (!props.discussion?.DownloadableFiles || props.discussion.DownloadableFiles.length === 0) {
+  if (!props.discussion?.DownloadableFiles || props.discussion.DownloadableFiles?.length === 0) {
     const newFiles = formValues.value.downloadableFiles || [];
     
     // Build connect array for new files
