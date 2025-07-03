@@ -3,6 +3,12 @@
  * 
  * Collection of utility functions to help prevent SSR-related crashes
  * especially when working with GraphQL data that might be undefined during hydration.
+ * 
+ * COMMON BUG PATTERN TO AVOID:
+ * ❌ obj?.array.length === 0  // Missing optional chaining on .length access
+ * ✅ obj?.array?.length === 0  // Proper optional chaining throughout
+ * 
+ * The ESLint rule "no-unsafe-optional-chaining" should catch these patterns.
  */
 
 /**

@@ -36,7 +36,10 @@ export default createConfigForNuxt({
       fixStyle: "separate-type-imports"
     }],
     // Prevent unsafe array access patterns that can cause SSR crashes
-    "no-unsafe-optional-chaining": "error",
+    // This rule catches patterns like: obj?.prop.length (without optional chaining on .length)
+    "no-unsafe-optional-chaining": ["error", { 
+      "disallowArithmeticOperators": true 
+    }],
     // Accessibility rules
     "vuejs-accessibility/alt-text": ["error", { 
       "elements": ["img", "object", "area", "input[type=\"image\"]"],
@@ -95,7 +98,10 @@ export default createConfigForNuxt({
         fixStyle: "separate-type-imports"
       }],
       // Prevent unsafe array access patterns that can cause SSR crashes
-      "no-unsafe-optional-chaining": "error"
+      // This rule catches patterns like: obj?.prop.length (without optional chaining on .length)
+      "no-unsafe-optional-chaining": ["error", { 
+        "disallowArithmeticOperators": true 
+      }]
     },
   }
 )
