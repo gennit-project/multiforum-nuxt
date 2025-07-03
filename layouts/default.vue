@@ -19,7 +19,7 @@ const showFooter = !route.name?.includes("map");
 // UI state management
 const showUserProfileDropdown = ref(false);
 const toggleDropdown = () => setSideNavIsOpenVar(!sideNavIsOpenVar.value);
-const toggleUserProfileDropdown = () => 
+const toggleUserProfileDropdown = () =>
   (showUserProfileDropdown.value = !showUserProfileDropdown.value);
 const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
 
@@ -27,9 +27,10 @@ const closeUserProfileDropdown = () => (showUserProfileDropdown.value = false);
 const { isSessionExpired, loginWithRedirect } = useAuthManager();
 
 // Test helpers (only in dev/test environments)
-const shouldExposeTestHelpers = isDevelopment.value || 
-  config.environment === "test" || 
-  (typeof window !== 'undefined' && (window as any).Cypress);
+const shouldExposeTestHelpers =
+  isDevelopment.value ||
+  config.environment === "test" ||
+  (typeof window !== "undefined" && (window as any).Cypress);
 
 if (shouldExposeTestHelpers) {
   useTestAuthHelpers();
@@ -61,7 +62,9 @@ const handleSessionExpiredLogin = () => {
         </button>
       </div>
 
-      <div class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200">
+      <div
+        class="flex flex-grow list-disc flex-col bg-gray-200 dark:bg-black dark:text-gray-200"
+      >
         <TopNav
           :show-user-profile-dropdown="showUserProfileDropdown"
           :side-nav-is-open="sideNavIsOpenVar"
@@ -69,27 +72,18 @@ const handleSessionExpiredLogin = () => {
           @toggle-dropdown="toggleDropdown"
           @toggle-user-profile-dropdown="toggleUserProfileDropdown"
         />
-        
+
         <div class="relative flex flex-grow flex-col">
           <SiteSidenav
             :key="`${sideNavIsOpenVar}`"
             :show-dropdown="sideNavIsOpenVar"
             @close="setSideNavIsOpenVar(false)"
           />
-          
-          <client-only>
-            <template #fallback>
-              <div class="flex w-full flex-grow flex-col">
-                <slot />
-                <SiteFooter v-if="showFooter" class="mt-auto" />
-              </div>
-            </template>
-            
-            <div class="flex w-full flex-grow flex-col">
-              <slot />
-              <SiteFooter v-if="showFooter" class="mt-auto" />
-            </div>
-          </client-only>
+
+          <div class="flex w-full flex-grow flex-col">
+            <slot />
+            <SiteFooter v-if="showFooter" class="mt-auto" />
+          </div>
         </div>
       </div>
     </main>
