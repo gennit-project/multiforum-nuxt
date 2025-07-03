@@ -235,6 +235,63 @@ On the backend (https://github.com/gennit-project/multiforum-backend), an Apollo
 
 The frontend is a Vue application that makes GraphQL queries to the Apollo server.
 
+## Authentication System
+
+Multiforum uses a hybrid authentication system that combines Auth0 for secure authentication with SSR-compatible auth hints for optimal user experience.
+
+### SSR Auth State Management
+
+To prevent UI flash and hydration issues, the application uses a two-layer authentication approach:
+
+1. **Auth Hint Cookies (SSR-compatible)**
+   - Non-sensitive cookies that indicate whether a user is logged in
+   - Can be read during Server-Side Rendering (SSR) for immediate auth state
+   - Ensures server and client render the same initial state
+   - Prevents the brief "blackout" flash when switching between auth states
+
+2. **Secure Auth Tokens (Client-side)**
+   - JWT tokens stored in localStorage for secure API calls
+   - Contains full user authentication data
+   - Used for actual authorization and API requests
+
+### How It Works
+
+1. **Login Flow**:
+   - User authenticates through Auth0
+   - Auth hint cookie is set (indicates "logged in" state)
+   - Auth token is stored in localStorage
+   - User data is fetched and cached
+
+2. **SSR Rendering**:
+   - Server reads auth hint cookies during SSR
+   - Renders appropriate UI state (logged in vs logged out)
+   - Client hydrates with matching state, preventing flash
+
+3. **Client-side Operation**:
+   - App checks for auth tokens in localStorage
+   - Makes authenticated GraphQL requests
+   - Maintains reactive auth state throughout the session
+
+4. **Logout Flow**:
+   - Auth hint cookies are cleared
+   - localStorage tokens are removed
+   - User is redirected to appropriate page
+
+### Key Components
+
+- **`useSSRAuth` composable**: Manages auth hint cookies and SSR state
+- **`useAuthManager` composable**: Handles secure auth tokens and user data
+- **`RequireAuth` component**: Conditionally renders content based on auth state
+- **Auth hint cookies**: `isLoggedIn`, `username`, `modProfileName`
+
+### Benefits
+
+- **No UI Flash**: Server and client render identical initial state
+- **SEO Friendly**: Public content is fully visible to search engines
+- **Fast Loading**: No loading states that delay content visibility
+- **Secure**: Sensitive data remains in secure client-side storage
+- **Reliable**: Handles edge cases like expired tokens gracefully
+
 ## Performance Optimizations
 
 We have implemented several performance optimizations to improve load times, reduce bandwidth usage, and enhance the user experience. See [PERFORMANCE.md](./PERFORMANCE.md) for details on:

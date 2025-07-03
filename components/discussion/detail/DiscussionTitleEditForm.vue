@@ -128,12 +128,29 @@ const isDownloadDetailPage = computed(() => {
     <div
       class="mb-3 mt-4 w-full flex flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
-      <v-skeleton-loader
-        v-if="getDiscussionLoading"
-        class="flex-1"
-        type="text"
-        :theme="theme"
-      />
+      <div v-if="getDiscussionLoading" class="flex-1">
+        <!-- Title skeleton -->
+        <v-skeleton-loader
+          class="mb-2"
+          type="text"
+          :theme="theme"
+        />
+        <!-- Back button and info text skeleton -->
+        <div class="ml-1 mt-1 flex items-center space-x-2">
+          <v-skeleton-loader
+            class="flex-1"
+            type="text"
+            :theme="theme"
+          />
+        </div>
+      </div>
+      <!-- Primary button skeleton -->
+      <div v-if="getDiscussionLoading" class="hidden md:block">
+        <v-skeleton-loader
+          type="button"
+          :theme="theme"
+        />
+      </div>
       <div v-else ref="discussionDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
