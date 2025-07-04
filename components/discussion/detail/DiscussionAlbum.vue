@@ -650,8 +650,9 @@ v-if="editingCaptionIndex === idx"
                     'w-full h-auto': expandedView
                   }"
                   :style="{
-                    maxHeight: expandedView ? '70vh' : '384px',
-                    aspectRatio: expandedView ? 'auto' : '1/1'
+                    aspectRatio: '3/2',
+                    maxWidth: expandedView ? '800px' : '384px',
+                    maxHeight: expandedView ? '533px' : '256px'
                   }"
                 >
                 <div 
@@ -724,7 +725,7 @@ v-if="editingCaptionIndex === idx"
     <!-- Custom lightbox with split layout -->
     <div
       v-if="isLightboxOpen"
-      class="fixed top-0 left-0 w-full bg-black z-50 transition-all duration-300 ease-in-out"
+      class="fixed top-0 left-0 w-full h-full bg-black z-50 transition-all duration-300 ease-in-out"
       :class="{
         'flex-col': mdAndDown,
         flex: true,
@@ -735,7 +736,7 @@ v-if="editingCaptionIndex === idx"
         class="flex flex-col relative transition-all duration-300 ease-in-out z-40 overflow-hidden"
         :class="{
           'w-3/4 h-full': !mdAndDown && isPanelVisible,
-          'w-full': mdAndDown || !isPanelVisible,
+          'w-full h-full': mdAndDown || !isPanelVisible,
         }"
       >
         <div class="flex justify-between items-center p-2 px-5 text-white z-50">
@@ -844,14 +845,10 @@ v-if="editingCaptionIndex === idx"
             v-else
             :src="currentImage.url || ''"
             :alt="currentImage.alt || ''"
-            class="object-contain transition-all duration-300 ease-in-out"
+            class="object-contain transition-all duration-300 ease-in-out w-full h-full"
             :style="{
               transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
-            }"
-            :class="{
-              'max-h-[90%] max-w-[90%]': isPanelVisible && !isZoomed,
-              'max-h-[95%] max-w-[95%]': !isPanelVisible && !isZoomed,
             }"
             @mousedown="startDrag"
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
