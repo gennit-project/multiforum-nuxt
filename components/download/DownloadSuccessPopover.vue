@@ -6,10 +6,11 @@ import CloseIcon from '@/components/icons/CloseIcon.vue';
 import DownloadFileIcon from '@/components/icons/DownloadFileIcon.vue';
 import TwitterIcon from '@/components/icons/TwitterIcon.vue';
 import FacebookIcon from '@/components/icons/FacebookIcon.vue';
-import LinkedInIcon from '@/components/icons/LinkedInIcon.vue';
 import RedditIcon from '@/components/icons/RedditIcon.vue';
 import DiscordIcon from '@/components/icons/DiscordIcon.vue';
 import BlueskyIcon from '@/components/icons/BlueskyIcon.vue';
+import PinterestIcon from '@/components/icons/PinterestIcon.vue';
+import TumblrIcon from '@/components/icons/TumblrIcon.vue';
 import CopyIcon from '@/components/icons/CopyIcon.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 
@@ -74,10 +75,15 @@ const shareToFacebook = () => {
   window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank', 'width=550,height=420');
 };
 
-const shareToLinkedIn = () => {
+const shareToPinterest = () => {
   const url = encodeURIComponent(shareUrl.value);
-  const title = encodeURIComponent(props.discussion.title);
-  window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}&title=${title}`, '_blank', 'width=550,height=420');
+  const description = encodeURIComponent(`Check out this download: ${props.discussion.title}`);
+  window.open(`https://pinterest.com/pin/create/button/?url=${url}&description=${description}`, '_blank', 'width=550,height=420');
+};
+
+const shareToTumblr = () => {
+  const url = encodeURIComponent(shareUrl.value);
+  window.open(`https://www.tumblr.com/widgets/share/tool?shareSource=legacy&canonicalUrl=${url}&posttype=link`, '_blank', 'width=550,height=420');
 };
 
 const shareToReddit = () => {
@@ -179,11 +185,18 @@ const copyLink = async () => {
                   Facebook
                 </button>
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-blue-700 hover:bg-blue-800 text-white rounded-md transition-colors whitespace-nowrap"
-                  @click="shareToLinkedIn"
+                  class="flex items-center px-3 py-1.5 text-xs bg-red-600 hover:bg-red-700 text-white rounded-md transition-colors whitespace-nowrap"
+                  @click="shareToPinterest"
                 >
-                  <LinkedInIcon />
-                  LinkedIn
+                  <PinterestIcon />
+                  Pinterest
+                </button>
+                <button
+                  class="flex items-center px-3 py-1.5 text-xs bg-indigo-800 hover:bg-indigo-900 text-white rounded-md transition-colors whitespace-nowrap"
+                  @click="shareToTumblr"
+                >
+                  <TumblrIcon />
+                  Tumblr
                 </button>
                 <button
                   class="flex items-center px-3 py-1.5 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded-md transition-colors whitespace-nowrap"
