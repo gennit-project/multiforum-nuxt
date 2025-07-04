@@ -1,5 +1,5 @@
 <template>
-  <div class="model-viewer-container relative border">
+  <div class="model-viewer-container relative border" :class="props.class" :style="props.style">
     <!-- Fullscreen button -->
     <button
       v-if="showFullscreenButton !== false"
@@ -23,8 +23,8 @@
     </button>
 
     <model-viewer
-      v-if="modelUrl"
-      :src="modelUrl"
+      v-if="props.modelUrl"
+      :src="props.modelUrl"
       alt="3D Model Preview"
       auto-rotate
       camera-controls
@@ -33,8 +33,8 @@
       environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
       tone-mapping="neutral"
       :style="{
-        width: width || '100%',
-        height: height || '300px',
+        width: props.width || '100%',
+        height: props.height || '300px',
         borderRadius: '8px'
       }"
     />
@@ -75,7 +75,7 @@
       >
         <model-viewer
           :src="
-            modelUrl ||
+            props.modelUrl ||
             'https://storage.googleapis.com/listical-dev/models/Tiny_Khopesh_Warrior_Posed_and_Rigged.glb'
           "
           alt="3D Model Preview - Fullscreen"
@@ -94,11 +94,13 @@
 <script setup lang="ts">
   import { onMounted, onUnmounted, ref } from "vue";
 
-  defineProps<{
+  const props = defineProps<{
     modelUrl?: string;
     height?: string;
     width?: string;
     showFullscreenButton?: boolean;
+    class?: string;
+    style?: Record<string, any>;
   }>();
 
   const isFullscreen = ref(false);

@@ -845,8 +845,17 @@ v-if="editingCaptionIndex === idx"
           <ModelViewer
             v-if="currentImage && currentImage.url && hasGlbExtension(currentImage.url)"
             :model-url="currentImage.url"
-            :height="isPanelVisible ? '90%' : '95%'"
-            :width="isPanelVisible ? '90%' : '95%'"
+            height="100%"
+            width="100%"
+            class="object-contain transition-all duration-300 ease-in-out w-full h-full"
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
+              cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
+            }"
+            @mousedown="startDrag"
+            @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
+            @touchend="isZoomed ? undefined : handleTouchEnd"
+            @touchmove="isZoomed ? onTouchDrag : undefined"
           />
           <img
             v-else
