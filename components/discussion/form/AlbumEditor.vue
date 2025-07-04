@@ -11,6 +11,8 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import FormRow from "@/components/FormRow.vue";
 import { useDisplay } from "vuetify";
 import ExpandableImage from "@/components/ExpandableImage.vue";
+import ModelViewer from "@/components/ModelViewer.vue";
+import StlViewer from "@/components/download/StlViewer.vue";
 import { isFileSizeValid } from "@/utils/index";
 
 const props = defineProps<{
@@ -680,6 +682,15 @@ const debouncedAutoSave = () => {
   }, 500); // 500ms debounce
 };
 
+// File type detection functions (copied from DiscussionAlbum)
+const hasGlbExtension = (url: string) => {
+  return url?.toLowerCase().endsWith('.glb');
+};
+
+const hasStlExtension = (url: string) => {
+  return url?.toLowerCase().endsWith('.stl');
+};
+
 </script>
 
 <template>
@@ -761,8 +772,22 @@ const debouncedAutoSave = () => {
 
       <div :class="[mdAndDown ? 'flex-col' : 'flex', 'gap-2']">
         <div>
+          <ModelViewer
+            v-if="image.url && hasGlbExtension(image.url)"
+            :model-url="image.url"
+            height="288px"
+            width="288px"
+            class="w-72"
+          />
+          <StlViewer
+            v-else-if="image.url && hasStlExtension(image.url)"
+            :src="image.url"
+            :width="288"
+            :height="288"
+            class="w-72"
+          />
           <ExpandableImage
-            v-if="image.url"
+            v-else-if="image.url"
             class="w-72 object-cover"
             :src="image.url"
             :alt="image.alt"
