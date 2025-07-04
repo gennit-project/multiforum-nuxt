@@ -41,6 +41,10 @@ const props = defineProps({
     type: Boolean,
     default: false, // Default to false for backward compatibility
   },
+  startInLightbox: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 // Use Vuetify's display utilities for responsive design
@@ -101,7 +105,7 @@ const isLoggedInAuthor = computed(() => {
 const { mutate: updateImage, loading: updateLoading } = useMutation(UPDATE_IMAGE);
 
 // Events emitted by this component
-const emit = defineEmits(["album-updated", "edit-album"]);
+const emit = defineEmits(["album-updated", "edit-album", "close-lightbox"]);
 
 const startEditingCaption = (index: number) => {
   // Set which image we're editing and initialize with current caption
@@ -279,6 +283,9 @@ const closeLightbox = () => {
   zoomLevel.value = 1; // Reset zoom when closing
   resetTranslation(); // Reset position when closing
   document.body.style.overflow = ""; // Restore scrolling
+  
+  // Emit close event for parent components
+  emit("close-lightbox");
 };
 
 const nextImage = () => {
@@ -381,6 +388,11 @@ onMounted(() => {
   // Touch events for mobile
   window.addEventListener("touchend", stopDrag);
   window.addEventListener("touchcancel", stopDrag);
+  
+  // Start in lightbox mode if prop is set
+  if (props.startInLightbox && orderedImages.value.length > 0) {
+    openLightbox(0);
+  }
 });
 
 onUnmounted(() => {
@@ -495,7 +507,7 @@ const handleTouchEnd = (event: TouchEvent) => {
 <template>
   <div class="w-full">
     <!-- Normal thumbnail grid view -->
-    <div v-if="!isLightboxOpen" class="overflow-x-auto border">
+    <div v-if="!isLightboxOpen && !startInLightbox" class="overflow-x-auto border">
 
       <!-- Grid view -->
       <div
@@ -510,7 +522,7 @@ const handleTouchEnd = (event: TouchEvent) => {
         >
           <ModelViewer
             v-if="image && hasGlbExtension(image.url)"
-            :model-url="image.url"
+            :model-url="image.url || ''"
             height="200px"
             width="100%"
             class="shadow-sm"
@@ -634,8 +646,8 @@ v-if="editingCaptionIndex === idx"
                 @click="openLightbox(idx)"
               >
                 <ModelViewer
-                  v-if="image && hasGlbExtension(image.url) && idx === activeIndex"
-                  :model-url="image.url || ''"
+                  v-if="image && image.url && hasGlbExtension(image.url) && idx === activeIndex"
+                  :model-url="image.url"
                   :height="expandedView ? '533px' : '256px'"
                   :width="expandedView ? '800px' : '384px'"
                   class="shadow-sm object-contain"
@@ -711,8 +723,8 @@ v-if="editingCaptionIndex === idx"
               @click="activeIndex = idx"
             >
               <ModelViewer
-                v-if="image && hasGlbExtension(image.url)"
-                :model-url="image.url || ''"
+                v-if="image && image.url && hasGlbExtension(image.url)"
+                :model-url="image.url"
                 height="80px"
                 width="80px"
                 class="rounded"

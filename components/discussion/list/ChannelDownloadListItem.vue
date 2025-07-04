@@ -10,6 +10,7 @@
   import { relativeTime } from "@/utils";
   import type { Discussion, DiscussionChannel, Tag } from "@/__generated__/graphql";
   import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
+  import ImageIcon from "@/components/icons/ImageIcon.vue";
   import { storeToRefs } from "pinia";
   import { useUIStore } from "@/stores/uiStore";
 
@@ -41,7 +42,7 @@
     },
   });
 
-  defineEmits(["filterByTag"]);
+  defineEmits(["filterByTag", "openAlbum"]);
 
   const route = useRoute();
   const uiStore = useUIStore();
@@ -80,9 +81,20 @@
   const relativeTimeAgo = computed(() => relativeTime(props.discussionChannel.createdAt));
   const tags = computed(() => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []);
 
-  // Get the first image from the album if available
+  // Get the first image from the album if available, respecting imageOrder
   const firstAlbumImage = computed(() => {
-    return props.discussion?.Album?.Images?.[0]?.url || null;
+    const album = props.discussion?.Album;
+    if (!album?.Images?.length) return null;
+    
+    // If imageOrder exists and has items, use the first ordered image
+    if (album.imageOrder?.length > 0) {
+      const firstImageId = album.imageOrder[0];
+      const orderedImage = album.Images.find(img => img.id === firstImageId);
+      return orderedImage?.url || null;
+    }
+    
+    // Fallback to first image in the Images array
+    return album.Images[0]?.url || null;
   });
 
   const filteredQuery = computed(() => {
@@ -101,32 +113,44 @@
         v-if="discussion"
         class="w-full flex-col"
       >
-        <nuxt-link
-          class="mb-1 flex w-full items-center gap-2"
-          :to="{
-            name: 'forums-forumId-downloads-discussionId',
-            params: {
-              forumId: defaultUniqueName,
-              discussionId: discussionChannel.discussionId,
-            },
-            query: filteredQuery,
-          }"
-        >
-          <div class="aspect-square w-full overflow-hidden border bg-gray-100 dark:bg-gray-700">
-            <img
-              v-if="firstAlbumImage"
-              :src="firstAlbumImage"
-              :alt="title"
-              class="h-full w-full object-cover"
-            >
-            <div
-              v-else
-              class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
-            >
-              No image available
+        <div class="relative mb-1">
+          <nuxt-link
+            class="flex w-full items-center gap-2"
+            :to="{
+              name: 'forums-forumId-downloads-discussionId',
+              params: {
+                forumId: defaultUniqueName,
+                discussionId: discussionChannel.discussionId,
+              },
+              query: filteredQuery,
+            }"
+          >
+            <div class="aspect-square w-full overflow-hidden border bg-gray-100 dark:bg-gray-700">
+              <img
+                v-if="firstAlbumImage"
+                :src="firstAlbumImage"
+                :alt="title"
+                class="h-full w-full object-cover"
+              >
+              <div
+                v-else
+                class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
+              >
+                No image available
+              </div>
             </div>
-          </div>
-        </nuxt-link>
+          </nuxt-link>
+          
+          <!-- Album View Button -->
+          <button
+            v-if="discussion?.Album?.Images?.length > 0"
+            class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
+            title="View album"
+            @click.stop="$emit('openAlbum', { discussion, album: discussion?.Album })"
+          >
+            <ImageIcon class="h-4 w-4" />
+          </button>
+        </div>
         <div class="flex gap-3">
           <div class="w-full flex-col">
             <div>

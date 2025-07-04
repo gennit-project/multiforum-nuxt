@@ -8,10 +8,12 @@
   import LoadMore from "../LoadMore.vue";
   import ErrorBanner from "../ErrorBanner.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
   import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
   import { usernameVar } from "@/cache";
   import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
   import { getSortFromQuery, getTimeFrameFromQuery } from "@/components/comments/getSortFromQuery";
+  import type { Discussion, Album } from "@/__generated__/graphql";
 
   const DOWNLOAD_PAGE_LIMIT = 25;
 
@@ -118,6 +120,25 @@
 
   const showModProfileModal = ref(false);
 
+  // Album lightbox state
+  type AlbumData = {
+    discussion: Discussion;
+    album: Album;
+  };
+  
+  const openAlbumData = ref<AlbumData | null>(null);
+  const isAlbumLightboxOpen = ref(false);
+
+  const handleOpenAlbum = (albumData: AlbumData) => {
+    openAlbumData.value = albumData;
+    isAlbumLightboxOpen.value = true;
+  };
+
+  const handleCloseAlbum = () => {
+    openAlbumData.value = null;
+    isAlbumLightboxOpen.value = false;
+  };
+
   onMounted(() => {
     if (downloadChannelResult.value?.getDiscussionsInChannel.discussionChannels.length === 0) {
       refetchDownloads();
@@ -212,6 +233,7 @@
         @filter-by-channel="filterByChannel"
         @filter-by-tag="filterByTag"
         @open-mod-profile="showModProfileModal = true"
+        @open-album="handleOpenAlbum"
       />
     </div>
     <div v-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0">
@@ -222,5 +244,16 @@
         @load-more="loadMore"
       />
     </div>
+    
+    <!-- Album Lightbox -->
+    <DiscussionAlbum
+      v-if="isAlbumLightboxOpen && openAlbumData?.album"
+      :album="openAlbumData.album"
+      :discussion-id="openAlbumData.discussion?.id || ''"
+      :discussion-author="openAlbumData.discussion?.Author?.username || ''"
+      :show-edit-album="false"
+      :start-in-lightbox="true"
+      @close-lightbox="handleCloseAlbum"
+    />
   </div>
 </template>
