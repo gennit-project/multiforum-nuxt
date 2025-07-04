@@ -8,6 +8,7 @@ import XmarkIcon from "@/components/icons/XmarkIcon.vue";
 import TextInput from "@/components/TextInput.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import FormRow from "@/components/FormRow.vue";
 import { useDisplay } from "vuetify";
 import ExpandableImage from "@/components/ExpandableImage.vue";
 import { isFileSizeValid } from "@/utils/index";
@@ -767,31 +768,43 @@ const debouncedAutoSave = () => {
             :alt="image.alt"
           />
         </div>
-        <div class="flex-col gap-2 flex-1">
-          <TextInput
-            class="mt-2"
-            label="Image URL"
-            :value="image.url"
-            placeholder="https://example.com/my-image.jpg"
-            :full-width="true"
-            @update="(val) => updateImageField(index, 'url', val)"
-          />
-          <TextInput
-            class="mt-2"
-            label="Caption"
-            :value="image.caption"
-            placeholder="Short caption or description"
-            :full-width="true"
-            @update="(val) => updateImageField(index, 'caption', val)"
-          />
-          <TextInput
-            class="mt-2"
-            label="Attribution/Copyright"
-            :value="image.copyright"
-            placeholder="Who took this photo? (optional)"
-            :full-width="true"
-            @update="(val) => updateImageField(index, 'copyright', val)"
-          />
+        <div class="flex-col flex-1">
+          <FormRow section-title="Image URL">
+            <template #content>
+              <TextInput
+                :value="image.url"
+                placeholder="https://example.com/my-image.jpg"
+                @update="(val) => updateImageField(index, 'url', val)"
+              />
+            </template>
+          </FormRow>
+          <FormRow section-title="Alt Text">
+            <template #content>
+              <TextInput
+                :value="image.alt"
+                placeholder="Describe the image for accessibility"
+                @update="(val) => updateImageField(index, 'alt', val)"
+              />
+            </template>
+          </FormRow>
+          <FormRow section-title="Caption">
+            <template #content>
+              <TextInput
+                :value="image.caption"
+                placeholder="Short caption or description"
+                @update="(val) => updateImageField(index, 'caption', val)"
+              />
+            </template>
+          </FormRow>
+          <FormRow section-title="Attribution/Copyright">
+            <template #content>
+              <TextInput
+                :value="image.copyright"
+                placeholder="Who took this photo? (optional)"
+                @update="(val) => updateImageField(index, 'copyright', val)"
+              />
+            </template>
+          </FormRow>
         </div>
       </div>
     </div>
@@ -813,7 +826,7 @@ const debouncedAutoSave = () => {
           >
             Choose Files
           </button>
-          <div class="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
+          <div class="h-6 w-px bg-gray-300 dark:bg-gray-600" />
           <button 
             type="button" 
             class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 transition-colors"
@@ -846,14 +859,16 @@ const debouncedAutoSave = () => {
     <div v-if="showUrlInput" class="mt-4 p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800">
       <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Add Image from URL</h3>
       <div class="mb-3">
-        <TextInput
-          ref="urlInputRef"
-          label="Image URL"
-          :value="imageUrl"
-          placeholder="https://example.com/image.jpg or https://example.com/model.glb"
-          :full-width="true"
-          @update="(val) => imageUrl = val"
-        />
+        <FormRow section-title="Image URL">
+          <template #content>
+            <TextInput
+              ref="urlInputRef"
+              :value="imageUrl"
+              placeholder="https://example.com/image.jpg or https://example.com/model.glb"
+              @update="(val) => imageUrl = val"
+            />
+          </template>
+        </FormRow>
         <p v-if="urlInputError" class="text-red-500 text-sm mt-1">{{ urlInputError }}</p>
       </div>
       <div class="flex gap-2">

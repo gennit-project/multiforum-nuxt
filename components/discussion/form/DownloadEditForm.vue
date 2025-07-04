@@ -20,7 +20,7 @@ import Notification from "@/components/NotificationComponent.vue";
 import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import { usernameVar } from "@/cache";
 
-const MAX_DOWNLOAD_FILE_SIZE_MB = 10;
+const MAX_DOWNLOAD_FILE_SIZE_MB = 50;
 const MAX_DOWNLOAD_FILE_SIZE_BYTES = MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
 
 const props = defineProps({
