@@ -516,6 +516,7 @@ function handleSave() {
                           type="text"
                         >
                         <button
+                          type="button"
                           class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
                           title="Delete this file"
                           @click="removeFile(index)"
@@ -528,6 +529,7 @@ function handleSave() {
                   <!-- For newly uploaded files without URL yet, show regular Remove button -->
                   <button
                     v-if="!file.url"
+                    type="button"
                     class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                     @click="removeFile(index)"
                   >
