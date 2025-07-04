@@ -1,5 +1,6 @@
 <script lang="ts">
 import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
+import { GET_CHANNEL } from "@/graphQLData/channel/queries";
 import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
 import { defineComponent, computed, ref } from "vue";
 import { useRouter, useRoute, useHead } from "nuxt/app";
@@ -54,11 +55,26 @@ export default defineComponent({
       channelUniqueName: channelId.value,
     });
 
+    const {
+      result: getChannelResult,
+      loading: getChannelLoading,
+      error: getChannelError,
+    } = useQuery(GET_CHANNEL, {
+      uniqueName: channelId.value,
+    });
+
     const discussion = computed<Discussion>(() => {
       if (getDiscussionError.value || getDiscussionLoading.value) {
         return null;
       }
       return getDiscussionResult.value.discussions[0];
+    });
+
+    const channelData = computed(() => {
+      if (getChannelError.value || getChannelLoading.value || !getChannelResult.value) {
+        return null;
+      }
+      return getChannelResult.value.channels[0];
     });
 
     const images = computed(() => {
@@ -414,6 +430,7 @@ export default defineComponent({
 
     return {
       channelId,
+      channelData,
       dataLoaded,
       discussion,
       discussionId,
@@ -460,6 +477,7 @@ export default defineComponent({
         :update-discussion-loading="updateDiscussionLoading"
         :download-mode="true"
         :discussion="discussion"
+        :channel-data="channelData"
         @submit="submit"
         @update-form-values="updateFormValues"
       />
