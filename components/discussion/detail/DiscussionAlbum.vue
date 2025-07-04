@@ -37,6 +37,10 @@ const props = defineProps({
     type: Boolean,
     default: true, // Default to true for backward compatibility
   },
+  expandedView: {
+    type: Boolean,
+    default: false, // Default to false for backward compatibility
+  },
 });
 
 // Use Vuetify's display utilities for responsive design
@@ -51,14 +55,33 @@ const lightboxIndex = ref(0);
 
 const orderedImages = computed(() => {  
   if (!props.album) {
+    console.log('DiscussionAlbum: No album prop');
     return [];
   }
-  if (!props.album.imageOrder) {
+  
+  console.log('DiscussionAlbum: Album data:', {
+    album: props.album,
+    images: props.album.Images,
+    imageOrder: props.album.imageOrder,
+    imagesLength: props.album.Images?.length,
+    imageOrderLength: props.album.imageOrder?.length
+  });
+  
+  if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
+    console.log('DiscussionAlbum: No imageOrder, using Images directly');
     return props.album.Images || [];
   }
-  return props.album.imageOrder.map((imageId) => {
-    return props.album.Images.find((image) => image.id === imageId);
-  });
+  
+  const orderedResult = props.album.imageOrder
+    .map((imageId) => {
+      const foundImage = props.album.Images?.find((image) => image.id === imageId);
+      console.log(`DiscussionAlbum: Looking for image ${imageId}, found:`, foundImage);
+      return foundImage;
+    })
+    .filter((image) => image !== undefined);
+    
+  console.log('DiscussionAlbum: Final ordered images:', orderedResult);
+  return orderedResult;
 });
 
 // Current image based on ordered images
@@ -470,7 +493,7 @@ const handleTouchEnd = (event: TouchEvent) => {
 </script>
 
 <template>
-  <div class="w-full h-full">
+  <div class="w-full">
     <!-- Normal thumbnail grid view -->
     <div v-if="!isLightboxOpen" class="overflow-x-auto border">
 
@@ -588,7 +611,11 @@ v-if="editingCaptionIndex === idx"
         <!-- Image container -->
         <div class="flex items-center justify-center">
           <div 
-            class="mb-4 flex rounded dark:text-white max-h-96 max-w-96 overflow-x-auto overflow-y-hidden touch-pan-x"
+            class="mb-4 flex rounded dark:text-white overflow-x-auto overflow-y-hidden touch-pan-x"
+            :class="{
+              'max-h-96 max-w-96': !expandedView,
+              'w-full': expandedView
+            }"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
           >
@@ -598,22 +625,34 @@ v-if="editingCaptionIndex === idx"
               class="flex flex-shrink-0 w-auto"
             >
               <div
-                class="max-h-96 max-w-96 min-h-10 cursor-pointer"
+                class="min-h-10 cursor-pointer"
+                :class="{
+                  'max-h-96 max-w-96': !expandedView,
+                  'w-full': expandedView
+                }"
                 @click="openLightbox(idx)"
               >
                 <ModelViewer
                   v-if="image && hasGlbExtension(image.url)"
                   :model-url="image.url"
-                  height="384px"
-                  width="384px"
+                  :height="expandedView ? '600px' : '384px'"
+                  :width="expandedView ? '100%' : '384px'"
                   :class="{ hidden: idx !== activeIndex }"
                 />
                 <img
                   v-else-if="image"
                   :src="image.url || ''"
                   :alt="image.alt || ''"
-                  class="shadow-sm max-h-96 max-w-96"
-                  :class="{ hidden: idx !== activeIndex }"
+                  class="shadow-sm object-contain"
+                  :class="{
+                    hidden: idx !== activeIndex,
+                    'max-h-96 max-w-96': !expandedView,
+                    'w-full h-auto': expandedView
+                  }"
+                  :style="{
+                    maxHeight: expandedView ? '70vh' : '384px',
+                    aspectRatio: expandedView ? 'auto' : '1/1'
+                  }"
                 >
                 <div 
                   v-if="editingCaptionIndex === idx && idx === activeIndex" 
@@ -649,13 +688,43 @@ v-if="editingCaptionIndex === idx"
             </div>
           </div>
         </div>
+        
+        <!-- Thumbnails row for expanded view -->
+        <div v-if="expandedView && orderedImages.length > 1" class="mt-4 px-4">
+          <div class="flex gap-2 overflow-x-auto pb-2">
+            <div
+              v-for="(image, idx) in orderedImages"
+              :key="`thumb-${image?.id || idx}`"
+              class="flex-shrink-0 cursor-pointer border-2 rounded transition-all"
+              :class="{
+                'border-orange-500': idx === activeIndex,
+                'border-gray-300 hover:border-gray-400': idx !== activeIndex
+              }"
+              @click="activeIndex = idx"
+            >
+              <ModelViewer
+                v-if="image && hasGlbExtension(image.url)"
+                :model-url="image.url"
+                height="80px"
+                width="80px"
+                class="rounded"
+              />
+              <img
+                v-else-if="image"
+                :src="image.url || ''"
+                :alt="image.alt || ''"
+                class="w-20 h-20 object-cover rounded shadow-sm"
+              >
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- Custom lightbox with split layout -->
     <div
       v-if="isLightboxOpen"
-      class="fixed top-0 left-0 w-full h-full bg-black z-50 transition-all duration-300 ease-in-out"
+      class="fixed top-0 left-0 w-full bg-black z-50 transition-all duration-300 ease-in-out"
       :class="{
         'flex-col': mdAndDown,
         flex: true,
@@ -666,7 +735,7 @@ v-if="editingCaptionIndex === idx"
         class="flex flex-col relative transition-all duration-300 ease-in-out z-40 overflow-hidden"
         :class="{
           'w-3/4 h-full': !mdAndDown && isPanelVisible,
-          'w-full h-full': mdAndDown || !isPanelVisible,
+          'w-full': mdAndDown || !isPanelVisible,
         }"
       >
         <div class="flex justify-between items-center p-2 px-5 text-white z-50">

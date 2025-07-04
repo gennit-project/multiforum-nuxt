@@ -40,9 +40,6 @@ import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
 const DiscussionAlbum = defineAsyncComponent(
   () => import("@/components/discussion/detail/DiscussionAlbum.vue")
 );
-const LightgalleryAlbum = defineAsyncComponent(
-  () => import("@/components/discussion/detail/LightgalleryAlbum.vue")
-);
 
 const COMMENT_LIMIT = 50;
 
@@ -333,7 +330,7 @@ const handleEditAlbum = () => {
     />
     <div
       v-else
-      class="w-full max-w-4xl space-y-2 py-2"
+      class="w-full max-w-6xl space-y-2 py-2"
     >
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
@@ -393,7 +390,7 @@ const handleEditAlbum = () => {
                     >
                       <template #album-slot>
                         <div class="bg-black text-white">
-                          <LightgalleryAlbum
+                          <DiscussionAlbum
                             v-if="
                               discussion?.Album &&
                               discussion?.Album?.Images &&
@@ -401,6 +398,11 @@ const handleEditAlbum = () => {
                             "
                             :album="discussion.Album"
                             :carousel-format="true"
+                            :expanded-view="true"
+                            :discussion-author="discussion.Author?.username || ''"
+                            :discussion-id="discussionId"
+                            @album-updated="refetchDiscussion"
+                            @edit-album="handleEditAlbum"
                           />
                           <div
                             v-else
