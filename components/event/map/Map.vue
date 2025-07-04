@@ -167,7 +167,7 @@ const renderMap = async () => {
       if (props.useMobileStyles) {
         // Mobile uses a single tap handler
         marker.addListener("click", () => {
-          emit("highlightEvent", eventLocationId, event.id, event, true);
+          emit("highlightEvent", eventLocationId, event.id, event, true, true);
           emit("openPreview", event, true);
           emit("lockColors");
         });
@@ -180,7 +180,7 @@ const renderMap = async () => {
 
         marker.addListener("mouseover", () => {
           if (!props.colorLocked) {
-            emit("highlightEvent", eventLocationId, event.id, event, true);
+            emit("highlightEvent", eventLocationId, event.id, event, true, true);
           }
         });
 

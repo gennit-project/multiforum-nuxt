@@ -172,7 +172,7 @@ const onMouseLeaveEventListItem = () => {
         @filter-by-tag="filterByTag"
         @filter-by-channel="filterByChannel"
         @open-preview="() => {
-          emit('highlightEvent', getEventLocationId(event), event.id, event);
+          emit('highlightEvent', getEventLocationId(event), event.id, event, false, true);
           $nextTick(() => {
             $emit('openPreview')            
           });

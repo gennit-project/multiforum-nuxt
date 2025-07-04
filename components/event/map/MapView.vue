@@ -364,7 +364,8 @@ const highlightEvent = (
   eventLocationId: string,
   eventId: string,
   eventData: EventData,
-  clickedMapMarker = false
+  clickedMapMarker = false,
+  shouldNavigate = false
 ) => {
   highlightedEventLocationId.value = eventLocationId;
 
@@ -384,7 +385,10 @@ const highlightEvent = (
     markerMap: desktopMarkerMap.value,
     map: desktopMap.value,
   });
-  sendToPreview(eventId, eventLocationId);
+  
+  if (shouldNavigate) {
+    sendToPreview(eventId, eventLocationId);
+  }
 };
 
 const unhighlightEventOnMap = (markerMap: MarkerMap) => {
@@ -489,7 +493,6 @@ const isClientSide = typeof window !== "undefined";
             />
             <EventList
               v-else-if="eventResult && eventResult.events"
-              key="highlightedEventId"
               class="mt-48 pt-0"
               :events="eventResult.events"
               :channel-id="channelId"
@@ -563,7 +566,6 @@ const isClientSide = typeof window !== "undefined";
           <div class="h-1/3 w-full">
             <div class="mx-auto">
               <EventList
-                key="highlightedEventId"
                 :events="eventResult.events"
                 :channel-id="channelId"
                 :highlighted-event-location-id="highlightedEventLocationId"
