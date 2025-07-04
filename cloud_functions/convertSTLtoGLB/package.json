@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@google-cloud/storage": "^6.9.0",
+    "parse-stl": "^1.0.2"
+  }
+}
