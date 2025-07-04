@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed, nextTick } from "vue";
 import { useMutation } from "@vue/apollo-composable";
-import { CREATE_SIGNED_STORAGE_URL, CREATE_IMAGE } from "@/graphQLData/discussion/mutations";
+import { CREATE_SIGNED_STORAGE_URL, CREATE_IMAGE, UPDATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import XmarkIcon from "@/components/icons/XmarkIcon.vue";
@@ -26,6 +26,18 @@ const props = defineProps<{
     };
   };
   allowImageUpload?: boolean;
+  discussionId?: string; // For auto-save functionality
+  existingAlbum?: {
+    id: string;
+    Images: {
+      id: string;
+      url: string;
+      alt: string;
+      caption: string;
+      copyright: string;
+    }[];
+    imageOrder: string[];
+  } | null;
 }>();
 
 const emit = defineEmits(["updateFormValues"]);
@@ -52,6 +64,10 @@ const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
 // Mutation to create an image record in the database
 const { mutate: createImage, error: createImageError } =
   useMutation(CREATE_IMAGE);
+
+// Mutation to update discussion with album data (for auto-save)
+const { mutate: updateDiscussion, error: updateDiscussionError, loading: updateDiscussionLoading } =
+  useMutation(UPDATE_DISCUSSION);
 
 // Keep track of which item is uploading or done
 const loadingStates = ref<{ [key: number]: boolean }>({});
@@ -143,6 +159,11 @@ const imageUrl = ref('');
 const urlInputError = ref('');
 const isCreatingImageFromUrl = ref(false);
 const urlInputRef = ref<{ focus: () => void } | null>(null);
+
+// Auto-save state
+const isAutoSaving = ref(false);
+const autoSaveSuccess = ref(false);
+let autoSaveTimeout: NodeJS.Timeout | null = null;
 
 // Computed property to check if URL is valid for enabling Add Image button
 const isUrlValid = computed(() => {
@@ -289,6 +310,9 @@ const updateImageField = (
       imageOrder: props.formValues.album.imageOrder,
     },
   });
+  
+  // Trigger auto-save
+  debouncedAutoSave();
 };
 
 const deleteImage = (index: number) => {
@@ -304,6 +328,9 @@ const deleteImage = (index: number) => {
       imageOrder: updatedImageOrder,
     },
   });
+  
+  // Trigger auto-save
+  debouncedAutoSave();
 };
 
 // Function to move image up in the order
@@ -326,6 +353,9 @@ const moveImageUp = (index: number) => {
       imageOrder: updatedImageOrder,
     },
   });
+  
+  // Trigger auto-save
+  debouncedAutoSave();
 };
 
 // Function to move image down in the order
@@ -351,6 +381,9 @@ const moveImageDown = (index: number) => {
       imageOrder: updatedImageOrder,
     },
   });
+  
+  // Trigger auto-save
+  debouncedAutoSave();
 };
 
 type AddImageInput = {
@@ -486,6 +519,157 @@ const addNewImage = (input: Partial<AddImageInput>) => {
       imageOrder: updatedImageOrder
     },
   });
+  
+  // Trigger auto-save
+  debouncedAutoSave();
+};
+
+// Auto-save functionality
+const getAlbumUpdateInput = () => {
+  const albumData = props.formValues.album;
+  if (!albumData || (!albumData.images?.length && !albumData.imageOrder?.length)) {
+    return {}; // No album data to update
+  }
+
+  const albumId = props.existingAlbum?.id;
+  
+  // If the album doesn't exist yet, CREATE it and connect to existing images
+  if (!albumId) {
+    const newImages = albumData.images || [];
+    
+    // Filter out images without IDs
+    const validImages = newImages.filter(img => img.id);
+    
+    if (validImages.length === 0) {
+      return {}; // No valid images to connect
+    }
+    
+    return {
+      Album: {
+        create: {
+          node: {
+            imageOrder: albumData.imageOrder || [],
+            Images: {
+              connect: validImages.map(img => ({
+                where: { node: { id: img.id } }
+              }))
+            },
+          },
+        },
+      },
+    };
+  }
+
+  // If the album already exists, build the connect/update/disconnect arrays
+  const oldImages = props.existingAlbum?.Images ?? [];
+  const newImages = albumData.images || [];
+
+  // CONNECT array: new images that need to be connected to this album
+  const connectImageArray = newImages
+    .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
+    .map((img) => ({
+      connect: {
+        where: { node: { id: img.id } }
+      }
+    }));
+
+  // UPDATE array: existing images that need updates
+  const updateImageArray = newImages
+    .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
+    .map((img) => ({
+      where: { node: { id: img.id } },
+      update: {
+        node: {
+          url: img.url,
+          alt: img.alt,
+          caption: img.caption,
+          copyright: img.copyright,
+        },
+      },
+    }));
+    
+  // DISCONNECT array: old images that are no longer present
+  const disconnectImageArray = oldImages
+    .filter((old) => !newImages.some((img) => img.id === old.id))
+    .map((old) => ({
+      disconnect: {
+        where: { node: { id: old.id } },
+      },
+    }));
+    
+  // Combine all operations
+  const imagesOps = [
+    ...connectImageArray,
+    ...updateImageArray,
+    ...disconnectImageArray,
+  ];
+
+  return {
+    Album: {
+      update: {
+        node: {
+          imageOrder: albumData.imageOrder || [],
+          Images: imagesOps,
+        },
+      },
+    },
+  };
+};
+
+const performAutoSave = async () => {
+  if (!props.discussionId) {
+    console.log('No discussionId provided, skipping auto-save');
+    return;
+  }
+
+  try {
+    isAutoSaving.value = true;
+    autoSaveSuccess.value = false;
+
+    const albumUpdateInput = getAlbumUpdateInput();
+    
+    if (Object.keys(albumUpdateInput).length === 0) {
+      console.log('No album changes to save');
+      return;
+    }
+
+    console.log('Auto-saving album changes:', albumUpdateInput);
+
+    await updateDiscussion({
+      where: { id: props.discussionId },
+      updateDiscussionInput: albumUpdateInput,
+    });
+
+    autoSaveSuccess.value = true;
+    console.log('Album auto-saved successfully');
+    
+    // Hide success indicator after 2 seconds
+    setTimeout(() => {
+      autoSaveSuccess.value = false;
+    }, 2000);
+
+  } catch (error) {
+    console.error('Auto-save failed:', error);
+  } finally {
+    isAutoSaving.value = false;
+  }
+};
+
+const debouncedAutoSave = () => {
+  // Only auto-save if we have a discussionId (edit mode)
+  if (!props.discussionId) {
+    return;
+  }
+
+  // Clear existing timeout
+  if (autoSaveTimeout) {
+    clearTimeout(autoSaveTimeout);
+  }
+
+  // Set new timeout for debounced save
+  autoSaveTimeout = setTimeout(() => {
+    performAutoSave();
+  }, 500); // 500ms debounce
 };
 
 </script>
@@ -500,6 +684,18 @@ const addNewImage = (input: Partial<AddImageInput>) => {
       v-if="createImageError"
       :text="createImageError.message"
     />
+    <ErrorBanner
+      v-if="updateDiscussionError"
+      :text="updateDiscussionError.message"
+    />
+    
+    <!-- Auto-save indicators -->
+    <div v-if="isAutoSaving || autoSaveSuccess" class="mb-2 flex items-center gap-2">
+      <LoadingSpinner v-if="isAutoSaving" class="h-4 w-4" />
+      <span v-if="isAutoSaving" class="text-sm text-blue-600 dark:text-blue-400">Saving album...</span>
+      <span v-else-if="autoSaveSuccess" class="text-sm text-green-600 dark:text-green-400">✓ Album saved</span>
+    </div>
+    
     <div v-if="loadingStates[-1]" class="mb-2 flex items-center gap-2">
       <LoadingSpinner />
       <span v-if="uploadStatus" class="text-sm text-gray-600 dark:text-gray-300">{{ uploadStatus }}</span>

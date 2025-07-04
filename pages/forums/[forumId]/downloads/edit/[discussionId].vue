@@ -233,6 +233,98 @@ export default defineComponent({
       );
     });
 
+    // Function to get album update input
+    const getAlbumUpdateInput = () => {
+      const albumData = formValues.value.album;
+      if (!albumData || (!albumData.images?.length && !albumData.imageOrder?.length)) {
+        return {}; // No album data to update
+      }
+
+      const albumId = discussion.value?.Album?.id;
+      
+      // If the album doesn't exist yet, CREATE it and connect to existing images
+      if (!albumId) {
+        const newImages = albumData.images || [];
+        
+        // Filter out images without IDs (shouldn't happen with our new flow)
+        const validImages = newImages.filter(img => img.id);
+        
+        if (validImages.length === 0) {
+          return {}; // No valid images to connect
+        }
+        
+        return {
+          Album: {
+            create: {
+              node: {
+                imageOrder: albumData.imageOrder || [],
+                Images: {
+                  connect: validImages.map(img => ({
+                    where: { node: { id: img.id } }
+                  }))
+                },
+              },
+            },
+          },
+        };
+      }
+
+      // If the album already exists, build the connect/update/delete arrays
+      const oldImages = discussion.value?.Album?.Images ?? [];
+      const newImages = albumData.images || [];
+
+      // CONNECT array: new images that need to be connected to this album
+      const connectImageArray = newImages
+        .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
+        .map((img) => ({
+          connect: {
+            where: { node: { id: img.id } }
+          }
+        }));
+
+      // UPDATE array: existing images that need updates
+      const updateImageArray = newImages
+        .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
+        .map((img) => ({
+          where: { node: { id: img.id } },
+          update: {
+            node: {
+              url: img.url,
+              alt: img.alt,
+              caption: img.caption,
+              copyright: img.copyright,
+            },
+          },
+        }));
+        
+      // DISCONNECT array: old images that are no longer present
+      const disconnectImageArray = oldImages
+        .filter((old) => !newImages.some((img) => img.id === old.id))
+        .map((old) => ({
+          disconnect: {
+            where: { node: { id: old.id } },
+          },
+        }));
+        
+      // Combine all operations
+      const imagesOps = [
+        ...connectImageArray,
+        ...updateImageArray,
+        ...disconnectImageArray,
+      ];
+
+      return {
+        Album: {
+          update: {
+            node: {
+              imageOrder: albumData.imageOrder || [],
+              Images: imagesOps,
+            },
+          },
+        },
+      };
+    };
+
     const updateDiscussionInput = computed<DiscussionUpdateInput>(() => {
       const tagConnections: DiscussionTagsConnectOrCreateFieldInput[] =
         formValues.value.selectedTags.map((tag: string) => {
@@ -265,6 +357,9 @@ export default defineComponent({
             };
           });
 
+      // Get album update input
+      const albumUpdateInput = getAlbumUpdateInput();
+
       const result: DiscussionUpdateInput = {
         title: formValues.value.title,
         body: formValues.value.body,
@@ -274,6 +369,7 @@ export default defineComponent({
             disconnect: tagDisconnections,
           },
         ],
+        ...albumUpdateInput, // Include album data
       };
       return result;
     });

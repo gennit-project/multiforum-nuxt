@@ -41,7 +41,7 @@ const buttonClasses = computed(() => {
   // Use green styling for best answer comments
   if (properties.isMarkedAsAnswer) {
     const bestAnswerClasses = properties.active
-      ? "border-green-500 bg-green-500 text-white dark:border-green-600 dark:bg-green-600 dark:hover:bg-green-500"
+      ? "border-green-500 bg-green-500 dark:border-green-600 dark:bg-green-600 dark:hover:bg-green-500"
       : "border-green-200 bg-green-100 text-green-700 hover:border-green-400 hover:bg-green-200 dark:border-green-600 dark:bg-green-800 dark:text-green-300 dark:hover:bg-green-700";
     
     // Include external class passed from parent component
@@ -51,8 +51,8 @@ const buttonClasses = computed(() => {
   }
 
   const defaultClasses = properties.active
-    ? "border-orange-500 bg-orange-500 text-white dark:border-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500"
-    : "border-gray-200 bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600";
+    ? "border-orange-500 text-black bg-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500"
+    : "border-gray-200 text-white bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600";
 
   const permalinkClasses = properties.isPermalinked
     ? "border-orange-500 hover:bg-orange-300 dark:border-orange-600 dark:hover:bg-orange-600"

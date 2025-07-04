@@ -10,13 +10,13 @@ defineProps({
 </script>
 
 <template>
-  <span v-if="!loading" class="justify-center dark:text-white">
+  <span v-if="!loading" class="justify-center">
     <slot />
   </span>
-  <span v-if="loading" class="justify-center dark:text-white">
+  <span v-if="loading" class="justify-center">
     <LoadingSpinner />
   </span>
-  <span v-if="showCount" id="count" class="mx-1 justify-center text-xs dark:text-white">
+  <span v-if="showCount" id="count" class="mx-1 justify-center text-xs">
     {{ count }}
   </span>
 </template>

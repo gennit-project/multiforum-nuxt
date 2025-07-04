@@ -248,16 +248,27 @@ function handleUpdateAlbum(newVals: {
       <AlbumEditor
         :form-values="formValues"
         :allow-image-upload="true"
+        :discussion-id="props.discussion.id !== 'temp-id' ? props.discussion.id : undefined"
+        :existing-album="props.discussion.Album"
         @update-form-values="handleUpdateAlbum"
       />
       
-      <div class="flex align-items gap-2 justify-end mt-4">
+      <!-- Only show Save Album button in create mode (when discussionId is not provided) -->
+      <div v-if="isCreateMode" class="flex align-items gap-2 justify-end mt-4">
         <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
         <PrimaryButton
           :label="'Save Album'"
           :loading="updateDiscussionLoading && !isCreateMode"
           @click="handleSave"
         />
+      </div>
+      
+      <!-- Show auto-save info in edit mode -->
+      <div v-else class="flex justify-between items-center mt-4">
+        <span class="text-sm text-gray-600 dark:text-gray-400">
+          Album changes are saved automatically
+        </span>
+        <GenericButton :text="'Close'" @click="emit('closeEditor')" />
       </div>
     </div>
     
