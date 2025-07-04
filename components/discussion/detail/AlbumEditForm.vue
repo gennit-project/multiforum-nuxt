@@ -133,9 +133,9 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   const connectImageArray = newImages
     .filter((img) => !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
-      connect: {
+      connect: [{
         where: { node: { id: img.id } }
-      }
+      }]
     }));
 
   // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
@@ -153,20 +153,20 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
       },
     }));
     
-  // DELETE array: any old image that is no longer present in `newImages`
-  const deleteImageArray = oldImages
+  // DISCONNECT array: any old image that is no longer present in `newImages`
+  const disconnectImageArray = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
     .map((old) => ({
-      delete: {
+      disconnect: [{
         where: { node: { id: old.id } },
-      },
+      }]
     }));
     
   // Combine all operations into a single array. Each object is one "Images" operation.
   const imagesOps = [
     ...connectImageArray,
     ...updateImageArray,
-    ...deleteImageArray,
+    ...disconnectImageArray,
   ];
 
   // Wrap them in the correct update shape

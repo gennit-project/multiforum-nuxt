@@ -568,14 +568,26 @@ const getAlbumUpdateInput = () => {
   const connectImageArray = newImages
     .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
-      connect: {
+      connect: [{
         where: { node: { id: img.id } }
-      }
+      }]
     }));
 
-  // UPDATE array: existing images that need updates
+  // UPDATE array: existing images that need updates (only if properties changed)
   const updateImageArray = newImages
-    .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
+    .filter((img) => {
+      if (!img.id) return false;
+      const oldImage = oldImages.find((old) => old.id === img.id);
+      if (!oldImage) return false;
+      
+      // Only update if properties have actually changed
+      return (
+        oldImage.url !== img.url ||
+        oldImage.alt !== img.alt ||
+        oldImage.caption !== img.caption ||
+        oldImage.copyright !== img.copyright
+      );
+    })
     .map((img) => ({
       where: { node: { id: img.id } },
       update: {
@@ -592,9 +604,9 @@ const getAlbumUpdateInput = () => {
   const disconnectImageArray = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
     .map((old) => ({
-      disconnect: {
+      disconnect: [{
         where: { node: { id: old.id } },
-      },
+      }]
     }));
     
   // Combine all operations
@@ -618,7 +630,6 @@ const getAlbumUpdateInput = () => {
 
 const performAutoSave = async () => {
   if (!props.discussionId) {
-    console.log('No discussionId provided, skipping auto-save');
     return;
   }
 
@@ -629,11 +640,8 @@ const performAutoSave = async () => {
     const albumUpdateInput = getAlbumUpdateInput();
     
     if (Object.keys(albumUpdateInput).length === 0) {
-      console.log('No album changes to save');
       return;
     }
-
-    console.log('Auto-saving album changes:', albumUpdateInput);
 
     await updateDiscussion({
       where: { id: props.discussionId },
@@ -641,7 +649,6 @@ const performAutoSave = async () => {
     });
 
     autoSaveSuccess.value = true;
-    console.log('Album auto-saved successfully');
     
     // Hide success indicator after 2 seconds
     setTimeout(() => {
@@ -798,10 +805,10 @@ const debouncedAutoSave = () => {
         <p class="text-sm text-gray-500 dark:text-gray-300 mb-3">
           Drag and drop, tap to add files, or paste a link to an image
         </p>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 text-black">
           <button 
             type="button" 
-            class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600 transition-colors"
+            class="px-4 py-2 bg-orange-500 rounded hover:bg-orange-600 transition-colors"
             @click="selectFiles"
           >
             Choose Files
@@ -809,7 +816,7 @@ const debouncedAutoSave = () => {
           <div class="h-6 w-px bg-gray-300 dark:bg-gray-600"></div>
           <button 
             type="button" 
-            class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 transition-colors"
             @click="showUrlInputForm"
           >
             Link to Image

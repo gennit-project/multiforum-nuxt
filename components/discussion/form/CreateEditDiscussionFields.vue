@@ -190,14 +190,7 @@ onMounted(() => {
               <template #content>
                 <AlbumEditForm
                   v-if="formValues"
-                  :discussion="{
-                    id: 'temp-id',
-                    Album: {
-                      id: '',
-                      Images: (formValues.album?.images as Image[]) || [],
-                      imageOrder: formValues.album?.imageOrder || [],
-                    },
-                  }"
+                  :discussion="discussion"
                   @close-editor="() => {}"
                   @update-form-values="
                     (albumData) => {
