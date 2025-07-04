@@ -505,7 +505,7 @@ const handleTouchEnd = (event: TouchEvent) => {
 </script>
 
 <template>
-  <div class="w-full">
+  <div class="w-ful">
     <!-- Normal thumbnail grid view -->
     <div v-if="!isLightboxOpen && !startInLightbox" class="overflow-x-auto border">
 
@@ -592,7 +592,7 @@ v-if="editingCaptionIndex === idx"
       </div>
 
       <!-- Carousel view -->
-      <div v-else class="flex flex-col">
+      <div v-else class="flex flex-col border *:border-gray-300 dark:border-gray-700 rounded-lg">
         <!-- Counter and navigation row -->
         <div class="flex items-center justify-between p-2">
           <span class="text-sm">{{

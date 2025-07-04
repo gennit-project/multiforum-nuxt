@@ -111,6 +111,27 @@ onDone(() => {
   emit("closeEditor");
 });
 
+// Generate accept attribute from channel allowed file types
+const acceptAttribute = computed(() => {
+  const allowedTypes = props.channelData?.allowedFileTypes || [];
+  if (allowedTypes.length === 0) {
+    return undefined; // No restriction if no types specified
+  }
+  
+  // Convert file types to file extensions for accept attribute
+  const extensions = allowedTypes.map(type => {
+    const lowerType = type.toLowerCase();
+    // If it's already an extension (starts with .), use as-is
+    if (lowerType.startsWith('.')) {
+      return lowerType;
+    }
+    // Otherwise add a dot prefix
+    return `.${lowerType}`;
+  });
+  
+  return extensions.join(',');
+});
+
 // Initialize form values after component is mounted
 onMounted(() => {
   console.log("DownloadEditForm mounted, initializing formValues");
@@ -450,6 +471,7 @@ function handleSave() {
                 id="downloadable-file-input"
                 type="file"
                 class="hidden"
+                :accept="acceptAttribute"
                 :disabled="uploadingFile"
                 @change="handleFileUpload"
               >
@@ -540,6 +562,7 @@ function handleSave() {
                   id="additional-file-input"
                   type="file"
                   class="hidden"
+                  :accept="acceptAttribute"
                   :disabled="uploadingFile"
                   @change="handleFileUpload"
                 >
