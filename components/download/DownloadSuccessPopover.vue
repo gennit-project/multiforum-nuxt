@@ -9,6 +9,7 @@ import FacebookIcon from '@/components/icons/FacebookIcon.vue';
 import LinkedInIcon from '@/components/icons/LinkedInIcon.vue';
 import RedditIcon from '@/components/icons/RedditIcon.vue';
 import DiscordIcon from '@/components/icons/DiscordIcon.vue';
+import BlueskyIcon from '@/components/icons/BlueskyIcon.vue';
 import CopyIcon from '@/components/icons/CopyIcon.vue';
 import CheckIcon from '@/components/icons/CheckIcon.vue';
 
@@ -83,6 +84,12 @@ const shareToReddit = () => {
   const url = encodeURIComponent(shareUrl.value);
   const title = encodeURIComponent(props.discussion.title);
   window.open(`https://reddit.com/submit?url=${url}&title=${title}`, '_blank', 'width=550,height=420');
+};
+
+const shareToBluesky = () => {
+  const text = encodeURIComponent(`Check out this download: ${props.discussion.title}`);
+  const url = encodeURIComponent(shareUrl.value);
+  window.open(`https://bsky.app/intent/compose?text=${text} ${url}`, '_blank', 'width=550,height=420');
 };
 
 const shareToDiscord = () => {
@@ -184,6 +191,13 @@ const copyLink = async () => {
                 >
                   <RedditIcon />
                   Reddit
+                </button>
+                <button
+                  class="flex items-center px-3 py-1.5 text-xs bg-sky-500 hover:bg-sky-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  @click="shareToBluesky"
+                >
+                  <BlueskyIcon />
+                  Bluesky
                 </button>
                 <button
                   class="flex items-center px-3 py-1.5 text-xs rounded-md transition-colors whitespace-nowrap"
