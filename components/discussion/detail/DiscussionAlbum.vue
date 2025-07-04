@@ -513,6 +513,7 @@ const handleTouchEnd = (event: TouchEvent) => {
             :model-url="image.url"
             height="200px"
             width="100%"
+            class="shadow-sm"
           />
           <img
             v-else-if="image"
@@ -633,11 +634,17 @@ v-if="editingCaptionIndex === idx"
                 @click="openLightbox(idx)"
               >
                 <ModelViewer
-                  v-if="image && hasGlbExtension(image.url)"
-                  :model-url="image.url"
-                  :height="expandedView ? '600px' : '384px'"
-                  :width="expandedView ? '100%' : '384px'"
-                  :class="{ hidden: idx !== activeIndex }"
+                  v-if="image && hasGlbExtension(image.url) && idx === activeIndex"
+                  :model-url="image.url || ''"
+                  :height="expandedView ? '533px' : '256px'"
+                  :width="expandedView ? '800px' : '384px'"
+                  class="shadow-sm object-contain"
+                  :style="{
+                    aspectRatio: '3/2',
+                    maxWidth: expandedView ? '800px' : '384px',
+                    maxHeight: expandedView ? '533px' : '256px'
+                  }"
+                  :show-fullscreen-button="false"
                 />
                 <img
                   v-else-if="image"
@@ -705,7 +712,7 @@ v-if="editingCaptionIndex === idx"
             >
               <ModelViewer
                 v-if="image && hasGlbExtension(image.url)"
-                :model-url="image.url"
+                :model-url="image.url || ''"
                 height="80px"
                 width="80px"
                 class="rounded"
@@ -836,7 +843,7 @@ v-if="editingCaptionIndex === idx"
           </button>
 
           <ModelViewer
-            v-if="hasGlbExtension(currentImage.url)"
+            v-if="currentImage && currentImage.url && hasGlbExtension(currentImage.url)"
             :model-url="currentImage.url"
             :height="isPanelVisible ? '90%' : '95%'"
             :width="isPanelVisible ? '90%' : '95%'"

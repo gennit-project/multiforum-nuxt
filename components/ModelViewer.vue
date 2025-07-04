@@ -2,6 +2,7 @@
   <div class="model-viewer-container relative border">
     <!-- Fullscreen button -->
     <button
+      v-if="showFullscreenButton !== false"
       class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
       title="View in fullscreen"
       @click="openFullscreen"
@@ -31,7 +32,11 @@
       shadow-intensity="0.4"
       environment-image="https://modelviewer.dev/shared-assets/environments/aircraft_workshop_01_1k.hdr"
       tone-mapping="neutral"
-      style="width: 100%; height: 300px; border-radius: 8px"
+      :style="{
+        width: width || '100%',
+        height: height || '300px',
+        borderRadius: '8px'
+      }"
     />
 
     <!-- Fullscreen modal -->
@@ -93,6 +98,7 @@
     modelUrl?: string;
     height?: string;
     width?: string;
+    showFullscreenButton?: boolean;
   }>();
 
   const isFullscreen = ref(false);
