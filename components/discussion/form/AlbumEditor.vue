@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
+import { ref, computed, nextTick } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import { CREATE_SIGNED_STORAGE_URL, CREATE_IMAGE } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
@@ -141,6 +141,19 @@ const uploadStatus = ref('');
 const showUrlInput = ref(false);
 const imageUrl = ref('');
 const urlInputError = ref('');
+const isCreatingImageFromUrl = ref(false);
+const urlInputRef = ref<{ focus: () => void } | null>(null);
+
+// Computed property to check if URL is valid for enabling Add Image button
+const isUrlValid = computed(() => {
+  if (!imageUrl.value.trim()) return false;
+  try {
+    new URL(imageUrl.value.trim());
+    return true;
+  } catch {
+    return false;
+  }
+});
 
 /**
  * Handle uploading multiple files at once
@@ -362,6 +375,13 @@ const showUrlInputForm = () => {
   showUrlInput.value = true;
   imageUrl.value = '';
   urlInputError.value = '';
+  
+  // Focus the input after it's rendered
+  nextTick(() => {
+    if (urlInputRef.value) {
+      urlInputRef.value.focus();
+    }
+  });
 };
 
 // Function to cancel URL input
@@ -372,7 +392,7 @@ const cancelUrlInput = () => {
 };
 
 // Function to validate and add image from URL
-const addImageFromUrl = () => {
+const addImageFromUrl = async () => {
   if (!imageUrl.value.trim()) {
     urlInputError.value = 'Please enter a valid URL';
     return;
@@ -386,18 +406,51 @@ const addImageFromUrl = () => {
     return;
   }
   
-  // Add the image
-  addNewImage({
-    url: imageUrl.value.trim(),
-    alt: '',
-    caption: '',
-    copyright: ''
-  });
+  if (!usernameVar.value) {
+    urlInputError.value = 'No username found, cannot create image.';
+    return;
+  }
   
-  // Reset form
-  showUrlInput.value = false;
-  imageUrl.value = '';
+  // Clear any previous errors
   urlInputError.value = '';
+  isCreatingImageFromUrl.value = true;
+  
+  try {
+    // Create the Image record in the database first
+    const createImageResult = await createImage({
+      url: imageUrl.value.trim(),
+      alt: '',              // Empty alt text by default
+      caption: '',          // Empty caption by default
+      copyright: '',        // Empty copyright by default
+      username: usernameVar.value
+    });
+    
+    // Get the created image from the result
+    const createdImage = createImageResult?.data?.createImages?.images?.[0];
+    
+    if (!createdImage || !createdImage.id) {
+      throw new Error('Failed to create image record in database');
+    }
+    
+    // Add the image to our album using the addNewImage helper
+    addNewImage({
+      id: createdImage.id,
+      url: createdImage.url,
+      alt: createdImage.alt || '',
+      caption: createdImage.caption || '',
+      copyright: createdImage.copyright || ''
+    });
+    
+    // Reset form
+    showUrlInput.value = false;
+    imageUrl.value = '';
+    urlInputError.value = '';
+  } catch (err) {
+    console.error('Error creating image from URL:', err);
+    urlInputError.value = 'Failed to create image. Please try again.';
+  } finally {
+    isCreatingImageFromUrl.value = false;
+  }
 };
 
 /**
@@ -591,6 +644,7 @@ const addNewImage = (input: Partial<AddImageInput>) => {
       <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Add Image from URL</h3>
       <div class="mb-3">
         <TextInput
+          ref="urlInputRef"
           label="Image URL"
           :value="imageUrl"
           placeholder="https://example.com/image.jpg or https://example.com/model.glb"
@@ -602,10 +656,13 @@ const addNewImage = (input: Partial<AddImageInput>) => {
       <div class="flex gap-2">
         <button
           type="button"
-          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
+          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors flex items-center gap-2"
+          :disabled="!isUrlValid || isCreatingImageFromUrl"
+          :class="{ 'opacity-50 cursor-not-allowed': !isUrlValid || isCreatingImageFromUrl }"
           @click="addImageFromUrl"
         >
-          Add Image
+          <LoadingSpinner v-if="isCreatingImageFromUrl" class="h-4 w-4" />
+          {{ isCreatingImageFromUrl ? 'Creating...' : 'Add Image' }}
         </button>
         <button
           type="button"

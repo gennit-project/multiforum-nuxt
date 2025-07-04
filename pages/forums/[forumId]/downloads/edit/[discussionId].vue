@@ -319,6 +319,7 @@ export default defineComponent({
     return {
       channelId,
       dataLoaded,
+      discussion,
       discussionId,
       existingTags,
       formValues,
@@ -369,7 +370,7 @@ export default defineComponent({
     </template>
     <template #does-not-have-auth>
       <div class="flex justify-center p-8 dark:text-white">
-        You don't have permission to see this page.
+        You do not have permission to see this page.
       </div>
     </template>
   </RequireAuth>
