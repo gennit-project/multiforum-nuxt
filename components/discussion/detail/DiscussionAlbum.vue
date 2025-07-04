@@ -15,6 +15,7 @@ import { useMutation } from "@vue/apollo-composable";
 import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
 import { usernameVar } from "@/cache";
 import ModelViewer from "@/components/ModelViewer.vue";
+import StlViewer from "@/components/download/StlViewer.vue";
 
 const props = defineProps({
   album: {
@@ -190,7 +191,7 @@ const onDrag = (event: MouseEvent) => {
   translateY.value = event.clientY - startY.value;
 };
 
-const stopDrag = (event?: MouseEvent) => {
+const stopDrag = (event?: MouseEvent | TouchEvent | Event) => {
   // Stop dragging when mouse button is released
   isDragging.value = false;
   
@@ -358,6 +359,11 @@ const hasGlbExtension = (url: string) => {
   return url?.toLowerCase().endsWith('.glb');
 };
 
+// Check if a URL has a .stl extension
+const hasStlExtension = (url: string) => {
+  return url?.toLowerCase().endsWith('.stl');
+};
+
 // Custom event handler for mouseup that checks for text editor
 const handleMouseUp = (event: MouseEvent) => {
   // If we're editing a caption and the click is in the editor area, don't close
@@ -377,6 +383,11 @@ const handleMouseUp = (event: MouseEvent) => {
   stopDrag(event);
 };
 
+// Handler for touch events
+const handleTouchStop = (event: TouchEvent) => {
+  stopDrag(event);
+};
+
 onMounted(() => {
   window.addEventListener("keydown", handleKeyDown);
 
@@ -386,8 +397,8 @@ onMounted(() => {
   window.addEventListener("mousemove", onDrag);
 
   // Touch events for mobile
-  window.addEventListener("touchend", stopDrag);
-  window.addEventListener("touchcancel", stopDrag);
+  window.addEventListener("touchend", handleTouchStop);
+  window.addEventListener("touchcancel", handleTouchStop);
   
   // Start in lightbox mode if prop is set
   if (props.startInLightbox && orderedImages.value.length > 0) {
@@ -400,8 +411,8 @@ onUnmounted(() => {
   window.removeEventListener("mouseup", handleMouseUp);
   window.removeEventListener("mouseleave", stopDrag);
   window.removeEventListener("mousemove", onDrag);
-  window.removeEventListener("touchend", stopDrag);
-  window.removeEventListener("touchcancel", stopDrag);
+  window.removeEventListener("touchend", handleTouchStop);
+  window.removeEventListener("touchcancel", handleTouchStop);
   document.body.style.overflow = ""; // Ensure scrolling is restored
 });
 
@@ -525,6 +536,13 @@ const handleTouchEnd = (event: TouchEvent) => {
             :model-url="image.url || ''"
             height="200px"
             width="100%"
+            class="shadow-sm"
+          />
+          <StlViewer
+            v-else-if="image && image.url && hasStlExtension(image.url)"
+            :src="image.url"
+            :width="200"
+            :height="200"
             class="shadow-sm"
           />
           <img
@@ -658,6 +676,18 @@ v-if="editingCaptionIndex === idx"
                   }"
                   :show-fullscreen-button="false"
                 />
+                <StlViewer
+                  v-else-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex"
+                  :src="image.url"
+                  :width="expandedView ? 800 : 384"
+                  :height="expandedView ? 533 : 256"
+                  class="shadow-sm object-contain"
+                  :style="{
+                    aspectRatio: '3/2',
+                    maxWidth: expandedView ? '800px' : '384px',
+                    maxHeight: expandedView ? '533px' : '256px'
+                  }"
+                />
                 <img
                   v-else-if="image"
                   :src="image.url || ''"
@@ -727,6 +757,13 @@ v-if="editingCaptionIndex === idx"
                 :model-url="image.url"
                 height="80px"
                 width="80px"
+                class="rounded"
+              />
+              <StlViewer
+                v-else-if="image && image.url && hasStlExtension(image.url)"
+                :src="image.url"
+                :width="80"
+                :height="80"
                 class="rounded"
               />
               <img
@@ -869,6 +906,25 @@ v-if="editingCaptionIndex === idx"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
           />
+          <div
+            v-else-if="currentImage && currentImage.url && hasStlExtension(currentImage.url)"
+            class="w-full h-full flex items-center justify-center"
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
+              cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
+            }"
+            @mousedown="startDrag"
+            @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
+            @touchend="isZoomed ? undefined : handleTouchEnd"
+            @touchmove="isZoomed ? onTouchDrag : undefined"
+          >
+            <StlViewer
+              :src="currentImage.url"
+              :width="800"
+              :height="600"
+              class="object-contain transition-all duration-300 ease-in-out"
+            />
+          </div>
           <img
             v-else
             :src="currentImage.url || ''"

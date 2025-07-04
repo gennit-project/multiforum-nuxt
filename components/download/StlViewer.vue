@@ -13,6 +13,7 @@
 import * as THREE from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { markRaw } from 'vue';
 
 export default {
   name: 'StlViewer',
@@ -61,7 +62,7 @@ export default {
     this.initViewer();
     this.loadModel();
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.cleanup();
   },
   watch: {
@@ -74,34 +75,34 @@ export default {
       const container = this.$refs.container;
       
       // Scene
-      this.scene = new THREE.Scene();
+      this.scene = markRaw(new THREE.Scene());
       this.scene.background = new THREE.Color(this.backgroundColor);
       
       // Camera
-      this.camera = new THREE.PerspectiveCamera(
+      this.camera = markRaw(new THREE.PerspectiveCamera(
         50,
         this.width / this.height,
         0.1,
         1000
-      );
+      ));
       
       // Renderer
-      this.renderer = new THREE.WebGLRenderer({ antialias: true });
+      this.renderer = markRaw(new THREE.WebGLRenderer({ antialias: true }));
       this.renderer.setSize(this.width, this.height);
       this.renderer.shadowMap.enabled = true;
       container.appendChild(this.renderer.domElement);
       
       // Lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+      const ambientLight = markRaw(new THREE.AmbientLight(0xffffff, 0.6));
       this.scene.add(ambientLight);
       
-      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.4);
+      const directionalLight = markRaw(new THREE.DirectionalLight(0xffffff, 0.4));
       directionalLight.position.set(10, 10, 10);
       directionalLight.castShadow = true;
       this.scene.add(directionalLight);
       
       // Controls
-      this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls = markRaw(new OrbitControls(this.camera, this.renderer.domElement));
       this.controls.enableDamping = true;
       this.controls.dampingFactor = 0.05;
       this.controls.autoRotate = this.autoRotate;
@@ -109,7 +110,7 @@ export default {
       
       // Grid
       if (this.showGrid) {
-        const gridHelper = new THREE.GridHelper(200, 20);
+        const gridHelper = markRaw(new THREE.GridHelper(200, 20));
         this.scene.add(gridHelper);
       }
       
@@ -139,13 +140,13 @@ export default {
           geometry.translate(-center.x, -center.y, -center.z);
           
           // Create mesh
-          const material = new THREE.MeshPhongMaterial({
+          const material = markRaw(new THREE.MeshPhongMaterial({
             color: this.modelColor,
             specular: 0x111111,
             shininess: 200
-          });
+          }));
           
-          this.mesh = new THREE.Mesh(geometry, material);
+          this.mesh = markRaw(new THREE.Mesh(geometry, material));
           this.mesh.castShadow = true;
           this.mesh.receiveShadow = true;
           this.scene.add(this.mesh);
@@ -189,7 +190,9 @@ export default {
     cleanup() {
       if (this.renderer) {
         this.renderer.dispose();
-        this.$refs.container.removeChild(this.renderer.domElement);
+        if (this.$refs.container && this.$refs.container.contains(this.renderer.domElement)) {
+          this.$refs.container.removeChild(this.renderer.domElement);
+        }
       }
       
       if (this.mesh) {
