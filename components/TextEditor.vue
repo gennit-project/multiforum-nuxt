@@ -10,6 +10,7 @@ import { usernameVar } from "@/cache";
 import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { isFileSizeValid } from "@/utils/index";
 import EmojiPicker from "@/components/comments/EmojiPicker.vue";
+import EyeSlashIcon from "@/components/icons/EyeSlashIcon.vue";
 import { 
   formatText,
   insertEmoji as insertEmojiAtPosition,
@@ -388,7 +389,13 @@ onBeforeUnmount(() => {
 });
 
 // Format buttons configuration
-const formatButtons = [
+type FormatButton = {
+  label: string;
+  format: string;
+  class?: string;
+};
+
+const formatButtons: FormatButton[] = [
   { label: "B", format: "bold" },
   { label: "I", format: "italic" },
   { label: "U", format: "underline" },
@@ -396,6 +403,7 @@ const formatButtons = [
   { label: "H2", format: "header2" },
   { label: "H3", format: "header3" },
   { label: "Quote", format: "quote" },
+  { label: "spoiler", format: "spoiler", class: "line-through" },
   { label: "Emoji", format: "emoji" },
 ];
 
@@ -505,10 +513,14 @@ const closeEmojiPicker = () => {
           <button
             v-for="button in formatButtons"
             :key="button.label"
-            class="border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300"
+            :class="[
+              'border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300',
+              button.class
+            ]"
             @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatTextArea(button.format)"
           >
-            {{ button.label }}
+            <EyeSlashIcon v-if="button.format === 'spoiler'" class="w-4 h-4" />
+            <span v-else>{{ button.label }}</span>
           </button>
         </div>
       </TabList>

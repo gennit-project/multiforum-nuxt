@@ -13,10 +13,18 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import { UPDATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
 import AlbumEditor from "@/components/discussion/form/AlbumEditor.vue";
 import Notification from "@/components/NotificationComponent.vue";
+import { useRoute } from "vue-router";
+
+// Get the discussion ID from the route params
+const route = useRoute();
+const discussionIdInParams = computed(() => {
+  // If the discussion ID is provided in the route params, use it
+  return route.params.discussionId ? String(route.params.discussionId) : "";
+})
 
 const props = defineProps({
   discussion: {
-    type: Object as PropType<Discussion>,
+    type: Object as PropType<Discussion | null | undefined>,
     required: true,
   },
 });
@@ -27,7 +35,7 @@ const emit = defineEmits(["closeEditor", "updateFormValues"]);
 // even if the discussion itself is new
 const isCreateMode = computed(() => {
   // If discussion has a real ID, we're in edit mode
-  if (props.discussion.id !== 'temp-id') {
+  if (props.discussion?.id !== 'temp-id' && !discussionIdInParams.value) {
     return false;
   }
   
@@ -189,7 +197,7 @@ const {
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {
-    where: { id: props.discussion.id },
+    where: { id: props.discussion?.id || discussionIdInParams.value },
     updateDiscussionInput: getUpdateDiscussionInputForAlbum(),
   },
 }));
@@ -204,7 +212,7 @@ function handleSave() {
   console.log("Current album data:", JSON.stringify(formValues.value.album));
   
   // For both cases where we're inside CreateEditDiscussionFields (temp-id)
-  if (props.discussion.id === 'temp-id') {
+  if (props.discussion?.id === 'temp-id') {
     // Always emit the form values to update the parent component
     console.log("Emitting updateFormValues in CreateEditDiscussionFields context");
     emit("updateFormValues", {
@@ -248,8 +256,8 @@ function handleUpdateAlbum(newVals: {
       <AlbumEditor
         :form-values="formValues"
         :allow-image-upload="true"
-        :discussion-id="props.discussion.id !== 'temp-id' ? props.discussion.id : undefined"
-        :existing-album="props.discussion.Album"
+        :discussion-id="discussionIdInParams"
+        :existing-album="props.discussion?.Album || undefined"
         @update-form-values="handleUpdateAlbum"
       />
       

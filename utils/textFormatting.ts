@@ -13,7 +13,7 @@ export type FormatTextParams = {
 /**
  * Supported text formatting types
  */
-export type FormatType = 'bold' | 'italic' | 'underline' | 'header1' | 'header2' | 'header3' | 'quote';
+export type FormatType = 'bold' | 'italic' | 'underline' | 'header1' | 'header2' | 'header3' | 'quote' | 'spoiler';
 
 /**
  * Formats text according to the specified format type
@@ -38,6 +38,8 @@ export function formatText(params: FormatTextParams): string {
       return formatHeader3({ text });
     case 'quote':
       return formatQuote({ text });
+    case 'spoiler':
+      return formatSpoiler({ text });
     default:
       return text;
   }
@@ -129,6 +131,15 @@ export function insertTextAtPosition(params: {
  */
 export function calculateRemainingChars(params: { current: number; max: number }): number {
   return params.max - params.current;
+}
+
+/**
+ * Format text as a spoiler (markdown)
+ * @param params The text to format
+ * @returns The formatted text
+ */
+export function formatSpoiler(params: { text: string }): string {
+  return `>!${params.text}!<`;
 }
 
 /**

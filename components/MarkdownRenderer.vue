@@ -57,23 +57,30 @@ md.renderer.rules.link_open = (
   return self.renderToken(tokens, idx, options);
 };
 
+
 // Add external link icon after the link content
 md.renderer.rules.link_close = () => {
   return '</a><span class="external-link-icon"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></span>';
 };
 
 const renderedMarkdown = computed(() => {
-  const rawHTML = md.render(props.text);
+  // Preprocess text to handle spoiler markup before markdown processing
+  const preprocessedText = props.text.replace(/>!([^!]+)!</g, '§SPOILER§$1§/SPOILER§');
+  
+  const rawHTML = md.render(preprocessedText);
+  
+  // Post-process to convert spoiler placeholders back to HTML
+  const processedHTML = rawHTML.replace(/§SPOILER§([^§]+)§\/SPOILER§/g, '<span class="spoiler-text">$1</span>');
 
   if (import.meta.client && DOMPurify) {
     // Configure DOMPurify to allow target="_blank" attribute
     const config = {
-      ADD_ATTR: ["target", "rel"],
-      ADD_TAGS: ["svg", "path", "polyline", "line"],
+      ADD_ATTR: ["target", "rel", "class"],
+      ADD_TAGS: ["svg", "path", "polyline", "line", "span"],
     };
-    return DOMPurify.sanitize(rawHTML, config);
+    return DOMPurify.sanitize(processedHTML, config);
   }
-  return rawHTML; // Return the raw HTML if on the server
+  return processedHTML; // Return the raw HTML if on the server
 });
 </script>
 
@@ -278,6 +285,31 @@ const renderedMarkdown = computed(() => {
       }
     }
 
+    /* ── spoiler text ───────────────────────────────────── */
+    .spoiler-text {
+      background-color: #000 !important;
+      color: #000 !important;
+      padding: 0.1em 0.2em !important;
+      border-radius: 3px !important;
+      cursor: pointer !important;
+      user-select: none !important;
+      
+      &:hover {
+        background-color: transparent !important;
+        color: inherit !important;
+      }
+      
+      .dark & {
+        background-color: #6b7280 !important;
+        color: #6b7280 !important;
+        
+        &:hover {
+          background-color: transparent !important;
+          color: inherit !important;
+        }
+      }
+    }
+
     /* ── external‑link helper ───────────────────────────── */
     .external-link {
       display: inline-flex;
@@ -421,6 +453,31 @@ const renderedMarkdown = computed(() => {
     .dark & {
       border-left-color: #63b3ed;
       color: #ccc;
+    }
+  }
+
+  /* ── spoiler text ───────────────────────────────────── */
+  .spoiler-text {
+    background-color: #000 !important;
+    color: #000 !important;
+    padding: 0.1em 0.2em !important;
+    border-radius: 3px !important;
+    cursor: pointer !important;
+    user-select: none !important;
+    
+    &:hover {
+      background-color: transparent !important;
+      color: inherit !important;
+    }
+    
+    .dark & {
+      background-color: #6b7280 !important;
+      color: #6b7280 !important;
+      
+      &:hover {
+        background-color: transparent !important;
+        color: inherit !important;
+      }
     }
   }
 

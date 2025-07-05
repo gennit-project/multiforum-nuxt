@@ -14,6 +14,7 @@ import ExpandableImage from "@/components/ExpandableImage.vue";
 import ModelViewer from "@/components/ModelViewer.vue";
 import StlViewer from "@/components/download/StlViewer.vue";
 import { isFileSizeValid } from "@/utils/index";
+import { type Album } from "@/__generated__/graphql";
 
 const props = defineProps<{
   formValues: {
@@ -30,17 +31,7 @@ const props = defineProps<{
   };
   allowImageUpload?: boolean;
   discussionId?: string; // For auto-save functionality
-  existingAlbum?: {
-    id: string;
-    Images: {
-      id: string;
-      url: string;
-      alt: string;
-      caption: string;
-      copyright: string;
-    }[];
-    imageOrder: string[];
-  } | null;
+  existingAlbum?: Album | null | undefined;
 }>();
 
 const emit = defineEmits(["updateFormValues"]);
