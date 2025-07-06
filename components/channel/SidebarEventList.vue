@@ -179,7 +179,7 @@
       </nuxt-link>
       <nuxt-link
         v-if="event?.virtualEventUrl"
-        class="w-fit rounded-sm bg-orange-600 px-4 py-1 text-orange-100"
+        class="w-fit rounded-sm bg-orange-600 px-4 py-1 text-black"
         target="_blank"
         :to="event?.virtualEventUrl"
       >

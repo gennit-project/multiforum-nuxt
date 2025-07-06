@@ -8,7 +8,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import DiscussionVotes from "../vote/DiscussionVotes.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import { relativeTime } from "@/utils";
+import { stableRelativeTime } from "@/utils";
 import type {
   Discussion,
   DiscussionChannel,
@@ -109,7 +109,7 @@ const authorProfilePicURL = computed(
 );
 const title = computed(() => props.discussion?.title || "[Deleted]");
 const relativeTimeAgo = computed(() =>
-  relativeTime(props.discussionChannel.createdAt)
+  stableRelativeTime(props.discussionChannel.createdAt)
 );
 const tags = computed(
   () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []

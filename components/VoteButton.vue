@@ -52,7 +52,7 @@ const buttonClasses = computed(() => {
 
   const defaultClasses = properties.active
     ? "border-orange-500 text-black bg-orange-500 dark:border-orange-600 dark:bg-orange-600 dark:hover:bg-orange-500"
-    : "border-gray-200 text-white bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600";
+    : "border-gray-200 text-black dark:text-white bg-gray-100 text-black hover:border-orange-400 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600";
 
   const permalinkClasses = properties.isPermalinked
     ? "border-orange-500 hover:bg-orange-300 dark:border-orange-600 dark:hover:bg-orange-600"
