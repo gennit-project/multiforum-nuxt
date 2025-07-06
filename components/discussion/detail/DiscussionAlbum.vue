@@ -611,34 +611,6 @@ v-if="editingCaptionIndex === idx"
 
       <!-- Carousel view -->
       <div v-else class="flex flex-col border *:border-gray-300 dark:border-gray-700 rounded-lg">
-        <!-- Counter and navigation row -->
-        <div class="flex items-center justify-between p-2">
-          <span class="text-sm">{{
-            `${activeIndex + 1} of ${orderedImages.length}`
-          }}</span>
-
-          <div class="flex items-center gap-2">
-            <!-- Navigation Buttons -->
-            <div v-if="orderedImages.length > 1" class="flex gap-2">
-              <button
-                type="button"
-                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
-                @click="goLeft"
-              >
-                <LeftArrowIcon class="h-4 w-4" />
-              </button>
-
-              <button
-                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
-                type="button"
-                @click="goRight"
-              >
-                <RightArrowIcon class="h-4 w-4" />
-              </button>
-            </div>
-          </div>
-        </div>
-
         <!-- Image container -->
         <div class="flex items-center justify-center">
           <div 
@@ -735,6 +707,34 @@ v-if="editingCaptionIndex === idx"
                   <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Counter and navigation row -->
+        <div class="flex items-center justify-between p-2">
+          <span class="text-sm">{{
+            `${activeIndex + 1} of ${orderedImages.length}`
+          }}</span>
+
+          <div class="flex items-center gap-2">
+            <!-- Navigation Buttons -->
+            <div v-if="orderedImages.length > 1" class="flex gap-2">
+              <button
+                type="button"
+                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+                @click="goLeft"
+              >
+                <LeftArrowIcon class="h-4 w-4" />
+              </button>
+
+              <button
+                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+                type="button"
+                @click="goRight"
+              >
+                <RightArrowIcon class="h-4 w-4" />
+              </button>
             </div>
           </div>
         </div>
