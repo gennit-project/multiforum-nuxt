@@ -67,16 +67,41 @@ const emit = defineEmits([
 const route = useRoute();
 const router = useRouter();
 
-const relativeTime = (date: string) => DateTime.fromISO(date).toRelative();
+// Stable relative time function that rounds to prevent hydration mismatches
+const stableRelativeTime = (isoDate: string) => {
+  const date = DateTime.fromISO(isoDate);
+  const now = DateTime.now();
+  const diff = now.diff(date);
+
+  if (diff.as("years") >= 1) {
+    const years = Math.floor(diff.as("years"));
+    return years === 1 ? "1 year ago" : `${years} years ago`;
+  } else if (diff.as("months") >= 1) {
+    const months = Math.floor(diff.as("months"));
+    return months === 1 ? "1 month ago" : `${months} months ago`;
+  } else if (diff.as("days") >= 1) {
+    const days = Math.floor(diff.as("days"));
+    return days === 1 ? "1 day ago" : `${days} days ago`;
+  } else if (diff.as("hours") >= 1) {
+    const hours = Math.floor(diff.as("hours"));
+    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
+  } else if (diff.as("minutes") >= 5) {
+    // Round minutes to nearest 5 to reduce hydration mismatches
+    const minutes = Math.floor(diff.as("minutes") / 5) * 5;
+    return `${minutes} minutes ago`;
+  } else {
+    return "just now";
+  }
+};
 
 const editedAt = computed(() => {
   if (!props.discussion?.updatedAt) return "";
-  return `Edited ${relativeTime(props.discussion.updatedAt)}`;
+  return `Edited ${stableRelativeTime(props.discussion.updatedAt)}`;
 });
 
 const createdAt = computed(() => {
   if (!props.discussion?.createdAt) return "";
-  return `Posted ${relativeTime(props.discussion.createdAt)}`;
+  return `Posted ${stableRelativeTime(props.discussion.createdAt)}`;
 });
 
 const {
