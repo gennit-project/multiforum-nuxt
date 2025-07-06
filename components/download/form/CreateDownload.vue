@@ -38,7 +38,37 @@
     mutate: createDownload,
     loading: createDownloadLoading,
     error: createDownloadError,
+    onDone,
   } = useMutation(CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS);
+
+  onDone((response) => {
+    console.log("CreateDownload onDone response:", response);
+    console.log("Full response.data:", response.data);
+    console.log("createDiscussionWithChannelConnections:", response.data?.createDiscussionWithChannelConnections);
+    
+    // Try both possible response structures
+    const directId = response.data?.createDiscussionWithChannelConnections?.id;
+    const arrayId = response.data?.createDiscussionWithChannelConnections?.[0]?.DiscussionChannels?.[0]?.Discussion?.id;
+    
+    const newDiscussionId = directId || arrayId;
+    console.log("Extracted discussionId:", newDiscussionId);
+    
+    if (newDiscussionId) {
+      console.log("Navigating to download detail page:", {
+        forumId: channelId.value,
+        discussionId: newDiscussionId,
+      });
+      router.push({
+        name: "forums-forumId-downloads-discussionId",
+        params: {
+          forumId: channelId.value,
+          discussionId: newDiscussionId,
+        },
+      });
+    } else {
+      console.error("No discussionId found in response");
+    }
+  });
 
   const updateFormValues = (newValues: Partial<CreateEditDiscussionFormValues>) => {
     formValues.value = { ...formValues.value, ...newValues };
@@ -81,7 +111,7 @@
         }),
       };
 
-      const result = await createDownload({
+      await createDownload({
         input: [
           {
             discussionCreateInput,
@@ -90,15 +120,7 @@
         ],
       });
 
-      if (result?.data?.createDiscussionWithChannelConnections?.id) {
-        router.push({
-          name: "forums-forumId-downloads-discussionId",
-          params: {
-            forumId: channelId.value,
-            discussionId: result.data.createDiscussionWithChannelConnections.id,
-          },
-        });
-      }
+      // Navigation is now handled in the onDone hook
     } catch (error) {
       console.error("Error creating download:", error);
     }
