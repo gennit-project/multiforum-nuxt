@@ -29,13 +29,23 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  handleCancelInParent: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["submit"]);
+const emit = defineEmits(["submit", "cancel"]);
 const router = useRouter();
 
 function handleCancel() {
-  router.go(-1);
+  if (props.handleCancelInParent) {
+    // Let the parent handle the cancel navigation
+    emit("cancel");
+  } else {
+    // Use the default behavior (go back in history)
+    router.go(-1);
+  }
 }
 </script>
 

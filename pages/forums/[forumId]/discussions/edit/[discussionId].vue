@@ -322,6 +322,15 @@ export default defineComponent({
         ...data,
       };
     },
+    handleCancel() {
+      this.router.push({
+        name: "forums-forumId-discussions-discussionId",
+        params: {
+          forumId: this.formValues.selectedChannels[0],
+          discussionId: this.discussionId,
+        },
+      });
+    },
   },
 });
 </script>
@@ -344,6 +353,7 @@ export default defineComponent({
         :download-mode="false"
         @submit="submit"
         @update-form-values="updateFormValues"
+        @cancel="handleCancel"
       />
     </template>
     <template #does-not-have-auth>

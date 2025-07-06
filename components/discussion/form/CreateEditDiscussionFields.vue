@@ -31,7 +31,7 @@ const props = defineProps<{
   discussion?: any;
 }>();
 
-defineEmits(["submit", "updateFormValues"]);
+defineEmits(["submit", "updateFormValues", "cancel"]);
 
 const formTitle = computed(() => {
   // handle edit mode
@@ -94,8 +94,10 @@ onMounted(() => {
         :form-title="formTitle"
         :needs-changes="needsChanges"
         :loading="createDiscussionLoading || updateDiscussionLoading"
+        :handle-cancel-in-parent="editMode"
         @input="touched = true"
         @submit="$emit('submit')"
+        @cancel="$emit('cancel')"
       >
         <div v-if="getDiscussionError">
           <ErrorBanner
