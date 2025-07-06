@@ -241,6 +241,10 @@ export default defineNuxtConfig({
         headers: {
           'cache-control': 'public, max-age=31536000, immutable'
         }
+      },
+      // Redirect download base pages to description tab
+      '/forums/**/downloads/*': { 
+        redirect: { to: '/forums/**/downloads/*/description', statusCode: 301 }
       }
     }
   },
