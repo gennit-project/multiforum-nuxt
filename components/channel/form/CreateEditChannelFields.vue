@@ -133,6 +133,7 @@
 
   const titleIsInvalid = computed(() => !isValidTitle(props.formValues?.uniqueName || ""));
   const touched = ref(false);
+  const titleInputRef = ref<{ focus: () => void } | null>(null);
   const router = useRouter();
   const forumId = computed(() => {
     if (typeof route.params.forumId === "string") {
@@ -150,6 +151,10 @@
           forumId: forumId.value,
         },
       });
+    }
+    // Auto-focus the forum unique name field in create mode
+    if (!props.editMode && titleInputRef.value?.focus) {
+      titleInputRef.value.focus();
     }
   });
 
