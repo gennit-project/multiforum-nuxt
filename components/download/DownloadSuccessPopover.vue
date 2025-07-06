@@ -42,7 +42,12 @@ const primaryFile = computed(() => {
 // Generate attribution text
 const attributionText = computed(() => {
   const title = props.discussion.title || "Untitled";
-  const author = props.discussion.Author?.username || "Unknown";
+  const username = props.discussion.Author?.username || "Unknown";
+  const displayName = props.discussion.Author?.displayName;
+  
+  // If display name exists, format as "by Catherine Luse (cluse)", otherwise "by cluse"
+  const author = displayName ? `${displayName} (${username})` : username;
+  
   const url = typeof window !== "undefined" ? window.location.href : "";
   return `"${title}" by ${author} - ${url}`;
 });
