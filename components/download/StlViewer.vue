@@ -10,9 +10,6 @@
 </template>
 
 <script>
-import * as THREE from 'three';
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { markRaw } from 'vue';
 
 export default {
@@ -55,10 +52,14 @@ export default {
       camera: null,
       renderer: null,
       controls: null,
-      mesh: null
+      mesh: null,
+      THREE: null,
+      STLLoader: null,
+      OrbitControls: null
     };
   },
-  mounted() {
+  async mounted() {
+    await this.loadThreeJS();
     this.initViewer();
     this.loadModel();
   },
@@ -71,15 +72,37 @@ export default {
     }
   },
   methods: {
+    async loadThreeJS() {
+      try {
+        const [
+          THREE,
+          { STLLoader },
+          { OrbitControls }
+        ] = await Promise.all([
+          import('three'),
+          import('three/examples/jsm/loaders/STLLoader'),
+          import('three/examples/jsm/controls/OrbitControls')
+        ]);
+        
+        this.THREE = THREE;
+        this.STLLoader = STLLoader;
+        this.OrbitControls = OrbitControls;
+      } catch (error) {
+        console.error('Error loading Three.js modules:', error);
+        this.error = 'Failed to load 3D rendering engine';
+        this.loading = false;
+      }
+    },
+    
     initViewer() {
       const container = this.$refs.container;
       
       // Scene
-      this.scene = markRaw(new THREE.Scene());
-      this.scene.background = new THREE.Color(this.backgroundColor);
+      this.scene = markRaw(new this.THREE.Scene());
+      this.scene.background = new this.THREE.Color(this.backgroundColor);
       
       // Camera
-      this.camera = markRaw(new THREE.PerspectiveCamera(
+      this.camera = markRaw(new this.THREE.PerspectiveCamera(
         50,
         this.width / this.height,
         0.1,
@@ -87,22 +110,22 @@ export default {
       ));
       
       // Renderer
-      this.renderer = markRaw(new THREE.WebGLRenderer({ antialias: true }));
+      this.renderer = markRaw(new this.THREE.WebGLRenderer({ antialias: true }));
       this.renderer.setSize(this.width, this.height);
       this.renderer.shadowMap.enabled = true;
       container.appendChild(this.renderer.domElement);
       
       // Lights
-      const ambientLight = markRaw(new THREE.AmbientLight(0xffffff, 0.6));
+      const ambientLight = markRaw(new this.THREE.AmbientLight(0xffffff, 0.6));
       this.scene.add(ambientLight);
       
-      const directionalLight = markRaw(new THREE.DirectionalLight(0xffffff, 0.4));
+      const directionalLight = markRaw(new this.THREE.DirectionalLight(0xffffff, 0.4));
       directionalLight.position.set(10, 10, 10);
       directionalLight.castShadow = true;
       this.scene.add(directionalLight);
       
       // Controls
-      this.controls = markRaw(new OrbitControls(this.camera, this.renderer.domElement));
+      this.controls = markRaw(new this.OrbitControls(this.camera, this.renderer.domElement));
       this.controls.enableDamping = true;
       this.controls.dampingFactor = 0.05;
       this.controls.autoRotate = this.autoRotate;
@@ -110,7 +133,7 @@ export default {
       
       // Grid
       if (this.showGrid) {
-        const gridHelper = markRaw(new THREE.GridHelper(200, 20));
+        const gridHelper = markRaw(new this.THREE.GridHelper(200, 20));
         this.scene.add(gridHelper);
       }
       
@@ -129,31 +152,31 @@ export default {
         this.mesh.material.dispose();
       }
       
-      const loader = new STLLoader();
+      const loader = new this.STLLoader();
       
       loader.load(
         this.src,
         (geometry) => {
           // Center geometry
           geometry.computeBoundingBox();
-          const center = geometry.boundingBox.getCenter(new THREE.Vector3());
+          const center = geometry.boundingBox.getCenter(new this.THREE.Vector3());
           geometry.translate(-center.x, -center.y, -center.z);
           
           // Create mesh
-          const material = markRaw(new THREE.MeshPhongMaterial({
+          const material = markRaw(new this.THREE.MeshPhongMaterial({
             color: this.modelColor,
             specular: 0x111111,
             shininess: 200
           }));
           
-          this.mesh = markRaw(new THREE.Mesh(geometry, material));
+          this.mesh = markRaw(new this.THREE.Mesh(geometry, material));
           this.mesh.castShadow = true;
           this.mesh.receiveShadow = true;
           this.scene.add(this.mesh);
           
           // Adjust camera
-          const box = new THREE.Box3().setFromObject(this.mesh);
-          const size = box.getSize(new THREE.Vector3());
+          const box = new this.THREE.Box3().setFromObject(this.mesh);
+          const size = box.getSize(new this.THREE.Vector3());
           const maxDim = Math.max(size.x, size.y, size.z);
           const fov = this.camera.fov * (Math.PI / 180);
           const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
@@ -210,8 +233,8 @@ export default {
     // Public methods
     resetCamera() {
       if (this.camera && this.controls && this.mesh) {
-        const box = new THREE.Box3().setFromObject(this.mesh);
-        const size = box.getSize(new THREE.Vector3());
+        const box = new this.THREE.Box3().setFromObject(this.mesh);
+        const size = box.getSize(new this.THREE.Vector3());
         const maxDim = Math.max(size.x, size.y, size.z);
         const fov = this.camera.fov * (Math.PI / 180);
         const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
