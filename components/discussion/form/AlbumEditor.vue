@@ -71,6 +71,25 @@ const isImageLimitReached = computed(() => {
   return (props.formValues.album?.images?.length ?? 0) >= MAX_IMAGES;
 });
 
+// Ordered images based on imageOrder field, similar to DiscussionAlbum
+const orderedImages = computed(() => {
+  if (!props.formValues.album?.images) {
+    return [];
+  }
+  
+  if (!props.formValues.album.imageOrder || props.formValues.album.imageOrder.length === 0) {
+    return props.formValues.album.images;
+  }
+  
+  const orderedResult = props.formValues.album.imageOrder
+    .map((imageId) => {
+      return props.formValues.album.images?.find((image) => image.id === imageId);
+    })
+    .filter((image) => image !== undefined);
+    
+  return orderedResult;
+});
+
 /**
  * Upload a single file and return the created image object or null on failure.
  * This handles both uploading the file to storage and creating the Image record in the database.
@@ -291,9 +310,17 @@ const updateImageField = (
   fieldName: keyof ImageInput,
   newValue: string
 ) => {
+  // Get the image at the ordered index
+  const orderedImage = orderedImages.value[index];
+  if (!orderedImage || !orderedImage.id) return;
+  
+  // Find the actual index in the images array
+  const actualIndex = props.formValues.album.images.findIndex(img => img.id === orderedImage.id);
+  if (actualIndex === -1) return;
+  
   const updatedImages = [...props.formValues.album.images];
-  updatedImages[index] = {
-    ...updatedImages[index],
+  updatedImages[actualIndex] = {
+    ...updatedImages[actualIndex],
     [fieldName]: newValue,
   };
 
@@ -310,8 +337,16 @@ const updateImageField = (
 };
 
 const deleteImage = (index: number) => {
+  // Get the image at the ordered index
+  const orderedImage = orderedImages.value[index];
+  if (!orderedImage || !orderedImage.id) return;
+  
+  // Find the actual index in the images array
+  const actualIndex = props.formValues.album.images.findIndex(img => img.id === orderedImage.id);
+  if (actualIndex === -1) return;
+  
   const updatedImages = [...props.formValues.album.images];
-  updatedImages.splice(index, 1);
+  updatedImages.splice(actualIndex, 1);
 
   // Update imageOrder after deletion
   const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
@@ -331,19 +366,16 @@ const deleteImage = (index: number) => {
 const moveImageUp = (index: number) => {
   if (index <= 0) return; // Can't move up if it's the first item
 
-  const updatedImages = [...props.formValues.album.images];
-  // Swap with the item above
-  [updatedImages[index], updatedImages[index - 1]] = [
-    updatedImages[index - 1],
-    updatedImages[index],
+  const updatedImageOrder = [...props.formValues.album.imageOrder];
+  // Swap with the item above in the imageOrder array
+  [updatedImageOrder[index], updatedImageOrder[index - 1]] = [
+    updatedImageOrder[index - 1],
+    updatedImageOrder[index],
   ];
-
-  // Update imageOrder after reordering
-  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
 
   emit("updateFormValues", {
     album: {
-      images: updatedImages,
+      images: props.formValues.album.images,
       imageOrder: updatedImageOrder,
     },
   });
@@ -354,24 +386,19 @@ const moveImageUp = (index: number) => {
 
 // Function to move image down in the order
 const moveImageDown = (index: number) => {
-  const images = props.formValues.album.images;
-  if (index >= images.length - 1) return; // Can't move down if it's the last item
+  const imageOrder = props.formValues.album.imageOrder;
+  if (index >= imageOrder.length - 1) return; // Can't move down if it's the last item
 
-  const updatedImages = [...images];
-  // Swap with the item below
-  [updatedImages[index], updatedImages[index + 1]] = [
-    updatedImages[index + 1],
-    updatedImages[index],
+  const updatedImageOrder = [...imageOrder];
+  // Swap with the item below in the imageOrder array
+  [updatedImageOrder[index], updatedImageOrder[index + 1]] = [
+    updatedImageOrder[index + 1],
+    updatedImageOrder[index],
   ];
-  console.log("updatedImages", updatedImages);
-
-  // Update imageOrder after reordering
-  const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
-  console.log("updatedImageOrder", updatedImageOrder);
 
   emit("updateFormValues", {
     album: {
-      images: updatedImages,
+      images: props.formValues.album.images,
       imageOrder: updatedImageOrder,
     },
   });
@@ -717,7 +744,7 @@ const hasStlExtension = (url: string) => {
       </p>
     </div>
     <div
-      v-for="(image, index) in props.formValues.album.images"
+      v-for="(image, index) in orderedImages"
       :key="image?.id || `temp-${index}`"
       class="mb-4 border-b py-2"
     >
@@ -739,10 +766,10 @@ const hasStlExtension = (url: string) => {
             <button
               type="button"
               class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:text-gray-200 dark:border-gray-600"
-              :disabled="index === (formValues.album?.images?.length || 0) - 1"
+              :disabled="index === orderedImages.length - 1"
               :class="{
                 'opacity-50 cursor-not-allowed':
-                  index === (formValues.album?.images?.length || 0) - 1,
+                  index === orderedImages.length - 1,
               }"
               @click="moveImageDown(index)"
             >
