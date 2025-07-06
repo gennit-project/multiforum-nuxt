@@ -212,7 +212,7 @@ const isDownloadDetailPage = computed(() => {
             v-if="!titleEditMode && isDownloadDetailPage"
             class="ml-2"
             :label="'New Upload'"
-            :to="`/forums/${channelId}/discussions/create`"
+            :to="`/forums/${channelId}/downloads/create`"
           />
           <PrimaryButton
             v-if="titleEditMode"

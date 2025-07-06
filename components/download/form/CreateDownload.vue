@@ -92,10 +92,10 @@
 
       if (result?.data?.createDiscussionWithChannelConnections?.id) {
         router.push({
-          name: "forums-forumId-downloads-downloadId",
+          name: "forums-forumId-downloads-discussionId",
           params: {
             forumId: channelId.value,
-            downloadId: result.data.createDiscussionWithChannelConnections.id,
+            discussionId: result.data.createDiscussionWithChannelConnections.id,
           },
         });
       }
