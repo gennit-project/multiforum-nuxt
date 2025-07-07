@@ -24,8 +24,9 @@ const discussionIdInParams = computed(() => {
 
 const props = defineProps({
   discussion: {
-    type: Object as PropType<Discussion | null | undefined>,
-    required: true,
+    type: [Object, null] as PropType<Discussion | null | undefined>,
+    required: false,
+    default: null,
   },
 });
 const emit = defineEmits(["closeEditor", "updateFormValues"]);

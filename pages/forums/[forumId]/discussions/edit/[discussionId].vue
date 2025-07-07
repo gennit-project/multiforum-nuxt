@@ -55,7 +55,7 @@ export default defineComponent({
     });
 
     const discussion = computed<Discussion>(() => {
-      if (getDiscussionError.value || getDiscussionLoading.value) {
+      if (getDiscussionError.value || getDiscussionLoading.value || !getDiscussionResult.value) {
         return null;
       }
       return getDiscussionResult.value.discussions[0];
@@ -199,7 +199,8 @@ export default defineComponent({
       if (
         getDiscussionLoading.value ||
         getDiscussionError.value ||
-        !getDiscussionResult.value.discussions[0].Tags
+        !getDiscussionResult.value ||
+        !getDiscussionResult.value.discussions[0]?.Tags
       ) {
         return [];
       }
@@ -273,7 +274,7 @@ export default defineComponent({
         },
         updateDiscussionInput: updateDiscussionInput.value,
         channelConnections: channelConnections.value,
-        channelDisconnections: discussion.value.DiscussionChannels.filter(
+        channelDisconnections: (discussion.value?.DiscussionChannels || []).filter(
           (dc) => {
             return !channelConnections.value.includes(
               dc.Channel?.uniqueName || ""
@@ -342,19 +343,26 @@ export default defineComponent({
   >
     {{ formValues }}
     <template #has-auth>
-      <CreateEditDiscussionFields
-        :key="dataLoaded.toString()"
-        :edit-mode="true"
-        :discussion-loading="getDiscussionLoading"
-        :get-discussion-error="getDiscussionError"
-        :update-discussion-error="updateDiscussionError"
-        :form-values="formValues"
-        :update-discussion-loading="updateDiscussionLoading"
-        :download-mode="false"
-        @submit="submit"
-        @update-form-values="updateFormValues"
-        @cancel="handleCancel"
-      />
+      <ClientOnly>
+        <CreateEditDiscussionFields
+          :key="dataLoaded.toString()"
+          :edit-mode="true"
+          :discussion-loading="getDiscussionLoading"
+          :get-discussion-error="getDiscussionError"
+          :update-discussion-error="updateDiscussionError"
+          :form-values="formValues"
+          :update-discussion-loading="updateDiscussionLoading"
+          :download-mode="false"
+          @submit="submit"
+          @update-form-values="updateFormValues"
+          @cancel="handleCancel"
+        />
+        <template #fallback>
+          <div class="flex justify-center items-center min-h-[400px]">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          </div>
+        </template>
+      </ClientOnly>
     </template>
     <template #does-not-have-auth>
       <div class="flex justify-center p-8 dark:text-white">
