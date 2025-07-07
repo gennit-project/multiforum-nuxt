@@ -28,11 +28,6 @@ vi.mock('@/components/nav/CreateAnythingButton.vue', () => ({
   }
 }));
 
-vi.mock('@/components/icons/LogoIcon.vue', () => ({
-  default: {
-    template: '<div class="site-logo">Logo</div>'
-  }
-}));
 
 vi.mock('@/components/nav/LoginButton.vue', () => ({
   default: {
@@ -96,7 +91,7 @@ describe('Topnav Component', () => {
     expect(wrapper.exists()).toBe(true);
     
     // Key UI elements should be present
-    expect(wrapper.find('.site-logo').exists()).toBe(true);
+    expect(wrapper.text()).toContain('🐝');
     expect(wrapper.find('.hamburger').exists()).toBe(true);
     expect(wrapper.find('.create-button').exists()).toBe(true);
     expect(wrapper.find('.theme-switcher').exists()).toBe(true);
