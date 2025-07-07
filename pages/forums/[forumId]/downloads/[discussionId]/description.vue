@@ -46,14 +46,21 @@
       <MarkdownPreview
         :disable-gallery="false"
         :text="bodyText"
-        :word-limit="1000"
       />
     </div>
     <div
       v-else
       class="text-gray-500 dark:text-gray-400 py-8 text-center"
     >
-      No description available for this download.
+      <div v-if="discussion && !discussion.body">
+        No description available for this download.
+      </div>
+      <div v-else-if="!discussion">
+        Discussion not found.
+      </div>
+      <div v-else>
+        Loading description...
+      </div>
     </div>
   </div>
 </template>

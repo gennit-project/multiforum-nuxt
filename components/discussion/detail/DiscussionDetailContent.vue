@@ -37,6 +37,7 @@ import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
 import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
+import MarkdownPreview from "@/components/MarkdownPreview.vue";
 // Lazy load the album components since they're not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
   () => import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -580,6 +581,18 @@ const handleEditAlbum = () => {
           <!-- Tab content via router-view -->
           <div class="mt-4">
             <NuxtPage />
+            <!-- Fallback to description if no nested route matches -->
+            <div v-if="$route.name === 'forums-forumId-downloads-discussionId'" class="px-2">
+              <div v-if="discussion?.body" class="rounded">
+                <MarkdownPreview
+                  :disable-gallery="false"
+                  :text="discussion.body"
+                />
+              </div>
+              <div v-else class="text-gray-500 dark:text-gray-400 py-8 text-center">
+                No description available for this download.
+              </div>
+            </div>
           </div>
         </div>
 
