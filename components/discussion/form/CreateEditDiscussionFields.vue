@@ -87,13 +87,13 @@ onMounted(() => {
 <template>
   <div class="flex w-full flex-col items-center justify-center">
     <div class="mx-auto w-full max-w-3xl">
-      <div v-if="discussionLoading">Loading...</div>
+      <div v-if="discussionLoading && !discussion">Loading...</div>
 
       <TailwindForm
         v-if="formValues"
         :form-title="formTitle"
         :needs-changes="needsChanges"
-        :loading="createDiscussionLoading || updateDiscussionLoading"
+        :loading="!discussion && (createDiscussionLoading || updateDiscussionLoading)"
         :handle-cancel-in-parent="editMode"
         @input="touched = true"
         @submit="$emit('submit')"

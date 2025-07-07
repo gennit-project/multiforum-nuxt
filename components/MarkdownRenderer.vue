@@ -72,33 +72,41 @@ const renderedMarkdown = computed(() => {
   // Post-process to convert spoiler placeholders back to HTML
   const processedHTML = rawHTML.replace(/§SPOILER§([^§]+)§\/SPOILER§/g, '<span class="spoiler-text">$1</span>');
 
-  if (import.meta.client && DOMPurify) {
-    // Configure DOMPurify to allow target="_blank" attribute
-    const config = {
-      ADD_ATTR: ["target", "rel", "class"],
-      ADD_TAGS: ["svg", "path", "polyline", "line", "span"],
-    };
-    return DOMPurify.sanitize(processedHTML, config);
-  }
-  return processedHTML; // Return the raw HTML if on the server
+  // Always return the processed HTML - DOMPurify is handled separately for hydration
+  return processedHTML;
 });
 </script>
 
 <template>
   <div class="markdown-container">
     <!-- Use both classes and inline styles to ensure font size is applied -->
-    <div 
-      ref="slotContainer" 
-      class="markdown-body" 
-      :class="
-        {
-          'font-size-small': props.fontSize === 'small',
-          'font-size-medium': props.fontSize === 'medium',
-          'font-size-large': props.fontSize === 'large',
-        }
-      " 
-      v-html="renderedMarkdown" 
-    />
+    <ClientOnly>
+      <div 
+        ref="slotContainer" 
+        class="markdown-body" 
+        :class="
+          {
+            'font-size-small': props.fontSize === 'small',
+            'font-size-medium': props.fontSize === 'medium',
+            'font-size-large': props.fontSize === 'large',
+          }
+        " 
+        v-html="renderedMarkdown" 
+      />
+      <template #fallback>
+        <div 
+          class="markdown-body" 
+          :class="
+            {
+              'font-size-small': props.fontSize === 'small',
+              'font-size-medium': props.fontSize === 'medium',
+              'font-size-large': props.fontSize === 'large',
+            }
+          " 
+          v-html="renderedMarkdown" 
+        />
+      </template>
+    </ClientOnly>
     <div v-if="$slots.default" class="inline-slot">
       <slot/>
     </div>

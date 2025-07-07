@@ -11,6 +11,7 @@ import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
 import { isFileSizeValid } from "@/utils/index";
 import EmojiPicker from "@/components/comments/EmojiPicker.vue";
 import EyeSlashIcon from "@/components/icons/EyeSlashIcon.vue";
+import CharCounter from "@/components/CharCounter.vue";
 import { 
   formatText,
   insertEmoji as insertEmojiAtPosition,

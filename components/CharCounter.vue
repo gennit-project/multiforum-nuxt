@@ -21,24 +21,27 @@ const props = defineProps({
 });
 
 const charactersRemaining = computed(() => props.max - props.current);
+const showWarning = computed(() => props.current <= props.max && charactersRemaining.value < props.max / 2);
+const showMinWarning = computed(() => props.current > 0 && props.current < props.min);
+const showOverLimit = computed(() => charactersRemaining.value < 0);
 </script>
 
 <template>
   <div :data-testid="testId">
     <div
-      v-if="current <= max && charactersRemaining < max / 2"
+      v-show="showWarning"
       class="text-right text-gray-500 dark:text-gray-300 text-sm font-medium mt-2 mb-4"
     >
       {{ `${charactersRemaining}/${max}` }} characters remaining
     </div>
     <div
-      v-if="current > 0 && current < min"
+      v-show="showMinWarning"
       class="text-right text-gray-500 dark:text-gray-300 text-sm font-medium mt-2 mb-4"
     >
       Minimum of {{ min }} characters
     </div>
     <div
-      v-else-if="charactersRemaining < 0"
+      v-show="showOverLimit && !showMinWarning"
       class="text-right text-red-400 dark:text-red-500 text-sm font-medium mt-2 mb-4"
     >
       {{ `${charactersRemaining}/${max}` }} characters remaining

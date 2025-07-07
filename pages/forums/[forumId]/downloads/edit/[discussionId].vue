@@ -470,34 +470,41 @@ export default defineComponent({
 });
 </script>
 <template>
-  <RequireAuth
-    :require-ownership="true"
-    :owners="ownerList"
-    :loading="getDiscussionLoading"
-  >
-    <template #has-auth>
-      <CreateEditDiscussionFields
-        :key="dataLoaded.toString()"
-        :edit-mode="true"
-        :discussion-loading="getDiscussionLoading"
-        :get-discussion-error="getDiscussionError"
-        :update-discussion-error="updateDiscussionError"
-        :form-values="formValues"
-        :update-discussion-loading="updateDiscussionLoading"
-        :download-mode="true"
-        :discussion="discussion"
-        :channel-data="channelData"
-        @submit="submit"
-        @update-form-values="updateFormValues"
-        @cancel="handleCancel"
-      />
-    </template>
-    <template #does-not-have-auth>
-      <div class="flex justify-center p-8 dark:text-white">
-        You do not have permission to see this page.
+  <ClientOnly>
+    <RequireAuth
+      :require-ownership="true"
+      :owners="ownerList"
+      :loading="getDiscussionLoading"
+    >
+      <template #has-auth>
+        <CreateEditDiscussionFields
+          :key="dataLoaded.toString()"
+          :edit-mode="true"
+          :discussion-loading="getDiscussionLoading"
+          :get-discussion-error="getDiscussionError"
+          :update-discussion-error="updateDiscussionError"
+          :form-values="formValues"
+          :update-discussion-loading="updateDiscussionLoading"
+          :download-mode="true"
+          :discussion="discussion"
+          :channel-data="channelData"
+          @submit="submit"
+          @update-form-values="updateFormValues"
+          @cancel="handleCancel"
+        />
+      </template>
+      <template #does-not-have-auth>
+        <div class="flex justify-center p-8 dark:text-white">
+          You do not have permission to see this page.
+        </div>
+      </template>
+    </RequireAuth>
+    <template #fallback>
+      <div class="flex justify-center items-center min-h-[400px]">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
       </div>
     </template>
-  </RequireAuth>
+  </ClientOnly>
 </template>
 
 <style></style>
