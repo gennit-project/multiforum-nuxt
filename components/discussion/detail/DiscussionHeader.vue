@@ -56,6 +56,11 @@ const props = defineProps({
     // boolean or undefined or null
     default: false,
   },
+  downloadMode: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 const emit = defineEmits([
@@ -285,7 +290,8 @@ const menuItems = computed(() => {
     discussionId: props.discussion.id,
     hasAlbum: !!props.discussion?.Album?.Images?.length,
     feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
-    hasSensitiveContent: !!props.discussion?.hasSensitiveContent
+    hasSensitiveContent: !!props.discussion?.hasSensitiveContent,
+    downloadMode: props.downloadMode
   });
 });
 
@@ -350,7 +356,7 @@ const authorIsMod = computed(
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <div v-if="usernameVar === discussion?.Author?.username">
+        <div v-if="usernameVar === discussion?.Author?.username && !downloadMode">
           <button
             v-if="!discussionBodyEditMode"
             type="button"

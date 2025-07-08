@@ -55,6 +55,7 @@
       discussionId: discussionId.value,
       channelUniqueName: channelId.value,
       username: usernameVar.value,
+      modName: loggedInUserModName.value,
       offset: 0,
       limit: COMMENT_LIMIT,
     }),
