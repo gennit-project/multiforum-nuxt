@@ -65,10 +65,10 @@
       return true;
     }
     
-    // Hide sidebar on wiki content pages and download detail pages to give more reading space
+    // Hide sidebar on wiki content pages and downloads pages to give more reading space
     // (but not wiki settings pages which are handled above)
     return !routeName.includes("forums-forumId-wiki") && 
-           !routeName.includes("forums-forumId-downloads-discussionId");
+           !routeName.includes("forums-forumId-downloads");
   });
 
   const channelId = computed(() => {
