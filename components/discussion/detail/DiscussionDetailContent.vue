@@ -28,7 +28,7 @@ import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.
 import Notification from "@/components/NotificationComponent.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import { usernameVar, modProfileNameVar } from "@/cache";
-import { useRoute } from "nuxt/app";
+import { useRoute, useRouter } from "nuxt/app";
 import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
 import ImageIcon from "@/components/icons/ImageIcon.vue";
 import AlbumEditForm from "./AlbumEditForm.vue";
@@ -38,6 +38,7 @@ import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
 import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
+import PencilIcon from "@/components/icons/PencilIcon.vue";
 // Lazy load the album components since they're not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
   () => import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -61,6 +62,7 @@ const props = defineProps({
 });
 
 const route = useRoute();
+const router = useRouter();
 const offset = ref(0);
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -362,6 +364,7 @@ const handleEditAlbum = () => {
                 :discussion-body-edit-mode="discussionBodyEditMode"
                 :discussion-channel-id="activeDiscussionChannel?.id"
                 :discussion-is-archived="isArchived || false"
+                :download-mode="downloadMode"
                 @cancel-edit-discussion-body="discussionBodyEditMode = false"
                 @handle-click-add-album="handleClickAddAlbum"
                 @handle-click-edit-body="handleClickEditDiscussionBody"
@@ -580,17 +583,33 @@ const handleEditAlbum = () => {
 
           <!-- Tab content via router-view -->
           <div class="mt-4">
-            <NuxtPage />
+            <NuxtPage :discussion="discussion" />
             <!-- Fallback to description if no nested route matches -->
             <div v-if="$route.name === 'forums-forumId-downloads-discussionId'" class="px-2">
-              <div v-if="discussion?.body" class="rounded">
-                <MarkdownPreview
-                  :disable-gallery="false"
-                  :text="discussion.body"
-                />
-              </div>
-              <div v-else class="text-gray-500 dark:text-gray-400 py-8 text-center">
-                No description available for this download.
+              <div class="space-y-4">
+                <!-- Edit button for download authors -->
+                <div v-if="loggedInUserIsAuthor && discussion" class="flex justify-end">
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                    @click="router.push(`/forums/${channelId}/downloads/${discussionId}/description`)"
+                    data-testid="edit-download-button-fallback"
+                  >
+                    <PencilIcon class="h-4 w-4" />
+                    Edit Description
+                  </button>
+                </div>
+                
+                <!-- Description content -->
+                <div v-if="discussion?.body" class="rounded">
+                  <MarkdownPreview
+                    :disable-gallery="false"
+                    :text="discussion.body"
+                  />
+                </div>
+                <div v-else class="text-gray-500 dark:text-gray-400 py-8 text-center">
+                  No description available for this download.
+                </div>
               </div>
             </div>
           </div>
