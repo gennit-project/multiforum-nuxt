@@ -13,7 +13,8 @@ function createMockRoute(query: Record<string, any> = {}): RouteLocationNormaliz
     query,
     hash: '',
     matched: [],
-  } as RouteLocationNormalized;
+    redirectedFrom: undefined,
+  };
 }
 
 describe('getDiscussionFilterValuesFromParams', () => {
