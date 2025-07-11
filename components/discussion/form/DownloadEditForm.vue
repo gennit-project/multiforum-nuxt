@@ -67,7 +67,7 @@ const downloadableFiles = computed(() => {
 
 // Form values
 const formValues = ref({
-  downloadableFiles: [] as any[],
+  downloadableFiles: [] as DownloadableFile[],
 });
 
 // Upload state
@@ -213,7 +213,7 @@ const handleFileUpload = async (event: Event) => {
 /**
  * Adds a downloadable file to the form values
  */
-const addNewFile = (fileData: any) => {
+const addNewFile = (fileData: DownloadableFile) => {
   const updatedFiles = [...formValues.value.downloadableFiles, fileData];
   formValues.value.downloadableFiles = updatedFiles;
 };

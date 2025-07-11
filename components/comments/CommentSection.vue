@@ -352,8 +352,8 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
           },
         });
 
-        const existingReplies = (existingData as { getCommentReplies?: { ChildComments?: any[]; aggregateChildCommentCount?: number } })?.getCommentReplies?.ChildComments || [];
-        const existingCount = (existingData as { getCommentReplies?: { ChildComments?: any[]; aggregateChildCommentCount?: number } })?.getCommentReplies?.aggregateChildCommentCount || 0;
+        const existingReplies = (existingData as { getCommentReplies?: { ChildComments?: CommentType[]; aggregateChildCommentCount?: number } })?.getCommentReplies?.ChildComments || [];
+        const existingCount = (existingData as { getCommentReplies?: { ChildComments?: CommentType[]; aggregateChildCommentCount?: number } })?.getCommentReplies?.aggregateChildCommentCount || 0;
 
         // Write the updated data back to the cache
         cache.writeQuery({

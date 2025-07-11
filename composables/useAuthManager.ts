@@ -56,11 +56,11 @@ export function useAuthManager() {
       if (auth0.isAuthenticated.value) {
         const claims = auth0.idTokenClaims;
 
-        if (claims) {
+        if (claims.value) {
           const currentTime = Math.floor(Date.now() / 1000);
-          const expiresAt = claims?.exp;
+          const expiresAt = claims.value.exp;
 
-          if (expiresAt <= currentTime + 60) {
+          if (expiresAt && expiresAt <= currentTime + 60) {
             console.log("Token is expired or about to expire, attempting refresh");
             isSessionExpired.value = true;
 

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { computed, ref, watch } from "vue";
+  import { computed, ref, watch, type Component } from "vue";
   import TabButton from "@/components/channel/TabButton.vue";
   import CalendarIcon from "@/components/icons/CalendarIcon.vue";
   import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
@@ -17,7 +17,7 @@
     name: string;
     routeSuffix: string;
     label: string;
-    icon: any;
+    icon: Component;
     countProperty: keyof Channel | null;
   };
 

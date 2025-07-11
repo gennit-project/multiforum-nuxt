@@ -106,7 +106,7 @@
         (dc: DiscussionChannel) => dc?.Channel?.uniqueName === channelId
       );
 
-      const existingData: any = cache.readQuery({
+      const existingData: { getDiscussionsInChannel?: { aggregateDiscussionChannelsCount?: number } } | null = cache.readQuery({
         query: GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
         variables: {
           channelUniqueName: channelId,

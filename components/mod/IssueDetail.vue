@@ -179,7 +179,7 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
 
       // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
       // to add this issue to the list of closed issues
-      const existingClosedIssuesByChannelData: any = cache.readQuery({
+      const existingClosedIssuesByChannelData: { channels?: { Issues: Issue[] }[] } | null = cache.readQuery({
         query: GET_CLOSED_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
       });
@@ -285,7 +285,7 @@ const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
       // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
       // so that the newly reopened issue is removed from the list
       // of closed issues.
-      const existingClosedIssuesByChannelData: any = cache.readQuery({
+      const existingClosedIssuesByChannelData: { channels?: { Issues: Issue[] }[] } | null = cache.readQuery({
         query: GET_CLOSED_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
       });

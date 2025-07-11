@@ -24,6 +24,10 @@ type FileChangeInput = {
   fieldName: string;
 }
 
+type EmojiClickEvent = {
+  unicode: string;
+}
+
 // Props
 const props = defineProps({
   allowImageUpload: {
@@ -89,7 +93,7 @@ const updateText = (newText: string) => {
   emit("update", newText);
 };
 
-const insertEmoji = (event: any) => {
+const insertEmoji = (event: EmojiClickEvent) => {
   const textarea = editorRef.value;
   if (!textarea) return;
   
@@ -424,7 +428,7 @@ const handleFileChange = async (input: FileChangeInput) => {
   }
 };
 
-const handleDrop = async (event: any) => {
+const handleDrop = async (event: DragEvent) => {
   event.preventDefault();
   if (!props.allowImageUpload) {
     return;

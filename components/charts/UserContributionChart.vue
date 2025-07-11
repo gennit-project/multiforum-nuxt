@@ -88,7 +88,7 @@ const contributions = computed(() => {
 
 // Track the last selected day
 const selectedDay = ref(null);
-const logSelected = (day: any) => {
+const logSelected = (day: { date: string; count: number; activities: unknown[]; week: number; day: number } | null) => {
   selectedDay.value = day;
 };
 

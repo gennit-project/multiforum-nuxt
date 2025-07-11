@@ -2,6 +2,7 @@
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_CHANNEL } from "@/graphQLData/channel/queries";
+import type { User } from "@/__generated__/graphql";
 import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { useRoute } from "nuxt/app";
@@ -32,7 +33,7 @@ const channel = computed(() => {
 const admins = computed(() => channel.value?.Admins ?? []);
 
 const ownerList = computed(() =>
-  admins.value.map((adminData: any) => adminData?.username)
+  admins.value.map((adminData: User) => adminData?.username)
 );
 </script>
 

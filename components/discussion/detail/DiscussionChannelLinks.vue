@@ -27,7 +27,7 @@ export default defineComponent({
     const getCommentCount = (channelId: string) => {
       const discussionChannels = props.discussionChannels;
 
-      const activeDiscussionChannel = discussionChannels.find((cs: any) => {
+      const activeDiscussionChannel = discussionChannels.find((cs: DiscussionChannel) => {
         return cs.Channel?.uniqueName === channelId;
       });
 
