@@ -31,11 +31,25 @@ const formattedEndTimeDate = computed(() => {
   return dateTime.toFormat("yyyy-MM-dd");
 });
 
-// Mock handlers
-const handleStartTimeDateChange = () => {};
-const handleEndTimeDateChange = () => {};
-const handleStartTimeTimeChange = () => {};
-const handleEndTimeTimeChange = () => {};
+// Define emits
+const emit = defineEmits(['updateStartDate', 'updateEndDate', 'updateStartTime', 'updateEndTime']);
+
+// Event handlers
+const handleStartTimeDateChange = (value: string) => {
+  emit('updateStartDate', value);
+};
+
+const handleEndTimeDateChange = (value: string) => {
+  emit('updateEndDate', value);
+};
+
+const handleStartTimeTimeChange = (value: string) => {
+  emit('updateStartTime', value);
+};
+
+const handleEndTimeTimeChange = (value: string) => {
+  emit('updateEndTime', value);
+};
 </script>
 
 <template>
@@ -63,6 +77,15 @@ const handleEndTimeTimeChange = () => {};
             data-testid="start-time-picker"
             @update="handleStartTimeTimeChange"
           />
+          
+          <!-- Arrow between start and end times - visible for non-all-day single-day events or multi-day events -->
+          <div 
+            v-if="!isAllDay || isMultiDay"
+            class="text-gray-500 dark:text-gray-400 mx-2"
+            data-testid="time-arrow"
+          >
+            →
+          </div>
         </div>
       </div>
       
