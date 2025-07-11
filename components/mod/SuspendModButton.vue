@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { useQuery } from "@vue/apollo-composable";
 import {
-  GET_MOD_SUSPENSION,
+  GET_SUSPENDED_MODS_BY_CHANNEL,
 } from "@/graphQLData/mod/queries";
 import { computed } from "vue";
 
@@ -21,15 +21,17 @@ const {
   loading: getModSuspensionLoading,
   error: getModSuspensionError,
   // refetch: refetchModSuspension
-} = useQuery(GET_MOD_SUSPENSION, {
+} = useQuery(GET_SUSPENDED_MODS_BY_CHANNEL, {
   channelUniqueName: props.channelUniqueName,
-  modProfileName: props.authorModProfileName,
 });
 
 const modIsSuspendedFromChannel = computed(() => {
   if (getModSuspensionLoading.value || getModSuspensionError.value)
     return false;
-  return getModSuspensionResult.value?.channels?.[0]?.SuspendedMods?.length > 0;
+  const suspendedMods = getModSuspensionResult.value?.channels?.[0]?.SuspendedMods || [];
+  return suspendedMods.some((suspendedMod: any) => 
+    suspendedMod.SuspendedMod?.displayName === props.authorModProfileName
+  );
 });
 </script>
 

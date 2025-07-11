@@ -46,6 +46,11 @@ const activeRevision = ref<WikiRevisionData | null>(null);
         body: props.wikiPage.body,
         createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
         Author: props.wikiPage.VersionAuthor,
+        AuthorConnection: {
+          edges: [],
+          pageInfo: { hasNextPage: false, hasPreviousPage: false },
+          totalCount: 0,
+        },
       };
 
       // First item: most recent edit (current vs most recent past version)
@@ -170,8 +175,8 @@ const activeRevision = ref<WikiRevisionData | null>(null);
     <WikiRevisionDiffModal
       v-if="activeRevision"
       :open="!!activeRevision"
-      :old-version="activeRevision.oldVersionData"
-      :new-version="activeRevision.newVersionData"
+      :old-version="activeRevision.oldVersionData || {}"
+      :new-version="activeRevision.newVersionData || {}"
       :is-most-recent="activeRevision === allEdits[0]"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"

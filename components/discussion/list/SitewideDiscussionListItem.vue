@@ -175,9 +175,7 @@ const revealSensitiveContent = () => {
             <nuxt-link
               v-if="discussion"
               :to="
-                getDetailLink(
-                  discussion.DiscussionChannels?.[0]?.channelUniqueName
-                )
+                getDetailLink()
               "
             >
               <span
@@ -200,7 +198,7 @@ const revealSensitiveContent = () => {
                 <!-- Comment count -->
                 <nuxt-link
                   v-if="discussion && !submittedToMultipleChannels"
-                  :to="getDetailLink(discussion.DiscussionChannels?.[0]?.channelUniqueName)"
+                  :to="getDetailLink()"
                   class="inline"
                 >
                   {{ commentCount }} {{ commentCount === 1 ? "comment" : "comments" }}

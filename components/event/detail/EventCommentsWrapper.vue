@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from "vue";
 import type { PropType } from "vue";
-import type { Event, Comment as CommentType } from "@/__generated__/graphql";
+import type { Event, Comment as CommentType, CommentCreateInput } from "@/__generated__/graphql";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
 import CommentSection from "@/components/comments/CommentSection.vue";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
@@ -103,7 +103,7 @@ const notifyOnReplyToCommentByDefault = computed(() => {
 });
 
 const createCommentInput = computed(() => {
-  const input = {
+  const input: CommentCreateInput = {
     isRootComment: false,
     Event: {
       connect: {
@@ -160,11 +160,13 @@ const createCommentInput = computed(() => {
   // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
   if (notifyOnReplyToCommentByDefault.value) {
     input.SubscribedToNotifications = {
-      connect: {
-        where: {
-          node: { username: usernameVar.value }
+      connect: [
+        {
+          where: {
+            node: { username: usernameVar.value }
+          }
         }
-      }
+      ]
     };
   }
 
@@ -222,7 +224,7 @@ function incrementCommentCount(cache: any) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsAggregate(existing = {}) {
+        CommentsAggregate(existing: any = {}) {
           return {
             ...existing,
             count: (existing.count || 0) + 1,
@@ -257,7 +259,7 @@ function decrementCommentCount(cache: any) {
     cache.modify({
       id: eventId,
       fields: {
-        CommentsAggregate(existing = {}) {
+        CommentsAggregate(existing: any = {}) {
           return {
             ...existing,
             count: Math.max(0, (existing.count || 0) - 1),

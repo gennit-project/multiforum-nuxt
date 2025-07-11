@@ -136,12 +136,12 @@ const { mutate: addFeedbackCommentToComment, loading: addFeedbackCommentToCommen
     const prevQueryResult = cache.readQuery({
       query: GET_DISCUSSION_FEEDBACK,
       variables: { id: discussionId.value, limit: PAGE_LIMIT, offset: offset.value, loggedInModName: modProfileNameVar.value },
-    });
+    }) as { discussions: Array<{ FeedbackCommentsAggregate?: { count?: number } }> } | null;
     const prevOriginalFeedbackList = discussion.value.FeedbackComments;
     const prevFeedbackComments = commentToGiveFeedbackOn.value?.FeedbackComments || [];
     const updatedDiscussion = {
       ...discussion.value,
-      FeedbackComments: [...prevOriginalFeedbackList.filter((comment: Comment) => comment.id !== commentToGiveFeedbackOn.value?.id), { ...commentToGiveFeedbackOn.value, FeedbackComments: [...prevFeedbackComments, newFeedbackComment], FeedbackCommentsAggregate: { count: (prevQueryResult.discussions[0].FeedbackCommentsAggregate?.count || 0) + 1, __typename: "FeedbackCommentsAggregate" } }],
+      FeedbackComments: [...prevOriginalFeedbackList.filter((comment: Comment) => comment.id !== commentToGiveFeedbackOn.value?.id), { ...commentToGiveFeedbackOn.value, FeedbackComments: [...prevFeedbackComments, newFeedbackComment], FeedbackCommentsAggregate: { count: (prevQueryResult?.discussions[0].FeedbackCommentsAggregate?.count || 0) + 1, __typename: "FeedbackCommentsAggregate" } }],
     };
     cache.writeQuery({
       query: GET_DISCUSSION_FEEDBACK,

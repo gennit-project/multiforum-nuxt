@@ -191,6 +191,7 @@
     }
   }
 
+  // @ts-ignore - definePageMeta is auto-imported by Nuxt
   definePageMeta({
     middleware: "forum-redirect",
   });

@@ -52,30 +52,30 @@ describe('TextEditor Component Tests', () => {
     const wrapper = shallowMount(SimpleMockEditor);
     
     // Set some text
-    wrapper.vm.setText('Hello world');
+    (wrapper.vm as any).setText('Hello world');
     
     // Call the method directly instead of finding and triggering buttons
-    wrapper.vm.formatBold();
+    (wrapper.vm as any).formatBold();
     
     // Check that formatText was called correctly
     expect(formatText).toHaveBeenCalledWith({ text: 'Hello world', format: 'bold' });
     
     // Check that the text was updated
-    expect(wrapper.vm.text).toBe('**Hello world**');
+    expect((wrapper.vm as any).text).toBe('**Hello world**');
     
     // Check event emission
     expect(wrapper.emitted('update')).toBeTruthy();
-    expect(wrapper.emitted('update')[0][0]).toBe('**Hello world**');
+    expect(wrapper.emitted('update')![0][0]).toBe('**Hello world**');
   });
   
   it('calls insertEmoji when emoji button is clicked', () => {
     const wrapper = shallowMount(SimpleMockEditor);
     
     // Set some text
-    wrapper.vm.setText('Hello');
+    (wrapper.vm as any).setText('Hello');
     
     // Call the method directly
-    wrapper.vm.addEmoji();
+    (wrapper.vm as any).addEmoji();
     
     // Check that insertEmoji was called correctly
     expect(insertEmoji).toHaveBeenCalledWith({
@@ -85,11 +85,11 @@ describe('TextEditor Component Tests', () => {
     });
     
     // Check that the text was updated
-    expect(wrapper.vm.text).toBe('Hello😀');
+    expect((wrapper.vm as any).text).toBe('Hello😀');
     
     // Check event emission
     expect(wrapper.emitted('update')).toBeTruthy();
-    expect(wrapper.emitted('update')[0][0]).toBe('Hello😀');
+    expect(wrapper.emitted('update')![0][0]).toBe('Hello😀');
   });
 });
 

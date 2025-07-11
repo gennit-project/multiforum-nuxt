@@ -30,8 +30,11 @@
     body: "",
     selectedChannels: channelId.value ? [channelId.value] : [],
     selectedTags: [],
-    linkPreviews: [],
-    images: [],
+    author: "",
+    album: {
+      images: [],
+      imageOrder: []
+    },
   });
 
   const {

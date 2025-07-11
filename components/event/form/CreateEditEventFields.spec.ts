@@ -357,8 +357,8 @@ describe('CreateEditEventFields Component', () => {
       
       const wrapper = mountComponent({
         ...defaultFormValues,
-        startTime,
-        endTime
+        startTime: startTime!,
+        endTime: endTime!
       });
       
       await nextTick();

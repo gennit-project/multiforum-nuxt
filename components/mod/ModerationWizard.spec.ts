@@ -222,7 +222,7 @@ describe('ModerationWizard Component', () => {
     });
     
     const archiveButton = wrapper.find('[data-testid="archive-button"]');
-    expect(JSON.parse(archiveButton.attributes('data-issue'))).toEqual(openIssue);
+    expect(JSON.parse(archiveButton.attributes('data-issue') || '')).toEqual(openIssue);
     expect(archiveButton.attributes('data-discussion-id')).toBe('disc-123');
     expect(archiveButton.attributes('data-event-id')).toBe('event-456');
     expect(archiveButton.attributes('data-comment-id')).toBe('comment-789');
@@ -241,7 +241,7 @@ describe('ModerationWizard Component', () => {
     });
     
     const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
-    expect(JSON.parse(suspendButton.attributes('data-issue'))).toEqual(openIssue);
+    expect(JSON.parse(suspendButton.attributes('data-issue') || '')).toEqual(openIssue);
     expect(suspendButton.attributes('data-discussion-id')).toBe('disc-123');
     expect(suspendButton.attributes('data-event-id')).toBe('event-456');
     expect(suspendButton.attributes('data-discussion-title')).toBe('Test Context');

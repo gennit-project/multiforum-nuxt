@@ -105,7 +105,7 @@
               :value="formValues.title"
               required
               @update="
-                updateSlug($event);
+                updateSlug();
                 formValues.title = $event;
               "
             />

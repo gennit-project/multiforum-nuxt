@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import { mount, VueWrapper } from '@vue/test-utils';
 import DateTimePickersRow from '@/components/event/form/DateTimePickersRow.vue';
 import DatePicker from '@/components/event/form/DatePicker.vue';
 import TimePicker from '@/components/event/form/TimePicker.vue';
@@ -10,7 +10,7 @@ const mockDirective = {
   unmounted: () => {}
 };
 
-const findPickerComponentsByTestId = (wrapper) => {
+const findPickerComponentsByTestId = (wrapper: VueWrapper<any>) => {
   return {
     startDatePicker: wrapper.find('[data-testid="start-date-picker"]'),
     startTimePicker: wrapper.find('[data-testid="start-time-picker"]'),
@@ -163,18 +163,18 @@ describe('DateTimePickersRow', () => {
 
     // Mock a date picker input change
     const startDatePicker = wrapper.findComponent('[data-testid="start-date-picker"]');
-    await startDatePicker.vm.$emit('update', '2023-01-01');
+    await (startDatePicker as any).vm.$emit('update', '2023-01-01');
     
     // Verify the event was emitted with the correct value
     expect(wrapper.emitted('updateStartDate')).toBeTruthy();
-    expect(wrapper.emitted('updateStartDate')[0]).toEqual(['2023-01-01']);
+    expect(wrapper.emitted('updateStartDate')?.[0]).toEqual(['2023-01-01']);
     
-    // Mock a time picker input change
+    // Mock a time picker input change  
     const startTimePicker = wrapper.findComponent('[data-testid="start-time-picker"]');
-    await startTimePicker.vm.$emit('update', '14:30');
+    await (startTimePicker as any).vm.$emit('update', '14:30');
     
     // Verify the event was emitted with the correct value
     expect(wrapper.emitted('updateStartTime')).toBeTruthy();
-    expect(wrapper.emitted('updateStartTime')[0]).toEqual(['14:30']);
+    expect(wrapper.emitted('updateStartTime')?.[0]).toEqual(['14:30']);
   });
 });

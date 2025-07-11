@@ -289,7 +289,7 @@ onAddFeedbackCommentToCommentDone(() => {
           <ErrorBanner
             v-if="getCommentError"
             class="mt-2 px-4"
-            :text="getCommentError?.message || 'Error loading comment'"
+            :text="(getCommentError as any)?.message || 'Error loading comment'"
           />
           <PageNotFound
             v-if="!getCommentLoading && !getCommentError && !originalComment"

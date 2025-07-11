@@ -66,8 +66,20 @@ const downloadableFiles = computed(() => {
 });
 
 // Form values
+type DownloadFormFile = {
+  id?: string;
+  fileName: string;
+  url: string;
+  kind: string;
+  size: number;
+  license: string;
+  priceModel: string;
+  priceCents: number;
+  priceCurrency: string;
+};
+
 const formValues = ref({
-  downloadableFiles: [] as DownloadableFile[],
+  downloadableFiles: [] as DownloadFormFile[],
 });
 
 // Upload state
@@ -213,7 +225,7 @@ const handleFileUpload = async (event: Event) => {
 /**
  * Adds a downloadable file to the form values
  */
-const addNewFile = (fileData: DownloadableFile) => {
+const addNewFile = (fileData: DownloadFormFile) => {
   const updatedFiles = [...formValues.value.downloadableFiles, fileData];
   formValues.value.downloadableFiles = updatedFiles;
 };
@@ -503,7 +515,7 @@ function handleSave() {
                   <div class="flex-1">
                     <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ file.fileName }}</h4>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ (file.size / (1024 * 1024)).toFixed(2) }}MB • {{ file.kind }}
+                      {{ file.size ? (file.size / (1024 * 1024)).toFixed(2) : '0' }}MB • {{ file.kind }}
                     </p>
                     <!-- Show URL for existing files (non-editable) -->
                     <div v-if="file.url" class="mt-2">

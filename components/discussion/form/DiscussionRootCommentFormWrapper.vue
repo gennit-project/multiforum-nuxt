@@ -199,9 +199,9 @@ const {
       const queryResult = cache.readQuery({
         query: GET_DISCUSSION_COMMENTS,
         variables: commentSectionQueryVariables
-      });
+      }) as { getCommentSection: any } | null;
 
-      if (queryResult) {
+      if (queryResult?.getCommentSection) {
         // Update the Comments array within getCommentSection
         cache.writeQuery({
           query: GET_DISCUSSION_COMMENTS,
@@ -231,9 +231,10 @@ const {
             getCommentSection(existingSection = {}, { readField }) {
               if (!existingSection) return existingSection;
               
+              const existingComments = readField('Comments', existingSection) as any[] || [];
               return {
                 ...existingSection,
-                Comments: [commentRef, ...(readField('Comments', existingSection) || [])]
+                Comments: [commentRef, ...existingComments]
               };
             }
           }

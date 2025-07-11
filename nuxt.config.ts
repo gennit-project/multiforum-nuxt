@@ -29,7 +29,7 @@ export default defineNuxtConfig({
     transpile: ["vuetify"],
   },
   experimental: {
-    payloadExtraction: true,
+    payloadExtraction: false,
   },
   compatibilityDate: "2024-04-03",
   components: true,

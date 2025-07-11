@@ -4,7 +4,7 @@ import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
 import { UPDATE_SERVER_CONFIG } from "@/graphQLData/admin/mutations";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import Notification from "@/components/NotificationComponent.vue";
-import type { ServerConfigUpdateInput, GetServerConfigQuery } from "@/__generated__/graphql";
+import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 import { config } from "@/config";
 import CreateEditServerFields from "@/components/admin/CreateEditServerFields.vue";
@@ -80,7 +80,7 @@ const {
     if (newServerConfig) {
       // Read the existing cache data first
       try {
-        const existingData = cache.readQuery<GetServerConfigQuery>({
+        const existingData = cache.readQuery<{ serverConfigs: any[] }>({
           query: GET_SERVER_CONFIG,
           variables: {
             serverName: config.serverName,

@@ -9,7 +9,7 @@ import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
 import { GET_USER } from "@/graphQLData/user/queries";
 import ErrorBanner from "@/components/ErrorBanner.vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import type { Event } from "@/__generated__/graphql";
+import type { Event, CommentCreateInput } from "@/__generated__/graphql";
 import type { CreateEditCommentFormValues } from "@/types/Comment";
 import { usernameVar } from "@/cache";
 
@@ -60,7 +60,7 @@ const createFormValues = ref<CreateEditCommentFormValues>(
 );
 
 const createCommentInput = computed(() => {
-  const baseInput = {
+  const baseInput: CommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
     text: createFormValues.value.text || "",
@@ -88,20 +88,24 @@ const createCommentInput = computed(() => {
       },
     },
     UpvotedByUsers: {
-      connect: {
-        where: { node: { username: usernameVar.value } },
-      },
+      connect: [
+        {
+          where: { node: { username: usernameVar.value } },
+        }
+      ],
     },
   };
 
   // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
   if (notifyOnReplyToCommentByDefault.value) {
     baseInput.SubscribedToNotifications = {
-      connect: {
-        where: {
-          node: { username: usernameVar.value }
+      connect: [
+        {
+          where: {
+            node: { username: usernameVar.value }
+          }
         }
-      }
+      ]
     };
   }
 

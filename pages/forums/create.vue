@@ -11,6 +11,7 @@ import type {
   ChannelTagsConnectOrCreateFieldInput,
 } from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";
+import { useRouter } from "nuxt/app";
 
 const router = useRouter();
 
@@ -22,6 +23,11 @@ const createChannelDefaultValues = {
   channelBannerURL: "",
   selectedTags: [],
   rules: [],
+  wikiEnabled: false,
+  downloadsEnabled: false,
+  allowedFileTypes: [],
+  eventsEnabled: true,
+  feedbackEnabled: true,
 };
 
 const formValues = ref(createChannelDefaultValues);

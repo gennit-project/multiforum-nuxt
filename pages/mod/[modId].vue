@@ -1,4 +1,9 @@
 <script lang="ts" setup>
+// @ts-ignore - definePageMeta is auto-imported by Nuxt
+definePageMeta({
+  middleware: 'mod-profile-redirect'
+})
+
 import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_MOD } from "@/graphQLData/mod/queries";
@@ -27,10 +32,6 @@ const mod = computed(() => {
   }
   return null;
 });
-
-definePageMeta({
-  middleware: 'mod-profile-redirect'
-})
 </script>
 
 <template>

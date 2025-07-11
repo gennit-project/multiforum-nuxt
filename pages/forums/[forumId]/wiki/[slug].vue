@@ -65,7 +65,7 @@
       class="mx-auto max-w-2xl rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-900 dark:text-red-200"
     >
       <p>Sorry, there was an error loading the wiki page.</p>
-      <p class="mt-2 text-sm">{{ (error || channelError).message }}</p>
+      <p class="mt-2 text-sm">{{ (error || channelError)?.message }}</p>
     </div>
 
     <div

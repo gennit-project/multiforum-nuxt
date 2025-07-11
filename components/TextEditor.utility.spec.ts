@@ -11,6 +11,7 @@ import {
   insertEmoji,
   insertTextAtPosition,
   calculateRemainingChars,
+  type FormatType,
 } from '@/utils/textFormatting';
 
 // Enhanced utility function testing
@@ -102,7 +103,7 @@ describe('TextEditor Component Methods', () => {
     const mockComponent = {
       text: '',
       emit: vi.fn(),
-      updateText(newText) {
+      updateText(newText: string) {
         this.text = newText;
         this.emit('update', newText);
       },
@@ -121,7 +122,7 @@ describe('TextEditor Component Methods', () => {
     const mockComponent = {
       text: 'Hello world',
       emit: vi.fn(),
-      formatTextArea(format) {
+      formatTextArea(format: FormatType) {
         const selectedText = this.text;
         // Use the actual formatText function
         this.text = formatText({ text: selectedText, format });
@@ -143,7 +144,7 @@ describe('TextEditor Component Methods', () => {
       text: 'Hello world',
       cursorPosition: 5,
       emit: vi.fn(),
-      insertEmoji(emoji) {
+      insertEmoji(emoji: string) {
         // Use the actual insertEmoji function
         this.text = insertEmoji({
           text: this.text,
@@ -179,7 +180,7 @@ describe('TextEditor Component Methods', () => {
       emit: vi.fn(),
       mockCreateSignedStorageUrl,
       mockUploadAndGetEmbeddedLink,
-      async handleImagePaste(file) {
+      async handleImagePaste(file: File) {
         // Simulate the actual behavior
         const filename = 'test-image.jpg';
         const contentType = file.type;

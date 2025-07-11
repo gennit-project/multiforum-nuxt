@@ -14,4 +14,6 @@ export type CreateEditChannelFormValues = {
     wikiEnabled: boolean;
     downloadsEnabled: boolean;
     allowedFileTypes: Array<string>;
+    eventsEnabled: boolean;
+    feedbackEnabled: boolean;
 }

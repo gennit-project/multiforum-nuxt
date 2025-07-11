@@ -65,6 +65,7 @@ export default defineComponent({
       if (!discussion.value?.Album?.Images) return [];
       return discussion.value.Album.Images.map((image: Image) => {
         return {
+          id: image.id,
           url: image.url || "",
           alt: image.alt || "",
           caption: image.caption || "",
@@ -165,10 +166,10 @@ export default defineComponent({
 
       // Filter out any null or undefined values from imageOrder and ensure they exist in images
       const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
-        (id): id is string =>
+        (id: string | null | undefined): id is string =>
           typeof id === "string" &&
           id.length > 0 &&
-          validImages.some((img) => img.id === id)
+          validImages.some((img: { id: string; url: string; alt: string; caption: string; copyright: string }) => img.id === id)
       );
 
       const formFields: CreateEditDiscussionFormValues = {

@@ -56,14 +56,14 @@ const {
 // Setup a query to get channel data (we'll use this for refetching after actions)
 const { refetch: refetchChannel } = useQuery(
   GET_CHANNEL,
-  {
-    uniqueName: channelId,
+  () => ({
+    uniqueName: channelId.value,
     now: DateTime.local().startOf("hour").toISO(),
-  },
-  {
+  }),
+  () => ({
     fetchPolicy: "network-only", // Always fetch from network when refetching
-    skip: true // Skip initial execution, we'll only use for refetch
-  }
+    enabled: false // Skip initial execution, we'll only use for refetch
+  })
 );
 
 const activeIssue = computed<Issue | null>(() => {

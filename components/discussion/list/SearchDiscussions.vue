@@ -48,10 +48,19 @@ watch(
 // Methods
 const updateFilters = (params: SearchDiscussionValues) => {
   const existingQuery = route.query;
+  
+  // Convert boolean values to strings for URL query parameters
+  const queryParams: Record<string, string | string[]> = {};
+  
+  if (params.tags) queryParams.tags = params.tags;
+  if (params.channels) queryParams.channels = params.channels;
+  if (params.searchInput !== undefined) queryParams.searchInput = params.searchInput;
+  if (params.showArchived !== undefined) queryParams.showArchived = params.showArchived.toString();
+  
   router.replace({
     query: {
       ...existingQuery,
-      ...params,
+      ...queryParams,
     },
   });
 };
@@ -79,7 +88,7 @@ const handleClickTag = (tagText: string) => {
     if (typeof newQuery.tags === "string") {
       newQuery.tags = [newQuery.tags];
     } else if (Array.isArray(newQuery.tags)) {
-      newQuery.tags = newQuery.tags.filter((tag: string) => tag !== tagText);
+      newQuery.tags = newQuery.tags.filter((tag): tag is string => typeof tag === 'string' && tag !== tagText);
     }
     router.replace({ query: { ...newQuery } });
     if (!filterValues.value.tags) {
@@ -141,7 +150,8 @@ const handleClickChannel = (uniqueName: string) => {
       newQuery.channels = [newQuery.channels];
     } else if (Array.isArray(newQuery.channels)) {
       newQuery.channels = newQuery.channels.filter(
-        (channel: string) => channel !== uniqueName
+        (channel): channel is string => 
+          typeof channel === 'string' && channel !== uniqueName
       );
     }
     router.replace({ query: { ...newQuery } });

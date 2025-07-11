@@ -87,7 +87,7 @@
     if (!album?.Images?.length) return null;
     
     // If imageOrder exists and has items, use the first ordered image
-    if (album.imageOrder?.length > 0) {
+    if (album.imageOrder?.length && album.imageOrder.length > 0) {
       const firstImageId = album.imageOrder[0];
       const orderedImage = album.Images.find(img => img.id === firstImageId);
       return orderedImage?.url || null;
@@ -143,7 +143,7 @@
           
           <!-- Album View Button -->
           <button
-            v-if="discussion?.Album?.Images?.length > 0"
+            v-if="discussion?.Album?.Images?.length && discussion.Album.Images.length > 0"
             class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
             title="View album"
             @click.stop="$emit('openAlbum', { discussion, album: discussion?.Album })"

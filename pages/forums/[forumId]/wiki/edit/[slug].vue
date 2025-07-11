@@ -178,7 +178,7 @@
   }
 
   // Derive slug from title
-  function updateSlug(value) {
+  function updateSlug(value: string) {
     if (!dataLoaded.value) return;
 
     formValues.value.slug = value

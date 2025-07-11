@@ -259,7 +259,7 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
           :class="navLinkClasses"
           @click.prevent="() => {
             routeAndClose({
-              path: '/account_settings',
+              name: 'account_settings',
             })
           }"
         >

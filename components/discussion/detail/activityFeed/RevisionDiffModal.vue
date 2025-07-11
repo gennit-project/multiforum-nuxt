@@ -131,11 +131,6 @@ const emit = defineEmits<{
         cache.gc();
       }
     },
-
-    onError: (_err) => {
-      isDeleting.value = false;
-      // Error will be handled by the error ref from useMutation
-    },
   });
 
   const handleDelete = async () => {

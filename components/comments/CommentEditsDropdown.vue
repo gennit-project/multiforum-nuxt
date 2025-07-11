@@ -19,8 +19,8 @@ type EditItem = {
   author: string;
   createdAt: any;
   isCurrent: boolean;
-  oldVersionData: Omit<TextVersion, "Author"> & { Author: CommentAuthor | null | undefined };
-  newVersionData: Omit<TextVersion, "Author"> & { Author: CommentAuthor | null | undefined };
+  oldVersionData: TextVersion;
+  newVersionData: TextVersion;
 };
 
 const activeRevision = ref<EditItem | null>(null);
@@ -69,12 +69,17 @@ const allEdits = computed(() => {
 
   if (props.comment?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
-    const currentVersion = {
+    const currentVersion: TextVersion = {
       id: "current",
       body: props.comment.text, // Current comment text
       createdAt: props.comment.updatedAt || props.comment.createdAt,
-      Author: props.comment.CommentAuthor,
-      AuthorConnection: (props.comment as any).AuthorConnection || null, // Add this line to satisfy TextVersion type
+      Author: props.comment.CommentAuthor as any, // Cast to User type which TextVersion expects
+      AuthorConnection: (props.comment as any).AuthorConnection || {
+        __typename: 'TextVersionAuthorConnection',
+        edges: [],
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+        totalCount: 0
+      },
     };
 
     // First item: most recent edit (current vs most recent past version)

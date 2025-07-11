@@ -24,7 +24,7 @@ const emit = defineEmits(["updateFormValues"]);
     <FormRow section-title="Forum Rules">
       <template #content>
         <RulesEditor 
-          :form-values="formValues"
+          :form-values="{ rules: formValues?.rules || [] }"
           @update-form-values="$emit('updateFormValues', $event)"
         />
       </template>

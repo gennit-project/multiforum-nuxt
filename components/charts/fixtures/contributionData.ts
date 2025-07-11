@@ -1,8 +1,46 @@
 // Contribution data fixture for testing GithubContributionChart component
 import type { DayData } from '@/types/contribution';
+import type { User, Comment, Discussion, Event } from '@/__generated__/graphql';
 
 // Create a stable date for testing that won't change with the current date
 const TEST_YEAR = 2023;
+
+// Helper to create minimal test user data
+const createTestUser = (username: string): User => ({
+  id: `user-${username}`,
+  username,
+  displayName: username,
+  email: `${username}@test.com`,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+} as unknown as User);
+
+// Helper to create minimal test comment data
+const createTestComment = (id: string, text: string, author: User): Comment => ({
+  id,
+  text,
+  CommentAuthor: author,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+} as unknown as Comment);
+
+// Helper to create minimal test discussion data
+const createTestDiscussion = (id: string, title: string, author: User): Discussion => ({
+  id,
+  title,
+  Author: author,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+} as unknown as Discussion);
+
+// Helper to create minimal test event data
+const createTestEvent = (id: string, title: string, poster: User): Event => ({
+  id,
+  title,
+  Poster: poster,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+} as unknown as Event);
 
 // Helper to create a date string in ISO format
 const createDateString = (year: number, month: number, day: number): string => {
@@ -21,11 +59,7 @@ export const contributionDataFixture: DayData[] = [
         type: "Comment",
         description: "Added a comment",
         Comments: [
-          {
-            id: "comment-1",
-            text: "Test comment content",
-            CommentAuthor: { username: "testuser" }
-          }        ]
+          createTestComment("comment-1", "Test comment content", createTestUser("testuser"))        ]
       }
     ]
   },
@@ -38,11 +72,7 @@ export const contributionDataFixture: DayData[] = [
         type: "Discussion",
         description: "Created a discussion",
         Discussions: [
-          {
-            id: "discussion-1",
-            title: "Test discussion",
-            Author: { username: "testuser" }
-          }        ]
+          createTestDiscussion("discussion-1", "Test discussion", createTestUser("testuser"))        ]
       }
     ]
   },
@@ -56,11 +86,7 @@ export const contributionDataFixture: DayData[] = [
         type: "Event",
         description: "Created an event",
         Events: [
-          {
-            id: "event-1",
-            title: "Test event",
-            Poster: { username: "testuser" }
-          }        ]
+          createTestEvent("event-1", "Test event", createTestUser("testuser"))        ]
       }
     ]
   },
@@ -73,8 +99,8 @@ export const contributionDataFixture: DayData[] = [
         id: "activity-4",
         type: "Mixed",
         description: "Multiple activities",
-        Comments: [{ id: "comment-2", text: "Another comment", CommentAuthor: { username: "testuser" } }],
-        Discussions: [{ id: "discussion-2", title: "Another discussion", Author: { username: "testuser" } }]
+        Comments: [createTestComment("comment-2", "Another comment", createTestUser("testuser"))],
+        Discussions: [createTestDiscussion("discussion-2", "Another discussion", createTestUser("testuser"))]
       }
     ]
   },
@@ -118,9 +144,9 @@ export const allTypesContributionData: DayData[] = [
         id: "activity-8",
         type: "All",
         description: "All activity types",
-        Comments: [{ id: "comment-3", text: "Comment content", CommentAuthor: { username: "testuser" } }],
-        Discussions: [{ id: "discussion-3", title: "Discussion title", Author: { username: "testuser" } }],
-        Events: [{ id: "event-3", title: "Event title", Poster: { username: "testuser" } }]
+        Comments: [createTestComment("comment-3", "Comment content", createTestUser("testuser"))],
+        Discussions: [createTestDiscussion("discussion-3", "Discussion title", createTestUser("testuser"))],
+        Events: [createTestEvent("event-3", "Event title", createTestUser("testuser"))]
       }
     ]
   }

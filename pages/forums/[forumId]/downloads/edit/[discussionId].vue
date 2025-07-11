@@ -82,6 +82,7 @@ export default defineComponent({
       if (!discussion.value?.Album?.Images) return [];
       return discussion.value.Album.Images.map((image: Image) => {
         return {
+          id: image.id,
           url: image.url || "",
           alt: image.alt || "",
           caption: image.caption || "",
@@ -194,10 +195,10 @@ export default defineComponent({
 
       // Filter out any null or undefined values from imageOrder and ensure they exist in images
       const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
-        (id: string): id is string =>
+        (id: string | null | undefined): id is string =>
           typeof id === "string" &&
           id.length > 0 &&
-          validImages.some((img: string) => img.id === id)
+          validImages.some((img: { id: string; url: string; alt: string; caption: string; copyright: string }) => img.id === id)
       );
 
       const formFields: CreateEditDiscussionFormValues = {
@@ -294,9 +295,9 @@ export default defineComponent({
       const connectImageArray = newImages
         .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
         .map((img) => ({
-          connect: {
+          connect: [{
             where: { node: { id: img.id } }
-          }
+          }]
         }));
 
       // UPDATE array: existing images that need updates
@@ -318,24 +319,27 @@ export default defineComponent({
       const disconnectImageArray = oldImages
         .filter((old) => !newImages.some((img) => img.id === old.id))
         .map((old) => ({
-          disconnect: {
-            where: { node: { id: old.id } },
-          },
+          where: { node: { id: old.id } },
         }));
         
-      // Combine all operations
-      const imagesOps = [
-        ...connectImageArray,
-        ...updateImageArray,
-        ...disconnectImageArray,
-      ];
-
+      // Build the Images operations object
+      const imagesOps: any = {};
+      if (connectImageArray.length > 0) {
+        imagesOps.connect = connectImageArray;
+      }
+      if (updateImageArray.length > 0) {
+        imagesOps.update = updateImageArray;
+      }
+      if (disconnectImageArray.length > 0) {
+        imagesOps.disconnect = disconnectImageArray;
+      }
+      
       return {
         Album: {
           update: {
             node: {
               imageOrder: albumData.imageOrder || [],
-              Images: imagesOps,
+              Images: [imagesOps],
             },
           },
         },

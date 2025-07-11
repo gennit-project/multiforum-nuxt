@@ -164,7 +164,7 @@ async function submitNotificationSettings() {
   });
 }
 
-function updateBasicFormValues(data: EditAccountSettingsFormValues) {
+function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
   basicFormValues.value = { ...basicFormValues.value, ...data };
 }
 </script>

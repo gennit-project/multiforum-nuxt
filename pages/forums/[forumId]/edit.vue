@@ -8,7 +8,7 @@ import CreateEditChannelFields from "@/components/channel/form/CreateEditChannel
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { usernameVar } from "@/cache";
-import type { Tag as TagData } from "@/__generated__/graphql";
+import type { ChannelUpdateInput, Tag as TagData } from "@/__generated__/graphql";
 import { useRoute } from "nuxt/app";
 import { useQuery, useMutation } from "@vue/apollo-composable";
 
@@ -78,7 +78,7 @@ const ownerList = computed(() => {
   return channel.value?.Admins?.map((admin: UserData) => admin.username) || [];
 });
 
-const channelUpdateInput = computed(() => {
+const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     onCreate: { node: { text: tag } },
     where: { node: { text: tag } },
