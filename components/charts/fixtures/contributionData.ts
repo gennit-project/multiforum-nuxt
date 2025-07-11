@@ -1,5 +1,5 @@
 // Contribution data fixture for testing GithubContributionChart component
-import type { Comment, Discussion, Event } from '@/__generated__/graphql';
+import type { DayData } from '@/types/contribution';
 
 // Create a stable date for testing that won't change with the current date
 const TEST_YEAR = 2023;
@@ -8,23 +8,6 @@ const TEST_YEAR = 2023;
 const createDateString = (year: number, month: number, day: number): string => {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
-
-// Define the activity type to match the component's interface
-interface Activity {
-  id: string;
-  type: string;
-  description: string;
-  Comments?: Partial<Comment>[];
-  Discussions?: Partial<Discussion>[];
-  Events?: Partial<Event>[];
-}
-
-// Define the day data type to match the component's interface
-interface DayData {
-  date: string;
-  count: number;
-  activities: Activity[];
-}
 
 // Create a sparse activity array for testing
 export const contributionDataFixture: DayData[] = [

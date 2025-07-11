@@ -5,28 +5,12 @@ import type {
   Discussion as DiscussionType,
   Event as EventType,
 } from "@/__generated__/graphql";
+import type { Activity, DayData } from "@/types/contribution";
 import { Calendar } from "lucide-vue-next";
 import CommentComponent from "@/components/comments/Comment.vue";
 import DiscussionItemInProfile from "@/components/user/DiscussionItemInProfile.vue";
 import EventListItemInProfile from "@/components/user/EventItemInProfile.vue";
 import ContributionChartSkeleton from "./ContributionChartSkeleton.vue";
-
-// Define the activity type
-interface Activity {
-  id: string;
-  type: string;
-  description: string;
-  Comments?: CommentType[];
-  Discussions?: DiscussionType[];
-  Events?: EventType[];
-}
-
-// Define the day data type
-interface DayData {
-  date: string; // ISO date string or date format
-  count: number;
-  activities: Activity[];
-}
 
 // Props definition with sparse data input
 const props = defineProps({
