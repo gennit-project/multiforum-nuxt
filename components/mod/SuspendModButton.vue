@@ -29,7 +29,7 @@ const {
 const modIsSuspendedFromChannel = computed(() => {
   if (getModSuspensionLoading.value || getModSuspensionError.value)
     return false;
-  return getModSuspensionResult.value?.channels[0].SuspendedMods.length > 0;
+  return getModSuspensionResult.value?.channels?.[0]?.SuspendedMods?.length > 0;
 });
 </script>
 

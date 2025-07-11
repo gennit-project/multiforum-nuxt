@@ -20,7 +20,7 @@ import {
 
 type FileChangeInput = {
   // event of HTMLInputElement;
-  event: Event;   
+  event: Event & { target: HTMLInputElement | null };   
   fieldName: string;
 }
 
@@ -419,7 +419,7 @@ const handleFileChange = async (input: FileChangeInput) => {
   if (!props.allowImageUpload) {
     return;
   }
-  if (!event.target || !(event.target.files)) {
+  if (!event.target || !event.target.files) {
     return;
   }
   const selectedFile = event.target.files[0];
@@ -434,9 +434,9 @@ const handleDrop = async (event: DragEvent) => {
     return;
   }
 
-  const { files } = event.dataTransfer;
+  const files = event.dataTransfer?.files;
 
-  if (files.length === 0) {
+  if (!files || files.length === 0) {
     return;
   }
 

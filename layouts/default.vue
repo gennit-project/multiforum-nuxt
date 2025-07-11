@@ -14,7 +14,7 @@ import { useTestAuthHelpers } from "@/composables/useTestAuthHelpers";
 
 const isDevelopment = computed(() => config.environment === "development");
 const route = useRoute();
-const showFooter = !route.name?.includes("map");
+const showFooter = !route.name?.toString().includes("map");
 
 // UI state management
 const showUserProfileDropdown = ref(false);

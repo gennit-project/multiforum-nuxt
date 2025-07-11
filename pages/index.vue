@@ -6,5 +6,5 @@
 
 <script setup lang="ts">
 // Redirect the user to /discussions using navigateTo
-navigateTo('/discussions')
+await navigateTo('/discussions');
 </script>
