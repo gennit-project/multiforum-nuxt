@@ -1,7 +1,8 @@
 import type { SearchDiscussionValues } from "@/types/Discussion";
+import type { RouteLocationNormalized } from "vue-router";
 
 type GetFilterValuesInput = {
-  route: any;
+  route: RouteLocationNormalized;
   channelId: string;
 };
 
@@ -27,20 +28,20 @@ export const getFilterValuesFromParams = function (
         if (typeof val === "string") {
           cleanedValues.tags = [val];
         }
-        if (typeof val === "object") {
+        if (Array.isArray(val)) {
           // If it is an array of strings, which
           // is good, then the type is an object.
-          cleanedValues.tags = val;
+          cleanedValues.tags = val.filter((v): v is string => typeof v === "string");
         }
         break;
       case "channels":
         if (typeof val === "string") {
           cleanedValues.channels = [val];
         }
-        if (typeof val === "object") {
+        if (Array.isArray(val)) {
           // If it is an array of strings, which
           // is good, then the type is an object.
-          cleanedValues.channels = val;
+          cleanedValues.channels = val.filter((v): v is string => typeof v === "string");
         }
         break;
       case "searchInput":

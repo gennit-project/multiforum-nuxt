@@ -6,6 +6,7 @@ import type { ApolloError } from "@apollo/client/core";
 import { gql } from "@apollo/client/core";
 import type { Comment } from "@/__generated__/graphql";
 import type { CreateReplyInputData } from "@/types/Comment";
+import type { MenuItemType } from "@/components/IconButtonDropdown.vue";
 import TextEditor from "../TextEditor.vue";
 import ChildComments from "./ChildComments.vue";
 import CommentButtons from "./CommentButtons.vue";
@@ -559,7 +560,7 @@ const handleUnmarkAsBestAnswer = async () => {
 };
 
 const commentMenuItems = computed(() => {
-  let menuItems: any[] = [];
+  let menuItems: MenuItemType[] = [];
   
   // Always add these base items for authenticated or unauthenticated users
   
@@ -638,7 +639,7 @@ const commentMenuItems = computed(() => {
   // Show mod actions if user has any mod permissions and isn't the comment author
   if (usernameVar.value && canPerformModActions && !isOwnComment) {
     // Create a list for mod actions
-    const modActions: any[] = [];
+    const modActions: MenuItemType[] = [];
 
     // Add report action if user has permission
     if (userPermissions.value.canReport) {

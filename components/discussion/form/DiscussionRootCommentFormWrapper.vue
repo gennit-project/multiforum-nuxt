@@ -4,6 +4,7 @@ import type { PropType } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
 import type { Comment, DiscussionChannel } from "@/__generated__/graphql";
+import type { ApolloCache, FetchResult } from "@apollo/client/core";
 import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
 import { GET_USER } from "@/graphQLData/user/queries";
@@ -137,7 +138,7 @@ const {
     createCommentInput: createCommentInput.value,
   },
 
-  update: (cache: any, result: any) => {
+  update: (cache: ApolloCache<any>, result: FetchResult) => {
     // This is the logic for updating the cache
     // after creating a root comment. For the logic for updating
     // the cache after replying to a comment, see the CommentSection
@@ -285,7 +286,7 @@ const handleCreateComment = async () => {
   createComment();
 };
 
-const handleUpdateComment = (event: any) => {
+const handleUpdateComment = (event: string) => {
   createFormValues.value.text = event;
 };
 </script>

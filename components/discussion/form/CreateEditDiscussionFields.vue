@@ -15,7 +15,7 @@ import {
 } from "@/utils/constants";
 import AlbumEditForm from "../detail/AlbumEditForm.vue";
 import DownloadEditForm from "./DownloadEditForm.vue";
-import type { Album, Image } from "@/__generated__/graphql";
+import type { Album, Image, Channel, Discussion } from "@/__generated__/graphql";
 
 const props = defineProps<{
   editMode: boolean;
@@ -27,8 +27,8 @@ const props = defineProps<{
   discussionLoading?: boolean;
   createDiscussionLoading?: boolean;
   updateDiscussionLoading?: boolean;
-  channelData?: any;
-  discussion?: any;
+  channelData?: Channel;
+  discussion?: Discussion;
 }>();
 
 defineEmits(["submit", "updateFormValues", "cancel"]);

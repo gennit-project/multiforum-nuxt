@@ -39,7 +39,7 @@ export const useTestAuth = () => {
       // Direct auth state setter for testing
       window.__SET_AUTH_STATE_DIRECT__ = (userData = {}) => {
         console.log('=== BEFORE SETTING AUTH STATE ===');
-        window.__DEBUG_AUTH_STATE__();
+        window.__DEBUG_AUTH_STATE__?.();
         
         console.log('Setting auth state directly for testing');
         
@@ -53,7 +53,7 @@ export const useTestAuth = () => {
         if (userData.modProfileName) setModProfileName(userData.modProfileName);
         
         console.log('=== AFTER SETTING AUTH STATE ===');
-        window.__DEBUG_AUTH_STATE__();
+        window.__DEBUG_AUTH_STATE__?.();
         console.log('Auth state setters have been called');
       };
 

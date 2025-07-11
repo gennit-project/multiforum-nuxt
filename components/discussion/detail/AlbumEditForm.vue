@@ -232,7 +232,7 @@ setTimeout(() => {
 
 function handleUpdateAlbum(newVals: {
   album: {
-    images: any[];
+    images: Image[];
     imageOrder: string[];
   };
 }) {

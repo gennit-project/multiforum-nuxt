@@ -16,6 +16,7 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import WarningModal from "@/components/WarningModal.vue";
 import type { PropType } from "vue";
 import type { Comment } from "@/__generated__/graphql";
+import type { MenuItemType } from "@/components/IconButtonDropdown.vue";
 import { timeAgo, ALLOWED_ICONS } from "@/utils";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
@@ -87,7 +88,7 @@ const {
 const { discussionId, eventId, forumId } = route.params;
 
 const commentMenuItems = computed(() => {
-  let out: any[] = [];
+  let out: MenuItemType[] = [];
   const loggedInUserAuthoredComment =
     props.comment?.CommentAuthor?.displayName === loggedInModName.value;
 

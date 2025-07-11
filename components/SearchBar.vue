@@ -58,10 +58,11 @@ const removeQuotationMarks = (input: string) => {
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
 
-const updateSearchInput = (e: any) => {
+const updateSearchInput = (e: Event) => {
   if (timeout) clearTimeout(timeout);
   timeout = setTimeout(() => {
-    emit("updateSearchInput", removeQuotationMarks(e.target.value));
+    const target = e.target as HTMLInputElement;
+    emit("updateSearchInput", removeQuotationMarks(target.value));
   }, 500);
 };
 
