@@ -3,7 +3,7 @@ import {
   getDiscussionHeaderMenuItems, 
   getEventHeaderMenuItems,
   getCommentAuthorStatus
-} from '@/utils/headerPermissionUtils'
+} from './headerPermissionUtils'
 
 describe('headerPermissionUtils', () => {
   describe('getDiscussionHeaderMenuItems', () => {
