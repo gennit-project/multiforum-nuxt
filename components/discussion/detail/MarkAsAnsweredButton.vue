@@ -38,7 +38,7 @@ const {
   error: markAsUnansweredError,
 } = useMutation(MARK_AS_UNANSWERED);
 
-const clickMarkAsAnswered = async (event: any) => {
+const clickMarkAsAnswered = async (event: Event) => {
   event.preventDefault();
   await markAsAnswered({
     channelId: props.channelId,
@@ -46,7 +46,7 @@ const clickMarkAsAnswered = async (event: any) => {
   });
 };
 
-const clickMarkAsUnanswered = async (event: any) => {
+const clickMarkAsUnanswered = async (event: Event) => {
   event.preventDefault();
   await markAsUnanswered({
     channelId: props.channelId,

@@ -4,6 +4,7 @@ import type {
   CommentCreateInput,
   Comment as CommentType,
 } from "@/__generated__/graphql";
+import type { ApolloCache } from "@apollo/client/core";
 import type { PropType } from "vue";
 import { computed, defineProps, ref } from "vue";
 import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
@@ -23,7 +24,7 @@ import SubscribeButton from "@/components/SubscribeButton.vue";
 const COMMENT_LIMIT = 50;
 
 type CommentSectionQueryUpdateInput = {
-  cache: any;
+  cache: ApolloCache<any>;
   commentToDeleteId: string;
   commentToAddFeedbackTo?: CommentType;
   newFeedbackComment?: CommentType;
@@ -241,7 +242,7 @@ const updateCommentSectionQueryResult = (
   }
 };
 
-const incrementCommentCount = (cache: any) => {
+const incrementCommentCount = (cache: ApolloCache<any>) => {
   try {
     if (!props.discussionChannel?.id) {
       console.error("No discussion channel ID found");
@@ -269,7 +270,7 @@ const incrementCommentCount = (cache: any) => {
   }
 };
 
-const decrementCommentCount = (cache: any) => {
+const decrementCommentCount = (cache: ApolloCache<any>) => {
   try {
     if (!props.discussionChannel?.id) {
       console.error("No discussion channel ID found");

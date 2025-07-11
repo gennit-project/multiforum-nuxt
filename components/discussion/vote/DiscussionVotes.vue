@@ -2,6 +2,7 @@
   import { computed } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { useMutation } from "@vue/apollo-composable";
+  import type { User } from "@/__generated__/graphql";
   import {
     UPVOTE_DISCUSSION_CHANNEL,
     UNDO_UPVOTE_DISCUSSION_CHANNEL,
@@ -57,7 +58,7 @@
   const loggedInUserUpvoted = computed(() => {
     if (!usernameVar.value) return false;
     const users = props.discussionChannel?.UpvotedByUsers || [];
-    return users.some((user: any) => user.username === usernameVar.value);
+    return users.some((user: User) => user.username === usernameVar.value);
   });
 
   const loggedInUserDownvoted = computed(

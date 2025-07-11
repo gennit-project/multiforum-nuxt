@@ -79,7 +79,7 @@ const handleClickTag = (tagText: string) => {
     if (typeof newQuery.tags === "string") {
       newQuery.tags = [newQuery.tags];
     } else if (Array.isArray(newQuery.tags)) {
-      newQuery.tags = newQuery.tags.filter((tag: any) => tag !== tagText);
+      newQuery.tags = newQuery.tags.filter((tag: string) => tag !== tagText);
     }
     router.replace({ query: { ...newQuery } });
     if (!filterValues.value.tags) {
@@ -141,7 +141,7 @@ const handleClickChannel = (uniqueName: string) => {
       newQuery.channels = [newQuery.channels];
     } else if (Array.isArray(newQuery.channels)) {
       newQuery.channels = newQuery.channels.filter(
-        (channel: any) => channel !== uniqueName
+        (channel: string) => channel !== uniqueName
       );
     }
     router.replace({ query: { ...newQuery } });

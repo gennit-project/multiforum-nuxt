@@ -245,7 +245,7 @@ const permalinkObject = computed(() => {
 
 const showCopiedLinkNotification = ref(false);
 
-const copyLink = async (event: any) => {
+const copyLink = async (event: Event) => {
   try {
     let basePath = "";
     if (import.meta.client) {
