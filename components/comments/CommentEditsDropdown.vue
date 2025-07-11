@@ -1,9 +1,19 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import type { Comment, User, TextVersion } from "@/__generated__/graphql";
+import type { Comment, User, TextVersion, CommentAuthor, ModerationProfile } from "@/__generated__/graphql";
 import { timeAgo } from "@/utils";
 import CommentRevisionDiffModal from "./CommentRevisionDiffModal.vue";
+
+// Define type for revision data
+interface RevisionData {
+  id: string;
+  author: string;
+  createdAt: string;
+  isCurrent: boolean;
+  oldVersionData?: TextVersion;
+  newVersionData?: TextVersion;
+}
 
 const props = defineProps({
   comment: {
@@ -13,14 +23,30 @@ const props = defineProps({
 });
 
 const isOpen = ref(false);
-const activeRevision = ref<{ 
-  id: string; 
-  author: string; 
-  createdAt: string; 
-  isCurrent: boolean; 
-  oldVersionData?: TextVersion; 
-  newVersionData?: TextVersion; 
-} | null>(null);
+const activeRevision = ref<RevisionData | null>(null);
+
+// Helper function to get display name from CommentAuthor union type
+const getAuthorDisplayName = (commentAuthor: CommentAuthor | null | undefined): string => {
+  if (!commentAuthor) return "[Deleted]";
+  
+  // Check if it's a User type (has username property)
+  if ('username' in commentAuthor && commentAuthor.username) {
+    return commentAuthor.username;
+  }
+  
+  // Check if it's a ModerationProfile type
+  if ('displayName' in commentAuthor) {
+    if (commentAuthor.displayName) {
+      return commentAuthor.displayName;
+    }
+    // If no displayName, try to get username from nested User
+    if (commentAuthor.User && 'username' in commentAuthor.User && commentAuthor.User.username) {
+      return commentAuthor.User.username;
+    }
+  }
+  
+  return "[Deleted]";
+};
 
 // Total number of edits
 const totalEdits = computed(() => {
@@ -48,7 +74,7 @@ const allEdits = computed(() => {
     // First item: most recent edit (current vs most recent past version)
     edits.push({
       id: "most-recent-edit",
-      author: (props.comment.CommentAuthor as User)?.username || "[Deleted]",
+      author: getAuthorDisplayName(props.comment.CommentAuthor),
       createdAt: props.comment.updatedAt || props.comment.createdAt,
       isCurrent: true,
       oldVersionData: props.comment.PastVersions[0], // Most recent past version
@@ -88,7 +114,7 @@ const closeDropdown = () => {
 };
 
 // Open diff modal for a specific revision
-const openRevisionDiff = (revision: { id: string; author: string; createdAt: string; isCurrent: boolean; oldVersionData?: TextVersion; newVersionData?: TextVersion; }) => {
+const openRevisionDiff = (revision: RevisionData) => {
   activeRevision.value = revision;
 };
 

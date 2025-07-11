@@ -15,6 +15,14 @@ import AlbumEditor from "@/components/discussion/form/AlbumEditor.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { useRoute } from "vue-router";
 
+// Define types for form data
+interface AlbumFormData {
+  album: {
+    images: Image[];
+    imageOrder: string[];
+  };
+}
+
 // Get the discussion ID from the route params
 const route = useRoute();
 const discussionIdInParams = computed(() => {
@@ -28,7 +36,10 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(["closeEditor", "updateFormValues"]);
+const emit = defineEmits<{
+  closeEditor: [];
+  updateFormValues: [formData: { album: { images: Image[]; imageOrder: string[] } }];
+}>();
 
 // Check if we're in create mode (using a temporary ID) or edit mode
 // If we have images with IDs, we're not really in "create" mode for the album,
@@ -79,7 +90,7 @@ const initialImageOrder = computed<string[]>(() => {
     console.log("Creating image order from images");
     // Create an order from the image IDs
     return images.value
-      .filter(img => img.id)
+      .filter((img): img is Image & { id: string } => Boolean(img.id))
       .map(img => img.id);
   }
   
@@ -87,7 +98,7 @@ const initialImageOrder = computed<string[]>(() => {
 });
 
 // Create reactive form values based on the computed props
-const formValues = ref({
+const formValues = ref<AlbumFormData>({
   album: {
     images: [], // Will be updated in onMounted
     imageOrder: [],
@@ -112,7 +123,7 @@ onMounted(() => {
 function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   // 1) If the album doesn't exist yet, CREATE it and connect to existing images
   if (!albumId.value) {
-    const newImages = formValues.value.album.images || [];
+    const newImages = formValues.value.album.images;
     
     // All images should already have IDs since they're created when uploaded
     return {
@@ -122,9 +133,11 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
             imageOrder: formValues.value.album.imageOrder,
             Images: {
               // Connect to existing images using their IDs
-              connect: newImages.map(img => ({
-                where: { node: { id: img.id } }
-              }))
+              connect: newImages
+                .filter((img): img is Image & { id: string } => Boolean(img.id))
+                .map(img => ({
+                  where: { node: { id: img.id } }
+                }))
             },
           },
         },
@@ -139,6 +152,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   // CONNECT array: any new image in `newImages` that has NO matching ID in `oldImages`
   // These are images that already exist in the database but need to be connected to this album
   const connectImageArray = newImages
+    .filter((img): img is Image & { id: string } => Boolean(img.id))
     .filter((img) => !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
       connect: [{
@@ -148,6 +162,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
 
   // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
   const updateImageArray = newImages
+    .filter((img): img is Image & { id: string } => Boolean(img.id))
     .filter((img) => oldImages.some((old) => old.id === img.id))
     .map((img) => ({
       where: { node: { id: img.id } },
@@ -163,7 +178,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
     
   // DISCONNECT array: any old image that is no longer present in `newImages`
   const disconnectImageArray = oldImages
-    .filter((old) => !newImages.some((img) => img.id === old.id))
+    .filter((old) => !newImages.some((img) => Boolean(img.id) && img.id === old.id))
     .map((old) => ({
       disconnect: [{
         where: { node: { id: old.id } },
@@ -219,10 +234,10 @@ function handleSave() {
       album: formValues.value.album
     });
     // Add a success notification
-savedSuccessfully.value = true;
-setTimeout(() => {
-  savedSuccessfully.value = false;
-}, 3000); // Hide after 3 seconds
+    savedSuccessfully.value = true;
+    setTimeout(() => {
+      savedSuccessfully.value = false;
+    }, 3000); // Hide after 3 seconds
   } else {
     // In actual edit mode for an existing discussion, perform the API mutation
     console.log("Calling updateDiscussion in edit mode");
@@ -230,12 +245,7 @@ setTimeout(() => {
   }
 }
 
-function handleUpdateAlbum(newVals: {
-  album: {
-    images: Image[];
-    imageOrder: string[];
-  };
-}) {
+function handleUpdateAlbum(newVals: AlbumFormData) {
   console.log("AlbumEditForm received update from AlbumEditor:", JSON.stringify(newVals));
   
   // Update the album data

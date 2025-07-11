@@ -186,8 +186,8 @@ const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(permalink);
     emit("showCopiedLinkNotification", true);
-  } catch (e: any) {
-    throw new Error(e);
+  } catch (e: unknown) {
+    throw new Error(e instanceof Error ? e.message : String(e));
   }
   setTimeout(() => {
     emit("showCopiedLinkNotification", false);
