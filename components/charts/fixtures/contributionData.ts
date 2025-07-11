@@ -1,4 +1,5 @@
 // Contribution data fixture for testing GithubContributionChart component
+import type { Comment, Discussion, Event } from '@/__generated__/graphql';
 
 // Create a stable date for testing that won't change with the current date
 const TEST_YEAR = 2023;
@@ -8,8 +9,25 @@ const createDateString = (year: number, month: number, day: number): string => {
   return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 };
 
+// Define the activity type to match the component's interface
+interface Activity {
+  id: string;
+  type: string;
+  description: string;
+  Comments?: Partial<Comment>[];
+  Discussions?: Partial<Discussion>[];
+  Events?: Partial<Event>[];
+}
+
+// Define the day data type to match the component's interface
+interface DayData {
+  date: string;
+  count: number;
+  activities: Activity[];
+}
+
 // Create a sparse activity array for testing
-export const contributionDataFixture = [
+export const contributionDataFixture: DayData[] = [
   // January data - a few days with activity
   {
     date: createDateString(TEST_YEAR, 1, 3),
@@ -22,10 +40,9 @@ export const contributionDataFixture = [
         Comments: [
           {
             id: "comment-1",
-            content: "Test comment content",
-            User: { username: "testuser" }
-          }
-        ]
+            text: "Test comment content",
+            CommentAuthor: { username: "testuser" }
+          }        ]
       }
     ]
   },
@@ -41,9 +58,8 @@ export const contributionDataFixture = [
           {
             id: "discussion-1",
             title: "Test discussion",
-            User: { username: "testuser" }
-          }
-        ]
+            Author: { username: "testuser" }
+          }        ]
       }
     ]
   },
@@ -60,9 +76,8 @@ export const contributionDataFixture = [
           {
             id: "event-1",
             title: "Test event",
-            User: { username: "testuser" }
-          }
-        ]
+            Poster: { username: "testuser" }
+          }        ]
       }
     ]
   },
@@ -75,8 +90,8 @@ export const contributionDataFixture = [
         id: "activity-4",
         type: "Mixed",
         description: "Multiple activities",
-        Comments: [{ id: "comment-2", content: "Another comment", User: { username: "testuser" } }],
-        Discussions: [{ id: "discussion-2", title: "Another discussion", User: { username: "testuser" } }]
+        Comments: [{ id: "comment-2", text: "Another comment", CommentAuthor: { username: "testuser" } }],
+        Discussions: [{ id: "discussion-2", title: "Another discussion", Author: { username: "testuser" } }]
       }
     ]
   },
@@ -89,10 +104,10 @@ export const contributionDataFixture = [
 ];
 
 // A set of data points with no activities - empty chart
-export const emptyContributionData = [];
+export const emptyContributionData: DayData[] = [];
 
 // A set of data with activity on consecutive days
-export const consecutiveDaysContributionData = [
+export const consecutiveDaysContributionData: DayData[] = [
   {
     date: createDateString(TEST_YEAR, 4, 10),
     count: 1,
@@ -111,7 +126,7 @@ export const consecutiveDaysContributionData = [
 ];
 
 // Data with one activity with all three types - comments, discussions, events
-export const allTypesContributionData = [
+export const allTypesContributionData: DayData[] = [
   {
     date: createDateString(TEST_YEAR, 5, 15),
     count: 3,
@@ -120,9 +135,9 @@ export const allTypesContributionData = [
         id: "activity-8",
         type: "All",
         description: "All activity types",
-        Comments: [{ id: "comment-3", content: "Comment content", User: { username: "testuser" } }],
-        Discussions: [{ id: "discussion-3", title: "Discussion title", User: { username: "testuser" } }],
-        Events: [{ id: "event-3", title: "Event title", User: { username: "testuser" } }]
+        Comments: [{ id: "comment-3", text: "Comment content", CommentAuthor: { username: "testuser" } }],
+        Discussions: [{ id: "discussion-3", title: "Discussion title", Author: { username: "testuser" } }],
+        Events: [{ id: "event-3", title: "Event title", Poster: { username: "testuser" } }]
       }
     ]
   }
