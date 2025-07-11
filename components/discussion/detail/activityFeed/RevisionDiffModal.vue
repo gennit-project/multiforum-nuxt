@@ -131,11 +131,7 @@ const emit = defineEmits<{
         cache.gc();
       }
     },
-    onCompleted: () => {
-      isDeleting.value = false;
-      emit("deleted", props.oldVersion.id);
-      emit("close");
-    },
+
     onError: (_err) => {
       isDeleting.value = false;
       // Error will be handled by the error ref from useMutation
@@ -159,6 +155,7 @@ const emit = defineEmits<{
 
   onDone(() => {
     isDeleting.value = false;
+    emit("deleted", props.oldVersion.id);
     emit("close");
   });
 

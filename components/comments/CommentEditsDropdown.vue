@@ -5,16 +5,6 @@ import type { Comment, TextVersion, CommentAuthor } from "@/__generated__/graphq
 import { timeAgo } from "@/utils";
 import CommentRevisionDiffModal from "./CommentRevisionDiffModal.vue";
 
-// Define type for revision data
-interface RevisionData {
-  id: string;
-  author: string;
-  createdAt: string;
-  isCurrent: boolean;
-  oldVersionData?: TextVersion;
-  newVersionData?: TextVersion;
-}
-
 const props = defineProps({
   comment: {
     type: Object as PropType<Comment>,
@@ -23,7 +13,17 @@ const props = defineProps({
 });
 
 const isOpen = ref(false);
-const activeRevision = ref<RevisionData | null>(null);
+// Define a type for the edit object
+type EditItem = {
+  id: string;
+  author: string;
+  createdAt: any;
+  isCurrent: boolean;
+  oldVersionData: Omit<TextVersion, "Author"> & { Author: CommentAuthor | null | undefined };
+  newVersionData: Omit<TextVersion, "Author"> & { Author: CommentAuthor | null | undefined };
+};
+
+const activeRevision = ref<EditItem | null>(null);
 
 // Helper function to get display name from CommentAuthor union type
 const getAuthorDisplayName = (commentAuthor: CommentAuthor | null | undefined): string => {
@@ -74,6 +74,7 @@ const allEdits = computed(() => {
       body: props.comment.text, // Current comment text
       createdAt: props.comment.updatedAt || props.comment.createdAt,
       Author: props.comment.CommentAuthor,
+      AuthorConnection: (props.comment as any).AuthorConnection || null, // Add this line to satisfy TextVersion type
     };
 
     // First item: most recent edit (current vs most recent past version)
@@ -108,7 +109,12 @@ const allEdits = computed(() => {
   return edits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 });
 
-// Toggle dropdown
+// Open diff modal for a specific edit item
+const openRevisionDiff = (edit: EditItem | undefined) => {
+  if (!edit) return;
+  activeRevision.value = edit;
+};
+// Toggle dropdown open/close
 const toggleDropdown = () => {
   isOpen.value = !isOpen.value;
 };
@@ -116,11 +122,6 @@ const toggleDropdown = () => {
 // Close dropdown when clicking outside
 const closeDropdown = () => {
   isOpen.value = false;
-};
-
-// Open diff modal for a specific revision
-const openRevisionDiff = (revision: RevisionData) => {
-  activeRevision.value = revision;
 };
 
 // Close diff modal
@@ -163,9 +164,7 @@ const handleRevisionDeleted = (deletedId: string) => {
       v-if="isOpen"
       class="absolute right-0 z-50 mt-2 w-64 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
     >
-      <div
-        class="border-b border-gray-200 p-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
-      >
+      <div>
         Edited {{ totalEdits }} time{{ totalEdits > 1 ? "s" : "" }}
       </div>
 

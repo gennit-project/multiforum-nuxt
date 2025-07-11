@@ -11,6 +11,7 @@ import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type {
   Discussion,
   DiscussionChannel,
+  DownloadableFile,
   Tag as TagData,
   DiscussionTagsConnectOrCreateFieldInput,
   DiscussionTagsDisconnectFieldInput,
@@ -182,7 +183,7 @@ export default defineComponent({
 
       // Create a map of valid images with their IDs
       const validImages = (discussion.Album?.Images ?? [])
-        .filter((image): image is Image & { id: string; url: string } => Boolean(image.id && image.url))
+        .filter((image: Image): image is Image & { id: string; url: string } => Boolean(image.id && image.url))
         .map((image: Image) => ({
           id: image.id,
           url: image.url,
@@ -193,10 +194,10 @@ export default defineComponent({
 
       // Filter out any null or undefined values from imageOrder and ensure they exist in images
       const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
-        (id): id is string =>
+        (id: string): id is string =>
           typeof id === "string" &&
           id.length > 0 &&
-          validImages.some((img) => img.id === id)
+          validImages.some((img: string) => img.id === id)
       );
 
       const formFields: CreateEditDiscussionFormValues = {
@@ -215,7 +216,7 @@ export default defineComponent({
           images: validImages,
           imageOrder: validImageOrder,
         },
-        downloadableFiles: discussion.DownloadableFiles?.map((file) => ({
+        downloadableFiles: discussion.DownloadableFiles?.map((file: DownloadableFile) => ({
           id: file.id || "",
           fileName: file.fileName || "",
           url: file.url || "",
@@ -506,5 +507,3 @@ export default defineComponent({
     </template>
   </ClientOnly>
 </template>
-
-<style></style>

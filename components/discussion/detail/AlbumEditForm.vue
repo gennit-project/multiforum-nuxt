@@ -50,7 +50,7 @@ const props = defineProps({
 });
 const emit = defineEmits<{
   closeEditor: [];
-  updateFormValues: [formData: { album: { images: Image[]; imageOrder: string[] } }];
+  updateFormValues: [formData: { album: { images: AlbumFormImage[]; imageOrder: string[] } }];
 }>();
 
 // Check if we're in create mode (using a temporary ID) or edit mode

@@ -147,13 +147,13 @@ onMounted(() => {
                   :discussion="
                     editMode && discussion
                       ? discussion
-                      : {
+                      : ({
                           id: 'temp-id',
                           DownloadableFiles: (formValues.downloadableFiles ||
                             []) as any,
-                        }
+                        } as Discussion)
                   "
-                  :channel-data="channelData"
+                  :channel-data="channelData ? { allowedFileTypes: channelData.allowedFileTypes?.filter((type): type is string => type !== null) || [] } : undefined"
                   @close-editor="() => {}"
                   @update-form-values="
                     (downloadData) => {

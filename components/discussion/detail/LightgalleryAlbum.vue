@@ -135,7 +135,7 @@ const canScrollRight = computed(
             @click="() => setActiveImage(thumbnailStartIndex + index)"
           >
             <img
-              :src="image.url"
+              :src="image.url || ''"
               :alt="`Thumbnail ${thumbnailStartIndex + index + 1}`"
               class="h-full w-full object-cover transition-opacity hover:opacity-80"
             >
