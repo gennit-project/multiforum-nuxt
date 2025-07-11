@@ -13,7 +13,19 @@
   });
 
   const isOpen = ref(false);
-  const activeRevision = ref(null);
+  
+  // Define type for revision data
+  interface RevisionData {
+    id: string;
+    type: 'body' | 'title';
+    author: string;
+    createdAt: string;
+    isCurrent: boolean;
+    oldVersion: TextVersion | { id: string; title?: string; body?: string; createdAt: string; Author?: User | null };
+    newVersion: TextVersion | { id: string; title?: string; body?: string; createdAt: string; Author?: User | null };
+  }
+  
+  const activeRevision = ref<RevisionData | null>(null);
 
   // Total number of edits - title versions + body versions
   const totalEdits = computed(() => {
@@ -29,29 +41,16 @@
 
   // Combine both types of edits and sort by timestamp (newest first)
   const allEdits = computed(() => {
-    const edits: Array<{
-      id: string;
-      type: string;
-      author: string;
-      createdAt: string;
-      isCurrent?: boolean;
-      oldVersion?: TextVersion;
-      newVersion?: TextVersion;
-      body?: string;
-      Author?: User;
-    }> = [];
+    const edits: RevisionData[] = [];
 
     // Add body revisions
     if (props.discussion?.PastBodyVersions?.length) {
       // Create current version entry
       const currentVersion = {
         id: "current",
-        type: "body",
-        author: props.discussion.Author?.username || "[Deleted]",
+        body: props.discussion.body,
         createdAt: props.discussion.updatedAt || props.discussion.createdAt,
-        isCurrent: true,
-        body: props.discussion.body, // Add the current body text
-        Author: props.discussion.Author, // Add the full Author object to match the structure
+        Author: props.discussion.Author,
       };
 
       // Add past body versions
@@ -61,7 +60,7 @@
 
         edits.push({
           id: version.id,
-          type: "body",
+          type: "body" as const,
           author: version.Author?.username || "[Deleted]",
           createdAt: version.createdAt,
           isCurrent: false,
@@ -79,7 +78,7 @@
           index === 0
             ? {
                 id: "current",
-                body: props.discussion.title,
+                title: props.discussion.title,
                 Author: props.discussion.Author,
                 createdAt: props.discussion.updatedAt || props.discussion.createdAt,
               }
@@ -87,7 +86,7 @@
 
         edits.push({
           id: version.id,
-          type: "title",
+          type: "title" as const,
           author: version.Author?.username || "[Deleted]",
           createdAt: version.createdAt,
           isCurrent: false,
@@ -112,7 +111,7 @@
   };
 
   // Open diff modal for a specific revision
-  const openRevisionDiff = (revision: { id: string; type: string; author: string; createdAt: string; isCurrent?: boolean; oldVersion?: TextVersion; newVersion?: TextVersion; }) => {
+  const openRevisionDiff = (revision: RevisionData) => {
     activeRevision.value = revision;
   };
 

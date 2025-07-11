@@ -4,10 +4,10 @@ import { insertEmoji, formatText } from '@/utils/textFormatting';
 
 // Mock the utility functions directly
 vi.mock('@/utils/textFormatting', () => ({
-  insertEmoji: vi.fn((params) => {
+  insertEmoji: vi.fn((params: { text: string; position: number; emoji: string }) => {
     return params.text.slice(0, params.position) + params.emoji + params.text.slice(params.position);
   }),
-  formatText: vi.fn((params) => {
+  formatText: vi.fn((params: { text: string; format: string }) => {
     if (params.format === 'bold') return `**${params.text}**`;
     if (params.format === 'italic') return `*${params.text}*`;
     return params.text;
@@ -24,23 +24,23 @@ const SimpleMockEditor = {
       <button class="emoji-btn" @click="addEmoji">Emoji</button>
     </div>
   `,
-  data() {
+  data(): { text: string } {
     return {
       text: ''
     };
   },
   methods: {
-    formatBold() {
+    formatBold(): string {
       this.text = formatText({ text: this.text, format: 'bold' });
       this.$emit('update', this.text);
       return this.text;
     },
-    addEmoji() {
+    addEmoji(): string {
       this.text = insertEmoji({ text: this.text, position: this.text.length, emoji: '😀' });
       this.$emit('update', this.text);
       return this.text;
     },
-    setText(value) {
+    setText(value: string): void {
       this.text = value;
     }
   }

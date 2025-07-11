@@ -1,40 +1,58 @@
 <script setup lang="ts">
-  import { computed, ref } from "vue";
-  import GenericModal from "@/components/GenericModal.vue";
-  import * as DiffMatchPatch from "diff-match-patch";
-  import { useMutation } from "@vue/apollo-composable";
-  import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
+import { computed, ref } from "vue";
+import type { PropType } from "vue";
+import type { TextVersion } from "@/__generated__/graphql";
+import GenericModal from "@/components/GenericModal.vue";
+import * as DiffMatchPatch from "diff-match-patch";
+import { useMutation } from "@vue/apollo-composable";
+import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
 
-  const props = defineProps({
-    open: {
-      type: Boolean,
-      required: true,
-    },
-    oldVersion: {
-      type: Object,
-      required: true,
-    },
-    newVersion: {
-      type: Object,
-      required: true,
-    },
-    isMostRecent: {
-      type: Boolean,
-      default: false,
-    },
-  });
+// Define the version data structure that can include current version data
+interface VersionData {
+  id: string;
+  body?: string;
+  title?: string;
+  createdAt: string;
+  Author?: {
+    username?: string;
+  } | null;
+}
 
-  const emit = defineEmits(["close", "deleted"]);
+const props = defineProps({
+  open: {
+    type: Boolean,
+    required: true,
+  },
+  oldVersion: {
+    type: Object as PropType<TextVersion | VersionData>,
+    required: true,
+  },
+  newVersion: {
+    type: Object as PropType<TextVersion | VersionData>,
+    required: true,
+  },
+  isMostRecent: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const emit = defineEmits<{
+  close: [];
+  deleted: [deletedId: string];
+}>();
 
   // Deletion state
   const isDeleting = ref(false);
 
   const oldVersionUsername = computed(() => {
-    return props.oldVersion.Author?.username || "[Deleted]";
+    const author = props.oldVersion.Author;
+    return (author && 'username' in author && author.username) ? author.username : "[Deleted]";
   });
 
   const newVersionUsername = computed(() => {
-    return props.newVersion.Author?.username || "[Deleted]";
+    const author = props.newVersion.Author;
+    return (author && 'username' in author && author.username) ? author.username : "[Deleted]";
   });
 
   const oldVersionDate = computed(() => {
@@ -57,8 +75,8 @@
     });
   });
 
-  const oldContent = computed(() => props.oldVersion.body || "");
-  const newContent = computed(() => props.newVersion.body || "");
+  const oldContent = computed(() => props.oldVersion.body || props.oldVersion.title || "");
+  const newContent = computed(() => props.newVersion.body || props.newVersion.title || "");
 
   // Computed property that generates the diff HTML
   const diffHtml = computed(() => {

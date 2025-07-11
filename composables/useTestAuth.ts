@@ -37,7 +37,11 @@ export const useTestAuth = () => {
       };
 
       // Direct auth state setter for testing
-      window.__SET_AUTH_STATE_DIRECT__ = (userData = {}) => {
+      window.__SET_AUTH_STATE_DIRECT__ = (userData: { 
+        username?: string; 
+        profilePicURL?: string; 
+        modProfileName?: string; 
+      } = {}) => {
         console.log('=== BEFORE SETTING AUTH STATE ===');
         window.__DEBUG_AUTH_STATE__?.();
         

@@ -58,7 +58,8 @@ export function useAuthManager() {
 
         if (claims.value) {
           const currentTime = Math.floor(Date.now() / 1000);
-          const expiresAt = claims.value.exp;
+          // Auth0 ID token claims include standard JWT claims like exp (expiration time)
+          const expiresAt = (claims.value as { exp?: number }).exp;
 
           if (expiresAt && expiresAt <= currentTime + 60) {
             console.log("Token is expired or about to expire, attempting refresh");

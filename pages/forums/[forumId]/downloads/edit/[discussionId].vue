@@ -108,7 +108,7 @@ export default defineComponent({
     });
 
     const ownerList = computed(() => {
-      if (discussion.value && discussion.value.Author) {
+      if (discussion.value?.Author?.username) {
         return [discussion.value.Author.username];
       }
       return [];
@@ -166,7 +166,7 @@ export default defineComponent({
     const dataLoaded = ref(false);
 
     onGetDiscussionResult((value) => {
-      if (value.loading === true) {
+      if (value.loading === true || !value.data?.discussions?.length) {
         return;
       }
       const discussion = value.data.discussions[0];
@@ -182,7 +182,7 @@ export default defineComponent({
 
       // Create a map of valid images with their IDs
       const validImages = (discussion.Album?.Images ?? [])
-        .filter((image: Image) => image.id && image.url)
+        .filter((image): image is Image & { id: string; url: string } => Boolean(image.id && image.url))
         .map((image: Image) => ({
           id: image.id,
           url: image.url,

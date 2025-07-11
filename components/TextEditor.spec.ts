@@ -83,21 +83,24 @@ describe('CharCounter', () => {
 describe('Image Upload Validation', () => {
   it('validates file size correctly', () => {
     // Mock small file (1MB)
-    const smallFile = { size: 1 * 1024 * 1024 }
-    expect(isFileSizeValid({ file: smallFile }).valid).toBe(true)
+    const smallFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(smallFile, 'size', { value: 1 * 1024 * 1024 });
+    expect(isFileSizeValid({ file: smallFile }).valid).toBe(true);
     
     // Mock large file (10MB)
-    const largeFile = { size: 10 * 1024 * 1024 }
-    expect(isFileSizeValid({ file: largeFile }).valid).toBe(false)
-  })
+    const largeFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(largeFile, 'size', { value: 10 * 1024 * 1024 });
+    expect(isFileSizeValid({ file: largeFile }).valid).toBe(false);
+  });
 
   it('returns informative error messages', () => {
-    const largeFile = { size: 10 * 1024 * 1024 }
-    const result = isFileSizeValid({ file: largeFile })
-    expect(result.valid).toBe(false)
-    expect(result.message).toContain('must be less than')
-  })
-})
+    const largeFile = new File([''], 'test.jpg', { type: 'image/jpeg' });
+    Object.defineProperty(largeFile, 'size', { value: 10 * 1024 * 1024 });
+    const result = isFileSizeValid({ file: largeFile });
+    expect(result.valid).toBe(false);
+    expect(result.message).toContain('must be less than');
+  });
+});
 
 // Test emoji insertion logic
 describe('Emoji Insertion', () => {
