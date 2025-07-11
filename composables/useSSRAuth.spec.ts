@@ -198,9 +198,19 @@ describe('useSSRAuth', () => {
     it('should encode and decode cookie values correctly', () => {
       useSSRAuth();
       
-      const authHintConfig = mockUseCookie.mock.calls.find(
-        call => call[0] === 'auth-hint'
-      )[1];
+      interface CookieConfig {
+        httpOnly: boolean;
+        secure: boolean;
+        sameSite: string;
+        encode: (value: any) => string;
+        decode: (value: any) => string;
+      }
+
+      type MockUseCookieCall = [string, CookieConfig];
+
+      const authHintConfig = (mockUseCookie.mock.calls.find(
+        (call: MockUseCookieCall) => call[0] === 'auth-hint'
+      ) as MockUseCookieCall)[1];
       
       // Test encode function
       expect(authHintConfig.encode('test')).toBe('test');

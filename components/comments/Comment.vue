@@ -712,6 +712,7 @@ const commentMenuItems = computed(() => {
       menuItems.push({
         value: "Moderation Actions",
         isDivider: true,
+        label: ""
       });
       menuItems = menuItems.concat(modActions);
     }

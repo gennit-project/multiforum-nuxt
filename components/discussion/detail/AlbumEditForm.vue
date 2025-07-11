@@ -15,10 +15,22 @@ import AlbumEditor from "@/components/discussion/form/AlbumEditor.vue";
 import Notification from "@/components/NotificationComponent.vue";
 import { useRoute } from "vue-router";
 
+// Define a simplified type for images used in the form
+type AlbumFormImage = {
+  id: string;
+  url: string;
+  alt: string;
+  caption: string;
+  isCoverImage: boolean;
+  hasSensitiveContent: boolean;
+  hasSpoiler: boolean;
+  copyright: string;
+};
+
 // Define types for form data
 interface AlbumFormData {
   album: {
-    images: Image[];
+    images: AlbumFormImage[];
     imageOrder: string[];
   };
 }
@@ -82,7 +94,8 @@ const images = computed(() => {
 const initialImageOrder = computed<string[]>(() => {
   // If there's an existing order, use it
   if (props.discussion?.Album?.imageOrder?.length) {
-    return props.discussion.Album.imageOrder;
+    // Filter out any null or undefined values to ensure string[]
+    return props.discussion.Album.imageOrder.filter((id): id is string => typeof id === "string");
   }
   
   // If no order exists, create one from the images array
@@ -90,7 +103,7 @@ const initialImageOrder = computed<string[]>(() => {
     console.log("Creating image order from images");
     // Create an order from the image IDs
     return images.value
-      .filter((img): img is Image & { id: string } => Boolean(img.id))
+      .filter((img): img is typeof images.value[number] => Boolean(img.id))
       .map(img => img.id);
   }
   
@@ -134,7 +147,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
             Images: {
               // Connect to existing images using their IDs
               connect: newImages
-                .filter((img): img is Image & { id: string } => Boolean(img.id))
+                .filter((img): img is AlbumFormImage => Boolean(img.id))
                 .map(img => ({
                   where: { node: { id: img.id } }
                 }))
@@ -146,13 +159,13 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   }
 
   // 2) If the album already exists, we build the connect/update/delete arrays
-  const oldImages = props.discussion.Album?.Images ?? [];
+  const oldImages = props.discussion?.Album?.Images ?? [];
   const newImages = formValues.value.album.images;
 
   // CONNECT array: any new image in `newImages` that has NO matching ID in `oldImages`
   // These are images that already exist in the database but need to be connected to this album
   const connectImageArray = newImages
-    .filter((img): img is Image & { id: string } => Boolean(img.id))
+    .filter((img): img is AlbumFormImage => Boolean(img.id))
     .filter((img) => !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
       connect: [{
@@ -162,7 +175,7 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
 
   // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
   const updateImageArray = newImages
-    .filter((img): img is Image & { id: string } => Boolean(img.id))
+    .filter((img): img is AlbumFormImage => Boolean(img.id))
     .filter((img) => oldImages.some((old) => old.id === img.id))
     .map((img) => ({
       where: { node: { id: img.id } },

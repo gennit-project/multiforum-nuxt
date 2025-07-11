@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import type { Comment, User, TextVersion, CommentAuthor, ModerationProfile } from "@/__generated__/graphql";
+import type { Comment, TextVersion, CommentAuthor } from "@/__generated__/graphql";
 import { timeAgo } from "@/utils";
 import CommentRevisionDiffModal from "./CommentRevisionDiffModal.vue";
 
@@ -40,7 +40,12 @@ const getAuthorDisplayName = (commentAuthor: CommentAuthor | null | undefined): 
       return commentAuthor.displayName;
     }
     // If no displayName, try to get username from nested User
-    if (commentAuthor.User && 'username' in commentAuthor.User && commentAuthor.User.username) {
+    if (
+      'User' in commentAuthor &&
+      commentAuthor.User &&
+      'username' in commentAuthor.User &&
+      commentAuthor.User.username
+    ) {
       return commentAuthor.User.username;
     }
   }
@@ -199,8 +204,8 @@ const handleRevisionDeleted = (deletedId: string) => {
     <CommentRevisionDiffModal
       v-if="activeRevision"
       :open="!!activeRevision"
-      :old-version="activeRevision.oldVersionData"
-      :new-version="activeRevision.newVersionData"
+      :old-version="activeRevision.oldVersionData || {}"
+      :new-version="activeRevision.newVersionData || {}"
       :is-most-recent="activeRevision === allEdits[0]"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"

@@ -48,9 +48,9 @@
       // Create current version entry
       const currentVersion = {
         id: "current",
-        body: props.discussion.body,
-        createdAt: props.discussion.updatedAt || props.discussion.createdAt,
-        Author: props.discussion.Author,
+        body: props.discussion.body ?? undefined,
+        createdAt: String(props.discussion.updatedAt || props.discussion.createdAt),
+        Author: props.discussion.Author ?? undefined,
       };
 
       // Add past body versions

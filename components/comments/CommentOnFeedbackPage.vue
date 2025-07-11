@@ -182,7 +182,9 @@ const copyLink = async () => {
     GivesFeedbackOnDiscussion: props.comment.GivesFeedbackOnDiscussion || undefined,
     GivesFeedbackOnEvent: props.comment.GivesFeedbackOnEvent || undefined,
   });
-  const permalink = `${basePath}${router.resolve(permalinkObject).href}`;
+  const permalink = permalinkObject
+    ? `${basePath}${router.resolve(permalinkObject).href}`
+    : "";
   try {
     await navigator.clipboard.writeText(permalink);
     emit("showCopiedLinkNotification", true);

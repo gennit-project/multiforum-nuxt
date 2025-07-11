@@ -188,11 +188,11 @@ const createCommentInput = computed(() => {
   // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
   if (notifyOnReplyToCommentByDefault.value) {
     input.SubscribedToNotifications = {
-      connect: {
+      connect: [{
         where: {
           node: { username: usernameVar.value }
         }
-      }
+      }]
     };
   }
 

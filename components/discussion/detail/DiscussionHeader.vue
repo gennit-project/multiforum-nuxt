@@ -19,49 +19,18 @@
   import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
   import { config } from "@/config";
   import EditsDropdown from "./activityFeed/EditsDropdown.vue";
+import type { Discussion } from "@/__generated__/graphql";
 
-const props = defineProps({
-  discussion: {
-    type: Object,
-    required: false,
-    default: null,
-  },
-  discussionChannelId: {
-    type: String,
-    required: false,
-    default: "",
-  },
-  compactMode: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  channelId: {
-    type: String,
-    required: false,
-    default: null,
-  },
-  showActionMenu: {
-    type: Boolean,
-    required: false,
-    default: true,
-  },
-  discussionBodyEditMode: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-  discussionIsArchived: {
-    type: Boolean || undefined || null,
-    // boolean or undefined or null
-    default: false,
-  },
-  downloadMode: {
-    type: Boolean,
-    required: false,
-    default: false,
-  },
-});
+const props = defineProps<{
+  discussion: Discussion | null;
+  discussionChannelId?: string;
+  compactMode?: boolean;
+  channelId?: string | null;
+  showActionMenu?: boolean;
+  discussionBodyEditMode?: boolean;
+  discussionIsArchived?: boolean | undefined | null;
+  downloadMode?: boolean;
+}>();
 
 const emit = defineEmits([
   "handleClickGiveFeedback",
@@ -113,7 +82,6 @@ onDoneDeleting(() => {
 
 const {
   mutate: updateSensitiveContent,
-  loading: updateSensitiveContentLoading,
   error: updateSensitiveContentError,
 } = useMutation(UPDATE_DISCUSSION_SENSITIVE_CONTENT);
 
@@ -245,7 +213,7 @@ const permalinkObject = computed(() => {
 
 const showCopiedLinkNotification = ref(false);
 
-const copyLink = async (event: Event) => {
+const copyLink = async () => {
   try {
     let basePath = "";
     if (import.meta.client) {
@@ -255,7 +223,7 @@ const copyLink = async (event: Event) => {
     }
     const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
     await navigator.clipboard.writeText(permalink);
-    showCopiedLinkNotification.value = event;
+    showCopiedLinkNotification.value = true;
   } catch (e) {
     console.error(e);
   }
@@ -290,8 +258,7 @@ const menuItems = computed(() => {
     discussionId: props.discussion.id,
     hasAlbum: !!props.discussion?.Album?.Images?.length,
     feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
-    hasSensitiveContent: !!props.discussion?.hasSensitiveContent,
-    downloadMode: props.downloadMode
+    hasSensitiveContent: !!props.discussion?.hasSensitiveContent
   });
 });
 
@@ -348,7 +315,8 @@ const authorIsMod = computed(
           <span>{{ editedAt }}</span>
           <EditsDropdown
             v-if="
-              discussion?.PastTitleVersions?.length > 0 || discussion?.PastBodyVersions?.length > 0
+              discussion &&
+              ((discussion.PastTitleVersions?.length ?? 0) > 0 || (discussion.PastBodyVersions?.length ?? 0) > 0)
             "
             class="ml-2"
             :discussion="discussion"

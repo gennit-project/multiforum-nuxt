@@ -4,7 +4,7 @@ import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
 import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
 import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
-import Comment from "@/components/comments/Comment.vue";
+import type { Comment as CommentType } from "@/__generated__/graphql";
 
 const PAGE_LIMIT = 25;
 
@@ -74,7 +74,7 @@ const loadMore = () => {
   });
 };
 
-const isCommentOnDeletedEvent = (comment) => {
+const isCommentOnDeletedEvent = (comment: CommentType) => {
   // If the comment was on a deleted discussion, the DiscussionChannel would still be there
   // because DiscussionChannels are not deleted along with the discussion, and comments
   // are attached to the DiscussionChannel. However, if a comment was on a deleted event,

@@ -75,8 +75,8 @@ const emit = defineEmits<{
     });
   });
 
-  const oldContent = computed(() => props.oldVersion.body || props.oldVersion.title || "");
-  const newContent = computed(() => props.newVersion.body || props.newVersion.title || "");
+  const oldContent = computed(() => props.oldVersion.body || ('title' in props.oldVersion ? props.oldVersion.title : "") || "");
+  const newContent = computed(() => props.newVersion.body || ('title' in props.newVersion ? props.newVersion.title : "") || "");
 
   // Computed property that generates the diff HTML
   const diffHtml = computed(() => {

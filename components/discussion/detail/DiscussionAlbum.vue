@@ -532,7 +532,7 @@ const handleTouchEnd = (event: TouchEvent) => {
           @click="openLightbox(idx)"
         >
           <ModelViewer
-            v-if="image && hasGlbExtension(image.url)"
+            v-if="image && hasGlbExtension(image.url ?? '')"
             :model-url="image.url || ''"
             height="200px"
             width="100%"
