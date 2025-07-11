@@ -18,7 +18,7 @@ import { isFileSizeValid } from "@/utils/index";
 
 type FileChangeInput = {
   // event of HTMLInputElement;
-  event: Event;
+  event: Event & { target: HTMLInputElement | null };
   fieldName: string;
 };
 
@@ -46,7 +46,10 @@ const props = defineProps({
 });
 
 // Emit
-const emit = defineEmits(["updateFormValues", "submit"]);
+const emit = defineEmits<{
+  updateFormValues: [formData: Partial<EditAccountSettingsFormValues>];
+  submit: [];
+}>();
 
 // Data and Setup
 const route = useRoute();

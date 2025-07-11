@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import type { PropType } from "vue";
 import { useMutation, useQuery } from "@vue/apollo-composable";
 import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
-import type { Comment, DiscussionChannel } from "@/__generated__/graphql";
+import type { Comment, DiscussionChannel, CommentCreateInput } from "@/__generated__/graphql";
 import type { ApolloCache, FetchResult } from "@apollo/client/core";
 import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
 import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
@@ -66,8 +66,8 @@ const createCommentDefaultValues = {
 
 const createFormValues = ref(createCommentDefaultValues);
 
-const createCommentInput = computed(() => {
-  const input = {
+const createCommentInput = computed((): CommentCreateInput[] => {
+  const input: CommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
     text: createFormValues.value.text || "",

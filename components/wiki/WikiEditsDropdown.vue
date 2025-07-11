@@ -1,18 +1,29 @@
 <script setup lang="ts">
-  import { ref, computed } from "vue";
-  import type { PropType } from "vue";
-  import { timeAgo } from "@/utils";
-  import WikiRevisionDiffModal from "./WikiRevisionDiffModal.vue";
+import { ref, computed } from "vue";
+import type { PropType } from "vue";
+import type { WikiPage, TextVersion, User } from "@/__generated__/graphql";
+import { timeAgo } from "@/utils";
+import WikiRevisionDiffModal from "./WikiRevisionDiffModal.vue";
 
-  const props = defineProps({
-    wikiPage: {
-      type: Object as PropType<any>, // Using any since we don't have a specific WikiPage type
-      required: true,
-    },
-  });
+// Define type for revision data
+interface WikiRevisionData {
+  id: string;
+  author: string;
+  createdAt: string;
+  isCurrent: boolean;
+  oldVersionData?: TextVersion;
+  newVersionData?: TextVersion;
+}
 
-  const isOpen = ref(false);
-  const activeRevision = ref(null);
+const props = defineProps({
+  wikiPage: {
+    type: Object as PropType<WikiPage>,
+    required: true,
+  },
+});
+
+const isOpen = ref(false);
+const activeRevision = ref<WikiRevisionData | null>(null);
 
   // Total number of edits
   const totalEdits = computed(() => {
@@ -26,7 +37,7 @@
 
   // Process all versions and sort by timestamp (newest first)
   const allEdits = computed(() => {
-    const edits = [];
+    const edits: WikiRevisionData[] = [];
 
     if (props.wikiPage?.PastVersions?.length) {
       // Create current version entry (as TextVersion structure)
@@ -49,7 +60,7 @@
       });
 
       // Subsequent items: compare each past version with the next one
-      props.wikiPage.PastVersions.forEach((version: any, index: number) => {
+      props.wikiPage.PastVersions.forEach((version, index) => {
         // Skip the most recent past version since it's already handled above
         if (index === 0) return;
         
@@ -81,7 +92,7 @@
   };
 
   // Open diff modal for a specific revision
-  const openRevisionDiff = (revision: any) => {
+  const openRevisionDiff = (revision: WikiRevisionData) => {
     activeRevision.value = revision;
     closeDropdown();
   };
