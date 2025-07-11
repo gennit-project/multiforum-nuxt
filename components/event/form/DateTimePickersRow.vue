@@ -1,118 +1,114 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { computed } from 'vue';
 import { DateTime } from 'luxon';
-import DatePicker from '@/components/event/form/DatePicker.vue';
-import TimePicker from '@/components/event/form/TimePicker.vue';
+import DatePicker from './DatePicker.vue';
+import TimePicker from './TimePicker.vue';
 
-// Props for controlling visibility of pickers
-defineProps({
+// Props for controlling visibility of pickers and data
+const props = defineProps({
   isAllDay: {
     type: Boolean,
-    default: false
+    required: true
   },
   isMultiDay: {
     type: Boolean,
-    default: false
+    required: true
+  },
+  startTime: {
+    type: Date,
+    required: true
+  },
+  endTime: {
+    type: Date,
+    required: true
   }
 });
 
-// Mock data for testing
-const startTime = ref(DateTime.now().toJSDate());
-const endTime = ref(DateTime.now().plus({ hours: 1 }).toJSDate());
+const emit = defineEmits([
+  'updateStartDate', 
+  'updateStartTime', 
+  'updateEndDate', 
+  'updateEndTime'
+]);
 
-// Formatted dates for display
+// Formatted dates for date pickers
 const formattedStartTimeDate = computed(() => {
-  const dateTime = DateTime.fromJSDate(startTime.value);
+  const dateTime = DateTime.fromJSDate(props.startTime);
   return dateTime.toFormat("yyyy-MM-dd");
 });
 
 const formattedEndTimeDate = computed(() => {
-  const dateTime = DateTime.fromJSDate(endTime.value);
+  const dateTime = DateTime.fromJSDate(props.endTime);
   return dateTime.toFormat("yyyy-MM-dd");
 });
 
-// Define emits
-const emit = defineEmits(['updateStartDate', 'updateEndDate', 'updateStartTime', 'updateEndTime']);
-
-// Event handlers
-const handleStartTimeDateChange = (value: string) => {
-  emit('updateStartDate', value);
+// Handler functions
+const handleStartTimeDateChange = (dateValue: string) => {
+  emit('updateStartDate', dateValue);
 };
 
-const handleEndTimeDateChange = (value: string) => {
-  emit('updateEndDate', value);
+const handleEndTimeDateChange = (dateValue: string) => {
+  emit('updateEndDate', dateValue);
 };
 
-const handleStartTimeTimeChange = (value: string) => {
-  emit('updateStartTime', value);
+const handleStartTimeTimeChange = (timeValue: string) => {
+  emit('updateStartTime', timeValue);
 };
 
-const handleEndTimeTimeChange = (value: string) => {
-  emit('updateEndTime', value);
+const handleEndTimeTimeChange = (timeValue: string) => {
+  emit('updateEndTime', timeValue);
 };
 </script>
 
 <template>
   <div class="flex flex-col dark:text-white">
-    <!-- Time selection container with responsive layout -->
-    <div class="flex flex-col md:flex-row md:gap-6">
+    <!-- Time selection container with responsive layout that wraps on mobile -->
+    <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <!-- Start Time Section -->
-      <div class="w-full md:w-1/2">
-        <label class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block">
-          Start Time
-        </label>
-        <div class="flex items-center gap-2 dark:text-white">
-          <DatePicker
-            test-id="start-time-date-input"
-            :value="formattedStartTimeDate"
-            data-testid="start-date-picker"
-            @update="handleStartTimeDateChange"
-          />
-          
-          <!-- Use reusable time picker component -->
-          <TimePicker
-            v-if="!isAllDay"
-            test-id="start-time-time-input"
-            :value="DateTime.fromJSDate(startTime).toFormat('HH:mm')"
-            data-testid="start-time-picker"
-            @update="handleStartTimeTimeChange"
-          />
-          
-          <!-- Arrow between start and end times - visible for non-all-day single-day events or multi-day events -->
-          <div 
-            v-if="!isAllDay || isMultiDay"
-            class="text-gray-500 dark:text-gray-400 mx-2"
-            data-testid="time-arrow"
-          >
-            →
-          </div>
-        </div>
+      <div class="flex flex-wrap items-center gap-1 sm:gap-2 dark:text-white">
+        <DatePicker
+          test-id="start-time-date-input"
+          :value="formattedStartTimeDate"
+          data-testid="start-date-picker"
+          @update="handleStartTimeDateChange"
+        />
+        
+        <!-- Time picker for start time -->
+        <TimePicker
+          v-if="!isAllDay"
+          test-id="start-time-time-input"
+          :value="DateTime.fromJSDate(startTime).toFormat('HH:mm')"
+          data-testid="start-time-picker"
+          @update="handleStartTimeTimeChange"
+        />
+      </div>
+      
+      <!-- Arrow icon between start and end - hidden on very small screens -->
+      <div v-if="!isAllDay || isMultiDay" class="flex items-center mx-1 sm:mx-2" data-testid="time-arrow">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+        </svg>
       </div>
       
       <!-- End Time Section -->
-      <div class="w-full md:w-1/2 mt-3 md:mt-0">
-        <label v-if="!isAllDay" class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1 block" data-testid="end-time-label">
-          End Time
-        </label>
-        <div class="flex items-center gap-2">
-          <!-- Only show end date input if multi-day event is checked -->
-          <DatePicker
-            v-if="isMultiDay"
-            test-id="end-time-date-input"
-            :value="formattedEndTimeDate"
-            data-testid="end-date-picker"
-            @update="handleEndTimeDateChange"
-          />
-          
-          <!-- Use reusable time picker component -->
-          <TimePicker
-            v-if="!isAllDay"
-            test-id="end-time-time-input"
-            :value="DateTime.fromJSDate(endTime).toFormat('HH:mm')"
-            data-testid="end-time-picker"
-            @update="handleEndTimeTimeChange"
-          />
-        </div>
+      <div class="flex flex-wrap items-center gap-1 sm:gap-2">
+        <!-- Only show end date input if multi-day event is checked -->
+        <DatePicker
+          v-if="isMultiDay"
+          test-id="end-time-date-input"
+          :value="formattedEndTimeDate"
+          data-testid="end-date-picker"
+          @update="handleEndTimeDateChange"
+        />
+        
+        <!-- Time picker for end time -->
+        <TimePicker
+          v-if="!isAllDay"
+          test-id="end-time-time-input"
+          :value="DateTime.fromJSDate(endTime).toFormat('HH:mm')"
+          data-testid="end-time-picker"
+          @update="handleEndTimeTimeChange"
+        />
       </div>
     </div>
   </div>
