@@ -853,6 +853,14 @@ v-if="editingCaptionIndex === idx"
               <span v-if="isPanelVisible">Close panel</span>
               <span v-else>Open panel</span>
             </button>
+            <!-- More Details button -->
+            <NuxtLink
+              v-if="currentImage?.Uploader?.username"
+              :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
+              class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+            >
+              More Details
+            </NuxtLink>
             <button
               type="button"
               class="flex items-center justify-center w-8 h-8 rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer"
@@ -1002,21 +1010,33 @@ v-if="editingCaptionIndex === lightboxIndex"
           </div>
           <div
             v-else-if="currentImage?.caption"
-            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative flex"
+            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative"
           >
-           <span> {{ currentImage.caption || "Image Details" }}</span>
-            <span
-              v-if="isLoggedInAuthor"
-              class="text-white bg-transparent border-0 px-2 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
-              role="button"
-              tabindex="0"
-              title="Edit caption"
-              @click="startEditingCaption(lightboxIndex)"
-              @keydown.enter="startEditingCaption(lightboxIndex)"
-              @keydown.space="startEditingCaption(lightboxIndex)"
-            >
-              <PencilIcon class="h-4 w-4" />
-            </span>
+            <div class="flex items-start justify-between">
+              <span class="flex-1"> {{ currentImage.caption || "Image Details" }}</span>
+              <span
+                v-if="isLoggedInAuthor"
+                class="text-white bg-transparent border-0 px-2 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+                role="button"
+                tabindex="0"
+                title="Edit caption"
+                @click="startEditingCaption(lightboxIndex)"
+                @keydown.enter="startEditingCaption(lightboxIndex)"
+                @keydown.space="startEditingCaption(lightboxIndex)"
+              >
+                <PencilIcon class="h-4 w-4" />
+              </span>
+            </div>
+            
+            <!-- More Details button -->
+            <div v-if="currentImage?.Uploader?.username" class="mt-3">
+              <NuxtLink
+                :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
+                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                More Details
+              </NuxtLink>
+            </div>
           </div>
           <div v-else class="text-gray-400 italic mt-2 relative">
             <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
@@ -1032,6 +1052,16 @@ v-if="editingCaptionIndex === lightboxIndex"
               <PencilIcon class="h-4 w-4" />
               <span>Add a caption for this image</span>
             </span>
+            
+            <!-- More Details button for images without captions -->
+            <div v-if="currentImage?.Uploader?.username" class="mt-3">
+              <NuxtLink
+                :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
+                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                More Details
+              </NuxtLink>
+            </div>
           </div>
           <!-- <MarkdownPreview
             v-if="currentImage.caption"

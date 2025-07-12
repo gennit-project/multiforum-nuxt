@@ -42,6 +42,12 @@ const isAdmin = computed(() => {
   return false;
 });
 
+// Check if we're on an image detail page
+const isImageDetailPage = computed(() => {
+  const path = route.path;
+  return path.includes('/images/') && path.split('/').length > 4; // /u/username/images/imageId
+});
+
 // Add SEO metadata for the user profile
 watchEffect(() => {
   if (!user.value) {
@@ -102,7 +108,13 @@ watchEffect(() => {
 <template>
   <NuxtLayout>
     <div class="max-w-screen-2xl w-full px-2 dark:bg-black bg-white">
-      <div class="flex flex-col lg:flex-row w-full">
+      <!-- Image detail page layout (full width) -->
+      <div v-if="isImageDetailPage" class="w-full">
+        <NuxtPage />
+      </div>
+      
+      <!-- Regular user profile layout -->
+      <div v-else class="flex flex-col lg:flex-row w-full">
         <div class="w-full lg:w-80 lg:shrink-0">
           <UserProfileSidebar :is-admin="isAdmin" />
         </div>

@@ -87,6 +87,10 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
               url
               alt
               caption
+              Uploader {
+                username
+                displayName
+              }
             }
           }
           Tags {
@@ -151,6 +155,10 @@ export const GET_SITE_WIDE_DISCUSSION_LIST = gql`
             url
             alt
             caption
+            Uploader {
+              username
+              displayName
+            }
           }
         }
         Tags {
@@ -214,6 +222,10 @@ export const GET_DISCUSSION = gql`
           alt
           caption
           copyright
+          Uploader {
+            username
+            displayName
+          }
         }
       }
       DiscussionChannels {

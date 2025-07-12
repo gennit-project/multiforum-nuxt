@@ -63,6 +63,12 @@ const tabs = computed(() => {
       count: props.user?.EventsAggregate?.count,
     },
     {
+      name: "Images",
+      href: `/u/${usernameInParams.value}/images`,
+      current: false,
+      count: props.user?.ImagesAggregate?.count,
+    },
+    {
       name: "Owned Forums",
       href: `/u/${usernameInParams.value}/ownedForums`,
       current: false,
