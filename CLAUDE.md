@@ -84,6 +84,71 @@
   - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
   - **Avoid `any`**: Only use `any` as a last resort when proper types are not available
   - **Type Checking**: Use `npm run tsc` (which runs `vue-tsc --noEmit`) for proper Vue component type checking
+
+### Common TypeScript Patterns and Fixes
+
+- **GraphQL Type Completion**: When creating objects that match GraphQL types, ensure all required properties are included
+  ```typescript
+  // Example: TextVersion requires AuthorConnection
+  const textVersion: TextVersion = {
+    id: "current",
+    body: content,
+    createdAt: new Date().toISOString(),
+    Author: user,
+    AuthorConnection: {
+      edges: [],
+      pageInfo: { hasNextPage: false, hasPreviousPage: false },
+      totalCount: 0,
+    },
+  };
+  ```
+
+- **Vue Router Type Safety**: Use proper route object structure for navigation
+  ```typescript
+  // Avoid: path property may not be compatible with router types
+  routeAndClose({ path: '/account_settings' })
+  
+  // Prefer: use name-based routing
+  routeAndClose({ name: 'account_settings' })
+  ```
+
+- **Error Type Handling**: GraphQL error objects may have inferred types as `never` in some contexts
+  ```typescript
+  // Cast to access message property when TypeScript can't infer the error type
+  :text="(getCommentError as any)?.message || 'Error loading comment'"
+  ```
+
+- **Form Value Types**: Ensure form default values match the expected type interface completely
+  ```typescript
+  // If CreateEditChannelFormValues includes eventsEnabled and feedbackEnabled
+  const defaultValues = {
+    // ... other properties
+    eventsEnabled: true,    // Don't forget these!
+    feedbackEnabled: true,
+  };
+  ```
+
+- **Nuxt Page Meta**: Use proper placement and TypeScript handling
+  ```typescript
+  // Place at top of script setup block with TypeScript ignore
+  // @ts-ignore - definePageMeta is auto-imported by Nuxt
+  definePageMeta({
+    middleware: 'some-middleware'
+  })
+  ```
+
+- **GraphQL Query Imports**: When refactoring queries, check that exports exist in the target file
+  ```typescript
+  // Before using GET_MOD_SUSPENSION, verify it exists in the queries file
+  // If not available, find similar queries like GET_SUSPENDED_MODS_BY_CHANNEL
+  ```
+
+- **Optional Chaining vs Null Coalescing**: Use appropriate patterns for component props
+  ```typescript
+  // For optional props that might be undefined
+  :old-version="activeRevision.oldVersionData || {}"
+  :new-version="activeRevision.newVersionData || {}"
+  ```
 - **Function Parameters**: For functions with more than one parameter, use a typed object instead of positional arguments
   ```typescript
   // Avoid:
