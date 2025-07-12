@@ -3,6 +3,9 @@ import { computed } from "vue";
 import { useQuery } from "@vue/apollo-composable";
 import { useRoute } from "nuxt/app";
 import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
+import Comment from "@/components/comments/Comment.vue";
+import InfoBanner from "@/components/InfoBanner.vue";
+import LoadMore from "@/components/LoadMore.vue";
 import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
 import type { Comment as CommentType } from "@/__generated__/graphql";
 
