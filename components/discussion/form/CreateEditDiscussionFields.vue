@@ -153,7 +153,10 @@ onMounted(() => {
                             []) as any,
                         } as Discussion)
                   "
-                  :channel-data="channelData ? { allowedFileTypes: channelData.allowedFileTypes?.filter((type): type is string => type !== null) || [] } : undefined"
+                  :channel-data="channelData ? { 
+                    allowedFileTypes: channelData.allowedFileTypes?.filter((type): type is string => type !== null) || [],
+                    FilterGroups: channelData.FilterGroups || []
+                  } : undefined"
                   @close-editor="() => {}"
                   @update-form-values="
                     (downloadData) => {
@@ -163,6 +166,7 @@ onMounted(() => {
                       );
                       $emit('updateFormValues', {
                         downloadableFiles: downloadData.downloadableFiles,
+                        downloadLabels: downloadData.downloadLabels,
                       });
                     }
                   "

@@ -8,6 +8,7 @@ import type {
   DiscussionDownloadableFilesConnectFieldInput,
   DiscussionDownloadableFilesDisconnectFieldInput,
   DiscussionDownloadableFilesUpdateFieldInput,
+  FilterGroup,
 } from "@/__generated__/graphql";
 // Using string literals instead of importing enums from massive generated file
 import PrimaryButton from "@/components/PrimaryButton.vue";
@@ -19,6 +20,7 @@ import { UPDATE_DISCUSSION, CREATE_SIGNED_STORAGE_URL, CREATE_DOWNLOADABLE_FILE 
 import Notification from "@/components/NotificationComponent.vue";
 import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
 import { usernameVar } from "@/cache";
+import DownloadLabelPicker from "@/components/download/DownloadLabelPicker.vue";
 
 const MAX_DOWNLOAD_FILE_SIZE_MB = 50;
 const MAX_DOWNLOAD_FILE_SIZE_BYTES = MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
@@ -28,10 +30,10 @@ const props = defineProps({
     type: Object as PropType<Discussion>,
     required: true,
   },
-  // Channel data to get allowed file types
+  // Channel data to get allowed file types and filter groups
   channelData: {
-    type: Object as PropType<{ allowedFileTypes?: string[] }>,
-    default: () => ({ allowedFileTypes: [] }),
+    type: Object as PropType<{ allowedFileTypes?: string[]; FilterGroups?: FilterGroup[] }>,
+    default: () => ({ allowedFileTypes: [], FilterGroups: [] }),
   },
 });
 
@@ -80,6 +82,7 @@ type DownloadFormFile = {
 
 const formValues = ref({
   downloadableFiles: [] as DownloadFormFile[],
+  downloadLabels: {} as Record<string, string[]>,
 });
 
 // Upload state
@@ -150,6 +153,11 @@ onMounted(() => {
   console.log("Files:", downloadableFiles.value);
   
   formValues.value.downloadableFiles = [...downloadableFiles.value];
+  
+  // Initialize download labels from props if in edit mode and discussion has labels
+  // Note: This assumes labels will be stored on the discussion model in the future
+  // For now, initialize as empty
+  formValues.value.downloadLabels = {};
   
   console.log("Initialized formValues:", formValues.value);
 });
@@ -431,13 +439,15 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
 function handleSave() {
   console.log("handleSave called, isCreateMode:", isCreateMode.value);
   console.log("Current downloadable files data:", JSON.stringify(formValues.value.downloadableFiles));
+  console.log("Current download labels:", JSON.stringify(formValues.value.downloadLabels));
   
   // For both cases where we're inside CreateEditDiscussionFields (temp-id)
   if (props.discussion.id === 'temp-id') {
     // Always emit the form values to update the parent component
     console.log("Emitting updateFormValues in CreateEditDiscussionFields context");
     emit("updateFormValues", {
-      downloadableFiles: formValues.value.downloadableFiles
+      downloadableFiles: formValues.value.downloadableFiles,
+      downloadLabels: formValues.value.downloadLabels
     });
     // Add a success notification
     savedSuccessfully.value = true;
@@ -591,6 +601,21 @@ function handleSave() {
               </div>
             </div>
           </div>
+        </template>
+      </FormRow>
+      
+      <!-- Download Labels Section -->
+      <FormRow 
+        v-if="channelData?.FilterGroups?.length > 0" 
+        section-title="Labels" 
+        class="mt-6"
+      >
+        <template #content>
+          <DownloadLabelPicker
+            :filter-groups="channelData.FilterGroups"
+            :selected-labels="formValues.downloadLabels"
+            @update:selected-labels="formValues.downloadLabels = $event"
+          />
         </template>
       </FormRow>
       

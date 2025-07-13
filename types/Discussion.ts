@@ -36,6 +36,7 @@ export interface CreateEditDiscussionFormValues {
       priceCents: number;
       priceCurrency: string;
     }[];
+    downloadLabels?: Record<string, string[]>; // filterGroupKey -> selected option values
 }
 
 export type SearchDiscussionValues = {
