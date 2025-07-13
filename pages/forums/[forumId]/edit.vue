@@ -33,6 +33,7 @@ const formValues = ref<CreateEditChannelFormValues>({
   feedbackEnabled: true,
   downloadsEnabled: false,
   allowedFileTypes: [],
+  downloadFilterGroups: [],
 });
 
 const dataLoaded = ref(false);
@@ -62,6 +63,7 @@ watch(getChannelResult, (newVal) => {
       feedbackEnabled: channelData.feedbackEnabled,
       downloadsEnabled: channelData.downloadsEnabled,
       allowedFileTypes: channelData.allowedFileTypes || [],
+      downloadFilterGroups: channelData.FilterGroups || [],
       rules,
     };
 
@@ -78,6 +80,10 @@ const ownerList = computed(() => {
   return channel.value?.Admins?.map((admin: UserData) => admin.username) || [];
 });
 
+const existingFilterGroups = computed(() => {
+  return channel.value?.FilterGroups || [];
+});
+
 const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
     onCreate: { node: { text: tag } },
@@ -89,6 +95,38 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     .map((tag: TagData) => ({
       where: { node: { text: tag } },
     }));
+
+  // Handle FilterGroups - delete all existing and recreate
+  const existingGroupIds = existingFilterGroups.value.map((group: any) => group.id);
+  const filterGroupDisconnections = existingGroupIds.map((id: string) => ({
+    where: { node: { id } },
+    delete: { 
+      options: [{ where: {} }]
+    }
+  }));
+
+  const filterGroupConnections = formValues.value.downloadFilterGroups.map((group, index) => ({
+    onCreate: {
+      node: {
+        id: group.id,
+        key: group.key,
+        displayName: group.displayName,
+        mode: group.mode,
+        order: index,
+        options: group.options?.map((option, optionIndex) => ({
+          onCreate: {
+            node: {
+              id: option.id,
+              value: option.value,
+              displayName: option.displayName,
+              order: optionIndex,
+            }
+          }
+        })) || []
+      }
+    },
+    where: { node: { id: group.id } }
+  }));
 
   return {
     description: formValues.value.description,
@@ -102,6 +140,10 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     downloadsEnabled: formValues.value.downloadsEnabled,
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
+    FilterGroups: [{ 
+      disconnect: filterGroupDisconnections,
+      connectOrCreate: filterGroupConnections 
+    }],
     Admins: [{ connect: [{ where: { node: { username: usernameVar.value } } }] }],
   };
 });

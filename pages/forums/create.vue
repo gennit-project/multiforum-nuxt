@@ -26,6 +26,7 @@ const createChannelDefaultValues = {
   wikiEnabled: false,
   downloadsEnabled: false,
   allowedFileTypes: [],
+  downloadFilterGroups: [],
   eventsEnabled: true,
   feedbackEnabled: true,
 };

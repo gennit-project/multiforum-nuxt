@@ -220,6 +220,19 @@ export const GET_CHANNEL = gql`
         canUpvoteDiscussion
         channelUniqueName
       }
+      FilterGroups(options: { sort: [{ order: ASC }] }) {
+        id
+        key
+        displayName
+        mode
+        order
+        options(options: { sort: [{ order: ASC }] }) {
+          id
+          value
+          displayName
+          order
+        }
+      }
     }
   }
 `;

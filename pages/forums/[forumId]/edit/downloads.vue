@@ -2,6 +2,8 @@
 import { computed } from "vue";
 import CheckBox from "@/components/CheckBox.vue";
 import FileTypePicker from "@/components/FileTypePicker.vue";
+import FilterGroupManager from "@/components/filter/FilterGroupManager.vue";
+import type { FilterGroup } from "@/__generated__/graphql";
 
 const props = defineProps({
   formValues: {
@@ -20,12 +22,20 @@ const selectedFileTypes = computed(() => {
   return props.formValues.allowedFileTypes || [];
 });
 
+const downloadFilterGroups = computed(() => {
+  return props.formValues.downloadFilterGroups || [];
+});
+
 const updateDownloadsEnabled = (enabled: boolean) => {
   emit("updateFormValues", { downloadsEnabled: enabled });
 };
 
 const updateAllowedFileTypes = (fileTypes: string[]) => {
   emit("updateFormValues", { allowedFileTypes: fileTypes });
+};
+
+const updateFilterGroups = (filterGroups: FilterGroup[]) => {
+  emit("updateFormValues", { downloadFilterGroups: filterGroups });
 };
 </script>
 
@@ -85,6 +95,17 @@ const updateAllowedFileTypes = (fileTypes: string[]) => {
         <p class="text-sm text-yellow-800 dark:text-yellow-200">
           <strong>Warning:</strong> No file types are selected. Users will not be able to upload any files until you select at least one file type.
         </p>
+      </div>
+    </div>
+
+    <!-- Filter Configuration Section -->
+    <div class="space-y-4">
+      <div class="border-t border-gray-200 pt-6 dark:border-gray-600">
+        <FilterGroupManager
+          :filter-groups="downloadFilterGroups"
+          :disabled="!downloadsEnabled"
+          @update-filter-groups="updateFilterGroups"
+        />
       </div>
     </div>
   </div>
