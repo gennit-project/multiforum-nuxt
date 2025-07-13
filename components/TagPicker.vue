@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
+import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import SearchableTagList from "@/components/SearchableTagList.vue";
+import { useQuery, useMutation } from "@vue/apollo-composable";
+import { GET_TAGS } from "@/graphQLData/tag/queries";
+import { CREATE_TAG } from "@/graphQLData/tag/mutations";
+import MultiSelect from "@/components/MultiSelect.vue";
+import type { MultiSelectOption } from "@/components/MultiSelect.vue";
+import type { Tag } from "@/__generated__/graphql";
 
 const props = defineProps({
-  hideSelected: {
-    type: Boolean,
-    default: false,
-  },
   selectedTags: {
     type: Array as PropType<string[]>,
     default: () => [],
@@ -17,80 +18,90 @@ const props = defineProps({
     default: "",
   },
 });
+
 const emit = defineEmits(["setSelectedTags"]);
 
-const isDropdownOpen = ref(false);
-const selected = ref([...props.selectedTags]);
+const searchQuery = ref("");
 
-const toggleDropdown = () => {
-  isDropdownOpen.value = !isDropdownOpen.value;
-};
+const {
+  mutate: createTag,
+  loading: createTagLoading,
+} = useMutation(CREATE_TAG);
 
-const toggleSelectedTag = (tag: string) => {
-  const index = selected.value.indexOf(tag);
-  if (index === -1) {
-    selected.value.push(tag);
-  } else {
-    selected.value.splice(index, 1);
-  }
-  emit("setSelectedTags", selected.value);
-};
-
-watch(
-  () => props.selectedTags,
-  (newVal) => {
-    selected.value = [...newVal];
+const {
+  loading: tagsLoading,
+  result: tagsResult,
+  refetch: refetchTags,
+} = useQuery(
+  GET_TAGS,
+  computed(() => ({
+    where: {
+      text_CONTAINS: searchQuery.value,
+    },
+  })),
+  {
+    fetchPolicy: "cache-first",
   }
 );
 
-const outside = () => {
-  isDropdownOpen.value = false;
+const tagOptions = computed<MultiSelectOption[]>(() => {
+  const tags = tagsResult.value?.tags || [];
+  const options = tags.map((tag: Tag) => ({
+    value: tag.text,
+    label: tag.text,
+  }));
+  
+  // Add option to create new tag if search doesn't match existing tags
+  if (searchQuery.value && !tags.some((tag: Tag) => tag.text.toLowerCase() === searchQuery.value.toLowerCase())) {
+    options.unshift({
+      value: searchQuery.value,
+      label: `Create "${searchQuery.value}"`,
+      icon: "fa-solid fa-plus",
+    });
+  }
+  
+  return options;
+});
+
+const handleUpdateTags = async (newTags: string[]) => {
+  // Check if we need to create any new tags
+  const existingTags = tagsResult.value?.tags?.map((tag: Tag) => tag.text) || [];
+  const tagsToCreate = newTags.filter(tag => !existingTags.includes(tag));
+  
+  // Create new tags
+  for (const tagText of tagsToCreate) {
+    try {
+      await createTag({ input: [{ text: tagText }] });
+    } catch (error) {
+      console.error("Error creating tag:", error);
+    }
+  }
+  
+  // Refetch tags to update the list
+  if (tagsToCreate.length > 0) {
+    await refetchTags();
+  }
+  
+  emit("setSelectedTags", newTags);
 };
 
-const removeSelection = (tag: string) => {
-  selected.value = selected.value.filter((c) => c !== tag);
-  emit("setSelectedTags", selected.value);
+const handleSearch = (query: string) => {
+  searchQuery.value = query;
 };
 </script>
 
 <template>
-  <div>
-    <div v-if="description" class="py-1 text-sm dark:text-gray-300">
-      {{ description }}
-    </div>
-    <div class="relative"> 
-      <div
-        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border 
-               px-4 text-left dark:border-gray-700 dark:bg-gray-700 text-sm"
-        @click="toggleDropdown"
-      >
-        <div v-if="selected.length === 0" class="text-gray-500 dark:text-gray-400">
-          There are no tags yet
-        </div>
-        <div
-          v-for="(tag, index) in selected"
-          :key="index"
-          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 
-                 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
-          @click="removeSelection(tag)"
-        >
-          <span>{{ tag }}</span>
-          <span class="ml-1 cursor-pointer" @click.stop="removeSelection(tag)">
-            &times;
-          </span>
-        </div>
-        <input
-          data-testid="tag-picker"
-          class="flex-1 border-none bg-transparent focus:outline-none dark:text-white text-sm"
-          placeholder="Add a tag..."
-        >
-      </div>
-      <SearchableTagList
-        v-if="isDropdownOpen"
-        v-click-outside="outside"
-        :selected-tags="selected"
-        @toggle-selection="toggleSelectedTag"
-      />
-    </div>
-  </div>
+  <MultiSelect
+    :model-value="selectedTags"
+    :options="tagOptions"
+    :description="description"
+    :loading="tagsLoading || createTagLoading"
+    placeholder="There are no tags yet"
+    search-placeholder="Add a tag..."
+    test-id="tag-picker"
+    searchable
+    show-chips
+    @update:model-value="handleUpdateTags"
+    @search="handleSearch"
+  />
 </template>

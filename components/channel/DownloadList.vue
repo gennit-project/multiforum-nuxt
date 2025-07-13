@@ -13,9 +13,16 @@
   import { usernameVar } from "@/cache";
   import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
   import { getSortFromQuery, getTimeFrameFromQuery } from "@/components/comments/getSortFromQuery";
-  import type { Discussion, Album } from "@/__generated__/graphql";
+  import type { Discussion, Album, FilterGroup } from "@/__generated__/graphql";
 
   const DOWNLOAD_PAGE_LIMIT = 25;
+
+  const props = defineProps({
+    filterGroups: {
+      type: Array as () => FilterGroup[],
+      default: () => [],
+    },
+  });
 
   const emit = defineEmits(["filterByTag", "filterByChannel"]);
 
@@ -145,6 +152,28 @@
     }
   });
 
+  // Parse download-specific filter values from query params
+  const getDownloadFiltersFromQuery = () => {
+    const filters: Record<string, string[]> = {};
+    
+    Object.keys(route.query).forEach(key => {
+      if (key.startsWith('filter_')) {
+        const filterKey = key.replace('filter_', '');
+        const value = route.query[key];
+        
+        if (typeof value === 'string' && value.length > 0) {
+          filters[filterKey] = value.split(',');
+        } else if (Array.isArray(value)) {
+          filters[filterKey] = value.filter((v): v is string => typeof v === 'string');
+        }
+      }
+    });
+    
+    return filters;
+  };
+
+  const downloadFilters = ref(getDownloadFiltersFromQuery());
+
   watch(
     () => route.query,
     () => {
@@ -153,6 +182,7 @@
           route,
           channelId: channelId.value,
         });
+        downloadFilters.value = getDownloadFiltersFromQuery();
       }
     }
   );
@@ -166,10 +196,43 @@
     emit("filterByChannel", channel);
   };
 
+  // Filter downloads based on selected filter groups
+  const filteredDownloads = computed(() => {
+    const downloads = downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels || [];
+    
+    // If no filters are active, return all downloads
+    const hasActiveFilters = Object.values(downloadFilters.value).some(values => values.length > 0);
+    if (!hasActiveFilters) {
+      return downloads;
+    }
+    
+    // For now, this is a placeholder for client-side filtering
+    // In a full implementation, this would filter based on discussion tags
+    // that match the filter group key-value pairs
+    return downloads.filter((discussionChannel: any) => {
+      const discussion = discussionChannel.Discussion;
+      if (!discussion?.Tags) return false;
+      
+      // Check if discussion tags match any selected filter values
+      const discussionTags = discussion.Tags.map((tag: any) => tag.text);
+      
+      // For each active filter group, check if discussion has matching tags
+      return Object.entries(downloadFilters.value).every(([filterKey, selectedValues]) => {
+        if (selectedValues.length === 0) return true;
+        
+        // Simple tag matching - in a real implementation, this would be more sophisticated
+        // For now, we'll check if any discussion tag contains the filter value
+        return selectedValues.some(filterValue => 
+          discussionTags.some((tag: string) => tag.toLowerCase().includes(filterValue.toLowerCase()))
+        );
+      });
+    });
+  });
+
   const reachedEndOfResults = computed(() => {
     return (
       downloadChannelResult.value?.getDiscussionsInChannel.aggregateDiscussionChannelsCount ===
-      downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels.length
+      filteredDownloads.value.length
     );
   });
 </script>
@@ -215,14 +278,23 @@
       </RequireAuth>
     </p>
 
+    <!-- Filtered results message -->
     <div
-      v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0"
+      v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0 && filteredDownloads.length === 0"
+      class="p-4 text-center"
+    >
+      <p class="text-gray-600 dark:text-gray-400">
+        No downloads match the selected filters.
+      </p>
+    </div>
+
+    <div
+      v-else-if="filteredDownloads.length > 0"
       class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       data-testid="channel-download-list"
     >
       <ChannelDownloadListItem
-        v-for="discussionChannel in downloadChannelResult.getDiscussionsInChannel
-          .discussionChannels"
+        v-for="discussionChannel in filteredDownloads"
         :key="`${discussionChannel.id}-${expandChannelDiscussions}`"
         :default-expanded="expandChannelDiscussions"
         :discussion="discussionChannel.Discussion"
@@ -236,7 +308,7 @@
         @open-album="handleOpenAlbum"
       />
     </div>
-    <div v-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0">
+    <div v-if="filteredDownloads.length > 0">
       <LoadMore
         class="mb-6 justify-self-center"
         :loading="downloadLoading"
