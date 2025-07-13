@@ -105,27 +105,24 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     }
   }));
 
-  const filterGroupConnections = formValues.value.downloadFilterGroups.map((group, index) => ({
-    onCreate: {
-      node: {
-        id: group.id,
-        key: group.key,
-        displayName: group.displayName,
-        mode: group.mode,
-        order: index,
-        options: group.options?.map((option, optionIndex) => ({
-          onCreate: {
-            node: {
-              id: option.id,
-              value: option.value,
-              displayName: option.displayName,
-              order: optionIndex,
-            }
+  const filterGroupCreations = formValues.value.downloadFilterGroups.map((group, index) => ({
+    node: {
+      id: group.id,
+      key: group.key,
+      displayName: group.displayName,
+      mode: group.mode,
+      order: index,
+      options: group.options ? {
+        create: group.options.map((option, optionIndex) => ({
+          node: {
+            id: option.id,
+            value: option.value,
+            displayName: option.displayName,
+            order: optionIndex,
           }
-        })) || []
-      }
-    },
-    where: { node: { id: group.id } }
+        }))
+      } : undefined
+    }
   }));
 
   return {
@@ -141,8 +138,8 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     FilterGroups: [{ 
-      disconnect: filterGroupDisconnections,
-      connectOrCreate: filterGroupConnections 
+      delete: filterGroupDisconnections,
+      create: filterGroupCreations 
     }],
     Admins: [{ connect: [{ where: { node: { username: usernameVar.value } } }] }],
   };
