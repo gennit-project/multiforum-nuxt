@@ -2,7 +2,7 @@
 import { computed, ref, watch } from "vue";
 import TabButton from "@/components/channel/TabButton.vue";
 import type { User } from "@/__generated__/graphql";
-import { usernameVar, isAuthenticatedVar } from "@/cache";
+// import { usernameVar, isAuthenticatedVar } from "@/cache"; // Unused for now
 import { useRoute } from "nuxt/app";
 
 const route = useRoute();

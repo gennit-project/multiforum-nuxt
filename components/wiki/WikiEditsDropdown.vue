@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import type { PropType } from "vue";
-import type { WikiPage, TextVersion, User } from "@/__generated__/graphql";
+import type { WikiPage, TextVersion } from "@/__generated__/graphql";
 import { timeAgo } from "@/utils";
 import WikiRevisionDiffModal from "./WikiRevisionDiffModal.vue";
 

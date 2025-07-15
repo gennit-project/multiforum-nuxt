@@ -17,7 +17,8 @@
 
   const DOWNLOAD_PAGE_LIMIT = 25;
 
-  const props = defineProps({
+  // Props used in template
+  defineProps({
     filterGroups: {
       type: Array as () => FilterGroup[],
       default: () => [],
@@ -217,7 +218,7 @@
       const discussionTags = discussion.Tags.map((tag: any) => tag.text);
       
       // For each active filter group, check if discussion has matching tags
-      return Object.entries(downloadFilters.value).every(([filterKey, selectedValues]) => {
+      return Object.entries(downloadFilters.value).every(([_filterKey, selectedValues]) => {
         if (selectedValues.length === 0) return true;
         
         // Simple tag matching - in a real implementation, this would be more sophisticated

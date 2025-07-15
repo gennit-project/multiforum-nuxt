@@ -7,12 +7,7 @@ import "highlight.js/styles/github-dark.css";
 
 const slotContainer = ref<HTMLElement | null>(null);
 
-// Use DOMPurify only in the client environment
-let DOMPurify: typeof import("dompurify");
-
-if (import.meta.client) {
-  DOMPurify = (await import("dompurify")).default;
-}
+// DOMPurify is not currently used but may be needed for future sanitization
 
 const props = defineProps({
   text: {
@@ -47,7 +42,7 @@ md.renderer.rules.link_open = (
   tokens: any,
   idx: number,
   options: any,
-  env: any,
+  _env: any,
   self: any
 ) => {
   const token = tokens[idx];

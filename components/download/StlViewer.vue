@@ -67,7 +67,7 @@ export default {
     this.cleanup();
   },
   watch: {
-    src(newSrc) {
+    src(_newSrc) {
       this.loadModel();
     }
   },

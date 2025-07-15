@@ -7,8 +7,8 @@ import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption } from '@/components/MultiSelect.vue';
 import type { Channel } from '@/__generated__/graphql';
 
-// Props definition
-const props = defineProps({
+// Props definition - used in template
+defineProps({
   selectedChannels: {
     type: Array as PropType<string[]>,
     default: () => [],

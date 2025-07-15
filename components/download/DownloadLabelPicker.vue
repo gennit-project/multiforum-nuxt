@@ -53,6 +53,7 @@ const toggleLabel = (groupKey: string, optionValue: string) => {
   
   // Remove empty arrays to keep the object clean
   if (newSelection.length === 0) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete updatedLabels[groupKey];
   }
   
@@ -68,6 +69,7 @@ const handleMultiSelectUpdate = (groupKey: string, selectedValues: string[]) => 
   
   // Remove empty arrays to keep the object clean
   if (selectedValues.length === 0) {
+    // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete updatedLabels[groupKey];
   }
   

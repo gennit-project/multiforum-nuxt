@@ -7,7 +7,7 @@ import DownloadFileIcon from "@/components/icons/DownloadFileIcon.vue";
 import TwitterIcon from "@/components/icons/TwitterIcon.vue";
 import FacebookIcon from "@/components/icons/FacebookIcon.vue";
 import RedditIcon from "@/components/icons/RedditIcon.vue";
-import DiscordIcon from "@/components/icons/DiscordIcon.vue";
+// import DiscordIcon from "@/components/icons/DiscordIcon.vue"; // Unused for now
 import BlueskyIcon from "@/components/icons/BlueskyIcon.vue";
 import PinterestIcon from "@/components/icons/PinterestIcon.vue";
 import TumblrIcon from "@/components/icons/TumblrIcon.vue";
@@ -133,7 +133,7 @@ const shareToBluesky = () => {
   );
 };
 
-const shareToDiscord = () => {
+const _shareToDiscord = () => {
   // Discord doesn't have a direct web share API, so we copy a formatted message
   const shareText = `Check out this download: **${props.discussion.title}**\n${shareUrl.value}`;
 

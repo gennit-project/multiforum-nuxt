@@ -14,7 +14,7 @@ import ExpandableImage from "@/components/ExpandableImage.vue";
 import ModelViewer from "@/components/ModelViewer.vue";
 import StlViewer from "@/components/download/StlViewer.vue";
 import { isFileSizeValid } from "@/utils/index";
-import { type Album } from "@/__generated__/graphql";
+import type { Album } from "@/__generated__/graphql";
 
 const props = defineProps<{
   formValues: {
@@ -60,7 +60,7 @@ const { mutate: createImage, error: createImageError } =
   useMutation(CREATE_IMAGE);
 
 // Mutation to update discussion with album data (for auto-save)
-const { mutate: updateDiscussion, error: updateDiscussionError, loading: updateDiscussionLoading } =
+const { mutate: updateDiscussion, error: updateDiscussionError } =
   useMutation(UPDATE_DISCUSSION);
 
 // Keep track of which item is uploading or done

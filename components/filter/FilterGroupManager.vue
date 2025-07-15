@@ -3,7 +3,7 @@ import { ref, computed } from "vue";
 import type { FilterGroup } from "@/__generated__/graphql";
 import { FilterMode } from "@/__generated__/graphql";
 import FilterOptionManager from "./FilterOptionManager.vue";
-import CheckBox from "@/components/CheckBox.vue";
+// import CheckBox from "@/components/CheckBox.vue"; // Unused for now
 
 const props = defineProps({
   filterGroups: {

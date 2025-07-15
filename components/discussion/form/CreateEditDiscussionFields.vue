@@ -15,7 +15,7 @@ import {
 } from "@/utils/constants";
 import AlbumEditForm from "../detail/AlbumEditForm.vue";
 import DownloadEditForm from "./DownloadEditForm.vue";
-import type { Album, Image, Channel, Discussion } from "@/__generated__/graphql";
+import type { Channel, Discussion } from "@/__generated__/graphql";
 
 const props = defineProps<{
   editMode: boolean;

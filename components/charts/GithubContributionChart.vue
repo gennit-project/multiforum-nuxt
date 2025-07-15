@@ -1,11 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, type PropType, nextTick } from "vue";
-import type {
-  Comment as CommentType,
-  Discussion as DiscussionType,
-  Event as EventType,
-} from "@/__generated__/graphql";
-import type { Activity, DayData } from "@/types/contribution";
+import type { DayData } from "@/types/contribution";
 import { Calendar } from "lucide-vue-next";
 import CommentComponent from "@/components/comments/Comment.vue";
 import DiscussionItemInProfile from "@/components/user/DiscussionItemInProfile.vue";

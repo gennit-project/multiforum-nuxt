@@ -8,7 +8,8 @@ import MultiSelect from "@/components/MultiSelect.vue";
 import type { MultiSelectOption } from "@/components/MultiSelect.vue";
 import type { Tag } from "@/__generated__/graphql";
 
-const props = defineProps({
+// Props are used in template
+defineProps({
   selectedTags: {
     type: Array as PropType<string[]>,
     default: () => [],

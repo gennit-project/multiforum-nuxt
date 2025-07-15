@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "nuxt/app";
-import type { FilterGroup, FilterOption } from "@/__generated__/graphql";
-import { FilterMode } from "@/__generated__/graphql";
+import type { FilterGroup } from "@/__generated__/graphql";
 import CheckBox from "@/components/CheckBox.vue";
 import MultiSelect from "@/components/MultiSelect.vue";
 import type { MultiSelectOption } from "@/components/MultiSelect.vue";

@@ -4,7 +4,7 @@ import HamburgerMenuButton from "@/components/nav/HamburgerMenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
 import CreateAnythingButton from "@/components/nav/CreateAnythingButton.vue";
-import LogoIcon from "@/components/icons/LogoIcon.vue";
+// import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from "nuxt/app";
 import LoginButton from "./LoginButton.vue";
 import {

@@ -134,12 +134,6 @@ const removeOption = (optionId: string) => {
   emit("updateGroup", props.filterGroup.id, { options: updatedOptions });
 };
 
-const updateOption = (optionId: string, updates: Partial<FilterOption>) => {
-  const updatedOptions = props.filterGroup.options?.map(option => 
-    option.id === optionId ? { ...option, ...updates } : option
-  ) || [];
-  emit("updateGroup", props.filterGroup.id, { options: updatedOptions });
-};
 
 const moveOption = (optionId: string, direction: "up" | "down") => {
   const options = [...(props.filterGroup.options || [])];

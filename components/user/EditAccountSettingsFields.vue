@@ -2,7 +2,6 @@
 import { ref, computed, nextTick } from "vue";
 import type { PropType } from "vue";
 import type { ApolloError } from "@apollo/client/errors";
-import { useRoute } from "nuxt/app";
 import { useMutation } from "@vue/apollo-composable";
 import TextInput from "@/components/TextInput.vue";
 import FormRow from "@/components/FormRow.vue";
@@ -52,13 +51,9 @@ const emit = defineEmits<{
 }>();
 
 // Data and Setup
-const route = useRoute();
 const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 const touched = ref(false);
 
-const usernameInParams = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
-});
 
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
