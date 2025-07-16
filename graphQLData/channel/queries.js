@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client/core";
-import { DateTime } from 'luxon';
+import { DateTime } from "luxon";
 
 export const GET_CHANNEL_NAMES = gql`
   query getChannelNames($channelWhere: ChannelWhere) {
@@ -146,7 +146,7 @@ export const GET_CHANNEL = gql`
         where: {
           AND: [
             { NOT: { Discussion: null } }
-            { Discussion: { hasDownload: false } }
+            { NOT: { Discussion: { hasDownload: true } } }
           ]
         }
       ) {
@@ -157,19 +157,13 @@ export const GET_CHANNEL = gql`
       }
       EventChannelsAggregate(
         where: {
-          NOT: { 
-            archived: true,
-            Event: null
-          }
-          Event: { 
-            canceled: false, 
-            endTime_GT: $now,
-          }
+          NOT: { archived: true, Event: null }
+          Event: { canceled: false, endTime_GT: $now }
         }
       ) {
         count
       }
-      DefaultModRole { 
+      DefaultModRole {
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -251,11 +245,11 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
       options: { limit: 4, sort: [{ startTime: ASC }] }
       where: {
         AND: [
-          { 
-            EventChannels_SOME: { 
-              channelUniqueName: $uniqueName,
+          {
+            EventChannels_SOME: {
+              channelUniqueName: $uniqueName
               archived: false
-            } 
+            }
           }
           {
             OR: [
@@ -276,12 +270,13 @@ export const GET_SOONEST_EVENTS_IN_CHANNEL = gql`
   }
 `;
 
-
 // Round down to nearest 10 seconds to ensure SSR and client use same timestamp
-const now = DateTime.now().set({ 
-  second: Math.floor(DateTime.now().second / 10) * 10, 
-  millisecond: 0 
-}).toISO();
+const now = DateTime.now()
+  .set({
+    second: Math.floor(DateTime.now().second / 10) * 10,
+    millisecond: 0,
+  })
+  .toISO();
 
 export const GET_CHANNELS = gql`
   query getSortedChannels(
@@ -322,8 +317,11 @@ export const GET_CHANNELS = gql`
         DiscussionChannelsAggregate(
           where: {
             AND: [
-              { NOT: { Discussion: null } }
-              { Discussion: { hasDownload: false } }
+              { NOT: { archived: true } },
+              { NOT: { Discussion: null } },
+              { NOT: {
+                Discussion: { hasDownload: true }
+               } }
             ]
           }
         ) {
