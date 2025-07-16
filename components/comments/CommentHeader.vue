@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import type { PropType } from "vue";
 import type { Comment, User } from "@/__generated__/graphql";
-import { relativeTime } from "@/utils";
+import { stableRelativeTime } from "@/utils";
 import { getCommentAuthorStatus } from "@/utils/headerPermissionUtils";
 import {
   getPermalinkToDiscussionComment,
@@ -71,7 +71,7 @@ const createdAtFormatted = computed(() => {
   if (!props.commentData.createdAt) {
     return "";
   }
-  return `posted ${relativeTime(props.commentData.createdAt)}${
+  return `posted ${stableRelativeTime(props.commentData.createdAt)}${
     props.showChannel
       ? " in c/" +
         (props.commentData.DiscussionChannel?.channelUniqueName ||
@@ -86,7 +86,7 @@ const editedAtFormatted = computed(() => {
   if (!props.commentData.updatedAt) {
     return "";
   }
-  return `Edited ${relativeTime(props.commentData.updatedAt)}`;
+  return `Edited ${stableRelativeTime(props.commentData.updatedAt)}`;
 });
 
 // Check if the comment has past versions
