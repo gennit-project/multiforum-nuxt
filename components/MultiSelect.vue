@@ -118,6 +118,11 @@ const removeSelection = (value: any, event?: Event) => {
   emit('update:modelValue', selected.value);
 };
 
+const clearSelection = () => {
+  selected.value = [];
+  emit('update:modelValue', selected.value);
+};
+
 const updateSearch = (query: string) => {
   searchQuery.value = query;
   emit('search', query);
@@ -200,16 +205,21 @@ const selectedOptions = computed(() => {
           </div>
         </div>
         
-        <!-- Single selection display (when not showing chips) -->
-        <div v-else-if="!showChips && selectedOptions.length > 0" class="flex items-center">
+        <!-- Single selection display or comma-separated values (when not showing chips) -->
+        <div v-else-if="!showChips && selectedOptions.length > 0" class="flex items-center flex-1">
+          <!-- Show avatar/icon only for single selection -->
           <img
-            v-if="selectedOptions[0].avatar"
+            v-if="selectedOptions.length === 1 && selectedOptions[0].avatar"
             :src="selectedOptions[0].avatar"
             :alt="selectedOptions[0].label"
             class="mr-2 h-6 w-6 rounded-full"
           >
-          <i v-else-if="selectedOptions[0].icon" :class="[selectedOptions[0].icon, 'mr-2']"></i>
-          <span class="text-gray-900 dark:text-white">{{ selectedOptions[0].label }}</span>
+          <i v-else-if="selectedOptions.length === 1 && selectedOptions[0].icon" :class="[selectedOptions[0].icon, 'mr-2']"></i>
+          
+          <!-- Show comma-separated labels for multiple selections -->
+          <span class="text-gray-900 dark:text-white truncate">
+            {{ selectedOptions.map(option => option.label).join(', ') }}
+          </span>
         </div>
         
         <!-- Placeholder -->
@@ -230,9 +240,23 @@ const selectedOptions = computed(() => {
           @click.stop
         >
         
-        <!-- Dropdown arrow -->
-        <div class="ml-auto text-gray-400">
-          <i :class="isDropdownOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
+        <!-- Clear button and dropdown arrow -->
+        <div class="ml-auto flex items-center text-gray-400">
+          <!-- Clear button -->
+          <button
+            v-if="selectedOptions.length > 0"
+            type="button"
+            class="mr-2 hover:text-red-500 transition-colors"
+            @click.stop="clearSelection"
+            :title="'Clear selection'"
+          >
+            <i class="fa-solid fa-times"></i>
+          </button>
+          
+          <!-- Dropdown arrow -->
+          <div>
+            <i :class="isDropdownOpen ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'"></i>
+          </div>
         </div>
       </div>
       
