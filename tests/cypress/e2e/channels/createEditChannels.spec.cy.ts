@@ -54,7 +54,7 @@ describe("Basic channel operations", () => {
       .clear()
       .type(TEST_DESCRIPTION);
 
-    cy.get('input[data-testid="tag-picker"]')
+    cy.get('[data-testid="tag-picker"]')
       .should('be.visible')
       .click();
       
