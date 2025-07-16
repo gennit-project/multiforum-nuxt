@@ -1,6 +1,6 @@
 <script setup lang="ts">
   import { computed } from "vue";
-  import { useRoute, useRouter } from "nuxt/app";
+  import { useRoute, useRouter, useHead } from "nuxt/app";
   import { GET_CHANNEL } from "@/graphQLData/channel/queries";
   import { useQuery } from "@vue/apollo-composable";
   import PencilIcon from "@/components/icons/PencilIcon.vue";
@@ -40,6 +40,160 @@
   function createWikiPage() {
     router.push(`/forums/${forumId}/wiki/create`);
   }
+
+  // SEO metadata setup
+  const {
+    onResult: onGetChannelResult,
+  } = useQuery(GET_CHANNEL, { uniqueName: forumId }, { errorPolicy: "all" });
+
+  onGetChannelResult((result) => {
+    try {
+      if (!result?.data?.channels) {
+        return;
+      }
+      if (result.data.channels.length === 0) {
+        // Handle the case where the channel is not found
+        useHead({
+          title: `Wiki Not Found${forumId ? ` | ${forumId}` : ""}`,
+          meta: [
+            { name: 'description', content: "The requested wiki could not be found." },
+            { name: 'robots', content: 'noindex' },
+          ],
+        });
+        return;
+      } else {
+        const channel = result.data.channels[0];
+        const wikiHomePage = channel.WikiHomePage;
+        const baseUrl = import.meta.env.VITE_BASE_URL;
+        const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+        const pageUrl = `${baseUrl}/forums/${forumId}/wiki`;
+
+        if (!channel.wikiEnabled) {
+          // Wiki is disabled
+          useHead({
+            title: `Wiki Disabled | ${forumId} | ${serverName}`,
+            meta: [
+              { name: 'description', content: `The wiki feature is not enabled for ${forumId}.` },
+              { name: 'robots', content: 'noindex' },
+            ],
+          });
+          return;
+        }
+
+        if (!wikiHomePage) {
+          // No wiki home page exists yet
+          const title = `${forumId} Wiki`;
+          const description = `Create and explore wiki pages for ${forumId} on ${serverName}`;
+          
+          useHead({
+            title: `${title} | ${serverName}`,
+            meta: [
+              { name: 'description', content: description },
+              
+              // OpenGraph tags
+              { property: 'og:title', content: title },
+              { property: 'og:description', content: description },
+              { property: 'og:type', content: 'website' },
+              { property: 'og:url', content: pageUrl },
+              { property: 'og:site_name', content: serverName },
+              
+              // Twitter Card tags
+              { name: 'twitter:card', content: 'summary' },
+              { name: 'twitter:title', content: title },
+              { name: 'twitter:description', content: description },
+
+              // Additional meta tags for wiki pages
+              { name: 'article:section', content: 'Wiki' },
+              { name: 'article:tag', content: 'wiki' },
+            ],
+            script: [
+              {
+                type: "application/ld+json",
+                children: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "WebSite",
+                  name: title,
+                  description: description,
+                  url: pageUrl,
+                  publisher: {
+                    "@type": "Organization",
+                    name: serverName,
+                  },
+                  mainEntityOfPage: {
+                    "@type": "WebPage",
+                    "@id": pageUrl,
+                  },
+                  keywords: ["wiki", forumId],
+                }),
+              },
+            ],
+          });
+        } else {
+          // Wiki home page exists
+          const title = wikiHomePage.title || `${forumId} Wiki`;
+          const description = wikiHomePage.body
+            ? wikiHomePage.body.substring(0, 160) +
+              (wikiHomePage.body.length > 160 ? "..." : "")
+            : `Explore the wiki for ${forumId} on ${serverName}`;
+
+          useHead({
+            title: `${title} | ${forumId} Wiki | ${serverName}`,
+            meta: [
+              { name: 'description', content: description },
+              
+              // OpenGraph tags
+              { property: 'og:title', content: title },
+              { property: 'og:description', content: description },
+              { property: 'og:type', content: 'article' },
+              { property: 'og:url', content: pageUrl },
+              { property: 'og:site_name', content: serverName },
+              
+              // Twitter Card tags
+              { name: 'twitter:card', content: 'summary' },
+              { name: 'twitter:title', content: title },
+              { name: 'twitter:description', content: description },
+
+              // Additional meta tags for wiki pages
+              { name: 'article:section', content: 'Wiki' },
+              { name: 'article:tag', content: 'wiki' },
+            ],
+            script: [
+              {
+                type: "application/ld+json",
+                children: JSON.stringify({
+                  "@context": "https://schema.org",
+                  "@type": "Article",
+                  headline: title,
+                  description: description,
+                  author: {
+                    "@type": "Person",
+                    name:
+                      wikiHomePage.VersionAuthor?.displayName ||
+                      wikiHomePage.VersionAuthor?.username ||
+                      "Anonymous",
+                  },
+                  datePublished: wikiHomePage.createdAt,
+                  dateModified: wikiHomePage.updatedAt || wikiHomePage.createdAt,
+                  publisher: {
+                    "@type": "Organization",
+                    name: serverName,
+                  },
+                  mainEntityOfPage: {
+                    "@type": "WebPage",
+                    "@id": pageUrl,
+                  },
+                  articleSection: "Wiki",
+                  keywords: ["wiki", forumId, title],
+                }),
+              },
+            ],
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error setting wiki index SEO metadata:", error);
+    }
+  });
 </script>
 
 <template>
