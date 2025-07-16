@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { computed, ref, watch, type Component } from "vue";
+  import { computed, ref, watch, onMounted, type Component } from "vue";
   import TabButton from "@/components/channel/TabButton.vue";
   import CalendarIcon from "@/components/icons/CalendarIcon.vue";
   import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
@@ -84,6 +84,12 @@
     return usernameVar.value || "";
   });
 
+  // Use a stable client-side check for authentication state
+  const isClientSide = ref(false);
+  onMounted(() => {
+    isClientSide.value = true;
+  });
+
   const tabRoutes = computed(() => {
     const routes: TabRoutes = {
       discussions: `/forums/${forumId.value}/discussions`,
@@ -144,38 +150,42 @@
       });
     }
 
-    const adminList = props.channel.Admins.map((user) => user.username || "");
-    const modList = (props.channel.Moderators ?? []).map((modProfile) => modProfile.displayName);
-    const isAdmin = adminList.includes(loggedInUsername.value);
-    const isMod = modList.includes(modProfileNameVar.value);
+    // Only show auth-dependent tabs after client-side hydration
+    if (isClientSide.value) {
+      const adminList = props.channel.Admins.map((user) => user.username || "");
+      const modList = (props.channel.Moderators ?? []).map((modProfile) => modProfile.displayName);
+      const isAdmin = adminList.includes(loggedInUsername.value);
+      const isMod = modList.includes(modProfileNameVar.value);
 
-    if (isAdmin) {
-      baseTabs.push({
-        name: "settings",
-        routeSuffix: "edit",
-        label: "Settings",
-        icon: CogIcon,
-        countProperty: null,
-      });
-    }
+      if (isAdmin) {
+        baseTabs.push({
+          name: "settings",
+          routeSuffix: "edit",
+          label: "Settings",
+          icon: CogIcon,
+          countProperty: null,
+        });
+      }
 
-    if (isAdmin || isMod) {
-      baseTabs.push({
-        name: "moderation",
-        routeSuffix: "issues",
-        label: "Issues",
-        icon: FlagIcon,
-        countProperty: "IssuesAggregate",
-      });
-    }
-    if (smAndDown.value) {
-      baseTabs.push({
-        name: "about",
-        routeSuffix: "about",
-        label: "About",
-        icon: InfoIcon,
-        countProperty: null,
-      });
+      if (isAdmin || isMod) {
+        baseTabs.push({
+          name: "moderation",
+          routeSuffix: "issues",
+          label: "Issues",
+          icon: FlagIcon,
+          countProperty: "IssuesAggregate",
+        });
+      }
+      
+      if (smAndDown.value) {
+        baseTabs.push({
+          name: "about",
+          routeSuffix: "about",
+          label: "About",
+          icon: InfoIcon,
+          countProperty: null,
+        });
+      }
     }
 
     return baseTabs;
