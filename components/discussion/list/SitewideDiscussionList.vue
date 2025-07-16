@@ -2,8 +2,10 @@
   import { computed, ref, watch } from "vue";
   import ErrorBanner from "../../ErrorBanner.vue";
   import SitewideDiscussionListItem from "./SitewideDiscussionListItem.vue";
+  import SitewideDiscussionSidebar from "./SitewideDiscussionSidebar.vue";
   import LoadMore from "../../LoadMore.vue";
   import { GET_SITE_WIDE_DISCUSSION_LIST } from "@/graphQLData/discussion/queries";
+  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
   import { useQuery } from "@vue/apollo-composable";
   import { useRoute } from "nuxt/app";
   import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
@@ -11,6 +13,7 @@
   import RequireAuth from "@/components/auth/RequireAuth.vue";
   import { useUIStore } from "@/stores/uiStore";
   import { storeToRefs } from "pinia";
+  import { config } from "@/config";
 
   const DISCUSSION_PAGE_LIMIT = 15;
 
@@ -66,6 +69,23 @@
       sort: activeSort,
       timeFrame: activeTimeFrame,
     },
+  });
+
+  const { result: getServerResult, error: getServerError } = useQuery(
+    GET_SERVER_CONFIG,
+    {
+      serverName: config.serverName,
+    },
+    {
+      fetchPolicy: "cache-first",
+    }
+  );
+
+  const serverConfig = computed(() => {
+    if (getServerError.value || !getServerResult.value?.serverConfigs) {
+      return null;
+    }
+    return getServerResult.value?.serverConfigs[0] || null;
   });
 
   const discussions = computed(() => {
@@ -145,65 +165,80 @@
 <template>
   <div class="flex justify-center">
     <div class="max-w-screen-2xl flex-1 bg-white dark:bg-gray-800 dark:text-white">
-      <slot />
-      <p v-if="discussionLoading">Loading...</p>
-      <ErrorBanner
-        v-else-if="discussionError"
-        class="max-w-5xl"
-        :text="discussionError.message"
-      />
-      <p
-        v-else-if="discussions && discussions.length === 0"
-        class="my-6 flex gap-2 px-4"
-      >
-        <span class="dark:text-white">There are no discussions to show.</span>
-
-        <RequireAuth :full-width="false">
-          <template #has-auth>
-            <nuxt-link
-              class="text-orange-500 underline"
-              :to="{ name: 'discussions-create' }"
+      <div class="relative w-full">
+        <div class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row">
+          <div class="flex-1 md:px-2">
+            <slot />
+            <p v-if="discussionLoading">Loading...</p>
+            <ErrorBanner
+              v-else-if="discussionError"
+              class="max-w-5xl"
+              :text="discussionError.message"
+            />
+            <p
+              v-else-if="discussions && discussions.length === 0"
+              class="my-6 flex gap-2 px-4"
             >
-              Create one?
-            </nuxt-link>
-          </template>
-          <template #does-not-have-auth>
-            <span class="cursor-pointer text-orange-500 underline">Create one?</span>
-          </template>
-        </RequireAuth>
-      </p>
-      <div
-        v-if="discussions && discussions.length > 0"
-        class="p-0"
-      >
-        <ul
-          class="m-0 flex flex-col divide-y divide-gray-200 bg-white p-0 shadow dark:divide-gray-700 dark:bg-gray-800 sm:rounded-lg"
-          data-testid="sitewide-discussion-list"
-          role="list"
-        >
-          <SitewideDiscussionListItem
-            v-for="discussion in discussionResult.getSiteWideDiscussionList.discussions"
-            :key="`${discussion.id}-${expandSitewideDiscussions}`"
-            :default-expanded="expandSitewideDiscussions"
-            :discussion="discussion"
-            :score="discussion.score"
-            :search-input="filterValues.searchInput"
-            :selected-channels="filterValues.channels"
-            :selected-tags="filterValues.tags"
-            @filter-by-channel="filterByChannel"
-            @filter-by-tag="filterByTag"
-          />
-        </ul>
-        <div v-if="discussionResult.getSiteWideDiscussionList.discussions.length > 0">
-          <LoadMore
-            class="ml-4 justify-self-center"
-            :loading="discussionLoading"
-            :reached-end-of-results="
-              aggregateDiscussionCount ===
-              discussionResult.getSiteWideDiscussionList.discussions.length
-            "
-            @load-more="loadMore"
-          />
+              <span class="dark:text-white">There are no discussions to show.</span>
+
+              <RequireAuth :full-width="false">
+                <template #has-auth>
+                  <nuxt-link
+                    class="text-orange-500 underline"
+                    :to="{ name: 'discussions-create' }"
+                  >
+                    Create one?
+                  </nuxt-link>
+                </template>
+                <template #does-not-have-auth>
+                  <span class="cursor-pointer text-orange-500 underline">Create one?</span>
+                </template>
+              </RequireAuth>
+            </p>
+            <div
+              v-if="discussions && discussions.length > 0"
+              class="p-0"
+            >
+              <ul
+                class="m-0 flex flex-col divide-y divide-gray-200 bg-white p-0 shadow dark:divide-gray-700 dark:bg-gray-800 sm:rounded-lg"
+                data-testid="sitewide-discussion-list"
+                role="list"
+              >
+                <SitewideDiscussionListItem
+                  v-for="discussion in discussionResult.getSiteWideDiscussionList.discussions"
+                  :key="`${discussion.id}-${expandSitewideDiscussions}`"
+                  :default-expanded="expandSitewideDiscussions"
+                  :discussion="discussion"
+                  :score="discussion.score"
+                  :search-input="filterValues.searchInput"
+                  :selected-channels="filterValues.channels"
+                  :selected-tags="filterValues.tags"
+                  @filter-by-channel="filterByChannel"
+                  @filter-by-tag="filterByTag"
+                />
+              </ul>
+              <div v-if="discussionResult.getSiteWideDiscussionList.discussions.length > 0">
+                <LoadMore
+                  class="ml-4 justify-self-center"
+                  :loading="discussionLoading"
+                  :reached-end-of-results="
+                    aggregateDiscussionCount ===
+                    discussionResult.getSiteWideDiscussionList.discussions.length
+                  "
+                  @load-more="loadMore"
+                />
+              </div>
+            </div>
+          </div>
+          <aside
+            v-if="serverConfig"
+            class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+          >
+            <SitewideDiscussionSidebar
+              :server-config="serverConfig"
+              class="px-4"
+            />
+          </aside>
         </div>
       </div>
     </div>
