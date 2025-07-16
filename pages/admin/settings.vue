@@ -36,6 +36,7 @@ const formValues = ref<ServerConfigUpdateInput>({
   rules: [],
   allowedFileTypes: [],
   enableDownloads: false,
+  enableEvents: false,
 });
 
 onGetServerResult((result) => {
@@ -52,6 +53,7 @@ onGetServerResult((result) => {
   
   console.log("Loading server config:", {
     enableDownloads: serverConfig.enableDownloads,
+    enableEvents: serverConfig.enableEvents,
     serverDescription: serverConfig.serverDescription,
     allowedFileTypes: serverConfig.allowedFileTypes
   });
@@ -61,6 +63,7 @@ onGetServerResult((result) => {
     rules,
     allowedFileTypes: serverConfig.allowedFileTypes || [],
     enableDownloads: Boolean(serverConfig.enableDownloads),
+    enableEvents: Boolean(serverConfig.enableEvents),
   };
   
   console.log("Updated form values:", formValues.value);
@@ -75,6 +78,7 @@ const serverUpdateInput = computed(() => {
     rules: JSON.stringify(formValues.value.rules) || "[]",
     allowedFileTypes: formValues.value.allowedFileTypes || [],
     enableDownloads: formValues.value.enableDownloads || false,
+    enableEvents: formValues.value.enableEvents || false,
   };
 });
 
@@ -108,6 +112,7 @@ const {
           ...formValues.value,
           ...updatedConfig,
           enableDownloads: Boolean(newServerConfig.enableDownloads),
+          enableEvents: Boolean(newServerConfig.enableEvents),
         };
         
         console.log("Updated form values after mutation:", formValues.value);

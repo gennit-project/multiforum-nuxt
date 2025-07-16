@@ -11,6 +11,7 @@ import { useRoute, useRouter } from "nuxt/app";
 import CogIcon from "@/components/icons/CogIcon.vue";
 import BookIcon from "@/components/icons/BookIcon.vue";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
+import CalendarIcon from "@/components/icons/CalendarIcon.vue";
 
 
 const props = defineProps({
@@ -65,6 +66,12 @@ const tabs = [
     key: "rules",
     label: "Rules",
     icon: BookIcon,
+    fontAwesome: null,
+  },
+  {
+    key: "calendar",
+    label: "Calendar Settings",
+    icon: CalendarIcon,
     fontAwesome: null,
   },
   {
