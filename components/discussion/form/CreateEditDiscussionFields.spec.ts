@@ -183,7 +183,7 @@ describe('CreateEditDiscussionFields Component', () => {
       
       // Validation error should be about missing channel selection
       expect(errorBanner.exists()).toBe(true);
-      expect(errorBanner.text()).toContain('Must select at least one channel');
+      expect(errorBanner.text()).toContain('Must select at least one forum');
     });
     
     it('validates that title cannot exceed character limit', async () => {
