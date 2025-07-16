@@ -105,8 +105,8 @@ const emit = defineEmits<{
         rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-100">${escapedText}</span>`;
       } else {
         // Equal - show in both columns
-        leftHtml += escapedText;
-        rightHtml += escapedText;
+        leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
+        rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
       }
     });
 
