@@ -9,6 +9,11 @@ import StlViewer from "@/components/download/StlViewer.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 
+// @ts-ignore - definePageMeta is auto-imported by Nuxt
+definePageMeta({
+  ssr: false
+});
+
 const route = useRoute();
 
 const username = computed(() => {
@@ -35,7 +40,7 @@ const {
 );
 
 const image = computed((): Image | null => {
-  if (imageLoading.value || imageError.value) return null;
+  if (imageError.value) return null;
   if (imageResult.value && imageResult.value.images.length > 0) {
     return imageResult.value.images[0];
   }
@@ -104,7 +109,8 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="max-w-4xl mx-auto px-4 py-8">
+  <ClientOnly>
+    <div class="max-w-4xl mx-auto px-4 py-8">
       <!-- Loading state -->
       <div v-if="imageLoading" class="flex justify-center items-center h-96">
         <div class="text-lg">Loading image...</div>
@@ -181,7 +187,7 @@ watchEffect(() => {
             :src="image.url"
             :alt="image.alt || 'Image'"
             class="max-w-full h-auto rounded-lg shadow-lg"
-          />
+          >
         </div>
 
         <!-- Uploader info -->
@@ -241,4 +247,5 @@ watchEffect(() => {
         </div>
       </div>
     </div>
+  </ClientOnly>
 </template>
