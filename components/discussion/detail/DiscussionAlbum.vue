@@ -617,7 +617,7 @@ v-if="editingCaptionIndex === idx"
             class="mb-4 flex rounded dark:text-white overflow-x-auto overflow-y-hidden touch-pan-x"
             :class="{
               'max-h-96 max-w-96': !expandedView,
-              'w-full': expandedView
+              'w-full max-h-[400px]': expandedView
             }"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
@@ -638,26 +638,26 @@ v-if="editingCaptionIndex === idx"
                 <ModelViewer
                   v-if="image && image.url && hasGlbExtension(image.url) && idx === activeIndex"
                   :model-url="image.url"
-                  :height="expandedView ? '533px' : '256px'"
-                  :width="expandedView ? '800px' : '384px'"
+                  :height="expandedView ? '400px' : '256px'"
+                  :width="expandedView ? '600px' : '384px'"
                   class="shadow-sm object-contain"
                   :style="{
                     aspectRatio: '3/2',
-                    maxWidth: expandedView ? '800px' : '384px',
-                    maxHeight: expandedView ? '533px' : '256px'
+                    maxWidth: expandedView ? '600px' : '384px',
+                    maxHeight: expandedView ? '400px' : '256px'
                   }"
                   :show-fullscreen-button="false"
                 />
                 <StlViewer
                   v-else-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex"
                   :src="image.url"
-                  :width="expandedView ? 800 : 384"
-                  :height="expandedView ? 533 : 256"
+                  :width="expandedView ? 600 : 384"
+                  :height="expandedView ? 400 : 256"
                   class="shadow-sm object-contain"
                   :style="{
                     aspectRatio: '3/2',
-                    maxWidth: expandedView ? '800px' : '384px',
-                    maxHeight: expandedView ? '533px' : '256px'
+                    maxWidth: expandedView ? '600px' : '384px',
+                    maxHeight: expandedView ? '400px' : '256px'
                   }"
                 />
                 <img
@@ -672,8 +672,8 @@ v-if="editingCaptionIndex === idx"
                   }"
                   :style="{
                     aspectRatio: '3/2',
-                    maxWidth: expandedView ? '800px' : '384px',
-                    maxHeight: expandedView ? '533px' : '256px'
+                    maxWidth: expandedView ? '600px' : '384px',
+                    maxHeight: expandedView ? '400px' : '256px'
                   }"
                 >
                 <div 
@@ -795,67 +795,76 @@ v-if="editingCaptionIndex === idx"
           'w-full h-full': mdAndDown || !isPanelVisible,
         }"
       >
-        <div class="flex justify-between items-center p-2 px-5 text-white z-50">
-          <div class="flex items-center gap-4">
+        <div class="flex justify-between items-center p-2 text-white z-50" :class="{ 'px-3': mdAndDown, 'px-5': !mdAndDown }">
+          <div class="flex items-center" :class="{ 'gap-2': mdAndDown, 'gap-4': !mdAndDown }">
             <button
-              class="bg-transparent border-0 text-white text-3xl cursor-pointer"
+              class="bg-transparent border-0 text-white cursor-pointer"
+              :class="{ 'text-2xl': mdAndDown, 'text-3xl': !mdAndDown }"
               @click="closeLightbox"
             >
               ×
             </button>
             <div class="flex-1">
-              <span class="text-sm">{{
+              <span :class="{ 'text-xs': mdAndDown, 'text-sm': !mdAndDown }">{{
                 `${lightboxIndex + 1} of ${orderedImages.length}`
               }}</span>
             </div>
           </div>
 
-          <div class="flex items-center gap-4">
+          <div class="flex items-center" :class="{ 'gap-1': mdAndDown, 'gap-4': !mdAndDown }">
             <!-- Zoom controls -->
             <div class="flex items-center bg-opacity-10 rounded">
               <button
-                class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                :class="[
+                  { 'px-1 py-1 text-sm': mdAndDown, 'px-2 py-1': !mdAndDown },
+                  { 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }
+                ]"
                 title="Zoom out"
                 :disabled="zoomLevel <= 1"
-                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }"
                 @click="zoomOut"
               >
                 −
               </button>
-              <span class="px-2 text-sm text-white"
-                >{{ Math.round(zoomLevel * 100) }}%</span
+              <span class="text-white" :class="{ 'px-1 text-xs': mdAndDown, 'px-2 text-sm': !mdAndDown }"
+                >{{ mdAndDown ? Math.round(zoomLevel * 100) + '%' : Math.round(zoomLevel * 100) + '%' }}</span
               >
               <button
-                class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                :class="[
+                  { 'px-1 py-1 text-sm': mdAndDown, 'px-2 py-1': !mdAndDown },
+                  { 'opacity-50 cursor-not-allowed': zoomLevel >= 3 }
+                ]"
                 title="Zoom in"
                 :disabled="zoomLevel >= 3"
-                :class="{ 'opacity-50 cursor-not-allowed': zoomLevel >= 3 }"
                 @click="zoomIn"
               >
                 +
               </button>
               <button
                 v-if="isZoomed"
-                class="px-2 py-1 hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                :class="{ 'px-1 py-1 text-xs': mdAndDown, 'px-2 py-1': !mdAndDown }"
                 title="Reset zoom"
                 @click="resetZoom"
               >
-                Reset
+                {{ mdAndDown ? 'R' : 'Reset' }}
               </button>
             </div>
 
             <!-- Panel toggle button -->
             <button
-              class="bg-opacity-10 bg-gray-800 border-0 text-white py-1 px-2 rounded cursor-pointer text-sm transition-colors"
+              class="bg-opacity-10 bg-gray-800 border-0 text-white rounded cursor-pointer transition-colors"
+              :class="{ 'py-1 px-1 text-xs': mdAndDown, 'py-1 px-2 text-sm': !mdAndDown }"
               :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
               @click="togglePanel"
             >
-              <span v-if="isPanelVisible">Close panel</span>
-              <span v-else>Open panel</span>
+              <span v-if="isPanelVisible">{{ mdAndDown ? 'Hide' : 'Close panel' }}</span>
+              <span v-else>{{ mdAndDown ? 'Show' : 'Open panel' }}</span>
             </button>
-            <!-- More Details button -->
+            <!-- More Details button - hidden on narrow screens to save space -->
             <NuxtLink
-              v-if="currentImage?.Uploader?.username"
+              v-if="currentImage?.Uploader?.username && !mdAndDown"
               :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
               class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
             >
@@ -863,11 +872,12 @@ v-if="editingCaptionIndex === idx"
             </NuxtLink>
             <button
               type="button"
-              class="flex items-center justify-center w-8 h-8 rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer"
+              class="flex items-center justify-center rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer"
+              :class="{ 'w-6 h-6': mdAndDown, 'w-8 h-8': !mdAndDown }"
               :href="currentImage.url || ''"
               @click="() => downloadImage(currentImage.url || '')"
             >
-              <DownloadIcon class="h-6 w-6" />
+              <DownloadIcon :class="{ 'h-4 w-4': mdAndDown, 'h-6 w-6': !mdAndDown }" />
             </button>
           </div>
         </div>
