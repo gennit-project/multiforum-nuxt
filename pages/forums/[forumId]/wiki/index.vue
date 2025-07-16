@@ -10,6 +10,7 @@
   import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import MarkdownPreview from "@/components/MarkdownPreview.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
+  import OnThisPage from "@/components/wiki/OnThisPage.vue";
   import { timeAgo } from "@/utils";
 
   const route = useRoute();
@@ -150,7 +151,7 @@
 
       <div class="flex gap-8">
         <!-- Main content -->
-        <div class="flex-1">
+        <div class="flex-1 min-w-0">
           <div class="prose prose-orange max-w-none dark:prose-invert">
             <MarkdownPreview
               :disable-gallery="false"
@@ -160,31 +161,37 @@
           </div>
         </div>
 
-        <!-- Sidebar with child pages -->
-        <div
-          v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
-          class="w-80 flex-shrink-0"
-        >
+        <!-- Right sidebar with On This Page and Child Pages -->
+        <div class="hidden lg:flex flex-col gap-6 w-80 flex-shrink-0">
+          <!-- On This Page Navigation -->
+          <OnThisPage :markdown-content="wikiHomePage.body" />
+          
+          <!-- Child Pages -->
           <div
-            class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-800"
+            v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
+            class="sticky top-8"
           >
-            <h3 class="font-semibold mb-4 text-lg text-gray-900 dark:text-white">Wiki Pages</h3>
-            <div class="space-y-2">
-              <div
-                v-for="childPage in wikiHomePage.ChildPages"
-                :key="childPage.id"
-                class="group"
-              >
-                <a
-                  :href="`/forums/${forumId}/wiki/${childPage.slug}`"
-                  class="hover:bg-orange-50 block rounded px-2 py-1 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
-                  @click.prevent="router.push(`/forums/${forumId}/wiki/${childPage.slug}`)"
+            <div
+              class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-800"
+            >
+              <h3 class="font-semibold mb-4 text-lg text-gray-900 dark:text-white">Wiki Pages</h3>
+              <div class="space-y-2">
+                <div
+                  v-for="childPage in wikiHomePage.ChildPages"
+                  :key="childPage.id"
+                  class="group"
                 >
-                  {{ childPage.title }}
-                </a>
-                <p class="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                  Updated {{ timeAgo(new Date(childPage.updatedAt || childPage.createdAt)) }}
-                </p>
+                  <a
+                    :href="`/forums/${forumId}/wiki/${childPage.slug}`"
+                    class="hover:bg-orange-50 block rounded px-2 py-1 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                    @click.prevent="router.push(`/forums/${forumId}/wiki/${childPage.slug}`)"
+                  >
+                    {{ childPage.title }}
+                  </a>
+                  <p class="ml-2 text-xs text-gray-500 dark:text-gray-400">
+                    Updated {{ timeAgo(new Date(childPage.updatedAt || childPage.createdAt)) }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

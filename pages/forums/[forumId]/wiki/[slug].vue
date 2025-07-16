@@ -8,6 +8,7 @@
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import OnThisPage from "@/components/wiki/OnThisPage.vue";
   import { timeAgo } from "@/utils";
 
   const route = useRoute();
@@ -98,7 +99,7 @@
 
     <div
       v-else
-      class="mx-auto max-w-3xl p-4"
+      class="mx-auto max-w-7xl p-4"
     >
       <!-- Wiki Page Content -->
       <div class="mb-4">
@@ -135,12 +136,23 @@
         </div>
       </div>
 
-      <div class="prose prose-orange max-w-none dark:prose-invert">
-        <MarkdownPreview
-          :disable-gallery="false"
-          :text="wikiPage.body"
-          :word-limit="3000"
-        />
+      <div class="flex gap-8">
+        <!-- Main content -->
+        <div class="flex-1 min-w-0">
+          <div class="prose prose-orange max-w-none dark:prose-invert">
+            <MarkdownPreview
+              :disable-gallery="false"
+              :text="wikiPage.body"
+              :word-limit="3000"
+            />
+          </div>
+        </div>
+
+        <!-- Right sidebar with On This Page -->
+        <div class="hidden lg:flex flex-col gap-6 w-80 flex-shrink-0">
+          <!-- On This Page Navigation -->
+          <OnThisPage :markdown-content="wikiPage.body" />
+        </div>
       </div>
     </div>
   </div>

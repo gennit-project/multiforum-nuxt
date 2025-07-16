@@ -5,6 +5,16 @@ import MarkdownIt from "markdown-it";
 import hljs from "highlight.js";
 import "highlight.js/styles/github-dark.css";
 
+// Helper function to generate heading anchors
+function generateHeadingId(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .replace(/^-|-$/g, ''); // Remove leading/trailing hyphens
+}
+
 const slotContainer = ref<HTMLElement | null>(null);
 
 // DOMPurify is not currently used but may be needed for future sanitization
@@ -49,6 +59,28 @@ md.renderer.rules.link_open = (
   token.attrPush(["target", "_blank"]);
   token.attrPush(["rel", "noopener noreferrer"]);
   token.attrPush(["class", "external-link"]);
+  return self.renderToken(tokens, idx, options);
+};
+
+// Configure heading renderer to add anchors
+md.renderer.rules.heading_open = (
+  tokens: any,
+  idx: number,
+  options: any,
+  _env: any,
+  self: any
+) => {
+  const token = tokens[idx];
+  const level = token.markup.length;
+  
+  // Get the heading text from the next token
+  const nextToken = tokens[idx + 1];
+  const headingText = nextToken && nextToken.content ? nextToken.content : `heading-${idx}`;
+  const headingId = generateHeadingId(headingText) || `heading-${idx}`;
+  
+  token.attrPush(["id", headingId]);
+  token.attrPush(["class", "heading-with-anchor"]);
+  
   return self.renderToken(tokens, idx, options);
 };
 
@@ -127,10 +159,19 @@ const renderedMarkdown = computed(() => {
     /* ── font‑size variants ─────────────────────────────── */
     &.font-size-small {
       h1 {
-        font-size: 1rem !important;
+        font-size: 1.2rem !important;
       }
       h2 {
+        font-size: 1.1rem !important;
+      }
+      h3 {
+        font-size: 1rem !important;
+      }
+      h4 {
         font-size: 0.9rem !important;
+      }
+      h5, h6 {
+        font-size: 0.8rem !important;
       }
       p,
       li {
@@ -140,10 +181,19 @@ const renderedMarkdown = computed(() => {
 
     &.font-size-medium {
       h1 {
-        font-size: 1.1rem !important;
+        font-size: 1.4rem !important;
       }
       h2 {
+        font-size: 1.2rem !important;
+      }
+      h3 {
+        font-size: 1.1rem !important;
+      }
+      h4 {
         font-size: 1rem !important;
+      }
+      h5, h6 {
+        font-size: 0.9rem !important;
       }
       p,
       li {
@@ -153,10 +203,19 @@ const renderedMarkdown = computed(() => {
 
     &.font-size-large {
       h1 {
-        font-size: 1.4rem !important;
+        font-size: 1.6rem !important;
       }
       h2 {
-        font-size: 1.3rem !important;
+        font-size: 1.4rem !important;
+      }
+      h3 {
+        font-size: 1.2rem !important;
+      }
+      h4 {
+        font-size: 1.1rem !important;
+      }
+      h5, h6 {
+        font-size: 1rem !important;
       }
       p,
       li {
@@ -166,8 +225,11 @@ const renderedMarkdown = computed(() => {
 
     /* ── general typography & elements ───────────────────── */
     h1,
-    h2 {
-      font-size: 1rem !important;
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
       font-weight: 600 !important;
       margin-top: 1.5rem !important;
       margin-bottom: 1rem !important;
@@ -368,30 +430,42 @@ const renderedMarkdown = computed(() => {
 
   /* ── font‑size variants ─────────────────────────────── */
   &.font-size-small {
-    h1 { font-size: 1rem !important; }
-    h2 { font-size: 0.9rem !important; }
+    h1 { font-size: 1.2rem !important; }
+    h2 { font-size: 1.1rem !important; }
+    h3 { font-size: 1rem !important; }
+    h4 { font-size: 0.9rem !important; }
+    h5, h6 { font-size: 0.8rem !important; }
     p,
     li { font-size: 0.8rem !important; }
   }
 
   &.font-size-medium {
-    h1 { font-size: 1.1rem !important; }
-    h2 { font-size: 1.0rem !important; }
+    h1 { font-size: 1.4rem !important; }
+    h2 { font-size: 1.2rem !important; }
+    h3 { font-size: 1.1rem !important; }
+    h4 { font-size: 1rem !important; }
+    h5, h6 { font-size: 0.9rem !important; }
     p,
     li { font-size: 0.9rem !important; }
   }
 
   &.font-size-large {
-    h1 { font-size: 1.4rem !important; }
-    h2 { font-size: 1.3rem !important; }
+    h1 { font-size: 1.6rem !important; }
+    h2 { font-size: 1.4rem !important; }
+    h3 { font-size: 1.2rem !important; }
+    h4 { font-size: 1.1rem !important; }
+    h5, h6 { font-size: 1rem !important; }
     p,
     li { font-size: 1.1rem !important; }
   }
 
   /* ── general typography & elements ───────────────────── */
   h1,
-  h2 {
-    font-size: 1rem !important;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-weight: 600 !important;
     margin-top: 1.5rem !important;
     margin-bottom: 1rem !important;

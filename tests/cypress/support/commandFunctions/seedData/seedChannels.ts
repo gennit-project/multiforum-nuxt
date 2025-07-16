@@ -26,7 +26,7 @@ const baseChannels: BaseChannel[] = [
     uniqueName: "cats",
     admins: ["cluse"],
     mods: ["testModProfile2"],
-    rules: "[{\"summary\":\"Focus on cats\",\"detail\":\"Non-cat-related content will be removed.\"}]"
+    rules: "[{\"summary\":\"Be kind and constructive\",\"detail\":\"Personal attacks and discrimination are not allowed.\"},{\"summary\":\"No medical diagnoses\",\"detail\":\"You may share experience, but do not claim professional authority unless you are a licensed vet and are willing to verify credentials.\"},{\"summary\":\"Source your information\",\"detail\":\"Link reputable references for health, nutrition, or behavior claims.\"},{\"summary\":\"No spam or self‑promotion\",\"detail\":\"Unless it directly helps the question at hand.\"},{\"summary\":\"Respect privacy\",\"detail\":\"Blur identifying info in photos (addresses, vet records, people's faces) unless you have permission.\"}]"
   },
   {
     uniqueName: "phx_music",
