@@ -96,8 +96,8 @@
       });
     }
 
-    // Sort by date (newest first)
-    return edits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    // Sort by date (oldest first - chronological order)
+    return edits.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
   });
 
   // Toggle dropdown
@@ -196,7 +196,7 @@
                 (Current)
               </span>
               <span
-                v-else-if="edit === allEdits[0]"
+                v-else-if="edit === allEdits[allEdits.length - 1]"
                 class="ml-1 text-orange-600 dark:text-orange-400"
               >
                 Most recent
@@ -213,7 +213,7 @@
       :open="!!activeRevision"
       :old-version="activeRevision.oldVersion"
       :new-version="activeRevision.newVersion"
-      :is-most-recent="activeRevision === allEdits[0]"
+      :is-most-recent="activeRevision === allEdits[allEdits.length - 1]"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"
     />

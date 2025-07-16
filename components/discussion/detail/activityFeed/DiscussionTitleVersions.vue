@@ -17,17 +17,17 @@
       return [];
     }
 
-    // Get past versions ordered by newest first (they should already be in this order)
-    const pastVersions = props.discussion.PastTitleVersions.slice();
+    // Get past versions ordered by oldest first (chronological order)
+    const pastVersions = props.discussion.PastTitleVersions.slice().reverse();
 
     // Create an array of title transitions:
     // [current <- past version N <- ... <- past version 1]
     const transitions = [];
 
-    // Add transitions between past versions
+    // Add transitions between past versions (chronological order)
     for (let i = 0; i < pastVersions.length; i++) {
       const oldVersion = pastVersions[i];
-      const newerVersion = i === 0 ? { body: props.discussion.title } : pastVersions[i - 1];
+      const newerVersion = i === pastVersions.length - 1 ? { body: props.discussion.title } : pastVersions[i + 1];
 
       transitions.push({
         id: oldVersion.id,
@@ -35,7 +35,7 @@
         oldTitle: oldVersion.body,
         newTitle: newerVersion.body,
         timestamp: new Date(oldVersion.createdAt),
-        isLatest: i === 0,
+        isLatest: i === pastVersions.length - 1,
       });
     }
 
