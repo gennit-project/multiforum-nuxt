@@ -252,32 +252,34 @@
       class="max-w-5xl"
       :text="downloadError.message"
     />
-    <p
+    <div
       v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length === 0"
       class="flex gap-2 p-4"
     >
       <span class="dark:text-white">There are no downloads yet.</span>
 
-      <RequireAuth :full-width="false">
-        <template #has-auth>
-          <nuxt-link
-            v-if="channelId"
-            class="text-orange-500 underline dark:text-white"
-            :to="{
-              name: 'forums-forumId-downloads-create',
-              params: {
-                forumId: channelId,
-              },
-            }"
-          >
-            Create one?
-          </nuxt-link>
-        </template>
-        <template #does-not-have-auth>
-          <span class="cursor-pointer text-orange-500 underline dark:text-white">Create one?</span>
-        </template>
-      </RequireAuth>
-    </p>
+      <ClientOnly>
+        <RequireAuth :full-width="false">
+          <template #has-auth>
+            <nuxt-link
+              v-if="channelId"
+              class="text-orange-500 underline dark:text-white"
+              :to="{
+                name: 'forums-forumId-downloads-create',
+                params: {
+                  forumId: channelId,
+                },
+              }"
+            >
+              Create one?
+            </nuxt-link>
+          </template>
+          <template #does-not-have-auth>
+            <span class="cursor-pointer text-orange-500 underline dark:text-white">Create one?</span>
+          </template>
+        </RequireAuth>
+      </ClientOnly>
+    </div>
 
     <!-- Filtered results message -->
     <div
