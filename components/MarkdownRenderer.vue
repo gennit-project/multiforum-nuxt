@@ -98,7 +98,17 @@ const renderedMarkdown = computed(() => {
   const rawHTML = md.render(preprocessedText);
   
   // Post-process to convert spoiler placeholders back to HTML
-  const processedHTML = rawHTML.replace(/§SPOILER§([^§]+)§\/SPOILER§/g, '<span class="spoiler-text">$1</span>');
+  let processedHTML = rawHTML.replace(/§SPOILER§([^§]+)§\/SPOILER§/g, '<span class="spoiler-text">$1</span>');
+  
+  // Wrap tables in responsive wrapper divs
+  processedHTML = processedHTML.replace(
+    /<table[^>]*>/gi,
+    '<div class="table-wrapper"><table>'
+  );
+  processedHTML = processedHTML.replace(
+    /<\/table>/gi,
+    '</table></div>'
+  );
 
   // Always return the processed HTML - DOMPurify is handled separately for hydration
   return processedHTML;
@@ -401,17 +411,65 @@ const renderedMarkdown = computed(() => {
     }
 
     /* ── table styling ──────────────────────────────────── */
+    .table-wrapper {
+      overflow-x: auto !important;
+      margin: 1rem 0 !important;
+      border-radius: 6px !important;
+      border: 1px solid #d0d7de !important;
+      
+      .dark & {
+        border-color: #30363d !important;
+      }
+      
+      /* Webkit scrollbar styling */
+      &::-webkit-scrollbar {
+        height: 8px !important;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: #f1f1f1 !important;
+        border-radius: 4px !important;
+        
+        .dark & {
+          background: #2d2d2d !important;
+        }
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: #c1c1c1 !important;
+        border-radius: 4px !important;
+        
+        &:hover {
+          background: #a8a8a8 !important;
+        }
+        
+        .dark & {
+          background: #555 !important;
+          
+          &:hover {
+            background: #777 !important;
+          }
+        }
+      }
+    }
+
     table {
       border-collapse: collapse !important;
       border-spacing: 0 !important;
       width: 100% !important;
-      margin: 1rem 0 !important;
-      border: 1px solid #d0d7de !important;
-      border-radius: 6px !important;
-      overflow: hidden !important;
+      min-width: 600px !important; /* Minimum width to prevent cramping */
+      margin: 0 !important;
+      border: none !important;
+      border-radius: 0 !important;
+      overflow: visible !important;
       
-      .dark & {
-        border-color: #30363d !important;
+      /* On mobile, allow table to be smaller but still scrollable */
+      @media (max-width: 768px) {
+        min-width: 500px !important;
+      }
+      
+      @media (max-width: 480px) {
+        min-width: 400px !important;
       }
     }
 
@@ -680,17 +738,65 @@ const renderedMarkdown = computed(() => {
   }
 
   /* ── table styling ──────────────────────────────────── */
+  .table-wrapper {
+    overflow-x: auto !important;
+    margin: 1rem 0 !important;
+    border-radius: 6px !important;
+    border: 1px solid #d0d7de !important;
+    
+    .dark & {
+      border-color: #30363d !important;
+    }
+    
+    /* Webkit scrollbar styling */
+    &::-webkit-scrollbar {
+      height: 8px !important;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: #f1f1f1 !important;
+      border-radius: 4px !important;
+      
+      .dark & {
+        background: #2d2d2d !important;
+      }
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: #c1c1c1 !important;
+      border-radius: 4px !important;
+      
+      &:hover {
+        background: #a8a8a8 !important;
+      }
+      
+      .dark & {
+        background: #555 !important;
+        
+        &:hover {
+          background: #777 !important;
+        }
+      }
+    }
+  }
+
   table {
     border-collapse: collapse !important;
     border-spacing: 0 !important;
     width: 100% !important;
-    margin: 1rem 0 !important;
-    border: 1px solid #d0d7de !important;
-    border-radius: 6px !important;
-    overflow: hidden !important;
+    min-width: 600px !important; /* Minimum width to prevent cramping */
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    overflow: visible !important;
     
-    .dark & {
-      border-color: #30363d !important;
+    /* On mobile, allow table to be smaller but still scrollable */
+    @media (max-width: 768px) {
+      min-width: 500px !important;
+    }
+    
+    @media (max-width: 480px) {
+      min-width: 400px !important;
     }
   }
 
