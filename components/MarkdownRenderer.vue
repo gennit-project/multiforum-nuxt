@@ -35,6 +35,7 @@ const props = defineProps({
 });
 
 const md = new MarkdownIt({
+  html: true, // Enable HTML tags in source
   highlight: (str, lang): any => {
     if (lang && hljs.getLanguage(lang)) {
       try {
@@ -375,6 +376,30 @@ const renderedMarkdown = computed(() => {
       }
     }
 
+    /* ── kbd (keyboard) styling ─────────────────────────── */
+    kbd {
+      display: inline-block !important;
+      padding: 0.2em 0.4em !important;
+      margin: 0 0.1em !important;
+      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+      font-size: 0.85em !important;
+      line-height: 1 !important;
+      color: #24292f !important;
+      background-color: #f6f8fa !important;
+      border: 1px solid #d0d7de !important;
+      border-radius: 6px !important;
+      box-shadow: inset 0 -1px 0 #d0d7de !important;
+      vertical-align: middle !important;
+      white-space: nowrap !important;
+      
+      .dark & {
+        color: #f0f6fc !important;
+        background-color: #21262d !important;
+        border-color: #30363d !important;
+        box-shadow: inset 0 -1px 0 #30363d !important;
+      }
+    }
+
     /* ── external‑link helper ───────────────────────────── */
     .external-link {
       display: inline-flex;
@@ -555,6 +580,30 @@ const renderedMarkdown = computed(() => {
         background-color: transparent !important;
         color: inherit !important;
       }
+    }
+  }
+
+  /* ── kbd (keyboard) styling ─────────────────────────── */
+  kbd {
+    display: inline-block !important;
+    padding: 0.2em 0.4em !important;
+    margin: 0 0.1em !important;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+    font-size: 0.85em !important;
+    line-height: 1 !important;
+    color: #24292f !important;
+    background-color: #f6f8fa !important;
+    border: 1px solid #d0d7de !important;
+    border-radius: 6px !important;
+    box-shadow: inset 0 -1px 0 #d0d7de !important;
+    vertical-align: middle !important;
+    white-space: nowrap !important;
+    
+    .dark & {
+      color: #f0f6fc !important;
+      background-color: #21262d !important;
+      border-color: #30363d !important;
+      box-shadow: inset 0 -1px 0 #30363d !important;
     }
   }
 
