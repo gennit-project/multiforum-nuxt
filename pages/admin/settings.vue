@@ -41,18 +41,29 @@ const formValues = ref<ServerConfigUpdateInput>({
 onGetServerResult((result) => {
   dataLoaded.value = true;
   const serverConfig = result.data?.serverConfigs[0];
+  if (!serverConfig) return;
+  
   let rules = [];
   try {
     rules = JSON.parse(serverConfig.rules) || [];
   } catch (e) {
     console.error("Error parsing server rules", e);
   }
+  
+  console.log("Loading server config:", {
+    enableDownloads: serverConfig.enableDownloads,
+    serverDescription: serverConfig.serverDescription,
+    allowedFileTypes: serverConfig.allowedFileTypes
+  });
+  
   formValues.value = {
     serverDescription: serverConfig.serverDescription || "",
     rules,
     allowedFileTypes: serverConfig.allowedFileTypes || [],
-    enableDownloads: serverConfig.enableDownloads || false,
+    enableDownloads: Boolean(serverConfig.enableDownloads),
   };
+  
+  console.log("Updated form values:", formValues.value);
 });
 
 const serverUpdateInput = computed(() => {
@@ -77,46 +88,49 @@ const {
 } = useMutation(UPDATE_SERVER_CONFIG, {
   update: (cache, { data }) => {
     const newServerConfig = data?.updateServerConfigs.serverConfigs[0];
+    console.log("Mutation response:", { data, newServerConfig });
+    
     if (newServerConfig) {
-      // Read the existing cache data first
       try {
-        const existingData = cache.readQuery<{ serverConfigs: any[] }>({
+        // Parse rules if they come back as string
+        let updatedConfig = { ...newServerConfig };
+        if (typeof updatedConfig.rules === 'string') {
+          try {
+            updatedConfig.rules = JSON.parse(updatedConfig.rules);
+          } catch (e) {
+            console.error("Error parsing rules from mutation response", e);
+            updatedConfig.rules = [];
+          }
+        }
+        
+        // Update the form values with the new data
+        formValues.value = {
+          ...formValues.value,
+          ...updatedConfig,
+          enableDownloads: Boolean(newServerConfig.enableDownloads),
+        };
+        
+        console.log("Updated form values after mutation:", formValues.value);
+        
+        // Also update the cache - reconstruct the full config
+        cache.writeQuery({
           query: GET_SERVER_CONFIG,
           variables: {
             serverName: config.serverName,
           },
+          data: {
+            serverConfigs: [{
+              ...serverConfig.value,
+              ...newServerConfig,
+            }],
+          },
         });
-        
-        if (existingData?.serverConfigs?.[0]) {
-          // Merge the updated fields with the existing data
-          const updatedServerConfig = {
-            ...existingData.serverConfigs[0],
-            ...newServerConfig,
-          };
-          
-          cache.writeQuery({
-            query: GET_SERVER_CONFIG,
-            variables: {
-              serverName: config.serverName,
-            },
-            data: {
-              serverConfigs: [updatedServerConfig],
-            },
-          });
-        }
       } catch (error) {
         console.error('Cache update error:', error);
-        // Fallback to refetch if cache update fails
-        try {
-          cache.evict({ 
-            id: cache.identify({ 
-              __typename: 'ServerConfig', 
-              serverName: config.serverName 
-            }) 
-          });
-        } catch (evictError) {
-          console.error('Cache eviction error:', evictError);
-        }
+        // Force refetch on error
+        cache.evict({
+          fieldName: 'serverConfigs'
+        });
       }
     }
   },
@@ -127,6 +141,11 @@ onDone(() => {
 });
 
 function submit() {
+  console.log("Submitting server config with:", {
+    input: serverUpdateInput.value,
+    formValues: formValues.value
+  });
+  
   updateServer({
     input: serverUpdateInput.value,
     serverName: config.serverName,
@@ -143,7 +162,7 @@ function updateFormValues(data: ServerConfigUpdateInput) {
     <RequireAuth :loading="getServerLoading">
       <template #has-auth>
         <CreateEditServerFields
-          :key="dataLoaded.toString()"
+          :key="`${dataLoaded.toString()}-${formValues.enableDownloads}`"
           :edit-mode="true"
           :server-loading="getServerLoading"
           :get-server-error="getServerError"
