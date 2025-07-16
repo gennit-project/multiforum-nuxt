@@ -7,6 +7,9 @@
   import TailwindForm from "@/components/FormComponent.vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { MAX_CHARS_IN_CHANNEL_NAME } from "@/utils/constants";
+  import { useQuery } from "@vue/apollo-composable";
+  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+  import { config } from "@/config";
 
   // Import icons
   import CogIcon from "@/components/icons/CogIcon.vue";
@@ -60,74 +63,108 @@
 
   const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
 
-  const tabs = [
+  // Get server config to check if downloads are enabled server-wide
+  const { result: serverConfigResult } = useQuery(
+    GET_SERVER_CONFIG,
     {
-      key: "basic",
-      label: "Basic Settings",
-      icon: CogIcon,
-      fontAwesome: null,
+      serverName: config.serverName,
     },
     {
-      key: "rules",
-      label: "Rules",
-      icon: BookIcon,
-      fontAwesome: null,
-    },
-    {
-      key: "mods",
-      label: "Moderators",
-      icon: UserAddIcon,
-      fontAwesome: null,
-    },
-    {
-      key: "owners",
-      label: "Forum Admins",
-      icon: null,
-      fontAwesome: "fa-solid fa-user-shield",
-    },
-    {
-      key: "roles",
-      label: "Roles",
-      icon: IdentificationIcon,
-      fontAwesome: null,
-    },
-    {
-      key: "suspended-users",
-      label: "User Suspensions",
-      icon: UserMinus,
-      fontAwesome: null,
-    },
-    {
-      key: "suspended-mods",
-      label: "Mod Suspensions",
-      icon: UserMinus,
-      fontAwesome: null,
-    },
-    {
-      key: "events",
-      label: "Events",
-      icon: CalendarIcon,
-      fontAwesome: null,
-    },
-    {
-      key: "downloads",
-      label: "Downloads",
-      icon: DownloadIcon,
-      fontAwesome: null,
-    },
-    {
-      key: "feedback",
-      label: "Feedback",
-      icon: AnnotationIcon,
-      fontAwesome: null,
-    },
-    {
-      key: "wiki",
-      label: "Wiki",
-      icon: PencilIcon,
-      fontAwesome: null,
-    },
-  ];
+      fetchPolicy: "cache-first",
+    }
+  );
+
+  const serverDownloadsEnabled = computed(() => {
+    return Boolean(serverConfigResult.value?.serverConfigs?.[0]?.enableDownloads);
+  });
+
+  const serverEventsEnabled = computed(() => {
+    return Boolean(serverConfigResult.value?.serverConfigs?.[0]?.enableEvents);
+  });
+
+  const tabs = computed(() => {
+    const baseTabs = [
+      {
+        key: "basic",
+        label: "Basic Settings",
+        icon: CogIcon,
+        fontAwesome: null,
+      },
+      {
+        key: "rules",
+        label: "Rules",
+        icon: BookIcon,
+        fontAwesome: null,
+      },
+      {
+        key: "mods",
+        label: "Moderators",
+        icon: UserAddIcon,
+        fontAwesome: null,
+      },
+      {
+        key: "owners",
+        label: "Forum Admins",
+        icon: null,
+        fontAwesome: "fa-solid fa-user-shield",
+      },
+      {
+        key: "roles",
+        label: "Roles",
+        icon: IdentificationIcon,
+        fontAwesome: null,
+      },
+      {
+        key: "suspended-users",
+        label: "User Suspensions",
+        icon: UserMinus,
+        fontAwesome: null,
+      },
+      {
+        key: "suspended-mods",
+        label: "Mod Suspensions",
+        icon: UserMinus,
+        fontAwesome: null,
+      },
+    ];
+
+    // Only show events tab if server events are enabled
+    if (serverEventsEnabled.value) {
+      baseTabs.push({
+        key: "events",
+        label: "Events",
+        icon: CalendarIcon,
+        fontAwesome: null,
+      });
+    }
+
+    // Only show downloads tab if server downloads are enabled
+    if (serverDownloadsEnabled.value) {
+      baseTabs.push({
+        key: "downloads",
+        label: "Downloads",
+        icon: DownloadIcon,
+        fontAwesome: null,
+      });
+    }
+
+    baseTabs.push(
+      {
+        key: "feedback",
+        label: "Feedback",
+        icon: AnnotationIcon,
+        fontAwesome: null,
+      },
+      {
+        key: "wiki",
+        label: "Wiki",
+        icon: PencilIcon,
+        fontAwesome: null,
+      }
+    );
+
+    return baseTabs;
+  });
 
   const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
 
@@ -161,7 +198,7 @@
   const isDropdownOpen = ref(false);
 
   const getCurrentTabLabel = computed(() => {
-    const currentTab = tabs.find(
+    const currentTab = tabs.value.find(
       (tab) => typeof route.name === "string" && route.name?.includes(`edit-${tab.key}`)
     );
     return currentTab?.label || "Settings";

@@ -12,6 +12,9 @@
   import { modProfileNameVar, usernameVar } from "@/cache";
   import { useRoute } from "nuxt/app";
   import { useDisplay } from "vuetify";
+  import { useQuery } from "@vue/apollo-composable";
+  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
+  import { config } from "@/config";
 
   type Tab = {
     name: string;
@@ -58,6 +61,25 @@
     }
   );
 
+  // Get server config to check if downloads are enabled server-wide
+  const { result: serverConfigResult } = useQuery(
+    GET_SERVER_CONFIG,
+    {
+      serverName: config.serverName,
+    },
+    {
+      fetchPolicy: "cache-first",
+    }
+  );
+
+  const serverDownloadsEnabled = computed(() => {
+    return Boolean(serverConfigResult.value?.serverConfigs?.[0]?.enableDownloads);
+  });
+
+  const serverEventsEnabled = computed(() => {
+    return Boolean(serverConfigResult.value?.serverConfigs?.[0]?.enableEvents);
+  });
+
   const loggedInUsername = computed(() => {
     return usernameVar.value || "";
   });
@@ -88,16 +110,21 @@
         icon: DiscussionIcon,
         countProperty: "DiscussionChannelsAggregate",
       },
-      {
+    ];
+
+    // Only show downloads tab if both server and channel have downloads enabled
+    if (serverDownloadsEnabled.value && props.channel?.downloadsEnabled !== false) {
+      baseTabs.push({
         name: "downloads",
         routeSuffix: "downloads",
         label: "Downloads",
         icon: DownloadIcon,
         countProperty: null,
-      },
-    ];
+      });
+    }
 
-    if (props.channel?.eventsEnabled !== false) {
+    // Only show events tab if both server and channel have events enabled
+    if (serverEventsEnabled.value && props.channel?.eventsEnabled !== false) {
       baseTabs.push({
         name: "events",
         routeSuffix: "events",
