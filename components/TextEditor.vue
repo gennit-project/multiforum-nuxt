@@ -76,6 +76,7 @@ const text = ref(props.initialValue);
 const showFormatted = ref(false);
 const showEmojiPicker = ref(false);
 const emojiPickerPosition = ref({ top: '0px', left: '0px' });
+const isFullScreen = ref(false);
 
 // Methods
 const focusEditor = () => {
@@ -393,6 +394,21 @@ onBeforeUnmount(() => {
   }
 });
 
+// Handle escape key to exit full-screen
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && isFullScreen.value) {
+    exitFullScreen();
+  }
+};
+
+onMounted(() => {
+  document.addEventListener('keydown', handleKeydown);
+});
+
+onBeforeUnmount(() => {
+  document.removeEventListener('keydown', handleKeydown);
+});
+
 // Format buttons configuration
 type FormatButton = {
   label: string;
@@ -410,6 +426,7 @@ const formatButtons: FormatButton[] = [
   { label: "Quote", format: "quote" },
   { label: "spoiler", format: "spoiler", class: "line-through" },
   { label: "Emoji", format: "emoji" },
+  { label: "⛶", format: "fullscreen" },
 ];
 
 const markdownDocsLink = "https://www.markdownguide.org/basic-syntax/";
@@ -451,10 +468,117 @@ const selectedTab = ref(0);
 const closeEmojiPicker = () => {
   showEmojiPicker.value = false;
 };
+
+// Full-screen methods
+const toggleFullScreen = () => {
+  isFullScreen.value = !isFullScreen.value;
+  // When entering full-screen, switch to split mode showing both editor and preview
+  if (isFullScreen.value) {
+    showFormatted.value = false; // Ensure we're in split mode, not just preview
+  }
+};
+
+const exitFullScreen = () => {
+  isFullScreen.value = false;
+};
 </script>
 
 <template>
-  <form class="rounded-md border p-2 dark:border-gray-600 relative">
+  <!-- Full-screen overlay -->
+  <div 
+    v-if="isFullScreen"
+    class="fixed inset-0 z-50 bg-white dark:bg-gray-900"
+  >
+    <!-- Emoji picker for full-screen -->
+    <div v-if="showEmojiPicker" class="absolute z-50" :style="{ top: emojiPickerPosition.top, left: emojiPickerPosition.left }">
+      <div class="relative">
+        <EmojiPicker 
+          @emoji-click="insertEmoji" 
+          @close="closeEmojiPicker" 
+        />
+      </div>
+    </div>
+    <!-- Full-screen header -->
+    <div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
+      <h2 class="text-lg font-medium dark:text-white">Full Screen Editor</h2>
+      <button 
+        @click="exitFullScreen"
+        class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+      >
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    
+    <!-- Full-screen content -->
+    <div class="flex flex-col md:flex-row" style="height: calc(100vh - 4rem);">
+      <!-- Editor side -->
+      <div class="flex-1 flex flex-col border-r dark:border-gray-600 h-1/2 md:h-full">
+        <div class="p-4 border-b dark:border-gray-600">
+          <h3 class="text-md font-medium dark:text-white mb-2">Markdown Editor</h3>
+          <!-- Format buttons for full-screen -->
+          <div class="flex items-center space-x-1 flex-wrap">
+            <button
+              v-for="button in formatButtons.filter(b => b.format !== 'fullscreen')"
+              :key="button.label"
+              :class="[
+                'border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300',
+                button.class
+              ]"
+              @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatTextArea(button.format)"
+            >
+              <EyeSlashIcon v-if="button.format === 'spoiler'" class="w-4 h-4" />
+              <span v-else>{{ button.label }}</span>
+            </button>
+          </div>
+        </div>
+        <div class="flex-1 p-4 flex flex-col">
+          <textarea
+            ref="editorRef"
+            :data-testid="props.testId + '-fullscreen'"
+            class="flex-1 w-full resize-none border border-gray-200 rounded-md text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 mb-2"
+            :value="text"
+            :placeholder="props.placeholder"
+            @input="updateText(($event.target as HTMLInputElement).value)"
+            @dragover.prevent
+            @drop="handleDrop"
+          />
+          <div class="flex-col divide-gray-400 dark:divide-gray-300">
+            <a
+              target="_blank"
+              :href="markdownDocsLink"
+              class="text-gray-400 hover:underline dark:text-gray-300 text-sm"
+            >
+              Markdown is supported
+            </a>
+            <AddImage
+              v-if="props.allowImageUpload"
+              label="Paste, drop, or click to add files"
+              :field-name="fieldName"
+              @file-change="(input: FileChangeInput) => {
+                handleFileChange(input);
+              }"
+            />
+          </div>
+        </div>
+      </div>
+      
+      <!-- Preview side -->
+      <div class="flex-1 flex flex-col h-1/2 md:h-full">
+        <div class="p-4 border-b dark:border-gray-600">
+          <h3 class="text-md font-medium dark:text-white">Preview</h3>
+        </div>
+        <div class="flex-1 p-4 overflow-auto">
+          <MarkdownRenderer
+            :text="text"
+            class="prose prose-sm max-w-none dark:prose-invert"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Regular editor form -->
+  <form v-else class="rounded-md border p-2 dark:border-gray-600 relative">
     <ErrorBanner
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
@@ -522,7 +646,11 @@ const closeEmojiPicker = () => {
               'border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300',
               button.class
             ]"
-            @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatTextArea(button.format)"
+            @click.prevent="
+              button.format === 'emoji' ? toggleEmojiPicker($event) : 
+              button.format === 'fullscreen' ? toggleFullScreen() : 
+              formatTextArea(button.format)
+            "
           >
             <EyeSlashIcon v-if="button.format === 'spoiler'" class="w-4 h-4" />
             <span v-else>{{ button.label }}</span>
