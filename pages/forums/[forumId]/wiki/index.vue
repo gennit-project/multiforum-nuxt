@@ -8,7 +8,7 @@
   import GenericButton from "@/components/GenericButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
   import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
-  import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
   import OnThisPage from "@/components/wiki/OnThisPage.vue";
   import { timeAgo } from "@/utils";
@@ -306,13 +306,9 @@
       <div class="flex gap-8">
         <!-- Main content -->
         <div class="flex-1 min-w-0">
-          <div class="prose prose-orange max-w-none dark:prose-invert">
-            <MarkdownPreview
-              :disable-gallery="false"
-              :text="wikiHomePage.body"
-              :word-limit="3000"
-            />
-          </div>
+          <MarkdownRenderer
+            :text="wikiHomePage.body"
+          />
         </div>
 
         <!-- Right sidebar with On This Page and Child Pages -->

@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import { ref, computed, onMounted } from "vue";
-  import MarkdownPreview from "@/components/MarkdownPreview.vue";
+  import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
   import EmojiButtons from "@/components/comments/EmojiButtons.vue";
   import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
   import Tag from "../../TagComponent.vue";
@@ -8,8 +8,12 @@
   import type { PropType } from "vue";
   import type { Discussion } from "@/__generated__/graphql";
   import { useRouter } from "nuxt/app";
+  import { useUIStore } from "@/stores/uiStore";
+  import { storeToRefs } from "pinia";
 
 const router = useRouter();
+const uiStore = useUIStore();
+const { fontSize } = storeToRefs(uiStore);
 
 const props = defineProps({
   channelId: {
@@ -119,10 +123,9 @@ const filterByTag = (tag: string) => {
       class="rounded"
       :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
     >
-      <MarkdownPreview
+      <MarkdownRenderer
         :text="bodyText"
-        :disable-gallery="false"
-        :word-limit="wordLimit"
+        :font-size="fontSize"
       />
     </div>
 
