@@ -27,12 +27,20 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  isActive: {
+    type: Boolean,
+    default: undefined,
+  },
 });
 
 const route = useRoute(); // Access the current route
 
 // Compute active state based on the current route
 const isActive = computed(() => {
+  // Use the isActive prop if explicitly provided, otherwise fall back to exact path matching
+  if (props.isActive !== undefined) {
+    return props.isActive;
+  }
   return route.path === props.to;
 });
 
