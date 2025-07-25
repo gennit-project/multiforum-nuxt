@@ -3,7 +3,6 @@ import { computed } from "vue";
 import { useMutation } from "@vue/apollo-composable";
 import GenericModal from "@/components/GenericModal.vue";
 import { BECOME_CHANNEL_ADMIN } from "@/graphQLData/channel/mutations";
-import { usernameVar } from "@/cache";
 
 const props = defineProps({
   channelUniqueName: {
@@ -28,8 +27,7 @@ onDone(() => {
 function handleBecomeAdmin() {
   try {
     becomeAdmin({
-      uniqueName: props.channelUniqueName,
-      username: usernameVar.value,
+      channelUniqueName: props.channelUniqueName,
     });
   } catch (err) {
     console.error("Error becoming admin:", err);

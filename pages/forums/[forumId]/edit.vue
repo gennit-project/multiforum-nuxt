@@ -15,7 +15,7 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 const route = useRoute();
 const channelId = route.params.forumId as string;
 
-const { result: getChannelResult, loading: getChannelLoading, error: getChannelError } = useQuery(GET_CHANNEL, {
+const { result: getChannelResult, loading: getChannelLoading, error: getChannelError, refetch: refetchChannel } = useQuery(GET_CHANNEL, {
   uniqueName: channelId,
   errorPolicy: 'all',
 });
@@ -150,6 +150,8 @@ const { mutate: updateChannel, loading: editChannelLoading, error: updateChannel
 
 onDone(() => {
   showSavedChangesNotification.value = true;
+  // Refetch channel data to ensure form values are in sync with server
+  refetchChannel();
 });
 
 function submit() {

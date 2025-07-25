@@ -46,7 +46,12 @@ const eventCheckboxDisabled = computed(() => {
 
 // Show warning if server events disabled
 const showServerDisabledWarning = computed(() => {
-  return !serverConfigLoading.value && !serverEventsEnabled.value;
+  return !serverConfigLoading.value && !serverEventsEnabled.value && serverConfig.value;
+});
+
+// Show error if server config data is missing
+const showMissingConfigError = computed(() => {
+  return !serverConfigLoading.value && !serverConfig.value;
 });
 
 const updateEventsEnabled = (enabled: boolean) => {
@@ -79,6 +84,13 @@ const updateEventsEnabled = (enabled: boolean) => {
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Configure event functionality for this forum.
         </p>
+      </div>
+      
+      <!-- Missing Config Error -->
+      <div v-if="showMissingConfigError">
+        <ErrorBanner 
+          text="Can't find the server config data." 
+        />
       </div>
       
       <!-- Server Disabled Warning -->

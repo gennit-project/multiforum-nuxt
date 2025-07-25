@@ -1,4 +1,4 @@
- 
+/* eslint-disable */
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -33520,6 +33520,7 @@ export type Mutation = {
   archiveComment?: Maybe<Issue>;
   archiveDiscussion?: Maybe<Issue>;
   archiveEvent?: Maybe<Issue>;
+  becomeForumAdmin?: Maybe<Scalars['Boolean']['output']>;
   cancelInviteForumMod?: Maybe<Scalars['Boolean']['output']>;
   cancelInviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
   createActivities: CreateActivitiesMutationResponse;
@@ -33782,6 +33783,11 @@ export type MutationArchiveEventArgs = {
   reportText: Scalars['String']['input'];
   selectedForumRules: Array<Scalars['String']['input']>;
   selectedServerRules: Array<Scalars['String']['input']>;
+};
+
+
+export type MutationBecomeForumAdminArgs = {
+  channelUniqueName: Scalars['String']['input'];
 };
 
 

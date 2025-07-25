@@ -179,23 +179,7 @@ export const CREATE_CHILD_WIKI_PAGE = gql`
 `;
 
 export const BECOME_CHANNEL_ADMIN = gql`
-  mutation becomeChannelAdmin($uniqueName: String!, $username: String!) {
-    updateChannels(
-      where: { uniqueName: $uniqueName }
-      update: {
-        Admins: {
-          connect: [{ where: { node: { username: $username } } }]
-        }
-      }
-    ) {
-      channels {
-        uniqueName
-        Admins {
-          username
-          displayName
-          profilePicURL
-        }
-      }
-    }
+  mutation becomeChannelAdmin($channelUniqueName: String!) {
+    becomeForumAdmin(channelUniqueName: $channelUniqueName)
   }
 `;
