@@ -309,6 +309,17 @@
           <MarkdownRenderer
             :text="wikiHomePage.body"
           />
+          
+          <!-- Bottom edit button - Docusaurus style -->
+          <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <button
+              class="flex items-center text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              @click="router.push(`/forums/${forumId}/wiki/edit/${wikiHomePage.slug}`)"
+            >
+              <PencilIcon class="mr-2 h-4 w-4" />
+              Edit this page
+            </button>
+          </div>
         </div>
 
         <!-- Right sidebar with On This Page and Child Pages -->
