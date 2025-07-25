@@ -75,7 +75,7 @@
     return typeof route.params.forumId === "string" ? route.params.forumId : "";
   });
 
-  const { result: getChannelResult, onResult: onGetChannelResult, loading: channelLoading } = useQuery(
+  const { result: getChannelResult, onResult: onGetChannelResult, loading: channelLoading, refetch: refetchChannel } = useQuery(
     GET_CHANNEL,
     {
       uniqueName: channelId,
@@ -97,6 +97,10 @@
     // Only show 404 if query has completed and no channel was found
     return !channelLoading.value && channelId.value && !channel.value;
   });
+
+  const handleRefetchChannelData = () => {
+    refetchChannel();
+  };
 
   const addForumToLocalStorage = (channel: Channel) => {
     if (!import.meta.client) {
@@ -299,6 +303,7 @@
                   v-if="channel"
                   :channel="channel"
                   class="px-4"
+                  @refetch-channel-data="handleRefetchChannelData"
                 />
               </aside>
             </div>

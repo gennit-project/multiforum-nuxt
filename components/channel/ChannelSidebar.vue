@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
 import type { PropType } from "vue";
 import Tag from "@/components/TagComponent.vue";
 import type { Channel } from "@/__generated__/graphql";
@@ -8,6 +8,8 @@ import SidebarEventList from "@/components/channel/SidebarEventList.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import { useRouter, useRoute } from "nuxt/app";
 import FontSizeControl from "@/components/channel/FontSizeControl.vue";
+import BecomeAdminModal from "@/components/channel/BecomeAdminModal.vue";
+import { isAuthenticatedVar } from "@/cache";
 
 const props = defineProps({
   channel: {
@@ -20,8 +22,11 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["refetchChannelData"]);
+
 const route = useRoute();
 const router = useRouter();
+const showBecomeAdminModal = ref(false);
 const eventChannelsAggregate = computed(() => {
   return props.channel?.EventChannelsAggregate?.count ?? 0;
 });
@@ -42,6 +47,18 @@ const filterChannelsByTag = (tag: string) => {
     name: "forums",
     query: { tag },
   });
+};
+
+const openBecomeAdminModal = () => {
+  showBecomeAdminModal.value = true;
+};
+
+const closeBecomeAdminModal = () => {
+  showBecomeAdminModal.value = false;
+};
+
+const handleBecomeAdminSuccess = () => {
+  emit("refetchChannelData");
 };
 </script>
 
@@ -175,12 +192,29 @@ const filterChannelsByTag = (tag: string) => {
             </div>
           </div>
 
-          <p v-else class="my-3 mb-6 text-sm dark:text-gray-400">
-            This forum does not have any admins.
-          </p>
+          <div v-else class="my-3 mb-6">
+            <p class="text-sm dark:text-gray-400 mb-3">
+              This forum does not have any admins.
+            </p>
+            <button
+              v-if="isAuthenticatedVar"
+              @click="openBecomeAdminModal"
+              class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors duration-200"
+            >
+              Become an admin of this forum
+            </button>
+          </div>
         </div>
       </div>
     </div>
+
+    <!-- Become Admin Modal -->
+    <BecomeAdminModal
+      :channel-unique-name="channelId"
+      :open="showBecomeAdminModal"
+      @close="closeBecomeAdminModal"
+      @success="handleBecomeAdminSuccess"
+    />
   </div>
 </template>
 

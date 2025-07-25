@@ -18,6 +18,7 @@ const {
   error: getChannelError,
   result: getChannelResult,
   loading: getChannelLoading,
+  refetch: refetchChannel,
 } = useQuery(GET_CHANNEL, {
   uniqueName: channelId.value,
   now: new Date().toISOString(),
@@ -35,6 +36,10 @@ const admins = computed(() => channel.value?.Admins ?? []);
 const ownerList = computed(() =>
   admins.value.map((adminData: User) => adminData?.username)
 );
+
+const handleRefetchChannelData = () => {
+  refetchChannel();
+};
 </script>
 
 <template>
@@ -44,6 +49,7 @@ const ownerList = computed(() =>
         v-if="channel"
         :channel="channel"
         :use-scrollbar="false"
+        @refetch-channel-data="handleRefetchChannelData"
       />
       <RequireAuth
         :require-ownership="true"

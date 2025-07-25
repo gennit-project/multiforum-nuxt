@@ -232,7 +232,7 @@
     </div>
     <div
       v-else
-      class="mx-auto max-w-3xl p-4"
+      class="mx-auto p-4"
     >
       <GoBack
         :to="slug === 'home' ? `/forums/${forumId}/wiki` : `/forums/${forumId}/wiki/${slug}`"
