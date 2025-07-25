@@ -36,7 +36,7 @@ const serverEventsEnabled = computed(() => {
 });
 
 const eventsEnabled = computed(() => {
-  return props.formValues.eventsEnabled !== false;
+  return props.formValues.eventsEnabled === true;
 });
 
 // Disable the checkbox if server events are disabled

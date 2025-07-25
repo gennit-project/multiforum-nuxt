@@ -130,7 +130,7 @@
     }
 
     // Only show events tab if both server and channel have events enabled
-    if (serverEventsEnabled.value && props.channel?.eventsEnabled !== false) {
+    if (serverEventsEnabled.value && props.channel?.eventsEnabled === true) {
       baseTabs.push({
         name: "events",
         routeSuffix: "events",

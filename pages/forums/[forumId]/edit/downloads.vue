@@ -43,7 +43,7 @@ const serverAllowedFileTypes = computed(() => {
 });
 
 const downloadsEnabled = computed(() => {
-  return props.formValues.downloadsEnabled !== false;
+  return props.formValues.downloadsEnabled === true;
 });
 
 const selectedFileTypes = computed(() => {

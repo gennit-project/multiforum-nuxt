@@ -7,9 +7,7 @@
   import TailwindForm from "@/components/FormComponent.vue";
   import { useRoute, useRouter } from "nuxt/app";
   import { MAX_CHARS_IN_CHANNEL_NAME } from "@/utils/constants";
-  import { useQuery } from "@vue/apollo-composable";
-  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-  import { config } from "@/config";
+  // Server config query removed since individual settings pages handle validation
 
   // Import icons
   import CogIcon from "@/components/icons/CogIcon.vue";
@@ -63,25 +61,6 @@
 
   const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
 
-  // Get server config to check if downloads are enabled server-wide
-  const { result: serverConfigResult } = useQuery(
-    GET_SERVER_CONFIG,
-    {
-      serverName: config.serverName,
-    },
-    {
-      fetchPolicy: "cache-first",
-    }
-  );
-
-  const serverDownloadsEnabled = computed(() => {
-    return Boolean(serverConfigResult.value?.serverConfigs?.[0]?.enableDownloads);
-  });
-
-  const serverEventsEnabled = computed(() => {
-    return Boolean(serverConfigResult.value?.serverConfigs?.[0]?.enableEvents);
-  });
-
   const tabs = computed(() => {
     const baseTabs = [
       {
@@ -94,6 +73,36 @@
         key: "rules",
         label: "Rules",
         icon: BookIcon,
+        fontAwesome: null,
+      },
+    ];
+
+    // Always show events and downloads tabs
+    baseTabs.push({
+      key: "events",
+      label: "Events",
+      icon: CalendarIcon,
+      fontAwesome: null,
+    });
+
+    baseTabs.push({
+      key: "downloads",
+      label: "Downloads",
+      icon: DownloadIcon,
+      fontAwesome: null,
+    });
+
+    baseTabs.push(
+      {
+        key: "feedback",
+        label: "Feedback",
+        icon: AnnotationIcon,
+        fontAwesome: null,
+      },
+      {
+        key: "wiki",
+        label: "Wiki",
+        icon: PencilIcon,
         fontAwesome: null,
       },
       {
@@ -124,41 +133,6 @@
         key: "suspended-mods",
         label: "Mod Suspensions",
         icon: UserMinus,
-        fontAwesome: null,
-      },
-    ];
-
-    // Only show events tab if server events are enabled
-    if (serverEventsEnabled.value) {
-      baseTabs.push({
-        key: "events",
-        label: "Events",
-        icon: CalendarIcon,
-        fontAwesome: null,
-      });
-    }
-
-    // Only show downloads tab if server downloads are enabled
-    if (serverDownloadsEnabled.value) {
-      baseTabs.push({
-        key: "downloads",
-        label: "Downloads",
-        icon: DownloadIcon,
-        fontAwesome: null,
-      });
-    }
-
-    baseTabs.push(
-      {
-        key: "feedback",
-        label: "Feedback",
-        icon: AnnotationIcon,
-        fontAwesome: null,
-      },
-      {
-        key: "wiki",
-        label: "Wiki",
-        icon: PencilIcon,
         fontAwesome: null,
       }
     );
