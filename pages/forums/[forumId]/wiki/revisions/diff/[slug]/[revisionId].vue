@@ -55,9 +55,9 @@ const allEdits = computed(() => {
     // Create current version entry (as TextVersion structure)
     const currentVersion = {
       id: "current",
-      body: wikiPage.value.body,
+      body: wikiPage.value.body ?? undefined,
       createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-      Author: wikiPage.value.VersionAuthor,
+      Author: wikiPage.value.VersionAuthor ?? undefined,
       AuthorConnection: {
         edges: [],
         pageInfo: { hasNextPage: false, hasPreviousPage: false },
@@ -65,32 +65,46 @@ const allEdits = computed(() => {
       },
     };
 
-    // First item: most recent edit (current vs most recent past version)
-    edits.push({
-      id: "most-recent-edit",
-      author: wikiPage.value.VersionAuthor?.username || "[Deleted]",
-      createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-      isCurrent: true,
-      // Store the versions for the modal
-      oldVersionData: wikiPage.value.PastVersions[0], // Most recent past version
-      newVersionData: currentVersion, // Current version
-    });
-
-    // Subsequent items: compare each past version with the next one
+    // Add an entry for the most recent edit only if content actually changed
+    if (wikiPage.value.PastVersions.length > 0) {
+      const mostRecentPastVersion = wikiPage.value.PastVersions[0];
+      const currentContent = wikiPage.value.body ?? undefined;
+      const pastContent = mostRecentPastVersion.body ?? undefined;
+      
+      // Only add the most recent edit if content actually changed
+      if (currentContent !== pastContent) {
+        edits.push({
+          id: "most-recent-edit",
+          author: wikiPage.value.VersionAuthor?.username || "[Deleted]",
+          createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
+          isCurrent: true,
+          // Show what changed in the most recent edit
+          oldVersionData: mostRecentPastVersion,
+          newVersionData: currentVersion,
+        });
+      }
+    }
+    
+    // Process each past version - show what changed in that specific edit
     wikiPage.value.PastVersions.forEach((version, index) => {
-      // Skip the most recent past version since it's already handled above
+      // Skip the most recent past version since we handled it above
       if (index === 0) return;
       
-      const nextVersion = wikiPage.value.PastVersions[index - 1]; // Next version (more recent)
+      const previousVersion = wikiPage.value.PastVersions[index + 1] || {
+        id: "initial",
+        body: "", // Show diff from empty if this was the first edit
+        createdAt: version.createdAt,
+        Author: null,
+      };
       
       edits.push({
         id: version.id,
         author: version.Author?.username || "[Deleted]",
         createdAt: version.createdAt,
         isCurrent: false,
-        // Store the versions for the modal
-        oldVersionData: version,
-        newVersionData: nextVersion,
+        // Show what changed in this specific edit
+        oldVersionData: previousVersion, // Version before this edit
+        newVersionData: version, // This version (result of the edit)
       });
     });
   }
@@ -267,7 +281,7 @@ useHead({
               <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
               >
-                Current version
+                Most recent edit
               </span>
             </div>
           </div>
