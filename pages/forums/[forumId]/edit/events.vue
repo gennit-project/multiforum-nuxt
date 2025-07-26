@@ -79,10 +79,10 @@ const updateEventsEnabled = (enabled: boolean) => {
     <div v-else>
       <div>
         <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-          Events Settings
+          Calendar Settings
         </h2>
         <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-          Configure event functionality for this forum.
+          Configure calendar functionality for this forum.
         </p>
       </div>
       
@@ -96,7 +96,7 @@ const updateEventsEnabled = (enabled: boolean) => {
       <!-- Server Disabled Warning -->
       <div v-if="showServerDisabledWarning">
         <ErrorBanner 
-          text="Events are disabled at the server level. The events/calendar tab cannot be enabled for this forum until events are enabled in the server configuration by an administrator." 
+          text="Calendar is disabled at the server level. The calendar tab cannot be enabled for this forum until events are enabled in the server configuration by an administrator." 
         />
       </div>
       
@@ -115,16 +115,16 @@ const updateEventsEnabled = (enabled: boolean) => {
               'text-gray-400 dark:text-gray-500': eventCheckboxDisabled
             }"
           >
-            Enable events/calendar tab in this forum
+            Enable calendar tab in this forum
           </label>
         </div>
         
         <p class="text-sm text-gray-600 dark:text-gray-400">
           <span v-if="serverEventsEnabled">
-            Allow users to create and share events in this forum.
+            Allow users to create and share events in this forum's calendar.
           </span>
           <span v-else class="text-red-600 dark:text-red-400">
-            Events must be enabled at the server level before they can be enabled for individual forums.
+            Calendar must be enabled at the server level before it can be enabled for individual forums.
           </span>
         </p>
       </div>
