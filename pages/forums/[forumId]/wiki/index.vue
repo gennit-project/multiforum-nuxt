@@ -332,14 +332,13 @@
         </div>
 
         <!-- Right sidebar with On This Page and Child Pages -->
-        <div class="hidden lg:flex flex-col gap-6 w-80 flex-shrink-0">
+        <div class="hidden lg:flex flex-col gap-6 w-80 flex-shrink-0 sticky top-0 max-h-screen overflow-y-auto">
           <!-- On This Page Navigation -->
           <OnThisPage :markdown-content="wikiHomePage.body" />
           
           <!-- Child Pages -->
           <div
             v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
-            class="sticky top-8"
           >
             <div
               class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-800"

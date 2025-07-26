@@ -29,7 +29,6 @@ const handleHeadingClick = (anchor: string) => {
 <template>
   <div 
     v-if="filteredHeadings.length > 0"
-    class="sticky top-8"
   >
     <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-800">
       <h3 class="font-semibold mb-4 text-sm text-gray-900 dark:text-white uppercase tracking-wide">

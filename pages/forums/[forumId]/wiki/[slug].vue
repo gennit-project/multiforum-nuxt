@@ -261,7 +261,7 @@
         </div>
 
         <!-- Right sidebar with On This Page -->
-        <div class="hidden lg:flex flex-col gap-6 w-80 flex-shrink-0">
+        <div class="hidden lg:flex flex-col gap-6 w-80 flex-shrink-0 sticky top-0 max-h-screen overflow-y-auto">
           <!-- On This Page Navigation -->
           <OnThisPage :markdown-content="wikiPage.body" />
         </div>
