@@ -6,8 +6,9 @@ import { useQuery, useMutation } from "@vue/apollo-composable";
 import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
 import LoadingSpinner from "@/components/LoadingSpinner.vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
-import * as DiffMatchPatch from "diff-match-patch";
 import type { WikiPage, TextVersion } from "@/__generated__/graphql";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 // Define type for revision data
 interface WikiRevisionData {
@@ -24,6 +25,10 @@ const router = useRouter();
 const forumId = route.params.forumId as string;
 const slug = route.params.slug as string;
 const revisionId = route.params.revisionId as string;
+
+// UI Store for theme
+const uiStore = useUIStore();
+const { theme } = storeToRefs(uiStore);
 
 // Query wiki page data for the specific slug
 const {
@@ -135,43 +140,11 @@ const newVersionDate = computed(() => {
 const oldContent = computed(() => currentRevision.value?.oldVersionData?.body || "");
 const newContent = computed(() => currentRevision.value?.newVersionData?.body || "");
 
-// Computed property that generates the diff HTML
-const diffHtml = computed(() => {
-  const dmp = new DiffMatchPatch.diff_match_patch();
-  const diffs = dmp.diff_main(oldContent.value, newContent.value);
-  dmp.diff_cleanupSemantic(diffs);
-
-  // Create highlighted HTML for both sides
-  let leftHtml = "";
-  let rightHtml = "";
-
-  diffs.forEach((diff) => {
-    const [operation, text] = diff;
-    const escapedText = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\n/g, "<br>");
-
-    // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
-    if (operation === -1) {
-      // Deletion - show in left column with red background
-      leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-300">${escapedText}</span>`;
-    } else if (operation === 1) {
-      // Insertion - show in right column with green background
-      rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-300">${escapedText}</span>`;
-    } else {
-      // Equal - show in both columns
-      leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
-      rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
-    }
-  });
-
-  return {
-    left: leftHtml,
-    right: rightHtml,
-  };
-});
+// Diff configuration
+const diffMode = ref('split'); // split or unified
+const diffLanguage = ref('markdown'); // Set to markdown for wiki content
+const diffTheme = computed(() => theme.value === 'dark' ? 'dark' : 'light');
+const foldingEnabled = ref(true); // Enable folding of unchanged sections
 
 // Set up delete mutation
 const {
@@ -317,56 +290,72 @@ useHead({
       <!-- Error banner for delete errors -->
       <ErrorBanner v-if="deleteError" :text="deleteError.message" />
 
-      <!-- Diff view -->
-      <div class="rounded-md border dark:border-gray-700">
-        <div class="grid grid-cols-1 lg:grid-cols-2">
-          <!-- Old version (left side) -->
-          <div
-            class="bg-red-500/10 p-6 dark:bg-red-500/20 lg:border-r dark:border-gray-700"
-          >
-            <h3 class="mb-4 text-lg font-medium text-red-700 dark:text-red-200">
-              Previous Version
-            </h3>
-            <div
-              class="min-h-[400px] overflow-auto rounded border border-red-300 bg-white p-4 dark:border-red-700 dark:bg-gray-900 dark:text-gray-200"
-            >
-              <div 
-                class="prose prose-sm max-w-none dark:prose-invert"
-                v-html="diffHtml.left"
-              />
+      <!-- Professional Diff View using vue-diff -->
+      <div class="rounded-md border dark:border-gray-700 overflow-hidden">
+        <!-- Diff mode toggle -->
+        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b dark:border-gray-700">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">View mode:</span>
+              <div class="flex rounded-md shadow-sm">
+                <button
+                  class="px-3 py-1 text-xs font-medium rounded-l-md border"
+                  :class="{
+                    'bg-orange-600 text-white border-orange-600': diffMode === 'split',
+                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': diffMode !== 'split'
+                  }"
+                  @click="diffMode = 'split'"
+                >
+                  Split
+                </button>
+                <button
+                  class="px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b"
+                  :class="{
+                    'bg-orange-600 text-white border-orange-600': diffMode === 'unified',
+                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': diffMode !== 'unified',
+                    'border-l-0': diffMode !== 'unified'
+                  }"
+                  @click="diffMode = 'unified'"
+                >
+                  Unified
+                </button>
+              </div>
             </div>
-          </div>
-
-          <!-- New version (right side) -->
-          <div
-            class="bg-green-500/10 p-6 dark:bg-green-500/20"
-          >
-            <h3 class="mb-4 text-lg font-medium text-green-700 dark:text-green-200">
-              {{ currentRevision.isCurrent ? 'Current Version' : 'Updated Version' }}
-            </h3>
-            <div
-              class="min-h-[400px] overflow-auto rounded border border-green-300 bg-white p-4 dark:border-green-700 dark:bg-gray-900 dark:text-gray-200"
-            >
-              <div 
-                class="prose prose-sm max-w-none dark:prose-invert"
-                v-html="diffHtml.right"
-              />
+            
+            <div class="flex items-center space-x-2">
+              <label class="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
+                <input 
+                  v-model="foldingEnabled" 
+                  type="checkbox" 
+                  class="rounded text-orange-600 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600"
+                >
+                <span>Fold unchanged sections</span>
+              </label>
             </div>
           </div>
         </div>
-
-        <!-- Legend -->
-        <div
-          class="flex flex-wrap justify-center gap-6 border-t p-4 text-sm text-gray-600 dark:border-gray-700 dark:text-gray-400"
-        >
-          <span class="flex items-center">
-            <span class="mr-2 inline-block h-4 w-4 bg-red-500/20 dark:bg-red-500/30 rounded"/>
-            Removed content
-          </span>
-          <span class="flex items-center">
-            <span class="mr-2 inline-block h-4 w-4 bg-green-500/20 dark:bg-green-500/30 rounded"/>
-            Added content
-          </span>
+        
+        <!-- Vue Diff Component -->
+        <div class="min-h-[400px]">
+          <ClientOnly>
+            <VueDiff
+              :mode="diffMode"
+              :theme="diffTheme"
+              :language="diffLanguage"
+              :prev="oldContent"
+              :current="newContent"
+              :folding="foldingEnabled"
+              :virtual-scroll="{ height: 600, lineMinHeight: 20, delay: 100 }"
+            />
+            <template #fallback>
+              <div class="flex items-center justify-center h-96 text-gray-500 dark:text-gray-400">
+                <div class="text-center">
+                  <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                  <p>Loading diff viewer...</p>
+                </div>
+              </div>
+            </template>
+          </ClientOnly>
         </div>
       </div>
     </div>

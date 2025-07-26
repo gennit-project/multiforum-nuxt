@@ -76,6 +76,7 @@
     "vue": "^3.5.13",
     "vue-apollo": "3.1.2",
     "vue-click-outside": "^1.1.0",
+    "vue-diff": "^1.2.4",
     "vue-easy-lightbox": "^1.19.0",
     "vue-google-maps-community-fork": "^0.3.1",
     "vue-material-design-icons": "^5.3.1",
