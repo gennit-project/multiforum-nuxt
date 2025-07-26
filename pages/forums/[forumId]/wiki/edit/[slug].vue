@@ -84,9 +84,9 @@
     (newWikiPage) => {
       if (newWikiPage && !dataLoaded.value) {
         formValues.value = {
-          title: newChannel.value?.WikiHomePage?.title || "",
-          body: newChannel.value?.WikiHomePage?.body || "",
-          slug: newChannel.value?.WikiHomePage?.slug || "",
+          title: newWikiPage.title || "",
+          body: newWikiPage.body || "",
+          slug: newWikiPage.slug || "",
         };
         dataLoaded.value = true;
       }
