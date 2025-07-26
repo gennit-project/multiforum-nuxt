@@ -140,11 +140,10 @@ const newVersionDate = computed(() => {
 const oldContent = computed(() => currentRevision.value?.oldVersionData?.body || "");
 const newContent = computed(() => currentRevision.value?.newVersionData?.body || "");
 
-// Diff configuration
-const diffMode = ref('split'); // split or unified
+// Diff configuration for v-code-diff
+const outputFormat = ref('side-by-side'); // side-by-side or line-by-line
 const diffLanguage = ref('markdown'); // Set to markdown for wiki content
 const diffTheme = computed(() => theme.value === 'dark' ? 'dark' : 'light');
-const foldingEnabled = ref(true); // Enable folding of unchanged sections
 
 // Set up delete mutation
 const {
@@ -290,7 +289,7 @@ useHead({
       <!-- Error banner for delete errors -->
       <ErrorBanner v-if="deleteError" :text="deleteError.message" />
 
-      <!-- Professional Diff View using vue-diff -->
+      <!-- Professional Diff View using v-code-diff -->
       <div class="rounded-md border dark:border-gray-700 overflow-hidden">
         <!-- Diff mode toggle -->
         <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b dark:border-gray-700">
@@ -301,51 +300,40 @@ useHead({
                 <button
                   class="px-3 py-1 text-xs font-medium rounded-l-md border"
                   :class="{
-                    'bg-orange-600 text-white border-orange-600': diffMode === 'split',
-                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': diffMode !== 'split'
+                    'bg-orange-600 text-white border-orange-600': outputFormat === 'side-by-side',
+                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': outputFormat !== 'side-by-side'
                   }"
-                  @click="diffMode = 'split'"
+                  @click="outputFormat = 'side-by-side'"
                 >
-                  Split
+                  Side by Side
                 </button>
                 <button
                   class="px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b"
                   :class="{
-                    'bg-orange-600 text-white border-orange-600': diffMode === 'unified',
-                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': diffMode !== 'unified',
-                    'border-l-0': diffMode !== 'unified'
+                    'bg-orange-600 text-white border-orange-600': outputFormat === 'line-by-line',
+                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': outputFormat !== 'line-by-line',
+                    'border-l-0': outputFormat !== 'line-by-line'
                   }"
-                  @click="diffMode = 'unified'"
+                  @click="outputFormat = 'line-by-line'"
                 >
-                  Unified
+                  Line by Line
                 </button>
               </div>
-            </div>
-            
-            <div class="flex items-center space-x-2">
-              <label class="flex items-center space-x-2 text-sm text-gray-700 dark:text-gray-300">
-                <input 
-                  v-model="foldingEnabled" 
-                  type="checkbox" 
-                  class="rounded text-orange-600 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600"
-                >
-                <span>Fold unchanged sections</span>
-              </label>
             </div>
           </div>
         </div>
         
-        <!-- Vue Diff Component -->
+        <!-- V-Code-Diff Component -->
         <div class="min-h-[400px]">
           <ClientOnly>
-            <VueDiff
-              :mode="diffMode"
-              :theme="diffTheme"
+            <CodeDiff
+              :old-string="oldContent"
+              :new-string="newContent"
+              :output-format="outputFormat"
               :language="diffLanguage"
-              :prev="oldContent"
-              :current="newContent"
-              :folding="foldingEnabled"
-              :virtual-scroll="{ height: 600, lineMinHeight: 20, delay: 100 }"
+              :theme="diffTheme"
+              :context="10"
+              class="diff-container"
             />
             <template #fallback>
               <div class="flex items-center justify-center h-96 text-gray-500 dark:text-gray-400">
@@ -361,3 +349,22 @@ useHead({
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Ensure the diff container takes full width */
+:deep(.diff-container) {
+  width: 100%;
+  border-radius: 0;
+}
+
+/* Override v-code-diff styles for better integration */
+:deep(.v-code-diff) {
+  border: none;
+  border-radius: 0;
+}
+
+/* Ensure proper spacing */
+:deep(.v-code-diff .d2h-wrapper) {
+  border: none;
+}
+</style>
