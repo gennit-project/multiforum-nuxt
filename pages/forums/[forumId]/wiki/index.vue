@@ -7,7 +7,6 @@
   import DocumentIcon from "@/components/icons/DocumentIcon.vue";
   import GenericButton from "@/components/GenericButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
-  import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
   import OnThisPage from "@/components/wiki/OnThisPage.vue";
@@ -299,7 +298,17 @@
             Last updated by {{ wikiHomePage.VersionAuthor?.username || "Unknown" }}
             {{ timeAgo(new Date(wikiHomePage.updatedAt || wikiHomePage.createdAt)) }}
           </span>
-          <WikiEditsDropdown :wiki-page="wikiHomePage" />
+          
+          <!-- Show see edits link if there are past versions -->
+          <template v-if="wikiHomePage.PastVersions && wikiHomePage.PastVersions.length > 0">
+            <span class="mx-2">·</span>
+            <router-link
+              :to="`/forums/${forumId}/wiki/revisions/${wikiHomePage.slug}`"
+              class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              See edits
+            </router-link>
+          </template>
         </div>
       </div>
 

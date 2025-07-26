@@ -1,0 +1,223 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import { useRoute, useRouter, useHead } from "nuxt/app";
+import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
+import { useQuery } from "@vue/apollo-composable";
+import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import ErrorBanner from "@/components/ErrorBanner.vue";
+import { timeAgo } from "@/utils";
+import type { WikiPage, TextVersion } from "@/__generated__/graphql";
+
+// Define type for revision data
+interface WikiRevisionData {
+  id: string;
+  author: string;
+  createdAt: string;
+  isCurrent: boolean;
+  oldVersionData?: TextVersion;
+  newVersionData?: TextVersion;
+}
+
+const route = useRoute();
+const router = useRouter();
+const forumId = route.params.forumId as string;
+const slug = route.params.slug as string;
+
+// Query wiki page data for the specific slug
+const {
+  result: wikiPageResult,
+  loading,
+  error,
+} = useQuery(
+  GET_WIKI_PAGE,
+  {
+    channelUniqueName: forumId,
+    slug: slug,
+  },
+  { errorPolicy: "all" }
+);
+
+// Computed property for the wiki page data
+const wikiPage = computed(() => wikiPageResult.value?.wikiPages[0] as WikiPage);
+
+// Total number of edits
+const totalEdits = computed(() => {
+  return wikiPage.value?.PastVersions?.length || 0;
+});
+
+// Check if there are any edits to show (need at least 1 past version, meaning it has been edited)
+const hasEdits = computed(() => {
+  return totalEdits.value >= 1;
+});
+
+// Process all versions and sort by timestamp (newest first)
+const allEdits = computed(() => {
+  const edits: WikiRevisionData[] = [];
+
+  if (wikiPage.value?.PastVersions?.length) {
+    // Create current version entry (as TextVersion structure)
+    const currentVersion = {
+      id: "current",
+      body: wikiPage.value.body,
+      createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
+      Author: wikiPage.value.VersionAuthor,
+      AuthorConnection: {
+        edges: [],
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+        totalCount: 0,
+      },
+    };
+
+    // First item: most recent edit (current vs most recent past version)
+    edits.push({
+      id: "most-recent-edit",
+      author: wikiPage.value.VersionAuthor?.username || "[Deleted]",
+      createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
+      isCurrent: true,
+      // Store the versions for the modal
+      oldVersionData: wikiPage.value.PastVersions[0], // Most recent past version
+      newVersionData: currentVersion, // Current version
+    });
+
+    // Subsequent items: compare each past version with the next one
+    wikiPage.value.PastVersions.forEach((version, index) => {
+      // Skip the most recent past version since it's already handled above
+      if (index === 0) return;
+      
+      const nextVersion = wikiPage.value.PastVersions[index - 1]; // Next version (more recent)
+      
+      edits.push({
+        id: version.id,
+        author: version.Author?.username || "[Deleted]",
+        createdAt: version.createdAt,
+        isCurrent: false,
+        // Store the versions for the modal
+        oldVersionData: version,
+        newVersionData: nextVersion,
+      });
+    });
+  }
+
+  return edits;
+});
+
+// Navigate to revision detail page
+const viewRevisionDiff = (revision: WikiRevisionData) => {
+  router.push(`/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`);
+};
+
+// Navigate back to wiki page
+const goBackToWiki = () => {
+  router.push(`/forums/${forumId}/wiki/${slug}`);
+};
+
+// SEO metadata setup
+useHead({
+  title: `Revision History - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId}`,
+  meta: [
+    { name: 'description', content: `View revision history for the ${wikiPage.value?.title || 'wiki page'}.` },
+    { name: 'robots', content: 'noindex' }, // Don't index revision pages
+  ],
+});
+</script>
+
+<template>
+  <div class="mx-auto max-w-7xl p-4">
+    <div v-if="loading" class="flex items-center justify-center p-8">
+      <LoadingSpinner size="lg" />
+    </div>
+
+    <div
+      v-else-if="error"
+      class="mx-auto max-w-2xl rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-900 dark:text-red-200"
+    >
+      <p>Sorry, there was an error loading the wiki page revisions.</p>
+      <p class="mt-2 text-sm">{{ error?.message }}</p>
+    </div>
+
+    <div v-else-if="!wikiPage" class="mx-auto max-w-2xl p-4 text-center dark:text-white">
+      <p class="mb-4 text-lg">This wiki page doesn't exist.</p>
+      <button
+        class="text-blue-600 hover:underline dark:text-blue-400"
+        @click="goBackToWiki"
+      >
+        Go back
+      </button>
+    </div>
+
+    <div v-else class="space-y-6">
+      <!-- Header -->
+      <div class="border-b border-gray-200 pb-4 dark:border-gray-700">
+        <nav class="mb-4">
+          <button
+            class="text-orange-600 hover:underline dark:text-orange-400"
+            @click="goBackToWiki"
+          >
+            ← Back to {{ wikiPage.title }}
+          </button>
+        </nav>
+        
+        <h1 class="text-2xl font-bold dark:text-white">
+          Revision History For Wiki Page
+        </h1>
+        <p class="mt-2 text-gray-600 dark:text-gray-400">
+          "{{ wikiPage.title }}" has been edited {{ totalEdits }} time{{ totalEdits !== 1 ? 's' : '' }}
+        </p>
+      </div>
+
+      <!-- No edits message -->
+      <div v-if="!hasEdits" class="text-center py-8">
+        <p class="text-gray-500 dark:text-gray-400">
+          This page has not been edited yet.
+        </p>
+        <button
+          class="mt-2 text-blue-600 hover:underline dark:text-blue-400"
+          @click="goBackToWiki"
+        >
+          Go back to wiki page
+        </button>
+      </div>
+
+      <!-- Revisions list -->
+      <div v-else class="space-y-4">
+        <div
+          v-for="(edit, index) in allEdits"
+          :key="edit.id"
+          class="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
+          @click="viewRevisionDiff(edit)"
+        >
+          <div class="flex items-center justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3">
+                <div class="font-medium text-gray-900 dark:text-gray-100">
+                  {{ edit.author }}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ timeAgo(new Date(edit.createdAt)) }}
+                </div>
+                <div v-if="edit.isCurrent" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">
+                  Current
+                </div>
+                <div v-else-if="index === 0" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200">
+                  Most recent edit
+                </div>
+              </div>
+              <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                {{ new Date(edit.createdAt).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "long",
+                  day: "numeric",
+                  hour: "numeric",
+                  minute: "numeric",
+                }) }}
+              </div>
+            </div>
+            <div class="flex items-center text-gray-400 dark:text-gray-500">
+              <i class="fas fa-chevron-right"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>

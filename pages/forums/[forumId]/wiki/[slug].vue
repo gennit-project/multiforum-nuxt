@@ -6,7 +6,6 @@
   import PencilIcon from "@/components/icons/PencilIcon.vue";
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import LoadingSpinner from "@/components/LoadingSpinner.vue";
-  import WikiEditsDropdown from "@/components/wiki/WikiEditsDropdown.vue";
   import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
   import OnThisPage from "@/components/wiki/OnThisPage.vue";
   import { timeAgo } from "@/utils";
@@ -229,7 +228,16 @@
             {{ timeAgo(new Date(wikiPage.updatedAt || wikiPage.createdAt)) }}
           </span>
           
-          <WikiEditsDropdown :wiki-page="wikiPage" />
+          <!-- Show see edits link if there are past versions -->
+          <template v-if="wikiPage.PastVersions && wikiPage.PastVersions.length > 0">
+            <span class="mx-2">·</span>
+            <router-link
+              :to="`/forums/${forumId}/wiki/revisions/${wikiPage.slug}`"
+              class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+            >
+              See edits
+            </router-link>
+          </template>
         </div>
       </div>
 
