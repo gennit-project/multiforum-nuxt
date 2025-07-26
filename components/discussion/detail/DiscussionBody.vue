@@ -1,6 +1,6 @@
 <script lang="ts" setup>
   import { ref, computed, onMounted } from "vue";
-  import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+  import MarkdownPreview from "@/components/MarkdownPreview.vue";
   import EmojiButtons from "@/components/comments/EmojiButtons.vue";
   import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
   import Tag from "../../TagComponent.vue";
@@ -123,9 +123,9 @@ const filterByTag = (tag: string) => {
       class="rounded"
       :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
     >
-      <MarkdownRenderer
+      <MarkdownPreview
         :text="bodyText"
-        :font-size="fontSize"
+        :disable-gallery="false"
       />
     </div>
 
