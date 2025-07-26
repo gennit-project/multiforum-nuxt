@@ -77,9 +77,13 @@ const profilePic = computed(() => {
       </h1>
       <h1
         v-if="user?.displayName"
-        class="mt-4 flex border-gray-700 text-3xl leading-6 text-gray-500 dark:text-gray-200"
+        class="mt-4 flex items-center gap-2 border-gray-700 text-3xl leading-6 text-gray-500 dark:text-gray-200"
       >
         {{ user.displayName }}
+        <span
+          v-if="isAdmin"
+          class="text-sm text-orange-600 dark:text-orange-500 px-2 py-1 border border-orange-600 dark:border-orange-500 rounded-md"
+        >Admin</span>
       </h1>
       <span v-if="user?.displayName" class="text-gray-600 dark:text-gray-400">
         {{ `u/${username}` }}
@@ -95,12 +99,12 @@ const profilePic = computed(() => {
           />
         </div>
         <slot />
-        <div v-if="user && username" class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden">
+        <div v-if="user && username" class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden text-gray-600 dark:text-gray-400">
           {{ `Joined ${relativeTime(user.createdAt)}` }}
         </div>
       </div>
 
-      <ul v-if="user" class="m-4 list-disc">
+      <ul v-if="user" class="m-4 list-disc text-gray-700 dark:text-gray-300">
         <li>{{ `${user.commentKarma ?? 0} comment karma` }}</li>
         <li>{{ `${user.discussionKarma ?? 0} discussion karma` }}</li>
       </ul>
