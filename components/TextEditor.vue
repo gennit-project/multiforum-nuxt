@@ -475,6 +475,12 @@ const toggleFullScreen = () => {
   // When entering full-screen, switch to split mode showing both editor and preview
   if (isFullScreen.value) {
     showFormatted.value = false; // Ensure we're in split mode, not just preview
+    // Focus the textarea when entering full-screen mode
+    nextTick(() => {
+      if (editorRef.value && !props.disableAutoFocus) {
+        editorRef.value.focus();
+      }
+    });
   }
 };
 
