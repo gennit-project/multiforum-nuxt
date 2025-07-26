@@ -327,6 +327,7 @@ useHead({
         <div class="min-h-[400px]">
           <ClientOnly>
             <CodeDiff
+              :key="`${revisionId}-${outputFormat}-${diffTheme}`"
               :old-string="oldContent"
               :new-string="newContent"
               :output-format="outputFormat"
@@ -366,5 +367,73 @@ useHead({
 /* Ensure proper spacing */
 :deep(.v-code-diff .d2h-wrapper) {
   border: none;
+}
+
+/* Remove gray borders between diff rows */
+:deep(.diff-container table) {
+  border-collapse: collapse !important;
+}
+
+:deep(.diff-container td) {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 0 !important; /* Reset padding */
+}
+
+:deep(.diff-container tr) {
+  border: none !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+:deep(.diff-container tbody tr) {
+  border: none !important;
+}
+
+:deep(.diff-container .d2h-code-line) {
+  border: none !important;
+  padding: 2px 8px !important; /* Consistent padding for code lines */
+  line-height: 1.4 !important; /* Consistent line height */
+}
+
+:deep(.diff-container .d2h-code-linenumber) {
+  border-right: 1px solid #e1e4e8 !important; /* Keep only the line number separator */
+  padding: 2px 8px !important; /* Consistent padding for line numbers */
+  line-height: 1.4 !important; /* Consistent line height */
+}
+
+/* Force consistent row height and spacing */
+:deep(.diff-container .d2h-code-side-line) {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+:deep(.diff-container .d2h-code-side-linenumber) {
+  padding: 2px 8px !important;
+  margin: 0 !important;
+}
+
+/* Ensure consistent table cell spacing */
+:deep(.diff-container table td) {
+  vertical-align: top !important;
+  padding: 0 !important;
+}
+
+/* Reset any inherited padding from parent components */
+:deep(.diff-container *) {
+  box-sizing: border-box !important;
+}
+
+/* Ensure consistent styling regardless of navigation method */
+:deep(.diff-container .d2h-file-wrapper) {
+  border: none !important;
+}
+
+:deep(.diff-container .d2h-file-header) {
+  border: none !important;
+  border-bottom: 1px solid #e1e4e8 !important; /* Keep only header separator */
 }
 </style>
