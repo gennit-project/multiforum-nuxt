@@ -72,7 +72,6 @@ md.renderer.rules.heading_open = (
   self: any
 ) => {
   const token = tokens[idx];
-  const level = token.markup.length;
   
   // Get the heading text from the next token
   const nextToken = tokens[idx + 1];

@@ -105,12 +105,12 @@ module.exports = {
         100: "#f5fdf5",
       },
       orange: {
-        // Bright creamsicle orange
+        // Bright creamsicle orange with improved contrast
         900: "#3b1c0e",
         800: "#4c2712",
         700: "#5e3317",
-        600: "#f2aa00",
-        500: "#ffbf00",
+        600: "#b8800a",
+        500: "#d4940c",
         400: "#ffcd33",
         300: "#ffdb66",
         200: "#ffe6b3",

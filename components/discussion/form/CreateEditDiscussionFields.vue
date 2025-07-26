@@ -64,7 +64,7 @@ const changesRequiredMessage = computed(() => {
   if (!props.formValues?.title) {
     return "A title is required.";
   } else if (props.formValues?.selectedChannels?.length === 0) {
-    return "Must select at least one channel.";
+    return "Must select at least one forum.";
   } else if (props.formValues?.body?.length > MAX_CHARS_IN_DISCUSSION_BODY) {
     return `Body cannot exceed ${MAX_CHARS_IN_DISCUSSION_BODY} characters.`;
   } else if (props.formValues?.title.length > DISCUSSION_TITLE_CHAR_LIMIT) {

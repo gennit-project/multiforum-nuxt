@@ -25,7 +25,7 @@ defineProps({
     :class="[
       disabled
         ? 'cursor-default bg-gray-200 text-gray-300 dark:bg-gray-800 dark:text-gray-300'
-        : ' bg-orange-600 hover:bg-orange-500 dark:border dark:border-orange-600 dark:bg-orange-500 dark:text-black dark:hover:bg-orange-400',
+        : ' bg-orange-400 hover:bg-orange-400 dark:border dark:border-orange-500 dark:bg-orange-400 dark:text-black dark:hover:bg-orange-400',
       '',
     ]"
     class="max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-orange-500 focus:ring-offset-2 focus:ring-offset-gray-100"
