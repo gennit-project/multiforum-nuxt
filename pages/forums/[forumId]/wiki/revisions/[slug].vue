@@ -103,7 +103,13 @@ const allEdits = computed(() => {
 
 // Navigate to revision detail page
 const viewRevisionDiff = (revision: WikiRevisionData) => {
-  router.push(`/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`);
+  console.log('Navigating to revision:', revision.id);
+  console.log('Path:', `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`);
+  try {
+    router.push(`/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`);
+  } catch (error) {
+    console.error('Navigation error:', error);
+  }
 };
 
 // Navigate back to wiki page
@@ -184,7 +190,7 @@ useHead({
           v-for="(edit, index) in allEdits"
           :key="edit.id"
           class="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
-          @click="viewRevisionDiff(edit)"
+          @click="() => { console.log('Click detected on revision:', edit.id); viewRevisionDiff(edit); }"
         >
           <div class="flex items-center justify-between">
             <div class="flex-1">

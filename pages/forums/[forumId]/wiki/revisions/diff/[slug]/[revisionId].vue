@@ -142,7 +142,7 @@ const newContent = computed(() => currentRevision.value?.newVersionData?.body ||
 
 // Diff configuration for v-code-diff
 const outputFormat = ref('side-by-side'); // side-by-side or line-by-line
-const diffLanguage = ref('markdown'); // Set to markdown for wiki content
+const diffLanguage = ref('markdown'); // Now supports markdown with extended language
 const diffTheme = computed(() => theme.value === 'dark' ? 'dark' : 'light');
 
 // Set up delete mutation
