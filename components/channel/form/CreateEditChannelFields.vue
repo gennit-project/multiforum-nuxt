@@ -80,7 +80,7 @@
     // Always show events and downloads tabs
     baseTabs.push({
       key: "events",
-      label: "Events",
+      label: "Calendar",
       icon: CalendarIcon,
       fontAwesome: null,
     });

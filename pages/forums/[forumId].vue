@@ -38,7 +38,7 @@
     // Forum settings pages where we want to show channel tabs
     const isForumSettingsPage = routeName.startsWith("forums-forumId-edit") && 
       (routeName === "forums-forumId-edit" || 
-       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|feedback|wiki)$/));
+       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki)$/));
     
     // Only hide tabs for content editing (discussions, events, etc), not forum settings
     const isContentEditPage = routeName.includes("edit") && !isForumSettingsPage;
@@ -59,7 +59,7 @@
     // Always show sidebar on forum settings pages (including wiki settings)
     const isForumSettingsPage = routeName.startsWith("forums-forumId-edit") && 
       (routeName === "forums-forumId-edit" || 
-       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|events|feedback|wiki)$/));
+       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki)$/));
     
     if (isForumSettingsPage) {
       return true;
