@@ -21,9 +21,7 @@ defineProps({
 const route = useRoute();
 const router = useRouter();
 
-const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
-});
+const channelId = ref(typeof route.params.forumId === "string" ? route.params.forumId : "");
 
 const filterValues = ref(
   getFilterValuesFromParams({
@@ -33,6 +31,13 @@ const filterValues = ref(
 );
 
 // Watchers
+watch(
+  () => route.params.forumId,
+  (newForumId) => {
+    channelId.value = typeof newForumId === "string" ? newForumId : "";
+  }
+);
+
 watch(
   () => route.query,
   () => {
