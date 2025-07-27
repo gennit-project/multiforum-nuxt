@@ -15,7 +15,7 @@ defineProps({
   },
   description: {
     type: String,
-    default: 'Select forums to submit to',
+    default: '',
   },
   testId: {
     type: String,
@@ -69,9 +69,9 @@ const handleSearch = (query: string) => {
     :loading="channelsLoading"
     :test-id="testId"
     placeholder="Select forums..."
-    search-placeholder="Search forums..."
+    search-placeholder="Type to search..."
     searchable
-    show-chips
+    :show-chips="false"
     height="h-12"
     @update:model-value="handleUpdateChannels"
     @search="handleSearch"

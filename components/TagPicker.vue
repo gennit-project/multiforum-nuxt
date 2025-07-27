@@ -97,11 +97,11 @@ const handleSearch = (query: string) => {
     :options="tagOptions"
     :description="description"
     :loading="tagsLoading || createTagLoading"
-    placeholder="There are no tags yet"
-    search-placeholder="Add a tag..."
+    placeholder="Select tags..."
+    search-placeholder="Type to search or create tags..."
     test-id="tag-picker"
     searchable
-    show-chips
+    :show-chips="false"
     @update:model-value="handleUpdateTags"
     @search="handleSearch"
   />

@@ -536,6 +536,7 @@ const touched = ref(false);
             <ForumPicker
               :test-id="'channel-input'"
               :selected-channels="formValues.selectedChannels"
+              :description="'Select forums to submit to'"
               @set-selected-channels="
                 emit('updateFormValues', { selectedChannels: $event })
               "
