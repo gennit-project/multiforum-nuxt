@@ -8,7 +8,7 @@ import type { MultiSelectOption } from '@/components/MultiSelect.vue';
 import type { Channel } from '@/__generated__/graphql';
 
 // Props definition - used in template
-defineProps({
+const props = defineProps({
   selectedChannels: {
     type: Array as PropType<string[]>,
     default: () => [],
@@ -45,11 +45,29 @@ const {
 
 const channelOptions = computed<MultiSelectOption[]>(() => {
   const channels = channelsResult.value?.channels || [];
-  return channels.map((channel: Channel) => ({
+  const mappedChannels = channels.map((channel: Channel) => ({
     value: channel.uniqueName,
     label: channel.displayName || channel.uniqueName,
     avatar: channel.channelIconURL || '',
   }));
+  
+  // Always include selected channels in options, even if they don't match current search
+  // This ensures selected chips can always be displayed
+  const existingChannelValues = new Set(mappedChannels.map(ch => ch.value));
+  
+  // Add any selected channels that aren't in the current search results
+  (props.selectedChannels || []).forEach(selectedValue => {
+    if (!existingChannelValues.has(selectedValue)) {
+      // Create a basic option for the selected channel that's not in current results
+      mappedChannels.push({
+        value: selectedValue,
+        label: selectedValue, // Use uniqueName as label since we don't have the full data
+        avatar: '',
+      });
+    }
+  });
+  
+  return mappedChannels;
 });
 
 const handleUpdateChannels = (newChannels: string[]) => {
@@ -57,21 +75,23 @@ const handleUpdateChannels = (newChannels: string[]) => {
 };
 
 const handleSearch = (query: string) => {
+  // Store search query for GraphQL filtering
   searchQuery.value = query;
+  // Do NOT emit any events that could affect selection
 };
 </script>
 
 <template>
   <MultiSelect
-    :model-value="selectedChannels"
+    :model-value="props.selectedChannels"
     :options="channelOptions"
-    :description="description"
+    :description="props.description"
     :loading="channelsLoading"
-    :test-id="testId"
+    :test-id="props.testId"
     placeholder="Select forums..."
     search-placeholder="Type to search..."
     searchable
-    :show-chips="false"
+    :show-chips="true"
     height="h-12"
     @update:model-value="handleUpdateChannels"
     @search="handleSearch"

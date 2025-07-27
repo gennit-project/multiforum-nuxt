@@ -92,7 +92,7 @@ const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
 
   // Auto-focus the search input when dropdown opens
-  if (isDropdownOpen.value && props.searchable && !props.showChips) {
+  if (isDropdownOpen.value && props.searchable) {
     nextTick(() => {
       searchInputRef.value?.focus();
     });
@@ -101,6 +101,8 @@ const toggleDropdown = () => {
 
 const closeDropdown = () => {
   isDropdownOpen.value = false;
+  // Clear search when closing dropdown to reset filter
+  searchQuery.value = "";
 };
 
 const toggleSelection = (value: any) => {
@@ -132,6 +134,7 @@ const clearSelection = () => {
 };
 
 const updateSearch = (query: string) => {
+  // ONLY update search query for filtering - do NOT affect selection
   searchQuery.value = query;
   emit("search", query);
 };
@@ -157,7 +160,8 @@ watch(
   () => props.modelValue,
   (newVal) => {
     selected.value = [...newVal];
-  }
+  },
+  { deep: true }
 );
 
 // Selected options for display
@@ -249,15 +253,6 @@ const selectedOptions = computed(() => {
           {{ placeholder }}
         </div>
 
-        <!-- Search input for chips mode -->
-        <input
-          v-if="showChips && searchable"
-          v-model="searchQuery"
-          class="flex-1 border-none bg-transparent focus:outline-none dark:text-white text-sm ml-2"
-          :placeholder="selectedOptions.length === 0 ? searchPlaceholder : ''"
-          @input="updateSearch(searchQuery)"
-          @click.stop
-        />
 
         <!-- Clear button and dropdown arrow -->
         <div class="ml-auto flex items-center text-gray-400">
@@ -297,7 +292,7 @@ const selectedOptions = computed(() => {
       >
         <!-- Search bar for dropdown -->
         <div
-          v-if="searchable && !showChips"
+          v-if="searchable"
           class="p-2 border-b border-gray-200 dark:border-gray-600"
         >
           <input
@@ -307,6 +302,11 @@ const selectedOptions = computed(() => {
             :placeholder="searchPlaceholder"
             class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
             @input="updateSearch(searchQuery)"
+            @keydown.stop
+            @keyup.stop
+            @click.stop
+            @focus.stop
+            @blur.stop
           />
         </div>
 
