@@ -39,6 +39,34 @@ To solve the problem where you're bored on the weekend but you don't know what t
 
 When the project is finished, I will add documentation so that anyone can deploy their own Multiforum with custom branding.
 
+## New feature July 2025 - Wikis
+
+I added a wiki feature. Forum owners can go into the forum settings and select a checkbox to enable the wiki. That turns on a Wiki tab.
+
+Here's an example of a wiki with a single page:
+
+![one-page-wiki-example](./screenshots/one-page-wiki-example.png)
+
+Here's a wiki with multiple pages - see there's a box that lists other pages:
+
+![multiple-page-wiki-example](./screenshots/wiki-multiple-pages.png)
+
+Here's how it looks when you edit a wiki page:
+
+![edit wiki example](./screenshots/edit-wiki-example.png)
+
+Here's how it looks when you edit a wiki page in full screen mode (after clicking the box in the top right of the text editor):
+
+![wiki edit fullscreen](./screenshots/wiki-edit-fullscreen)
+
+If you click 'see edits' you can see the revision history of a wiki page:
+
+![wiki revision history](./screenshots/wiki-revision-history.png)
+
+If you click a revision you can see the diff that shows what was edited:
+
+![wiki revision diff view](./screenshots/wiki-diff-view.png)
+
 ## Screenshots - Desktop width
 
 The below screenshots capture the state of the project as of January 2025. The layout is responsive with both desktop and mobile views.
