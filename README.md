@@ -22,6 +22,8 @@ This is a work in progress that intended to be an open-source, self-hosted platf
 
 ## Video Demo
 
+Note: The screenshots below are more recently updated than the video.
+
 [![Video demo of Multiforum](./screenshots/video-demo-thumbnail.png)](https://www.loom.com/share/c94dcfcad181448abf6501584e01f9d2?sid=5d53630c-813f-4cfe-bb22-1d7289effc2e)
 
 ## Overview
@@ -93,11 +95,6 @@ Some map markers indicate that there are multiple events at the same location. I
 you click that, you can see the list of events that are taking place there at different times:
 
 ![Clicking different map marker with multiple events](./screenshots/clicking-different-map-marker-with-multiple-events.png)
-
-Here's a screenshot of how it looks when you click on a location with multiple events. In 
-this case, the events are both at the same place, the Phoenix Zoo:
-
-![Clicking map marker with multiple events](./screenshots/clicking-map-marker-with-multiple-events.png)
 
 
 ### Event list within a forum

@@ -176,6 +176,11 @@ const isDownloadDetailPage = computed(() => {
           :current="formValues.title?.length || 0"
           :max="DISCUSSION_TITLE_CHAR_LIMIT"
         />
+         <div class="text-gray-500 dark:text-gray-300 text-xs py-1">{{
+            isDownloadDetailPage
+              ? `published by ${discussion?.Author ? discussion.Author.username : "[Deleted]"} ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
+              : `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
+          }}</div>
         <p
           v-if="!titleEditMode"
           class="ml-1 mt-1 text-gray-500 dark:text-gray-400 text-sm flex items-center space-x-2"
@@ -188,11 +193,7 @@ const isDownloadDetailPage = computed(() => {
           >
             <CheckCircleIcon class="h-4 w-4" /> Answered
           </span>
-          <span class="text-gray-500 dark:text-gray-300">{{
-            isDownloadDetailPage
-              ? `published by ${discussion?.Author ? discussion.Author.username : "[Deleted]"} ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
-              : `${discussion?.Author ? discussion.Author.username : "[Deleted]"} started this discussion ${formattedDate ? `on ${formattedDate}` : ""} in ${channelId}`
-          }}</span>
+         
         </p>
       </div>
       <RequireAuth class="hidden md:block" :full-width="false">
