@@ -37,7 +37,7 @@ Each forum has three main sections that enable different types of community inte
 
 **Wikis**: A collaborative knowledge base system where community members can create, edit, and maintain shared documentation. Each wiki page includes full revision history, allowing users to track changes over time and compare different versions using a built-in diff viewer. Forum owners can enable or disable the wiki feature based on their community's needs.
 
-All content types (discussions, events, and wiki pages) support cross-posting capabilities, allowing content to be shared across multiple forums to maximize reach and engagement.
+Discussions and events support cross-posting capabilities, allowing content to be shared across multiple forums to maximize reach and engagement.
 
 For location-based communities, the platform includes powerful discovery features: events can be searched across multiple forums based on location, tags, and keywords, solving the common problem of not knowing what activities are available in your area.
 
