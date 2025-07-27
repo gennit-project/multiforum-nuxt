@@ -349,7 +349,7 @@ const handleEditAlbum = () => {
           text="This discussion is locked. New comments cannot be added."
         />
         <div v-if="discussion" class="w-full">
-          <div class="w-full space-y-3 px-2">
+          <div class="w-full px-2">
             <div class="w-full rounded-lg pb-2 dark:border-gray-700">
               <DiscussionHeader
                 :channel-id="channelId"
@@ -645,7 +645,7 @@ const handleEditAlbum = () => {
         </div>
 
         <div v-else>
-          <div class="my-6 px-2 pt-2">
+          <div class="my-2 px-2 pt-2">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
               :aggregate-comment-count="aggregateCommentCount || 0"

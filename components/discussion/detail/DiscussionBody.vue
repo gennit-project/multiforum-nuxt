@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-  import { ref, computed, onMounted } from "vue";
-  import MarkdownPreview from "@/components/MarkdownPreview.vue";
-  import EmojiButtons from "@/components/comments/EmojiButtons.vue";
-  import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
-  import Tag from "../../TagComponent.vue";
-  import "md-editor-v3/lib/preview.css";
-  import type { PropType } from "vue";
-  import type { Discussion } from "@/__generated__/graphql";
-  import { useRouter } from "nuxt/app";
-  import { useUIStore } from "@/stores/uiStore";
-  import { storeToRefs } from "pinia";
+import { ref, computed, onMounted } from "vue";
+import MarkdownPreview from "@/components/MarkdownPreview.vue";
+import EmojiButtons from "@/components/comments/EmojiButtons.vue";
+import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
+import Tag from "../../TagComponent.vue";
+import "md-editor-v3/lib/preview.css";
+import type { PropType } from "vue";
+import type { Discussion } from "@/__generated__/graphql";
+import { useRouter } from "nuxt/app";
+import { useUIStore } from "@/stores/uiStore";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
 const uiStore = useUIStore();
@@ -68,7 +68,9 @@ const scrollElement = ref<HTMLElement | null>(null);
 // State for showing/hiding sensitive content
 const sensitiveContentRevealed = ref(false);
 
-const hasSensitiveContent = computed(() => !!props.discussion?.hasSensitiveContent);
+const hasSensitiveContent = computed(
+  () => !!props.discussion?.hasSensitiveContent
+);
 
 const shouldShowContent = computed(() => {
   return !hasSensitiveContent.value || sensitiveContentRevealed.value;
@@ -96,6 +98,14 @@ const filterByTag = (tag: string) => {
     },
   });
 };
+
+const hasAlbum = computed(() => {
+  return props.discussion?.Album && props.discussion.Album?.Images?.length > 0;
+});
+
+const hasEmoiji = computed(() => {
+  return props.discussionChannelId && props.emojiJson && props.showEmojiButton;
+});
 </script>
 
 <template>
@@ -123,24 +133,24 @@ const filterByTag = (tag: string) => {
       class="rounded"
       :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
     >
-      <MarkdownPreview
-        :text="bodyText"
-        :disable-gallery="false"
-      />
+      <MarkdownPreview :text="bodyText" :disable-gallery="false" />
     </div>
 
     <!-- Album slot (hidden when sensitive and not revealed) -->
-    <div v-if="shouldShowContent">
+    <div v-if="shouldShowContent && hasAlbum">
       <slot name="album-slot" />
     </div>
-    <div v-if="showEmojiButton" class="mt-2 flex">
+    <div v-if="showEmojiButton && hasEmoiji" :key="emojiJson" class="flex">
       <EmojiButtons
         :key="emojiJson"
         :discussion-channel-id="discussionChannelId"
         :emoji-json="emojiJson"
       />
     </div>
-    <div class="flex gap-2">
+    <div
+      class="flex gap-2"
+      v-if="discussion?.Tags && discussion.Tags.length > 0"
+    >
       <Tag
         v-for="tag in discussion?.Tags"
         :key="tag.text"
@@ -150,7 +160,7 @@ const filterByTag = (tag: string) => {
       />
     </div>
 
-    <div v-if="!downloadMode" class="my-2">
+    <div v-if="!downloadMode">
       <slot name="mark-answered-slot" />
     </div>
     <slot name="activity-feed-slot" />
