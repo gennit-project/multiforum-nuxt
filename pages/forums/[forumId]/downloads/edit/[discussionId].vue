@@ -300,7 +300,7 @@ export default defineComponent({
           }]
         }));
 
-      // UPDATE array: existing images that need updates
+      // UPDATE array: existing images that need updates  
       const updateImageArray = newImages
         .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
         .map((img) => ({
@@ -319,27 +319,24 @@ export default defineComponent({
       const disconnectImageArray = oldImages
         .filter((old) => !newImages.some((img) => img.id === old.id))
         .map((old) => ({
-          where: { node: { id: old.id } },
+          disconnect: [{
+            where: { node: { id: old.id } },
+          }]
         }));
         
-      // Build the Images operations object
-      const imagesOps: any = {};
-      if (connectImageArray.length > 0) {
-        imagesOps.connect = connectImageArray;
-      }
-      if (updateImageArray.length > 0) {
-        imagesOps.update = updateImageArray;
-      }
-      if (disconnectImageArray.length > 0) {
-        imagesOps.disconnect = disconnectImageArray;
-      }
+      // Combine all operations into a single array. Each object is one "Images" operation.
+      const imagesOps = [
+        ...connectImageArray,
+        ...updateImageArray,
+        ...disconnectImageArray,
+      ];
       
       return {
         Album: {
           update: {
             node: {
               imageOrder: albumData.imageOrder || [],
-              Images: [imagesOps],
+              Images: imagesOps,
             },
           },
         },
@@ -506,7 +503,7 @@ export default defineComponent({
     </RequireAuth>
     <template #fallback>
       <div class="flex justify-center items-center min-h-[400px]">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"/>
       </div>
     </template>
   </ClientOnly>

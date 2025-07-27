@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, watch } from "vue";
+  import { ref, watch } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
   import ChannelDiscussionList from "./ChannelDiscussionList.vue";
   import SitewideDiscussionList from "./SitewideDiscussionList.vue";

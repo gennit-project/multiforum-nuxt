@@ -13,7 +13,7 @@
 
 const router = useRouter();
 const uiStore = useUIStore();
-const { fontSize } = storeToRefs(uiStore);
+const { fontSize: _fontSize } = storeToRefs(uiStore);
 
 const props = defineProps({
   channelId: {
