@@ -106,13 +106,10 @@ they are visible even when the Discussions tab is active:
 
 ![Phoenix rock event list](./screenshots/phx-rock-event-list.png)
 
-Events can be filtered within a forum. This screenshot shows how it looks when
-events in "Phoenix Bird Lovers" are filtered to show only events next weekend:
+(Note: The above screenshot is a little outdated but the sidebar still shows events in this format.)
 
-![Phoenix bird lovers filtered by next weekend](./screenshots/phx-bird-lovers-filtered-by-next-weekend.png)
-
-Here are the events filtered by location. In this case they are filtered to show
-events within 10 miles of Tempe:
+Events can be filtered within a forum.Here are the events filtered by location. In this case they are filtered to show
+events within 5 miles of Tempe:
 
 ![Phoenix bird lovers events filtered by location](./screenshots/phx-bird-lovers-events-filtered-by-location.png)
 

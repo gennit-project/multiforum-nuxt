@@ -36,7 +36,19 @@ function filterByTag(tag: string) {
     <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
       There are no results.
     </p>
-    <div class="columns-1 sm:columns-2 lg:columns-3 gap-4">
+    <!-- Mobile layout: single column with dividers -->
+    <div class="block md:hidden divide-y divide-gray-300 dark:divide-gray-600">
+      <ChannelListItem
+        v-for="channel in channels"
+        :key="channel.uniqueName"
+        :channel="channel"
+        :search-input="searchInput"
+        :selected-tags="selectedTags"
+        @filter-by-tag="filterByTag"
+      />
+    </div>
+    <!-- Desktop layout: masonry columns -->
+    <div class="hidden md:block columns-1 sm:columns-2 lg:columns-3 gap-4">
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"

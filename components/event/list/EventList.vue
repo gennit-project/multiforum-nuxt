@@ -144,7 +144,7 @@ const onMouseLeaveEventListItem = () => {
       v-if="events.length > 0"
       role="list"
       :class="[
-        'ml-0 mb-4 flex flex-col gap-2 divide-y divide-gray-200 dark:divide-gray-600',
+        'bg-white ml-0 mb-4 flex flex-col gap-2 divide-y divide-gray-200 dark:divide-gray-600',
         { 'pointer-events-none': sideNavIsOpenVar },
       ]"
       data-testid="event-list"
