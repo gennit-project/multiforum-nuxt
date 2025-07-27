@@ -2,7 +2,7 @@
 
 Multiforum is an online platform for communities to create forums for sharing discussions and events. Key features:
 
-1. Each forum has two main sections:
+1. Each forum has three main sections:
   - Discussions: Content can be upvoted so best content rises to top
   - Calendar: Calendar with upcoming community events
   - Wikis: Wiki tab with shared knowledge base
