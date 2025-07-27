@@ -365,6 +365,7 @@ const handleEditAlbum = () => {
                 :discussion-channel-id="activeDiscussionChannel?.id"
                 :discussion-is-archived="isArchived || false"
                 :download-mode="downloadMode"
+                :show-action-menu="true"
                 @cancel-edit-discussion-body="discussionBodyEditMode = false"
                 @handle-click-add-album="handleClickAddAlbum"
                 @handle-click-edit-body="handleClickEditDiscussionBody"
