@@ -253,6 +253,7 @@ const revealSensitiveContent = () => {
                     :text="discussion.body"
                     :disable-gallery="false"
                     :word-limit="50" 
+                    :image-max-height="'150px'"
                     class="ml-2"
                   />
                 </div>

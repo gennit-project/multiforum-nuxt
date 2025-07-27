@@ -31,6 +31,10 @@ const props = defineProps({
   fontSize: {
     type: String,
     default: 'medium'
+  },
+  imageMaxHeight: {
+    type: String,
+    default: '350px'
   }
 });
 
@@ -112,10 +116,16 @@ const renderedMarkdown = computed(() => {
   // Always return the processed HTML - DOMPurify is handled separately for hydration
   return processedHTML;
 });
+
+const containerStyle = computed(() => {
+  return {
+    '--image-max-height': props.imageMaxHeight
+  };
+});
 </script>
 
 <template>
-  <div class="markdown-container">
+  <div class="markdown-container" :style="containerStyle">
     <!-- Use both classes and inline styles to ensure font size is applied -->
     <ClientOnly>
       <div 
@@ -327,7 +337,7 @@ const renderedMarkdown = computed(() => {
 
     img {
       margin-top: 1rem !important;
-      max-height: 350px !important;
+      max-height: var(--image-max-height, 350px) !important;
       max-width: 100% !important;
       height: auto !important;
       width: auto !important;
@@ -664,7 +674,7 @@ const renderedMarkdown = computed(() => {
 
   img {
     margin-top: 1rem !important;
-    max-height: 350px !important;
+    max-height: var(--image-max-height, 350px) !important;
     max-width: 100% !important;
     height: auto !important;
     width: auto !important;

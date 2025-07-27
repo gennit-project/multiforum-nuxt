@@ -151,6 +151,10 @@ export default defineComponent({
       type: Number,
       default: 100,
     },
+    imageMaxHeight: {
+      type: String,
+      default: '350px',
+    },
   },
   setup(props) {
     const uiStore = useUIStore();
@@ -339,6 +343,7 @@ export default defineComponent({
       :text="`${shownText}${!showFullText ? '...' : ''}`"
       :class="[{ clickable: !disableGallery }]"
       :font-size="fontSize"
+      :image-max-height="imageMaxHeight"
       @click="handleImageClick"
     />
     <button
