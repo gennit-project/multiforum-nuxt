@@ -4,7 +4,8 @@ Multiforum is an online platform for communities to create forums for sharing di
 
 1. Each forum has two main sections:
   - Discussions: Content can be upvoted so best content rises to top
-  - Events: Calendar with upcoming community events
+  - Calendar: Calendar with upcoming community events
+  - Wikis: Wiki tab with shared knowledge base
 2. Cross-posting capability:
   - Events and discussions can be submitted to multiple forums for increased visibility
 3. Location-based event discovery:
