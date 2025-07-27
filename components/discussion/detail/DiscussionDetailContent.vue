@@ -157,9 +157,9 @@ const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
 });
 
 const answers = computed(() => {
-  return (
-    activeDiscussionChannel.value ? activeDiscussionChannel.value.Answers : []
-  );
+  return activeDiscussionChannel.value
+    ? activeDiscussionChannel.value.Answers
+    : [];
 });
 
 const isArchived = computed(() => {
@@ -332,10 +332,7 @@ const handleEditAlbum = () => {
         !discussion && !activeDiscussionChannel && !getDiscussionLoading
       "
     />
-    <div
-      v-else
-      class="w-full max-w-6xl space-y-2 py-2"
-    >
+    <div v-else class="w-full max-w-6xl space-y-2 py-2">
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
           v-if="getDiscussionError"
@@ -351,10 +348,7 @@ const handleEditAlbum = () => {
           v-else-if="locked"
           text="This discussion is locked. New comments cannot be added."
         />
-        <div
-          v-if="discussion"
-          class="w-full"
-        >
+        <div v-if="discussion" class="w-full">
           <div class="w-full space-y-3 px-2">
             <div class="w-full rounded-lg pb-2 dark:border-gray-700">
               <DiscussionHeader
@@ -383,7 +377,11 @@ const handleEditAlbum = () => {
                   @close-editor="albumEditMode = false"
                 />
                 <!-- Download mode layout with sidebar -->
-                <div v-else-if="downloadMode && discussion" key="download-layout" class="flex flex-col gap-4 lg:flex-row lg:gap-6">
+                <div
+                  v-else-if="downloadMode && discussion"
+                  key="download-layout"
+                  class="flex flex-col gap-4 lg:flex-row lg:gap-6"
+                >
                   <div class="flex-1">
                     <DiscussionBody
                       :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
@@ -405,7 +403,9 @@ const handleEditAlbum = () => {
                             :album="discussion.Album"
                             :carousel-format="true"
                             :expanded-view="true"
-                            :discussion-author="discussion.Author?.username || ''"
+                            :discussion-author="
+                              discussion.Author?.username || ''
+                            "
                             :discussion-id="discussionId"
                             @album-updated="refetchDiscussion"
                             @edit-album="handleEditAlbum"
@@ -454,7 +454,12 @@ const handleEditAlbum = () => {
                             v-if="activeDiscussionChannel"
                             :discussion="discussion"
                             :discussion-channel="activeDiscussionChannel"
-                            :show-downvote="!loggedInUserIsAuthor && (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)"
+                            :show-downvote="
+                              !loggedInUserIsAuthor &&
+                              (activeDiscussionChannel?.Channel
+                                ?.feedbackEnabled ??
+                                true)
+                            "
                             :use-heart-icon="downloadMode"
                             @handle-click-edit-feedback="
                               handleClickEditFeedback
@@ -471,7 +476,10 @@ const handleEditAlbum = () => {
                     </DiscussionBody>
                   </div>
                   <div class="flex-shrink-0">
-                    <DownloadSidebar v-if="discussion" :discussion="discussion" />
+                    <DownloadSidebar
+                      v-if="discussion"
+                      :discussion="discussion"
+                    />
                   </div>
                 </div>
                 <!-- Regular discussion mode layout -->
@@ -527,7 +535,11 @@ const handleEditAlbum = () => {
                         v-if="activeDiscussionChannel"
                         :discussion="discussion"
                         :discussion-channel="activeDiscussionChannel"
-                        :show-downvote="!loggedInUserIsAuthor && (activeDiscussionChannel?.Channel?.feedbackEnabled ?? true)"
+                        :show-downvote="
+                          !loggedInUserIsAuthor &&
+                          (activeDiscussionChannel?.Channel?.feedbackEnabled ??
+                            true)
+                        "
                         :use-heart-icon="downloadMode"
                         @handle-click-edit-feedback="handleClickEditFeedback"
                         @handle-click-give-feedback="handleClickGiveFeedback"
@@ -555,7 +567,9 @@ const handleEditAlbum = () => {
                 }"
                 class="border-b-2 px-1 py-2 text-sm font-medium"
                 :class="
-                  typeof $route.name === 'string' && ($route.name.includes('description') || $route.name === 'forums-forumId-downloads-discussionId')
+                  typeof $route.name === 'string' &&
+                  ($route.name.includes('description') ||
+                    $route.name === 'forums-forumId-downloads-discussionId')
                     ? 'border-orange-500 text-orange-600 dark:text-orange-400'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 "
@@ -572,7 +586,8 @@ const handleEditAlbum = () => {
                 }"
                 class="border-b-2 px-1 py-2 text-sm font-medium"
                 :class="
-                  typeof $route.name === 'string' && $route.name.includes('comments')
+                  typeof $route.name === 'string' &&
+                  $route.name.includes('comments')
                     ? 'border-orange-500 text-orange-600 dark:text-orange-400'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
                 "
@@ -583,33 +598,46 @@ const handleEditAlbum = () => {
           </div>
 
           <!-- Tab content via router-view -->
-          <div class="mt-4">
+          <div class="mt-2 w-full">
             <NuxtPage :discussion="discussion" />
             <!-- Fallback to description if no nested route matches -->
-            <div v-if="$route.name === 'forums-forumId-downloads-discussionId'" class="px-2">
-              <div class="space-y-4">
-                <!-- Edit button for download authors -->
-                <div v-if="loggedInUserIsAuthor && discussion" class="flex justify-end">
-                  <button
-                    type="button"
-                    class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
-                    @click="router.push(`/forums/${channelId}/downloads/${discussionId}/description`)"
-                    data-testid="edit-download-button-fallback"
-                  >
-                    <PencilIcon class="h-4 w-4" />
-                    Edit Description
-                  </button>
-                </div>
-                
+            <div
+              v-if="$route.name === 'forums-forumId-downloads-discussionId'"
+              class="px-2"
+            >
+              <div
+                class="flex flex-col-reverse lg:flex-row lg:items-start lg:justify-between gap-4"
+              >
                 <!-- Description content -->
-                <div v-if="discussion?.body" class="rounded">
+                <div v-if="discussion?.body" class="flex-1 min-w-0">
                   <MarkdownPreview
                     :disable-gallery="false"
                     :text="discussion.body"
                   />
                 </div>
-                <div v-else class="text-gray-500 dark:text-gray-400 py-8 text-center">
+                <div
+                  v-else
+                  class="text-gray-500 dark:text-gray-400 py-8 text-center flex-1 min-w-0"
+                >
                   No description available for this download.
+                </div>
+                <div
+                  v-if="loggedInUserIsAuthor && discussion"
+                  class="w-full lg:w-auto flex justify-end"
+                >
+                  <button
+                    type="button"
+                    class="inline-flex items-center px-3 py-2 gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                    @click="
+                      router.push(
+                        `/forums/${channelId}/downloads/${discussionId}/description`
+                      )
+                    "
+                    data-testid="edit-download-button-fallback"
+                  >
+                    <PencilIcon class="h-4 w-4" />
+                    Edit Description
+                  </button>
                 </div>
               </div>
             </div>
@@ -624,7 +652,9 @@ const handleEditAlbum = () => {
               :comments="comments"
               :discussion-author="discussionAuthor || ''"
               :discussion-channel="activeDiscussionChannel || undefined"
-              :enable-feedback="activeDiscussionChannel?.Channel?.feedbackEnabled ?? true"
+              :enable-feedback="
+                activeDiscussionChannel?.Channel?.feedbackEnabled ?? true
+              "
               :loading="getDiscussionChannelLoading"
               :locked="locked"
               :mod-name="loggedInUserModName"
