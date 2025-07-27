@@ -183,7 +183,7 @@ const isExpanded = computed(() => {
 <template>
   <div class="pb-2 pt-2">
     <div>
-      <div class="flex flex-wrap items-center justify-end space-x-2">
+      <div class="flex flex-wrap items-center justify-end gap-1">
         <FilterChip
           v-if="!isForumScoped"
           class="align-middle"
@@ -279,21 +279,21 @@ const isExpanded = computed(() => {
           <SearchIcon />
         </button>
         <SortButtons />
+        <div>
         <RequireAuth :full-width="false">
           <template #has-auth>
             <PrimaryButton
-              class="mx-2"
-              :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
+              :label="isDownloadPage ? 'New Upload' : 'New Post'"
               @click="$router.push(isForumScoped ? (isDownloadPage ? `/forums/${channelId}/downloads/create` : `/forums/${channelId}/discussions/create`) : '/discussions/create')"
             />
           </template>
           <template #does-not-have-auth>
             <PrimaryButton
-              class="mx-2"
-              :label="isDownloadPage ? 'New Upload' : 'New Discussion'"
+              :label="isDownloadPage ? 'New Upload' : 'New Post'"
             />
           </template>
         </RequireAuth>
+        </div>
       </div>
     </div>
     <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
