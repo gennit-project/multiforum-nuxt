@@ -254,7 +254,7 @@ const revealSensitiveContent = () => {
             </button>
             <div
               v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
-              class="w-full border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
+              class="w-full max-w-full overflow-hidden border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
             >
               <!-- Sensitive content concealment box -->
               <div
@@ -280,11 +280,12 @@ const revealSensitiveContent = () => {
                   :text="discussion.body"
                   :word-limit="50"
                   :disable-gallery="false"
-                  class="ml-2 pb-2"
+                  :image-max-height="'200px'"
+                  class="ml-2 pb-2 max-w-full overflow-hidden break-words"
                 />
                 <div
                   v-if="discussion.Album"
-                  class="my-4 overflow-x-auto bg-black"
+                  class="my-4 max-w-full overflow-x-auto bg-black"
                 >
                   <DiscussionAlbum
                     :album="discussion.Album"

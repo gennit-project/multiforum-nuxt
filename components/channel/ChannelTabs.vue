@@ -231,7 +231,7 @@
     <div v-else class="relative">
       <Popper>
         <button
-          class="flex w-full items-center justify-between rounded-lg bg-white px-4 my-2 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+          class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
           data-testid="mobile-channel-nav-dropdown"
         >
           <div class="flex items-center space-x-2">

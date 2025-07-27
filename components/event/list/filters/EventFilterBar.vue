@@ -298,7 +298,7 @@
 </script>
 
 <template>
-  <div class="mx-4 mt-2 flex-1 flex-col space-y-1 dark:text-white">
+  <div class="mx-4 mt-1 flex-1 flex-col space-y-1 dark:text-white">
     <div class="mb-2 flex justify-end">
       <button
         v-if="allowHidingMainFilters"
@@ -334,7 +334,7 @@
     >
     <div
       v-if="showMainFilters"
-      class="flex flex-col gap-2 rounded-lg p-4 dark:bg-gray-800"
+      class="flex flex-col gap-2 rounded-lg p-2 dark:bg-gray-800"
       :class="[allowHidingMainFilters ? 'border border-gray-400 dark:border-gray-600' : '']"
     >
       <div
