@@ -249,7 +249,7 @@ const isExpanded = computed(() => {
           :class="
             showFilters
               ? 'border-orange-500'
-              : 'text-gray-800 border-gray-800 dark:border-gray-600 dark:text-gray-300'
+              : 'text-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-300'
           "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
           @click="
@@ -266,7 +266,7 @@ const isExpanded = computed(() => {
           :class="
             showSearch
               ? 'border-orange-500'
-              : 'text-gray-800 border-gray-800 dark:border-gray-600 dark:text-gray-300'
+              : 'text-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-300'
           "
           class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-800 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
           @click="

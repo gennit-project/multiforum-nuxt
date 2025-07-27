@@ -45,14 +45,14 @@ defineEmits(["filterByTag"]);
       <div>
         <h3
           v-if="channel.displayName"
-          class="font-bold text-gray-700 dark:text-gray-200"
+          class="font-bold text-gray-700 dark:text-gray-200 break-words"
         >
           <HighlightedSearchTerms
             :text="channel.displayName"
             :search-input="searchInput"
           />
         </h3>
-        <p class="text-gray-400 dark:text-gray-300 text-sm">
+        <p class="text-gray-400 dark:text-gray-300 text-sm break-words">
           <HighlightedSearchTerms
             :text="channel.uniqueName"
             :search-input="searchInput"
@@ -62,7 +62,7 @@ defineEmits(["filterByTag"]);
     </nuxt-link>
     <p
       v-if="channel.description"
-      class="text-gray-500 dark:text-gray-400 text-sm mb-2"
+      class="text-gray-500 dark:text-gray-400 text-sm mb-2 break-words"
     >
       <HighlightedSearchTerms
         :text="channel.description"
