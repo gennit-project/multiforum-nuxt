@@ -29,16 +29,19 @@ Note: The screenshots below are more recently updated than the video.
 
 ## Overview
 
-Each forum has two sections, a discussion section and a calendar. In the discussion section, content
-can be upvoted so that the best content rises to the top. In the event section, anyone can post
-an event that participants in the community may be interested in.
+Each forum has three main sections that enable different types of community interaction:
 
-Events can be submitted to multiple forums to increase visibility of them and
-help promote them. The same can be done with text-based discussion posts.
+**Discussions**: A social content system where community members can share posts, ask questions, and engage in conversations. Content can be upvoted so that the best contributions rise to the top, helping surface the most valuable information for the community.
 
-To solve the problem where you're bored on the weekend but you don't know what to do in your area, events can be searched across multiple forums based on location, tags and keyword. Screenshots are below.
+**Calendar**: A collaborative event management system where anyone can post events that community participants may be interested in. Events can be submitted to multiple forums simultaneously to increase visibility and help with promotion.
 
-When the project is finished, I will add documentation so that anyone can deploy their own Multiforum with custom branding.
+**Wikis**: A collaborative knowledge base system where community members can create, edit, and maintain shared documentation. Each wiki page includes full revision history, allowing users to track changes over time and compare different versions using a built-in diff viewer. Forum owners can enable or disable the wiki feature based on their community's needs.
+
+All content types (discussions, events, and wiki pages) support cross-posting capabilities, allowing content to be shared across multiple forums to maximize reach and engagement.
+
+For location-based communities, the platform includes powerful discovery features: events can be searched across multiple forums based on location, tags, and keywords, solving the common problem of not knowing what activities are available in your area.
+
+When the project is finished, documentation will be added so that anyone can deploy their own Multiforum instance with custom branding.
 
 ## New feature July 2025 - Wikis
 
@@ -58,7 +61,7 @@ Here's how it looks when you edit a wiki page:
 
 Here's how it looks when you edit a wiki page in full screen mode (after clicking the box in the top right of the text editor):
 
-![wiki edit fullscreen](./screenshots/wiki-edit-fullscreen)
+![wiki edit fullscreen](./screenshots/wiki-edit-fullscreen.png)
 
 If you click 'see edits' you can see the revision history of a wiki page:
 
