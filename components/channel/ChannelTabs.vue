@@ -228,28 +228,29 @@
 
     <!-- Mobile Dropdown (sm and down) -->
     <div v-else class="relative">
-      <Popper>
-        <button
-          class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-          data-testid="mobile-channel-nav-dropdown"
-        >
-          <div class="flex items-center space-x-2">
-            <component
-              :is="activeTab.icon"
-              class="h-5 w-5 shrink-0"
-            />
-            <span>{{ activeTab.label }}</span>
-            <span
-              v-if="showCounts && activeTab.countProperty && channel[activeTab.countProperty]?.count"
-              class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
-            >
-              {{ channel[activeTab.countProperty]?.count }}
-            </span>
-          </div>
-          <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"/>
-        </button>
+      <ClientOnly>
+        <Popper>
+          <button
+            class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+            data-testid="mobile-channel-nav-dropdown"
+          >
+            <div class="flex items-center space-x-2">
+              <component
+                :is="activeTab.icon"
+                class="h-5 w-5 shrink-0"
+              />
+              <span>{{ activeTab.label }}</span>
+              <span
+                v-if="showCounts && activeTab.countProperty && channel[activeTab.countProperty]?.count"
+                class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
+              >
+                {{ channel[activeTab.countProperty]?.count }}
+              </span>
+            </div>
+            <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"/>
+          </button>
 
-        <template #content>
+          <template #content>
           <div class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-600">
             <div class="py-1">
               <nuxt-link
@@ -282,6 +283,29 @@
           </div>
         </template>
       </Popper>
+      <template #fallback>
+        <!-- Fallback content for SSR - show a simple button that doesn't work but looks right -->
+        <button
+          class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+          data-testid="mobile-channel-nav-dropdown"
+        >
+          <div class="flex items-center space-x-2">
+            <component
+              :is="activeTab.icon"
+              class="h-5 w-5 shrink-0"
+            />
+            <span>{{ activeTab.label }}</span>
+            <span
+              v-if="showCounts && activeTab.countProperty && channel[activeTab.countProperty]?.count"
+              class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
+            >
+              {{ channel[activeTab.countProperty]?.count }}
+            </span>
+          </div>
+          <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"/>
+        </button>
+      </template>
+      </ClientOnly>
     </div>
   </div>
 </template>
