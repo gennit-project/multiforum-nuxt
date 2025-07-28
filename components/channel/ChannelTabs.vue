@@ -15,7 +15,9 @@
   import { useQuery } from "@vue/apollo-composable";
   import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
   import { config } from "@/config";
-  import Popper from "vue3-popper";
+  // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
+  import { defineAsyncComponent } from 'vue';
+  const Popper = defineAsyncComponent(() => import("vue3-popper"));
 
   type Tab = {
     name: string;

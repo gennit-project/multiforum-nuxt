@@ -19,7 +19,9 @@
   import FilterChip from "@/components/FilterChip.vue";
   import SelectCanceled from "./SelectCanceled.vue";
   import SelectFree from "./SelectFree.vue";
-  import Popper from "vue3-popper";
+  // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
+  import { defineAsyncComponent } from 'vue';
+  const Popper = defineAsyncComponent(() => import("vue3-popper"));
   import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
   import SearchableForumList from "@/components/channel/SearchableForumList.vue";
   import SearchableTagList from "@/components/SearchableTagList.vue";
