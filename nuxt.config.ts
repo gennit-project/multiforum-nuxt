@@ -249,6 +249,7 @@ export default defineNuxtConfig({
     }
   },
   plugins: [
+    { src: "@/plugins/polyfills.client", mode: "client" },
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },
@@ -285,6 +286,9 @@ export default defineNuxtConfig({
         "@": path.resolve(__dirname),
         "fast-deep-equal": "fast-deep-equal/es6/index.js",
       },
+    },
+    define: {
+      global: 'globalThis',
     },
     vue: {
       template: {

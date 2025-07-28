@@ -67,6 +67,7 @@
     "pinia": "^3.0.2",
     "prismjs": "^1.30.0",
     "random-word-slugs": "^0.1.7",
+    "regenerator-runtime": "^0.14.1",
     "roboto-fontface": "*",
     "swiper": "^11.2.6",
     "three": "^0.176.0",

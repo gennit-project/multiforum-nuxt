@@ -4,7 +4,6 @@ import { DateTime } from "luxon";
 import { getDatePieces } from "@/utils";
 import Tag from "@/components/TagComponent.vue";
 import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import type { PropType } from "vue";
 import type { Event } from "@/__generated__/graphql";
@@ -87,17 +86,6 @@ const eventDetailOptions = computed(() => {
       event: "",
     };
   }).sort((a, b) => b.label.localeCompare(a.label));
-});
-
-const truncatedDescription = computed(() => {
-  if (!props.event.description) {
-    return "";
-  }
-
-  if (props.event.description.length > 200) {
-    return props.event.description.slice(0, 500) + "...";
-  }
-  return props.event.description;
 });
 
 const isWithinChannel = props.currentChannelId ? true : false;
@@ -221,7 +209,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         :src="event.coverImageURL"
         alt="Event cover image"
         class="mb-4 max-h-48 rounded-lg block md:hidden"
-      />
+      >
       <!-- Title and image section for medium+ screens -->
       <div class="hidden md:flex md:items-start md:gap-4">
         <div class="flex-1">
@@ -312,7 +300,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-32 w-32 rounded-lg"
-          />
+          >
         </div>
       </div>
       <!-- Title section for small screens -->

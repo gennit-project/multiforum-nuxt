@@ -108,9 +108,6 @@
 
   const { smAndDown, mdAndUp } = useDisplay();
   
-  // State for mobile dropdown
-  const isDropdownOpen = ref(false);
-  
   // Find the current active tab
   const activeTab = computed(() => {
     return tabs.value.find(tab => route.path.includes(tab.routeSuffix)) || tabs.value[0];
@@ -247,7 +244,7 @@
               {{ channel[activeTab.countProperty]?.count }}
             </span>
           </div>
-          <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"></i>
+          <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"/>
         </button>
 
         <template #content>
