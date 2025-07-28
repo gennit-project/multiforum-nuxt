@@ -10,12 +10,12 @@ import type { WikiPage, TextVersion } from "@/__generated__/graphql";
 import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
 
-// Import CodeDiff dynamically to avoid SSR issues
-const CodeDiff = defineAsyncComponent(() => 
-  import('v-code-diff').then(module => ({
-    default: module.CodeDiff
-  }))
-);
+// TEMPORARILY COMMENTED OUT FOR TESTING - Import CodeDiff dynamically to avoid SSR issues
+// const CodeDiff = defineAsyncComponent(() => 
+//   import('v-code-diff').then(module => ({
+//     default: module.CodeDiff
+//   }))
+// );
 
 // Define type for revision data
 interface WikiRevisionData {
@@ -344,9 +344,9 @@ useHead({
           </div>
         </div>
         
-        <!-- V-Code-Diff Component -->
+        <!-- TEMPORARILY COMMENTED OUT FOR TESTING - V-Code-Diff Component -->
         <div class="min-h-[400px]">
-          <ClientOnly>
+          <!-- <ClientOnly>
             <CodeDiff
               :key="`${revisionId}-${outputFormat}-${diffTheme}`"
               :old-string="oldContent"
@@ -365,7 +365,24 @@ useHead({
                 </div>
               </div>
             </template>
-          </ClientOnly>
+          </ClientOnly> -->
+          
+          <!-- TEMPORARY PLACEHOLDER -->
+          <div class="flex items-center justify-center h-96 text-gray-500 dark:text-gray-400">
+            <div class="text-center">
+              <p class="text-lg mb-4">Diff viewer temporarily disabled for testing</p>
+              <div class="text-left bg-gray-100 dark:bg-gray-800 p-4 rounded max-w-2xl">
+                <div class="mb-4">
+                  <h4 class="font-semibold mb-2">Old Version:</h4>
+                  <pre class="whitespace-pre-wrap text-sm">{{ oldContent }}</pre>
+                </div>
+                <div>
+                  <h4 class="font-semibold mb-2">New Version:</h4>
+                  <pre class="whitespace-pre-wrap text-sm">{{ newContent }}</pre>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
