@@ -249,7 +249,6 @@ export default defineNuxtConfig({
     }
   },
   plugins: [
-    { src: "@/plugins/polyfills", mode: "all" },
     { src: "@/plugins/pinia", mode: "all" },
     { src: "@/plugins/google-maps", mode: "client" },
     { src: "@/plugins/vuetify", mode: "all" },
