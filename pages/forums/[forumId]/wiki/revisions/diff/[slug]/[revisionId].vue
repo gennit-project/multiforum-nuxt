@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref, defineAsyncComponent } from "vue";
 import { useRoute, useRouter, useHead } from "nuxt/app";
 import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
 import { useQuery, useMutation } from "@vue/apollo-composable";
@@ -9,6 +9,13 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
 import type { WikiPage, TextVersion } from "@/__generated__/graphql";
 import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
+
+// Import CodeDiff dynamically to avoid SSR issues
+const CodeDiff = defineAsyncComponent(() => 
+  import('v-code-diff').then(module => ({
+    default: module.CodeDiff
+  }))
+);
 
 // Define type for revision data
 interface WikiRevisionData {

@@ -114,7 +114,7 @@
       {
         key: "owners",
         label: "Forum Admins",
-        icon: null,
+        icon: null as any,
         fontAwesome: "fa-solid fa-user-shield",
       },
       {

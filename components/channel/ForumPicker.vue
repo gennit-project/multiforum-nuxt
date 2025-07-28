@@ -53,7 +53,7 @@ const channelOptions = computed<MultiSelectOption[]>(() => {
   
   // Always include selected channels in options, even if they don't match current search
   // This ensures selected chips can always be displayed
-  const existingChannelValues = new Set(mappedChannels.map(ch => ch.value));
+  const existingChannelValues = new Set(mappedChannels.map((ch: any) => ch.value));
   
   // Add any selected channels that aren't in the current search results
   (props.selectedChannels || []).forEach(selectedValue => {
