@@ -335,6 +335,11 @@ const resetZoom = () => {
 // Keyboard navigation
 const handleKeyDown = (e: KeyboardEvent) => {
   if (isLightboxOpen.value) {
+    // Don't handle keyboard shortcuts when editing a caption
+    if (editingCaptionIndex.value !== -1) {
+      return;
+    }
+    
     if (e.key === "Escape") {
       closeLightbox();
     } else if (e.key === "ArrowRight") {
@@ -988,7 +993,7 @@ v-if="editingCaptionIndex === idx"
           </button>
           <div
 v-if="editingCaptionIndex === lightboxIndex" 
-               class="mb-4 pb-2 pr-6"
+               class="mb-4 pb-2 mt-8"
                @click.stop
                @mousedown.stop
                @touchstart.stop

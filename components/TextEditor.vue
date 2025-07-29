@@ -644,7 +644,7 @@ const exitFullScreen = () => {
             Preview
           </Tab>
         </div>
-        <div v-if="!showFormatted" class="flex items-center space-x-1">
+        <div v-if="!showFormatted" class="flex items-center space-x-1 flex-wrap">
           <button
             v-for="button in formatButtons"
             :key="button.label"
