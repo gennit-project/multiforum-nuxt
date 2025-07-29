@@ -430,13 +430,7 @@ const handleEditAlbum = () => {
                         </div>
                       </template>
                       <template #activity-feed-slot>
-                        <DiscussionTitleVersions
-                          v-if="
-                            discussion?.PastTitleVersions &&
-                            discussion.PastTitleVersions.length > 0
-                          "
-                          :discussion="discussion"
-                        />
+                        <!-- Title Edit History moved to Description tab for downloads -->
                       </template>
                       <template #mark-answered-slot>
                         <MarkAsAnsweredButton
