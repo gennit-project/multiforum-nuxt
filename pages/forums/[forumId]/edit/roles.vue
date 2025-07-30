@@ -67,5 +67,8 @@ const serverConfig = computed(() => {
         :permissions="serverConfig.DefaultSuspendedModRole"
       />
     </div>
+    <div v-else class="text-center py-12">
+      <p class="text-gray-500 dark:text-gray-400">Could not find the server config data.</p>
+    </div>
   </div>
 </template>
