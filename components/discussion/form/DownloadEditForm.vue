@@ -313,6 +313,9 @@ const uploadFile = async (file: File): Promise<boolean> => {
       priceCurrency: createdFile.priceCurrency || "USD"
     });
     
+    // Auto-save after successful file upload
+    handleSave();
+    
     return true;
   } catch (err) {
     console.error("Error uploading file and creating downloadable file:", err);
@@ -372,6 +375,8 @@ const getFileKind = (file: File): string => {
 // Remove file
 const removeFile = (index: number) => {
   formValues.value.downloadableFiles.splice(index, 1);
+  // Auto-save after file removal
+  handleSave();
 };
 
 // Update license
@@ -619,14 +624,6 @@ function handleSave() {
         </template>
       </FormRow>
       
-      <div class="flex align-items gap-2 justify-end mt-4">
-        <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
-        <PrimaryButton
-          :label="'Save Download'"
-          :loading="updateDiscussionLoading && !isCreateMode"
-          @click="handleSave"
-        />
-      </div>
     </div>
     
     <ErrorBanner
