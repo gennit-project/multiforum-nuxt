@@ -27,11 +27,10 @@
   
   const activeRevision = ref<RevisionData | null>(null);
 
-  // Total number of edits - title versions + body versions
+  // Total number of edits - body versions only (title edits are handled separately)
   const totalEdits = computed(() => {
-    const titleEdits = props.discussion?.PastTitleVersions?.length || 0;
     const bodyEdits = props.discussion?.PastBodyVersions?.length || 0;
-    return titleEdits + bodyEdits;
+    return bodyEdits;
   });
 
   // Check if there are any edits to show (need at least 1 past version, meaning it has been edited)
@@ -39,11 +38,11 @@
     return totalEdits.value >= 1;
   });
 
-  // Combine both types of edits and sort by timestamp (newest first)
+  // Get body edits only (title edits are handled by separate DiscussionTitleVersions component)
   const allEdits = computed(() => {
     const edits: RevisionData[] = [];
 
-    // Add body revisions
+    // Add body revisions only
     if (props.discussion?.PastBodyVersions?.length) {
       // Create current version entry
       const currentVersion = {
@@ -70,34 +69,8 @@
       });
     }
 
-    // Add title revisions
-    if (props.discussion?.PastTitleVersions?.length) {
-      // Add past title versions
-      props.discussion.PastTitleVersions.forEach((version, index) => {
-        const nextVersion =
-          index === 0
-            ? {
-                id: "current",
-                title: props.discussion.title,
-                Author: props.discussion.Author,
-                createdAt: props.discussion.updatedAt || props.discussion.createdAt,
-              }
-            : props.discussion.PastTitleVersions[index - 1];
-
-        edits.push({
-          id: version.id,
-          type: "title" as const,
-          author: version.Author?.username || "[Deleted]",
-          createdAt: version.createdAt,
-          isCurrent: false,
-          oldVersion: version,
-          newVersion: nextVersion,
-        });
-      });
-    }
-
-    // Sort by date (oldest first - chronological order)
-    return edits.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+    // Sort by date (newest first - most recent at top)
+    return edits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   });
 
   // Toggle dropdown
@@ -176,16 +149,7 @@
           <div class="flex flex-col">
             <div class="flex items-center text-sm">
               <span class="font-medium text-gray-900 dark:text-gray-200">{{ edit.author }}</span>
-              <span
-                v-if="edit.type === 'title'"
-                class="ml-1 text-xs text-gray-500 dark:text-gray-400"
-                >(title)</span
-              >
-              <span
-                v-else
-                class="ml-1 text-xs text-gray-500 dark:text-gray-400"
-                >(body)</span
-              >
+              <span class="ml-1 text-xs text-gray-500 dark:text-gray-400">(body)</span>
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               {{ timeAgo(new Date(edit.createdAt)) }}
@@ -196,7 +160,7 @@
                 (Current)
               </span>
               <span
-                v-else-if="edit === allEdits[allEdits.length - 1]"
+                v-else-if="edit === allEdits[0]"
                 class="ml-1 text-orange-600 dark:text-orange-400"
               >
                 Most recent
@@ -213,7 +177,7 @@
       :open="!!activeRevision"
       :old-version="activeRevision.oldVersion"
       :new-version="activeRevision.newVersion"
-      :is-most-recent="activeRevision === allEdits[allEdits.length - 1]"
+      :is-most-recent="activeRevision === allEdits[0]"
       @close="closeRevisionDiff"
       @deleted="handleRevisionDeleted"
     />

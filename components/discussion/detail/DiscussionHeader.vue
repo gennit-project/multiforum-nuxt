@@ -316,7 +316,7 @@ const authorIsMod = computed(
           <EditsDropdown
             v-if="
               discussion &&
-              ((discussion.PastTitleVersions?.length ?? 0) > 0 || (discussion.PastBodyVersions?.length ?? 0) > 0)
+              (discussion.PastBodyVersions?.length ?? 0) > 0
             "
             class="ml-2"
             :discussion="discussion"
