@@ -267,6 +267,25 @@ const discussionAuthor = computed(
   () => discussion.value?.Author?.username || ""
 );
 
+// Check if discussion has downloadable .stl files
+const stlFiles = computed(() => {
+  if (!discussion.value?.DownloadableFiles) return [];
+  
+  return discussion.value.DownloadableFiles.filter(file => 
+    file.fileName?.toLowerCase().endsWith('.stl') || 
+    file.url?.toLowerCase().endsWith('.stl')
+  );
+});
+
+// Check if discussion should show album (has images OR .stl files)
+const shouldShowAlbum = computed(() => {
+  const hasImages = discussion.value?.Album?.Images && 
+                   discussion.value.Album.Images.length > 0;
+  const hasStlFiles = stlFiles.value.length > 0;
+  
+  return hasImages || hasStlFiles;
+});
+
 const handleClickGiveFeedback = () => {
   showFeedbackFormModal.value = true;
 };
@@ -395,18 +414,15 @@ const handleEditAlbum = () => {
                       <template #album-slot>
                         <div class="bg-black text-white">
                           <DiscussionAlbum
-                            v-if="
-                              discussion?.Album &&
-                              discussion?.Album?.Images &&
-                              discussion?.Album?.Images.length > 0
-                            "
-                            :album="discussion.Album"
+                            v-if="shouldShowAlbum"
+                            :album="discussion?.Album || null"
                             :carousel-format="true"
                             :expanded-view="true"
                             :discussion-author="
                               discussion.Author?.username || ''
                             "
                             :discussion-id="discussionId"
+                            :stl-files="stlFiles"
                             @album-updated="refetchDiscussion"
                             @edit-album="handleEditAlbum"
                           />
@@ -490,15 +506,12 @@ const handleEditAlbum = () => {
                   <template #album-slot>
                     <div class="bg-black text-white">
                       <DiscussionAlbum
-                        v-if="
-                          discussion?.Album &&
-                          discussion?.Album?.Images &&
-                          discussion?.Album?.Images.length > 0
-                        "
-                        :album="discussion.Album"
+                        v-if="shouldShowAlbum"
+                        :album="discussion?.Album || null"
                         :carousel-format="true"
                         :discussion-author="discussion.Author?.username || ''"
                         :discussion-id="discussionId"
+                        :stl-files="stlFiles"
                         @album-updated="refetchDiscussion"
                         @edit-album="handleEditAlbum"
                       />

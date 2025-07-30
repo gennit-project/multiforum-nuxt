@@ -19,8 +19,9 @@ import StlViewer from "@/components/download/StlViewer.vue";
 
 const props = defineProps({
   album: {
-    type: Object as PropType<Album>,
-    required: true,
+    type: Object as PropType<Album | null>,
+    required: false,
+    default: null,
   },
   carouselFormat: {
     type: Boolean,
@@ -46,6 +47,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  stlFiles: {
+    type: Array as PropType<Array<{ id?: string; url: string; fileName?: string }>>,
+    default: () => [],
+  },
 });
 
 // Use Vuetify's display utilities for responsive design
@@ -59,34 +64,47 @@ const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 
 const orderedImages = computed(() => {  
-  if (!props.album) {
-    console.log('DiscussionAlbum: No album prop');
-    return [];
-  }
+  // Start with album images if they exist
+  let albumImages: any[] = [];
   
-  console.log('DiscussionAlbum: Album data:', {
-    album: props.album,
-    images: props.album.Images,
-    imageOrder: props.album.imageOrder,
-    imagesLength: props.album.Images?.length,
-    imageOrderLength: props.album.imageOrder?.length
-  });
-  
-  if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
-    console.log('DiscussionAlbum: No imageOrder, using Images directly');
-    return props.album.Images || [];
-  }
-  
-  const orderedResult = props.album.imageOrder
-    .map((imageId) => {
-      const foundImage = props.album.Images?.find((image) => image.id === imageId);
-      console.log(`DiscussionAlbum: Looking for image ${imageId}, found:`, foundImage);
-      return foundImage;
-    })
-    .filter((image) => image !== undefined);
+  if (props.album) {
+    console.log('DiscussionAlbum: Album data:', {
+      album: props.album,
+      images: props.album.Images,
+      imageOrder: props.album.imageOrder,
+      imagesLength: props.album.Images?.length,
+      imageOrderLength: props.album.imageOrder?.length
+    });
     
-  console.log('DiscussionAlbum: Final ordered images:', orderedResult);
-  return orderedResult;
+    if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
+      console.log('DiscussionAlbum: No imageOrder, using Images directly');
+      albumImages = props.album.Images || [];
+    } else {
+      albumImages = props.album.imageOrder
+        .map((imageId) => {
+          const foundImage = props.album?.Images?.find((image) => image.id === imageId);
+          console.log(`DiscussionAlbum: Looking for image ${imageId}, found:`, foundImage);
+          return foundImage;
+        })
+        .filter((image) => image !== undefined);
+    }
+  }
+  
+  // Create synthetic "image" objects for STL files
+  const stlAsImages = props.stlFiles.map((stlFile, index) => ({
+    id: `stl-${stlFile.id || index}`,
+    url: stlFile.url,
+    alt: stlFile.fileName || `3D Model ${index + 1}`,
+    caption: stlFile.fileName || `3D Model: ${stlFile.fileName}`,
+    isStlFile: true,
+    fileName: stlFile.fileName,
+  }));
+  
+  // Combine album images with STL files
+  const allImages = [...albumImages, ...stlAsImages];
+  
+  console.log('DiscussionAlbum: Final ordered images (including STL):', allImages);
+  return allImages;
 });
 
 // Current image based on ordered images

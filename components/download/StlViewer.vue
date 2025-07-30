@@ -1,5 +1,9 @@
 <template>
-  <div class="stl-viewer-container" ref="container">
+  <div 
+    ref="container" 
+    class="stl-container"
+    :style="{ width: width + 'px', height: height + 'px' }"
+  >
     <div v-if="loading" class="loading-overlay">
       Loading 3D model...
     </div>
@@ -9,255 +13,202 @@
   </div>
 </template>
 
-<script>
-import { markRaw } from 'vue';
+<script setup>
+import { onMounted, ref, watch, onBeforeUnmount } from 'vue'
+import * as THREE from 'three'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
-export default {
-  name: 'StlViewer',
-  props: {
-    src: {
-      type: String,
-      required: true
+const props = defineProps({
+  src: {
+    type: String,
+    required: true
+  },
+  width: {
+    type: Number,
+    default: 400
+  },
+  height: {
+    type: Number,
+    default: 400
+  },
+  modelColor: {
+    type: String,
+    default: '#607d8b'
+  },
+  backgroundColor: {
+    type: String,
+    default: '#f0f0f0'
+  },
+  autoRotate: {
+    type: Boolean,
+    default: false
+  },
+  showGrid: {
+    type: Boolean,
+    default: false
+  }
+})
+
+const emit = defineEmits(['load', 'progress', 'error'])
+
+const container = ref(null)
+const loading = ref(true)
+const error = ref(null)
+
+let scene, camera, renderer, controls, animationId
+
+function initViewer(stlUrl) {
+  if (!container.value) return
+  
+  loading.value = true
+  error.value = null
+  
+  scene = new THREE.Scene()
+  scene.background = new THREE.Color(props.backgroundColor)
+
+  camera = new THREE.PerspectiveCamera(45, props.width / props.height, 0.1, 1000)
+  camera.position.set(3, 3, 3)
+
+  renderer = new THREE.WebGLRenderer({ antialias: true })
+  renderer.setSize(props.width, props.height)
+  container.value.appendChild(renderer.domElement)
+
+  controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.dampingFactor = 0.05
+  controls.autoRotate = props.autoRotate
+  controls.autoRotateSpeed = 2
+
+  const ambientLight = new THREE.AmbientLight(0x999999)
+  scene.add(ambientLight)
+
+  const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
+  directionalLight.position.set(5, 10, 7.5)
+  scene.add(directionalLight)
+
+  // Grid (optional)
+  if (props.showGrid) {
+    const gridHelper = new THREE.GridHelper(200, 20)
+    scene.add(gridHelper)
+  }
+
+  const loader = new STLLoader()
+  loader.load(
+    stlUrl, 
+    geometry => {
+      const material = new THREE.MeshStandardMaterial({ color: props.modelColor })
+      const mesh = new THREE.Mesh(geometry, material)
+
+      geometry.computeBoundingBox()
+      const center = new THREE.Vector3()
+      geometry.boundingBox.getCenter(center)
+      mesh.position.sub(center) // center the object
+
+      scene.add(mesh)
+      
+      // Adjust camera position based on object size
+      const box = new THREE.Box3().setFromObject(mesh)
+      const size = box.getSize(new THREE.Vector3())
+      const maxDim = Math.max(size.x, size.y, size.z)
+      const fov = camera.fov * (Math.PI / 180)
+      const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5
+      
+      camera.position.set(distance, distance, distance)
+      camera.lookAt(0, 0, 0)
+      controls.update()
+      
+      loading.value = false
+      emit('load', { geometry, mesh })
     },
-    width: {
-      type: Number,
-      default: 400
+    progress => {
+      const percent = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0
+      emit('progress', percent)
     },
-    height: {
-      type: Number,
-      default: 400
-    },
-    modelColor: {
-      type: String,
-      default: '#0066ff'
-    },
-    backgroundColor: {
-      type: String,
-      default: '#f0f0f0'
-    },
-    autoRotate: {
-      type: Boolean,
-      default: false
-    },
-    showGrid: {
-      type: Boolean,
-      default: true
+    loadError => {
+      console.error('Error loading STL:', loadError)
+      error.value = 'Failed to load 3D model'
+      loading.value = false
+      emit('error', loadError)
     }
-  },
-  data() {
-    return {
-      loading: true,
-      error: null,
-      scene: null,
-      camera: null,
-      renderer: null,
-      controls: null,
-      mesh: null,
-      THREE: null,
-      STLLoader: null,
-      OrbitControls: null
-    };
-  },
-  async mounted() {
-    await this.loadThreeJS();
-    this.initViewer();
-    this.loadModel();
-  },
-  beforeUnmount() {
-    this.cleanup();
-  },
-  watch: {
-    src(_newSrc) {
-      this.loadModel();
-    }
-  },
-  methods: {
-    async loadThreeJS() {
-      try {
-        const [
-          THREE,
-          { STLLoader },
-          { OrbitControls }
-        ] = await Promise.all([
-          import('three'),
-          import('three/examples/jsm/loaders/STLLoader'),
-          import('three/examples/jsm/controls/OrbitControls')
-        ]);
-        
-        this.THREE = THREE;
-        this.STLLoader = STLLoader;
-        this.OrbitControls = OrbitControls;
-      } catch (error) {
-        console.error('Error loading Three.js modules:', error);
-        this.error = 'Failed to load 3D rendering engine';
-        this.loading = false;
-      }
-    },
-    
-    initViewer() {
-      const container = this.$refs.container;
-      
-      // Scene
-      this.scene = markRaw(new this.THREE.Scene());
-      this.scene.background = new this.THREE.Color(this.backgroundColor);
-      
-      // Camera
-      this.camera = markRaw(new this.THREE.PerspectiveCamera(
-        50,
-        this.width / this.height,
-        0.1,
-        1000
-      ));
-      
-      // Renderer
-      this.renderer = markRaw(new this.THREE.WebGLRenderer({ antialias: true }));
-      this.renderer.setSize(this.width, this.height);
-      this.renderer.shadowMap.enabled = true;
-      container.appendChild(this.renderer.domElement);
-      
-      // Lights
-      const ambientLight = markRaw(new this.THREE.AmbientLight(0xffffff, 0.6));
-      this.scene.add(ambientLight);
-      
-      const directionalLight = markRaw(new this.THREE.DirectionalLight(0xffffff, 0.4));
-      directionalLight.position.set(10, 10, 10);
-      directionalLight.castShadow = true;
-      this.scene.add(directionalLight);
-      
-      // Controls
-      this.controls = markRaw(new this.OrbitControls(this.camera, this.renderer.domElement));
-      this.controls.enableDamping = true;
-      this.controls.dampingFactor = 0.05;
-      this.controls.autoRotate = this.autoRotate;
-      this.controls.autoRotateSpeed = 2;
-      
-      // Grid
-      if (this.showGrid) {
-        const gridHelper = markRaw(new this.THREE.GridHelper(200, 20));
-        this.scene.add(gridHelper);
-      }
-      
-      // Start animation
-      this.animate();
-    },
-    
-    loadModel() {
-      this.loading = true;
-      this.error = null;
-      
-      // Remove existing mesh
-      if (this.mesh) {
-        this.scene.remove(this.mesh);
-        this.mesh.geometry.dispose();
-        this.mesh.material.dispose();
-      }
-      
-      const loader = new this.STLLoader();
-      
-      loader.load(
-        this.src,
-        (geometry) => {
-          // Center geometry
-          geometry.computeBoundingBox();
-          const center = geometry.boundingBox.getCenter(new this.THREE.Vector3());
-          geometry.translate(-center.x, -center.y, -center.z);
-          
-          // Create mesh
-          const material = markRaw(new this.THREE.MeshPhongMaterial({
-            color: this.modelColor,
-            specular: 0x111111,
-            shininess: 200
-          }));
-          
-          this.mesh = markRaw(new this.THREE.Mesh(geometry, material));
-          this.mesh.castShadow = true;
-          this.mesh.receiveShadow = true;
-          this.scene.add(this.mesh);
-          
-          // Adjust camera
-          const box = new this.THREE.Box3().setFromObject(this.mesh);
-          const size = box.getSize(new this.THREE.Vector3());
-          const maxDim = Math.max(size.x, size.y, size.z);
-          const fov = this.camera.fov * (Math.PI / 180);
-          const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
-          
-          this.camera.position.set(distance, distance, distance);
-          this.camera.lookAt(0, 0, 0);
-          this.controls.update();
-          
-          this.loading = false;
-          this.$emit('load', { geometry, mesh: this.mesh });
-        },
-        (progress) => {
-          const percent = (progress.loaded / progress.total) * 100;
-          this.$emit('progress', percent);
-        },
-        (error) => {
-          console.error('Error loading STL:', error);
-          this.error = 'Failed to load 3D model';
-          this.loading = false;
-          this.$emit('error', error);
-        }
-      );
-    },
-    
-    animate() {
-      if (!this.renderer) return;
-      
-      requestAnimationFrame(() => this.animate());
-      
-      this.controls.update();
-      this.renderer.render(this.scene, this.camera);
-    },
-    
-    cleanup() {
-      if (this.renderer) {
-        this.renderer.dispose();
-        if (this.$refs.container && this.$refs.container.contains(this.renderer.domElement)) {
-          this.$refs.container.removeChild(this.renderer.domElement);
-        }
-      }
-      
-      if (this.mesh) {
-        this.mesh.geometry.dispose();
-        this.mesh.material.dispose();
-      }
-      
-      this.scene = null;
-      this.camera = null;
-      this.renderer = null;
-      this.controls = null;
-      this.mesh = null;
-    },
-    
-    // Public methods
-    resetCamera() {
-      if (this.camera && this.controls && this.mesh) {
-        const box = new this.THREE.Box3().setFromObject(this.mesh);
-        const size = box.getSize(new this.THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const fov = this.camera.fov * (Math.PI / 180);
-        const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
-        
-        this.camera.position.set(distance, distance, distance);
-        this.camera.lookAt(0, 0, 0);
-        this.controls.update();
-      }
-    },
-    
-    setAutoRotate(value) {
-      if (this.controls) {
-        this.controls.autoRotate = value;
-      }
+  )
+
+  animate()
+}
+
+function animate() {
+  animationId = requestAnimationFrame(animate)
+  controls.update()
+  renderer.render(scene, camera)
+}
+
+function cleanup() {
+  if (animationId) {
+    cancelAnimationFrame(animationId)
+  }
+  if (renderer) {
+    renderer.dispose()
+  }
+  if (controls) {
+    controls.dispose()
+  }
+  while (container.value?.firstChild) {
+    container.value.removeChild(container.value.firstChild)
+  }
+}
+
+onMounted(() => {
+  if (props.src) {
+    initViewer(props.src)
+  }
+})
+
+onBeforeUnmount(() => {
+  cleanup()
+})
+
+watch(() => props.src, (newUrl, oldUrl) => {
+  if (newUrl !== oldUrl) {
+    cleanup()
+    if (newUrl) {
+      initViewer(newUrl)
     }
   }
-};
+})
+
+// Exposed methods for parent components
+defineExpose({
+  resetCamera: () => {
+    if (camera && controls && scene.children.find(child => child.isMesh)) {
+      const mesh = scene.children.find(child => child.isMesh)
+      const box = new THREE.Box3().setFromObject(mesh)
+      const size = box.getSize(new THREE.Vector3())
+      const maxDim = Math.max(size.x, size.y, size.z)
+      const fov = camera.fov * (Math.PI / 180)
+      const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5
+      
+      camera.position.set(distance, distance, distance)
+      camera.lookAt(0, 0, 0)
+      controls.update()
+    }
+  },
+  setAutoRotate: (value) => {
+    if (controls) {
+      controls.autoRotate = value
+    }
+  }
+})
 </script>
 
 <style scoped>
-.stl-viewer-container {
+.stl-container {
+  overflow: hidden;
   position: relative;
   display: inline-block;
+}
+
+canvas {
+  display: block;
 }
 
 .loading-overlay,
@@ -270,6 +221,7 @@ export default {
   padding: 20px;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
 }
 
 .error-overlay {
