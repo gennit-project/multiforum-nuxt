@@ -93,6 +93,11 @@ const updateFilterGroups = (filterGroups: FilterGroup[]) => {
       <ErrorBanner :text="'Unable to load server configuration: ' + serverConfigError.message" />
     </div>
     
+    <!-- Empty State -->
+    <div v-else-if="!serverConfig" class="text-center py-12">
+      <p class="text-gray-500 dark:text-gray-400">Could not find the server config data.</p>
+    </div>
+    
     <!-- Main Content -->
     <div v-else>
       <div>
