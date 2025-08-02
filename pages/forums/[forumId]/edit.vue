@@ -179,19 +179,33 @@ const hasError = computed(() => {
           <p class="text-sm mt-2">{{ getChannelError?.message || updateChannelError?.message }}</p>
         </div>
         
-        <CreateEditChannelFields
-          v-if="!hasError"
-          :key="dataLoaded.toString()"
-          :edit-mode="true"
-          :channel-loading="getChannelLoading"
-          :get-channel-error="getChannelError"
-          :update-channel-error="updateChannelError"
-          :edit-channel-loading="editChannelLoading"
-          :form-values="formValues"
-          :owner-list="ownerList"
-          @submit="submit"
-          @update-form-values="updateFormValues"
-        />
+        <ClientOnly>
+          <CreateEditChannelFields
+            v-if="!hasError"
+            :key="dataLoaded.toString()"
+            :edit-mode="true"
+            :channel-loading="getChannelLoading"
+            :get-channel-error="getChannelError"
+            :update-channel-error="updateChannelError"
+            :edit-channel-loading="editChannelLoading"
+            :form-values="formValues"
+            :owner-list="ownerList"
+            @submit="submit"
+            @update-form-values="updateFormValues"
+          />
+          <template #fallback>
+            <div class="p-8 text-center">
+              <div class="animate-pulse">
+                <div class="h-8 bg-gray-200 rounded w-1/4 mb-4 dark:bg-gray-700"></div>
+                <div class="h-4 bg-gray-200 rounded w-1/2 mb-8 dark:bg-gray-700"></div>
+                <div class="space-y-4">
+                  <div class="h-10 bg-gray-200 rounded dark:bg-gray-700"></div>
+                  <div class="h-10 bg-gray-200 rounded dark:bg-gray-700"></div>
+                </div>
+              </div>
+            </div>
+          </template>
+        </ClientOnly>
         <Notification
           v-if="showSavedChangesNotification"
           title="Your changes have been saved."

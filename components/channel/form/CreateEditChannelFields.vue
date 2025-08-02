@@ -142,7 +142,13 @@
 
   const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
 
-  const titleIsInvalid = computed(() => !isValidTitle(props.formValues?.uniqueName || ""));
+  const titleIsInvalid = computed(() => {
+    // In edit mode, don't consider title invalid until we have loaded data
+    if (props.editMode && !props.formValues?.uniqueName) {
+      return false;
+    }
+    return !isValidTitle(props.formValues?.uniqueName || "");
+  });
   const touched = ref(false);
   const titleInputRef = ref<{ focus: () => void } | null>(null);
   const router = useRouter();

@@ -87,11 +87,8 @@
     return usernameVar.value || "";
   });
 
-  // Use a stable client-side check for authentication state
-  const isClientSide = ref(false);
-  onMounted(() => {
-    isClientSide.value = true;
-  });
+  // Since component is now wrapped in ClientOnly, we can directly access auth state
+  const isClientSide = ref(true);
 
   const tabRoutes = computed(() => {
     const routes: TabRoutes = {
@@ -158,42 +155,40 @@
       });
     }
 
-    // Only show auth-dependent tabs after client-side hydration
-    if (isClientSide.value) {
-      const adminList = props.channel.Admins.map((user) => user.username || "");
-      const modList = (props.channel.Moderators ?? []).map((modProfile) => modProfile.displayName);
-      const isAdmin = adminList.includes(loggedInUsername.value);
-      const isMod = modList.includes(modProfileNameVar.value);
+    // Now we can safely access auth state since component is client-only
+    const adminList = props.channel.Admins.map((user) => user.username || "");
+    const modList = (props.channel.Moderators ?? []).map((modProfile) => modProfile.displayName);
+    const isAdmin = adminList.includes(loggedInUsername.value);
+    const isMod = modList.includes(modProfileNameVar.value);
 
-      if (isAdmin) {
-        baseTabs.push({
-          name: "settings",
-          routeSuffix: "edit",
-          label: "Settings",
-          icon: CogIcon,
-          countProperty: null,
-        });
-      }
+    if (isAdmin) {
+      baseTabs.push({
+        name: "settings",
+        routeSuffix: "edit",
+        label: "Settings",
+        icon: CogIcon,
+        countProperty: null,
+      });
+    }
 
-      if (isAdmin || isMod) {
-        baseTabs.push({
-          name: "moderation",
-          routeSuffix: "issues",
-          label: "Issues",
-          icon: FlagIcon,
-          countProperty: "IssuesAggregate",
-        });
-      }
-      
-      if (smAndDown.value) {
-        baseTabs.push({
-          name: "about",
-          routeSuffix: "about",
-          label: "About",
-          icon: InfoIcon,
-          countProperty: null,
-        });
-      }
+    if (isAdmin || isMod) {
+      baseTabs.push({
+        name: "moderation",
+        routeSuffix: "issues",
+        label: "Issues",
+        icon: FlagIcon,
+        countProperty: "IssuesAggregate",
+      });
+    }
+    
+    if (smAndDown.value) {
+      baseTabs.push({
+        name: "about",
+        routeSuffix: "about",
+        label: "About",
+        icon: InfoIcon,
+        countProperty: null,
+      });
     }
 
     return baseTabs;
@@ -230,25 +225,27 @@
     <div v-else class="relative">
       <ClientOnly>
         <Popper>
-          <button
-            class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-            data-testid="mobile-channel-nav-dropdown"
-          >
-            <div class="flex items-center space-x-2">
-              <component
-                :is="activeTab.icon"
-                class="h-5 w-5 shrink-0"
-              />
-              <span>{{ activeTab.label }}</span>
-              <span
-                v-if="showCounts && activeTab.countProperty && channel[activeTab.countProperty]?.count"
-                class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
-              >
-                {{ channel[activeTab.countProperty]?.count }}
-              </span>
-            </div>
-            <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"/>
-          </button>
+          <template #default>
+            <button
+              class="flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+              data-testid="mobile-channel-nav-dropdown"
+            >
+              <div class="flex items-center space-x-2">
+                <component
+                  :is="activeTab.icon"
+                  class="h-5 w-5 shrink-0"
+                />
+                <span>{{ activeTab.label }}</span>
+                <span
+                  v-if="showCounts && activeTab.countProperty && channel[activeTab.countProperty]?.count"
+                  class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
+                >
+                  {{ channel[activeTab.countProperty]?.count }}
+                </span>
+              </div>
+              <i class="fa-solid fa-chevron-down h-4 w-4 ml-2"/>
+            </button>
+          </template>
 
           <template #content>
           <div class="mt-1 w-56 rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 dark:bg-gray-800 dark:ring-gray-600">

@@ -40,45 +40,47 @@ const deleteRule = (index: number) => {
 };
 </script>
 <template>
-  <div class="divide-y divide-gray-500">
-    <div
-      v-for="(rule, index) in formValues.rules"
-      :key="index"
-      class="mb-4 flex flex-col gap-2"
-    >
-      <div class="flex justify-between">
-        <span class="font-bold mt-3 dark:text-white">Rule {{ index + 1 }}</span>
-        <button
-          type="button"
-          class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500 flex items-center gap-1"
-          @click="deleteRule(index)"
-        >
-          <XmarkIcon class="h-4" />
-          Delete Rule
-        </button>
+  <div>
+    <div class="divide-y divide-gray-500">
+      <div
+        v-for="(rule, index) in formValues.rules"
+        :key="index"
+        class="mb-4 flex flex-col gap-2"
+      >
+        <div class="flex justify-between">
+          <span class="font-bold mt-3 dark:text-white">Rule {{ index + 1 }}</span>
+          <button
+            type="button"
+            class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500 flex items-center gap-1"
+            @click="deleteRule(index)"
+          >
+            <XmarkIcon class="h-4" />
+            Delete Rule
+          </button>
+        </div>
+        <TextInput
+          :test-id="'rule-short-name-input-' + index"
+          :value="rule.summary"
+          :placeholder="'Rule short name'"
+          :full-width="true"
+          @update="updateRule(index, 'summary', $event)"
+        />
+        <TextEditor
+          :test-id="'rule-detail-input-' + index"
+          :initial-value="rule.detail || ''"
+          :placeholder="'Rule details'"
+          :rows="4"
+          :disable-auto-focus="true"
+          :allow-image-upload="false"
+          @update="updateRule(index, 'detail', $event)"
+        />
       </div>
-      <TextInput
-        :test-id="'rule-short-name-input-' + index"
-        :value="rule.summary"
-        :placeholder="'Rule short name'"
-        :full-width="true"
-        @update="updateRule(index, 'summary', $event)"
-      />
-      <TextEditor
-        :test-id="'rule-detail-input-' + index"
-        :initial-value="rule.detail || ''"
-        :placeholder="'Rule details'"
-        :rows="4"
-        :disable-auto-focus="true"
-        :allow-image-upload="false"
-        @update="updateRule(index, 'detail', $event)"
-      />
     </div>
+    <button
+      class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
+      @click="addNewRule"
+    >
+      + Add New Rule
+    </button>
   </div>
-  <button
-    class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500"
-    @click="addNewRule"
-  >
-    + Add New Rule
-  </button>
 </template>
