@@ -2,7 +2,10 @@
   <div 
     ref="container" 
     class="stl-container"
+    :class="{ 'is-interactive': !loading && !error }"
     :style="{ width: width + 'px', height: height + 'px' }"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
   >
     <div v-if="loading" class="loading-overlay">
       Loading 3D model...
@@ -55,8 +58,11 @@ const emit = defineEmits(['load', 'progress', 'error'])
 const container = ref(null)
 const loading = ref(true)
 const error = ref(null)
+const isHovered = ref(false)
+const isFocused = ref(false)
 
 let scene, camera, renderer, controls, animationId
+const keyRotationSpeed = 0.05
 
 function initViewer(stlUrl) {
   if (!container.value) return
@@ -79,6 +85,17 @@ function initViewer(stlUrl) {
   controls.dampingFactor = 0.05
   controls.autoRotate = props.autoRotate
   controls.autoRotateSpeed = 2
+  
+  // Add visual feedback for interaction
+  renderer.domElement.style.cursor = 'grab'
+  
+  controls.addEventListener('start', () => {
+    renderer.domElement.style.cursor = 'grabbing'
+  })
+  
+  controls.addEventListener('end', () => {
+    renderer.domElement.style.cursor = 'grab'
+  })
 
   const ambientLight = new THREE.AmbientLight(0x999999)
   scene.add(ambientLight)
@@ -142,6 +159,30 @@ function animate() {
   renderer.render(scene, camera)
 }
 
+
+function onMouseEnter() {
+  isHovered.value = true
+}
+
+function onMouseLeave() {
+  isHovered.value = false
+}
+
+function resetCamera() {
+  if (camera && controls && scene.children.find(child => child.isMesh)) {
+    const mesh = scene.children.find(child => child.isMesh)
+    const box = new THREE.Box3().setFromObject(mesh)
+    const size = box.getSize(new THREE.Vector3())
+    const maxDim = Math.max(size.x, size.y, size.z)
+    const fov = camera.fov * (Math.PI / 180)
+    const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5
+    
+    camera.position.set(distance, distance, distance)
+    camera.lookAt(0, 0, 0)
+    controls.update()
+  }
+}
+
 function cleanup() {
   if (animationId) {
     cancelAnimationFrame(animationId)
@@ -178,20 +219,7 @@ watch(() => props.src, (newUrl, oldUrl) => {
 
 // Exposed methods for parent components
 defineExpose({
-  resetCamera: () => {
-    if (camera && controls && scene.children.find(child => child.isMesh)) {
-      const mesh = scene.children.find(child => child.isMesh)
-      const box = new THREE.Box3().setFromObject(mesh)
-      const size = box.getSize(new THREE.Vector3())
-      const maxDim = Math.max(size.x, size.y, size.z)
-      const fov = camera.fov * (Math.PI / 180)
-      const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5
-      
-      camera.position.set(distance, distance, distance)
-      camera.lookAt(0, 0, 0)
-      controls.update()
-    }
-  },
+  resetCamera,
   setAutoRotate: (value) => {
     if (controls) {
       controls.autoRotate = value
@@ -205,6 +233,22 @@ defineExpose({
   overflow: hidden;
   position: relative;
   display: inline-block;
+  transition: all 0.2s ease;
+  border-radius: 8px;
+}
+
+.stl-container:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+.stl-container.is-interactive {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.stl-container.is-interactive:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
 }
 
 canvas {
