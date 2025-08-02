@@ -3,7 +3,7 @@
     ref="container" 
     class="stl-container"
     :class="{ 'is-interactive': !loading && !error }"
-    :style="{ width: width + 'px', height: height + 'px' }"
+    :style="containerStyle"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
   >
@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, onBeforeUnmount } from 'vue'
+import { onMounted, ref, watch, onBeforeUnmount, computed, nextTick } from 'vue'
 import * as THREE from 'three'
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
@@ -28,12 +28,20 @@ const props = defineProps({
     required: true
   },
   width: {
-    type: Number,
-    default: 400
+    type: [Number, String],
+    default: '100%'
   },
   height: {
-    type: Number,
+    type: [Number, String],
     default: 400
+  },
+  maxWidth: {
+    type: [Number, String],
+    default: null
+  },
+  aspectRatio: {
+    type: Number,
+    default: 1 // 1:1 square by default
   },
   modelColor: {
     type: String,
@@ -53,16 +61,63 @@ const props = defineProps({
   }
 })
 
+const containerStyle = computed(() => {
+  const style = {}
+  
+  // Handle width
+  if (typeof props.width === 'number') {
+    style.width = props.width + 'px'
+  } else {
+    style.width = props.width
+  }
+  
+  // Handle height
+  if (typeof props.height === 'number') {
+    style.height = props.height + 'px'
+  } else {
+    style.height = props.height
+  }
+  
+  // Handle max-width for responsive behavior
+  if (props.maxWidth) {
+    if (typeof props.maxWidth === 'number') {
+      style.maxWidth = props.maxWidth + 'px'
+    } else {
+      style.maxWidth = props.maxWidth
+    }
+  }
+  
+  return style
+})
+
 const emit = defineEmits(['load', 'progress', 'error'])
 
 const container = ref(null)
 const loading = ref(true)
 const error = ref(null)
 const isHovered = ref(false)
-const isFocused = ref(false)
+const actualWidth = ref(400)
+const actualHeight = ref(400)
 
 let scene, camera, renderer, controls, animationId
-const keyRotationSpeed = 0.05
+
+function updateDimensions() {
+  if (!container.value) return
+  
+  const rect = container.value.getBoundingClientRect()
+  actualWidth.value = rect.width
+  actualHeight.value = rect.height
+  
+  if (renderer && camera) {
+    renderer.setSize(actualWidth.value, actualHeight.value)
+    camera.aspect = actualWidth.value / actualHeight.value
+    camera.updateProjectionMatrix()
+  }
+}
+
+function handleResize() {
+  updateDimensions()
+}
 
 function initViewer(stlUrl) {
   if (!container.value) return
@@ -70,15 +125,19 @@ function initViewer(stlUrl) {
   loading.value = true
   error.value = null
   
-  scene = new THREE.Scene()
-  scene.background = new THREE.Color(props.backgroundColor)
+  // Wait for next tick to ensure container has proper dimensions
+  nextTick(() => {
+    updateDimensions()
+    
+    scene = new THREE.Scene()
+    scene.background = new THREE.Color(props.backgroundColor)
 
-  camera = new THREE.PerspectiveCamera(45, props.width / props.height, 0.1, 1000)
-  camera.position.set(3, 3, 3)
+    camera = new THREE.PerspectiveCamera(45, actualWidth.value / actualHeight.value, 0.1, 1000)
+    camera.position.set(3, 3, 3)
 
-  renderer = new THREE.WebGLRenderer({ antialias: true })
-  renderer.setSize(props.width, props.height)
-  container.value.appendChild(renderer.domElement)
+    renderer = new THREE.WebGLRenderer({ antialias: true })
+    renderer.setSize(actualWidth.value, actualHeight.value)
+    container.value.appendChild(renderer.domElement)
 
   controls = new OrbitControls(camera, renderer.domElement)
   controls.enableDamping = true
@@ -148,9 +207,10 @@ function initViewer(stlUrl) {
       loading.value = false
       emit('error', loadError)
     }
-  )
+    )
 
-  animate()
+    animate()
+  })
 }
 
 function animate() {
@@ -202,10 +262,12 @@ onMounted(() => {
   if (props.src) {
     initViewer(props.src)
   }
+  window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
   cleanup()
+  window.removeEventListener('resize', handleResize)
 })
 
 watch(() => props.src, (newUrl, oldUrl) => {
@@ -232,7 +294,10 @@ defineExpose({
 .stl-container {
   overflow: hidden;
   position: relative;
-  display: inline-block;
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   transition: all 0.2s ease;
   border-radius: 8px;
 }
@@ -253,6 +318,9 @@ defineExpose({
 
 canvas {
   display: block;
+  width: 100% !important;
+  height: auto !important;
+  max-width: 100%;
 }
 
 .loading-overlay,
