@@ -88,8 +88,13 @@ const {
 
 removeForumOwnerDone(() => {
   showRemoveOwnerModal.value = false;
-  // Navigate to the forum list since the user is no longer an owner
-  router.push("/");
+  // Navigate to the forum detail page since the user is no longer an owner
+  router.push({
+    name: "forums-forumId",
+    params: {
+      forumId: forumId.value,
+    },
+  });
 });
 
 const handleRemoveOwner = () => {
