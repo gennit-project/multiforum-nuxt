@@ -93,7 +93,7 @@ onMounted(() => {
         v-if="formValues"
         :form-title="formTitle"
         :needs-changes="needsChanges"
-        :loading="!discussion && (createDiscussionLoading || updateDiscussionLoading)"
+        :loading="createDiscussionLoading || updateDiscussionLoading"
         :handle-cancel-in-parent="editMode"
         @input="touched = true"
         @submit="$emit('submit')"
