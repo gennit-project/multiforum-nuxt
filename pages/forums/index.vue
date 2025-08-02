@@ -136,24 +136,38 @@ const defaultLabels = {
             </template>
           </FilterChip>
         </div>
-        <ErrorBanner
-          v-if="channelError"
-          class="mx-auto max-w-4xl"
-          :text="channelError.message"
-        />
-        <ChannelList
-          v-if="channelResult && channelResult.getSortedChannels?.channels"
-          class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
-          :channels="channelResult.getSortedChannels?.channels || []"
-          :result-count="channelResult.getSortedChannels?.aggregateChannelCount || 0"
-          :search-input="searchInput"
-          :selected-tags="selectedTags"
-          @filter-by-tag="setSelectedTags"
-          @load-more="loadMore"
-        />
-        <div v-if="channelLoading" class="mx-auto max-w-5xl flex-1">
-          Loading...
-        </div>
+        <ClientOnly>
+          <ErrorBanner
+            v-if="channelError"
+            class="mx-auto max-w-4xl"
+            :text="channelError.message"
+          />
+          <ChannelList
+            v-if="channelResult && channelResult.getSortedChannels?.channels"
+            class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
+            :channels="channelResult.getSortedChannels?.channels || []"
+            :result-count="channelResult.getSortedChannels?.aggregateChannelCount || 0"
+            :search-input="searchInput"
+            :selected-tags="selectedTags"
+            @filter-by-tag="setSelectedTags"
+            @load-more="loadMore"
+          />
+          <div v-if="channelLoading" class="mx-auto max-w-5xl flex-1">
+            Loading...
+          </div>
+          <template #fallback>
+            <div class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900">
+              <div class="animate-pulse">
+                <div class="h-8 bg-gray-200 rounded w-1/4 mb-4 dark:bg-gray-700"/>
+                <div class="space-y-4">
+                  <div class="h-20 bg-gray-200 rounded dark:bg-gray-700"/>
+                  <div class="h-20 bg-gray-200 rounded dark:bg-gray-700"/>
+                  <div class="h-20 bg-gray-200 rounded dark:bg-gray-700"/>
+                </div>
+              </div>
+            </div>
+          </template>
+        </ClientOnly>
       </div>
     </div>
   </NuxtLayout>
