@@ -55,6 +55,10 @@
       type: Boolean,
       default: false,
     },
+    ownerList: {
+      type: Array,
+      default: () => [],
+    },
   });
 
   const emit = defineEmits(["submit", "updateFormValues"]);
@@ -430,6 +434,7 @@
                 :form-values="formValues"
                 :title-is-invalid="titleIsInvalid"
                 :touched="touched"
+                :owner-list="ownerList"
                 @submit="$emit('submit', $event)"
                 @update-form-values="emit('updateFormValues', $event)"
               />

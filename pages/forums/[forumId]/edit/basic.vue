@@ -7,14 +7,17 @@ import TagPicker from "@/components/TagPicker.vue";
 import TextInput from "@/components/TextInput.vue";
 import TextEditor from "@/components/TextEditor.vue";
 import AddImage from "@/components/AddImage.vue";
+import RemoveOwnerModal from "@/components/channel/RemoveOwnerModal.vue";
 import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
 import { usernameVar } from "@/cache";
-import { ref, nextTick, defineProps, defineEmits } from "vue";
+import { ref, nextTick, defineProps, defineEmits, computed } from "vue";
 import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
+import { REMOVE_FORUM_OWNER } from "@/graphQLData/mod/mutations";
 import { useMutation } from "@vue/apollo-composable";
 import { isFileSizeValid } from "@/utils/index";
+import { useRoute, useRouter } from "nuxt/app";
 
-defineProps({
+const props = defineProps({
   formValues: {
     type: Object,
     required: true,
@@ -31,7 +34,12 @@ defineProps({
     type: Boolean,
     required: true,
   },
+  ownerList: {
+    type: Array,
+    required: true,
+  },
 });
+
 type FileChangeInput = {
   // event of HTMLInputElement;
   event: Event;
@@ -49,9 +57,47 @@ nextTick(() => {
 
 const emit = defineEmits(["updateFormValues", "submit"]);
 
+const route = useRoute();
+const router = useRouter();
+
+const forumId = computed(() => {
+  if (typeof route.params.forumId === "string") {
+    return route.params.forumId;
+  }
+  return "";
+});
+
+const showRemoveOwnerModal = ref(false);
+
+const canRemoveOwner = computed(() => {
+  const currentUser = usernameVar.value;
+  const owners = props.ownerList as string[];
+  return currentUser && owners.includes(currentUser);
+});
+
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
 );
+
+const {
+  mutate: removeForumOwner,
+  loading: removeForumOwnerLoading,
+  error: removeForumOwnerError,
+  onDone: removeForumOwnerDone,
+} = useMutation(REMOVE_FORUM_OWNER);
+
+removeForumOwnerDone(() => {
+  showRemoveOwnerModal.value = false;
+  // Navigate to the forum list since the user is no longer an owner
+  router.push("/");
+});
+
+const handleRemoveOwner = () => {
+  removeForumOwner({
+    username: usernameVar.value,
+    channelUniqueName: forumId.value,
+  });
+};
 
 const upload = async (file: File) => {
   if (!usernameVar.value) {
@@ -108,7 +154,8 @@ const handleImageChange = async (input: FileChangeInput) => {
 </script>
 
 <template>
-  <div class="space-y-4 sm:space-y-5 flex-1">
+  <div>
+    <div class="space-y-4 sm:space-y-5 flex-1">
     <FormRow section-title="Forum Unique Name" :required="!editMode">
       <template #content>
         <TextInput
@@ -207,8 +254,9 @@ const handleImageChange = async (input: FileChangeInput) => {
         />
       </template>
     </FormRow>
-    <FormRow section-title="Destructive Settings" :dangerous="true">
+    <FormRow  >
       <template #content>
+        <h3 class="text-lg font-medium text-red-600 dark:text-red-400 mb-3">Dangerous Settings</h3>
         <div class="flex gap-2 align-items mt-4">
           <CheckBox
             :test-id="'lock-forum-checkbox'"
@@ -228,7 +276,31 @@ const handleImageChange = async (input: FileChangeInput) => {
           Locking a forum will prevent users from creating new threads or
           replying to existing threads.
         </p>
+        
+        <div v-if="canRemoveOwner" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3">Remove Yourself as Owner</h4>
+          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
+            This action cannot be undone. You will lose all owner privileges for this forum,
+            including the ability to change forum settings, manage other owners, and access this page.
+          </p>
+          <PrimaryButton
+            :test-id="'remove-owner-button'"
+            :label="'Remove Yourself as Owner'"
+            :background-color="'red'"
+            @click="showRemoveOwnerModal = true"
+          />
+        </div>
       </template>
     </FormRow>
+    </div>
+    
+    <RemoveOwnerModal
+      :open="showRemoveOwnerModal"
+      :forum-name="formValues.uniqueName"
+      :loading="removeForumOwnerLoading"
+      :error="removeForumOwnerError?.message || ''"
+      @close="showRemoveOwnerModal = false"
+      @confirm="handleRemoveOwner"
+    />
   </div>
 </template>

@@ -7,8 +7,9 @@ import {
   TransitionRoot,
 } from "@headlessui/vue";
 import ErrorBanner from "@/components/ErrorBanner.vue";
+import { computed } from "vue";
 
-  defineProps({
+  const props = defineProps({
     dataTestid: {
       type: String,
       default: "",
@@ -51,9 +52,25 @@ import ErrorBanner from "@/components/ErrorBanner.vue";
       type: Boolean,
       default: false,
     },
+    warningColor: {
+      type: Boolean,
+      default: false,
+    },
   });
 
 const emit = defineEmits(["close", "primaryButtonClick"]);
+
+const primaryButtonClasses = computed(() => {
+  if (props.primaryButtonDisabled) {
+    return 'bg-gray-300 text-black dark:bg-gray-700 dark:text-gray-200';
+  }
+  
+  if (props.warningColor) {
+    return 'border-transparent border bg-red-600 text-white hover:bg-red-500 focus:ring-red-500';
+  }
+  
+  return 'border-transparent border bg-orange-600 text-white hover:bg-orange-500 focus:ring-orange-500';
+});
 </script>
 
 <template>
@@ -140,12 +157,9 @@ const emit = defineEmits(["close", "primaryButtonClick"]);
                     type="button"
                     :data-testid="`${dataTestid}-primary-button`"
                     :disabled="primaryButtonDisabled"
-                    class="max-h-10"
                     :class="[
-                      !primaryButtonDisabled
-                        ? `border-transparent border bg-orange-600 text-white hover:bg-orange-500`
-                        : 'bg-gray-300 text-black dark:bg-gray-700 dark:text-gray-200',
-                      `inline-flex w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm  focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm`,
+                      primaryButtonClasses,
+                      'max-h-10 inline-flex w-full justify-center rounded-full px-4 py-2 text-base font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:ml-3 sm:w-auto sm:text-sm',
                     ]"
                     @click="emit('primaryButtonClick')"
                   >
