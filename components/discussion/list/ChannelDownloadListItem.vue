@@ -220,7 +220,7 @@
               />
             </div>
             <div class="flex items-center justify-between gap-2 dark:text-white">
-              <div class="text-gray-900 dark:text-white"><sup>$</sup>0.<sup>00</sup></div>
+              <!-- <div class="text-gray-900 dark:text-white"><sup>$</sup>0.<sup>00</sup></div> -->
               <div class="flex items-center gap-1">
                 <DiscussionVotes
                   v-if="discussionChannel"

@@ -105,14 +105,14 @@ const handleDownload = () => {
         </div>
         
         <!-- Price Section -->
-        <div class="text-left mb-3">
+        <!-- <div class="text-left mb-3">
           <div class="text-3xl font-bold text-gray-900 dark:text-white">
             <sup class="text-lg">{{ priceDisplay.main?.charAt(0) || '$' }}</sup>{{ priceDisplay.main?.slice(1) || '0' }}<sup class="text-lg">.{{ priceDisplay.sub || '00' }}</sup>
           </div>
           <div v-if="priceDisplay.label" class="py-1 text-sm text-gray-500 dark:text-gray-400">
             {{ priceDisplay.label }}
           </div>
-        </div>
+        </div> -->
 
         <!-- Available Instantly -->
         <div class="text-sm font-medium text-green-600 dark:text-green-400">
@@ -130,9 +130,9 @@ const handleDownload = () => {
       <div v-if="priceDisplay.label === 'Free Download'" class="text-xs mt-2 text-gray-500 dark:text-gray-400">
         By downloading, you agree to the content license
       </div>
-      <div v-else class="text-xs mt-2 text-gray-500 dark:text-gray-400">
+      <!-- <div v-else class="text-xs mt-2 text-gray-500 dark:text-gray-400">
         By placing an order, you're purchasing a content license
-      </div>
+      </div> -->
 
       <!-- License Section -->
       <div class="border-t border-gray-200 pt-4 dark:border-gray-700">
