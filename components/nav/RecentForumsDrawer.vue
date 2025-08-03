@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
+import { useRouter } from "nuxt/app";
 import RecentForumsList from "./RecentForumsList.vue";
 
 type ForumItem = {
@@ -17,8 +18,15 @@ const emit = defineEmits<{
   close: [];
 }>();
 
+const router = useRouter();
+
 const closeDrawer = () => {
   emit('close');
+};
+
+const navigateToCreateForum = () => {
+  router.push('/forums/create');
+  closeDrawer();
 };
 </script>
 
@@ -63,6 +71,19 @@ const closeDrawer = () => {
 
         <!-- Forums List -->
         <div class="p-4">
+          <!-- Add Forum Button -->
+          <button
+            type="button"
+            class="w-full font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700 px-2 mb-2"
+            @click="navigateToCreateForum"
+          >
+            <span class="text-green-600 dark:text-green-400 font-bold">+</span>
+            Add Forum
+          </button>
+          
+          <!-- Divider -->
+          <div v-if="forums.length > 0" class="border-t border-gray-200 dark:border-gray-600 mb-4"></div>
+          
           <RecentForumsList
             :forums="forums"
             :show-header="false"
