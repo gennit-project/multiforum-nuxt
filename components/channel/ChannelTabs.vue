@@ -124,7 +124,7 @@
     ];
 
     // Only show downloads tab if both server and channel have downloads enabled
-    if (serverDownloadsEnabled.value && props.channel?.downloadsEnabled !== false) {
+    if (serverDownloadsEnabled.value && props.channel?.downloadsEnabled === true) {
       baseTabs.push({
         name: "downloads",
         routeSuffix: "downloads",
