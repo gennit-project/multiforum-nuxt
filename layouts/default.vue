@@ -8,7 +8,7 @@ import VerticalIconNav from "@/components/nav/VerticalIconNav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import DevOverlay from "@/components/nav/DevOverlay.vue";
 import { config } from "@/config";
-import { sideNavIsOpenVar, setSideNavIsOpenVar } from "@/cache";
+import { sideNavIsOpenVar, setSideNavIsOpenVar, isAuthenticatedVar } from "@/cache";
 
 // Composables for separated concerns
 import { useAuthManager } from "@/composables/useAuthManager";
@@ -43,7 +43,7 @@ if (shouldExposeTestHelpers) {
 
 // Handle session expired login
 const handleSessionExpiredLogin = () => {
-  if (loginWithRedirect) {
+  if (loginWithRedirect && isAuthenticatedVar.value) {
     loginWithRedirect();
   }
 };
@@ -55,7 +55,7 @@ const handleSessionExpiredLogin = () => {
     <main class="flex min-h-screen flex-col">
       <!-- Session expired banner -->
       <div
-        v-if="isSessionExpired"
+        v-if="isSessionExpired && isAuthenticatedVar"
         class="bg-red-500 p-4 text-center text-white"
       >
         Your session has expired. Please

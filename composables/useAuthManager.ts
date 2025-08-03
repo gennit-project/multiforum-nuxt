@@ -76,10 +76,16 @@ export function useAuthManager() {
             }
           }
         }
+      } else {
+        // User is not authenticated, ensure session expired is false
+        isSessionExpired.value = false;
       }
     } catch (error) {
       console.error("Error checking token expiration:", error);
-      isSessionExpired.value = true;
+      // Only set session expired if user was actually authenticated
+      if (auth0 && auth0.isAuthenticated.value) {
+        isSessionExpired.value = true;
+      }
     }
   };
 

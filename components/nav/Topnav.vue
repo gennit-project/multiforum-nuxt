@@ -68,7 +68,7 @@ const isOnMapPage = computed(() => {
     class="z-20 w-full bg-gray-900 border-b pr-4 border-b-gray-600"
     :class="[isOnMapPage ? 'fixed' : '']"
   >
-    <div class="flex items-center justify-between px-2 py-1 lg:px-4 lg:pl-12">
+    <div class="flex items-center justify-between px-2 py-1 lg:ml-10">
       <div class="flex items-center">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
