@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useRoute } from "nuxt/app";
+import { useDisplay } from "vuetify";
 import TopNav from "@/components/nav/Topnav.vue";
 import SiteSidenav from "@/components/nav/SiteSidenav.vue";
+import VerticalIconNav from "@/components/nav/VerticalIconNav.vue";
 import SiteFooter from "@/components/layout/SiteFooter.vue";
 import DevOverlay from "@/components/nav/DevOverlay.vue";
 import { config } from "@/config";
@@ -15,6 +17,9 @@ import { useTestAuthHelpers } from "@/composables/useTestAuthHelpers";
 const isDevelopment = computed(() => config.environment === "development");
 const route = useRoute();
 const showFooter = !route.name?.toString().includes("map");
+
+// Responsive display
+const { lgAndUp } = useDisplay();
 
 // UI state management
 const showUserProfileDropdown = ref(false);
@@ -74,16 +79,27 @@ const handleSessionExpiredLogin = () => {
         />
 
         <div class="relative flex flex-grow flex-col">
+          <!-- Vertical Icon Navigation for Large Screens -->
+          <VerticalIconNav />
+
+          <!-- Mobile/Tablet Side Navigation -->
           <SiteSidenav
+            v-if="!lgAndUp"
             :key="`${sideNavIsOpenVar}`"
             :show-dropdown="sideNavIsOpenVar"
             @close="setSideNavIsOpenVar(false)"
           />
 
-          <div class="flex w-full flex-grow flex-col">
+          <div
+            class="flex w-full flex-grow flex-col bg-white dark:bg-black lg:pl-20"
+          >
             <slot />
-            <SiteFooter v-if="showFooter" class="mt-auto" />
           </div>
+          <SiteFooter
+            v-if="showFooter"
+            class="mt-auto"
+            :class="{ 'pl-16': lgAndUp }"
+          />
         </div>
       </div>
     </main>

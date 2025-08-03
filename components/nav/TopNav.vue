@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from "vue";
+import { useDisplay } from "vuetify";
 import HamburgerMenuButton from "@/components/nav/HamburgerMenuButton.vue";
 import UserProfileDropdownMenu from "@/components/nav/UserProfileDropdownMenu.vue";
 import ThemeSwitcher from "@/components/nav/ThemeSwitcher.vue";
@@ -17,6 +18,7 @@ import {
 defineEmits(["toggleDropdown"]);
 
 const route = useRoute();
+const { lgAndUp } = useDisplay();
 
 const channelId = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -66,7 +68,7 @@ const isOnMapPage = computed(() => {
     class="z-20 w-full bg-gray-900 border-b pr-4 border-b-gray-600"
     :class="[isOnMapPage ? 'fixed' : '']"
   >
-    <div class="flex items-center justify-between px-2 py-1 lg:px-4">
+    <div class="flex items-center justify-between px-2 py-1 lg:px-4 lg:pl-12">
       <div class="flex items-center">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
@@ -77,8 +79,8 @@ const isOnMapPage = computed(() => {
 
         <div class="ml-12 flex items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
-            🐝
-            <span class="ml-1 font-bold text-white logo-font">Topical</span>
+            <span v-if="!lgAndUp">🐝</span>
+            <span class="font-bold text-white logo-font" :class="{ 'ml-1': !lgAndUp }">Topical</span>
           </nuxt-link>
 
           <div
