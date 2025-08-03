@@ -12,13 +12,16 @@ import UserIcon from "@/components/icons/UserIcon.vue";
 import SettingsIcon from "@/components/icons/SettingsIcon.vue";
 import AdminIcon from "@/components/icons/AdminIcon.vue";
 import LoginIcon from "@/components/icons/LoginIcon.vue";
+import MoreIcon from "@/components/icons/MoreIcon.vue";
 import AvatarComponent from "@/components/AvatarComponent.vue";
 import IconTooltip from "@/components/common/IconTooltip.vue";
+import RecentForumsDrawer from "./RecentForumsDrawer.vue";
 import { GET_USER } from "@/graphQLData/user/queries";
 import { usernameVar, isAuthenticatedVar } from "@/cache";
 import SiteSidenavLogout from "./SiteSidenavLogout.vue";
 
 const DEFAULT_LIMIT = 5;
+const VERTICAL_NAV_LIMIT = 3;
 
 type NavigationItem = {
   name: string;
@@ -89,6 +92,18 @@ const { height } = useDisplay();
 
 // Check if screen is vertically short (less than 700px)
 const isVerticallyShort = computed(() => height.value < 700);
+
+// Drawer state
+const isDrawerOpen = ref(false);
+
+// Limited forums for vertical nav
+const limitedRecentForums = computed(() => {
+  return recentForums.value.slice(0, VERTICAL_NAV_LIMIT);
+});
+
+const hasMoreForums = computed(() => {
+  return recentForums.value.length > VERTICAL_NAV_LIMIT;
+});
 
 // Active state detection
 const currentForumId = computed(() => 
@@ -194,8 +209,9 @@ const getUserActionClasses = (isActive: boolean) => {
 
     <!-- Recent Forums (hidden when vertically short) -->
     <div v-if="recentForums.length > 0 && !isVerticallyShort" class="flex flex-col space-y-1">
+      <!-- Limited Recent Forums -->
       <IconTooltip
-        v-for="forum in recentForums"
+        v-for="forum in limitedRecentForums"
         :key="forum.uniqueName"
         :text="forum.uniqueName"
       >
@@ -215,6 +231,19 @@ const getUserActionClasses = (isActive: boolean) => {
           />
         </div>
       </IconTooltip>
+
+      <!-- More Button -->
+      <div v-if="hasMoreForums" class="flex flex-col items-center">
+        <IconTooltip text="More Forums">
+          <div
+            :class="getUserActionClasses(false)"
+            @click="isDrawerOpen = true"
+          >
+            <MoreIcon />
+          </div>
+        </IconTooltip>
+        <span class="text-xs text-gray-400 mt-1">More</span>
+      </div>
     </div>
 
     <!-- Divider -->
@@ -291,5 +320,12 @@ const getUserActionClasses = (isActive: boolean) => {
         </div>
       </IconTooltip>
     </div>
+
+    <!-- Recent Forums Drawer -->
+    <RecentForumsDrawer
+      :forums="recentForums"
+      :is-open="isDrawerOpen"
+      @close="isDrawerOpen = false"
+    />
   </div>
 </template>
