@@ -11,8 +11,6 @@ import type {
   FilterGroup,
 } from "@/__generated__/graphql";
 // Using string literals instead of importing enums from massive generated file
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import GenericButton from "@/components/GenericButton.vue";
 import FormRow from "@/components/FormRow.vue";
 import { useMutation } from "@vue/apollo-composable";
 import ErrorBanner from "@/components/ErrorBanner.vue";
@@ -113,7 +111,6 @@ const { mutate: createDownloadableFile, error: createDownloadableFileError } =
 const {
   mutate: updateDiscussion,
   error: updateDiscussionError,
-  loading: updateDiscussionLoading,
   onDone,
 } = useMutation(UPDATE_DISCUSSION, () => ({
   variables: {

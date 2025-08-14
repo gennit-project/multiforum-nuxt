@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-  import { computed, ref, watch, onMounted, type Component } from "vue";
+  import { computed, ref, watch, type Component } from "vue";
   import TabButton from "@/components/channel/TabButton.vue";
   import CalendarIcon from "@/components/icons/CalendarIcon.vue";
   import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
@@ -88,7 +88,6 @@
   });
 
   // Since component is now wrapped in ClientOnly, we can directly access auth state
-  const isClientSide = ref(true);
 
   const tabRoutes = computed(() => {
     const routes: TabRoutes = {

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useRouter, useRoute } from "nuxt/app";
+import { useRouter } from "nuxt/app";
 import AvatarComponent from "@/components/AvatarComponent.vue";
 
 type ForumItem = {
@@ -17,11 +16,6 @@ defineProps<{
 }>();
 
 const router = useRouter();
-const route = useRoute();
-
-const currentForumId = computed(() => 
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
-);
 
 const navigateToForum = async (forumUniqueName: string, onNavigate?: () => void) => {
   try {

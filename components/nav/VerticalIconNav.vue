@@ -123,6 +123,24 @@ const addCurrentForumToRecent = () => {
   if (!import.meta.client || !currentForumId.value) return;
   
   const existingForums = JSON.parse(localStorage.getItem("recentForums") || "[]");
+  
+  // Check if the current forum is already in the visible portion (top VERTICAL_NAV_LIMIT)
+  const visibleForums = existingForums.slice(0, VERTICAL_NAV_LIMIT);
+  const isAlreadyVisible = visibleForums.some((forum: any) => forum.uniqueName === currentForumId.value);
+  
+  // If it's already visible, just update the timestamp without changing order
+  if (isAlreadyVisible) {
+    const updatedForums = existingForums.map((forum: any) => 
+      forum.uniqueName === currentForumId.value 
+        ? { ...forum, timestamp: Date.now() }
+        : forum
+    );
+    localStorage.setItem("recentForums", JSON.stringify(updatedForums));
+    loadRecentForums();
+    return;
+  }
+  
+  // If not visible, move to top (existing behavior)
   const currentForum = {
     uniqueName: currentForumId.value,
     channelIconURL: null, // Will be updated when we have the icon
@@ -162,7 +180,7 @@ const getIconCircleClasses = (isActive: boolean) => {
 };
 
 const getForumIconClasses = (isActive: boolean) => {
-  const baseClasses = "w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden";
+  const baseClasses = "w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden";
   return isActive ? `${baseClasses} ring-2 ring-orange-500 ring-offset-0` : baseClasses;
 };
 
@@ -205,7 +223,7 @@ const getUserActionClasses = (isActive: boolean) => {
     </div>
 
     <!-- Divider -->
-    <div v-if="!isVerticallyShort" class="w-8 h-px bg-gray-600" :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"></div>
+    <div v-if="!isVerticallyShort" class="w-8 h-px bg-gray-600" :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"/>
 
     <!-- Recent Forums (hidden when vertically short) -->
     <div v-if="recentForums.length > 0 && !isVerticallyShort" class="flex flex-col space-y-1">
@@ -247,7 +265,7 @@ const getUserActionClasses = (isActive: boolean) => {
     </div>
 
     <!-- Divider -->
-    <div class="w-8 h-px bg-gray-600" :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"></div>
+    <div class="w-8 h-px bg-gray-600" :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"/>
 
     <!-- User Actions -->
     <div class="flex flex-col mt-auto" :class="{ 'space-y-1': isVerticallyShort, 'space-y-2': !isVerticallyShort }">

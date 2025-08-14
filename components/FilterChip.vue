@@ -1,9 +1,8 @@
 <script>
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref, computed, defineAsyncComponent } from "vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import { useUIStore } from "@/stores/uiStore";
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
-import { defineAsyncComponent } from 'vue';
 const Popper = defineAsyncComponent(() => import("vue3-popper"));
 
 export default defineComponent({

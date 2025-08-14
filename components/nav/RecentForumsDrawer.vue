@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { ref } from "vue";
 import { useRouter } from "nuxt/app";
 import RecentForumsList from "./RecentForumsList.vue";
 
@@ -82,7 +81,7 @@ const navigateToCreateForum = () => {
           </button>
           
           <!-- Divider -->
-          <div v-if="forums.length > 0" class="border-t border-gray-200 dark:border-gray-600 mb-4"></div>
+          <div v-if="forums.length > 0" class="border-t border-gray-200 dark:border-gray-600 mb-4"/>
           
           <RecentForumsList
             :forums="forums"

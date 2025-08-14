@@ -1,33 +1,32 @@
 <script setup lang="ts">
-  import { computed, ref, watch } from "vue";
+  import { computed, ref, watch, defineAsyncComponent } from "vue";
   import { useRoute, useRouter } from "nuxt/app";
+  import type { DistanceUnit, SearchEventValues } from "@/types/Event";
+  import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
   import LocationSearchBar from "@/components/event/list/filters/LocationSearchBar.vue";
   import ChannelIcon from "@/components/icons/ChannelIcon.vue";
   import TagIcon from "@/components/icons/TagIcon.vue";
+  import FilterIcon from "@/components/icons/FilterIcon.vue";
   import { getTagLabel, getChannelLabel } from "@/utils";
   import SearchBar from "../../../SearchBar.vue";
-  import type { DistanceUnit, SearchEventValues } from "@/types/Event";
   import {
     distanceOptionsForKilometers,
     distanceOptionsForMiles,
     MilesOrKm,
   } from "@/components/event/list/filters/eventSearchOptions";
   import LocationFilterTypes from "./locationFilterTypes";
-  import FilterIcon from "@/components/icons/FilterIcon.vue";
   import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
   import GenericButton from "@/components/GenericButton.vue";
   import FilterChip from "@/components/FilterChip.vue";
   import SelectCanceled from "./SelectCanceled.vue";
   import SelectFree from "./SelectFree.vue";
-  // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
-  import { defineAsyncComponent } from 'vue';
-  const Popper = defineAsyncComponent(() => import("vue3-popper"));
-  import type { UpdateLocationInput } from "@/components/event/form/CreateEditEventFields.vue";
   import SearchableForumList from "@/components/channel/SearchableForumList.vue";
   import SearchableTagList from "@/components/SearchableTagList.vue";
   import { updateFilters } from "@/utils/routerUtils";
   import PrimaryButton from "@/components/PrimaryButton.vue";
   import RequireAuth from "@/components/auth/RequireAuth.vue";
+  // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
+  const Popper = defineAsyncComponent(() => import("vue3-popper"));
 
   // Props
   const props = defineProps({
