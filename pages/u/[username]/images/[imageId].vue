@@ -175,9 +175,8 @@ watchEffect(() => {
             width="800px"
             class="max-w-full h-auto"
           />
-          <ClientOnly>
+          <ClientOnly v-else-if="image.url && hasStlExtension(image.url)">
             <StlViewer
-              v-if="image.url && hasStlExtension(image.url)"
               :src="image.url"
               :width="800"
               :height="600"

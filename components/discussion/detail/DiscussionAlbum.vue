@@ -561,9 +561,8 @@ const handleTouchEnd = (event: TouchEvent) => {
             width="100%"
             class="shadow-sm"
           />
-          <ClientOnly>
+          <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
             <StlViewer
-              v-if="image && image.url && hasStlExtension(image.url)"
               :src="image.url"
               :width="200"
               :height="200"
@@ -673,9 +672,8 @@ v-if="editingCaptionIndex === idx"
                   }"
                   :show-fullscreen-button="false"
                 />
-                <ClientOnly>
+                <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex">
                   <StlViewer
-                    v-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex"
                     :src="image.url"
                     :width="expandedView ? 600 : 384"
                     :height="expandedView ? 400 : 256"
@@ -786,9 +784,8 @@ v-if="editingCaptionIndex === idx"
                 width="80px"
                 class="rounded"
               />
-              <ClientOnly>
+              <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
                 <StlViewer
-                  v-if="image && image.url && hasStlExtension(image.url)"
                   :src="image.url"
                   :width="80"
                   :height="80"

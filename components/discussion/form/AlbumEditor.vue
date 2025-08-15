@@ -797,9 +797,8 @@ const hasStlExtension = (url: string) => {
             width="288px"
             class="w-72"
           />
-          <ClientOnly>
+          <ClientOnly v-else-if="image.url && hasStlExtension(image.url)">
             <StlViewer
-              v-if="image.url && hasStlExtension(image.url)"
               :src="image.url"
               :width="288"
               :height="288"
