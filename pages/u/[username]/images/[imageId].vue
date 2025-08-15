@@ -175,17 +175,19 @@ watchEffect(() => {
             width="800px"
             class="max-w-full h-auto"
           />
-          <StlViewer
-            v-else-if="image.url && hasStlExtension(image.url)"
-            :src="image.url"
-            :width="800"
-            :height="600"
-            class="max-w-full h-auto"
-          />
+          <ClientOnly>
+            <StlViewer
+              v-if="image.url && hasStlExtension(image.url)"
+              :src="image.url"
+              :width="800"
+              :height="600"
+              class="max-w-full h-auto"
+            />
+          </ClientOnly>
           <img
             v-else-if="image.url"
             :src="image.url"
-            :alt="image.alt || 'Image'"
+            :alt="image.alt ?? 'Image'"
             class="max-w-full h-auto rounded-lg shadow-lg"
           >
         </div>

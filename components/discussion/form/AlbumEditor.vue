@@ -797,13 +797,15 @@ const hasStlExtension = (url: string) => {
             width="288px"
             class="w-72"
           />
-          <StlViewer
-            v-else-if="image.url && hasStlExtension(image.url)"
-            :src="image.url"
-            :width="288"
-            :height="288"
-            class="w-72"
-          />
+          <ClientOnly>
+            <StlViewer
+              v-if="image.url && hasStlExtension(image.url)"
+              :src="image.url"
+              :width="288"
+              :height="288"
+              class="w-72"
+            />
+          </ClientOnly>
           <ExpandableImage
             v-else-if="image.url"
             class="w-72 object-cover"

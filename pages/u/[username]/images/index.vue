@@ -154,18 +154,20 @@ const getImageAlt = (image: Image) => {
                 class="w-full h-full object-cover"
               />
               <!-- STL viewer for STL files -->
-              <StlViewer
-                v-else-if="image.url && hasStlExtension(image.url)"
-                :src="image.url"
-                :width="300"
-                :height="300"
-                class="w-full h-full object-cover"
-              />
+              <ClientOnly>
+                <StlViewer
+                  v-if="image.url && hasStlExtension(image.url)"
+                  :src="image.url"
+                  :width="300"
+                  :height="300"
+                  class="w-full h-full object-cover"
+                />
+              </ClientOnly>
               <!-- Regular image -->
               <img
                 v-else-if="image.url"
                 :src="image.url"
-                :alt="getImageAlt(image)"
+                :alt="getImageAlt(image) ?? 'Image'"
                 class="w-full h-full object-cover"
                 loading="lazy"
               />

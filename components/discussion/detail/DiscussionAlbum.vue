@@ -561,13 +561,15 @@ const handleTouchEnd = (event: TouchEvent) => {
             width="100%"
             class="shadow-sm"
           />
-          <StlViewer
-            v-else-if="image && image.url && hasStlExtension(image.url)"
-            :src="image.url"
-            :width="200"
-            :height="200"
-            class="shadow-sm"
-          />
+          <ClientOnly>
+            <StlViewer
+              v-if="image && image.url && hasStlExtension(image.url)"
+              :src="image.url"
+              :width="200"
+              :height="200"
+              class="shadow-sm"
+            />
+          </ClientOnly>
           <img
             v-else-if="image"
             :src="image.url || ''"
@@ -671,18 +673,20 @@ v-if="editingCaptionIndex === idx"
                   }"
                   :show-fullscreen-button="false"
                 />
-                <StlViewer
-                  v-else-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex"
-                  :src="image.url"
-                  :width="expandedView ? 600 : 384"
-                  :height="expandedView ? 400 : 256"
-                  class="shadow-sm object-contain"
-                  :style="{
-                    aspectRatio: '3/2',
-                    maxWidth: expandedView ? '600px' : '384px',
-                    maxHeight: expandedView ? '400px' : '256px'
-                  }"
-                />
+                <ClientOnly>
+                  <StlViewer
+                    v-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex"
+                    :src="image.url"
+                    :width="expandedView ? 600 : 384"
+                    :height="expandedView ? 400 : 256"
+                    class="shadow-sm object-contain"
+                    :style="{
+                      aspectRatio: '3/2',
+                      maxWidth: expandedView ? '600px' : '384px',
+                      maxHeight: expandedView ? '400px' : '256px'
+                    }"
+                  />
+                </ClientOnly>
                 <img
                   v-else-if="image"
                   :src="image.url || ''"
@@ -782,13 +786,15 @@ v-if="editingCaptionIndex === idx"
                 width="80px"
                 class="rounded"
               />
-              <StlViewer
-                v-else-if="image && image.url && hasStlExtension(image.url)"
-                :src="image.url"
-                :width="80"
-                :height="80"
-                class="rounded"
-              />
+              <ClientOnly>
+                <StlViewer
+                  v-if="image && image.url && hasStlExtension(image.url)"
+                  :src="image.url"
+                  :width="80"
+                  :height="80"
+                  class="rounded"
+                />
+              </ClientOnly>
               <img
                 v-else-if="image"
                 :src="image.url || ''"
@@ -959,12 +965,14 @@ v-if="editingCaptionIndex === idx"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
           >
-            <StlViewer
-              :src="currentImage.url"
-              :width="800"
-              :height="600"
-              class="object-contain transition-all duration-300 ease-in-out"
-            />
+            <ClientOnly>
+              <StlViewer
+                :src="currentImage.url"
+                :width="800"
+                :height="600"
+                class="object-contain transition-all duration-300 ease-in-out"
+              />
+            </ClientOnly>
           </div>
           <img
             v-else
