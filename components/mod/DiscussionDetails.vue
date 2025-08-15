@@ -5,6 +5,7 @@ import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { DateTime } from 'luxon';
 import { useRoute } from 'nuxt/app';
 import { modProfileNameVar } from '@/cache';
+import { stableRelativeTime } from '@/utils';
 import type { Issue } from '@/__generated__/graphql';
 
 /* component imports that were previously declared in `components:`.
@@ -60,6 +61,11 @@ onGetDiscussionResult(({ data }) => {
 /* ---------- utilities ---------- */
 const formatDate = (iso: string) =>
   DateTime.fromISO(iso).toLocaleString(DateTime.DATE_FULL);
+
+const editedAt = computed(() => {
+  if (!discussion.value?.updatedAt) return "";
+  return `Edited ${stableRelativeTime(discussion.value.updatedAt)}`;
+});
 </script>
 
 <template>
@@ -88,6 +94,8 @@ const formatDate = (iso: string) =>
         <span class="ml-1"
           >posted on {{ formatDate(discussion.createdAt) }}</span
         >
+        <span v-if="discussion.updatedAt" class="mx-2">&middot;</span>
+        <span v-if="discussion.updatedAt">{{ editedAt }}</span>
       </nuxt-link>
 
       <div class="border-l border-l-2 pl-6">

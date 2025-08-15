@@ -14,6 +14,7 @@ import type {
   Event as EventData,
 } from "@/__generated__/graphql";
 import { DateTime } from "luxon";
+import { stableRelativeTime } from "@/utils";
 import "md-editor-v3/lib/style.css";
 import EventFooter from "@/components/event/detail/EventFooter.vue";
 import EventHeader from "@/components/event/detail/EventHeader.vue";
@@ -242,6 +243,11 @@ const eventHasStarted = computed(() => {
 
 const originalPoster = computed(() => event.value?.Poster?.username || "");
 
+const editedAt = computed(() => {
+  if (!event.value?.updatedAt) return "";
+  return `Edited ${stableRelativeTime(event.value.updatedAt)}`;
+});
+
 const eventDescriptionEditMode = ref(false);
 
 const handleClickEditEventDescription = () => {
@@ -377,6 +383,8 @@ watchEffect(() => {
               <span class="ml-1"
                 >posted on {{ formatDate(event.createdAt) }}</span
               >
+              <span v-if="event.updatedAt" class="mx-2">&middot;</span>
+              <span v-if="event.updatedAt">{{ editedAt }}</span>
             </nuxt-link>
             <InfoBanner
               v-if="eventHasStarted"

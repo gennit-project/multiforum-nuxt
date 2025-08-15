@@ -27,6 +27,7 @@ import DiscussionDetails from "@/components/mod/DiscussionDetails.vue";
 import EventDetail from "@/components/event/detail/EventDetail.vue";
 import CommentDetails from "@/components/mod/CommentDetails.vue";
 import ModerationWizard from "@/components/mod/ModerationWizard.vue";
+import OriginalPosterActions from "@/components/mod/OriginalPosterActions.vue";
 import ActivityFeed from "@/components/mod/ActivityFeed.vue";
 import { modProfileNameVar, usernameVar } from "@/cache";
 import { useRoute } from "nuxt/app";
@@ -608,6 +609,22 @@ const toggleCloseOpenIssue = async () => {
     console.error("Error toggling issue open/close state:", error);
   }
 };
+
+// Handle delete actions from Original Poster Actions
+const handleDeleteDiscussion = (discussionId: string) => {
+  console.log("Delete discussion:", discussionId);
+  // TODO: Implement discussion deletion
+};
+
+const handleDeleteEvent = (eventId: string) => {
+  console.log("Delete event:", eventId);
+  // TODO: Implement event deletion
+};
+
+const handleDeleteComment = (commentId: string) => {
+  console.log("Delete comment:", commentId);
+  // TODO: Implement comment deletion
+};
 </script>
 
 <template>
@@ -718,6 +735,23 @@ const toggleCloseOpenIssue = async () => {
             @unsuspended-mod-successfully="refetchIssue"
             @open-issue="toggleCloseOpenIssue"
             @close-issue="toggleCloseOpenIssue"
+          />
+          <OriginalPosterActions
+            v-if="
+              issue &&
+              (activeIssue?.relatedDiscussionId ||
+                activeIssue?.relatedEventId ||
+                activeIssue?.relatedCommentId)
+            "
+            :issue="issue"
+            :discussion-id="activeIssue?.relatedDiscussionId || ''"
+            :event-id="activeIssue?.relatedEventId || ''"
+            :comment-id="activeIssue?.relatedCommentId || ''"
+            :channel-unique-name="channelId"
+            :is-current-user-original-poster="isCurrentUserOriginalPoster"
+            @delete-discussion="handleDeleteDiscussion"
+            @delete-event="handleDeleteEvent"
+            @delete-comment="handleDeleteComment"
           />
           <div class="flex w-full flex-col">
             <h2 v-if="activeIssue" class="text-xl font-bold border-b mt-8 pb-1">
