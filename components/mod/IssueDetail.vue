@@ -492,7 +492,12 @@ const isOriginalUserAuthor = computed(() => {
 // Determine if the current user is the original author via mod profile
 const isOriginalModAuthor = computed(() => {
   return !!modProfileNameVar.value && originalModProfileName.value === modProfileNameVar.value;
-})
+});
+
+// Determine if the current user is the original poster (either as user or mod)
+const isCurrentUserOriginalPoster = computed(() => {
+  return isOriginalUserAuthor.value || isOriginalModAuthor.value;
+});
 
 const updateComment = (text: string) => {
   createFormValues.value.text = text;
@@ -704,6 +709,7 @@ const toggleCloseOpenIssue = async () => {
             :comment-id="activeIssue?.relatedCommentId || ''"
             :channel-unique-name="channelId"
             :close-issue-loading="closeIssueLoading"
+            :is-current-user-original-poster="isCurrentUserOriginalPoster"
             @archived-successfully="refetchIssue"
             @unarchived-successfully="refetchIssue"
             @suspended-user-successfully="refetchIssue"

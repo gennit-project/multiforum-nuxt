@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import RequireAuth from "@/components/auth/RequireAuth.vue";
 import type { Issue } from "@/__generated__/graphql";
 import ArchiveButton from "./ArchiveButton.vue";
@@ -6,7 +7,7 @@ import SuspendUserButton from "./SuspendUserButton.vue";
 import EyeIcon from "../icons/EyeIcon.vue";
 import XCircleIcon from "../icons/XCircleIcon.vue";
 
-defineProps({
+const props = defineProps({
   issue: {
     type: Object as () => Issue,
     required: true,
@@ -41,6 +42,11 @@ defineProps({
     required: false,
     default: false,
   },
+  isCurrentUserOriginalPoster: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 
 defineEmits([
@@ -53,6 +59,11 @@ defineEmits([
   "unsuspended-user-successfully",
   "unsuspended-mod-successfully"
 ]);
+
+// Compute whether actions should be disabled
+const actionsDisabled = computed(() => {
+  return !props.issue.isOpen || props.isCurrentUserOriginalPoster;
+});
 
 </script>
 
@@ -71,13 +82,13 @@ defineEmits([
         <div
           class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
           :class="[
-            issue.isOpen
+            issue.isOpen && !isCurrentUserOriginalPoster
               ? 'border-orange-500'
               : 'border-gray-300 dark:border-gray-700',
           ]"
         >
           <h1
-            v-if="issue.isOpen"
+            v-if="issue.isOpen && !isCurrentUserOriginalPoster"
             class="text-xl font-bold text-orange-500 border-b border-gray-300 dark:border-gray-600 pb-2"
           >
             Mod Decision Needed
@@ -91,6 +102,9 @@ defineEmits([
           <p v-if="!issue.isOpen" class="text-gray-600 dark:text-gray-400" >
             {{ "Mod actions are disabled because the issue is closed." }}
           </p>
+          <p v-else-if="isCurrentUserOriginalPoster" class="text-gray-600 dark:text-gray-400" >
+            {{ "Mod actions are disabled because you are the author of the original post." }}
+          </p>
           <RequireAuth :full-width="true">
             <template #has-auth>
               <div class="flex flex-col space-y-4 mt-4">
@@ -101,7 +115,7 @@ defineEmits([
                   :context-text="contextText"
                   :channel-unique-name="channelUniqueName"
                   :issue="issue"
-                  :disabled="!issue.isOpen"
+                  :disabled="actionsDisabled"
                   @archived-successfully="$emit('archived-successfully')"
                   @unarchived-successfully="$emit('unarchived-successfully')"
                 />
@@ -112,12 +126,12 @@ defineEmits([
                   :event-title="contextText"
                   :event-id="eventId"
                   :channel-unique-name="channelUniqueName"
-                  :disabled="!issue.isOpen"
+                  :disabled="actionsDisabled"
                   @suspended-successfully="$emit('suspended-user-successfully')"
                   @unsuspended-successfully="$emit('unsuspended-user-successfully')"
                 />
                 <button
-                  v-if="issue.isOpen"
+                  v-if="issue.isOpen && !isCurrentUserOriginalPoster"
                   class="w-full cursor-pointer bg-orange-600 hover:bg-orange-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
                   :loading="closeIssueLoading"
                   @click="$emit('close-issue')"
