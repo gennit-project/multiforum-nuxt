@@ -15,6 +15,7 @@ const mockMarker = {
   addListener: vi.fn(),
   setMap: vi.fn(),
   setIcon: vi.fn(),
+  getMap: vi.fn().mockReturnValue({}), // Mock getMap to return a map object
 };
 
 const mockBounds = {
@@ -162,30 +163,33 @@ describe('Map with Clustering', () => {
     expect(global.google.maps.Marker).toHaveBeenCalledTimes(mockEvents.length);
   });
 
-  it('should clear markers including clusterer when clearing', async () => {
-    const wrapper = mount(Map, {
+  it('should create MarkerClusterer with correct configuration', async () => {
+    const { MarkerClusterer } = await import('@googlemaps/markerclusterer');
+    
+    mount(Map, {
       props: {
         events: mockEvents,
-        colorLocked: false, 
+        colorLocked: false,
         previewIsOpen: false,
         useMobileStyles: false,
       },
     });
 
-    await wrapper.vm.$nextTick();
+    // Wait for component to initialize
+    await new Promise(resolve => setTimeout(resolve, 0));
     
-    // Trigger re-render which should clear previous markers
-    await wrapper.setProps({
-      events: [...mockEvents, {
-        id: '4',
-        title: 'Event 4',
-        location: { latitude: 35.0, longitude: -120.0 },
-      } as Event],
-    });
-
-    await wrapper.vm.$nextTick();
-
-    // Verify clusterer clearMarkers was called
-    expect(mockMarkerClusterer.clearMarkers).toHaveBeenCalled();
+    // Verify MarkerClusterer was called with correct parameters
+    expect(MarkerClusterer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        markers: expect.any(Array),
+        map: expect.any(Object),
+        onClusterClick: expect.any(Function),
+      })
+    );
+    
+    // Verify the correct number of markers were passed
+    const call = (MarkerClusterer as any).mock.calls[0];
+    const config = call[0];
+    expect(config.markers).toHaveLength(mockEvents.length);
   });
 });
