@@ -194,12 +194,13 @@ const getUserActionClasses = (isActive: boolean) => {
   <div class="fixed left-0 top-0 h-full w-16 bg-gray-900 border-r border-gray-600 hidden lg:flex flex-col items-center z-40" :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }">
     <!-- Logo -->
     <IconTooltip text="Topical - Home" :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }">
-      <div 
+      <a 
+        href="/"
         class="w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 flex items-center justify-center transition-colors duration-200 cursor-pointer"
-        @click="() => navigateTo({ name: 'index' })"
+        @click.prevent="() => navigateTo({ name: 'index' })"
       >
         <span class="text-2xl">🐝</span>
-      </div>
+      </a>
     </IconTooltip>
 
     <!-- Main Navigation Icons -->
@@ -209,16 +210,17 @@ const getUserActionClasses = (isActive: boolean) => {
         :key="item.name"
         :text="item.name"
       >
-        <div
+        <a
+          :href="item.href"
           :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-          @click="() => navigateTo({ name: item.routerName })"
+          @click.prevent="() => navigateTo({ name: item.routerName })"
         >
           <component
             :is="item.icon"
             class="h-6 w-6 text-gray-300"
             aria-hidden="true"
           />
-        </div>
+        </a>
       </IconTooltip>
     </div>
 
@@ -233,9 +235,10 @@ const getUserActionClasses = (isActive: boolean) => {
         :key="forum.uniqueName"
         :text="forum.uniqueName"
       >
-        <div
+        <a
+          :href="`/forums/${forum.uniqueName}/discussions`"
           :class="getForumIconClasses(currentForumId === forum.uniqueName)"
-          @click="() => navigateTo({
+          @click.prevent="() => navigateTo({
             name: 'forums-forumId-discussions',
             params: { forumId: forum.uniqueName },
           })"
@@ -247,7 +250,7 @@ const getUserActionClasses = (isActive: boolean) => {
             :is-small="true"
             :is-square="false"
           />
-        </div>
+        </a>
       </IconTooltip>
 
       <!-- More Button -->
@@ -274,9 +277,10 @@ const getUserActionClasses = (isActive: boolean) => {
         v-if="isAuthenticatedVar && usernameVar"
         text="My Profile"
       >
-        <div
+        <a
+          :href="`/u/${usernameVar}`"
           :class="getUserActionClasses(isActiveUserAction('u-username'))"
-          @click="() => navigateTo({
+          @click.prevent="() => navigateTo({
             name: 'u-username',
             params: { username: usernameVar },
           })"
@@ -289,7 +293,7 @@ const getUserActionClasses = (isActive: boolean) => {
             class="h-8 w-8"
           />
           <UserIcon v-else />
-        </div>
+        </a>
       </IconTooltip>
 
       <!-- Settings -->
@@ -297,22 +301,24 @@ const getUserActionClasses = (isActive: boolean) => {
         v-if="isAuthenticatedVar && usernameVar"
         text="Account Settings"
       >
-        <div
+        <a
+          href="/account_settings"
           :class="getUserActionClasses(isActiveUserAction('account_settings'))"
-          @click="() => navigateTo({ name: 'account_settings' })"
+          @click.prevent="() => navigateTo({ name: 'account_settings' })"
         >
           <SettingsIcon />
-        </div>
+        </a>
       </IconTooltip>
 
       <!-- Admin Dashboard -->
       <IconTooltip text="Admin Dashboard">
-        <div
+        <a
+          href="/admin/issues"
           :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
-          @click="() => navigateTo({ name: 'admin-issues' })"
+          @click.prevent="() => navigateTo({ name: 'admin-issues' })"
         >
           <AdminIcon />
-        </div>
+        </a>
       </IconTooltip>
 
       <!-- Sign Out -->
