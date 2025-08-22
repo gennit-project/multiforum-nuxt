@@ -133,7 +133,7 @@
     "eslint-plugin-vue": "^9.33.0",
     "eslint-plugin-vuejs-accessibility": "^2.4.1",
     "globals": "^15.15.0",
-    "happy-dom": "^17.6.3",
+    "happy-dom": "^18.0.1",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "prettier": "^3.5.3",
