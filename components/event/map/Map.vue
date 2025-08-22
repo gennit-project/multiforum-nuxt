@@ -98,7 +98,7 @@ const clearMarkers = () => {
     markerClusterer.value.clearMarkers();
     markerClusterer.value = null;
   }
-  
+
   for (const key in markerMap.markers) {
     const markerData = markerMap.markers[key];
     const marker = markerData.marker;
@@ -255,7 +255,7 @@ const renderMap = async () => {
         clustererMap.fitBounds(bounds);
         // Limit zoom level to prevent zooming in too much
         const currentZoom = clustererMap.getZoom() || 0;
-        const maxZoom = Math.min(currentZoom + 3, 18);
+        const maxZoom = Math.min(currentZoom + 1, 18);
         setTimeout(() => {
           clustererMap.setZoom(maxZoom);
         }, 200);
