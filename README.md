@@ -52,6 +52,18 @@ For location-based communities, the platform includes powerful discovery feature
 
 When the project is finished, documentation will be added so that anyone can deploy their own Multiforum instance with custom branding.
 
+## New feature August 2025 - Map marker clustering
+
+I have installed the marker clusterer tool (https://developers.google.com/maps/documentation/javascript/marker-clustering) to make the map look much cleaner. Here's the before and after.
+
+Before:
+
+![marker clustering before - way too many markers](./screenshots/marker-clustering-before.png)
+
+After:
+
+![marker clustering after - much fewer markers](./screenshots/marker-clustering-after.png)
+
 ## New feature July 2025 - Wikis
 
 I added a wiki feature. Forum owners can go into the forum settings and select a checkbox to enable the wiki. That turns on a Wiki tab.
