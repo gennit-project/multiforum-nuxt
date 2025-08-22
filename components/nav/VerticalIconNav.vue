@@ -219,7 +219,7 @@ const getUserActionClasses = (isActive: boolean) => {
 
 <template>
   <div
-    class="fixed left-0 top-0 z-40 hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
+    class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
     :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
   >
     <!-- Logo -->

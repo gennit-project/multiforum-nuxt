@@ -65,19 +65,19 @@ const isOnMapPage = computed(() => {
 
 <template>
   <nav
-    class="z-20 w-full border-b border-b-gray-600 bg-gray-900 pr-4"
+    class="z-20 w-full border-b border-b-gray-600 bg-gray-900 pr-4 lg:ml-16"
     :class="[isOnMapPage ? 'fixed' : '']"
   >
-    <div class="flex items-center justify-between px-2 py-1 lg:ml-10">
+    <div class="flex items-center justify-between px-2 py-1">
       <div class="flex items-center">
         <HamburgerMenuButton
           v-if="!sideNavIsOpenVar"
           data-testid="menu-button"
-          class="fixed-menu-button cursor-pointer md:ml-1"
+          class="fixed-menu-button cursor-pointer md:ml-1 lg:hidden"
           @click="$emit('toggleDropdown')"
         />
 
-        <div class="ml-12 flex items-center space-x-1 text-sm">
+        <div class="ml-2 flex items-center space-x-1 text-sm">
           <nuxt-link to="/" class="flex items-center gap-1">
             <span v-if="!lgAndUp">🐝</span>
             <span
@@ -155,6 +155,6 @@ const isOnMapPage = computed(() => {
   position: fixed; /* Makes the button stay in the same place on the screen */
   top: 6px; /* Distance from the top of the viewport */
   left: 10px; /* Distance from the left of the viewport */
-  z-index: 19; /* Ensures the button is above other content */
+  z-index: 20; /* Ensures the button is above other content */
 }
 </style>
