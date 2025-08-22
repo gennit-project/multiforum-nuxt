@@ -116,7 +116,7 @@ describe('DiscussionBody Sensitive Content', () => {
       });
     });
 
-    it('should show blocked view with login prompt for sensitive content', () => {
+    it('should show sensitive content warning div for sensitive content', () => {
       const mockDiscussion = createMockDiscussion(true);
       
       const wrapper = mount(DiscussionBody, {
@@ -126,17 +126,50 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should show the sensitive content warning
       const sensitiveContentDiv = wrapper.find('[data-testid="require-auth"]').element.parentElement;
       expect(sensitiveContentDiv?.classList.contains('bg-gray-200')).toBe(true);
-      expect(wrapper.text()).toContain('This content has been marked as potentially sensitive.');
-      expect(wrapper.text()).toContain('Log in to reveal sensitive content');
+    });
+
+    it('should show sensitive content warning text for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
       
-      // Should not show the actual content
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      expect(wrapper.text()).toContain('This content has been marked as potentially sensitive.');
+    });
+
+    it('should show login prompt button text for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      expect(wrapper.text()).toContain('Log in to reveal sensitive content');
+    });
+
+    it('should not show actual content for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
       expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(false);
     });
 
-    it('should show content normally when not sensitive', () => {
+    it('should not show sensitive content warning for non-sensitive content', () => {
       const mockDiscussion = createMockDiscussion(false);
       
       const wrapper = mount(DiscussionBody, {
@@ -146,11 +179,20 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should not show sensitive content warning
       const sensitiveContentWarnings = wrapper.findAll('.bg-gray-200');
       expect(sensitiveContentWarnings.length).toBe(0);
+    });
+
+    it('should show actual content for non-sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(false);
       
-      // Should show the actual content
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
       expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(true);
     });
   });
@@ -171,7 +213,7 @@ describe('DiscussionBody Sensitive Content', () => {
       });
     });
 
-    it('should show blocked view by default for sensitive content', () => {
+    it('should show sensitive content warning div for sensitive content', () => {
       const mockDiscussion = createMockDiscussion(true);
       
       const wrapper = mount(DiscussionBody, {
@@ -181,17 +223,50 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should show the sensitive content warning with reveal button
       const sensitiveContentDiv = wrapper.find('[data-testid="require-auth"]').element.parentElement;
       expect(sensitiveContentDiv?.classList.contains('bg-gray-200')).toBe(true);
-      expect(wrapper.text()).toContain('This content has been marked as potentially sensitive.');
-      expect(wrapper.text()).toContain('Reveal sensitive content');
+    });
+
+    it('should show sensitive content warning text for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
       
-      // Should not show the actual content initially
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      expect(wrapper.text()).toContain('This content has been marked as potentially sensitive.');
+    });
+
+    it('should show reveal button text for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      expect(wrapper.text()).toContain('Reveal sensitive content');
+    });
+
+    it('should not show actual content initially for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
       expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(false);
     });
 
-    it('should reveal content when user clicks reveal button', async () => {
+    it('should find reveal button when user wants to click it', async () => {
       const mockDiscussion = createMockDiscussion(true);
       
       const wrapper = mount(DiscussionBody, {
@@ -201,21 +276,46 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Initially content should be hidden
-      expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(false);
-      
-      // Find and click the reveal button
       const buttons = wrapper.findAll('button');
       const revealButton = buttons.find(button => button.text().includes('Reveal sensitive content'));
       expect(revealButton?.exists()).toBe(true);
+    });
+
+    it('should show content after user clicks reveal button', async () => {
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      const buttons = wrapper.findAll('button');
+      const revealButton = buttons.find(button => button.text().includes('Reveal sensitive content'));
       
       await revealButton!.trigger('click');
       await wrapper.vm.$nextTick();
       
-      // Content should now be visible
       expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(true);
+    });
+
+    it('should hide warning after user clicks reveal button', async () => {
+      const mockDiscussion = createMockDiscussion(true);
       
-      // Warning should be hidden
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      const buttons = wrapper.findAll('button');
+      const revealButton = buttons.find(button => button.text().includes('Reveal sensitive content'));
+      
+      await revealButton!.trigger('click');
+      await wrapper.vm.$nextTick();
+      
       const sensitiveContentWarnings = wrapper.findAll('.bg-gray-200');
       expect(sensitiveContentWarnings.length).toBe(0);
     });
@@ -237,7 +337,7 @@ describe('DiscussionBody Sensitive Content', () => {
       });
     });
 
-    it('should NOT show blocked view for sensitive content', () => {
+    it('should not show sensitive content warning for sensitive content', () => {
       const mockDiscussion = createMockDiscussion(true);
       
       const wrapper = mount(DiscussionBody, {
@@ -247,16 +347,37 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should NOT show the sensitive content warning
       const sensitiveContentWarnings = wrapper.findAll('.bg-gray-200');
       expect(sensitiveContentWarnings.length).toBe(0);
-      expect(wrapper.text()).not.toContain('This content has been marked as potentially sensitive.');
+    });
+
+    it('should not show sensitive content warning text for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
       
-      // Should show the actual content immediately
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
+      expect(wrapper.text()).not.toContain('This content has been marked as potentially sensitive.');
+    });
+
+    it('should show actual content immediately for sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
       expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(true);
     });
 
-    it('should show content normally when not sensitive', () => {
+    it('should not show sensitive content warning for non-sensitive content', () => {
       const mockDiscussion = createMockDiscussion(false);
       
       const wrapper = mount(DiscussionBody, {
@@ -266,11 +387,20 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should not show sensitive content warning
       const sensitiveContentWarnings = wrapper.findAll('.bg-gray-200');
       expect(sensitiveContentWarnings.length).toBe(0);
+    });
+
+    it('should show actual content for non-sensitive content', () => {
+      const mockDiscussion = createMockDiscussion(false);
       
-      // Should show the actual content
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
       expect(wrapper.find('[data-testid="markdown-preview"]').exists()).toBe(true);
     });
   });
@@ -295,7 +425,6 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should treat as user does not allow sensitive content by default
       const sensitiveContentDiv = wrapper.find('[data-testid="require-auth"]').element.parentElement;
       expect(sensitiveContentDiv?.classList.contains('bg-gray-200')).toBe(true);
     });
@@ -321,13 +450,35 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Should treat as user does not allow sensitive content by default
       const sensitiveContentDiv = wrapper.find('[data-testid="require-auth"]').element.parentElement;
       expect(sensitiveContentDiv?.classList.contains('bg-gray-200')).toBe(true);
+    });
+
+    it('should show reveal button text when missing user data', () => {
+      mockIsAuthenticatedVar.value = true;
+      mockUsernameVar.value = 'testuser';
+      mockRequireAuthShowsAuth = true;
+      
+      // Mock query to return empty users array
+      mockUseQuery.mockReturnValue({
+        result: ref({
+          users: []
+        })
+      });
+      
+      const mockDiscussion = createMockDiscussion(true);
+      
+      const wrapper = mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: mockDiscussion
+        }
+      });
+      
       expect(wrapper.text()).toContain('Reveal sensitive content');
     });
 
-    it('should call useQuery with correct reactive parameters', () => {
+    it('should call useQuery with correct structure', () => {
       mockIsAuthenticatedVar.value = true;
       mockUsernameVar.value = 'testuser';
       
@@ -338,23 +489,43 @@ describe('DiscussionBody Sensitive Content', () => {
         }
       });
       
-      // Verify useQuery was called with the correct structure
       expect(mockUseQuery).toHaveBeenCalledWith(
         expect.any(Object), // GET_USER query
         expect.any(Function), // Variables function
         expect.any(Function)  // Options function
       );
+    });
+
+    it('should call useQuery with correct variables function', () => {
+      mockIsAuthenticatedVar.value = true;
+      mockUsernameVar.value = 'testuser';
       
-      // Get the functions that were passed to useQuery
-      const [, variablesFunc, optionsFunc] = mockUseQuery.mock.calls[0];
+      mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: createMockDiscussion()
+        }
+      });
       
-      // Test variables function
+      const [, variablesFunc] = mockUseQuery.mock.calls[0];
       const variables = variablesFunc();
       expect(variables).toEqual({
         username: 'testuser'
       });
+    });
+
+    it('should call useQuery with correct options function', () => {
+      mockIsAuthenticatedVar.value = true;
+      mockUsernameVar.value = 'testuser';
       
-      // Test options function
+      mount(DiscussionBody, {
+        props: {
+          channelId: 'test-channel',
+          discussion: createMockDiscussion()
+        }
+      });
+      
+      const [, , optionsFunc] = mockUseQuery.mock.calls[0];
       const options = optionsFunc();
       expect(options).toEqual({
         enabled: true // isAuthenticatedVar.value && !!usernameVar.value
