@@ -20,6 +20,14 @@
   import AnnotationIcon from "@/components/icons/AnnotationIcon.vue";
   import DownloadIcon from "@/components/icons/DownloadIcon.vue";
 
+
+  interface TabItem {
+    key: string;
+    label: string;
+    icon: any | null;
+    fontAwesome: string | null;
+  }
+
   const route = useRoute();
   const props = defineProps({
     editMode: {
@@ -66,7 +74,7 @@
   const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
 
   const tabs = computed(() => {
-    const baseTabs = [
+    const baseTabs: TabItem[] = [
       {
         key: "basic",
         label: "Basic Settings",
@@ -118,7 +126,7 @@
       {
         key: "owners",
         label: "Forum Admins",
-        icon: null as any,
+        icon: null,
         fontAwesome: "fa-solid fa-user-shield",
       },
       {

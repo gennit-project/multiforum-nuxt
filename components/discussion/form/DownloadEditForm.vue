@@ -608,13 +608,13 @@ function handleSave() {
       
       <!-- Download Labels Section -->
       <FormRow 
-        v-if="channelData?.FilterGroups?.length > 0" 
+        v-if="channelData?.FilterGroups && channelData.FilterGroups.length > 0" 
         section-title="Labels" 
         class="mt-6"
       >
         <template #content>
           <DownloadLabelPicker
-            :filter-groups="channelData.FilterGroups"
+            :filter-groups="channelData.FilterGroups || []"
             :selected-labels="formValues.downloadLabels"
             @update:selected-labels="formValues.downloadLabels = $event"
           />

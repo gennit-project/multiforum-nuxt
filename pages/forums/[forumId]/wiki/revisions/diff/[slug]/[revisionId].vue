@@ -16,8 +16,8 @@ const CodeDiff = defineAsyncComponent(async () => {
   const highlightModule = await import('highlight.js/lib/languages/markdown');
   
   // Register markdown language with highlight.js
-  if (vCodeDiffModule.hljs) {
-    vCodeDiffModule.hljs.registerLanguage('markdown', highlightModule.default);
+  if ((vCodeDiffModule as any).hljs) {
+    (vCodeDiffModule as any).hljs.registerLanguage('markdown', highlightModule.default);
   }
   
   return vCodeDiffModule.CodeDiff;
