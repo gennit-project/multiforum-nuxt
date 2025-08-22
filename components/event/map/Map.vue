@@ -9,18 +9,8 @@ import placeIcon from '@/assets/images/place-icon.svg';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Event } from '@/__generated__/graphql';
 
-// The Google map requires that the styles have to be set
-// when the map is rendered and they can't change based on props.
-// And if we render both mobile and desktop maps with the same map div,
-// with the same ref, and just hide one with CSS, that doesn't work because
-// all markers get painted on both maps twice. That's bad because if a
-// map marker is highlighted, it calls the maps API excessively, and the markers
-// appear to be un-highlighted due the duplicated and overlapping map
-// markers. So the workaround is to create two different maps
-// for desktop and mobile, which reference two different map divs.
-
 export interface MarkerData {
-  marker: google.maps.Marker;
+  marker: any; // Changed to any since we can have both legacy and advanced markers
   events: { [key: string]: Event };
   numberOfEvents: number;
 }
@@ -29,6 +19,7 @@ export interface MarkerMap {
   markers: { [key: string]: MarkerData };
   infowindow?: google.maps.InfoWindow;
 }
+
 const props = defineProps({
   colorLocked: {
     type: Boolean,
@@ -80,7 +71,6 @@ const router = useRouter();
 const loader = new Loader({
   apiKey: config.googleMapsApiKey,
   version: 'weekly',
-  libraries: ['marker'],
 });
 
 const mobileMapDiv = ref<HTMLElement | null>(null);
@@ -103,8 +93,14 @@ const clearMarkers = () => {
     const markerData = markerMap.markers[key];
     const marker = markerData.marker;
 
-    if (marker && marker.getMap() !== null) {
-      marker.setMap(null);
+    if (marker) {
+      // Handle both legacy and advanced markers
+      if (marker.setMap) {
+        marker.setMap(null);
+      }
+      if (marker.map) {
+        marker.map = null;
+      }
       google.maps.event.clearInstanceListeners(marker);
     }
   }
@@ -120,28 +116,16 @@ const getMapStyles = () => {
 const renderMap = async () => {
   await loader.load();
   clearMarkers();
-  if (map.value) {
-    map.value = null;
-  }
-
-  const mapStyles = getMapStyles();
+  if (map.value) map.value = null;
 
   const mapConfig = {
     center: { lat: 33.4255, lng: -111.94 },
     zoom: 7,
     mapTypeId: 'terrain',
-    styles: mapStyles,
+    mapId: config.googleMapId,
     zoomControl: true,
-    zoomControlOptions: {
-      position: google.maps.ControlPosition.RIGHT_TOP,
-    },
+    zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_TOP },
   };
-
-  // Only add mapId if we're not using custom styles (dark theme)
-  // because mapId overrides the styles property
-  if (config.googleMapId && mapStyles.length === 0) {
-    mapConfig.mapId = config.googleMapId;
-  }
 
   map.value = new google.maps.Map(
     props.useMobileStyles ? mobileMapDiv.value! : desktopMapDiv.value!,
@@ -153,134 +137,91 @@ const renderMap = async () => {
   const markers: google.maps.Marker[] = [];
 
   props.events.forEach((event) => {
-    if (event.location) {
-      const marker = new google.maps.Marker({
-        title: `Click to view event: ${event.title}`,
-        position: {
-          lat: event.location.latitude,
-          lng: event.location.longitude,
-        },
-        map: null, // Don't add to map yet, we'll add to clusterer
-        clickable: true,
-        draggable: false,
-        icon: {
-          url: placeIcon,
-          scaledSize: {
-            width: props.useMobileStyles ? 30 : 20,
-            height: props.useMobileStyles ? 30 : 20,
-            equals: () => false,
-          },
-        },
+    if (!event.location) return;
+
+    const position = {
+      lat: event.location.latitude,
+      lng: event.location.longitude,
+    };
+
+    // IMPORTANT: don't set map here; let the clusterer handle it.
+    const marker = new google.maps.Marker({
+      position,
+      title: `Click to view event: ${event.title}`,
+    });
+
+    bounds.extend(new google.maps.LatLng(position.lat, position.lng));
+
+    const eventLocationId = `${event.location.latitude}${event.location.longitude}`;
+
+    if (props.useMobileStyles) {
+      marker.addListener('click', () => {
+        emit('highlightEvent', eventLocationId, event.id, event, true, true);
+        emit('openPreview', event, true);
+        emit('lockColors');
+      });
+    } else {
+      marker.addListener('click', () => {
+        emit('openPreview', event, true);
+        emit('lockColors');
       });
 
-      bounds.extend(marker.getPosition()!);
-
-      const eventLocationId =
-        event.location.latitude.toString() +
-        event.location.longitude.toString();
-
-      // Use different event bindings for mobile vs desktop
-      if (props.useMobileStyles) {
-        // Mobile uses a single tap handler
-        marker.addListener('click', () => {
+      marker.addListener('mouseover', () => {
+        if (!props.colorLocked) {
           emit('highlightEvent', eventLocationId, event.id, event, true, true);
-          emit('openPreview', event, true);
-          emit('lockColors');
-        });
-      } else {
-        // Desktop uses separate mouse events
-        marker.addListener('click', () => {
-          emit('openPreview', event, true);
-          emit('lockColors');
-        });
-
-        marker.addListener('mouseover', () => {
-          if (!props.colorLocked) {
-            emit(
-              'highlightEvent',
-              eventLocationId,
-              event.id,
-              event,
-              true,
-              true
-            );
-          }
-        });
-
-        marker.addListener('mouseout', () => {
-          const unhighlight = () => {
-            if (!props.colorLocked) {
-              if (
-                router.currentRoute.value.fullPath.includes(eventLocationId)
-              ) {
-                emit('unHighlight');
-              }
-
-              marker.setIcon({
-                url: placeIcon,
-                scaledSize: {
-                  width: props.useMobileStyles ? 30 : 20,
-                  height: props.useMobileStyles ? 30 : 20,
-                  equals: () => false,
-                },
-              });
-              infowindow.close();
-            }
-          };
-          unhighlight();
-        });
-      }
-
-      const updateMarkerMap = () => {
-        if (markerMap.markers[eventLocationId]) {
-          markerMap.markers[eventLocationId].events[event.id] = event;
-          markerMap.markers[eventLocationId].numberOfEvents += 1;
-          markerMap.markers[eventLocationId].marker = marker;
-        } else {
-          markerMap.markers[eventLocationId] = {
-            marker,
-            events: { [event.id]: event },
-            numberOfEvents: 1,
-          };
         }
-      };
+      });
 
-      updateMarkerMap();
-      markers.push(marker);
+      marker.addListener('mouseout', () => {
+        if (!props.colorLocked) {
+          if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
+            emit('unHighlight');
+          }
+          infowindow.close();
+        }
+      });
     }
+
+    // keep your markerMap bookkeeping
+    if (markerMap.markers[eventLocationId]) {
+      markerMap.markers[eventLocationId].events[event.id] = event;
+      markerMap.markers[eventLocationId].numberOfEvents += 1;
+      markerMap.markers[eventLocationId].marker = marker;
+    } else {
+      markerMap.markers[eventLocationId] = {
+        marker,
+        events: { [event.id]: event },
+        numberOfEvents: 1,
+      };
+    }
+
+    markers.push(marker);
   });
 
-  // Create marker clusterer
+  // Cluster AFTER building markers. Pass map here.
   markerClusterer.value = new MarkerClusterer({
     markers,
     map: map.value!,
     onClusterClick: (event, cluster, clustererMap) => {
-      // When cluster is clicked, zoom in
-      const bounds = cluster.bounds;
-      if (bounds) {
-        clustererMap.fitBounds(bounds);
-        // Limit zoom level to prevent zooming in too much
+      const b = cluster.bounds;
+      if (b) {
+        clustererMap.fitBounds(b);
         const currentZoom = clustererMap.getZoom() || 0;
         const maxZoom = Math.min(currentZoom + 1, 18);
-        setTimeout(() => {
-          clustererMap.setZoom(maxZoom);
-        }, 200);
+        setTimeout(() => clustererMap.setZoom(maxZoom), 200);
       }
     },
   });
 
   markerMap.infowindow = infowindow;
 
-  map.value.fitBounds(bounds);
-  // @ts-ignore
-  if (map.value && map.value.getZoom() > 15) {
-    map.value.setZoom(15);
+  // fit and cap zoom
+  if (!bounds.isEmpty()) {
+    map.value.fitBounds(bounds);
+    if ((map.value.getZoom() ?? 0) > 15) map.value.setZoom(15);
   }
 
-  emit('setMarkerData', {
-    markerMap: markerMap,
-    map: map.value,
-  });
+  emit('setMarkerData', { markerMap, map: map.value });
 };
 
 onMounted(async () => {
@@ -293,6 +234,7 @@ watch(currentTheme, (newTheme, oldTheme) => {
     renderMap();
   }
 });
+
 // Watch for mobile/desktop switch
 watch(
   () => props.useMobileStyles,
