@@ -179,6 +179,12 @@ const revealSensitiveContent = () => {
                 > 
                   <CheckCircleIcon class="h-4 w-4" /> Answered
                 </span>
+                <span
+                  v-if="hasSensitiveContent"
+                  class="text-xs text-orange-600 dark:text-orange-400 border border-orange-600 dark:border-orange-400 rounded-full px-2"
+                >
+                  Sensitive
+                </span>
               </nuxt-link>
               <div
                 class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"

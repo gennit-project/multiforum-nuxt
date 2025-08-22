@@ -178,17 +178,25 @@ const revealSensitiveContent = () => {
                 getDetailLink()
               "
             >
-              <span
-                :class="
-                  discussionIdInParams === discussionId ? 'text-black' : ''
-                "
-                class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
-              >
-                <HighlightedSearchTerms
-                  :text="title"
-                  :search-input="searchInput"
-                />
-              </span>
+              <div class="flex items-center gap-2">
+                <span
+                  :class="
+                    discussionIdInParams === discussionId ? 'text-black' : ''
+                  "
+                  class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                >
+                  <HighlightedSearchTerms
+                    :text="title"
+                    :search-input="searchInput"
+                  />
+                </span>
+                <span
+                  v-if="hasSensitiveContent"
+                  class="text-xs text-orange-600 dark:text-orange-400 border border-orange-600 dark:border-orange-400 rounded-full px-2"
+                >
+                  Sensitive
+                </span>
+              </div>
             </nuxt-link>
             <div
               class="text-xs pt-1 text-gray-500 no-underline dark:text-gray-300"
