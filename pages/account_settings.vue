@@ -8,12 +8,9 @@ import RequireAuth from "@/components/auth/RequireAuth.vue";
 import NotificationComponent from "@/components/NotificationComponent.vue";
 import FormRow from "@/components/FormRow.vue";
 import CheckBox from "@/components/CheckBox.vue";
-import SaveButton from "@/components/SaveButton.vue";
 import type { EditAccountSettingsFormValues } from "@/types/User";
 import type { UserUpdateInput } from "@/__generated__/graphql";
 import { usernameVar } from "@/cache";
-import { useRoute, useRouter } from "nuxt/app";
-
 type NotificationFormValues = {
   notifyOnReplyToCommentByDefault: boolean;
   notifyOnReplyToDiscussionByDefault: boolean;
@@ -24,9 +21,6 @@ type NotificationFormValues = {
   notificationBundleEnabled: boolean;
   enableSensitiveContentByDefault: boolean;
 };
-
-const route = useRoute();
-const router = useRouter();
 
 const {
   result: getUserResult,
@@ -172,6 +166,25 @@ async function submitNotificationSettings() {
 function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
   basicFormValues.value = { ...basicFormValues.value, ...data };
 }
+
+// Debounced auto-save for notification settings
+let saveTimeout: NodeJS.Timeout;
+function debouncedAutoSave() {
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  saveTimeout = setTimeout(async () => {
+    if (dataLoaded.value) {
+      await submitNotificationSettings();
+    }
+  }, 800); // 800ms delay
+}
+
+// Handle checkbox updates with auto-save
+function handleCheckboxUpdate(field: keyof NotificationFormValues, value: boolean | string) {
+  (notificationFormValues.value as any)[field] = value;
+  debouncedAutoSave();
+}
 </script>
 
 <template>
@@ -200,9 +213,8 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
               />
             </div>
 
-            <!-- Notification Settings Section -->
             <div v-if="dataLoaded" class="space-y-6">
-              <h2 class="text-xl font-semibold mb-4">Notification Settings</h2>
+              <h2 class="text-xl font-semibold mb-4">Preferences</h2>
               
               <!-- Email Notification Preferences -->
               <FormRow section-title="Email Notifications">
@@ -212,7 +224,7 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       <CheckBox
                         :test-id="'notify-comment-reply'"
                         :checked="notificationFormValues.notifyOnReplyToCommentByDefault"
-                        @update="notificationFormValues.notifyOnReplyToCommentByDefault = $event"
+                        @update="handleCheckboxUpdate('notifyOnReplyToCommentByDefault', $event)"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         Email me when someone replies to my comments
@@ -223,7 +235,7 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       <CheckBox
                         :test-id="'notify-discussion-reply'"
                         :checked="notificationFormValues.notifyOnReplyToDiscussionByDefault"
-                        @update="notificationFormValues.notifyOnReplyToDiscussionByDefault = $event"
+                        @update="handleCheckboxUpdate('notifyOnReplyToDiscussionByDefault', $event)"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         Email me when someone replies to my discussions
@@ -234,7 +246,7 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       <CheckBox
                         :test-id="'notify-event-reply'"
                         :checked="notificationFormValues.notifyOnReplyToEventByDefault"
-                        @update="notificationFormValues.notifyOnReplyToEventByDefault = $event"
+                        @update="handleCheckboxUpdate('notifyOnReplyToEventByDefault', $event)"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         Email me when someone replies to my events
@@ -245,7 +257,7 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       <CheckBox
                         :test-id="'notify-tagged'"
                         :checked="notificationFormValues.notifyWhenTagged"
-                        @update="notificationFormValues.notifyWhenTagged = $event"
+                        @update="handleCheckboxUpdate('notifyWhenTagged', $event)"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         Email me when someone tags me in a comment
@@ -256,7 +268,7 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       <CheckBox
                         :test-id="'notify-feedback'"
                         :checked="notificationFormValues.notifyOnFeedback"
-                        @update="notificationFormValues.notifyOnFeedback = $event"
+                        @update="handleCheckboxUpdate('notifyOnFeedback', $event)"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         Email me when I receive feedback from moderators
@@ -274,7 +286,7 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       <CheckBox
                         :test-id="'enable-sensitive-content'"
                         :checked="notificationFormValues.enableSensitiveContentByDefault"
-                        @update="notificationFormValues.enableSensitiveContentByDefault = $event"
+                        @update="handleCheckboxUpdate('enableSensitiveContentByDefault', $event)"
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         I am over 18 and want to view sensitive content by default
@@ -284,14 +296,6 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                 </template>
               </FormRow>
 
-              <!-- Save Button for Notifications -->
-              <div class="pt-4">
-                <SaveButton
-                  :test-id="'save-notification-settings'"
-                  :loading="updateUserLoading"
-                  @click="submitNotificationSettings"
-                />
-              </div>
 
               <!-- Error Display -->
               <div v-if="getUserError || updateUserError" class="text-red-600 dark:text-red-400 text-sm">
