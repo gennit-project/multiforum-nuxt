@@ -164,7 +164,7 @@
 
 <template>
   <div class="flex justify-center">
-    <div class="max-w-screen-2xl flex-1 bg-white dark:bg-gray-800 dark:text-white">
+    <div class="max-w-screen-2xl flex-1 bg-white dark:bg-black dark:text-white">
       <div class="relative w-full">
         <div class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row">
           <div class="flex-1 md:px-2">
@@ -200,7 +200,7 @@
               class="p-0"
             >
               <ul
-                class="m-0 flex flex-col divide-y divide-gray-200 bg-white p-0 shadow dark:divide-gray-700 dark:bg-gray-800 sm:rounded-lg"
+                class="m-0 flex flex-col divide-y divide-gray-200 bg-white p-0 shadow dark:divide-gray-700 dark:bg-black sm:rounded-lg"
                 data-testid="sitewide-discussion-list"
                 role="list"
               >

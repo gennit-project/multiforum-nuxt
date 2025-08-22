@@ -285,7 +285,7 @@ const revealSensitiveContent = () => {
               <!-- Sensitive content concealment box -->
               <div
                 v-if="hasSensitiveContent && !sensitiveContentRevealed && !userAllowsSensitiveContent"
-                class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center ml-2 mr-2 mb-2"
+                class="rounded border bg-gray-200 dark:bg-black p-4 text-center ml-2 mr-2 mb-2"
               >
                 <p class="text-gray-600 dark:text-gray-300 mb-3 text-sm">
                   This content has been marked as potentially sensitive.
