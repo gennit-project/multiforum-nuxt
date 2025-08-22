@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, computed } from 'vue';
 import { timeAgo } from '@/utils';
 
 export default defineComponent({
@@ -50,9 +50,18 @@ export default defineComponent({
       default: false,
     },
   },
-  setup() {
+  setup(props) {
+    const accountCreatedText = computed(() => {
+      if (!props.accountCreated) return '';
+      try {
+        return `account created ${timeAgo(new Date(props.accountCreated))}`;
+      } catch {
+        return '';
+      }
+    });
+
     return {
-      timeAgo,
+      accountCreatedText,
     };
   },
 });
@@ -120,8 +129,8 @@ export default defineComponent({
             </p>
           </div>
           <ul class="text-xs">
-            <li>
-              {{ `account created ${timeAgo(new Date(accountCreated))}` }}
+            <li v-if="accountCreatedText">
+              {{ accountCreatedText }}
             </li>
             <li>{{ `${commentKarma ?? 0} comment karma` }}</li>
             <li>{{ `${discussionKarma ?? 0} discussion karma` }}</li>

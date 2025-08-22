@@ -76,8 +76,10 @@ const loadRecentForums = () => {
     .slice(0, DEFAULT_LIMIT);
 };
 
-// Load initial forums
-loadRecentForums();
+// Load initial forums only on client
+if (import.meta.client) {
+  loadRecentForums();
+}
 
 const { result: getUserResult } = useQuery(
   GET_USER,
@@ -269,50 +271,52 @@ const getUserActionClasses = (isActive: boolean) => {
     />
 
     <!-- Recent Forums (hidden when vertically short) -->
-    <div
-      v-if="recentForums.length > 0 && !isVerticallyShort"
-      class="flex flex-col space-y-1"
-    >
-      <!-- Limited Recent Forums -->
-      <IconTooltip
-        v-for="forum in limitedRecentForums"
-        :key="forum.uniqueName"
-        :text="forum.uniqueName"
+    <ClientOnly>
+      <div
+        v-if="recentForums.length > 0 && !isVerticallyShort"
+        class="flex flex-col space-y-1"
       >
-        <a
-          :href="`/forums/${forum.uniqueName}/discussions`"
-          :class="getForumIconClasses(currentForumId === forum.uniqueName)"
-          @click.prevent="
-            () =>
-              navigateTo({
-                name: 'forums-forumId-discussions',
-                params: { forumId: forum.uniqueName },
-              })
-          "
+        <!-- Limited Recent Forums -->
+        <IconTooltip
+          v-for="forum in limitedRecentForums"
+          :key="forum.uniqueName"
+          :text="forum.uniqueName"
         >
-          <AvatarComponent
-            class="h-8 w-8"
-            :text="forum.uniqueName || ''"
-            :src="forum?.channelIconURL ?? ''"
-            :is-small="true"
-            :is-square="false"
-          />
-        </a>
-      </IconTooltip>
-
-      <!-- More Button -->
-      <div v-if="hasMoreForums" class="flex flex-col items-center">
-        <IconTooltip text="More Forums">
-          <div
-            :class="getUserActionClasses(false)"
-            @click="isDrawerOpen = true"
+          <a
+            :href="`/forums/${forum.uniqueName}/discussions`"
+            :class="getForumIconClasses(currentForumId === forum.uniqueName)"
+            @click.prevent="
+              () =>
+                navigateTo({
+                  name: 'forums-forumId-discussions',
+                  params: { forumId: forum.uniqueName },
+                })
+            "
           >
-            <MoreIcon />
-          </div>
+            <AvatarComponent
+              class="h-8 w-8"
+              :text="forum.uniqueName || ''"
+              :src="forum?.channelIconURL ?? ''"
+              :is-small="true"
+              :is-square="false"
+            />
+          </a>
         </IconTooltip>
-        <span class="mt-1 text-xs text-gray-400">More</span>
+
+        <!-- More Button -->
+        <div v-if="hasMoreForums" class="flex flex-col items-center">
+          <IconTooltip text="More Forums">
+            <div
+              :class="getUserActionClasses(false)"
+              @click="isDrawerOpen = true"
+            >
+              <MoreIcon />
+            </div>
+          </IconTooltip>
+          <span class="mt-1 text-xs text-gray-400">More</span>
+        </div>
       </div>
-    </div>
+    </ClientOnly>
 
     <!-- Divider -->
     <div
@@ -328,45 +332,7 @@ const getUserActionClasses = (isActive: boolean) => {
         'space-y-2': !isVerticallyShort,
       }"
     >
-      <!-- Profile -->
-      <IconTooltip v-if="isAuthenticatedVar && usernameVar" text="My Profile">
-        <a
-          :href="`/u/${usernameVar}`"
-          :class="getUserActionClasses(isActiveUserAction('u-username'))"
-          @click.prevent="
-            () =>
-              navigateTo({
-                name: 'u-username',
-                params: { username: usernameVar },
-              })
-          "
-        >
-          <AvatarComponent
-            v-if="profilePicURL"
-            :text="usernameVar"
-            :src="profilePicURL"
-            :is-small="true"
-            class="h-8 w-8"
-          />
-          <UserIcon v-else />
-        </a>
-      </IconTooltip>
-
-      <!-- Settings -->
-      <IconTooltip
-        v-if="isAuthenticatedVar && usernameVar"
-        text="Account Settings"
-      >
-        <a
-          href="/account_settings"
-          :class="getUserActionClasses(isActiveUserAction('account_settings'))"
-          @click.prevent="() => navigateTo({ name: 'account_settings' })"
-        >
-          <SettingsIcon />
-        </a>
-      </IconTooltip>
-
-      <!-- Admin Dashboard -->
+      <!-- Admin Dashboard (always shown) -->
       <IconTooltip text="Admin Dashboard">
         <a
           href="/admin/issues"
@@ -377,20 +343,70 @@ const getUserActionClasses = (isActive: boolean) => {
         </a>
       </IconTooltip>
 
-      <!-- Sign Out -->
-      <IconTooltip v-if="isAuthenticatedVar" text="Sign Out">
-        <SiteSidenavLogout
-          :nav-link-classes="getUserActionClasses(false)"
-          :show-icon-only="true"
-        />
-      </IconTooltip>
+      <!-- Authentication-dependent actions -->
+      <ClientOnly>
+        <!-- Profile -->
+        <IconTooltip v-if="isAuthenticatedVar && usernameVar" text="My Profile">
+          <a
+            :href="`/u/${usernameVar}`"
+            :class="getUserActionClasses(isActiveUserAction('u-username'))"
+            @click.prevent="
+              () =>
+                navigateTo({
+                  name: 'u-username',
+                  params: { username: usernameVar },
+                })
+            "
+          >
+            <AvatarComponent
+              v-if="profilePicURL"
+              :text="usernameVar"
+              :src="profilePicURL"
+              :is-small="true"
+              class="h-8 w-8"
+            />
+            <UserIcon v-else />
+          </a>
+        </IconTooltip>
 
-      <!-- Sign In -->
-      <IconTooltip v-if="!isAuthenticatedVar" text="Log In">
-        <div :class="getUserActionClasses(false)">
-          <LoginIcon />
-        </div>
-      </IconTooltip>
+        <!-- Settings -->
+        <IconTooltip
+          v-if="isAuthenticatedVar && usernameVar"
+          text="Account Settings"
+        >
+          <a
+            href="/account_settings"
+            :class="getUserActionClasses(isActiveUserAction('account_settings'))"
+            @click.prevent="() => navigateTo({ name: 'account_settings' })"
+          >
+            <SettingsIcon />
+          </a>
+        </IconTooltip>
+
+        <!-- Sign Out -->
+        <IconTooltip v-if="isAuthenticatedVar" text="Sign Out">
+          <SiteSidenavLogout
+            :nav-link-classes="getUserActionClasses(false)"
+            :show-icon-only="true"
+          />
+        </IconTooltip>
+
+        <!-- Sign In -->
+        <IconTooltip v-if="!isAuthenticatedVar" text="Log In">
+          <div :class="getUserActionClasses(false)">
+            <LoginIcon />
+          </div>
+        </IconTooltip>
+
+        <template #fallback>
+          <!-- Fallback: Show login icon as default -->
+          <IconTooltip text="Log In">
+            <div :class="getUserActionClasses(false)">
+              <LoginIcon />
+            </div>
+          </IconTooltip>
+        </template>
+      </ClientOnly>
     </div>
 
     <!-- Recent Forums Drawer -->

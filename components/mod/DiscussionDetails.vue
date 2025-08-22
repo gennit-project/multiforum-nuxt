@@ -69,7 +69,8 @@ const editedAt = computed(() => {
   <div>
     <ErrorBanner v-if="getDiscussionError" :text="getDiscussionError.message" />
     <LoadingSpinner v-else-if="getDiscussionLoading" />
-    <div v-if="discussion" class="mt-3 flex w-full flex-col gap-2">
+    <ClientOnly>
+      <div v-if="discussion" class="mt-3 flex w-full flex-col gap-2">
       <nuxt-link
         :to="{
           name: 'u-username',
@@ -91,11 +92,18 @@ const editedAt = computed(() => {
           :discussion-karma="discussion?.Author.discussionKarma ?? 0"
           :account-created="discussion?.Author.createdAt ?? ''"
         />
-        <span class="ml-1"
-          >posted on {{ formatDate(discussion.createdAt) }}</span
-        >
-        <span v-if="discussion.updatedAt" class="mx-2">&middot;</span>
-        <span v-if="discussion.updatedAt">{{ editedAt }}</span>
+        <ClientOnly>
+          <span class="ml-1"
+            >posted on {{ formatDate(discussion.createdAt) }}</span
+          >
+          <span v-if="discussion.updatedAt" class="mx-2">&middot;</span>
+          <span v-if="discussion.updatedAt">{{ editedAt }}</span>
+          <template #fallback>
+            <span class="ml-1"
+              >posted on {{ discussion.createdAt.split('T')[0] }}</span
+            >
+          </template>
+        </ClientOnly>
       </nuxt-link>
 
       <div class="border-l border-l-2 pl-6">
@@ -121,5 +129,18 @@ const editedAt = computed(() => {
         />
       </div>
     </div>
+      <template #fallback>
+        <div class="mt-3 flex w-full flex-col gap-2">
+          <div class="flex items-center dark:text-white">
+            <div class="mr-2 h-6 w-6 rounded-full bg-gray-300 animate-pulse"/>
+            <div class="h-4 bg-gray-300 animate-pulse rounded w-32"/>
+          </div>
+          <div class="border-l border-l-2 pl-6">
+            <div class="h-6 bg-gray-300 animate-pulse rounded w-48 mb-2"/>
+            <div class="h-4 bg-gray-300 animate-pulse rounded w-full"/>
+          </div>
+        </div>
+      </template>
+    </ClientOnly>
   </div>
 </template>
