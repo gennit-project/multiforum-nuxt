@@ -26,11 +26,10 @@ export default defineNuxtPlugin((nuxtApp) => {
   const auth0 = createAuth0(createAuth0options);
   nuxtApp.vueApp.use(auth0);
 
-  // ② Immediately access the composable (works after .use)
-  const { getAccessTokenSilently } = useAuth0();
-
-  // ③ Expose a helper for code that runs outside Vue’s setup()/script setup
-  (globalThis as any).__auth0_getToken = (
-    options: Parameters<typeof getAccessTokenSilently>[0] = {}
-  ) => getAccessTokenSilently({ detailedResponse: false, ...options });
+  // ② Expose a helper for code that runs outside Vue's setup()/script setup
+  // Access the composable lazily when the function is called
+  (globalThis as any).__auth0_getToken = (options: any = {}) => {
+    const { getAccessTokenSilently } = useAuth0();
+    return getAccessTokenSilently({ detailedResponse: false, ...options });
+  };
 });

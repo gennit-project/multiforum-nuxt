@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
+import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import nightModeMapStyles from '@/components/event/map/nightModeMapStyles';
@@ -79,17 +80,25 @@ const router = useRouter();
 const loader = new Loader({
   apiKey: config.googleMapsApiKey,
   version: 'weekly',
+  libraries: ['marker'],
 });
 
 const mobileMapDiv = ref<HTMLElement | null>(null);
 const desktopMapDiv = ref<HTMLElement | null>(null);
 const map = ref<google.maps.Map | null>(null);
+const markerClusterer = ref<MarkerClusterer | null>(null);
 
 let markerMap: MarkerMap = {
   markers: {},
 };
 
 const clearMarkers = () => {
+  // Clear the marker clusterer first
+  if (markerClusterer.value) {
+    markerClusterer.value.clearMarkers();
+    markerClusterer.value = null;
+  }
+  
   for (const key in markerMap.markers) {
     const markerData = markerMap.markers[key];
     const marker = markerData.marker;
@@ -135,6 +144,7 @@ const renderMap = async () => {
 
   const bounds = new google.maps.LatLngBounds();
   const infowindow = new google.maps.InfoWindow();
+  const markers: google.maps.Marker[] = [];
 
   props.events.forEach((event) => {
     if (event.location) {
@@ -144,7 +154,7 @@ const renderMap = async () => {
           lat: event.location.latitude,
           lng: event.location.longitude,
         },
-        map: map.value,
+        map: null, // Don't add to map yet, we'll add to clusterer
         clickable: true,
         draggable: false,
         icon: {
@@ -230,7 +240,27 @@ const renderMap = async () => {
       };
 
       updateMarkerMap();
+      markers.push(marker);
     }
+  });
+
+  // Create marker clusterer
+  markerClusterer.value = new MarkerClusterer({
+    markers,
+    map: map.value!,
+    onClusterClick: (event, cluster, clustererMap) => {
+      // When cluster is clicked, zoom in
+      const bounds = cluster.bounds;
+      if (bounds) {
+        clustererMap.fitBounds(bounds);
+        // Limit zoom level to prevent zooming in too much
+        const currentZoom = clustererMap.getZoom() || 0;
+        const maxZoom = Math.min(currentZoom + 3, 18);
+        setTimeout(() => {
+          clustererMap.setZoom(maxZoom);
+        }, 200);
+      }
+    },
   });
 
   markerMap.infowindow = infowindow;
