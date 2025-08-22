@@ -130,29 +130,16 @@ const containerStyle = computed(() => {
 <template>
   <div class="markdown-container" :style="containerStyle">
     <!-- Use both classes and inline styles to ensure font size is applied -->
-    <ClientOnly>
-      <div
-        ref="slotContainer"
-        class="markdown-body"
-        :class="{
-          'font-size-small': props.fontSize === 'small',
-          'font-size-medium': props.fontSize === 'medium',
-          'font-size-large': props.fontSize === 'large',
-        }"
-        v-html="renderedMarkdown"
-      />
-      <template #fallback>
-        <div
-          class="markdown-body"
-          :class="{
-            'font-size-small': props.fontSize === 'small',
-            'font-size-medium': props.fontSize === 'medium',
-            'font-size-large': props.fontSize === 'large',
-          }"
-          v-html="renderedMarkdown"
-        />
-      </template>
-    </ClientOnly>
+    <div
+      ref="slotContainer"
+      class="markdown-body"
+      :class="{
+        'font-size-small': props.fontSize === 'small',
+        'font-size-medium': props.fontSize === 'medium',
+        'font-size-large': props.fontSize === 'large',
+      }"
+      v-html="renderedMarkdown"
+    />
     <div v-if="$slots.default" class="inline-slot">
       <slot />
     </div>
