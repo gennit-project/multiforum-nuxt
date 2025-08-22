@@ -1,21 +1,16 @@
-import { COMMENT_VOTE_FIELDS } from "../comment/queries";
-import { gql } from "@apollo/client/core";
+import { COMMENT_VOTE_FIELDS } from '../comment/queries';
+import { gql } from '@apollo/client/core';
 
 export const GET_ISSUE_FOR_COMMENT = gql`
-query getIssueForComment(
-  $commentId: ID!
-) {
-  comments(
-    where: {
-      id: $commentId
-    }) {
+  query getIssueForComment($commentId: ID!) {
+    comments(where: { id: $commentId }) {
       id
       RelatedIssues {
         id
       }
     }
-}
-`
+  }
+`;
 
 export const ISSUE_FIELDS = gql`
   # ${COMMENT_VOTE_FIELDS}
@@ -284,14 +279,8 @@ export const GET_ISSUES_BY_COMMENT = gql`
 `;
 
 export const GET_ISSUES = gql`
-  query getIssues (
-    $issueWhere: IssueWhere
-  ){
-    issues(where: $issueWhere, options: { 
-      sort: { 
-        createdAt: DESC 
-      } 
-    }) {
+  query getIssues($issueWhere: IssueWhere) {
+    issues(where: $issueWhere, options: { sort: { createdAt: DESC } }) {
       id
       title
       body

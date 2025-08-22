@@ -1,15 +1,15 @@
-import type { SearchEventValues, } from "@/types/Event";
-import { chronologicalOrder, reverseChronologicalOrder } from "./filterStrings";
-import LocationFilterTypes from "./locationFilterTypes";
-import { timeShortcutValues, resultOrderTypes } from "./eventSearchOptions";
+import type { SearchEventValues } from '@/types/Event';
+import { chronologicalOrder, reverseChronologicalOrder } from './filterStrings';
+import LocationFilterTypes from './locationFilterTypes';
+import { timeShortcutValues, resultOrderTypes } from './eventSearchOptions';
 
 const defaultPlace = {
   // Default map center is Tempe Public Library
-  name: "Tempe Public Library",
+  name: 'Tempe Public Library',
   latitude: 33.39131450000001,
   longitude: -111.9280626,
-  referencePointId: "ChIJR35tTZ8IK4cR2D0p0AxOqbg",
-  address: "3500 S Rural Rd, Tempe, AZ 85282, USA",
+  referencePointId: 'ChIJR35tTZ8IK4cR2D0p0AxOqbg',
+  address: '3500 S Rural Rd, Tempe, AZ 85282, USA',
 };
 
 type GetFilterValuesInput = {
@@ -30,7 +30,7 @@ const getFilterValuesFromParams = function (
     timeShortcut: timeShortcutValues.NONE,
     tags: [],
     channels: [],
-    searchInput: "",
+    searchInput: '',
     showCanceledEvents: false,
     free: false,
     resultsOrder: chronologicalOrder,
@@ -41,7 +41,7 @@ const getFilterValuesFromParams = function (
 
   // For the online events list, only include
   // events with a virtual event URL.
-  if (route?.name === "events-list-search") {
+  if (route?.name === 'events-list-search') {
     cleanedValues.hasVirtualEventUrl = true;
   }
 
@@ -57,27 +57,27 @@ const getFilterValuesFromParams = function (
     const val = route.query[key];
 
     switch (key) {
-      case "timeShortcut":
-        if (typeof val === "string") {
+      case 'timeShortcut':
+        if (typeof val === 'string') {
           cleanedValues.timeShortcut = val;
         }
         break;
-      case "radius":
+      case 'radius':
         cleanedValues.radius = parseFloat(val);
         cleanedValues.locationFilter = LocationFilterTypes.WITHIN_RADIUS;
         break;
-      case "placeName":
-        if (typeof val === "string") {
+      case 'placeName':
+        if (typeof val === 'string') {
           cleanedValues.placeName = val;
         }
         break;
-      case "placeAddress":
-        if (typeof val === "string") {
+      case 'placeAddress':
+        if (typeof val === 'string') {
           cleanedValues.placeAddress = val;
         }
         break;
-      case "latitude":
-        if (typeof val === "string") {
+      case 'latitude':
+        if (typeof val === 'string') {
           // Cast string to number for filtering by distance
           const parsedVal = parseFloat(val);
           if (!isNaN(parsedVal)) {
@@ -85,8 +85,8 @@ const getFilterValuesFromParams = function (
           }
         }
         break;
-      case "longitude":
-        if (typeof val === "string") {
+      case 'longitude':
+        if (typeof val === 'string') {
           // Cast string to number for filtering by distance
           const parsedVal = parseFloat(val);
           if (!isNaN(parsedVal)) {
@@ -94,10 +94,10 @@ const getFilterValuesFromParams = function (
           }
         }
         break;
-      case "tags":
-        if (typeof val === "string") {
-          cleanedValues.tags = val.split(",");
-        } else if (typeof val === "object") {
+      case 'tags':
+        if (typeof val === 'string') {
+          cleanedValues.tags = val.split(',');
+        } else if (typeof val === 'object') {
           // If it is an array of strings, which
           // is good, then the type is an object.
           cleanedValues.tags = val;
@@ -105,37 +105,37 @@ const getFilterValuesFromParams = function (
           cleanedValues.tags = [];
         }
         break;
-      case "channels":
-        if (typeof val === "string") {
+      case 'channels':
+        if (typeof val === 'string') {
           cleanedValues.channels = [val];
         }
-        if (typeof val === "object") {
+        if (typeof val === 'object') {
           // If it is an array of strings, which
           // is good, then the type is an object.
           cleanedValues.channels = val;
         }
         break;
-      case "searchInput":
-        if (typeof val === "string") {
+      case 'searchInput':
+        if (typeof val === 'string') {
           cleanedValues.searchInput = val;
         }
         break;
-      case "showCanceledEvents":
+      case 'showCanceledEvents':
         // May need to cast to boolean
-        if (val === "true") {
+        if (val === 'true') {
           cleanedValues.showCanceledEvents = true;
-        } else if (val === "false") {
+        } else if (val === 'false') {
           cleanedValues.showCanceledEvents = false;
         }
         break;
-      case "showOnlyFreeEvents":
-        if (val === "true") {
+      case 'showOnlyFreeEvents':
+        if (val === 'true') {
           cleanedValues.free = true;
-        } else if (val === "false") {
+        } else if (val === 'false') {
           cleanedValues.free = false;
         }
         break;
-      case "resultsOrder":
+      case 'resultsOrder':
         if (val === resultOrderTypes.CHRONOLOGICAL) {
           cleanedValues.resultsOrder = chronologicalOrder;
         }
@@ -143,13 +143,13 @@ const getFilterValuesFromParams = function (
           cleanedValues.resultsOrder = reverseChronologicalOrder;
         }
         break;
-      case "locationFilter":
+      case 'locationFilter':
         cleanedValues.locationFilter = val?.toString();
         break;
-      case "showArchived":
-        if (val === "true") {
+      case 'showArchived':
+        if (val === 'true') {
           cleanedValues.showArchived = true;
-        } else if (val === "false") {
+        } else if (val === 'false') {
           cleanedValues.showArchived = false;
         }
         break;
@@ -171,7 +171,7 @@ const getFilterValuesFromParams = function (
     resultsOrder,
     locationFilter,
     hasVirtualEventUrl,
-    showArchived
+    showArchived,
   } = cleanedValues;
 
   const defaultRadius = 160.934; // 100 miles
@@ -189,7 +189,7 @@ const getFilterValuesFromParams = function (
     timeShortcut: timeShortcut || timeShortcutValues.NONE,
     tags: tags || [],
     channels: channels || [],
-    searchInput: searchInput || "",
+    searchInput: searchInput || '',
     showCanceledEvents: showCanceledEvents || false,
     free: free || false,
     resultsOrder: resultsOrder || chronologicalOrder,

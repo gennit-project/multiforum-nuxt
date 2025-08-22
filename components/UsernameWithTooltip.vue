@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent } from "vue";
-import { timeAgo } from "@/utils";
+import { defineComponent } from 'vue';
+import { timeAgo } from '@/utils';
 
 export default defineComponent({
-  name: "UsernameWithTooltip",
+  name: 'UsernameWithTooltip',
   props: {
     username: {
       type: String,
@@ -12,17 +12,17 @@ export default defineComponent({
     displayName: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     src: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     accountCreated: {
       type: String,
       required: false,
-      default: "",
+      default: '',
     },
     commentKarma: {
       type: Number,
@@ -59,10 +59,7 @@ export default defineComponent({
 </script>
 <template>
   <client-only>
-    <v-tooltip
-      location="bottom"
-      content-class="custom-tooltip"
-    >
+    <v-tooltip location="bottom" content-class="custom-tooltip">
       <template #activator="{ props }">
         <button v-bind="props">
           <slot>
@@ -74,60 +71,47 @@ export default defineComponent({
                 }"
                 class="flex flex-row items-center gap-1 hover:underline"
               >
-                <span
-                  v-if="!displayName"
-                  class="font-bold"
-                >{{ username }}</span>
-                <span
-                  v-if="displayName"
-                  class="font-bold"
-                >{{
+                <span v-if="!displayName" class="font-bold">{{
+                  username
+                }}</span>
+                <span v-if="displayName" class="font-bold">{{
                   displayName
                 }}</span>
                 <span
                   v-if="displayName"
                   class="text-gray-500 dark:text-gray-300"
-                >{{ `(u/${username})` }}</span>
+                  >{{ `(u/${username})` }}</span
+                >
               </nuxt-link>
               <span
                 v-if="isAdmin"
-                class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-              >Admin</span>
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Admin</span
+              >
               <span
                 v-else-if="isMod"
-                class="rounded-md border border-orange-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
               >
                 Mod
               </span>
               <span
                 v-if="isOriginalPoster"
-                class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-              >OP</span>
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >OP</span
+              >
             </div>
           </slot>
         </button>
       </template>
       <template #default>
         <div>
-          <div
-            v-if="!displayName"
-            class="text-md flex w-full flex-col"
-          >
-            <AvatarComponent
-              :text="username"
-              :src="src"
-              :is-medium="true"
-            />{{ username }}
+          <div v-if="!displayName" class="text-md flex w-full flex-col">
+            <AvatarComponent :text="username" :src="src" :is-medium="true" />{{
+              username
+            }}
           </div>
-          <div
-            v-if="displayName"
-            class="text-md flex w-full flex-col"
-          >
-            <AvatarComponent
-              :text="username"
-              :src="src"
-              :is-medium="true"
-            />
+          <div v-if="displayName" class="text-md flex w-full flex-col">
+            <AvatarComponent :text="username" :src="src" :is-medium="true" />
             <p class="text-xs font-bold">
               {{ displayName }}
             </p>
@@ -145,7 +129,7 @@ export default defineComponent({
         </div>
       </template>
     </v-tooltip>
-    
+
     <!-- SSR Fallback -->
     <template #fallback>
       <button>
@@ -157,33 +141,28 @@ export default defineComponent({
             }"
             class="flex flex-row items-center gap-1 hover:underline"
           >
-            <span
-              v-if="!displayName"
-              class="font-bold"
-            >{{ username }}</span>
-            <span
-              v-if="displayName"
-              class="font-bold"
-            >{{ displayName }}</span>
-            <span
-              v-if="displayName"
-              class="text-gray-500 dark:text-gray-300"
-            >{{ `(u/${username})` }}</span>
+            <span v-if="!displayName" class="font-bold">{{ username }}</span>
+            <span v-if="displayName" class="font-bold">{{ displayName }}</span>
+            <span v-if="displayName" class="text-gray-500 dark:text-gray-300">{{
+              `(u/${username})`
+            }}</span>
           </nuxt-link>
           <span
             v-if="isAdmin"
-            class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-          >Admin</span>
+            class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+            >Admin</span
+          >
           <span
             v-else-if="isMod"
-            class="rounded-md border border-orange-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+            class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
           >
             Mod
           </span>
           <span
             v-if="isOriginalPoster"
-            class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-          >OP</span>
+            class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+            >OP</span
+          >
         </div>
       </button>
     </template>

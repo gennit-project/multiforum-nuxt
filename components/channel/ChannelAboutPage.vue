@@ -1,18 +1,18 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import type { User } from "@/__generated__/graphql";
-import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import type { User } from '@/__generated__/graphql';
+import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 const {
   error: getChannelError,

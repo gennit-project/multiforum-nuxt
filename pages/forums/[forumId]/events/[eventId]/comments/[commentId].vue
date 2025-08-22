@@ -1,27 +1,27 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import type { ApolloError } from "@apollo/client/core";
-import { useRoute } from "nuxt/app";
-import Comment from "@/components/comments/Comment.vue";
-import PermalinkedComment from "@/components/comments/PermalinkedComment.vue";
+import { ref } from 'vue';
+import type { ApolloError } from '@apollo/client/core';
+import { useRoute } from 'nuxt/app';
+import Comment from '@/components/comments/Comment.vue';
+import PermalinkedComment from '@/components/comments/PermalinkedComment.vue';
 
 const route = useRoute();
 const permalinkedCommentId = ref(route.params.commentId);
 
 defineEmits([
-  "clickEditComment",
-  "clickReport",
-  "createComment",
-  "deleteComment",
-  "hideEditCommentEditor",
-  "hideReplyEditor",
-  "startCommentSave",
-  "openEditCommentEditor",
-  "openReplyEditor",
-  "saveEdit",
-  "scrollToTop",
-  "updateCreateReplyCommentInput",
-  "updateEditCommentInput",
+  'clickEditComment',
+  'clickReport',
+  'createComment',
+  'deleteComment',
+  'hideEditCommentEditor',
+  'hideReplyEditor',
+  'startCommentSave',
+  'openEditCommentEditor',
+  'openReplyEditor',
+  'saveEdit',
+  'scrollToTop',
+  'updateCreateReplyCommentInput',
+  'updateEditCommentInput',
 ]);
 
 defineProps({
@@ -49,7 +49,7 @@ defineProps({
   editFormOpenAtCommentID: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   editCommentError: {
     type: Object as () => ApolloError | null | undefined,
@@ -59,7 +59,7 @@ defineProps({
   originalPoster: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
 });
 </script>

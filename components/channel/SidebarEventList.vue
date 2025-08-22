@@ -1,162 +1,161 @@
 <script setup lang="ts">
-  import { computed } from "vue";
-  import { DateTime } from "luxon";
-  import type { Event } from "@/__generated__/graphql";
-  import { useQuery } from "@vue/apollo-composable";
-  import { GET_SOONEST_EVENTS_IN_CHANNEL } from "@/graphQLData/channel/queries";
-  import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { DateTime } from 'luxon';
+import type { Event } from '@/__generated__/graphql';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_SOONEST_EVENTS_IN_CHANNEL } from '@/graphQLData/channel/queries';
+import { useRoute } from 'nuxt/app';
 
-  defineProps({
-    eventChannelsAggregate: {
-      type: Number,
-      required: true,
-    },
+defineProps({
+  eventChannelsAggregate: {
+    type: Number,
+    required: true,
+  },
+});
+
+const route = useRoute();
+
+const channelId = computed(() => {
+  if (typeof route.params.forumId === 'string') {
+    return route.params.forumId;
+  }
+  return '';
+});
+
+const {
+  error: getEventsError,
+  result: getEventsResult,
+  loading: getEventsLoading,
+} = useQuery(
+  GET_SOONEST_EVENTS_IN_CHANNEL,
+  {
+    uniqueName: channelId,
+    now: DateTime.local().startOf('hour').toISO(),
+  },
+  {
+    fetchPolicy: 'cache-first',
+  }
+);
+
+const soonestEventsInChannel = computed(() => {
+  if (getEventsLoading.value || getEventsError.value) {
+    return [];
+  }
+  return getEventsResult.value.events;
+});
+
+// Helper functions
+const getDateSectionFormat = (date: string) => {
+  const dateObj = DateTime.fromISO(date);
+  // The date should be in the format "Thu Nov 9"
+  return dateObj.toLocaleString({
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
   });
+};
 
-  const route = useRoute();
+const happeningNow = (e: Event) => {
+  // We consider an event to be happening now if the start time is in the past
+  // and the end time is in the future
+  return (
+    e.startTime < new Date().toISOString() && // start time is in the past
+    e.endTime > new Date().toISOString()
+  ); // end time is in the future
+};
 
-  const channelId = computed(() => {
-    if (typeof route.params.forumId === "string") {
-      return route.params.forumId;
-    }
-    return "";
-  });
-
-  const {
-    error: getEventsError,
-    result: getEventsResult,
-    loading: getEventsLoading,
-  } = useQuery(
-    GET_SOONEST_EVENTS_IN_CHANNEL,
-    {
-      uniqueName: channelId,
-      now: DateTime.local().startOf("hour").toISO(),
-    },
-    {
-      fetchPolicy: "cache-first",
-    }
+const happeningToday = (e: Event) => {
+  const startTime = DateTime.fromISO(e.startTime ?? '');
+  const now = DateTime.now();
+  return (
+    startTime.day === now.day &&
+    startTime.month === now.month &&
+    startTime.year === now.year
   );
+};
 
-  const soonestEventsInChannel = computed(() => {
-    if (getEventsLoading.value || getEventsError.value) {
-      return [];
-    }
-    return getEventsResult.value.events;
-  });
+const happeningTomorrow = (e: Event) => {
+  const startTime = DateTime.fromISO(e.startTime ?? '');
+  const tomorrow = DateTime.now().startOf('day').plus({ days: 1 });
+  return (
+    startTime.day === tomorrow.day &&
+    startTime.month === tomorrow.month &&
+    startTime.year === tomorrow.year
+  );
+};
 
-  // Helper functions
-  const getDateSectionFormat = (date: string) => {
-    const dateObj = DateTime.fromISO(date);
-    // The date should be in the format "Thu Nov 9"
-    return dateObj.toLocaleString({
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
+const afterTomorrow = (e: Event) => {
+  const startTime = DateTime.fromISO(e.startTime ?? '');
+  const tomorrow = DateTime.now().startOf('day').plus({ days: 1 });
+  return startTime > tomorrow;
+};
+
+const getSidebarLinkText = (event: Event) => {
+  // If event.isAllDay is true, simply return "All Day · Event Title"
+  // Otherwise, state the title in this format: "10:00 AM · Event Title"
+  if (event.isAllDay) {
+    return `All Day · ${event.title}`;
+  }
+  const startTime = DateTime.fromISO(event.startTime ?? '');
+  return `${startTime.toLocaleString(DateTime.TIME_SIMPLE)} · ${event.title}`;
+};
+
+const dateObj = computed(() => {
+  const res: Record<string, Event[]> = {
+    happeningNow: [],
+    happeningToday: [],
+    happeningTomorrow: [],
+    afterTomorrow: [],
   };
 
-  const happeningNow = (e: Event) => {
-    // We consider an event to be happening now if the start time is in the past
-    // and the end time is in the future
-    return (
-      e.startTime < new Date().toISOString() && // start time is in the past
-      e.endTime > new Date().toISOString()
-    ); // end time is in the future
-  };
-
-  const happeningToday = (e: Event) => {
-    const startTime = DateTime.fromISO(e.startTime ?? "");
-    const now = DateTime.now();
-    return (
-      startTime.day === now.day && startTime.month === now.month && startTime.year === now.year
-    );
-  };
-
-  const happeningTomorrow = (e: Event) => {
-    const startTime = DateTime.fromISO(e.startTime ?? "");
-    const tomorrow = DateTime.now().startOf("day").plus({ days: 1 });
-    return (
-      startTime.day === tomorrow.day &&
-      startTime.month === tomorrow.month &&
-      startTime.year === tomorrow.year
-    );
-  };
-
-  const afterTomorrow = (e: Event) => {
-    const startTime = DateTime.fromISO(e.startTime ?? "");
-    const tomorrow = DateTime.now().startOf("day").plus({ days: 1 });
-    return startTime > tomorrow;
-  };
-
-  const getSidebarLinkText = (event: Event) => {
-    // If event.isAllDay is true, simply return "All Day · Event Title"
-    // Otherwise, state the title in this format: "10:00 AM · Event Title"
-    if (event.isAllDay) {
-      return `All Day · ${event.title}`;
-    }
-    const startTime = DateTime.fromISO(event.startTime ?? "");
-    return `${startTime.toLocaleString(DateTime.TIME_SIMPLE)} · ${event.title}`;
-  };
-
-  const dateObj = computed(() => {
-    const res: Record<string, Event[]> = {
-      happeningNow: [],
-      happeningToday: [],
-      happeningTomorrow: [],
-      afterTomorrow: [],
-    };
-
-    if (!soonestEventsInChannel.value) {
-      return res;
-    }
-
-    for (let i = 0; i < soonestEventsInChannel.value.length; i++) {
-      const event = soonestEventsInChannel.value[i];
-
-      if (!event) {
-        continue;
-      }
-
-      if (happeningNow(event)) {
-        res.happeningNow.push(event);
-      } else if (happeningToday(event)) {
-        res.happeningToday.push(event);
-      } else if (happeningTomorrow(event)) {
-        res.happeningTomorrow.push(event);
-      } else if (afterTomorrow(event)) {
-        res.afterTomorrow.push(event);
-      }
-    }
-
+  if (!soonestEventsInChannel.value) {
     return res;
-  });
+  }
 
-  const dateSectionObj = computed(() => {
-    const res: Record<string, Event[]> = {};
+  for (let i = 0; i < soonestEventsInChannel.value.length; i++) {
+    const event = soonestEventsInChannel.value[i];
 
-    for (let i = 0; i < dateObj.value.afterTomorrow.length; i++) {
-      const event = dateObj.value.afterTomorrow[i];
-
-      const date = getDateSectionFormat(event.startTime ?? "");
-      if (!res[date]) {
-        res[date] = [];
-      }
-      res[date].push(event);
+    if (!event) {
+      continue;
     }
 
-    return res;
-  });
+    if (happeningNow(event)) {
+      res.happeningNow.push(event);
+    } else if (happeningToday(event)) {
+      res.happeningToday.push(event);
+    } else if (happeningTomorrow(event)) {
+      res.happeningTomorrow.push(event);
+    } else if (afterTomorrow(event)) {
+      res.afterTomorrow.push(event);
+    }
+  }
+
+  return res;
+});
+
+const dateSectionObj = computed(() => {
+  const res: Record<string, Event[]> = {};
+
+  for (let i = 0; i < dateObj.value.afterTomorrow.length; i++) {
+    const event = dateObj.value.afterTomorrow[i];
+
+    const date = getDateSectionFormat(event.startTime ?? '');
+    if (!res[date]) {
+      res[date] = [];
+    }
+    res[date].push(event);
+  }
+
+  return res;
+});
 </script>
 
 <template>
-  <div
-    v-if="dateObj.happeningNow.length > 0"
-    class="flex flex-col"
-  >
+  <div v-if="dateObj.happeningNow.length > 0" class="flex flex-col">
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-circle-play mr-2 text-orange-500"/>Happening Now
+      <i class="fa-solid fa-circle-play mr-2 text-orange-500" />Happening Now
     </span>
     <div
       v-for="event in dateObj.happeningNow"
@@ -189,14 +188,11 @@
     </div>
   </div>
 
-  <div
-    v-if="dateObj.happeningToday.length > 0"
-    class="flex flex-col"
-  >
+  <div v-if="dateObj.happeningToday.length > 0" class="flex flex-col">
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-calendar-day mr-2"/>Today
+      <i class="fa-solid fa-calendar-day mr-2" />Today
     </span>
     <div
       v-for="event in dateObj.happeningToday"
@@ -220,14 +216,11 @@
     </div>
   </div>
 
-  <div
-    v-if="dateObj.happeningTomorrow.length > 0"
-    class="flex flex-col"
-  >
+  <div v-if="dateObj.happeningTomorrow.length > 0" class="flex flex-col">
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
-      <i class="fa-solid fa-calendar-plus mr-2"/>Tomorrow
+      <i class="fa-solid fa-calendar-plus mr-2" />Tomorrow
     </span>
     <div
       v-for="event in dateObj.happeningTomorrow"
@@ -257,8 +250,10 @@
       :key="date"
       class="flex flex-col"
     >
-      <span class="my-1 mb-1 flex items-center text-sm leading-6 text-gray-500 dark:text-gray-400">
-        <i class="fa-solid fa-calendar-week mr-2"/>{{ date }}
+      <span
+        class="my-1 mb-1 flex items-center text-sm leading-6 text-gray-500 dark:text-gray-400"
+      >
+        <i class="fa-solid fa-calendar-week mr-2" />{{ date }}
       </span>
       <div
         v-for="event in events"
@@ -285,7 +280,8 @@
 
   <div
     v-if="
-      soonestEventsInChannel.length > 0 && eventChannelsAggregate > soonestEventsInChannel.length
+      soonestEventsInChannel.length > 0 &&
+      eventChannelsAggregate > soonestEventsInChannel.length
     "
   >
     <nuxt-link

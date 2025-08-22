@@ -1,78 +1,78 @@
 <script setup lang="ts">
-  import { ref } from "vue";
-  import { useRoute, useRouter } from "nuxt/app";
-  import { useMutation } from "@vue/apollo-composable";
-  import { CREATE_WIKI_PAGE } from "@/graphQLData/channel/mutations";
-  import TextEditor from "@/components/TextEditor.vue";
-  import TextInput from "@/components/TextInput.vue";
-  import PrimaryButton from "@/components/PrimaryButton.vue";
-  import ErrorBanner from "@/components/ErrorBanner.vue";
-  import GoBack from "@/components/GoBack.vue";
-  import { usernameVar } from "@/cache";
+import { ref } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import { useMutation } from '@vue/apollo-composable';
+import { CREATE_WIKI_PAGE } from '@/graphQLData/channel/mutations';
+import TextEditor from '@/components/TextEditor.vue';
+import TextInput from '@/components/TextInput.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import GoBack from '@/components/GoBack.vue';
+import { usernameVar } from '@/cache';
 
-  const route = useRoute();
-  const router = useRouter();
-  const forumId = route.params.forumId as string;
+const route = useRoute();
+const router = useRouter();
+const forumId = route.params.forumId as string;
 
-  // Form data
-  const formValues = ref({
-    title: "",
-    body: "",
-    slug: "home", // Default slug for the wiki home page
-  });
+// Form data
+const formValues = ref({
+  title: '',
+  body: '',
+  slug: 'home', // Default slug for the wiki home page
+});
 
-  // No need to derive slug for home page as it's always "home"
-  function updateSlug() {
-    // We're keeping the slug as "home" for the wiki home page
-    // This is intentional - the home page must have the slug "home"
-  }
+// No need to derive slug for home page as it's always "home"
+function updateSlug() {
+  // We're keeping the slug as "home" for the wiki home page
+  // This is intentional - the home page must have the slug "home"
+}
 
-  // Create wiki page mutation
-  const {
-    mutate: createWikiPage,
-    loading: isCreating,
-    error: creationError,
-    onDone,
-  } = useMutation(CREATE_WIKI_PAGE);
+// Create wiki page mutation
+const {
+  mutate: createWikiPage,
+  loading: isCreating,
+  error: creationError,
+  onDone,
+} = useMutation(CREATE_WIKI_PAGE);
 
-  // Handle form submission
-  function handleSubmit() {
-    if (!formValues.value.title || !formValues.value.body) return;
-    const channelUpdateInput = {
-      WikiHomePage: {
-        create: {
-          node: {
-            title: formValues.value.title,
-            body: formValues.value.body,
-            slug: formValues.value.slug,
-            channelUniqueName: forumId,
-            VersionAuthor: {
-              connect: {
-                where: {
-                  node: {
-                    username: usernameVar.value,
-                  },
+// Handle form submission
+function handleSubmit() {
+  if (!formValues.value.title || !formValues.value.body) return;
+  const channelUpdateInput = {
+    WikiHomePage: {
+      create: {
+        node: {
+          title: formValues.value.title,
+          body: formValues.value.body,
+          slug: formValues.value.slug,
+          channelUniqueName: forumId,
+          VersionAuthor: {
+            connect: {
+              where: {
+                node: {
+                  username: usernameVar.value,
                 },
               },
             },
           },
         },
       },
-    };
+    },
+  };
 
-    createWikiPage({
-      where: {
-        uniqueName: forumId,
-      },
-      update: channelUpdateInput,
-    });
-  }
-
-  // Handle mutation completion
-  onDone(() => {
-    // Navigate to the wiki page with a query parameter to avoid cached data
-    router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
+  createWikiPage({
+    where: {
+      uniqueName: forumId,
+    },
+    update: channelUpdateInput,
   });
+}
+
+// Handle mutation completion
+onDone(() => {
+  // Navigate to the wiki page with a query parameter to avoid cached data
+  router.push(`/forums/${forumId}/wiki?t=${Date.now()}`);
+});
 </script>
 
 <template>
@@ -83,18 +83,14 @@
 
         <div class="mb-6">
           <h1 class="text-2xl font-bold dark:text-white">Create Wiki Page</h1>
-          <p class="text-gray-600 dark:text-gray-300">This will be the home page for your wiki.</p>
+          <p class="text-gray-600 dark:text-gray-300">
+            This will be the home page for your wiki.
+          </p>
         </div>
 
-        <ErrorBanner
-          v-if="creationError"
-          :text="creationError.message"
-        />
+        <ErrorBanner v-if="creationError" :text="creationError.message" />
 
-        <form
-          class="space-y-6"
-          @submit.prevent="handleSubmit"
-        >
+        <form class="space-y-6" @submit.prevent="handleSubmit">
           <div>
             <TextInput
               id="wiki-title"
@@ -125,7 +121,9 @@
           </div>
 
           <div>
-            <label class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200">
+            <label
+              class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-200"
+            >
               Content
             </label>
             <TextEditor

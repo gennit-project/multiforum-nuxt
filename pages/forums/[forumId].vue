@@ -1,204 +1,223 @@
 <script setup lang="ts">
-  import ChannelTabs from "@/components/channel/ChannelTabs.vue";
-  import ChannelHeaderMobile from "@/components/channel/ChannelHeaderMobile.vue";
-  import ChannelHeaderDesktop from "@/components/channel/ChannelHeaderDesktop.vue";
-  import DiscussionTitleEditForm from "@/components/discussion/detail/DiscussionTitleEditForm.vue";
-  import EventTitleEditForm from "@/components/event/detail/EventTitleEditForm.vue";
-  import IssueTitleEditForm from "@/components/mod/IssueTitleEditForm.vue";
-  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-  import type { Channel, User } from "@/__generated__/graphql";
-  import { computed } from "vue";
-  import ChannelSidebar from "@/components/channel/ChannelSidebar.vue";
-  import { useRoute, useRouter, useHead } from "nuxt/app";
-  import { useQuery } from "@vue/apollo-composable";
-  import { DateTime } from "luxon";
-  import BackLink from "@/components/BackLink.vue";
-  import PageNotFound from "@/components/PageNotFound.vue";
+import ChannelTabs from '@/components/channel/ChannelTabs.vue';
+import ChannelHeaderMobile from '@/components/channel/ChannelHeaderMobile.vue';
+import ChannelHeaderDesktop from '@/components/channel/ChannelHeaderDesktop.vue';
+import DiscussionTitleEditForm from '@/components/discussion/detail/DiscussionTitleEditForm.vue';
+import EventTitleEditForm from '@/components/event/detail/EventTitleEditForm.vue';
+import IssueTitleEditForm from '@/components/mod/IssueTitleEditForm.vue';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import type { Channel, User } from '@/__generated__/graphql';
+import { computed } from 'vue';
+import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
+import { useRoute, useRouter, useHead } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import { DateTime } from 'luxon';
+import BackLink from '@/components/BackLink.vue';
+import PageNotFound from '@/components/PageNotFound.vue';
 
-  const route = useRoute();
-  const router = useRouter();
+const route = useRoute();
+const router = useRouter();
 
-  const showDiscussionTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-discussions-discussionId")
+const showDiscussionTitle = computed(() =>
+  route.name?.toString().includes('forums-forumId-discussions-discussionId')
+);
+const showDownloadTitle = computed(() =>
+  route.name?.toString().includes('forums-forumId-downloads-discussionId')
+);
+const showEventTitle = computed(() =>
+  route.name?.toString().includes('forums-forumId-events-eventId')
+);
+const showIssueTitle = computed(() =>
+  route.name?.toString().includes('forums-forumId-issues-issueId')
+);
+
+const showChannelTabs = computed(() => {
+  const routeName = String(route.name);
+  const isCreatePage = routeName.includes('create');
+
+  // Forum settings pages where we want to show channel tabs
+  const isForumSettingsPage =
+    routeName.startsWith('forums-forumId-edit') &&
+    (routeName === 'forums-forumId-edit' ||
+      routeName.match(
+        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki)$/
+      ));
+
+  // Only hide tabs for content editing (discussions, events, etc), not forum settings
+  const isContentEditPage = routeName.includes('edit') && !isForumSettingsPage;
+
+  return (
+    !showDiscussionTitle.value &&
+    !showDownloadTitle.value &&
+    !showEventTitle.value &&
+    !showIssueTitle.value &&
+    !isCreatePage &&
+    !isContentEditPage
   );
-  const showDownloadTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-downloads-discussionId")
-  );
-  const showEventTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-events-eventId")
-  );
-  const showIssueTitle = computed(() =>
-    route.name?.toString().includes("forums-forumId-issues-issueId")
-  );
+});
 
-  const showChannelTabs = computed(() => {
-    const routeName = String(route.name);
-    const isCreatePage = routeName.includes("create");
-    
-    // Forum settings pages where we want to show channel tabs
-    const isForumSettingsPage = routeName.startsWith("forums-forumId-edit") && 
-      (routeName === "forums-forumId-edit" || 
-       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki)$/));
-    
-    // Only hide tabs for content editing (discussions, events, etc), not forum settings
-    const isContentEditPage = routeName.includes("edit") && !isForumSettingsPage;
-    
-    return (
-      !showDiscussionTitle.value &&
-      !showDownloadTitle.value &&
-      !showEventTitle.value &&
-      !showIssueTitle.value &&
-      !isCreatePage &&
-      !isContentEditPage
-    );
-  });
+const showChannelSidebar = computed(() => {
+  const routeName = String(route.name);
 
-  const showChannelSidebar = computed(() => {
-    const routeName = String(route.name);
-    
-    // Always show sidebar on forum settings pages (including wiki settings)
-    const isForumSettingsPage = routeName.startsWith("forums-forumId-edit") && 
-      (routeName === "forums-forumId-edit" || 
-       routeName.match(/^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki)$/));
-    
-    if (isForumSettingsPage) {
-      return true;
-    }
-    
-    // Hide sidebar on wiki content pages and downloads pages to give more reading space
-    // (but not wiki settings pages which are handled above)
-    return !routeName.includes("forums-forumId-wiki") && 
-           !routeName.includes("forums-forumId-downloads");
-  });
+  // Always show sidebar on forum settings pages (including wiki settings)
+  const isForumSettingsPage =
+    routeName.startsWith('forums-forumId-edit') &&
+    (routeName === 'forums-forumId-edit' ||
+      routeName.match(
+        /^forums-forumId-edit-(basic|rules|mods|owners|roles|suspended-users|suspended-mods|calendar|feedback|wiki)$/
+      ));
 
-  const channelId = computed(() => {
-    return typeof route.params.forumId === "string" ? route.params.forumId : "";
-  });
-
-  const { result: getChannelResult, onResult: onGetChannelResult, loading: channelLoading, refetch: refetchChannel } = useQuery(
-    GET_CHANNEL,
-    {
-      uniqueName: channelId,
-      // Using luxon, round down to the nearest hour
-      now: DateTime.local().startOf("hour").toISO(),
-    },
-    {
-      fetchPolicy: "cache-first",
-      nextFetchPolicy: "cache-first",
-      enabled: !!channelId.value,
-    }
-  );
-
-  const channel = computed(() => {
-    return getChannelResult.value?.channels?.[0] ?? null;
-  });
-
-  const showNotFound = computed(() => {
-    // Only show 404 if query has completed and no channel was found
-    return !channelLoading.value && channelId.value && !channel.value;
-  });
-
-  const handleRefetchChannelData = () => {
-    refetchChannel();
-  };
-
-  const addForumToLocalStorage = (channel: Channel) => {
-    if (!import.meta.client) {
-      return;
-    }
-    let recentForums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
-
-    const sideNavItem = {
-      uniqueName: channelId.value,
-      displayName: channel.displayName,
-      channelIconURL: channel.channelIconURL,
-      timestamp: Date.now(),
-    };
-
-    recentForums = recentForums.filter((forum: any) => forum.uniqueName !== channelId.value);
-
-    recentForums.unshift(sideNavItem);
-
-    // Limit to 20 items after adding the new one
-    recentForums = recentForums.slice(0, 20);
-
-    // Clean up invalid entries
-    recentForums = recentForums.filter((forum: any) => typeof forum === "object");
-
-    localStorage.setItem("recentForums", JSON.stringify(recentForums));
-  };
-  onGetChannelResult((result) => {
-    const loadedChannel = result.data?.channels[0];
-    if (!loadedChannel) {
-      return;
-    }
-    addForumToLocalStorage(loadedChannel);
-    // redirect to /discussions if we are at the channel root
-    if (route.name === "forums-forumId") {
-      router.push({
-        name: "forums-forumId-discussions",
-        params: {
-          forumId: channelId.value,
-        },
-      });
-    }
-    const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
-    const forumDescription = loadedChannel.description
-      ? loadedChannel.description.substring(0, 160) +
-        (loadedChannel.description.length > 160 ? "..." : "")
-      : `${forumName} - Community Forum`;
-    const baseUrl = import.meta.env.VITE_BASE_URL;
-    const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-    const imageUrl = loadedChannel.channelIconURL || loadedChannel.channelBannerURL || "";
-
-    // Set basic SEO meta tags
-    useHead({
-      title: `${forumName} | ${serverName}`,
-      description: forumDescription,
-      image: imageUrl,
-      type: "website",
-    });
-
-    // Add structured data for rich results
-    useHead({
-      script: [
-        {
-          type: "application/ld+json",
-          children: JSON.stringify({
-            "@context": "https://schema.org",
-            "@type": "DiscussionForumPosting",
-            name: forumName,
-            description: forumDescription,
-            image: imageUrl,
-            url: `${baseUrl}/forums/${channelId.value}`,
-            publisher: {
-              "@type": "Organization",
-              name: serverName,
-              url: baseUrl,
-            },
-          }),
-        },
-      ],
-    });
-  });
-  const adminList = computed(() => {
-    return channel.value ? channel.value.Admins.map((user: User) => user?.username) : [];
-  });
-  if (!channelId.value) {
-    if (import.meta.client) {
-      router.push({
-        name: "forums-forumId-discussions",
-        params: {
-          forumId: channelId.value,
-        },
-      });
-    }
+  if (isForumSettingsPage) {
+    return true;
   }
 
-  // @ts-ignore - definePageMeta is auto-imported by Nuxt
-  definePageMeta({
-    middleware: "forum-redirect",
+  // Hide sidebar on wiki content pages and downloads pages to give more reading space
+  // (but not wiki settings pages which are handled above)
+  return (
+    !routeName.includes('forums-forumId-wiki') &&
+    !routeName.includes('forums-forumId-downloads')
+  );
+});
+
+const channelId = computed(() => {
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+});
+
+const {
+  result: getChannelResult,
+  onResult: onGetChannelResult,
+  loading: channelLoading,
+  refetch: refetchChannel,
+} = useQuery(
+  GET_CHANNEL,
+  {
+    uniqueName: channelId,
+    // Using luxon, round down to the nearest hour
+    now: DateTime.local().startOf('hour').toISO(),
+  },
+  {
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+    enabled: !!channelId.value,
+  }
+);
+
+const channel = computed(() => {
+  return getChannelResult.value?.channels?.[0] ?? null;
+});
+
+const showNotFound = computed(() => {
+  // Only show 404 if query has completed and no channel was found
+  return !channelLoading.value && channelId.value && !channel.value;
+});
+
+const handleRefetchChannelData = () => {
+  refetchChannel();
+};
+
+const addForumToLocalStorage = (channel: Channel) => {
+  if (!import.meta.client) {
+    return;
+  }
+  let recentForums =
+    JSON.parse(localStorage.getItem('recentForums') || '[]') || [];
+
+  const sideNavItem = {
+    uniqueName: channelId.value,
+    displayName: channel.displayName,
+    channelIconURL: channel.channelIconURL,
+    timestamp: Date.now(),
+  };
+
+  recentForums = recentForums.filter(
+    (forum: any) => forum.uniqueName !== channelId.value
+  );
+
+  recentForums.unshift(sideNavItem);
+
+  // Limit to 20 items after adding the new one
+  recentForums = recentForums.slice(0, 20);
+
+  // Clean up invalid entries
+  recentForums = recentForums.filter((forum: any) => typeof forum === 'object');
+
+  localStorage.setItem('recentForums', JSON.stringify(recentForums));
+};
+onGetChannelResult((result) => {
+  const loadedChannel = result.data?.channels[0];
+  if (!loadedChannel) {
+    return;
+  }
+  addForumToLocalStorage(loadedChannel);
+  // redirect to /discussions if we are at the channel root
+  if (route.name === 'forums-forumId') {
+    router.push({
+      name: 'forums-forumId-discussions',
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
+  const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
+  const forumDescription = loadedChannel.description
+    ? loadedChannel.description.substring(0, 160) +
+      (loadedChannel.description.length > 160 ? '...' : '')
+    : `${forumName} - Community Forum`;
+  const baseUrl = import.meta.env.VITE_BASE_URL;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const imageUrl =
+    loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
+
+  // Set basic SEO meta tags
+  useHead({
+    title: `${forumName} | ${serverName}`,
+    description: forumDescription,
+    image: imageUrl,
+    type: 'website',
   });
+
+  // Add structured data for rich results
+  useHead({
+    script: [
+      {
+        type: 'application/ld+json',
+        children: JSON.stringify({
+          '@context': 'https://schema.org',
+          '@type': 'DiscussionForumPosting',
+          name: forumName,
+          description: forumDescription,
+          image: imageUrl,
+          url: `${baseUrl}/forums/${channelId.value}`,
+          publisher: {
+            '@type': 'Organization',
+            name: serverName,
+            url: baseUrl,
+          },
+        }),
+      },
+    ],
+  });
+});
+const adminList = computed(() => {
+  return channel.value
+    ? channel.value.Admins.map((user: User) => user?.username)
+    : [];
+});
+if (!channelId.value) {
+  if (import.meta.client) {
+    router.push({
+      name: 'forums-forumId-discussions',
+      params: {
+        forumId: channelId.value,
+      },
+    });
+  }
+}
+
+// @ts-ignore - definePageMeta is auto-imported by Nuxt
+definePageMeta({
+  middleware: 'forum-redirect',
+});
 </script>
 
 <template>
@@ -209,14 +228,23 @@
       class="flex flex-col bg-white dark:bg-black dark:text-white md:min-h-screen"
     >
       <ChannelHeaderMobile
-        v-if="!showDiscussionTitle && !showDownloadTitle && !showEventTitle && !showIssueTitle"
+        v-if="
+          !showDiscussionTitle &&
+          !showDownloadTitle &&
+          !showEventTitle &&
+          !showIssueTitle
+        "
         :channel="channel"
         :channel-id="channelId"
         class="block md:hidden"
       />
       <ChannelHeaderDesktop
         v-if="
-          channel.channelBannerURL && !showDiscussionTitle && !showDownloadTitle && !showEventTitle && !showIssueTitle
+          channel.channelBannerURL &&
+          !showDiscussionTitle &&
+          !showDownloadTitle &&
+          !showEventTitle &&
+          !showIssueTitle
         "
         :admin-list="adminList"
         :channel="channel"
@@ -226,7 +254,9 @@
         :show-create-button="true"
       />
       <main class="flex w-full justify-center">
-        <article class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black">
+        <article
+          class="w-full max-w-screen-2xl rounded-lg focus:outline-none dark:bg-black"
+        >
           <div
             v-if="showDiscussionTitle"
             class="flex w-full items-start gap-2 border-b border-gray-300 px-2 dark:border-gray-600 lg:px-4 2xl:px-0"
@@ -281,25 +311,34 @@
           </div>
 
           <div class="relative w-full">
-            <div class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row">
+            <div
+              class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
+            >
               <div class="flex-1 md:px-2">
                 <ClientOnly>
                   <ChannelTabs
                     v-if="showChannelTabs"
                     :admin-list="adminList"
                     :channel="channel"
-                    class="w-full border-b border-gray-300  dark:border-gray-600  md:ml-2"
+                    class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
                     :desktop="false"
                     :route="route"
                     :show-counts="true"
                     :vertical="false"
                   />
                   <template #fallback>
-                    <div class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2">
-                      <nav aria-label="Tabs" class="space-x-2 overflow-x-auto text-sm">
+                    <div
+                      class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
+                    >
+                      <nav
+                        aria-label="Tabs"
+                        class="space-x-2 overflow-x-auto text-sm"
+                      >
                         <!-- Show basic tabs as fallback during SSR -->
                         <div class="flex space-x-2 p-2">
-                          <div class="rounded-lg bg-orange-50 px-3 py-2 text-sm font-medium text-orange-700 dark:bg-orange-900/20 dark:text-orange-300">
+                          <div
+                            class="bg-orange-50 rounded-lg px-3 py-2 text-sm font-medium text-orange-700 dark:bg-orange-900/20 dark:text-orange-300"
+                          >
                             Loading...
                           </div>
                         </div>

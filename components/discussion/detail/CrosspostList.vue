@@ -1,11 +1,11 @@
 <script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent } from "vue";
-import type { Channel as ChannelData } from "@/__generated__/graphql";
-import Tag from "../../TagComponent.vue";
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
+import type { Channel as ChannelData } from '@/__generated__/graphql';
+import Tag from '../../TagComponent.vue';
 
 export default defineComponent({
-  name: "CrosspostList",
+  name: 'CrosspostList',
   components: { Tag },
   props: {
     channelLinks: {
@@ -30,18 +30,11 @@ export default defineComponent({
 </script>
 
 <template>
-  <div
-    class="rounded-lg space-y-4 shadow-md   text-gray-900 p-4 mr-4 narrow"
-  >
-    <div class="text-lg mb-2">
-      Crossposted To Channels
-    </div>
+  <div class="narrow mr-4 space-y-4 rounded-lg p-4 text-gray-900 shadow-md">
+    <div class="mb-2 text-lg">Crossposted To Channels</div>
 
     <ul class="list-disc pl-3">
-      <li
-        v-for="channel in channelLinks"
-        :key="channel.uniqueName"
-      >
+      <li v-for="channel in channelLinks" :key="channel.uniqueName">
         <nuxt-link
           class="mr-1 underline"
           :to="{
@@ -64,11 +57,7 @@ export default defineComponent({
             },
           }"
         >
-          <Tag
-            class="mt-2"
-            :tag="channel.uniqueName"
-            :channel-mode="true"
-          />
+          <Tag class="mt-2" :tag="channel.uniqueName" :channel-mode="true" />
         </nuxt-link>
       </li>
     </ul>
@@ -76,7 +65,7 @@ export default defineComponent({
 </template>
 
 <style>
-.narrow { 
-    max-width: 300px;
+.narrow {
+  max-width: 300px;
 }
 </style>

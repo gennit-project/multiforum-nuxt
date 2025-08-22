@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import type { PropType } from "vue";
-import SearchableFileTypeList from "@/components/SearchableFileTypeList.vue";
+import { ref, watch } from 'vue';
+import type { PropType } from 'vue';
+import SearchableFileTypeList from '@/components/SearchableFileTypeList.vue';
 
 const props = defineProps({
   selectedFileTypes: {
@@ -10,7 +10,7 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: "",
+    default: '',
   },
   disabled: {
     type: Boolean,
@@ -18,7 +18,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["setSelectedFileTypes"]);
+const emit = defineEmits(['setSelectedFileTypes']);
 
 const isDropdownOpen = ref(false);
 const selected = ref([...props.selectedFileTypes]);
@@ -36,7 +36,7 @@ const toggleSelectedFileType = (fileType: string) => {
   } else {
     selected.value.splice(index, 1);
   }
-  emit("setSelectedFileTypes", selected.value);
+  emit('setSelectedFileTypes', selected.value);
 };
 
 watch(
@@ -52,7 +52,7 @@ const outside = () => {
 
 const removeSelection = (fileType: string) => {
   selected.value = selected.value.filter((c) => c !== fileType);
-  emit("setSelectedFileTypes", selected.value);
+  emit('setSelectedFileTypes', selected.value);
 };
 </script>
 
@@ -61,36 +61,33 @@ const removeSelection = (fileType: string) => {
     <div v-if="description" class="py-1 text-sm dark:text-gray-300">
       {{ description }}
     </div>
-    <div class="relative"> 
+    <div class="relative">
       <div
-        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border 
-               px-4 text-left dark:border-gray-700 dark:bg-gray-700 text-sm"
+        class="flex min-h-10 w-full cursor-text flex-wrap items-center rounded-lg border px-4 text-left text-sm dark:border-gray-700 dark:bg-gray-700"
         :class="{
-          'opacity-50 cursor-not-allowed': disabled,
-          'cursor-text': !disabled
+          'cursor-not-allowed opacity-50': disabled,
+          'cursor-text': !disabled,
         }"
         @click="toggleDropdown"
       >
-        <div v-if="selected.length === 0" class="text-gray-500 dark:text-gray-400">
-          <span v-if="disabled">
-            Enable downloads to select file types
-          </span>
-          <span v-else>
-            Select allowed file types...
-          </span>
+        <div
+          v-if="selected.length === 0"
+          class="text-gray-500 dark:text-gray-400"
+        >
+          <span v-if="disabled"> Enable downloads to select file types </span>
+          <span v-else> Select allowed file types... </span>
         </div>
         <div
           v-for="(fileType, index) in selected"
           :key="index"
-          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 
-                 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
+          class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 text-orange-700 dark:bg-orange-700 dark:text-orange-100"
           :class="{ 'opacity-50': disabled }"
           @click="!disabled && removeSelection(fileType)"
         >
           <span>{{ fileType }}</span>
-          <span 
+          <span
             v-if="!disabled"
-            class="ml-1 cursor-pointer" 
+            class="ml-1 cursor-pointer"
             @click.stop="removeSelection(fileType)"
           >
             &times;
@@ -99,10 +96,10 @@ const removeSelection = (fileType: string) => {
         <input
           v-if="!disabled"
           data-testid="file-type-picker"
-          class="flex-1 border-none bg-transparent focus:outline-none dark:text-white text-sm"
+          class="bg-transparent flex-1 border-none text-sm focus:outline-none dark:text-white"
           placeholder="Search file types..."
           readonly
-        >
+        />
       </div>
       <SearchableFileTypeList
         v-if="isDropdownOpen && !disabled"

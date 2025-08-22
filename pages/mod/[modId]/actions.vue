@@ -3,5 +3,5 @@ import IssueList from '@/components/mod/IssueList.vue';
 </script>
 
 <template>
-    <IssueList :is-forum-scoped="true" />
+  <IssueList :is-forum-scoped="true" />
 </template>

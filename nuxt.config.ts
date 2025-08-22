@@ -1,8 +1,8 @@
-import { defineNuxtConfig } from "nuxt/config";
-import { config } from "./config";
-import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
-import path from "path";
-import { inMemoryCacheOptions } from "./cache";
+import { defineNuxtConfig } from 'nuxt/config';
+import { config } from './config';
+import vuetify, { transformAssetUrls } from 'vite-plugin-vuetify';
+import path from 'path';
+import { inMemoryCacheOptions } from './cache';
 
 export default defineNuxtConfig({
   app: {
@@ -11,32 +11,35 @@ export default defineNuxtConfig({
       meta: [
         { charset: 'utf-8' },
         { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-        { name: 'description', content: `Welcome to ${config.serverDisplayName}` },
-        { name: 'color-scheme', content: 'dark light' }
+        {
+          name: 'description',
+          content: `Welcome to ${config.serverDisplayName}`,
+        },
+        { name: 'color-scheme', content: 'dark light' },
       ],
       htmlAttrs: {
-        class: 'dark dark-mode-ready'  // Default to dark mode for initial SSR
-      }
-    }
+        class: 'dark dark-mode-ready', // Default to dark mode for initial SSR
+      },
+    },
   },
   vue: {
     compilerOptions: {
-      whitespace: "preserve",
-      isCustomElement: (tag) => tag === "model-viewer",
+      whitespace: 'preserve',
+      isCustomElement: (tag) => tag === 'model-viewer',
     },
   },
   build: {
-    transpile: ["vuetify"],
+    transpile: ['vuetify'],
   },
   experimental: {
     payloadExtraction: false,
   },
-  compatibilityDate: "2024-04-03",
+  compatibilityDate: '2024-04-03',
   components: true,
   css: [
-    "vuetify/styles",
-    "@fortawesome/fontawesome-free/css/all.css",
-    "@/assets/css/index.css",
+    'vuetify/styles',
+    '@fortawesome/fontawesome-free/css/all.css',
+    '@/assets/css/index.css',
   ],
   devtools: { enabled: true },
   imports: {
@@ -44,13 +47,13 @@ export default defineNuxtConfig({
   },
   modules: [
     [
-      "@nuxtjs/apollo",
+      '@nuxtjs/apollo',
       {
         clients: {
           default: {
-            httpEndpoint: config?.graphqlUrl || "",
-            tokenName: "token", 
-            tokenStorage: "localStorage",
+            httpEndpoint: config?.graphqlUrl || '',
+            tokenName: 'token',
+            tokenStorage: 'localStorage',
             inMemoryCacheOptions,
             // Always get fresh token from localStorage on each request
             apolloLink: ({ uri }) => {
@@ -58,209 +61,234 @@ export default defineNuxtConfig({
               if (import.meta.client) {
                 return import('@apollo/client/core').then(
                   async ({ HttpLink, from }) => {
-                    const { setContext } = await import('@apollo/client/link/context')
-                    const { onError }   = await import('@apollo/client/link/error')
+                    const { setContext } = await import(
+                      '@apollo/client/link/context'
+                    );
+                    const { onError } = await import(
+                      '@apollo/client/link/error'
+                    );
 
                     /* helper that returns a token or null */
-                    const getToken = async (force = false): Promise<string | null> => {
-                      const fn = (globalThis as any).__auth0_getToken
-                      if (!fn) return null
+                    const getToken = async (
+                      force = false
+                    ): Promise<string | null> => {
+                      const fn = (globalThis as any).__auth0_getToken;
+                      if (!fn) return null;
                       try {
-                        return await fn(force ? { cacheMode: 'off' } : {})
+                        return await fn(force ? { cacheMode: 'off' } : {});
                       } catch {
-                        return null
+                        return null;
                       }
-                    }
+                    };
 
                     /* ---- authLink: attach a (fresh) token to every request ---- */
                     const authLink = setContext(async (_, { headers }) => {
-                      const token = (await getToken()) || localStorage.getItem('token')
+                      const token =
+                        (await getToken()) || localStorage.getItem('token');
                       return {
                         headers: {
                           ...headers,
                           ...(token && { Authorization: `Bearer ${token}` }),
                         },
-                      }
-                    })
-
-                    /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
-                    const { fromPromise } = await import('@apollo/client/link/utils');
-                    const errorLink = onError(({ graphQLErrors, networkError, forward, operation }) => {
-                      const unauth =
-                        (networkError && (networkError as any).statusCode === 401) ||
-                        graphQLErrors?.some(e => e.extensions?.code === 'UNAUTHENTICATED');
-
-                      if (!unauth) return;
-
-                      // Force‑refresh, bypassing the SDK cache
-                      return fromPromise(
-                        getToken(true).then(newToken => {
-                          if (!newToken) throw new Error('silent refresh failed');
-                          localStorage.setItem('token', newToken);
-
-                          operation.setContext(({ headers = {} }) => ({
-                            headers: { ...headers, Authorization: `Bearer ${newToken}` },
-                          }));
-                        }).catch(() => {
-                          // SSO cookie is gone → just reload; user either comes back in
-                          // silently or is sent to /authorize.
-                          window.location.reload();
-                        })
-                      ).flatMap(() => forward(operation));
+                      };
                     });
 
-                    const httpLink = new HttpLink({ uri })
-                    return from([errorLink, authLink, httpLink])
+                    /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
+                    const { fromPromise } = await import(
+                      '@apollo/client/link/utils'
+                    );
+                    const errorLink = onError(
+                      ({ graphQLErrors, networkError, forward, operation }) => {
+                        const unauth =
+                          (networkError &&
+                            (networkError as any).statusCode === 401) ||
+                          graphQLErrors?.some(
+                            (e) => e.extensions?.code === 'UNAUTHENTICATED'
+                          );
+
+                        if (!unauth) return;
+
+                        // Force‑refresh, bypassing the SDK cache
+                        return fromPromise(
+                          getToken(true)
+                            .then((newToken) => {
+                              if (!newToken)
+                                throw new Error('silent refresh failed');
+                              localStorage.setItem('token', newToken);
+
+                              operation.setContext(({ headers = {} }) => ({
+                                headers: {
+                                  ...headers,
+                                  Authorization: `Bearer ${newToken}`,
+                                },
+                              }));
+                            })
+                            .catch(() => {
+                              // SSO cookie is gone → just reload; user either comes back in
+                              // silently or is sent to /authorize.
+                              window.location.reload();
+                            })
+                        ).flatMap(() => forward(operation));
+                      }
+                    );
+
+                    const httpLink = new HttpLink({ uri });
+                    return from([errorLink, authLink, httpLink]);
                   }
-                )
+                );
               }
 
               // SSR path: plain link, no token
-              return { uri }
+              return { uri };
             },
 
             defaultOptions: {
               watchQuery: {
                 errorPolicy: 'all',
                 notifyOnNetworkStatusChange: true,
-                fetchPolicy: "cache-first",
+                fetchPolicy: 'cache-first',
               },
               query: {
                 errorPolicy: 'all',
                 notifyOnNetworkStatusChange: true,
-                fetchPolicy: "cache-first",
+                fetchPolicy: 'cache-first',
               },
               mutation: {
                 errorPolicy: 'all',
               },
             },
-            
           },
         },
       },
     ],
     // Add image optimization
-    ['@nuxt/image', {
-      // Image quality options
-      quality: 80,
-      // Use WebP and AVIF formats where supported
-      format: ['webp', 'avif', 'jpg', 'png'],
-      // Provider for image generation
-      provider: 'ipx',
-      // Responsive image breakpoints
-      screens: {
-        xs: 320,
-        sm: 640,
-        md: 768,
-        lg: 1024,
-        xl: 1280,
-        xxl: 1536,
-        '2xl': 1536
-      },
-      // Default image optimization options
-      modifiers: {
-        format: 'webp',
+    [
+      '@nuxt/image',
+      {
+        // Image quality options
         quality: 80,
-        width: 'auto',
-        height: 'auto'
-      },
-      // Domains to allow for remote images
-      domains: ['storage.googleapis.com'],
-      // Adjust placeholder behavior
-      placeholder: {
-        size: 10,
-      },
-      // Presets for common image types
-      presets: {
-        avatar: {
-          modifiers: {
-            format: 'webp',
-            width: 50,
-            height: 50,
-          }
+        // Use WebP and AVIF formats where supported
+        format: ['webp', 'avif', 'jpg', 'png'],
+        // Provider for image generation
+        provider: 'ipx',
+        // Responsive image breakpoints
+        screens: {
+          xs: 320,
+          sm: 640,
+          md: 768,
+          lg: 1024,
+          xl: 1280,
+          xxl: 1536,
+          '2xl': 1536,
         },
-        thumbnail: {
-          modifiers: {
-            format: 'webp',
-            width: 320,
-            height: 180,
-          }
+        // Default image optimization options
+        modifiers: {
+          format: 'webp',
+          quality: 80,
+          width: 'auto',
+          height: 'auto',
         },
-        cover: {
-          modifiers: {
-            format: 'webp',
-            width: 1200,
-            height: 630,
-          }
-        }
-      }
-    }],
+        // Domains to allow for remote images
+        domains: ['storage.googleapis.com'],
+        // Adjust placeholder behavior
+        placeholder: {
+          size: 10,
+        },
+        // Presets for common image types
+        presets: {
+          avatar: {
+            modifiers: {
+              format: 'webp',
+              width: 50,
+              height: 50,
+            },
+          },
+          thumbnail: {
+            modifiers: {
+              format: 'webp',
+              width: 320,
+              height: 180,
+            },
+          },
+          cover: {
+            modifiers: {
+              format: 'webp',
+              width: 1200,
+              height: 630,
+            },
+          },
+        },
+      },
+    ],
     // Light/dark mode support
-    "@nuxtjs/color-mode",
+    '@nuxtjs/color-mode',
     // The order matters in this list. Tailwind must come last
     // to avoid its styles being overridden by other styles.
     [
-      "@nuxtjs/tailwindcss",
+      '@nuxtjs/tailwindcss',
       {
-        cssPath: ["@/assets/css/index.css", { injectPosition: "last" }],
-        configPath: "tailwind.config.js",
+        cssPath: ['@/assets/css/index.css', { injectPosition: 'last' }],
+        configPath: 'tailwind.config.js',
       },
     ],
-    ['@nuxtjs/google-fonts', {
-      families: {
-        Roboto: true,
-        Inter: [400, 700],
-        Montserrat: [400, 700],
+    [
+      '@nuxtjs/google-fonts',
+      {
+        families: {
+          Roboto: true,
+          Inter: [400, 700],
+          Montserrat: [400, 700],
+        },
+        display: 'swap',
+        prefetch: true,
+        preconnect: true,
       },
-      display: 'swap',
-      prefetch: true,
-      preconnect: true,
-  }],
+    ],
   ],
-  nitro: { 
-    preset: "vercel",
+  nitro: {
+    preset: 'vercel',
     // Enable CDN caching
     cdn: true,
     // Enable server-side caching
     routeRules: {
       // Cache API routes
-      '/api/**': { 
-        cache: { 
+      '/api/**': {
+        cache: {
           // Let middleware handle specific cache times
-          headers: ['cache-control']
-        }
+          headers: ['cache-control'],
+        },
       },
       // Cache static assets
-      '/_nuxt/**': { 
+      '/_nuxt/**': {
         headers: {
-          'cache-control': 'public, max-age=31536000, immutable'
-        }
+          'cache-control': 'public, max-age=31536000, immutable',
+        },
       },
       // Cache public assets
-      '/assets/**': { 
+      '/assets/**': {
         headers: {
-          'cache-control': 'public, max-age=31536000, immutable'
-        }
+          'cache-control': 'public, max-age=31536000, immutable',
+        },
       },
       // Redirect download base pages to description tab
-      '/forums/**/downloads/*': { 
-        redirect: { to: '/forums/**/downloads/*/description', statusCode: 301 }
-      }
-    }
+      '/forums/**/downloads/*': {
+        redirect: { to: '/forums/**/downloads/*/description', statusCode: 301 },
+      },
+    },
   },
   plugins: [
-    { src: "@/plugins/pinia", mode: "all" },
-    { src: "@/plugins/google-maps", mode: "client" },
-    { src: "@/plugins/vuetify", mode: "all" },
-    { src: "@/plugins/performance.client", mode: "client" },
-    { src: "@/plugins/click-outside.client", mode: "client" },
+    { src: '@/plugins/pinia', mode: 'all' },
+    { src: '@/plugins/google-maps', mode: 'client' },
+    { src: '@/plugins/vuetify', mode: 'all' },
+    { src: '@/plugins/performance.client', mode: 'client' },
+    { src: '@/plugins/click-outside.client', mode: 'client' },
   ],
   runtimeConfig: {
     public: {
       apollo: {
         clients: {
           default: {
-            httpEndpoint: config?.graphqlUrl || "",
+            httpEndpoint: config?.graphqlUrl || '',
           },
         },
       },
@@ -282,8 +310,8 @@ export default defineNuxtConfig({
     plugins: [vuetify({ autoImport: true })],
     resolve: {
       alias: {
-        "@": path.resolve(__dirname),
-        "fast-deep-equal": "fast-deep-equal/es6/index.js",
+        '@': path.resolve(__dirname),
+        'fast-deep-equal': 'fast-deep-equal/es6/index.js',
       },
     },
     define: {
@@ -296,7 +324,7 @@ export default defineNuxtConfig({
     },
     // Allow connections from ngrok for mobile testing
     server: {
-      allowedHosts: ['localhost', '69f8-98-168-53-208.ngrok-free.app']
+      allowedHosts: ['localhost', '69f8-98-168-53-208.ngrok-free.app'],
     },
     build: {
       minify: false,
@@ -312,16 +340,23 @@ export default defineNuxtConfig({
           manualChunks: {
             'vue-libs': ['vue', 'vue-router', 'pinia'],
             'ui-libs': ['vuetify'],
-            'apollo': ['@apollo/client', '@vue/apollo-composable'],
+            apollo: ['@apollo/client', '@vue/apollo-composable'],
             'date-libs': ['luxon'],
             'map-libs': ['@googlemaps/js-api-loader'],
-            '3d-libs': ['three', '@google/model-viewer']
-          }
-        }
-      }
+            '3d-libs': ['three', '@google/model-viewer'],
+          },
+        },
+      },
     },
     optimizeDeps: {
-      include: ['vue', 'vue-router', '@vue/apollo-composable', 'luxon', 'three', '@google/model-viewer']
-    }
+      include: [
+        'vue',
+        'vue-router',
+        '@vue/apollo-composable',
+        'luxon',
+        'three',
+        '@google/model-viewer',
+      ],
+    },
   },
 });

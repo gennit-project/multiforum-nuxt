@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import type { PropType } from "vue";
-import type { ServerConfig } from "@/__generated__/graphql";
-import RulesComponent from "@/components/channel/Rules.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import type { ServerConfig } from '@/__generated__/graphql';
+import RulesComponent from '@/components/channel/Rules.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
 
 const props = defineProps({
   serverConfig: {
@@ -16,8 +16,10 @@ const props = defineProps({
   },
 });
 
-const serverRules = computed(() => props.serverConfig?.rules ?? "");
-const serverDescription = computed(() => props.serverConfig?.serverDescription ?? "");
+const serverRules = computed(() => props.serverConfig?.rules ?? '');
+const serverDescription = computed(
+  () => props.serverConfig?.serverDescription ?? ''
+);
 </script>
 
 <template>
@@ -35,7 +37,8 @@ const serverDescription = computed(() => props.serverConfig?.serverDescription ?
         :word-limit="1000"
       />
       <p v-else class="text-xs dark:text-white">
-        Welcome to the admin dashboard. Here is where you can edit server settings and manage server scoped issues.
+        Welcome to the admin dashboard. Here is where you can edit server
+        settings and manage server scoped issues.
       </p>
     </div>
 

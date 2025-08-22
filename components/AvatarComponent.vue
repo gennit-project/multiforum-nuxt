@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-  import { computed } from "vue";
-  import Identicon from "identicon.js";
-  import sha256 from "crypto-js/sha256";
-  import { useAppTheme } from "@/composables/useTheme";
-  const { theme } = useAppTheme();
+import { computed } from 'vue';
+import Identicon from 'identicon.js';
+import sha256 from 'crypto-js/sha256';
+import { useAppTheme } from '@/composables/useTheme';
+const { theme } = useAppTheme();
 
 const props = defineProps({
   text: {
@@ -18,7 +18,7 @@ const props = defineProps({
   src: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   isLarge: {
     type: Boolean,
@@ -45,14 +45,14 @@ const identiconData = computed(() => {
   // Generate the identicon and get the data for the img src
   const data = new Identicon(hash, {
     // If theme is dark, use a dark background
-    background: theme.value === "dark" ? [0, 0, 0, 255] : [255, 255, 255, 255],
+    background: theme.value === 'dark' ? [0, 0, 0, 255] : [255, 255, 255, 255],
     margin: 0.2,
     size: 420,
-    format: "svg",
+    format: 'svg',
   }).toString();
 
   // Return the data as a base64 SVG for the src of the img
-  return "data:image/svg+xml;base64," + data;
+  return 'data:image/svg+xml;base64,' + data;
 });
 </script>
 
@@ -68,7 +68,7 @@ const identiconData = computed(() => {
         isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
-    >
+    />
     <img
       v-else
       class="border dark:border-gray-600"
@@ -80,6 +80,6 @@ const identiconData = computed(() => {
       ]"
       :src="identiconData"
       :alt="text"
-    >
+    />
   </div>
 </template>

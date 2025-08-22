@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import type { PropType } from "vue";
-import type { Comment, User } from "@/__generated__/graphql";
-import { stableRelativeTime } from "@/utils";
-import { getCommentAuthorStatus } from "@/utils/headerPermissionUtils";
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import type { Comment, User } from '@/__generated__/graphql';
+import { stableRelativeTime } from '@/utils';
+import { getCommentAuthorStatus } from '@/utils/headerPermissionUtils';
 import {
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
   getPermalinkToEventComment,
-  getPermalinkToEvent
-} from "@/utils/routerUtils";
-import CommentEditsDropdown from "./CommentEditsDropdown.vue";
+  getPermalinkToEvent,
+} from '@/utils/routerUtils';
+import CommentEditsDropdown from './CommentEditsDropdown.vue';
 
 // Props definition using defineProps
 const props = defineProps({
@@ -24,7 +24,7 @@ const props = defineProps({
   },
   parentCommentId: {
     type: String,
-    default: "",
+    default: '',
   },
   showContextLink: {
     type: Boolean,
@@ -36,11 +36,11 @@ const props = defineProps({
   },
   originalPoster: {
     type: String,
-    default: "",
+    default: '',
   },
   label: {
     type: String,
-    default: "",
+    default: '',
   },
   isAnswer: {
     type: Boolean,
@@ -49,8 +49,8 @@ const props = defineProps({
 });
 // Use the utility function to determine admin/mod status
 const authorStatus = computed(() => {
-  return getCommentAuthorStatus({ 
-    author: props.commentData.CommentAuthor 
+  return getCommentAuthorStatus({
+    author: props.commentData.CommentAuthor,
   });
 });
 
@@ -69,29 +69,32 @@ const commentAuthorDisplayName = computed(
 
 const createdAtFormatted = computed(() => {
   if (!props.commentData.createdAt) {
-    return "";
+    return '';
   }
   return `posted ${stableRelativeTime(props.commentData.createdAt)}${
     props.showChannel
-      ? " in c/" +
+      ? ' in c/' +
         (props.commentData.DiscussionChannel?.channelUniqueName ||
-          (props.commentData.Event?.EventChannels && props.commentData.Event?.EventChannels[0].channelUniqueName) ||
+          (props.commentData.Event?.EventChannels &&
+            props.commentData.Event?.EventChannels[0].channelUniqueName) ||
           props.commentData.Channel?.uniqueName ||
-          "")
-      : ""
+          '')
+      : ''
   }`;
 });
 
 const editedAtFormatted = computed(() => {
   if (!props.commentData.updatedAt) {
-    return "";
+    return '';
   }
   return `Edited ${stableRelativeTime(props.commentData.updatedAt)}`;
 });
 
 // Check if the comment has past versions
 const hasRevisionHistory = computed(() => {
-  return props.commentData?.PastVersions && props.commentData.PastVersions.length > 0;
+  return (
+    props.commentData?.PastVersions && props.commentData.PastVersions.length > 0
+  );
 });
 
 const contextLinkObject = computed(() => {
@@ -106,73 +109,73 @@ const contextLinkObject = computed(() => {
   } = props.commentData;
   if (!Channel?.uniqueName && !DiscussionChannel?.channelUniqueName) {
     console.error(
-      "Could not get context link because the channel unique name was not found"
+      'Could not get context link because the channel unique name was not found'
     );
-    return "";
+    return '';
   }
   if (GivesFeedbackOnComment) {
     if (GivesFeedbackOnComment.DiscussionChannel) {
       // If it's giving feedback on a discussion comment, the context is the
       // discussion comment it's giving feedback on.
       return getPermalinkToDiscussionComment({
-          forumId: Channel?.uniqueName || "",
-          discussionId:
-            GivesFeedbackOnComment.DiscussionChannel?.discussionId || "",
-          commentId: GivesFeedbackOnComment.id,
-      })
+        forumId: Channel?.uniqueName || '',
+        discussionId:
+          GivesFeedbackOnComment.DiscussionChannel?.discussionId || '',
+        commentId: GivesFeedbackOnComment.id,
+      });
     }
     // If it's giving feedback on an event comment, the context is the
     // event comment it's giving feedback on.
     return getPermalinkToEventComment({
-      forumId: Channel?.uniqueName || "",
-      eventId: GivesFeedbackOnComment.Event?.id || "",
+      forumId: Channel?.uniqueName || '',
+      eventId: GivesFeedbackOnComment.Event?.id || '',
       commentId: GivesFeedbackOnComment.id,
-    })
+    });
   }
   if (GivesFeedbackOnDiscussion) {
     // If it's giving feedback on a discussion, the context is the discussion.
     return getPermalinkToDiscussion({
-      forumId: Channel?.uniqueName || "",
+      forumId: Channel?.uniqueName || '',
       discussionId: GivesFeedbackOnDiscussion.id,
-    })
+    });
   }
   if (GivesFeedbackOnEvent) {
     // If it's giving feedback on an event, the context is the event.
     return getPermalinkToEvent({
-      forumId: GivesFeedbackOnEvent.EventChannels[0]?.channelUniqueName || "",
+      forumId: GivesFeedbackOnEvent.EventChannels[0]?.channelUniqueName || '',
       eventId: GivesFeedbackOnEvent.id,
-    })
+    });
   }
   // If the discussion comment has a parent comment, the context is the parent comment.
   if (ParentComment && DiscussionChannel) {
     return getPermalinkToDiscussionComment({
-      forumId: DiscussionChannel?.channelUniqueName || "",
-      discussionId: DiscussionChannel?.discussionId || "",
+      forumId: DiscussionChannel?.channelUniqueName || '',
+      discussionId: DiscussionChannel?.discussionId || '',
       commentId: ParentComment.id,
-    })
+    });
   }
   if (ParentComment && Event) {
     // If the event comment has a parent comment, the context is the parent comment.
     return getPermalinkToEventComment({
-      forumId: Event.EventChannels[0]?.channelUniqueName || "",
+      forumId: Event.EventChannels[0]?.channelUniqueName || '',
       eventId: Event.id,
       commentId: ParentComment.id,
-    })
+    });
   }
-  // By default, return a permalink to the comment itself. The link is different 
+  // By default, return a permalink to the comment itself. The link is different
   // whether it's a comment on a discussion or an event.
   if (DiscussionChannel) {
     return getPermalinkToDiscussionComment({
-      forumId: DiscussionChannel?.channelUniqueName || "",
-      discussionId: DiscussionChannel?.discussionId || "",
+      forumId: DiscussionChannel?.channelUniqueName || '',
+      discussionId: DiscussionChannel?.discussionId || '',
       commentId: props.commentData.id,
-    })
+    });
   }
   return getPermalinkToEventComment({
-    forumId: Event?.EventChannels[0]?.channelUniqueName || "",
-    eventId: Event?.id || "",
+    forumId: Event?.EventChannels[0]?.channelUniqueName || '',
+    eventId: Event?.id || '',
     commentId: props.commentData.id,
-  })
+  });
 });
 </script>
 
@@ -219,22 +222,33 @@ const contextLinkObject = computed(() => {
             }"
           >
             <span class="flex flex-row items-center gap-1">
-              <span v-if="!commentAuthorDisplayName" class="font-bold">{{ commentAuthorUsername }}</span>
-              <span v-if="commentAuthorDisplayName" class="font-bold">{{ commentAuthorDisplayName }}</span>
-              <span v-if="commentAuthorDisplayName" class="text-gray-500 dark:text-gray-300">{{ `(u/${commentAuthorUsername})` }}</span>
+              <span v-if="!commentAuthorDisplayName" class="font-bold">{{
+                commentAuthorUsername
+              }}</span>
+              <span v-if="commentAuthorDisplayName" class="font-bold">{{
+                commentAuthorDisplayName
+              }}</span>
+              <span
+                v-if="commentAuthorDisplayName"
+                class="text-gray-500 dark:text-gray-300"
+                >{{ `(u/${commentAuthorUsername})` }}</span
+              >
 
               <span
                 v-if="isAdmin"
-                class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-              >Admin</span>
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Admin</span
+              >
               <span
                 v-else-if="isMod"
-                class="rounded-md border border-orange-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-              >Mod</span>
+                class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >Mod</span
+              >
               <span
                 v-if="commentAuthorUsername === originalPoster"
-                class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-              >OP</span>
+                class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+                >OP</span
+              >
             </span>
           </NuxtLink>
           <NuxtLink
@@ -272,13 +286,13 @@ const contextLinkObject = computed(() => {
           </span>
           <span
             v-if="label"
-            class="rounded-lg border border-orange-500 px-2 py-1 text-orange-600 dark:text-orange-400 bg-orange-100 dark:bg-orange-900"
+            class="rounded-lg border border-orange-500 bg-orange-100 px-2 py-1 text-orange-600 dark:bg-orange-900 dark:text-orange-400"
           >
             {{ label }}
           </span>
           <span
             v-if="isAnswer"
-            class="rounded-lg border border-green-500 px-2 py-1 text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900"
+            class="rounded-lg border border-green-500 bg-green-100 px-2 py-1 text-green-600 dark:bg-green-900 dark:text-green-400"
           >
             Best Answer
           </span>

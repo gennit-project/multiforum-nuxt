@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
-import type { PropType } from "vue";
+import { ref, computed, onMounted } from 'vue';
+import type { PropType } from 'vue';
 import type {
   Discussion,
   DownloadableFile,
@@ -9,16 +9,20 @@ import type {
   DiscussionDownloadableFilesDisconnectFieldInput,
   DiscussionDownloadableFilesUpdateFieldInput,
   FilterGroup,
-} from "@/__generated__/graphql";
+} from '@/__generated__/graphql';
 // Using string literals instead of importing enums from massive generated file
-import FormRow from "@/components/FormRow.vue";
-import { useMutation } from "@vue/apollo-composable";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { UPDATE_DISCUSSION, CREATE_SIGNED_STORAGE_URL, CREATE_DOWNLOADABLE_FILE } from "@/graphQLData/discussion/mutations";
-import Notification from "@/components/NotificationComponent.vue";
-import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
-import { usernameVar } from "@/cache";
-import DownloadLabelPicker from "@/components/download/DownloadLabelPicker.vue";
+import FormRow from '@/components/FormRow.vue';
+import { useMutation } from '@vue/apollo-composable';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import {
+  UPDATE_DISCUSSION,
+  CREATE_SIGNED_STORAGE_URL,
+  CREATE_DOWNLOADABLE_FILE,
+} from '@/graphQLData/discussion/mutations';
+import Notification from '@/components/NotificationComponent.vue';
+import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
+import { usernameVar } from '@/cache';
+import DownloadLabelPicker from '@/components/download/DownloadLabelPicker.vue';
 
 const MAX_DOWNLOAD_FILE_SIZE_MB = 50;
 const MAX_DOWNLOAD_FILE_SIZE_BYTES = MAX_DOWNLOAD_FILE_SIZE_MB * 1024 * 1024;
@@ -30,21 +34,26 @@ const props = defineProps({
   },
   // Channel data to get allowed file types and filter groups
   channelData: {
-    type: Object as PropType<{ allowedFileTypes?: string[]; FilterGroups?: FilterGroup[] }>,
+    type: Object as PropType<{
+      allowedFileTypes?: string[];
+      FilterGroups?: FilterGroup[];
+    }>,
     default: () => ({ allowedFileTypes: [], FilterGroups: [] }),
   },
 });
 
-const emit = defineEmits(["closeEditor", "updateFormValues"]);
+const emit = defineEmits(['closeEditor', 'updateFormValues']);
 
 // Check if we're in create mode (using a temporary ID) or edit mode
 const isCreateMode = computed(() => {
   if (props.discussion.id !== 'temp-id') {
     return false;
   }
-  
+
   // If we have files with IDs, we're editing an existing download (not in create mode)
-  const hasExistingFiles = props.discussion?.DownloadableFiles?.some(file => file.id);
+  const hasExistingFiles = props.discussion?.DownloadableFiles?.some(
+    (file) => file.id
+  );
   return !hasExistingFiles;
 });
 
@@ -52,15 +61,15 @@ const downloadableFiles = computed(() => {
   if (!props.discussion?.DownloadableFiles) return [];
   return props.discussion.DownloadableFiles.map((file: DownloadableFile) => {
     return {
-      id: file.id || "",
-      fileName: file.fileName || "",
-      url: file.url || "",
-      kind: file.kind || "OTHER",
+      id: file.id || '',
+      fileName: file.fileName || '',
+      url: file.url || '',
+      kind: file.kind || 'OTHER',
       size: file.size || 0,
-      license: file.license?.id || "",
-      priceModel: file.priceModel || "FREE",
+      license: file.license?.id || '',
+      priceModel: file.priceModel || 'FREE',
       priceCents: file.priceCents || 0,
-      priceCurrency: file.priceCurrency || "USD",
+      priceCurrency: file.priceCurrency || 'USD',
     };
   });
 });
@@ -85,20 +94,20 @@ const formValues = ref({
 
 // Upload state
 const uploadingFile = ref(false);
-const uploadError = ref("");
+const uploadError = ref('');
 
 // Notification state
 const savedSuccessfully = ref(false);
 
 // License options (placeholder as requested)
 const licenseOptions = [
-  { id: "mit", name: "MIT License" },
-  { id: "apache-2", name: "Apache License 2.0" },
-  { id: "gpl-3", name: "GNU General Public License v3.0" },
-  { id: "bsd-3", name: "BSD 3-Clause License" },
-  { id: "creative-commons", name: "Creative Commons" },
-  { id: "proprietary", name: "Proprietary" },
-  { id: "other", name: "Other" },
+  { id: 'mit', name: 'MIT License' },
+  { id: 'apache-2', name: 'Apache License 2.0' },
+  { id: 'gpl-3', name: 'GNU General Public License v3.0' },
+  { id: 'bsd-3', name: 'BSD 3-Clause License' },
+  { id: 'creative-commons', name: 'Creative Commons' },
+  { id: 'proprietary', name: 'Proprietary' },
+  { id: 'other', name: 'Other' },
 ];
 
 // GraphQL mutations
@@ -120,7 +129,7 @@ const {
 }));
 
 onDone(() => {
-  emit("closeEditor");
+  emit('closeEditor');
 });
 
 // Generate accept attribute from channel allowed file types
@@ -129,9 +138,9 @@ const acceptAttribute = computed(() => {
   if (allowedTypes.length === 0) {
     return undefined; // No restriction if no types specified
   }
-  
+
   // Convert file types to file extensions for accept attribute
-  const extensions = allowedTypes.map(type => {
+  const extensions = allowedTypes.map((type) => {
     const lowerType = type.toLowerCase();
     // If it's already an extension (starts with .), use as-is
     if (lowerType.startsWith('.')) {
@@ -140,54 +149,55 @@ const acceptAttribute = computed(() => {
     // Otherwise add a dot prefix
     return `.${lowerType}`;
   });
-  
+
   return extensions.join(',');
 });
 
 // Initialize form values after component is mounted
 onMounted(() => {
-  console.log("DownloadEditForm mounted, initializing formValues");
-  console.log("Files:", downloadableFiles.value);
-  
+  console.log('DownloadEditForm mounted, initializing formValues');
+  console.log('Files:', downloadableFiles.value);
+
   formValues.value.downloadableFiles = [...downloadableFiles.value];
-  
+
   // Initialize download labels from props if in edit mode and discussion has labels
   // Note: This assumes labels will be stored on the discussion model in the future
   // For now, initialize as empty
   formValues.value.downloadLabels = {};
-  
-  console.log("Initialized formValues:", formValues.value);
+
+  console.log('Initialized formValues:', formValues.value);
 });
 
 // File validation
 const validateFileType = (file: File): { valid: boolean; message: string } => {
   const allowedTypes = props.channelData?.allowedFileTypes || [];
-  
+
   if (allowedTypes.length === 0) {
-    return { valid: true, message: "" };
+    return { valid: true, message: '' };
   }
 
   const fileExtension = file.name.toLowerCase().split('.').pop();
-  const isAllowed = allowedTypes.some(type => 
-    type.toLowerCase().includes(fileExtension || '') || 
-    file.type.toLowerCase().includes(type.toLowerCase())
+  const isAllowed = allowedTypes.some(
+    (type) =>
+      type.toLowerCase().includes(fileExtension || '') ||
+      file.type.toLowerCase().includes(type.toLowerCase())
   );
 
   if (!isAllowed) {
     return {
       valid: false,
-      message: `File type not allowed. Allowed types: ${allowedTypes.join(', ')}`
+      message: `File type not allowed. Allowed types: ${allowedTypes.join(', ')}`,
     };
   }
 
-  return { valid: true, message: "" };
+  return { valid: true, message: '' };
 };
 
 const validateFileSize = (file: File): { valid: boolean; message: string } => {
   if (file.size > MAX_DOWNLOAD_FILE_SIZE_BYTES) {
     return {
       valid: false,
-      message: `File size must be less than ${MAX_DOWNLOAD_FILE_SIZE_MB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+      message: `File size must be less than ${MAX_DOWNLOAD_FILE_SIZE_MB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
     };
   }
   return { valid: true, message: '' };
@@ -197,7 +207,7 @@ const validateFileSize = (file: File): { valid: boolean; message: string } => {
 const handleFileUpload = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
-  
+
   if (!file) return;
 
   // Validate file type
@@ -207,23 +217,24 @@ const handleFileUpload = async (event: Event) => {
     return;
   }
 
-  uploadError.value = "";
+  uploadError.value = '';
   uploadingFile.value = true;
 
   try {
     const success = await uploadFile(file);
-    
+
     if (!success) {
       // Error message is already set in uploadFile function
-      console.error("Upload failed");
+      console.error('Upload failed');
     }
   } catch (error) {
-    console.error("Upload failed:", error);
-    uploadError.value = error instanceof Error ? error.message : "Upload failed";
+    console.error('Upload failed:', error);
+    uploadError.value =
+      error instanceof Error ? error.message : 'Upload failed';
   } finally {
     uploadingFile.value = false;
     // Reset the input so user can re-upload the same file if needed
-    (event.target as HTMLInputElement).value = "";
+    (event.target as HTMLInputElement).value = '';
   }
 };
 
@@ -242,7 +253,7 @@ const addNewFile = (fileData: DownloadFormFile) => {
  */
 const uploadFile = async (file: File): Promise<boolean> => {
   if (!usernameVar.value) {
-    console.error("No username found, cannot upload.");
+    console.error('No username found, cannot upload.');
     return false;
   }
 
@@ -256,7 +267,8 @@ const uploadFile = async (file: File): Promise<boolean> => {
   try {
     // Generate a unique filename
     const filename = getUploadFileName({ username: usernameVar.value, file });
-    const fileType = file.type || getFileTypeFromName(file.name) || "application/octet-stream";
+    const fileType =
+      file.type || getFileTypeFromName(file.name) || 'application/octet-stream';
     const signedStorageURLInput = { filename, contentType: fileType };
 
     // Ask the server for a signed storage URL
@@ -264,7 +276,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
 
     if (!signedStorageURL) {
-      throw new Error("No signed storage URL returned");
+      throw new Error('No signed storage URL returned');
     }
 
     // Upload the file using the signed URL
@@ -274,29 +286,30 @@ const uploadFile = async (file: File): Promise<boolean> => {
       fileType,
       signedStorageURL,
     });
-    
+
     if (!fileUrl) {
-      throw new Error("No file URL returned from upload");
+      throw new Error('No file URL returned from upload');
     }
-    
+
     // Now create the DownloadableFile record in the database
     const createFileResult = await createDownloadableFile({
       fileName: file.name,
       url: fileUrl,
       kind: getFileKind(file),
       size: file.size,
-      priceModel: "FREE",
+      priceModel: 'FREE',
       priceCents: 0,
-      priceCurrency: "USD"
+      priceCurrency: 'USD',
     });
-    
+
     // Get the created file from the result
-    const createdFile = createFileResult?.data?.createDownloadableFiles?.downloadableFiles?.[0];
-    
+    const createdFile =
+      createFileResult?.data?.createDownloadableFiles?.downloadableFiles?.[0];
+
     if (!createdFile || !createdFile.id) {
-      throw new Error("Failed to create downloadable file record in database");
+      throw new Error('Failed to create downloadable file record in database');
     }
-    
+
     // Add the file to our form values using the addNewFile helper
     addNewFile({
       id: createdFile.id,
@@ -304,69 +317,69 @@ const uploadFile = async (file: File): Promise<boolean> => {
       url: createdFile.url,
       kind: createdFile.kind,
       size: createdFile.size,
-      license: createdFile.license?.id || "",
-      priceModel: createdFile.priceModel || "FREE",
+      license: createdFile.license?.id || '',
+      priceModel: createdFile.priceModel || 'FREE',
       priceCents: createdFile.priceCents || 0,
-      priceCurrency: createdFile.priceCurrency || "USD"
+      priceCurrency: createdFile.priceCurrency || 'USD',
     });
-    
+
     // Auto-save after successful file upload
     handleSave();
-    
+
     return true;
   } catch (err) {
-    console.error("Error uploading file and creating downloadable file:", err);
-    uploadError.value = err instanceof Error ? err.message : "Upload failed";
+    console.error('Error uploading file and creating downloadable file:', err);
+    uploadError.value = err instanceof Error ? err.message : 'Upload failed';
     return false;
   }
 };
 
 const getFileTypeFromName = (filename: string): string | null => {
   if (!filename) return null;
-  
+
   const extension = filename.toLowerCase().split('.').pop();
   if (!extension) return null;
-  
+
   const mimeTypes: Record<string, string> = {
-    'zip': 'application/zip',
-    'rar': 'application/x-rar-compressed',
+    zip: 'application/zip',
+    rar: 'application/x-rar-compressed',
     '7z': 'application/x-7z-compressed',
-    'tar': 'application/x-tar',
-    'gz': 'application/gzip',
-    'pdf': 'application/pdf',
-    'doc': 'application/msword',
-    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-    'exe': 'application/x-msdownload',
-    'dmg': 'application/x-apple-diskimage',
-    'pkg': 'application/x-newton-compatible-pkg',
-    'deb': 'application/vnd.debian.binary-package',
-    'rpm': 'application/x-rpm',
+    tar: 'application/x-tar',
+    gz: 'application/gzip',
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    exe: 'application/x-msdownload',
+    dmg: 'application/x-apple-diskimage',
+    pkg: 'application/x-newton-compatible-pkg',
+    deb: 'application/vnd.debian.binary-package',
+    rpm: 'application/x-rpm',
   };
-  
+
   return mimeTypes[extension] || 'application/octet-stream';
 };
 
 const getFileKind = (file: File): string => {
   const extension = file.name.toLowerCase().split('.').pop();
-  
+
   // Map to actual FileKind enum values: ZIP, RAR, PNG, JPG, BLEND, STL, GLB, OTHER
   if (extension === 'zip') {
-    return "ZIP";
+    return 'ZIP';
   } else if (extension === 'rar') {
-    return "RAR";
+    return 'RAR';
   } else if (['png'].includes(extension || '')) {
-    return "PNG";
+    return 'PNG';
   } else if (['jpg', 'jpeg'].includes(extension || '')) {
-    return "JPG";
+    return 'JPG';
   } else if (extension === 'blend') {
-    return "BLEND";
+    return 'BLEND';
   } else if (extension === 'stl') {
-    return "STL";
+    return 'STL';
   } else if (extension === 'glb') {
-    return "GLB";
+    return 'GLB';
   }
-  
-  return "OTHER";
+
+  return 'OTHER';
 };
 
 // Remove file
@@ -385,21 +398,30 @@ const updateLicense = (fileIndex: number, licenseId: string) => {
 
 function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   // 1) If no downloadable files exist yet in the original discussion, CREATE connections
-  if (!props.discussion?.DownloadableFiles || props.discussion.DownloadableFiles?.length === 0) {
+  if (
+    !props.discussion?.DownloadableFiles ||
+    props.discussion.DownloadableFiles?.length === 0
+  ) {
     const newFiles = formValues.value.downloadableFiles || [];
-    
+
     // Build connect array for new files
-    const connectArray: DiscussionDownloadableFilesConnectFieldInput[] = newFiles
-      .filter(file => file.id) // Only connect files that have database IDs
-      .map(file => ({
-        where: { node: { id: file.id } }
-      }));
-    
+    const connectArray: DiscussionDownloadableFilesConnectFieldInput[] =
+      newFiles
+        .filter((file) => file.id) // Only connect files that have database IDs
+        .map((file) => ({
+          where: { node: { id: file.id } },
+        }));
+
     return {
       hasDownload: newFiles.length > 0,
-      DownloadableFiles: connectArray.length > 0 ? [{
-        connect: connectArray
-      }] : undefined,
+      DownloadableFiles:
+        connectArray.length > 0
+          ? [
+              {
+                connect: connectArray,
+              },
+            ]
+          : undefined,
     };
   }
 
@@ -411,15 +433,16 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   const connectArray: DiscussionDownloadableFilesConnectFieldInput[] = newFiles
     .filter((file) => file.id && !oldFiles.some((old) => old.id === file.id))
     .map((file) => ({
-      where: { node: { id: file.id } }
+      where: { node: { id: file.id } },
     }));
 
   // DISCONNECT array: any old file that is no longer present in `newFiles`
-  const disconnectArray: DiscussionDownloadableFilesDisconnectFieldInput[] = oldFiles
-    .filter((old) => !newFiles.some((file) => file.id === old.id))
-    .map((old) => ({
-      where: { node: { id: old.id } }
-    }));
+  const disconnectArray: DiscussionDownloadableFilesDisconnectFieldInput[] =
+    oldFiles
+      .filter((old) => !newFiles.some((file) => file.id === old.id))
+      .map((old) => ({
+        where: { node: { id: old.id } },
+      }));
 
   // Build the update field input object
   const updateFieldInput: DiscussionDownloadableFilesUpdateFieldInput = {};
@@ -433,23 +456,32 @@ function getUpdateDiscussionInputForDownloadableFiles(): DiscussionUpdateInput {
   // Return the update input
   return {
     hasDownload: newFiles.length > 0,
-    DownloadableFiles: Object.keys(updateFieldInput).length > 0 ? [updateFieldInput] : undefined,
+    DownloadableFiles:
+      Object.keys(updateFieldInput).length > 0 ? [updateFieldInput] : undefined,
   };
 }
 
 // For handling save
 function handleSave() {
-  console.log("handleSave called, isCreateMode:", isCreateMode.value);
-  console.log("Current downloadable files data:", JSON.stringify(formValues.value.downloadableFiles));
-  console.log("Current download labels:", JSON.stringify(formValues.value.downloadLabels));
-  
+  console.log('handleSave called, isCreateMode:', isCreateMode.value);
+  console.log(
+    'Current downloadable files data:',
+    JSON.stringify(formValues.value.downloadableFiles)
+  );
+  console.log(
+    'Current download labels:',
+    JSON.stringify(formValues.value.downloadLabels)
+  );
+
   // For both cases where we're inside CreateEditDiscussionFields (temp-id)
   if (props.discussion.id === 'temp-id') {
     // Always emit the form values to update the parent component
-    console.log("Emitting updateFormValues in CreateEditDiscussionFields context");
-    emit("updateFormValues", {
+    console.log(
+      'Emitting updateFormValues in CreateEditDiscussionFields context'
+    );
+    emit('updateFormValues', {
       downloadableFiles: formValues.value.downloadableFiles,
-      downloadLabels: formValues.value.downloadLabels
+      downloadLabels: formValues.value.downloadLabels,
     });
     // Add a success notification
     savedSuccessfully.value = true;
@@ -458,7 +490,7 @@ function handleSave() {
     }, 3000); // Hide after 3 seconds
   } else {
     // In actual edit mode for an existing discussion, perform the API mutation
-    console.log("Calling updateDiscussion in edit mode");
+    console.log('Calling updateDiscussion in edit mode');
     updateDiscussion();
   }
 }
@@ -466,26 +498,21 @@ function handleSave() {
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 w-full flex flex-col">
-      
-      <ErrorBanner
-        v-if="uploadError"
-        :text="uploadError"
-        class="mb-4"
-      />
-      
+    <div class="mb-3 mt-3 flex w-full flex-col">
+      <ErrorBanner v-if="uploadError" :text="uploadError" class="mb-4" />
+
       <ErrorBanner
         v-else-if="createSignedStorageUrlError"
         :text="createSignedStorageUrlError.message"
         class="mb-4"
       />
-      
+
       <ErrorBanner
         v-else-if="createDownloadableFileError"
         :text="createDownloadableFileError.message"
         class="mb-4"
       />
-      
+
       <!-- File Upload Section -->
       <FormRow section-title="File Upload" :required="true">
         <template #content>
@@ -498,50 +525,63 @@ function handleSave() {
                 :accept="acceptAttribute"
                 :disabled="uploadingFile"
                 @change="handleFileUpload"
-              >
+              />
               <label
                 for="downloadable-file-input"
-                class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 cursor-pointer"
-                :class="{ 'opacity-50 cursor-not-allowed': uploadingFile }"
+                class="hover:bg-gray-50 focus:ring-indigo-500 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                :class="{ 'cursor-not-allowed opacity-50': uploadingFile }"
               >
                 <span v-if="uploadingFile">Uploading...</span>
                 <span v-else>Choose File</span>
               </label>
               <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
                 Maximum file size: {{ MAX_DOWNLOAD_FILE_SIZE_MB }}MB
-                <br>
+                <br />
                 <span v-if="channelData?.allowedFileTypes?.length">
-                  Allowed file types: {{ channelData.allowedFileTypes.join(', ') }}
+                  Allowed file types:
+                  {{ channelData.allowedFileTypes.join(', ') }}
                 </span>
               </p>
             </div>
-            
+
             <!-- Display uploaded files -->
-            <div v-if="formValues.downloadableFiles.length > 0" class="space-y-4">
+            <div
+              v-if="formValues.downloadableFiles.length > 0"
+              class="space-y-4"
+            >
               <div
                 v-for="(file, index) in formValues.downloadableFiles"
                 :key="index"
-                class="border border-gray-200 rounded-lg p-4 dark:border-gray-600"
+                class="rounded-lg border border-gray-200 p-4 dark:border-gray-600"
               >
-                <div class="flex items-center justify-between mb-3">
+                <div class="mb-3 flex items-center justify-between">
                   <div class="flex-1">
-                    <h4 class="font-medium text-gray-900 dark:text-gray-100">{{ file.fileName }}</h4>
+                    <h4 class="font-medium text-gray-900 dark:text-gray-100">
+                      {{ file.fileName }}
+                    </h4>
                     <p class="text-sm text-gray-500 dark:text-gray-400">
-                      {{ file.size ? (file.size / (1024 * 1024)).toFixed(2) : '0' }}MB • {{ file.kind }}
+                      {{
+                        file.size
+                          ? (file.size / (1024 * 1024)).toFixed(2)
+                          : '0'
+                      }}MB • {{ file.kind }}
                     </p>
                     <!-- Show URL for existing files (non-editable) -->
                     <div v-if="file.url" class="mt-2">
-                      <label class="text-xs font-medium text-gray-700 dark:text-gray-300">File URL:</label>
-                      <div class="flex items-center gap-2 mt-1">
+                      <label
+                        class="text-xs font-medium text-gray-700 dark:text-gray-300"
+                        >File URL:</label
+                      >
+                      <div class="mt-1 flex items-center gap-2">
                         <input
                           :value="file.url"
                           readonly
-                          class="flex-1 text-sm bg-gray-50 border border-gray-200 rounded px-2 py-1 text-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 cursor-not-allowed"
+                          class="bg-gray-50 flex-1 cursor-not-allowed rounded border border-gray-200 px-2 py-1 text-sm text-gray-600 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-400"
                           type="text"
-                        >
+                        />
                         <button
                           type="button"
-                          class="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
+                          class="text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300"
                           title="Delete this file"
                           @click="removeFile(index)"
                         >
@@ -560,14 +600,19 @@ function handleSave() {
                     Remove
                   </button>
                 </div>
-                
+
                 <!-- License Selection -->
                 <FormRow section-title="License">
                   <template #content>
                     <select
                       :value="file.license"
                       class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
-                      @change="updateLicense(index, ($event.target as HTMLSelectElement).value)"
+                      @change="
+                        updateLicense(
+                          index,
+                          ($event.target as HTMLSelectElement).value
+                        )
+                      "
                     >
                       <option value="">Select a license...</option>
                       <option
@@ -581,7 +626,7 @@ function handleSave() {
                   </template>
                 </FormRow>
               </div>
-              
+
               <!-- Option to add another file -->
               <div>
                 <input
@@ -591,11 +636,11 @@ function handleSave() {
                   :accept="acceptAttribute"
                   :disabled="uploadingFile"
                   @change="handleFileUpload"
-                >
+                />
                 <label
                   for="additional-file-input"
-                  class="inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-600 cursor-pointer"
-                  :class="{ 'opacity-50 cursor-not-allowed': uploadingFile }"
+                  class="hover:bg-gray-50 inline-flex cursor-pointer items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                  :class="{ 'cursor-not-allowed opacity-50': uploadingFile }"
                 >
                   <span v-if="uploadingFile">Uploading...</span>
                   <span v-else>+ Add Another File</span>
@@ -605,11 +650,11 @@ function handleSave() {
           </div>
         </template>
       </FormRow>
-      
+
       <!-- Download Labels Section -->
-      <FormRow 
-        v-if="channelData?.FilterGroups && channelData.FilterGroups.length > 0" 
-        section-title="Labels" 
+      <FormRow
+        v-if="channelData?.FilterGroups && channelData.FilterGroups.length > 0"
+        section-title="Labels"
         class="mt-6"
       >
         <template #content>
@@ -620,15 +665,14 @@ function handleSave() {
           />
         </template>
       </FormRow>
-      
     </div>
-    
+
     <ErrorBanner
       v-if="updateDiscussionError"
       class="mx-auto my-3 max-w-5xl"
       :text="updateDiscussionError.message"
     />
-    
+
     <Notification
       :show="savedSuccessfully"
       :title="'Download saved successfully'"

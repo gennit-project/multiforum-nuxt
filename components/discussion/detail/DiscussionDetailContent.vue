@@ -1,47 +1,47 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref, watch } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
+import { computed, defineAsyncComponent, ref, watch } from 'vue';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import {
   GET_DISCUSSION_COMMENTS,
   GET_DISCUSSION_CHANNEL_COMMENT_AGGREGATE,
   GET_DISCUSSION_CHANNEL_ROOT_COMMENT_AGGREGATE,
-} from "@/graphQLData/comment/queries";
+} from '@/graphQLData/comment/queries';
 import type {
   Discussion,
   DiscussionChannel,
   Comment,
-} from "@/__generated__/graphql";
-import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from "@/graphQLData/discussion/mutations";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import InfoBanner from "@/components/InfoBanner.vue";
-import DiscussionBody from "@/components/discussion/detail/DiscussionBody.vue";
-import DiscussionHeader from "@/components/discussion/detail/DiscussionHeader.vue";
-import DiscussionCommentsWrapper from "@/components/discussion/detail/DiscussionCommentsWrapper.vue";
-import DiscussionChannelLinks from "@/components/discussion/detail/DiscussionChannelLinks.vue";
-import DiscussionRootCommentFormWrapper from "@/components/discussion/form/DiscussionRootCommentFormWrapper.vue";
-import DiscussionVotes from "@/components/discussion/vote/DiscussionVotes.vue";
-import PageNotFound from "@/components/PageNotFound.vue";
-import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
-import ConfirmUndoDiscussionFeedbackModal from "@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue";
-import EditFeedbackModal from "@/components/discussion/detail/EditFeedbackModal.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { usernameVar, modProfileNameVar } from "@/cache";
-import { useRoute, useRouter } from "nuxt/app";
-import DiscussionBodyEditForm from "./DiscussionBodyEditForm.vue";
-import ImageIcon from "@/components/icons/ImageIcon.vue";
-import AlbumEditForm from "./AlbumEditForm.vue";
-import MarkAsAnsweredButton from "./MarkAsAnsweredButton.vue";
-import ArchivedDiscussionInfoBanner from "./ArchivedDiscussionInfoBanner.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import DiscussionTitleVersions from "./activityFeed/DiscussionTitleVersions.vue";
-import DownloadSidebar from "@/components/channel/DownloadSidebar.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import PencilIcon from "@/components/icons/PencilIcon.vue";
+} from '@/__generated__/graphql';
+import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import InfoBanner from '@/components/InfoBanner.vue';
+import DiscussionBody from '@/components/discussion/detail/DiscussionBody.vue';
+import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
+import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
+import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
+import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
+import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
+import PageNotFound from '@/components/PageNotFound.vue';
+import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
+import ConfirmUndoDiscussionFeedbackModal from '@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue';
+import EditFeedbackModal from '@/components/discussion/detail/EditFeedbackModal.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { usernameVar, modProfileNameVar } from '@/cache';
+import { useRoute, useRouter } from 'nuxt/app';
+import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
+import ImageIcon from '@/components/icons/ImageIcon.vue';
+import AlbumEditForm from './AlbumEditForm.vue';
+import MarkAsAnsweredButton from './MarkAsAnsweredButton.vue';
+import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import DiscussionTitleVersions from './activityFeed/DiscussionTitleVersions.vue';
+import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
 // Lazy load the album components since they're not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
-  () => import("@/components/discussion/detail/DiscussionAlbum.vue")
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
 );
 
 const COMMENT_LIMIT = 50;
@@ -65,7 +65,7 @@ const route = useRoute();
 const router = useRouter();
 const offset = ref(0);
 const channelId = computed(() =>
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 const loggedInUserModName = computed(() => modProfileNameVar.value);
 const lastValidDiscussion = ref<Discussion | null>(null);
@@ -84,7 +84,7 @@ const {
     channelUniqueName: channelId.value,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -131,7 +131,7 @@ const {
     sort: commentSort.value,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -197,7 +197,7 @@ const { result: getDiscussionChannelCommentAggregateResult } = useQuery(
     channelUniqueName: channelId,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -208,7 +208,7 @@ const { result: getDiscussionChannelRootCommentAggregateResult } = useQuery(
     channelUniqueName: channelId,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -264,25 +264,26 @@ const loggedInUserIsAuthor = computed(() => {
   return discussion.value?.Author?.username === usernameVar.value;
 });
 const discussionAuthor = computed(
-  () => discussion.value?.Author?.username || ""
+  () => discussion.value?.Author?.username || ''
 );
 
 // Check if discussion has downloadable .stl files
 const stlFiles = computed(() => {
   if (!discussion.value?.DownloadableFiles) return [];
-  
-  return discussion.value.DownloadableFiles.filter(file => 
-    file.fileName?.toLowerCase().endsWith('.stl') || 
-    file.url?.toLowerCase().endsWith('.stl')
+
+  return discussion.value.DownloadableFiles.filter(
+    (file) =>
+      file.fileName?.toLowerCase().endsWith('.stl') ||
+      file.url?.toLowerCase().endsWith('.stl')
   );
 });
 
 // Check if discussion should show album (has images OR .stl files)
 const shouldShowAlbum = computed(() => {
-  const hasImages = discussion.value?.Album?.Images && 
-                   discussion.value.Album.Images.length > 0;
+  const hasImages =
+    discussion.value?.Album?.Images && discussion.value.Album.Images.length > 0;
   const hasStlFiles = stlFiles.value.length > 0;
-  
+
   return hasImages || hasStlFiles;
 });
 
@@ -290,20 +291,20 @@ const handleClickGiveFeedback = () => {
   showFeedbackFormModal.value = true;
 };
 
-const feedbackText = ref("");
+const feedbackText = ref('');
 const previousOffset = ref(0);
 
 const handleSubmitFeedback = async () => {
   if (!feedbackText.value) {
-    console.error("No feedback text found.");
+    console.error('No feedback text found.');
     return;
   }
   if (!loggedInUserModName.value) {
-    console.error("No mod name found.");
+    console.error('No mod name found.');
     return;
   }
   if (!activeDiscussionChannel.value?.channelUniqueName) {
-    console.error("No active discussion channel found.");
+    console.error('No active discussion channel found.');
     return;
   }
   await addFeedbackCommentToDiscussion({
@@ -435,7 +436,7 @@ const handleEditAlbum = () => {
                               <button
                                 v-if="loggedInUserIsAuthor && usernameVar"
                                 @click="handleClickAddAlbum"
-                                class="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                                class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
                                 data-testid="add-images-button"
                               >
                                 <ImageIcon class="h-5 w-5" />
@@ -613,10 +614,10 @@ const handleEditAlbum = () => {
               class="px-2"
             >
               <div
-                class="flex flex-col-reverse lg:flex-row lg:items-start lg:justify-between gap-4"
+                class="flex flex-col-reverse gap-4 lg:flex-row lg:items-start lg:justify-between"
               >
                 <!-- Description content -->
-                <div v-if="discussion?.body" class="flex-1 min-w-0">
+                <div v-if="discussion?.body" class="min-w-0 flex-1">
                   <MarkdownPreview
                     :disable-gallery="false"
                     :text="discussion.body"
@@ -624,17 +625,17 @@ const handleEditAlbum = () => {
                 </div>
                 <div
                   v-else
-                  class="text-gray-500 dark:text-gray-400 py-8 text-center flex-1 min-w-0"
+                  class="min-w-0 flex-1 py-8 text-center text-gray-500 dark:text-gray-400"
                 >
                   No description available for this download.
                 </div>
                 <div
                   v-if="loggedInUserIsAuthor && discussion"
-                  class="w-full lg:w-auto flex justify-end"
+                  class="flex w-full justify-end lg:w-auto"
                 >
                   <button
                     type="button"
-                    class="inline-flex items-center px-3 py-2 gap-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700"
+                    class="hover:bg-gray-50 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                     @click="
                       router.push(
                         `/forums/${channelId}/downloads/${discussionId}/description`

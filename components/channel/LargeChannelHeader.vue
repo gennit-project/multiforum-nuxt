@@ -1,6 +1,6 @@
 <script lang="ts">
-import { defineComponent } from "vue";
-import ChannelIcon from "@/components/icons/ChannelIcon.vue";
+import { defineComponent } from 'vue';
+import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 
 export default defineComponent({
   components: {
@@ -19,9 +19,9 @@ export default defineComponent({
 <template>
   <section aria-labelledby="section-2-title">
     <div class="overflow-hidden">
-      <div class="space-y-2 px-4 mt-2 flex items-center font-bold">
+      <div class="mt-2 flex items-center space-y-2 px-4 font-bold">
         <ChannelIcon class="h-6 w-6" />
-        <h1 class="text-xl mt-8 ml-4 no-underline">
+        <h1 class="ml-4 mt-8 text-xl no-underline">
           {{ channelId }}
         </h1>
       </div>

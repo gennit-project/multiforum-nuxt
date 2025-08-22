@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_MODS_BY_CHANNEL } from "@/graphQLData/mod/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { GET_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const { result, loading, error } = useQuery(
@@ -18,12 +18,12 @@ const { result, loading, error } = useQuery(
     channelUniqueName: forumId.value,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 const mods = computed(() => result.value?.channels[0]?.Moderators);
 
-defineEmits(["click-remove-mod"]);
+defineEmits(['click-remove-mod']);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -42,7 +42,7 @@ defineEmits(["click-remove-mod"]);
       <div
         v-for="mod in mods"
         :key="mod.displayName"
-        class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <nuxt-link
           :to="{ name: 'mod-modId', params: { modId: mod.displayName } }"
@@ -50,12 +50,12 @@ defineEmits(["click-remove-mod"]);
         >
           <AvatarComponent :text="mod.displayName" class="mr-2 h-6 w-6" />
           <span class="text-sm font-bold">{{
-            `${mod.displayName} ${mod.User?.username ? `(${mod.User?.username})` : ""}`
+            `${mod.displayName} ${mod.User?.username ? `(${mod.User?.username})` : ''}`
           }}</span>
         </nuxt-link>
         <button
           type="button"
-          class="flex rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
+          class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
           @click="$emit('click-remove-mod', mod.User?.username)"
         >
           Remove Mod

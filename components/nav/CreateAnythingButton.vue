@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, nextTick, computed, onMounted } from "vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { useRoute, useRouter } from "nuxt/app";
+import { ref, nextTick, computed, onMounted } from 'vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import { useRoute, useRouter } from 'nuxt/app';
 
 // Props
 defineProps({
@@ -22,37 +22,37 @@ const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId !== "string") {
-    return "";
+  if (typeof route.params.forumId !== 'string') {
+    return '';
   }
   return route.params.forumId;
 });
 
 const menuItems = [
   {
-    text: "+ New Discussion",
-    testId: "create-discussion-menu-item",
+    text: '+ New Discussion',
+    testId: 'create-discussion-menu-item',
     action: () =>
       router.push(
         channelId.value
           ? `/forums/${channelId.value}/discussions/create`
-          : "/discussions/create"
+          : '/discussions/create'
       ),
   },
   {
-    text: "+ New Event",
-    testId: "create-event-menu-item",
+    text: '+ New Event',
+    testId: 'create-event-menu-item',
     action: () =>
       router.push(
         channelId.value
           ? `/forums/${channelId.value}/events/create`
-          : "/events/create"
+          : '/events/create'
       ),
   },
   {
-    text: "+ New Forum",
-    testId: "create-channel-menu-item",
-    action: () => router.push("/forums/create"),
+    text: '+ New Forum',
+    testId: 'create-channel-menu-item',
+    action: () => router.push('/forums/create'),
   },
 ];
 
@@ -80,14 +80,14 @@ const adjustMenuPosition = () => {
 
 onMounted(() => {
   adjustMenuPosition();
-  window.addEventListener("resize", adjustMenuPosition);
+  window.addEventListener('resize', adjustMenuPosition);
 });
 
 const isMenuOpen = ref(false);
 const showTooltip = ref(false);
 const showFooter = computed(() => {
   return (
-    route.name && typeof route.name === "string" && !route.name.includes("map")
+    route.name && typeof route.name === 'string' && !route.name.includes('map')
   );
 });
 
@@ -106,18 +106,17 @@ const handleItemClick = (item: any) => {
             <button
               type="button"
               v-bind="props"
-              class="inline-flex rounded-md border border-gray-800 dark:border-gray-600 px-2 py-2 items-center gap-1 focus:outline-none text-xs"
+              class="inline-flex items-center gap-1 rounded-md border border-gray-800 px-2 py-2 text-xs focus:outline-none dark:border-gray-600"
               :class="[
-                backgroundColor === 'light' 
-                  ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700' 
-                  : 'bg-gray-800 text-gray-100 hover:bg-gray-700'
+                backgroundColor === 'light'
+                  ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
+                  : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
               ]"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span
-                class="flex whitespace-nowrap items-center">
-                {{ usePrimaryButton ? "Create" : "+ Add" }}
+              <span class="flex items-center whitespace-nowrap">
+                {{ usePrimaryButton ? 'Create' : '+ Add' }}
               </span>
               <ChevronDownIcon
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3"
@@ -159,7 +158,7 @@ const handleItemClick = (item: any) => {
         </v-menu>
         <template #fallback>
           <button
-            class="inline-flex border border-gray-800 dark:border-gray-600 px-3 py-2 items-center gap-x-1.5 rounded-md text-xs focus:outline-none"
+            class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-800 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
             :class="[
               usePrimaryButton
                 ? '!border !border-gray-800 dark:!border-gray-600'
@@ -170,7 +169,7 @@ const handleItemClick = (item: any) => {
             data-testid="fake-create-anything-button"
           >
             <span class="flex items-center">
-              + {{ usePrimaryButton ? "Create" : "" }}
+              + {{ usePrimaryButton ? 'Create' : '' }}
             </span>
             <ChevronDownIcon
               class="-mr-1 ml-1 mt-0.5 h-3 w-3"
@@ -183,7 +182,7 @@ const handleItemClick = (item: any) => {
 
     <template #does-not-have-auth>
       <button
-        class="inline-flex border border-gray-800 dark:border-gray-600 px-3 py-2 items-center gap-x-1.5 rounded-md text-xs focus:outline-none"
+        class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-800 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
         :class="[
           usePrimaryButton
             ? '!border !border-gray-800 dark:!border-gray-600'
@@ -194,12 +193,9 @@ const handleItemClick = (item: any) => {
         data-testid="fake-create-anything-button"
       >
         <span class="flex items-center">
-          + {{ usePrimaryButton ? "Create" : "" }}
+          + {{ usePrimaryButton ? 'Create' : '' }}
         </span>
-        <ChevronDownIcon
-          class="-mr-1 ml-1 mt-0.5 h-3 w-3"
-          aria-hidden="true"
-        />
+        <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
       </button>
       <client-only>
         <v-tooltip v-if="showFooter" activator="parent" location="bottom">

@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client/core";
-import { ISSUE_FIELDS } from "./queries";
+import { gql } from '@apollo/client/core';
+import { ISSUE_FIELDS } from './queries';
 
 export const CLOSE_ISSUE = gql`
   mutation closeIssue($id: ID!) {
@@ -103,11 +103,7 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD = gql`
                         where: { node: { uniqueName: $channelUniqueName } }
                       }
                     }
-                    Issue: { 
-                      connect: { 
-                        where: { node: { id: $issueId } } 
-                      } 
-                    }
+                    Issue: { connect: { where: { node: { id: $issueId } } } }
                     CommentAuthor: {
                       ModerationProfile: {
                         connect: {
@@ -150,9 +146,7 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER = gql`
             node: {
               actionDescription: $actionDescription
               actionType: $actionType
-              User: {
-                connect: { where: { node: { username: $username } } }
-              }
+              User: { connect: { where: { node: { username: $username } } } }
               Comment: {
                 create: {
                   node: {
@@ -163,16 +157,10 @@ export const ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER = gql`
                         where: { node: { uniqueName: $channelUniqueName } }
                       }
                     }
-                    Issue: { 
-                      connect: { 
-                        where: { node: { id: $issueId } } 
-                      } 
-                    }
+                    Issue: { connect: { where: { node: { id: $issueId } } } }
                     CommentAuthor: {
                       User: {
-                        connect: {
-                          where: { node: { username: $username } }
-                        }
+                        connect: { where: { node: { username: $username } } }
                       }
                     }
                   }
@@ -230,7 +218,6 @@ export const ARCHIVE_DISCUSSION = gql`
   }
 `;
 
-
 export const UNARCHIVE_DISCUSSION = gql`
   mutation unarchiveDiscussion(
     $discussionId: ID!
@@ -245,8 +232,7 @@ export const UNARCHIVE_DISCUSSION = gql`
       id
     }
   }
-`
-
+`;
 
 export const REPORT_EVENT = gql`
   mutation reportEvent(
@@ -282,7 +268,7 @@ export const UNARCHIVE_EVENT = gql`
       id
     }
   }
-`
+`;
 
 export const ARCHIVE_EVENT = gql`
   mutation archiveEvent(
@@ -343,15 +329,9 @@ export const ARCHIVE_COMMENT = gql`
 `;
 
 export const UNARCHIVE_COMMENT = gql`
-  mutation unarchiveComment(
-    $commentId: ID!
-    $explanation: String!
-  ) {
-    unarchiveComment(
-      commentId: $commentId
-      explanation: $explanation
-    ) {
+  mutation unarchiveComment($commentId: ID!, $explanation: String!) {
+    unarchiveComment(commentId: $commentId, explanation: $explanation) {
       id
     }
   }
-`
+`;

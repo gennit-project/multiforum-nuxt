@@ -1,8 +1,8 @@
 <script>
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "HamburgerMenuButton",
+  name: 'HamburgerMenuButton',
   setup() {},
 });
 </script>
@@ -10,7 +10,7 @@ export default defineComponent({
   <button
     data-testid="hamburger-menu-button"
     type="button"
-    class="bg-black inline-flex border border-gray-700 items-center justify-center rounded-md p-2 text-gray-300 hover:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700  hover:text-white"
+    class="inline-flex items-center justify-center rounded-md border border-gray-700 bg-black p-2 text-gray-300 hover:bg-gray-900 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-gray-700"
     aria-controls="mobile-menu"
     aria-expanded="false"
   >

@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import EmojiButtons from "@/components/comments/EmojiButtons.vue";
-import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
-import Tag from "../../TagComponent.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import "md-editor-v3/lib/preview.css";
-import type { PropType } from "vue";
-import type { Discussion } from "@/__generated__/graphql";
-import { useRouter } from "nuxt/app";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { usernameVar, isAuthenticatedVar } from "@/cache";
+import { ref, computed, onMounted } from 'vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import EmojiButtons from '@/components/comments/EmojiButtons.vue';
+import NewEmojiButton from '@/components/comments/NewEmojiButton.vue';
+import Tag from '../../TagComponent.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import 'md-editor-v3/lib/preview.css';
+import type { PropType } from 'vue';
+import type { Discussion } from '@/__generated__/graphql';
+import { useRouter } from 'nuxt/app';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_USER } from '@/graphQLData/user/queries';
+import { usernameVar, isAuthenticatedVar } from '@/cache';
 
 const router = useRouter();
 const uiStore = useUIStore();
@@ -23,7 +23,7 @@ const { fontSize: _fontSize } = storeToRefs(uiStore);
 const { result: getUserResult } = useQuery(
   GET_USER,
   () => ({
-    username: usernameVar.value || "",
+    username: usernameVar.value || '',
   }),
   () => ({
     enabled: isAuthenticatedVar.value && !!usernameVar.value,
@@ -43,7 +43,7 @@ const props = defineProps({
   discussionChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   downloadMode: {
     type: Boolean,
@@ -53,7 +53,7 @@ const props = defineProps({
   emojiJson: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   showEmojiButton: {
     type: Boolean,
@@ -74,7 +74,7 @@ const props = defineProps({
 
 // Computed properties for discussion body and links
 const bodyText = computed(() => {
-  return props.discussion?.body || "";
+  return props.discussion?.body || '';
 });
 
 // Scroll element setup, ensure document.documentElement is accessed only on the client-side
@@ -88,11 +88,17 @@ const hasSensitiveContent = computed(
 );
 
 const userAllowsSensitiveContent = computed(() => {
-  return getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false;
+  return (
+    getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false
+  );
 });
 
 const shouldShowContent = computed(() => {
-  return !hasSensitiveContent.value || sensitiveContentRevealed.value || userAllowsSensitiveContent.value;
+  return (
+    !hasSensitiveContent.value ||
+    sensitiveContentRevealed.value ||
+    userAllowsSensitiveContent.value
+  );
 });
 
 const revealSensitiveContent = () => {
@@ -108,7 +114,7 @@ onMounted(() => {
 // Method for filtering discussions by tag
 const filterByTag = (tag: string) => {
   router.push({
-    name: "forums-forumId-discussions",
+    name: 'forums-forumId-discussions',
     params: {
       forumId: props.channelId,
     },
@@ -131,17 +137,21 @@ const hasEmoiji = computed(() => {
   <div class="flex flex-col gap-2">
     <!-- Sensitive content concealment box -->
     <div
-      v-if="hasSensitiveContent && !sensitiveContentRevealed && !userAllowsSensitiveContent"
-      class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center"
+      v-if="
+        hasSensitiveContent &&
+        !sensitiveContentRevealed &&
+        !userAllowsSensitiveContent
+      "
+      class="rounded border bg-gray-200 p-4 text-center dark:bg-gray-800"
     >
-      <p class="text-gray-600 dark:text-gray-300 mb-3">
+      <p class="mb-3 text-gray-600 dark:text-gray-300">
         This content has been marked as potentially sensitive.
       </p>
       <RequireAuth>
         <template #has-auth>
           <button
             type="button"
-            class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
+            class="rounded bg-black px-4 py-2 text-white hover:bg-gray-800"
             @click="revealSensitiveContent"
           >
             Reveal sensitive content
@@ -150,7 +160,7 @@ const hasEmoiji = computed(() => {
         <template #does-not-have-auth>
           <button
             type="button"
-            class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
+            class="rounded bg-black px-4 py-2 text-white hover:bg-gray-800"
           >
             Log in to reveal sensitive content
           </button>
@@ -162,7 +172,7 @@ const hasEmoiji = computed(() => {
     <div
       v-if="discussion?.body && !downloadMode && shouldShowContent"
       class="rounded"
-      :class="[shaded ? ' bg-gray-100 dark:bg-gray-700 ' : '']"
+      :class="[shaded ? 'bg-gray-100 dark:bg-gray-700' : '']"
     >
       <MarkdownPreview :text="bodyText" :disable-gallery="false" />
     </div>

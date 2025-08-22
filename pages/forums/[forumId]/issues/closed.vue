@@ -1,11 +1,11 @@
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import type { Issue } from "@/__generated__/graphql";
-import { GET_CLOSED_ISSUES_BY_CHANNEL } from "@/graphQLData/issue/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import { DateTime } from "luxon";
-import IssueListItem from "@/components/mod/ModIssueListItem.vue";
+import { computed, defineComponent } from 'vue';
+import type { Issue } from '@/__generated__/graphql';
+import { GET_CLOSED_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import { DateTime } from 'luxon';
+import IssueListItem from '@/components/mod/ModIssueListItem.vue';
 
 export default defineComponent({
   components: {
@@ -15,8 +15,8 @@ export default defineComponent({
     const route = useRoute();
 
     const channelId = computed(() => {
-      if (typeof route.params.forumId !== "string") {
-        return "";
+      if (typeof route.params.forumId !== 'string') {
+        return '';
       }
       return route.params.forumId;
     });
@@ -59,7 +59,7 @@ export default defineComponent({
 
 <template>
   <ul
-    class="divide-y border-t border-gray-200 dark:border-gray-800 divide-gray-200 dark:divide-gray-800 dark:text-white"
+    class="divide-y divide-gray-200 border-t border-gray-200 dark:divide-gray-800 dark:border-gray-800 dark:text-white"
     data-testid="issue-list"
   >
     <IssueListItem

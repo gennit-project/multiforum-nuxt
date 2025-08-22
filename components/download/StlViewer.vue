@@ -1,15 +1,13 @@
 <template>
-  <div 
-    ref="container" 
+  <div
+    ref="container"
     class="stl-container"
     :class="{ 'is-interactive': !loading && !error }"
     :style="containerStyle"
     @mouseenter="onMouseEnter"
     @mouseleave="onMouseLeave"
   >
-    <div v-if="loading" class="loading-overlay">
-      Loading 3D model...
-    </div>
+    <div v-if="loading" class="loading-overlay">Loading 3D model...</div>
     <div v-if="error" class="error-overlay">
       {{ error }}
     </div>
@@ -17,277 +15,294 @@
 </template>
 
 <script setup>
-import { onMounted, ref, watch, onBeforeUnmount, computed, nextTick } from 'vue'
-import * as THREE from 'three'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import {
+  onMounted,
+  ref,
+  watch,
+  onBeforeUnmount,
+  computed,
+  nextTick,
+} from 'vue';
+import * as THREE from 'three';
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 const props = defineProps({
   src: {
     type: String,
-    required: true
+    required: true,
   },
   width: {
     type: [Number, String],
-    default: '100%'
+    default: '100%',
   },
   height: {
     type: [Number, String],
-    default: 400
+    default: 400,
   },
   maxWidth: {
     type: [Number, String],
-    default: null
+    default: null,
   },
   aspectRatio: {
     type: Number,
-    default: 1 // 1:1 square by default
+    default: 1, // 1:1 square by default
   },
   modelColor: {
     type: String,
-    default: '#607d8b'
+    default: '#607d8b',
   },
   backgroundColor: {
     type: String,
-    default: '#f0f0f0'
+    default: '#f0f0f0',
   },
   autoRotate: {
     type: Boolean,
-    default: false
+    default: false,
   },
   showGrid: {
     type: Boolean,
-    default: false
-  }
-})
+    default: false,
+  },
+});
 
 const containerStyle = computed(() => {
-  const style = {}
-  
+  const style = {};
+
   // Handle width
   if (typeof props.width === 'number') {
-    style.width = props.width + 'px'
+    style.width = props.width + 'px';
   } else {
-    style.width = props.width
+    style.width = props.width;
   }
-  
+
   // Handle height
   if (typeof props.height === 'number') {
-    style.height = props.height + 'px'
+    style.height = props.height + 'px';
   } else {
-    style.height = props.height
+    style.height = props.height;
   }
-  
+
   // Handle max-width for responsive behavior
   if (props.maxWidth) {
     if (typeof props.maxWidth === 'number') {
-      style.maxWidth = props.maxWidth + 'px'
+      style.maxWidth = props.maxWidth + 'px';
     } else {
-      style.maxWidth = props.maxWidth
+      style.maxWidth = props.maxWidth;
     }
   }
-  
-  return style
-})
 
-const emit = defineEmits(['load', 'progress', 'error'])
+  return style;
+});
 
-const container = ref(null)
-const loading = ref(true)
-const error = ref(null)
-const isHovered = ref(false)
-const actualWidth = ref(400)
-const actualHeight = ref(400)
+const emit = defineEmits(['load', 'progress', 'error']);
 
-let scene, camera, renderer, controls, animationId
+const container = ref(null);
+const loading = ref(true);
+const error = ref(null);
+const isHovered = ref(false);
+const actualWidth = ref(400);
+const actualHeight = ref(400);
+
+let scene, camera, renderer, controls, animationId;
 
 function updateDimensions() {
-  if (!container.value) return
-  
-  const rect = container.value.getBoundingClientRect()
-  actualWidth.value = rect.width
-  actualHeight.value = rect.height
-  
+  if (!container.value) return;
+
+  const rect = container.value.getBoundingClientRect();
+  actualWidth.value = rect.width;
+  actualHeight.value = rect.height;
+
   if (renderer && camera) {
-    renderer.setSize(actualWidth.value, actualHeight.value)
-    camera.aspect = actualWidth.value / actualHeight.value
-    camera.updateProjectionMatrix()
+    renderer.setSize(actualWidth.value, actualHeight.value);
+    camera.aspect = actualWidth.value / actualHeight.value;
+    camera.updateProjectionMatrix();
   }
 }
 
 function handleResize() {
-  updateDimensions()
+  updateDimensions();
 }
 
 function initViewer(stlUrl) {
-  if (!container.value) return
-  
-  loading.value = true
-  error.value = null
-  
+  if (!container.value) return;
+
+  loading.value = true;
+  error.value = null;
+
   // Wait for next tick to ensure container has proper dimensions
   nextTick(() => {
-    updateDimensions()
-    
-    scene = new THREE.Scene()
-    scene.background = new THREE.Color(props.backgroundColor)
+    updateDimensions();
 
-    camera = new THREE.PerspectiveCamera(45, actualWidth.value / actualHeight.value, 0.1, 1000)
-    camera.position.set(3, 3, 3)
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(props.backgroundColor);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true })
-    renderer.setSize(actualWidth.value, actualHeight.value)
-    container.value.appendChild(renderer.domElement)
+    camera = new THREE.PerspectiveCamera(
+      45,
+      actualWidth.value / actualHeight.value,
+      0.1,
+      1000
+    );
+    camera.position.set(3, 3, 3);
 
-  controls = new OrbitControls(camera, renderer.domElement)
-  controls.enableDamping = true
-  controls.dampingFactor = 0.05
-  controls.autoRotate = props.autoRotate
-  controls.autoRotateSpeed = 2
-  
-  // Add visual feedback for interaction
-  renderer.domElement.style.cursor = 'grab'
-  
-  controls.addEventListener('start', () => {
-    renderer.domElement.style.cursor = 'grabbing'
-  })
-  
-  controls.addEventListener('end', () => {
-    renderer.domElement.style.cursor = 'grab'
-  })
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(actualWidth.value, actualHeight.value);
+    container.value.appendChild(renderer.domElement);
 
-  const ambientLight = new THREE.AmbientLight(0x999999)
-  scene.add(ambientLight)
+    controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.autoRotate = props.autoRotate;
+    controls.autoRotateSpeed = 2;
 
-  const directionalLight = new THREE.DirectionalLight(0xffffff, 1)
-  directionalLight.position.set(5, 10, 7.5)
-  scene.add(directionalLight)
+    // Add visual feedback for interaction
+    renderer.domElement.style.cursor = 'grab';
 
-  // Grid (optional)
-  if (props.showGrid) {
-    const gridHelper = new THREE.GridHelper(200, 20)
-    scene.add(gridHelper)
-  }
+    controls.addEventListener('start', () => {
+      renderer.domElement.style.cursor = 'grabbing';
+    });
 
-  const loader = new STLLoader()
-  loader.load(
-    stlUrl, 
-    geometry => {
-      const material = new THREE.MeshStandardMaterial({ color: props.modelColor })
-      const mesh = new THREE.Mesh(geometry, material)
+    controls.addEventListener('end', () => {
+      renderer.domElement.style.cursor = 'grab';
+    });
 
-      geometry.computeBoundingBox()
-      const center = new THREE.Vector3()
-      geometry.boundingBox.getCenter(center)
-      mesh.position.sub(center) // center the object
+    const ambientLight = new THREE.AmbientLight(0x999999);
+    scene.add(ambientLight);
 
-      scene.add(mesh)
-      
-      // Adjust camera position based on object size
-      const box = new THREE.Box3().setFromObject(mesh)
-      const size = box.getSize(new THREE.Vector3())
-      const maxDim = Math.max(size.x, size.y, size.z)
-      const fov = camera.fov * (Math.PI / 180)
-      const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5
-      
-      camera.position.set(distance, distance, distance)
-      camera.lookAt(0, 0, 0)
-      controls.update()
-      
-      loading.value = false
-      emit('load', { geometry, mesh })
-    },
-    progress => {
-      const percent = progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0
-      emit('progress', percent)
-    },
-    loadError => {
-      console.error('Error loading STL:', loadError)
-      error.value = 'Failed to load 3D model'
-      loading.value = false
-      emit('error', loadError)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+    directionalLight.position.set(5, 10, 7.5);
+    scene.add(directionalLight);
+
+    // Grid (optional)
+    if (props.showGrid) {
+      const gridHelper = new THREE.GridHelper(200, 20);
+      scene.add(gridHelper);
     }
-    )
 
-    animate()
-  })
+    const loader = new STLLoader();
+    loader.load(
+      stlUrl,
+      (geometry) => {
+        const material = new THREE.MeshStandardMaterial({
+          color: props.modelColor,
+        });
+        const mesh = new THREE.Mesh(geometry, material);
+
+        geometry.computeBoundingBox();
+        const center = new THREE.Vector3();
+        geometry.boundingBox.getCenter(center);
+        mesh.position.sub(center); // center the object
+
+        scene.add(mesh);
+
+        // Adjust camera position based on object size
+        const box = new THREE.Box3().setFromObject(mesh);
+        const size = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const fov = camera.fov * (Math.PI / 180);
+        const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
+
+        camera.position.set(distance, distance, distance);
+        camera.lookAt(0, 0, 0);
+        controls.update();
+
+        loading.value = false;
+        emit('load', { geometry, mesh });
+      },
+      (progress) => {
+        const percent =
+          progress.total > 0 ? (progress.loaded / progress.total) * 100 : 0;
+        emit('progress', percent);
+      },
+      (loadError) => {
+        console.error('Error loading STL:', loadError);
+        error.value = 'Failed to load 3D model';
+        loading.value = false;
+        emit('error', loadError);
+      }
+    );
+
+    animate();
+  });
 }
 
 function animate() {
-  animationId = requestAnimationFrame(animate)
-  controls.update()
-  renderer.render(scene, camera)
+  animationId = requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
 }
 
-
 function onMouseEnter() {
-  isHovered.value = true
+  isHovered.value = true;
 }
 
 function onMouseLeave() {
-  isHovered.value = false
+  isHovered.value = false;
 }
 
 function resetCamera() {
-  if (camera && controls && scene.children.find(child => child.isMesh)) {
-    const mesh = scene.children.find(child => child.isMesh)
-    const box = new THREE.Box3().setFromObject(mesh)
-    const size = box.getSize(new THREE.Vector3())
-    const maxDim = Math.max(size.x, size.y, size.z)
-    const fov = camera.fov * (Math.PI / 180)
-    const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5
-    
-    camera.position.set(distance, distance, distance)
-    camera.lookAt(0, 0, 0)
-    controls.update()
+  if (camera && controls && scene.children.find((child) => child.isMesh)) {
+    const mesh = scene.children.find((child) => child.isMesh);
+    const box = new THREE.Box3().setFromObject(mesh);
+    const size = box.getSize(new THREE.Vector3());
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const fov = camera.fov * (Math.PI / 180);
+    const distance = Math.abs(maxDim / Math.sin(fov / 2)) * 1.5;
+
+    camera.position.set(distance, distance, distance);
+    camera.lookAt(0, 0, 0);
+    controls.update();
   }
 }
 
 function cleanup() {
   if (animationId) {
-    cancelAnimationFrame(animationId)
+    cancelAnimationFrame(animationId);
   }
   if (renderer) {
-    renderer.dispose()
+    renderer.dispose();
   }
   if (controls) {
-    controls.dispose()
+    controls.dispose();
   }
   while (container.value?.firstChild) {
-    container.value.removeChild(container.value.firstChild)
+    container.value.removeChild(container.value.firstChild);
   }
 }
 
 onMounted(() => {
   if (props.src) {
-    initViewer(props.src)
+    initViewer(props.src);
   }
-  window.addEventListener('resize', handleResize)
-})
+  window.addEventListener('resize', handleResize);
+});
 
 onBeforeUnmount(() => {
-  cleanup()
-  window.removeEventListener('resize', handleResize)
-})
+  cleanup();
+  window.removeEventListener('resize', handleResize);
+});
 
-watch(() => props.src, (newUrl, oldUrl) => {
-  if (newUrl !== oldUrl) {
-    cleanup()
-    if (newUrl) {
-      initViewer(newUrl)
+watch(
+  () => props.src,
+  (newUrl, oldUrl) => {
+    if (newUrl !== oldUrl) {
+      cleanup();
+      if (newUrl) {
+        initViewer(newUrl);
+      }
     }
   }
-})
+);
 
 // Exposed methods for parent components
 defineExpose({
   resetCamera,
   setAutoRotate: (value) => {
     if (controls) {
-      controls.autoRotate = value
+      controls.autoRotate = value;
     }
-  }
-})
+  },
+});
 </script>
 
 <style scoped>

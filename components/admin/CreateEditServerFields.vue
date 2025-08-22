@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from "vue";
-import type { PropType } from "vue";
-import type { ApolloError } from "@apollo/client/errors";
-import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import TailwindForm from "@/components/FormComponent.vue";
-import { useRoute, useRouter } from "nuxt/app";
+import { computed, ref, onMounted } from 'vue';
+import type { PropType } from 'vue';
+import type { ApolloError } from '@apollo/client/errors';
+import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import TailwindForm from '@/components/FormComponent.vue';
+import { useRoute, useRouter } from 'nuxt/app';
 
 // Import icons
-import CogIcon from "@/components/icons/CogIcon.vue";
-import BookIcon from "@/components/icons/BookIcon.vue";
-import DownloadIcon from "@/components/icons/DownloadIcon.vue";
-import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-
+import CogIcon from '@/components/icons/CogIcon.vue';
+import BookIcon from '@/components/icons/BookIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 
 const props = defineProps({
   editMode: {
@@ -50,33 +49,33 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["submit", "updateFormValues"]);
+const emit = defineEmits(['submit', 'updateFormValues']);
 
 const route = useRoute();
 const router = useRouter();
 
 const tabs = [
   {
-    key: "basic",
-    label: "Basic Settings",
+    key: 'basic',
+    label: 'Basic Settings',
     icon: CogIcon,
     fontAwesome: null,
   },
   {
-    key: "rules",
-    label: "Rules",
+    key: 'rules',
+    label: 'Rules',
     icon: BookIcon,
     fontAwesome: null,
   },
   {
-    key: "calendar",
-    label: "Calendar Settings",
+    key: 'calendar',
+    label: 'Calendar Settings',
     icon: CalendarIcon,
     fontAwesome: null,
   },
   {
-    key: "downloads",
-    label: "Download Settings",
+    key: 'downloads',
+    label: 'Download Settings',
     icon: DownloadIcon,
     fontAwesome: null,
   },
@@ -86,24 +85,25 @@ const isDropdownOpen = ref(false);
 
 // On mounted, if in edit mode and no tab is selected, go to /basic
 onMounted(() => {
-  if (props.editMode && route.name === "admin-settings") {
+  if (props.editMode && route.name === 'admin-settings') {
     router.push({
-      name: "admin-settings-basic",
+      name: 'admin-settings-basic',
     });
   }
 });
 
 const getCurrentTabLabel = computed(() => {
-  const currentTab = tabs.find((tab) =>
-    typeof route.name === "string" && route.name?.includes(`settings-${tab.key}`)
+  const currentTab = tabs.find(
+    (tab) =>
+      typeof route.name === 'string' &&
+      route.name?.includes(`settings-${tab.key}`)
   );
-  return currentTab?.label || "Settings";
+  return currentTab?.label || 'Settings';
 });
-
 </script>
 
 <template>
-  <div class="mt-4 w-full pt-0 px-0">
+  <div class="mt-4 w-full px-0 pt-0">
     <div v-if="serverLoading">Loading...</div>
 
     <div>
@@ -154,13 +154,15 @@ const getCurrentTabLabel = computed(() => {
                     v-if="
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`settings-${tab.key}`)
                       )?.fontAwesome
                     "
                     :class="[
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`settings-${tab.key}`)
                       )?.fontAwesome,
                       'mr-2 text-orange-500',
                     ]"
@@ -170,13 +172,15 @@ const getCurrentTabLabel = computed(() => {
                     :is="
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`settings-${tab.key}`)
                       )?.icon
                     "
                     v-else-if="
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`settings-${tab.key}`)
                       )?.icon
                     "
                     class="mr-2 h-5 w-5 text-orange-500"
@@ -199,9 +203,11 @@ const getCurrentTabLabel = computed(() => {
                   class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="{
                     'bg-gray-50 text-orange-500 dark:bg-gray-700':
-                      typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`settings-${tab.key}`),
                     'text-gray-700 dark:text-gray-300':
-                      typeof route.name === 'string' && !route.name?.includes(`settings-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      !route.name?.includes(`settings-${tab.key}`),
                   }"
                   :to="{
                     name: `admin-settings-${tab.key}`,
@@ -216,7 +222,8 @@ const getCurrentTabLabel = computed(() => {
                       'mr-2',
                       {
                         'text-orange-500':
-                          typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`settings-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
                           typeof route.name === 'string' &&
                           !route.name?.includes(`settings-${tab.key}`),
@@ -230,9 +237,11 @@ const getCurrentTabLabel = computed(() => {
                     class="mr-2 h-5 w-5"
                     :class="{
                       'text-orange-500':
-                        typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`settings-${tab.key}`),
                       'text-gray-400 dark:text-gray-400':
-                        typeof route.name === 'string' && !route.name?.includes(`settings-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        !route.name?.includes(`settings-${tab.key}`),
                     }"
                   />
                   {{ tab.label }}
@@ -254,11 +263,14 @@ const getCurrentTabLabel = computed(() => {
                   class="flex cursor-pointer items-center px-3 py-2"
                   :class="{
                     'border-r-2 border-orange-500 dark:text-white':
-                      typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`settings-${tab.key}`),
                     'text-gray-900':
-                      typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`settings-${tab.key}`),
                     'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
-                      typeof route.name === 'string' && !route.name?.includes(`settings-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      !route.name?.includes(`settings-${tab.key}`),
                   }"
                   :to="{
                     name: `admin-settings-${tab.key}`,
@@ -272,7 +284,8 @@ const getCurrentTabLabel = computed(() => {
                       'mr-2',
                       {
                         'text-orange-500':
-                          typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`settings-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
                           typeof route.name === 'string' &&
                           !route.name?.includes(`settings-${tab.key}`),
@@ -286,9 +299,11 @@ const getCurrentTabLabel = computed(() => {
                     class="mr-2 h-5 w-5"
                     :class="{
                       'text-orange-500':
-                        typeof route.name === 'string' && route.name?.includes(`settings-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`settings-${tab.key}`),
                       'text-gray-400 dark:text-gray-400':
-                        typeof route.name === 'string' && !route.name?.includes(`settings-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        !route.name?.includes(`settings-${tab.key}`),
                     }"
                   />
                   {{ tab.label }}

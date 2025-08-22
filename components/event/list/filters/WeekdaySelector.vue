@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { PropType } from "vue";
+import { ref, computed } from 'vue';
+import type { PropType } from 'vue';
 import {
   weekdays as weekdayData,
   defaultSelectedWeekdays,
-} from "@/components/event/list/filters/eventSearchOptions";
-import type { SelectedWeekdays, WeekdayData } from "@/types/Event";
-import ResetButton from "@/components/ResetButton.vue";
+} from '@/components/event/list/filters/eventSearchOptions';
+import type { SelectedWeekdays, WeekdayData } from '@/types/Event';
+import ResetButton from '@/components/ResetButton.vue';
 
 const props = defineProps({
   selectedWeekdays: {
@@ -15,7 +15,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["updateWeekdays", "reset"]);
+const emit = defineEmits(['updateWeekdays', 'reset']);
 
 const workingCopyOfSelectedWeekdays = ref({ ...props.selectedWeekdays });
 
@@ -37,7 +37,7 @@ const toggleSelectWeekday = (day: WeekdayData) => {
   } else {
     addWeekday(day);
   }
-  emit("updateWeekdays", flattenedWeekdays.value);
+  emit('updateWeekdays', flattenedWeekdays.value);
 };
 
 const removeWeekday = (day: WeekdayData) => {
@@ -49,7 +49,7 @@ const addWeekday = (day: WeekdayData) => {
 };
 
 const reset = () => {
-  emit("reset");
+  emit('reset');
   workingCopyOfSelectedWeekdays.value = { ...defaultSelectedWeekdays };
 };
 </script>
@@ -69,7 +69,7 @@ const reset = () => {
           class="mr-1 h-4 w-4 cursor-pointer rounded border-gray-400 text-orange-600 focus:ring-orange-500 dark:bg-gray-300"
           :checked="workingCopyOfSelectedWeekdays[weekday.number] === true"
           @input="() => toggleSelectWeekday(weekday)"
-        >
+        />
         <span>{{ weekday.shortName }}</span>
       </label>
     </div>

@@ -5,16 +5,16 @@ type User = {
 
 const users: User[] = [
   {
-    username: "cluse",
-    emailAddress: "catherine.luse@gmail.com",
+    username: 'cluse',
+    emailAddress: 'catherine.luse@gmail.com',
   },
   {
-    username: "alice",
-    emailAddress: "the.rinnovator@gmail.com",
+    username: 'alice',
+    emailAddress: 'the.rinnovator@gmail.com',
   },
   {
-    username: "eleanorperaltamontoya",
-    emailAddress: "eleanorperaltamontoya@gmail.com",
+    username: 'eleanorperaltamontoya',
+    emailAddress: 'eleanorperaltamontoya@gmail.com',
   },
 ];
 export default users;

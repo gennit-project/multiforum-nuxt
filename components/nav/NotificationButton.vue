@@ -1,26 +1,14 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  setup(){}
-})
+  setup() {},
+});
 </script>
 <template>
   <button
     type="button"
-    class="
-              flex-shrink-0
-              bg-gray-800
-              p-1
-              rounded-full
-              text-gray-400
-              hover:text-white
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-offset-gray-800
-              focus:ring-white
-            "
+    class="flex-shrink-0 rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800"
   >
     <span class="sr-only">View notifications</span>
     <svg

@@ -1,27 +1,27 @@
 {
-    "framework": "nuxtjs",
-    "devCommand": "npm run dev",
-    "buildCommand": "npm run build",
-    "installCommand": "rm -rf package-lock.json node_modules && npm install --legacy-peer-deps",
-    "outputDirectory": ".output",
-    "headers": [
-      {
-        "source": "/_nuxt/(.*)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
-          }
-        ]
-      },
-      {
-        "source": "/images/(.*)",
-        "headers": [
-          {
-            "key": "Cache-Control",
-            "value": "public, max-age=31536000, immutable"
-          }
-        ]
-      }
-    ]
-  }
+  "framework": "nuxtjs",
+  "devCommand": "npm run dev",
+  "buildCommand": "npm run build",
+  "installCommand": "rm -rf package-lock.json node_modules && npm install --legacy-peer-deps",
+  "outputDirectory": ".output",
+  "headers": [
+    {
+      "source": "/_nuxt/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/images/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ]
+}

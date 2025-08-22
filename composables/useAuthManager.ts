@@ -1,9 +1,9 @@
 // composables/useAuthManager.ts
-import { ref, watch, onMounted, onUnmounted } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
-import { useLazyQuery } from "@vue/apollo-composable";
-import { useRouter } from "nuxt/app";
-import { GET_EMAIL } from "@/graphQLData/email/queries";
+import { ref, watch, onMounted, onUnmounted } from 'vue';
+import { useAuth0 } from '@auth0/auth0-vue';
+import { useLazyQuery } from '@vue/apollo-composable';
+import { useRouter } from 'nuxt/app';
+import { GET_EMAIL } from '@/graphQLData/email/queries';
 import {
   setUsername,
   setModProfileName,
@@ -13,12 +13,12 @@ import {
   setIsLoadingAuth,
   setNotificationCount,
   setProfilePicURL,
-} from "@/cache";
-import { useSSRAuth } from "@/composables/useSSRAuth";
+} from '@/cache';
+import { useSSRAuth } from '@/composables/useSSRAuth';
 
 export function useAuthManager() {
   const router = useRouter();
-  const userEmail = ref("");
+  const userEmail = ref('');
   const isSessionExpired = ref(false);
   const tokenCheckInterval = ref<number | null>(null);
   const { setAuthHint, setUsernameHint, clearAuthHints } = useSSRAuth();
@@ -45,7 +45,7 @@ export function useAuthManager() {
   });
 
   onError((error) => {
-    console.error("GraphQL query error:", error);
+    console.error('GraphQL query error:', error);
   });
 
   // Token expiration check
@@ -62,15 +62,17 @@ export function useAuthManager() {
           const expiresAt = (claims.value as { exp?: number }).exp;
 
           if (expiresAt && expiresAt <= currentTime + 60) {
-            console.log("Token is expired or about to expire, attempting refresh");
+            console.log(
+              'Token is expired or about to expire, attempting refresh'
+            );
             isSessionExpired.value = true;
 
             try {
-              await auth0.getAccessTokenSilently({ cacheMode: "off" });
-              console.log("Token refreshed successfully");
+              await auth0.getAccessTokenSilently({ cacheMode: 'off' });
+              console.log('Token refreshed successfully');
               isSessionExpired.value = false;
             } catch (refreshError) {
-              console.error("Failed to refresh token:", refreshError);
+              console.error('Failed to refresh token:', refreshError);
               isSessionExpired.value = true;
               handleAuthError(refreshError);
             }
@@ -81,7 +83,7 @@ export function useAuthManager() {
         isSessionExpired.value = false;
       }
     } catch (error) {
-      console.error("Error checking token expiration:", error);
+      console.error('Error checking token expiration:', error);
       // Only set session expired if user was actually authenticated
       if (auth0 && auth0.isAuthenticated.value) {
         isSessionExpired.value = true;
@@ -92,8 +94,9 @@ export function useAuthManager() {
   // Handle authentication errors
   const handleAuthError = (error: any) => {
     if (
-      error.error === "invalid_grant" ||
-      (error.error_description && error.error_description.includes("refresh token"))
+      error.error === 'invalid_grant' ||
+      (error.error_description &&
+        error.error_description.includes('refresh token'))
     ) {
       clearAuthState();
     }
@@ -102,17 +105,17 @@ export function useAuthManager() {
   // Clear authentication state
   const clearAuthState = () => {
     setIsAuthenticated(false);
-    setUsername("");
-    setModProfileName("");
+    setUsername('');
+    setModProfileName('');
     setNotificationCount(0);
-    setProfilePicURL("");
+    setProfilePicURL('');
     // Clear auth hint cookies
     clearAuthHints();
   };
 
   // Handle visibility change (tab focus)
   const handleVisibilityChange = () => {
-    if (document.visibilityState === "visible") {
+    if (document.visibilityState === 'visible') {
       checkTokenExpiration();
     }
   };
@@ -127,17 +130,20 @@ export function useAuthManager() {
       setUsername(userData.username);
       setIsLoadingAuth(false);
       setIsAuthenticated(true);
-      setModProfileName(modProfileData?.displayName || "");
+      setModProfileName(modProfileData?.displayName || '');
       setNotificationCount(userData.NotificationsAggregate?.count || 0);
-      
+
       // Set auth hint cookies for SSR
       setAuthHint(true);
       setUsernameHint(userData.username);
-      
+
       if (userData.profilePicURL) {
         setProfilePicURL(userData.profilePicURL);
       }
-    } else if (newResult?.data?.emails?.[0] === null || newResult?.data?.emails?.length === 0) {
+    } else if (
+      newResult?.data?.emails?.[0] === null ||
+      newResult?.data?.emails?.length === 0
+    ) {
       // User needs to create username
       handleMissingUsername();
     }
@@ -148,18 +154,20 @@ export function useAuthManager() {
     if (
       isAuthenticatedVar.value &&
       !isLoadingAuthVar.value &&
-      window.location.pathname !== "/create-username"
+      window.location.pathname !== '/create-username'
     ) {
-      const hasCheckedUsername = sessionStorage.getItem("hasCheckedUsername");
+      const hasCheckedUsername = sessionStorage.getItem('hasCheckedUsername');
       if (!hasCheckedUsername) {
         // Store current path for return after username creation
-        if (window.location.pathname !== "/") {
-          sessionStorage.setItem("previousPath", window.location.pathname);
+        if (window.location.pathname !== '/') {
+          sessionStorage.setItem('previousPath', window.location.pathname);
         }
-        
-        sessionStorage.setItem("hasCheckedUsername", "true");
-        console.log("Email not found in system, redirecting to create username page");
-        router.push("/create-username");
+
+        sessionStorage.setItem('hasCheckedUsername', 'true');
+        console.log(
+          'Email not found in system, redirecting to create username page'
+        );
+        router.push('/create-username');
       }
     }
   };
@@ -172,7 +180,7 @@ export function useAuthManager() {
 
     // Set initial authentication state
     isAuthenticatedVar.value = isAuthenticated.value === true;
-    
+
     // Set auth hint cookie on initial auth
     if (isAuthenticated.value === true) {
       setAuthHint(true);
@@ -208,7 +216,7 @@ export function useAuthManager() {
       () => auth0.error.value,
       (error) => {
         if (error && isAuthError(error)) {
-          console.error("Auth0 error detected:", error);
+          console.error('Auth0 error detected:', error);
           clearAuthState();
           auth0.logout({
             logoutParams: {
@@ -221,18 +229,19 @@ export function useAuthManager() {
 
     // Setup token checking
     tokenCheckInterval.value = window.setInterval(checkTokenExpiration, 60000);
-    document.addEventListener("visibilitychange", handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
     checkTokenExpiration();
   };
 
   // Check if error is auth-related
   const isAuthError = (error: any) => {
     return (
-      error.error === "login_required" ||
-      error.error === "unauthorized" ||
-      error.error === "invalid_grant" ||
-      (error.message && error.message.includes("expired")) ||
-      (error.error_description && error.error_description.includes("refresh token"))
+      error.error === 'login_required' ||
+      error.error === 'unauthorized' ||
+      error.error === 'invalid_grant' ||
+      (error.message && error.message.includes('expired')) ||
+      (error.error_description &&
+        error.error_description.includes('refresh token'))
     );
   };
 
@@ -241,7 +250,7 @@ export function useAuthManager() {
     if (tokenCheckInterval.value !== null) {
       clearInterval(tokenCheckInterval.value);
     }
-    document.removeEventListener("visibilitychange", handleVisibilityChange);
+    document.removeEventListener('visibilitychange', handleVisibilityChange);
   };
 
   // Mount and unmount handlers

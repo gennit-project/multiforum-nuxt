@@ -1,30 +1,41 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import { COUNT_CLOSED_ISSUES, COUNT_OPEN_ISSUES } from "@/graphQLData/mod/queries";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import {
+  COUNT_CLOSED_ISSUES,
+  COUNT_OPEN_ISSUES,
+} from '@/graphQLData/mod/queries';
 
 const route = useRoute();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId !== "string") {
-    return "";
+  if (typeof route.params.forumId !== 'string') {
+    return '';
   }
   return route.params.forumId;
 });
 
 const issueId = computed(() => {
-  if (typeof route.params.issueId !== "string") {
-    return "";
+  if (typeof route.params.issueId !== 'string') {
+    return '';
   }
   return route.params.issueId;
 });
 
-const { result: issuesResult, error: issuesError, loading: issuesLoading } = useQuery(COUNT_OPEN_ISSUES, {
+const {
+  result: issuesResult,
+  error: issuesError,
+  loading: issuesLoading,
+} = useQuery(COUNT_OPEN_ISSUES, {
   channelUniqueName: channelId.value,
 });
 
-const { result: closedIssuesResult, error: closedIssuesError, loading: closedIssuesLoading } = useQuery(COUNT_CLOSED_ISSUES, {
+const {
+  result: closedIssuesResult,
+  error: closedIssuesError,
+  loading: closedIssuesLoading,
+} = useQuery(COUNT_CLOSED_ISSUES, {
   channelUniqueName: channelId.value,
 });
 
@@ -44,24 +55,33 @@ const closedCount = computed(() => {
 </script>
 
 <template>
-  <div class="bg-white dark:bg-gray-900 dark:text-white border-gray-200 dark:border-gray-600">
+  <div
+    class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white"
+  >
     <nav v-if="!issueId" class="flex items-center gap-4 py-3 pl-4">
       <nuxt-link
         :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
-        class="px-4 py-2 border-b-2"
+        class="border-b-2 px-4 py-2"
         :class="{
-          'border-black text-black dark:border-white dark:text-white': route.name === 'forums-forumId-issues',
-          'border-gray-500 text-gray-500 dark:text-gray-400': route.name !== 'forums-forumId-issues',
+          'border-black text-black dark:border-white dark:text-white':
+            route.name === 'forums-forumId-issues',
+          'border-gray-500 text-gray-500 dark:text-gray-400':
+            route.name !== 'forums-forumId-issues',
         }"
       >
         <i class="far fa-dot-circle" /> {{ openCount }} Open
       </nuxt-link>
       <nuxt-link
-        :to="{ name: 'forums-forumId-issues-closed', params: { forumId: channelId } }"
-        class="px-4 py-2 border-b-2"
+        :to="{
+          name: 'forums-forumId-issues-closed',
+          params: { forumId: channelId },
+        }"
+        class="border-b-2 px-4 py-2"
         :class="{
-          'border-black text-black dark:border-white dark:text-white': route.name === 'forums-forumId-issues-closed',
-          'border-gray-500 text-gray-500 dark:text-gray-400': route.name !== 'forums-forumId-issues-closed',
+          'border-black text-black dark:border-white dark:text-white':
+            route.name === 'forums-forumId-issues-closed',
+          'border-gray-500 text-gray-500 dark:text-gray-400':
+            route.name !== 'forums-forumId-issues-closed',
         }"
       >
         <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed

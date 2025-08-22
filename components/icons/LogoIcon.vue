@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   setup() {},
@@ -20,7 +20,7 @@ export default defineComponent({
         <stop offset="100%" stop-color="#1d9bd1" />
       </linearGradient>
     </defs>
-  
+
     <path
       fill="none"
       stroke-width="1.5"

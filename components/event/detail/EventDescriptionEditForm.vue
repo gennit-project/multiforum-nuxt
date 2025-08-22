@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import type { PropType } from "vue";
-import type { Event } from "@/__generated__/graphql";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import GenericButton from "@/components/GenericButton.vue";
-import { useMutation } from "@vue/apollo-composable";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
-import { MAX_CHARS_IN_EVENT_DESCRIPTION } from "@/utils/constants";
+import { ref } from 'vue';
+import type { PropType } from 'vue';
+import type { Event } from '@/__generated__/graphql';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import GenericButton from '@/components/GenericButton.vue';
+import { useMutation } from '@vue/apollo-composable';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { MAX_CHARS_IN_EVENT_DESCRIPTION } from '@/utils/constants';
 
 const props = defineProps({
   event: {
@@ -15,9 +15,9 @@ const props = defineProps({
     required: true,
   },
 });
-const emits = defineEmits(["closeEditor"]);
+const emits = defineEmits(['closeEditor']);
 const formValues = ref({
-  description: props.event?.description || "",
+  description: props.event?.description || '',
 });
 
 const {
@@ -35,13 +35,13 @@ const {
 }));
 
 onDone(() => {
-  emits("closeEditor");
+  emits('closeEditor');
 });
 </script>
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 w-full flex flex-col">
+    <div class="mb-3 mt-3 flex w-full flex-col">
       <TextEditor
         class="mb-3"
         :test-id="'body-input'"
@@ -55,7 +55,7 @@ onDone(() => {
         :current="formValues.description?.length || 0"
         :max="MAX_CHARS_IN_EVENT_DESCRIPTION"
       />
-      <div class="flex align-items gap-2 justify-end">
+      <div class="align-items flex justify-end gap-2">
         <GenericButton :text="'Cancel'" @click="emits('closeEditor')" />
         <PrimaryButton
           :disabled="

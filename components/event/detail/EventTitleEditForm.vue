@@ -1,28 +1,28 @@
 <script lang="ts" setup>
-  import { ref, nextTick, computed } from "vue";
-  import type { Event } from "@/__generated__/graphql";
-  import RequireAuth from "@/components/auth/RequireAuth.vue";
-  import CreateButton from "@/components/CreateButton.vue";
-  import PrimaryButton from "@/components/PrimaryButton.vue";
-  import GenericButton from "@/components/GenericButton.vue";
-  import TextInput from "@/components/TextInput.vue";
-  import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
-  import { useMutation, useQuery } from "@vue/apollo-composable";
-  import ErrorBanner from "@/components/ErrorBanner.vue";
-  import { GET_EVENT } from "@/graphQLData/event/queries";
-  import { modProfileNameVar, usernameVar } from "@/cache";
-  import { EVENT_TITLE_CHAR_LIMIT } from "@/utils/constants";
-  import { useAppTheme } from "@/composables/useTheme";
-  import { useRoute } from "nuxt/app";
+import { ref, nextTick, computed } from 'vue';
+import type { Event } from '@/__generated__/graphql';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import CreateButton from '@/components/CreateButton.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import GenericButton from '@/components/GenericButton.vue';
+import TextInput from '@/components/TextInput.vue';
+import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { GET_EVENT } from '@/graphQLData/event/queries';
+import { modProfileNameVar, usernameVar } from '@/cache';
+import { EVENT_TITLE_CHAR_LIMIT } from '@/utils/constants';
+import { useAppTheme } from '@/composables/useTheme';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 const titleEditMode = ref(false);
 
 const channelId = computed(() =>
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 const eventId = computed(() =>
-  typeof route.params.eventId === "string" ? route.params.eventId : ""
+  typeof route.params.eventId === 'string' ? route.params.eventId : ''
 );
 
 const {
@@ -51,7 +51,7 @@ const formValues = ref({
 });
 
 onGetEventResult((result) => {
-  formValues.value.title = result?.data?.events?.[0]?.title || "";
+  formValues.value.title = result?.data?.events?.[0]?.title || '';
 });
 
 const {
@@ -82,21 +82,21 @@ const onClickEdit = () => {
   });
 };
 const formattedDate = computed(() => {
-  if (!event.value?.createdAt) return "";
+  if (!event.value?.createdAt) return '';
   // Date should be in this format: Mar 30, 2023
-  return new Date(event.value.createdAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
+  return new Date(event.value.createdAt).toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
   });
 });
-  const { theme } = useAppTheme();
+const { theme } = useAppTheme();
 </script>
 
 <template>
-  <div class="w-full mt-4 lg:px-4">
+  <div class="mt-4 w-full lg:px-4">
     <div
-      class="flex md:flex-row md:items-center md:justify-between space-x-0 md:space-x-2"
+      class="flex space-x-0 md:flex-row md:items-center md:justify-between md:space-x-2"
     >
       <v-skeleton-loader
         v-if="getEventLoading"
@@ -107,9 +107,9 @@ const formattedDate = computed(() => {
       <div v-else ref="eventDetail" class="flex-1">
         <h2
           v-if="!titleEditMode"
-          class="text-wrap px-1 text-md md:text-3xl sm:tracking-tight"
+          class="text-md text-wrap px-1 sm:tracking-tight md:text-3xl"
         >
-          {{ event?.title || "[Deleted]" }}
+          {{ event?.title || '[Deleted]' }}
         </h2>
         <TextInput
           v-else
@@ -125,17 +125,19 @@ const formattedDate = computed(() => {
           :max="EVENT_TITLE_CHAR_LIMIT"
         />
         <div
-          class="ml-1 mb-2 text-gray-500 dark:text-gray-400 text-sm flex align-items space-x-2"
+          class="align-items mb-2 ml-1 flex space-x-2 text-sm text-gray-500 dark:text-gray-400"
         >
-          <slot/>
-          <span class="flex align-items mt-0.5">
-            {{ `${event?.Poster ? event.Poster.username : "[Deleted]"} posted this event on ${formattedDate}`}}
+          <slot />
+          <span class="align-items mt-0.5 flex">
+            {{
+              `${event?.Poster ? event.Poster.username : '[Deleted]'} posted this event on ${formattedDate}`
+            }}
           </span>
         </div>
       </div>
       <RequireAuth class="hidden md:block" :full-width="false">
         <template #has-auth>
-          <div class="h-10 flex items-center">
+          <div class="flex h-10 items-center">
             <GenericButton
               v-if="!titleEditMode && authorIsLoggedInUser"
               :text="'Edit'"

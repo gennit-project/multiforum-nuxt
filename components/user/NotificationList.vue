@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_NOTIFICATIONS } from "@/graphQLData/notification/queries";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { usernameVar } from "@/cache";
-import { timeAgo } from "@/utils";
-import type { Notification } from "@/__generated__/graphql";
-import MarkdownRenderer from "../MarkdownRenderer.vue";
-import { MARK_NOTIFICATIONS_AS_READ } from "@/graphQLData/user/mutations";
+import { computed } from 'vue';
+import { GET_NOTIFICATIONS } from '@/graphQLData/notification/queries';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { usernameVar } from '@/cache';
+import { timeAgo } from '@/utils';
+import type { Notification } from '@/__generated__/graphql';
+import MarkdownRenderer from '../MarkdownRenderer.vue';
+import { MARK_NOTIFICATIONS_AS_READ } from '@/graphQLData/user/mutations';
 
 const NOTIFICATION_PAGE_LIMIT = 15;
 
@@ -18,28 +18,32 @@ const {
   error: notificationError,
   loading: notificationLoading,
   fetchMore,
-  refetch
-} = useQuery(GET_NOTIFICATIONS, () => ({
-  username: username.value,
-  options: {
-    limit: NOTIFICATION_PAGE_LIMIT,
-    offset: 0,
-    sort: {
-      createdAt: "DESC",
+  refetch,
+} = useQuery(
+  GET_NOTIFICATIONS,
+  () => ({
+    username: username.value,
+    options: {
+      limit: NOTIFICATION_PAGE_LIMIT,
+      offset: 0,
+      sort: {
+        createdAt: 'DESC',
+      },
     },
+  }),
+  {
+    fetchPolicy: 'cache-and-network',
+    // Only run the query when there's a username
+    enabled: computed(() => !!username.value),
   }
-}), {
-  fetchPolicy: 'cache-and-network',
-  // Only run the query when there's a username
-  enabled: computed(() => !!username.value)
-});
+);
 
-const { 
-    mutate: markNotificationsAsRead,
-    loading: markNotificationsAsReadLoading,
-    error: markNotificationsAsReadError,
-    onDone: markNotificationsAsReadDone,
-} = useMutation(MARK_NOTIFICATIONS_AS_READ,);
+const {
+  mutate: markNotificationsAsRead,
+  loading: markNotificationsAsReadLoading,
+  error: markNotificationsAsReadError,
+  onDone: markNotificationsAsReadDone,
+} = useMutation(MARK_NOTIFICATIONS_AS_READ);
 
 markNotificationsAsReadDone(() => {
   refetch();
@@ -74,7 +78,7 @@ const loadMore = () => {
         limit: NOTIFICATION_PAGE_LIMIT,
         offset: notificationResult.value.users[0]?.Notifications?.length,
         sort: {
-          createdAt: "DESC",
+          createdAt: 'DESC',
         },
       },
     },
@@ -105,7 +109,7 @@ const markAllAsRead = () => {
 </script>
 
 <template>
-  <div class="flex justify-center dak:text-white">
+  <div class="dak:text-white flex justify-center">
     <div class="w-full max-w-5xl">
       <p v-if="notificationLoading">Loading...</p>
       <ErrorBanner
@@ -122,8 +126,10 @@ const markAllAsRead = () => {
         v-if="notifications && notifications.length > 0"
         class="flex flex-col gap-2"
       >
-        <h1 class="text-2xl border-b border-gray-500 mt-4 mx-4 mb-2">Notifications</h1>
-        <p class="text-sm text-gray-500 dark:text-gray-300 mx-4">
+        <h1 class="mx-4 mb-2 mt-4 border-b border-gray-500 text-2xl">
+          Notifications
+        </h1>
+        <p class="mx-4 text-sm text-gray-500 dark:text-gray-300">
           You have {{ aggregateNotificationCount }} unread notifications
         </p>
         <div>
@@ -134,10 +140,13 @@ const markAllAsRead = () => {
             @click="markAllAsRead"
           />
         </div>
-        <ErrorBanner v-if="markNotificationsAsReadError" :text="markNotificationsAsReadError.message" />
+        <ErrorBanner
+          v-if="markNotificationsAsReadError"
+          :text="markNotificationsAsReadError.message"
+        />
         <ul
           role="list"
-          class="flex-1 flex-col divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800 dark:text-white shadow sm:rounded-lg"
+          class="flex-1 flex-col divide-y divide-gray-200 bg-white shadow dark:divide-gray-700 dark:bg-gray-800 dark:text-white sm:rounded-lg"
           data-testid="notification-list"
         >
           <li
@@ -145,8 +154,9 @@ const markAllAsRead = () => {
             :key="notification.id"
             class="p-4"
           >
-            <p class="text-gray-500 dark:text-gray-300 text-sm mb-2">
-              {{ timeAgo(new Date(notification.createdAt)) }} - {{ notification.read ? "Read" : "Unread" }}
+            <p class="mb-2 text-sm text-gray-500 dark:text-gray-300">
+              {{ timeAgo(new Date(notification.createdAt)) }} -
+              {{ notification.read ? 'Read' : 'Unread' }}
             </p>
             <MarkdownRenderer
               v-if="notification.text"

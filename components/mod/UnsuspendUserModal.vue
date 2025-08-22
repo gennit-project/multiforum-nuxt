@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import GenericModal from "@/components/GenericModal.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import UserPlus from "@/components/icons/UserPlus.vue";
-import { useMutation } from "@vue/apollo-composable";
-import { IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
-import { UNSUSPEND_USER } from "@/graphQLData/mod/mutations";
+import { computed, ref } from 'vue';
+import GenericModal from '@/components/GenericModal.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import UserPlus from '@/components/icons/UserPlus.vue';
+import { useMutation } from '@vue/apollo-composable';
+import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';
+import { UNSUSPEND_USER } from '@/graphQLData/mod/mutations';
 
 const props = defineProps({
   open: {
@@ -15,17 +15,17 @@ const props = defineProps({
   issueId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   title: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
 });
-const emit = defineEmits(["close", "unsuspendedSuccessfully"]);
+const emit = defineEmits(['close', 'unsuspendedSuccessfully']);
 
-const explanation = ref("No violation");
+const explanation = ref('No violation');
 
 const {
   mutate: unsuspendUser,
@@ -47,11 +47,11 @@ const {
 });
 
 unsuspendDone(() => {
-  emit("unsuspendedSuccessfully");
+  emit('unsuspendedSuccessfully');
 });
 
 const modalTitle = computed(() => {
-  return "Unsuspend Author";
+  return 'Unsuspend Author';
 });
 
 const modalBody = computed(() => {
@@ -60,7 +60,7 @@ const modalBody = computed(() => {
 
 const submit = async () => {
   if (!props.issueId) {
-    console.error("No issue ID provided.");
+    console.error('No issue ID provided.');
     return;
   }
   await unsuspendUser({
@@ -70,7 +70,7 @@ const submit = async () => {
 };
 
 const close = () => {
-  emit("close");
+  emit('close');
 };
 </script>
 

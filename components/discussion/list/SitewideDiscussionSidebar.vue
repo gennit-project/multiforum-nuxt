@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import type { PropType } from "vue";
-import type { ServerConfig } from "@/__generated__/graphql";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import type { ServerConfig } from '@/__generated__/graphql';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
 
 const props = defineProps({
   serverConfig: {
@@ -15,7 +15,9 @@ const props = defineProps({
   },
 });
 
-const serverDescription = computed(() => props.serverConfig?.serverDescription ?? "");
+const serverDescription = computed(
+  () => props.serverConfig?.serverDescription ?? ''
+);
 </script>
 
 <template>
@@ -33,7 +35,8 @@ const serverDescription = computed(() => props.serverConfig?.serverDescription ?
         :word-limit="1000"
       />
       <p v-else class="text-xs dark:text-white">
-        Welcome to our community! This is where you can find discussions from all forums.
+        Welcome to our community! This is where you can find discussions from
+        all forums.
       </p>
     </div>
 

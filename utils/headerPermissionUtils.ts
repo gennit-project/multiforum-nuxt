@@ -4,13 +4,13 @@
  * available to users in the various header components.
  */
 
-import type { MenuItem } from "@/types/GenericFormTypes";
-import { ALLOWED_ICONS } from "@/utils";
+import type { MenuItem } from '@/types/GenericFormTypes';
+import { ALLOWED_ICONS } from '@/utils';
 
 /**
  * Determines which actions should be available in the discussion header menu
  * based on user permissions and the discussion state
- * 
+ *
  * @param params - Parameters to determine which menu items to show:
  *   - isOwnDiscussion - Whether the current user is the author of the discussion
  *   - isArchived - Whether the discussion is archived
@@ -29,14 +29,23 @@ export const getDiscussionHeaderMenuItems = (params: {
   feedbackEnabled?: boolean;
   hasSensitiveContent?: boolean;
 }): MenuItem[] => {
-  const { isOwnDiscussion, isArchived, userPermissions, isLoggedIn, discussionId, hasAlbum = false, feedbackEnabled = true, hasSensitiveContent = false } = params;
+  const {
+    isOwnDiscussion,
+    isArchived,
+    userPermissions,
+    isLoggedIn,
+    discussionId,
+    hasAlbum = false,
+    feedbackEnabled = true,
+    hasSensitiveContent = false,
+  } = params;
   let menuItems: MenuItem[] = [];
 
   // Only add "View Feedback" if feedback is enabled on the channel
   if (feedbackEnabled) {
     menuItems.push({
-      label: "View Feedback",
-      event: "handleViewFeedback",
+      label: 'View Feedback',
+      event: 'handleViewFeedback',
       icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       value: discussionId,
     });
@@ -44,8 +53,8 @@ export const getDiscussionHeaderMenuItems = (params: {
 
   // Always add copy link
   menuItems.push({
-    label: "Copy Link",
-    event: "copyLink",
+    label: 'Copy Link',
+    event: 'copyLink',
     icon: ALLOWED_ICONS.COPY_LINK,
     value: discussionId,
   });
@@ -58,31 +67,33 @@ export const getDiscussionHeaderMenuItems = (params: {
   // If user is the author of the discussion
   if (isOwnDiscussion) {
     menuItems.push({
-      label: "Edit",
-      event: "handleEdit",
+      label: 'Edit',
+      event: 'handleEdit',
       icon: ALLOWED_ICONS.EDIT,
       value: discussionId,
     });
-    
+
     // Add sensitive content toggle
     menuItems.push({
-      label: hasSensitiveContent ? "Mark as non-sensitive content" : "Mark as sensitive content",
-      event: "handleToggleSensitiveContent",
+      label: hasSensitiveContent
+        ? 'Mark as non-sensitive content'
+        : 'Mark as sensitive content',
+      event: 'handleToggleSensitiveContent',
       icon: ALLOWED_ICONS.MARK_SENSITIVE,
       value: discussionId,
     });
-    
+
     // Add "Add album" action if the discussion doesn't have an album
     if (!hasAlbum) {
       menuItems.push({
-        label: "Add Album",
-        event: "handleAddAlbum",
+        label: 'Add Album',
+        event: 'handleAddAlbum',
         icon: ALLOWED_ICONS.ADD_ALBUM,
       });
     }
     menuItems.push({
-      label: "Delete",
-      event: "handleDelete",
+      label: 'Delete',
+      event: 'handleDelete',
       icon: ALLOWED_ICONS.DELETE,
       value: discussionId,
     });
@@ -90,12 +101,12 @@ export const getDiscussionHeaderMenuItems = (params: {
 
   // Check if the user has any moderation permission (standard mod or above)
   // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions = 
-    !userPermissions.isSuspendedMod && 
-    (userPermissions.isChannelOwner || 
-     userPermissions.isElevatedMod || 
-     userPermissions.canReport || 
-     userPermissions.canGiveFeedback);
+  const canPerformModActions =
+    !userPermissions.isSuspendedMod &&
+    (userPermissions.isChannelOwner ||
+      userPermissions.isElevatedMod ||
+      userPermissions.canReport ||
+      userPermissions.canGiveFeedback);
 
   // Show mod actions if user has any mod permissions and isn't the discussion creator
   if (isLoggedIn && canPerformModActions && !isOwnDiscussion) {
@@ -105,8 +116,8 @@ export const getDiscussionHeaderMenuItems = (params: {
     // Add report action if user has permission
     if (userPermissions.canReport) {
       modActions.push({
-        label: "Report",
-        event: "handleClickReport",
+        label: 'Report',
+        event: 'handleClickReport',
         icon: ALLOWED_ICONS.REPORT,
         value: discussionId,
       });
@@ -115,8 +126,8 @@ export const getDiscussionHeaderMenuItems = (params: {
     // Add feedback action if user has permission
     if (userPermissions.canGiveFeedback) {
       modActions.push({
-        label: "Give Feedback",
-        event: "handleFeedback",
+        label: 'Give Feedback',
+        event: 'handleFeedback',
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
         value: discussionId,
       });
@@ -126,8 +137,8 @@ export const getDiscussionHeaderMenuItems = (params: {
     if (!isArchived) {
       if (userPermissions.canHideDiscussion) {
         modActions.push({
-          label: "Archive",
-          event: "handleClickArchive",
+          label: 'Archive',
+          event: 'handleClickArchive',
           icon: ALLOWED_ICONS.ARCHIVE,
           value: discussionId,
         });
@@ -135,8 +146,8 @@ export const getDiscussionHeaderMenuItems = (params: {
 
       if (userPermissions.canSuspendUser) {
         modActions.push({
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
+          label: 'Archive and Suspend',
+          event: 'handleClickArchiveAndSuspend',
           icon: ALLOWED_ICONS.SUSPEND,
           value: discussionId,
         });
@@ -144,8 +155,8 @@ export const getDiscussionHeaderMenuItems = (params: {
     } else {
       if (userPermissions.canHideDiscussion) {
         modActions.push({
-          label: "Unarchive",
-          event: "handleClickUnarchive",
+          label: 'Unarchive',
+          event: 'handleClickUnarchive',
           icon: ALLOWED_ICONS.UNARCHIVE,
           value: discussionId,
         });
@@ -155,7 +166,7 @@ export const getDiscussionHeaderMenuItems = (params: {
     // Only add the mod actions section if there are actually actions to show
     if (modActions.length > 0) {
       menuItems.push({
-        value: "Moderation Actions",
+        value: 'Moderation Actions',
         isDivider: true,
       });
       menuItems = menuItems.concat(modActions);
@@ -168,7 +179,7 @@ export const getDiscussionHeaderMenuItems = (params: {
 /**
  * Determines which actions should be available in the event header menu
  * based on user permissions and the event state
- * 
+ *
  * @param params - Parameters to determine which menu items to show:
  *   - isOwnEvent - Whether the current user is the author of the event
  *   - isArchived - Whether the event is archived
@@ -189,43 +200,43 @@ export const getEventHeaderMenuItems = (params: {
   isOnFeedbackPage?: boolean;
   feedbackEnabled?: boolean;
 }): MenuItem[] => {
-  const { 
-    isOwnEvent, 
-    isArchived, 
-    isCanceled, 
-    userPermissions, 
-    isLoggedIn, 
+  const {
+    isOwnEvent,
+    isArchived,
+    isCanceled,
+    userPermissions,
+    isLoggedIn,
     eventId,
     isOnFeedbackPage = false,
-    feedbackEnabled = true
+    feedbackEnabled = true,
   } = params;
-  
+
   // Debug log to see the permissions before making menu decisions
-  console.log("EVENT HEADER MENU PERMISSIONS:", {
+  console.log('EVENT HEADER MENU PERMISSIONS:', {
     canHideEvent: userPermissions?.canHideEvent,
     isElevatedMod: userPermissions?.isElevatedMod,
     canReport: userPermissions?.canReport,
     canGiveFeedback: userPermissions?.canGiveFeedback,
     isOwnEvent,
     isArchived,
-    isCanceled
+    isCanceled,
   });
-  
+
   let menuItems: MenuItem[] = [];
 
   // Base menu items that don't depend on being on the feedback page
   if (!isOnFeedbackPage) {
     menuItems.push({
-      label: "Copy Link",
-      event: "copyLink",
+      label: 'Copy Link',
+      event: 'copyLink',
       icon: ALLOWED_ICONS.COPY_LINK,
     });
 
     // Only add "View Feedback" if feedback is enabled on the channel
     if (feedbackEnabled) {
       menuItems.push({
-        label: "View Feedback",
-        event: "handleViewFeedback",
+        label: 'View Feedback',
+        event: 'handleViewFeedback',
         icon: ALLOWED_ICONS.VIEW_FEEDBACK,
       });
     }
@@ -240,22 +251,22 @@ export const getEventHeaderMenuItems = (params: {
   if (isOwnEvent) {
     menuItems = menuItems.concat([
       {
-        label: "Edit",
-        event: "handleEdit",
+        label: 'Edit',
+        event: 'handleEdit',
         icon: ALLOWED_ICONS.EDIT,
       },
       {
-        label: "Delete",
-        event: "handleDelete",
+        label: 'Delete',
+        event: 'handleDelete',
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
-    
+
     // Only show Cancel option if event is not already canceled
     if (!isCanceled) {
       menuItems.push({
-        label: "Cancel",
-        event: "handleCancel",
+        label: 'Cancel',
+        event: 'handleCancel',
         icon: ALLOWED_ICONS.CANCEL,
       });
     }
@@ -263,12 +274,12 @@ export const getEventHeaderMenuItems = (params: {
 
   // Check if the user has any moderation permission (standard mod or above)
   // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions = 
-    !userPermissions.isSuspendedMod && 
-    (userPermissions.isChannelOwner || 
-     userPermissions.isElevatedMod || 
-     userPermissions.canReport || 
-     userPermissions.canGiveFeedback);
+  const canPerformModActions =
+    !userPermissions.isSuspendedMod &&
+    (userPermissions.isChannelOwner ||
+      userPermissions.isElevatedMod ||
+      userPermissions.canReport ||
+      userPermissions.canGiveFeedback);
 
   // Show mod actions if user has any mod permissions and isn't the event creator
   if (isLoggedIn && canPerformModActions && !isOwnEvent) {
@@ -278,8 +289,8 @@ export const getEventHeaderMenuItems = (params: {
     // Add report action if user has permission
     if (userPermissions.canReport) {
       modActions.push({
-        label: "Report",
-        event: "handleReport",
+        label: 'Report',
+        event: 'handleReport',
         icon: ALLOWED_ICONS.REPORT,
       });
     }
@@ -287,8 +298,8 @@ export const getEventHeaderMenuItems = (params: {
     // Add feedback action if user has permission and not on the feedback page
     if (userPermissions.canGiveFeedback && !isOnFeedbackPage) {
       modActions.push({
-        label: "Give Feedback",
-        event: "handleFeedback",
+        label: 'Give Feedback',
+        event: 'handleFeedback',
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
       });
     }
@@ -297,8 +308,8 @@ export const getEventHeaderMenuItems = (params: {
     if (!isArchived) {
       if (userPermissions.canHideEvent) {
         modActions.push({
-          label: "Archive",
-          event: "handleClickArchive",
+          label: 'Archive',
+          event: 'handleClickArchive',
           icon: ALLOWED_ICONS.ARCHIVE,
           value: eventId,
         });
@@ -306,8 +317,8 @@ export const getEventHeaderMenuItems = (params: {
 
       if (userPermissions.canSuspendUser) {
         modActions.push({
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
+          label: 'Archive and Suspend',
+          event: 'handleClickArchiveAndSuspend',
           icon: ALLOWED_ICONS.SUSPEND,
           value: eventId,
         });
@@ -315,8 +326,8 @@ export const getEventHeaderMenuItems = (params: {
     } else {
       if (userPermissions.canHideEvent) {
         modActions.push({
-          label: "Unarchive",
-          event: "handleClickUnarchive",
+          label: 'Unarchive',
+          event: 'handleClickUnarchive',
           icon: ALLOWED_ICONS.UNARCHIVE,
           value: eventId,
         });
@@ -326,7 +337,7 @@ export const getEventHeaderMenuItems = (params: {
     // Only add the mod actions section if there are actually actions to show
     if (modActions.length > 0) {
       menuItems.push({
-        value: "Moderation Actions",
+        value: 'Moderation Actions',
         isDivider: true,
       });
       menuItems = menuItems.concat(modActions);
@@ -339,7 +350,7 @@ export const getEventHeaderMenuItems = (params: {
 /**
  * Determines the admin/mod status labels for a comment header
  * Based on the user roles embedded in the comment data
- * 
+ *
  * @param params - Parameters to determine the admin/mod status:
  *   - author - The comment author data
  * @returns Object with isAdmin and isMod booleans
@@ -348,25 +359,25 @@ export const getCommentAuthorStatus = (params: {
   author: any; // Using 'any' here because of the complex union type in the original component
 }): { isAdmin: boolean; isMod: boolean } => {
   const { author } = params;
-  
+
   if (!author) {
     return { isAdmin: false, isMod: false };
   }
-  
+
   let isAdmin = false;
   let isMod = false;
-  
-  if (author.__typename === "User") {
+
+  if (author.__typename === 'User') {
     // Check admin status from ServerRoles
     if (author.ServerRoles && author.ServerRoles.length > 0) {
       isAdmin = !!author.ServerRoles[0].showAdminTag;
     }
-    
+
     // Check mod status from ChannelRoles
     if (author.ChannelRoles && author.ChannelRoles.length > 0) {
       isMod = !!author.ChannelRoles[0].showModTag;
     }
   }
-  
+
   return { isAdmin, isMod };
 };

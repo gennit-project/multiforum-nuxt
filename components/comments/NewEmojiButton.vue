@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import VoteButton from "@/components/VoteButton.vue";
-import FloatingDropdown from "@/components/FloatingDropdown.vue";
-import EmojiPicker from "@/components/comments/EmojiPicker.vue";
+import { ref } from 'vue';
+import VoteButton from '@/components/VoteButton.vue';
+import FloatingDropdown from '@/components/FloatingDropdown.vue';
+import EmojiPicker from '@/components/comments/EmojiPicker.vue';
 
 defineProps({
   commentId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   emojiJson: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   isPermalinked: {
     type: Boolean,
@@ -34,10 +34,10 @@ defineProps({
 
 const showMenu = ref(false);
 
-const emit = defineEmits(["toggleEmojiPicker"]);
+const emit = defineEmits(['toggleEmojiPicker']);
 
 function handleClick() {
-  emit("toggleEmojiPicker");
+  emit('toggleEmojiPicker');
 }
 </script>
 

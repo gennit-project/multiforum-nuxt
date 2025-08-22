@@ -29,7 +29,7 @@ defineProps({
       v-if="channel?.channelBannerURL"
       :src="channel?.channelBannerURL"
       :alt="'channel banner'"
-      class="max-h-36 object-cover w-full"
-    >
+      class="max-h-36 w-full object-cover"
+    />
   </div>
 </template>

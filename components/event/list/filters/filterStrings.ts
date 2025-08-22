@@ -1,2 +1,2 @@
-export const chronologicalOrder = { startTime: "ASC" };
-export const reverseChronologicalOrder = { startTime: "DESC" };
+export const chronologicalOrder = { startTime: 'ASC' };
+export const reverseChronologicalOrder = { startTime: 'DESC' };

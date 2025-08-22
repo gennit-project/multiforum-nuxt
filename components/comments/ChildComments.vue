@@ -1,11 +1,11 @@
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
-import LoadMore from "../LoadMore.vue";
-import { getSortFromQuery } from "./getSortFromQuery";
-import { useRoute } from "nuxt/app";
-import ErrorBanner from "../ErrorBanner.vue";
+import { defineComponent, computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
+import LoadMore from '../LoadMore.vue';
+import { getSortFromQuery } from './getSortFromQuery';
+import { useRoute } from 'nuxt/app';
+import ErrorBanner from '../ErrorBanner.vue';
 
 const PAGE_LIMIT = 5;
 
@@ -119,8 +119,6 @@ export default defineComponent({
         @load-more="loadMore"
       />
     </div>
-    <div v-if="commentLoading">
-      Loading...
-    </div>
+    <div v-if="commentLoading">Loading...</div>
   </div>
 </template>

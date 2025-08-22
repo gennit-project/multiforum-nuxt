@@ -1,7 +1,7 @@
-import { ONLINE_EVENT_LIST } from "../constants";
-import { setupTestData } from "../../support/testSetup";
+import { ONLINE_EVENT_LIST } from '../constants';
+import { setupTestData } from '../../support/testSetup';
 
-describe("Filter events by channel", () => {
+describe('Filter events by channel', () => {
   // Set up test data once for all tests in this file
   setupTestData();
 
@@ -14,8 +14,8 @@ describe("Filter events by channel", () => {
     });
   });
 
-  it("filters events by channel", () => {
-    const searchTerm = "Test free/virtual event";
+  it('filters events by channel', () => {
+    const searchTerm = 'Test free/virtual event';
 
     cy.visit(ONLINE_EVENT_LIST);
     // Wait for initial events data to load
@@ -35,13 +35,13 @@ describe("Filter events by channel", () => {
     cy.wait('@getEventsRequest').its('response.statusCode').should('eq', 200);
 
     // should have one result
-    cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 1);
+    cy.get('ul[data-testid="event-list"]').find('li').should('have.length', 1);
 
     // top result contains the search term
-    cy.get('ul[data-testid="event-list"]').find("li").contains(searchTerm);
+    cy.get('ul[data-testid="event-list"]').find('li').contains(searchTerm);
   });
 
-  it("when filtering by two tags, shows events that have at least one of the tags", () => {
+  it('when filtering by two tags, shows events that have at least one of the tags', () => {
     cy.visit(ONLINE_EVENT_LIST);
     // Wait for initial events data to load
     cy.wait('@getEventsRequest').its('response.statusCode').should('eq', 200);
@@ -57,7 +57,7 @@ describe("Filter events by channel", () => {
       .should('be.visible')
       .first()
       .click();
-    
+
     // Wait for first filter to apply
     cy.wait('@getEventsRequest').its('response.statusCode').should('eq', 200);
 
@@ -66,11 +66,11 @@ describe("Filter events by channel", () => {
       .should('be.visible')
       .first()
       .click();
-    
+
     // Wait for second filter to apply
     cy.wait('@getEventsRequest').its('response.statusCode').should('eq', 200);
 
     // should have ten results
-    cy.get('ul[data-testid="event-list"]').find("li").should("have.length", 10);
+    cy.get('ul[data-testid="event-list"]').find('li').should('have.length', 10);
   });
 });

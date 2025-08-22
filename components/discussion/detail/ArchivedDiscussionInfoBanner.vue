@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, defineProps } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_DISCUSSION_ISSUE } from "@/graphQLData/mod/queries";
-import ArchiveBox from "@/components/icons/ArchiveBox.vue";
+import { computed, defineProps } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_DISCUSSION_ISSUE } from '@/graphQLData/mod/queries';
+import ArchiveBox from '@/components/icons/ArchiveBox.vue';
 
 const props = defineProps({
   channelId: {
@@ -31,7 +31,7 @@ const markdownLinkToIssue = computed(() => {
 });
 
 const text = computed(() => {
-  return `This discussion has been ${markdownLinkToIssue.value ?? "archived"}. New comments cannot be added.`;
+  return `This discussion has been ${markdownLinkToIssue.value ?? 'archived'}. New comments cannot be added.`;
 });
 </script>
 <template>

@@ -7,52 +7,52 @@ import { mount } from '@vue/test-utils';
 describe('useTheme composable - Core functionality', () => {
   beforeEach(() => {
     vi.resetModules();
-    
+
     // Mock Nuxt composables
     vi.mock('nuxt/app', () => ({
       useCookie: () => ({
-        value: null
+        value: null,
       }),
       useRoute: () => ({
-        query: {}
+        query: {},
       }),
       useRouter: () => ({
-        replace: vi.fn()
-      })
+        replace: vi.fn(),
+      }),
     }));
-    
+
     // Mock localStorage
     vi.stubGlobal('localStorage', {
       getItem: vi.fn(),
-      setItem: vi.fn()
+      setItem: vi.fn(),
     });
-    
+
     // Mock matchMedia
     vi.stubGlobal('matchMedia', () => ({
       matches: false,
-      addEventListener: vi.fn()
+      addEventListener: vi.fn(),
     }));
-    
+
     // Mock document.documentElement.classList
     document.documentElement.classList = {
       add: vi.fn(),
       remove: vi.fn(),
-      contains: vi.fn()
+      contains: vi.fn(),
     } as any;
-    
+
     // Mock import.meta.client
     vi.stubGlobal('import', {
-      meta: { client: true }
+      meta: { client: true },
     });
   });
-  
+
   afterEach(() => {
     vi.restoreAllMocks();
   });
 
-  it("should allow toggling between themes", async () => {
+  it('should allow toggling between themes', async () => {
     // Import useAppTheme inside test to ensure mocks are applied
-    const { useAppTheme } = await import("@/composables/useTheme");
+    const { useAppTheme } = await import('@/composables/useTheme');
 
     // Create a simple test component
     const TestComponent = defineComponent({
@@ -68,26 +68,26 @@ describe('useTheme composable - Core functionality', () => {
 
         // Force light theme initially
         setTheme('light');
-        
+
         return { theme, setTheme };
-      }
+      },
     });
-    
+
     // Mount the component
     const wrapper = mount(TestComponent);
-    
+
     // Initial theme should be light (we set it explicitly)
     expect(wrapper.find('.theme-display').text()).toBe('light');
-    
+
     // Click dark theme button
     await wrapper.find('[data-testid="dark-btn"]').trigger('click');
-    
+
     // Theme should update to dark
     expect(wrapper.find('.theme-display').text()).toBe('dark');
-    
+
     // Click light theme button
     await wrapper.find('[data-testid="light-btn"]').trigger('click');
-    
+
     // Theme should update back to light
     expect(wrapper.find('.theme-display').text()).toBe('light');
   });

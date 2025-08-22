@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
@@ -19,21 +19,7 @@ export default defineComponent({
 <template>
   <nuxt-link
     :to="to"
-    class="
-      group 
-      inline-flex 
-      items-center 
-      px-4 
-      py-3 
-      text-xs 
-      font-medium 
-      border-b-3
-      border-transparent
-      dark:text-white 
-      hover:text-orange-500 
-      hover:border-orange-500
-      hover:dark:text-gray-200
-    "
+    class="border-b-3 border-transparent group inline-flex items-center px-4 py-3 text-xs font-medium hover:border-orange-500 hover:text-orange-500 dark:text-white hover:dark:text-gray-200"
     active-class="
       inline-flex
       items-center

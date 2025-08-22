@@ -1,5 +1,5 @@
 <script setup>
-import RequireAuth from "@/components/auth/RequireAuth.vue";
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 
 const props = defineProps({
   props: {
@@ -8,11 +8,11 @@ const props = defineProps({
   },
   testId: {
     type: String,
-    default: "",
+    default: '',
   },
   buttonClasses: {
     type: String,
-    default: "",
+    default: '',
   },
   loading: Boolean,
   showCount: Boolean,
@@ -22,7 +22,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(["click"]);
+defineEmits(['click']);
 </script>
 
 <template>
@@ -34,7 +34,11 @@ defineEmits(["click"]);
         :class="buttonClasses"
         @click="$emit('click')"
       >
-        <ButtonContent :loading="loading" :show-count="showCount" :count="count">
+        <ButtonContent
+          :loading="loading"
+          :show-count="showCount"
+          :count="count"
+        >
           <slot />
         </ButtonContent>
       </button>

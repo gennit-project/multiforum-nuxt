@@ -1,9 +1,9 @@
 <script setup lang="ts">
 /* eslint-disable vue/no-v-html */
-import { computed, ref } from "vue";
-import MarkdownIt from "markdown-it";
-import hljs from "highlight.js";
-import "highlight.js/styles/github-dark.css";
+import { computed, ref } from 'vue';
+import MarkdownIt from 'markdown-it';
+import hljs from 'highlight.js';
+import 'highlight.js/styles/github-dark.css';
 
 // Helper function to generate heading anchors
 function generateHeadingId(text: string): string {
@@ -26,16 +26,16 @@ const props = defineProps({
   },
   hasSlot: {
     type: Boolean,
-    default: false
+    default: false,
   },
   fontSize: {
     type: String,
-    default: 'medium'
+    default: 'medium',
   },
   imageMaxHeight: {
     type: String,
-    default: '350px'
-  }
+    default: '350px',
+  },
 });
 
 const md = new MarkdownIt({
@@ -45,7 +45,7 @@ const md = new MarkdownIt({
       try {
         return `<pre class="hljs p-4 text-xs"><code>${hljs.highlight(str, { language: lang }).value}</code></pre>`;
       } catch (error) {
-        console.warn("Failed to highlight code block", error);
+        console.warn('Failed to highlight code block', error);
       }
     }
     return `<pre class="hljs p-4 text-xs"><code>${md.utils.escapeHtml(str)}</code></pre>`;
@@ -61,9 +61,9 @@ md.renderer.rules.link_open = (
   self: any
 ) => {
   const token = tokens[idx];
-  token.attrPush(["target", "_blank"]);
-  token.attrPush(["rel", "noopener noreferrer"]);
-  token.attrPush(["class", "external-link"]);
+  token.attrPush(['target', '_blank']);
+  token.attrPush(['rel', 'noopener noreferrer']);
+  token.attrPush(['class', 'external-link']);
   return self.renderToken(tokens, idx, options);
 };
 
@@ -76,18 +76,18 @@ md.renderer.rules.heading_open = (
   self: any
 ) => {
   const token = tokens[idx];
-  
+
   // Get the heading text from the next token
   const nextToken = tokens[idx + 1];
-  const headingText = nextToken && nextToken.content ? nextToken.content : `heading-${idx}`;
+  const headingText =
+    nextToken && nextToken.content ? nextToken.content : `heading-${idx}`;
   const headingId = generateHeadingId(headingText) || `heading-${idx}`;
-  
-  token.attrPush(["id", headingId]);
-  token.attrPush(["class", "heading-with-anchor"]);
-  
+
+  token.attrPush(['id', headingId]);
+  token.attrPush(['class', 'heading-with-anchor']);
+
   return self.renderToken(tokens, idx, options);
 };
-
 
 // Add external link icon after the link content
 md.renderer.rules.link_close = () => {
@@ -96,22 +96,25 @@ md.renderer.rules.link_close = () => {
 
 const renderedMarkdown = computed(() => {
   // Preprocess text to handle spoiler markup before markdown processing
-  const preprocessedText = props.text.replace(/>!([^!]+)!</g, '§SPOILER§$1§/SPOILER§');
-  
+  const preprocessedText = props.text.replace(
+    />!([^!]+)!</g,
+    '§SPOILER§$1§/SPOILER§'
+  );
+
   const rawHTML = md.render(preprocessedText);
-  
+
   // Post-process to convert spoiler placeholders back to HTML
-  let processedHTML = rawHTML.replace(/§SPOILER§([^§]+)§\/SPOILER§/g, '<span class="spoiler-text">$1</span>');
-  
+  let processedHTML = rawHTML.replace(
+    /§SPOILER§([^§]+)§\/SPOILER§/g,
+    '<span class="spoiler-text">$1</span>'
+  );
+
   // Wrap tables in responsive wrapper divs
   processedHTML = processedHTML.replace(
     /<table[^>]*>/gi,
     '<div class="table-wrapper"><table>'
   );
-  processedHTML = processedHTML.replace(
-    /<\/table>/gi,
-    '</table></div>'
-  );
+  processedHTML = processedHTML.replace(/<\/table>/gi, '</table></div>');
 
   // Always return the processed HTML - DOMPurify is handled separately for hydration
   return processedHTML;
@@ -119,7 +122,7 @@ const renderedMarkdown = computed(() => {
 
 const containerStyle = computed(() => {
   return {
-    '--image-max-height': props.imageMaxHeight
+    '--image-max-height': props.imageMaxHeight,
   };
 });
 </script>
@@ -128,34 +131,30 @@ const containerStyle = computed(() => {
   <div class="markdown-container" :style="containerStyle">
     <!-- Use both classes and inline styles to ensure font size is applied -->
     <ClientOnly>
-      <div 
-        ref="slotContainer" 
-        class="markdown-body" 
-        :class="
-          {
+      <div
+        ref="slotContainer"
+        class="markdown-body"
+        :class="{
+          'font-size-small': props.fontSize === 'small',
+          'font-size-medium': props.fontSize === 'medium',
+          'font-size-large': props.fontSize === 'large',
+        }"
+        v-html="renderedMarkdown"
+      />
+      <template #fallback>
+        <div
+          class="markdown-body"
+          :class="{
             'font-size-small': props.fontSize === 'small',
             'font-size-medium': props.fontSize === 'medium',
             'font-size-large': props.fontSize === 'large',
-          }
-        " 
-        v-html="renderedMarkdown" 
-      />
-      <template #fallback>
-        <div 
-          class="markdown-body" 
-          :class="
-            {
-              'font-size-small': props.fontSize === 'small',
-              'font-size-medium': props.fontSize === 'medium',
-              'font-size-large': props.fontSize === 'large',
-            }
-          " 
-          v-html="renderedMarkdown" 
+          }"
+          v-html="renderedMarkdown"
         />
       </template>
     </ClientOnly>
     <div v-if="$slots.default" class="inline-slot">
-      <slot/>
+      <slot />
     </div>
   </div>
 </template>
@@ -190,7 +189,8 @@ const containerStyle = computed(() => {
       h4 {
         font-size: 0.9rem !important;
       }
-      h5, h6 {
+      h5,
+      h6 {
         font-size: 0.8rem !important;
       }
       p,
@@ -212,7 +212,8 @@ const containerStyle = computed(() => {
       h4 {
         font-size: 1rem !important;
       }
-      h5, h6 {
+      h5,
+      h6 {
         font-size: 0.9rem !important;
       }
       p,
@@ -234,7 +235,8 @@ const containerStyle = computed(() => {
       h4 {
         font-size: 1.1rem !important;
       }
-      h5, h6 {
+      h5,
+      h6 {
         font-size: 1rem !important;
       }
       p,
@@ -302,14 +304,14 @@ const containerStyle = computed(() => {
     }
 
     code {
-      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+      font-family:
+        SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace !important;
       padding: 0.2em 0.4em !important;
       margin: 0 !important;
       border-radius: 6px !important;
       max-width: 100% !important;
       overflow-wrap: break-word !important;
       white-space: pre-wrap !important;
-
     }
 
     pre code {
@@ -378,16 +380,16 @@ const containerStyle = computed(() => {
       border-radius: 3px !important;
       cursor: pointer !important;
       user-select: none !important;
-      
+
       &:hover {
         background-color: transparent !important;
         color: inherit !important;
       }
-      
+
       .dark & {
         background-color: #6b7280 !important;
         color: #6b7280 !important;
-        
+
         &:hover {
           background-color: transparent !important;
           color: inherit !important;
@@ -400,7 +402,8 @@ const containerStyle = computed(() => {
       display: inline-block !important;
       padding: 0.2em 0.4em !important;
       margin: 0 0.1em !important;
-      font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+      font-family:
+        SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace !important;
       font-size: 0.85em !important;
       line-height: 1 !important;
       color: #24292f !important;
@@ -410,7 +413,7 @@ const containerStyle = computed(() => {
       box-shadow: inset 0 -1px 0 #d0d7de !important;
       vertical-align: middle !important;
       white-space: nowrap !important;
-      
+
       .dark & {
         color: #f0f6fc !important;
         background-color: #21262d !important;
@@ -425,36 +428,36 @@ const containerStyle = computed(() => {
       margin: 1rem 0 !important;
       border-radius: 6px !important;
       border: 1px solid #d0d7de !important;
-      
+
       .dark & {
         border-color: #30363d !important;
       }
-      
+
       /* Webkit scrollbar styling */
       &::-webkit-scrollbar {
         height: 8px !important;
       }
-      
+
       &::-webkit-scrollbar-track {
         background: #f1f1f1 !important;
         border-radius: 4px !important;
-        
+
         .dark & {
           background: #2d2d2d !important;
         }
       }
-      
+
       &::-webkit-scrollbar-thumb {
         background: #c1c1c1 !important;
         border-radius: 4px !important;
-        
+
         &:hover {
           background: #a8a8a8 !important;
         }
-        
+
         .dark & {
           background: #555 !important;
-          
+
           &:hover {
             background: #777 !important;
           }
@@ -471,12 +474,12 @@ const containerStyle = computed(() => {
       border: none !important;
       border-radius: 0 !important;
       overflow: visible !important;
-      
+
       /* On mobile, allow table to be smaller but still scrollable */
       @media (max-width: 768px) {
         min-width: 500px !important;
       }
-      
+
       @media (max-width: 480px) {
         min-width: 400px !important;
       }
@@ -484,7 +487,7 @@ const containerStyle = computed(() => {
 
     thead {
       background-color: #f6f8fa !important;
-      
+
       .dark & {
         background-color: #21262d !important;
       }
@@ -497,11 +500,11 @@ const containerStyle = computed(() => {
       border-bottom: 1px solid #d0d7de !important;
       border-right: 1px solid #d0d7de !important;
       background-color: #f6f8fa !important;
-      
+
       &:last-child {
         border-right: none !important;
       }
-      
+
       .dark & {
         border-color: #30363d !important;
         background-color: #21262d !important;
@@ -513,11 +516,11 @@ const containerStyle = computed(() => {
       padding: 0.75rem 1rem !important;
       border-bottom: 1px solid #d0d7de !important;
       border-right: 1px solid #d0d7de !important;
-      
+
       &:last-child {
         border-right: none !important;
       }
-      
+
       .dark & {
         border-color: #30363d !important;
       }
@@ -529,10 +532,10 @@ const containerStyle = computed(() => {
           border-bottom: none !important;
         }
       }
-      
+
       &:hover {
         background-color: #f6f8fa !important;
-        
+
         .dark & {
           background-color: #161b22 !important;
         }
@@ -594,33 +597,72 @@ const containerStyle = computed(() => {
 
   /* ── font‑size variants ─────────────────────────────── */
   &.font-size-small {
-    h1 { font-size: 1.2rem !important; }
-    h2 { font-size: 1.1rem !important; }
-    h3 { font-size: 1rem !important; }
-    h4 { font-size: 0.9rem !important; }
-    h5, h6 { font-size: 0.8rem !important; }
+    h1 {
+      font-size: 1.2rem !important;
+    }
+    h2 {
+      font-size: 1.1rem !important;
+    }
+    h3 {
+      font-size: 1rem !important;
+    }
+    h4 {
+      font-size: 0.9rem !important;
+    }
+    h5,
+    h6 {
+      font-size: 0.8rem !important;
+    }
     p,
-    li { font-size: 0.8rem !important; }
+    li {
+      font-size: 0.8rem !important;
+    }
   }
 
   &.font-size-medium {
-    h1 { font-size: 1.4rem !important; }
-    h2 { font-size: 1.2rem !important; }
-    h3 { font-size: 1.1rem !important; }
-    h4 { font-size: 1rem !important; }
-    h5, h6 { font-size: 0.9rem !important; }
+    h1 {
+      font-size: 1.4rem !important;
+    }
+    h2 {
+      font-size: 1.2rem !important;
+    }
+    h3 {
+      font-size: 1.1rem !important;
+    }
+    h4 {
+      font-size: 1rem !important;
+    }
+    h5,
+    h6 {
+      font-size: 0.9rem !important;
+    }
     p,
-    li { font-size: 0.9rem !important; }
+    li {
+      font-size: 0.9rem !important;
+    }
   }
 
   &.font-size-large {
-    h1 { font-size: 1.6rem !important; }
-    h2 { font-size: 1.4rem !important; }
-    h3 { font-size: 1.2rem !important; }
-    h4 { font-size: 1.1rem !important; }
-    h5, h6 { font-size: 1rem !important; }
+    h1 {
+      font-size: 1.6rem !important;
+    }
+    h2 {
+      font-size: 1.4rem !important;
+    }
+    h3 {
+      font-size: 1.2rem !important;
+    }
+    h4 {
+      font-size: 1.1rem !important;
+    }
+    h5,
+    h6 {
+      font-size: 1rem !important;
+    }
     p,
-    li { font-size: 1.1rem !important; }
+    li {
+      font-size: 1.1rem !important;
+    }
   }
 
   /* ── general typography & elements ───────────────────── */
@@ -649,7 +691,7 @@ const containerStyle = computed(() => {
 
   pre {
     border-radius: 5px;
-    overflow-x: auto;          // keep horizontal scroll for code blocks
+    overflow-x: auto; // keep horizontal scroll for code blocks
     padding-bottom: 0.25rem !important;
     max-width: 100%;
     white-space: pre-wrap;
@@ -705,16 +747,16 @@ const containerStyle = computed(() => {
     border-radius: 3px !important;
     cursor: pointer !important;
     user-select: none !important;
-    
+
     &:hover {
       background-color: transparent !important;
       color: inherit !important;
     }
-    
+
     .dark & {
       background-color: #6b7280 !important;
       color: #6b7280 !important;
-      
+
       &:hover {
         background-color: transparent !important;
         color: inherit !important;
@@ -727,7 +769,8 @@ const containerStyle = computed(() => {
     display: inline-block !important;
     padding: 0.2em 0.4em !important;
     margin: 0 0.1em !important;
-    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+    font-family:
+      SFMono-Regular, Consolas, 'Liberation Mono', Menlo, monospace !important;
     font-size: 0.85em !important;
     line-height: 1 !important;
     color: #24292f !important;
@@ -737,7 +780,7 @@ const containerStyle = computed(() => {
     box-shadow: inset 0 -1px 0 #d0d7de !important;
     vertical-align: middle !important;
     white-space: nowrap !important;
-    
+
     .dark & {
       color: #f0f6fc !important;
       background-color: #21262d !important;
@@ -752,36 +795,36 @@ const containerStyle = computed(() => {
     margin: 1rem 0 !important;
     border-radius: 6px !important;
     border: 1px solid #d0d7de !important;
-    
+
     .dark & {
       border-color: #30363d !important;
     }
-    
+
     /* Webkit scrollbar styling */
     &::-webkit-scrollbar {
       height: 8px !important;
     }
-    
+
     &::-webkit-scrollbar-track {
       background: #f1f1f1 !important;
       border-radius: 4px !important;
-      
+
       .dark & {
         background: #2d2d2d !important;
       }
     }
-    
+
     &::-webkit-scrollbar-thumb {
       background: #c1c1c1 !important;
       border-radius: 4px !important;
-      
+
       &:hover {
         background: #a8a8a8 !important;
       }
-      
+
       .dark & {
         background: #555 !important;
-        
+
         &:hover {
           background: #777 !important;
         }
@@ -798,12 +841,12 @@ const containerStyle = computed(() => {
     border: none !important;
     border-radius: 0 !important;
     overflow: visible !important;
-    
+
     /* On mobile, allow table to be smaller but still scrollable */
     @media (max-width: 768px) {
       min-width: 500px !important;
     }
-    
+
     @media (max-width: 480px) {
       min-width: 400px !important;
     }
@@ -811,7 +854,7 @@ const containerStyle = computed(() => {
 
   thead {
     background-color: #f6f8fa !important;
-    
+
     .dark & {
       background-color: #21262d !important;
     }
@@ -824,11 +867,11 @@ const containerStyle = computed(() => {
     border-bottom: 1px solid #d0d7de !important;
     border-right: 1px solid #d0d7de !important;
     background-color: #f6f8fa !important;
-    
+
     &:last-child {
       border-right: none !important;
     }
-    
+
     .dark & {
       border-color: #30363d !important;
       background-color: #21262d !important;
@@ -840,11 +883,11 @@ const containerStyle = computed(() => {
     padding: 0.75rem 1rem !important;
     border-bottom: 1px solid #d0d7de !important;
     border-right: 1px solid #d0d7de !important;
-    
+
     &:last-child {
       border-right: none !important;
     }
-    
+
     .dark & {
       border-color: #30363d !important;
     }
@@ -856,10 +899,10 @@ const containerStyle = computed(() => {
         border-bottom: none !important;
       }
     }
-    
+
     &:hover {
       background-color: #f6f8fa !important;
-      
+
       .dark & {
         background-color: #161b22 !important;
       }

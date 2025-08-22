@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import InfoIcon from "@/components/icons/InfoIcon.vue";
-import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import InfoIcon from '@/components/icons/InfoIcon.vue';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 
 defineProps({
   testId: {
     type: String,
-    default: "",
+    default: '',
   },
   text: {
     type: String,
@@ -15,7 +15,10 @@ defineProps({
 </script>
 
 <template>
-  <div :data-testid="testId" class="rounded-md bg-orange-100 dark:bg-orange-900 p-4 dark:text-white">
+  <div
+    :data-testid="testId"
+    class="rounded-md bg-orange-100 p-4 dark:bg-orange-900 dark:text-white"
+  >
     <div class="flex">
       <div class="shrink-0">
         <slot>
@@ -28,7 +31,6 @@ defineProps({
     </div>
   </div>
 </template>
-
 
 <style scoped>
 .text-wrap {

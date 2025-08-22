@@ -1,33 +1,33 @@
 <script lang="ts" setup>
-import { useMutation } from "@vue/apollo-composable";
-import VoteButton from "@/components/VoteButton.vue";
+import { useMutation } from '@vue/apollo-composable';
+import VoteButton from '@/components/VoteButton.vue';
 import {
   ADD_EMOJI_TO_COMMENT,
   REMOVE_EMOJI_FROM_COMMENT,
-} from "@/graphQLData/comment/mutations";
+} from '@/graphQLData/comment/mutations';
 import {
   ADD_EMOJI_TO_DISCUSSION_CHANNEL,
   REMOVE_EMOJI_FROM_DISCUSSION_CHANNEL,
-} from "@/graphQLData/discussion/mutations";
-import { usernameVar } from "@/cache";
-import { ref } from "vue";
+} from '@/graphQLData/discussion/mutations';
+import { usernameVar } from '@/cache';
+import { ref } from 'vue';
 
 // Props
 const props = defineProps({
   commentId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   emojiJson: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   isPermalinked: {
     type: Boolean,
@@ -99,7 +99,7 @@ function getCount(emojiLabel: string) {
 function getTooltipText(emojiLabel: string) {
   const count = getCount(emojiLabel);
   const usernames = Object.values(emojiObject.value[emojiLabel] || {}).flat();
-  let tooltipText = usernames.slice(0, 5).join(", ");
+  let tooltipText = usernames.slice(0, 5).join(', ');
   if (usernames.length > 5) {
     tooltipText += ` and ${count - 5} more`;
   }

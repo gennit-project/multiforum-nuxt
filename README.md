@@ -3,21 +3,30 @@
 Multiforum is an online platform for communities to create forums for sharing discussions and events. Key features:
 
 1. Each forum has three main sections:
-  - Discussions: Content can be upvoted so best content rises to top
-  - Calendar: Calendar with upcoming community events
-  - Wikis: Wiki tab with shared knowledge base
+
+- Discussions: Content can be upvoted so best content rises to top
+- Calendar: Calendar with upcoming community events
+- Wikis: Wiki tab with shared knowledge base
+
 2. Cross-posting capability:
-  - Events and discussions can be submitted to multiple forums for increased visibility
+
+- Events and discussions can be submitted to multiple forums for increased visibility
+
 3. Location-based event discovery:
-  - Map integration shows events across forums
-  - Events can be filtered by proximity, time, tags, and forums
+
+- Map integration shows events across forums
+- Events can be filtered by proximity, time, tags, and forums
+
 4. Responsive design:
-  - Works on both desktop and mobile
+
+- Works on both desktop and mobile
+
 5. Technology stack:
-  - Frontend: Vue/Nuxt.js with Apollo client
-  - Backend: Apollo server with Neo4j graph database
-  - Authentication: Auth0
-  - Maps: Google Maps integration
+
+- Frontend: Vue/Nuxt.js with Apollo client
+- Backend: Apollo server with Neo4j graph database
+- Authentication: Auth0
+- Maps: Google Maps integration
 
 This is a work in progress that intended to be an open-source, self-hosted platform.
 
@@ -95,7 +104,7 @@ If you click the map marker, more details about the event show up:
 
 ### Filtering the map by forums
 
-If I'm only interested in events from a few specific forums, I filter the 
+If I'm only interested in events from a few specific forums, I filter the
 map by those forums:
 
 ![Filtering map by multiple forums](./screenshots/filtering-map-by-multiple-forums2.png)
@@ -128,7 +137,6 @@ you click that, you can see the list of events that are taking place there at di
 
 ![Clicking different map marker with multiple events](./screenshots/clicking-different-map-marker-with-multiple-events.png)
 
-
 ### Event list within a forum
 
 Each forum can have its own list of upcoming events. In this example, a forum about
@@ -144,7 +152,6 @@ Events can be filtered within a forum.Here are the events filtered by location. 
 events within 5 miles of Tempe:
 
 ![Phoenix bird lovers events filtered by location](./screenshots/phx-bird-lovers-events-filtered-by-location.png)
-
 
 ### Discussion list within a forum
 
@@ -162,7 +169,6 @@ the comments. In the case of a birdwatching group, maybe there's a comment ident
 
 ![Phoenix bird lovers discussion detail](./screenshots/phx-bird-lovers-discussion-detail.png)
 
-
 ### Forum without any events
 
 Events are optional for forums. I intend to make it possible for a forum to turn
@@ -177,7 +183,6 @@ have no need for events:
 You can share an event to one or more forums. In a typical use case, you would link to an official
 event page with the full details and information about how to buy tickets, if applicable.
 
-
 Submitting an event to multiple forums is a good way to increase the visibility of the event. This one will now be visible in the context of both of the selected forums:
 
 ![Submitting an event to multiple forums](./screenshots/submitting-event-to-multiple-forums.png)
@@ -186,18 +191,14 @@ If you add an address, the event will be discoverable from the sitewide event se
 
 ![Adding an address for so that the event shows up on the map](./screenshots/adding-an-address-makes-the-event-discoverable-from-sitewide-search.png)
 
-
 ### Recently visited forums
 
 If you click the menu button on the top left of any page, it shows recently visited forums
 to support easy context switching.
 
-
 ![Recently visited forums](./screenshots/recently-visited-forums.png)
 
-
 ## Screenshots - Mobile width
-
 
 ### Discussion list views within a forum
 
@@ -229,7 +230,6 @@ you come to it from within the context of an individual forum:
 
 ![Discussion detail page at mobile width](./screenshots/discussion-detail-at-mobile-width.png)
 
-
 ### Sitewide event list
 
 Here's the sitewide in-person event list with an active filter,
@@ -238,7 +238,6 @@ as well. Here, the events are filtered by the birdwatching forum,
 so not all of the map markers are displayed.
 
 ![Sitewide filtered event list at mobile width](./screenshots/sitewide-filtered-event-list-at-mobile-width.png)
-
 
 ### List of all forums
 
@@ -253,7 +252,6 @@ The list of forums can be filtered by tag:
 The forum list can be filtered by search terms as well:
 
 ![Forum list filtered by search terms](./screenshots/forum-list-filtered-by-search-terms.png)
-
 
 ## Technology Stack
 
@@ -270,6 +268,7 @@ Multiforum uses a hybrid authentication system that combines Auth0 for secure au
 To prevent UI flash and hydration issues, the application uses a two-layer authentication approach:
 
 1. **Auth Hint Cookies (SSR-compatible)**
+
    - Non-sensitive cookies that indicate whether a user is logged in
    - Can be read during Server-Side Rendering (SSR) for immediate auth state
    - Ensures server and client render the same initial state
@@ -283,17 +282,20 @@ To prevent UI flash and hydration issues, the application uses a two-layer authe
 ### How It Works
 
 1. **Login Flow**:
+
    - User authenticates through Auth0
    - Auth hint cookie is set (indicates "logged in" state)
    - Auth token is stored in localStorage
    - User data is fetched and cached
 
 2. **SSR Rendering**:
+
    - Server reads auth hint cookies during SSR
    - Renders appropriate UI state (logged in vs logged out)
    - Client hydrates with matching state, preventing flash
 
 3. **Client-side Operation**:
+
    - App checks for auth tokens in localStorage
    - Makes authenticated GraphQL requests
    - Maintains reactive auth state throughout the session
@@ -313,21 +315,25 @@ To prevent UI flash and hydration issues, the application uses a two-layer authe
 ### Important Implementation Details
 
 **Cookie Synchronization Requirements:**
+
 - Auth hint cookies MUST be updated whenever auth state changes
 - Both login and logout flows must clear/set cookies consistently
 - GraphQL user data fetching should also update auth hints for consistency
 
 **SSR vs Client-side State:**
+
 - SSR uses ONLY auth hint cookies (no localStorage access)
 - Client-side uses BOTH cookies and localStorage tokens
 - The `RequireAuth` component handles this dual-state checking automatically
 
 **Testing Considerations:**
+
 - Test auth flows in SSR mode (disable JavaScript) to verify server rendering
 - Test with cleared cookies to ensure proper fallback behavior
 - Verify no hydration mismatches between server and client rendering
 
 **Common Pitfalls to Avoid:**
+
 - Don't add auth token logic to SSR-rendered components
 - Don't rely on localStorage during initial render
 - Always update auth hints when modifying auth state
@@ -336,7 +342,7 @@ To prevent UI flash and hydration issues, the application uses a two-layer authe
 ### Debugging Auth Issues
 
 1. **UI Flash Problems**: Check if auth hint cookies match actual auth state
-2. **Hydration Errors**: Verify server and client render identical initial state  
+2. **Hydration Errors**: Verify server and client render identical initial state
 3. **Login/Logout Issues**: Ensure all auth state updates include cookie synchronization
 4. **Missing Auth UI**: Check both cookie and localStorage token presence
 
@@ -363,13 +369,16 @@ We have implemented several performance optimizations to improve load times, red
 The application requires several environment variables to be set up. For a comprehensive list of environment variables with detailed descriptions, see the [Environment Variables section in CONTRIBUTING.md](CONTRIBUTING.md#environment-variables).
 
 ### Development Setup
+
 1. Create a `.env` file in the root directory
 2. Copy the variables from `.env.example` (if available)
 3. Fill in your values for each required variable
 4. Never commit the `.env` file to version control
 
 ### Docker Setup
+
 When using Docker Compose, these variables can be set in the environment or in a `.env` file. The `docker-compose.yml` file includes default values for some variables:
+
 - `NEO4J_AUTH`: defaults to "neo4j/neo4j"
 - `NEO4J_PASSWORD`: defaults to "neo4j"
 - `NEO4J_USERNAME`: defaults to "neo4j"

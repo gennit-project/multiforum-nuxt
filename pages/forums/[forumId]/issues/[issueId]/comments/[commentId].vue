@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { useRoute } from "nuxt/app";
-import { ref } from "vue";
-import type { ApolloError } from "@apollo/client";
-import PermalinkedActivityFeedItem from "@/components/mod/PermalinkedActivityFeedItem.vue";
-import ActivityFeedListItem from "@/components/mod/ActivityFeedListItem.vue";
+import { useRoute } from 'nuxt/app';
+import { ref } from 'vue';
+import type { ApolloError } from '@apollo/client';
+import PermalinkedActivityFeedItem from '@/components/mod/PermalinkedActivityFeedItem.vue';
+import ActivityFeedListItem from '@/components/mod/ActivityFeedListItem.vue';
 
 const route = useRoute();
 const permalinkedCommentId = ref(route.params.commentId);
 
 defineEmits([
-  "clickEditComment",
-  "clickReport",
-  "deleteComment",
-  "hideEditCommentEditor",
-  "hideReplyEditor",
-  "startCommentSave",
-  "openEditCommentEditor",
-  "saveEdit",
-  "updateEditCommentInput",
-  "showCopiedLinkNotification",
+  'clickEditComment',
+  'clickReport',
+  'deleteComment',
+  'hideEditCommentEditor',
+  'hideReplyEditor',
+  'startCommentSave',
+  'openEditCommentEditor',
+  'saveEdit',
+  'updateEditCommentInput',
+  'showCopiedLinkNotification',
 ]);
 
 defineProps({
@@ -30,7 +30,7 @@ defineProps({
   editFormOpenAtCommentID: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   editCommentError: {
     type: Object as () => ApolloError | null | undefined,
@@ -40,7 +40,7 @@ defineProps({
   originalPoster: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
 });
 </script>

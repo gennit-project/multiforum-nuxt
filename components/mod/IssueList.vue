@@ -1,10 +1,10 @@
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import type { Issue } from "@/__generated__/graphql";
-import { GET_ISSUES_BY_CHANNEL } from "@/graphQLData/issue/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import ModIssueListItem from "./ModIssueListItem.vue";
+import { computed, defineComponent } from 'vue';
+import type { Issue } from '@/__generated__/graphql';
+import { GET_ISSUES_BY_CHANNEL } from '@/graphQLData/issue/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import ModIssueListItem from './ModIssueListItem.vue';
 
 export default defineComponent({
   components: {
@@ -14,8 +14,8 @@ export default defineComponent({
     const route = useRoute();
 
     const channelId = computed(() => {
-      if (typeof route.params.forumId !== "string") {
-        return "";
+      if (typeof route.params.forumId !== 'string') {
+        return '';
       }
       return route.params.forumId;
     });
@@ -53,7 +53,12 @@ export default defineComponent({
     class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
     data-testid="issue-list"
   >
-    <ModIssueListItem v-for="issue in issues" :key="issue.id" :issue="issue" :channel-id="channelId" />
+    <ModIssueListItem
+      v-for="issue in issues"
+      :key="issue.id"
+      :issue="issue"
+      :channel-id="channelId"
+    />
   </ul>
 </template>
 

@@ -16,14 +16,11 @@ import MarkdownPreview from '../MarkdownPreview.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 
-
 const props = defineProps<{
   activeIssue: Issue;
 }>();
 
-const emit = defineEmits([
-  'fetchedOriginalAuthorUsername',
-])
+const emit = defineEmits(['fetchedOriginalAuthorUsername']);
 
 /* ---------- route & variable helpers ---------- */
 const route = useRoute();
@@ -31,7 +28,7 @@ const route = useRoute();
 const discussionId = computed(() => props.activeIssue.relatedDiscussionId);
 
 const channelId = computed(() =>
-  typeof route.params.forumId === 'string' ? route.params.forumId : '',
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 
 /* ---------- GraphQL query ---------- */
@@ -63,7 +60,7 @@ const formatDate = (iso: string) =>
   DateTime.fromISO(iso).toLocaleString(DateTime.DATE_FULL);
 
 const editedAt = computed(() => {
-  if (!discussion.value?.updatedAt) return "";
+  if (!discussion.value?.updatedAt) return '';
   return `Edited ${stableRelativeTime(discussion.value.updatedAt)}`;
 });
 </script>
@@ -74,7 +71,10 @@ const editedAt = computed(() => {
     <LoadingSpinner v-else-if="getDiscussionLoading" />
     <div v-if="discussion" class="mt-3 flex w-full flex-col gap-2">
       <nuxt-link
-        :to="{ name: 'u-username', params: { username: discussion?.Author?.username } }"
+        :to="{
+          name: 'u-username',
+          params: { username: discussion?.Author?.username },
+        }"
         class="flex items-center dark:text-white"
       >
         <AvatarComponent

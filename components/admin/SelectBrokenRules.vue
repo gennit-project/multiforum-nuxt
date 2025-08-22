@@ -1,13 +1,12 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_CHANNEL_RULES } from "@/graphQLData/channel/queries";
-import { GET_SERVER_RULES } from "@/graphQLData/admin/queries";
-import BrokenRuleListItem from "./BrokenRuleListItem.vue";
-import { config } from "@/config";
-import { useRoute } from "nuxt/app";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-
+import { ref, computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_CHANNEL_RULES } from '@/graphQLData/channel/queries';
+import { GET_SERVER_RULES } from '@/graphQLData/admin/queries';
+import BrokenRuleListItem from './BrokenRuleListItem.vue';
+import { config } from '@/config';
+import { useRoute } from 'nuxt/app';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
 type RuleOption = {
   summary: string;
@@ -15,17 +14,17 @@ type RuleOption = {
 };
 
 const emit = defineEmits([
-  "toggleForumRuleSelection",
-  "toggleServerRuleSelection",
+  'toggleForumRuleSelection',
+  'toggleServerRuleSelection',
 ]);
 const selected = ref([]);
 const route = useRoute();
 
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const {
@@ -55,7 +54,7 @@ const getRules = (rulesJSON: string): RuleOption[] => {
       });
     }
   } catch (e) {
-    console.error("Error parsing channel rules", e);
+    console.error('Error parsing channel rules', e);
   }
   return rules;
 };
@@ -77,12 +76,12 @@ const serverRuleOptions = computed<RuleOption[]>(() => {
   return getRules(serverConfig.rules);
 });
 
-const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
+const showServerRuleOptions = ref(forumRuleOptions.value.length === 0);
 </script>
 
 <template>
   <div
-    class="w-full rounded-md border-gray-200 bg-white dark:text-white dark:border-gray-600 dark:bg-gray-800"
+    class="w-full rounded-md border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800 dark:text-white"
   >
     <div v-if="channelRulesLoading || serverRulesLoading">Loading...</div>
 
@@ -99,7 +98,7 @@ const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
     <template v-else>
       <div class="pl-1">
         <div v-if="forumRuleOptions.length > 0" class="pt-3">
-          <h3 class="uppercase text-sm text-gray-700 dark:text-gray-300">
+          <h3 class="text-sm uppercase text-gray-700 dark:text-gray-300">
             Forum rules for {{ forumId }}
           </h3>
           <div
@@ -117,7 +116,7 @@ const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
           </div>
         </div>
         <div class="pt-3">
-          <h3 class="uppercase text-sm text-gray-700 dark:text-gray-300">
+          <h3 class="text-sm uppercase text-gray-700 dark:text-gray-300">
             Server Rules
           </h3>
           <div v-if="showServerRuleOptions">
@@ -137,10 +136,10 @@ const showServerRuleOptions = ref(forumRuleOptions.value.length === 0)
           </div>
           <button
             v-if="forumRuleOptions.length > 0"
-            class="border rounded-md border-gray-600 dark:border-gray-400 px-2 py-1 mt-2 text-sm text-gray-500 dark:text-gray-300"
+            class="mt-2 rounded-md border border-gray-600 px-2 py-1 text-sm text-gray-500 dark:border-gray-400 dark:text-gray-300"
             @click="showServerRuleOptions = !showServerRuleOptions"
           >
-            {{ showServerRuleOptions ? "Hide" : "Show" }} Server Rules
+            {{ showServerRuleOptions ? 'Hide' : 'Show' }} Server Rules
           </button>
         </div>
       </div>

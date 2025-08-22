@@ -1,49 +1,49 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { ref, computed } from 'vue';
+import { useQuery, useMutation } from '@vue/apollo-composable';
 import {
   GET_CLOSED_ISSUES_BY_CHANNEL,
   GET_ISSUE,
   GET_ISSUES_BY_CHANNEL,
-} from "@/graphQLData/issue/queries";
+} from '@/graphQLData/issue/queries';
 import {
   CLOSE_ISSUE,
   REOPEN_ISSUE,
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
-} from "@/graphQLData/issue/mutations";
+} from '@/graphQLData/issue/mutations';
 import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
-} from "@/graphQLData/mod/queries";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { DateTime } from "luxon";
-import type { Issue } from "@/__generated__/graphql";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import "md-editor-v3/lib/style.css";
-import PageNotFound from "@/components/PageNotFound.vue";
-import DiscussionDetails from "@/components/mod/DiscussionDetails.vue";
-import EventDetail from "@/components/event/detail/EventDetail.vue";
-import CommentDetails from "@/components/mod/CommentDetails.vue";
-import ModerationWizard from "@/components/mod/ModerationWizard.vue";
-import OriginalPosterActions from "@/components/mod/OriginalPosterActions.vue";
-import ActivityFeed from "@/components/mod/ActivityFeed.vue";
-import { modProfileNameVar, usernameVar } from "@/cache";
-import { useRoute } from "nuxt/app";
-import XCircleIcon from "../icons/XCircleIcon.vue";
-import ArrowPathIcon from "../icons/ArrowPath.vue";
+} from '@/graphQLData/mod/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { DateTime } from 'luxon';
+import type { Issue } from '@/__generated__/graphql';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import 'md-editor-v3/lib/style.css';
+import PageNotFound from '@/components/PageNotFound.vue';
+import DiscussionDetails from '@/components/mod/DiscussionDetails.vue';
+import EventDetail from '@/components/event/detail/EventDetail.vue';
+import CommentDetails from '@/components/mod/CommentDetails.vue';
+import ModerationWizard from '@/components/mod/ModerationWizard.vue';
+import OriginalPosterActions from '@/components/mod/OriginalPosterActions.vue';
+import ActivityFeed from '@/components/mod/ActivityFeed.vue';
+import { modProfileNameVar, usernameVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
+import XCircleIcon from '../icons/XCircleIcon.vue';
+import ArrowPathIcon from '../icons/ArrowPath.vue';
 
 // Setup
 const route = useRoute();
 
 // Route and issueId computations
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const issueId = computed(() => {
-  return typeof route.params.issueId === "string" ? route.params.issueId : "";
+  return typeof route.params.issueId === 'string' ? route.params.issueId : '';
 });
 
 // Fetch issue data
@@ -59,11 +59,11 @@ const { refetch: refetchChannel } = useQuery(
   GET_CHANNEL,
   () => ({
     uniqueName: channelId.value,
-    now: DateTime.local().startOf("hour").toISO(),
+    now: DateTime.local().startOf('hour').toISO(),
   }),
   () => ({
-    fetchPolicy: "network-only", // Always fetch from network when refetching
-    enabled: false // Skip initial execution, we'll only use for refetch
+    fetchPolicy: 'network-only', // Always fetch from network when refetching
+    enabled: false, // Skip initial execution, we'll only use for refetch
   })
 );
 
@@ -72,7 +72,7 @@ const activeIssue = computed<Issue | null>(() => {
   return getIssueResult.value.issues[0];
 });
 
-const activeIssueId = computed(() => activeIssue.value?.id || "");
+const activeIssueId = computed(() => activeIssue.value?.id || '');
 
 const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
   CLOSE_ISSUE,
@@ -84,7 +84,7 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
       // Get the issue in the cache by ID, then edit it so the isOpen field is false.
       cache.modify({
         id: cache.identify({
-          __typename: "Issue",
+          __typename: 'Issue',
           id: activeIssueId.value,
         }),
         fields: {
@@ -180,7 +180,9 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
 
       // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
       // to add this issue to the list of closed issues
-      const existingClosedIssuesByChannelData: { channels?: { Issues: Issue[] }[] } | null = cache.readQuery({
+      const existingClosedIssuesByChannelData: {
+        channels?: { Issues: Issue[] }[];
+      } | null = cache.readQuery({
         query: GET_CLOSED_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
       });
@@ -220,7 +222,7 @@ const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
       // Get the issue in the cache by ID, then edit it so the isOpen field is true.
       cache.modify({
         id: cache.identify({
-          __typename: "Issue",
+          __typename: 'Issue',
           id: activeIssueId.value,
         }),
         fields: {
@@ -286,7 +288,9 @@ const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
       // Also update the result of GET_CLOSED_ISSUES_BY_CHANNEL
       // so that the newly reopened issue is removed from the list
       // of closed issues.
-      const existingClosedIssuesByChannelData: { channels?: { Issues: Issue[] }[] } | null = cache.readQuery({
+      const existingClosedIssuesByChannelData: {
+        channels?: { Issues: Issue[] }[];
+      } | null = cache.readQuery({
         query: GET_CLOSED_ISSUES_BY_CHANNEL,
         variables: { channelUniqueName: channelId.value },
       });
@@ -467,12 +471,12 @@ const {
 
 const closeOpenButtonText = computed(() => {
   if (activeIssue.value?.isOpen)
-    return createFormValues.value.text ? "Close with comment" : "Close issue";
-  return createFormValues.value.text ? "Reopen with comment" : "Reopen issue";
+    return createFormValues.value.text ? 'Close with comment' : 'Close issue';
+  return createFormValues.value.text ? 'Reopen with comment' : 'Reopen issue';
 });
 
 // Form values for creating comments
-const createCommentDefaultValues = { text: "", isRootComment: true, depth: 1 };
+const createCommentDefaultValues = { text: '', isRootComment: true, depth: 1 };
 const createFormValues = ref(createCommentDefaultValues);
 
 const issue = computed<Issue | null>(
@@ -483,16 +487,21 @@ const issue = computed<Issue | null>(
 const originalAuthorUsername = ref('');
 
 // Get the mod profile name of the original author, if applicable
-const originalModProfileName = ref('')
+const originalModProfileName = ref('');
 
 // Determine if the current user is the original author via username
 const isOriginalUserAuthor = computed(() => {
-  return !!usernameVar.value && originalAuthorUsername.value === usernameVar.value;
+  return (
+    !!usernameVar.value && originalAuthorUsername.value === usernameVar.value
+  );
 });
 
 // Determine if the current user is the original author via mod profile
 const isOriginalModAuthor = computed(() => {
-  return !!modProfileNameVar.value && originalModProfileName.value === modProfileNameVar.value;
+  return (
+    !!modProfileNameVar.value &&
+    originalModProfileName.value === modProfileNameVar.value
+  );
 });
 
 // Determine if the current user is the original poster (either as user or mod)
@@ -513,20 +522,20 @@ const handleCreateComment = async () => {
       issueId: activeIssue.value.id,
       commentText: createFormValues.value.text,
       username: usernameVar.value,
-      actionDescription: "commented on the issue",
-      actionType: "comment",
+      actionDescription: 'commented on the issue',
+      actionType: 'comment',
       channelUniqueName: channelId.value,
     });
-  } 
+  }
   // Case 2: Current user is the original author who posted as a mod
-  else if (isOriginalModAuthor.value){
+  else if (isOriginalModAuthor.value) {
     if (!modProfileNameVar.value) return;
     await addIssueActivityFeedItemWithCommentAsMod({
       issueId: activeIssue.value.id,
       commentText: createFormValues.value.text,
       displayName: modProfileNameVar.value,
-      actionDescription: "commented on the issue",
-      actionType: "comment",
+      actionDescription: 'commented on the issue',
+      actionType: 'comment',
       channelUniqueName: channelId.value,
     });
   }
@@ -537,18 +546,18 @@ const handleCreateComment = async () => {
       issueId: activeIssue.value.id,
       commentText: createFormValues.value.text,
       displayName: modProfileNameVar.value,
-      actionDescription: "commented on the issue",
-      actionType: "comment",
+      actionDescription: 'commented on the issue',
+      actionType: 'comment',
       channelUniqueName: channelId.value,
     });
   }
-  
-  createFormValues.value.text = "";
+
+  createFormValues.value.text = '';
 };
 
 const toggleCloseOpenIssue = async () => {
   if (!activeIssue.value || !modProfileNameVar.value) return;
-  
+
   try {
     if (activeIssue.value.isOpen) {
       // Close the issue
@@ -558,8 +567,8 @@ const toggleCloseOpenIssue = async () => {
         await addIssueActivityFeedItemWithCommentAsMod({
           issueId: activeIssue.value.id,
           displayName: modProfileNameVar.value,
-          actionDescription: "closed the issue",
-          actionType: "close",
+          actionDescription: 'closed the issue',
+          actionType: 'close',
           commentText: createFormValues.value.text,
           channelUniqueName: channelId.value,
         });
@@ -567,20 +576,20 @@ const toggleCloseOpenIssue = async () => {
         await addIssueActivityFeedItem({
           issueId: activeIssue.value.id,
           displayName: modProfileNameVar.value,
-          actionDescription: "closed the issue",
-          actionType: "close",
+          actionDescription: 'closed the issue',
+          actionType: 'close',
         });
       }
     } else {
       // Reopen the issue
       await reopenIssue();
-      
+
       if (createFormValues.value.text) {
         await addIssueActivityFeedItemWithCommentAsMod({
           issueId: activeIssue.value.id,
           displayName: modProfileNameVar.value,
-          actionDescription: "reopened the issue",
-          actionType: "reopen",
+          actionDescription: 'reopened the issue',
+          actionType: 'reopen',
           commentText: createFormValues.value.text,
           channelUniqueName: channelId.value,
         });
@@ -588,41 +597,41 @@ const toggleCloseOpenIssue = async () => {
         await addIssueActivityFeedItem({
           issueId: activeIssue.value.id,
           displayName: modProfileNameVar.value,
-          actionDescription: "reopened the issue",
-          actionType: "reopen",
+          actionDescription: 'reopened the issue',
+          actionType: 'reopen',
         });
       }
     }
-    
+
     // Refetch channel data to update issue counts in the UI
     // This is important for updating the IssuesAggregate count in ChannelTabs
     try {
       await refetchChannel();
-      console.log("Refetched channel data to update issue counts");
+      console.log('Refetched channel data to update issue counts');
     } catch (error) {
-      console.error("Error refetching channel data:", error);
+      console.error('Error refetching channel data:', error);
     }
-    
+
     // Reset comment form
-    createFormValues.value.text = "";
+    createFormValues.value.text = '';
   } catch (error) {
-    console.error("Error toggling issue open/close state:", error);
+    console.error('Error toggling issue open/close state:', error);
   }
 };
 
 // Handle delete actions from Original Poster Actions
 const handleDeleteDiscussion = (discussionId: string) => {
-  console.log("Delete discussion:", discussionId);
+  console.log('Delete discussion:', discussionId);
   // TODO: Implement discussion deletion
 };
 
 const handleDeleteEvent = (eventId: string) => {
-  console.log("Delete event:", eventId);
+  console.log('Delete event:', eventId);
   // TODO: Implement event deletion
 };
 
 const handleDeleteComment = (commentId: string) => {
-  console.log("Delete comment:", commentId);
+  console.log('Delete comment:', commentId);
   // TODO: Implement comment deletion
 };
 </script>
@@ -650,20 +659,21 @@ const handleDeleteComment = (commentId: string) => {
         {{
           `Original ${
             activeIssue?.relatedDiscussionId
-              ? "discussion"
+              ? 'discussion'
               : activeIssue?.relatedEventId
-                ? "event"
-                : "comment"
+                ? 'event'
+                : 'comment'
           }`
         }}
       </h2>
-      <div id="original-post-container" class="border border-gray-200 dark:border-gray-600 rounded-lg px-4 py-2">
+      <div
+        id="original-post-container"
+        class="rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-600"
+      >
         <DiscussionDetails
           v-if="activeIssue?.relatedDiscussionId"
           :active-issue="activeIssue"
-          @fetched-original-author-username="
-            originalAuthorUsername = $event
-          "
+          @fetched-original-author-username="originalAuthorUsername = $event"
         />
         <EventDetail
           v-if="activeIssue?.relatedEventId"
@@ -674,19 +684,13 @@ const handleDeleteComment = (commentId: string) => {
           :show-add-to-calendar="false"
           :show-event-in-past-banner="false"
           :show-title="true"
-          @fetched-original-author-username="
-            originalAuthorUsername = $event
-          "
+          @fetched-original-author-username="originalAuthorUsername = $event"
         />
         <CommentDetails
           v-if="activeIssue?.relatedCommentId"
           :comment-id="activeIssue.relatedCommentId"
-          @fetched-original-author-username="
-            originalAuthorUsername = $event
-          "
-          @fetched-original-mod-profile-name="
-            originalModProfileName = $event
-          "
+          @fetched-original-author-username="originalAuthorUsername = $event"
+          @fetched-original-mod-profile-name="originalModProfileName = $event"
         />
       </div>
     </div>
@@ -754,7 +758,7 @@ const handleDeleteComment = (commentId: string) => {
             @delete-comment="handleDeleteComment"
           />
           <div class="flex w-full flex-col">
-            <h2 v-if="activeIssue" class="text-xl font-bold border-b mt-8 pb-1">
+            <h2 v-if="activeIssue" class="mt-8 border-b pb-1 text-xl font-bold">
               Leave a comment
             </h2>
             <TextEditor
@@ -779,7 +783,10 @@ const handleDeleteComment = (commentId: string) => {
                 :data-testid="'createCommentButton'"
                 :label="'Comment'"
                 :disabled="createFormValues.text.length === 0"
-                :loading="addIssueActivityFeedItemWithCommentAsModLoading || addIssueActivityFeedItemWithCommentAsUserLoading"
+                :loading="
+                  addIssueActivityFeedItemWithCommentAsModLoading ||
+                  addIssueActivityFeedItemWithCommentAsUserLoading
+                "
                 @click.prevent="handleCreateComment"
               />
             </div>

@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
-import type { Issue } from "@/__generated__/graphql";
-import { GET_ISSUES } from "@/graphQLData/issue/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "nuxt/app";
-import ModIssueListItem from "@/components/mod/ModIssueListItem.vue";
+import { computed, ref, watch } from 'vue';
+import type { Issue } from '@/__generated__/graphql';
+import { GET_ISSUES } from '@/graphQLData/issue/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'nuxt/app';
+import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId !== "string") {
-    return "";
+  if (typeof route.params.forumId !== 'string') {
+    return '';
   }
   return route.params.forumId;
 });
@@ -20,28 +20,28 @@ const getDefaultFilter = () => {
   // If there is no query param at all, the default should be true.
   // If the query param is given as false, that overrides that.
 
-  if (route.query.showOnlyServerRuleViolations === "false") {
-    return false
+  if (route.query.showOnlyServerRuleViolations === 'false') {
+    return false;
   }
-  return true
-}
+  return true;
+};
 const showOnlyServerRuleViolations = ref(getDefaultFilter());
 
 const variables = computed(() => {
-  if (showOnlyServerRuleViolations.value){
+  if (showOnlyServerRuleViolations.value) {
     return {
       issueWhere: {
         isOpen: true,
-        flaggedServerRuleViolation: true
-      }
-    }
+        flaggedServerRuleViolation: true,
+      },
+    };
   }
   return {
     issueWhere: {
-      isOpen: true
-    }
-  }
-})
+      isOpen: true,
+    },
+  };
+});
 
 const {
   result: getIssuesResult,
@@ -49,7 +49,7 @@ const {
   loading: getIssuesLoading,
   refetch,
 } = useQuery(GET_ISSUES, variables, {
-  fetchPolicy: "cache-first",
+  fetchPolicy: 'cache-first',
 });
 
 const issues = computed<Issue[]>(() => {
@@ -74,7 +74,7 @@ watch(
   () => {
     if (route.query) {
       showOnlyServerRuleViolations.value =
-        route.query.showOnlyServerRuleViolations === "true";
+        route.query.showOnlyServerRuleViolations === 'true';
       refetch();
     }
   }
@@ -95,7 +95,7 @@ watch(showOnlyServerRuleViolations, () => {
         @change="toggleShowOnlyServerRuleViolations"
         class="mr-2"
         data-testid="show-only-server-rule-violations"
-      >
+      />
       <label for="show-only-server-rule-violations" class="mr-2"
         >Show only server rule violations</label
       >

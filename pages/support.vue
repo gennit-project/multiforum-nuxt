@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import { SEND_BUG_REPORT } from "@/graphQLData/email/mutations";
-import TextEditor from "@/components/TextEditor.vue";
-import TextInput from "@/components/TextInput.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import NotificationComponent from "@/components/NotificationComponent.vue";
-import FormComponent from "@/components/FormComponent.vue";
-import FormRow from "@/components/FormRow.vue";
-import { usernameVar } from "@/cache";
+import { ref, computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import { SEND_BUG_REPORT } from '@/graphQLData/email/mutations';
+import TextEditor from '@/components/TextEditor.vue';
+import TextInput from '@/components/TextInput.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import NotificationComponent from '@/components/NotificationComponent.vue';
+import FormComponent from '@/components/FormComponent.vue';
+import FormRow from '@/components/FormRow.vue';
+import { usernameVar } from '@/cache';
 
 type BugReportFormValues = {
   contactEmail: string;
@@ -18,9 +18,9 @@ type BugReportFormValues = {
 };
 
 const formValues = ref<BugReportFormValues>({
-  contactEmail: "",
-  subject: "",
-  text: "",
+  contactEmail: '',
+  subject: '',
+  text: '',
 });
 
 const {
@@ -36,16 +36,18 @@ onDone(() => {
   showSuccessNotification.value = true;
   // Reset form after successful submission
   formValues.value = {
-    contactEmail: "",
-    subject: "",
-    text: "",
+    contactEmail: '',
+    subject: '',
+    text: '',
   };
 });
 
 const isFormValid = computed(() => {
-  return formValues.value.contactEmail.trim() !== "" &&
-         formValues.value.subject.trim() !== "" &&
-         formValues.value.text.trim() !== "";
+  return (
+    formValues.value.contactEmail.trim() !== '' &&
+    formValues.value.subject.trim() !== '' &&
+    formValues.value.text.trim() !== ''
+  );
 });
 
 const submitBugReport = async () => {
@@ -74,13 +76,14 @@ const updateText = (value: string) => {
 
 <template>
   <NuxtLayout name="default">
-    <div class="bg-white dark:bg-gray-900 dark:text-white min-h-screen">
-      <div class="max-w-4xl mx-auto px-6 lg:px-12 py-8">
+    <div class="min-h-screen bg-white dark:bg-gray-900 dark:text-white">
+      <div class="mx-auto max-w-4xl px-6 py-8 lg:px-12">
         <div class="mb-8">
-          <h1 class="text-2xl font-bold mb-4">Report a Bug</h1>
-          <p class="text-gray-600 dark:text-gray-400 mb-6">
-            Found a bug or have feedback? Let us know! Please provide as much detail as possible, 
-            including screenshots if relevant. We'll get back to you at the email address you provide.
+          <h1 class="mb-4 text-2xl font-bold">Report a Bug</h1>
+          <p class="mb-6 text-gray-600 dark:text-gray-400">
+            Found a bug or have feedback? Let us know! Please provide as much
+            detail as possible, including screenshots if relevant. We'll get
+            back to you at the email address you provide.
           </p>
         </div>
 
@@ -107,7 +110,7 @@ const updateText = (value: string) => {
                   required
                   @update="updateContactEmail"
                 />
-                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+                <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   We'll use this email to respond to your bug report.
                 </p>
               </template>
@@ -124,9 +127,11 @@ const updateText = (value: string) => {
                     required
                     @update="updateSubject"
                   />
-                  
+
                   <div>
-                    <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    <label
+                      class="mb-2 block text-sm font-medium text-gray-700 dark:text-gray-300"
+                    >
                       Description *
                     </label>
                     <TextEditor

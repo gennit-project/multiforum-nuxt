@@ -1,8 +1,8 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "EventTab",
+  name: 'EventTab',
 
   setup() {
     // The main reason I have this component is so the event

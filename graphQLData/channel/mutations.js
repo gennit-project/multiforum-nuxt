@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const CREATE_CHANNEL = gql`
   mutation createChannel($createChannelInput: [ChannelCreateInput!]!) {
@@ -21,10 +21,7 @@ export const CREATE_CHANNEL = gql`
 `;
 
 export const UPDATE_CHANNEL = gql`
-  mutation updateChannel(
-    $where: ChannelWhere
-    $update: ChannelUpdateInput
-  ) {
+  mutation updateChannel($where: ChannelWhere, $update: ChannelUpdateInput) {
     updateChannels(where: $where, update: $update) {
       channels {
         uniqueName
@@ -79,7 +76,10 @@ export const DELETE_CHANNEL = gql`
 
 export const ENABLE_CHANNEL_WIKI = gql`
   mutation enableChannelWiki($uniqueName: String!) {
-    updateChannels(where: { uniqueName: $uniqueName }, update: { wikiEnabled: true }) {
+    updateChannels(
+      where: { uniqueName: $uniqueName }
+      update: { wikiEnabled: true }
+    ) {
       channels {
         uniqueName
         wikiEnabled
@@ -90,7 +90,10 @@ export const ENABLE_CHANNEL_WIKI = gql`
 
 export const DISABLE_CHANNEL_WIKI = gql`
   mutation disableChannelWiki($uniqueName: String!) {
-    updateChannels(where: { uniqueName: $uniqueName }, update: { wikiEnabled: false }) {
+    updateChannels(
+      where: { uniqueName: $uniqueName }
+      update: { wikiEnabled: false }
+    ) {
       channels {
         uniqueName
         wikiEnabled
@@ -130,7 +133,10 @@ export const CREATE_WIKI_PAGE = gql`
 `;
 
 export const UPDATE_WIKI_PAGE = gql`
-  mutation updateWikiPage($where: WikiPageWhere!, $update: WikiPageUpdateInput!) {
+  mutation updateWikiPage(
+    $where: WikiPageWhere!
+    $update: WikiPageUpdateInput!
+  ) {
     updateWikiPages(where: $where, update: $update) {
       wikiPages {
         id
@@ -149,7 +155,10 @@ export const UPDATE_WIKI_PAGE = gql`
 `;
 
 export const CREATE_CHILD_WIKI_PAGE = gql`
-  mutation createChildWikiPage($where: WikiPageWhere!, $update: WikiPageUpdateInput!) {
+  mutation createChildWikiPage(
+    $where: WikiPageWhere!
+    $update: WikiPageUpdateInput!
+  ) {
     updateWikiPages(where: $where, update: $update) {
       wikiPages {
         id

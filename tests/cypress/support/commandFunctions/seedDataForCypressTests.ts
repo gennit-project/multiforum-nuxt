@@ -1,4 +1,4 @@
-import type { SeedDataInput } from "../types";
+import type { SeedDataInput } from '../types';
 
 const seedDataForCypressTests = (input: SeedDataInput) => {
   const {

@@ -1,11 +1,11 @@
 <script lang="ts">
-import type { PropType} from "vue";
-import { defineComponent, computed } from "vue";
-import type { Event as EventData , EventChannel } from "@/__generated__/graphql";
-import { useRoute } from "nuxt/app";
-import { DateTime } from "luxon";
-import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import { relativeTime } from "@/utils";
+import type { PropType } from 'vue';
+import { defineComponent, computed } from 'vue';
+import type { Event as EventData, EventChannel } from '@/__generated__/graphql';
+import { useRoute } from 'nuxt/app';
+import { DateTime } from 'luxon';
+import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
+import { relativeTime } from '@/utils';
 
 export default defineComponent({
   components: {
@@ -33,17 +33,17 @@ export default defineComponent({
     const route = useRoute();
 
     const eventId = computed(() => {
-      if (typeof route.params.eventId === "string") {
+      if (typeof route.params.eventId === 'string') {
         return route.params.eventId;
       }
-      return "";
+      return '';
     });
 
     const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
+      if (typeof route.params.forumId === 'string') {
         return route.params.forumId;
       }
-      return "";
+      return '';
     });
 
     const posterIsAdmin = computed(() => {
@@ -121,24 +121,21 @@ export default defineComponent({
       {{
         `${
           eventData.createdAt
-            ? `posted this event ${relativeTime("" + eventData.createdAt)}`
-            : ""
+            ? `posted this event ${relativeTime('' + eventData.createdAt)}`
+            : ''
         }`
       }}
       <span v-if="eventData.updatedAt"> &#8226; </span>
       {{
         eventData.updatedAt
-          ? `Edited ${relativeTime("" + eventData.updatedAt)}`
-          : ""
+          ? `Edited ${relativeTime('' + eventData.updatedAt)}`
+          : ''
       }}
     </div>
     <div class="time-zone">
       {{ `Time zone: ${getTimeZone(eventData.startTime)}` }}
     </div>
-    <p
-      v-if="!eventData.virtualEventUrl && !eventData.address"
-      class="xs"
-    >
+    <p v-if="!eventData.virtualEventUrl && !eventData.address" class="xs">
       This event won't show in site-wide search results because it doesn't have
       a location or a virtual event URL. It will only appear in forum specific
       search results.

@@ -32,10 +32,7 @@ const emit = defineEmits(['close']);
 const feedbackToEditID = ref('');
 const commentData: Ref<Comment | null> = ref(null);
 
-const {
-  error: getError,
-  onResult,
-} = useQuery(
+const { error: getError, onResult } = useQuery(
   GET_FEEDBACK,
   {
     commentId: props.commentId,
@@ -99,7 +96,6 @@ const updateFeedback = (text: string) => {
 
 const title = 'Edit your feedback';
 const body = '';
-
 </script>
 
 <template>

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import type { PropType } from "vue";
-import { useRoute } from "nuxt/app";
-import { useMutation } from "@vue/apollo-composable";
-import { DateTime } from "luxon";
-import GenericModal from "@/components/GenericModal.vue";
-import FlagIcon from "@/components/icons/FlagIcon.vue";
-import TextEditor from "@/components/TextEditor.vue";
+import { computed, ref } from 'vue';
+import type { PropType } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useMutation } from '@vue/apollo-composable';
+import { DateTime } from 'luxon';
+import GenericModal from '@/components/GenericModal.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
+import TextEditor from '@/components/TextEditor.vue';
 import {
   REPORT_DISCUSSION,
   REPORT_EVENT,
@@ -14,12 +14,12 @@ import {
   ARCHIVE_DISCUSSION,
   ARCHIVE_EVENT,
   ARCHIVE_COMMENT,
-} from "@/graphQLData/issue/mutations";
-import { SUSPEND_USER } from "@/graphQLData/mod/mutations";
-import type { Comment } from "@/__generated__/graphql";
-import SelectBrokenRules from "@/components/admin/SelectBrokenRules.vue";
-import ArchiveBox from "@/components/icons/ArchiveBox.vue";
-import { IS_ORIGINAL_POSTER_SUSPENDED } from "@/graphQLData/mod/queries";
+} from '@/graphQLData/issue/mutations';
+import { SUSPEND_USER } from '@/graphQLData/mod/mutations';
+import type { Comment } from '@/__generated__/graphql';
+import SelectBrokenRules from '@/components/admin/SelectBrokenRules.vue';
+import ArchiveBox from '@/components/icons/ArchiveBox.vue';
+import { IS_ORIGINAL_POSTER_SUSPENDED } from '@/graphQLData/mod/queries';
 
 type FinalCommentTextInput = {
   selectedForumRules: string[];
@@ -31,32 +31,32 @@ const props = defineProps({
   issueId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionTitle: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   eventTitle: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   commentId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   eventId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   comment: {
     type: Object as PropType<Comment | null | undefined>,
@@ -74,12 +74,12 @@ const props = defineProps({
   discussionChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   eventChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   suspendUserEnabled: {
     type: Boolean,
@@ -88,25 +88,25 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  "close",
-  "reportSubmittedSuccessfully",
-  "reportedAndArchivedSuccessfully",
-  "suspended-user-successfully",
-  "suspended-mod-successfully",
+  'close',
+  'reportSubmittedSuccessfully',
+  'reportedAndArchivedSuccessfully',
+  'suspended-user-successfully',
+  'suspended-mod-successfully',
 ]);
 
 const route = useRoute();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const selectedForumRules = ref<string[]>([]);
 const selectedServerRules = ref<string[]>([]);
-const reportText = ref("");
+const reportText = ref('');
 
 // Holds the chosen suspension length if props.suspendUserEnabled is true
-const suspensionLength = ref<"" | "two_weeks" | "one_month" | "indefinite">("");
+const suspensionLength = ref<'' | 'two_weeks' | 'one_month' | 'indefinite'>('');
 
 const toggleForumRuleSelection = (rule: string) => {
   if (selectedForumRules.value.includes(rule)) {
@@ -176,12 +176,12 @@ const {
 } = useMutation(ARCHIVE_DISCUSSION, {
   update: (cache) => {
     if (!props.discussionChannelId) {
-      console.error("No discussion channel ID provided.");
+      console.error('No discussion channel ID provided.');
       return;
     }
     cache.modify({
       id: cache.identify({
-        __typename: "DiscussionChannel",
+        __typename: 'DiscussionChannel',
         id: props.discussionChannelId,
       }),
       fields: {
@@ -201,12 +201,12 @@ const {
 } = useMutation(ARCHIVE_EVENT, {
   update: (cache) => {
     if (!props.eventChannelId) {
-      console.error("No event channel ID provided.");
+      console.error('No event channel ID provided.');
       return;
     }
     cache.modify({
       id: cache.identify({
-        __typename: "EventChannel",
+        __typename: 'EventChannel',
         id: props.eventChannelId,
       }),
       fields: {
@@ -227,7 +227,7 @@ const {
   update: (cache) => {
     cache.modify({
       id: cache.identify({
-        __typename: "Comment",
+        __typename: 'Comment',
         id: props.commentId,
       }),
       fields: {
@@ -240,66 +240,66 @@ const {
 });
 
 reportDiscussionDone(() => {
-  reportText.value = "";
-  emit("reportSubmittedSuccessfully");
+  reportText.value = '';
+  emit('reportSubmittedSuccessfully');
 });
 
 reportEventDone(() => {
-  reportText.value = "";
-  emit("reportSubmittedSuccessfully");
+  reportText.value = '';
+  emit('reportSubmittedSuccessfully');
 });
 
 reportCommentDone(() => {
-  reportText.value = "";
-  emit("reportSubmittedSuccessfully");
+  reportText.value = '';
+  emit('reportSubmittedSuccessfully');
 });
 
 archiveDiscussionDone(() => {
-  emit("reportedAndArchivedSuccessfully");
+  emit('reportedAndArchivedSuccessfully');
 });
 
 archiveEventDone(() => {
-  emit("reportedAndArchivedSuccessfully");
+  emit('reportedAndArchivedSuccessfully');
 });
 
 archiveCommentDone(() => {
-  emit("reportedAndArchivedSuccessfully");
+  emit('reportedAndArchivedSuccessfully');
 });
 
 suspendUserDone(() => {
-  emit("suspended-user-successfully");
+  emit('suspended-user-successfully');
 });
 
 const modalTitle = computed(() => {
   if (props.archiveAfterReporting) {
     if (props.commentId) {
-      return "Archive Comment";
+      return 'Archive Comment';
     } else if (props.discussionId) {
-      return "Archive Discussion";
+      return 'Archive Discussion';
     } else if (props.eventId) {
-      return "Archive Event";
+      return 'Archive Event';
     }
   } else {
     if (props.commentId) {
-      return "Report Comment";
+      return 'Report Comment';
     } else if (props.discussionId) {
-      return "Report Discussion";
+      return 'Report Discussion';
     } else if (props.eventId) {
-      return "Report Event";
+      return 'Report Event';
     }
   }
-  return "Report Content";
+  return 'Report Content';
 });
 
 const contentType = computed(() => {
   if (props.commentId) {
-    return "comment";
+    return 'comment';
   } else if (props.discussionId) {
-    return "discussion";
+    return 'discussion';
   } else if (props.eventId) {
-    return "event";
+    return 'event';
   }
-  return "";
+  return '';
 });
 
 const modalBody = computed(() => {
@@ -307,11 +307,11 @@ const modalBody = computed(() => {
 });
 
 const modalPlaceholder = computed(() => {
-  let contentType = "discussion";
+  let contentType = 'discussion';
   if (props.commentId) {
-    contentType = "comment";
+    contentType = 'comment';
   } else if (props.eventId) {
-    contentType = "event";
+    contentType = 'event';
   }
   return `Explain why this ${contentType} should be removed`;
 });
@@ -324,9 +324,9 @@ ${
     ? `
 Server rule violations:
 
-${selectedForumRules.map((rule) => `- ${rule}`).join("\n")}
+${selectedForumRules.map((rule) => `- ${rule}`).join('\n')}
 `
-    : ""
+    : ''
 }
 
 ${
@@ -334,9 +334,9 @@ ${
     ? `
 Forum rule violations:
 
-${selectedServerRules.map((rule) => `- ${rule}`).join("\n")}
+${selectedServerRules.map((rule) => `- ${rule}`).join('\n')}
 `
-    : ""
+    : ''
 }
 
 ${
@@ -346,20 +346,20 @@ Notes:
 
 ${reportText}
 `
-    : ""
+    : ''
 }
 `;
 };
 const submit = async () => {
   if (!props.discussionId && !props.eventId && !props.commentId) {
-    console.error("No discussion, event, or comment ID provided.");
+    console.error('No discussion, event, or comment ID provided.');
     return;
   }
 
   if (props.suspendUserEnabled) {
     // Require a suspension length
     if (!suspensionLength.value) {
-      console.error("A suspension length is required to suspend the user.");
+      console.error('A suspension length is required to suspend the user.');
       return;
     }
 
@@ -399,7 +399,7 @@ const submit = async () => {
     }
 
     if (!issueId) {
-      console.error("Could not suspend the user without an issue ID.");
+      console.error('Could not suspend the user without an issue ID.');
       return;
     }
 
@@ -408,13 +408,13 @@ const submit = async () => {
     let suspendIndefinitely = false;
 
     switch (suspensionLength.value) {
-      case "two_weeks":
+      case 'two_weeks':
         suspendUntil = DateTime.now().plus({ weeks: 2 }).toISO();
         break;
-      case "one_month":
+      case 'one_month':
         suspendUntil = DateTime.now().plus({ months: 1 }).toISO();
         break;
-      case "indefinite":
+      case 'indefinite':
         suspendIndefinitely = true;
         break;
     }
@@ -488,9 +488,9 @@ const submit = async () => {
 const close = () => {
   selectedForumRules.value = [];
   selectedServerRules.value = [];
-  reportText.value = "";
-  suspensionLength.value = "";
-  emit("close");
+  reportText.value = '';
+  suspensionLength.value = '';
+  emit('close');
 };
 </script>
 
@@ -546,12 +546,12 @@ const close = () => {
       />
       <div v-if="suspendUserEnabled" class="mt-4">
         <label
-          class="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1"
+          class="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-200"
           >Suspend user for</label
         >
         <select
           v-model="suspensionLength"
-          class="block w-60 p-2 border border-gray-300 rounded-md dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600"
+          class="block w-60 rounded-md border border-gray-300 p-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
         >
           <option disabled value="">-- Select --</option>
           <option value="two_weeks">Two Weeks</option>
@@ -559,7 +559,7 @@ const close = () => {
           <option value="indefinite">Indefinite</option>
         </select>
       </div>
-      <h2 class="text-gray-500 dark:text-gray-400 text-sm mt-4">
+      <h2 class="mt-4 text-sm text-gray-500 dark:text-gray-400">
         {{ modalBody }}
       </h2>
       <TextEditor

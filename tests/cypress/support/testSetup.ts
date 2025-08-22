@@ -1,4 +1,4 @@
-import { deleteAll, seedAll } from "../e2e/utils";
+import { deleteAll, seedAll } from '../e2e/utils';
 
 /**
  * Optimized test data management for Cypress tests
@@ -26,7 +26,7 @@ export const setupTestData = () => {
     // Skip login if we're preserving sessions
     cy.log('✅ Using shared test data');
   });
-  
+
   // Clean up after all tests in the file are done
   after(() => {
     cy.log('🧹 Cleaning up test data');
@@ -37,13 +37,18 @@ export const setupTestData = () => {
 /**
  * Login as a user and ensure necessary setup has been done
  * This is more efficient than logging in for each test case
- * 
+ *
  * @param loginMethod - Authentication method to use:
  *   - 'loginWithCreateEventButton' (default) - UI-based login
  *   - 'loginAsAdminWithUISync' - Programmatic login with UI state sync
  *   - 'loginProgrammatically' - Programmatic login with session caching (fastest)
  */
-export const loginUser = (loginMethod: 'loginWithCreateEventButton' | 'loginAsAdminWithUISync' | 'loginProgrammatically' = 'loginWithCreateEventButton') => {
+export const loginUser = (
+  loginMethod:
+    | 'loginWithCreateEventButton'
+    | 'loginAsAdminWithUISync'
+    | 'loginProgrammatically' = 'loginWithCreateEventButton'
+) => {
   beforeEach(() => {
     // Make sure data is initialized even if setupTestData wasn't called
     if (!dataInitialized) {
@@ -52,7 +57,7 @@ export const loginUser = (loginMethod: 'loginWithCreateEventButton' | 'loginAsAd
       seedAll();
       dataInitialized = true;
     }
-    
+
     // Login with the specified method
     cy[loginMethod]();
   });

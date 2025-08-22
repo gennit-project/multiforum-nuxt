@@ -1,16 +1,21 @@
 <script setup lang="ts">
-import { ref, nextTick, computed } from "vue";
-import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
-import ExclamationIcon from "@/components/icons/ExclamationIcon.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import DatePicker from "@/components/event/form/DatePicker.vue";
-import CharCounter from "@/components/CharCounter.vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { DOES_USER_EXIST } from "@/graphQLData/user/queries";
-import { CREATE_EMAIL_AND_USER } from "@/graphQLData/email/mutations";
-import { setUsername, setModProfileName, setIsAuthenticated, setIsLoadingAuth } from "@/cache";
-import { MAX_CHARS_IN_USERNAME } from "@/utils/constants";
+import { ref, nextTick, computed } from 'vue';
+import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
+import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import DatePicker from '@/components/event/form/DatePicker.vue';
+import CharCounter from '@/components/CharCounter.vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import { DOES_USER_EXIST } from '@/graphQLData/user/queries';
+import { CREATE_EMAIL_AND_USER } from '@/graphQLData/email/mutations';
+import {
+  setUsername,
+  setModProfileName,
+  setIsAuthenticated,
+  setIsLoadingAuth,
+} from '@/cache';
+import { MAX_CHARS_IN_USERNAME } from '@/utils/constants';
 
 const props = defineProps({
   email: {
@@ -18,8 +23,8 @@ const props = defineProps({
     required: true,
   },
 });
-const newUsername = ref(props.email?.split("@")[0]);
-const birthday = ref("");
+const newUsername = ref(props.email?.split('@')[0]);
+const birthday = ref('');
 
 const {
   error: getUserError,
@@ -55,27 +60,27 @@ const usernameIsEmpty = computed(() => {
   if (!newUsername.value) {
     return true;
   }
-  return newUsername.value.length === 0
+  return newUsername.value.length === 0;
 });
 
 const isValidUsername = (username: string) => {
-  return /^[a-zA-Z0-9_]+$/.test(username)
-}
+  return /^[a-zA-Z0-9_]+$/.test(username);
+};
 
 const validationErrorMessage = computed(() => {
   if (usernameIsEmpty.value) {
-    return "Username cannot be empty.";
+    return 'Username cannot be empty.';
   }
   if (usernameIsTaken.value) {
-    return "The username is already taken.";
+    return 'The username is already taken.';
   }
   if (usernameIsInvalid.value) {
-    return "Username can only contain letters, numbers, and underscores.";
+    return 'Username can only contain letters, numbers, and underscores.';
   }
   if (newUsername.value.length > MAX_CHARS_IN_USERNAME) {
     return `Username must be less than ${MAX_CHARS_IN_USERNAME} characters.`;
   }
-  return "";
+  return '';
 });
 
 const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value));
@@ -83,22 +88,24 @@ const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value));
 // Age validation logic
 const calculateAge = (birthDate: string): number => {
   if (!birthDate) return 0;
-  
+
   const today = new Date();
   const birth = new Date(birthDate);
   let age = today.getFullYear() - birth.getFullYear();
   const monthDiff = today.getMonth() - birth.getMonth();
-  
+
   if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
     age--;
   }
-  
+
   return age;
 };
 
 const userAge = computed(() => calculateAge(birthday.value));
 
-const birthdayIsEmpty = computed(() => !birthday.value || birthday.value.length === 0);
+const birthdayIsEmpty = computed(
+  () => !birthday.value || birthday.value.length === 0
+);
 
 const isUnderAge = computed(() => {
   if (birthdayIsEmpty.value) return false;
@@ -107,19 +114,20 @@ const isUnderAge = computed(() => {
 
 const birthdayValidationMessage = computed(() => {
   if (birthdayIsEmpty.value) {
-    return "Birthday is required.";
+    return 'Birthday is required.';
   }
   if (isUnderAge.value) {
-    return "You must be at least 13 years old to create an account.";
+    return 'You must be at least 13 years old to create an account.';
   }
-  return "";
+  return '';
 });
 
 const confirmedAvailable = computed(
-  () => !usernameIsTaken.value && !usernameIsEmpty.value && !usernameIsInvalid.value
+  () =>
+    !usernameIsTaken.value && !usernameIsEmpty.value && !usernameIsInvalid.value
 );
 
-const emit = defineEmits(["emailAndUserCreated"]);
+const emit = defineEmits(['emailAndUserCreated']);
 
 onEmailAndUserCreated((result) => {
   const user = result.data.createEmailAndUser;
@@ -130,10 +138,10 @@ onEmailAndUserCreated((result) => {
 
     if (username) {
       setUsername(username);
-      
+
       // Store username in localStorage for persistence
       localStorage.setItem('username', username);
-      
+
       // Set the flag to prevent unnecessary checks
       sessionStorage.setItem('hasCheckedUsername', 'true');
     }
@@ -145,7 +153,7 @@ onEmailAndUserCreated((result) => {
     setIsAuthenticated(true);
     setIsLoadingAuth(false);
 
-    emit("emailAndUserCreated");
+    emit('emailAndUserCreated');
   }
 });
 
@@ -185,17 +193,16 @@ const canSave = computed(() => {
 
   return true;
 });
-
-
 </script>
 
 <template>
   <div>
     <div class="my-4 h-72 px-10 py-6">
-      <h1 class="my-8 flex justify-center text-xl">
-        Create Username
-      </h1>
-      <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+      <h1 class="my-8 flex justify-center text-xl">Create Username</h1>
+      <label
+        for="username"
+        class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+      >
         Username
       </label>
       <div class="relative mt-1 flex rounded-full shadow-sm">
@@ -210,8 +217,11 @@ const canSave = computed(() => {
           ]"
           class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
           @update:model-value="updateUsername"
+        />
+        <div
+          v-if="usernameIsTaken || usernameIsInvalid"
+          class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
         >
-        <div v-if="usernameIsTaken || usernameIsInvalid" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
           <ExclamationIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
         </div>
       </div>
@@ -227,7 +237,10 @@ const canSave = computed(() => {
         />
         <div v-if="confirmedAvailable" class="flex items-start">
           <div class="flex-shrink-0">
-            <CheckCircleIcon class="mr-2 h-6 w-6 text-green-400" aria-hidden="true" />
+            <CheckCircleIcon
+              class="mr-2 h-6 w-6 text-green-400"
+              aria-hidden="true"
+            />
           </div>
           <p class="mt-1 text-sm text-gray-500 dark:text-gray-200">
             This username is available
@@ -237,7 +250,10 @@ const canSave = computed(() => {
 
       <!-- Birthday Field -->
       <div class="mt-6">
-        <label for="birthday" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          for="birthday"
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Birthday
         </label>
         <div class="relative mt-1 flex rounded-full shadow-sm">
@@ -246,7 +262,10 @@ const canSave = computed(() => {
             test-id="birthday-picker"
             @update="updateBirthday"
           />
-          <div v-if="isUnderAge" class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+          <div
+            v-if="isUnderAge"
+            class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
+          >
             <ExclamationIcon class="h-5 w-5 text-red-500" aria-hidden="true" />
           </div>
         </div>
@@ -265,10 +284,12 @@ const canSave = computed(() => {
         :loading="createEmailAndUserLoading"
         @click="createEmailAndUser"
       />
-      <p v-if="createEmailAndUserLoading">
-        Loading...
-      </p>
+      <p v-if="createEmailAndUserLoading">Loading...</p>
     </div>
-    <ErrorBanner v-if="createEmailAndUserError" class="mx-auto my-3 max-w-5xl" :text="createEmailAndUserError.message" />
+    <ErrorBanner
+      v-if="createEmailAndUserError"
+      class="mx-auto my-3 max-w-5xl"
+      :text="createEmailAndUserError.message"
+    />
   </div>
 </template>

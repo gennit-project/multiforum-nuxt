@@ -4,12 +4,12 @@ import { useRouter } from 'nuxt/app';
 const props = defineProps({
   to: {
     type: String,
-    required: true
+    required: true,
   },
   label: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const router = useRouter();

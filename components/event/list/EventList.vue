@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import EventListItem from "./EventListItem.vue";
-import LoadMore from "../../LoadMore.vue";
-import { useRoute, useRouter } from "nuxt/app";
-import type { Event } from "@/__generated__/graphql";
-import { sideNavIsOpenVar } from "@/cache";
-import type { PropType } from "vue";
+import { computed } from 'vue';
+import EventListItem from './EventListItem.vue';
+import LoadMore from '../../LoadMore.vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import type { Event } from '@/__generated__/graphql';
+import { sideNavIsOpenVar } from '@/cache';
+import type { PropType } from 'vue';
 
 const props = defineProps({
   highlightedEventLocationId: {
     type: String,
-    default: "",
+    default: '',
   },
   highlightedEventId: {
     type: String,
-    default: "",
+    default: '',
   },
   events: {
     type: Array as PropType<Event[]>,
@@ -42,61 +42,61 @@ const props = defineProps({
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
 const emit = defineEmits([
-  "filterByTag",
-  "filterByChannel",
-  "highlightEvent",
-  "unhighlight",
-  "openPreview",
-  "loadMore",
+  'filterByTag',
+  'filterByChannel',
+  'highlightEvent',
+  'unhighlight',
+  'openPreview',
+  'loadMore',
 ]);
 
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const createEventLink = computed(() => {
   if (channelId.value) {
     return `/forums/${channelId.value}/events/create`;
   }
-  return "/events/create";
+  return '/events/create';
 });
 
 const filterByTag = (tag: string) => {
-  emit("filterByTag", tag);
+  emit('filterByTag', tag);
 };
 
 const filterByChannel = (channel: string) => {
-  emit("filterByChannel", channel);
+  emit('filterByChannel', channel);
 };
 
 const getEventLocationId = (event: Event) => {
   if (event.location) {
     return (
-      (event.location.latitude.toString() || "") +
-      (event.location?.longitude.toString() || "")
+      (event.location.latitude.toString() || '') +
+      (event.location?.longitude.toString() || '')
     );
   }
-  return "no_location";
+  return 'no_location';
 };
 
 const handleClickEventListItem = (event: Event) => {
   if (props.showMap) {
-    emit("openPreview", event.id);
+    emit('openPreview', event.id);
   } else {
     if (channelId.value) {
       return router.push({
-        name: "forums-forumId-events-eventId",
+        name: 'forums-forumId-events-eventId',
         params: {
           eventId: event.id,
           forumId: channelId.value,
@@ -104,7 +104,7 @@ const handleClickEventListItem = (event: Event) => {
       });
     }
     return router.push({
-      name: "forums-forumId-events-eventId",
+      name: 'forums-forumId-events-eventId',
       params: {
         eventId: event.id,
         forumId: event.EventChannels[0].channelUniqueName,
@@ -115,13 +115,13 @@ const handleClickEventListItem = (event: Event) => {
 
 const onMouseOverEventListItem = (event: Event) => {
   if (props.showMap) {
-    emit("highlightEvent", getEventLocationId(event), event.id, event);
+    emit('highlightEvent', getEventLocationId(event), event.id, event);
   }
 };
 
 const onMouseLeaveEventListItem = () => {
   if (props.showMap) {
-    emit("unhighlight");
+    emit('unhighlight');
   }
 };
 </script>
@@ -144,7 +144,7 @@ const onMouseLeaveEventListItem = () => {
       v-if="events.length > 0"
       role="list"
       :class="[
-        'bg-white dark:bg-black ml-0 mb-4 flex flex-col gap-2 divide-y divide-gray-200 dark:divide-gray-600',
+        'mb-4 ml-0 flex flex-col gap-2 divide-y divide-gray-200 bg-white dark:divide-gray-600 dark:bg-black',
         { 'pointer-events-none': sideNavIsOpenVar },
       ]"
       data-testid="event-list"
@@ -161,7 +161,8 @@ const onMouseLeaveEventListItem = () => {
         :show-detail-link="!showMap"
         :class="[
           event.id === highlightedEventId ||
-          (!highlightedEventId && highlightedEventLocationId === getEventLocationId(event))
+          (!highlightedEventId &&
+            highlightedEventLocationId === getEventLocationId(event))
             ? 'bg-gray-200 dark:bg-gray-700'
             : '',
         ]"
@@ -171,12 +172,21 @@ const onMouseLeaveEventListItem = () => {
         @clicked-event-list-item="handleClickEventListItem(event)"
         @filter-by-tag="filterByTag"
         @filter-by-channel="filterByChannel"
-        @open-preview="() => {
-          emit('highlightEvent', getEventLocationId(event), event.id, event, false, true);
-          $nextTick(() => {
-            $emit('openPreview')            
-          });
-        }"
+        @open-preview="
+          () => {
+            emit(
+              'highlightEvent',
+              getEventLocationId(event),
+              event.id,
+              event,
+              false,
+              true
+            );
+            $nextTick(() => {
+              $emit('openPreview');
+            });
+          }
+        "
       />
     </ul>
 

@@ -26,20 +26,19 @@ const props = defineProps({
 // Emits definition
 const emit = defineEmits(['setSelectedChannels']);
 
-const searchQuery = ref("");
+const searchQuery = ref('');
 
-const {
-  loading: channelsLoading,
-  result: channelsResult,
-} = useQuery(
+const { loading: channelsLoading, result: channelsResult } = useQuery(
   GET_CHANNEL_NAMES,
   computed(() => ({
     channelWhere: {
-      uniqueName_MATCHES: searchQuery.value ? `(?i).*${searchQuery.value}.*` : ".*",
+      uniqueName_MATCHES: searchQuery.value
+        ? `(?i).*${searchQuery.value}.*`
+        : '.*',
     },
   })),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -50,13 +49,15 @@ const channelOptions = computed<MultiSelectOption[]>(() => {
     label: channel.displayName || channel.uniqueName,
     avatar: channel.channelIconURL || '',
   }));
-  
+
   // Always include selected channels in options, even if they don't match current search
   // This ensures selected chips can always be displayed
-  const existingChannelValues = new Set(mappedChannels.map((ch: any) => ch.value));
-  
+  const existingChannelValues = new Set(
+    mappedChannels.map((ch: any) => ch.value)
+  );
+
   // Add any selected channels that aren't in the current search results
-  (props.selectedChannels || []).forEach(selectedValue => {
+  (props.selectedChannels || []).forEach((selectedValue) => {
     if (!existingChannelValues.has(selectedValue)) {
       // Create a basic option for the selected channel that's not in current results
       mappedChannels.push({
@@ -66,7 +67,7 @@ const channelOptions = computed<MultiSelectOption[]>(() => {
       });
     }
   });
-  
+
   return mappedChannels;
 });
 

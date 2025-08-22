@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import type { PropType } from "vue";
-import type { TextVersion } from "@/__generated__/graphql";
-import GenericModal from "@/components/GenericModal.vue";
-import * as DiffMatchPatch from "diff-match-patch";
-import { useMutation } from "@vue/apollo-composable";
-import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
+import { computed, ref } from 'vue';
+import type { PropType } from 'vue';
+import type { TextVersion } from '@/__generated__/graphql';
+import GenericModal from '@/components/GenericModal.vue';
+import * as DiffMatchPatch from 'diff-match-patch';
+import { useMutation } from '@vue/apollo-composable';
+import { DELETE_TEXT_VERSION } from '@/graphQLData/discussion/mutations';
 
 // Define the version data structure that can include current version data
 interface VersionData {
@@ -42,121 +42,139 @@ const emit = defineEmits<{
   deleted: [deletedId: string];
 }>();
 
-  // Deletion state
-  const isDeleting = ref(false);
+// Deletion state
+const isDeleting = ref(false);
 
-  const oldVersionUsername = computed(() => {
-    const author = props.oldVersion.Author;
-    return (author && 'username' in author && author.username) ? author.username : "[Deleted]";
+const oldVersionUsername = computed(() => {
+  const author = props.oldVersion.Author;
+  return author && 'username' in author && author.username
+    ? author.username
+    : '[Deleted]';
+});
+
+const newVersionUsername = computed(() => {
+  const author = props.newVersion.Author;
+  return author && 'username' in author && author.username
+    ? author.username
+    : '[Deleted]';
+});
+
+const oldVersionDate = computed(() => {
+  return new Date(props.oldVersion.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
+});
 
-  const newVersionUsername = computed(() => {
-    const author = props.newVersion.Author;
-    return (author && 'username' in author && author.username) ? author.username : "[Deleted]";
+const newVersionDate = computed(() => {
+  return new Date(props.newVersion.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
+});
 
-  const oldVersionDate = computed(() => {
-    return new Date(props.oldVersion.createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-    });
-  });
+const oldContent = computed(
+  () =>
+    props.oldVersion.body ||
+    ('title' in props.oldVersion ? props.oldVersion.title : '') ||
+    ''
+);
+const newContent = computed(
+  () =>
+    props.newVersion.body ||
+    ('title' in props.newVersion ? props.newVersion.title : '') ||
+    ''
+);
 
-  const newVersionDate = computed(() => {
-    return new Date(props.newVersion.createdAt).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "numeric",
-      minute: "numeric",
-    });
-  });
+// Computed property that generates the diff HTML
+const diffHtml = computed(() => {
+  const dmp = new DiffMatchPatch.diff_match_patch();
+  const diffs = dmp.diff_main(oldContent.value, newContent.value);
+  dmp.diff_cleanupSemantic(diffs);
 
-  const oldContent = computed(() => props.oldVersion.body || ('title' in props.oldVersion ? props.oldVersion.title : "") || "");
-  const newContent = computed(() => props.newVersion.body || ('title' in props.newVersion ? props.newVersion.title : "") || "");
+  // Create highlighted HTML for both sides
+  let leftHtml = '';
+  let rightHtml = '';
 
-  // Computed property that generates the diff HTML
-  const diffHtml = computed(() => {
-    const dmp = new DiffMatchPatch.diff_match_patch();
-    const diffs = dmp.diff_main(oldContent.value, newContent.value);
-    dmp.diff_cleanupSemantic(diffs);
+  diffs.forEach((diff) => {
+    const [operation, text] = diff;
+    const escapedText = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
 
-    // Create highlighted HTML for both sides
-    let leftHtml = "";
-    let rightHtml = "";
-
-    diffs.forEach((diff) => {
-      const [operation, text] = diff;
-      const escapedText = text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/\n/g, "<br>");
-
-      // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
-      if (operation === -1) {
-        // Deletion - show in left column with red background
-        leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-100">${escapedText}</span>`;
-      } else if (operation === 1) {
-        // Insertion - show in right column with green background
-        rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-100">${escapedText}</span>`;
-      } else {
-        // Equal - show in both columns
-        leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
-        rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
-      }
-    });
-
-    return {
-      left: leftHtml,
-      right: rightHtml,
-    };
-  });
-
-  // Set up delete mutation with dynamic variables
-  const {
-    mutate: deleteTextVersion,
-    loading,
-    error,
-    onDone,
-  } = useMutation(DELETE_TEXT_VERSION, {
-    // Don't set variables here, as they won't update if props change
-    update: (cache, { data }) => {
-      if (data?.deleteTextVersions?.nodesDeleted) {
-        // Clear cache for this revision
-        cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
-        cache.gc();
-      }
-    },
-  });
-
-  const handleDelete = async () => {
-    if (confirm("Are you sure you want to delete this revision? This action cannot be undone.")) {
-      isDeleting.value = true;
-      try {
-        // Pass variables at call time to ensure we use the current props value
-        await deleteTextVersion({
-          id: props.oldVersion.id,
-        });
-      } catch {
-        isDeleting.value = false;
-        // Error will be handled by the error ref from useMutation
-      }
+    // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
+    if (operation === -1) {
+      // Deletion - show in left column with red background
+      leftHtml += `<span class="bg-red-500/20 text-red-800 dark:bg-red-500/30 dark:text-red-100">${escapedText}</span>`;
+    } else if (operation === 1) {
+      // Insertion - show in right column with green background
+      rightHtml += `<span class="bg-green-500/20 text-green-800 dark:bg-green-500/30 dark:text-green-100">${escapedText}</span>`;
+    } else {
+      // Equal - show in both columns
+      leftHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
+      rightHtml += `<span class="dark:text-gray-200">${escapedText}</span>`;
     }
-  };
-
-  onDone(() => {
-    isDeleting.value = false;
-    emit("deleted", props.oldVersion.id);
-    emit("close");
   });
 
-  const handleClose = () => {
-    emit("close");
+  return {
+    left: leftHtml,
+    right: rightHtml,
   };
+});
+
+// Set up delete mutation with dynamic variables
+const {
+  mutate: deleteTextVersion,
+  loading,
+  error,
+  onDone,
+} = useMutation(DELETE_TEXT_VERSION, {
+  // Don't set variables here, as they won't update if props change
+  update: (cache, { data }) => {
+    if (data?.deleteTextVersions?.nodesDeleted) {
+      // Clear cache for this revision
+      cache.evict({ id: `TextVersion:${props.oldVersion.id}` });
+      cache.gc();
+    }
+  },
+});
+
+const handleDelete = async () => {
+  if (
+    confirm(
+      'Are you sure you want to delete this revision? This action cannot be undone.'
+    )
+  ) {
+    isDeleting.value = true;
+    try {
+      // Pass variables at call time to ensure we use the current props value
+      await deleteTextVersion({
+        id: props.oldVersion.id,
+      });
+    } catch {
+      isDeleting.value = false;
+      // Error will be handled by the error ref from useMutation
+    }
+  }
+};
+
+onDone(() => {
+  isDeleting.value = false;
+  emit('deleted', props.oldVersion.id);
+  emit('close');
+});
+
+const handleClose = () => {
+  emit('close');
+};
 </script>
 
 <template>
@@ -172,7 +190,9 @@ const emit = defineEmits<{
     @primary-button-click="handleDelete"
   >
     <template #icon>
-      <i class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"></i>
+      <i
+        class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"
+      ></i>
     </template>
     <template #content>
       <div class="flex flex-col gap-4">
@@ -206,7 +226,9 @@ const emit = defineEmits<{
             <div
               class="flex-1 rounded-t-md border-b bg-red-500/10 p-4 dark:border-gray-700 dark:bg-red-500/20 md:rounded-l-md md:rounded-tr-none md:border-b-0 md:border-r"
             >
-              <h3 class="mb-2 text-sm font-medium text-red-700 dark:text-red-200">
+              <h3
+                class="mb-2 text-sm font-medium text-red-700 dark:text-red-200"
+              >
                 Previous Version
               </h3>
               <div
@@ -221,7 +243,9 @@ const emit = defineEmits<{
             <div
               class="flex-1 rounded-b-md bg-green-500/10 p-4 dark:bg-green-500/20 md:rounded-r-md md:rounded-bl-none"
             >
-              <h3 class="mb-2 text-sm font-medium text-green-700 dark:text-green-200">
+              <h3
+                class="mb-2 text-sm font-medium text-green-700 dark:text-green-200"
+              >
                 Current Version
               </h3>
               <div
@@ -238,11 +262,15 @@ const emit = defineEmits<{
             class="mt-4 flex flex-wrap justify-center gap-4 border-t p-2 text-xs text-gray-500 dark:border-gray-700 dark:text-gray-400"
           >
             <span class="flex items-center">
-              <span class="mr-1 inline-block h-3 w-3 bg-red-500/20 dark:bg-red-500/30"></span>
+              <span
+                class="mr-1 inline-block h-3 w-3 bg-red-500/20 dark:bg-red-500/30"
+              ></span>
               Removed content
             </span>
             <span class="flex items-center">
-              <span class="mr-1 inline-block h-3 w-3 bg-green-500/20 dark:bg-green-500/30"></span>
+              <span
+                class="mr-1 inline-block h-3 w-3 bg-green-500/20 dark:bg-green-500/30"
+              ></span>
               Added content
             </span>
           </div>

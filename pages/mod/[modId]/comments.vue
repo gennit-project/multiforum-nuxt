@@ -1,21 +1,18 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import { GET_MOD, GET_MOD_COMMENTS } from "@/graphQLData/mod/queries";
-import Comment from "@/components/comments/Comment.vue";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import { GET_MOD, GET_MOD_COMMENTS } from '@/graphQLData/mod/queries';
+import Comment from '@/components/comments/Comment.vue';
 
 const PAGE_LIMIT = 25;
 
 const route = useRoute();
 const modProfileName = computed(() => {
-  return typeof route.params.modId === "string" ? route.params.modId : "";
+  return typeof route.params.modId === 'string' ? route.params.modId : '';
 });
 
-const { 
-  result: modResult, 
-  error: getModError
-} = useQuery(GET_MOD, () => ({
+const { result: modResult, error: getModError } = useQuery(GET_MOD, () => ({
   displayName: modProfileName.value,
 }));
 
@@ -42,7 +39,7 @@ const {
     offset: 0,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -73,7 +70,9 @@ const loadMore = () => {
 };
 
 const commentCount = computed(() => {
-  return commentResult.value?.moderationProfiles[0]?.AuthoredComments?.length || 0;
+  return (
+    commentResult.value?.moderationProfiles[0]?.AuthoredComments?.length || 0
+  );
 });
 
 const comments = computed(() => {

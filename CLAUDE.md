@@ -1,6 +1,7 @@
 # Multiforum Development Guide
 
 ## Build & Run Commands
+
 - `npm run dev` - Start development server
 - `npm run build` - Build for production
 - `npm run test` - Open Cypress test runner
@@ -11,46 +12,53 @@
 - `npx eslint --fix path/to/file.vue` - Fix linting issues
 
 ## Cypress Testing (E2E)
+
 - Use `setupTestData()` from `support/testSetup.ts` to initialize data once per test file
 - Use `loginUser()` to handle authentication for tests that need it
 - Avoid multiple database resets with `beforeEach` - use shared test data when possible
 
 ### Cypress Test Optimizations
+
 - **Replace arbitrary timeouts with network waits**:
+
   ```javascript
   // Before: Fixed timeout that might be too short or too long
-  cy.get("button").contains("Save").click().wait(3000);
-  
+  cy.get('button').contains('Save').click().wait(3000);
+
   // After: Wait for the actual network request to complete
   cy.intercept('POST', '**/graphql').as('graphqlRequest');
-  cy.get("button").contains("Save").click();
+  cy.get('button').contains('Save').click();
   cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
   ```
 
 - **Validate network responses**: Add status code checks to ensure operations completed successfully
+
   ```javascript
   cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
   ```
 
 - **Intercept specific GraphQL operations** by pattern-matching on the request body:
+
   ```javascript
   // Match specific GraphQL operations
   cy.intercept('POST', '**/graphql', (req) => {
     if (req.body.query.includes('createDiscussion')) {
-      req.alias = 'createDiscussionRequest'
+      req.alias = 'createDiscussionRequest';
     }
   });
-  
+
   // Later in the test
   cy.wait('@createDiscussionRequest');
   ```
 
 ## Vitest Testing (Unit)
+
 - Unit tests are located in `tests/unit` directory
 - Run all unit tests with `npm run test:unit`
 - Run specific tests with `npm run test:unit -- --run tests/unit/path/to/test.spec.ts`
 
 ### Unit Test Best Practices
+
 - **Test Real Code, Not Mocks**: Ensure tests verify actual application code rather than reimplementing logic in test files
   - Extract component logic into utility files when appropriate for better testability
   - Import and test the actual functions from your codebase rather than creating test-only implementations
@@ -69,6 +77,7 @@
   - Test both success and failure paths
 
 ## Pre-commit Workflow
+
 - TypeScript type checking and unit tests run automatically before each commit
 - The pre-commit hook runs the `verify` command which includes:
   - TypeScript type checking (`npm run tsc`)
@@ -79,6 +88,7 @@
 - To skip pre-commit hooks temporarily: `git commit --no-verify`
 
 ## Code Style Guidelines
+
 - **TypeScript**: Use strict typing whenever possible, proper interfaces in `types/` directory
   - **Import GraphQL Types**: When fixing TypeScript errors, prefer importing proper types from `@/__generated__/graphql` over using `any`
   - **Examples**: Use `User`, `Comment`, `Discussion`, `Event`, `Revision`, `TextVersion` etc. from the generated GraphQL schema
@@ -88,10 +98,11 @@
 ### Common TypeScript Patterns and Fixes
 
 - **GraphQL Type Completion**: When creating objects that match GraphQL types, ensure all required properties are included
+
   ```typescript
   // Example: TextVersion requires AuthorConnection
   const textVersion: TextVersion = {
-    id: "current",
+    id: 'current',
     body: content,
     createdAt: new Date().toISOString(),
     Author: user,
@@ -104,40 +115,45 @@
   ```
 
 - **Vue Router Type Safety**: Use proper route object structure for navigation
+
   ```typescript
   // Avoid: path property may not be compatible with router types
-  routeAndClose({ path: '/account_settings' })
-  
+  routeAndClose({ path: '/account_settings' });
+
   // Prefer: use name-based routing
-  routeAndClose({ name: 'account_settings' })
+  routeAndClose({ name: 'account_settings' });
   ```
 
 - **Error Type Handling**: GraphQL error objects may have inferred types as `never` in some contexts
+
   ```typescript
   // Cast to access message property when TypeScript can't infer the error type
   :text="(getCommentError as any)?.message || 'Error loading comment'"
   ```
 
 - **Form Value Types**: Ensure form default values match the expected type interface completely
+
   ```typescript
   // If CreateEditChannelFormValues includes eventsEnabled and feedbackEnabled
   const defaultValues = {
     // ... other properties
-    eventsEnabled: true,    // Don't forget these!
+    eventsEnabled: true, // Don't forget these!
     feedbackEnabled: true,
   };
   ```
 
 - **Nuxt Page Meta**: Use proper placement and TypeScript handling
+
   ```typescript
   // Place at top of script setup block with TypeScript ignore
   // @ts-ignore - definePageMeta is auto-imported by Nuxt
   definePageMeta({
-    middleware: 'some-middleware'
-  })
+    middleware: 'some-middleware',
+  });
   ```
 
 - **GraphQL Query Imports**: When refactoring queries, check that exports exist in the target file
+
   ```typescript
   // Before using GET_MOD_SUSPENSION, verify it exists in the queries file
   // If not available, find similar queries like GET_SUSPENDED_MODS_BY_CHANNEL
@@ -150,10 +166,11 @@
   :new-version="activeRevision.newVersionData || {}"
   ```
 - **Function Parameters**: For functions with more than one parameter, use a typed object instead of positional arguments
+
   ```typescript
   // Avoid:
   function updateUser(id: string, name: string, email: string) { ... }
-  
+
   // Prefer:
   type UpdateUserParams = {
     id: string;
@@ -162,6 +179,7 @@
   };
   function updateUser(params: UpdateUserParams) { ... }
   ```
+
 - **Vue Components**: Use script setup API with TypeScript and properly typed props/emits
 - **Error Handling**: Use try/catch with specific error types, validate GraphQL responses
 - **Naming**: camelCase for variables/functions, PascalCase for components/interfaces
@@ -169,13 +187,14 @@
 - **Testing**: Each feature requires Cypress tests, seed data before tests and clean up after
 - **CSS**: Use Tailwind utility classes, dark mode compatible with `dark:` prefix
 - **Composables**: Extract reusable logic into composables under `composables/` directory
-- **Reactivity and Watchers**: 
+- **Reactivity and Watchers**:
   - Avoid unnecessary watchers. Use Vue's built-in reactivity system (props, computed, refs) whenever possible
   - Use watchers only when absolutely necessary (e.g., for router param changes or external API calls)
   - When a component needs to react to prop changes, handle this through the component lifecycle or computed properties, not watchers
   - For individual item state that doesn't need to be shared, use local `ref` variables instead of Pinia store state
 
 ## Cypress Testing Guidelines
+
 - **Always use URL constants**: Never use relative URLs like `cy.visit('/')` in tests
   - Use the constants defined in `tests/cypress/e2e/constants.ts` for all URLs
   - Example: `cy.visit(DISCUSSION_LIST)` instead of `cy.visit('/')`
@@ -194,19 +213,19 @@
 For tests that need authentication, use this pattern for reliable programmatic authentication:
 
 ```typescript
-it("should test authenticated functionality", () => {
+it('should test authenticated functionality', () => {
   // Set up GraphQL interceptions first
   cy.intercept('POST', '**/graphql').as('graphqlRequest');
-  
+
   // Visit the page first to load auth functions
   cy.visit(YOUR_PAGE_URL);
-  
+
   // Set the auth token programmatically
   cy.loginAsAdmin();
-  
+
   // Wait for page to fully load and auth functions to be available
   cy.wait(1000);
-  
+
   // Manually sync the reactive auth state
   cy.window().then((win) => {
     const testWin = win as any;
@@ -217,15 +236,16 @@ it("should test authenticated functionality", () => {
       console.log('Auth sync functions not available yet');
     }
   });
-  
+
   // Verify authentication is complete
   cy.window().its('localStorage').invoke('getItem', 'token').should('exist');
-  
+
   // Continue with your test...
 });
 ```
 
 **Key Points:**
+
 - **Do NOT use `cy.loginAsAdminWithUISync()`** - it has timing issues and visits different pages
 - **Visit your target page first** - this loads the `useTestAuth` composable and auth sync functions
 - **Use `cy.loginAsAdmin()` to set the token** - this only sets localStorage, not reactive state
@@ -234,12 +254,14 @@ it("should test authenticated functionality", () => {
 - **Always verify token exists** - ensures the auth setup worked
 
 **Why this pattern works:**
+
 1. The `useTestAuth` composable is loaded by the default layout on every page
 2. It exposes `__SET_AUTH_STATE_DIRECT__` function on the window object
 3. This function directly updates `isAuthenticatedVar` and other reactive auth state
 4. The UI immediately reflects the authenticated state without needing page refreshes
 
 **Update existing tests:**
+
 - Replace UI-based authentication (`loginUser()`) with this programmatic pattern
 - Replace `cy.loginAsAdminWithUISync()` calls with this manual approach
 - This pattern is faster and more reliable than UI-based authentication
@@ -254,10 +276,12 @@ The application has two separate but related permission systems:
 ### User Permission Levels
 
 1. **Standard Users**:
+
    - Use the DefaultChannelRole for the channel (or DefaultServerRole as fallback)
    - Have permissions like createDiscussion, createComment, upvoteContent, etc.
 
 2. **Channel Admins/Owners**:
+
    - Users in the `Channel.Admins` list
    - Have all user and moderator permissions automatically
 
@@ -268,12 +292,14 @@ The application has two separate but related permission systems:
 ### Moderator Permission Levels
 
 1. **Standard/Normal Moderators**:
+
    - All authenticated users are considered standard moderators by default
    - Not explicitly included in `Channel.Moderators` list, not in `Channel.SuspendedMods`
    - Can perform basic moderation actions (report, give feedback) based on DefaultModRole
    - These permissions are controlled by the DefaultModRole configuration
 
 2. **Elevated Moderators**:
+
    - Explicitly included in the `Channel.Moderators` list
    - Have additional permissions beyond standard moderators
    - Can typically archive content, manage other moderators, etc.
@@ -289,13 +315,12 @@ The application has two separate but related permission systems:
 - **Role Determination**:
   - User roles are determined by admin/owner status and suspension status
   - Mod roles are determined by presence in Moderators or SuspendedMods lists
-  
 - **Permission Flow**:
   - Channel-specific roles take precedence over server-wide defaults
   - Channel owners/admins bypass all permission checks (both user and mod)
   - Suspended status overrides all other status for that permission type
-  
 - **Fallback Chain**:
+
   - Channel-specific roles -> Server default roles -> Deny access
 
 - **User vs. Mod Actions**:
@@ -319,18 +344,22 @@ The application has two separate but related permission systems:
 Any UI component should respect the permissions provided by these roles without adding additional restrictions.
 
 ### Common Issues
+
 - The moderator menus in headers (Discussion/Event/Comment) should show the "Give Feedback" and "Report" options for standard moderators
 - The "Moderation Actions" menu section should appear for any user who has at least one moderation permission
 - Ensure menu items are generated correctly in each header component by checking for specific permissions, not just moderator status
 
 ### Testing Moderator Permissions
+
 When testing moderator permissions:
+
 - Make sure the test user has the expected permission level
 - Check that appropriate UI elements appear based on permission level
 - Verify that unprivileged users don't see moderation options
 - Test that suspended moderators can't access moderation features
 
 ## Project Structure
+
 - Components in `components/` directory with subdirectories for features
 - Pages in `pages/` directory matching route structure
 - GraphQL queries/mutations in `graphQLData/` by domain
@@ -342,6 +371,7 @@ When testing moderator permissions:
 - **Downloads**: There is no separate Download type. Downloads are discussions with the `hasDownload` field set to true. They use the Discussion type and are displayed with a different frontend skin in download-specific components.
 
 ## Working with Claude
+
 - **Incremental Changes**: Make small, focused changes rather than large sweeping changes
   - Work on one test file at a time rather than multiple tests at once
   - Fix specific issues incrementally rather than rewriting multiple files

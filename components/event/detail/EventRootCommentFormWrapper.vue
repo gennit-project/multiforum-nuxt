@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRoute } from "nuxt/app";
-import type { PropType } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
-import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
-import { GET_EVENT_COMMENTS } from "@/graphQLData/comment/queries";
-import { GET_USER } from "@/graphQLData/user/queries";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import type { Event, CommentCreateInput } from "@/__generated__/graphql";
-import type { CreateEditCommentFormValues } from "@/types/Comment";
-import { usernameVar } from "@/cache";
+import { ref, computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import type { PropType } from 'vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.vue';
+import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
+import { GET_EVENT_COMMENTS } from '@/graphQLData/comment/queries';
+import { GET_USER } from '@/graphQLData/user/queries';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import type { Event, CommentCreateInput } from '@/__generated__/graphql';
+import type { CreateEditCommentFormValues } from '@/types/Comment';
+import { usernameVar } from '@/cache';
 
 const COMMENT_LIMIT = 50;
 const props = defineProps({
@@ -24,33 +24,36 @@ const props = defineProps({
     type: Number,
     required: true,
   },
-  
 });
 const route = useRoute();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 // Query for user data to get notification preferences
-const {
-  result: getUserResult,
-} = useQuery(GET_USER, {
-  username: usernameVar.value,
-}, {
-  enabled: !!usernameVar.value,
-});
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value,
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 // Get user's notification preference for comment replies
 const notifyOnReplyToCommentByDefault = computed(() => {
-  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+  return (
+    getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false
+  );
 });
 
 const createCommentDefaultValues: CreateEditCommentFormValues = {
-  text: "",
+  text: '',
   isRootComment: true,
   depth: 1,
 };
@@ -63,7 +66,7 @@ const createCommentInput = computed(() => {
   const baseInput: CommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
-    text: createFormValues.value.text || "",
+    text: createFormValues.value.text || '',
     CommentAuthor: {
       User: {
         connect: {
@@ -91,7 +94,7 @@ const createCommentInput = computed(() => {
       connect: [
         {
           where: { node: { username: usernameVar.value } },
-        }
+        },
       ],
     },
   };
@@ -102,10 +105,10 @@ const createCommentInput = computed(() => {
       connect: [
         {
           where: {
-            node: { username: usernameVar.value }
-          }
-        }
-      ]
+            node: { username: usernameVar.value },
+          },
+        },
+      ],
     };
   }
 
@@ -122,7 +125,7 @@ const {
   error: createCommentError,
   onDone,
 } = useMutation(CREATE_COMMENT, {
-  errorPolicy: "all",
+  errorPolicy: 'all',
   refetchQueries: () => [
     {
       query: GET_EVENT_COMMENTS,
@@ -140,7 +143,7 @@ const {
 // After mutation completion
 onDone((result) => {
   if (result.errors?.length) {
-    console.error("Error creating comment:", result.errors);
+    console.error('Error creating comment:', result.errors);
     createCommentPermissionError.value = result.errors[0].message;
     createCommentLoading.value = false;
     return;
@@ -152,7 +155,7 @@ onDone((result) => {
 function handleCreateComment() {
   if (!props.event) {
     console.warn(
-      "Could not create the comment because there is no event in the create root comment form"
+      'Could not create the comment because there is no event in the create root comment form'
     );
     return;
   }

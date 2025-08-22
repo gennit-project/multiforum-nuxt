@@ -8,35 +8,35 @@ vi.mock('@vue/apollo-composable', () => ({
     mutate: vi.fn().mockResolvedValue({ data: { id: 'issue-123' } }),
     loading: false,
     error: undefined,
-    onDone: vi.fn(fn => fn)
+    onDone: vi.fn((fn) => fn),
   })),
   useLazyQuery: vi.fn(() => ({
     load: vi.fn(),
     loading: false,
     error: undefined,
-    result: { value: { data: {} } }
+    result: { value: { data: {} } },
   })),
   useQuery: vi.fn(() => ({
     loading: false,
     error: undefined,
-    result: { value: {} }
-  }))
+    result: { value: {} },
+  })),
 }));
 
 vi.mock('nuxt/app', () => ({
   useRoute: () => ({
-    params: { forumId: 'test-forum' }
-  })
+    params: { forumId: 'test-forum' },
+  }),
 }));
 
 vi.mock('luxon', () => ({
   DateTime: {
     now: () => ({
       plus: () => ({
-        toISO: () => '2024-04-29T12:00:00Z'
-      })
-    })
-  }
+        toISO: () => '2024-04-29T12:00:00Z',
+      }),
+    }),
+  },
 }));
 
 vi.mock('@/components/GenericModal.vue', () => ({
@@ -62,24 +62,24 @@ vi.mock('@/components/GenericModal.vue', () => ({
       loading: Boolean,
       error: String,
       primaryButtonDisabled: Boolean,
-      dataTestid: String
+      dataTestid: String,
     },
-    emits: ['close', 'primaryButtonClick']
-  }
+    emits: ['close', 'primaryButtonClick'],
+  },
 }));
 
 vi.mock('@/components/icons/FlagIcon.vue', () => ({
   default: {
     name: 'FlagIcon',
-    template: '<div data-testid="flag-icon"></div>'
-  }
+    template: '<div data-testid="flag-icon"></div>',
+  },
 }));
 
 vi.mock('@/components/icons/ArchiveBox.vue', () => ({
   default: {
     name: 'ArchiveBox',
-    template: '<div data-testid="archive-box-icon"></div>'
-  }
+    template: '<div data-testid="archive-box-icon"></div>',
+  },
 }));
 
 vi.mock('@/components/TextEditor.vue', () => ({
@@ -91,18 +91,18 @@ vi.mock('@/components/TextEditor.vue', () => ({
       initialValue: String,
       placeholder: String,
       disableAutoFocus: Boolean,
-      allowImageUpload: Boolean
+      allowImageUpload: Boolean,
     },
-    emits: ['update']
-  }
+    emits: ['update'],
+  },
 }));
 
 vi.mock('@/components/admin/SelectBrokenRules.vue', () => ({
   default: {
     name: 'SelectBrokenRules',
     template: '<div data-testid="select-broken-rules"></div>',
-    emits: ['toggleForumRuleSelection', 'toggleServerRuleSelection']
-  }
+    emits: ['toggleForumRuleSelection', 'toggleServerRuleSelection'],
+  },
 }));
 
 describe('BrokenRulesModal Component', () => {
@@ -111,32 +111,34 @@ describe('BrokenRulesModal Component', () => {
   });
 
   const mountComponent = async (props = {}) => {
-    const BrokenRulesModal = await import('@/components/mod/BrokenRulesModal.vue').then(m => m.default);
+    const BrokenRulesModal = await import(
+      '@/components/mod/BrokenRulesModal.vue'
+    ).then((m) => m.default);
     return mount(BrokenRulesModal, {
       props: {
         open: true,
         discussionId: '123',
-        ...props
+        ...props,
       },
-      shallow: true
+      shallow: true,
     });
   };
 
   it('renders the correct title for reporting a discussion', async () => {
     const wrapper = await mountComponent({
       discussionId: '123',
-      archiveAfterReporting: false
+      archiveAfterReporting: false,
     });
-    
+
     expect((wrapper.vm as any).modalTitle).toBe('Report Discussion');
   });
 
   it('renders the correct title for archiving a discussion', async () => {
     const wrapper = await mountComponent({
       discussionId: '123',
-      archiveAfterReporting: true
+      archiveAfterReporting: true,
     });
-    
+
     expect((wrapper.vm as any).modalTitle).toBe('Archive Discussion');
   });
 
@@ -144,9 +146,9 @@ describe('BrokenRulesModal Component', () => {
     const wrapper = await mountComponent({
       commentId: '456',
       discussionId: '',
-      archiveAfterReporting: false
+      archiveAfterReporting: false,
     });
-    
+
     expect((wrapper.vm as any).modalTitle).toBe('Report Comment');
   });
 
@@ -154,9 +156,9 @@ describe('BrokenRulesModal Component', () => {
     const wrapper = await mountComponent({
       commentId: '456',
       discussionId: '',
-      archiveAfterReporting: true
+      archiveAfterReporting: true,
     });
-    
+
     expect((wrapper.vm as any).modalTitle).toBe('Archive Comment');
   });
 
@@ -164,9 +166,9 @@ describe('BrokenRulesModal Component', () => {
     const wrapper = await mountComponent({
       eventId: '789',
       discussionId: '',
-      archiveAfterReporting: false
+      archiveAfterReporting: false,
     });
-    
+
     expect((wrapper.vm as any).modalTitle).toBe('Report Event');
   });
 
@@ -174,25 +176,25 @@ describe('BrokenRulesModal Component', () => {
     const wrapper = await mountComponent({
       eventId: '789',
       discussionId: '',
-      archiveAfterReporting: true
+      archiveAfterReporting: true,
     });
-    
+
     expect((wrapper.vm as any).modalTitle).toBe('Archive Event');
   });
 
   it('toggles forum rule selection correctly', async () => {
     const wrapper = await mountComponent();
-    
+
     expect((wrapper.vm as any).selectedForumRules).toEqual([]);
-    
+
     // Add a rule
     (wrapper.vm as any).toggleForumRuleSelection('rule1');
     expect((wrapper.vm as any).selectedForumRules).toEqual(['rule1']);
-    
+
     // Add another rule
     (wrapper.vm as any).toggleForumRuleSelection('rule2');
     expect((wrapper.vm as any).selectedForumRules).toEqual(['rule1', 'rule2']);
-    
+
     // Toggle off a rule
     (wrapper.vm as any).toggleForumRuleSelection('rule1');
     expect((wrapper.vm as any).selectedForumRules).toEqual(['rule2']);
@@ -200,17 +202,20 @@ describe('BrokenRulesModal Component', () => {
 
   it('toggles server rule selection correctly', async () => {
     const wrapper = await mountComponent();
-    
+
     expect((wrapper.vm as any).selectedServerRules).toEqual([]);
-    
+
     // Add a rule
     (wrapper.vm as any).toggleServerRuleSelection('server-rule1');
     expect((wrapper.vm as any).selectedServerRules).toEqual(['server-rule1']);
-    
+
     // Add another rule
     (wrapper.vm as any).toggleServerRuleSelection('server-rule2');
-    expect((wrapper.vm as any).selectedServerRules).toEqual(['server-rule1', 'server-rule2']);
-    
+    expect((wrapper.vm as any).selectedServerRules).toEqual([
+      'server-rule1',
+      'server-rule2',
+    ]);
+
     // Toggle off a rule
     (wrapper.vm as any).toggleServerRuleSelection('server-rule1');
     expect((wrapper.vm as any).selectedServerRules).toEqual(['server-rule2']);
@@ -218,12 +223,12 @@ describe('BrokenRulesModal Component', () => {
 
   it('emits close event when close method is called', async () => {
     const wrapper = await mountComponent();
-    
+
     (wrapper.vm as any).close();
     await nextTick();
-    
+
     expect(wrapper.emitted()).toHaveProperty('close');
-    
+
     // Also check that fields are reset
     expect((wrapper.vm as any).selectedForumRules).toEqual([]);
     expect((wrapper.vm as any).selectedServerRules).toEqual([]);
@@ -233,15 +238,15 @@ describe('BrokenRulesModal Component', () => {
 
   it('generates correct formatted comment text', async () => {
     const wrapper = await mountComponent();
-    
+
     const input = {
       selectedForumRules: ['Forum Rule 1', 'Forum Rule 2'],
       selectedServerRules: ['Server Rule 1'],
-      reportText: 'This is a test report'
+      reportText: 'This is a test report',
     };
-    
+
     const result = (wrapper.vm as any).getFinalCommentText(input);
-    
+
     // Check that all rules are included in the result
     expect(result).toContain('Forum Rule 1');
     expect(result).toContain('Forum Rule 2');

@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import type { Comment } from "@/__generated__/graphql";
-import BackLink from "@/components/BackLink.vue";
-import { GET_FEEDBACK_ON_COMMENT } from "@/graphQLData/comment/queries";
-import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from "@/graphQLData/comment/mutations";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { ref, computed, watch } from "vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import PageNotFound from "@/components/PageNotFound.vue";
-import CommentHeader from "@/components/comments/CommentHeader.vue";
-import FeedbackSection from "@/components/comments/FeedbackSection.vue";
-import { modProfileNameVar } from "@/cache";
-import { useRoute } from "nuxt/app";
+import type { Comment } from '@/__generated__/graphql';
+import BackLink from '@/components/BackLink.vue';
+import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
+import { ADD_FEEDBACK_COMMENT_TO_COMMENT } from '@/graphQLData/comment/mutations';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import { ref, computed, watch } from 'vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import PageNotFound from '@/components/PageNotFound.vue';
+import CommentHeader from '@/components/comments/CommentHeader.vue';
+import FeedbackSection from '@/components/comments/FeedbackSection.vue';
+import { modProfileNameVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
 
 const PAGE_LIMIT = 10;
 
 const route = useRoute();
-const channelId = ref("");
-const discussionId = ref("");
-const commentId = ref("");
+const channelId = ref('');
+const discussionId = ref('');
+const commentId = ref('');
 const offset = ref(0);
-const feedbackId = ref("");
+const feedbackId = ref('');
 
 const {
   result: getCommentResult,
@@ -55,25 +55,29 @@ const contextOfFeedbackComment = computed(() => {
   }
   return null;
 });
-const feedbackOnComment = "forums-forumId-discussions-commentFeedback-discussionId-commentId";
-const commentPermalinkRoute = "forums-forumId-discussions-discussionId-comments-commentId"
-const feedbackOnDiscussionPermalink = "forums-forumId-discussions-feedback-discussionId-feedbackId";
-const feedbackOnCommentPermalink = "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId"
+const feedbackOnComment =
+  'forums-forumId-discussions-commentFeedback-discussionId-commentId';
+const commentPermalinkRoute =
+  'forums-forumId-discussions-discussionId-comments-commentId';
+const feedbackOnDiscussionPermalink =
+  'forums-forumId-discussions-feedback-discussionId-feedbackId';
+const feedbackOnCommentPermalink =
+  'forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId';
 
 const updateContextLink = () => {
   if (originalComment.value) {
     if (route.name === feedbackOnComment) {
-        // If the comment is a feedback comment, we want to link to the original comment.
+      // If the comment is a feedback comment, we want to link to the original comment.
       return {
         name: commentPermalinkRoute,
         params: {
           discussionId: route.params.discussionId,
-          commentId: originalComment.value.id || "",
+          commentId: originalComment.value.id || '',
         },
       };
     }
     if (route.name === feedbackOnDiscussionPermalink) {
-        // If the comment is permalinked feedback on a comment, link to the original comment.
+      // If the comment is permalinked feedback on a comment, link to the original comment.
       if (!contextOfFeedbackComment.value) {
         return {
           name: commentPermalinkRoute,
@@ -85,18 +89,18 @@ const updateContextLink = () => {
       }
     }
     if (route.name === feedbackOnCommentPermalink) {
-        // If the comment is a feedback comment, we want to link to the original comment.
+      // If the comment is a feedback comment, we want to link to the original comment.
       return {
         name: commentPermalinkRoute,
         params: {
           forumId: route.params.forumId,
           discussionId: route.params.discussionId,
-          commentId: originalComment.value.id || "",
+          commentId: originalComment.value.id || '',
         },
       };
     }
   }
-  return "";
+  return '';
 };
 
 // context link is a router object
@@ -108,13 +112,15 @@ onGetCommentDone(() => {
 
 const updateParams = () => {
   channelId.value =
-    typeof route.params.forumId === "string" ? route.params.forumId : "";
+    typeof route.params.forumId === 'string' ? route.params.forumId : '';
   discussionId.value =
-    typeof route.params.discussionId === "string" ? route.params.discussionId : "";
+    typeof route.params.discussionId === 'string'
+      ? route.params.discussionId
+      : '';
   commentId.value =
-    typeof route.params.commentId === "string" ? route.params.commentId : "";
+    typeof route.params.commentId === 'string' ? route.params.commentId : '';
   feedbackId.value =
-    typeof route.params.feedbackId === "string" ? route.params.feedbackId : "";
+    typeof route.params.feedbackId === 'string' ? route.params.feedbackId : '';
   contextLink.value = updateContextLink();
 };
 
@@ -130,7 +136,7 @@ const parentCommentId = computed(() => {
   if (originalComment.value && originalComment.value.ParentComment) {
     return originalComment.value.ParentComment.id;
   }
-  return "";
+  return '';
 });
 
 const feedbackComments = computed(() => {
@@ -156,20 +162,15 @@ const loadMore = () => {
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
 
-      const prevFeedbackComments =
-        previousResult.comments[0].FeedbackComments;
-      const newFeedbackComments =
-        fetchMoreResult.comments[0].FeedbackComments;
+      const prevFeedbackComments = previousResult.comments[0].FeedbackComments;
+      const newFeedbackComments = fetchMoreResult.comments[0].FeedbackComments;
 
       return {
         ...previousResult,
         comments: [
           {
             ...previousResult.comments[0],
-            FeedbackComments: [
-              ...prevFeedbackComments,
-              ...newFeedbackComments,
-            ],
+            FeedbackComments: [...prevFeedbackComments, ...newFeedbackComments],
           },
         ],
       };
@@ -207,7 +208,8 @@ const {
         },
       });
 
-      const prevOriginalFeedbackList = originalComment.value?.FeedbackComments || [];
+      const prevOriginalFeedbackList =
+        originalComment.value?.FeedbackComments || [];
       const prevFeedbackComments =
         commentToGiveFeedbackOn.value.FeedbackComments || [];
 
@@ -215,7 +217,7 @@ const {
         ...originalComment.value,
         FeedbackComments: [
           ...prevOriginalFeedbackList.filter(
-            (comment) => comment.id !== commentToGiveFeedbackOn.value?.id,
+            (comment) => comment.id !== commentToGiveFeedbackOn.value?.id
           ),
           {
             ...commentToGiveFeedbackOn.value,
@@ -225,7 +227,7 @@ const {
                 (prevQueryResult.comments
                   ? prevQueryResult.comments[0].FeedbackCommentsAggregate.count
                   : 0) + 1,
-              __typename: "FeedbackCommentsAggregate",
+              __typename: 'FeedbackCommentsAggregate',
             },
           },
         ],
@@ -257,10 +259,10 @@ onAddFeedbackCommentToCommentDone(() => {
 
 <template>
   <div class="flex justify-center dark:text-white">
-    <div class="w-full max-w-4xl space-y-4 rounded-lg bg-white p-4 dark:bg-gray-800 sm:px-2 md:px-5">
-      <div v-if="getCommentLoading && !getCommentResult">
-        Loading...
-      </div>
+    <div
+      class="w-full max-w-4xl space-y-4 rounded-lg bg-white p-4 dark:bg-gray-800 sm:px-2 md:px-5"
+    >
+      <div v-if="getCommentLoading && !getCommentResult">Loading...</div>
       <ErrorBanner v-if="getCommentError" :text="getCommentError.message" />
       <div v-else>
         <div v-if="originalComment">
@@ -277,13 +279,17 @@ onAddFeedbackCommentToCommentDone(() => {
           >
             View Context
           </nuxt-link>
-          <div class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5">
+          <div
+            class="align-center mx-1 flex justify-between px-1 sm:mt-2 md:mt-5"
+          >
             <BackLink
               :link="`/forums/${channelId}/discussions/${discussionId}`"
               :data-testid="'comment-detail-back-link'"
             />
           </div>
-          <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">
+          <h1
+            class="text-wrap text-center text-2xl font-bold dark:text-gray-200"
+          >
             Feedback
           </h1>
           <ErrorBanner
@@ -294,7 +300,7 @@ onAddFeedbackCommentToCommentDone(() => {
           <PageNotFound
             v-if="!getCommentLoading && !getCommentError && !originalComment"
           />
-          <p class="px-2 mb-4 dark:text-white">
+          <p class="mb-4 px-2 dark:text-white">
             This page collects feedback on this comment:
           </p>
           <CommentHeader
@@ -339,9 +345,11 @@ onAddFeedbackCommentToCommentDone(() => {
           @update-comment-to-remove-feedback-from="
             commentToRemoveFeedbackFrom = $event
           "
-          @add-feedback-comment-to-comment="($event) => {
-            addFeedbackCommentToComment($event);
-          }"
+          @add-feedback-comment-to-comment="
+            ($event) => {
+              addFeedbackCommentToComment($event);
+            }
+          "
         />
       </div>
     </div>

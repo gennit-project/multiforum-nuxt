@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import MarkdownPreview from "../MarkdownPreview.vue";
-import type { PropType } from "vue";
-import { timeAgo } from "@/utils";
-import type { ModerationAction } from "@/__generated__/graphql";
-import { useRoute } from "nuxt/app";
-import ArchiveBox from "../icons/ArchiveBox.vue";
-import ArchiveBoxXMark from "../icons/ArchiveBoxXMark.vue";
-import ChatBubbleBottomCenter from "../icons/ChatBubbleBottomCenter.vue";
-import XmarkIcon from "../icons/XmarkIcon.vue";
-import UserPlus from "../icons/UserPlus.vue";
-import UserMinus from "../icons/UserMinus.vue";
-import ArrowPath from "../icons/ArrowPath.vue";
-import FlagIcon from "../icons/FlagIcon.vue";
-import XCircleIcon from "../icons/XCircleIcon.vue";
-import { ActionType } from "@/types/Comment";
+import MarkdownPreview from '../MarkdownPreview.vue';
+import type { PropType } from 'vue';
+import { timeAgo } from '@/utils';
+import type { ModerationAction } from '@/__generated__/graphql';
+import { useRoute } from 'nuxt/app';
+import ArchiveBox from '../icons/ArchiveBox.vue';
+import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
+import ChatBubbleBottomCenter from '../icons/ChatBubbleBottomCenter.vue';
+import XmarkIcon from '../icons/XmarkIcon.vue';
+import UserPlus from '../icons/UserPlus.vue';
+import UserMinus from '../icons/UserMinus.vue';
+import ArrowPath from '../icons/ArrowPath.vue';
+import FlagIcon from '../icons/FlagIcon.vue';
+import XCircleIcon from '../icons/XCircleIcon.vue';
+import { ActionType } from '@/types/Comment';
 
 const actionTypeToIcon = {
   [ActionType.Close]: XCircleIcon,
@@ -44,10 +44,10 @@ const isPermalinked =
 
 <template>
   <li
-    class="list-none mt-4"
+    class="mt-4 list-none"
     :class="[
       isPermalinked
-        ? 'bg-orange-100 rounded-lg border border-orange-500 dark:bg-orange-900'
+        ? 'rounded-lg border border-orange-500 bg-orange-100 dark:bg-orange-900'
         : '',
     ]"
   >
@@ -61,7 +61,7 @@ const isPermalinked =
           <div class="relative px-1">
             <div
               v-if="activityItem.actionType"
-              class="flex h-8 w-8 items-center bg-gray-500 justify-center rounded-full ring-8 ring-white dark:text-white dark:ring-gray-800"
+              class="flex h-8 w-8 items-center justify-center rounded-full bg-gray-500 ring-8 ring-white dark:text-white dark:ring-gray-800"
             >
               <component
                 :is="actionTypeToIcon[activityItem.actionType as ActionType]"
@@ -89,13 +89,13 @@ const isPermalinked =
                       activityItem.ModerationProfile.displayName,
                   },
                 }"
-                class="font-medium text-gray-900 hover:underline dark:text-gray-200 flex items-center gap-1"
+                class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
               >
                 <span class="flex flex-row items-center gap-1">
                   {{ activityItem.ModerationProfile?.displayName }}
                   <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
+                    class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >OP</span
                   >
                 </span>
@@ -115,27 +115,27 @@ const isPermalinked =
                     username: activityItem.User.username,
                   },
                 }"
-                class="font-medium text-gray-900 hover:underline dark:text-gray-200 flex items-center gap-1"
+                class="flex items-center gap-1 font-medium text-gray-900 hover:underline dark:text-gray-200"
               >
                 <span class="flex items-center gap-1">
                   {{ activityItem.User.username }}
                   <span
                     v-if="isOriginalPoster"
-                    class="rounded-md border border-gray-500 dark:border-gray-300 px-1 text-xs text-gray-500 dark:text-gray-300"
+                    class="rounded-md border border-gray-500 px-1 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
                     >OP</span
                   >
                 </span>
               </nuxt-link>
               {{ activityItem.actionDescription }}
             </span>
-            {{ " " }}
+            {{ ' ' }}
 
             <span class="whitespace-nowrap">{{
               `${timeAgo(new Date(activityItem.createdAt))}`
             }}</span>
           </div>
 
-          <div class="border-l-2 border-gray-200 dark:border-gray-500 pl-2">
+          <div class="border-l-2 border-gray-200 pl-2 dark:border-gray-500">
             <MarkdownPreview
               v-if="activityItem.Comment"
               :text="activityItem.Comment.text || ''"

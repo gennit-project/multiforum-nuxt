@@ -1,5 +1,5 @@
-import { computed } from "vue";
-import { useCookie } from "nuxt/app";
+import { computed } from 'vue';
+import { useCookie } from 'nuxt/app';
 
 export const useSSRAuth = () => {
   // Use a simple cookie to hint at auth status for SSR
@@ -8,8 +8,8 @@ export const useSSRAuth = () => {
     httpOnly: false, // Needs to be accessible by client JS
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    encode: value => value || '',
-    decode: value => value || ''
+    encode: (value) => value || '',
+    decode: (value) => value || '',
   });
 
   // Additional cookie for username hint (non-sensitive)
@@ -17,8 +17,8 @@ export const useSSRAuth = () => {
     httpOnly: false,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    encode: value => value || '',
-    decode: value => value || ''
+    encode: (value) => value || '',
+    decode: (value) => value || '',
   });
 
   return {
@@ -33,6 +33,6 @@ export const useSSRAuth = () => {
     clearAuthHints: () => {
       authHint.value = null;
       usernameHint.value = null;
-    }
+    },
   };
 };

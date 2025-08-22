@@ -1,24 +1,24 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useRouter, useRoute } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
-import { useDisplay } from "vuetify";
-import type { RouteLocationAsRelativeGeneric } from "vue-router";
-import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-import LocationIcon from "@/components/icons/LocationIcon.vue";
-import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
-import ChannelIcon from "@/components/icons/ChannelIcon.vue";
-import UserIcon from "@/components/icons/UserIcon.vue";
-import SettingsIcon from "@/components/icons/SettingsIcon.vue";
-import AdminIcon from "@/components/icons/AdminIcon.vue";
-import LoginIcon from "@/components/icons/LoginIcon.vue";
-import MoreIcon from "@/components/icons/MoreIcon.vue";
-import AvatarComponent from "@/components/AvatarComponent.vue";
-import IconTooltip from "@/components/common/IconTooltip.vue";
-import RecentForumsDrawer from "./RecentForumsDrawer.vue";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { usernameVar, isAuthenticatedVar } from "@/cache";
-import SiteSidenavLogout from "./SiteSidenavLogout.vue";
+import { ref, computed, watch } from 'vue';
+import { useRouter, useRoute } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import { useDisplay } from 'vuetify';
+import type { RouteLocationAsRelativeGeneric } from 'vue-router';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import LocationIcon from '@/components/icons/LocationIcon.vue';
+import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
+import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import UserIcon from '@/components/icons/UserIcon.vue';
+import SettingsIcon from '@/components/icons/SettingsIcon.vue';
+import AdminIcon from '@/components/icons/AdminIcon.vue';
+import LoginIcon from '@/components/icons/LoginIcon.vue';
+import MoreIcon from '@/components/icons/MoreIcon.vue';
+import AvatarComponent from '@/components/AvatarComponent.vue';
+import IconTooltip from '@/components/common/IconTooltip.vue';
+import RecentForumsDrawer from './RecentForumsDrawer.vue';
+import { GET_USER } from '@/graphQLData/user/queries';
+import { usernameVar, isAuthenticatedVar } from '@/cache';
+import SiteSidenavLogout from './SiteSidenavLogout.vue';
 
 const DEFAULT_LIMIT = 5;
 const VERTICAL_NAV_LIMIT = 3;
@@ -31,29 +31,29 @@ type NavigationItem = {
 };
 
 const navigation: NavigationItem[] = [
-  { 
-    name: "Search Forum Calendars", 
-    href: "/events/list/search", 
+  {
+    name: 'Search Forum Calendars',
+    href: '/events/list/search',
     icon: CalendarIcon,
-    routerName: "events-list-search"
+    routerName: 'events-list-search',
   },
-  { 
-    name: "Search In-person Events", 
-    href: "/map/search", 
+  {
+    name: 'Search In-person Events',
+    href: '/map/search',
     icon: LocationIcon,
-    routerName: "map-search"
+    routerName: 'map-search',
   },
-  { 
-    name: "Discussions", 
-    href: "/discussions", 
+  {
+    name: 'Discussions',
+    href: '/discussions',
     icon: DiscussionIcon,
-    routerName: "discussions"
+    routerName: 'discussions',
   },
-  { 
-    name: "All Forums", 
-    href: "/forums", 
+  {
+    name: 'All Forums',
+    href: '/forums',
     icon: ChannelIcon,
-    routerName: "forums"
+    routerName: 'forums',
   },
 ];
 
@@ -70,21 +70,27 @@ const loadRecentForums = () => {
     recentForums.value = [];
     return;
   }
-  const forums = JSON.parse(localStorage.getItem("recentForums") || "[]") || [];
-  recentForums.value = forums.sort((a: any, b: any) => b.timestamp - a.timestamp).slice(0, DEFAULT_LIMIT);
+  const forums = JSON.parse(localStorage.getItem('recentForums') || '[]') || [];
+  recentForums.value = forums
+    .sort((a: any, b: any) => b.timestamp - a.timestamp)
+    .slice(0, DEFAULT_LIMIT);
 };
 
 // Load initial forums
 loadRecentForums();
 
-const { result: getUserResult } = useQuery(GET_USER, {
-  username: usernameVar.value,
-},{
-  enabled: !!usernameVar.value,
-});
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value,
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 const user = computed(() => getUserResult.value?.users[0] || null);
-const profilePicURL = computed(() => user.value?.profilePicURL || "");
+const profilePicURL = computed(() => user.value?.profilePicURL || '');
 
 const router = useRouter();
 const route = useRoute();
@@ -106,8 +112,8 @@ const hasMoreForums = computed(() => {
 });
 
 // Active state detection
-const currentForumId = computed(() => 
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
+const currentForumId = computed(() =>
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 
 const isActiveNavItem = (routeName: string) => {
@@ -121,82 +127,107 @@ const isActiveUserAction = (routeName: string) => {
 // Auto-add current forum to recent forums
 const addCurrentForumToRecent = () => {
   if (!import.meta.client || !currentForumId.value) return;
-  
-  const existingForums = JSON.parse(localStorage.getItem("recentForums") || "[]");
-  
+
+  const existingForums = JSON.parse(
+    localStorage.getItem('recentForums') || '[]'
+  );
+
   // Check if the current forum is already in the visible portion (top VERTICAL_NAV_LIMIT)
   const visibleForums = existingForums.slice(0, VERTICAL_NAV_LIMIT);
-  const isAlreadyVisible = visibleForums.some((forum: any) => forum.uniqueName === currentForumId.value);
-  
+  const isAlreadyVisible = visibleForums.some(
+    (forum: any) => forum.uniqueName === currentForumId.value
+  );
+
   // If it's already visible, just update the timestamp without changing order
   if (isAlreadyVisible) {
-    const updatedForums = existingForums.map((forum: any) => 
-      forum.uniqueName === currentForumId.value 
+    const updatedForums = existingForums.map((forum: any) =>
+      forum.uniqueName === currentForumId.value
         ? { ...forum, timestamp: Date.now() }
         : forum
     );
-    localStorage.setItem("recentForums", JSON.stringify(updatedForums));
+    localStorage.setItem('recentForums', JSON.stringify(updatedForums));
     loadRecentForums();
     return;
   }
-  
+
   // If not visible, move to top (existing behavior)
   const currentForum = {
     uniqueName: currentForumId.value,
     channelIconURL: null, // Will be updated when we have the icon
-    timestamp: Date.now()
+    timestamp: Date.now(),
   };
-  
+
   // Remove existing entry if it exists
-  const filteredForums = existingForums.filter((forum: any) => forum.uniqueName !== currentForumId.value);
-  
+  const filteredForums = existingForums.filter(
+    (forum: any) => forum.uniqueName !== currentForumId.value
+  );
+
   // Add current forum to the top
   const updatedForums = [currentForum, ...filteredForums];
-  
-  localStorage.setItem("recentForums", JSON.stringify(updatedForums));
-  
+
+  localStorage.setItem('recentForums', JSON.stringify(updatedForums));
+
   // Reload the recent forums to update the UI
   loadRecentForums();
 };
 
 // Watch for route changes and add current forum to recent list
-watch(currentForumId, (newForumId, oldForumId) => {
-  if (newForumId && newForumId !== oldForumId) {
-    addCurrentForumToRecent();
-  }
-}, { immediate: true });
+watch(
+  currentForumId,
+  (newForumId, oldForumId) => {
+    if (newForumId && newForumId !== oldForumId) {
+      addCurrentForumToRecent();
+    }
+  },
+  { immediate: true }
+);
 
 const navigateTo = async (route: RouteLocationAsRelativeGeneric) => {
   try {
     await router.push(route);
   } catch (error) {
-    console.error("Navigation error:", error);
+    console.error('Navigation error:', error);
   }
 };
 
 const getIconCircleClasses = (isActive: boolean) => {
-  const baseClasses = "w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer";
-  return isActive ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900` : baseClasses;
+  const baseClasses =
+    'w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+  return isActive
+    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900`
+    : baseClasses;
 };
 
 const getForumIconClasses = (isActive: boolean) => {
-  const baseClasses = "w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden";
-  return isActive ? `${baseClasses} ring-2 ring-orange-500 ring-offset-0` : baseClasses;
+  const baseClasses =
+    'w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer overflow-hidden';
+  return isActive
+    ? `${baseClasses} ring-2 ring-orange-500 ring-offset-0`
+    : baseClasses;
 };
 
 const getUserActionClasses = (isActive: boolean) => {
-  const baseClasses = "w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer";
-  return isActive ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900` : baseClasses;
+  const baseClasses =
+    'w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+  return isActive
+    ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900`
+    : baseClasses;
 };
 </script>
 
 <template>
-  <div class="fixed left-0 top-0 h-full w-16 bg-gray-900 border-r border-gray-600 hidden lg:flex flex-col items-center z-40" :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }">
+  <div
+    class="fixed left-0 top-0 z-40 hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
+    :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
+  >
     <!-- Logo -->
-    <IconTooltip text="Topical - Home" :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }">
-      <a 
+    <IconTooltip
+      text="Topical - Home"
+      :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
+    >
+      <a
         href="/"
-        class="w-12 h-12 rounded-full bg-orange-500 hover:bg-orange-600 flex items-center justify-center transition-colors duration-200 cursor-pointer"
+        class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
         @click.prevent="() => navigateTo({ name: 'index' })"
       >
         <span class="text-2xl">🐝</span>
@@ -204,7 +235,13 @@ const getUserActionClasses = (isActive: boolean) => {
     </IconTooltip>
 
     <!-- Main Navigation Icons -->
-    <div class="flex flex-col" :class="{ 'space-y-1': isVerticallyShort, 'space-y-2': !isVerticallyShort }">
+    <div
+      class="flex flex-col"
+      :class="{
+        'space-y-1': isVerticallyShort,
+        'space-y-2': !isVerticallyShort,
+      }"
+    >
       <IconTooltip
         v-for="item in navigation"
         :key="item.name"
@@ -225,10 +262,17 @@ const getUserActionClasses = (isActive: boolean) => {
     </div>
 
     <!-- Divider -->
-    <div v-if="!isVerticallyShort" class="w-8 h-px bg-gray-600" :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"/>
+    <div
+      v-if="!isVerticallyShort"
+      class="h-px w-8 bg-gray-600"
+      :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
+    />
 
     <!-- Recent Forums (hidden when vertically short) -->
-    <div v-if="recentForums.length > 0 && !isVerticallyShort" class="flex flex-col space-y-1">
+    <div
+      v-if="recentForums.length > 0 && !isVerticallyShort"
+      class="flex flex-col space-y-1"
+    >
       <!-- Limited Recent Forums -->
       <IconTooltip
         v-for="forum in limitedRecentForums"
@@ -238,10 +282,13 @@ const getUserActionClasses = (isActive: boolean) => {
         <a
           :href="`/forums/${forum.uniqueName}/discussions`"
           :class="getForumIconClasses(currentForumId === forum.uniqueName)"
-          @click.prevent="() => navigateTo({
-            name: 'forums-forumId-discussions',
-            params: { forumId: forum.uniqueName },
-          })"
+          @click.prevent="
+            () =>
+              navigateTo({
+                name: 'forums-forumId-discussions',
+                params: { forumId: forum.uniqueName },
+              })
+          "
         >
           <AvatarComponent
             class="h-8 w-8"
@@ -263,27 +310,36 @@ const getUserActionClasses = (isActive: boolean) => {
             <MoreIcon />
           </div>
         </IconTooltip>
-        <span class="text-xs text-gray-400 mt-1">More</span>
+        <span class="mt-1 text-xs text-gray-400">More</span>
       </div>
     </div>
 
     <!-- Divider -->
-    <div class="w-8 h-px bg-gray-600" :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"/>
+    <div
+      class="h-px w-8 bg-gray-600"
+      :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
+    />
 
     <!-- User Actions -->
-    <div class="flex flex-col mt-auto" :class="{ 'space-y-1': isVerticallyShort, 'space-y-2': !isVerticallyShort }">
+    <div
+      class="mt-auto flex flex-col"
+      :class="{
+        'space-y-1': isVerticallyShort,
+        'space-y-2': !isVerticallyShort,
+      }"
+    >
       <!-- Profile -->
-      <IconTooltip
-        v-if="isAuthenticatedVar && usernameVar"
-        text="My Profile"
-      >
+      <IconTooltip v-if="isAuthenticatedVar && usernameVar" text="My Profile">
         <a
           :href="`/u/${usernameVar}`"
           :class="getUserActionClasses(isActiveUserAction('u-username'))"
-          @click.prevent="() => navigateTo({
-            name: 'u-username',
-            params: { username: usernameVar },
-          })"
+          @click.prevent="
+            () =>
+              navigateTo({
+                name: 'u-username',
+                params: { username: usernameVar },
+              })
+          "
         >
           <AvatarComponent
             v-if="profilePicURL"
@@ -322,24 +378,16 @@ const getUserActionClasses = (isActive: boolean) => {
       </IconTooltip>
 
       <!-- Sign Out -->
-      <IconTooltip
-        v-if="isAuthenticatedVar"
-        text="Sign Out"
-      >
-        <SiteSidenavLogout 
+      <IconTooltip v-if="isAuthenticatedVar" text="Sign Out">
+        <SiteSidenavLogout
           :nav-link-classes="getUserActionClasses(false)"
           :show-icon-only="true"
         />
       </IconTooltip>
 
       <!-- Sign In -->
-      <IconTooltip
-        v-if="!isAuthenticatedVar"
-        text="Log In"
-      >
-        <div
-          :class="getUserActionClasses(false)"
-        >
+      <IconTooltip v-if="!isAuthenticatedVar" text="Log In">
+        <div :class="getUserActionClasses(false)">
           <LoginIcon />
         </div>
       </IconTooltip>

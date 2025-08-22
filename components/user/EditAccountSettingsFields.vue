@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from "vue";
-import type { PropType } from "vue";
-import type { ApolloError } from "@apollo/client/errors";
-import { useMutation } from "@vue/apollo-composable";
-import TextInput from "@/components/TextInput.vue";
-import FormRow from "@/components/FormRow.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import AddImage from "@/components/AddImage.vue";
-import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
-import { usernameVar } from "@/cache";
-import type { EditAccountSettingsFormValues } from "@/types/User";
-import FormComponent from "../FormComponent.vue";
-import { MAX_CHARS_IN_USER_BIO } from "@/utils/constants";
-import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
-import { isFileSizeValid } from "@/utils/index";
+import { ref, computed, nextTick } from 'vue';
+import type { PropType } from 'vue';
+import type { ApolloError } from '@apollo/client/errors';
+import { useMutation } from '@vue/apollo-composable';
+import TextInput from '@/components/TextInput.vue';
+import FormRow from '@/components/FormRow.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import AddImage from '@/components/AddImage.vue';
+import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
+import { usernameVar } from '@/cache';
+import type { EditAccountSettingsFormValues } from '@/types/User';
+import FormComponent from '../FormComponent.vue';
+import { MAX_CHARS_IN_USER_BIO } from '@/utils/constants';
+import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import { isFileSizeValid } from '@/utils/index';
 
 type FileChangeInput = {
   // event of HTMLInputElement;
@@ -54,7 +54,6 @@ const emit = defineEmits<{
 const titleInputRef = ref<InstanceType<typeof TextInput> | null>(null);
 const touched = ref(false);
 
-
 const { mutate: createSignedStorageUrl } = useMutation(
   CREATE_SIGNED_STORAGE_URL
 );
@@ -62,7 +61,7 @@ const { mutate: createSignedStorageUrl } = useMutation(
 // Methods
 const upload = async (file: any) => {
   if (!usernameVar.value) {
-    console.error("No username found");
+    console.error('No username found');
     return;
   }
   const sizeCheck = isFileSizeValid({ file, isProfilePic: true });
@@ -89,7 +88,7 @@ const upload = async (file: any) => {
 
     return embeddedLink;
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error('Error uploading file:', error);
   }
 };
 
@@ -107,8 +106,8 @@ const handleProfilePicChange = async (input: FileChangeInput) => {
       return;
     }
 
-    emit("updateFormValues", { profilePicURL: embeddedLink });
-    emit("submit");
+    emit('updateFormValues', { profilePicURL: embeddedLink });
+    emit('submit');
   }
 };
 

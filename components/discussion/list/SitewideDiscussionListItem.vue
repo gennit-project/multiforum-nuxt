@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref } from "vue";
-import type { PropType } from "vue";
-import { useRoute } from "nuxt/app";
+import { computed, defineAsyncComponent, ref } from 'vue';
+import type { PropType } from 'vue';
+import { useRoute } from 'nuxt/app';
 import type {
   Discussion,
   DiscussionChannel,
   Tag,
-} from "@/__generated__/graphql";
-import { safeArrayFirst } from "@/utils/ssrSafetyUtils";
-import TagComponent from "@/components/TagComponent.vue";
-import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { relativeTime } from "@/utils";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { usernameVar, isAuthenticatedVar } from "@/cache";
+} from '@/__generated__/graphql';
+import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import TagComponent from '@/components/TagComponent.vue';
+import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { relativeTime } from '@/utils';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_USER } from '@/graphQLData/user/queries';
+import { usernameVar, isAuthenticatedVar } from '@/cache';
 // Lazy load the album component since it's not needed for initial render
-const DiscussionAlbum = defineAsyncComponent(() => 
-  import("@/components/discussion/detail/DiscussionAlbum.vue")
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
 );
 
 const props = defineProps({
@@ -34,7 +34,7 @@ const props = defineProps({
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
   selectedTags: {
     type: Array,
@@ -50,7 +50,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(["filterByTag"]);
+defineEmits(['filterByTag']);
 
 const route = useRoute();
 
@@ -58,7 +58,7 @@ const route = useRoute();
 const { result: getUserResult } = useQuery(
   GET_USER,
   () => ({
-    username: usernameVar.value || "",
+    username: usernameVar.value || '',
   }),
   () => ({
     enabled: isAuthenticatedVar.value && !!usernameVar.value,
@@ -66,10 +66,10 @@ const { result: getUserResult } = useQuery(
 );
 
 const forumId = computed(() => {
-  if (!props.discussion) return "";
+  if (!props.discussion) return '';
   const firstChannel = safeArrayFirst(props.discussion.DiscussionChannels);
-  return firstChannel?.channelUniqueName || "";
-})
+  return firstChannel?.channelUniqueName || '';
+});
 
 // UI state is now handled via props
 
@@ -101,9 +101,9 @@ const discussionDetailOptions = computed(() => {
     const commentCount = dc.CommentsAggregate?.count || 0;
     const discussionDetailLink = `/forums/${dc.channelUniqueName}/discussions/${props.discussion?.id}`;
     return {
-      label: `${commentCount} ${commentCount === 1 ? "comment" : "comments"} in ${dc.channelUniqueName}`,
+      label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: discussionDetailLink,
-      event: "",
+      event: '',
     };
   }).sort((a, b) => b.label.localeCompare(a.label));
 });
@@ -116,44 +116,52 @@ const authorIsAdmin = computed(() => {
 const getDetailLink = () => {
   if (!props.discussion) {
     return {
-      name: "forums-forumId-discussions",
+      name: 'forums-forumId-discussions',
       params: {
         forumId: forumId.value,
-      }
+      },
     };
   }
   return {
     name: 'forums-forumId-discussions-discussionId',
     params: {
       forumId: forumId.value,
-      discussionId: props.discussion.id
-    }
+      discussionId: props.discussion.id,
+    },
   };
 };
 
 const discussionIdInParams = computed(() =>
-  typeof route.params.discussionId === "string" ? route.params.discussionId : ""
+  typeof route.params.discussionId === 'string' ? route.params.discussionId : ''
 );
-const discussionId = computed(() => props.discussion?.id || "");
-const title = computed(() => props.discussion?.title || "[Deleted]");
+const discussionId = computed(() => props.discussion?.id || '');
+const title = computed(() => props.discussion?.title || '[Deleted]');
 const tags = computed(
   () => props.discussion?.Tags.map((tag: Tag) => tag.text) || []
 );
 const authorUsername = computed(
-  () => props.discussion?.Author?.username || "Deleted"
+  () => props.discussion?.Author?.username || 'Deleted'
 );
 const relative = computed(() =>
-  props.discussion ? relativeTime(props.discussion.createdAt) : ""
+  props.discussion ? relativeTime(props.discussion.createdAt) : ''
 );
 
 // Sensitive content logic
 const sensitiveContentRevealed = ref(false);
-const hasSensitiveContent = computed(() => !!props.discussion?.hasSensitiveContent);
+const hasSensitiveContent = computed(
+  () => !!props.discussion?.hasSensitiveContent
+);
 const userAllowsSensitiveContent = computed(() => {
-  return getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false;
+  return (
+    getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false
+  );
 });
 const shouldShowContent = computed(() => {
-  return !hasSensitiveContent.value || sensitiveContentRevealed.value || userAllowsSensitiveContent.value;
+  return (
+    !hasSensitiveContent.value ||
+    sensitiveContentRevealed.value ||
+    userAllowsSensitiveContent.value
+  );
 });
 
 const revealSensitiveContent = () => {
@@ -163,7 +171,7 @@ const revealSensitiveContent = () => {
 
 <template>
   <li
-    class="pt-2 pb-2 px-4 list-none"
+    class="list-none px-4 pb-2 pt-2"
     :class="{
       'bg-gray-100 dark:bg-gray-700': discussionIdInParams === discussionId,
     }"
@@ -172,30 +180,25 @@ const revealSensitiveContent = () => {
       <div class="w-full">
         <nuxt-link
           v-if="discussion"
-          :to="
-            getDetailLink()
-          "
-          class="-ml-0.5 mb-1 flex items-center gap-2 dark:text-white text-xs"
+          :to="getDetailLink()"
+          class="-ml-0.5 mb-1 flex items-center gap-2 text-xs dark:text-white"
         >
           <div class="flex items-center text-orange-700 dark:text-white">
             <AvatarComponent
-              :text="discussion.DiscussionChannels?.[0]?.channelUniqueName || ''"
+              :text="
+                discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
+              "
               :is-square="true"
               class="mr-1 h-6 w-6"
             />
             <span>{{
-              discussion.DiscussionChannels?.[0]?.channelUniqueName || ""
+              discussion.DiscussionChannels?.[0]?.channelUniqueName || ''
             }}</span>
           </div>
         </nuxt-link>
         <div class="flex gap-2">
           <div class="flex-1">
-            <nuxt-link
-              v-if="discussion"
-              :to="
-                getDetailLink()
-              "
-            >
+            <nuxt-link v-if="discussion" :to="getDetailLink()">
               <div class="flex items-center gap-2">
                 <span
                   :class="
@@ -210,14 +213,14 @@ const revealSensitiveContent = () => {
                 </span>
                 <span
                   v-if="hasSensitiveContent"
-                  class="text-xs text-orange-600 dark:text-orange-400 border border-orange-600 dark:border-orange-400 rounded-full px-2"
+                  class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
                 >
                   Sensitive
                 </span>
               </div>
             </nuxt-link>
             <div
-              class="text-xs pt-1 text-gray-500 no-underline dark:text-gray-300"
+              class="pt-1 text-xs text-gray-500 no-underline dark:text-gray-300"
             >
               <!-- Use div instead of p to avoid invalid HTML (button inside p) -->
               <div class="whitespace-normal">
@@ -227,7 +230,8 @@ const revealSensitiveContent = () => {
                   :to="getDetailLink()"
                   class="inline"
                 >
-                  {{ commentCount }} {{ commentCount === 1 ? "comment" : "comments" }}
+                  {{ commentCount }}
+                  {{ commentCount === 1 ? 'comment' : 'comments' }}
                 </nuxt-link>
 
                 <MenuButton
@@ -237,9 +241,14 @@ const revealSensitiveContent = () => {
                 >
                   <span class="inline cursor-pointer">
                     <i class="fa-regular fa-comment mr-1 h-4 w-4" />
-                    {{ commentCount }} {{ commentCount === 1 ? "comment" : "comments" }}
-                    in {{ channelCount }} {{ channelCount === 1 ? "forum" : "forums" }}
-                    <ChevronDownIcon class="inline ml-1 h-4 w-4" aria-hidden="true" />
+                    {{ commentCount }}
+                    {{ commentCount === 1 ? 'comment' : 'comments' }} in
+                    {{ channelCount }}
+                    {{ channelCount === 1 ? 'forum' : 'forums' }}
+                    <ChevronDownIcon
+                      class="ml-1 inline h-4 w-4"
+                      aria-hidden="true"
+                    />
                   </span>
                 </MenuButton>
 
@@ -259,42 +268,58 @@ const revealSensitiveContent = () => {
               </div>
             </div>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && !isExpanded"
-              class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              v-if="
+                discussion &&
+                (discussion.body || discussion.Album) &&
+                !isExpanded
+              "
+              class="text-xs text-gray-600 hover:underline dark:text-gray-300"
               @click="isExpanded = true"
             >
               <i
-                class="mr-1 fa-solid fa-expand text-md text-gray-600 dark:text-gray-300 hover:underline"
+                class="fa-solid fa-expand text-md mr-1 text-gray-600 hover:underline dark:text-gray-300"
               />
               Expand
             </button>
             <button
-              v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
-              class="text-xs text-gray-600 dark:text-gray-300 hover:underline"
+              v-if="
+                discussion &&
+                (discussion.body || discussion.Album) &&
+                isExpanded
+              "
+              class="text-xs text-gray-600 hover:underline dark:text-gray-300"
               @click="isExpanded = false"
             >
               <i
-                class="mr-1 fa-solid fa-x text-xs text-gray-600 dark:text-gray-300 hover:underline"
+                class="fa-solid fa-x mr-1 text-xs text-gray-600 hover:underline dark:text-gray-300"
               />
               Collapse
             </button>
             <div
-              v-if="discussion && (discussion.body || discussion.Album) && isExpanded"
-              class="w-full max-w-full overflow-hidden border-l-2 border-gray-300 bg-gray-100 pt-2 my-2 dark:bg-black"
+              v-if="
+                discussion &&
+                (discussion.body || discussion.Album) &&
+                isExpanded
+              "
+              class="my-2 w-full max-w-full overflow-hidden border-l-2 border-gray-300 bg-gray-100 pt-2 dark:bg-black"
             >
               <!-- Sensitive content concealment box -->
               <div
-                v-if="hasSensitiveContent && !sensitiveContentRevealed && !userAllowsSensitiveContent"
-                class="rounded border bg-gray-200 dark:bg-black p-4 text-center ml-2 mr-2 mb-2"
+                v-if="
+                  hasSensitiveContent &&
+                  !sensitiveContentRevealed &&
+                  !userAllowsSensitiveContent
+                "
+                class="mb-2 ml-2 mr-2 rounded border bg-gray-200 p-4 text-center dark:bg-black"
               >
-                <p class="text-gray-600 dark:text-gray-300 mb-3 text-sm">
+                <p class="mb-3 text-sm text-gray-600 dark:text-gray-300">
                   This content has been marked as potentially sensitive.
                 </p>
                 <RequireAuth>
                   <template #has-auth>
                     <button
                       type="button"
-                      class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded text-sm"
+                      class="rounded bg-black px-3 py-1 text-sm text-white hover:bg-gray-800"
                       @click="revealSensitiveContent"
                     >
                       Reveal sensitive content
@@ -303,14 +328,14 @@ const revealSensitiveContent = () => {
                   <template #does-not-have-auth>
                     <button
                       type="button"
-                      class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded text-sm"
+                      class="rounded bg-black px-3 py-1 text-sm text-white hover:bg-gray-800"
                     >
                       Log in to reveal sensitive content
                     </button>
                   </template>
                 </RequireAuth>
               </div>
-              
+
               <!-- Discussion content (hidden when sensitive and not revealed) -->
               <template v-if="shouldShowContent">
                 <MarkdownPreview
@@ -319,7 +344,7 @@ const revealSensitiveContent = () => {
                   :word-limit="50"
                   :disable-gallery="false"
                   :image-max-height="'200px'"
-                  class="ml-2 pb-2 max-w-full overflow-hidden break-words"
+                  class="ml-2 max-w-full overflow-hidden break-words pb-2"
                 />
                 <div
                   v-if="discussion.Album"
@@ -336,7 +361,7 @@ const revealSensitiveContent = () => {
               </template>
             </div>
             <div
-              class="font-medium mt-1 flex space-x-1 text-sm text-gray-600 hover:no-underline"
+              class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
             >
               <TagComponent
                 v-for="tag in tags"

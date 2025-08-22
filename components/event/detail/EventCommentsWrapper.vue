@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import type { PropType } from "vue";
-import type { Event, Comment as CommentType, CommentCreateInput } from "@/__generated__/graphql";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import CommentSection from "@/components/comments/CommentSection.vue";
-import type { CreateEditCommentFormValues } from "@/types/Comment";
-import { usernameVar } from "@/cache";
-import { useRoute } from "nuxt/app";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { SUBSCRIBE_TO_EVENT, UNSUBSCRIBE_FROM_EVENT } from "@/graphQLData/event/mutations";
-import Notification from "@/components/NotificationComponent.vue";
-import SubscribeButton from "@/components/SubscribeButton.vue";
+import { computed, ref } from 'vue';
+import type { PropType } from 'vue';
+import type {
+  Event,
+  Comment as CommentType,
+  CommentCreateInput,
+} from '@/__generated__/graphql';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import CommentSection from '@/components/comments/CommentSection.vue';
+import type { CreateEditCommentFormValues } from '@/types/Comment';
+import { usernameVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { GET_USER } from '@/graphQLData/user/queries';
+import {
+  SUBSCRIBE_TO_EVENT,
+  UNSUBSCRIBE_FROM_EVENT,
+} from '@/graphQLData/event/mutations';
+import Notification from '@/components/NotificationComponent.vue';
+import SubscribeButton from '@/components/SubscribeButton.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -71,10 +78,10 @@ const commentSectionQueryVariables = computed(() => ({
 }));
 
 const createCommentDefaultValues = {
-  text: "",
+  text: '',
   isRootComment: false,
   depth: 1,
-  parentCommentId: "",
+  parentCommentId: '',
 };
 
 const createFormValues = ref<CreateEditCommentFormValues>(
@@ -82,24 +89,28 @@ const createFormValues = ref<CreateEditCommentFormValues>(
 );
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 // Query for user data to get notification preferences
-const {
-  result: getUserResult,
-} = useQuery(GET_USER, {
-  username: usernameVar.value,
-}, {
-  enabled: !!usernameVar.value,
-});
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value,
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 // Get user's notification preference for comment replies
 const notifyOnReplyToCommentByDefault = computed(() => {
-  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+  return (
+    getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false
+  );
 });
 
 const createCommentInput = computed(() => {
@@ -132,7 +143,7 @@ const createCommentInput = computed(() => {
         },
       },
     },
-    text: createFormValues.value.text || "",
+    text: createFormValues.value.text || '',
     CommentAuthor: {
       User: {
         connect: {
@@ -163,10 +174,10 @@ const createCommentInput = computed(() => {
       connect: [
         {
           where: {
-            node: { username: usernameVar.value }
-          }
-        }
-      ]
+            node: { username: usernameVar.value },
+          },
+        },
+      ],
     };
   }
 
@@ -186,38 +197,38 @@ function updateCommentSectionQueryResult(input: {
     const { cache, commentToDeleteId } = input;
 
     if (!commentToDeleteId) {
-      console.error("No comment ID provided for deletion");
+      console.error('No comment ID provided for deletion');
       return;
     }
 
     // Directly evict the comment from the cache
     cache.evict({
-      id: cache.identify({ __typename: "Comment", id: commentToDeleteId }),
+      id: cache.identify({ __typename: 'Comment', id: commentToDeleteId }),
     });
 
     // Garbage collection to clean up unreachable references
     cache.gc();
   } catch (error) {
-    console.error("Error updating comment section query result:", error);
+    console.error('Error updating comment section query result:', error);
   }
 }
 
 function incrementCommentCount(cache: any) {
   try {
     if (!props.event?.id) {
-      console.error("No event ID found for incrementing comment count");
+      console.error('No event ID found for incrementing comment count');
       return;
     }
 
     // Use cache.modify to directly update the CommentsAggregate field
     // This is much safer than using writeQuery
     const eventId = cache.identify({
-      __typename: "Event",
+      __typename: 'Event',
       id: props.event.id,
     });
 
     if (!eventId) {
-      console.error("Could not identify event in cache");
+      console.error('Could not identify event in cache');
       return;
     }
 
@@ -233,26 +244,26 @@ function incrementCommentCount(cache: any) {
       },
     });
   } catch (error) {
-    console.error("Error incrementing comment count:", error);
+    console.error('Error incrementing comment count:', error);
   }
 }
 
 function decrementCommentCount(cache: any) {
   try {
     if (!props.event?.id) {
-      console.error("No event ID found for decrementing comment count");
+      console.error('No event ID found for decrementing comment count');
       return;
     }
 
     // Use cache.modify to directly update the CommentsAggregate field
     // This is much safer than using writeQuery
     const eventId = cache.identify({
-      __typename: "Event",
+      __typename: 'Event',
       id: props.event.id,
     });
 
     if (!eventId) {
-      console.error("Could not identify event in cache");
+      console.error('Could not identify event in cache');
       return;
     }
 
@@ -268,7 +279,7 @@ function decrementCommentCount(cache: any) {
       },
     });
   } catch (error) {
-    console.error("Error decrementing comment count:", error);
+    console.error('Error decrementing comment count:', error);
   }
 }
 
@@ -294,17 +305,17 @@ const {
     if (result.data?.subscribeToEvent && props.event?.id) {
       cache.modify({
         id: cache.identify({
-          __typename: "Event",
-          id: props.event.id
+          __typename: 'Event',
+          id: props.event.id,
         }),
         fields: {
           SubscribedToNotifications(_) {
             return result.data.subscribeToEvent.SubscribedToNotifications;
-          }
-        }
+          },
+        },
       });
     }
-  }
+  },
 });
 
 onSubscribeComplete(() => {
@@ -320,38 +331,40 @@ const {
     if (result.data?.unsubscribeFromEvent && props.event?.id) {
       cache.modify({
         id: cache.identify({
-          __typename: "Event",
-          id: props.event.id
+          __typename: 'Event',
+          id: props.event.id,
         }),
         fields: {
           SubscribedToNotifications(_) {
             return result.data.unsubscribeFromEvent.SubscribedToNotifications;
-          }
-        }
+          },
+        },
       });
     }
-  }
+  },
 });
 
 onUnsubscribeComplete(() => {
   showUnsubscribedNotification.value = true;
 });
 
-const subscriptionLoading = computed(() => subscribeLoading.value || unsubscribeLoading.value);
+const subscriptionLoading = computed(
+  () => subscribeLoading.value || unsubscribeLoading.value
+);
 
 const handleSubscriptionToggle = () => {
   if (!props.event?.id) {
-    console.error("No event ID found");
+    console.error('No event ID found');
     return;
   }
 
   if (isSubscribed.value) {
     unsubscribeFromEvent({
-      eventId: props.event.id
+      eventId: props.event.id,
     });
   } else {
     subscribeToEvent({
-      eventId: props.event.id
+      eventId: props.event.id,
     });
   }
 };
@@ -395,7 +408,7 @@ const handleSubscriptionToggle = () => {
     @close-notification="showSubscribedNotification = false"
   />
   <Notification
-    :show="showUnsubscribedNotification" 
+    :show="showUnsubscribedNotification"
     :title="'Successfully unsubscribed from notifications for this event'"
     @close-notification="showUnsubscribedNotification = false"
   />

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { DateTime } from "luxon";
-import type { Event as EventData } from "@/__generated__/graphql";
-import PrimaryButton from "../PrimaryButton.vue";
+import { ref } from 'vue';
+import { DateTime } from 'luxon';
+import type { Event as EventData } from '@/__generated__/graphql';
+import PrimaryButton from '../PrimaryButton.vue';
 
 const props = defineProps({
   event: {
@@ -20,36 +20,36 @@ const addToGoogleCalendar = () => {
     googleCalendarDateFormat
   );
 
-  const baseUrl = "https://www.google.com/calendar/render";
+  const baseUrl = 'https://www.google.com/calendar/render';
   const location = props.event?.address
     ? encodeURIComponent(props.event?.address)
-    : encodeURIComponent(props.event?.virtualEventUrl || "");
+    : encodeURIComponent(props.event?.virtualEventUrl || '');
   const name = encodeURIComponent(props.event?.title);
-  const details = encodeURIComponent(props.event?.description || "");
+  const details = encodeURIComponent(props.event?.description || '');
 
   const googleUrl = `${baseUrl}?action=TEMPLATE&text=${name}&dates=${start}/${end}&details=${details}&location=${location}`;
-  window.open(googleUrl, "_blank");
+  window.open(googleUrl, '_blank');
 };
 
 const addToiCal = () => {
   const data = [
-    "BEGIN:VCALENDAR",
-    "VERSION:2.0",
-    "BEGIN:VEVENT",
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'BEGIN:VEVENT',
     `URL:${document.URL}`,
-    `DTSTART:${props.event?.startTime.replace(/-|:|\.\d{3}/g, "")}`,
-    `DTEND:${props.event?.endTime.replace(/-|:|\.\d{3}/g, "")}`,
+    `DTSTART:${props.event?.startTime.replace(/-|:|\.\d{3}/g, '')}`,
+    `DTEND:${props.event?.endTime.replace(/-|:|\.\d{3}/g, '')}`,
     `SUMMARY:${props.event?.title}`,
     `DESCRIPTION:${props.event?.description}`,
     `LOCATION:${props.event?.address}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\n");
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\n');
 
-  const blob = new Blob([data], { type: "text/calendar;charset=utf-8;" });
-  const link = document.createElement("a");
+  const blob = new Blob([data], { type: 'text/calendar;charset=utf-8;' });
+  const link = document.createElement('a');
   link.href = URL.createObjectURL(blob);
-  link.setAttribute("download", "event.ics");
+  link.setAttribute('download', 'event.ics');
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -62,16 +62,16 @@ const addToOutlook = () => {
 
 const calendarOptions = ref([
   {
-    label: "Google Calendar",
-    event: "google",
+    label: 'Google Calendar',
+    event: 'google',
   },
   {
-    label: "iCal",
-    event: "ical",
+    label: 'iCal',
+    event: 'ical',
   },
   {
-    label: "Outlook",
-    event: "outlook",
+    label: 'Outlook',
+    event: 'outlook',
   },
 ]);
 </script>
@@ -83,6 +83,6 @@ const calendarOptions = ref([
     @ical="addToiCal"
     @outlook="addToOutlook"
   >
-    <PrimaryButton :label="'+ Add to Calendar'"/>
+    <PrimaryButton :label="'+ Add to Calendar'" />
   </MenuButton>
 </template>

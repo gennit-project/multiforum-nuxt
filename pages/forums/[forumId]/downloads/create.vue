@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import CreateDownload from "@/components/download/form/CreateDownload.vue";
+import CreateDownload from '@/components/download/form/CreateDownload.vue';
 </script>
 
 <template>

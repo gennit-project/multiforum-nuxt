@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import type { PropType, Ref } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { GET_TAGS } from "@/graphQLData/tag/queries";
-import type { Tag } from "@/__generated__/graphql";
-import SearchBar from "@/components/SearchBar.vue";
-import { CREATE_TAG } from "@/graphQLData/tag/mutations";
-import ErrorBanner from "./ErrorBanner.vue";
+import { ref, computed, watch } from 'vue';
+import type { PropType, Ref } from 'vue';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { GET_TAGS } from '@/graphQLData/tag/queries';
+import type { Tag } from '@/__generated__/graphql';
+import SearchBar from '@/components/SearchBar.vue';
+import { CREATE_TAG } from '@/graphQLData/tag/mutations';
+import ErrorBanner from './ErrorBanner.vue';
 
 const {
   mutate: createTag,
@@ -25,13 +25,13 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
-const emit = defineEmits(["toggleSelection"]);
+const emit = defineEmits(['toggleSelection']);
 
-const searchInput: Ref<string> = ref("");
+const searchInput: Ref<string> = ref('');
 
 const searchInputComputed = computed(() => searchInput.value);
 
@@ -47,7 +47,7 @@ const {
     },
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -84,11 +84,11 @@ const handleAddTag = async (event: KeyboardEvent) => {
         const createdTag = response?.data?.createTags?.tags?.[0]?.text;
         if (createdTag) {
           selected.value.push(createdTag);
-          emit("toggleSelection", createdTag);
+          emit('toggleSelection', createdTag);
         }
-        input.value = "";
+        input.value = '';
       } catch (error) {
-        console.error("Error creating tag:", error);
+        console.error('Error creating tag:', error);
       }
     }
   }
@@ -97,7 +97,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
 
 <template>
   <div
-    class="absolute z-10 left-0 right-0 top-full max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white dark:bg-gray-800 shadow-lg dark:border-gray-700 dark:text-white touch-scroll-y"
+    class="touch-scroll-y absolute left-0 right-0 top-full z-10 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
   >
     <SearchBar
       class="w-full align-middle"
@@ -113,7 +113,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
     />
     <ErrorBanner
       v-if="createTagError"
-      class="text-red-500 text-sm mt-1"
+      class="mt-1 text-sm text-red-500"
       :text="createTagError.message"
     />
     <div v-if="tagsLoading">Loading...</div>
@@ -134,7 +134,7 @@ const handleAddTag = async (event: KeyboardEvent) => {
           :checked="selected.includes(tag.text)"
           class="border border-gray-300 text-orange-600 dark:border-gray-600"
           @change="() => emit('toggleSelection', tag.text)"
-        >
+        />
         <div class="flex items-center space-x-2">
           <div class="flex-col">
             <span :data-testid="`tag-picker-${tag.text}`" class="font-bold">{{

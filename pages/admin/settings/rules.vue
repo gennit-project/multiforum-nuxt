@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
-import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
-import FormRow from "@/components/FormRow.vue";
-import RulesEditor from "@/components/RulesEditor.vue";
+import type { PropType } from 'vue';
+import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import FormRow from '@/components/FormRow.vue';
+import RulesEditor from '@/components/RulesEditor.vue';
 
 defineProps({
   editMode: {
@@ -16,14 +16,14 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["updateFormValues"]);
+const emit = defineEmits(['updateFormValues']);
 </script>
 
 <template>
   <div class="space-y-4 sm:space-y-5">
     <FormRow section-title="Forum Rules">
       <template #content>
-        <RulesEditor 
+        <RulesEditor
           :form-values="{ rules: formValues?.rules || [] }"
           @update-form-values="$emit('updateFormValues', $event)"
         />

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import axios from "axios";
-import LocationIcon from "@/components/icons/LocationIcon.vue";
-import { config } from "@/config";
+import { ref } from 'vue';
+import axios from 'axios';
+import LocationIcon from '@/components/icons/LocationIcon.vue';
+import { config } from '@/config';
 
 // Props
 const props = defineProps({
@@ -20,7 +20,7 @@ const props = defineProps({
   },
   initialValue: {
     type: String,
-    default: "",
+    default: '',
   },
   inTopNav: {
     type: Boolean,
@@ -32,11 +32,11 @@ const props = defineProps({
   },
   radius: {
     type: String,
-    default: "",
+    default: '',
   },
   referencePointAddressName: {
     type: String,
-    default: "",
+    default: '',
   },
   rightSideIsRounded: {
     type: Boolean,
@@ -44,7 +44,7 @@ const props = defineProps({
   },
   searchPlaceholder: {
     type: String,
-    default: "Anywhere",
+    default: 'Anywhere',
   },
   useMediumRoundedCorners: {
     type: Boolean,
@@ -59,7 +59,7 @@ const apiKey = config.openCageApiKey;
 const searchLocations = async () => {
   if (searchQuery.value.length > 2) {
     const response = await axios.get(
-      "https://api.opencagedata.com/geocode/v1/json",
+      'https://api.opencagedata.com/geocode/v1/json',
       {
         params: {
           q: searchQuery.value,
@@ -74,23 +74,25 @@ const searchLocations = async () => {
 const selectLocation = (location: any) => {
   const placeData = {
     formatted_address: location.formatted,
-    name: location.formatted.split(",")[0],
+    name: location.formatted.split(',')[0],
     lat: location.geometry.lat,
     lng: location.geometry.lng,
   };
   searchQuery.value = location.formatted;
   searchResults.value = [];
-  emit("updateLocationInput", placeData);
+  emit('updateLocationInput', placeData);
 };
 
-const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
+const emit = defineEmits(['updateLocationInput', 'requestUserLocation']);
 </script>
 
 <template>
   <div class="flex-1 dark:text-white">
     <label for="search" class="sr-only">Search Location</label>
     <div class="relative flex items-center">
-      <div class="pointer-events-none absolute left-0 flex items-center py-2.5 pl-3">
+      <div
+        class="pointer-events-none absolute left-0 flex items-center py-2.5 pl-3"
+      >
         <LocationIcon
           class="h-5 w-5 text-gray-400 dark:text-gray-200"
           aria-hidden="true"
@@ -105,14 +107,14 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
           rightSideIsRounded ? 'rounded-r-full' : '',
           useMediumRoundedCorners ? 'rounded-md' : '',
         ]"
-        :placeholder="searchPlaceholder" 
+        :placeholder="searchPlaceholder"
         @input="searchLocations"
-      >
+      />
       <slot />
       <client-only>
         <ul
           v-if="searchResults.length"
-          class="dark:text-white absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
+          class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-700 dark:text-white"
           style="top: 100%"
         >
           <li
@@ -128,12 +130,10 @@ const emit = defineEmits(["updateLocationInput", "requestUserLocation"]);
         <template #fallback>
           <ul
             v-if="searchResults.length"
-            class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto border border-gray-200 bg-white dark:bg-gray-700 dark:border-gray-700 rounded-md shadow-lg"
+            class="absolute z-10 mt-1 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-700"
             style="top: 100%"
           >
-            <li class="cursor-pointer px-4 py-2">
-              Loading...
-            </li>
+            <li class="cursor-pointer px-4 py-2">Loading...</li>
           </ul>
         </template>
       </client-only>

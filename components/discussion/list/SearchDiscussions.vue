@@ -1,14 +1,14 @@
 <script setup lang="ts">
-  import { ref, watch } from "vue";
-  import { useRoute, useRouter } from "nuxt/app";
-  import ChannelDiscussionList from "./ChannelDiscussionList.vue";
-  import SitewideDiscussionList from "./SitewideDiscussionList.vue";
-  import DiscussionFilterBar from "@/components/discussion/list/DiscussionFilterBar.vue";
-  import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
-  import type { SearchDiscussionValues } from "@/types/Discussion";
+import { ref, watch } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import ChannelDiscussionList from './ChannelDiscussionList.vue';
+import SitewideDiscussionList from './SitewideDiscussionList.vue';
+import DiscussionFilterBar from '@/components/discussion/list/DiscussionFilterBar.vue';
+import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams';
+import type { SearchDiscussionValues } from '@/types/Discussion';
 
 // Props and Emits
-defineEmits(["filterByTag", "filterByChannel"]);
+defineEmits(['filterByTag', 'filterByChannel']);
 
 defineProps({
   isForumScoped: {
@@ -21,7 +21,9 @@ defineProps({
 const route = useRoute();
 const router = useRouter();
 
-const channelId = ref(typeof route.params.forumId === "string" ? route.params.forumId : "");
+const channelId = ref(
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
+);
 
 const filterValues = ref(
   getFilterValuesFromParams({
@@ -34,7 +36,7 @@ const filterValues = ref(
 watch(
   () => route.params.forumId,
   (newForumId) => {
-    channelId.value = typeof newForumId === "string" ? newForumId : "";
+    channelId.value = typeof newForumId === 'string' ? newForumId : '';
   }
 );
 
@@ -53,15 +55,17 @@ watch(
 // Methods
 const updateFilters = (params: SearchDiscussionValues) => {
   const existingQuery = route.query;
-  
+
   // Convert boolean values to strings for URL query parameters
   const queryParams: Record<string, string | string[]> = {};
-  
+
   if (params.tags) queryParams.tags = params.tags;
   if (params.channels) queryParams.channels = params.channels;
-  if (params.searchInput !== undefined) queryParams.searchInput = params.searchInput;
-  if (params.showArchived !== undefined) queryParams.showArchived = params.showArchived.toString();
-  
+  if (params.searchInput !== undefined)
+    queryParams.searchInput = params.searchInput;
+  if (params.showArchived !== undefined)
+    queryParams.showArchived = params.showArchived.toString();
+
   router.replace({
     query: {
       ...existingQuery,
@@ -75,7 +79,7 @@ const handleClickTag = (tagText: string) => {
 
   const clearTags = () => {
     const newQuery = { ...route.query };
-    delete newQuery["tags"];
+    delete newQuery['tags'];
     router.replace({ query: { ...newQuery } });
     if (!filterValues.value.tags) {
       filterValues.value.tags = [];
@@ -90,10 +94,12 @@ const handleClickTag = (tagText: string) => {
     if (newQuery.tags === null) {
       newQuery.tags = [];
     }
-    if (typeof newQuery.tags === "string") {
+    if (typeof newQuery.tags === 'string') {
       newQuery.tags = [newQuery.tags];
     } else if (Array.isArray(newQuery.tags)) {
-      newQuery.tags = newQuery.tags.filter((tag): tag is string => typeof tag === 'string' && tag !== tagText);
+      newQuery.tags = newQuery.tags.filter(
+        (tag): tag is string => typeof tag === 'string' && tag !== tagText
+      );
     }
     router.replace({ query: { ...newQuery } });
     if (!filterValues.value.tags) {
@@ -104,12 +110,12 @@ const handleClickTag = (tagText: string) => {
 
   const alreadyFilteringByOnlyThisTag =
     currentQuery.tags &&
-    typeof currentQuery.tags === "string" &&
+    typeof currentQuery.tags === 'string' &&
     tagText === currentQuery.tags;
 
   const alreadyFilteringByMultipleTagsIncludingThisTag =
     currentQuery.tags &&
-    typeof currentQuery.tags === "object" &&
+    typeof currentQuery.tags === 'object' &&
     currentQuery.tags.includes(tagText);
 
   if (alreadyFilteringByOnlyThisTag) {
@@ -126,17 +132,17 @@ const handleClickChannel = (uniqueName: string) => {
 
   const alreadyFilteringByThisChannel =
     currentQuery.channels &&
-    typeof currentQuery.channels === "string" &&
+    typeof currentQuery.channels === 'string' &&
     uniqueName === currentQuery.channels;
 
   const alreadyFilteringByMultipleChannelsIncludingThisChannel =
     currentQuery.channels &&
-    typeof currentQuery.channels === "object" &&
+    typeof currentQuery.channels === 'object' &&
     currentQuery.channels.includes(uniqueName);
 
   const clearChannels = () => {
     const newQuery = { ...route.query };
-    delete newQuery["channels"];
+    delete newQuery['channels'];
     router.replace({ query: { ...newQuery } });
     if (!filterValues.value.channels) {
       filterValues.value.channels = [];
@@ -151,11 +157,11 @@ const handleClickChannel = (uniqueName: string) => {
     if (newQuery.channels === null) {
       newQuery.channels = [];
     }
-    if (typeof newQuery.channels === "string") {
+    if (typeof newQuery.channels === 'string') {
       newQuery.channels = [newQuery.channels];
     } else if (Array.isArray(newQuery.channels)) {
       newQuery.channels = newQuery.channels.filter(
-        (channel): channel is string => 
+        (channel): channel is string =>
           typeof channel === 'string' && channel !== uniqueName
       );
     }

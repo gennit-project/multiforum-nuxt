@@ -1,63 +1,65 @@
 <script setup lang="ts">
-  import { computed } from "vue";
-  import type { PropType } from "vue";
-  import type { Discussion } from "@/__generated__/graphql";
-  import { timeAgo } from "@/utils";
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import type { Discussion } from '@/__generated__/graphql';
+import { timeAgo } from '@/utils';
 
-  const props = defineProps({
-    discussion: {
-      type: Object as PropType<Discussion>,
-      required: true,
-    },
-  });
+const props = defineProps({
+  discussion: {
+    type: Object as PropType<Discussion>,
+    required: true,
+  },
+});
 
-  // Process the past title versions
-  const titleVersionsWithCurrent = computed(() => {
-    if (!props.discussion?.PastTitleVersions || props.discussion.PastTitleVersions.length === 0) {
-      return [];
-    }
+// Process the past title versions
+const titleVersionsWithCurrent = computed(() => {
+  if (
+    !props.discussion?.PastTitleVersions ||
+    props.discussion.PastTitleVersions.length === 0
+  ) {
+    return [];
+  }
 
-    // Get past versions ordered by oldest first (chronological order)
-    const pastVersions = props.discussion.PastTitleVersions.slice().reverse();
+  // Get past versions ordered by oldest first (chronological order)
+  const pastVersions = props.discussion.PastTitleVersions.slice().reverse();
 
-    // Create an array of title transitions:
-    // [current <- past version N <- ... <- past version 1]
-    const transitions = [];
+  // Create an array of title transitions:
+  // [current <- past version N <- ... <- past version 1]
+  const transitions = [];
 
-    // Add transitions between past versions (chronological order)
-    for (let i = 0; i < pastVersions.length; i++) {
-      const oldVersion = pastVersions[i];
-      const newerVersion = i === pastVersions.length - 1 ? { body: props.discussion.title } : pastVersions[i + 1];
+  // Add transitions between past versions (chronological order)
+  for (let i = 0; i < pastVersions.length; i++) {
+    const oldVersion = pastVersions[i];
+    const newerVersion =
+      i === pastVersions.length - 1
+        ? { body: props.discussion.title }
+        : pastVersions[i + 1];
 
-      transitions.push({
-        id: oldVersion.id,
-        author: oldVersion.Author?.username || "[Deleted]",
-        oldTitle: oldVersion.body,
-        newTitle: newerVersion.body,
-        timestamp: new Date(oldVersion.createdAt),
-        isLatest: i === pastVersions.length - 1,
-      });
-    }
+    transitions.push({
+      id: oldVersion.id,
+      author: oldVersion.Author?.username || '[Deleted]',
+      oldTitle: oldVersion.body,
+      newTitle: newerVersion.body,
+      timestamp: new Date(oldVersion.createdAt),
+      isLatest: i === pastVersions.length - 1,
+    });
+  }
 
-    return transitions;
-  });
+  return transitions;
+});
 
-  // Show the activity feed only if there are past title versions
-  const showActivityFeed = computed(() => {
-    return titleVersionsWithCurrent.value.length > 0;
-  });
+// Show the activity feed only if there are past title versions
+const showActivityFeed = computed(() => {
+  return titleVersionsWithCurrent.value.length > 0;
+});
 </script>
 
 <template>
-  <div
-    v-if="showActivityFeed"
-    class="mb-6 mt-4"
-  >
-    <h3 class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">Title Edit History</h3>
-    <ul
-      role="list"
-      class="flow-root"
-    >
+  <div v-if="showActivityFeed" class="mb-6 mt-4">
+    <h3 class="mb-2 text-xs font-medium text-gray-500 dark:text-gray-400">
+      Title Edit History
+    </h3>
+    <ul role="list" class="flow-root">
       <li
         v-for="item in titleVersionsWithCurrent"
         :key="item.id"
@@ -83,12 +85,22 @@
           <!-- Activity content -->
           <div class="min-w-0 flex-1">
             <div class="text-xs leading-6">
-              <span class="font-medium text-gray-900 dark:text-gray-200">{{ item.author }}</span>
-              <span class="text-gray-500 dark:text-gray-400"> changed the title </span>
-              <span class="text-gray-500 line-through dark:text-gray-400">{{ item.oldTitle }}</span>
+              <span class="font-medium text-gray-900 dark:text-gray-200">{{
+                item.author
+              }}</span>
+              <span class="text-gray-500 dark:text-gray-400">
+                changed the title
+              </span>
+              <span class="text-gray-500 line-through dark:text-gray-400">{{
+                item.oldTitle
+              }}</span>
               <span class="text-gray-500 dark:text-gray-400"> → </span>
-              <span class="text-gray-900 dark:text-gray-200">{{ item.newTitle }}</span>
-              <span class="whitespace-nowrap text-xs text-gray-500 dark:text-gray-400">
+              <span class="text-gray-900 dark:text-gray-200">{{
+                item.newTitle
+              }}</span>
+              <span
+                class="whitespace-nowrap text-xs text-gray-500 dark:text-gray-400"
+              >
                 {{ timeAgo(item.timestamp) }}
               </span>
             </div>

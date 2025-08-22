@@ -1,21 +1,21 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
-import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
-import type { Album } from "@/__generated__/graphql";
-import { useDisplay } from "vuetify";
-import DownloadIcon from "@/components/icons/DownloadIcon.vue";
-import XmarkIcon from "@/components/icons/XmarkIcon.vue";
-import PencilIcon from "@/components/icons/PencilIcon.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import SaveButton from "@/components/SaveButton.vue";
-import CancelButton from "@/components/CancelButton.vue";
-import { useMutation } from "@vue/apollo-composable";
-import { UPDATE_IMAGE } from "@/graphQLData/discussion/mutations";
-import { usernameVar } from "@/cache";
-import ModelViewer from "@/components/ModelViewer.vue";
-import StlViewer from "@/components/download/StlViewer.vue";
+import type { PropType } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
+import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
+import type { Album } from '@/__generated__/graphql';
+import { useDisplay } from 'vuetify';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import SaveButton from '@/components/SaveButton.vue';
+import CancelButton from '@/components/CancelButton.vue';
+import { useMutation } from '@vue/apollo-composable';
+import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
+import { usernameVar } from '@/cache';
+import ModelViewer from '@/components/ModelViewer.vue';
+import StlViewer from '@/components/download/StlViewer.vue';
 
 const props = defineProps({
   album: {
@@ -48,7 +48,9 @@ const props = defineProps({
     default: false,
   },
   stlFiles: {
-    type: Array as PropType<Array<{ id?: string; url: string; fileName?: string }>>,
+    type: Array as PropType<
+      Array<{ id?: string; url: string; fileName?: string }>
+    >,
     default: () => [],
   },
 });
@@ -63,33 +65,38 @@ const activeIndex = ref(0);
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 
-const orderedImages = computed(() => {  
+const orderedImages = computed(() => {
   // Start with album images if they exist
   let albumImages: any[] = [];
-  
+
   if (props.album) {
     console.log('DiscussionAlbum: Album data:', {
       album: props.album,
       images: props.album.Images,
       imageOrder: props.album.imageOrder,
       imagesLength: props.album.Images?.length,
-      imageOrderLength: props.album.imageOrder?.length
+      imageOrderLength: props.album.imageOrder?.length,
     });
-    
+
     if (!props.album.imageOrder || props.album.imageOrder.length === 0) {
       console.log('DiscussionAlbum: No imageOrder, using Images directly');
       albumImages = props.album.Images || [];
     } else {
       albumImages = props.album.imageOrder
         .map((imageId) => {
-          const foundImage = props.album?.Images?.find((image) => image.id === imageId);
-          console.log(`DiscussionAlbum: Looking for image ${imageId}, found:`, foundImage);
+          const foundImage = props.album?.Images?.find(
+            (image) => image.id === imageId
+          );
+          console.log(
+            `DiscussionAlbum: Looking for image ${imageId}, found:`,
+            foundImage
+          );
           return foundImage;
         })
         .filter((image) => image !== undefined);
     }
   }
-  
+
   // Create synthetic "image" objects for STL files
   const stlAsImages = props.stlFiles.map((stlFile, index) => ({
     id: `stl-${stlFile.id || index}`,
@@ -99,11 +106,14 @@ const orderedImages = computed(() => {
     isStlFile: true,
     fileName: stlFile.fileName,
   }));
-  
+
   // Combine album images with STL files
   const allImages = [...albumImages, ...stlAsImages];
-  
-  console.log('DiscussionAlbum: Final ordered images (including STL):', allImages);
+
+  console.log(
+    'DiscussionAlbum: Final ordered images (including STL):',
+    allImages
+  );
   return allImages;
 });
 
@@ -115,52 +125,53 @@ const isPanelVisible = ref(true);
 
 // Caption editing
 const editingCaptionIndex = ref(-1);
-const editingCaption = ref("");
+const editingCaption = ref('');
 const isLoggedInAuthor = computed(() => {
   return usernameVar.value === props.discussionAuthor;
 });
 
 // Mutation to update image caption
-const { mutate: updateImage, loading: updateLoading } = useMutation(UPDATE_IMAGE);
+const { mutate: updateImage, loading: updateLoading } =
+  useMutation(UPDATE_IMAGE);
 
 // Events emitted by this component
-const emit = defineEmits(["album-updated", "edit-album", "close-lightbox"]);
+const emit = defineEmits(['album-updated', 'edit-album', 'close-lightbox']);
 
 const startEditingCaption = (index: number) => {
   // Set which image we're editing and initialize with current caption
   editingCaptionIndex.value = index;
-  editingCaption.value = orderedImages.value[index]?.caption || "";
+  editingCaption.value = orderedImages.value[index]?.caption || '';
 };
 
 const cancelEditingCaption = () => {
   editingCaptionIndex.value = -1;
-  editingCaption.value = "";
+  editingCaption.value = '';
 };
 
 const saveCaption = async () => {
   if (editingCaptionIndex.value < 0) return;
-  
+
   // Get the image being edited
   const image = orderedImages.value[editingCaptionIndex.value];
   if (!image) return;
-  
+
   try {
     // Use the simplified mutation to just update the image's caption
     const result = await updateImage({
       imageId: image.id,
-      caption: editingCaption.value
+      caption: editingCaption.value,
     });
-    
+
     // Emit event to parent component that album was updated
-    emit("album-updated");
-    
+    emit('album-updated');
+
     // Reset editing state
     cancelEditingCaption();
-    
-    console.log("Caption saved successfully:", result);
+
+    console.log('Caption saved successfully:', result);
   } catch (error) {
-    console.error("Error updating caption:", error);
-    alert("Error saving caption. Please try again.");
+    console.error('Error updating caption:', error);
+    alert('Error saving caption. Please try again.');
   }
 };
 
@@ -190,17 +201,18 @@ const startDrag = (event: MouseEvent) => {
 const onDrag = (event: MouseEvent) => {
   // Only move if we're actively dragging (mouse button is held down)
   if (!isDragging.value) return;
-  
+
   // Don't handle drag events if we're editing a caption
   if (editingCaptionIndex.value !== -1) return;
-  
+
   // Check if the event target is inside the text editor
   const target = event.target as HTMLElement;
-  if (target && (
-    target.tagName === 'TEXTAREA' || 
-    target.closest('.text-editor-container') || 
-    target.closest('button')
-  )) {
+  if (
+    target &&
+    (target.tagName === 'TEXTAREA' ||
+      target.closest('.text-editor-container') ||
+      target.closest('button'))
+  ) {
     return;
   }
 
@@ -212,15 +224,16 @@ const onDrag = (event: MouseEvent) => {
 const stopDrag = (event?: MouseEvent | TouchEvent | Event) => {
   // Stop dragging when mouse button is released
   isDragging.value = false;
-  
+
   // If we have an event and are editing a caption, check if the click is inside the editor
   if (event && editingCaptionIndex.value !== -1) {
     const target = event.target as HTMLElement;
-    if (target && (
-      target.tagName === 'TEXTAREA' || 
-      target.closest('form') || 
-      target.closest('button')
-    )) {
+    if (
+      target &&
+      (target.tagName === 'TEXTAREA' ||
+        target.closest('form') ||
+        target.closest('button'))
+    ) {
       // Don't do anything if the click is inside the editor
       event.stopPropagation();
     }
@@ -231,16 +244,17 @@ const stopDrag = (event?: MouseEvent | TouchEvent | Event) => {
 const startTouchDrag = (event: TouchEvent) => {
   // Only handle panning when zoomed in
   if (!isZoomed.value) return;
-  
+
   // Don't handle if we're editing a caption
   if (editingCaptionIndex.value !== -1) {
     const target = event.target as HTMLElement;
-    if (target && (
-      target.tagName === 'TEXTAREA' || 
-      target.closest('.text-editor-container') || 
-      target.closest('form') ||
-      target.closest('button')
-    )) {
+    if (
+      target &&
+      (target.tagName === 'TEXTAREA' ||
+        target.closest('.text-editor-container') ||
+        target.closest('form') ||
+        target.closest('button'))
+    ) {
       return;
     }
   }
@@ -294,17 +308,17 @@ const openLightbox = (index: number) => {
   isPanelVisible.value = true; // Always show panel when opening lightbox
   zoomLevel.value = 1; // Reset zoom when opening lightbox
   resetTranslation(); // Reset position when opening lightbox
-  document.body.style.overflow = "hidden"; // Prevent scrolling
+  document.body.style.overflow = 'hidden'; // Prevent scrolling
 };
 
 const closeLightbox = () => {
   isLightboxOpen.value = false;
   zoomLevel.value = 1; // Reset zoom when closing
   resetTranslation(); // Reset position when closing
-  document.body.style.overflow = ""; // Restore scrolling
-  
+  document.body.style.overflow = ''; // Restore scrolling
+
   // Emit close event for parent components
-  emit("close-lightbox");
+  emit('close-lightbox');
 };
 
 const nextImage = () => {
@@ -357,21 +371,21 @@ const handleKeyDown = (e: KeyboardEvent) => {
     if (editingCaptionIndex.value !== -1) {
       return;
     }
-    
-    if (e.key === "Escape") {
+
+    if (e.key === 'Escape') {
       closeLightbox();
-    } else if (e.key === "ArrowRight") {
+    } else if (e.key === 'ArrowRight') {
       nextImage();
-    } else if (e.key === "ArrowLeft") {
+    } else if (e.key === 'ArrowLeft') {
       prevImage();
-    } else if (e.key === "i") {
+    } else if (e.key === 'i') {
       // 'i' for info panel toggle
       togglePanel();
-    } else if (e.key === "+") {
+    } else if (e.key === '+') {
       zoomIn();
-    } else if (e.key === "-") {
+    } else if (e.key === '-') {
       zoomOut();
-    } else if (e.key === "0") {
+    } else if (e.key === '0') {
       resetZoom();
     }
   }
@@ -392,17 +406,18 @@ const handleMouseUp = (event: MouseEvent) => {
   // If we're editing a caption and the click is in the editor area, don't close
   if (editingCaptionIndex.value !== -1) {
     const target = event.target as HTMLElement;
-    if (target && (
-      target.tagName === 'TEXTAREA' || 
-      target.closest('.text-editor-container') || 
-      target.closest('form') ||
-      target.closest('button')
-    )) {
+    if (
+      target &&
+      (target.tagName === 'TEXTAREA' ||
+        target.closest('.text-editor-container') ||
+        target.closest('form') ||
+        target.closest('button'))
+    ) {
       event.stopPropagation();
       return;
     }
   }
-  
+
   stopDrag(event);
 };
 
@@ -412,17 +427,17 @@ const handleTouchStop = (event: TouchEvent) => {
 };
 
 onMounted(() => {
-  window.addEventListener("keydown", handleKeyDown);
+  window.addEventListener('keydown', handleKeyDown);
 
   // Global event listeners to handle events outside the image element
-  window.addEventListener("mouseup", handleMouseUp);
-  window.addEventListener("mouseleave", stopDrag); // Stop dragging if mouse leaves window
-  window.addEventListener("mousemove", onDrag);
+  window.addEventListener('mouseup', handleMouseUp);
+  window.addEventListener('mouseleave', stopDrag); // Stop dragging if mouse leaves window
+  window.addEventListener('mousemove', onDrag);
 
   // Touch events for mobile
-  window.addEventListener("touchend", handleTouchStop);
-  window.addEventListener("touchcancel", handleTouchStop);
-  
+  window.addEventListener('touchend', handleTouchStop);
+  window.addEventListener('touchcancel', handleTouchStop);
+
   // Start in lightbox mode if prop is set
   if (props.startInLightbox && orderedImages.value.length > 0) {
     openLightbox(0);
@@ -430,13 +445,13 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  window.removeEventListener("keydown", handleKeyDown);
-  window.removeEventListener("mouseup", handleMouseUp);
-  window.removeEventListener("mouseleave", stopDrag);
-  window.removeEventListener("mousemove", onDrag);
-  window.removeEventListener("touchend", handleTouchStop);
-  window.removeEventListener("touchcancel", handleTouchStop);
-  document.body.style.overflow = ""; // Ensure scrolling is restored
+  window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('mouseup', handleMouseUp);
+  window.removeEventListener('mouseleave', stopDrag);
+  window.removeEventListener('mousemove', onDrag);
+  window.removeEventListener('touchend', handleTouchStop);
+  window.removeEventListener('touchcancel', handleTouchStop);
+  document.body.style.overflow = ''; // Ensure scrolling is restored
 });
 
 const downloadImage = (imageUrl: string) => {
@@ -447,9 +462,9 @@ const downloadImage = (imageUrl: string) => {
       const blobUrl = URL.createObjectURL(blob);
 
       // Create download link
-      const downloadLink = document.createElement("a");
+      const downloadLink = document.createElement('a');
       downloadLink.href = blobUrl;
-      const filename = imageUrl.split("/").pop() || "image.jpg";
+      const filename = imageUrl.split('/').pop() || 'image.jpg';
       downloadLink.download = filename;
 
       // Append to document, click, and clean up
@@ -463,7 +478,7 @@ const downloadImage = (imageUrl: string) => {
       }, 100);
     })
     .catch((error) => {
-      console.error("Download failed:", error);
+      console.error('Download failed:', error);
     });
 };
 
@@ -473,22 +488,23 @@ const touchEndX = ref(0);
 const handleTouchStart = (event: TouchEvent) => {
   // Store the initial touch position
   touchStartX.value = event.touches[0].clientX;
-  
+
   // If we're in the lightbox view and zoomed in, let the image panning handle this
   if (isLightboxOpen.value && isZoomed.value) {
     return;
   }
-  
+
   // If we're editing a caption, ignore swipes
   if (editingCaptionIndex.value !== -1) {
     // Check if the touch is inside the editor
     const target = event.target as HTMLElement;
-    if (target && (
-      target.tagName === 'TEXTAREA' || 
-      target.closest('.text-editor-container') || 
-      target.closest('form') ||
-      target.closest('button')
-    )) {
+    if (
+      target &&
+      (target.tagName === 'TEXTAREA' ||
+        target.closest('.text-editor-container') ||
+        target.closest('form') ||
+        target.closest('button'))
+    ) {
       return;
     }
   }
@@ -499,24 +515,25 @@ const handleTouchEnd = (event: TouchEvent) => {
   if (isLightboxOpen.value && isZoomed.value) {
     return;
   }
-  
+
   // If we're editing a caption, ignore swipes
   if (editingCaptionIndex.value !== -1) {
     // Check if the touch is inside the editor
     const target = event.target as HTMLElement;
-    if (target && (
-      target.tagName === 'TEXTAREA' || 
-      target.closest('.text-editor-container') || 
-      target.closest('form') ||
-      target.closest('button')
-    )) {
+    if (
+      target &&
+      (target.tagName === 'TEXTAREA' ||
+        target.closest('.text-editor-container') ||
+        target.closest('form') ||
+        target.closest('button'))
+    ) {
       return;
     }
   }
-  
+
   touchEndX.value = event.changedTouches[0].clientX;
   const swipeDistance = touchEndX.value - touchStartX.value;
-  
+
   // Only trigger if the swipe is significant enough (e.g., > 50px)
   if (Math.abs(swipeDistance) > 50) {
     if (swipeDistance > 0) {
@@ -541,8 +558,10 @@ const handleTouchEnd = (event: TouchEvent) => {
 <template>
   <div class="w-ful">
     <!-- Normal thumbnail grid view -->
-    <div v-if="!isLightboxOpen && !startInLightbox" class="overflow-x-auto border">
-
+    <div
+      v-if="!isLightboxOpen && !startInLightbox"
+      class="overflow-x-auto border"
+    >
       <!-- Grid view -->
       <div
         v-if="!carouselFormat"
@@ -561,7 +580,9 @@ const handleTouchEnd = (event: TouchEvent) => {
             width="100%"
             class="shadow-sm"
           />
-          <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
+          <ClientOnly
+            v-else-if="image && image.url && hasStlExtension(image.url)"
+          >
             <StlViewer
               :src="image.url"
               :width="200"
@@ -574,25 +595,26 @@ const handleTouchEnd = (event: TouchEvent) => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <div
-v-if="editingCaptionIndex === idx" 
-               class="text-center text-xs mt-1"
-               @click.stop
-               @mousedown.stop
-               @touchstart.stop>
+            v-if="editingCaptionIndex === idx"
+            class="mt-1 text-center text-xs"
+            @click.stop
+            @mousedown.stop
+            @touchstart.stop
+          >
             <TextEditor
               :initial-value="editingCaption"
               :allow-image-upload="false"
               placeholder="Write a caption..."
               :rows="2"
-              @update="(text) => editingCaption = text"
+              @update="(text) => (editingCaption = text)"
               @click.stop
               @mousedown.stop
               @touchstart.stop
             />
-            <div class="flex gap-2 mt-1 justify-center">
-              <SaveButton 
+            <div class="mt-1 flex justify-center gap-2">
+              <SaveButton
                 size="xs"
                 :disabled="updateLoading"
                 :loading="updateLoading"
@@ -601,25 +623,27 @@ v-if="editingCaptionIndex === idx"
               <CancelButton size="xs" @click.stop="cancelEditingCaption" />
             </div>
           </div>
-          <div v-else class="text-center text-xs relative group">
+          <div v-else class="group relative text-center text-xs">
             <span v-if="image?.caption">
               <span>{{ image.caption }}</span>
               <span
                 v-if="isLoggedInAuthor"
-                class="inline-flex ml-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+                class="bg-transparent ml-2 inline-flex cursor-pointer rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
                 role="button"
                 tabindex="0"
                 @click.stop="startEditingCaption(idx)"
                 @keydown.enter.stop="startEditingCaption(idx)"
                 @keydown.space.stop="startEditingCaption(idx)"
               >
-                <PencilIcon class="h-3 w-3 re" />
+                <PencilIcon class="re h-3 w-3" />
               </span>
             </span>
-            <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
+            <span v-else-if="!isLoggedInAuthor" class="italic text-gray-400"
+              >No caption</span
+            >
             <span
               v-else
-              class="text-orange-400 hover:text-orange-300 flex items-center justify-center gap-1 w-full cursor-pointer"
+              class="flex w-full cursor-pointer items-center justify-center gap-1 text-orange-400 hover:text-orange-300"
               role="button"
               tabindex="0"
               @click.stop="startEditingCaption(idx)"
@@ -634,14 +658,17 @@ v-if="editingCaptionIndex === idx"
       </div>
 
       <!-- Carousel view -->
-      <div v-else class="flex flex-col border *:border-gray-300 dark:border-gray-700 rounded-lg">
+      <div
+        v-else
+        class="flex flex-col rounded-lg border *:border-gray-300 dark:border-gray-700"
+      >
         <!-- Image container -->
         <div class="flex items-center justify-center">
-          <div 
-            class="mb-4 flex rounded dark:text-white overflow-x-auto overflow-y-hidden touch-pan-x"
+          <div
+            class="mb-4 flex touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
             :class="{
               'max-h-96 max-w-96': !expandedView,
-              'w-full max-h-[400px]': expandedView
+              'max-h-[400px] w-full': expandedView,
             }"
             @touchstart="handleTouchStart"
             @touchend="handleTouchEnd"
@@ -649,39 +676,51 @@ v-if="editingCaptionIndex === idx"
             <div
               v-for="(image, idx) in orderedImages"
               :key="image?.id || idx"
-              class="flex flex-shrink-0 w-auto"
+              class="flex w-auto flex-shrink-0"
             >
               <div
                 class="min-h-10 cursor-pointer"
                 :class="{
                   'max-h-96 max-w-96': !expandedView,
-                  'w-full': expandedView
+                  'w-full': expandedView,
                 }"
                 @click="openLightbox(idx)"
               >
                 <ModelViewer
-                  v-if="image && image.url && hasGlbExtension(image.url) && idx === activeIndex"
+                  v-if="
+                    image &&
+                    image.url &&
+                    hasGlbExtension(image.url) &&
+                    idx === activeIndex
+                  "
                   :model-url="image.url"
                   :height="expandedView ? '400px' : '256px'"
                   :width="expandedView ? '600px' : '384px'"
-                  class="shadow-sm object-contain"
+                  class="object-contain shadow-sm"
                   :style="{
                     aspectRatio: '3/2',
                     maxWidth: expandedView ? '600px' : '384px',
-                    maxHeight: expandedView ? '400px' : '256px'
+                    maxHeight: expandedView ? '400px' : '256px',
                   }"
                   :show-fullscreen-button="false"
                 />
-                <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url) && idx === activeIndex">
+                <ClientOnly
+                  v-else-if="
+                    image &&
+                    image.url &&
+                    hasStlExtension(image.url) &&
+                    idx === activeIndex
+                  "
+                >
                   <StlViewer
                     :src="image.url"
                     :width="expandedView ? 600 : 384"
                     :height="expandedView ? 400 : 256"
-                    class="shadow-sm object-contain"
+                    class="object-contain shadow-sm"
                     :style="{
                       aspectRatio: '3/2',
                       maxWidth: expandedView ? '600px' : '384px',
-                      maxHeight: expandedView ? '400px' : '256px'
+                      maxHeight: expandedView ? '400px' : '256px',
                     }"
                   />
                 </ClientOnly>
@@ -689,30 +728,30 @@ v-if="editingCaptionIndex === idx"
                   v-else-if="image"
                   :src="image.url || ''"
                   :alt="image.alt || ''"
-                  class="shadow-sm object-contain"
+                  class="object-contain shadow-sm"
                   :class="{
                     hidden: idx !== activeIndex,
                     'max-h-96 max-w-96': !expandedView,
-                    'w-full h-auto': expandedView
+                    'h-auto w-full': expandedView,
                   }"
                   :style="{
                     aspectRatio: '3/2',
                     maxWidth: expandedView ? '600px' : '384px',
-                    maxHeight: expandedView ? '400px' : '256px'
+                    maxHeight: expandedView ? '400px' : '256px',
                   }"
-                >
-                <div 
-                  v-if="editingCaptionIndex === idx && idx === activeIndex" 
-                  class="text-center text-xs mt-1"
+                />
+                <div
+                  v-if="editingCaptionIndex === idx && idx === activeIndex"
+                  class="mt-1 text-center text-xs"
                 >
                   <TextEditor
                     :initial-value="editingCaption"
                     placeholder="Write a caption..."
                     :rows="2"
-                    @update="(text) => editingCaption = text"
+                    @update="(text) => (editingCaption = text)"
                   />
-                  <div class="flex gap-2 mt-1 justify-center">
-                    <SaveButton 
+                  <div class="mt-1 flex justify-center gap-2">
+                    <SaveButton
                       size="xs"
                       :disabled="updateLoading"
                       :loading="updateLoading"
@@ -723,13 +762,17 @@ v-if="editingCaptionIndex === idx"
                 </div>
                 <div
                   v-else
-                  class="text-center text-xs relative group"
+                  class="group relative text-center text-xs"
                   :class="{ hidden: idx !== activeIndex }"
                 >
                   <span v-if="image?.caption">
                     {{ image.caption }}
                   </span>
-                  <span v-else-if="!isLoggedInAuthor" class="text-gray-400 italic">No caption</span>
+                  <span
+                    v-else-if="!isLoggedInAuthor"
+                    class="italic text-gray-400"
+                    >No caption</span
+                  >
                 </div>
               </div>
             </div>
@@ -747,14 +790,14 @@ v-if="editingCaptionIndex === idx"
             <div v-if="orderedImages.length > 1" class="flex gap-2">
               <button
                 type="button"
-                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+                class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
                 @click="goLeft"
               >
                 <LeftArrowIcon class="h-4 w-4" />
               </button>
 
               <button
-                class="hover:bg-gray-500 flex items-center justify-center px-2 h-8"
+                class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
                 type="button"
                 @click="goRight"
               >
@@ -763,17 +806,17 @@ v-if="editingCaptionIndex === idx"
             </div>
           </div>
         </div>
-        
+
         <!-- Thumbnails row for expanded view -->
         <div v-if="expandedView && orderedImages.length > 1" class="mt-4 px-4">
           <div class="flex gap-2 overflow-x-auto pb-2">
             <div
               v-for="(image, idx) in orderedImages"
               :key="`thumb-${image?.id || idx}`"
-              class="flex-shrink-0 cursor-pointer border-2 rounded transition-all"
+              class="flex-shrink-0 cursor-pointer rounded border-2 transition-all"
               :class="{
                 'border-orange-500': idx === activeIndex,
-                'border-gray-300 hover:border-gray-400': idx !== activeIndex
+                'border-gray-300 hover:border-gray-400': idx !== activeIndex,
               }"
               @click="activeIndex = idx"
             >
@@ -784,7 +827,9 @@ v-if="editingCaptionIndex === idx"
                 width="80px"
                 class="rounded"
               />
-              <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
+              <ClientOnly
+                v-else-if="image && image.url && hasStlExtension(image.url)"
+              >
                 <StlViewer
                   :src="image.url"
                   :width="80"
@@ -796,8 +841,8 @@ v-if="editingCaptionIndex === idx"
                 v-else-if="image"
                 :src="image.url || ''"
                 :alt="image.alt || ''"
-                class="w-20 h-20 object-cover rounded shadow-sm"
-              >
+                class="h-20 w-20 rounded object-cover shadow-sm"
+              />
             </div>
           </div>
         </div>
@@ -807,7 +852,7 @@ v-if="editingCaptionIndex === idx"
     <!-- Custom lightbox with split layout -->
     <div
       v-if="isLightboxOpen"
-      class="fixed top-0 left-0 w-full h-full bg-black z-50 transition-all duration-300 ease-in-out"
+      class="fixed left-0 top-0 z-50 h-full w-full bg-black transition-all duration-300 ease-in-out"
       :class="{
         'flex-col': mdAndDown,
         flex: true,
@@ -815,16 +860,22 @@ v-if="editingCaptionIndex === idx"
     >
       <!-- Left panel for images (75% width on desktop, full width on mobile) -->
       <div
-        class="flex flex-col relative transition-all duration-300 ease-in-out z-40 overflow-hidden"
+        class="relative z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
         :class="{
-          'w-3/4 h-full': !mdAndDown && isPanelVisible,
-          'w-full h-full': mdAndDown || !isPanelVisible,
+          'h-full w-3/4': !mdAndDown && isPanelVisible,
+          'h-full w-full': mdAndDown || !isPanelVisible,
         }"
       >
-        <div class="flex justify-between items-center p-2 text-white z-50" :class="{ 'px-3': mdAndDown, 'px-5': !mdAndDown }">
-          <div class="flex items-center" :class="{ 'gap-2': mdAndDown, 'gap-4': !mdAndDown }">
+        <div
+          class="z-50 flex items-center justify-between p-2 text-white"
+          :class="{ 'px-3': mdAndDown, 'px-5': !mdAndDown }"
+        >
+          <div
+            class="flex items-center"
+            :class="{ 'gap-2': mdAndDown, 'gap-4': !mdAndDown }"
+          >
             <button
-              class="bg-transparent border-0 text-white cursor-pointer"
+              class="bg-transparent cursor-pointer border-0 text-white"
               :class="{ 'text-2xl': mdAndDown, 'text-3xl': !mdAndDown }"
               @click="closeLightbox"
             >
@@ -837,14 +888,17 @@ v-if="editingCaptionIndex === idx"
             </div>
           </div>
 
-          <div class="flex items-center" :class="{ 'gap-1': mdAndDown, 'gap-4': !mdAndDown }">
+          <div
+            class="flex items-center"
+            :class="{ 'gap-1': mdAndDown, 'gap-4': !mdAndDown }"
+          >
             <!-- Zoom controls -->
-            <div class="flex items-center bg-opacity-10 rounded">
+            <div class="flex items-center rounded bg-opacity-10">
               <button
-                class="hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
                 :class="[
                   { 'px-1 py-1 text-sm': mdAndDown, 'px-2 py-1': !mdAndDown },
-                  { 'opacity-50 cursor-not-allowed': zoomLevel <= 1 }
+                  { 'cursor-not-allowed opacity-50': zoomLevel <= 1 },
                 ]"
                 title="Zoom out"
                 :disabled="zoomLevel <= 1"
@@ -852,14 +906,23 @@ v-if="editingCaptionIndex === idx"
               >
                 −
               </button>
-              <span class="text-white" :class="{ 'px-1 text-xs': mdAndDown, 'px-2 text-sm': !mdAndDown }"
-                >{{ mdAndDown ? Math.round(zoomLevel * 100) + '%' : Math.round(zoomLevel * 100) + '%' }}</span
+              <span
+                class="text-white"
+                :class="{
+                  'px-1 text-xs': mdAndDown,
+                  'px-2 text-sm': !mdAndDown,
+                }"
+                >{{
+                  mdAndDown
+                    ? Math.round(zoomLevel * 100) + '%'
+                    : Math.round(zoomLevel * 100) + '%'
+                }}</span
               >
               <button
-                class="hover:bg-opacity-20 text-white cursor-pointer transition-colors"
+                class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
                 :class="[
                   { 'px-1 py-1 text-sm': mdAndDown, 'px-2 py-1': !mdAndDown },
-                  { 'opacity-50 cursor-not-allowed': zoomLevel >= 3 }
+                  { 'cursor-not-allowed opacity-50': zoomLevel >= 3 },
                 ]"
                 title="Zoom in"
                 :disabled="zoomLevel >= 3"
@@ -869,8 +932,11 @@ v-if="editingCaptionIndex === idx"
               </button>
               <button
                 v-if="isZoomed"
-                class="hover:bg-opacity-20 text-white cursor-pointer transition-colors"
-                :class="{ 'px-1 py-1 text-xs': mdAndDown, 'px-2 py-1': !mdAndDown }"
+                class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
+                :class="{
+                  'px-1 py-1 text-xs': mdAndDown,
+                  'px-2 py-1': !mdAndDown,
+                }"
                 title="Reset zoom"
                 @click="resetZoom"
               >
@@ -880,67 +946,81 @@ v-if="editingCaptionIndex === idx"
 
             <!-- Panel toggle button -->
             <button
-              class="bg-opacity-10 bg-gray-800 border-0 text-white rounded cursor-pointer transition-colors"
-              :class="{ 'py-1 px-1 text-xs': mdAndDown, 'py-1 px-2 text-sm': !mdAndDown }"
+              class="cursor-pointer rounded border-0 bg-gray-800 bg-opacity-10 text-white transition-colors"
+              :class="{
+                'px-1 py-1 text-xs': mdAndDown,
+                'px-2 py-1 text-sm': !mdAndDown,
+              }"
               :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
               @click="togglePanel"
             >
-              <span v-if="isPanelVisible">{{ mdAndDown ? 'Hide' : 'Close panel' }}</span>
+              <span v-if="isPanelVisible">{{
+                mdAndDown ? 'Hide' : 'Close panel'
+              }}</span>
               <span v-else>{{ mdAndDown ? 'Show' : 'Open panel' }}</span>
             </button>
             <!-- More Details button - hidden on narrow screens to save space -->
             <NuxtLink
               v-if="currentImage?.Uploader?.username && !mdAndDown"
               :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
-              class="inline-flex items-center px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 transition-colors"
+              class="inline-flex items-center rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               More Details
             </NuxtLink>
             <button
               type="button"
-              class="flex items-center justify-center rounded hover:bg-white hover:bg-opacity-20 text-white text-xl no-underline cursor-pointer"
-              :class="{ 'w-6 h-6': mdAndDown, 'w-8 h-8': !mdAndDown }"
+              class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+              :class="{ 'h-6 w-6': mdAndDown, 'h-8 w-8': !mdAndDown }"
               :href="currentImage.url || ''"
               @click="() => downloadImage(currentImage.url || '')"
             >
-              <DownloadIcon :class="{ 'h-4 w-4': mdAndDown, 'h-6 w-6': !mdAndDown }" />
+              <DownloadIcon
+                :class="{ 'h-4 w-4': mdAndDown, 'h-6 w-6': !mdAndDown }"
+              />
             </button>
           </div>
         </div>
 
         <div
-          class="flex-1 flex justify-center items-center relative h-full overflow-hidden"
+          class="relative flex h-full flex-1 items-center justify-center overflow-hidden"
           @touchstart="handleTouchStart"
           @touchend="handleTouchEnd"
-          @click="(event) => {
-            // Don't close editing mode if click happens within editor
-            if (editingCaptionIndex !== -1) {
-              const target = event.target as HTMLElement;
-              if (target && (
-                target.tagName === 'TEXTAREA' || 
-                target.closest('.text-editor-container') || 
-                target.closest('form') ||
-                target.closest('button')
-              )) {
-                event.stopPropagation();
+          @click="
+            (event) => {
+              // Don't close editing mode if click happens within editor
+              if (editingCaptionIndex !== -1) {
+                const target = event.target as HTMLElement;
+                if (
+                  target &&
+                  (target.tagName === 'TEXTAREA' ||
+                    target.closest('.text-editor-container') ||
+                    target.closest('form') ||
+                    target.closest('button'))
+                ) {
+                  event.stopPropagation();
+                }
               }
             }
-          }"
+          "
         >
           <button
             v-if="orderedImages.length > 1"
-            class="absolute left-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50"
+            class="absolute left-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black bg-opacity-50 text-white"
             @click="prevImage"
           >
             <LeftArrowIcon class="h-6 w-6" />
           </button>
 
           <ModelViewer
-            v-if="currentImage && currentImage.url && hasGlbExtension(currentImage.url)"
+            v-if="
+              currentImage &&
+              currentImage.url &&
+              hasGlbExtension(currentImage.url)
+            "
             :model-url="currentImage.url"
             height="100%"
             width="100%"
-            class="object-contain transition-all duration-300 ease-in-out w-full h-full"
+            class="h-full w-full object-contain transition-all duration-300 ease-in-out"
             :style="{
               transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
@@ -951,8 +1031,12 @@ v-if="editingCaptionIndex === idx"
             @touchmove="isZoomed ? onTouchDrag : undefined"
           />
           <div
-            v-else-if="currentImage && currentImage.url && hasStlExtension(currentImage.url)"
-            class="w-full h-full flex items-center justify-center"
+            v-else-if="
+              currentImage &&
+              currentImage.url &&
+              hasStlExtension(currentImage.url)
+            "
+            class="flex h-full w-full items-center justify-center"
             :style="{
               transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
@@ -975,7 +1059,7 @@ v-if="editingCaptionIndex === idx"
             v-else
             :src="currentImage.url || ''"
             :alt="currentImage.alt || ''"
-            class="object-contain transition-all duration-300 ease-in-out w-full h-full"
+            class="h-full w-full object-contain transition-all duration-300 ease-in-out"
             :style="{
               transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
               cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
@@ -984,11 +1068,11 @@ v-if="editingCaptionIndex === idx"
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
-          >
+          />
 
           <button
             v-if="orderedImages.length > 1"
-            class="absolute right-5 bg-black bg-opacity-50 text-white border-0 w-10 h-10 rounded-full flex justify-center items-center cursor-pointer z-50"
+            class="absolute right-5 z-50 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-black bg-opacity-50 text-white"
             @click="nextImage"
           >
             <RightArrowIcon class="h-6 w-6" />
@@ -999,35 +1083,36 @@ v-if="editingCaptionIndex === idx"
       <!-- Right/Bottom panel for custom content (different layouts based on screen size) -->
       <div
         v-if="isPanelVisible"
-        class="bg-gray-900 text-white overflow-y-auto z-40 transition-all duration-300 ease-in-out"
+        class="z-40 overflow-y-auto bg-gray-900 text-white transition-all duration-300 ease-in-out"
         :class="{
-          'w-1/4 h-full': !mdAndDown,
-          'w-full h-22 min-h-[70px] absolute bottom-0 left-0 shadow-md shadow-black':
+          'h-full w-1/4': !mdAndDown,
+          'h-22 absolute bottom-0 left-0 min-h-[70px] w-full shadow-md shadow-black':
             mdAndDown,
         }"
       >
-        <div class="p-5 relative">
+        <div class="relative p-5">
           <button
-            class="absolute top-2 right-2 text-white bg-transparent border-0 p-1 rounded-full hover:bg-gray-800 transition-colors"
+            class="bg-transparent absolute right-2 top-2 rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
             title="Close panel"
             @click="togglePanel"
           >
             <XmarkIcon class="h-4 w-4" />
           </button>
           <div
-v-if="editingCaptionIndex === lightboxIndex" 
-               class="mb-4 pb-2 mt-8"
-               @click.stop
-               @mousedown.stop
-               @touchstart.stop
-               @mousemove.stop
-               @mouseup.stop>
+            v-if="editingCaptionIndex === lightboxIndex"
+            class="mb-4 mt-8 pb-2"
+            @click.stop
+            @mousedown.stop
+            @touchstart.stop
+            @mousemove.stop
+            @mouseup.stop
+          >
             <TextEditor
               class="text-editor-container"
               :initial-value="editingCaption"
               placeholder="Write a caption for this image..."
               :rows="3"
-              @update="(text) => editingCaption = text"
+              @update="(text) => (editingCaption = text)"
               @click.stop
               @mousedown.stop
               @touchstart.stop
@@ -1037,8 +1122,8 @@ v-if="editingCaptionIndex === lightboxIndex"
               @keydown.stop
               @keyup.stop
             />
-            <div class="flex gap-2 mt-2">
-              <SaveButton 
+            <div class="mt-2 flex gap-2">
+              <SaveButton
                 :disabled="updateLoading"
                 :loading="updateLoading"
                 @click.stop="saveCaption"
@@ -1048,13 +1133,15 @@ v-if="editingCaptionIndex === lightboxIndex"
           </div>
           <div
             v-else-if="currentImage?.caption"
-            class="text-md mb-4 pb-2 border-white border-opacity-20 pr-6 relative"
+            class="text-md relative mb-4 border-white border-opacity-20 pb-2 pr-6"
           >
             <div class="flex items-start justify-between">
-              <span class="flex-1"> {{ currentImage.caption || "Image Details" }}</span>
+              <span class="flex-1">
+                {{ currentImage.caption || 'Image Details' }}</span
+              >
               <span
                 v-if="isLoggedInAuthor"
-                class="text-white bg-transparent border-0 px-2 rounded-full hover:bg-gray-800 transition-colors cursor-pointer"
+                class="bg-transparent cursor-pointer rounded-full border-0 px-2 text-white transition-colors hover:bg-gray-800"
                 role="button"
                 tabindex="0"
                 title="Edit caption"
@@ -1065,22 +1152,24 @@ v-if="editingCaptionIndex === lightboxIndex"
                 <PencilIcon class="h-4 w-4" />
               </span>
             </div>
-            
+
             <!-- More Details button -->
             <div v-if="currentImage?.Uploader?.username" class="mt-3">
               <NuxtLink
                 :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
-                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
               >
                 More Details
               </NuxtLink>
             </div>
           </div>
-          <div v-else class="text-gray-400 italic mt-2 relative">
-            <span v-if="!isLoggedInAuthor">No caption available for this image.</span>
+          <div v-else class="relative mt-2 italic text-gray-400">
+            <span v-if="!isLoggedInAuthor"
+              >No caption available for this image.</span
+            >
             <span
               v-else
-              class="text-orange-400 hover:text-orange-300 flex items-center gap-1 transition-colors cursor-pointer"
+              class="flex cursor-pointer items-center gap-1 text-orange-400 transition-colors hover:text-orange-300"
               role="button"
               tabindex="0"
               @click="startEditingCaption(lightboxIndex)"
@@ -1090,12 +1179,12 @@ v-if="editingCaptionIndex === lightboxIndex"
               <PencilIcon class="h-4 w-4" />
               <span>Add a caption for this image</span>
             </span>
-            
+
             <!-- More Details button for images without captions -->
             <div v-if="currentImage?.Uploader?.username" class="mt-3">
               <NuxtLink
                 :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
-                class="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                class="inline-flex items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
               >
                 More Details
               </NuxtLink>

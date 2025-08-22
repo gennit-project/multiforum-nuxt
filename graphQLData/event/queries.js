@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client/core";
-import { AUTHOR_FIELDS } from "../discussion/queries";
+import { gql } from '@apollo/client/core';
+import { AUTHOR_FIELDS } from '../discussion/queries';
 
 // Fragment for shared event fields
 export const EVENT_FIELDS = gql`
@@ -64,10 +64,10 @@ export const EVENT_FIELDS = gql`
 // get event by ID
 export const GET_EVENT = gql`
   query getEvent(
-    $id: ID!, 
+    $id: ID!
     $channelUniqueName: String!
     $loggedInModName: String
-    ) {
+  ) {
     events(where: { id: $id }) {
       ...EventFields
       FeedbackCommentsAggregate {
@@ -132,7 +132,7 @@ export const GET_EVENT_FEEDBACK = gql`
       title
       startTime
       endTime
-      cost 
+      cost
       free
       FeedbackCommentsAggregate {
         count

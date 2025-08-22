@@ -1,6 +1,6 @@
 <script>
-import { defineComponent } from "vue";
-import GenericModal from "./GenericModal.vue";
+import { defineComponent } from 'vue';
+import GenericModal from './GenericModal.vue';
 import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
 export default defineComponent({
@@ -12,12 +12,12 @@ export default defineComponent({
     title: {
       type: String,
       require: true,
-      default: "Are you sure?",
+      default: 'Are you sure?',
     },
     body: {
       type: String,
       require: true,
-      default: "",
+      default: '',
     },
     open: {
       type: Boolean,
@@ -25,19 +25,19 @@ export default defineComponent({
     },
     primaryButtonText: {
       type: String,
-      default: "Delete",
+      default: 'Delete',
     },
     secondaryButtonText: {
       type: String,
-      default: "Cancel",
+      default: 'Cancel',
     },
     icon: {
       type: String,
-      default: "ExclamationIcon",
+      default: 'ExclamationIcon',
     },
     error: {
       type: String,
-      default: "",
+      default: '',
     },
     loading: {
       type: Boolean,
@@ -45,7 +45,7 @@ export default defineComponent({
     },
     dataTestid: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   setup() {},
@@ -64,14 +64,8 @@ export default defineComponent({
     :loading="loading"
   >
     <template #icon>
-      <i
-        v-if="icon === 'trash'"
-        class="fas fa-trash-alt dark:text-gray-100"
-      />
-      <ExclamationIcon
-        v-else
-        class="dark:text-gray-100"
-      />
+      <i v-if="icon === 'trash'" class="fas fa-trash-alt dark:text-gray-100" />
+      <ExclamationIcon v-else class="dark:text-gray-100" />
     </template>
   </GenericModal>
 </template>

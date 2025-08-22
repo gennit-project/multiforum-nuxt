@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { ref} from "vue";
-import { useRoute } from "nuxt/app";
-import PermalinkedComment from "@/components/comments/PermalinkedComment.vue";
-import Comment from "@/components/comments/Comment.vue";
-import type { ApolloError } from "@apollo/client";
+import { ref } from 'vue';
+import { useRoute } from 'nuxt/app';
+import PermalinkedComment from '@/components/comments/PermalinkedComment.vue';
+import Comment from '@/components/comments/Comment.vue';
+import type { ApolloError } from '@apollo/client';
 
 const route = useRoute();
 const permalinkedCommentId = ref(route.params.commentId);
 defineEmits([
-  "clickEditComment",
-  "clickEditFeedback",
-  "clickFeedback",
-  "clickReport",
-  "clickUndoFeedback",
-  "createComment",
-  "deleteComment",
-  "handleViewFeedback",
-  "hideEditCommentEditor",
-  "hideReplyEditor",
-  "startCommentSave",
-  "openEditCommentEditor",
-  "openReplyEditor",
-  "saveEdit",
-  "scrollToTop",
-  "updateCreateReplyCommentInput",
-  "updateEditCommentInput",
-  "updateFeedback",
-  "showCopiedLinkNotification",
+  'clickEditComment',
+  'clickEditFeedback',
+  'clickFeedback',
+  'clickReport',
+  'clickUndoFeedback',
+  'createComment',
+  'deleteComment',
+  'handleViewFeedback',
+  'hideEditCommentEditor',
+  'hideReplyEditor',
+  'startCommentSave',
+  'openEditCommentEditor',
+  'openReplyEditor',
+  'saveEdit',
+  'scrollToTop',
+  'updateCreateReplyCommentInput',
+  'updateEditCommentInput',
+  'updateFeedback',
+  'showCopiedLinkNotification',
 ]);
 defineProps({
   aggregateCommentCount: {
@@ -57,7 +57,7 @@ defineProps({
   editFormOpenAtCommentID: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   editCommentError: {
     type: Object as () => ApolloError | null | undefined,
@@ -68,7 +68,7 @@ defineProps({
     type: String,
     required: true,
   },
-})
+});
 </script>
 
 <template>
@@ -108,7 +108,9 @@ defineProps({
         @click-edit-feedback="$emit('clickEditFeedback', $event)"
         @update-feedback="$emit('updateFeedback', $event)"
         @handle-view-feedback="$emit('handleViewFeedback', $event)"
-        @show-copied-link-notification="$emit('showCopiedLinkNotification', $event)"
+        @show-copied-link-notification="
+          $emit('showCopiedLinkNotification', $event)
+        "
       />
     </template>
   </PermalinkedComment>

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_PENDING_CHANNEL_MODS_BY_CHANNEL } from "@/graphQLData/mod/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { GET_PENDING_CHANNEL_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const { result, loading, error } = useQuery(
@@ -18,14 +18,14 @@ const { result, loading, error } = useQuery(
     channelUniqueName: forumId.value,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 const invites = computed(
   () => result.value?.channels[0]?.PendingModInvites ?? []
 );
 
-defineEmits(["click-cancel-invite"]);
+defineEmits(['click-cancel-invite']);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -40,18 +40,15 @@ defineEmits(["click-cancel-invite"]);
     >
       This forum has no pending mod invites.
     </div>
-    <div
-      v-if="invites && invites.length > 0"
-      class="flex-col text-sm"
-    >
+    <div v-if="invites && invites.length > 0" class="flex-col text-sm">
       <div
         v-for="invite in invites"
         :key="invite.username"
-        class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <nuxt-link
           :to="{ name: 'u-username', params: { username: invite.username } }"
-          class="flex items-center dark:text-white font-bold"
+          class="flex items-center font-bold dark:text-white"
         >
           <AvatarComponent
             :text="invite.username"
@@ -71,7 +68,7 @@ defineEmits(["click-cancel-invite"]);
 
         <button
           type="button"
-          class="flex rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
+          class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
           @click="$emit('click-cancel-invite', invite.username)"
         >
           Cancel Invite

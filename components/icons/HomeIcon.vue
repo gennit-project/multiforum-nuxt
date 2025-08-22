@@ -1,9 +1,8 @@
-<script setup lang="ts">
-</script>
+<script setup lang="ts"></script>
 <template>
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    class="h-6 w-6 higher"
+    class="higher h-6 w-6"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -18,6 +17,6 @@
 </template>
 <style>
 .higher {
-    margin-top: -6px;
+  margin-top: -6px;
 }
 </style>

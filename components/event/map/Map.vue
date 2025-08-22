@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import { Loader } from "@googlemaps/js-api-loader";
-import { useRouter } from "nuxt/app";
-import { config } from "@/config";
-import nightModeMapStyles from "@/components/event/map/nightModeMapStyles";
-import placeIcon from "@/assets/images/place-icon.svg";
-import { useAppTheme } from "@/composables/useTheme";
-import type { Event } from "@/__generated__/graphql";
+import { ref, onMounted, watch } from 'vue';
+import { Loader } from '@googlemaps/js-api-loader';
+import { useRouter } from 'nuxt/app';
+import { config } from '@/config';
+import nightModeMapStyles from '@/components/event/map/nightModeMapStyles';
+import placeIcon from '@/assets/images/place-icon.svg';
+import { useAppTheme } from '@/composables/useTheme';
+import type { Event } from '@/__generated__/graphql';
 
 // The Google map requires that the styles have to be set
 // when the map is rendered and they can't change based on props.
@@ -48,37 +48,37 @@ const props = defineProps({
 });
 
 const { theme: appTheme } = useAppTheme();
-const currentTheme = ref("light");
+const currentTheme = ref('light');
 onMounted(() => {
   currentTheme.value = appTheme.value;
 
   const observer = new MutationObserver((mutations) => {
     mutations.forEach((mutation) => {
-      if (mutation.attributeName === "class") {
-        const isDark = document.documentElement.classList.contains("dark");
-        currentTheme.value = isDark ? "dark" : "light";
+      if (mutation.attributeName === 'class') {
+        const isDark = document.documentElement.classList.contains('dark');
+        currentTheme.value = isDark ? 'dark' : 'light';
       }
     });
   });
 
   observer.observe(document.documentElement, {
     attributes: true,
-    attributeFilter: ["class"],
+    attributeFilter: ['class'],
   });
 });
 
 const emit = defineEmits([
-  "openPreview",
-  "lockColors",
-  "highlightEvent",
-  "unHighlight",
-  "setMarkerData",
+  'openPreview',
+  'lockColors',
+  'highlightEvent',
+  'unHighlight',
+  'setMarkerData',
 ]);
 
 const router = useRouter();
 const loader = new Loader({
   apiKey: config.googleMapsApiKey,
-  version: "weekly",
+  version: 'weekly',
 });
 
 const mobileMapDiv = ref<HTMLElement | null>(null);
@@ -105,7 +105,7 @@ const clearMarkers = () => {
 };
 
 const getMapStyles = () => {
-  return currentTheme.value === "dark" ? nightModeMapStyles : [];
+  return currentTheme.value === 'dark' ? nightModeMapStyles : [];
 };
 
 const renderMap = async () => {
@@ -120,7 +120,7 @@ const renderMap = async () => {
   const mapConfig = {
     center: { lat: 33.4255, lng: -111.94 },
     zoom: 7,
-    mapTypeId: "terrain",
+    mapTypeId: 'terrain',
     styles: mapStyles,
     zoomControl: true,
     zoomControlOptions: {
@@ -166,31 +166,38 @@ const renderMap = async () => {
       // Use different event bindings for mobile vs desktop
       if (props.useMobileStyles) {
         // Mobile uses a single tap handler
-        marker.addListener("click", () => {
-          emit("highlightEvent", eventLocationId, event.id, event, true, true);
-          emit("openPreview", event, true);
-          emit("lockColors");
+        marker.addListener('click', () => {
+          emit('highlightEvent', eventLocationId, event.id, event, true, true);
+          emit('openPreview', event, true);
+          emit('lockColors');
         });
       } else {
         // Desktop uses separate mouse events
-        marker.addListener("click", () => {
-          emit("openPreview", event, true);
-          emit("lockColors");
+        marker.addListener('click', () => {
+          emit('openPreview', event, true);
+          emit('lockColors');
         });
 
-        marker.addListener("mouseover", () => {
+        marker.addListener('mouseover', () => {
           if (!props.colorLocked) {
-            emit("highlightEvent", eventLocationId, event.id, event, true, true);
+            emit(
+              'highlightEvent',
+              eventLocationId,
+              event.id,
+              event,
+              true,
+              true
+            );
           }
         });
 
-        marker.addListener("mouseout", () => {
+        marker.addListener('mouseout', () => {
           const unhighlight = () => {
             if (!props.colorLocked) {
               if (
                 router.currentRoute.value.fullPath.includes(eventLocationId)
               ) {
-                emit("unHighlight");
+                emit('unHighlight');
               }
 
               marker.setIcon({
@@ -234,7 +241,7 @@ const renderMap = async () => {
     map.value.setZoom(15);
   }
 
-  emit("setMarkerData", {
+  emit('setMarkerData', {
     markerMap: markerMap,
     map: map.value,
   });

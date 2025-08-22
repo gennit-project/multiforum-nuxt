@@ -1,6 +1,6 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
-import * as dotenv from 'dotenv'
-dotenv.config()
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const codegenConfig: CodegenConfig = {
   schema: process.env.GRAPHQL_URL_FOR_TYPES,
@@ -11,8 +11,8 @@ const codegenConfig: CodegenConfig = {
       plugins: [],
       presetConfig: {
         gqlTagName: 'gql',
-      }
-    }
+      },
+    },
   },
   ignoreNoDocuments: true,
 };

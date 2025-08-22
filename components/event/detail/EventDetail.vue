@@ -1,33 +1,33 @@
 <script lang="ts" setup>
-import { computed, ref, watch, watchEffect } from "vue";
-import Tag from "@/components/TagComponent.vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_EVENT } from "@/graphQLData/event/queries";
+import { computed, ref, watch, watchEffect } from 'vue';
+import Tag from '@/components/TagComponent.vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_EVENT } from '@/graphQLData/event/queries';
 import {
   GET_EVENT_COMMENTS,
   GET_EVENT_ROOT_COMMENT_AGGREGATE,
-} from "@/graphQLData/comment/queries";
-import { GET_EVENT_CHANNEL } from "@/graphQLData/mod/queries";
+} from '@/graphQLData/comment/queries';
+import { GET_EVENT_CHANNEL } from '@/graphQLData/mod/queries';
 import type {
   Comment,
   EventChannel,
   Event as EventData,
-} from "@/__generated__/graphql";
-import { DateTime } from "luxon";
-import { stableRelativeTime } from "@/utils";
-import "md-editor-v3/lib/style.css";
-import EventFooter from "@/components/event/detail/EventFooter.vue";
-import EventHeader from "@/components/event/detail/EventHeader.vue";
-import EventBody from "@/components/event/detail/EventBody.vue";
-import ExpandableImage from "@/components/ExpandableImage.vue";
-import EventCommentsWrapper from "@/components/event/detail/EventCommentsWrapper.vue";
-import EventRootCommentFormWrapper from "@/components/event/detail/EventRootCommentFormWrapper.vue";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import EventChannelLinks from "@/components/event/detail/EventChannelLinks.vue";
-import { useRoute, useHead } from "nuxt/app";
-import { modProfileNameVar } from "@/cache";
-import AddToCalendarButton from "../AddToCalendarButton.vue";
-import ArchivedEventInfoBanner from "./ArchivedEventInfoBanner.vue";
+} from '@/__generated__/graphql';
+import { DateTime } from 'luxon';
+import { stableRelativeTime } from '@/utils';
+import 'md-editor-v3/lib/style.css';
+import EventFooter from '@/components/event/detail/EventFooter.vue';
+import EventHeader from '@/components/event/detail/EventHeader.vue';
+import EventBody from '@/components/event/detail/EventBody.vue';
+import ExpandableImage from '@/components/ExpandableImage.vue';
+import EventCommentsWrapper from '@/components/event/detail/EventCommentsWrapper.vue';
+import EventRootCommentFormWrapper from '@/components/event/detail/EventRootCommentFormWrapper.vue';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import EventChannelLinks from '@/components/event/detail/EventChannelLinks.vue';
+import { useRoute, useHead } from 'nuxt/app';
+import { modProfileNameVar } from '@/cache';
+import AddToCalendarButton from '../AddToCalendarButton.vue';
+import ArchivedEventInfoBanner from './ArchivedEventInfoBanner.vue';
 
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
@@ -43,7 +43,7 @@ const props = defineProps({
   issueEventId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   showAddToCalendar: {
     type: Boolean,
@@ -78,9 +78,9 @@ const offset = ref(0);
 
 // Instead of a computed property, make it a ref
 const eventId = ref(
-  typeof route.params.eventId === "string"
+  typeof route.params.eventId === 'string'
     ? route.params.eventId
-    : props.issueEventId || ""
+    : props.issueEventId || ''
 );
 
 // Add a watcher for the route params
@@ -88,12 +88,12 @@ watch(
   () => route.params.eventId,
   (newEventId) => {
     eventId.value =
-      typeof newEventId === "string" ? newEventId : props.issueEventId || "";
+      typeof newEventId === 'string' ? newEventId : props.issueEventId || '';
   }
 );
 
 const channelId = computed(() =>
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 
 const loggedInUserModName = computed(() => modProfileNameVar.value);
@@ -113,7 +113,7 @@ const {
 onEventResult(({ data }) => {
   if (data?.events?.length) {
     const event = data.events[0];
-    emit('fetchedOriginalPosterUsername', event.Poster?.username || "");
+    emit('fetchedOriginalPosterUsername', event.Poster?.username || '');
   }
 });
 
@@ -241,10 +241,10 @@ const eventHasStarted = computed(() => {
   );
 });
 
-const originalPoster = computed(() => event.value?.Poster?.username || "");
+const originalPoster = computed(() => event.value?.Poster?.username || '');
 
 const editedAt = computed(() => {
-  if (!event.value?.updatedAt) return "";
+  if (!event.value?.updatedAt) return '';
   return `Edited ${stableRelativeTime(event.value.updatedAt)}`;
 });
 
@@ -258,22 +258,22 @@ const handleClickEditEventDescription = () => {
 watchEffect(() => {
   if (!event.value) {
     useHead({
-      title: `Event Not Found${channelId.value ? ` | ${channelId.value}` : ""}`,
-      description: "The requested event could not be found.",
+      title: `Event Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
+      description: 'The requested event could not be found.',
     });
     return;
   }
 
-  const title = event.value.title || "Event";
+  const title = event.value.title || 'Event';
   const forumName =
-    activeEventChannel.value?.Channel?.displayName || channelId.value || "";
+    activeEventChannel.value?.Channel?.displayName || channelId.value || '';
   const description = event.value.description
     ? event.value.description.substring(0, 160) +
-      (event.value.description.length > 160 ? "..." : "")
+      (event.value.description.length > 160 ? '...' : '')
     : `${title} - Event on ${formatDate(event.value.startTime)}`;
   const baseUrl = import.meta.env.VITE_BASE_URL;
   const serverDisplayName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  const imageUrl = event.value.coverImageURL || "";
+  const imageUrl = event.value.coverImageURL || '';
 
   // Set basic SEO meta tags
   useHead({
@@ -282,17 +282,17 @@ watchEffect(() => {
       : `${title} | ${serverDisplayName}`,
     description: description,
     image: imageUrl,
-    type: "event",
+    type: 'event',
   });
 
   // Add structured data for rich results
   useHead({
     script: [
       {
-        type: "application/ld+json",
+        type: 'application/ld+json',
         children: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Event",
+          '@context': 'https://schema.org',
+          '@type': 'Event',
           name: title,
           description: description,
           startDate: event.value.startTime,
@@ -300,34 +300,34 @@ watchEffect(() => {
           image: imageUrl,
           location: event.value.address
             ? {
-                "@type": "Place",
+                '@type': 'Place',
                 name: event.value.address,
                 address: {
-                  "@type": "PostalAddress",
+                  '@type': 'PostalAddress',
                   streetAddress: event.value.address,
                 },
               }
             : {
-                "@type": "VirtualLocation",
+                '@type': 'VirtualLocation',
                 url:
                   event.value.virtualEventUrl ??
                   `${baseUrl}/events/list/search/${event.value.id}`,
               },
           organizer: {
-            "@type": "Person",
+            '@type': 'Person',
             name:
               event.value.Poster?.displayName ||
               event.value.Poster?.username ||
-              "Anonymous",
+              'Anonymous',
           },
           eventStatus: event.value.canceled
-            ? "https://schema.org/EventCancelled"
+            ? 'https://schema.org/EventCancelled'
             : eventIsInThePast.value
-              ? "https://schema.org/EventScheduled"
-              : "https://schema.org/EventScheduled",
+              ? 'https://schema.org/EventScheduled'
+              : 'https://schema.org/EventScheduled',
           eventAttendanceMode: event.value.virtualEventUrl
-            ? "https://schema.org/OnlineEventAttendanceMode"
-            : "https://schema.org/OfflineEventAttendanceMode",
+            ? 'https://schema.org/OnlineEventAttendanceMode'
+            : 'https://schema.org/OfflineEventAttendanceMode',
         }),
       },
     ],
@@ -337,9 +337,9 @@ watchEffect(() => {
 
 <template>
   <div
-    class="w-full space-y-4 bg-white dark:bg-gray-800 md:px-6 dark:text-white"
+    class="w-full space-y-4 bg-white dark:bg-gray-800 dark:text-white md:px-6"
   >
-    <div class="mb-10 px-2 flex w-full justify-center rounded-lg">
+    <div class="mb-10 flex w-full justify-center rounded-lg px-2">
       <div class="w-full">
         <div class="mt-1 w-full space-y-2">
           <p v-if="eventLoading && !event" class="px-4 lg:px-10">Loading...</p>
@@ -463,7 +463,7 @@ watchEffect(() => {
               />
             </div>
 
-            <div v-if="event.Tags?.length > 0" class="my-2 sm:px-4 px-0">
+            <div v-if="event.Tags?.length > 0" class="my-2 px-0 sm:px-4">
               <div class="flex space-x-1">
                 <Tag
                   v-for="tag in event.Tags"

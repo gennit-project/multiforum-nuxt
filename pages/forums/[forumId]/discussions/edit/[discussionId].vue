@@ -1,12 +1,12 @@
 <script lang="ts">
-import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
-import { defineComponent, computed, ref } from "vue";
-import { useRouter, useRoute, useHead } from "nuxt/app";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
-import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
+import { defineComponent, computed, ref } from 'vue';
+import { useRouter, useRoute, useHead } from 'nuxt/app';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
+import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type {
   Discussion,
   DiscussionChannel,
@@ -15,11 +15,11 @@ import type {
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
   Image,
-} from "@/__generated__/graphql";
-import { modProfileNameVar } from "@/cache";
+} from '@/__generated__/graphql';
+import { modProfileNameVar } from '@/cache';
 
 export default defineComponent({
-  name: "EditDiscussion",
+  name: 'EditDiscussion',
   components: {
     CreateEditDiscussionFields,
     RequireAuth,
@@ -30,15 +30,15 @@ export default defineComponent({
     const router = useRouter();
 
     const channelId = computed(() => {
-      if (typeof route.params.forumId !== "string") {
-        return "";
+      if (typeof route.params.forumId !== 'string') {
+        return '';
       }
       return route.params.forumId;
     });
 
     const discussionId = computed(() => {
-      if (typeof route.params.discussionId !== "string") {
-        return "";
+      if (typeof route.params.discussionId !== 'string') {
+        return '';
       }
       return route.params.discussionId;
     });
@@ -55,7 +55,11 @@ export default defineComponent({
     });
 
     const discussion = computed<Discussion>(() => {
-      if (getDiscussionError.value || getDiscussionLoading.value || !getDiscussionResult.value) {
+      if (
+        getDiscussionError.value ||
+        getDiscussionLoading.value ||
+        !getDiscussionResult.value
+      ) {
         return null;
       }
       return getDiscussionResult.value.discussions[0];
@@ -66,13 +70,13 @@ export default defineComponent({
       return discussion.value.Album.Images.map((image: Image) => {
         return {
           id: image.id,
-          url: image.url || "",
-          alt: image.alt || "",
-          caption: image.caption || "",
+          url: image.url || '',
+          alt: image.alt || '',
+          caption: image.caption || '',
           isCoverImage: false,
           hasSensitiveContent: false,
           hasSpoiler: false,
-          copyright: image.copyright || "",
+          copyright: image.copyright || '',
         };
       });
     });
@@ -103,16 +107,16 @@ export default defineComponent({
       if (discussion.value) {
         return {
           title: discussion.value.title,
-          body: discussion.value?.body || "",
+          body: discussion.value?.body || '',
           selectedTags: discussion.value.Tags.map((tag: TagData) => {
             return tag.text;
           }),
           selectedChannels: discussion.value.DiscussionChannels.map(
             (discussionChannel: DiscussionChannel) => {
-              return discussionChannel?.Channel?.uniqueName || "";
+              return discussionChannel?.Channel?.uniqueName || '';
             }
           ),
-          author: discussion.value.Author?.username || "",
+          author: discussion.value.Author?.username || '',
           album: {
             images: orderedImages.value,
             imageOrder: imageOrder.value, // Add imageOrder
@@ -120,11 +124,11 @@ export default defineComponent({
         };
       }
       return {
-        title: "",
-        body: "",
+        title: '',
+        body: '',
         selectedTags: [],
         selectedChannels: [],
-        author: "",
+        author: '',
         album: {
           images: [],
           imageOrder: [], // Add empty imageOrder
@@ -149,7 +153,10 @@ export default defineComponent({
       useHead({
         title: `Edit Discussion | ${channelId.value} | ${serverName}`,
         meta: [
-          { name: 'description', content: `Edit discussion: ${discussion.title}` },
+          {
+            name: 'description',
+            content: `Edit discussion: ${discussion.title}`,
+          },
         ],
       });
 
@@ -159,17 +166,25 @@ export default defineComponent({
         .map((image: Image) => ({
           id: image.id,
           url: image.url,
-          alt: image.alt || "",
-          caption: image.caption || "",
-          copyright: image.copyright || "",
+          alt: image.alt || '',
+          caption: image.caption || '',
+          copyright: image.copyright || '',
         }));
 
       // Filter out any null or undefined values from imageOrder and ensure they exist in images
       const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
         (id: string | null | undefined): id is string =>
-          typeof id === "string" &&
+          typeof id === 'string' &&
           id.length > 0 &&
-          validImages.some((img: { id: string; url: string; alt: string; caption: string; copyright: string }) => img.id === id)
+          validImages.some(
+            (img: {
+              id: string;
+              url: string;
+              alt: string;
+              caption: string;
+              copyright: string;
+            }) => img.id === id
+          )
       );
 
       const formFields: CreateEditDiscussionFormValues = {
@@ -275,21 +290,21 @@ export default defineComponent({
         },
         updateDiscussionInput: updateDiscussionInput.value,
         channelConnections: channelConnections.value,
-        channelDisconnections: (discussion.value?.DiscussionChannels || []).filter(
-          (dc) => {
+        channelDisconnections: (discussion.value?.DiscussionChannels || [])
+          .filter((dc) => {
             return !channelConnections.value.includes(
-              dc.Channel?.uniqueName || ""
+              dc.Channel?.uniqueName || ''
             );
-          }
-        ).map((dc) => {
-          return dc.Channel?.uniqueName;
-        }),
+          })
+          .map((dc) => {
+            return dc.Channel?.uniqueName;
+          }),
       },
     }));
 
     onDone(() => {
       router.push({
-        name: "forums-forumId-discussions-discussionId",
+        name: 'forums-forumId-discussions-discussionId',
         params: {
           forumId: formValues.value.selectedChannels[0],
           discussionId: discussionId.value,
@@ -326,7 +341,7 @@ export default defineComponent({
     },
     handleCancel() {
       this.router.push({
-        name: "forums-forumId-discussions-discussionId",
+        name: 'forums-forumId-discussions-discussionId',
         params: {
           forumId: this.formValues.selectedChannels[0],
           discussionId: this.discussionId,
@@ -359,8 +374,10 @@ export default defineComponent({
           @cancel="handleCancel"
         />
         <template #fallback>
-          <div class="flex justify-center items-center min-h-[400px]">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+          <div class="flex min-h-[400px] items-center justify-center">
+            <div
+              class="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-500"
+            ></div>
           </div>
         </template>
       </ClientOnly>

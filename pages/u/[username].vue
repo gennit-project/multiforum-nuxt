@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { computed, watchEffect } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_USER } from "@/graphQLData/user/queries";
-import UserProfileSidebar from "@/components/user/UserProfileSidebar.vue";
-import { useHead, useRoute } from "nuxt/app";
-import UserContributionChart from "@/components/charts/UserContributionChart.vue";
+import { computed, watchEffect } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_USER } from '@/graphQLData/user/queries';
+import UserProfileSidebar from '@/components/user/UserProfileSidebar.vue';
+import { useHead, useRoute } from 'nuxt/app';
+import UserContributionChart from '@/components/charts/UserContributionChart.vue';
 
 const route = useRoute();
 const username = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
+  return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
 const {
@@ -22,7 +22,7 @@ const {
   },
   {
     enabled: !!username.value,
-    fetchPolicy: "network-only",
+    fetchPolicy: 'network-only',
   }
 );
 
@@ -53,7 +53,7 @@ watchEffect(() => {
   if (!user.value) {
     useHead({
       title: username.value ? `${username.value} - Profile` : 'User Not Found',
-      description: 'The requested user profile could not be found.'
+      description: 'The requested user profile could not be found.',
     });
     return;
   }
@@ -63,22 +63,23 @@ watchEffect(() => {
   const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
   const profilePic = user.value.profilePicURL || '';
   const userBio = user.value.bio || `${userName}'s profile`;
-  
+
   // Calculate metrics for description
   const discussionCount = user.value.discussionCount || 0;
   const commentCount = user.value.commentCount || 0;
   const eventsCount = user.value.eventsCount || 0;
-  
-  const description = userBio.length > 10 
-    ? userBio.substring(0, 160) + (userBio.length > 160 ? '...' : '')
-    : `${userName} has posted ${discussionCount} discussions, ${commentCount} comments, and ${eventsCount} events on ${serverName}.`;
+
+  const description =
+    userBio.length > 10
+      ? userBio.substring(0, 160) + (userBio.length > 160 ? '...' : '')
+      : `${userName} has posted ${discussionCount} discussions, ${commentCount} comments, and ${eventsCount} events on ${serverName}.`;
 
   // Set basic SEO meta tags
   useHead({
     title: `${userName} | ${serverName}`,
     description: description,
     image: profilePic,
-    type: 'profile'
+    type: 'profile',
   });
 
   // Add structured data for rich results
@@ -96,30 +97,30 @@ watchEffect(() => {
           memberOf: {
             '@type': 'Organization',
             name: serverName,
-            url: baseUrl
-          }
-        })
-      }
-    ]
+            url: baseUrl,
+          },
+        }),
+      },
+    ],
   });
 });
 </script>
 
 <template>
   <NuxtLayout>
-    <div class="max-w-screen-2xl w-full px-2 dark:bg-black bg-white">
+    <div class="w-full max-w-screen-2xl bg-white px-2 dark:bg-black">
       <!-- Image detail page layout (full width) -->
       <div v-if="isImageDetailPage" class="w-full">
         <NuxtPage />
       </div>
-      
+
       <!-- Regular user profile layout -->
-      <div v-else class="flex flex-col lg:flex-row w-full">
+      <div v-else class="flex w-full flex-col lg:flex-row">
         <div class="w-full lg:w-80 lg:shrink-0">
           <UserProfileSidebar :is-admin="isAdmin" />
         </div>
-        
-        <div class="flex-1 flex-col min-w-0 pt-4">
+
+        <div class="min-w-0 flex-1 flex-col pt-4">
           <client-only>
             <UserContributionChart />
           </client-only>

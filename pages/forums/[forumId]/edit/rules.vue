@@ -5,7 +5,7 @@ defineProps({
     required: true,
   },
 });
-defineEmits(["updateFormValues"]);
+defineEmits(['updateFormValues']);
 </script>
 
 <template>

@@ -1,8 +1,8 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
-  name: "ChannelLink",
+  name: 'ChannelLink',
   props: {
     eventId: {
       type: String,
@@ -51,10 +51,7 @@ export default defineComponent({
         :is-square="false"
       />
       <div class="flex-col space-y-1 text-xs">
-        <div
-          v-if="channelDisplayName"
-          class="font-bold"
-        >
+        <div v-if="channelDisplayName" class="font-bold">
           {{ channelDisplayName }}
         </div>
         <div

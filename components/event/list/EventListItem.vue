@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, nextTick } from "vue";
-import { DateTime } from "luxon";
-import { getDatePieces } from "@/utils";
-import Tag from "@/components/TagComponent.vue";
-import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import type { PropType } from "vue";
-import type { Event } from "@/__generated__/graphql";
-import type { SearchEventValues } from "@/types/Event";
-import { useRoute, useRouter } from "nuxt/app";
+import { computed, nextTick } from 'vue';
+import { DateTime } from 'luxon';
+import { getDatePieces } from '@/utils';
+import Tag from '@/components/TagComponent.vue';
+import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import type { PropType } from 'vue';
+import type { Event } from '@/__generated__/graphql';
+import type { SearchEventValues } from '@/types/Event';
+import { useRoute, useRouter } from 'nuxt/app';
 
 const props = defineProps({
   event: {
@@ -29,7 +29,7 @@ const props = defineProps({
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
   showMap: {
     type: Boolean,
@@ -42,7 +42,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["openPreview"]);
+const emit = defineEmits(['openPreview']);
 
 const route = useRoute();
 const router = useRouter();
@@ -58,14 +58,14 @@ const defaultUniqueName = computed(() => {
     return props.currentChannelId;
   }
   if (props.event.EventChannels.length > 0) {
-    return props.event.EventChannels?.[0]?.channelUniqueName || "";
+    return props.event.EventChannels?.[0]?.channelUniqueName || '';
   }
-  return "";
+  return '';
 });
 
 const detailLink = computed(() => {
   if (!defaultUniqueName.value) {
-    return "";
+    return '';
   }
   return `/forums/${defaultUniqueName.value}/events/${props.event.id}`;
 });
@@ -81,9 +81,9 @@ const eventDetailOptions = computed(() => {
   return props.event.EventChannels.map((dc) => {
     const commentCount = dc.CommentsAggregate?.count || 0;
     return {
-      label: `${commentCount} ${commentCount === 1 ? "comment" : "comments"} in ${dc.channelUniqueName}`,
+      label: `${commentCount} ${commentCount === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
       value: `/forums/${dc.channelUniqueName}/events/${props.event.id}`,
-      event: "",
+      event: '',
     };
   }).sort((a, b) => b.label.localeCompare(a.label));
 });
@@ -95,7 +95,7 @@ const handleClickTag = (tagText: string) => {
 
   if (currentQuery.tags) {
     if (
-      typeof currentQuery.tags === "string" &&
+      typeof currentQuery.tags === 'string' &&
       tagText === currentQuery.tags
     ) {
       const newQuery = { ...route.query };
@@ -127,7 +127,7 @@ const updateFilters = (params: SearchEventValues) => {
   Object.keys(params).forEach((key) => {
     const typedKey = key as keyof SearchEventValues;
     const value = params[typedKey];
-    if (value !== undefined && typeof value !== "string") {
+    if (value !== undefined && typeof value !== 'string') {
       cleanedParams[key] = String(value);
     } else if (value !== undefined) {
       cleanedParams[key] = value;
@@ -139,11 +139,11 @@ const updateFilters = (params: SearchEventValues) => {
 };
 
 const handleClick = async () => {
-  if (props.currentChannelId || route.name === "events-list-search") {
+  if (props.currentChannelId || route.name === 'events-list-search') {
     await nextTick();
     router.push(detailLink.value);
   } else {
-    emit("openPreview");
+    emit('openPreview');
   }
 };
 
@@ -155,7 +155,7 @@ const eventSpansMultipleDates = computed(() => {
   return (
     // If the difference between start time and end time is greater than 24 hours
     Math.abs(
-      startTimeObj.diff(DateTime.fromISO(props.event.endTime), "hours").hours
+      startTimeObj.diff(DateTime.fromISO(props.event.endTime), 'hours').hours
     ) > 24
   );
 });
@@ -167,7 +167,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
 <template>
   <li
     :ref="`#${event.id}`"
-    class="relative py-2 list-none flex justify-between gap-4 bg-white dark:bg-black"
+    class="relative flex list-none justify-between gap-4 bg-white py-2 dark:bg-black"
     :data-testid="`event-list-item-${event.title}`"
     @click="handleClick"
   >
@@ -177,8 +177,8 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           class="font-semibold text-xs uppercase text-gray-500 dark:text-gray-200"
         >
           {{
-            new Date(event.startTime).toLocaleString("en-US", {
-              weekday: "short",
+            new Date(event.startTime).toLocaleString('en-US', {
+              weekday: 'short',
             })
           }}
         </div>
@@ -189,34 +189,34 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           class="font-semibold text-xs lowercase text-gray-500 dark:text-gray-200"
         >
           {{
-            new Date(event.startTime).toLocaleString("en-US", {
-              month: "short",
+            new Date(event.startTime).toLocaleString('en-US', {
+              month: 'short',
             })
           }}
         </div>
         <div
           v-if="eventSpansMultipleDates"
-          class="mt-2 ml-2 text-xs text-gray-500 dark:text-gray-200 rounded-full px-2 py-1"
+          class="ml-2 mt-2 rounded-full px-2 py-1 text-xs text-gray-500 dark:text-gray-200"
         >
           <span>Multiple Days</span>
         </div>
       </div>
     </div>
 
-    <div class="flex-1 min-w-0">
+    <div class="min-w-0 flex-1">
       <img
         v-if="event.coverImageURL"
         :src="event.coverImageURL"
         alt="Event cover image"
-        class="mb-4 max-h-48 rounded-lg block md:hidden"
-      >
+        class="mb-4 block max-h-48 rounded-lg md:hidden"
+      />
       <!-- Title and image section for medium+ screens -->
       <div class="hidden md:flex md:items-start md:gap-4">
         <div class="flex-1">
           <router-link
             :to="detailLink"
             :data-testid="'event-title'"
-            class="text-md flex-wrap gap-2 mt-2 flex items-center cursor-pointer text-gray-800 dark:text-gray-200 hover:text-orange-700"
+            class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
           >
             <HighlightedSearchTerms
               :text="event.title"
@@ -224,29 +224,29 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             />
             <span
               v-if="isArchived"
-              class="text-xs text-red-500 dark:text-red-400 border border-red-500 dark:border-red-400 rounded-full px-2"
+              class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
               >Archived</span
             >
           </router-link>
           <span
             v-if="event.canceled"
-            class="rounded-lg bg-red-100 px-3 ml-2 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
+            class="ml-2 rounded-lg bg-red-100 px-3 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
             >Canceled</span
           >
 
           <!-- Location and time info right under title -->
-          <div class="flex gap-1 flex-wrap mt-1">
+          <div class="mt-1 flex flex-wrap gap-1">
             <span
               class="flex flex-wrap text-sm text-gray-500 dark:text-gray-200"
             >
               {{
-                `${event.locationName || ""}${event.locationName ? " at " : ""}${timeOfDay}`
+                `${event.locationName || ''}${event.locationName ? ' at ' : ''}${timeOfDay}`
               }}
             </span>
           </div>
           <p
             v-if="event.virtualEventUrl"
-            class="text-black dark:text-white text-sm"
+            class="text-sm text-black dark:text-white"
           >
             Online event
           </p>
@@ -260,12 +260,12 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               (isWithinChannel || !submittedToMultipleChannels)
             "
             :to="detailLink"
-            class="flex mt-1 cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
+            class="mt-1 flex cursor-pointer items-center justify-start gap-1 text-gray-500 dark:text-gray-100"
           >
             <button
-              class="rounded-md bg-gray-100 px-4 py-1 hover:bg-gray-200 text-black dark:bg-gray-600 dark:hover:bg-gray-500 dark:text-white text-xs"
+              class="rounded-md bg-gray-100 px-4 py-1 text-xs text-black hover:bg-gray-200 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-500"
             >
-              <i class="fa-regular fa-comment h-4 w-4 mr-2" />
+              <i class="fa-regular fa-comment mr-2 h-4 w-4" />
               <span class="text black text-sm dark:text-white">{{
                 `${commentCount}`
               }}</span>
@@ -285,9 +285,9 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
               <i class="fa-regular fa-comment mr-2 h-4 w-4" />
               {{
                 `${commentCount} ${
-                  commentCount === 1 ? "comment" : "comments"
+                  commentCount === 1 ? 'comment' : 'comments'
                 } in ${channelCount} ${
-                  channelCount === 1 ? "channel" : "channels"
+                  channelCount === 1 ? 'channel' : 'channels'
                 }`
               }}
               <ChevronDownIcon class="-mr-1 ml-2 h-4 w-4" aria-hidden="true" />
@@ -300,7 +300,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
             :alt="event.title"
             :src="event.coverImageURL"
             class="h-32 w-32 rounded-lg"
-          >
+          />
         </div>
       </div>
       <!-- Title section for small screens -->
@@ -308,7 +308,7 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
         <router-link
           :to="detailLink"
           :data-testid="'event-title'"
-          class="text-md flex-wrap gap-2 mt-2 flex items-center cursor-pointer text-gray-800 dark:text-gray-200 hover:text-orange-700"
+          class="text-md mt-2 flex cursor-pointer flex-wrap items-center gap-2 text-gray-800 hover:text-orange-700 dark:text-gray-200"
         >
           <HighlightedSearchTerms
             :text="event.title"
@@ -316,27 +316,27 @@ const channelCount = computed(() => props.event?.EventChannels.length || 0);
           />
           <span
             v-if="isArchived"
-            class="text-xs text-red-500 dark:text-red-400 border border-red-500 dark:border-red-400 rounded-full px-2"
+            class="rounded-full border border-red-500 px-2 text-xs text-red-500 dark:border-red-400 dark:text-red-400"
             >Archived</span
           >
         </router-link>
         <span
           v-if="event.canceled"
-          class="rounded-lg bg-red-100 px-3 ml-2 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
+          class="ml-2 rounded-lg bg-red-100 px-3 py-1 text-sm text-red-500 dark:bg-red-500 dark:text-white"
           >Canceled</span
         >
 
         <!-- Location and time info right under title -->
-        <div class="flex gap-1 flex-wrap mt-1">
+        <div class="mt-1 flex flex-wrap gap-1">
           <span class="flex flex-wrap text-sm text-gray-500 dark:text-gray-200">
             {{
-              `${event.locationName || ""}${event.locationName ? " at " : ""}${timeOfDay}`
+              `${event.locationName || ''}${event.locationName ? ' at ' : ''}${timeOfDay}`
             }}
           </span>
         </div>
         <p
           v-if="event.virtualEventUrl"
-          class="text-black dark:text-white text-sm"
+          class="text-sm text-black dark:text-white"
         >
           Online event
         </p>

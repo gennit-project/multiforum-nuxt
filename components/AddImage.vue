@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 
 const props = defineProps({
   fieldName: {
     type: String,
     required: true,
-    default: "",
+    default: '',
   },
   label: {
     type: String,
     required: false,
-    default: "Add Image",
+    default: 'Add Image',
   },
   disabled: {
     type: Boolean,
@@ -33,35 +33,35 @@ const clearFileInput = () => {
 // For mobile browsers that might not properly cleanup
 const onFileSelected = (event: Event) => {
   if (props.disabled) return;
-  
+
   const input = event.target as HTMLInputElement;
   if (input && input.files && input.files.length > 0) {
-    console.log(`File selected: ${input.files[0].name}, type: ${input.files[0].type}, size: ${input.files[0].size}`);
+    console.log(
+      `File selected: ${input.files[0].name}, type: ${input.files[0].type}, size: ${input.files[0].size}`
+    );
   }
-  
+
   emit('file-change', {
     event,
-    fieldName: props.fieldName
+    fieldName: props.fieldName,
   });
-  
+
   // Set a timeout to clear the input after the event has been processed
   // This ensures the same file can be selected again on mobile
   setTimeout(clearFileInput, 500);
 };
-
 </script>
 
 <template>
   <div>
     <label
       :class="[
-        'border-orange-400 dark:text-white dark:border-orange-800 my-1 inline-flex items-center rounded-md border px-3 py-1 py-1.5 text-sm transition-colors',
+        'my-1 inline-flex items-center rounded-md border border-orange-400 px-3 py-1 py-1.5 text-sm transition-colors dark:border-orange-800 dark:text-white',
         !disabled
-          ? 'bg-orange-100 text-orange-700 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800 cursor-pointer'
+          ? 'cursor-pointer bg-orange-100 text-orange-700 hover:bg-orange-100 dark:bg-orange-900 dark:text-orange-200 dark:hover:bg-orange-800'
           : 'cursor-not-allowed bg-gray-100 text-gray-500 opacity-60 dark:bg-gray-700 dark:text-gray-400',
       ]"
       :for="`file-input-${props.fieldName}`"
-     
     >
       <i class="fa fa-image mr-2" /> {{ props.label }}
       <input
@@ -73,7 +73,7 @@ const onFileSelected = (event: Event) => {
         :disabled="disabled"
         @change="onFileSelected"
         @click="clearFileInput"
-      >
+      />
     </label>
   </div>
 </template>

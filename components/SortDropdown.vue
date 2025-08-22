@@ -1,13 +1,13 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   setup() {},
   data() {
-      return {
-          isOpen: false
-      }
-  }
+    return {
+      isOpen: false,
+    };
+  },
 });
 </script>
 <template>
@@ -16,16 +16,7 @@ export default defineComponent({
       <button
         id="menu-button"
         type="button"
-        class="
-          py-2
-          group
-          inline-flex
-          justify-center
-          text-sm
-          font-medium
-          text-gray-700
-          hover:text-gray-900
-        "
+        class="group inline-flex justify-center py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
         aria-expanded="false"
         aria-haspopup="true"
         @click="isOpen = !isOpen"
@@ -33,15 +24,7 @@ export default defineComponent({
         Sort
         <!-- Heroicon name: solid/chevron-down -->
         <svg
-          class="
-            flex-shrink-0
-            -mr-1
-            ml-1
-            h-5
-            w-5
-            text-gray-400
-            group-hover:text-gray-500
-          "
+          class="-mr-1 ml-1 h-5 w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500"
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 20 20"
           fill="currentColor"
@@ -68,32 +51,17 @@ export default defineComponent({
           -->
     <div
       v-if="isOpen"
-      class="
-        origin-top-right
-        absolute
-        right-0
-        mt-2
-        w-40
-        z-20
-        rounded-full
-        shadow-2xl
-         
-        ring-1 ring-black ring-opacity-5
-        focus:outline-none
-      "
+      class="absolute right-0 z-20 mt-2 w-40 origin-top-right rounded-full shadow-2xl ring-1 ring-black ring-opacity-5 focus:outline-none"
       role="menu"
       aria-orientation="vertical"
       aria-labelledby="menu-button"
       tabindex="-1"
     >
-      <div
-        class="py-1"
-        role="none"
-      >
+      <div class="py-1" role="none">
         <a
           id="menu-item-0"
           href="#"
-          class="font-medium text-gray-900 block px-4 py-2 text-sm"
+          class="block px-4 py-2 text-sm font-medium text-gray-900"
           role="menuitem"
           tabindex="-1"
         >
@@ -103,7 +71,7 @@ export default defineComponent({
         <a
           id="menu-item-1"
           href="#"
-          class="text-gray-500 block px-4 py-2 text-sm"
+          class="block px-4 py-2 text-sm text-gray-500"
           role="menuitem"
           tabindex="-1"
         >
@@ -113,7 +81,7 @@ export default defineComponent({
         <a
           id="menu-item-2"
           href="#"
-          class="text-gray-500 block px-4 py-2 text-sm"
+          class="block px-4 py-2 text-sm text-gray-500"
           role="menuitem"
           tabindex="-1"
         >

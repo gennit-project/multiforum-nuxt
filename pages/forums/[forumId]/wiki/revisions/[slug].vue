@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useRoute, useRouter, useHead } from "nuxt/app";
-import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
-import { useQuery } from "@vue/apollo-composable";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { timeAgo } from "@/utils";
-import type { WikiPage, TextVersion } from "@/__generated__/graphql";
+import { computed } from 'vue';
+import { useRoute, useRouter, useHead } from 'nuxt/app';
+import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
+import { useQuery } from '@vue/apollo-composable';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { timeAgo } from '@/utils';
+import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 
 // Define type for revision data
 interface WikiRevisionData {
@@ -34,7 +34,7 @@ const {
     channelUniqueName: forumId,
     slug: slug,
   },
-  { errorPolicy: "all" }
+  { errorPolicy: 'all' }
 );
 
 // Computed property for the wiki page data
@@ -57,7 +57,7 @@ const allEdits = computed(() => {
   if (wikiPage.value?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
     const currentVersion = {
-      id: "current",
+      id: 'current',
       body: wikiPage.value.body ?? undefined,
       createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
       Author: wikiPage.value.VersionAuthor ?? undefined,
@@ -73,12 +73,12 @@ const allEdits = computed(() => {
       const mostRecentPastVersion = wikiPage.value.PastVersions[0];
       const currentContent = wikiPage.value.body ?? undefined;
       const pastContent = mostRecentPastVersion.body ?? undefined;
-      
+
       // Only add the most recent edit if content actually changed
       if (currentContent !== pastContent) {
         edits.push({
-          id: "most-recent-edit",
-          author: wikiPage.value.VersionAuthor?.username || "[Deleted]",
+          id: 'most-recent-edit',
+          author: wikiPage.value.VersionAuthor?.username || '[Deleted]',
           createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
           isCurrent: true,
           // Show what changed in the most recent edit
@@ -87,22 +87,22 @@ const allEdits = computed(() => {
         });
       }
     }
-    
+
     // Process each past version - show what changed in that specific edit
     wikiPage.value.PastVersions.forEach((version, index) => {
       // Skip the most recent past version since we handled it above
       if (index === 0) return;
-      
+
       const previousVersion = wikiPage.value.PastVersions[index + 1] || {
-        id: "initial",
-        body: "", // Show diff from empty if this was the first edit
+        id: 'initial',
+        body: '', // Show diff from empty if this was the first edit
         createdAt: version.createdAt,
         Author: null,
       };
-      
+
       edits.push({
         id: version.id,
-        author: version.Author?.username || "[Deleted]",
+        author: version.Author?.username || '[Deleted]',
         createdAt: version.createdAt,
         isCurrent: false,
         // Show what changed in this specific edit
@@ -118,9 +118,14 @@ const allEdits = computed(() => {
 // Navigate to revision detail page
 const viewRevisionDiff = (revision: WikiRevisionData) => {
   console.log('Navigating to revision:', revision.id);
-  console.log('Path:', `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`);
+  console.log(
+    'Path:',
+    `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`
+  );
   try {
-    router.push(`/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`);
+    router.push(
+      `/forums/${forumId}/wiki/revisions/diff/${slug}/${revision.id}`
+    );
   } catch (error) {
     console.error('Navigation error:', error);
   }
@@ -135,7 +140,10 @@ const goBackToWiki = () => {
 useHead({
   title: `Revision History - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId}`,
   meta: [
-    { name: 'description', content: `View revision history for the ${wikiPage.value?.title || 'wiki page'}.` },
+    {
+      name: 'description',
+      content: `View revision history for the ${wikiPage.value?.title || 'wiki page'}.`,
+    },
     { name: 'robots', content: 'noindex' }, // Don't index revision pages
   ],
 });
@@ -155,7 +163,10 @@ useHead({
       <p class="mt-2 text-sm">{{ error?.message }}</p>
     </div>
 
-    <div v-else-if="!wikiPage" class="mx-auto max-w-2xl p-4 text-center dark:text-white">
+    <div
+      v-else-if="!wikiPage"
+      class="mx-auto max-w-2xl p-4 text-center dark:text-white"
+    >
       <p class="mb-4 text-lg">This wiki page doesn't exist.</p>
       <button
         class="text-blue-600 hover:underline dark:text-blue-400"
@@ -176,17 +187,19 @@ useHead({
             ← Back to {{ wikiPage.title }}
           </button>
         </nav>
-        
+
         <h1 class="text-2xl font-bold dark:text-white">
           Revision History For Wiki Page
         </h1>
         <p class="mt-2 text-gray-600 dark:text-gray-400">
-          "{{ wikiPage.title }}" has been edited {{ totalEdits }} time{{ totalEdits !== 1 ? 's' : '' }}
+          "{{ wikiPage.title }}" has been edited {{ totalEdits }} time{{
+            totalEdits !== 1 ? 's' : ''
+          }}
         </p>
       </div>
 
       <!-- No edits message -->
-      <div v-if="!hasEdits" class="text-center py-8">
+      <div v-if="!hasEdits" class="py-8 text-center">
         <p class="text-gray-500 dark:text-gray-400">
           This page has not been edited yet.
         </p>
@@ -203,8 +216,13 @@ useHead({
         <div
           v-for="(edit, index) in allEdits"
           :key="edit.id"
-          class="border border-gray-200 rounded-lg p-6 hover:bg-gray-50 dark:border-gray-700 dark:hover:bg-gray-800/50 cursor-pointer transition-colors"
-          @click="() => { console.log('Click detected on revision:', edit.id); viewRevisionDiff(edit); }"
+          class="hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-200 p-6 transition-colors dark:border-gray-700 dark:hover:bg-gray-800/50"
+          @click="
+            () => {
+              console.log('Click detected on revision:', edit.id);
+              viewRevisionDiff(edit);
+            }
+          "
         >
           <div class="flex items-center justify-between">
             <div class="flex-1">
@@ -215,18 +233,23 @@ useHead({
                 <div class="text-sm text-gray-500 dark:text-gray-400">
                   {{ timeAgo(new Date(edit.createdAt)) }}
                 </div>
-                <div v-if="edit.isCurrent" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200">
+                <div
+                  v-if="edit.isCurrent"
+                  class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
+                >
                   Most recent edit
                 </div>
               </div>
               <div class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-                {{ new Date(edit.createdAt).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "numeric",
-                }) }}
+                {{
+                  new Date(edit.createdAt).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: 'numeric',
+                    minute: 'numeric',
+                  })
+                }}
               </div>
             </div>
             <div class="flex items-center text-gray-400 dark:text-gray-500">

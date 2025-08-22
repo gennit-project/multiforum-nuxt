@@ -3,17 +3,20 @@ import { mount } from '@vue/test-utils';
 import { nextTick } from 'vue';
 import { DateTime } from 'luxon';
 import type { CreateEditEventFormValues } from '@/types/Event';
-import { EVENT_TITLE_CHAR_LIMIT, MAX_CHARS_IN_EVENT_DESCRIPTION } from '@/utils/constants';
+import {
+  EVENT_TITLE_CHAR_LIMIT,
+  MAX_CHARS_IN_EVENT_DESCRIPTION,
+} from '@/utils/constants';
 // Import actual component
 import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
 
 // Mock the components
 const mockComponents = {
-  'FormRow': {
+  FormRow: {
     template: '<div><slot /><slot name="content" /></div>',
-    props: ['sectionTitle', 'required', 'description']
+    props: ['sectionTitle', 'required', 'description'],
   },
-  'TextInput': {
+  TextInput: {
     template: `
       <div>
         <div>
@@ -31,27 +34,29 @@ const mockComponents = {
     methods: {
       focus() {
         // Mock focus method
-      }
-    }
+      },
+    },
   },
-  'CharCounter': {
+  CharCounter: {
     template: '<div data-testid="char-counter">{{ current }}/{{ max }}</div>',
-    props: ['current', 'max']
+    props: ['current', 'max'],
   },
-  'ForumPicker': {
+  ForumPicker: {
     template: '<div data-testid="forum-picker"></div>',
     props: ['selectedChannels'],
-    emits: ['setSelectedChannels']
+    emits: ['setSelectedChannels'],
   },
-  'ErrorMessage': {
-    template: '<div class="text-red-500" data-testid="error-message">{{ text }}</div>',
-    props: ['text']
+  ErrorMessage: {
+    template:
+      '<div class="text-red-500" data-testid="error-message">{{ text }}</div>',
+    props: ['text'],
   },
-  'ErrorBanner': {
-    template: '<div class="text-red-500 bg-red-100 p-3 my-2 pl-4 rounded dark:bg-red-500 dark:text-white text-wrap" data-testid="error-banner">{{ text }}</div>',
-    props: ['text']
+  ErrorBanner: {
+    template:
+      '<div class="text-red-500 bg-red-100 p-3 my-2 pl-4 rounded dark:bg-red-500 dark:text-white text-wrap" data-testid="error-banner">{{ text }}</div>',
+    props: ['text'],
   },
-  'FormComponent': {
+  FormComponent: {
     template: `
       <form data-testid="event-form">
         <div class="form-title">{{ formTitle }}</div>
@@ -61,70 +66,91 @@ const mockComponents = {
         <slot></slot>
       </form>
     `,
-    props: ['formTitle', 'needsChanges', 'loading', 'showCancelButton', 'showButtonsInHeader', 'description']
+    props: [
+      'formTitle',
+      'needsChanges',
+      'loading',
+      'showCancelButton',
+      'showButtonsInHeader',
+      'description',
+    ],
   },
-  'TextEditor': {
+  TextEditor: {
     template: '<textarea data-testid="description-input"></textarea>',
-    props: ['initialValue', 'placeholder', 'fieldName', 'disableAutoFocus', 'showCharCounter', 'maxChars'],
-    emits: ['update']
+    props: [
+      'initialValue',
+      'placeholder',
+      'fieldName',
+      'disableAutoFocus',
+      'showCharCounter',
+      'maxChars',
+    ],
+    emits: ['update'],
   },
-  'LocationSearchBar': {
-    template: '<div data-testid="location-search-bar"><input type="text" @input="$emit(\'updateLocationInput\', {name: \'Test Location\', formatted_address: \'123 Test St\', lat: 0, lng: 0})" /></div>',
+  LocationSearchBar: {
+    template:
+      '<div data-testid="location-search-bar"><input type="text" @input="$emit(\'updateLocationInput\', {name: \'Test Location\', formatted_address: \'123 Test St\', lat: 0, lng: 0})" /></div>',
     props: ['initialValue', 'searchPlaceholder', 'fullWidth'],
-    emits: ['updateLocationInput']
+    emits: ['updateLocationInput'],
   },
-  'AddImage': {
+  AddImage: {
     template: '<div data-testid="add-image"></div>',
     props: ['fieldName', 'label'],
-    emits: ['fileChange']
+    emits: ['fileChange'],
   },
-  'TagPicker': {
+  TagPicker: {
     template: '<div data-testid="tag-picker"></div>',
     props: ['selectedTags'],
-    emits: ['setSelectedTags']
+    emits: ['setSelectedTags'],
   },
-  'CheckBox': {
-    template: '<input type="checkbox" :checked="checked" @change="$emit(\'input\', $event.target.checked)" />',
+  CheckBox: {
+    template:
+      '<input type="checkbox" :checked="checked" @change="$emit(\'input\', $event.target.checked)" />',
     props: ['checked'],
-    emits: ['input']
-  }
+    emits: ['input'],
+  },
 };
 
 // Mock the needed Nuxt and Vue modules
 vi.mock('nuxt/app', () => ({
   useRouter: () => ({
     go: vi.fn(),
-    resolve: vi.fn(() => ({ href: '/test-url' }))
+    resolve: vi.fn(() => ({ href: '/test-url' })),
   }),
   useRoute: () => ({
-    params: {}
-  })
+    params: {},
+  }),
 }));
 
 // Mock Apollo composable
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: () => ({
     mutate: vi.fn(),
-    error: { value: null }
+    error: { value: null },
   }),
   useQuery: () => ({
     result: { value: null },
     loading: { value: false },
-    error: { value: null }
-  })
+    error: { value: null },
+  }),
 }));
 
 // Mock cache
 vi.mock('@/cache', () => ({
-  usernameVar: { value: 'testuser' }
+  usernameVar: { value: 'testuser' },
 }));
-
 
 describe('CreateEditEventFields Component', () => {
   // Default form values for testing
-  const defaultStartTime = DateTime.now().plus({ hours: 1 }).startOf('hour').toISO();
-  const defaultEndTime = DateTime.now().plus({ hours: 3 }).startOf('hour').toISO();
-  
+  const defaultStartTime = DateTime.now()
+    .plus({ hours: 1 })
+    .startOf('hour')
+    .toISO();
+  const defaultEndTime = DateTime.now()
+    .plus({ hours: 3 })
+    .startOf('hour')
+    .toISO();
+
   const defaultFormValues: CreateEditEventFormValues = {
     title: '',
     description: '',
@@ -145,7 +171,7 @@ describe('CreateEditEventFields Component', () => {
     cost: '',
     free: false,
     isHostedByOP: false,
-    isAllDay: false
+    isAllDay: false,
   };
 
   // Helper function to mount component
@@ -165,10 +191,10 @@ describe('CreateEditEventFields Component', () => {
         stubs: mockComponents,
         mocks: {
           $route: {
-            params: {}
-          }
-        }
-      }
+            params: {},
+          },
+        },
+      },
     });
   };
 
@@ -177,83 +203,89 @@ describe('CreateEditEventFields Component', () => {
       const wrapper = mountComponent({
         ...defaultFormValues,
         title: '', // Empty title
-        selectedChannels: ['test-channel'] // Valid channel selection
+        selectedChannels: ['test-channel'], // Valid channel selection
       });
-      
+
       // Trigger input to set touched state to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // Find error banner
       const errorBanner = wrapper.find('[data-testid="error-banner"]');
-      
+
       // Validation error should be about missing title
       expect(errorBanner.exists()).toBe(true);
       expect(errorBanner.text()).toContain('A title is required');
     });
-    
+
     it('validates that at least one channel must be selected', async () => {
       const wrapper = mountComponent({
         ...defaultFormValues,
         title: 'Test Event', // Valid title
-        selectedChannels: [] // No channels selected
+        selectedChannels: [], // No channels selected
       });
-      
+
       // Trigger input to set touched state to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // Find error banner
       const errorBanner = wrapper.find('[data-testid="error-banner"]');
-      
+
       // Validation error should be about missing channel selection
       expect(errorBanner.exists()).toBe(true);
-      expect(errorBanner.text()).toContain('At least one channel must be selected');
+      expect(errorBanner.text()).toContain(
+        'At least one channel must be selected'
+      );
     });
-    
+
     it('validates that title cannot exceed character limit', async () => {
       // Create a title that's too long
       const longTitle = 'A'.repeat(EVENT_TITLE_CHAR_LIMIT + 10);
-      
+
       const wrapper = mountComponent({
         ...defaultFormValues,
         title: longTitle,
-        selectedChannels: ['test-channel'] // Valid channel selection
+        selectedChannels: ['test-channel'], // Valid channel selection
       });
-      
+
       // Trigger input to set touched state to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // Find error banner
       const errorBanner = wrapper.find('[data-testid="error-banner"]');
-      
+
       // Validation error should be about title length
       expect(errorBanner.exists()).toBe(true);
-      expect(errorBanner.text()).toContain(`Title cannot exceed ${EVENT_TITLE_CHAR_LIMIT} characters`);
+      expect(errorBanner.text()).toContain(
+        `Title cannot exceed ${EVENT_TITLE_CHAR_LIMIT} characters`
+      );
     });
 
     it('validates that description cannot exceed character limit', async () => {
       // Create a description that's too long
       const longDescription = 'A'.repeat(MAX_CHARS_IN_EVENT_DESCRIPTION + 10);
-      
+
       const wrapper = mountComponent({
         ...defaultFormValues,
         title: 'Test Event', // Valid title
         selectedChannels: ['test-channel'], // Valid channel selection
-        description: longDescription
+        description: longDescription,
       });
-      
+
       // Trigger input to set touched state to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // Find error banner
       const errorBanner = wrapper.find('[data-testid="error-banner"]');
-      
+
       // Validation error should be about description length
       expect(errorBanner.exists()).toBe(true);
-      expect(errorBanner.text()).toContain(`Description cannot exceed ${MAX_CHARS_IN_EVENT_DESCRIPTION} characters`);
+      expect(errorBanner.text()).toContain(
+        `Description cannot exceed ${MAX_CHARS_IN_EVENT_DESCRIPTION} characters`
+      );
     });
 
     it('validates that virtual event URL must be valid', async () => {
@@ -261,16 +293,18 @@ describe('CreateEditEventFields Component', () => {
         ...defaultFormValues,
         title: 'Test Event', // Valid title
         selectedChannels: ['test-channel'], // Valid channel selection
-        virtualEventUrl: 'invalid-url' // Invalid URL
+        virtualEventUrl: 'invalid-url', // Invalid URL
       });
-      
+
       // Need to simulate user interaction to set touched to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // The form should show that it has errors
-      expect(wrapper.find('[data-testid="validation-error"]').exists()).toBe(true);
-      
+      expect(wrapper.find('[data-testid="validation-error"]').exists()).toBe(
+        true
+      );
+
       // Find any error message about URL validity
       expect(wrapper.html()).toContain('Virtual event URL must be valid');
     });
@@ -280,89 +314,101 @@ describe('CreateEditEventFields Component', () => {
     it('warns when start time is in the past', async () => {
       // Set start time to one day ago
       const pastStartTime = DateTime.now().minus({ days: 1 }).toISO();
-      
+
       const wrapper = mountComponent({
         ...defaultFormValues,
         title: 'Test Event', // Valid title
         selectedChannels: ['test-channel'], // Valid channel selection
-        startTime: pastStartTime
+        startTime: pastStartTime,
       });
-      
+
       // Trigger input to set touched state to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // Should find ErrorMessage component containing the warning text
-      expect(wrapper.html()).toContain('Are you sure you want the start time to be in the past');
+      expect(wrapper.html()).toContain(
+        'Are you sure you want the start time to be in the past'
+      );
     });
-    
+
     it('validates that start time must be before end time', async () => {
       // Start time is after end time
       const invalidStartTime = DateTime.now().plus({ days: 1 }).toISO();
       const invalidEndTime = DateTime.now().toISO();
-      
+
       const wrapper = mountComponent({
         ...defaultFormValues,
         title: 'Test Event', // Valid title
         selectedChannels: ['test-channel'], // Valid channel selection
         startTime: invalidStartTime,
-        endTime: invalidEndTime
+        endTime: invalidEndTime,
       });
-      
+
       // Trigger input to set touched state to true
       await wrapper.find('[data-testid="title-input"]').trigger('input');
       await nextTick();
-      
+
       // Should find text about start time needing to be before end time
-      expect(wrapper.html()).toContain('The start time must be before the end time');
-      
+      expect(wrapper.html()).toContain(
+        'The start time must be before the end time'
+      );
+
       // The validation state should indicate errors
-      expect(wrapper.find('[data-testid="validation-error"]').exists()).toBe(true);
+      expect(wrapper.find('[data-testid="validation-error"]').exists()).toBe(
+        true
+      );
     });
   });
 
   describe('Form interactivity', () => {
     it('emits update events when form fields change', async () => {
       const wrapper = mountComponent();
-      
+
       // Find title input and change its value
       const titleInput = wrapper.find('[data-testid="title-input"]');
       await titleInput.setValue('New Event Title');
-      
+
       // Check for updateFormValues event
       expect(wrapper.emitted()).toHaveProperty('updateFormValues');
-      
+
       const updateEvents = wrapper.emitted('updateFormValues');
       expect(updateEvents).toBeTruthy();
-      
+
       // Check that at least one update event contains the title
-      const hasUpdateWithTitle = updateEvents?.some(event => 
-        (event[0] as any)?.title === 'New Event Title'
+      const hasUpdateWithTitle = updateEvents?.some(
+        (event) => (event[0] as any)?.title === 'New Event Title'
       );
-      
+
       expect(hasUpdateWithTitle).toBe(true);
     });
-    
+
     it('calculates event duration correctly', async () => {
       // Test with a 3 hour and 30 minute event
-      const startTime = DateTime.fromObject({ 
-        year: 2025, month: 6, day: 15,
-        hour: 9, minute: 0
+      const startTime = DateTime.fromObject({
+        year: 2025,
+        month: 6,
+        day: 15,
+        hour: 9,
+        minute: 0,
       }).toISO();
-      
-      const endTime = DateTime.fromObject({ 
-        year: 2025, month: 6, day: 15,
-        hour: 12, minute: 30
+
+      const endTime = DateTime.fromObject({
+        year: 2025,
+        month: 6,
+        day: 15,
+        hour: 12,
+        minute: 30,
       }).toISO();
-      
+
       const wrapper = mountComponent({
         ...defaultFormValues,
         startTime: startTime!,
-        endTime: endTime!
+        endTime: endTime!,
       });
-      
+
       await nextTick();
-      
+
       // Check that the duration is displayed correctly
       expect(wrapper.html()).toContain('3h 30m');
     });

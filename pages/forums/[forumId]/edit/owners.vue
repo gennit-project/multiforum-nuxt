@@ -1,29 +1,29 @@
 <script lang="ts" setup>
-import PendingForumOwnerList from "@/components/channel/form/PendingForumOwnerList.vue";
-import ForumOwnerList from "@/components/channel/form/ForumOwnerList.vue";
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import PendingForumOwnerList from '@/components/channel/form/PendingForumOwnerList.vue';
+import ForumOwnerList from '@/components/channel/form/ForumOwnerList.vue';
+import { ref, computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
 import {
   INVITE_FORUM_OWNER,
   CANCEL_INVITE_FORUM_OWNER,
   REMOVE_FORUM_OWNER,
-} from "@/graphQLData/mod/mutations";
-import { useRoute } from "nuxt/app";
+} from '@/graphQLData/mod/mutations';
+import { useRoute } from 'nuxt/app';
 import {
   GET_PENDING_CHANNEL_OWNERS_BY_CHANNEL,
   GET_CHANNEL_OWNERS_BY_CHANNEL,
-} from "@/graphQLData/mod/queries";
-import ErrorBanner from "@/components/ErrorBanner.vue";
+} from '@/graphQLData/mod/queries';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
 const route = useRoute();
 
-const newOwnerUsername = ref("");
+const newOwnerUsername = ref('');
 
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const {
@@ -108,48 +108,47 @@ const {
   },
 });
 
-const { 
-  mutate: removeForumOwner, 
+const {
+  mutate: removeForumOwner,
   loading: removeForumOwnerLoading,
   onDone: removeForumOwnerDone,
   error: removeForumOwnerError,
-} =
-  useMutation(REMOVE_FORUM_OWNER, {
-    update: (cache) => {
-      // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
-      // to remove the removed user
+} = useMutation(REMOVE_FORUM_OWNER, {
+  update: (cache) => {
+    // update the result of GET_CHANNEL_OWNERS_BY_CHANNEL
+    // to remove the removed user
 
-      const existingData: any = cache.readQuery({
-        query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-        variables: {
-          channelUniqueName: forumId.value,
-        },
-      });
+    const existingData: any = cache.readQuery({
+      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
+      variables: {
+        channelUniqueName: forumId.value,
+      },
+    });
 
-      const existingOwners = existingData?.channels[0]?.Admins ?? [];
+    const existingOwners = existingData?.channels[0]?.Admins ?? [];
 
-      cache.writeQuery({
-        query: GET_CHANNEL_OWNERS_BY_CHANNEL,
-        variables: {
-          channelUniqueName: forumId.value,
-        },
-        data: {
-          channels: [
-            {
-              Admins: [
-                ...existingOwners.filter(
-                  (owner: any) => owner.username !== newOwnerUsername.value
-                ),
-              ],
-            },
-          ],
-        },
-      });
-    },
-  });
+    cache.writeQuery({
+      query: GET_CHANNEL_OWNERS_BY_CHANNEL,
+      variables: {
+        channelUniqueName: forumId.value,
+      },
+      data: {
+        channels: [
+          {
+            Admins: [
+              ...existingOwners.filter(
+                (owner: any) => owner.username !== newOwnerUsername.value
+              ),
+            ],
+          },
+        ],
+      },
+    });
+  },
+});
 
 inviteOwnerDone(() => {
-  newOwnerUsername.value = "";
+  newOwnerUsername.value = '';
 });
 
 removeForumOwnerDone(() => {
@@ -163,8 +162,8 @@ cancelInviteOwnerDone(() => {
   showCancelInviteModal.value = false;
 });
 
-const inviteeToRemove = ref("");
-const forumOwnerToRemove = ref("");
+const inviteeToRemove = ref('');
+const forumOwnerToRemove = ref('');
 
 const clickCancelInvite = (inviteeUsername: string) => {
   inviteeToRemove.value = inviteeUsername;
@@ -181,7 +180,7 @@ const clickRemoveOwner = (ownerUsername: string) => {
   <div class="flex-col space-y-4 dark:text-white">
     <FormRow section-title="Invite a New Admin">
       <template #content>
-        <div class="w-full flex items-center gap-2">
+        <div class="flex w-full items-center gap-2">
           <div class="w-full">
             <TextInput
               :test-id="'new-owner-input'"
@@ -196,10 +195,13 @@ const clickRemoveOwner = (ownerUsername: string) => {
             :label="'Invite'"
             :loading="inviteOwnerLoading"
             :disabled="newOwnerUsername === ''"
-            @click="() => inviteOwner({
-              inviteeUsername: newOwnerUsername,
-              channelUniqueName: forumId,
-            })"
+            @click="
+              () =>
+                inviteOwner({
+                  inviteeUsername: newOwnerUsername,
+                  channelUniqueName: forumId,
+                })
+            "
           />
         </div>
         <ErrorBanner v-if="inviteOwnerError" :text="inviteOwnerError.message" />

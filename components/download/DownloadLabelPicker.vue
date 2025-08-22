@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import type { PropType } from "vue";
-import type { FilterGroup } from "@/__generated__/graphql";
-import MultiSelect from "@/components/MultiSelect.vue";
-import type { MultiSelectOption } from "@/components/MultiSelect.vue";
-import CheckBox from "@/components/CheckBox.vue";
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import type { FilterGroup } from '@/__generated__/graphql';
+import MultiSelect from '@/components/MultiSelect.vue';
+import type { MultiSelectOption } from '@/components/MultiSelect.vue';
+import CheckBox from '@/components/CheckBox.vue';
 
 const props = defineProps({
   filterGroups: {
@@ -28,7 +28,7 @@ const shouldUseDropdown = (group: FilterGroup) => {
 
 // Convert filter group options to MultiSelect options
 const getMultiSelectOptions = (group: FilterGroup): MultiSelectOption[] => {
-  return (group.options || []).map(option => ({
+  return (group.options || []).map((option) => ({
     value: option.value,
     label: option.displayName,
   }));
@@ -38,52 +38,60 @@ const getMultiSelectOptions = (group: FilterGroup): MultiSelectOption[] => {
 const toggleLabel = (groupKey: string, optionValue: string) => {
   const currentSelection = props.selectedLabels[groupKey] || [];
   const index = currentSelection.indexOf(optionValue);
-  
+
   let newSelection: string[];
   if (index === -1) {
     newSelection = [...currentSelection, optionValue];
   } else {
-    newSelection = currentSelection.filter(val => val !== optionValue);
+    newSelection = currentSelection.filter((val) => val !== optionValue);
   }
-  
+
   const updatedLabels = {
     ...props.selectedLabels,
     [groupKey]: newSelection,
   };
-  
+
   // Remove empty arrays to keep the object clean
   if (newSelection.length === 0) {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete updatedLabels[groupKey];
   }
-  
+
   emit('update:selectedLabels', updatedLabels);
 };
 
 // Handle MultiSelect updates for large groups
-const handleMultiSelectUpdate = (groupKey: string, selectedValues: string[]) => {
+const handleMultiSelectUpdate = (
+  groupKey: string,
+  selectedValues: string[]
+) => {
   const updatedLabels = {
     ...props.selectedLabels,
     [groupKey]: selectedValues,
   };
-  
+
   // Remove empty arrays to keep the object clean
   if (selectedValues.length === 0) {
     // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
     delete updatedLabels[groupKey];
   }
-  
+
   emit('update:selectedLabels', updatedLabels);
 };
 
 // Check if any labels are selected
 const hasSelectedLabels = computed(() => {
-  return Object.values(props.selectedLabels).some(values => values.length > 0);
+  return Object.values(props.selectedLabels).some(
+    (values) => values.length > 0
+  );
 });
 
 // Get total count of selected labels
 const selectedLabelCount = computed(() => {
-  return Object.values(props.selectedLabels).reduce((total, values) => total + values.length, 0);
+  return Object.values(props.selectedLabels).reduce(
+    (total, values) => total + values.length,
+    0
+  );
 });
 </script>
 
@@ -95,26 +103,25 @@ const selectedLabelCount = computed(() => {
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">
           Download Labels
         </h3>
-        <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
+        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
           Select labels to help users find your download through filters
         </p>
       </div>
-      <div v-if="hasSelectedLabels" class="text-sm text-gray-600 dark:text-gray-400">
+      <div
+        v-if="hasSelectedLabels"
+        class="text-sm text-gray-600 dark:text-gray-400"
+      >
         {{ selectedLabelCount }} selected
       </div>
     </div>
 
     <!-- Filter Groups -->
     <div class="space-y-6">
-      <div
-        v-for="group in filterGroups"
-        :key="group.id"
-        class="space-y-3"
-      >
+      <div v-for="group in filterGroups" :key="group.id" class="space-y-3">
         <h4 class="text-md font-medium text-gray-800 dark:text-gray-200">
           {{ group.displayName }}
         </h4>
-        
+
         <!-- MultiSelect for groups with 10+ options -->
         <div v-if="shouldUseDropdown(group)">
           <MultiSelect
@@ -127,7 +134,7 @@ const selectedLabelCount = computed(() => {
             @update:model-value="handleMultiSelectUpdate(group.key, $event)"
           />
         </div>
-        
+
         <!-- Regular checkboxes for groups with <10 options -->
         <div v-else class="space-y-2">
           <div
@@ -136,11 +143,13 @@ const selectedLabelCount = computed(() => {
             class="flex items-center"
           >
             <CheckBox
-              :checked="selectedLabels[group.key]?.includes(option.value) || false"
+              :checked="
+                selectedLabels[group.key]?.includes(option.value) || false
+              "
               @update="toggleLabel(group.key, option.value)"
             />
-            <label 
-              class="ml-2 text-sm text-gray-700 dark:text-gray-300 cursor-pointer"
+            <label
+              class="ml-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300"
               @click="toggleLabel(group.key, option.value)"
             >
               {{ option.displayName }}
@@ -149,11 +158,11 @@ const selectedLabelCount = computed(() => {
         </div>
       </div>
     </div>
-    
+
     <!-- Empty state -->
     <div
       v-if="filterGroups.length === 0"
-      class="text-center py-6 text-gray-500 dark:text-gray-400"
+      class="py-6 text-center text-gray-500 dark:text-gray-400"
     >
       <p class="text-sm">No label categories configured for this forum.</p>
     </div>

@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import { useRoute } from "nuxt/app";
-import { useMutation } from "@vue/apollo-composable";
-import GenericModal from "@/components/GenericModal.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import ArchiveBoxXMark from "../icons/ArchiveBoxXMark.vue";
+import { computed, ref } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useMutation } from '@vue/apollo-composable';
+import GenericModal from '@/components/GenericModal.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import ArchiveBoxXMark from '../icons/ArchiveBoxXMark.vue';
 import {
   UNARCHIVE_DISCUSSION,
   UNARCHIVE_EVENT,
   UNARCHIVE_COMMENT,
-} from "@/graphQLData/issue/mutations";
+} from '@/graphQLData/issue/mutations';
 
 const props = defineProps({
   open: {
@@ -19,39 +19,38 @@ const props = defineProps({
   commentId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   eventChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   eventId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
 });
-const emit = defineEmits(["close", "unarchivedSuccessfully"]);
+const emit = defineEmits(['close', 'unarchivedSuccessfully']);
 
 const route = useRoute();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-
-const explanation = ref("No violation");
+const explanation = ref('No violation');
 
 const {
   mutate: unarchiveDiscussion,
@@ -64,13 +63,13 @@ const {
     // so that archived=false.
 
     if (!props.discussionChannelId) {
-      console.error("No discussion channel ID provided.");
+      console.error('No discussion channel ID provided.');
       return;
     }
 
     cache.modify({
       id: cache.identify({
-        __typename: "DiscussionChannel",
+        __typename: 'DiscussionChannel',
         id: props.discussionChannelId,
       }),
       fields: {
@@ -93,13 +92,13 @@ const {
     // so that archived=false.
 
     if (!props.eventChannelId) {
-      console.error("No event channel ID provided.");
+      console.error('No event channel ID provided.');
       return;
     }
 
     cache.modify({
       id: cache.identify({
-        __typename: "EventChannel",
+        __typename: 'EventChannel',
         id: props.eventChannelId,
       }),
       fields: {
@@ -122,13 +121,13 @@ const {
     // so that archived=false.
 
     if (!props.commentId) {
-      console.error("No comment ID provided.");
+      console.error('No comment ID provided.');
       return;
     }
 
     cache.modify({
       id: cache.identify({
-        __typename: "Comment",
+        __typename: 'Comment',
         id: props.commentId,
       }),
       fields: {
@@ -141,52 +140,52 @@ const {
 });
 
 unarchiveDiscussionDone(() => {
-  emit("unarchivedSuccessfully");
+  emit('unarchivedSuccessfully');
 });
 
 unarchiveEventDone(() => {
-  emit("unarchivedSuccessfully");
+  emit('unarchivedSuccessfully');
 });
 
 unarchiveCommentDone(() => {
-  emit("unarchivedSuccessfully");
+  emit('unarchivedSuccessfully');
 });
 
 const modalTitle = computed(() => {
   if (props.commentId) {
-    return "Unarchive Comment";
+    return 'Unarchive Comment';
   } else if (props.discussionId) {
-    return "Unarchive Discussion";
+    return 'Unarchive Discussion';
   } else if (props.eventId) {
-    return "Unarchive Event";
+    return 'Unarchive Event';
   }
 
-  return "Unarchive Content";
+  return 'Unarchive Content';
 });
 
 const modalBody = computed(() => {
-  let contentType = "discussion";
+  let contentType = 'discussion';
   if (props.commentId) {
-    contentType = "comment";
+    contentType = 'comment';
   } else if (props.eventId) {
-    contentType = "event";
+    contentType = 'event';
   }
   return `(Optional) Please add any more information or context about why this ${contentType} should be unarchived.`;
 });
 
 const modalPlaceholder = computed(() => {
-  let contentType = "discussion";
+  let contentType = 'discussion';
   if (props.commentId) {
-    contentType = "comment";
+    contentType = 'comment';
   } else if (props.eventId) {
-    contentType = "event";
+    contentType = 'event';
   }
   return `Explain why this ${contentType} should be unarchived`;
 });
 
 const submit = async () => {
   if (!props.discussionId && !props.eventId && !props.commentId) {
-    console.error("No discussion, event, or comment ID provided.");
+    console.error('No discussion, event, or comment ID provided.');
     return;
   }
 
@@ -216,7 +215,7 @@ const submit = async () => {
 };
 
 const close = () => {
-  emit("close");
+  emit('close');
 };
 </script>
 
@@ -258,9 +257,18 @@ const close = () => {
         :allow-image-upload="false"
         @update="explanation = $event"
       />
-      <ErrorBanner 
-        v-if="unarchiveDiscussionError || unarchiveEventError || unarchiveCommentError"
-        :text="unarchiveDiscussionError?.message || unarchiveEventError?.message || unarchiveCommentError?.message" />
+      <ErrorBanner
+        v-if="
+          unarchiveDiscussionError ||
+          unarchiveEventError ||
+          unarchiveCommentError
+        "
+        :text="
+          unarchiveDiscussionError?.message ||
+          unarchiveEventError?.message ||
+          unarchiveCommentError?.message
+        "
+      />
     </template>
   </GenericModal>
 </template>

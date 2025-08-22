@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed, ref } from 'vue';
 import {
   PENDING_FORUM_OWNER_INVITE_EXISTS,
   PENDING_FORUM_MOD_INVITE_EXISTS,
-} from "@/graphQLData/mod/queries";
+} from '@/graphQLData/mod/queries';
 import {
   ACCEPT_FORUM_OWNER_INVITE,
   ACCEPT_FORUM_MOD_INVITE,
-} from "@/graphQLData/mod/mutations";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { usernameVar } from "@/cache";
-import { useRoute } from "nuxt/app";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import ErrorBanner from "../ErrorBanner.vue";
+} from '@/graphQLData/mod/mutations';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { usernameVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import ErrorBanner from '../ErrorBanner.vue';
 
 const route = useRoute();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const { result: pendingOwnerInviteResult } = useQuery(

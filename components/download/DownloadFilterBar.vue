@@ -1,22 +1,22 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import SearchBar from "@/components/SearchBar.vue";
-import FilterChip from "@/components/FilterChip.vue";
-import TagIcon from "@/components/icons/TagIcon.vue";
-import SearchableTagList from "@/components/SearchableTagList.vue";
-import SortButtons from "@/components/SortButtons.vue";
-import { getTagLabel } from "@/utils";
-import { getFilterValuesFromParams } from "../discussion/list/getDiscussionFilterValuesFromParams";
-import type { SearchDiscussionValues } from "@/types/Discussion";
-import type { FilterGroup } from "@/__generated__/graphql";
-import { updateFilters } from "@/utils/routerUtils";
-import { useRoute, useRouter } from "nuxt/app";
-import FilterIcon from "@/components/icons/FilterIcon.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import SearchIcon from "@/components/icons/SearchIcon.vue";
-import DownloadFilters from "./DownloadFilters.vue";
-import CheckBox from "@/components/CheckBox.vue";
+import { ref, computed, watch } from 'vue';
+import SearchBar from '@/components/SearchBar.vue';
+import FilterChip from '@/components/FilterChip.vue';
+import TagIcon from '@/components/icons/TagIcon.vue';
+import SearchableTagList from '@/components/SearchableTagList.vue';
+import SortButtons from '@/components/SortButtons.vue';
+import { getTagLabel } from '@/utils';
+import { getFilterValuesFromParams } from '../discussion/list/getDiscussionFilterValuesFromParams';
+import type { SearchDiscussionValues } from '@/types/Discussion';
+import type { FilterGroup } from '@/__generated__/graphql';
+import { updateFilters } from '@/utils/routerUtils';
+import { useRoute, useRouter } from 'nuxt/app';
+import FilterIcon from '@/components/icons/FilterIcon.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
+import DownloadFilters from './DownloadFilters.vue';
+import CheckBox from '@/components/CheckBox.vue';
 
 const props = defineProps({
   filterGroups: {
@@ -31,10 +31,10 @@ const router = useRouter();
 
 // Computed property for channelId from route params
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 // Local reactive state for filter values
@@ -113,7 +113,7 @@ const toggleShowSearch = () => {
 // Count active download filters
 const getActiveDownloadFilterCount = computed(() => {
   let count = 0;
-  props.filterGroups.forEach(group => {
+  props.filterGroups.forEach((group) => {
     const queryValue = route.query[`filter_${group.key}`];
     if (typeof queryValue === 'string' && queryValue.length > 0) {
       count += queryValue.split(',').length;
@@ -138,27 +138,27 @@ const hasActiveDownloadFilters = computed(() => {
           v-if="filterGroups.length > 0"
           data-testid="download-filter-button"
           :class="[
-            'lg:hidden border flex px-1.5 h-9 rounded-md items-center gap-1 hover:bg-gray-100 dark:hover:bg-gray-700',
+            'flex h-9 items-center gap-1 rounded-md border px-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden',
             hasActiveDownloadFilters
               ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-              : 'text-gray-800 border-gray-800 dark:border-gray-600 dark:text-gray-300'
+              : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300',
           ]"
           @click="toggleShowFilters"
         >
           <FilterIcon />
-          <span v-if="hasActiveDownloadFilters" class="text-xs ml-1">
+          <span v-if="hasActiveDownloadFilters" class="ml-1 text-xs">
             {{ getActiveDownloadFilterCount }}
           </span>
         </button>
-        
+
         <button
           data-testid="download-search-button"
           :class="
             showSearch
               ? 'border-orange-500'
-              : 'text-gray-800 border-gray-800 dark:border-gray-600 dark:text-gray-300'
+              : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
-          class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-800 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
+          class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           @click="toggleShowSearch"
         >
           <SearchIcon />
@@ -173,20 +173,17 @@ const hasActiveDownloadFilters = computed(() => {
             />
           </template>
           <template #does-not-have-auth>
-            <PrimaryButton
-              class="mx-2"
-              label="New Upload"
-            />
+            <PrimaryButton class="mx-2" label="New Upload" />
           </template>
         </RequireAuth>
       </div>
     </div>
     <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
-    
+
     <!-- Search Panel -->
     <div
       v-if="showSearch"
-      class="flex flex-col gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
     >
       <SearchBar
         data-testid="download-filter-search-bar"
@@ -199,16 +196,16 @@ const hasActiveDownloadFilters = computed(() => {
         @update-search-input="updateSearchInput"
       />
     </div>
-    
+
     <!-- Mobile Filter Panel -->
     <div
       v-if="showFilters && filterGroups.length > 0"
-      class="lg:hidden flex flex-col gap-4 py-4 px-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+      class="flex flex-col gap-4 bg-gray-100 px-2 py-4 dark:bg-gray-700 dark:text-gray-300 lg:hidden"
     >
       <DownloadFilters :filter-groups="filterGroups" />
-      
+
       <!-- Tags and Archived for mobile -->
-      <div class="border-t border-gray-300 dark:border-gray-600 pt-4 space-y-4">
+      <div class="space-y-4 border-t border-gray-300 pt-4 dark:border-gray-600">
         <FilterChip
           class="w-full"
           :data-testid="'tag-filter-button'"
@@ -227,7 +224,7 @@ const hasActiveDownloadFilters = computed(() => {
             </div>
           </template>
         </FilterChip>
-        
+
         <div class="flex items-center gap-2 text-sm">
           <CheckBox
             data-testid="show-archived-downloads"
@@ -240,11 +237,11 @@ const hasActiveDownloadFilters = computed(() => {
         </div>
       </div>
     </div>
-    
+
     <!-- Desktop Filter Panel (for tags/archived only) -->
     <div
       v-if="showFilters && !filterGroups.length"
-      class="hidden lg:flex justify-end gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+      class="hidden justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300 lg:flex"
     >
       <FilterChip
         class="align-middle"

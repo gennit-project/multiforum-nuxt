@@ -1,33 +1,41 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import type { UserData } from "@/types/User";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { UPDATE_CHANNEL } from "@/graphQLData/channel/mutations";
-import type { CreateEditChannelFormValues } from "@/types/Channel";
-import CreateEditChannelFields from "@/components/channel/form/CreateEditChannelFields.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import { usernameVar } from "@/cache";
-import type { ChannelUpdateInput, Tag as TagData } from "@/__generated__/graphql";
-import { useRoute } from "nuxt/app";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { ref, computed, watch } from 'vue';
+import type { UserData } from '@/types/User';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { UPDATE_CHANNEL } from '@/graphQLData/channel/mutations';
+import type { CreateEditChannelFormValues } from '@/types/Channel';
+import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import { usernameVar } from '@/cache';
+import type {
+  ChannelUpdateInput,
+  Tag as TagData,
+} from '@/__generated__/graphql';
+import { useRoute } from 'nuxt/app';
+import { useQuery, useMutation } from '@vue/apollo-composable';
 
 const route = useRoute();
 const channelId = route.params.forumId as string;
 
-const { result: getChannelResult, loading: getChannelLoading, error: getChannelError, refetch: refetchChannel } = useQuery(GET_CHANNEL, {
+const {
+  result: getChannelResult,
+  loading: getChannelLoading,
+  error: getChannelError,
+  refetch: refetchChannel,
+} = useQuery(GET_CHANNEL, {
   uniqueName: channelId,
   errorPolicy: 'all',
 });
 
 const formValues = ref<CreateEditChannelFormValues>({
-  uniqueName: "",
-  displayName: "",
-  description: "",
+  uniqueName: '',
+  displayName: '',
+  description: '',
   selectedTags: [],
   rules: [],
-  channelIconURL: "",
-  channelBannerURL: "",
+  channelIconURL: '',
+  channelBannerURL: '',
   wikiEnabled: false,
   eventsEnabled: true,
   feedbackEnabled: true,
@@ -40,37 +48,40 @@ const dataLoaded = ref(false);
 
 const channel = computed(() => getChannelResult.value?.channels[0]);
 
-watch(getChannelResult, (newVal) => {
-  if (newVal && !getChannelLoading.value && !getChannelError.value) {
-    const channelData = newVal.channels[0];
-    let rules = [];
+watch(
+  getChannelResult,
+  (newVal) => {
+    if (newVal && !getChannelLoading.value && !getChannelError.value) {
+      const channelData = newVal.channels[0];
+      let rules = [];
 
-    try {
-      rules = JSON.parse(channelData.rules) || [];
-    } catch (e) {
-      console.error("Error parsing channel rules", e);
+      try {
+        rules = JSON.parse(channelData.rules) || [];
+      } catch (e) {
+        console.error('Error parsing channel rules', e);
+      }
+
+      formValues.value = {
+        uniqueName: channelData.uniqueName,
+        description: channelData.description,
+        displayName: channelData.displayName,
+        selectedTags: channelData.Tags.map((tag: TagData) => tag.text),
+        channelIconURL: channelData.channelIconURL,
+        channelBannerURL: channelData.channelBannerURL,
+        wikiEnabled: channelData.wikiEnabled,
+        eventsEnabled: channelData.eventsEnabled,
+        feedbackEnabled: channelData.feedbackEnabled,
+        downloadsEnabled: channelData.downloadsEnabled,
+        allowedFileTypes: channelData.allowedFileTypes || [],
+        downloadFilterGroups: channelData.FilterGroups || [],
+        rules,
+      };
+
+      dataLoaded.value = true;
     }
-
-    formValues.value = {
-      uniqueName: channelData.uniqueName,
-      description: channelData.description,
-      displayName: channelData.displayName,
-      selectedTags: channelData.Tags.map((tag: TagData) => tag.text),
-      channelIconURL: channelData.channelIconURL,
-      channelBannerURL: channelData.channelBannerURL,
-      wikiEnabled: channelData.wikiEnabled,
-      eventsEnabled: channelData.eventsEnabled,
-      feedbackEnabled: channelData.feedbackEnabled,
-      downloadsEnabled: channelData.downloadsEnabled,
-      allowedFileTypes: channelData.allowedFileTypes || [],
-      downloadFilterGroups: channelData.FilterGroups || [],
-      rules,
-    };
-
-    dataLoaded.value = true;
-  }
-}, { immediate: true });
-
+  },
+  { immediate: true }
+);
 
 const existingTags = computed(() => {
   return channel.value?.Tags?.map((tag: TagData) => tag.text) || [];
@@ -97,33 +108,39 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     }));
 
   // Handle FilterGroups - delete all existing and recreate
-  const existingGroupIds = existingFilterGroups.value.map((group: any) => group.id);
+  const existingGroupIds = existingFilterGroups.value.map(
+    (group: any) => group.id
+  );
   const filterGroupDisconnections = existingGroupIds.map((id: string) => ({
     where: { node: { id } },
-    delete: { 
-      options: [{ where: {} }]
-    }
+    delete: {
+      options: [{ where: {} }],
+    },
   }));
 
-  const filterGroupCreations = formValues.value.downloadFilterGroups.map((group, index) => ({
-    node: {
-      id: group.id,
-      key: group.key,
-      displayName: group.displayName,
-      mode: group.mode,
-      order: index,
-      options: group.options ? {
-        create: group.options.map((option, optionIndex) => ({
-          node: {
-            id: option.id,
-            value: option.value,
-            displayName: option.displayName,
-            order: optionIndex,
-          }
-        }))
-      } : undefined
-    }
-  }));
+  const filterGroupCreations = formValues.value.downloadFilterGroups.map(
+    (group, index) => ({
+      node: {
+        id: group.id,
+        key: group.key,
+        displayName: group.displayName,
+        mode: group.mode,
+        order: index,
+        options: group.options
+          ? {
+              create: group.options.map((option, optionIndex) => ({
+                node: {
+                  id: option.id,
+                  value: option.value,
+                  displayName: option.displayName,
+                  order: optionIndex,
+                },
+              })),
+            }
+          : undefined,
+      },
+    })
+  );
 
   return {
     description: formValues.value.description,
@@ -137,16 +154,25 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     downloadsEnabled: formValues.value.downloadsEnabled,
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
-    FilterGroups: [{ 
-      delete: filterGroupDisconnections,
-      create: filterGroupCreations 
-    }],
-    Admins: [{ connect: [{ where: { node: { username: usernameVar.value } } }] }],
+    FilterGroups: [
+      {
+        delete: filterGroupDisconnections,
+        create: filterGroupCreations,
+      },
+    ],
+    Admins: [
+      { connect: [{ where: { node: { username: usernameVar.value } } }] },
+    ],
   };
 });
 
 const showSavedChangesNotification = ref(false);
-const { mutate: updateChannel, loading: editChannelLoading, error: updateChannelError, onDone } = useMutation(UPDATE_CHANNEL);
+const {
+  mutate: updateChannel,
+  loading: editChannelLoading,
+  error: updateChannelError,
+  onDone,
+} = useMutation(UPDATE_CHANNEL);
 
 onDone(() => {
   showSavedChangesNotification.value = true;
@@ -172,13 +198,25 @@ const hasError = computed(() => {
 
 <template>
   <div :key="$route.fullPath" class="px-2 md:px-8">
-    <RequireAuth :require-ownership="true" :owners="ownerList" :loading="!dataLoaded || getChannelLoading">
+    <RequireAuth
+      :require-ownership="true"
+      :owners="ownerList"
+      :loading="!dataLoaded || getChannelLoading"
+    >
       <template #has-auth>
-        <div v-if="hasError" class="p-4 mb-4 text-red-700 bg-red-100 rounded-lg dark:bg-red-800 dark:text-red-200">
-          <p>Sorry, there was an error loading the forum data. Please try again later.</p>
-          <p class="text-sm mt-2">{{ getChannelError?.message || updateChannelError?.message }}</p>
+        <div
+          v-if="hasError"
+          class="mb-4 rounded-lg bg-red-100 p-4 text-red-700 dark:bg-red-800 dark:text-red-200"
+        >
+          <p>
+            Sorry, there was an error loading the forum data. Please try again
+            later.
+          </p>
+          <p class="mt-2 text-sm">
+            {{ getChannelError?.message || updateChannelError?.message }}
+          </p>
         </div>
-        
+
         <ClientOnly>
           <CreateEditChannelFields
             v-if="!hasError"
@@ -196,11 +234,15 @@ const hasError = computed(() => {
           <template #fallback>
             <div class="p-8 text-center">
               <div class="animate-pulse">
-                <div class="h-8 bg-gray-200 rounded w-1/4 mb-4 dark:bg-gray-700"></div>
-                <div class="h-4 bg-gray-200 rounded w-1/2 mb-8 dark:bg-gray-700"></div>
+                <div
+                  class="mb-4 h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700"
+                ></div>
+                <div
+                  class="mb-8 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700"
+                ></div>
                 <div class="space-y-4">
-                  <div class="h-10 bg-gray-200 rounded dark:bg-gray-700"></div>
-                  <div class="h-10 bg-gray-200 rounded dark:bg-gray-700"></div>
+                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"></div>
+                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"></div>
                 </div>
               </div>
             </div>
@@ -213,7 +255,9 @@ const hasError = computed(() => {
         />
       </template>
       <template #does-not-have-auth>
-        <div class="p-8 dark:text-white">You don't have permission to see this page.</div>
+        <div class="p-8 dark:text-white">
+          You don't have permission to see this page.
+        </div>
       </template>
     </RequireAuth>
   </div>

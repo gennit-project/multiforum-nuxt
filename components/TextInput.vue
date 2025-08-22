@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, watch, defineExpose } from "vue";
-import ExclamationTriangleIcon from "@/components/icons/ExclamationIcon.vue";
+import { ref, watch, defineExpose } from 'vue';
+import ExclamationTriangleIcon from '@/components/icons/ExclamationIcon.vue';
 
 const props = defineProps({
   disabled: {
@@ -9,11 +9,11 @@ const props = defineProps({
   },
   errorMessage: {
     type: String,
-    default: "",
+    default: '',
   },
   value: {
     type: String,
-    default: "",
+    default: '',
   },
   invalid: {
     type: Boolean,
@@ -21,7 +21,7 @@ const props = defineProps({
   },
   placeholder: {
     type: String,
-    default: "",
+    default: '',
   },
   rows: {
     type: Number,
@@ -29,10 +29,10 @@ const props = defineProps({
   },
   testId: {
     type: String,
-    default: "",
+    default: '',
   },
 });
-const emit = defineEmits(["update"]);
+const emit = defineEmits(['update']);
 const text = ref(props.value);
 
 watch(
@@ -50,7 +50,7 @@ defineExpose({ focus });
 
 const handleInput = (value: string) => {
   text.value = value;
-  emit("update", value);
+  emit('update', value);
 };
 </script>
 
@@ -63,7 +63,9 @@ const handleInput = (value: string) => {
         v-model="text"
         class="block min-w-0 flex-1 rounded-lg border border-gray-300 pb-2.5 pt-2.5 placeholder-gray-400 dark:border-none dark:border-gray-700 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400 sm:text-sm"
         :class="[
-          disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-500 dark:text-gray-300' : '',
+          disabled
+            ? 'bg-gray-200 bg-clip-padding dark:bg-gray-500 dark:text-gray-300'
+            : '',
           invalid
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
             : 'focus:border-orange-500 focus:ring-orange-500',
@@ -71,9 +73,8 @@ const handleInput = (value: string) => {
         :data-testid="testId"
         :disabled="disabled"
         type="text"
-     
         @input="handleInput(($event.target as HTMLInputElement).value)"
-      >
+      />
       <textarea
         v-else-if="rows && rows > 1"
         ref="inputRef"
@@ -84,7 +85,7 @@ const handleInput = (value: string) => {
         :rows="rows"
         type="text"
         :class="[
-          disabled ? ' bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
+          disabled ? 'bg-gray-200 bg-clip-padding dark:bg-gray-800' : '',
           invalid
             ? 'border-red-300 text-red-500 focus:border-red-500 focus:outline-none focus:ring-red-500'
             : 'focus:border-orange-500 focus:ring-orange-500',

@@ -1,5 +1,5 @@
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent } from 'vue';
 
 export default defineComponent({
   props: {
@@ -30,9 +30,9 @@ export default defineComponent({
   <input
     type="checkbox"
     :class="[disabled ? 'text-orange-200' : 'text-orange-600']"
-    class="focus:ring-orange-500 h-4 w-4 border border-gray-500 rounded dark:bg-gray-800 dark:border-gray-400 dark:focus:ring-orange-500"
+    class="h-4 w-4 rounded border border-gray-500 focus:ring-orange-500 dark:border-gray-400 dark:bg-gray-800 dark:focus:ring-orange-500"
     :checked="checked"
     :disabled="disabled"
     @change="handleChange"
-  >
+  />
 </template>

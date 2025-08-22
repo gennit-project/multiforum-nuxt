@@ -1,4 +1,4 @@
-import { gql } from '@apollo/client/core'
+import { gql } from '@apollo/client/core';
 
 export const GET_IMAGE_DETAILS = gql`
   query GetImageDetails($imageId: ID!) {
@@ -23,18 +23,16 @@ export const GET_IMAGE_DETAILS = gql`
       }
     }
   }
-`
+`;
 
 export const GET_USER_IMAGES = gql`
   query GetUserImages($username: String!, $offset: Int!, $limit: Int!) {
     users(where: { username: $username }) {
       username
       displayName
-      Images(options: { 
-        limit: $limit, 
-        offset: $offset,
-        sort: { createdAt: DESC }
-      }) {
+      Images(
+        options: { limit: $limit, offset: $offset, sort: { createdAt: DESC } }
+      ) {
         id
         url
         alt
@@ -51,4 +49,4 @@ export const GET_USER_IMAGES = gql`
       }
     }
   }
-`
+`;

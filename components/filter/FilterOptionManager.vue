@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { FilterGroup, FilterOption } from "@/__generated__/graphql";
-import { FilterMode } from "@/__generated__/graphql";
+import { ref, computed } from 'vue';
+import type { FilterGroup, FilterOption } from '@/__generated__/graphql';
+import { FilterMode } from '@/__generated__/graphql';
 
 const props = defineProps({
   filterGroup: {
@@ -30,7 +30,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["updateGroup", "removeGroup", "moveGroup"]);
+const emit = defineEmits(['updateGroup', 'removeGroup', 'moveGroup']);
 
 const isEditing = ref(false);
 const showNewOptionForm = ref(false);
@@ -42,13 +42,13 @@ const editForm = ref({
 });
 
 const newOptionForm = ref({
-  value: "",
-  displayName: "",
+  value: '',
+  displayName: '',
 });
 
 const filterModeOptions = [
-  { value: FilterMode.Include, label: "Inclusion" },
-  { value: FilterMode.Exclude, label: "Exclusion" },
+  { value: FilterMode.Include, label: 'Inclusion' },
+  { value: FilterMode.Exclude, label: 'Exclusion' },
 ];
 
 const isValidKey = (key: string) => /^[a-zA-Z0-9_]+$/.test(key);
@@ -59,18 +59,21 @@ const isKeyUnique = (key: string) => {
 
 const canSaveGroup = computed(() => {
   return (
-    editForm.value.key && 
-    editForm.value.displayName && 
+    editForm.value.key &&
+    editForm.value.displayName &&
     isValidKey(editForm.value.key) &&
-    (editForm.value.key === props.filterGroup.key || isKeyUnique(editForm.value.key))
+    (editForm.value.key === props.filterGroup.key ||
+      isKeyUnique(editForm.value.key))
   );
 });
 
 const canAddOption = computed(() => {
   return (
-    newOptionForm.value.value && 
+    newOptionForm.value.value &&
     newOptionForm.value.displayName &&
-    !props.filterGroup.options?.some(option => option.value === newOptionForm.value.value)
+    !props.filterGroup.options?.some(
+      (option) => option.value === newOptionForm.value.value
+    )
   );
 });
 
@@ -85,8 +88,8 @@ const startEditing = () => {
 
 const saveGroup = () => {
   if (!canSaveGroup.value) return;
-  
-  emit("updateGroup", props.filterGroup.id, {
+
+  emit('updateGroup', props.filterGroup.id, {
     key: editForm.value.key,
     displayName: editForm.value.displayName,
     mode: editForm.value.mode,
@@ -112,44 +115,44 @@ const addOption = () => {
     displayName: newOptionForm.value.displayName,
     order: props.filterGroup.options?.length || 0,
     // Required fields for GraphQL type but not used in this context
-    __typename: "FilterOption" as const,
+    __typename: 'FilterOption' as const,
     group: props.filterGroup,
     groupAggregate: null,
     groupConnection: {} as any,
   };
 
   const updatedOptions = [...(props.filterGroup.options || []), newOption];
-  emit("updateGroup", props.filterGroup.id, { options: updatedOptions });
+  emit('updateGroup', props.filterGroup.id, { options: updatedOptions });
 
   // Reset form
   newOptionForm.value = {
-    value: "",
-    displayName: "",
+    value: '',
+    displayName: '',
   };
   showNewOptionForm.value = false;
 };
 
 const removeOption = (optionId: string) => {
-  const updatedOptions = props.filterGroup.options?.filter(option => option.id !== optionId) || [];
-  emit("updateGroup", props.filterGroup.id, { options: updatedOptions });
+  const updatedOptions =
+    props.filterGroup.options?.filter((option) => option.id !== optionId) || [];
+  emit('updateGroup', props.filterGroup.id, { options: updatedOptions });
 };
 
-
-const moveOption = (optionId: string, direction: "up" | "down") => {
+const moveOption = (optionId: string, direction: 'up' | 'down') => {
   const options = [...(props.filterGroup.options || [])];
-  const index = options.findIndex(option => option.id === optionId);
-  
+  const index = options.findIndex((option) => option.id === optionId);
+
   if (index === -1) return;
-  
-  if (direction === "up" && index > 0) {
+
+  if (direction === 'up' && index > 0) {
     [options[index], options[index - 1]] = [options[index - 1], options[index]];
-  } else if (direction === "down" && index < options.length - 1) {
+  } else if (direction === 'down' && index < options.length - 1) {
     [options[index], options[index + 1]] = [options[index + 1], options[index]];
   }
-  
+
   // Update order values
   const orderedOptions = options.map((option, i) => ({ ...option, order: i }));
-  emit("updateGroup", props.filterGroup.id, { options: orderedOptions });
+  emit('updateGroup', props.filterGroup.id, { options: orderedOptions });
 };
 </script>
 
@@ -164,7 +167,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
         <button
           v-if="canMoveUp"
           type="button"
-          class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+          class="rounded border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           :disabled="disabled"
           @click="$emit('moveGroup', filterGroup.id, 'up')"
         >
@@ -173,7 +176,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
         <button
           v-if="canMoveDown"
           type="button"
-          class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 border border-gray-300 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600"
+          class="rounded border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
           :disabled="disabled"
           @click="$emit('moveGroup', filterGroup.id, 'down')"
         >
@@ -181,7 +184,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
         </button>
         <button
           type="button"
-          class="px-2 py-1 text-xs font-medium text-red-600 bg-red-100 border border-red-300 rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-red-900 dark:text-red-300 dark:border-red-700 dark:hover:bg-red-800"
+          class="rounded border border-red-300 bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-700 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
           :disabled="disabled"
           @click="$emit('removeGroup', filterGroup.id)"
         >
@@ -191,25 +194,34 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
     </div>
 
     <!-- Group Settings -->
-    <div v-if="!isEditing" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div v-if="!isEditing" class="grid grid-cols-1 gap-4 md:grid-cols-3">
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Group Type
         </label>
         <p class="mt-1 text-sm text-gray-900 dark:text-white">
-          {{ filterModeOptions.find(opt => opt.value === filterGroup.mode)?.label }}
+          {{
+            filterModeOptions.find((opt) => opt.value === filterGroup.mode)
+              ?.label
+          }}
         </p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Computer-Friendly Key
         </label>
-        <p class="mt-1 text-sm text-gray-900 dark:text-white font-mono">
+        <p class="mt-1 font-mono text-sm text-gray-900 dark:text-white">
           {{ filterGroup.key }}
         </p>
       </div>
       <div>
-        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+        <label
+          class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+        >
           Display Name
         </label>
         <p class="mt-1 text-sm text-gray-900 dark:text-white">
@@ -220,14 +232,16 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
 
     <!-- Edit Group Form -->
     <div v-else class="space-y-3">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Group Type
           </label>
           <select
             v-model="editForm.mode"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           >
             <option
               v-for="option in filterModeOptions"
@@ -239,15 +253,21 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
           </select>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Computer-Friendly Key
           </label>
           <input
             v-model="editForm.key"
             type="text"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white font-mono"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 font-mono shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             :class="{
-              'border-red-500': editForm.key && (!isValidKey(editForm.key) || (editForm.key !== filterGroup.key && !isKeyUnique(editForm.key)))
+              'border-red-500':
+                editForm.key &&
+                (!isValidKey(editForm.key) ||
+                  (editForm.key !== filterGroup.key &&
+                    !isKeyUnique(editForm.key))),
             }"
           />
           <p
@@ -257,27 +277,34 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
             Key can only contain letters, numbers, and underscores.
           </p>
           <p
-            v-if="editForm.key && isValidKey(editForm.key) && editForm.key !== filterGroup.key && !isKeyUnique(editForm.key)"
+            v-if="
+              editForm.key &&
+              isValidKey(editForm.key) &&
+              editForm.key !== filterGroup.key &&
+              !isKeyUnique(editForm.key)
+            "
             class="mt-1 text-xs text-red-500"
           >
             This key is already used by another filter group.
           </p>
         </div>
         <div>
-          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <label
+            class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+          >
             Display Name
           </label>
           <input
             v-model="editForm.displayName"
             type="text"
-            class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
           />
         </div>
       </div>
       <div class="flex space-x-3">
         <button
           type="button"
-          class="px-3 py-2 text-sm font-medium text-white bg-green-600 border border-transparent rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border-transparent rounded-md border bg-green-600 px-3 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="!canSaveGroup"
           @click="saveGroup"
         >
@@ -285,7 +312,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
         </button>
         <button
           type="button"
-          class="px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white dark:border-gray-500 dark:hover:bg-gray-700"
+          class="hover:bg-gray-50 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
           @click="cancelEditing"
         >
           Cancel
@@ -297,7 +324,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
     <div v-if="!isEditing" class="flex justify-start">
       <button
         type="button"
-        class="px-3 py-2 text-sm font-medium text-blue-600 bg-blue-100 border border-blue-300 rounded-md hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-blue-900 dark:text-blue-300 dark:border-blue-700 dark:hover:bg-blue-800"
+        class="rounded-md border border-blue-300 bg-blue-100 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-blue-700 dark:bg-blue-900 dark:text-blue-300 dark:hover:bg-blue-800"
         :disabled="disabled"
         @click="startEditing"
       >
@@ -307,14 +334,14 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
 
     <!-- Options Section -->
     <div class="border-t border-gray-200 pt-4 dark:border-gray-600">
-      <div class="flex items-center justify-between mb-3">
+      <div class="mb-3 flex items-center justify-between">
         <h6 class="text-sm font-medium text-gray-900 dark:text-white">
           Options in this Group
         </h6>
         <button
           v-if="!showNewOptionForm"
           type="button"
-          class="px-2 py-1 text-xs font-medium text-white bg-green-600 border border-transparent rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="border-transparent rounded border bg-green-600 px-2 py-1 text-xs font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
           :disabled="disabled"
           @click="showNewOptionForm = true"
         >
@@ -325,45 +352,58 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
       <!-- New Option Form -->
       <div
         v-if="showNewOptionForm"
-        class="p-3 border border-gray-300 rounded bg-gray-50 dark:bg-gray-700 dark:border-gray-600 mb-3"
+        class="bg-gray-50 mb-3 rounded border border-gray-300 p-3 dark:border-gray-600 dark:bg-gray-700"
       >
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">
+            <label
+              class="block text-xs font-medium text-gray-700 dark:text-gray-300"
+            >
               Option Value
             </label>
             <input
               v-model="newOptionForm.value"
               type="text"
               placeholder="e.g. 10x20"
-              class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white font-mono"
+              class="mt-1 block w-full rounded border border-gray-300 px-2 py-1 font-mono text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white"
               :class="{
-                'border-red-500': newOptionForm.value && filterGroup.options?.some(option => option.value === newOptionForm.value)
+                'border-red-500':
+                  newOptionForm.value &&
+                  filterGroup.options?.some(
+                    (option) => option.value === newOptionForm.value
+                  ),
               }"
             />
             <p
-              v-if="newOptionForm.value && filterGroup.options?.some(option => option.value === newOptionForm.value)"
+              v-if="
+                newOptionForm.value &&
+                filterGroup.options?.some(
+                  (option) => option.value === newOptionForm.value
+                )
+              "
               class="mt-1 text-xs text-red-500"
             >
               This value already exists in this group.
             </p>
           </div>
           <div>
-            <label class="block text-xs font-medium text-gray-700 dark:text-gray-300">
+            <label
+              class="block text-xs font-medium text-gray-700 dark:text-gray-300"
+            >
               Display Name
             </label>
             <input
               v-model="newOptionForm.displayName"
               type="text"
               placeholder="e.g. 10 × 20"
-              class="mt-1 block w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-600 dark:border-gray-500 dark:text-white"
+              class="mt-1 block w-full rounded border border-gray-300 px-2 py-1 text-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-500 dark:bg-gray-600 dark:text-white"
             />
           </div>
         </div>
-        <div class="flex space-x-2 mt-3">
+        <div class="mt-3 flex space-x-2">
           <button
             type="button"
-            class="px-2 py-1 text-xs font-medium text-white bg-green-600 border border-transparent rounded hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="border-transparent rounded border bg-green-600 px-2 py-1 text-xs font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             :disabled="!canAddOption"
             @click="addOption"
           >
@@ -371,7 +411,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
           </button>
           <button
             type="button"
-            class="px-2 py-1 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:bg-gray-600 dark:text-white dark:border-gray-500 dark:hover:bg-gray-700"
+            class="hover:bg-gray-50 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
             @click="showNewOptionForm = false"
           >
             Cancel
@@ -380,23 +420,35 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
       </div>
 
       <!-- Existing Options -->
-      <div v-if="filterGroup.options && filterGroup.options.length > 0" class="space-y-2">
+      <div
+        v-if="filterGroup.options && filterGroup.options.length > 0"
+        class="space-y-2"
+      >
         <div
           v-for="(option, optionIndex) in filterGroup.options"
           :key="option.id"
-          class="flex items-center justify-between p-2 border border-gray-200 rounded bg-white dark:bg-gray-800 dark:border-gray-600"
+          class="flex items-center justify-between rounded border border-gray-200 bg-white p-2 dark:border-gray-600 dark:bg-gray-800"
         >
-          <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-2">
+          <div class="grid flex-1 grid-cols-1 gap-2 md:grid-cols-2">
             <div>
-              <span class="text-xs text-gray-500 dark:text-gray-400">Option Value:</span>
-              <span class="ml-1 text-sm font-mono text-gray-900 dark:text-white">{{ option.value }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400"
+                >Option Value:</span
+              >
+              <span
+                class="ml-1 font-mono text-sm text-gray-900 dark:text-white"
+                >{{ option.value }}</span
+              >
             </div>
             <div>
-              <span class="text-xs text-gray-500 dark:text-gray-400">Display:</span>
-              <span class="ml-1 text-sm text-gray-900 dark:text-white">{{ option.displayName }}</span>
+              <span class="text-xs text-gray-500 dark:text-gray-400"
+                >Display:</span
+              >
+              <span class="ml-1 text-sm text-gray-900 dark:text-white">{{
+                option.displayName
+              }}</span>
             </div>
           </div>
-          <div class="flex space-x-1 ml-4">
+          <div class="ml-4 flex space-x-1">
             <button
               v-if="optionIndex > 0"
               type="button"
@@ -419,7 +471,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
             </button>
             <button
               type="button"
-              class="px-2 py-1 text-xs font-medium text-red-600 bg-red-100 border border-red-300 rounded hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:bg-red-900 dark:text-red-300 dark:border-red-700 dark:hover:bg-red-800"
+              class="rounded border border-red-300 bg-red-100 px-2 py-1 text-xs font-medium text-red-600 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 dark:border-red-700 dark:bg-red-900 dark:text-red-300 dark:hover:bg-red-800"
               :disabled="disabled"
               @click="removeOption(option.id)"
             >
@@ -432,7 +484,7 @@ const moveOption = (optionId: string, direction: "up" | "down") => {
       <!-- Empty Options State -->
       <div
         v-else-if="!showNewOptionForm"
-        class="text-center py-4 text-gray-500 dark:text-gray-400 text-sm"
+        class="py-4 text-center text-sm text-gray-500 dark:text-gray-400"
       >
         No options configured. Add an option above.
       </div>

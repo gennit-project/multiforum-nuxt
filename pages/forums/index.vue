@@ -1,24 +1,24 @@
 <script lang="ts" setup>
-import { computed, ref, watchEffect } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
-import ChannelList from "@/components/channel/ChannelList.vue";
-import { GET_CHANNELS } from "@/graphQLData/channel/queries";
-import TagIcon from "@/components/icons/TagIcon.vue";
-import FilterChip from "@/components/FilterChip.vue";
-import SearchBar from "@/components/SearchBar.vue";
-import { getTagLabel } from "@/utils";
-import type { LocationQueryValue } from "vue-router";
+import { computed, ref, watchEffect } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import ChannelList from '@/components/channel/ChannelList.vue';
+import { GET_CHANNELS } from '@/graphQLData/channel/queries';
+import TagIcon from '@/components/icons/TagIcon.vue';
+import FilterChip from '@/components/FilterChip.vue';
+import SearchBar from '@/components/SearchBar.vue';
+import { getTagLabel } from '@/utils';
+import type { LocationQueryValue } from 'vue-router';
 
 const route = useRoute();
 const router = useRouter();
 
 const selectedTags = ref<Array<string>>(
-  route.query.tag && typeof route.query.tag === "string"
+  route.query.tag && typeof route.query.tag === 'string'
     ? [route.query.tag]
     : []
 );
-const searchInput = ref<string>("");
+const searchInput = ref<string>('');
 
 const setSearchInput = (input: string) => {
   searchInput.value = input;
@@ -45,12 +45,12 @@ const setSelectedTags = (tag: string) => {
 // update the selected tags whenever query params change in the URL
 watchEffect(() => {
   if (route.query.tag) {
-    if (typeof route.query.tag === "string") {
+    if (typeof route.query.tag === 'string') {
       selectedTags.value = [route.query.tag];
     } else {
       selectedTags.value = route.query.tag.map((tag: LocationQueryValue) => {
         // convert to string
-        return tag?.toString() || "";
+        return tag?.toString() || '';
       });
     }
   } else {
@@ -72,7 +72,7 @@ const {
     searchInput: searchInput,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -88,11 +88,12 @@ const loadMore = () => {
         ...previousResult,
         getSortedChannels: {
           channels: [
-            ...previousResult.getSortedChannels?.channels || [], 
-            ...fetchMoreResult.getSortedChannels?.channels || [],
+            ...(previousResult.getSortedChannels?.channels || []),
+            ...(fetchMoreResult.getSortedChannels?.channels || []),
           ],
-          aggregateChannelCount: fetchMoreResult.getSortedChannels?.aggregateChannelCount || 0,
-        }
+          aggregateChannelCount:
+            fetchMoreResult.getSortedChannels?.aggregateChannelCount || 0,
+        },
       };
     },
   });
@@ -102,7 +103,7 @@ const loadMore = () => {
 const tagLabel = computed(() => getTagLabel(selectedTags.value));
 
 const defaultLabels = {
-  tags: "Tags",
+  tags: 'Tags',
 };
 </script>
 
@@ -110,7 +111,7 @@ const defaultLabels = {
   <NuxtLayout>
     <div class="bg-gray-200 dark:bg-black">
       <div class="flex-col justify-center">
-        <div class="flex max-w-4xl items-center justify-between py-2 mx-auto">
+        <div class="mx-auto flex max-w-4xl items-center justify-between py-2">
           <SearchBar
             class="mr-4 w-full align-middle"
             :search-placeholder="'Search forums'"
@@ -144,9 +145,11 @@ const defaultLabels = {
           />
           <ChannelList
             v-if="channelResult && channelResult.getSortedChannels?.channels"
-            class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900"
+            class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 dark:bg-gray-900 md:p-6"
             :channels="channelResult.getSortedChannels?.channels || []"
-            :result-count="channelResult.getSortedChannels?.aggregateChannelCount || 0"
+            :result-count="
+              channelResult.getSortedChannels?.aggregateChannelCount || 0
+            "
             :search-input="searchInput"
             :selected-tags="selectedTags"
             @filter-by-tag="setSelectedTags"
@@ -156,13 +159,17 @@ const defaultLabels = {
             Loading...
           </div>
           <template #fallback>
-            <div class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 md:p-6 dark:bg-gray-900">
+            <div
+              class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 dark:bg-gray-900 md:p-6"
+            >
               <div class="animate-pulse">
-                <div class="h-8 bg-gray-200 rounded w-1/4 mb-4 dark:bg-gray-700"/>
+                <div
+                  class="mb-4 h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700"
+                />
                 <div class="space-y-4">
-                  <div class="h-20 bg-gray-200 rounded dark:bg-gray-700"/>
-                  <div class="h-20 bg-gray-200 rounded dark:bg-gray-700"/>
-                  <div class="h-20 bg-gray-200 rounded dark:bg-gray-700"/>
+                  <div class="h-20 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div class="h-20 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div class="h-20 rounded bg-gray-200 dark:bg-gray-700" />
                 </div>
               </div>
             </div>

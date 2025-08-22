@@ -2,7 +2,7 @@
 import {
   enteredDevelopmentEnvironmentVar,
   setEnteredDevelopmentEnvironment,
-} from "@/cache";
+} from '@/cache';
 
 const hideOverlay = () => {
   setEnteredDevelopmentEnvironment(true);
@@ -15,13 +15,13 @@ const hideOverlay = () => {
       v-if="!enteredDevelopmentEnvironmentVar"
       class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-90"
     >
-      <div class="text-white text-2xl md:text-4xl font-bold mb-8">
+      <div class="mb-8 text-2xl font-bold text-white md:text-4xl">
         This is a remote development environment
       </div>
       <button
         type="button"
         @click="hideOverlay"
-        class="px-8 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg text-lg font-semibold transition-colors"
+        class="font-semibold rounded-lg bg-orange-600 px-8 py-3 text-lg text-white transition-colors hover:bg-orange-700"
       >
         Enter
       </button>

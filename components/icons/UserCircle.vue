@@ -1,6 +1,8 @@
 <script setup lang="ts"></script>
 <template>
-  <span class="inline-block overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600">
+  <span
+    class="inline-block overflow-hidden rounded-full bg-gray-100 dark:bg-gray-600"
+  >
     <svg
       class="h-full w-full text-gray-300 dark:text-gray-700"
       fill="currentColor"

@@ -1,11 +1,11 @@
 <script lang="ts">
-import { defineComponent, ref, watch, onMounted } from "vue";
-import { useRoute } from "nuxt/app";
-import MarkdownPreview from '@/components/MarkdownPreview.vue'
-import axios from "axios";
+import { defineComponent, ref, watch, onMounted } from 'vue';
+import { useRoute } from 'nuxt/app';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import axios from 'axios';
 
 export default defineComponent({
-  name: "MarkdownLoader",
+  name: 'MarkdownLoader',
   components: {
     MarkdownPreview,
   },
@@ -17,14 +17,14 @@ export default defineComponent({
   },
   setup(props) {
     const route = useRoute();
-    const content = ref("");
+    const content = ref('');
 
     const loadPost = async (slug: string) => {
       try {
         const response = await axios.get(`/${slug}.md`);
         content.value = response.data;
       } catch (error) {
-        console.error("Error loading post:", error);
+        console.error('Error loading post:', error);
       }
     };
 
@@ -35,7 +35,7 @@ export default defineComponent({
           loadPost(newSlug as string);
         }
       },
-      { immediate: true },
+      { immediate: true }
     );
 
     onMounted(() => {
@@ -52,7 +52,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="flex max-w-5xl mx-auto px-4 py-12">
+  <div class="mx-auto flex max-w-5xl px-4 py-12">
     <MarkdownPreview
       :text="content"
       :disable-gallery="true"

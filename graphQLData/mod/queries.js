@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const COUNT_OPEN_ISSUES = gql`
   query countOpenIssues($channelUniqueName: String!) {

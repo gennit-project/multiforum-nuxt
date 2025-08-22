@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/vue";
-import type { PropType } from "vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import SortIcon from "@/components/icons/SortIcon.vue";
+import { Menu, MenuButton, MenuItem, MenuItems } from '@headlessui/vue';
+import type { PropType } from 'vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import SortIcon from '@/components/icons/SortIcon.vue';
 
 type MenuItemType = {
   value: string;
@@ -17,7 +17,7 @@ defineProps({
   label: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   showSortIcon: {
     type: Boolean,
@@ -26,10 +26,10 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["clickedItem"]);
+const emit = defineEmits(['clickedItem']);
 
 function handleClick(item: MenuItemType) {
-  emit("clickedItem", item.value);
+  emit('clickedItem', item.value);
 }
 </script>
 
@@ -39,7 +39,7 @@ function handleClick(item: MenuItemType) {
       <div>
         <MenuButton
           :data-testid="`text-dropdown-${label}`"
-          class="text-gray-700 inline-flex border border-gray-300 dark:border-gray-600 hover:dark:bg-gray-700 py-2 w-full items-center justify-center gap-x-1.5 rounded-md bg-white pr-4 pl-3 text-xs hover:bg-gray-100 focus:outline-none dark:bg-gray-800 dark:text-white transition-colors duration-200"
+          class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-100 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white hover:dark:bg-gray-700"
         >
           <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
           {{ label }}
@@ -58,7 +58,7 @@ function handleClick(item: MenuItemType) {
         leave-to-class="transform opacity-0 scale-95"
       >
         <MenuItems
-          class="absolute right-0 top mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
+          class="top absolute right-0 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-700 dark:text-gray-200"
         >
           <div class="py-1">
             <MenuItem
@@ -87,7 +87,7 @@ function handleClick(item: MenuItemType) {
     <template #fallback>
       <button
         :data-testid="`text-dropdown-${label}`"
-        class="text-gray-700 inline-flex border border-gray-300 dark:border-gray-600 hover:dark:bg-gray-600 py-2 w-full items-center justify-center gap-x-1.5 rounded-md bg-white pr-4 pl-3 text-xs hover:bg-gray-200 focus:outline-none dark:bg-gray-700 dark:text-white transition-colors duration-200"
+        class="inline-flex w-full items-center justify-center gap-x-1.5 rounded-md border border-gray-300 bg-white py-2 pl-3 pr-4 text-xs text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none dark:border-gray-600 dark:bg-gray-700 dark:text-white hover:dark:bg-gray-600"
       >
         <SortIcon v-if="showSortIcon" class="h-4 w-4" aria-hidden="true" />
         {{ label }}

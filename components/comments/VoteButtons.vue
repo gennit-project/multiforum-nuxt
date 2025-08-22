@@ -2,7 +2,10 @@
 import { computed } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import ErrorBanner from '../ErrorBanner.vue';
-import { UPVOTE_COMMENT, UNDO_UPVOTE_COMMENT } from '@/graphQLData/comment/mutations';
+import {
+  UPVOTE_COMMENT,
+  UNDO_UPVOTE_COMMENT,
+} from '@/graphQLData/comment/mutations';
 import type { PropType } from 'vue';
 import type { Comment } from '@/__generated__/graphql';
 import VotesComponent from './Votes.vue';
@@ -40,7 +43,6 @@ const emit = defineEmits([
   'clickFeedback',
 ]);
 
-
 const loggedInUserUpvoted = computed(() => {
   if (!usernameVar) {
     return false;
@@ -48,7 +50,9 @@ const loggedInUserUpvoted = computed(() => {
   if (!props.commentData.UpvotedByUsers) {
     return false;
   }
-  return props.commentData.UpvotedByUsers.some(user => user.username === usernameVar.value);
+  return props.commentData.UpvotedByUsers.some(
+    (user) => user.username === usernameVar.value
+  );
 });
 
 const upvoteCount = computed(() => {
@@ -66,14 +70,22 @@ const loggedInUserDownvoted = computed(() => {
   return feedbackCommentsByLoggedInUser.length > 0;
 });
 
-const { mutate: upvoteComment, error: upvoteCommentError, loading: upvoteCommentLoading } = useMutation(UPVOTE_COMMENT, () => ({
+const {
+  mutate: upvoteComment,
+  error: upvoteCommentError,
+  loading: upvoteCommentLoading,
+} = useMutation(UPVOTE_COMMENT, () => ({
   variables: {
     id: props.commentData.id,
     username: usernameVar.value,
   },
 }));
 
-const { mutate: undoUpvoteComment, error: undoUpvoteError, loading: undoUpvoteLoading } = useMutation(UNDO_UPVOTE_COMMENT, () => ({
+const {
+  mutate: undoUpvoteComment,
+  error: undoUpvoteError,
+  loading: undoUpvoteLoading,
+} = useMutation(UNDO_UPVOTE_COMMENT, () => ({
   variables: {
     id: props.commentData.id,
     username: usernameVar.value,

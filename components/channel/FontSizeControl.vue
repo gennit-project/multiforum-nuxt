@@ -1,26 +1,26 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import RadioButtons from "@/components/RadioButtons.vue";
-import { useUIStore, type FontSize } from "@/stores/uiStore";
+import { computed } from 'vue';
+import RadioButtons from '@/components/RadioButtons.vue';
+import { useUIStore, type FontSize } from '@/stores/uiStore';
 
 // Just use the store directly
 const uiStore = useUIStore();
 
 const options = [
-  { label: "Small", value: "small" },
-  { label: "Medium", value: "medium" },
-  { label: "Large", value: "large" }
+  { label: 'Small', value: 'small' },
+  { label: 'Medium', value: 'medium' },
+  { label: 'Large', value: 'large' },
 ];
 
 const selectedOption = computed(() => {
   const size = uiStore.fontSize;
   return {
     label: size.charAt(0).toUpperCase() + size.slice(1),
-    value: size
+    value: size,
   };
 });
 
-const updateFontSize = (option: { label: string, value: string }) => {
+const updateFontSize = (option: { label: string; value: string }) => {
   // Call the store action directly
   uiStore.setFontSize(option.value as FontSize);
 };
@@ -29,8 +29,10 @@ const updateFontSize = (option: { label: string, value: string }) => {
 <template>
   <div class="font-size-control">
     <div class="flex justify-between">
-      <span class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400">
-        <i class="fa-solid fa-text-height mr-2"/>Font Size
+      <span
+        class="my-2 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
+      >
+        <i class="fa-solid fa-text-height mr-2" />Font Size
       </span>
     </div>
     <RadioButtons

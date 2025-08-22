@@ -1,14 +1,14 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import GenericModal from "@/components/GenericModal.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from "@/graphQLData/discussion/queries";
-import type { Comment } from "@/__generated__/graphql";
-import CommentHeader from "@/components/comments/CommentHeader.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import { UPDATE_COMMENT } from "@/graphQLData/comment/mutations";
-import type { CreateEditCommentFormValues } from "@/types/Comment";
+import { ref, computed } from 'vue';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import GenericModal from '@/components/GenericModal.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { GET_SPECIFIC_DISCUSSION_FEEDBACK as GET_FEEDBACK } from '@/graphQLData/discussion/queries';
+import type { Comment } from '@/__generated__/graphql';
+import CommentHeader from '@/components/comments/CommentHeader.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import { UPDATE_COMMENT } from '@/graphQLData/comment/mutations';
+import type { CreateEditCommentFormValues } from '@/types/Comment';
 
 const props = defineProps({
   discussionId: {
@@ -25,12 +25,12 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["close"]);
+const emit = defineEmits(['close']);
 
-const feedbackToEditID = ref("");
+const feedbackToEditID = ref('');
 const commentData = ref<Comment | null>(null);
 const editFormValues = ref<CreateEditCommentFormValues>({
-  text: commentData.value?.text || "",
+  text: commentData.value?.text || '',
   isRootComment: true,
   depth: 1,
 });
@@ -42,14 +42,14 @@ const { error: getError, onResult } = useQuery(
     modName: props.modName,
   },
   {
-    fetchPolicy: "network-only",
+    fetchPolicy: 'network-only',
   }
 );
 
 onResult((result) => {
   const comment = result?.data?.comments?.[0];
   if (!comment) {
-    console.warn("No feedback found");
+    console.warn('No feedback found');
     return;
   }
   feedbackToEditID.value = comment.id;
@@ -58,7 +58,7 @@ onResult((result) => {
 });
 
 const updateCommentInput = computed(() => ({
-  text: editFormValues.value?.text || "",
+  text: editFormValues.value?.text || '',
 }));
 
 const {
@@ -69,19 +69,19 @@ const {
 } = useMutation(UPDATE_COMMENT);
 
 onDoneUpdatingComment(() => {
-  emit("close");
+  emit('close');
 });
 
 function handleEdit() {
   try {
     editComment({
       commentWhere: {
-        id: commentData.value?.id || "",
+        id: commentData.value?.id || '',
       },
       updateCommentInput: updateCommentInput.value,
     });
   } catch (error) {
-    console.error("Error updating feedback", error);
+    console.error('Error updating feedback', error);
   }
 }
 
@@ -89,8 +89,8 @@ function updateFeedback(text: string) {
   editFormValues.value.text = text;
 }
 
-const title = "Update your feedback?";
-const body = "Are you sure you want to update your feedback?";
+const title = 'Update your feedback?';
+const body = 'Are you sure you want to update your feedback?';
 </script>
 
 <template>

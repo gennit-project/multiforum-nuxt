@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { PropType } from "vue";
-import type { Discussion } from "@/__generated__/graphql";
-import CloseIcon from "@/components/icons/CloseIcon.vue";
-import DownloadFileIcon from "@/components/icons/DownloadFileIcon.vue";
-import TwitterIcon from "@/components/icons/TwitterIcon.vue";
-import FacebookIcon from "@/components/icons/FacebookIcon.vue";
-import RedditIcon from "@/components/icons/RedditIcon.vue";
+import { ref, computed } from 'vue';
+import type { PropType } from 'vue';
+import type { Discussion } from '@/__generated__/graphql';
+import CloseIcon from '@/components/icons/CloseIcon.vue';
+import DownloadFileIcon from '@/components/icons/DownloadFileIcon.vue';
+import TwitterIcon from '@/components/icons/TwitterIcon.vue';
+import FacebookIcon from '@/components/icons/FacebookIcon.vue';
+import RedditIcon from '@/components/icons/RedditIcon.vue';
 // import DiscordIcon from "@/components/icons/DiscordIcon.vue"; // Unused for now
-import BlueskyIcon from "@/components/icons/BlueskyIcon.vue";
-import PinterestIcon from "@/components/icons/PinterestIcon.vue";
-import TumblrIcon from "@/components/icons/TumblrIcon.vue";
-import CopyIcon from "@/components/icons/CopyIcon.vue";
-import CheckIcon from "@/components/icons/CheckIcon.vue";
+import BlueskyIcon from '@/components/icons/BlueskyIcon.vue';
+import PinterestIcon from '@/components/icons/PinterestIcon.vue';
+import TumblrIcon from '@/components/icons/TumblrIcon.vue';
+import CopyIcon from '@/components/icons/CopyIcon.vue';
+import CheckIcon from '@/components/icons/CheckIcon.vue';
 
 const props = defineProps({
   discussion: {
@@ -41,20 +41,20 @@ const primaryFile = computed(() => {
 
 // Generate attribution text
 const attributionText = computed(() => {
-  const title = props.discussion.title || "Untitled";
-  const username = props.discussion.Author?.username || "Unknown";
+  const title = props.discussion.title || 'Untitled';
+  const username = props.discussion.Author?.username || 'Unknown';
   const displayName = props.discussion.Author?.displayName;
-  
+
   // If display name exists, format as "by Catherine Luse (cluse)", otherwise "by cluse"
   const author = displayName ? `${displayName} (${username})` : username;
-  
-  const url = typeof window !== "undefined" ? window.location.href : "";
+
+  const url = typeof window !== 'undefined' ? window.location.href : '';
   return `"${title}" by ${author} - ${url}`;
 });
 
 // Generate share URL (current page)
 const shareUrl = computed(() => {
-  return typeof window !== "undefined" ? window.location.href : "";
+  return typeof window !== 'undefined' ? window.location.href : '';
 });
 
 const copyAttribution = async () => {
@@ -65,7 +65,7 @@ const copyAttribution = async () => {
       attributionCopied.value = false;
     }, 2000);
   } catch (err) {
-    console.error("Failed to copy attribution:", err);
+    console.error('Failed to copy attribution:', err);
   }
 };
 
@@ -76,8 +76,8 @@ const shareToTwitter = () => {
   const url = encodeURIComponent(shareUrl.value);
   window.open(
     `https://twitter.com/intent/tweet?text=${text}&url=${url}`,
-    "_blank",
-    "width=550,height=420"
+    '_blank',
+    'width=550,height=420'
   );
 };
 
@@ -85,8 +85,8 @@ const shareToFacebook = () => {
   const url = encodeURIComponent(shareUrl.value);
   window.open(
     `https://www.facebook.com/sharer/sharer.php?u=${url}`,
-    "_blank",
-    "width=550,height=420"
+    '_blank',
+    'width=550,height=420'
   );
 };
 
@@ -97,8 +97,8 @@ const shareToPinterest = () => {
   );
   window.open(
     `https://pinterest.com/pin/create/button/?url=${url}&description=${description}`,
-    "_blank",
-    "width=550,height=420"
+    '_blank',
+    'width=550,height=420'
   );
 };
 
@@ -106,8 +106,8 @@ const shareToTumblr = () => {
   const url = encodeURIComponent(shareUrl.value);
   window.open(
     `https://www.tumblr.com/widgets/share/tool?shareSource=legacy&canonicalUrl=${url}&posttype=link`,
-    "_blank",
-    "width=550,height=420"
+    '_blank',
+    'width=550,height=420'
   );
 };
 
@@ -116,8 +116,8 @@ const shareToReddit = () => {
   const title = encodeURIComponent(props.discussion.title);
   window.open(
     `https://reddit.com/submit?url=${url}&title=${title}`,
-    "_blank",
-    "width=550,height=420"
+    '_blank',
+    'width=550,height=420'
   );
 };
 
@@ -128,8 +128,8 @@ const shareToBluesky = () => {
   const url = encodeURIComponent(shareUrl.value);
   window.open(
     `https://bsky.app/intent/compose?text=${text} ${url}`,
-    "_blank",
-    "width=550,height=420"
+    '_blank',
+    'width=550,height=420'
   );
 };
 
@@ -146,7 +146,7 @@ const _shareToDiscord = () => {
       }, 2000);
     })
     .catch((err) => {
-      console.error("Failed to copy Discord message:", err);
+      console.error('Failed to copy Discord message:', err);
     });
 };
 
@@ -158,7 +158,7 @@ const copyLink = async () => {
       linkCopied.value = false;
     }, 2000);
   } catch (err) {
-    console.error("Failed to copy link:", err);
+    console.error('Failed to copy link:', err);
   }
 };
 </script>
@@ -166,7 +166,7 @@ const copyLink = async () => {
 <template>
   <div
     v-if="visible"
-    class="fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-2xl mx-4"
+    class="fixed bottom-4 left-1/2 z-50 mx-4 w-full max-w-2xl -translate-x-1/2 transform"
   >
     <!-- Backdrop for mobile -->
     <div
@@ -176,11 +176,11 @@ const copyLink = async () => {
 
     <!-- Popover content -->
     <div
-      class="relative bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 p-6"
+      class="relative rounded-lg border border-gray-200 bg-white p-6 shadow-xl dark:border-gray-700 dark:bg-gray-800"
     >
       <!-- Close button -->
       <button
-        class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+        class="absolute right-3 top-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
         @click="emit('close')"
       >
         <CloseIcon />
@@ -191,20 +191,20 @@ const copyLink = async () => {
         <!-- File preview placeholder -->
         <div class="flex-shrink-0">
           <div
-            class="w-16 h-16 bg-gradient-to-br from-orange-100 to-orange-200 dark:from-orange-800 dark:to-orange-900 rounded-lg border-2 border-dashed border-orange-300 dark:border-orange-600 flex items-center justify-center"
+            class="flex h-16 w-16 items-center justify-center rounded-lg border-2 border-dashed border-orange-300 bg-gradient-to-br from-orange-100 to-orange-200 dark:border-orange-600 dark:from-orange-800 dark:to-orange-900"
           >
             <DownloadFileIcon />
           </div>
           <div
-            class="text-xs text-center mt-1 text-gray-500 dark:text-gray-400 truncate w-16"
+            class="mt-1 w-16 truncate text-center text-xs text-gray-500 dark:text-gray-400"
           >
-            {{ primaryFile?.fileName || "File" }}
+            {{ primaryFile?.fileName || 'File' }}
           </div>
         </div>
 
         <!-- Main content -->
-        <div class="flex-1 min-w-0">
-          <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-2">
+        <div class="min-w-0 flex-1">
+          <h3 class="font-semibold mb-2 text-lg text-gray-900 dark:text-white">
             Say thanks! Give a shout-out...
           </h3>
 
@@ -212,12 +212,12 @@ const copyLink = async () => {
           <div class="space-y-3">
             <!-- Social sharing -->
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+              <p class="mb-2 text-sm text-gray-600 dark:text-gray-300">
                 Share this download:
               </p>
               <div class="flex flex-wrap gap-2">
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToTwitter"
                 >
                   <TwitterIcon />
@@ -225,7 +225,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToFacebook"
                 >
                   <FacebookIcon />
@@ -233,7 +233,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToPinterest"
                 >
                   <PinterestIcon />
@@ -241,7 +241,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToTumblr"
                 >
                   <TumblrIcon />
@@ -249,7 +249,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToReddit"
                 >
                   <RedditIcon />
@@ -257,7 +257,7 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs bg-gray-500 hover:bg-gray-600 text-white rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md bg-gray-500 px-3 py-1.5 text-xs text-white transition-colors hover:bg-gray-600"
                   @click="shareToBluesky"
                 >
                   <BlueskyIcon />
@@ -265,44 +265,44 @@ const copyLink = async () => {
                 </button>
 
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs rounded-md transition-colors whitespace-nowrap"
+                  class="flex items-center whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors"
                   :class="
                     linkCopied
                       ? 'bg-green-500 text-white'
-                      : 'bg-gray-500 hover:bg-gray-600 text-white'
+                      : 'bg-gray-500 text-white hover:bg-gray-600'
                   "
                   @click="copyLink"
                 >
                   <CopyIcon v-if="!linkCopied" />
                   <CheckIcon v-else />
-                  {{ linkCopied ? "Copied!" : "Copy Link" }}
+                  {{ linkCopied ? 'Copied!' : 'Copy Link' }}
                 </button>
               </div>
             </div>
 
             <!-- Attribution -->
             <div>
-              <p class="text-sm text-gray-600 dark:text-gray-300 mb-2">
+              <p class="mb-2 text-sm text-gray-600 dark:text-gray-300">
                 Copy attribution:
               </p>
               <div class="flex items-center space-x-2">
                 <div
-                  class="flex-1 p-2 bg-gray-50 dark:bg-gray-700 rounded text-xs text-gray-700 dark:text-gray-300 truncate"
+                  class="bg-gray-50 flex-1 truncate rounded p-2 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300"
                 >
                   {{ attributionText }}
                 </div>
                 <button
-                  class="flex items-center px-3 py-1.5 text-xs rounded-md transition-colors flex-shrink-0 whitespace-nowrap"
+                  class="flex flex-shrink-0 items-center whitespace-nowrap rounded-md px-3 py-1.5 text-xs transition-colors"
                   :class="
                     attributionCopied
                       ? 'bg-green-500 text-white'
-                      : 'bg-orange-500 hover:bg-orange-600 text-black'
+                      : 'bg-orange-500 text-black hover:bg-orange-600'
                   "
                   @click="copyAttribution"
                 >
                   <CopyIcon v-if="!attributionCopied" />
                   <CheckIcon v-else />
-                  {{ attributionCopied ? "Copied!" : "Copy" }}
+                  {{ attributionCopied ? 'Copied!' : 'Copy' }}
                 </button>
               </div>
             </div>

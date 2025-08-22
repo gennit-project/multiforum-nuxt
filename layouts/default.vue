@@ -1,22 +1,26 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRoute } from "nuxt/app";
-import { useDisplay } from "vuetify";
-import TopNav from "@/components/nav/Topnav.vue";
-import SiteSidenav from "@/components/nav/SiteSidenav.vue";
-import VerticalIconNav from "@/components/nav/VerticalIconNav.vue";
-import SiteFooter from "@/components/layout/SiteFooter.vue";
-import DevOverlay from "@/components/nav/DevOverlay.vue";
-import { config } from "@/config";
-import { sideNavIsOpenVar, setSideNavIsOpenVar, isAuthenticatedVar } from "@/cache";
+import { ref, computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useDisplay } from 'vuetify';
+import TopNav from '@/components/nav/Topnav.vue';
+import SiteSidenav from '@/components/nav/SiteSidenav.vue';
+import VerticalIconNav from '@/components/nav/VerticalIconNav.vue';
+import SiteFooter from '@/components/layout/SiteFooter.vue';
+import DevOverlay from '@/components/nav/DevOverlay.vue';
+import { config } from '@/config';
+import {
+  sideNavIsOpenVar,
+  setSideNavIsOpenVar,
+  isAuthenticatedVar,
+} from '@/cache';
 
 // Composables for separated concerns
-import { useAuthManager } from "@/composables/useAuthManager";
-import { useTestAuthHelpers } from "@/composables/useTestAuthHelpers";
+import { useAuthManager } from '@/composables/useAuthManager';
+import { useTestAuthHelpers } from '@/composables/useTestAuthHelpers';
 
-const isDevelopment = computed(() => config.environment === "development");
+const isDevelopment = computed(() => config.environment === 'development');
 const route = useRoute();
-const showFooter = !route.name?.toString().includes("map");
+const showFooter = !route.name?.toString().includes('map');
 
 // Responsive display
 const { lgAndUp } = useDisplay();
@@ -34,8 +38,8 @@ const { isSessionExpired, loginWithRedirect } = useAuthManager();
 // Test helpers (only in dev/test environments)
 const shouldExposeTestHelpers =
   isDevelopment.value ||
-  config.environment === "test" ||
-  (typeof window !== "undefined" && (window as any).Cypress);
+  config.environment === 'test' ||
+  (typeof window !== 'undefined' && (window as any).Cypress);
 
 if (shouldExposeTestHelpers) {
   useTestAuthHelpers();

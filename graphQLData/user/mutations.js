@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const CREATE_USER = gql`
   mutation createUser($username: String!) {
@@ -11,15 +11,12 @@ export const CREATE_USER = gql`
 `;
 
 export const UPDATE_USER = gql`
-  mutation updateUser(
-    $where: UserWhere
-    $update: UserUpdateInput
-  ) {
+  mutation updateUser($where: UserWhere, $update: UserUpdateInput) {
     updateUsers(where: $where, update: $update) {
       users {
         username
-        displayName 
-        bio 
+        displayName
+        bio
         profilePicURL
         notifyOnReplyToCommentByDefault
         notifyOnReplyToDiscussionByDefault
@@ -34,7 +31,6 @@ export const UPDATE_USER = gql`
     }
   }
 `;
-
 
 export const CREATE_MOD_PROFILE = gql`
   mutation createModProfile($username: String!, $displayName: String!) {

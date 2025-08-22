@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import AvatarComponent from "@/components/AvatarComponent.vue";
+import type { PropType } from 'vue';
+import AvatarComponent from '@/components/AvatarComponent.vue';
 
 type ChannelOption = {
   uniqueName: string;
@@ -20,11 +20,11 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["toggleSelection"]);
+const emit = defineEmits(['toggleSelection']);
 
 const truncate = (description: string) => {
   return description.length > 100
-    ? description.substring(0, 100) + "..."
+    ? description.substring(0, 100) + '...'
     : description;
 };
 </script>
@@ -35,9 +35,9 @@ const truncate = (description: string) => {
       type="checkbox"
       :value="channel.uniqueName"
       :checked="selected.includes(channel.uniqueName)"
-      class="border border-gray-300 text-orange-600 dark:border-gray-600 w-4 h-4"
+      class="h-4 w-4 border border-gray-300 text-orange-600 dark:border-gray-600"
       @change="() => emit('toggleSelection', channel.uniqueName)"
-    >
+    />
     <div class="flex items-center space-x-2">
       <AvatarComponent
         v-if="channel.icon"
@@ -52,7 +52,7 @@ const truncate = (description: string) => {
         :is-small="true"
         :text="channel.uniqueName"
       />
-      <div class="flex-col text-sm flex-1">
+      <div class="flex-1 flex-col text-sm">
         <span
           v-if="!channel.displayName"
           class="font-mono font-bold"
@@ -69,7 +69,7 @@ const truncate = (description: string) => {
             >{{ channel.uniqueName }}</span
           >
         </div>
-        <div>{{ truncate(channel.description || "") }}</div>
+        <div>{{ truncate(channel.description || '') }}</div>
       </div>
     </div>
   </label>

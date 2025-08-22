@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import CheckIcon from "@/components/icons/CheckIcon.vue";
-import XmarkIcon from "@/components/icons/XmarkIcon.vue";
+import CheckIcon from '@/components/icons/CheckIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
 
 interface Props {
   permissions: Record<string, any>;
@@ -9,11 +9,11 @@ interface Props {
 defineProps<Props>();
 
 const formatPermissionName = (name: string) => {
-  if (!name || typeof name !== "string") return "";
+  if (!name || typeof name !== 'string') return '';
   return name
     .split(/(?=[A-Z])/)
     .map((word) => word.toLowerCase())
-    .join(" ");
+    .join(' ');
 };
 </script>
 
@@ -29,12 +29,12 @@ const formatPermissionName = (name: string) => {
     >
       <CheckIcon
         v-if="value"
-        class="w-4 h-4 text-green-500"
+        class="h-4 w-4 text-green-500"
         aria-label="Permission granted"
       />
       <XmarkIcon
         v-else
-        class="w-4 h-4 text-red-500"
+        class="h-4 w-4 text-red-500"
         aria-label="Permission denied"
       />
       <span class="ml-2 text-sm">{{ formatPermissionName(key) }}</span>

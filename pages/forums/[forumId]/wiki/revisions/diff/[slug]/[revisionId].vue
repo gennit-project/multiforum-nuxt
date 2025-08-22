@@ -1,25 +1,28 @@
 <script setup lang="ts">
-import { computed, ref, defineAsyncComponent } from "vue";
-import { useRoute, useRouter, useHead } from "nuxt/app";
-import { GET_WIKI_PAGE } from "@/graphQLData/channel/queries";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { DELETE_TEXT_VERSION } from "@/graphQLData/discussion/mutations";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import type { WikiPage, TextVersion } from "@/__generated__/graphql";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
+import { computed, ref, defineAsyncComponent } from 'vue';
+import { useRoute, useRouter, useHead } from 'nuxt/app';
+import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { DELETE_TEXT_VERSION } from '@/graphQLData/discussion/mutations';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import type { WikiPage, TextVersion } from '@/__generated__/graphql';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 // Import CodeDiff dynamically to avoid SSR issues
 const CodeDiff = defineAsyncComponent(async () => {
   const vCodeDiffModule = await import('v-code-diff');
   const highlightModule = await import('highlight.js/lib/languages/markdown');
-  
+
   // Register markdown language with highlight.js
   if ((vCodeDiffModule as any).hljs) {
-    (vCodeDiffModule as any).hljs.registerLanguage('markdown', highlightModule.default);
+    (vCodeDiffModule as any).hljs.registerLanguage(
+      'markdown',
+      highlightModule.default
+    );
   }
-  
+
   return vCodeDiffModule.CodeDiff;
 });
 
@@ -54,7 +57,7 @@ const {
     channelUniqueName: forumId,
     slug: slug,
   },
-  { errorPolicy: "all" }
+  { errorPolicy: 'all' }
 );
 
 // Computed property for the wiki page data
@@ -67,7 +70,7 @@ const allEdits = computed(() => {
   if (wikiPage.value?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
     const currentVersion = {
-      id: "current",
+      id: 'current',
       body: wikiPage.value.body ?? undefined,
       createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
       Author: wikiPage.value.VersionAuthor ?? undefined,
@@ -83,12 +86,12 @@ const allEdits = computed(() => {
       const mostRecentPastVersion = wikiPage.value.PastVersions[0];
       const currentContent = wikiPage.value.body ?? undefined;
       const pastContent = mostRecentPastVersion.body ?? undefined;
-      
+
       // Only add the most recent edit if content actually changed
       if (currentContent !== pastContent) {
         edits.push({
-          id: "most-recent-edit",
-          author: wikiPage.value.VersionAuthor?.username || "[Deleted]",
+          id: 'most-recent-edit',
+          author: wikiPage.value.VersionAuthor?.username || '[Deleted]',
           createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
           isCurrent: true,
           // Show what changed in the most recent edit
@@ -97,22 +100,22 @@ const allEdits = computed(() => {
         });
       }
     }
-    
+
     // Process each past version - show what changed in that specific edit
     wikiPage.value.PastVersions.forEach((version, index) => {
       // Skip the most recent past version since we handled it above
       if (index === 0) return;
-      
+
       const previousVersion = wikiPage.value.PastVersions[index + 1] || {
-        id: "initial",
-        body: "", // Show diff from empty if this was the first edit
+        id: 'initial',
+        body: '', // Show diff from empty if this was the first edit
         createdAt: version.createdAt,
         Author: null,
       };
-      
+
       edits.push({
         id: version.id,
-        author: version.Author?.username || "[Deleted]",
+        author: version.Author?.username || '[Deleted]',
         createdAt: version.createdAt,
         isCurrent: false,
         // Show what changed in this specific edit
@@ -127,7 +130,7 @@ const allEdits = computed(() => {
 
 // Find the specific revision
 const currentRevision = computed(() => {
-  return allEdits.value.find(edit => edit.id === revisionId);
+  return allEdits.value.find((edit) => edit.id === revisionId);
 });
 
 // Deletion state
@@ -135,42 +138,50 @@ const isDeleting = ref(false);
 
 // Computed properties for the revision
 const oldVersionUsername = computed(() => {
-  return currentRevision.value?.oldVersionData?.Author?.username || "[Deleted]";
+  return currentRevision.value?.oldVersionData?.Author?.username || '[Deleted]';
 });
 
 const newVersionUsername = computed(() => {
-  return currentRevision.value?.newVersionData?.Author?.username || "[Deleted]";
+  return currentRevision.value?.newVersionData?.Author?.username || '[Deleted]';
 });
 
 const oldVersionDate = computed(() => {
-  if (!currentRevision.value?.oldVersionData?.createdAt) return "";
-  return new Date(currentRevision.value.oldVersionData.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  if (!currentRevision.value?.oldVersionData?.createdAt) return '';
+  return new Date(
+    currentRevision.value.oldVersionData.createdAt
+  ).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
 });
 
 const newVersionDate = computed(() => {
-  if (!currentRevision.value?.newVersionData?.createdAt) return "";
-  return new Date(currentRevision.value.newVersionData.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  if (!currentRevision.value?.newVersionData?.createdAt) return '';
+  return new Date(
+    currentRevision.value.newVersionData.createdAt
+  ).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
 });
 
-const oldContent = computed(() => currentRevision.value?.oldVersionData?.body || "");
-const newContent = computed(() => currentRevision.value?.newVersionData?.body || "");
+const oldContent = computed(
+  () => currentRevision.value?.oldVersionData?.body || ''
+);
+const newContent = computed(
+  () => currentRevision.value?.newVersionData?.body || ''
+);
 
 // Diff configuration for v-code-diff
 const outputFormat = ref('side-by-side'); // side-by-side or line-by-line
 const diffLanguage = ref('markdown'); // Now supports markdown with extended language
-const diffTheme = computed(() => theme.value === 'dark' ? 'dark' : 'light');
+const diffTheme = computed(() => (theme.value === 'dark' ? 'dark' : 'light'));
 
 // Set up delete mutation
 const {
@@ -182,7 +193,9 @@ const {
   update: (cache, { data }) => {
     if (data?.deleteTextVersions?.nodesDeleted) {
       // Clear cache for this revision
-      cache.evict({ id: `TextVersion:${currentRevision.value?.oldVersionData?.id}` });
+      cache.evict({
+        id: `TextVersion:${currentRevision.value?.oldVersionData?.id}`,
+      });
       cache.gc();
     }
   },
@@ -196,15 +209,19 @@ onDone(() => {
 
 const handleDelete = async () => {
   if (!currentRevision.value?.oldVersionData?.id) return;
-  
-  if (confirm("Are you sure you want to delete this revision? This action cannot be undone.")) {
+
+  if (
+    confirm(
+      'Are you sure you want to delete this revision? This action cannot be undone.'
+    )
+  ) {
     isDeleting.value = true;
     try {
       await deleteTextVersion({
         id: currentRevision.value.oldVersionData.id,
       });
     } catch (err) {
-      console.error("Error deleting revision:", err);
+      console.error('Error deleting revision:', err);
       isDeleting.value = false;
     }
   }
@@ -223,7 +240,10 @@ const goBackToWiki = () => {
 useHead({
   title: `Revision Detail - ${wikiPage.value?.title || 'Wiki Page'} | ${forumId}`,
   meta: [
-    { name: 'description', content: `View revision details for the ${wikiPage.value?.title || 'wiki page'}.` },
+    {
+      name: 'description',
+      content: `View revision details for the ${wikiPage.value?.title || 'wiki page'}.`,
+    },
     { name: 'robots', content: 'noindex' }, // Don't index revision pages
   ],
 });
@@ -243,7 +263,10 @@ useHead({
       <p class="mt-2 text-sm">{{ error?.message }}</p>
     </div>
 
-    <div v-else-if="!wikiPage || !currentRevision" class="mx-auto max-w-2xl p-4 text-center dark:text-white">
+    <div
+      v-else-if="!wikiPage || !currentRevision"
+      class="mx-auto max-w-2xl p-4 text-center dark:text-white"
+    >
       <p class="mb-4 text-lg">This revision doesn't exist.</p>
       <button
         class="text-blue-600 hover:underline dark:text-blue-400"
@@ -276,9 +299,7 @@ useHead({
 
         <div class="flex items-center justify-between">
           <div>
-            <h1 class="text-2xl font-bold dark:text-white">
-              Revision Detail
-            </h1>
+            <h1 class="text-2xl font-bold dark:text-white">Revision Detail</h1>
             <div class="mt-2 space-y-1">
               <div class="text-sm text-gray-600 dark:text-gray-400">
                 From version by {{ oldVersionUsername }} ({{ oldVersionDate }})
@@ -287,12 +308,9 @@ useHead({
                 To version by {{ newVersionUsername }} ({{ newVersionDate }})
               </div>
             </div>
-            <div
-              v-if="currentRevision.isCurrent"
-              class="mt-2"
-            >
+            <div v-if="currentRevision.isCurrent" class="mt-2">
               <span
-                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
+                class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:bg-green-800 dark:text-green-200"
               >
                 Most recent edit
               </span>
@@ -300,13 +318,21 @@ useHead({
           </div>
 
           <!-- Delete button -->
-          <div v-if="currentRevision.oldVersionData?.id && currentRevision.oldVersionData.id !== 'current'">
+          <div
+            v-if="
+              currentRevision.oldVersionData?.id &&
+              currentRevision.oldVersionData.id !== 'current'
+            "
+          >
             <button
-              class="px-4 py-2 text-sm font-medium text-red-700 bg-red-100 border border-red-300 rounded-md hover:bg-red-200 dark:bg-red-800 dark:text-red-200 dark:border-red-600 dark:hover:bg-red-700 disabled:opacity-50"
+              class="rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 hover:bg-red-200 disabled:opacity-50 dark:border-red-600 dark:bg-red-800 dark:text-red-200 dark:hover:bg-red-700"
               :disabled="isDeleting || deleteLoading"
               @click="handleDelete"
             >
-              <i v-if="isDeleting || deleteLoading" class="fas fa-spinner fa-spin mr-2"></i>
+              <i
+                v-if="isDeleting || deleteLoading"
+                class="fas fa-spinner fa-spin mr-2"
+              ></i>
               Delete Revision
             </button>
           </div>
@@ -317,29 +343,37 @@ useHead({
       <ErrorBanner v-if="deleteError" :text="deleteError.message" />
 
       <!-- Professional Diff View using v-code-diff -->
-      <div class="rounded-md border dark:border-gray-700 overflow-hidden">
+      <div class="overflow-hidden rounded-md border dark:border-gray-700">
         <!-- Diff mode toggle -->
-        <div class="bg-gray-50 dark:bg-gray-800 px-4 py-3 border-b dark:border-gray-700">
+        <div
+          class="bg-gray-50 border-b px-4 py-3 dark:border-gray-700 dark:bg-gray-800"
+        >
           <div class="flex items-center justify-between">
             <div class="flex items-center space-x-4">
-              <span class="text-sm font-medium text-gray-700 dark:text-gray-300">View mode:</span>
+              <span class="text-sm font-medium text-gray-700 dark:text-gray-300"
+                >View mode:</span
+              >
               <div class="flex rounded-md shadow-sm">
                 <button
-                  class="px-3 py-1 text-xs font-medium rounded-l-md border"
+                  class="rounded-l-md border px-3 py-1 text-xs font-medium"
                   :class="{
-                    'bg-orange-600 text-white border-orange-600': outputFormat === 'side-by-side',
-                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': outputFormat !== 'side-by-side'
+                    'border-orange-600 bg-orange-600 text-white':
+                      outputFormat === 'side-by-side',
+                    'hover:bg-gray-50 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600':
+                      outputFormat !== 'side-by-side',
                   }"
                   @click="outputFormat = 'side-by-side'"
                 >
                   Side by Side
                 </button>
                 <button
-                  class="px-3 py-1 text-xs font-medium rounded-r-md border-t border-r border-b"
+                  class="rounded-r-md border-b border-r border-t px-3 py-1 text-xs font-medium"
                   :class="{
-                    'bg-orange-600 text-white border-orange-600': outputFormat === 'line-by-line',
-                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-600': outputFormat !== 'line-by-line',
-                    'border-l-0': outputFormat !== 'line-by-line'
+                    'border-orange-600 bg-orange-600 text-white':
+                      outputFormat === 'line-by-line',
+                    'hover:bg-gray-50 border-gray-300 bg-white text-gray-700 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600':
+                      outputFormat !== 'line-by-line',
+                    'border-l-0': outputFormat !== 'line-by-line',
                   }"
                   @click="outputFormat = 'line-by-line'"
                 >
@@ -364,31 +398,16 @@ useHead({
               class="diff-container"
             />
             <template #fallback>
-              <div class="flex items-center justify-center h-96 text-gray-500 dark:text-gray-400">
+              <div
+                class="flex h-96 items-center justify-center text-gray-500 dark:text-gray-400"
+              >
                 <div class="text-center">
-                  <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                  <i class="fas fa-spinner fa-spin mb-2 text-2xl"></i>
                   <p>Loading diff viewer...</p>
                 </div>
               </div>
             </template>
           </ClientOnly>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         </div>
       </div>
     </div>

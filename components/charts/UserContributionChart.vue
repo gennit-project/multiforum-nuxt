@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useUIStore } from "@/stores/uiStore";
-import GithubContributionChart from "./GithubContributionChart.vue";
-import ContributionChartSkeleton from "./ContributionChartSkeleton.vue";
-import { GET_USER_CONTRIBUTIONS, GET_USER } from "@/graphQLData/user/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
+import { ref, computed } from 'vue';
+import { useUIStore } from '@/stores/uiStore';
+import GithubContributionChart from './GithubContributionChart.vue';
+import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
+import { GET_USER_CONTRIBUTIONS, GET_USER } from '@/graphQLData/user/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
 
 // Get the theme from UI store
 const uiStore = useUIStore();
-const isDarkMode = computed(() => uiStore.theme === "dark");
+const isDarkMode = computed(() => uiStore.theme === 'dark');
 const route = useRoute();
 const username = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
+  return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
 // Year for the backend query (null by default)
@@ -28,7 +28,7 @@ const { result: userResult } = useQuery(
     username: username,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -48,7 +48,7 @@ const { result: contributionsResult, loading } = useQuery(
     year: queryYear,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -57,28 +57,33 @@ const contributions = computed(() => {
     if (contributionsResult.value?.getUserContributions) {
       // Get the raw data from the API - this is now a flat array of day data
       const rawData = contributionsResult.value.getUserContributions;
-      
+
       // Make sure rawData is an array
       if (!Array.isArray(rawData)) {
-        console.error('Expected getUserContributions to be an array, got:', typeof rawData);
+        console.error(
+          'Expected getUserContributions to be an array, got:',
+          typeof rawData
+        );
         return [];
       }
-      
+
       // Process the data to ensure compatibility with the chart component
-      return rawData.map((day) => {
-        if (!day) return null;
+      return rawData
+        .map((day) => {
+          if (!day) return null;
 
-        // Calculate count - use provided count or derive from activities
-        const dayCount = day.count || 0;
-        const activitiesCount = day.activities?.length || 0;
-        const finalCount = dayCount > 0 ? dayCount : activitiesCount;
+          // Calculate count - use provided count or derive from activities
+          const dayCount = day.count || 0;
+          const activitiesCount = day.activities?.length || 0;
+          const finalCount = dayCount > 0 ? dayCount : activitiesCount;
 
-        return {
-          date: day.date,
-          count: finalCount,
-          activities: day.activities || [],
-        };
-      }).filter((day) => day !== null); // Filter out null values
+          return {
+            date: day.date,
+            count: finalCount,
+            activities: day.activities || [],
+          };
+        })
+        .filter((day) => day !== null); // Filter out null values
     }
   } catch (error) {
     console.error('Error processing contribution data:', error);
@@ -87,7 +92,13 @@ const contributions = computed(() => {
 });
 
 // Track the last selected day
-type ContributionDay = { date: string; count: number; activities: unknown[]; week: number; day: number };
+type ContributionDay = {
+  date: string;
+  count: number;
+  activities: unknown[];
+  week: number;
+  day: number;
+};
 const selectedDay = ref<ContributionDay | null>(null);
 const logSelected = (day: ContributionDay | null) => {
   selectedDay.value = day;
@@ -103,7 +114,7 @@ const setYear = (newYear: number) => {
 const currentYear = computed(() => new Date().getFullYear());
 </script>
 <template>
-  <div class="rounded-lg overflow-hidden">
+  <div class="overflow-hidden rounded-lg">
     <client-only>
       <GithubContributionChart
         :dark-mode="isDarkMode"
@@ -122,4 +133,3 @@ const currentYear = computed(() => new Date().getFullYear());
     </client-only>
   </div>
 </template>
-

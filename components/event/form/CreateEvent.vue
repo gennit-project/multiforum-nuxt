@@ -1,31 +1,31 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "nuxt/app";
-import { DateTime } from "luxon";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
-import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
-import { getTimePieces } from "@/utils";
-import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
-import type { CreateEditEventFormValues } from "@/types/Event";
+import { ref, computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'nuxt/app';
+import { DateTime } from 'luxon';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
+import { CREATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { getTimePieces } from '@/utils';
+import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
+import type { CreateEditEventFormValues } from '@/types/Event';
 import type {
   EventCreateInput,
   EventTagsConnectOrCreateFieldInput,
   Event,
-} from "@/__generated__/graphql";
-import { usernameVar } from "@/cache";
+} from '@/__generated__/graphql';
+import { usernameVar } from '@/cache';
 
 const now = DateTime.now();
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() =>
-  route.params.forumId ? String(route.params.forumId) : ""
+  route.params.forumId ? String(route.params.forumId) : ''
 );
 const createEventDefaultValues = getDefaultEventFormValues(channelId.value);
 const formValues = ref<CreateEditEventFormValues>(createEventDefaultValues);
-const defaultStartTimeObj = now.startOf("hour").plus({ hours: 1 });
+const defaultStartTimeObj = now.startOf('hour').plus({ hours: 1 });
 const startTimePieces = ref(getTimePieces(defaultStartTimeObj));
 
 const eventCreateInput = computed<EventCreateInput>(() => {
@@ -36,14 +36,14 @@ const eventCreateInput = computed<EventCreateInput>(() => {
     }));
 
   let input: EventCreateInput = {
-    title: formValues.value.title || "",
+    title: formValues.value.title || '',
     description: formValues.value.description || null,
     startTime: formValues.value.startTime || null,
     startTimeDayOfWeek: startTimePieces.value.startTimeDayOfWeek || null,
     startTimeHourOfDay: startTimePieces.value.startTimeHourOfDay || 0,
     endTime: formValues.value.endTime || null,
     canceled: false,
-    cost: formValues.value.cost || "",
+    cost: formValues.value.cost || '',
     free: formValues.value.free || false,
     virtualEventUrl: formValues.value.virtualEventUrl || null,
     isInPrivateResidence: formValues.value.isInPrivateResidence || null,
@@ -95,7 +95,7 @@ onDone((response) => {
   const newEventId = response.data?.createEventWithChannelConnections[0]?.id;
   const redirectChannelId = formValues.value.selectedChannels[0];
   router.push({
-    name: "forums-forumId-events-eventId",
+    name: 'forums-forumId-events-eventId',
     params: { forumId: redirectChannelId, eventId: newEventId },
   });
 });
@@ -103,15 +103,15 @@ onDone((response) => {
 function submit() {
   createEventLoading.value = true;
   if (!eventCreateInput.value?.title) {
-    console.error("Title is required");
+    console.error('Title is required');
     return;
   }
   if (!channelConnections.value?.length) {
-    console.error("Channel is required");
+    console.error('Channel is required');
     return;
   }
-  if (usernameVar.value === "") {
-    console.error("Username is required");
+  if (usernameVar.value === '') {
+    console.error('Username is required');
     return;
   }
 

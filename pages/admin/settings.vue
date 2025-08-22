@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-import { UPDATE_SERVER_CONFIG } from "@/graphQLData/admin/mutations";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import { config } from "@/config";
-import CreateEditServerFields from "@/components/admin/CreateEditServerFields.vue";
+import { ref, computed } from 'vue';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { UPDATE_SERVER_CONFIG } from '@/graphQLData/admin/mutations';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { config } from '@/config';
+import CreateEditServerFields from '@/components/admin/CreateEditServerFields.vue';
 
 const dataLoaded = ref(false);
 const {
@@ -21,7 +21,7 @@ const {
     serverName: config.serverName,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -32,7 +32,7 @@ const serverConfig = computed(() => {
   return getServerResult.value.serverConfigs?.[0] || null;
 });
 const formValues = ref<ServerConfigUpdateInput>({
-  serverDescription: "",
+  serverDescription: '',
   rules: [],
   allowedFileTypes: [],
   enableDownloads: false,
@@ -43,30 +43,30 @@ onGetServerResult((result) => {
   dataLoaded.value = true;
   const serverConfig = result.data?.serverConfigs[0];
   if (!serverConfig) return;
-  
+
   let rules = [];
   try {
     rules = JSON.parse(serverConfig.rules) || [];
   } catch (e) {
-    console.error("Error parsing server rules", e);
+    console.error('Error parsing server rules', e);
   }
-  
-  console.log("Loading server config:", {
+
+  console.log('Loading server config:', {
     enableDownloads: serverConfig.enableDownloads,
     enableEvents: serverConfig.enableEvents,
     serverDescription: serverConfig.serverDescription,
-    allowedFileTypes: serverConfig.allowedFileTypes
+    allowedFileTypes: serverConfig.allowedFileTypes,
   });
-  
+
   formValues.value = {
-    serverDescription: serverConfig.serverDescription || "",
+    serverDescription: serverConfig.serverDescription || '',
     rules,
     allowedFileTypes: serverConfig.allowedFileTypes || [],
     enableDownloads: Boolean(serverConfig.enableDownloads),
     enableEvents: Boolean(serverConfig.enableEvents),
   };
-  
-  console.log("Updated form values:", formValues.value);
+
+  console.log('Updated form values:', formValues.value);
 });
 
 const serverUpdateInput = computed(() => {
@@ -75,7 +75,7 @@ const serverUpdateInput = computed(() => {
   // will be more complicated.
   return {
     serverDescription: formValues.value.serverDescription,
-    rules: JSON.stringify(formValues.value.rules) || "[]",
+    rules: JSON.stringify(formValues.value.rules) || '[]',
     allowedFileTypes: formValues.value.allowedFileTypes || [],
     enableDownloads: formValues.value.enableDownloads || false,
     enableEvents: formValues.value.enableEvents || false,
@@ -92,8 +92,8 @@ const {
 } = useMutation(UPDATE_SERVER_CONFIG, {
   update: (cache, { data }) => {
     const newServerConfig = data?.updateServerConfigs.serverConfigs[0];
-    console.log("Mutation response:", { data, newServerConfig });
-    
+    console.log('Mutation response:', { data, newServerConfig });
+
     if (newServerConfig) {
       try {
         // Parse rules if they come back as string
@@ -102,11 +102,11 @@ const {
           try {
             updatedConfig.rules = JSON.parse(updatedConfig.rules);
           } catch (e) {
-            console.error("Error parsing rules from mutation response", e);
+            console.error('Error parsing rules from mutation response', e);
             updatedConfig.rules = [];
           }
         }
-        
+
         // Update the form values with the new data
         formValues.value = {
           ...formValues.value,
@@ -114,9 +114,9 @@ const {
           enableDownloads: Boolean(newServerConfig.enableDownloads),
           enableEvents: Boolean(newServerConfig.enableEvents),
         };
-        
-        console.log("Updated form values after mutation:", formValues.value);
-        
+
+        console.log('Updated form values after mutation:', formValues.value);
+
         // Also update the cache - reconstruct the full config
         cache.writeQuery({
           query: GET_SERVER_CONFIG,
@@ -124,17 +124,19 @@ const {
             serverName: config.serverName,
           },
           data: {
-            serverConfigs: [{
-              ...serverConfig.value,
-              ...newServerConfig,
-            }],
+            serverConfigs: [
+              {
+                ...serverConfig.value,
+                ...newServerConfig,
+              },
+            ],
           },
         });
       } catch (error) {
         console.error('Cache update error:', error);
         // Force refetch on error
         cache.evict({
-          fieldName: 'serverConfigs'
+          fieldName: 'serverConfigs',
         });
       }
     }
@@ -146,11 +148,11 @@ onDone(() => {
 });
 
 function submit() {
-  console.log("Submitting server config with:", {
+  console.log('Submitting server config with:', {
     input: serverUpdateInput.value,
-    formValues: formValues.value
+    formValues: formValues.value,
   });
-  
+
   updateServer({
     input: serverUpdateInput.value,
     serverName: config.serverName,

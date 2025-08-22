@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
-import { useAuth0 } from "@auth0/auth0-vue";
-import { useRouter } from "vue-router";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_EMAIL } from "@/graphQLData/email/queries";
-import { usernameVar, userDataLoadingVar } from "@/cache";
-import CreateUsernameForm from "@/components/auth/CreateUsernameForm.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
+import { ref, onMounted, watch } from 'vue';
+import { useAuth0 } from '@auth0/auth0-vue';
+import { useRouter } from 'vue-router';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_EMAIL } from '@/graphQLData/email/queries';
+import { usernameVar, userDataLoadingVar } from '@/cache';
+import CreateUsernameForm from '@/components/auth/CreateUsernameForm.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
 
 const { user, isAuthenticated } = useAuth0();
 const router = useRouter();
@@ -14,26 +14,25 @@ const emailNotInSystem = ref(false);
 const initialCheckComplete = ref(false);
 const loading = ref(true);
 
-
 // Handle redirects when mounted
 if (import.meta.client) {
   onMounted(() => {
     // Check for stored username
     const storedUsername = localStorage.getItem('username');
-    
+
     // Redirect unauthenticated users to home page
     if (!isAuthenticated.value) {
-      console.log("Not authenticated, redirecting to home");
+      console.log('Not authenticated, redirecting to home');
       router.push('/');
     }
     // If we already have a username in state or storage, redirect back to previous page or home
     else if (usernameVar.value || storedUsername) {
-      console.log("Username already exists, no need for creation page");
+      console.log('Username already exists, no need for creation page');
       const previousPath = sessionStorage.getItem('previousPath') || '/';
       router.push(previousPath);
     }
   });
-  
+
   // Also watch for username changes (in case it loads after mount)
   watch(usernameVar, (newUsername) => {
     if (newUsername) {
@@ -65,17 +64,26 @@ if (import.meta.client) {
 </script>
 
 <template>
-  <div class="flex justify-center items-center min-h-screen">
-    <div class="max-w-md w-full">
+  <div class="flex min-h-screen items-center justify-center">
+    <div class="w-full max-w-md">
       <!-- Show loading state while checking email -->
-      <div v-if="loading" class="text-center py-8">
+      <div v-if="loading" class="py-8 text-center">
         <LoadingSpinner />
         <p class="mt-4">Checking your account...</p>
       </div>
 
       <!-- Show the create username form only when ready -->
       <client-only>
-        <div v-if="!loading && user?.email && !usernameVar && !userDataLoadingVar && emailNotInSystem && initialCheckComplete">
+        <div
+          v-if="
+            !loading &&
+            user?.email &&
+            !usernameVar &&
+            !userDataLoadingVar &&
+            emailNotInSystem &&
+            initialCheckComplete
+          "
+        >
           <CreateUsernameForm
             :email="user.email"
             @email-and-user-created="router.push('/')"

@@ -1,9 +1,13 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { PropType } from "vue";
-import type { Comment, TextVersion, CommentAuthor } from "@/__generated__/graphql";
-import { timeAgo } from "@/utils";
-import CommentRevisionDiffModal from "./CommentRevisionDiffModal.vue";
+import { ref, computed } from 'vue';
+import type { PropType } from 'vue';
+import type {
+  Comment,
+  TextVersion,
+  CommentAuthor,
+} from '@/__generated__/graphql';
+import { timeAgo } from '@/utils';
+import CommentRevisionDiffModal from './CommentRevisionDiffModal.vue';
 
 const props = defineProps({
   comment: {
@@ -26,14 +30,16 @@ type EditItem = {
 const activeRevision = ref<EditItem | null>(null);
 
 // Helper function to get display name from CommentAuthor union type
-const getAuthorDisplayName = (commentAuthor: CommentAuthor | null | undefined): string => {
-  if (!commentAuthor) return "[Deleted]";
-  
+const getAuthorDisplayName = (
+  commentAuthor: CommentAuthor | null | undefined
+): string => {
+  if (!commentAuthor) return '[Deleted]';
+
   // Check if it's a User type (has username property)
   if ('username' in commentAuthor && commentAuthor.username) {
     return commentAuthor.username;
   }
-  
+
   // Check if it's a ModerationProfile type
   if ('displayName' in commentAuthor) {
     if (commentAuthor.displayName) {
@@ -49,8 +55,8 @@ const getAuthorDisplayName = (commentAuthor: CommentAuthor | null | undefined): 
       return commentAuthor.User.username;
     }
   }
-  
-  return "[Deleted]";
+
+  return '[Deleted]';
 };
 
 // Total number of edits
@@ -70,7 +76,7 @@ const allEdits = computed(() => {
   if (props.comment?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
     const currentVersion: TextVersion = {
-      id: "current",
+      id: 'current',
       body: props.comment.text, // Current comment text
       createdAt: props.comment.updatedAt || props.comment.createdAt,
       Author: props.comment.CommentAuthor as any, // Cast to User type which TextVersion expects
@@ -78,13 +84,13 @@ const allEdits = computed(() => {
         __typename: 'TextVersionAuthorConnection',
         edges: [],
         pageInfo: { hasNextPage: false, hasPreviousPage: false },
-        totalCount: 0
+        totalCount: 0,
       },
     };
 
     // First item: most recent edit (current vs most recent past version)
     edits.push({
-      id: "most-recent-edit",
+      id: 'most-recent-edit',
       author: getAuthorDisplayName(props.comment.CommentAuthor),
       createdAt: props.comment.updatedAt || props.comment.createdAt,
       isCurrent: true,
@@ -96,12 +102,12 @@ const allEdits = computed(() => {
     props.comment.PastVersions.forEach((version, index) => {
       // Skip the most recent past version since it's already handled above
       if (index === 0) return;
-      
+
       const nextVersion = props.comment.PastVersions[index - 1]; // Next version (more recent)
-      
+
       edits.push({
         id: version.id,
-        author: version.Author?.username || "[Deleted]",
+        author: version.Author?.username || '[Deleted]',
         createdAt: version.createdAt,
         isCurrent: false,
         oldVersionData: version,
@@ -111,7 +117,9 @@ const allEdits = computed(() => {
   }
 
   // Sort by date (newest first)
-  return edits.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  return edits.sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
 });
 
 // Open diff modal for a specific edit item
@@ -141,7 +149,9 @@ const handleRevisionDeleted = (deletedId: string) => {
 
   // If the deleted revision is in the past versions, update the UI
   if (props.comment?.PastVersions) {
-    const index = props.comment.PastVersions.findIndex((version) => version.id === deletedId);
+    const index = props.comment.PastVersions.findIndex(
+      (version) => version.id === deletedId
+    );
     if (index !== -1) {
       // Close the dropdown as we've modified the list
       isOpen.value = false;
@@ -151,11 +161,7 @@ const handleRevisionDeleted = (deletedId: string) => {
 </script>
 
 <template>
-  <div
-    v-if="hasEdits"
-    v-click-outside="closeDropdown"
-    class="relative"
-  >
+  <div v-if="hasEdits" v-click-outside="closeDropdown" class="relative">
     <!-- Dropdown toggle button -->
     <button
       class="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
@@ -169,9 +175,7 @@ const handleRevisionDeleted = (deletedId: string) => {
       v-if="isOpen"
       class="absolute right-0 z-50 mt-2 w-64 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800"
     >
-      <div>
-        Edited {{ totalEdits }} time{{ totalEdits > 1 ? "s" : "" }}
-      </div>
+      <div>Edited {{ totalEdits }} time{{ totalEdits > 1 ? 's' : '' }}</div>
 
       <ul class="max-h-80 overflow-y-auto py-1">
         <li
@@ -182,7 +186,9 @@ const handleRevisionDeleted = (deletedId: string) => {
         >
           <div class="flex flex-col">
             <div class="flex items-center text-sm">
-              <span class="font-medium text-gray-900 dark:text-gray-200">{{ edit.author }}</span>
+              <span class="font-medium text-gray-900 dark:text-gray-200">{{
+                edit.author
+              }}</span>
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               {{ timeAgo(new Date(edit.createdAt)) }}

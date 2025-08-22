@@ -1,23 +1,23 @@
 <script setup lang="ts">
-  import { useAppTheme } from "@/composables/useTheme";
+import { useAppTheme } from '@/composables/useTheme';
 
 // Set inheritAttrs to false so we can handle attribute inheritance manually
 defineOptions({
   inheritAttrs: false,
 });
 
-  const { theme } = useAppTheme();
-  const props = defineProps({
-    modelValue: {
-      type: Boolean,
-      default: false,
-    },
-  });
+const { theme } = useAppTheme();
+const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false,
+  },
+});
 
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 
 function close() {
-  emit("update:modelValue", false);
+  emit('update:modelValue', false);
 }
 </script>
 
@@ -32,7 +32,11 @@ function close() {
       >
         <template #activator="{ props: activatorProps }">
           <div v-bind="activatorProps">
-            <slot name="button" v-bind="{...activatorProps, class: $attrs.class}" @close="close" />
+            <slot
+              name="button"
+              v-bind="{ ...activatorProps, class: $attrs.class }"
+              @close="close"
+            />
           </div>
         </template>
         <v-card :theme="theme">
@@ -41,7 +45,7 @@ function close() {
       </v-menu>
     </div>
     <template #fallback>
-      <slot name="button" v-bind="{class: $attrs.class}" @close="close" />
+      <slot name="button" v-bind="{ class: $attrs.class }" @close="close" />
     </template>
   </client-only>
 </template>

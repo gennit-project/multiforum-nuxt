@@ -1,17 +1,17 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useRoute } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_SUSPENDED_USERS_IN_CHANNEL } from "@/graphQLData/mod/queries";
-import { DateTime } from "luxon";
+import { computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_SUSPENDED_USERS_IN_CHANNEL } from '@/graphQLData/mod/queries';
+import { DateTime } from 'luxon';
 
 const route = useRoute();
 
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const {
@@ -40,14 +40,14 @@ const humanReadableDate = (dateISO: string): string => {
 <template>
   <div class="flex-col space-y-4 dark:text-white">
     <div class="mb-6">
-      <h1 class="text-xl font-bold mb-2">User Suspensions</h1>
-      <p class="text-gray-600 text-sm dark:text-gray-400">
+      <h1 class="mb-2 text-xl font-bold">User Suspensions</h1>
+      <p class="text-sm text-gray-600 dark:text-gray-400">
         {{
           `These are the active suspensions of users from ${forumId}. It's possible for a user to be listed twice if moderation actions were taken on more than one of their posts.`
         }}
       </p>
       <ul
-        class="text-gray-600 text-sm dark:text-gray-400 list-disc ml-4 list-outside"
+        class="ml-4 list-outside list-disc text-sm text-gray-600 dark:text-gray-400"
       >
         <li>
           To un-suspend a user, click Related Issue and follow the provided
@@ -72,16 +72,16 @@ const humanReadableDate = (dateISO: string): string => {
         <div
           v-for="user in suspendedUsers"
           :key="user.username"
-          class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+          class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
-          <div class="flex-col w-full">
-            <div class="flex justify-between gap-2 w-full">
+          <div class="w-full flex-col">
+            <div class="flex w-full justify-between gap-2">
               <nuxt-link
                 :to="{
                   name: 'u-username',
                   params: { username: user.username },
                 }"
-                class="flex items-center dark:text-white font-bold"
+                class="flex items-center font-bold dark:text-white"
               >
                 <AvatarComponent
                   :text="user.username"
@@ -100,7 +100,7 @@ const humanReadableDate = (dateISO: string): string => {
               </nuxt-link>
               <nuxt-link
                 v-if="user.RelatedIssue"
-                class="flex rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
+                class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
                 :to="{
                   name: 'forums-forumId-issues-issueId',
                   params: { issueId: user.RelatedIssue?.id },

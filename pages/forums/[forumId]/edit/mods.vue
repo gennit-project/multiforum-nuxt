@@ -1,29 +1,29 @@
 <script lang="ts" setup>
-import PendingForumModList from "@/components/channel/form/PendingForumModList.vue";
-import ModList from "@/components/channel/form/ModList.vue";
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
+import PendingForumModList from '@/components/channel/form/PendingForumModList.vue';
+import ModList from '@/components/channel/form/ModList.vue';
+import { ref, computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
 import {
   INVITE_FORUM_MOD,
   CANCEL_INVITE_FORUM_MOD,
   REMOVE_FORUM_MOD,
-} from "@/graphQLData/mod/mutations";
-import { useRoute } from "nuxt/app";
+} from '@/graphQLData/mod/mutations';
+import { useRoute } from 'nuxt/app';
 import {
   GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
   GET_MODS_BY_CHANNEL,
-} from "@/graphQLData/mod/queries";
-import ErrorBanner from "@/components/ErrorBanner.vue";
+} from '@/graphQLData/mod/queries';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 
 const route = useRoute();
 
-const newModUsername = ref("");
+const newModUsername = ref('');
 
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const {
@@ -43,8 +43,7 @@ const {
       },
     });
 
-    const existingInvites =
-      existingData?.channels[0]?.PendingModInvites ?? [];
+    const existingInvites = existingData?.channels[0]?.PendingModInvites ?? [];
 
     cache.writeQuery({
       query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
@@ -84,8 +83,7 @@ const {
       },
     });
 
-    const existingInvites =
-      existingData?.channels[0]?.PendingModInvites ?? [];
+    const existingInvites = existingData?.channels[0]?.PendingModInvites ?? [];
 
     cache.writeQuery({
       query: GET_PENDING_CHANNEL_MODS_BY_CHANNEL,
@@ -107,48 +105,47 @@ const {
   },
 });
 
-const { 
-  mutate: removeForumMod, 
+const {
+  mutate: removeForumMod,
   loading: removeForumModLoading,
   onDone: removeForumModDone,
   error: removeForumModError,
-} =
-  useMutation(REMOVE_FORUM_MOD, {
-    update: (cache, { data }) => {
-      // update the result of GET_MODS_BY_CHANNEL
-      // to remove the removed user
+} = useMutation(REMOVE_FORUM_MOD, {
+  update: (cache, { data }) => {
+    // update the result of GET_MODS_BY_CHANNEL
+    // to remove the removed user
 
-      const existingData: any = cache.readQuery({
-        query: GET_MODS_BY_CHANNEL ,
-        variables: {
-          channelUniqueName: forumId.value,
-        },
-      });
+    const existingData: any = cache.readQuery({
+      query: GET_MODS_BY_CHANNEL,
+      variables: {
+        channelUniqueName: forumId.value,
+      },
+    });
 
-      const existingMods = existingData?.channels[0]?.Admins ?? [];
+    const existingMods = existingData?.channels[0]?.Admins ?? [];
 
-      cache.writeQuery({
-        query: GET_MODS_BY_CHANNEL,
-        variables: {
-          channelUniqueName: forumId.value,
-        },
-        data: {
-          channels: [
-            {
-              Admins: [
-                ...existingMods.filter(
-                  (mod: any) => mod.username !== newModUsername.value
-                ),
-              ],
-            },
-          ],
-        },
-      });
-    },
-  });
+    cache.writeQuery({
+      query: GET_MODS_BY_CHANNEL,
+      variables: {
+        channelUniqueName: forumId.value,
+      },
+      data: {
+        channels: [
+          {
+            Admins: [
+              ...existingMods.filter(
+                (mod: any) => mod.username !== newModUsername.value
+              ),
+            ],
+          },
+        ],
+      },
+    });
+  },
+});
 
 inviteModDone(() => {
-  newModUsername.value = "";
+  newModUsername.value = '';
 });
 
 removeForumModDone(() => {
@@ -162,8 +159,8 @@ cancelInviteModDone(() => {
   showCancelInviteModal.value = false;
 });
 
-const inviteeToRemove = ref("");
-const forumModToRemove = ref("");
+const inviteeToRemove = ref('');
+const forumModToRemove = ref('');
 
 const clickCancelInvite = (inviteeUsername: string) => {
   inviteeToRemove.value = inviteeUsername;
@@ -180,7 +177,7 @@ const clickRemoveMod = (modUsername: string) => {
   <div class="flex-col space-y-4 dark:text-white">
     <FormRow section-title="Invite a New Mod">
       <template #content>
-        <div class="w-full flex items-center gap-2">
+        <div class="flex w-full items-center gap-2">
           <div class="w-full flex-1 items-center">
             <TextInput
               :test-id="'new-mod-input'"
@@ -195,10 +192,13 @@ const clickRemoveMod = (modUsername: string) => {
             :label="'Invite'"
             :loading="inviteModLoading"
             :disabled="!newModUsername"
-            @click="() => inviteMod({
-              inviteeUsername: newModUsername,
-              channelUniqueName: forumId,
-            })"
+            @click="
+              () =>
+                inviteMod({
+                  inviteeUsername: newModUsername,
+                  channelUniqueName: forumId,
+                })
+            "
           />
         </div>
         <ErrorBanner v-if="inviteModError" :text="inviteModError.message" />

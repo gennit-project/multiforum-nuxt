@@ -143,7 +143,7 @@ function viewFeedback() {
       @vote="clickUpvote"
     >
       <i class="fa-solid fa-arrow-up mr-1 w-3" />
-      <span id="count" class="text-xs">{{upvoteCount}}</span>
+      <span id="count" class="text-xs">{{ upvoteCount }}</span>
     </VoteButton>
 
     <MenuButton

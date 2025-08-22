@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client/core";
-import { AUTHOR_FIELDS } from "../discussion/queries";
+import { gql } from '@apollo/client/core';
+import { AUTHOR_FIELDS } from '../discussion/queries';
 
 export const COMMENT_VOTE_FIELDS = gql`
   fragment CommentVoteFields on Comment {

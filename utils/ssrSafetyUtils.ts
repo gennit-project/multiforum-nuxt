@@ -1,13 +1,13 @@
 /**
  * SSR Safety Utilities
- * 
+ *
  * Collection of utility functions to help prevent SSR-related crashes
  * especially when working with GraphQL data that might be undefined during hydration.
- * 
+ *
  * COMMON BUG PATTERN TO AVOID:
  * ❌ obj?.array.length === 0  // Missing optional chaining on .length access
  * ✅ obj?.array?.length === 0  // Proper optional chaining throughout
- * 
+ *
  * The ESLint rule "no-unsafe-optional-chaining" should catch these patterns.
  */
 
@@ -17,7 +17,10 @@
  * @param fallback - Value to return if array is empty or undefined
  * @returns First array item or fallback
  */
-export function safeArrayFirst<T>(array: T[] | undefined | null, fallback: T | null = null): T | null {
+export function safeArrayFirst<T>(
+  array: T[] | undefined | null,
+  fallback: T | null = null
+): T | null {
   return Array.isArray(array) && array.length > 0 ? array[0] : fallback;
 }
 
@@ -27,7 +30,10 @@ export function safeArrayFirst<T>(array: T[] | undefined | null, fallback: T | n
  * @param fallback - Value to return if array is undefined
  * @returns Array length or fallback
  */
-export function safeArrayLength(array: unknown[] | undefined | null, fallback: number = 0): number {
+export function safeArrayLength(
+  array: unknown[] | undefined | null,
+  fallback: number = 0
+): number {
   return Array.isArray(array) ? array.length : fallback;
 }
 
@@ -47,9 +53,15 @@ export function ensureArray<T>(value: T[] | undefined | null): T[] {
  * @param fallback - Value to return if path doesn't exist
  * @returns Property value or fallback
  */
-export function safeGet<T>(obj: any, path: string, fallback: T | null = null): T | null {
+export function safeGet<T>(
+  obj: any,
+  path: string,
+  fallback: T | null = null
+): T | null {
   try {
-    return path.split('.').reduce((current, key) => current?.[key], obj) ?? fallback;
+    return (
+      path.split('.').reduce((current, key) => current?.[key], obj) ?? fallback
+    );
   } catch {
     return fallback;
   }
@@ -69,7 +81,10 @@ export function isClient(): boolean {
  * @param fallback - Value to return during SSR
  * @returns Function result or fallback
  */
-export function clientOnly<T>(fn: () => T, fallback: T | null = null): T | null {
+export function clientOnly<T>(
+  fn: () => T,
+  fallback: T | null = null
+): T | null {
   return isClient() ? fn() : fallback;
 }
 
@@ -78,11 +93,13 @@ export function clientOnly<T>(fn: () => T, fallback: T | null = null): T | null 
  * @param discussion - Discussion object from GraphQL
  * @returns Normalized discussion with guaranteed array properties
  */
-export function validateDiscussionData<T extends { DownloadableFiles?: any; DiscussionChannels?: any }>(
+export function validateDiscussionData<
+  T extends { DownloadableFiles?: any; DiscussionChannels?: any },
+>(
   discussion: T | null | undefined
-): T & { DownloadableFiles: any[]; DiscussionChannels: any[] } | null {
+): (T & { DownloadableFiles: any[]; DiscussionChannels: any[] }) | null {
   if (!discussion) return null;
-  
+
   return {
     ...discussion,
     DownloadableFiles: ensureArray(discussion.DownloadableFiles),
@@ -97,9 +114,9 @@ export function validateDiscussionData<T extends { DownloadableFiles?: any; Disc
  */
 export function validateEventData<T extends { EventChannels?: any }>(
   event: T | null | undefined
-): T & { EventChannels: any[] } | null {
+): (T & { EventChannels: any[] }) | null {
   if (!event) return null;
-  
+
   return {
     ...event,
     EventChannels: ensureArray(event.EventChannels),

@@ -1,13 +1,13 @@
-import LocationFilterTypes from "./locationFilterTypes";
-import type { SearchEventValues } from "@/types/Event";
-import { timeShortcutValues } from "./eventSearchOptions";
-import { DateTime } from "luxon";
-import type { EventWhere } from "@/__generated__/graphql";
+import LocationFilterTypes from './locationFilterTypes';
+import type { SearchEventValues } from '@/types/Event';
+import { timeShortcutValues } from './eventSearchOptions';
+import { DateTime } from 'luxon';
+import type { EventWhere } from '@/__generated__/graphql';
 
 const now = DateTime.now();
 
 const getStartOfThisWeekend = () => {
-  const startOfWeek = now.startOf("week");
+  const startOfWeek = now.startOf('week');
   return startOfWeek.plus({ days: 5 });
 };
 
@@ -35,7 +35,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     longitude,
     free,
     hasVirtualEventUrl,
-    showArchived
+    showArchived,
   } = filterValues;
   // These conditions will be added to the filter
   // object under an AND operator.
@@ -49,7 +49,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
           NOT: {
             channelUniqueName: null,
           },
-          archived: false
+          archived: false,
         },
       });
     } else {
@@ -61,7 +61,6 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
         },
       });
     }
-    
   }
 
   // Free event filter
@@ -73,7 +72,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     // It is better to remove it from the list of conditions.
     conditions = conditions.filter((condition) => {
       return !condition.free;
-    })
+    });
   }
 
   if (!showCanceledEvents) {
@@ -101,8 +100,6 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   }
   // Location filter
   switch (locationFilter) {
-   
-   
     case LocationFilterTypes.NONE:
       if (showMap) {
         conditions.push({ NOT: { location: null } });
@@ -111,7 +108,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     case LocationFilterTypes.ONLY_WITH_ADDRESS:
       // Filter by events that have a location
       // with coordinates
-      
+
       conditions.push({ NOT: { locationName: null } });
       break;
 
@@ -166,11 +163,12 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       },
     });
   }
-  const truthyChannels = channels?.filter((channel: string) => {
-    // Don't filter for a channel if a channel is an empty string.
-    // This could happen if the query params are `?channels=`.
-    return !!channel;
-  }) || [];
+  const truthyChannels =
+    channels?.filter((channel: string) => {
+      // Don't filter for a channel if a channel is an empty string.
+      // This could happen if the query params are `?channels=`.
+      return !!channel;
+    }) || [];
 
   // Channel filter
   if (channelId) {
@@ -181,7 +179,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       conditions.push({
         EventChannels_SOME: {
           channelUniqueName: channelId,
-          archived: false
+          archived: false,
         },
       });
     } else {
@@ -191,7 +189,6 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
         },
       });
     }
-  
   } else if (truthyChannels.length > 0) {
     // If we are in the sitewide event search page,
     // show events from any channel in the query params.
@@ -200,15 +197,15 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       // Technically a selected channel could be an array
       // of strings, but we expect it to always be a string.
       (prev: any, curr: any) => {
-        if (!showArchived)  {
-          return prev.concat({ 
-            channelUniqueName_CONTAINS: curr, 
-            archived: false 
+        if (!showArchived) {
+          return prev.concat({
+            channelUniqueName_CONTAINS: curr,
+            archived: false,
           });
         }
         return prev.concat({ channelUniqueName_CONTAINS: curr });
       },
-      [],
+      []
     );
     conditions.push({
       EventChannels_SOME: {
@@ -220,7 +217,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
   const getStartOfNextWeek = () => {
     const today = now.startOf('day');
     const nextSunday = today.set({ weekday: 7 }); // 7 is Sunday
-    
+
     // If today is already Sunday, get next Sunday
     // If today is Saturday, nextSunday will be tomorrow
     if (today >= nextSunday) {
@@ -229,13 +226,13 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
     return nextSunday;
   };
 
-  const defaultStartDateObj = now.startOf("hour");
+  const defaultStartDateObj = now.startOf('hour');
   const defaultEndDateRangeObj = defaultStartDateObj.plus({ years: 2 });
   const defaultStartDateISO = defaultStartDateObj.toISO();
   const defaultEndDateRangeISO = defaultEndDateRangeObj.toISO();
   const startOfThisWeekend = getStartOfThisWeekend();
   const startOfNextWeek = getStartOfNextWeek();
-  const startOfThisMonth = now.startOf("month");
+  const startOfThisMonth = now.startOf('month');
 
   // Filter events by time range based on a selected
   // time filter shortcut, for example, today or next week.
@@ -244,8 +241,8 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
 
   switch (timeShortcut) {
     case timeShortcutValues.TODAY:
-      beginningOfDateRangeISO = now.startOf("day").toISO();
-      endOfDateRangeISO = now.endOf("day").toISO();
+      beginningOfDateRangeISO = now.startOf('day').toISO();
+      endOfDateRangeISO = now.endOf('day').toISO();
       break;
     case timeShortcutValues.NEXT_MONTH:
       beginningOfDateRangeISO = startOfThisMonth.plus({ months: 1 }).toISO();
@@ -261,7 +258,7 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       break;
     case timeShortcutValues.PAST_EVENTS:
       beginningOfDateRangeISO = now.minus({ years: 2 }).toISO();
-      endOfDateRangeISO = now.startOf("day").toISO();
+      endOfDateRangeISO = now.startOf('day').toISO();
       break;
     case timeShortcutValues.THIS_MONTH:
       beginningOfDateRangeISO = startOfThisMonth.toISO();
@@ -272,8 +269,8 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       endOfDateRangeISO = startOfThisWeekend.plus({ days: 2 }).toISO();
       break;
     case timeShortcutValues.TOMORROW:
-      beginningOfDateRangeISO = now.startOf("day").plus({ days: 1 }).toISO();
-      endOfDateRangeISO = now.endOf("day").plus({ days: 1 }).toISO();
+      beginningOfDateRangeISO = now.startOf('day').plus({ days: 1 }).toISO();
+      endOfDateRangeISO = now.endOf('day').plus({ days: 1 }).toISO();
       break;
     case timeShortcutValues.NONE:
       beginningOfDateRangeISO = defaultStartDateISO;
@@ -305,6 +302,6 @@ const getEventWhere = (input: GetEventWhereInput): EventWhere => {
       },
     ]),
   };
-  return result
+  return result;
 };
 export default getEventWhere;

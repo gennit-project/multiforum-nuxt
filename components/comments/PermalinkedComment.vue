@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_COMMENT_AND_REPLIES } from "@/graphQLData/comment/queries";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_COMMENT_AND_REPLIES } from '@/graphQLData/comment/queries';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 const {
@@ -19,7 +19,7 @@ const comment = computed(() => {
 });
 
 const parentCommentId = computed(() => {
-  return comment.value?.ParentComment?.id || "";
+  return comment.value?.ParentComment?.id || '';
 });
 
 const discussionId = computed(() => {
@@ -34,7 +34,7 @@ const parentCommentPermalink = computed(() => {
   if (parentCommentId.value) {
     if (discussionId.value) {
       return {
-        name: "forums-forumId-discussions-discussionId-comments-commentId",
+        name: 'forums-forumId-discussions-discussionId-comments-commentId',
         params: {
           forumId: route.params.forumId,
           discussionId: route.params.discussionId,
@@ -45,7 +45,7 @@ const parentCommentPermalink = computed(() => {
 
     if (eventId.value) {
       return {
-        name: "forums-forumId-events-eventId-comments-commentId",
+        name: 'forums-forumId-events-eventId-comments-commentId',
         params: {
           forumId: route.params.forumId,
           eventId: route.params.eventId,
@@ -69,7 +69,7 @@ const parentCommentPermalink = computed(() => {
     >
       <nuxt-link
         v-if="parentCommentId && parentCommentPermalink"
-        class="text-xs underline px-2 py-1 dark:text-white"
+        class="px-2 py-1 text-xs underline dark:text-white"
         :to="parentCommentPermalink"
       >
         View Context

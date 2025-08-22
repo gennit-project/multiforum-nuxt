@@ -1,5 +1,9 @@
 <template>
-  <div class="model-viewer-container relative border" :class="props.class" :style="props.style">
+  <div
+    class="model-viewer-container relative border"
+    :class="props.class"
+    :style="props.style"
+  >
     <!-- Fullscreen button -->
     <button
       v-if="showFullscreenButton !== false"
@@ -35,7 +39,7 @@
       :style="{
         width: props.width || '100%',
         height: props.height || '300px',
-        borderRadius: '8px'
+        borderRadius: '8px',
       }"
     />
 
@@ -69,10 +73,7 @@
       </button>
 
       <!-- Fullscreen model viewer -->
-      <div
-        class="h-full max-h-full w-full max-w-6xl"
-        @click.stop
-      >
+      <div class="h-full max-h-full w-full max-w-6xl" @click.stop>
         <model-viewer
           :src="
             props.modelUrl ||
@@ -92,55 +93,55 @@
 </template>
 
 <script setup lang="ts">
-  import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref } from 'vue';
 
-  const props = defineProps<{
-    modelUrl?: string;
-    height?: string;
-    width?: string;
-    showFullscreenButton?: boolean;
-    class?: string;
-    style?: Record<string, any>;
-  }>();
+const props = defineProps<{
+  modelUrl?: string;
+  height?: string;
+  width?: string;
+  showFullscreenButton?: boolean;
+  class?: string;
+  style?: Record<string, any>;
+}>();
 
-  const isFullscreen = ref(false);
-  const modelViewer = ref();
+const isFullscreen = ref(false);
+const modelViewer = ref();
 
-  const openFullscreen = () => {
-    isFullscreen.value = true;
-    // Prevent body scroll when fullscreen is open
-    document.body.style.overflow = "hidden";
+const openFullscreen = () => {
+  isFullscreen.value = true;
+  // Prevent body scroll when fullscreen is open
+  document.body.style.overflow = 'hidden';
+};
+
+const closeFullscreen = () => {
+  isFullscreen.value = false;
+  // Restore body scroll
+  document.body.style.overflow = '';
+};
+
+onMounted(async () => {
+  if (import.meta.env) {
+    await import('@google/model-viewer');
+  }
+});
+
+// Close fullscreen on escape key
+onMounted(() => {
+  const handleEscape = (event: KeyboardEvent) => {
+    if (event.key === 'Escape' && isFullscreen.value) {
+      closeFullscreen();
+    }
   };
 
-  const closeFullscreen = () => {
-    isFullscreen.value = false;
-    // Restore body scroll
-    document.body.style.overflow = "";
-  };
+  document.addEventListener('keydown', handleEscape);
 
-  onMounted(async () => {
-    if (import.meta.env) {
-      await import("@google/model-viewer");
+  // Cleanup on unmount
+  onUnmounted(() => {
+    document.removeEventListener('keydown', handleEscape);
+    // Ensure body scroll is restored if component unmounts while fullscreen
+    if (isFullscreen.value) {
+      document.body.style.overflow = '';
     }
   });
-
-  // Close fullscreen on escape key
-  onMounted(() => {
-    const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape" && isFullscreen.value) {
-        closeFullscreen();
-      }
-    };
-
-    document.addEventListener("keydown", handleEscape);
-
-    // Cleanup on unmount
-    onUnmounted(() => {
-      document.removeEventListener("keydown", handleEscape);
-      // Ensure body scroll is restored if component unmounts while fullscreen
-      if (isFullscreen.value) {
-        document.body.style.overflow = "";
-      }
-    });
-  });
+});
 </script>

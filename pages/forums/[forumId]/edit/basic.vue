@@ -2,20 +2,20 @@
 import {
   MAX_CHARS_IN_CHANNEL_DESCRIPTION,
   MAX_CHARS_IN_CHANNEL_DISPLAY_NAME,
-} from "@/utils/constants";
-import TagPicker from "@/components/TagPicker.vue";
-import TextInput from "@/components/TextInput.vue";
-import TextEditor from "@/components/TextEditor.vue";
-import AddImage from "@/components/AddImage.vue";
-import RemoveOwnerModal from "@/components/channel/RemoveOwnerModal.vue";
-import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
-import { usernameVar } from "@/cache";
-import { ref, nextTick, defineProps, defineEmits, computed } from "vue";
-import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
-import { REMOVE_FORUM_OWNER } from "@/graphQLData/mod/mutations";
-import { useMutation } from "@vue/apollo-composable";
-import { isFileSizeValid } from "@/utils/index";
-import { useRoute, useRouter } from "nuxt/app";
+} from '@/utils/constants';
+import TagPicker from '@/components/TagPicker.vue';
+import TextInput from '@/components/TextInput.vue';
+import TextEditor from '@/components/TextEditor.vue';
+import AddImage from '@/components/AddImage.vue';
+import RemoveOwnerModal from '@/components/channel/RemoveOwnerModal.vue';
+import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
+import { usernameVar } from '@/cache';
+import { ref, nextTick, defineProps, defineEmits, computed } from 'vue';
+import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import { REMOVE_FORUM_OWNER } from '@/graphQLData/mod/mutations';
+import { useMutation } from '@vue/apollo-composable';
+import { isFileSizeValid } from '@/utils/index';
+import { useRoute, useRouter } from 'nuxt/app';
 
 const props = defineProps({
   formValues: {
@@ -55,16 +55,16 @@ nextTick(() => {
   }
 });
 
-const emit = defineEmits(["updateFormValues", "submit"]);
+const emit = defineEmits(['updateFormValues', 'submit']);
 
 const route = useRoute();
 const router = useRouter();
 
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const showRemoveOwnerModal = ref(false);
@@ -90,7 +90,7 @@ removeForumOwnerDone(() => {
   showRemoveOwnerModal.value = false;
   // Navigate to the forum detail page since the user is no longer an owner
   router.push({
-    name: "forums-forumId",
+    name: 'forums-forumId',
     params: {
       forumId: forumId.value,
     },
@@ -106,7 +106,7 @@ const handleRemoveOwner = () => {
 
 const upload = async (file: File) => {
   if (!usernameVar.value) {
-    console.error("No username found");
+    console.error('No username found');
     return;
   }
   const sizeCheck = isFileSizeValid({ file });
@@ -140,7 +140,7 @@ const upload = async (file: File) => {
 
     return embeddedLink;
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error('Error uploading file:', error);
   }
 };
 
@@ -152,153 +152,158 @@ const handleImageChange = async (input: FileChangeInput) => {
     const embeddedLink = await upload(selectedFile);
     if (!embeddedLink) return;
 
-    emit("updateFormValues", { [fieldName]: embeddedLink });
-    emit("submit");
+    emit('updateFormValues', { [fieldName]: embeddedLink });
+    emit('submit');
   }
 };
 </script>
 
 <template>
   <div>
-    <div class="space-y-4 sm:space-y-5 flex-1">
-    <FormRow section-title="Forum Unique Name" :required="!editMode">
-      <template #content>
-        <TextInput
-          ref="titleInputRef"
-          :test-id="'title-input'"
-          :disabled="true"
-          :value="formValues.uniqueName"
-          :placeholder="'Add unique name with no spaces. Ex. forum_name'"
-          :full-width="true"
-        />
-      </template>
-    </FormRow>
-
-    <FormRow section-title="Forum Display Name">
-      <template #content>
-        <TextInput
-          ref="displayNameInputRef"
-          :test-id="'display-name-input'"
-          :value="formValues.displayName"
-          :placeholder="'A more human readable display name'"
-          :full-width="true"
-          @update="$emit('updateFormValues', { displayName: $event })"
-        />
-        <CharCounter
-          :current="formValues.displayName?.length || 0"
-          :max="MAX_CHARS_IN_CHANNEL_DISPLAY_NAME"
-        />
-      </template>
-    </FormRow>
-
-    <FormRow section-title="Tags">
-      <template #content>
-        <TagPicker
-          data-testid="tag-input"
-          :selected-tags="formValues.selectedTags"
-          @set-selected-tags="
-            $emit('updateFormValues', { selectedTags: $event })
-          "
-        />
-      </template>
-    </FormRow>
-
-    <FormRow section-title="Description">
-      <template #content>
-        <TextEditor
-          class="my-3"
-          :test-id="'description-input'"
-          :initial-value="formValues.description || ''"
-          :placeholder="'Add description'"
-          :disable-auto-focus="true"
-          :allow-image-upload="false"
-          @update="$emit('updateFormValues', { description: $event })"
-        />
-        <CharCounter
-          :current="formValues.description?.length || 0"
-          :max="MAX_CHARS_IN_CHANNEL_DESCRIPTION"
-        />
-      </template>
-    </FormRow>
-    <FormRow section-title="Forum Icon">
-      <template #content>
-        <AvatarComponent
-          class="shadow-sm"
-          :src="formValues.channelIconURL"
-          :text="formValues.uniqueName"
-          :is-square="true"
-          :is-medium="true"
-        />
-        <AddImage
-          key="channel-icon-url"
-          :field-name="'channelIconURL'"
-          @file-change="
-            (input: FileChangeInput) => {
-              handleImageChange(input);
-            }
-          "
-        />
-      </template>
-    </FormRow>
-    <FormRow section-title="Forum Banner">
-      <template #content>
-        <img
-          v-if="formValues.channelBannerURL"
-          class="w-full shadow-sm"
-          :src="formValues.channelBannerURL"
-          :alt="formValues.uniqueName"
-        >
-        <AddImage
-          key="channel-banner-url"
-          :field-name="'channelBannerURL'"
-          @file-change="
-            (input: FileChangeInput) => {
-              handleImageChange(input);
-            }
-          "
-        />
-      </template>
-    </FormRow>
-    <FormRow  >
-      <template #content>
-        <h3 class="text-lg font-medium text-red-600 dark:text-red-400 mb-3">Dangerous Settings</h3>
-        <div class="flex gap-2 align-items mt-4">
-          <CheckBox
-            :test-id="'lock-forum-checkbox'"
-            :checked="formValues.locked"
-            @update="$emit('updateFormValues', { locked: $event })"
+    <div class="flex-1 space-y-4 sm:space-y-5">
+      <FormRow section-title="Forum Unique Name" :required="!editMode">
+        <template #content>
+          <TextInput
+            ref="titleInputRef"
+            :test-id="'title-input'"
+            :disabled="true"
+            :value="formValues.uniqueName"
+            :placeholder="'Add unique name with no spaces. Ex. forum_name'"
+            :full-width="true"
           />
-          <label
-            class="text-sm text-gray-600 dark:text-gray-400"
-            for="lock-forum-checkbox"
-            >Lock Forum</label
-          >
-        
-        </div>
-        <p
-          class="text-sm text-gray-600 dark:text-gray-400 mt-2"
-        >
-          Locking a forum will prevent users from creating new threads or
-          replying to existing threads.
-        </p>
-        
-        <div v-if="canRemoveOwner" class="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-          <h4 class="text-sm font-medium text-red-600 dark:text-red-400 mb-3">Remove Yourself as Owner</h4>
-          <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            This action cannot be undone. You will lose all owner privileges for this forum,
-            including the ability to change forum settings, manage other owners, and access this page.
+        </template>
+      </FormRow>
+
+      <FormRow section-title="Forum Display Name">
+        <template #content>
+          <TextInput
+            ref="displayNameInputRef"
+            :test-id="'display-name-input'"
+            :value="formValues.displayName"
+            :placeholder="'A more human readable display name'"
+            :full-width="true"
+            @update="$emit('updateFormValues', { displayName: $event })"
+          />
+          <CharCounter
+            :current="formValues.displayName?.length || 0"
+            :max="MAX_CHARS_IN_CHANNEL_DISPLAY_NAME"
+          />
+        </template>
+      </FormRow>
+
+      <FormRow section-title="Tags">
+        <template #content>
+          <TagPicker
+            data-testid="tag-input"
+            :selected-tags="formValues.selectedTags"
+            @set-selected-tags="
+              $emit('updateFormValues', { selectedTags: $event })
+            "
+          />
+        </template>
+      </FormRow>
+
+      <FormRow section-title="Description">
+        <template #content>
+          <TextEditor
+            class="my-3"
+            :test-id="'description-input'"
+            :initial-value="formValues.description || ''"
+            :placeholder="'Add description'"
+            :disable-auto-focus="true"
+            :allow-image-upload="false"
+            @update="$emit('updateFormValues', { description: $event })"
+          />
+          <CharCounter
+            :current="formValues.description?.length || 0"
+            :max="MAX_CHARS_IN_CHANNEL_DESCRIPTION"
+          />
+        </template>
+      </FormRow>
+      <FormRow section-title="Forum Icon">
+        <template #content>
+          <AvatarComponent
+            class="shadow-sm"
+            :src="formValues.channelIconURL"
+            :text="formValues.uniqueName"
+            :is-square="true"
+            :is-medium="true"
+          />
+          <AddImage
+            key="channel-icon-url"
+            :field-name="'channelIconURL'"
+            @file-change="
+              (input: FileChangeInput) => {
+                handleImageChange(input);
+              }
+            "
+          />
+        </template>
+      </FormRow>
+      <FormRow section-title="Forum Banner">
+        <template #content>
+          <img
+            v-if="formValues.channelBannerURL"
+            class="w-full shadow-sm"
+            :src="formValues.channelBannerURL"
+            :alt="formValues.uniqueName"
+          />
+          <AddImage
+            key="channel-banner-url"
+            :field-name="'channelBannerURL'"
+            @file-change="
+              (input: FileChangeInput) => {
+                handleImageChange(input);
+              }
+            "
+          />
+        </template>
+      </FormRow>
+      <FormRow>
+        <template #content>
+          <h3 class="mb-3 text-lg font-medium text-red-600 dark:text-red-400">
+            Dangerous Settings
+          </h3>
+          <div class="align-items mt-4 flex gap-2">
+            <CheckBox
+              :test-id="'lock-forum-checkbox'"
+              :checked="formValues.locked"
+              @update="$emit('updateFormValues', { locked: $event })"
+            />
+            <label
+              class="text-sm text-gray-600 dark:text-gray-400"
+              for="lock-forum-checkbox"
+              >Lock Forum</label
+            >
+          </div>
+          <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            Locking a forum will prevent users from creating new threads or
+            replying to existing threads.
           </p>
-          <PrimaryButton
-            :test-id="'remove-owner-button'"
-            :label="'Remove Yourself as Owner'"
-            :background-color="'red'"
-            @click="showRemoveOwnerModal = true"
-          />
-        </div>
-      </template>
-    </FormRow>
+
+          <div
+            v-if="canRemoveOwner"
+            class="mt-6 border-t border-gray-200 pt-6 dark:border-gray-700"
+          >
+            <h4 class="mb-3 text-sm font-medium text-red-600 dark:text-red-400">
+              Remove Yourself as Owner
+            </h4>
+            <p class="mb-4 text-sm text-gray-600 dark:text-gray-400">
+              This action cannot be undone. You will lose all owner privileges
+              for this forum, including the ability to change forum settings,
+              manage other owners, and access this page.
+            </p>
+            <PrimaryButton
+              :test-id="'remove-owner-button'"
+              :label="'Remove Yourself as Owner'"
+              :background-color="'red'"
+              @click="showRemoveOwnerModal = true"
+            />
+          </div>
+        </template>
+      </FormRow>
     </div>
-    
+
     <RemoveOwnerModal
       :open="showRemoveOwnerModal"
       :forum-name="formValues.uniqueName"

@@ -1,20 +1,24 @@
 <script lang="ts" setup>
-import { ref, computed, nextTick } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import { CREATE_SIGNED_STORAGE_URL, CREATE_IMAGE, UPDATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
-import { usernameVar } from "@/cache";
-import { getUploadFileName, uploadAndGetEmbeddedLink } from "@/utils";
-import XmarkIcon from "@/components/icons/XmarkIcon.vue";
-import TextInput from "@/components/TextInput.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import FormRow from "@/components/FormRow.vue";
-import { useDisplay } from "vuetify";
-import ExpandableImage from "@/components/ExpandableImage.vue";
-import ModelViewer from "@/components/ModelViewer.vue";
-import StlViewer from "@/components/download/StlViewer.vue";
-import { isFileSizeValid } from "@/utils/index";
-import type { Album } from "@/__generated__/graphql";
+import { ref, computed, nextTick } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import {
+  CREATE_SIGNED_STORAGE_URL,
+  CREATE_IMAGE,
+  UPDATE_DISCUSSION,
+} from '@/graphQLData/discussion/mutations';
+import { usernameVar } from '@/cache';
+import { getUploadFileName, uploadAndGetEmbeddedLink } from '@/utils';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+import TextInput from '@/components/TextInput.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import FormRow from '@/components/FormRow.vue';
+import { useDisplay } from 'vuetify';
+import ExpandableImage from '@/components/ExpandableImage.vue';
+import ModelViewer from '@/components/ModelViewer.vue';
+import StlViewer from '@/components/download/StlViewer.vue';
+import { isFileSizeValid } from '@/utils/index';
+import type { Album } from '@/__generated__/graphql';
 
 const props = defineProps<{
   formValues: {
@@ -34,7 +38,7 @@ const props = defineProps<{
   existingAlbum?: Album | null | undefined;
 }>();
 
-const emit = defineEmits(["updateFormValues"]);
+const emit = defineEmits(['updateFormValues']);
 
 const { mdAndDown } = useDisplay();
 
@@ -76,17 +80,22 @@ const orderedImages = computed(() => {
   if (!props.formValues.album?.images) {
     return [];
   }
-  
-  if (!props.formValues.album.imageOrder || props.formValues.album.imageOrder.length === 0) {
+
+  if (
+    !props.formValues.album.imageOrder ||
+    props.formValues.album.imageOrder.length === 0
+  ) {
     return props.formValues.album.images;
   }
-  
+
   const orderedResult = props.formValues.album.imageOrder
     .map((imageId) => {
-      return props.formValues.album.images?.find((image) => image.id === imageId);
+      return props.formValues.album.images?.find(
+        (image) => image.id === imageId
+      );
     })
     .filter((image) => image !== undefined);
-    
+
   return orderedResult;
 });
 
@@ -96,7 +105,7 @@ const orderedImages = computed(() => {
  */
 const uploadFile = async (file: File): Promise<boolean> => {
   if (!usernameVar.value) {
-    console.error("No username found, cannot upload.");
+    console.error('No username found, cannot upload.');
     return false;
   }
   const sizeCheck = isFileSizeValid({ file });
@@ -116,7 +125,7 @@ const uploadFile = async (file: File): Promise<boolean> => {
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
 
     if (!signedStorageURL) {
-      throw new Error("No signed storage URL returned");
+      throw new Error('No signed storage URL returned');
     }
 
     // Upload the file using the signed URL
@@ -126,39 +135,39 @@ const uploadFile = async (file: File): Promise<boolean> => {
       fileType: contentType,
       signedStorageURL,
     });
-    
+
     if (!fileUrl) {
-      throw new Error("No file URL returned from upload");
+      throw new Error('No file URL returned from upload');
     }
-    
+
     // Now create the Image record in the database
     const createImageResult = await createImage({
       url: fileUrl,
-      alt: file.name,           // Default to filename for alt text
-      caption: "",              // Empty caption by default
-      copyright: "",            // Empty copyright by default
-      username: usernameVar.value
+      alt: file.name, // Default to filename for alt text
+      caption: '', // Empty caption by default
+      copyright: '', // Empty copyright by default
+      username: usernameVar.value,
     });
-    
+
     // Get the created image from the result
     const createdImage = createImageResult?.data?.createImages?.images?.[0];
-    
+
     if (!createdImage || !createdImage.id) {
-      throw new Error("Failed to create image record in database");
+      throw new Error('Failed to create image record in database');
     }
-    
+
     // Add the image to our album using the addNewImage helper
     addNewImage({
       id: createdImage.id,
       url: createdImage.url,
       alt: createdImage.alt || file.name,
-      caption: createdImage.caption || "",
-      copyright: createdImage.copyright || ""
+      caption: createdImage.caption || '',
+      copyright: createdImage.copyright || '',
     });
-    
+
     return true;
   } catch (err) {
-    console.error("Error uploading file and creating image:", err);
+    console.error('Error uploading file and creating image:', err);
     return false;
   }
 };
@@ -197,10 +206,13 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
   if (!files || files.length === 0) return;
 
   // Check if adding these files would exceed the limit
-  if ((props.formValues.album?.images?.length ?? 0) + files.length > MAX_IMAGES) {
+  if (
+    (props.formValues.album?.images?.length ?? 0) + files.length >
+    MAX_IMAGES
+  ) {
     const remainingSlots = MAX_IMAGES - props.formValues.album.images.length;
     alert(
-      `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? "s" : ""}. Maximum limit is ${MAX_IMAGES} images.`
+      `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? 's' : ''}. Maximum limit is ${MAX_IMAGES} images.`
     );
     // Only process up to the remaining slots
     const filesToProcess = Array.from(files).slice(0, remainingSlots);
@@ -213,11 +225,11 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     let successCount = 0;
     for (let i = 0; i < filesToProcess.length; i++) {
       const file = filesToProcess[i];
-      uploadStatus.value = `Uploading ${i+1}/${filesToProcess.length} images...`;
+      uploadStatus.value = `Uploading ${i + 1}/${filesToProcess.length} images...`;
       const success = await uploadFile(file);
       if (success) successCount++;
     }
-    
+
     uploadStatus.value = `Successfully uploaded ${successCount} image${successCount !== 1 ? 's' : ''}.`;
     setTimeout(() => {
       uploadStatus.value = '';
@@ -229,16 +241,16 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     // Convert FileList to Array first
     const filesArray = Array.from(files);
     uploadStatus.value = `Uploading 0/${filesArray.length} images...`;
-    
+
     // Process files one by one sequentially to avoid race conditions
     let successCount = 0;
     for (let i = 0; i < filesArray.length; i++) {
       const file = filesArray[i];
-      uploadStatus.value = `Uploading ${i+1}/${filesArray.length} images...`;
+      uploadStatus.value = `Uploading ${i + 1}/${filesArray.length} images...`;
       const success = await uploadFile(file);
       if (success) successCount++;
     }
-    
+
     uploadStatus.value = `Successfully uploaded ${successCount} image${successCount !== 1 ? 's' : ''}.`;
     setTimeout(() => {
       uploadStatus.value = '';
@@ -261,7 +273,7 @@ const selectFiles = (event?: Event) => {
     event.preventDefault();
     event.stopPropagation();
   }
-  
+
   // Check if we've reached the limit before opening file dialog
   if (isImageLimitReached.value) {
     alert(`You've reached the maximum limit of ${MAX_IMAGES} images.`);
@@ -281,7 +293,7 @@ const handleFileInputChange = (event: Event) => {
   if (!input?.files?.length) return;
   handleMultipleFiles(input.files);
   // Reset the input so user can re-upload the same file if needed
-  input.value = "";
+  input.value = '';
 };
 
 const handleDrop = async (event: DragEvent) => {
@@ -313,11 +325,13 @@ const updateImageField = (
   // Get the image at the ordered index
   const orderedImage = orderedImages.value[index];
   if (!orderedImage || !orderedImage.id) return;
-  
+
   // Find the actual index in the images array
-  const actualIndex = props.formValues.album.images.findIndex(img => img.id === orderedImage.id);
+  const actualIndex = props.formValues.album.images.findIndex(
+    (img) => img.id === orderedImage.id
+  );
   if (actualIndex === -1) return;
-  
+
   const updatedImages = [...props.formValues.album.images];
   updatedImages[actualIndex] = {
     ...updatedImages[actualIndex],
@@ -325,13 +339,13 @@ const updateImageField = (
   };
 
   // Include imageOrder in the emit
-  emit("updateFormValues", {
+  emit('updateFormValues', {
     album: {
       images: updatedImages,
       imageOrder: props.formValues.album.imageOrder,
     },
   });
-  
+
   // Trigger auto-save
   debouncedAutoSave();
 };
@@ -340,24 +354,26 @@ const deleteImage = (index: number) => {
   // Get the image at the ordered index
   const orderedImage = orderedImages.value[index];
   if (!orderedImage || !orderedImage.id) return;
-  
+
   // Find the actual index in the images array
-  const actualIndex = props.formValues.album.images.findIndex(img => img.id === orderedImage.id);
+  const actualIndex = props.formValues.album.images.findIndex(
+    (img) => img.id === orderedImage.id
+  );
   if (actualIndex === -1) return;
-  
+
   const updatedImages = [...props.formValues.album.images];
   updatedImages.splice(actualIndex, 1);
 
   // Update imageOrder after deletion
   const updatedImageOrder = updateImageOrderAfterChange(updatedImages);
 
-  emit("updateFormValues", {
+  emit('updateFormValues', {
     album: {
       images: updatedImages,
       imageOrder: updatedImageOrder,
     },
   });
-  
+
   // Trigger auto-save
   debouncedAutoSave();
 };
@@ -373,13 +389,13 @@ const moveImageUp = (index: number) => {
     updatedImageOrder[index],
   ];
 
-  emit("updateFormValues", {
+  emit('updateFormValues', {
     album: {
       images: props.formValues.album.images,
       imageOrder: updatedImageOrder,
     },
   });
-  
+
   // Trigger auto-save
   debouncedAutoSave();
 };
@@ -396,13 +412,13 @@ const moveImageDown = (index: number) => {
     updatedImageOrder[index],
   ];
 
-  emit("updateFormValues", {
+  emit('updateFormValues', {
     album: {
       images: props.formValues.album.images,
       imageOrder: updatedImageOrder,
     },
   });
-  
+
   // Trigger auto-save
   debouncedAutoSave();
 };
@@ -417,7 +433,7 @@ type AddImageInput = {
 
 const updateImageOrderAfterChange = (images: ImageInput[]) => {
   // Map to just the IDs, filtering out any undefined IDs
-  return images.map(img => img.id).filter(id => id !== undefined);
+  return images.map((img) => img.id).filter((id) => id !== undefined);
 };
 
 // Function to show URL input form
@@ -429,7 +445,7 @@ const showUrlInputForm = () => {
   showUrlInput.value = true;
   imageUrl.value = '';
   urlInputError.value = '';
-  
+
   // Focus the input after it's rendered
   nextTick(() => {
     if (urlInputRef.value) {
@@ -451,7 +467,7 @@ const addImageFromUrl = async () => {
     urlInputError.value = 'Please enter a valid URL';
     return;
   }
-  
+
   // Basic URL validation
   try {
     new URL(imageUrl.value);
@@ -459,42 +475,42 @@ const addImageFromUrl = async () => {
     urlInputError.value = 'Please enter a valid URL';
     return;
   }
-  
+
   if (!usernameVar.value) {
     urlInputError.value = 'No username found, cannot create image.';
     return;
   }
-  
+
   // Clear any previous errors
   urlInputError.value = '';
   isCreatingImageFromUrl.value = true;
-  
+
   try {
     // Create the Image record in the database first
     const createImageResult = await createImage({
       url: imageUrl.value.trim(),
-      alt: '',              // Empty alt text by default
-      caption: '',          // Empty caption by default
-      copyright: '',        // Empty copyright by default
-      username: usernameVar.value
+      alt: '', // Empty alt text by default
+      caption: '', // Empty caption by default
+      copyright: '', // Empty copyright by default
+      username: usernameVar.value,
     });
-    
+
     // Get the created image from the result
     const createdImage = createImageResult?.data?.createImages?.images?.[0];
-    
+
     if (!createdImage || !createdImage.id) {
       throw new Error('Failed to create image record in database');
     }
-    
+
     // Add the image to our album using the addNewImage helper
     addNewImage({
       id: createdImage.id,
       url: createdImage.url,
       alt: createdImage.alt || '',
       caption: createdImage.caption || '',
-      copyright: createdImage.copyright || ''
+      copyright: createdImage.copyright || '',
     });
-    
+
     // Reset form
     showUrlInput.value = false;
     imageUrl.value = '';
@@ -522,7 +538,7 @@ const addNewImage = (input: Partial<AddImageInput>) => {
     id: id, // May be undefined for manual entries
     url: url || '',
     alt: alt || '',
-    caption: caption || '', 
+    caption: caption || '',
     copyright: copyright || '',
   };
 
@@ -534,13 +550,13 @@ const addNewImage = (input: Partial<AddImageInput>) => {
     updatedImageOrder.push(id);
   }
 
-  emit("updateFormValues", {
+  emit('updateFormValues', {
     album: {
       images: updatedImages,
-      imageOrder: updatedImageOrder
+      imageOrder: updatedImageOrder,
     },
   });
-  
+
   // Trigger auto-save
   debouncedAutoSave();
 };
@@ -548,32 +564,35 @@ const addNewImage = (input: Partial<AddImageInput>) => {
 // Auto-save functionality
 const getAlbumUpdateInput = () => {
   const albumData = props.formValues.album;
-  if (!albumData || (!albumData.images?.length && !albumData.imageOrder?.length)) {
+  if (
+    !albumData ||
+    (!albumData.images?.length && !albumData.imageOrder?.length)
+  ) {
     return {}; // No album data to update
   }
 
   const albumId = props.existingAlbum?.id;
-  
+
   // If the album doesn't exist yet, CREATE it and connect to existing images
   if (!albumId) {
     const newImages = albumData.images || [];
-    
+
     // Filter out images without IDs
-    const validImages = newImages.filter(img => img.id);
-    
+    const validImages = newImages.filter((img) => img.id);
+
     if (validImages.length === 0) {
       return {}; // No valid images to connect
     }
-    
+
     return {
       Album: {
         create: {
           node: {
             imageOrder: albumData.imageOrder || [],
             Images: {
-              connect: validImages.map(img => ({
-                where: { node: { id: img.id } }
-              }))
+              connect: validImages.map((img) => ({
+                where: { node: { id: img.id } },
+              })),
             },
           },
         },
@@ -589,9 +608,11 @@ const getAlbumUpdateInput = () => {
   const connectImageArray = newImages
     .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
-      connect: [{
-        where: { node: { id: img.id } }
-      }]
+      connect: [
+        {
+          where: { node: { id: img.id } },
+        },
+      ],
     }));
 
   // UPDATE array: existing images that need updates (only if properties changed)
@@ -600,7 +621,7 @@ const getAlbumUpdateInput = () => {
       if (!img.id) return false;
       const oldImage = oldImages.find((old) => old.id === img.id);
       if (!oldImage) return false;
-      
+
       // Only update if properties have actually changed
       return (
         oldImage.url !== img.url ||
@@ -620,16 +641,18 @@ const getAlbumUpdateInput = () => {
         },
       },
     }));
-    
+
   // DISCONNECT array: old images that are no longer present
   const disconnectImageArray = oldImages
     .filter((old) => !newImages.some((img) => img.id === old.id))
     .map((old) => ({
-      disconnect: [{
-        where: { node: { id: old.id } },
-      }]
+      disconnect: [
+        {
+          where: { node: { id: old.id } },
+        },
+      ],
     }));
-    
+
   // Combine all operations
   const imagesOps = [
     ...connectImageArray,
@@ -659,7 +682,7 @@ const performAutoSave = async () => {
     autoSaveSuccess.value = false;
 
     const albumUpdateInput = getAlbumUpdateInput();
-    
+
     if (Object.keys(albumUpdateInput).length === 0) {
       return;
     }
@@ -670,12 +693,11 @@ const performAutoSave = async () => {
     });
 
     autoSaveSuccess.value = true;
-    
+
     // Hide success indicator after 2 seconds
     setTimeout(() => {
       autoSaveSuccess.value = false;
     }, 2000);
-
   } catch (error) {
     console.error('Auto-save failed:', error);
   } finally {
@@ -708,34 +730,43 @@ const hasGlbExtension = (url: string) => {
 const hasStlExtension = (url: string) => {
   return url?.toLowerCase().endsWith('.stl');
 };
-
 </script>
 
 <template>
-  <div class="border p-2 rounded-md dark:border-gray-600">
+  <div class="rounded-md border p-2 dark:border-gray-600">
     <ErrorBanner
       v-if="createSignedStorageUrlError"
       :text="createSignedStorageUrlError.message"
     />
-    <ErrorBanner
-      v-if="createImageError"
-      :text="createImageError.message"
-    />
+    <ErrorBanner v-if="createImageError" :text="createImageError.message" />
     <ErrorBanner
       v-if="updateDiscussionError"
       :text="updateDiscussionError.message"
     />
-    
+
     <!-- Auto-save indicators -->
-    <div v-if="isAutoSaving || autoSaveSuccess" class="mb-2 flex items-center gap-2">
+    <div
+      v-if="isAutoSaving || autoSaveSuccess"
+      class="mb-2 flex items-center gap-2"
+    >
       <LoadingSpinner v-if="isAutoSaving" class="h-4 w-4" />
-      <span v-if="isAutoSaving" class="text-sm text-blue-600 dark:text-blue-400">Saving album...</span>
-      <span v-else-if="autoSaveSuccess" class="text-sm text-green-600 dark:text-green-400">✓ Album saved</span>
+      <span v-if="isAutoSaving" class="text-sm text-blue-600 dark:text-blue-400"
+        >Saving album...</span
+      >
+      <span
+        v-else-if="autoSaveSuccess"
+        class="text-sm text-green-600 dark:text-green-400"
+        >✓ Album saved</span
+      >
     </div>
-    
+
     <div v-if="loadingStates[-1]" class="mb-2 flex items-center gap-2">
       <LoadingSpinner />
-      <span v-if="uploadStatus" class="text-sm text-gray-600 dark:text-gray-300">{{ uploadStatus }}</span>
+      <span
+        v-if="uploadStatus"
+        class="text-sm text-gray-600 dark:text-gray-300"
+        >{{ uploadStatus }}</span
+      >
     </div>
     <div class="mb-2">
       <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -748,7 +779,7 @@ const hasStlExtension = (url: string) => {
       :key="image?.id || `temp-${index}`"
       class="mb-4 border-b py-2"
     >
-      <div class="flex items-center justify-between mb-2">
+      <div class="mb-2 flex items-center justify-between">
         <div class="flex items-center">
           <span class="font-bold dark:text-white">Image {{ index + 1 }}</span>
         </div>
@@ -756,19 +787,19 @@ const hasStlExtension = (url: string) => {
           <div class="ml-4 flex gap-1">
             <button
               type="button"
-              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:text-gray-200 dark:border-gray-600"
+              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:border-gray-600 dark:text-gray-200"
               :disabled="index === 0"
-              :class="{ 'opacity-50 cursor-not-allowed': index === 0 }"
+              :class="{ 'cursor-not-allowed opacity-50': index === 0 }"
               @click="moveImageUp(index)"
             >
               ↑
             </button>
             <button
               type="button"
-              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:text-gray-200 dark:border-gray-600"
+              class="rounded border border-gray-300 px-2 py-1 text-gray-700 dark:border-gray-600 dark:text-gray-200"
               :disabled="index === orderedImages.length - 1"
               :class="{
-                'opacity-50 cursor-not-allowed':
+                'cursor-not-allowed opacity-50':
                   index === orderedImages.length - 1,
               }"
               @click="moveImageDown(index)"
@@ -778,7 +809,7 @@ const hasStlExtension = (url: string) => {
           </div>
           <button
             type="button"
-            class="rounded border border-gray-500 dark:border-gray-600 px-2 py-1 text-gray-500 dark:text-gray-200 flex items-center gap-1"
+            class="flex items-center gap-1 rounded border border-gray-500 px-2 py-1 text-gray-500 dark:border-gray-600 dark:text-gray-200"
             @click="deleteImage(index)"
           >
             <XmarkIcon class="h-4" />
@@ -812,7 +843,7 @@ const hasStlExtension = (url: string) => {
             :alt="image.alt"
           />
         </div>
-        <div class="flex-col flex-1">
+        <div class="flex-1 flex-col">
           <FormRow section-title="Image URL">
             <template #content>
               <TextInput
@@ -854,26 +885,29 @@ const hasStlExtension = (url: string) => {
     </div>
     <div
       v-if="!isImageLimitReached"
-      class="my-3 border-2 border-dotted border-gray-400 p-4 text-center cursor-pointer rounded-md"
+      class="my-3 cursor-pointer rounded-md border-2 border-dotted border-gray-400 p-4 text-center"
       @drop="handleDrop"
       @dragover="handleDragOver"
     >
-      <label for="album-file-input" class="w-full h-full flex flex-col items-center justify-center cursor-pointer">
-        <p class="text-sm text-gray-500 dark:text-gray-300 mb-3">
+      <label
+        for="album-file-input"
+        class="flex h-full w-full cursor-pointer flex-col items-center justify-center"
+      >
+        <p class="mb-3 text-sm text-gray-500 dark:text-gray-300">
           Drag and drop, tap to add files, or paste a link to an image
         </p>
         <div class="flex items-center gap-4 text-black">
-          <button 
-            type="button" 
-            class="px-4 py-2 bg-orange-500 rounded hover:bg-orange-600 transition-colors"
+          <button
+            type="button"
+            class="rounded bg-orange-500 px-4 py-2 transition-colors hover:bg-orange-600"
             @click="selectFiles"
           >
             Choose Files
           </button>
           <div class="h-6 w-px bg-gray-300 dark:bg-gray-600" />
-          <button 
-            type="button" 
-            class="px-4 py-2 bg-blue-500 rounded hover:bg-blue-600 transition-colors"
+          <button
+            type="button"
+            class="rounded bg-blue-500 px-4 py-2 transition-colors hover:bg-blue-600"
             @click="showUrlInputForm"
           >
             Link to Image
@@ -888,20 +922,25 @@ const hasStlExtension = (url: string) => {
         accept="image/*"
         style="display: none"
         @change="handleFileInputChange"
-      >
+      />
     </div>
     <div
       v-else
-      class="my-3 border-2 border-dotted border-gray-300 p-4 text-center bg-gray-50 dark:bg-gray-800 rounded-md opacity-70"
+      class="bg-gray-50 my-3 rounded-md border-2 border-dotted border-gray-300 p-4 text-center opacity-70 dark:bg-gray-800"
     >
       <p class="text-sm text-gray-500 dark:text-gray-400">
         Maximum limit of {{ MAX_IMAGES }} images reached
       </p>
     </div>
-    
+
     <!-- URL Input Form -->
-    <div v-if="showUrlInput" class="mt-4 p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800">
-      <h3 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Add Image from URL</h3>
+    <div
+      v-if="showUrlInput"
+      class="bg-gray-50 mt-4 rounded-md border border-gray-300 p-4 dark:border-gray-600 dark:bg-gray-800"
+    >
+      <h3 class="mb-3 text-sm font-medium text-gray-700 dark:text-gray-300">
+        Add Image from URL
+      </h3>
       <div class="mb-3">
         <FormRow section-title="Image URL">
           <template #content>
@@ -909,18 +948,23 @@ const hasStlExtension = (url: string) => {
               ref="urlInputRef"
               :value="imageUrl"
               placeholder="https://example.com/image.jpg or https://example.com/model.glb"
-              @update="(val) => imageUrl = val"
+              @update="(val) => (imageUrl = val)"
             />
           </template>
         </FormRow>
-        <p v-if="urlInputError" class="text-red-500 text-sm mt-1">{{ urlInputError }}</p>
+        <p v-if="urlInputError" class="mt-1 text-sm text-red-500">
+          {{ urlInputError }}
+        </p>
       </div>
       <div class="flex gap-2">
         <button
           type="button"
-          class="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors flex items-center gap-2"
+          class="flex items-center gap-2 rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
           :disabled="!isUrlValid || isCreatingImageFromUrl"
-          :class="{ 'opacity-50 cursor-not-allowed': !isUrlValid || isCreatingImageFromUrl }"
+          :class="{
+            'cursor-not-allowed opacity-50':
+              !isUrlValid || isCreatingImageFromUrl,
+          }"
           @click="addImageFromUrl"
         >
           <LoadingSpinner v-if="isCreatingImageFromUrl" class="h-4 w-4" />
@@ -928,7 +972,7 @@ const hasStlExtension = (url: string) => {
         </button>
         <button
           type="button"
-          class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors"
+          class="rounded bg-gray-500 px-4 py-2 text-white transition-colors hover:bg-gray-600"
           @click="cancelUrlInput"
         >
           Cancel

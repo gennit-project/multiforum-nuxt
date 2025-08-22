@@ -1,15 +1,15 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_CHANNEL_OWNERS_BY_CHANNEL } from "@/graphQLData/mod/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { GET_CHANNEL_OWNERS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const { result, loading, error } = useQuery(
@@ -18,12 +18,12 @@ const { result, loading, error } = useQuery(
     channelUniqueName: forumId.value,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 const admins = computed(() => result.value?.channels[0]?.Admins);
 
-defineEmits(["click-remove-owner"]);
+defineEmits(['click-remove-owner']);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -37,15 +37,15 @@ defineEmits(["click-remove-owner"]);
     >
       This forum has no owners.
     </div>
-    <div v-if="admins && admins.length > 0" class="flex-col text-sm ">
+    <div v-if="admins && admins.length > 0" class="flex-col text-sm">
       <div
         v-for="admin in admins"
         :key="admin.username"
-        class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
         <nuxt-link
           :to="{ name: 'u-username', params: { username: admin.username } }"
-          class="flex items-center dark:text-white font-bold"
+          class="flex items-center font-bold dark:text-white"
         >
           <AvatarComponent
             :text="admin.username"
@@ -65,7 +65,7 @@ defineEmits(["click-remove-owner"]);
 
         <button
           type="button"
-          class="flex rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
+          class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
           @click="$emit('click-remove-owner', admin.username)"
         >
           Remove Admin

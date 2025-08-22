@@ -1,27 +1,29 @@
 // composables/useTestAuthHelpers.ts
-import { nextTick, onMounted } from "vue";
-import { 
-  setUsername, 
-  setIsAuthenticated, 
-  isAuthenticatedVar 
-} from "@/cache";
-import { config } from "@/config";
+import { nextTick, onMounted } from 'vue';
+import { setUsername, setIsAuthenticated, isAuthenticatedVar } from '@/cache';
+import { config } from '@/config';
 
 export function useTestAuthHelpers() {
   // Only expose in development, test, or Cypress environments
-  const shouldExpose = 
-    config.environment === "development" || 
-    config.environment === "test" || 
+  const shouldExpose =
+    config.environment === 'development' ||
+    config.environment === 'test' ||
     (typeof window !== 'undefined' && (window as any).Cypress);
 
   if (!shouldExpose) return;
 
-  console.log('🔧 Exposing test auth helpers for environment:', config.environment);
+  console.log(
+    '🔧 Exposing test auth helpers for environment:',
+    config.environment
+  );
 
   // Create the auth state setter function
-  const setAuthStateDirect = (authState: { username: string; authenticated?: boolean }) => {
+  const setAuthStateDirect = (authState: {
+    username: string;
+    authenticated?: boolean;
+  }) => {
     console.log('🔧 Direct auth state update:', authState);
-    
+
     if (authState.authenticated !== false) {
       setIsAuthenticated(true);
       setUsername(authState.username);
@@ -33,10 +35,15 @@ export function useTestAuthHelpers() {
       isAuthenticatedVar.value = false;
       console.log('🔧 Auth state set to FALSE');
     }
-    
+
     // Force UI reactivity update
     nextTick(() => {
-      console.log('🔧 After nextTick - isAuthenticated:', isAuthenticatedVar.value, 'username:', authState.username);
+      console.log(
+        '🔧 After nextTick - isAuthenticated:',
+        isAuthenticatedVar.value,
+        'username:',
+        authState.username
+      );
     });
   };
 

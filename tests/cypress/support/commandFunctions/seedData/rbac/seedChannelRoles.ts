@@ -1,10 +1,10 @@
-import type { ChannelRoleCreateInput } from "../../../../../../__generated__/graphql";
+import type { ChannelRoleCreateInput } from '../../../../../../__generated__/graphql';
 
 const channelRoles: ChannelRoleCreateInput[] = [
   {
-    name: "Basic mod role for /cats",
-    description: "Standard mod permissions",
-    channelUniqueName: "cats",
+    name: 'Basic mod role for /cats',
+    description: 'Standard mod permissions',
+    channelUniqueName: 'cats',
     showModTag: true,
     canCreateComment: true,
     canCreateDiscussion: true,
@@ -15,6 +15,5 @@ const channelRoles: ChannelRoleCreateInput[] = [
     canUpvoteDiscussion: true,
   },
 ];
-
 
 export default channelRoles;

@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const AUTHOR_FIELDS = gql`
   fragment AuthorFields on User {
@@ -403,10 +403,6 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
     }
   }
 `;
-
-
-
-
 
 // # Retrieve everything needed to render the sidebar
 // query GetChannelFilters($name: String!) {

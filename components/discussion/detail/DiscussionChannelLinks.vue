@@ -1,12 +1,12 @@
 <script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent, computed } from "vue";
-import DiscussionChannelLink from "./DiscussionChannelLink.vue";
-import { useRoute } from "nuxt/app";
-import type { DiscussionChannel } from "@/__generated__/graphql";
+import type { PropType } from 'vue';
+import { defineComponent, computed } from 'vue';
+import DiscussionChannelLink from './DiscussionChannelLink.vue';
+import { useRoute } from 'nuxt/app';
+import type { DiscussionChannel } from '@/__generated__/graphql';
 
 export default defineComponent({
-  name: "DiscussionChannelLinks",
+  name: 'DiscussionChannelLinks',
   components: {
     DiscussionChannelLink,
   },
@@ -14,7 +14,7 @@ export default defineComponent({
     channelId: {
       type: String,
       required: false,
-      default: ''
+      default: '',
     },
     discussionChannels: {
       type: Array as PropType<Array<DiscussionChannel>>,
@@ -27,9 +27,11 @@ export default defineComponent({
     const getCommentCount = (channelId: string) => {
       const discussionChannels = props.discussionChannels;
 
-      const activeDiscussionChannel = discussionChannels.find((cs: DiscussionChannel) => {
-        return cs.Channel?.uniqueName === channelId;
-      });
+      const activeDiscussionChannel = discussionChannels.find(
+        (cs: DiscussionChannel) => {
+          return cs.Channel?.uniqueName === channelId;
+        }
+      );
 
       if (!activeDiscussionChannel) {
         return 0;
@@ -45,10 +47,13 @@ export default defineComponent({
       const activeDiscussionChannel = discussionChannels.find(
         (dc: DiscussionChannel) => {
           return dc.channelUniqueName === channelId;
-        },
+        }
       );
 
-      if (!activeDiscussionChannel || !activeDiscussionChannel.UpvotedByUsersAggregate?.count) {
+      if (
+        !activeDiscussionChannel ||
+        !activeDiscussionChannel.UpvotedByUsersAggregate?.count
+      ) {
         return 0;
       }
       return activeDiscussionChannel.UpvotedByUsersAggregate.count;
@@ -56,9 +61,9 @@ export default defineComponent({
 
     const activeDiscussionChannel = computed(() => {
       return props.discussionChannels.filter((dc) => {
-            return  dc.channelUniqueName === props.channelId;
-          })[0]
-    })
+        return dc.channelUniqueName === props.channelId;
+      })[0];
+    });
 
     const channelsExceptActive = computed(() => {
       return props.discussionChannels.filter((dc) => {
@@ -66,13 +71,12 @@ export default defineComponent({
       });
     });
 
-    
     return {
       activeDiscussionChannel,
       channelsExceptActive,
       route,
       getCommentCount,
-      getVoteCount
+      getVoteCount,
     };
   },
 });
@@ -80,13 +84,8 @@ export default defineComponent({
 
 <template>
   <div class="px-3 dark:text-white">
-    <div
-      v-if="!channelId"
-      class="my-4"
-    >
-      <h2 class="text-lg">
-        Comments in Forums
-      </h2>
+    <div v-if="!channelId" class="my-4">
+      <h2 class="text-lg">Comments in Forums</h2>
 
       <ul class="list-disc pl-3">
         <DiscussionChannelLink
@@ -102,12 +101,9 @@ export default defineComponent({
       </ul>
     </div>
 
-
     <div v-if="channelId && channelsExceptActive.length > 0">
       <div>
-        <h2 class="mt-4 text-lg">
-          Comments in Other Forums
-        </h2>
+        <h2 class="mt-4 text-lg">Comments in Other Forums</h2>
         <ul class="list-disc pl-4">
           <DiscussionChannelLink
             v-for="dc in channelsExceptActive"
@@ -120,10 +116,7 @@ export default defineComponent({
             :discussion-id="dc.discussionId"
           />
         </ul>
-        <p
-          v-if="channelsExceptActive.length === 0"
-          class="text-sm"
-        >
+        <p v-if="channelsExceptActive.length === 0" class="text-sm">
           The post was not submitted to any other channels.
         </p>
       </div>

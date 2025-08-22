@@ -1,29 +1,29 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import { useRoute, useRouter } from "nuxt/app";
+import { ref, computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'nuxt/app';
 import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
-} from "@/graphQLData/comment/mutations";
-import VoteButtons from "./VoteButtons.vue";
-import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import MarkdownPreview from "../MarkdownPreview.vue";
-import TextEditor from "../TextEditor.vue";
-import CancelButton from "@/components/CancelButton.vue";
-import SaveButton from "@/components/SaveButton.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import WarningModal from "@/components/WarningModal.vue";
-import type { PropType } from "vue";
-import type { Comment } from "@/__generated__/graphql";
-import type { MenuItemType } from "@/components/IconButtonDropdown.vue";
-import { timeAgo, ALLOWED_ICONS } from "@/utils";
-import { modProfileNameVar, usernameVar } from "@/cache";
-import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
-import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
-import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+} from '@/graphQLData/comment/mutations';
+import VoteButtons from './VoteButtons.vue';
+import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
+import MarkdownPreview from '../MarkdownPreview.vue';
+import TextEditor from '../TextEditor.vue';
+import CancelButton from '@/components/CancelButton.vue';
+import SaveButton from '@/components/SaveButton.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import WarningModal from '@/components/WarningModal.vue';
+import type { PropType } from 'vue';
+import type { Comment } from '@/__generated__/graphql';
+import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
+import { timeAgo, ALLOWED_ICONS } from '@/utils';
+import { modProfileNameVar, usernameVar } from '@/cache';
+import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
+import ArchivedCommentText from '@/components/comments/ArchivedCommentText.vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 
 const props = defineProps({
   comment: {
@@ -36,20 +36,20 @@ const props = defineProps({
   },
 });
 const emit = defineEmits([
-  "showCopiedLinkNotification",
-  "clickReport",
-  "openModProfile",
-  "clickArchive",
-  "clickUnarchive",
-  "clickArchiveAndSuspend",
+  'showCopiedLinkNotification',
+  'clickReport',
+  'openModProfile',
+  'clickArchive',
+  'clickUnarchive',
+  'clickArchiveAndSuspend',
 ]);
 const route = useRoute();
 const router = useRouter();
 
 const loggedInModName = computed(() => {
-  const modName = modProfileNameVar.value
+  const modName = modProfileNameVar.value;
   if (!modName) {
-    console.error("Error fetching mod profile name");
+    console.error('Error fetching mod profile name');
   }
   return modName;
 });
@@ -80,7 +80,7 @@ const {
 } = useMutation(DELETE_COMMENT, {
   update: (cache: any) => {
     cache.evict({
-      id: cache.identify({ __typename: "Comment", id: props.comment.id }),
+      id: cache.identify({ __typename: 'Comment', id: props.comment.id }),
     });
   },
 });
@@ -95,15 +95,15 @@ const commentMenuItems = computed(() => {
   if (loggedInUserAuthoredComment) {
     out = out.concat([
       {
-        label: "Edit",
-        value: "",
-        event: "handleEdit",
+        label: 'Edit',
+        value: '',
+        event: 'handleEdit',
         icon: ALLOWED_ICONS.EDIT,
       },
       {
-        label: "Delete",
-        value: "",
-        event: "handleDelete",
+        label: 'Delete',
+        value: '',
+        event: 'handleDelete',
         icon: ALLOWED_ICONS.DELETE,
       },
     ]);
@@ -111,9 +111,9 @@ const commentMenuItems = computed(() => {
     if (loggedInModName.value) {
       out = out.concat([
         {
-          label: "Report",
-          value: "",
-          event: "clickReport",
+          label: 'Report',
+          value: '',
+          event: 'clickReport',
           icon: ALLOWED_ICONS.REPORT,
         },
       ]);
@@ -121,14 +121,14 @@ const commentMenuItems = computed(() => {
       if (!props.comment.archived) {
         out = out.concat([
           {
-            label: "Archive",
-            event: "clickArchive",
+            label: 'Archive',
+            event: 'clickArchive',
             icon: ALLOWED_ICONS.ARCHIVE,
             value: '',
           },
           {
-            label: "Archive and Suspend",
-            event: "clickArchiveAndSuspend",
+            label: 'Archive and Suspend',
+            event: 'clickArchiveAndSuspend',
             icon: ALLOWED_ICONS.SUSPEND,
             value: '',
           },
@@ -136,8 +136,8 @@ const commentMenuItems = computed(() => {
       } else {
         out = out.concat([
           {
-            label: "Unarchive",
-            event: "clickUnarchive",
+            label: 'Unarchive',
+            event: 'clickUnarchive',
             icon: ALLOWED_ICONS.UNARCHIVE,
             value: '',
           },
@@ -146,18 +146,18 @@ const commentMenuItems = computed(() => {
     } else {
       out = out.concat([
         {
-          label: "Report",
-          value: "",
-          event: "clickReport",
+          label: 'Report',
+          value: '',
+          event: 'clickReport',
           icon: ALLOWED_ICONS.REPORT,
         },
       ]);
     }
   }
   out.push({
-    label: "Copy Link",
-    value: "",
-    event: "copyLink",
+    label: 'Copy Link',
+    value: '',
+    event: 'copyLink',
     icon: ALLOWED_ICONS.COPY_LINK,
   });
 
@@ -165,11 +165,11 @@ const commentMenuItems = computed(() => {
 });
 
 const copyLink = async () => {
-  let basePath = "";
+  let basePath = '';
   if (import.meta.client) {
     basePath = window.location.origin;
   } else {
-    basePath = process.env.BASE_URL || "";
+    basePath = process.env.BASE_URL || '';
   }
 
   const permalinkObject = getFeedbackPermalinkObject({
@@ -179,20 +179,21 @@ const copyLink = async () => {
     eventId: eventId as string,
     commentId: props.comment.id,
     GivesFeedbackOnComment: props.comment.GivesFeedbackOnComment || undefined,
-    GivesFeedbackOnDiscussion: props.comment.GivesFeedbackOnDiscussion || undefined,
+    GivesFeedbackOnDiscussion:
+      props.comment.GivesFeedbackOnDiscussion || undefined,
     GivesFeedbackOnEvent: props.comment.GivesFeedbackOnEvent || undefined,
   });
   const permalink = permalinkObject
     ? `${basePath}${router.resolve(permalinkObject).href}`
-    : "";
+    : '';
   try {
     await navigator.clipboard.writeText(permalink);
-    emit("showCopiedLinkNotification", true);
+    emit('showCopiedLinkNotification', true);
   } catch (e: unknown) {
     throw new Error(e instanceof Error ? e.message : String(e));
   }
   setTimeout(() => {
-    emit("showCopiedLinkNotification", false);
+    emit('showCopiedLinkNotification', false);
   }, 2000);
 };
 
@@ -282,7 +283,9 @@ function handleUnarchive() {
       <span class="whitespace-nowrap">{{
         `gave feedback ${timeAgo(new Date(comment.createdAt))}`
       }}</span>
-      <span v-if="isHighlighted" class="rounded-lg bg-orange-500 px-2 text-black"
+      <span
+        v-if="isHighlighted"
+        class="rounded-lg bg-orange-500 px-2 text-black"
         >Permalinked</span
       >
       <MenuButton
@@ -310,7 +313,7 @@ function handleUnarchive() {
     </div>
 
     <div class="ml-12 border-l-2 border-gray-200 pl-2 dark:border-gray-500">
-      <ArchivedCommentText 
+      <ArchivedCommentText
         v-if="comment?.archived"
         :channel-id="forumId as string"
         :comment-id="comment.id"

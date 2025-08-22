@@ -1,16 +1,16 @@
-import { DISCUSSION_LIST } from "../constants";
-import { setupTestData } from "../../support/testSetup";
+import { DISCUSSION_LIST } from '../constants';
+import { setupTestData } from '../../support/testSetup';
 
-describe("Basic root comment operations", () => {
+describe('Basic root comment operations', () => {
   // Set up test data once for all tests in this file
   setupTestData();
 
-  it("creates, edits and deletes a comment", () => {
-    const TEST_COMMENT_TEXT = "Test comment";
-    
+  it('creates, edits and deletes a comment', () => {
+    const TEST_COMMENT_TEXT = 'Test comment';
+
     // Set up GraphQL request interception
     cy.intercept('POST', '**/graphql').as('graphqlRequest');
-    
+
     // Intercept specific GraphQL operations
     cy.intercept('POST', '**/graphql', (req) => {
       if (req.body.query?.includes('createComments')) {
@@ -24,14 +24,14 @@ describe("Basic root comment operations", () => {
 
     // Go to the discussion list
     cy.visit(DISCUSSION_LIST);
-    
+
     // Authenticate programmatically on current page
     cy.authenticateOnCurrentPage();
-    
+
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Click on the first discussion
-    cy.get("span").contains("Example topic 1").click();
+    cy.get('span').contains('Example topic 1').click();
     cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Click the 'write a reply' textarea
@@ -45,63 +45,66 @@ describe("Basic root comment operations", () => {
       .type(TEST_COMMENT_TEXT);
 
     // Save the comment
-    cy.get("button").contains("Save").click();
-    cy.wait('@createCommentRequest').its('response.statusCode').should('eq', 200);
+    cy.get('button').contains('Save').click();
+    cy.wait('@createCommentRequest')
+      .its('response.statusCode')
+      .should('eq', 200);
 
     // Check for paragraph with comment text
-    cy.get("p").contains(TEST_COMMENT_TEXT).should('be.visible');
+    cy.get('p').contains(TEST_COMMENT_TEXT).should('be.visible');
 
     // Now edit the comment
     cy.get('div[data-testid="comment"]')
-      .should("be.visible")
-      .and("contain", TEST_COMMENT_TEXT)
+      .should('be.visible')
+      .and('contain', TEST_COMMENT_TEXT)
       .within(() => {
         // Look for the comment menu button
         cy.get('button[data-testid="commentMenu"]')
-          .should("be.visible")
+          .should('be.visible')
           .click();
       });
 
-    cy.get(".v-list-item")
-      .contains("div", "Edit")
-      .should("be.visible")
-      .click();
+    cy.get('.v-list-item').contains('div', 'Edit').should('be.visible').click();
 
     // Type a new comment
-    const updatedCommentText = "This is my updated comment";
+    const updatedCommentText = 'This is my updated comment';
     cy.get("textarea[data-testid='texteditor-textarea']")
       .should('be.visible')
       .clear()
       .type(updatedCommentText);
 
     // Save the comment
-    cy.get("span").contains("Save").click();
-    cy.wait('@updateCommentRequest').its('response.statusCode').should('eq', 200);
-    
+    cy.get('span').contains('Save').click();
+    cy.wait('@updateCommentRequest')
+      .its('response.statusCode')
+      .should('eq', 200);
+
     // Check for paragraph with updated comment text
-    cy.get("p").contains(updatedCommentText).should('be.visible');
+    cy.get('p').contains(updatedCommentText).should('be.visible');
 
     // Now delete the comment
     cy.get('div[data-testid="comment"]')
-      .should("be.visible")
-      .and("contain", updatedCommentText)
+      .should('be.visible')
+      .and('contain', updatedCommentText)
       .within(() => {
         // Look for the comment menu button
         cy.get('button[data-testid="commentMenu"]')
-          .should("be.visible")
+          .should('be.visible')
           .click();
       });
 
-    cy.get(".v-list-item")
-      .contains("div", "Delete")
-      .should("be.visible")
+    cy.get('.v-list-item')
+      .contains('div', 'Delete')
+      .should('be.visible')
       .click();
 
     // Confirm deletion
-    cy.get("button").contains("Delete").click();
-    cy.wait('@deleteCommentRequest').its('response.statusCode').should('eq', 200);
+    cy.get('button').contains('Delete').click();
+    cy.wait('@deleteCommentRequest')
+      .its('response.statusCode')
+      .should('eq', 200);
 
     // Check that the comment is gone
-    cy.get("p").contains(updatedCommentText).should("not.exist");
+    cy.get('p').contains(updatedCommentText).should('not.exist');
   });
 });

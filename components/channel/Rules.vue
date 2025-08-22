@@ -1,6 +1,6 @@
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
-import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
+import { defineComponent, ref, computed } from 'vue';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 
 type Rule = {
   detail: string;
@@ -8,14 +8,14 @@ type Rule = {
 };
 
 export default defineComponent({
-  name: "RulesComponent",
+  name: 'RulesComponent',
   components: {
     MarkdownRenderer,
   },
   props: {
     rules: {
       type: String,
-      default: "",
+      default: '',
     },
   },
   setup(props) {
@@ -30,7 +30,7 @@ export default defineComponent({
           });
         }
       } catch (e) {
-        console.error("Error parsing channel rules", e);
+        console.error('Error parsing channel rules', e);
       }
       return rules;
     });
@@ -59,7 +59,7 @@ export default defineComponent({
     <div
       v-for="(rule, i) in openRules"
       :key="rule.summary"
-      class="my-2 pt-2 dark:border-gray-700 dark:text-gray-100" 
+      class="my-2 pt-2 dark:border-gray-700 dark:text-gray-100"
     >
       <div
         v-if="rule.summary"

@@ -1,7 +1,7 @@
 <script>
-import { config } from "@/config";
+import { config } from '@/config';
 export default {
-  name: "LinkPreview",
+  name: 'LinkPreview',
   props: {
     url: {
       type: String,
@@ -10,9 +10,9 @@ export default {
   },
   data() {
     return {
-      title: "",
-      description: "",
-      imageUrl: "",
+      title: '',
+      description: '',
+      imageUrl: '',
       htmlInferredImages: [],
       apiKey: config.openGraphApiKey,
       showImage: true,
@@ -30,8 +30,8 @@ export default {
         .then((response) => response.json())
         .then((data) => {
           this.title = data.hybridGraph.title || data.hybridGraph.url;
-          this.description = data.hybridGraph.description || "";
-          this.imageUrl = data.hybridGraph.image || "";
+          this.description = data.hybridGraph.description || '';
+          this.imageUrl = data.hybridGraph.image || '';
 
           if (data.htmlInferred.images) {
             this.htmlInferredImages = data.htmlInferred.images;
@@ -44,30 +44,23 @@ export default {
 </script>
 
 <template>
-  <div class="rounded overflow-hidden shadow-lg my-1 border">
-    <a
-      :href="url"
-      target="_blank"
-      rel="noopener"
-    >
+  <div class="my-1 overflow-hidden rounded border shadow-lg">
+    <a :href="url" target="_blank" rel="noopener">
       <img
         v-if="imageUrl && showImage"
-        class="w-20 m-4 object-cover"
+        class="m-4 w-20 object-cover"
         :src="imageUrl"
         :alt="title"
         @error="showImage = false"
-      >
+      />
     </a>
     <div class="px-6 py-4">
-      <a
-        :href="url"
-        target="_blank"
-        rel="noopener"
-      ><div class="font-bold text-xl mb-2 hover:text-gray-400">{{ title }}</div></a>
-      <p
-        class="text-gray-700 text-base"
-        :class="!showImage ? 'mt-4' : ''"
+      <a :href="url" target="_blank" rel="noopener"
+        ><div class="mb-2 text-xl font-bold hover:text-gray-400">
+          {{ title }}
+        </div></a
       >
+      <p class="text-base text-gray-700" :class="!showImage ? 'mt-4' : ''">
         {{ description }}
       </p>
     </div>

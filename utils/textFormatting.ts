@@ -13,7 +13,15 @@ export type FormatTextParams = {
 /**
  * Supported text formatting types
  */
-export type FormatType = 'bold' | 'italic' | 'underline' | 'header1' | 'header2' | 'header3' | 'quote' | 'spoiler';
+export type FormatType =
+  | 'bold'
+  | 'italic'
+  | 'underline'
+  | 'header1'
+  | 'header2'
+  | 'header3'
+  | 'quote'
+  | 'spoiler';
 
 /**
  * Formats text according to the specified format type
@@ -105,7 +113,10 @@ export function formatHeader3(params: { text: string }): string {
  * @returns The formatted text
  */
 export function formatQuote(params: { text: string }): string {
-  return params.text.split('\n').map(line => `> ${line}`).join('\n');
+  return params.text
+    .split('\n')
+    .map((line) => `> ${line}`)
+    .join('\n');
 }
 
 /**
@@ -113,15 +124,17 @@ export function formatQuote(params: { text: string }): string {
  * @param params Object containing the original text, position, and text to insert
  * @returns The new text with the inserted content
  */
-export function insertTextAtPosition(params: { 
-  originalText: string; 
-  position: { start: number; end: number }; 
+export function insertTextAtPosition(params: {
+  originalText: string;
+  position: { start: number; end: number };
   textToInsert: string;
 }): string {
   const { originalText, position, textToInsert } = params;
-  return originalText.substring(0, position.start) + 
-         textToInsert + 
-         originalText.substring(position.end);
+  return (
+    originalText.substring(0, position.start) +
+    textToInsert +
+    originalText.substring(position.end)
+  );
 }
 
 /**
@@ -129,7 +142,10 @@ export function insertTextAtPosition(params: {
  * @param params Object containing the current number of characters and the maximum allowed
  * @returns The number of characters remaining (can be negative if over limit)
  */
-export function calculateRemainingChars(params: { current: number; max: number }): number {
+export function calculateRemainingChars(params: {
+  current: number;
+  max: number;
+}): number {
   return params.max - params.current;
 }
 
@@ -147,6 +163,14 @@ export function formatSpoiler(params: { text: string }): string {
  * @param params Object containing the original text, cursor position, and emoji to insert
  * @returns The new text with the emoji inserted
  */
-export function insertEmoji(params: { text: string; position: number; emoji: string }): string {
-  return params.text.slice(0, params.position) + params.emoji + params.text.slice(params.position);
+export function insertEmoji(params: {
+  text: string;
+  position: number;
+  emoji: string;
+}): string {
+  return (
+    params.text.slice(0, params.position) +
+    params.emoji +
+    params.text.slice(params.position)
+  );
 }

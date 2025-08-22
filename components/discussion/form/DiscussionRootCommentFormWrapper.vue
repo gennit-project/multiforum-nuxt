@@ -1,27 +1,31 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import type { PropType } from "vue";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import CreateRootCommentForm from "@/components/comments/CreateRootCommentForm.vue";
-import type { Comment, DiscussionChannel, CommentCreateInput } from "@/__generated__/graphql";
-import type { ApolloCache, FetchResult } from "@apollo/client/core";
-import { CREATE_COMMENT } from "@/graphQLData/comment/mutations";
-import { GET_DISCUSSION_COMMENTS } from "@/graphQLData/comment/queries";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { usernameVar } from "@/cache";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import { useRoute } from "nuxt/app";
-import { gql } from "@apollo/client/core";
+import { ref, computed } from 'vue';
+import type { PropType } from 'vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import CreateRootCommentForm from '@/components/comments/CreateRootCommentForm.vue';
+import type {
+  Comment,
+  DiscussionChannel,
+  CommentCreateInput,
+} from '@/__generated__/graphql';
+import type { ApolloCache, FetchResult } from '@apollo/client/core';
+import { CREATE_COMMENT } from '@/graphQLData/comment/mutations';
+import { GET_DISCUSSION_COMMENTS } from '@/graphQLData/comment/queries';
+import { GET_USER } from '@/graphQLData/user/queries';
+import { usernameVar } from '@/cache';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import { useRoute } from 'nuxt/app';
+import { gql } from '@apollo/client/core';
 
 // Props
 const props = defineProps({
   link: {
     type: String,
-    default: "",
+    default: '',
   },
   dataTestid: {
     type: String,
-    default: "",
+    default: '',
   },
   discussionChannel: {
     type: Object as PropType<DiscussionChannel>,
@@ -35,7 +39,7 @@ const props = defineProps({
   modName: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
 });
 
@@ -45,21 +49,25 @@ const COMMENT_LIMIT = 50;
 const route = useRoute();
 
 // Query for user data to get notification preferences
-const {
-  result: getUserResult,
-} = useQuery(GET_USER, {
-  username: usernameVar.value,
-}, {
-  enabled: !!usernameVar.value,
-});
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value,
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 // Get user's notification preference for comment replies
 const notifyOnReplyToCommentByDefault = computed(() => {
-  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+  return (
+    getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false
+  );
 });
 
 const createCommentDefaultValues = {
-  text: "",
+  text: '',
   isRootComment: true,
   depth: 1,
 };
@@ -70,7 +78,7 @@ const createCommentInput = computed((): CommentCreateInput[] => {
   const input: CommentCreateInput = {
     isRootComment: true,
     isFeedbackComment: false,
-    text: createFormValues.value.text || "",
+    text: createFormValues.value.text || '',
     CommentAuthor: {
       User: {
         connect: {
@@ -101,24 +109,28 @@ const createCommentInput = computed((): CommentCreateInput[] => {
       },
     },
     UpvotedByUsers: {
-      connect: [{
-        where: {
-          node: {
-            username: usernameVar.value,
+      connect: [
+        {
+          where: {
+            node: {
+              username: usernameVar.value,
+            },
           },
         },
-      }],
+      ],
     },
   };
 
   // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
   if (notifyOnReplyToCommentByDefault.value) {
     input.SubscribedToNotifications = {
-      connect: [{
-        where: {
-          node: { username: usernameVar.value }
-        }
-      }]
+      connect: [
+        {
+          where: {
+            node: { username: usernameVar.value },
+          },
+        },
+      ],
     };
   }
 
@@ -133,7 +145,7 @@ const {
   error: createCommentError,
   onDone,
 } = useMutation(CREATE_COMMENT, () => ({
-  errorPolicy: "none",
+  errorPolicy: 'none',
   variables: {
     createCommentInput: createCommentInput.value,
   },
@@ -146,7 +158,7 @@ const {
     try {
       const newComment: Comment = result.data?.createComments?.comments[0];
       if (!newComment) {
-        console.error("No new comment returned from createComments mutation");
+        console.error('No new comment returned from createComments mutation');
         return;
       }
 
@@ -182,7 +194,7 @@ const {
               count
             }
           }
-        `
+        `,
       });
 
       // Read the current query result from the cache
@@ -198,7 +210,7 @@ const {
 
       const queryResult = cache.readQuery({
         query: GET_DISCUSSION_COMMENTS,
-        variables: commentSectionQueryVariables
+        variables: commentSectionQueryVariables,
       }) as { getCommentSection: any } | null;
 
       if (queryResult?.getCommentSection) {
@@ -210,34 +222,34 @@ const {
             ...queryResult,
             getCommentSection: {
               ...queryResult.getCommentSection,
-              Comments: [
-                newComment,
-                ...queryResult.getCommentSection.Comments
-              ]
-            }
-          }
+              Comments: [newComment, ...queryResult.getCommentSection.Comments],
+            },
+          },
         });
       } else {
-        console.warn("Could not read query result from cache, falling back to direct modification");
-        
+        console.warn(
+          'Could not read query result from cache, falling back to direct modification'
+        );
+
         // Fallback: try to modify the ROOT_QUERY directly
         const queryId = cache.identify({
-          __typename: "Query"
+          __typename: 'Query',
         });
-        
+
         cache.modify({
           id: queryId,
           fields: {
             getCommentSection(existingSection = {}, { readField }) {
               if (!existingSection) return existingSection;
-              
-              const existingComments = readField('Comments', existingSection) as any[] || [];
+
+              const existingComments =
+                (readField('Comments', existingSection) as any[]) || [];
               return {
                 ...existingSection,
-                Comments: [commentRef, ...existingComments]
+                Comments: [commentRef, ...existingComments],
               };
-            }
-          }
+            },
+          },
         });
       }
 
@@ -245,21 +257,21 @@ const {
       if (props.discussionChannel?.id) {
         cache.modify({
           id: cache.identify({
-            __typename: "DiscussionChannel",
-            id: props.discussionChannel.id
+            __typename: 'DiscussionChannel',
+            id: props.discussionChannel.id,
           }),
           fields: {
             CommentsAggregate(existing = {}) {
               return {
                 ...existing,
-                count: (existing.count || 0) + 1
+                count: (existing.count || 0) + 1,
               };
-            }
-          }
+            },
+          },
         });
       }
     } catch (error) {
-      console.error("Error updating cache after creating comment:", error);
+      console.error('Error updating cache after creating comment:', error);
     }
   },
 }));
@@ -273,13 +285,13 @@ onDone(() => {
 const handleCreateComment = async () => {
   if (!props.discussionChannel) {
     console.warn(
-      "Could not create the comment because there is no discussion channel in the create root comment form"
+      'Could not create the comment because there is no discussion channel in the create root comment form'
     );
     return;
   }
   if (!usernameVar.value) {
     console.warn(
-      "Could not create the comment because there is no username in the create root comment form"
+      'Could not create the comment because there is no username in the create root comment form'
     );
     return;
   }

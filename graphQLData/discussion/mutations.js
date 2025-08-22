@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const CREATE_SIGNED_STORAGE_URL = gql`
   mutation createSignedURL($filename: String!, $contentType: String!) {
@@ -499,7 +499,9 @@ export const SUBSCRIBE_TO_DISCUSSION_CHANNEL = gql`
 
 export const UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL = gql`
   mutation unsubscribeFromDiscussionChannel($discussionChannelId: ID!) {
-    unsubscribeFromDiscussionChannel(discussionChannelId: $discussionChannelId) {
+    unsubscribeFromDiscussionChannel(
+      discussionChannelId: $discussionChannelId
+    ) {
       id
       SubscribedToNotifications {
         username
@@ -509,7 +511,10 @@ export const UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL = gql`
 `;
 
 export const UPDATE_DISCUSSION_SENSITIVE_CONTENT = gql`
-  mutation updateDiscussionSensitiveContent($discussionId: ID!, $hasSensitiveContent: Boolean!) {
+  mutation updateDiscussionSensitiveContent(
+    $discussionId: ID!
+    $hasSensitiveContent: Boolean!
+  ) {
     updateDiscussions(
       where: { id: $discussionId }
       update: { hasSensitiveContent: $hasSensitiveContent }
@@ -521,7 +526,6 @@ export const UPDATE_DISCUSSION_SENSITIVE_CONTENT = gql`
     }
   }
 `;
-
 
 // mutation {
 //   createFilterGroups(input: [{

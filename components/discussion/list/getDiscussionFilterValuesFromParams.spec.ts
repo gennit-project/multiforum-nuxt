@@ -3,7 +3,9 @@ import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams
 import type { RouteLocationNormalized } from 'vue-router';
 
 // Helper to create mock route objects
-function createMockRoute(query: Record<string, any> = {}): RouteLocationNormalized {
+function createMockRoute(
+  query: Record<string, any> = {}
+): RouteLocationNormalized {
   return {
     name: 'test',
     path: '/',

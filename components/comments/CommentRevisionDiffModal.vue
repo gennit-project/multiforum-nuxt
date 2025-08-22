@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
-import GenericModal from "@/components/GenericModal.vue";
-import * as DiffMatchPatch from "diff-match-patch";
-import { useMutation } from "@vue/apollo-composable";
-import { DELETE_TEXT_VERSION } from "@/graphQLData/comment/mutations";
+import { computed, ref } from 'vue';
+import GenericModal from '@/components/GenericModal.vue';
+import * as DiffMatchPatch from 'diff-match-patch';
+import { useMutation } from '@vue/apollo-composable';
+import { DELETE_TEXT_VERSION } from '@/graphQLData/comment/mutations';
 import DOMPurify from 'dompurify';
 
 const props = defineProps({
@@ -25,41 +25,41 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["close", "deleted"]);
+const emit = defineEmits(['close', 'deleted']);
 
 // Deletion state
 const isDeleting = ref(false);
 
 const oldVersionUsername = computed(() => {
-  return props.oldVersion.Author?.username || "[Deleted]";
+  return props.oldVersion.Author?.username || '[Deleted]';
 });
 
 const newVersionUsername = computed(() => {
-  return props.newVersion.Author?.username || "[Deleted]";
+  return props.newVersion.Author?.username || '[Deleted]';
 });
 
 const oldVersionDate = computed(() => {
-  return new Date(props.oldVersion.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  return new Date(props.oldVersion.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
 });
 
 const newVersionDate = computed(() => {
-  return new Date(props.newVersion.createdAt).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "short",
-    day: "numeric",
-    hour: "numeric",
-    minute: "numeric",
+  return new Date(props.newVersion.createdAt).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
   });
 });
 
-const oldContent = computed(() => props.oldVersion.body || "");
-const newContent = computed(() => props.newVersion.body || "");
+const oldContent = computed(() => props.oldVersion.body || '');
+const newContent = computed(() => props.newVersion.body || '');
 
 // Computed property that generates the diff HTML
 const diffHtml = computed(() => {
@@ -68,16 +68,16 @@ const diffHtml = computed(() => {
   dmp.diff_cleanupSemantic(diffs);
 
   // Create highlighted HTML for both sides
-  let leftHtml = "";
-  let rightHtml = "";
+  let leftHtml = '';
+  let rightHtml = '';
 
   diffs.forEach((diff) => {
     const [operation, text] = diff;
     const escapedText = text
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/\n/g, "<br>");
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/\n/g, '<br>');
 
     // Operation is either -1 (deletion), 0 (equal), or 1 (insertion)
     if (operation === -1) {
@@ -125,7 +125,7 @@ const {
 const handleDelete = async () => {
   if (
     confirm(
-      "Are you sure you want to delete this revision? This action cannot be undone."
+      'Are you sure you want to delete this revision? This action cannot be undone.'
     )
   ) {
     isDeleting.value = true;
@@ -142,14 +142,14 @@ const handleDelete = async () => {
 };
 
 const handleClose = () => {
-  emit("close");
+  emit('close');
 };
 
 onDone(() => {
-  emit("deleted", props.oldVersion.id);
+  emit('deleted', props.oldVersion.id);
 
   isDeleting.value = false;
-  emit("close");
+  emit('close');
 });
 </script>
 
@@ -211,7 +211,7 @@ onDone(() => {
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-900 dark:text-gray-200"
               >
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="sanitizedDiffHtml.left"/>
+                <div v-html="sanitizedDiffHtml.left" />
               </div>
             </div>
 
@@ -228,7 +228,7 @@ onDone(() => {
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800 dark:text-gray-200"
               >
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="sanitizedDiffHtml.right"/>
+                <div v-html="sanitizedDiffHtml.right" />
               </div>
             </div>
           </div>

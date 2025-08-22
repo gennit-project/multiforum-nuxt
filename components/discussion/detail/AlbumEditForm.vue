@@ -1,19 +1,19 @@
 <script lang="ts" setup>
-import { ref, computed, onMounted } from "vue";
-import type { PropType } from "vue";
+import { ref, computed, onMounted } from 'vue';
+import type { PropType } from 'vue';
 import type {
   Discussion,
   Image,
   DiscussionUpdateInput,
-} from "@/__generated__/graphql";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import GenericButton from "@/components/GenericButton.vue";
-import { useMutation } from "@vue/apollo-composable";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import { UPDATE_DISCUSSION } from "@/graphQLData/discussion/mutations";
-import AlbumEditor from "@/components/discussion/form/AlbumEditor.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import { useRoute } from "vue-router";
+} from '@/__generated__/graphql';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import GenericButton from '@/components/GenericButton.vue';
+import { useMutation } from '@vue/apollo-composable';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import { UPDATE_DISCUSSION } from '@/graphQLData/discussion/mutations';
+import AlbumEditor from '@/components/discussion/form/AlbumEditor.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import { useRoute } from 'vue-router';
 
 // Define a simplified type for images used in the form
 type AlbumFormImage = {
@@ -39,8 +39,8 @@ interface AlbumFormData {
 const route = useRoute();
 const discussionIdInParams = computed(() => {
   // If the discussion ID is provided in the route params, use it
-  return route.params.discussionId ? String(route.params.discussionId) : "";
-})
+  return route.params.discussionId ? String(route.params.discussionId) : '';
+});
 
 const props = defineProps({
   discussion: {
@@ -50,7 +50,9 @@ const props = defineProps({
 });
 const emit = defineEmits<{
   closeEditor: [];
-  updateFormValues: [formData: { album: { images: AlbumFormImage[]; imageOrder: string[] } }];
+  updateFormValues: [
+    formData: { album: { images: AlbumFormImage[]; imageOrder: string[] } },
+  ];
 }>();
 
 // Check if we're in create mode (using a temporary ID) or edit mode
@@ -61,32 +63,34 @@ const isCreateMode = computed(() => {
   if (props.discussion?.id !== 'temp-id' && !discussionIdInParams.value) {
     return false;
   }
-  
+
   // If we have images with IDs, we're editing an existing album (not in create mode)
-  const hasExistingImages = props.discussion?.Album?.Images?.some(img => img.id);
+  const hasExistingImages = props.discussion?.Album?.Images?.some(
+    (img) => img.id
+  );
   return !hasExistingImages;
 });
 
 const albumId = computed(() => {
   // In create mode, we use an empty string to indicate there's no album yet
   if (isCreateMode.value) {
-    return "";
+    return '';
   }
-  return props.discussion?.Album?.id || "";
+  return props.discussion?.Album?.id || '';
 });
 
 const images = computed(() => {
   if (!props.discussion?.Album?.Images) return [];
   return props.discussion.Album.Images.map((image: Image) => {
     return {
-      id: image.id || "",
-      url: image.url || "",
-      alt: image.alt || "",
-      caption: image.caption || "",
+      id: image.id || '',
+      url: image.url || '',
+      alt: image.alt || '',
+      caption: image.caption || '',
       isCoverImage: false,
       hasSensitiveContent: false,
       hasSpoiler: false,
-      copyright: image.copyright || "",
+      copyright: image.copyright || '',
     };
   });
 });
@@ -95,18 +99,20 @@ const initialImageOrder = computed<string[]>(() => {
   // If there's an existing order, use it
   if (props.discussion?.Album?.imageOrder?.length) {
     // Filter out any null or undefined values to ensure string[]
-    return props.discussion.Album.imageOrder.filter((id): id is string => typeof id === "string");
+    return props.discussion.Album.imageOrder.filter(
+      (id): id is string => typeof id === 'string'
+    );
   }
-  
+
   // If no order exists, create one from the images array
   if (images.value.length > 0) {
-    console.log("Creating image order from images");
+    console.log('Creating image order from images');
     // Create an order from the image IDs
     return images.value
-      .filter((img): img is typeof images.value[number] => Boolean(img.id))
-      .map(img => img.id);
+      .filter((img): img is (typeof images.value)[number] => Boolean(img.id))
+      .map((img) => img.id);
   }
-  
+
   return [];
 });
 
@@ -123,21 +129,21 @@ const savedSuccessfully = ref(false);
 
 // Initialize form values after component is mounted
 onMounted(() => {
-  console.log("AlbumEditForm mounted, initializing formValues");
-  console.log("Images:", images.value);
-  console.log("ImageOrder:", initialImageOrder.value);
-  
+  console.log('AlbumEditForm mounted, initializing formValues');
+  console.log('Images:', images.value);
+  console.log('ImageOrder:', initialImageOrder.value);
+
   formValues.value.album.images = [...images.value];
   formValues.value.album.imageOrder = [...initialImageOrder.value];
-  
-  console.log("Initialized formValues:", formValues.value);
+
+  console.log('Initialized formValues:', formValues.value);
 });
 
 function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
   // 1) If the album doesn't exist yet, CREATE it and connect to existing images
   if (!albumId.value) {
     const newImages = formValues.value.album.images;
-    
+
     // All images should already have IDs since they're created when uploaded
     return {
       Album: {
@@ -148,9 +154,9 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
               // Connect to existing images using their IDs
               connect: newImages
                 .filter((img): img is AlbumFormImage => Boolean(img.id))
-                .map(img => ({
-                  where: { node: { id: img.id } }
-                }))
+                .map((img) => ({
+                  where: { node: { id: img.id } },
+                })),
             },
           },
         },
@@ -168,9 +174,11 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
     .filter((img): img is AlbumFormImage => Boolean(img.id))
     .filter((img) => !oldImages.some((old) => old.id === img.id))
     .map((img) => ({
-      connect: [{
-        where: { node: { id: img.id } }
-      }]
+      connect: [
+        {
+          where: { node: { id: img.id } },
+        },
+      ],
     }));
 
   // UPDATE array: any image in `newImages` whose ID already exists in `oldImages`
@@ -188,16 +196,20 @@ function getUpdateDiscussionInputForAlbum(): DiscussionUpdateInput {
         },
       },
     }));
-    
+
   // DISCONNECT array: any old image that is no longer present in `newImages`
   const disconnectImageArray = oldImages
-    .filter((old) => !newImages.some((img) => Boolean(img.id) && img.id === old.id))
+    .filter(
+      (old) => !newImages.some((img) => Boolean(img.id) && img.id === old.id)
+    )
     .map((old) => ({
-      disconnect: [{
-        where: { node: { id: old.id } },
-      }]
+      disconnect: [
+        {
+          where: { node: { id: old.id } },
+        },
+      ],
     }));
-    
+
   // Combine all operations into a single array. Each object is one "Images" operation.
   const imagesOps = [
     ...connectImageArray,
@@ -231,20 +243,22 @@ const {
 }));
 
 onDone(() => {
-  emit("closeEditor");
+  emit('closeEditor');
 });
 
 // For handling save
 function handleSave() {
-  console.log("handleSave called, isCreateMode:", isCreateMode.value);
-  console.log("Current album data:", JSON.stringify(formValues.value.album));
-  
+  console.log('handleSave called, isCreateMode:', isCreateMode.value);
+  console.log('Current album data:', JSON.stringify(formValues.value.album));
+
   // For both cases where we're inside CreateEditDiscussionFields (temp-id)
   if (props.discussion?.id === 'temp-id') {
     // Always emit the form values to update the parent component
-    console.log("Emitting updateFormValues in CreateEditDiscussionFields context");
-    emit("updateFormValues", {
-      album: formValues.value.album
+    console.log(
+      'Emitting updateFormValues in CreateEditDiscussionFields context'
+    );
+    emit('updateFormValues', {
+      album: formValues.value.album,
     });
     // Add a success notification
     savedSuccessfully.value = true;
@@ -253,29 +267,37 @@ function handleSave() {
     }, 3000); // Hide after 3 seconds
   } else {
     // In actual edit mode for an existing discussion, perform the API mutation
-    console.log("Calling updateDiscussion in edit mode");
+    console.log('Calling updateDiscussion in edit mode');
     updateDiscussion();
   }
 }
 
 function handleUpdateAlbum(newVals: AlbumFormData) {
-  console.log("AlbumEditForm received update from AlbumEditor:", JSON.stringify(newVals));
-  
+  console.log(
+    'AlbumEditForm received update from AlbumEditor:',
+    JSON.stringify(newVals)
+  );
+
   // Update the album data
   formValues.value.album = {
     images: newVals.album.images,
-    imageOrder: newVals.album.imageOrder
+    imageOrder: newVals.album.imageOrder,
   };
-  
-  console.log("Updated formValues in AlbumEditForm:", JSON.stringify(formValues.value.album));
+
+  console.log(
+    'Updated formValues in AlbumEditForm:',
+    JSON.stringify(formValues.value.album)
+  );
 }
 </script>
 
 <template>
   <div class="w-full">
-    <div class="mb-3 mt-3 w-full flex flex-col">
-      <h3 class="text-lg font-semibold mb-4 dark:text-white">Edit Album (Optional)</h3>
-      
+    <div class="mb-3 mt-3 flex w-full flex-col">
+      <h3 class="font-semibold mb-4 text-lg dark:text-white">
+        Edit Album (Optional)
+      </h3>
+
       <AlbumEditor
         :form-values="formValues"
         :allow-image-upload="true"
@@ -283,9 +305,9 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
         :existing-album="props.discussion?.Album || undefined"
         @update-form-values="handleUpdateAlbum"
       />
-      
+
       <!-- Only show Save Album button in create mode (when discussionId is not provided) -->
-      <div v-if="isCreateMode" class="flex align-items gap-2 justify-end mt-4">
+      <div v-if="isCreateMode" class="align-items mt-4 flex justify-end gap-2">
         <GenericButton :text="'Cancel'" @click="emit('closeEditor')" />
         <PrimaryButton
           :label="'Save Album'"
@@ -293,22 +315,22 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
           @click="handleSave"
         />
       </div>
-      
+
       <!-- Show auto-save info in edit mode -->
-      <div v-else class="flex justify-between items-center mt-4">
+      <div v-else class="mt-4 flex items-center justify-between">
         <span class="text-sm text-gray-600 dark:text-gray-400">
           Album changes are saved automatically
         </span>
         <GenericButton :text="'Close'" @click="emit('closeEditor')" />
       </div>
     </div>
-    
+
     <ErrorBanner
       v-if="updateDiscussionError"
       class="mx-auto my-3 max-w-5xl"
       :text="updateDiscussionError.message"
     />
-    
+
     <Notification
       :show="savedSuccessfully"
       :title="'Album saved successfully'"

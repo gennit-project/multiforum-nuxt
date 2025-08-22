@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const GET_NOTIFICATIONS = gql`
   query getNotifications($username: String!) {
@@ -11,9 +11,7 @@ export const GET_NOTIFICATIONS = gql`
         read
         text
       }
-      NotificationsAggregate (
-        where: { read: false }
-      ) {
+      NotificationsAggregate(where: { read: false }) {
         count
       }
     }

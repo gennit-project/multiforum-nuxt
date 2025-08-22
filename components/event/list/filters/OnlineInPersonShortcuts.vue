@@ -1,18 +1,18 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import LocationFilterTypes from "./locationFilterTypes";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
-import type { SearchEventValues } from "@/types/Event";
-import Tag from "@/components/TagComponent.vue";
-import { capitalizeCase } from "@/components/comments/getSortFromQuery";
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import LocationFilterTypes from './locationFilterTypes';
+import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import type { SearchEventValues } from '@/types/Event';
+import Tag from '@/components/TagComponent.vue';
+import { capitalizeCase } from '@/components/comments/getSortFromQuery';
 
 // Setup function
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const filterValues = ref<SearchEventValues>(
@@ -54,7 +54,7 @@ const updateFilters = (params: SearchEventValues) => {
 };
 
 const formatLabel = (shortcut: string) => {
-  return capitalizeCase(shortcut.split("_").join(" "));
+  return capitalizeCase(shortcut.split('_').join(' '));
 };
 
 // Watcher to update filters on query change

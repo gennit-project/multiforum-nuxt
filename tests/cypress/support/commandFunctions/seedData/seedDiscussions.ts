@@ -1,4 +1,4 @@
-import type { DiscussionCreateInput } from "../../../../../__generated__/graphql";
+import type { DiscussionCreateInput } from '../../../../../__generated__/graphql';
 
 export type DiscussionCreateInputWithChannels = {
   discussionCreateInput: DiscussionCreateInput;
@@ -15,25 +15,25 @@ type BaseDiscussion = {
 
 const baseDiscussions: BaseDiscussion[] = [
   {
-    title: "Example topic 1",
-    body: "Test discussion body 1",
-    author: "cluse",
+    title: 'Example topic 1',
+    body: 'Test discussion body 1',
+    author: 'cluse',
     tags: [],
-    channels: ["cats"],
+    channels: ['cats'],
   },
   {
-    title: "Example topic 2",
+    title: 'Example topic 2',
     body: undefined,
-    author: "cluse",
-    tags: ["newYears"],
-    channels: ["phx_music"],
+    author: 'cluse',
+    tags: ['newYears'],
+    channels: ['phx_music'],
   },
   {
-    title: "Example topic 3",
+    title: 'Example topic 3',
     body: undefined,
-    author: "cluse",
-    tags: ["trivia"],
-    channels: ["phx_music"],
+    author: 'cluse',
+    tags: ['trivia'],
+    channels: ['phx_music'],
   },
 ];
 

@@ -7,13 +7,13 @@ defineProps({
 });
 
 // Generate day labels for skeleton
-const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+const dayLabels = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 </script>
 
 <template>
   <div class="animate-pulse">
     <!-- Month label skeleton -->
-    <div class="flex ml-8">
+    <div class="ml-8 flex">
       <div class="relative h-6 w-full">
         <div
           v-for="i in 12"
@@ -28,15 +28,15 @@ const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     <!-- Grid skeleton -->
     <div class="flex items-start">
       <!-- Day labels skeleton -->
-      <div class="pr-2 text-tiny relative w-10" style="height: 104px;">
+      <div class="text-tiny relative w-10 pr-2" style="height: 104px">
         <div
           v-for="(day, index) in dayLabels"
           :key="'skeleton-day-' + index"
           class="absolute flex items-center"
-          :style="{top: `${index * 14 + 3}px`}"
+          :style="{ top: `${index * 14 + 3}px` }"
         >
           <div
-            class="w-6 h-2 rounded opacity-70"
+            class="h-2 w-6 rounded opacity-70"
             :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
           />
         </div>
@@ -65,18 +65,24 @@ const dayLabels = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
         </g>
       </svg>
     </div>
-    
+
     <!-- Color legend skeleton -->
-    <div class="flex items-center text-xs space-x-2 mt-4">
-      <div class="w-8 h-3 rounded opacity-70" :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"/>
+    <div class="mt-4 flex items-center space-x-2 text-xs">
+      <div
+        class="h-3 w-8 rounded opacity-70"
+        :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
+      />
       <div
         v-for="level in 5"
         :key="'level-' + (level - 1)"
-        class="w-3 h-3 rounded-sm"
+        class="h-3 w-3 rounded-sm"
         :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
-        :style="{ opacity: 0.3 + (level * 0.15) }"
+        :style="{ opacity: 0.3 + level * 0.15 }"
       />
-      <div class="w-8 h-3 rounded opacity-70" :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"/>
+      <div
+        class="h-3 w-8 rounded opacity-70"
+        :class="darkMode ? 'bg-gray-700' : 'bg-gray-300'"
+      />
     </div>
   </div>
 </template>

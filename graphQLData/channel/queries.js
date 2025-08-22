@@ -1,5 +1,5 @@
-import { gql } from "@apollo/client/core";
-import { DateTime } from "luxon";
+import { gql } from '@apollo/client/core';
+import { DateTime } from 'luxon';
 
 export const GET_CHANNEL_NAMES = gql`
   query getChannelNames($channelWhere: ChannelWhere) {

@@ -1,7 +1,7 @@
-import { defineConfig } from "cypress";
-import dotenv from "dotenv";
+import { defineConfig } from 'cypress';
+import dotenv from 'dotenv';
 
-dotenv.config({ path: ".env" });
+dotenv.config({ path: '.env' });
 
 export default defineConfig({
   includeShadowDom: true,
@@ -13,7 +13,7 @@ export default defineConfig({
       });
     },
     supportFile: 'tests/cypress/support/e2e.ts',
-    specPattern: 'tests/cypress/e2e/**/*.spec.cy.ts'
+    specPattern: 'tests/cypress/e2e/**/*.spec.cy.ts',
   },
   video: false,
   env: {
@@ -22,9 +22,11 @@ export default defineConfig({
     auth0Username: process.env.VITE_AUTH0_USERNAME,
     auth0Password: process.env.VITE_AUTH0_PASSWORD,
     auth0Email: process.env.VITE_AUTH0_USERNAME, // If email is the same as username
-    auth0ClientId: process.env.AUTH0_CLIENT_ID || process.env.VITE_AUTH0_CLIENT_ID,
+    auth0ClientId:
+      process.env.AUTH0_CLIENT_ID || process.env.VITE_AUTH0_CLIENT_ID,
     auth0ClientSecret: process.env.VITE_AUTH0_CLIENT_SECRET,
-    auth0Audience: process.env.VITE_AUTH0_AUDIENCE || 'https://gennit.us.auth0.com/api/v2/',
+    auth0Audience:
+      process.env.VITE_AUTH0_AUDIENCE || 'https://gennit.us.auth0.com/api/v2/',
     adminUsername: process.env.CYPRESS_ADMIN_TEST_USERNAME,
     adminEmail: process.env.CYPRESS_ADMIN_TEST_EMAIL,
     // Support existing env variables used in commands.ts
@@ -34,6 +36,6 @@ export default defineConfig({
     graphqlUrl: process.env.VITE_GRAPHQL_URL,
     baseUrl: process.env.VITE_BASE_URL || 'http://localhost:3000',
     // Test environment flag
-    NODE_ENV: 'test'
-  }
+    NODE_ENV: 'test',
+  },
 });

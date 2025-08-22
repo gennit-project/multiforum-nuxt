@@ -1,19 +1,19 @@
 <script lang="ts" setup>
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
-  middleware: 'mod-profile-redirect'
-})
+  middleware: 'mod-profile-redirect',
+});
 
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { GET_MOD } from "@/graphQLData/mod/queries";
-import ModProfileSidebar from "@/components/mod/ModProfileSidebar.vue";
-import { useRoute } from "nuxt/app";
-import ModProfileTabs from "../../components/mod/ModProfileTabs.vue";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_MOD } from '@/graphQLData/mod/queries';
+import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
+import { useRoute } from 'nuxt/app';
+import ModProfileTabs from '../../components/mod/ModProfileTabs.vue';
 
 const route = useRoute();
 const modProfileName = computed(() => {
-  return typeof route.params.modId === "string" ? route.params.modId : "";
+  return typeof route.params.modId === 'string' ? route.params.modId : '';
 });
 
 const { result, error } = useQuery(
@@ -22,7 +22,7 @@ const { result, error } = useQuery(
     displayName: modProfileName.value,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -36,9 +36,9 @@ const mod = computed(() => {
 
 <template>
   <NuxtLayout>
-    <div class="max-w-screen-2xl w-full px-2 dark:bg-black">
+    <div class="w-full max-w-screen-2xl px-2 dark:bg-black">
       <ModProfileSidebar :is-admin="false" />
-      <div class="flex-1 min-w-0">
+      <div class="min-w-0 flex-1">
         <ModProfileTabs
           v-if="mod"
           :show-counts="true"

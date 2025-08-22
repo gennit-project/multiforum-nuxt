@@ -1,16 +1,16 @@
 <script lang="ts" setup>
 // redirect to /comments
-import { GET_USER } from "@/graphQLData/user/queries";
-import { useRoute, useRouter } from "nuxt/app";
-import UserProfileTabs from "@/components/user/UserProfileTabs.vue";
-import { useQuery } from "@vue/apollo-composable";
-import { computed } from "vue";
+import { GET_USER } from '@/graphQLData/user/queries';
+import { useRoute, useRouter } from 'nuxt/app';
+import UserProfileTabs from '@/components/user/UserProfileTabs.vue';
+import { useQuery } from '@vue/apollo-composable';
+import { computed } from 'vue';
 
 const router = useRouter();
 
 const route = useRoute();
 const username = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
+  return typeof route.params.username === 'string' ? route.params.username : '';
 });
 router.push(`/u/${username.value}/comments`);
 
@@ -25,7 +25,7 @@ const {
   },
   {
     enabled: !!username.value,
-    fetchPolicy: "network-only",
+    fetchPolicy: 'network-only',
   }
 );
 
@@ -40,7 +40,7 @@ const user = computed(() => {
 </script>
 
 <template>
-  <div class="w-full md:w-3/4 pt-6 rounded-lg bg-gray-100 dark:bg-gray-900">
+  <div class="w-full rounded-lg bg-gray-100 pt-6 dark:bg-gray-900 md:w-3/4">
     <UserProfileTabs
       v-if="user"
       :show-counts="true"
@@ -49,9 +49,7 @@ const user = computed(() => {
       class="block border-b border-gray-200 dark:border-gray-600"
       :route="route"
     />
-    <div v-else>
-      Loading...
-    </div>
+    <div v-else>Loading...</div>
     <NuxtPage />
   </div>
 </template>

@@ -4,11 +4,11 @@ export default defineComponent({
   props: {
     wide: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  setup(){}
-})
+  setup() {},
+});
 </script>
 <template>
   <svg

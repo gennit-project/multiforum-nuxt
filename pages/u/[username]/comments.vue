@@ -1,20 +1,20 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import ArchivedCommentText from "@/components/comments/ArchivedCommentText.vue";
-import Comment from "@/components/comments/Comment.vue";
-import InfoBanner from "@/components/InfoBanner.vue";
-import LoadMore from "@/components/LoadMore.vue";
-import { GET_USER, GET_USER_COMMENTS } from "@/graphQLData/user/queries";
-import type { Comment as CommentType } from "@/__generated__/graphql";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import ArchivedCommentText from '@/components/comments/ArchivedCommentText.vue';
+import Comment from '@/components/comments/Comment.vue';
+import InfoBanner from '@/components/InfoBanner.vue';
+import LoadMore from '@/components/LoadMore.vue';
+import { GET_USER, GET_USER_COMMENTS } from '@/graphQLData/user/queries';
+import type { Comment as CommentType } from '@/__generated__/graphql';
 
 const PAGE_LIMIT = 25;
 
 const route = useRoute();
 
 const username = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
+  return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
 const {
@@ -24,7 +24,6 @@ const {
 } = useQuery(GET_USER, () => ({
   username: username.value,
 }));
-
 
 const user = computed(() => {
   if (getUserLoading.value || getUserError.value) {
@@ -40,7 +39,12 @@ const commentsAggregate = computed(() => {
   return user.value ? user.value.CommentsAggregate.count : 0;
 });
 
-const { result: commentResult, loading, error, fetchMore } = useQuery(
+const {
+  result: commentResult,
+  loading,
+  error,
+  fetchMore,
+} = useQuery(
   GET_USER_COMMENTS,
   () => ({
     username: username.value,
@@ -48,7 +52,7 @@ const { result: commentResult, loading, error, fetchMore } = useQuery(
     offset: 0,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -83,15 +87,13 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
   // are attached to the DiscussionChannel. However, if a comment was on a deleted event,
   // the Event would be null, and the DiscussionChannel would be null. So this is how we
   // infer that the comment was on a deleted event.
-  return comment.Event === null && comment.DiscussionChannel === null
+  return comment.Event === null && comment.DiscussionChannel === null;
 };
 </script>
 
 <template>
   <div class="py-3 dark:text-white">
-    <div v-if="error">
-      Error
-    </div>
+    <div v-if="error">Error</div>
     <div
       v-else-if="
         commentResult?.users?.length === 0 ||
@@ -101,36 +103,42 @@ const isCommentOnDeletedEvent = (comment: CommentType) => {
       No comments yet
     </div>
     <div v-else-if="commentResult && commentResult?.users?.length > 0">
-      <div v-for="comment in commentResult.users[0].Comments" :key="comment.id" class="space-y-4">
+      <div
+        v-for="comment in commentResult.users[0].Comments"
+        :key="comment.id"
+        class="space-y-4"
+      >
         <Comment
           v-if="!comment.archived"
           :comment-data="comment"
-          :parent-comment-id="comment.ParentComment ? comment.ParentComment.id : null"
+          :parent-comment-id="
+            comment.ParentComment ? comment.ParentComment.id : null
+          "
           :depth="0"
           :show-channel="true"
           :show-context-link="true"
           :go-to-permalink-on-click="true"
         />
-        <ArchivedCommentText 
+        <ArchivedCommentText
           v-if="comment?.archived"
           :channel-id="comment.Channel?.uniqueName"
           :comment-id="comment.id"
         />
         <InfoBanner
           v-if="isCommentOnDeletedEvent(comment)"
-          class="ml-10 my-2"
+          class="my-2 ml-10"
           :text="'This comment was on an event that has been deleted.'"
           type="warning"
         />
+      </div>
     </div>
-    </div>
-    <div v-if="loading">
-      Loading...
-    </div>
+    <div v-if="loading">Loading...</div>
     <div v-if="commentResult?.users[0]?.Comments.length > 0">
       <LoadMore
         class="justify-self-center"
-        :reached-end-of-results="commentsAggregate === commentResult.users[0].Comments.length"
+        :reached-end-of-results="
+          commentsAggregate === commentResult.users[0].Comments.length
+        "
         @load-more="loadMore"
       />
     </div>

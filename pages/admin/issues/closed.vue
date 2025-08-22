@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import type { Issue } from "@/__generated__/graphql";
-import { GET_CLOSED_ISSUES } from "@/graphQLData/issue/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import ModIssueListItem from "@/components/mod/ModIssueListItem.vue";
+import { computed } from 'vue';
+import type { Issue } from '@/__generated__/graphql';
+import { GET_CLOSED_ISSUES } from '@/graphQLData/issue/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import ModIssueListItem from '@/components/mod/ModIssueListItem.vue';
 
 const route = useRoute();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId !== "string") {
-    return "";
+  if (typeof route.params.forumId !== 'string') {
+    return '';
   }
   return route.params.forumId;
 });

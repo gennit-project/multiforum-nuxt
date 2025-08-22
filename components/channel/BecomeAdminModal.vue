@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import GenericModal from "@/components/GenericModal.vue";
-import { BECOME_CHANNEL_ADMIN } from "@/graphQLData/channel/mutations";
+import { computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import GenericModal from '@/components/GenericModal.vue';
+import { BECOME_CHANNEL_ADMIN } from '@/graphQLData/channel/mutations';
 
 const props = defineProps({
   channelUniqueName: {
@@ -15,13 +15,18 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["close", "success"]);
+const emit = defineEmits(['close', 'success']);
 
-const { mutate: becomeAdmin, loading, error, onDone } = useMutation(BECOME_CHANNEL_ADMIN);
+const {
+  mutate: becomeAdmin,
+  loading,
+  error,
+  onDone,
+} = useMutation(BECOME_CHANNEL_ADMIN);
 
 onDone(() => {
-  emit("success");
-  emit("close");
+  emit('success');
+  emit('close');
 });
 
 function handleBecomeAdmin() {
@@ -30,13 +35,14 @@ function handleBecomeAdmin() {
       channelUniqueName: props.channelUniqueName,
     });
   } catch (err) {
-    console.error("Error becoming admin:", err);
+    console.error('Error becoming admin:', err);
   }
 }
 
-const title = computed(() => "Become an admin of this forum?");
-const body = computed(() => 
-  "You will be able to add and remove mods, set rules for the forum and change the forum description and other settings."
+const title = computed(() => 'Become an admin of this forum?');
+const body = computed(
+  () =>
+    'You will be able to add and remove mods, set rules for the forum and change the forum description and other settings.'
 );
 </script>
 

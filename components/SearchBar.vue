@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, nextTick } from "vue";
-import SearchIcon from "@/components/icons/SearchIcon.vue";
+import { ref, onMounted, nextTick } from 'vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
 
 // Props
 const props = defineProps({
@@ -10,11 +10,11 @@ const props = defineProps({
   },
   initialValue: {
     type: String,
-    default: "",
+    default: '',
   },
   searchPlaceholder: {
     type: String,
-    default: "",
+    default: '',
   },
   small: {
     type: Boolean,
@@ -30,12 +30,12 @@ const props = defineProps({
   },
   testId: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
 // Emit event
-const emit = defineEmits(["updateSearchInput"]);
+const emit = defineEmits(['updateSearchInput']);
 
 // Template refs
 const searchInputRef = ref<HTMLElement | null>(null);
@@ -53,7 +53,7 @@ onMounted(() => {
 });
 
 const removeQuotationMarks = (input: string) => {
-  return input.split("'").join("").split('"').join("");
+  return input.split("'").join('').split('"').join('');
 };
 
 let timeout: ReturnType<typeof setTimeout> | null = null;
@@ -62,19 +62,19 @@ const updateSearchInput = (e: Event) => {
   if (timeout) clearTimeout(timeout);
   timeout = setTimeout(() => {
     const target = e.target as HTMLInputElement;
-    emit("updateSearchInput", removeQuotationMarks(target.value));
+    emit('updateSearchInput', removeQuotationMarks(target.value));
   }, 500);
 };
 
 const clear = () => {
-  emit("updateSearchInput", "");
-  input.value = "";
+  emit('updateSearchInput', '');
+  input.value = '';
 };
 </script>
 
 <template>
-  <div class="flex flex-1 items-center justify-center h-full">
-    <div class="relative flex items-center w-full">
+  <div class="flex h-full flex-1 items-center justify-center">
+    <div class="relative flex w-full items-center">
       <div
         class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
       >
@@ -90,14 +90,14 @@ const clear = () => {
           rightSideIsRounded ? 'rounded-r-full' : 'rounded-r-md',
           small ? 'h-9' : 'h-10',
         ]"
-        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
+        class="w-full border border-gray-200 pl-10 pr-12 text-sm leading-5 text-gray-900 placeholder-gray-400 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-white dark:placeholder-gray-400"
         :placeholder="searchPlaceholder"
         type="text"
         @input="updateSearchInput"
-      >
-      <div 
-        v-if="initialValue" 
-        class="absolute right-12 inset-y-0 flex cursor-pointer items-center z-10" 
+      />
+      <div
+        v-if="initialValue"
+        class="absolute inset-y-0 right-12 z-10 flex cursor-pointer items-center"
         @click="clear"
       >
         <i class="fa-solid fa-xmark h-4 w-4 text-gray-400 dark:text-gray-300" />

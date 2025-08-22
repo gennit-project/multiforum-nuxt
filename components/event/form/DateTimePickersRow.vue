@@ -8,38 +8,38 @@ import TimePicker from './TimePicker.vue';
 const props = defineProps({
   isAllDay: {
     type: Boolean,
-    required: true
+    required: true,
   },
   isMultiDay: {
     type: Boolean,
-    required: true
+    required: true,
   },
   startTime: {
     type: Date,
-    required: true
+    required: true,
   },
   endTime: {
     type: Date,
-    required: true
-  }
+    required: true,
+  },
 });
 
 const emit = defineEmits([
-  'updateStartDate', 
-  'updateStartTime', 
-  'updateEndDate', 
-  'updateEndTime'
+  'updateStartDate',
+  'updateStartTime',
+  'updateEndDate',
+  'updateEndTime',
 ]);
 
 // Formatted dates for date pickers
 const formattedStartTimeDate = computed(() => {
   const dateTime = DateTime.fromJSDate(props.startTime);
-  return dateTime.toFormat("yyyy-MM-dd");
+  return dateTime.toFormat('yyyy-MM-dd');
 });
 
 const formattedEndTimeDate = computed(() => {
   const dateTime = DateTime.fromJSDate(props.endTime);
-  return dateTime.toFormat("yyyy-MM-dd");
+  return dateTime.toFormat('yyyy-MM-dd');
 });
 
 // Handler functions
@@ -65,14 +65,14 @@ const handleEndTimeTimeChange = (timeValue: string) => {
     <!-- Time selection container with responsive layout that wraps on mobile -->
     <div class="flex flex-wrap items-center gap-1 sm:gap-2">
       <!-- Start Time Section -->
-      <div class="flex flex-wrap items-center gap-1 sm:gap-2 dark:text-white">
+      <div class="flex flex-wrap items-center gap-1 dark:text-white sm:gap-2">
         <DatePicker
           test-id="start-time-date-input"
           :value="formattedStartTimeDate"
           data-testid="start-date-picker"
           @update="handleStartTimeDateChange"
         />
-        
+
         <!-- Time picker for start time -->
         <TimePicker
           v-if="!isAllDay"
@@ -82,14 +82,27 @@ const handleEndTimeTimeChange = (timeValue: string) => {
           @update="handleStartTimeTimeChange"
         />
       </div>
-      
+
       <!-- Arrow icon between start and end - hidden on very small screens -->
-      <div v-if="!isAllDay || isMultiDay" class="flex items-center mx-1 sm:mx-2" data-testid="time-arrow">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd" />
+      <div
+        v-if="!isAllDay || isMultiDay"
+        class="mx-1 flex items-center sm:mx-2"
+        data-testid="time-arrow"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="h-4 w-4 text-gray-400"
+          viewBox="0 0 20 20"
+          fill="currentColor"
+        >
+          <path
+            fill-rule="evenodd"
+            d="M12.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-2.293-2.293a1 1 0 010-1.414z"
+            clip-rule="evenodd"
+          />
         </svg>
       </div>
-      
+
       <!-- End Time Section -->
       <div class="flex flex-wrap items-center gap-1 sm:gap-2">
         <!-- Only show end date input if multi-day event is checked -->
@@ -100,7 +113,7 @@ const handleEndTimeTimeChange = (timeValue: string) => {
           data-testid="end-date-picker"
           @update="handleEndTimeDateChange"
         />
-        
+
         <!-- Time picker for end time -->
         <TimePicker
           v-if="!isAllDay"

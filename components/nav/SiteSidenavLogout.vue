@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useAuth0 } from "@auth0/auth0-vue";
-import { config } from "@/config";
-import { isAuthenticatedVar } from "@/cache";
-import { useRoute } from "nuxt/app";
+import { useAuth0 } from '@auth0/auth0-vue';
+import { config } from '@/config';
+import { isAuthenticatedVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
 
 defineProps({
   navLinkClasses: {
     type: String,
-    default: "",
+    default: '',
   },
   showIconOnly: {
     type: Boolean,
@@ -20,7 +20,7 @@ const route = useRoute();
 
 const handleLogout = () => {
   // Store the current path in local storage
-  localStorage.setItem("postLogoutRedirect", route.fullPath);
+  localStorage.setItem('postLogoutRedirect', route.fullPath);
   // Redirect to the fixed logout route
   logout({
     logoutParams: {
@@ -45,7 +45,12 @@ const handleLogout = () => {
       stroke="currentColor"
       viewBox="0 0 24 24"
     >
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+      />
     </svg>
     <span v-else>Sign Out</span>
   </nuxt-link>

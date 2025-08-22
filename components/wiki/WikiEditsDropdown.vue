@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import type { PropType } from "vue";
-import type { WikiPage, TextVersion } from "@/__generated__/graphql";
-import { timeAgo } from "@/utils";
-import WikiRevisionDiffModal from "./WikiRevisionDiffModal.vue";
+import { ref, computed } from 'vue';
+import type { PropType } from 'vue';
+import type { WikiPage, TextVersion } from '@/__generated__/graphql';
+import { timeAgo } from '@/utils';
+import WikiRevisionDiffModal from './WikiRevisionDiffModal.vue';
 
 // Define type for revision data
 interface WikiRevisionData {
@@ -25,101 +25,97 @@ const props = defineProps({
 const isOpen = ref(false);
 const activeRevision = ref<WikiRevisionData | null>(null);
 
-  // Total number of edits
-  const totalEdits = computed(() => {
-    return props.wikiPage?.PastVersions?.length || 0;
-  });
+// Total number of edits
+const totalEdits = computed(() => {
+  return props.wikiPage?.PastVersions?.length || 0;
+});
 
-  // Check if there are any edits to show (need at least 1 past version, meaning it has been edited)
-  const hasEdits = computed(() => {
-    return totalEdits.value >= 1;
-  });
+// Check if there are any edits to show (need at least 1 past version, meaning it has been edited)
+const hasEdits = computed(() => {
+  return totalEdits.value >= 1;
+});
 
-  // Process all versions and sort by timestamp (newest first)
-  const allEdits = computed(() => {
-    const edits: WikiRevisionData[] = [];
+// Process all versions and sort by timestamp (newest first)
+const allEdits = computed(() => {
+  const edits: WikiRevisionData[] = [];
 
-    if (props.wikiPage?.PastVersions?.length) {
-      // Create current version entry (as TextVersion structure)
-      const currentVersion = {
-        id: "current",
-        body: props.wikiPage.body,
-        createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
-        Author: props.wikiPage.VersionAuthor,
-        AuthorConnection: {
-          edges: [],
-          pageInfo: { hasNextPage: false, hasPreviousPage: false },
-          totalCount: 0,
-        },
-      };
+  if (props.wikiPage?.PastVersions?.length) {
+    // Create current version entry (as TextVersion structure)
+    const currentVersion = {
+      id: 'current',
+      body: props.wikiPage.body,
+      createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
+      Author: props.wikiPage.VersionAuthor,
+      AuthorConnection: {
+        edges: [],
+        pageInfo: { hasNextPage: false, hasPreviousPage: false },
+        totalCount: 0,
+      },
+    };
 
-      // First item: most recent edit (current vs most recent past version)
+    // First item: most recent edit (current vs most recent past version)
+    edits.push({
+      id: 'most-recent-edit',
+      author: props.wikiPage.VersionAuthor?.username || '[Deleted]',
+      createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
+      isCurrent: true,
+      // Store the versions for the modal
+      oldVersionData: props.wikiPage.PastVersions[0], // Most recent past version
+      newVersionData: currentVersion, // Current version
+    });
+
+    // Subsequent items: compare each past version with the next one
+    props.wikiPage.PastVersions.forEach((version, index) => {
+      // Skip the most recent past version since it's already handled above
+      if (index === 0) return;
+
+      const nextVersion = props.wikiPage.PastVersions[index - 1]; // Next version (more recent)
+
       edits.push({
-        id: "most-recent-edit",
-        author: props.wikiPage.VersionAuthor?.username || "[Deleted]",
-        createdAt: props.wikiPage.updatedAt || props.wikiPage.createdAt,
-        isCurrent: true,
+        id: version.id,
+        author: version.Author?.username || '[Deleted]',
+        createdAt: version.createdAt,
+        isCurrent: false,
         // Store the versions for the modal
-        oldVersionData: props.wikiPage.PastVersions[0], // Most recent past version
-        newVersionData: currentVersion, // Current version
+        oldVersionData: version,
+        newVersionData: nextVersion,
       });
+    });
+  }
 
-      // Subsequent items: compare each past version with the next one
-      props.wikiPage.PastVersions.forEach((version, index) => {
-        // Skip the most recent past version since it's already handled above
-        if (index === 0) return;
-        
-        const nextVersion = props.wikiPage.PastVersions[index - 1]; // Next version (more recent)
-        
-        edits.push({
-          id: version.id,
-          author: version.Author?.username || "[Deleted]",
-          createdAt: version.createdAt,
-          isCurrent: false,
-          // Store the versions for the modal
-          oldVersionData: version,
-          newVersionData: nextVersion,
-        });
-      });
-    }
+  return edits;
+});
 
-    return edits;
-  });
+// Toggle dropdown
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
 
-  // Toggle dropdown
-  const toggleDropdown = () => {
-    isOpen.value = !isOpen.value;
-  };
+// Close dropdown when clicking outside
+const closeDropdown = () => {
+  isOpen.value = false;
+};
 
-  // Close dropdown when clicking outside
-  const closeDropdown = () => {
-    isOpen.value = false;
-  };
+// Open diff modal for a specific revision
+const openRevisionDiff = (revision: WikiRevisionData) => {
+  activeRevision.value = revision;
+  closeDropdown();
+};
 
-  // Open diff modal for a specific revision
-  const openRevisionDiff = (revision: WikiRevisionData) => {
-    activeRevision.value = revision;
-    closeDropdown();
-  };
+// Close diff modal
+const closeRevisionDiff = () => {
+  activeRevision.value = null;
+};
 
-  // Close diff modal
-  const closeRevisionDiff = () => {
-    activeRevision.value = null;
-  };
-
-  // Handle revision deleted event
-  const handleRevisionDeleted = () => {
-    closeRevisionDiff();
-    // The cache will be updated by the mutation
-  };
+// Handle revision deleted event
+const handleRevisionDeleted = () => {
+  closeRevisionDiff();
+  // The cache will be updated by the mutation
+};
 </script>
 
 <template>
-  <div
-    v-if="hasEdits"
-    v-click-outside="closeDropdown"
-    class="relative"
-  >
+  <div v-if="hasEdits" v-click-outside="closeDropdown" class="relative">
     <!-- Dropdown toggle button -->
     <span class="mx-2">·</span>
     <button
@@ -137,7 +133,7 @@ const activeRevision = ref<WikiRevisionData | null>(null);
       <div
         class="border-b border-gray-200 p-2 text-xs font-medium text-gray-700 dark:border-gray-700 dark:text-gray-300"
       >
-        Edited {{ totalEdits }} time{{ totalEdits > 1 ? "s" : "" }}
+        Edited {{ totalEdits }} time{{ totalEdits > 1 ? 's' : '' }}
       </div>
 
       <ul class="max-h-80 overflow-y-auto py-1">
@@ -149,7 +145,9 @@ const activeRevision = ref<WikiRevisionData | null>(null);
         >
           <div class="flex flex-col">
             <div class="flex items-center text-sm">
-              <span class="font-medium text-gray-900 dark:text-gray-200">{{ edit.author }}</span>
+              <span class="font-medium text-gray-900 dark:text-gray-200">{{
+                edit.author
+              }}</span>
             </div>
             <div class="text-xs text-gray-500 dark:text-gray-400">
               {{ timeAgo(new Date(edit.createdAt)) }}

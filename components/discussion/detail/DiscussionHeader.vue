@@ -1,25 +1,28 @@
 <script lang="ts" setup>
-  import { ref, computed } from "vue";
-  import { useMutation, useQuery } from "@vue/apollo-composable";
-  import { useRoute, useRouter } from "nuxt/app";
-  import { DateTime } from "luxon";
-  import { stableRelativeTime } from "@/utils";
-  import { DELETE_DISCUSSION, UPDATE_DISCUSSION_SENSITIVE_CONTENT } from "@/graphQLData/discussion/mutations";
-  import WarningModal from "@/components/WarningModal.vue";
-  import ErrorBanner from "@/components/ErrorBanner.vue";
-  import Notification from "@/components/NotificationComponent.vue";
-  import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-  import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-  import { getAllPermissions } from "@/utils/permissionUtils";
-  import { getDiscussionHeaderMenuItems } from "@/utils/headerPermissionUtils";
-  import { usernameVar, modProfileNameVar } from "@/cache";
-  import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
-  import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-  import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
-  import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-  import { config } from "@/config";
-  import EditsDropdown from "./activityFeed/EditsDropdown.vue";
-import type { Discussion } from "@/__generated__/graphql";
+import { ref, computed } from 'vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'nuxt/app';
+import { DateTime } from 'luxon';
+import { stableRelativeTime } from '@/utils';
+import {
+  DELETE_DISCUSSION,
+  UPDATE_DISCUSSION_SENSITIVE_CONTENT,
+} from '@/graphQLData/discussion/mutations';
+import WarningModal from '@/components/WarningModal.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
+import { getAllPermissions } from '@/utils/permissionUtils';
+import { getDiscussionHeaderMenuItems } from '@/utils/headerPermissionUtils';
+import { usernameVar, modProfileNameVar } from '@/cache';
+import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import { config } from '@/config';
+import EditsDropdown from './activityFeed/EditsDropdown.vue';
+import type { Discussion } from '@/__generated__/graphql';
 
 const props = defineProps<{
   discussion: Discussion | null;
@@ -33,22 +36,22 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits([
-  "handleClickGiveFeedback",
-  "handleClickEditBody",
-  "cancelEditDiscussionBody",
-  "handleClickAddAlbum",
+  'handleClickGiveFeedback',
+  'handleClickEditBody',
+  'cancelEditDiscussionBody',
+  'handleClickAddAlbum',
 ]);
 
 const route = useRoute();
 const router = useRouter();
 
 const editedAt = computed(() => {
-  if (!props.discussion?.updatedAt) return "";
+  if (!props.discussion?.updatedAt) return '';
   return `Edited ${stableRelativeTime(props.discussion.updatedAt)}`;
 });
 
 const createdAt = computed(() => {
-  if (!props.discussion?.createdAt) return "";
+  if (!props.discussion?.createdAt) return '';
   return `Posted ${stableRelativeTime(props.discussion.createdAt)}`;
 });
 
@@ -63,7 +66,7 @@ const {
     if (data?.deleteDiscussions?.nodesDeleted > 0) {
       cache.evict({
         id: cache.identify({
-          __typename: "Discussion",
+          __typename: 'Discussion',
           id: props.discussion?.id,
         }),
       });
@@ -74,20 +77,18 @@ const {
 onDoneDeleting(() => {
   if (props.channelId) {
     router.push({
-      name: "forums-forumId-discussions",
+      name: 'forums-forumId-discussions',
       params: { forumId: props.channelId },
     });
   }
 });
 
-const {
-  mutate: updateSensitiveContent,
-  error: updateSensitiveContentError,
-} = useMutation(UPDATE_DISCUSSION_SENSITIVE_CONTENT);
+const { mutate: updateSensitiveContent, error: updateSensitiveContentError } =
+  useMutation(UPDATE_DISCUSSION_SENSITIVE_CONTENT);
 
 const handleToggleSensitiveContent = async () => {
   if (!props.discussion?.id) return;
-  
+
   try {
     await updateSensitiveContent({
       discussionId: props.discussion.id,
@@ -95,13 +96,13 @@ const handleToggleSensitiveContent = async () => {
     });
     showSuccessfullyUpdatedSensitiveContent.value = true;
   } catch (error) {
-    console.error("Error updating sensitive content:", error);
+    console.error('Error updating sensitive content:', error);
   }
 };
 
 const defaultChannel = computed(() => {
   if (!props.discussion) {
-    return "";
+    return '';
   }
   const channelInRoute = route.params.forumId;
   return (
@@ -115,11 +116,11 @@ const { result: getChannelResult } = useQuery(
   {
     uniqueName: props.channelId || defaultChannel.value,
     // Using luxon, round down to the nearest hour
-    now: DateTime.local().startOf("hour").toISO(),
+    now: DateTime.local().startOf('hour').toISO(),
   },
   {
-    fetchPolicy: "cache-first",
-    nextFetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
     enabled: computed(() => !!props.channelId || !!defaultChannel.value),
   }
 );
@@ -131,7 +132,7 @@ const { result: getServerResult } = useQuery(
     serverName: config.serverName,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -166,7 +167,7 @@ const { result: getPermissionResult } = useQuery(
   {
     modDisplayName: modProfileNameVar,
     username: usernameVar,
-    channelUniqueName: props.channelId || defaultChannel.value || "",
+    channelUniqueName: props.channelId || defaultChannel.value || '',
   },
   {
     // enable if the username and modDisplayName are set
@@ -177,7 +178,7 @@ const { result: getPermissionResult } = useQuery(
         !!props.channelId &&
         !!defaultChannel.value
     ),
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -203,7 +204,7 @@ const userPermissions = computed(() => {
 const permalinkObject = computed(() => {
   if (!props.discussion) return {};
   return {
-    name: "forums-forumId-discussions-discussionId",
+    name: 'forums-forumId-discussions-discussionId',
     params: {
       discussionId: props.discussion.id,
       forumId: defaultChannel.value,
@@ -215,11 +216,11 @@ const showCopiedLinkNotification = ref(false);
 
 const copyLink = async () => {
   try {
-    let basePath = "";
+    let basePath = '';
     if (import.meta.client) {
       basePath = window.location.origin;
     } else {
-      basePath = process.env.BASE_URL || "";
+      basePath = process.env.BASE_URL || '';
     }
     const permalink = `${basePath}${router.resolve(permalinkObject.value).href}`;
     await navigator.clipboard.writeText(permalink);
@@ -257,8 +258,9 @@ const menuItems = computed(() => {
     isLoggedIn: !!usernameVar.value,
     discussionId: props.discussion.id,
     hasAlbum: !!props.discussion?.Album?.Images?.length,
-    feedbackEnabled: getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
-    hasSensitiveContent: !!props.discussion?.hasSensitiveContent
+    feedbackEnabled:
+      getChannelResult.value?.channels[0]?.feedbackEnabled ?? true,
+    hasSensitiveContent: !!props.discussion?.hasSensitiveContent,
   });
 });
 
@@ -290,45 +292,50 @@ const authorIsMod = computed(
           }"
         >
           <span class="flex flex-row items-center gap-1">
-            <span v-if="!discussion.Author.displayName" class="font-bold">{{ discussion.Author.username }}</span>
-            <span v-else class="font-bold">{{ discussion.Author.displayName }}</span>
-            <span v-if="discussion.Author.displayName" class="text-gray-500 dark:text-gray-300">{{ `(u/${discussion.Author.username})` }}</span>
+            <span v-if="!discussion.Author.displayName" class="font-bold">{{
+              discussion.Author.username
+            }}</span>
+            <span v-else class="font-bold">{{
+              discussion.Author.displayName
+            }}</span>
+            <span
+              v-if="discussion.Author.displayName"
+              class="text-gray-500 dark:text-gray-300"
+              >{{ `(u/${discussion.Author.username})` }}</span
+            >
 
             <span
               v-if="authorIsAdmin"
-              class="rounded-md border border-gray-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-            >Admin</span>
+              class="rounded-md border border-gray-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Admin</span
+            >
             <span
               v-else-if="authorIsMod"
-              class="rounded-md border border-orange-500 dark:border-gray-300 px-1 py-0 text-xs text-gray-500 dark:text-gray-300"
-            >Mod</span>
+              class="rounded-md border border-orange-500 px-1 py-0 text-xs text-gray-500 dark:border-gray-300 dark:text-gray-300"
+              >Mod</span
+            >
           </span>
         </nuxt-link>
         <span v-else>[Deleted]</span>
         <div>{{ createdAt }}</div>
-        <span
-          v-if="discussion?.updatedAt"
-          class="mx-2"
-          >&#8226;</span
-        >
+        <span v-if="discussion?.updatedAt" class="mx-2">&#8226;</span>
         <div class="flex items-center">
           <span>{{ editedAt }}</span>
           <EditsDropdown
-            v-if="
-              discussion &&
-              (discussion.PastBodyVersions?.length ?? 0) > 0
-            "
+            v-if="discussion && (discussion.PastBodyVersions?.length ?? 0) > 0"
             class="ml-2"
             :discussion="discussion"
           />
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <div v-if="usernameVar === discussion?.Author?.username && !downloadMode">
+        <div
+          v-if="usernameVar === discussion?.Author?.username && !downloadMode"
+        >
           <button
             v-if="!discussionBodyEditMode"
             type="button"
-            class="flex align-items gap-2 text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
+            class="align-items flex gap-2 text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
             @click="$emit('handleClickEditBody')"
           >
             Edit
@@ -336,7 +343,7 @@ const authorIsMod = computed(
           <button
             v-else-if="usernameVar"
             type="button"
-            class="text-xs text-gray-500 dark:text-gray-300 hover:text-black dark:hover:text-white"
+            class="text-xs text-gray-500 hover:text-black dark:text-gray-300 dark:hover:text-white"
             @click="$emit('cancelEditDiscussionBody')"
           >
             Cancel
@@ -349,7 +356,7 @@ const authorIsMod = computed(
           @copy-link="copyLink"
           @handle-edit="
             router.push(
-              discussion.hasDownload 
+              discussion.hasDownload
                 ? `/forums/${channelId}/downloads/edit/${discussion.id}`
                 : `/forums/${channelId}/discussions/edit/${discussion.id}`
             )

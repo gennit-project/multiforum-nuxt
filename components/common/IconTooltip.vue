@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref } from 'vue';
 
 defineProps<{
   text: string;
@@ -49,18 +49,20 @@ const hideTooltip = () => {
       >
         <div
           v-if="isVisible"
-          class="absolute left-full top-1/2 transform -translate-y-1/2 ml-2 z-50 pointer-events-none"
+          class="pointer-events-none absolute left-full top-1/2 z-50 ml-2 -translate-y-1/2 transform"
         >
           <!-- Tooltip content -->
-          <div class="relative bg-gray-800 text-white text-sm font-medium px-3 py-2 rounded-lg shadow-lg whitespace-nowrap">
+          <div
+            class="relative whitespace-nowrap rounded-lg bg-gray-800 px-3 py-2 text-sm font-medium text-white shadow-lg"
+          >
             {{ text }}
-            
+
             <!-- Left-pointing arrow -->
-            <svg 
-              class="absolute right-full top-1/2 transform -translate-y-1/2 text-gray-800" 
-              width="6" 
-              height="12" 
-              viewBox="0 0 6 12" 
+            <svg
+              class="absolute right-full top-1/2 -translate-y-1/2 transform text-gray-800"
+              width="6"
+              height="12"
+              viewBox="0 0 6 12"
               fill="currentColor"
             >
               <path d="M6 0 L0 6 L6 12 Z" />

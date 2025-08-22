@@ -1,241 +1,260 @@
 <script setup lang="ts">
-  import { computed, ref, onMounted, watch } from "vue";
-  import { useRoute } from "nuxt/app";
-  import { useQuery } from "@vue/apollo-composable";
-  import { useUIStore } from "@/stores/uiStore";
-  import { storeToRefs } from "pinia";
-  import ChannelDownloadListItem from "../discussion/list/ChannelDownloadListItem.vue";
-  import LoadMore from "../LoadMore.vue";
-  import ErrorBanner from "../ErrorBanner.vue";
-  import RequireAuth from "@/components/auth/RequireAuth.vue";
-  import DiscussionAlbum from "@/components/discussion/detail/DiscussionAlbum.vue";
-  import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
-  import { usernameVar } from "@/cache";
-  import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
-  import { getSortFromQuery, getTimeFrameFromQuery } from "@/components/comments/getSortFromQuery";
-  import type { Discussion, Album, FilterGroup } from "@/__generated__/graphql";
+import { computed, ref, onMounted, watch } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
+import ChannelDownloadListItem from '../discussion/list/ChannelDownloadListItem.vue';
+import LoadMore from '../LoadMore.vue';
+import ErrorBanner from '../ErrorBanner.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import DiscussionAlbum from '@/components/discussion/detail/DiscussionAlbum.vue';
+import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
+import { usernameVar } from '@/cache';
+import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import {
+  getSortFromQuery,
+  getTimeFrameFromQuery,
+} from '@/components/comments/getSortFromQuery';
+import type { Discussion, Album, FilterGroup } from '@/__generated__/graphql';
 
-  const DOWNLOAD_PAGE_LIMIT = 25;
+const DOWNLOAD_PAGE_LIMIT = 25;
 
-  // Props used in template
-  defineProps({
-    filterGroups: {
-      type: Array as () => FilterGroup[],
-      default: () => [],
-    },
-  });
+// Props used in template
+defineProps({
+  filterGroups: {
+    type: Array as () => FilterGroup[],
+    default: () => [],
+  },
+});
 
-  const emit = defineEmits(["filterByTag", "filterByChannel"]);
+const emit = defineEmits(['filterByTag', 'filterByChannel']);
 
-  const route = useRoute();
-  const uiStore = useUIStore();
-  const { expandChannelDiscussions } = storeToRefs(uiStore);
+const route = useRoute();
+const uiStore = useUIStore();
+const { expandChannelDiscussions } = storeToRefs(uiStore);
 
-  const channelId = computed(() => {
-    return typeof route.params.forumId === "string" ? route.params.forumId : "";
-  });
+const channelId = computed(() => {
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
+});
 
-  const filterValues = ref(
-    getFilterValuesFromParams({
-      route,
-      channelId: channelId.value,
-    })
-  );
+const filterValues = ref(
+  getFilterValuesFromParams({
+    route,
+    channelId: channelId.value,
+  })
+);
 
-  const activeSort = computed(() => {
-    return getSortFromQuery(route.query);
-  });
+const activeSort = computed(() => {
+  return getSortFromQuery(route.query);
+});
 
-  const activeTimeFrame = computed(() => {
-    return getTimeFrameFromQuery(route.query);
-  });
+const activeTimeFrame = computed(() => {
+  return getTimeFrameFromQuery(route.query);
+});
 
-  const searchInput = computed(() => {
-    return filterValues.value.searchInput;
-  });
+const searchInput = computed(() => {
+  return filterValues.value.searchInput;
+});
 
-  const selectedTags = computed(() => {
-    return filterValues.value.tags;
-  });
+const selectedTags = computed(() => {
+  return filterValues.value.tags;
+});
 
-  const selectedChannels = computed(() => {
-    return filterValues.value.channels;
-  });
+const selectedChannels = computed(() => {
+  return filterValues.value.channels;
+});
 
-  const showArchived = computed(() => {
-    return filterValues.value.showArchived;
-  });
+const showArchived = computed(() => {
+  return filterValues.value.showArchived;
+});
 
-  const {
-    result: downloadChannelResult,
-    error: downloadError,
-    loading: downloadLoading,
-    refetch: refetchDownloads,
-    fetchMore,
-  } = useQuery(GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA, {
-    channelUniqueName: channelId,
-    searchInput,
-    selectedTags,
-    showArchived,
-    hasDownload: true,
-    options: {
-      limit: DOWNLOAD_PAGE_LIMIT,
-      offset: 0,
-      sort: activeSort,
-      timeFrame: activeTimeFrame,
-    },
-  });
+const {
+  result: downloadChannelResult,
+  error: downloadError,
+  loading: downloadLoading,
+  refetch: refetchDownloads,
+  fetchMore,
+} = useQuery(GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA, {
+  channelUniqueName: channelId,
+  searchInput,
+  selectedTags,
+  showArchived,
+  hasDownload: true,
+  options: {
+    limit: DOWNLOAD_PAGE_LIMIT,
+    offset: 0,
+    sort: activeSort,
+    timeFrame: activeTimeFrame,
+  },
+});
 
-  watch(
-    () => usernameVar.value,
-    (newValue) => {
-      if (newValue) {
-        // This makes it so that items upvoted by the logged
-        // in user show the orange active upvote button.
-        refetchDownloads();
-      }
-    }
-  );
-
-  const loadMore = () => {
-    fetchMore({
-      variables: {
-        options: {
-          limit: DOWNLOAD_PAGE_LIMIT,
-          offset: downloadChannelResult.value?.getDiscussionsInChannel.discussionChannels.length,
-          // @ts-ignore
-          sort: activeSort.value,
-          // @ts-ignore
-          timeFrame: activeTimeFrame.value,
-        },
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        return {
-          getDiscussionsInChannel: {
-            ...previousResult.getDiscussionsInChannel,
-            aggregateDiscussionChannelsCount:
-              fetchMoreResult.getDiscussionsInChannel.aggregateDiscussionChannelsCount,
-            discussionChannels: [
-              ...previousResult.getDiscussionsInChannel.discussionChannels,
-              ...fetchMoreResult.getDiscussionsInChannel.discussionChannels,
-            ],
-          },
-        };
-      },
-    });
-  };
-
-  const showModProfileModal = ref(false);
-
-  // Album lightbox state
-  type AlbumData = {
-    discussion: Discussion;
-    album: Album;
-  };
-  
-  const openAlbumData = ref<AlbumData | null>(null);
-  const isAlbumLightboxOpen = ref(false);
-
-  const handleOpenAlbum = (albumData: AlbumData) => {
-    openAlbumData.value = albumData;
-    isAlbumLightboxOpen.value = true;
-  };
-
-  const handleCloseAlbum = () => {
-    openAlbumData.value = null;
-    isAlbumLightboxOpen.value = false;
-  };
-
-  onMounted(() => {
-    if (downloadChannelResult.value?.getDiscussionsInChannel.discussionChannels.length === 0) {
+watch(
+  () => usernameVar.value,
+  (newValue) => {
+    if (newValue) {
+      // This makes it so that items upvoted by the logged
+      // in user show the orange active upvote button.
       refetchDownloads();
     }
+  }
+);
+
+const loadMore = () => {
+  fetchMore({
+    variables: {
+      options: {
+        limit: DOWNLOAD_PAGE_LIMIT,
+        offset:
+          downloadChannelResult.value?.getDiscussionsInChannel
+            .discussionChannels.length,
+        // @ts-ignore
+        sort: activeSort.value,
+        // @ts-ignore
+        timeFrame: activeTimeFrame.value,
+      },
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult;
+      return {
+        getDiscussionsInChannel: {
+          ...previousResult.getDiscussionsInChannel,
+          aggregateDiscussionChannelsCount:
+            fetchMoreResult.getDiscussionsInChannel
+              .aggregateDiscussionChannelsCount,
+          discussionChannels: [
+            ...previousResult.getDiscussionsInChannel.discussionChannels,
+            ...fetchMoreResult.getDiscussionsInChannel.discussionChannels,
+          ],
+        },
+      };
+    },
+  });
+};
+
+const showModProfileModal = ref(false);
+
+// Album lightbox state
+type AlbumData = {
+  discussion: Discussion;
+  album: Album;
+};
+
+const openAlbumData = ref<AlbumData | null>(null);
+const isAlbumLightboxOpen = ref(false);
+
+const handleOpenAlbum = (albumData: AlbumData) => {
+  openAlbumData.value = albumData;
+  isAlbumLightboxOpen.value = true;
+};
+
+const handleCloseAlbum = () => {
+  openAlbumData.value = null;
+  isAlbumLightboxOpen.value = false;
+};
+
+onMounted(() => {
+  if (
+    downloadChannelResult.value?.getDiscussionsInChannel.discussionChannels
+      .length === 0
+  ) {
+    refetchDownloads();
+  }
+});
+
+// Parse download-specific filter values from query params
+const getDownloadFiltersFromQuery = () => {
+  const filters: Record<string, string[]> = {};
+
+  Object.keys(route.query).forEach((key) => {
+    if (key.startsWith('filter_')) {
+      const filterKey = key.replace('filter_', '');
+      const value = route.query[key];
+
+      if (typeof value === 'string' && value.length > 0) {
+        filters[filterKey] = value.split(',');
+      } else if (Array.isArray(value)) {
+        filters[filterKey] = value.filter(
+          (v): v is string => typeof v === 'string'
+        );
+      }
+    }
   });
 
-  // Parse download-specific filter values from query params
-  const getDownloadFiltersFromQuery = () => {
-    const filters: Record<string, string[]> = {};
-    
-    Object.keys(route.query).forEach(key => {
-      if (key.startsWith('filter_')) {
-        const filterKey = key.replace('filter_', '');
-        const value = route.query[key];
-        
-        if (typeof value === 'string' && value.length > 0) {
-          filters[filterKey] = value.split(',');
-        } else if (Array.isArray(value)) {
-          filters[filterKey] = value.filter((v): v is string => typeof v === 'string');
-        }
-      }
-    });
-    
-    return filters;
-  };
+  return filters;
+};
 
-  const downloadFilters = ref(getDownloadFiltersFromQuery());
+const downloadFilters = ref(getDownloadFiltersFromQuery());
 
-  watch(
-    () => route.query,
-    () => {
-      if (route.query) {
-        filterValues.value = getFilterValuesFromParams({
-          route,
-          channelId: channelId.value,
-        });
-        downloadFilters.value = getDownloadFiltersFromQuery();
-      }
+watch(
+  () => route.query,
+  () => {
+    if (route.query) {
+      filterValues.value = getFilterValuesFromParams({
+        route,
+        channelId: channelId.value,
+      });
+      downloadFilters.value = getDownloadFiltersFromQuery();
     }
+  }
+);
+
+// Methods
+const filterByTag = (tag: string) => {
+  emit('filterByTag', tag);
+};
+
+const filterByChannel = (channel: string) => {
+  emit('filterByChannel', channel);
+};
+
+// Filter downloads based on selected filter groups
+const filteredDownloads = computed(() => {
+  const downloads =
+    downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels ||
+    [];
+
+  // If no filters are active, return all downloads
+  const hasActiveFilters = Object.values(downloadFilters.value).some(
+    (values) => values.length > 0
   );
+  if (!hasActiveFilters) {
+    return downloads;
+  }
 
-  // Methods
-  const filterByTag = (tag: string) => {
-    emit("filterByTag", tag);
-  };
+  // For now, this is a placeholder for client-side filtering
+  // In a full implementation, this would filter based on discussion tags
+  // that match the filter group key-value pairs
+  return downloads.filter((discussionChannel: any) => {
+    const discussion = discussionChannel.Discussion;
+    if (!discussion?.Tags) return false;
 
-  const filterByChannel = (channel: string) => {
-    emit("filterByChannel", channel);
-  };
+    // Check if discussion tags match any selected filter values
+    const discussionTags = discussion.Tags.map((tag: any) => tag.text);
 
-  // Filter downloads based on selected filter groups
-  const filteredDownloads = computed(() => {
-    const downloads = downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels || [];
-    
-    // If no filters are active, return all downloads
-    const hasActiveFilters = Object.values(downloadFilters.value).some(values => values.length > 0);
-    if (!hasActiveFilters) {
-      return downloads;
-    }
-    
-    // For now, this is a placeholder for client-side filtering
-    // In a full implementation, this would filter based on discussion tags
-    // that match the filter group key-value pairs
-    return downloads.filter((discussionChannel: any) => {
-      const discussion = discussionChannel.Discussion;
-      if (!discussion?.Tags) return false;
-      
-      // Check if discussion tags match any selected filter values
-      const discussionTags = discussion.Tags.map((tag: any) => tag.text);
-      
-      // For each active filter group, check if discussion has matching tags
-      return Object.entries(downloadFilters.value).every(([_filterKey, selectedValues]) => {
+    // For each active filter group, check if discussion has matching tags
+    return Object.entries(downloadFilters.value).every(
+      ([_filterKey, selectedValues]) => {
         if (selectedValues.length === 0) return true;
-        
+
         // Simple tag matching - in a real implementation, this would be more sophisticated
         // For now, we'll check if any discussion tag contains the filter value
-        return selectedValues.some(filterValue => 
-          discussionTags.some((tag: string) => tag.toLowerCase().includes(filterValue.toLowerCase()))
+        return selectedValues.some((filterValue) =>
+          discussionTags.some((tag: string) =>
+            tag.toLowerCase().includes(filterValue.toLowerCase())
+          )
         );
-      });
-    });
-  });
-
-  const reachedEndOfResults = computed(() => {
-    return (
-      downloadChannelResult.value?.getDiscussionsInChannel.aggregateDiscussionChannelsCount ===
-      filteredDownloads.value.length
+      }
     );
   });
+});
+
+const reachedEndOfResults = computed(() => {
+  return (
+    downloadChannelResult.value?.getDiscussionsInChannel
+      .aggregateDiscussionChannelsCount === filteredDownloads.value.length
+  );
+});
 </script>
 
 <template>
@@ -253,7 +272,10 @@
       :text="downloadError.message"
     />
     <div
-      v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length === 0"
+      v-else-if="
+        downloadChannelResult?.getDiscussionsInChannel?.discussionChannels
+          ?.length === 0
+      "
       class="flex gap-2 p-4"
     >
       <span class="dark:text-white">There are no downloads yet.</span>
@@ -275,7 +297,10 @@
             </nuxt-link>
           </template>
           <template #does-not-have-auth>
-            <span class="cursor-pointer text-orange-500 underline dark:text-white">Create one?</span>
+            <span
+              class="cursor-pointer text-orange-500 underline dark:text-white"
+              >Create one?</span
+            >
           </template>
         </RequireAuth>
       </ClientOnly>
@@ -283,7 +308,10 @@
 
     <!-- Filtered results message -->
     <div
-      v-else-if="downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length > 0 && filteredDownloads.length === 0"
+      v-else-if="
+        downloadChannelResult?.getDiscussionsInChannel?.discussionChannels
+          ?.length > 0 && filteredDownloads.length === 0
+      "
       class="p-4 text-center"
     >
       <p class="text-gray-600 dark:text-gray-400">
@@ -319,7 +347,7 @@
         @load-more="loadMore"
       />
     </div>
-    
+
     <!-- Album Lightbox -->
     <DiscussionAlbum
       v-if="isAlbumLightboxOpen && openAlbumData?.album"

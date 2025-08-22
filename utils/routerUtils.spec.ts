@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach, afterAll } from 'vitest';
-import { 
+import {
   getPermalinkToDiscussionComment,
   getPermalinkToDiscussion,
   getPermalinkToEventComment,
   getPermalinkToEvent,
   getFeedbackPermalinkObject,
-  updateFilters
+  updateFilters,
 } from '@/utils/routerUtils';
 
 // Mock console.error to prevent log pollution during tests
@@ -28,7 +28,7 @@ describe('routerUtils', () => {
       const input = {
         forumId: 'forum-123',
         discussionId: 'discussion-456',
-        commentId: 'comment-789'
+        commentId: 'comment-789',
       };
 
       const result = getPermalinkToDiscussionComment(input);
@@ -38,8 +38,8 @@ describe('routerUtils', () => {
         params: {
           forumId: 'forum-123',
           discussionId: 'discussion-456',
-          commentId: 'comment-789'
-        }
+          commentId: 'comment-789',
+        },
       });
     });
   });
@@ -48,7 +48,7 @@ describe('routerUtils', () => {
     it('returns the correct permalink object for a discussion', () => {
       const input = {
         forumId: 'forum-123',
-        discussionId: 'discussion-456'
+        discussionId: 'discussion-456',
       };
 
       const result = getPermalinkToDiscussion(input);
@@ -57,8 +57,8 @@ describe('routerUtils', () => {
         name: 'forums-forumId-discussions-discussionId',
         params: {
           forumId: 'forum-123',
-          discussionId: 'discussion-456'
-        }
+          discussionId: 'discussion-456',
+        },
       });
     });
   });
@@ -68,7 +68,7 @@ describe('routerUtils', () => {
       const input = {
         forumId: 'forum-123',
         eventId: 'event-456',
-        commentId: 'comment-789'
+        commentId: 'comment-789',
       };
 
       const result = getPermalinkToEventComment(input);
@@ -78,8 +78,8 @@ describe('routerUtils', () => {
         params: {
           forumId: 'forum-123',
           eventId: 'event-456',
-          commentId: 'comment-789'
-        }
+          commentId: 'comment-789',
+        },
       });
     });
   });
@@ -88,7 +88,7 @@ describe('routerUtils', () => {
     it('returns the correct permalink object for an event', () => {
       const input = {
         forumId: 'forum-123',
-        eventId: 'event-456'
+        eventId: 'event-456',
       };
 
       const result = getPermalinkToEvent(input);
@@ -97,8 +97,8 @@ describe('routerUtils', () => {
         name: 'forums-forumId-events-eventId',
         params: {
           forumId: 'forum-123',
-          eventId: 'event-456'
-        }
+          eventId: 'event-456',
+        },
       });
     });
   });
@@ -111,7 +111,7 @@ describe('routerUtils', () => {
         commentId: 'feedback-789',
         GivesFeedbackOnDiscussion: {
           id: 'discussion-456',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -121,8 +121,8 @@ describe('routerUtils', () => {
         params: {
           forumId: 'forum-123',
           discussionId: 'discussion-456',
-          feedbackId: 'feedback-789'
-        }
+          feedbackId: 'feedback-789',
+        },
       });
     });
 
@@ -133,7 +133,7 @@ describe('routerUtils', () => {
         commentId: 'feedback-789',
         GivesFeedbackOnDiscussion: {
           id: 'discussion-456',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -143,8 +143,8 @@ describe('routerUtils', () => {
         params: {
           forumId: 'forum-123',
           discussionId: 'discussion-456',
-          feedbackId: 'feedback-789'
-        }
+          feedbackId: 'feedback-789',
+        },
       });
     });
 
@@ -155,7 +155,7 @@ describe('routerUtils', () => {
         commentId: 'feedback-789',
         GivesFeedbackOnEvent: {
           id: 'event-456',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -165,8 +165,8 @@ describe('routerUtils', () => {
         params: {
           forumId: 'forum-123',
           eventId: 'event-456',
-          feedbackId: 'feedback-789'
-        }
+          feedbackId: 'feedback-789',
+        },
       });
     });
 
@@ -177,7 +177,7 @@ describe('routerUtils', () => {
         commentId: 'feedback-789',
         GivesFeedbackOnEvent: {
           id: 'event-456',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -187,8 +187,8 @@ describe('routerUtils', () => {
         params: {
           forumId: 'forum-123',
           eventId: 'event-456',
-          feedbackId: 'feedback-789'
-        }
+          feedbackId: 'feedback-789',
+        },
       });
     });
 
@@ -200,7 +200,7 @@ describe('routerUtils', () => {
         commentId: 'feedback-789',
         GivesFeedbackOnComment: {
           id: 'comment-123',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -211,8 +211,8 @@ describe('routerUtils', () => {
           forumId: 'forum-123',
           discussionId: 'discussion-456',
           commentId: 'comment-123',
-          feedbackId: 'feedback-789'
-        }
+          feedbackId: 'feedback-789',
+        },
       });
     });
 
@@ -224,7 +224,7 @@ describe('routerUtils', () => {
         commentId: 'feedback-789',
         GivesFeedbackOnComment: {
           id: 'comment-123',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -239,7 +239,7 @@ describe('routerUtils', () => {
         // missing commentId
         GivesFeedbackOnDiscussion: {
           id: 'discussion-456',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -257,7 +257,7 @@ describe('routerUtils', () => {
         // missing commentId
         GivesFeedbackOnEvent: {
           id: 'event-456',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject(input);
@@ -276,12 +276,12 @@ describe('routerUtils', () => {
         discussionId: 'discussion-456',
         GivesFeedbackOnComment: {
           id: 'comment-123',
-        } as any
+        } as any,
       };
 
       const result = getFeedbackPermalinkObject({
         ...input,
-        commentId: undefined
+        commentId: undefined,
       });
 
       expect(result).toBeNull();
@@ -294,15 +294,15 @@ describe('routerUtils', () => {
   describe('updateFilters', () => {
     it('updates query parameters correctly and calls router.replace', () => {
       const mockRouter = {
-        replace: vi.fn()
+        replace: vi.fn(),
       };
 
       const mockRoute = {
         path: '/events',
         query: {
           existingParam: 'value',
-          shouldBeRemoved: 'value'
-        }
+          shouldBeRemoved: 'value',
+        },
       };
 
       const params = {
@@ -317,7 +317,7 @@ describe('routerUtils', () => {
       updateFilters({
         params,
         router: mockRouter as any,
-        route: mockRoute
+        route: mockRoute,
       });
 
       expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -327,15 +327,15 @@ describe('routerUtils', () => {
           channels: ['channel-1', 'channel-2'],
           tags: ['tag-1', 'tag-2'],
           searchInput: 'test search',
-          radius: 10
+          radius: 10,
         },
-        force: true
+        force: true,
       });
     });
 
     it('removes parameters with empty values', () => {
       const mockRouter = {
-        replace: vi.fn()
+        replace: vi.fn(),
       };
 
       const mockRoute = {
@@ -345,8 +345,8 @@ describe('routerUtils', () => {
           channels: ['old-channel'],
           emptyString: 'should-be-removed',
           emptyArray: ['should', 'be', 'removed'],
-          undefinedValue: 'should-be-removed'
-        }
+          undefinedValue: 'should-be-removed',
+        },
       };
 
       const params = {
@@ -361,7 +361,7 @@ describe('routerUtils', () => {
       updateFilters({
         params,
         router: mockRouter as any,
-        route: mockRoute
+        route: mockRoute,
       });
 
       expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -370,23 +370,23 @@ describe('routerUtils', () => {
           existingParam: 'value',
           channels: ['old-channel'],
         },
-        force: true
+        force: true,
       });
     });
 
     it('handles numeric and boolean values correctly', () => {
       const mockRouter = {
-        replace: vi.fn()
+        replace: vi.fn(),
       };
 
       const mockRoute = {
         path: '/events',
-        query: {}
+        query: {},
       };
 
       const params = {
         latitude: 12.345,
-        longitude: 67.890,
+        longitude: 67.89,
         radius: 10,
         showCanceledEvents: true,
         showOnlyFreeEvents: false,
@@ -395,33 +395,33 @@ describe('routerUtils', () => {
       updateFilters({
         params,
         router: mockRouter as any,
-        route: mockRoute
+        route: mockRoute,
       });
 
       expect(mockRouter.replace).toHaveBeenCalledWith({
         path: '/events',
         query: {
           latitude: 12.345,
-          longitude: 67.890,
+          longitude: 67.89,
           radius: 10,
           showCanceledEvents: true,
           showOnlyFreeEvents: false,
         },
-        force: true
+        force: true,
       });
     });
 
     it('preserves parameters that are not included in the update', () => {
       const mockRouter = {
-        replace: vi.fn()
+        replace: vi.fn(),
       };
 
       const mockRoute = {
         path: '/events',
         query: {
           existingParam: 'value',
-          anotherParam: 'keep me'
-        }
+          anotherParam: 'keep me',
+        },
       };
 
       const params = {
@@ -431,7 +431,7 @@ describe('routerUtils', () => {
       updateFilters({
         params,
         router: mockRouter as any,
-        route: mockRoute
+        route: mockRoute,
       });
 
       expect(mockRouter.replace).toHaveBeenCalledWith({
@@ -441,7 +441,7 @@ describe('routerUtils', () => {
           anotherParam: 'keep me',
           searchInput: 'new search',
         },
-        force: true
+        force: true,
       });
     });
   });

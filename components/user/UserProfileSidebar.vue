@@ -1,12 +1,12 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import "md-editor-v3/lib/style.css";
-import { GET_USER } from "@/graphQLData/user/queries";
-import { relativeTime } from "@/utils";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import { useRoute } from "nuxt/app";
-import { usernameVar, profilePicURLVar } from "@/cache";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import 'md-editor-v3/lib/style.css';
+import { GET_USER } from '@/graphQLData/user/queries';
+import { relativeTime } from '@/utils';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import { useRoute } from 'nuxt/app';
+import { usernameVar, profilePicURLVar } from '@/cache';
 
 // Define props
 defineProps({
@@ -19,10 +19,10 @@ defineProps({
 const route = useRoute();
 
 const username = computed(() => {
-  if (typeof route.params.username === "string") {
+  if (typeof route.params.username === 'string') {
     return route.params.username;
   }
-  return "";
+  return '';
 });
 
 // Fetch the user data
@@ -30,11 +30,15 @@ const {
   result,
   loading: getUserLoading,
   error: getUserError,
-} = useQuery(GET_USER, () => ({
-  username: username.value,
-}),{
-  enabled: !!usernameVar.value,
-});
+} = useQuery(
+  GET_USER,
+  () => ({
+    username: username.value,
+  }),
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 const user = computed(() => {
   if (getUserLoading.value || getUserError.value) {
@@ -52,15 +56,13 @@ const profilePic = computed(() => {
   // Otherwise use the profile pic from query result
   return user.value?.profilePicURL;
 });
-
-
 </script>
 
 <template>
   <div class="rounded-lg">
-    <div class="p-4 flex flex-col gap-2">
+    <div class="flex flex-col gap-2 p-4">
       <AvatarComponent
-        class="flex-1 max-w-72"
+        class="max-w-72 flex-1"
         :src="profilePic"
         :text="username"
         :is-square="false"
@@ -72,8 +74,9 @@ const profilePic = computed(() => {
         {{ username }}
         <span
           v-if="isAdmin"
-          class="text-xs text-orange-500 px-2 py-1 border border-orange-500 rounded-md"
-        >Admin</span>
+          class="rounded-md border border-orange-500 px-2 py-1 text-xs text-orange-500"
+          >Admin</span
+        >
       </h1>
       <h1
         v-if="user?.displayName"
@@ -82,8 +85,9 @@ const profilePic = computed(() => {
         {{ user.displayName }}
         <span
           v-if="isAdmin"
-          class="text-sm text-orange-600 dark:text-orange-500 px-2 py-1 border border-orange-600 dark:border-orange-500 rounded-md"
-        >Admin</span>
+          class="rounded-md border border-orange-600 px-2 py-1 text-sm text-orange-600 dark:border-orange-500 dark:text-orange-500"
+          >Admin</span
+        >
       </h1>
       <span v-if="user?.displayName" class="text-gray-600 dark:text-gray-400">
         {{ `u/${username}` }}
@@ -99,7 +103,10 @@ const profilePic = computed(() => {
           />
         </div>
         <slot />
-        <div v-if="user && username" class="mt-6 hidden min-w-0 flex-1 sm:block 2xl:hidden text-gray-600 dark:text-gray-400">
+        <div
+          v-if="user && username"
+          class="mt-6 hidden min-w-0 flex-1 text-gray-600 dark:text-gray-400 sm:block 2xl:hidden"
+        >
           {{ `Joined ${relativeTime(user.createdAt)}` }}
         </div>
       </div>

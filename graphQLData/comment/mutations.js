@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 export const ADD_EMOJI_TO_COMMENT = gql`
   mutation addEmojiToComment(
@@ -243,7 +243,7 @@ export const UPDATE_COMMENT = gql`
           count
         }
         FeedbackComments {
-          id 
+          id
           CommentAuthor {
             ... on ModerationProfile {
               displayName

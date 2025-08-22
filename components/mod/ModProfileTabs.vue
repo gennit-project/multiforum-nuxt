@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
-import TabButton from "@/components/channel/TabButton.vue";
-import type { ModerationProfile } from "@/__generated__/graphql";
-import { useRoute } from "nuxt/app";
+import { computed, ref, watch } from 'vue';
+import TabButton from '@/components/channel/TabButton.vue';
+import type { ModerationProfile } from '@/__generated__/graphql';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 
@@ -26,7 +26,7 @@ const props = defineProps({
 
 const channelId = ref(route.params.forumId);
 const modNameInParams = computed(() => {
-  return typeof route.params.modId === "string" ? route.params.modId : "";
+  return typeof route.params.modId === 'string' ? route.params.modId : '';
 });
 
 watch(
@@ -40,19 +40,19 @@ watch(
 const tabs = computed(() => {
   const tabList: TabData[] = [
     {
-      name: "Comments",
+      name: 'Comments',
       href: `/mod/${modNameInParams.value}/comments`,
       current: true,
       count: props.mod?.AuthoredCommentsAggregate?.count,
     },
     {
-      name: "Mod Actions",
+      name: 'Mod Actions',
       href: `/mod/${modNameInParams.value}/actions`,
       current: false,
       count: props.mod?.ActivityFeedAggregate?.count,
     },
     {
-      name: "Issues",
+      name: 'Issues',
       href: `/mod/${modNameInParams.value}/issues`,
       current: false,
       count: props.mod?.AuthoredIssuesAggregate?.count,

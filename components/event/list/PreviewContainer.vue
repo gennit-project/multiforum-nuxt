@@ -5,8 +5,8 @@ import {
   TransitionChild,
   TransitionRoot,
   DialogTitle,
-} from "@headlessui/vue";
-import XIcon from "@/components/icons/XmarkIcon.vue";
+} from '@headlessui/vue';
+import XIcon from '@/components/icons/XmarkIcon.vue';
 
 defineProps({
   isOpen: {
@@ -15,7 +15,7 @@ defineProps({
   },
   header: {
     type: String,
-    default: "",
+    default: '',
   },
   topLayer: {
     type: Boolean,
@@ -23,7 +23,7 @@ defineProps({
   },
 });
 
-defineEmits(["closePreview"]);
+defineEmits(['closePreview']);
 </script>
 
 <template>
@@ -56,7 +56,7 @@ defineEmits(["closePreview"]);
                     class="flex min-h-0 flex-1 flex-col overflow-auto bg-white px-8 py-2 dark:bg-gray-800 dark:text-gray-200"
                   >
                     <div>
-                      <div class="flex gap-4 items-center">
+                      <div class="flex items-center gap-4">
                         <div class="ml-3 flex h-7 items-center">
                           <button
                             type="button"
@@ -68,7 +68,7 @@ defineEmits(["closePreview"]);
                           </button>
                         </div>
                         <DialogTitle
-                          class="font-medium my-3 text-lg text-gray-900 dark:text-gray-200"
+                          class="my-3 text-lg font-medium text-gray-900 dark:text-gray-200"
                         >
                           {{ header }}
                         </DialogTitle>

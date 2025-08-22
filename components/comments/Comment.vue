@@ -1,33 +1,36 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import type { PropType } from "vue";
-import type { ApolloError } from "@apollo/client/core";
-import { gql } from "@apollo/client/core";
-import type { Comment } from "@/__generated__/graphql";
-import type { CreateReplyInputData } from "@/types/Comment";
-import type { MenuItemType } from "@/components/IconButtonDropdown.vue";
-import TextEditor from "../TextEditor.vue";
-import ChildComments from "./ChildComments.vue";
-import CommentButtons from "./CommentButtons.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import EllipsisHorizontal from "@/components/icons/EllipsisHorizontal.vue";
-import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import CommentHeader from "./CommentHeader.vue";
-import { ALLOWED_ICONS } from "@/utils";
-import { usernameVar, modProfileNameVar } from "@/cache";
-import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
-import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
-import { getAllPermissions } from "@/utils/permissionUtils";
-import ArchivedCommentText from "./ArchivedCommentText.vue";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from "@/graphQLData/user/queries";
-import { GET_SERVER_CONFIG } from "@/graphQLData/admin/queries";
-import { MARK_AS_ANSWERED_BY_COMMENT, UNMARK_COMMENT_AS_ANSWER } from "@/graphQLData/discussion/mutations";
-import { DateTime } from "luxon";
-import { config } from "@/config";
-import { useQuery, useMutation } from "@vue/apollo-composable";
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import type { PropType } from 'vue';
+import type { ApolloError } from '@apollo/client/core';
+import { gql } from '@apollo/client/core';
+import type { Comment } from '@/__generated__/graphql';
+import type { CreateReplyInputData } from '@/types/Comment';
+import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
+import TextEditor from '../TextEditor.vue';
+import ChildComments from './ChildComments.vue';
+import CommentButtons from './CommentButtons.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
+import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import CommentHeader from './CommentHeader.vue';
+import { ALLOWED_ICONS } from '@/utils';
+import { usernameVar, modProfileNameVar } from '@/cache';
+import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
+import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
+import { getAllPermissions } from '@/utils/permissionUtils';
+import ArchivedCommentText from './ArchivedCommentText.vue';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
+import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
+import {
+  MARK_AS_ANSWERED_BY_COMMENT,
+  UNMARK_COMMENT_AS_ANSWER,
+} from '@/graphQLData/discussion/mutations';
+import { DateTime } from 'luxon';
+import { config } from '@/config';
+import { useQuery, useMutation } from '@vue/apollo-composable';
 
 const MAX_COMMENT_DEPTH = 5;
 const SHOW_MORE_THRESHOLD = 1000;
@@ -71,7 +74,7 @@ const props = defineProps({
   },
   editFormOpenAtCommentID: {
     type: String,
-    default: "",
+    default: '',
   },
   enableFeedback: {
     type: Boolean,
@@ -92,11 +95,11 @@ const props = defineProps({
   modProfileName: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   parentCommentId: {
     type: String,
-    default: "",
+    default: '',
   },
   readonly: {
     type: Boolean,
@@ -104,7 +107,7 @@ const props = defineProps({
   },
   replyFormOpenAtCommentID: {
     type: String,
-    default: "",
+    default: '',
   },
   showHeader: {
     type: Boolean,
@@ -125,7 +128,7 @@ const props = defineProps({
   originalPoster: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   lengthOfCommentInProgress: {
     type: Number,
@@ -142,45 +145,45 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  "createComment",
-  "delete-comment",
-  "click-edit-comment",
-  "openEditCommentEditor",
-  "updateEditCommentInput",
-  "updateCreateReplyCommentInput",
-  "showCopiedLinkNotification",
-  "clickReport",
-  "clickFeedback",
-  "clickUndoFeedback",
-  "clickEditFeedback",
-  "handleViewFeedback",
-  "startCommentSave",
-  "openReplyEditor",
-  "hideReplyEditor",
-  "hideEditCommentEditor",
-  "saveEdit",
-  "openModProfile",
-  "scrollToTop",
-  "handleClickArchive",
-  "handleClickArchiveAndSuspend",
-  "handleClickUnarchive",
-  "update-edit-comment-input",
-  "showMarkedAsBestAnswerNotification",
-  "showUnmarkedAsBestAnswerNotification",
+  'createComment',
+  'delete-comment',
+  'click-edit-comment',
+  'openEditCommentEditor',
+  'updateEditCommentInput',
+  'updateCreateReplyCommentInput',
+  'showCopiedLinkNotification',
+  'clickReport',
+  'clickFeedback',
+  'clickUndoFeedback',
+  'clickEditFeedback',
+  'handleViewFeedback',
+  'startCommentSave',
+  'openReplyEditor',
+  'hideReplyEditor',
+  'hideEditCommentEditor',
+  'saveEdit',
+  'openModProfile',
+  'scrollToTop',
+  'handleClickArchive',
+  'handleClickArchiveAndSuspend',
+  'handleClickUnarchive',
+  'update-edit-comment-input',
+  'showMarkedAsBestAnswerNotification',
+  'showUnmarkedAsBestAnswerNotification',
 ]);
 
 const route = useRoute();
 const router = useRouter();
-const { discussionId, eventId, issueId } = route.params
+const { discussionId, eventId, issueId } = route.params;
 
-const forumId = computed (() => {
+const forumId = computed(() => {
   if (props.commentData?.Channel?.uniqueName) {
     return props.commentData.Channel.uniqueName;
   }
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const { result: getChannelResult } = useQuery(
@@ -188,11 +191,11 @@ const { result: getChannelResult } = useQuery(
   {
     uniqueName: forumId,
     // Using luxon, round down to the nearest hour
-    now: DateTime.local().startOf("hour").toISO(),
+    now: DateTime.local().startOf('hour').toISO(),
   },
   {
-    fetchPolicy: "cache-first",
-    nextFetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
   }
 );
 
@@ -202,7 +205,7 @@ const { result: getServerResult } = useQuery(
     serverName: config.serverName,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -215,8 +218,8 @@ const standardModRole = computed(() => {
   if (getServerResult.value?.serverConfigs[0]?.DefaultModRole) {
     return getServerResult.value?.serverConfigs[0]?.DefaultModRole;
   }
-  return null
-})
+  return null;
+});
 
 const elevatedModRole = computed(() => {
   // If the channel has a Default Elevated Mod Role, return that.
@@ -227,115 +230,124 @@ const elevatedModRole = computed(() => {
   if (getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole) {
     return getServerResult.value?.serverConfigs[0]?.DefaultElevatedModRole;
   }
-  return null
-})
-
-const { result: getPermissionResult } = useQuery(USER_IS_MOD_OR_OWNER_IN_CHANNEL, {
-  modDisplayName: modProfileNameVar.value,
-  username: usernameVar.value,
-  channelUniqueName: forumId.value || "",
-}, {
-  enabled: !!modProfileNameVar.value && !!usernameVar.value && !!forumId.value,
-  fetchPolicy: "cache-first",
+  return null;
 });
+
+const { result: getPermissionResult } = useQuery(
+  USER_IS_MOD_OR_OWNER_IN_CHANNEL,
+  {
+    modDisplayName: modProfileNameVar.value,
+    username: usernameVar.value,
+    channelUniqueName: forumId.value || '',
+  },
+  {
+    enabled:
+      !!modProfileNameVar.value && !!usernameVar.value && !!forumId.value,
+    fetchPolicy: 'cache-first',
+  }
+);
 
 // Mutations for marking comments as best answers
-const {
-  mutate: markAsAnsweredByComment,
-} = useMutation(MARK_AS_ANSWERED_BY_COMMENT, {
-  update: (cache, { data }) => {
-    // The mutation response contains the updated discussionChannel with new Answers array
-    if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
-      const updatedChannel = data.updateDiscussionChannels.discussionChannels[0];
-      
-      // Update any cached queries that might contain this data
-      cache.modify({
-        fields: {
-          discussionChannels(existingChannels = [], { readField }) {
-            return existingChannels.map((channelRef: any) => {
-              const channelId = readField('id', channelRef);
-              if (channelId === updatedChannel.id) {
-                cache.writeFragment({
-                  id: cache.identify(channelRef),
-                  fragment: gql`
-                    fragment UpdatedAnswers on DiscussionChannel {
-                      id
-                      answered
-                      Answers {
-                        id
-                        text
-                        CommentAuthor {
-                          ... on User {
-                            username
-                          }
-                          ... on ModerationProfile {
-                            displayName
-                          }
-                        }
-                      }
-                    }
-                  `,
-                  data: updatedChannel,
-                });
-              }
-              return channelRef;
-            });
-          },
-        },
-      });
-    }
-  },
-});
+const { mutate: markAsAnsweredByComment } = useMutation(
+  MARK_AS_ANSWERED_BY_COMMENT,
+  {
+    update: (cache, { data }) => {
+      // The mutation response contains the updated discussionChannel with new Answers array
+      if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
+        const updatedChannel =
+          data.updateDiscussionChannels.discussionChannels[0];
 
-const {
-  mutate: unmarkCommentAsAnswer,
-} = useMutation(UNMARK_COMMENT_AS_ANSWER, {
-  update: (cache, { data }) => {
-    // The mutation response contains the updated discussionChannel with new Answers array
-    if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
-      const updatedChannel = data.updateDiscussionChannels.discussionChannels[0];
-      
-      // Update any cached queries that might contain this data
-      // This will trigger reactivity and update the UI immediately
-      cache.modify({
-        fields: {
-          // Force a refresh of any queries that depend on the answers
-          discussionChannels(existingChannels = [], { readField }) {
-            return existingChannels.map((channelRef: any) => {
-              const channelId = readField('id', channelRef);
-              if (channelId === updatedChannel.id) {
-                // Update this channel with the new answers
-                cache.writeFragment({
-                  id: cache.identify(channelRef),
-                  fragment: gql`
-                    fragment UpdatedAnswers on DiscussionChannel {
-                      id
-                      answered
-                      Answers {
+        // Update any cached queries that might contain this data
+        cache.modify({
+          fields: {
+            discussionChannels(existingChannels = [], { readField }) {
+              return existingChannels.map((channelRef: any) => {
+                const channelId = readField('id', channelRef);
+                if (channelId === updatedChannel.id) {
+                  cache.writeFragment({
+                    id: cache.identify(channelRef),
+                    fragment: gql`
+                      fragment UpdatedAnswers on DiscussionChannel {
                         id
-                        text
-                        CommentAuthor {
-                          ... on User {
-                            username
-                          }
-                          ... on ModerationProfile {
-                            displayName
+                        answered
+                        Answers {
+                          id
+                          text
+                          CommentAuthor {
+                            ... on User {
+                              username
+                            }
+                            ... on ModerationProfile {
+                              displayName
+                            }
                           }
                         }
                       }
-                    }
-                  `,
-                  data: updatedChannel,
-                });
-              }
-              return channelRef;
-            });
+                    `,
+                    data: updatedChannel,
+                  });
+                }
+                return channelRef;
+              });
+            },
           },
-        },
-      });
-    }
-  },
-});
+        });
+      }
+    },
+  }
+);
+
+const { mutate: unmarkCommentAsAnswer } = useMutation(
+  UNMARK_COMMENT_AS_ANSWER,
+  {
+    update: (cache, { data }) => {
+      // The mutation response contains the updated discussionChannel with new Answers array
+      if (data?.updateDiscussionChannels?.discussionChannels?.[0]) {
+        const updatedChannel =
+          data.updateDiscussionChannels.discussionChannels[0];
+
+        // Update any cached queries that might contain this data
+        // This will trigger reactivity and update the UI immediately
+        cache.modify({
+          fields: {
+            // Force a refresh of any queries that depend on the answers
+            discussionChannels(existingChannels = [], { readField }) {
+              return existingChannels.map((channelRef: any) => {
+                const channelId = readField('id', channelRef);
+                if (channelId === updatedChannel.id) {
+                  // Update this channel with the new answers
+                  cache.writeFragment({
+                    id: cache.identify(channelRef),
+                    fragment: gql`
+                      fragment UpdatedAnswers on DiscussionChannel {
+                        id
+                        answered
+                        Answers {
+                          id
+                          text
+                          CommentAuthor {
+                            ... on User {
+                              username
+                            }
+                            ... on ModerationProfile {
+                              displayName
+                            }
+                          }
+                        }
+                      }
+                    `,
+                    data: updatedChannel,
+                  });
+                }
+                return channelRef;
+              });
+            },
+          },
+        });
+      }
+    },
+  }
+);
 
 const permissionData = computed(() => {
   if (getPermissionResult.value?.channels?.[0]) {
@@ -394,29 +406,36 @@ const isFeedbackComment = computed(() => {
 
 const permalinkObject = computed(() => {
   if (!canShowPermalink.value) {
-    console.warn("No permalink object found for comment", props.commentData);
+    console.warn('No permalink object found for comment', props.commentData);
     return {};
   }
 
-  const channelUniqueName = props.commentData.Channel?.uniqueName || 
-                          props.commentData?.DiscussionChannel?.channelUniqueName;
-                          
+  const channelUniqueName =
+    props.commentData.Channel?.uniqueName ||
+    props.commentData?.DiscussionChannel?.channelUniqueName;
+
   // If we don't have a valid forumId and we're not on a page with a forumId param,
   // we can't create a permalink
   if (!channelUniqueName && !forumId.value) {
-    console.warn("Missing forumId for comment permalink", props.commentData.id);
+    console.warn('Missing forumId for comment permalink', props.commentData.id);
     return {};
   }
 
   if (isFeedbackComment.value) {
     return getFeedbackPermalinkObject({
       routeName: route.name as string,
-      forumId: channelUniqueName || forumId.value as string,
-      discussionId: props.commentData.GivesFeedbackOnDiscussion?.id || discussionId as string || props.commentData?.DiscussionChannel?.discussionId,
-      eventId: props.commentData.GivesFeedbackOnEvent?.id || eventId as string,
+      forumId: channelUniqueName || (forumId.value as string),
+      discussionId:
+        props.commentData.GivesFeedbackOnDiscussion?.id ||
+        (discussionId as string) ||
+        props.commentData?.DiscussionChannel?.discussionId,
+      eventId:
+        props.commentData.GivesFeedbackOnEvent?.id || (eventId as string),
       commentId: props.commentData.GivesFeedbackOnComment?.id,
-      GivesFeedbackOnComment: props.commentData.GivesFeedbackOnComment || undefined,
-      GivesFeedbackOnDiscussion: props.commentData.GivesFeedbackOnDiscussion || undefined,
+      GivesFeedbackOnComment:
+        props.commentData.GivesFeedbackOnComment || undefined,
+      GivesFeedbackOnDiscussion:
+        props.commentData.GivesFeedbackOnDiscussion || undefined,
       GivesFeedbackOnEvent: props.commentData.GivesFeedbackOnEvent || undefined,
     });
   }
@@ -428,7 +447,7 @@ const permalinkObject = computed(() => {
   if (discussionIdInLink && (channelUniqueName || forumId.value)) {
     // Permalink for comment on a discussion
     result = {
-      name: "forums-forumId-discussions-discussionId-comments-commentId",
+      name: 'forums-forumId-discussions-discussionId-comments-commentId',
       params: {
         discussionId: discussionIdInLink,
         commentId: props.commentData.id,
@@ -439,7 +458,7 @@ const permalinkObject = computed(() => {
   const eventIdInLink = eventId || props.commentData?.Event?.id;
   if (eventIdInLink && (channelUniqueName || forumId.value)) {
     result = {
-      name: "forums-forumId-events-eventId-comments-commentId",
+      name: 'forums-forumId-events-eventId-comments-commentId',
       params: {
         eventId: props.commentData.Event?.id,
         forumId: channelUniqueName || forumId.value,
@@ -450,7 +469,7 @@ const permalinkObject = computed(() => {
   const issueIdInLink = issueId || props.commentData?.Issue?.id;
   if (issueIdInLink && channelUniqueName) {
     result = {
-      name: "forums-forumId-issues-issueId-comments-commentId",
+      name: 'forums-forumId-issues-issueId-comments-commentId',
       params: {
         issueId: issueIdInLink,
         forumId: channelUniqueName,
@@ -462,11 +481,11 @@ const permalinkObject = computed(() => {
   return result;
 });
 
-let basePath = "";
+let basePath = '';
 if (import.meta.client) {
   basePath = window.location.origin;
 } else {
-  basePath = process.env.BASE_URL || "";
+  basePath = process.env.BASE_URL || '';
 }
 
 const permalink = computed(() => {
@@ -478,18 +497,18 @@ const permalink = computed(() => {
 
 const copyLink = async () => {
   if (!permalink.value) {
-    console.warn("No permalink available to copy");
+    console.warn('No permalink available to copy');
     return;
   }
-  
+
   try {
     await navigator.clipboard.writeText(permalink.value);
-    emit("showCopiedLinkNotification", true);
+    emit('showCopiedLinkNotification', true);
   } catch (e: any) {
     throw new Error(e);
   }
   setTimeout(() => {
-    emit("showCopiedLinkNotification", false);
+    emit('showCopiedLinkNotification', false);
   }, 2000);
 };
 
@@ -503,73 +522,90 @@ const isMarkedAsAnswer = computed(() => {
   if (!props.answers || props.answers.length === 0) {
     return false;
   }
-  
+
   // Check if this comment's ID is in the Answers array
-  return props.answers.some((answer: any) => answer.id === props.commentData.id);
+  return props.answers.some(
+    (answer: any) => answer.id === props.commentData.id
+  );
 });
 
 // Functions for marking/unmarking as best answer
 const handleMarkAsBestAnswer = async () => {
   // Get discussionId from route params or comment data
-  const discussionIdFromRoute = typeof discussionId === 'string' ? discussionId : Array.isArray(discussionId) ? discussionId[0] : undefined;
-  const discussionIdToUse = discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
-  
+  const discussionIdFromRoute =
+    typeof discussionId === 'string'
+      ? discussionId
+      : Array.isArray(discussionId)
+        ? discussionId[0]
+        : undefined;
+  const discussionIdToUse =
+    discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
+
   if (!discussionIdToUse) {
-    console.warn("No discussion ID found for comment");
+    console.warn('No discussion ID found for comment');
     return;
   }
-  
+
   try {
     await markAsAnsweredByComment({
       commentId: props.commentData.id,
       channelId: forumId.value,
-      discussionId: discussionIdToUse 
+      discussionId: discussionIdToUse,
     });
-    emit("showMarkedAsBestAnswerNotification", true);
+    emit('showMarkedAsBestAnswerNotification', true);
     setTimeout(() => {
-      emit("showMarkedAsBestAnswerNotification", false);
+      emit('showMarkedAsBestAnswerNotification', false);
     }, 3000);
   } catch (error) {
-    console.error("Error marking comment as best answer:", error);
+    console.error('Error marking comment as best answer:', error);
   }
 };
 
 const handleUnmarkAsBestAnswer = async () => {
   // Get discussionId from route params or comment data
-  const discussionIdFromRoute = typeof discussionId === 'string' ? discussionId : Array.isArray(discussionId) ? discussionId[0] : undefined;
-  const discussionIdToUse = discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
-  
+  const discussionIdFromRoute =
+    typeof discussionId === 'string'
+      ? discussionId
+      : Array.isArray(discussionId)
+        ? discussionId[0]
+        : undefined;
+  const discussionIdToUse =
+    discussionIdFromRoute || props.commentData.DiscussionChannel?.discussionId;
+
   if (!discussionIdToUse) {
-    console.warn("No discussion ID found for comment");
+    console.warn('No discussion ID found for comment');
     return;
   }
-  
+
   try {
     await unmarkCommentAsAnswer({
       commentId: props.commentData.id,
       channelId: forumId.value,
       discussionId: discussionIdToUse,
     });
-    emit("showUnmarkedAsBestAnswerNotification", true);
+    emit('showUnmarkedAsBestAnswerNotification', true);
     setTimeout(() => {
-      emit("showUnmarkedAsBestAnswerNotification", false);
+      emit('showUnmarkedAsBestAnswerNotification', false);
     }, 3000);
   } catch (error) {
-    console.error("Error unmarking comment as best answer:", error);
+    console.error('Error unmarking comment as best answer:', error);
   }
 };
 
 const commentMenuItems = computed(() => {
   let menuItems: MenuItemType[] = [];
-  
+
   // Always add these base items for authenticated or unauthenticated users
-  
+
   // Only show Copy Link when we have a valid permalink
-  if (canShowPermalink.value && Object.keys(permalinkObject.value ?? {}).length > 0) {
+  if (
+    canShowPermalink.value &&
+    Object.keys(permalinkObject.value ?? {}).length > 0
+  ) {
     menuItems.push({
-      label: "Copy Link",
-      value: "",
-      event: "copyLink",
+      label: 'Copy Link',
+      value: '',
+      event: 'copyLink',
       icon: ALLOWED_ICONS.COPY_LINK,
     });
   }
@@ -577,51 +613,57 @@ const commentMenuItems = computed(() => {
   // Always show feedback option if enabled
   if (props.enableFeedback) {
     menuItems.push({
-      label: "View Feedback",
-      value: "",
-      event: "handleViewFeedback",
+      label: 'View Feedback',
+      value: '',
+      event: 'handleViewFeedback',
       icon: ALLOWED_ICONS.VIEW_FEEDBACK,
     });
   }
-  
+
   // Return early if user is not logged in
   if (!usernameVar.value) {
     return menuItems;
   }
 
-  const isOwnComment = props.commentData?.CommentAuthor?.__typename === "User" &&
-                      props.commentData?.CommentAuthor?.username === usernameVar.value;
+  const isOwnComment =
+    props.commentData?.CommentAuthor?.__typename === 'User' &&
+    props.commentData?.CommentAuthor?.username === usernameVar.value;
 
   // If user is the author of the comment
   if (isOwnComment) {
     menuItems.push({
-      label: "Edit",
-      value: "",
-      event: "handleEdit",
+      label: 'Edit',
+      value: '',
+      event: 'handleEdit',
       icon: ALLOWED_ICONS.EDIT,
     });
     menuItems.push({
-      label: "Delete",
-      value: "",
-      event: "handleDelete",
+      label: 'Delete',
+      value: '',
+      event: 'handleDelete',
       icon: ALLOWED_ICONS.DELETE,
     });
   }
 
   // If user is the discussion author and this is a root comment in a discussion
-  if (isDiscussionAuthor.value && discussionId && props.depth === 1 && !isOwnComment) {
+  if (
+    isDiscussionAuthor.value &&
+    discussionId &&
+    props.depth === 1 &&
+    !isOwnComment
+  ) {
     if (!isMarkedAsAnswer.value) {
       menuItems.push({
-        label: "Mark as Best Answer",
-        value: "",
-        event: "handleMarkAsBestAnswer",
+        label: 'Mark as Best Answer',
+        value: '',
+        event: 'handleMarkAsBestAnswer',
         icon: ALLOWED_ICONS.MARK_BEST_ANSWER,
       });
     } else {
       menuItems.push({
-        label: "Undo Mark as Best Answer",
-        value: "",
-        event: "handleUnmarkAsBestAnswer",
+        label: 'Undo Mark as Best Answer',
+        value: '',
+        event: 'handleUnmarkAsBestAnswer',
         icon: ALLOWED_ICONS.UNDO,
       });
     }
@@ -629,12 +671,12 @@ const commentMenuItems = computed(() => {
 
   // Check if the user has any moderation permission (standard mod or above)
   // Standard mods are neither elevated nor suspended, but should still see Report and Give Feedback options
-  const canPerformModActions = 
-    !userPermissions.value.isSuspendedMod && 
-    (userPermissions.value.isChannelOwner || 
-     userPermissions.value.isElevatedMod || 
-     userPermissions.value.canReport || 
-     userPermissions.value.canGiveFeedback);
+  const canPerformModActions =
+    !userPermissions.value.isSuspendedMod &&
+    (userPermissions.value.isChannelOwner ||
+      userPermissions.value.isElevatedMod ||
+      userPermissions.value.canReport ||
+      userPermissions.value.canGiveFeedback);
 
   // Show mod actions if user has any mod permissions and isn't the comment author
   if (usernameVar.value && canPerformModActions && !isOwnComment) {
@@ -644,9 +686,9 @@ const commentMenuItems = computed(() => {
     // Add report action if user has permission
     if (userPermissions.value.canReport) {
       modActions.push({
-        label: "Report",
-        value: "",
-        event: "clickReport",
+        label: 'Report',
+        value: '',
+        event: 'clickReport',
         icon: ALLOWED_ICONS.REPORT,
       });
     }
@@ -654,25 +696,28 @@ const commentMenuItems = computed(() => {
     // Add feedback action if user has permission and feedback is enabled
     if (userPermissions.value.canGiveFeedback && props.enableFeedback) {
       modActions.push({
-        label: "Give Feedback",
-        value: "",
-        event: "clickFeedback",
+        label: 'Give Feedback',
+        value: '',
+        event: 'clickFeedback',
         icon: ALLOWED_ICONS.GIVE_FEEDBACK,
       });
     }
 
     // Add feedback management actions if comment has feedback
-    if (props.enableFeedback && props.commentData.FeedbackComments?.length > 0) {
+    if (
+      props.enableFeedback &&
+      props.commentData.FeedbackComments?.length > 0
+    ) {
       modActions.push({
-        label: "Undo Feedback",
-        value: "",
-        event: "clickUndoFeedback",
+        label: 'Undo Feedback',
+        value: '',
+        event: 'clickUndoFeedback',
         icon: ALLOWED_ICONS.UNDO,
       });
       modActions.push({
-        label: "Edit Feedback",
-        value: "",
-        event: "clickEditFeedback",
+        label: 'Edit Feedback',
+        value: '',
+        event: 'clickEditFeedback',
         icon: ALLOWED_ICONS.EDIT,
       });
     }
@@ -681,8 +726,8 @@ const commentMenuItems = computed(() => {
     if (!props.commentData.archived) {
       if (userPermissions.value.canHideComment) {
         modActions.push({
-          label: "Archive",
-          event: "handleClickArchive",
+          label: 'Archive',
+          event: 'handleClickArchive',
           icon: ALLOWED_ICONS.ARCHIVE,
           value: '',
         });
@@ -690,8 +735,8 @@ const commentMenuItems = computed(() => {
 
       if (userPermissions.value.canSuspendUser) {
         modActions.push({
-          label: "Archive and Suspend",
-          event: "handleClickArchiveAndSuspend",
+          label: 'Archive and Suspend',
+          event: 'handleClickArchiveAndSuspend',
           icon: ALLOWED_ICONS.SUSPEND,
           value: '',
         });
@@ -699,8 +744,8 @@ const commentMenuItems = computed(() => {
     } else {
       if (userPermissions.value.canHideComment) {
         modActions.push({
-          label: "Unarchive",
-          event: "handleClickUnarchive",
+          label: 'Unarchive',
+          event: 'handleClickUnarchive',
           icon: ALLOWED_ICONS.UNARCHIVE,
           value: '',
         });
@@ -710,43 +755,43 @@ const commentMenuItems = computed(() => {
     // Only add the mod actions section if there are actually actions to show
     if (modActions.length > 0) {
       menuItems.push({
-        value: "Moderation Actions",
+        value: 'Moderation Actions',
         isDivider: true,
-        label: ""
+        label: '',
       });
       menuItems = menuItems.concat(modActions);
     }
   }
-  
+
   return menuItems;
 });
 
 const showReplies = ref(true);
 const highlight = ref(false);
-const editorId = "texteditor";
+const editorId = 'texteditor';
 
 const maxCommentDepth = MAX_COMMENT_DEPTH;
 
 function createComment(parentCommentId: string) {
-  emit("createComment", parentCommentId);
+  emit('createComment', parentCommentId);
 }
 
 function handleDelete(input: DeleteCommentInputData) {
-  emit("delete-comment", input);
+  emit('delete-comment', input);
 }
 
 function handleEdit(commentData: Comment) {
-  emit("click-edit-comment", commentData);
+  emit('click-edit-comment', commentData);
 }
 
 function updateExistingComment(text: string, depth: number) {
-  emit("update-edit-comment-input", text, depth === 1);
+  emit('update-edit-comment-input', text, depth === 1);
 }
 
 function updateNewComment(input: CreateReplyInputData) {
   const { text, parentCommentId, depth } = input;
   if (parentCommentId) {
-    emit("updateCreateReplyCommentInput", {
+    emit('updateCreateReplyCommentInput', {
       text,
       parentCommentId,
       depth,
@@ -755,19 +800,19 @@ function updateNewComment(input: CreateReplyInputData) {
 }
 
 function handleReport() {
-  emit("clickReport", props.commentData);
+  emit('clickReport', props.commentData);
 }
 
 function handleFeedback(input: HandleFeedbackInput) {
-  emit("clickFeedback", input);
+  emit('clickFeedback', input);
 }
 
 function handleUndoFeedback(input: HandleFeedbackInput) {
-  emit("clickUndoFeedback", input);
+  emit('clickUndoFeedback', input);
 }
 
 function handleEditFeedback(input: HandleEditFeedbackInput) {
-  emit("clickEditFeedback", input);
+  emit('clickEditFeedback', input);
 }
 
 const showEditCommentForm = computed(() => {
@@ -783,16 +828,16 @@ const saveDisabled = computed(() => {
   );
 });
 const label = computed(() => {
-  let label = "";
+  let label = '';
   if (props.showLabel) {
     if (props.commentData.GivesFeedbackOnDiscussion) {
-      label = "Feedback on Discussion";
+      label = 'Feedback on Discussion';
     } else if (props.commentData.GivesFeedbackOnEvent) {
-      label = "Feedback on Event";
+      label = 'Feedback on Event';
     } else if (props.commentData.GivesFeedbackOnComment) {
-      label = "Feedback on Comment";
+      label = 'Feedback on Comment';
     } else if (props.commentData.Issue) {
-      label = "Comment on Issue";
+      label = 'Comment on Issue';
     }
   }
   return label;
@@ -804,7 +849,7 @@ const label = computed(() => {
     <div
       :class="[
         depth > 1
-          ? 'border-l border-gray-300 pl-4 ml-1 pt-2 dark:border-gray-600'
+          ? 'ml-1 border-l border-gray-300 pl-4 pt-2 dark:border-gray-600'
           : '',
       ]"
       class="flex w-full"
@@ -813,10 +858,10 @@ const label = computed(() => {
         <div
           :class="[
             isHighlighted
-              ? 'rounded-md bg-orange-100 dark:bg-orange-900 border border-orange-600 p-2'
+              ? 'rounded-md border border-orange-600 bg-orange-100 p-2 dark:bg-orange-900'
               : isMarkedAsAnswer
-              ? 'rounded-md bg-green-100 dark:bg-green-900 border border-green-600 p-2'
-              : 'dark:bg-gray-950 ',
+                ? 'rounded-md border border-green-600 bg-green-100 p-2 dark:bg-green-900'
+                : 'dark:bg-gray-950',
           ]"
           class="flex w-full"
           data-testid="comment"
@@ -837,7 +882,7 @@ const label = computed(() => {
             >
               <div class="w-full dark:text-gray-200">
                 <div class="w-full overflow-auto">
-                  <ArchivedCommentText 
+                  <ArchivedCommentText
                     v-if="props.commentData?.archived"
                     :channel-id="forumId"
                     :comment-id="props.commentData.id"
@@ -850,18 +895,24 @@ const label = computed(() => {
                     class="ml-3"
                     :class="[
                       props.goToPermalinkOnClick
-                        ? 'cursor-pointer hover:text-gray-500 hover:bg-gray-100 hover:dark:bg-gray-700'
+                        ? 'cursor-pointer hover:bg-gray-100 hover:text-gray-500 hover:dark:bg-gray-700'
                         : '',
                     ]"
                   >
                     <MarkdownPreview
-                      v-if="!goToPermalinkOnClick || !Object.keys(permalinkObject ?? {}).length"
+                      v-if="
+                        !goToPermalinkOnClick ||
+                        !Object.keys(permalinkObject ?? {}).length
+                      "
                       :key="textCopy || ''"
                       :text="textCopy || ''"
                       :word-limit="SHOW_MORE_THRESHOLD"
                       :disable-gallery="false"
                     />
-                    <router-link v-else-if="Object.keys(permalinkObject ?? {}).length" :to="permalinkObject || {}">
+                    <router-link
+                      v-else-if="Object.keys(permalinkObject ?? {}).length"
+                      :to="permalinkObject || {}"
+                    >
                       <MarkdownPreview
                         :key="textCopy || ''"
                         :text="textCopy || ''"
@@ -878,7 +929,14 @@ const label = computed(() => {
                     :editor-id="editorId"
                     :show-char-counter="true"
                     :max-chars="MAX_CHARS_IN_COMMENT"
-                    @update="(text) => emit('update-edit-comment-input', text, props.depth === 1)"
+                    @update="
+                      (text) =>
+                        emit(
+                          'update-edit-comment-input',
+                          text,
+                          props.depth === 1
+                        )
+                    "
                   />
                   <ErrorBanner
                     v-if="
@@ -1001,7 +1059,10 @@ const label = computed(() => {
                       "
                       @handle-click-archive-and-suspend="
                         () => {
-                          emit('handleClickArchiveAndSuspend', props.commentData.id);
+                          emit(
+                            'handleClickArchiveAndSuspend',
+                            props.commentData.id
+                          );
                         }
                       "
                       @handle-click-unarchive="
@@ -1091,13 +1152,19 @@ const label = computed(() => {
                 @handle-view-feedback="
                   (commentId: string) => emit('handleViewFeedback', commentId)
                 "
-                @handle-click-archive="(commentId: string) => {
-                  emit('handleClickArchive', commentId)
-                }"
-                @handle-click-archive-and-suspend="(commentId: string) => {
-                  emit('handleClickArchiveAndSuspend', commentId)
-                }"
-                @handle-click-unarchive="(commentId: string ) => emit('handleClickUnarchive', commentId)"
+                @handle-click-archive="
+                  (commentId: string) => {
+                    emit('handleClickArchive', commentId);
+                  }
+                "
+                @handle-click-archive-and-suspend="
+                  (commentId: string) => {
+                    emit('handleClickArchiveAndSuspend', commentId);
+                  }
+                "
+                @handle-click-unarchive="
+                  (commentId: string) => emit('handleClickUnarchive', commentId)
+                "
               />
             </div>
           </ChildComments>

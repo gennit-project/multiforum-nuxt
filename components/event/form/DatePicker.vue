@@ -4,16 +4,16 @@ import { computed, ref } from 'vue';
 const props = defineProps({
   value: {
     type: String,
-    required: true
+    required: true,
   },
   testId: {
     type: String,
-    default: 'date-picker'
+    default: 'date-picker',
   },
   disabled: {
     type: Boolean,
-    default: false
-  }
+    default: false,
+  },
 });
 
 const emit = defineEmits(['update']);
@@ -29,7 +29,7 @@ const baseStyles = computed(() => {
   return [
     'border cursor-pointer rounded border-gray-200 text-sm focus:border-orange-500 focus:ring-orange-500 w-full sm:w-36 h-10',
     'dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:[color-scheme:dark]',
-    props.disabled ? 'opacity-60 cursor-not-allowed' : ''
+    props.disabled ? 'opacity-60 cursor-not-allowed' : '',
   ].join(' ');
 });
 </script>
@@ -44,7 +44,7 @@ const baseStyles = computed(() => {
       :value="value"
       style="color-scheme: light dark"
       @input="handleChange"
-    >
+    />
     <!-- Using only the native calendar icon -->
   </div>
 </template>

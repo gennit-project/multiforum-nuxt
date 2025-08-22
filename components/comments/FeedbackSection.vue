@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
-import { useRoute } from "nuxt/app";
-import InfoBanner from "@/components/InfoBanner.vue";
-import LoadMore from "@/components/LoadMore.vue";
-import CommentOnFeedbackPage from "./CommentOnFeedbackPage.vue";
-import Notification from "../NotificationComponent.vue";
-import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
-import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
-import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
-import type { Comment } from "@/__generated__/graphql";
-import type { PropType } from "vue";
-import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
+import { ref, computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import InfoBanner from '@/components/InfoBanner.vue';
+import LoadMore from '@/components/LoadMore.vue';
+import CommentOnFeedbackPage from './CommentOnFeedbackPage.vue';
+import Notification from '../NotificationComponent.vue';
+import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
+import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
+import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
+import type { Comment } from '@/__generated__/graphql';
+import type { PropType } from 'vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 
 type GiveFeedbackInput = {
   commentData: Comment;
@@ -59,7 +59,7 @@ const props = defineProps({
   },
   loggedInUserModName: {
     type: String,
-    default: "",
+    default: '',
   },
   reachedEndOfResults: {
     type: Boolean,
@@ -76,19 +76,19 @@ const props = defineProps({
 });
 
 const emit = defineEmits([
-  "openFeedbackFormModal",
-  "updateCommentToGiveFeedbackOn",
-  "updateCommentToRemoveFeedbackFrom",
-  "addFeedbackCommentToComment",
-  "closeFeedbackFormModal",
+  'openFeedbackFormModal',
+  'updateCommentToGiveFeedbackOn',
+  'updateCommentToRemoveFeedbackFrom',
+  'addFeedbackCommentToComment',
+  'closeFeedbackFormModal',
 ]);
 
 const route = useRoute();
 const channelId = computed(() =>
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 const feedbackId = computed(() =>
-  typeof route.params.feedbackId === "string" ? route.params.feedbackId : ""
+  typeof route.params.feedbackId === 'string' ? route.params.feedbackId : ''
 );
 
 const showConfirmUndoFeedbackModal = ref(false);
@@ -97,19 +97,19 @@ const showCopiedLinkNotification = ref(false);
 
 function handleClickGiveFeedback(input: GiveFeedbackInput) {
   const { commentData, parentCommentId } = input;
-  emit("openFeedbackFormModal", { commentData, parentCommentId });
-  emit("updateCommentToGiveFeedbackOn", commentData);
+  emit('openFeedbackFormModal', { commentData, parentCommentId });
+  emit('updateCommentToGiveFeedbackOn', commentData);
 }
 
 function handleClickUndoFeedback(input: GiveFeedbackInput) {
   const { commentData } = input;
   showConfirmUndoFeedbackModal.value = true;
-  emit("updateCommentToRemoveFeedbackFrom", commentData);
+  emit('updateCommentToRemoveFeedbackFrom', commentData);
 }
 
 function handleClickEditFeedback(input: EditFeedbackInput) {
   const { commentData } = input;
-  emit("updateCommentToGiveFeedbackOn", commentData);
+  emit('updateCommentToGiveFeedbackOn', commentData);
   showEditCommentFeedbackModal.value = true;
 }
 
@@ -119,11 +119,11 @@ function updateFeedback(text: string) {
 
 function handleSubmitFeedback() {
   if (!props.commentToGiveFeedbackOn?.id) {
-    console.error("commentId is required to submit feedback");
+    console.error('commentId is required to submit feedback');
     return;
   }
   if (!props.loggedInUserModName) {
-    console.error("modName is required to submit feedback");
+    console.error('modName is required to submit feedback');
     return;
   }
   const feedbackInput = {
@@ -132,11 +132,11 @@ function handleSubmitFeedback() {
     modProfileName: props.loggedInUserModName,
     channelId: channelId.value,
   };
-  emit("addFeedbackCommentToComment", feedbackInput);
+  emit('addFeedbackCommentToComment', feedbackInput);
 }
 
 const showBrokenRulesModal = ref(false);
-const showArchiveModal = ref(false);  
+const showArchiveModal = ref(false);
 const showUnarchiveModal = ref(false);
 const showArchiveAndSuspendModal = ref(false);
 const showSuccessfullyReported = ref(false);
@@ -148,7 +148,6 @@ const commentToReport = ref<Comment | null>(null);
 const commentToArchiveId = ref<string | null>(null);
 const commentToUnarchiveId = ref<string | null>(null);
 const commentToArchiveAndSuspendId = ref<string | null>(null);
-
 </script>
 
 <template>
@@ -181,22 +180,30 @@ const commentToArchiveAndSuspendId = ref<string | null>(null);
         @click-feedback="handleClickGiveFeedback"
         @click-undo-feedback="handleClickUndoFeedback"
         @click-edit-feedback="handleClickEditFeedback"
-        @click-report="() => {
-          commentToReport = comment;
-          showBrokenRulesModal = true;
-        }"
-        @click-archive="() => {
-          commentToArchiveId = comment.id;
-          showArchiveModal = true;
-        }"
-        @click-unarchive="() => {
-          commentToUnarchiveId = comment.id;
-          showUnarchiveModal = true;
-        }"
-        @click-archive-and-suspend="() => {
-          commentToArchiveAndSuspendId = comment.id;
-          showArchiveAndSuspendModal = true;
-        }"
+        @click-report="
+          () => {
+            commentToReport = comment;
+            showBrokenRulesModal = true;
+          }
+        "
+        @click-archive="
+          () => {
+            commentToArchiveId = comment.id;
+            showArchiveModal = true;
+          }
+        "
+        @click-unarchive="
+          () => {
+            commentToUnarchiveId = comment.id;
+            showUnarchiveModal = true;
+          }
+        "
+        @click-archive-and-suspend="
+          () => {
+            commentToArchiveAndSuspendId = comment.id;
+            showArchiveAndSuspendModal = true;
+          }
+        "
       />
     </div>
     <LoadMore

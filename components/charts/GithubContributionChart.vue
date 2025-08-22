@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { ref, computed, watch, type PropType, nextTick } from "vue";
-import type { DayData } from "@/types/contribution";
-import { Calendar } from "lucide-vue-next";
-import CommentComponent from "@/components/comments/Comment.vue";
-import DiscussionItemInProfile from "@/components/user/DiscussionItemInProfile.vue";
-import EventListItemInProfile from "@/components/user/EventItemInProfile.vue";
-import ContributionChartSkeleton from "./ContributionChartSkeleton.vue";
+import { ref, computed, watch, type PropType, nextTick } from 'vue';
+import type { DayData } from '@/types/contribution';
+import { Calendar } from 'lucide-vue-next';
+import CommentComponent from '@/components/comments/Comment.vue';
+import DiscussionItemInProfile from '@/components/user/DiscussionItemInProfile.vue';
+import EventListItemInProfile from '@/components/user/EventItemInProfile.vue';
+import ContributionChartSkeleton from './ContributionChartSkeleton.vue';
 
 // Props definition with sparse data input
 const props = defineProps({
@@ -42,26 +42,26 @@ const props = defineProps({
   // Additional class name
   className: {
     type: String,
-    default: "",
+    default: '',
   },
   // Customizable text content
   texts: {
     type: Object,
     default: () => ({
-      less: "Less",
-      more: "More",
-      yearLabel: "Year:",
-      noContributions: "No contributions on this day",
+      less: 'Less',
+      more: 'More',
+      yearLabel: 'Year:',
+      noContributions: 'No contributions on this day',
       contributionsText: (count: number) =>
-        `${count} contribution${count !== 1 ? "s" : ""} on this day`,
-      activityDetailsHeading: "Activity Details",
-      loading: "Loading activity data...",
+        `${count} contribution${count !== 1 ? 's' : ''} on this day`,
+      activityDetailsHeading: 'Activity Details',
+      loading: 'Loading activity data...',
     }),
   },
 });
 
 // Emits
-const emit = defineEmits(["day-select", "year-select"]);
+const emit = defineEmits(['day-select', 'year-select']);
 
 interface DayInfo extends DayData {
   week: number;
@@ -76,10 +76,10 @@ const gridData = ref<DayData[][]>([]);
 const buildGridDataFromContributions = () => {
   // Create a map of date -> activity data for quick lookup
   const activityMap: Record<string, DayData> = {};
-  
+
   // Check if contributionData exists before iterating
   if (props.contributionData && Array.isArray(props.contributionData)) {
-    props.contributionData.forEach(day => {
+    props.contributionData.forEach((day) => {
       activityMap[day.date] = day;
     });
   }
@@ -88,27 +88,27 @@ const buildGridDataFromContributions = () => {
   const year = selectedYearValue.value;
   const firstDay = new Date(year, 0, 1);
   const lastDay = new Date(year, 11, 31);
-  
+
   // Get the first Sunday of the grid
   const startDate = new Date(firstDay);
   startDate.setDate(firstDay.getDate() - firstDay.getDay());
-  
+
   // Get the last Saturday of the grid
   const endDate = new Date(lastDay);
   const daysToAdd = 6 - lastDay.getDay();
   endDate.setDate(lastDay.getDate() + daysToAdd);
-  
+
   // Build the grid week by week
   const grid: DayData[][] = [];
   let currentDate = new Date(startDate);
-  
+
   while (currentDate <= endDate) {
     const week: DayData[] = [];
-    
+
     // Add 7 days (a full week)
     for (let i = 0; i < 7; i++) {
       const dateStr = currentDate.toISOString().split('T')[0];
-      
+
       // Check if we have activity data for this day
       if (activityMap[dateStr]) {
         week.push(activityMap[dateStr]);
@@ -117,26 +117,30 @@ const buildGridDataFromContributions = () => {
         week.push({
           date: dateStr,
           count: 0,
-          activities: []
+          activities: [],
         });
       }
-      
+
       // Move to next day
       const nextDate = new Date(currentDate);
       nextDate.setDate(currentDate.getDate() + 1);
       currentDate = nextDate;
     }
-    
+
     grid.push(week);
   }
-  
+
   return grid;
 };
 
 // Update grid when year or contribution data changes
-watch([() => props.contributionData, selectedYearValue], () => {
-  gridData.value = buildGridDataFromContributions();
-}, { immediate: true });
+watch(
+  [() => props.contributionData, selectedYearValue],
+  () => {
+    gridData.value = buildGridDataFromContributions();
+  },
+  { immediate: true }
+);
 
 // Generate year range for dropdown
 const availableYears = computed(() => {
@@ -170,19 +174,19 @@ const monthLabels = computed(() => {
 
     try {
       const date = new Date(dayWithDate.date);
-      const monthName = date.toLocaleString("default", { month: "short" });
+      const monthName = date.toLocaleString('default', { month: 'short' });
 
       // Only add a new label if we haven't seen this month yet
       if (!addedMonths.has(monthName)) {
         addedMonths.add(monthName);
         labels.push({
           month: monthName,
-          x: weekIndex, 
+          x: weekIndex,
           position: weekIndex,
         });
       }
     } catch (e) {
-      console.error("Error parsing date", e);
+      console.error('Error parsing date', e);
     }
   });
 
@@ -191,7 +195,7 @@ const monthLabels = computed(() => {
 
 // Get day of the week labels
 const dayLabels = computed(() => {
-  return ["Sat","Sun", "Mon", "Tue", "Wed", "Thu", "Fri"];
+  return ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 });
 
 // Use computed for colors to ensure reactivity
@@ -199,20 +203,20 @@ const getColorScheme = computed(() => {
   if (props.darkMode) {
     // Dark mode colors (similar to GitHub dark mode)
     return {
-      0: "#161b22",
-      1: "#0e4429",
-      2: "#006d32",
-      3: "#26a641",
-      4: "#39d353" // 4 or more
+      0: '#161b22',
+      1: '#0e4429',
+      2: '#006d32',
+      3: '#26a641',
+      4: '#39d353', // 4 or more
     };
   } else {
     // Light mode colors (GitHub default)
     return {
-      0: "#ebedf0",
-      1: "#9be9a8",
-      2: "#40c463",
-      3: "#30a14e",
-      4: "#216e39" // 4 or more
+      0: '#ebedf0',
+      1: '#9be9a8',
+      2: '#40c463',
+      3: '#30a14e',
+      4: '#216e39', // 4 or more
     };
   }
 });
@@ -226,7 +230,8 @@ const getColor = (count: number) => {
 
 // Select a day to show details
 const selectDay = (weekIndex: number, dayIndex: number) => {
-  if (!gridData.value[weekIndex] || !gridData.value[weekIndex][dayIndex]) return;
+  if (!gridData.value[weekIndex] || !gridData.value[weekIndex][dayIndex])
+    return;
 
   const dayData = gridData.value[weekIndex][dayIndex];
 
@@ -243,12 +248,12 @@ const selectDay = (weekIndex: number, dayIndex: number) => {
     selectedDay.value.day === dayIndex
   ) {
     selectedDay.value = null;
-    emit("day-select", null);
+    emit('day-select', null);
     return;
   }
 
   selectedDay.value = dayInfo;
-  emit("day-select", dayInfo);
+  emit('day-select', dayInfo);
 };
 
 // Format the date from ISO string or date string
@@ -256,10 +261,10 @@ const formatDate = (dateStr: string) => {
   try {
     const date = new Date(dateStr);
     return date.toLocaleDateString(undefined, {
-      weekday: "long",
-      year: "numeric",
-      month: "long",
-      day: "numeric",
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     });
   } catch {
     return dateStr;
@@ -268,7 +273,7 @@ const formatDate = (dateStr: string) => {
 
 // Handle year changes
 const handleYearChange = (newYear: number) => {
-  emit("year-select", newYear);
+  emit('year-select', newYear);
 };
 
 // Watch for changes to selectedYearValue
@@ -328,12 +333,12 @@ const cellCount = computed(() => {
 
 <template>
   <div
-    class="contribution-chart flex flex-col space-y-4 px-4 mb-4 rounded-lg transition-colors duration-300"
+    class="contribution-chart mb-4 flex flex-col space-y-4 rounded-lg px-4 transition-colors duration-300"
     :class="[darkMode ? 'text-white' : 'bg-white text-gray-800', className]"
   >
     <!-- Header with title -->
-    <div class="flex justify-between items-center">
-      <h2 class="text-xl font-semibold">{{ formattedTitle }}</h2>
+    <div class="flex items-center justify-between">
+      <h2 class="font-semibold text-xl">{{ formattedTitle }}</h2>
 
       <div class="flex items-center space-x-2">
         <label for="year-select" class="text-sm font-medium">{{
@@ -342,11 +347,11 @@ const cellCount = computed(() => {
         <select
           id="year-select"
           v-model="selectedYearValue"
-          class="p-1 border rounded text-sm w-20"
+          class="w-20 rounded border p-1 text-sm"
           :class="
             darkMode
-              ? 'bg-gray-800 text-white border-gray-600'
-              : 'bg-white text-gray-800 border-gray-300'
+              ? 'border-gray-600 bg-gray-800 text-white'
+              : 'border-gray-300 bg-white text-gray-800'
           "
         >
           <option v-for="year in availableYears" :key="year" :value="year">
@@ -366,7 +371,7 @@ const cellCount = computed(() => {
       <!-- Actual chart (when not loading) -->
       <div v-else class="flex flex-col">
         <!-- Month labels (improved positioning) -->
-        <div class="flex ml-8">
+        <div class="ml-8 flex">
           <div
             class="relative h-6 w-full"
             :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
@@ -386,14 +391,14 @@ const cellCount = computed(() => {
           <!-- Day labels (properly spaced) -->
           <div
             class="text-tiny relative w-10"
-            style="height: 104px;"
+            style="height: 104px"
             :class="darkMode ? 'text-gray-400' : 'text-gray-500'"
           >
             <span
               v-for="(day, index) in dayLabels"
               :key="'day-label-' + index"
               class="absolute flex items-center"
-              :style="{top: `${index * 14 + 3}px`}"
+              :style="{ top: `${index * 14 + 3}px` }"
             >
               {{ day }}
             </span>
@@ -422,13 +427,15 @@ const cellCount = computed(() => {
                   ry="2"
                   :data-date="dayData.date"
                   :data-count="dayData.count"
-                  class="cursor-pointer hover:stroke-1 transition-colors duration-200"
+                  class="cursor-pointer transition-colors duration-200 hover:stroke-1"
                   :class="[
-                    darkMode ? 'hover:stroke-green-600' : 'hover:stroke-green-400',
+                    darkMode
+                      ? 'hover:stroke-green-600'
+                      : 'hover:stroke-green-400',
                     selectedDay &&
                     selectedDay.week === weekIndex &&
                     selectedDay.day === dayIndex
-                      ? 'stroke-2 stroke-orange-500'
+                      ? 'stroke-orange-500 stroke-2'
                       : '',
                   ]"
                   @click="selectDay(weekIndex, dayIndex)"
@@ -447,14 +454,14 @@ const cellCount = computed(() => {
 
     <!-- Color legend -->
     <div
-      class="flex items-center text-xs space-x-2"
+      class="flex items-center space-x-2 text-xs"
       :class="darkMode ? 'text-gray-300' : 'text-gray-600'"
     >
       <span>{{ texts.less }}</span>
       <div
         v-for="level in 5"
         :key="'level-' + (level - 1)"
-        class="w-3 h-3 rounded-sm transition-colors duration-200"
+        class="h-3 w-3 rounded-sm transition-colors duration-200"
         :style="{ backgroundColor: getColor(level - 1) }"
       />
       <span>{{ texts.more }}</span>
@@ -463,13 +470,13 @@ const cellCount = computed(() => {
     <!-- Selected day details -->
     <div
       v-if="selectedDay"
-      class="mt-4 p-4 rounded-lg border"
+      class="mt-4 rounded-lg border p-4"
       :class="darkMode ? 'border-green-500' : 'bg-gray-50 border-orange-500'"
     >
       <div class="flex gap-3">
         <Calendar
           :size="20"
-          :class="darkMode ? 'text-green-400 mt-1' : 'text-green-500 mt-1'"
+          :class="darkMode ? 'mt-1 text-green-400' : 'mt-1 text-green-500'"
         />
         <div class="w-full">
           <h3 class="font-medium">{{ formatDate(selectedDay.date) }}</h3>
@@ -481,19 +488,44 @@ const cellCount = computed(() => {
               {{ texts.noContributions }}
             </template>
             <template v-else>
-              <template v-for="(activity, idx) in selectedDay.activities" :key="activity.id">
-                <template v-if="activity.Comments && activity.Comments.length > 0">
-                  {{ activity.Comments.length }} {{ activity.Comments.length === 1 ? 'comment' : 'comments' }}
+              <template
+                v-for="(activity, idx) in selectedDay.activities"
+                :key="activity.id"
+              >
+                <template
+                  v-if="activity.Comments && activity.Comments.length > 0"
+                >
+                  {{ activity.Comments.length }}
+                  {{ activity.Comments.length === 1 ? 'comment' : 'comments' }}
                 </template>
-                <template v-if="activity.Discussions && activity.Discussions.length > 0">
-                  <template v-if="activity.Comments && activity.Comments.length > 0">•</template>
-                  {{ activity.Discussions.length }} {{ activity.Discussions.length === 1 ? 'discussion ' : 'discussions ' }}
+                <template
+                  v-if="activity.Discussions && activity.Discussions.length > 0"
+                >
+                  <template
+                    v-if="activity.Comments && activity.Comments.length > 0"
+                    >•</template
+                  >
+                  {{ activity.Discussions.length }}
+                  {{
+                    activity.Discussions.length === 1
+                      ? 'discussion '
+                      : 'discussions '
+                  }}
                 </template>
                 <template v-if="activity.Events && activity.Events.length > 0">
-                  <template v-if="(activity.Comments && activity.Comments.length > 0) || (activity.Discussions && activity.Discussions.length > 0)">•</template>
-                  {{ activity.Events.length }} {{ activity.Events.length === 1 ? 'event' : 'events' }}
+                  <template
+                    v-if="
+                      (activity.Comments && activity.Comments.length > 0) ||
+                      (activity.Discussions && activity.Discussions.length > 0)
+                    "
+                    >•</template
+                  >
+                  {{ activity.Events.length }}
+                  {{ activity.Events.length === 1 ? 'event' : 'events' }}
                 </template>
-                <template v-if="idx < selectedDay.activities.length - 1"> and </template>
+                <template v-if="idx < selectedDay.activities.length - 1">
+                  and
+                </template>
               </template>
               on this day
             </template>
@@ -501,19 +533,19 @@ const cellCount = computed(() => {
 
           <div v-if="selectedDay.count > 0" class="mt-2">
             <div
-              class="text-xs font-medium uppercase tracking-wide mb-1 mt-3"
+              class="mb-1 mt-3 text-xs font-medium uppercase tracking-wide"
               :class="darkMode ? 'text-gray-400' : 'text-gray-600'"
             >
               {{ texts.activityDetailsHeading }}
             </div>
             <ul
-              class="mt-1 text-sm space-y-2 list-none"
+              class="mt-1 list-none space-y-2 text-sm"
               :class="darkMode ? 'text-gray-300' : 'text-gray-700'"
             >
               <li
                 v-for="activity in selectedDay.activities"
                 :key="activity.id"
-                class="flex-col items-start list-none"
+                class="list-none flex-col items-start"
               >
                 <div class="flex-1">
                   <div class="flex flex-col sm:flex-row sm:justify-between">
@@ -524,8 +556,15 @@ const cellCount = computed(() => {
                   </div>
                 </div>
                 <!-- Comments Section -->
-                <div v-if="activity.Comments && activity.Comments.length > 0" class="mt-2">
-                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Comments</h4>
+                <div
+                  v-if="activity.Comments && activity.Comments.length > 0"
+                  class="mt-2"
+                >
+                  <h4
+                    class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Comments
+                  </h4>
                   <div
                     v-for="comment in activity.Comments"
                     :key="comment.id"
@@ -551,23 +590,37 @@ const cellCount = computed(() => {
                 </div>
 
                 <!-- Discussions Section -->
-                <div v-if="activity.Discussions && activity.Discussions.length > 0" class="py-2">
-                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Discussions</h4>
+                <div
+                  v-if="activity.Discussions && activity.Discussions.length > 0"
+                  class="py-2"
+                >
+                  <h4
+                    class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Discussions
+                  </h4>
                   <DiscussionItemInProfile
                     v-for="discussion in activity.Discussions"
                     :key="discussion.id"
-                    class="flex-col gap-2 mb-1"
+                    class="mb-1 flex-col gap-2"
                     :discussion="discussion"
                   />
                 </div>
 
                 <!-- Events Section -->
-                <div v-if="activity.Events && activity.Events.length > 0" class="py-2">
-                  <h4 class="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Events</h4>
+                <div
+                  v-if="activity.Events && activity.Events.length > 0"
+                  class="py-2"
+                >
+                  <h4
+                    class="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300"
+                  >
+                    Events
+                  </h4>
                   <EventListItemInProfile
                     v-for="event in activity.Events"
                     :key="event.id"
-                    class="flex-col gap-2 mb-1"
+                    class="mb-1 flex-col gap-2"
                     :current-channel-id="''"
                     :event="event"
                   />
@@ -584,7 +637,7 @@ const cellCount = computed(() => {
 <style scoped>
 .contribution-chart {
   font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial,
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial,
     sans-serif;
 }
 .text-tiny {

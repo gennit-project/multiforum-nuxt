@@ -1,41 +1,41 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import Comment from "./Comment.vue";
-import LoadMore from "../LoadMore.vue";
-import WarningModal from "../WarningModal.vue";
-import BrokenRulesModal from "@/components/mod/BrokenRulesModal.vue";
-import GenericFeedbackFormModal from "@/components/GenericFeedbackFormModal.vue";
-import SortButtons from "@/components/SortButtons.vue";
-import Notification from "@/components/NotificationComponent.vue";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import ConfirmUndoCommentFeedbackModal from "@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue";
-import EditCommentFeedbackModal from "@/components/comments/EditCommentFeedbackModal.vue";
-import { GET_COMMENT_REPLIES } from "@/graphQLData/comment/queries";
+import { ref, computed, watchEffect } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import Comment from './Comment.vue';
+import LoadMore from '../LoadMore.vue';
+import WarningModal from '../WarningModal.vue';
+import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
+import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
+import SortButtons from '@/components/SortButtons.vue';
+import Notification from '@/components/NotificationComponent.vue';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import ConfirmUndoCommentFeedbackModal from '@/components/discussion/detail/ConfirmUndoCommentFeedbackModal.vue';
+import EditCommentFeedbackModal from '@/components/comments/EditCommentFeedbackModal.vue';
+import { GET_COMMENT_REPLIES } from '@/graphQLData/comment/queries';
 import {
   DELETE_COMMENT,
   UPDATE_COMMENT,
   SOFT_DELETE_COMMENT,
   CREATE_COMMENT,
   ADD_FEEDBACK_COMMENT_TO_COMMENT,
-} from "@/graphQLData/comment/mutations";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
+} from '@/graphQLData/comment/mutations';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import type {
   CommentCreateInput,
   Comment as CommentType,
-} from "@/__generated__/graphql";
+} from '@/__generated__/graphql';
 import type {
   CreateEditCommentFormValues,
   CreateReplyInputData,
   DeleteCommentInputData,
-} from "@/types/Comment";
-import type { Ref, PropType } from "vue";
-import { modProfileNameVar } from "@/cache";
-import { useRouter, useRoute } from "nuxt/app";
-import UnarchiveModal from "@/components/mod/UnarchiveModal.vue";
-import LockIcon from "@/components/icons/LockIcon.vue";
-import PinnedAnswers from "@/components/comments/PinnedAnswers.vue";
-import InfoBanner from "@/components/InfoBanner.vue";
+} from '@/types/Comment';
+import type { Ref, PropType } from 'vue';
+import { modProfileNameVar } from '@/cache';
+import { useRouter, useRoute } from 'nuxt/app';
+import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
+import LockIcon from '@/components/icons/LockIcon.vue';
+import PinnedAnswers from '@/components/comments/PinnedAnswers.vue';
+import InfoBanner from '@/components/InfoBanner.vue';
 
 type CommentSectionQueryVariablesType = {
   discussionId?: string;
@@ -121,12 +121,12 @@ const props = defineProps({
 
 // Emits
 const emit = defineEmits([
-  "updateCommentSectionQueryResult",
-  "decrementCommentCount",
-  "incrementCommentCount",
-  "updateCreateReplyCommentInput",
-  "updateCreateFormValues",
-  "loadMore",
+  'updateCommentSectionQueryResult',
+  'decrementCommentCount',
+  'incrementCommentCount',
+  'updateCreateReplyCommentInput',
+  'updateCreateFormValues',
+  'loadMore',
 ]);
 
 // Route and router
@@ -135,13 +135,13 @@ const router = useRouter();
 
 // Computed properties
 const channelId = computed(() =>
-  typeof route.params.forumId === "string" ? route.params.forumId : ""
+  typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
 const activeSort = computed(() => getSortFromQuery(route.query));
 const permalinkedCommentId = ref(`${route.params.commentId}`);
 
 // Comment form state
-const commentToDeleteId = ref("");
+const commentToDeleteId = ref('');
 
 const commentToDeleteReplyCount = ref(0);
 const commentToEdit: Ref<CommentType | null> = ref(null);
@@ -153,19 +153,19 @@ const commentToReport: Ref<CommentType | null> = ref(null);
 const showDeleteCommentModal = ref(false);
 const showConfirmUndoFeedbackModal = ref(false);
 const showEditCommentFeedbackModal = ref(false);
-const parentOfCommentToDelete = ref("");
-const parentIdOfCommentToGiveFeedbackOn = ref("");
+const parentOfCommentToDelete = ref('');
+const parentIdOfCommentToGiveFeedbackOn = ref('');
 const commentInProcess = ref(false);
-const replyFormOpenAtCommentID = ref("");
-const editFormOpenAtCommentID = ref("");
+const replyFormOpenAtCommentID = ref('');
+const editFormOpenAtCommentID = ref('');
 const showCopiedLinkNotification = ref(false);
 const showMarkedAsBestAnswerNotification = ref(false);
 const showUnmarkedAsBestAnswerNotification = ref(false);
 
 // Moderation related state
-const commentToArchiveId = ref("");
-const commentToArchiveAndSuspendId = ref("");
-const commentToUnarchiveId = ref("");
+const commentToArchiveId = ref('');
+const commentToArchiveAndSuspendId = ref('');
+const commentToUnarchiveId = ref('');
 const showArchiveModal = ref(false);
 const showArchiveAndSuspendModal = ref(false);
 const showUnarchiveModal = ref(false);
@@ -178,7 +178,7 @@ const showSuccessfullyUnarchived = ref(false);
 const locked = ref(props.locked);
 
 const editFormValues = ref<CreateEditCommentFormValues>({
-  text: commentToEdit.value?.text || "",
+  text: commentToEdit.value?.text || '',
   isRootComment: true,
   depth: 1,
 });
@@ -199,18 +199,18 @@ const {
     if (parentId && commentWeGaveFeedbackOn) {
       // Modify the comment to add feedback
       cache.modify({
-        id: cache.identify({ 
-          __typename: "Comment", 
-          id: commentWeGaveFeedbackOn.id 
+        id: cache.identify({
+          __typename: 'Comment',
+          id: commentWeGaveFeedbackOn.id,
         }),
         fields: {
           FeedbackComments(existing = []) {
             return [...existing, newFeedbackComment];
-          }
-        }
+          },
+        },
       });
     } else {
-      emit("updateCommentSectionQueryResult", {
+      emit('updateCommentSectionQueryResult', {
         cache,
         commentToAddFeedbackTo: commentToGiveFeedbackOn.value,
         newFeedbackComment,
@@ -239,17 +239,17 @@ const {
     // First evict the comment itself
     cache.evict({
       id: cache.identify({
-        __typename: "Comment",
-        id: commentToDeleteId.value
-      })
+        __typename: 'Comment',
+        id: commentToDeleteId.value,
+      }),
     });
 
     if (parentOfCommentToDelete.value) {
       // For replies, update the parent's child comments and count
       cache.modify({
         id: cache.identify({
-          __typename: "Comment",
-          id: parentOfCommentToDelete.value
+          __typename: 'Comment',
+          id: parentOfCommentToDelete.value,
         }),
         fields: {
           ChildComments(existing = []) {
@@ -260,16 +260,16 @@ const {
           ChildCommentsAggregate(existing = { count: 0 }) {
             return {
               ...existing,
-              count: Math.max(0, (existing.count || 0) - 1)
+              count: Math.max(0, (existing.count || 0) - 1),
             };
-          }
-        }
+          },
+        },
       });
     } else {
       // For root comments, update the DiscussionChannel's comments
       cache.modify({
         id: cache.identify({
-          __typename: "DiscussionChannel",
+          __typename: 'DiscussionChannel',
           id: props.commentSectionQueryVariables.discussionId,
         }),
         fields: {
@@ -281,22 +281,22 @@ const {
           CommentsAggregate(existing = { count: 0 }) {
             return {
               ...existing,
-              count: Math.max(0, (existing.count || 0) - 1)
+              count: Math.max(0, (existing.count || 0) - 1),
             };
-          }
-        }
+          },
+        },
       });
     }
 
     // Clean up any dangling references
     cache.gc();
-    
-    emit("decrementCommentCount", cache);
+
+    emit('decrementCommentCount', cache);
   },
 });
 
 onDoneDeletingComment(() => {
-  commentToDeleteId.value = "";
+  commentToDeleteId.value = '';
   showDeleteCommentModal.value = false;
 });
 
@@ -304,14 +304,14 @@ const { mutate: softDeleteComment, onDone: onDoneSoftDeletingComment } =
   useMutation(SOFT_DELETE_COMMENT);
 
 onDoneSoftDeletingComment(() => {
-  commentToDeleteId.value = "";
+  commentToDeleteId.value = '';
   showDeleteCommentModal.value = false;
 });
 
 const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
   CREATE_COMMENT,
   {
-    errorPolicy: "all",
+    errorPolicy: 'all',
     update: (cache, result) => {
       const newComment: CommentType = result.data?.createComments?.comments[0];
       const newCommentParentId = newComment?.ParentComment?.id;
@@ -320,7 +320,7 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
       if (!newCommentParentId) {
         cache.modify({
           id: cache.identify({
-            __typename: "DiscussionChannel",
+            __typename: 'DiscussionChannel',
             id: props.commentSectionQueryVariables.discussionId,
           }),
           fields: {
@@ -330,12 +330,12 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
             CommentsAggregate(existing = { count: 0 }) {
               return {
                 ...existing,
-                count: (existing?.count || 0) + 1
+                count: (existing?.count || 0) + 1,
               };
-            }
-          }
+            },
+          },
         });
-        emit("incrementCommentCount", cache);
+        emit('incrementCommentCount', cache);
         return;
       }
 
@@ -352,8 +352,24 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
           },
         });
 
-        const existingReplies = (existingData as { getCommentReplies?: { ChildComments?: CommentType[]; aggregateChildCommentCount?: number } })?.getCommentReplies?.ChildComments || [];
-        const existingCount = (existingData as { getCommentReplies?: { ChildComments?: CommentType[]; aggregateChildCommentCount?: number } })?.getCommentReplies?.aggregateChildCommentCount || 0;
+        const existingReplies =
+          (
+            existingData as {
+              getCommentReplies?: {
+                ChildComments?: CommentType[];
+                aggregateChildCommentCount?: number;
+              };
+            }
+          )?.getCommentReplies?.ChildComments || [];
+        const existingCount =
+          (
+            existingData as {
+              getCommentReplies?: {
+                ChildComments?: CommentType[];
+                aggregateChildCommentCount?: number;
+              };
+            }
+          )?.getCommentReplies?.aggregateChildCommentCount || 0;
 
         // Write the updated data back to the cache
         cache.writeQuery({
@@ -367,35 +383,35 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
           },
           data: {
             getCommentReplies: {
-              __typename: "CommentReplies",
+              __typename: 'CommentReplies',
               ChildComments: [newComment, ...existingReplies],
-              aggregateChildCommentCount: existingCount + 1
-            }
-          }
+              aggregateChildCommentCount: existingCount + 1,
+            },
+          },
         });
 
         // Update the parent comment's counts
         cache.modify({
           id: cache.identify({
-            __typename: "Comment",
+            __typename: 'Comment',
             id: newCommentParentId,
           }),
           fields: {
             ChildCommentsAggregate(existing = { count: 0 }) {
               return {
-                __typename: "CommentsAggregate",
-                count: (existing.count || 0) + 1
+                __typename: 'CommentsAggregate',
+                count: (existing.count || 0) + 1,
               };
             },
             replyCount(existing = 0) {
               return (existing || 0) + 1;
-            }
-          }
+            },
+          },
         });
 
-        emit("incrementCommentCount", cache);
+        emit('incrementCommentCount', cache);
       } catch (error) {
-        console.error("Error updating cache:", error);
+        console.error('Error updating cache:', error);
       }
     },
   }
@@ -403,28 +419,28 @@ const { mutate: createComment, onDone: onDoneCreatingComment } = useMutation(
 
 onDoneCreatingComment(() => {
   commentInProcess.value = false;
-  replyFormOpenAtCommentID.value = "";
-  emit("updateCreateFormValues", {
-    text: "",
+  replyFormOpenAtCommentID.value = '';
+  emit('updateCreateFormValues', {
+    text: '',
     isRootComment: true,
     depth: 1,
-    parentCommentId: "",
+    parentCommentId: '',
   });
 });
 
 onDoneUpdatingComment(() => {
   commentInProcess.value = false;
-  editFormOpenAtCommentID.value = "";
+  editFormOpenAtCommentID.value = '';
   commentToEdit.value = null;
   editFormValues.value = {
-    text: "",
+    text: '',
     isRootComment: true,
     depth: 1,
   };
 });
 
 watchEffect(() => {
-  if (typeof route.params.commentId === "string") {
+  if (typeof route.params.commentId === 'string') {
     permalinkedCommentId.value = route.params.commentId;
   }
 });
@@ -432,17 +448,17 @@ watchEffect(() => {
 function handleClickCreate() {
   // Simply trigger the mutation with the properly structured input from props
   createComment({
-    createCommentInput: props.createCommentInput
+    createCommentInput: props.createCommentInput,
   });
 }
 
 function updateCreateInputValuesForReply(input: CreateReplyInputData) {
   const { text, parentCommentId, depth } = input;
   if (!parentCommentId) {
-    throw new Error("parentCommentId is required to reply to a comment");
+    throw new Error('parentCommentId is required to reply to a comment');
   }
   // Emit to parent to update the form values
-  emit("updateCreateReplyCommentInput", {
+  emit('updateCreateReplyCommentInput', {
     text,
     isRootComment: false,
     parentCommentId,
@@ -454,7 +470,7 @@ function handleClickEdit(commentData: CommentType) {
   commentToEdit.value = commentData;
   editFormOpenAtCommentID.value = commentData.id;
   editFormValues.value = {
-    text: commentData.text || "",
+    text: commentData.text || '',
     isRootComment: !commentData.ParentComment,
     depth: 1,
   };
@@ -478,10 +494,10 @@ function handleClickDelete(input: DeleteCommentInputData) {
 
 function handleSaveEdit() {
   if (!commentToEdit.value?.id) {
-    console.error("No comment to edit");
+    console.error('No comment to edit');
     return;
   }
-  
+
   editComment({
     commentWhere: {
       id: commentToEdit.value.id,
@@ -495,7 +511,7 @@ function handleSaveEdit() {
 
 function handleDeleteComment() {
   if (!commentToDeleteId.value) {
-    throw new Error("commentId is required to delete a comment");
+    throw new Error('commentId is required to delete a comment');
   }
   if (commentToDeleteReplyCount.value > 0) {
     softDeleteComment({ id: commentToDeleteId.value });
@@ -510,20 +526,20 @@ function scrollToTop() {
 
 function openReplyEditor(commentId: string) {
   replyFormOpenAtCommentID.value = commentId;
-  editFormOpenAtCommentID.value = ""; // Close edit form if open
+  editFormOpenAtCommentID.value = ''; // Close edit form if open
 }
 
 function hideReplyEditor() {
-  replyFormOpenAtCommentID.value = "";
+  replyFormOpenAtCommentID.value = '';
 }
 
 function openEditCommentEditor(commentId: string) {
   editFormOpenAtCommentID.value = commentId;
-  replyFormOpenAtCommentID.value = ""; // Close reply form if open
+  replyFormOpenAtCommentID.value = ''; // Close reply form if open
 }
 
 function hideEditCommentEditor() {
-  editFormOpenAtCommentID.value = "";
+  editFormOpenAtCommentID.value = '';
   commentToEdit.value = null; // Clear edited comment data
 }
 
@@ -569,11 +585,11 @@ function handleClickUnarchive(commentId: string) {
 
 function handleSubmitFeedback() {
   if (!commentToGiveFeedbackOn.value?.id) {
-    console.error("commentId is required to submit feedback");
+    console.error('commentId is required to submit feedback');
     return;
   }
   if (!modProfileNameVar.value) {
-    console.error("modName is required to submit feedback");
+    console.error('modName is required to submit feedback');
     return;
   }
   const feedbackInput = {
@@ -591,7 +607,7 @@ function updateFeedback(text: string) {
 
 function handleViewFeedback(commentId: string) {
   router.push({
-    name: "forums-forumId-discussions-commentFeedback-discussionId-commentId",
+    name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId',
     params: {
       forumId: channelId.value,
       discussionId: route.params.discussionId,
@@ -616,18 +632,22 @@ const lengthOfCommentInProgress = computed(() => {
   <div class="pr-2">
     <div>
       <div class="align-items flex justify-between">
-        <div class="flex items-center justify-between space-x-4 w-full">
+        <div class="flex w-full items-center justify-between space-x-4">
           <h2 id="comments" class="px-1 text-lg dark:text-white">
             {{ `Comments (${aggregateCommentCount})` }}
           </h2>
           <slot name="subscription-button" />
         </div>
-        <SortButtons v-if="showCommentSortButtons && aggregateCommentCount > 0" class="ml-2" :show-top-options="false" />
+        <SortButtons
+          v-if="showCommentSortButtons && aggregateCommentCount > 0"
+          class="ml-2"
+          :show-top-options="false"
+        />
       </div>
       <div class="my-2">
-        <slot/>
+        <slot />
       </div>
-      <PinnedAnswers 
+      <PinnedAnswers
         v-if="answers?.length > 0"
         :answers="answers"
         :enable-feedback="enableFeedback"
@@ -652,8 +672,12 @@ const lengthOfCommentInProgress = computed(() => {
         @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
         @handle-click-unarchive="handleClickUnarchive"
         @show-copied-link-notification="showCopiedLinkNotification = $event"
-        @show-marked-as-best-answer-notification="showMarkedAsBestAnswerNotification = $event"
-        @show-unmarked-as-best-answer-notification="showUnmarkedAsBestAnswerNotification = $event"
+        @show-marked-as-best-answer-notification="
+          showMarkedAsBestAnswerNotification = $event
+        "
+        @show-unmarked-as-best-answer-notification="
+          showUnmarkedAsBestAnswerNotification = $event
+        "
         @open-mod-profile="showModProfileModal = true"
         @scroll-to-top="scrollToTop"
         @update-edit-comment-input="updateEditInputValues"
@@ -698,8 +722,12 @@ const lengthOfCommentInProgress = computed(() => {
         @update-feedback="updateFeedback"
         @handle-view-feedback="handleViewFeedback"
         @show-copied-link-notification="showCopiedLinkNotification = $event"
-        @show-marked-as-best-answer-notification="showMarkedAsBestAnswerNotification = $event"
-        @show-unmarked-as-best-answer-notification="showUnmarkedAsBestAnswerNotification = $event"
+        @show-marked-as-best-answer-notification="
+          showMarkedAsBestAnswerNotification = $event
+        "
+        @show-unmarked-as-best-answer-notification="
+          showUnmarkedAsBestAnswerNotification = $event
+        "
         @handle-click-archive="handleClickArchive"
         @handle-click-archive-and-suspend="handleClickArchiveAndSuspend"
         @handle-click-unarchive="handleClickUnarchive"
@@ -712,7 +740,10 @@ const lengthOfCommentInProgress = computed(() => {
           There are no comments yet.
         </div>
         <div :key="activeSort">
-          <div v-for="(comment, index) in comments || []" :key="comment?.id || index">
+          <div
+            v-for="(comment, index) in comments || []"
+            :key="comment?.id || index"
+          >
             <Comment
               v-if="comment?.id !== permalinkedCommentId"
               :aggregate-comment-count="aggregateCommentCount"
@@ -735,7 +766,9 @@ const lengthOfCommentInProgress = computed(() => {
               @open-edit-comment-editor="openEditCommentEditor"
               @hide-edit-comment-editor="hideEditCommentEditor"
               @click-edit-comment="handleClickEdit"
-              @update-create-reply-comment-input="updateCreateInputValuesForReply"
+              @update-create-reply-comment-input="
+                updateCreateInputValuesForReply
+              "
               @create-comment="handleClickCreate"
               @show-copied-link-notification="
                 showCopiedLinkNotification = $event

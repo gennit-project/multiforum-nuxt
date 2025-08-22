@@ -1,31 +1,31 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, watch } from "vue";
-import { useRoute } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
-import ChannelDiscussionListItem from "./ChannelDiscussionListItem.vue";
-import LoadMore from "../../LoadMore.vue";
-import ErrorBanner from "../../ErrorBanner.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from "@/graphQLData/discussion/queries";
-import { usernameVar } from "@/cache";
-import { getFilterValuesFromParams } from "@/components/event/list/filters/getEventFilterValuesFromParams";
+import { computed, ref, onMounted, watch } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
+import ChannelDiscussionListItem from './ChannelDiscussionListItem.vue';
+import LoadMore from '../../LoadMore.vue';
+import ErrorBanner from '../../ErrorBanner.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
+import { usernameVar } from '@/cache';
+import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
-} from "@/components/comments/getSortFromQuery";
+} from '@/components/comments/getSortFromQuery';
 
 const DISCUSSION_PAGE_LIMIT = 25;
 
-const emit = defineEmits(["filterByTag", "filterByChannel"]);
+const emit = defineEmits(['filterByTag', 'filterByChannel']);
 
 const route = useRoute();
 const uiStore = useUIStore();
 const { expandChannelDiscussions } = storeToRefs(uiStore);
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const filterValues = ref(
@@ -65,22 +65,19 @@ const {
   loading: discussionLoading,
   refetch: refetchDiscussions,
   fetchMore,
-} = useQuery(
-  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
-  {
-    channelUniqueName: channelId,
-    searchInput,
-    selectedTags,
-    showArchived,
-    hasDownload: false,
-    options: {
-      limit: DISCUSSION_PAGE_LIMIT,
-      offset: 0,
-      sort: activeSort,
-      timeFrame: activeTimeFrame,
-    },
+} = useQuery(GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA, {
+  channelUniqueName: channelId,
+  searchInput,
+  selectedTags,
+  showArchived,
+  hasDownload: false,
+  options: {
+    limit: DISCUSSION_PAGE_LIMIT,
+    offset: 0,
+    sort: activeSort,
+    timeFrame: activeTimeFrame,
   },
-);
+});
 watch(
   () => usernameVar.value,
   (newValue) => {
@@ -149,11 +146,11 @@ watch(
 
 // Methods
 const filterByTag = (tag: string) => {
-  emit("filterByTag", tag);
+  emit('filterByTag', tag);
 };
 
 const filterByChannel = (channel: string) => {
-  emit("filterByChannel", channel);
+  emit('filterByChannel', channel);
 };
 
 const reachedEndOfResults = computed(() => {
@@ -167,7 +164,7 @@ const reachedEndOfResults = computed(() => {
 </script>
 
 <template>
-  <div class="px-2 ">
+  <div class="px-2">
     <slot />
     <p
       v-if="!discussionChannelResult && discussionLoading"
@@ -217,7 +214,7 @@ const reachedEndOfResults = computed(() => {
         discussionChannelResult?.getDiscussionsInChannel?.discussionChannels
           ?.length > 0
       "
-      class="dark:divide-gray-700 divide-gray-200 flex flex-col divide-y"
+      class="flex flex-col divide-y divide-gray-200 dark:divide-gray-700"
       data-testid="channel-discussion-list"
     >
       <ChannelDiscussionListItem
@@ -242,7 +239,7 @@ const reachedEndOfResults = computed(() => {
       "
     >
       <LoadMore
-        class="justify-self-center mb-6"
+        class="mb-6 justify-self-center"
         :loading="discussionLoading"
         :reached-end-of-results="reachedEndOfResults"
         @load-more="loadMore"

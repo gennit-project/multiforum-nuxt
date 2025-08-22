@@ -1,23 +1,23 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import SearchBar from "@/components/SearchBar.vue";
-import FilterChip from "@/components/FilterChip.vue";
-import ChannelIcon from "@/components/icons/ChannelIcon.vue";
-import TagIcon from "@/components/icons/TagIcon.vue";
-import SearchableForumList from "@/components/channel/SearchableForumList.vue";
-import SearchableTagList from "@/components/SearchableTagList.vue";
-import SortButtons from "@/components/SortButtons.vue";
-import { getTagLabel, getChannelLabel } from "@/utils";
-import { getFilterValuesFromParams } from "./getDiscussionFilterValuesFromParams";
-import type { SearchDiscussionValues } from "@/types/Discussion";
-import { updateFilters } from "@/utils/routerUtils";
-import { useRoute, useRouter } from "nuxt/app";
-import FilterIcon from "@/components/icons/FilterIcon.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import SearchIcon from "@/components/icons/SearchIcon.vue";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
+import { ref, computed, watch } from 'vue';
+import SearchBar from '@/components/SearchBar.vue';
+import FilterChip from '@/components/FilterChip.vue';
+import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import TagIcon from '@/components/icons/TagIcon.vue';
+import SearchableForumList from '@/components/channel/SearchableForumList.vue';
+import SearchableTagList from '@/components/SearchableTagList.vue';
+import SortButtons from '@/components/SortButtons.vue';
+import { getTagLabel, getChannelLabel } from '@/utils';
+import { getFilterValuesFromParams } from './getDiscussionFilterValuesFromParams';
+import type { SearchDiscussionValues } from '@/types/Discussion';
+import { updateFilters } from '@/utils/routerUtils';
+import { useRoute, useRouter } from 'nuxt/app';
+import FilterIcon from '@/components/icons/FilterIcon.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import SearchIcon from '@/components/icons/SearchIcon.vue';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 defineProps({
   isForumScoped: {
@@ -44,16 +44,16 @@ const router = useRouter();
 
 // Default filter labels
 const defaultFilterLabels = {
-  channels: "All Forums",
-  tags: "Tags",
+  channels: 'All Forums',
+  tags: 'Tags',
 };
 
 // Computed property for channelId from route params
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 // Local reactive state for filter values
@@ -108,7 +108,7 @@ const updateSearchInput = (searchInput: string) => {
 };
 // Check if we're on the downloads page
 const isDownloadPage = computed(() => {
-  return route.name && route.name.toString().includes("downloads");
+  return route.name && route.name.toString().includes('downloads');
 });
 
 const toggleSelectedChannel = (channel: string) => {
@@ -215,7 +215,7 @@ const isExpanded = computed(() => {
             :aria-pressed="isExpanded"
             :class="[
               // layout
-              'flex px-2 h-9 items-center border-l first:border-none transition-colors',
+              'flex h-9 items-center border-l px-2 transition-colors first:border-none',
               // base (non‑active) colours
               !isExpanded
                 ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
@@ -232,7 +232,7 @@ const isExpanded = computed(() => {
             aria-label="Collapse all discussions"
             :aria-pressed="!isExpanded"
             :class="[
-              'flex px-2 h-9 items-center border-l transition-colors',
+              'flex h-9 items-center border-l px-2 transition-colors',
               isExpanded
                 ? 'bg-gray-50 text-gray-800 dark:bg-gray-800 dark:text-gray-300'
                 : 'bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-white',
@@ -249,9 +249,9 @@ const isExpanded = computed(() => {
           :class="
             showFilters
               ? 'border-orange-500'
-              : 'text-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-300'
+              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
-          class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
+          class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-500 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           @click="
             (event) => {
               event.preventDefault();
@@ -266,9 +266,9 @@ const isExpanded = computed(() => {
           :class="
             showSearch
               ? 'border-orange-500'
-              : 'text-gray-800 border-gray-300 dark:border-gray-600 dark:text-gray-300'
+              : 'border-gray-300 text-gray-800 dark:border-gray-600 dark:text-gray-300'
           "
-          class="border flex px-1.5 h-9 rounded-md items-center gap-1 text-gray-800 dark:text-gray-300 hover:text-gray-700 dark:hover:text-gray-200 dark:hover:bg-gray-700 hover:bg-gray-100 dark:bg-gray-900"
+          class="flex h-9 items-center gap-1 rounded-md border px-1.5 text-gray-800 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 dark:hover:text-gray-200"
           @click="
             (event) => {
               event.preventDefault();
@@ -280,26 +280,34 @@ const isExpanded = computed(() => {
         </button>
         <SortButtons />
         <div>
-        <RequireAuth :full-width="false">
-          <template #has-auth>
-            <PrimaryButton
-              :label="isDownloadPage ? 'New Upload' : 'New Post'"
-              @click="$router.push(isForumScoped ? (isDownloadPage ? `/forums/${channelId}/downloads/create` : `/forums/${channelId}/discussions/create`) : '/discussions/create')"
-            />
-          </template>
-          <template #does-not-have-auth>
-            <PrimaryButton
-              :label="isDownloadPage ? 'New Upload' : 'New Post'"
-            />
-          </template>
-        </RequireAuth>
+          <RequireAuth :full-width="false">
+            <template #has-auth>
+              <PrimaryButton
+                :label="isDownloadPage ? 'New Upload' : 'New Post'"
+                @click="
+                  $router.push(
+                    isForumScoped
+                      ? isDownloadPage
+                        ? `/forums/${channelId}/downloads/create`
+                        : `/forums/${channelId}/discussions/create`
+                      : '/discussions/create'
+                  )
+                "
+              />
+            </template>
+            <template #does-not-have-auth>
+              <PrimaryButton
+                :label="isDownloadPage ? 'New Upload' : 'New Post'"
+              />
+            </template>
+          </RequireAuth>
         </div>
       </div>
     </div>
     <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
     <div
       v-if="showSearch"
-      class="flex flex-col gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+      class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
     >
       <SearchBar
         data-testid="discussion-filter-search-bar"
@@ -314,7 +322,7 @@ const isExpanded = computed(() => {
     </div>
     <div
       v-if="showFilters"
-      class="flex justify-end gap-2 py-2 dark:text-gray-300 dark:bg-gray-700 bg-gray-100"
+      class="flex justify-end gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"
     >
       <FilterChip
         class="align-middle"
@@ -343,8 +351,8 @@ const isExpanded = computed(() => {
         />
         {{
           isDownloadPage
-            ? "Show archived downloads"
-            : "Show archived discussions"
+            ? 'Show archived downloads'
+            : 'Show archived discussions'
         }}
       </div>
     </div>

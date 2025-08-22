@@ -1,61 +1,61 @@
 <script lang="ts">
-import { computed, defineComponent, ref, watchEffect } from "vue";
-import VueEasyLightbox from "vue-easy-lightbox";
-import MarkdownIt from "markdown-it";
-import { config } from "@/config";
-import MarkdownRenderer from "@/components/MarkdownRenderer.vue";
-import { useUIStore } from "@/stores/uiStore";
-import { storeToRefs } from "pinia";
+import { computed, defineComponent, ref, watchEffect } from 'vue';
+import VueEasyLightbox from 'vue-easy-lightbox';
+import MarkdownIt from 'markdown-it';
+import { config } from '@/config';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 
 function linkifyUsernames(markdownString: string) {
   // First find all email addresses and their positions
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
   const emails: { email: string; start: number; end: number }[] = [];
   let match;
-  
+
   while ((match = emailRegex.exec(markdownString)) !== null) {
     emails.push({
       email: match[0],
       start: match.index,
-      end: match.index + match[0].length
+      end: match.index + match[0].length,
     });
   }
-  
+
   // Function to check if a position is within an email
   const isInEmail = (pos: number): boolean => {
-    return emails.some(email => pos >= email.start && pos < email.end);
+    return emails.some((email) => pos >= email.start && pos < email.end);
   };
-  
+
   // Now find usernames, but skip those within emails
   const regex = /(?<!https?:\/\/(?:[\w.-]+))\b(u\/|@)([a-zA-Z0-9_-]+)/g;
   const parts: string[] = [];
   let lastIndex = 0;
-  
+
   while ((match = regex.exec(markdownString)) !== null) {
     const matchStart = match.index;
-    
+
     // Skip if this username is part of an email
     if (isInEmail(matchStart)) {
       continue;
     }
-    
+
     const prefix = match[1]; // 'u/' or '@'
     const username = match[2];
-    
+
     // Add text before this match
     parts.push(markdownString.substring(lastIndex, matchStart));
-    
+
     // Add the username as a markdown link
     parts.push(`[${prefix}${username}](${config.baseUrl}u/${username})`);
-    
+
     lastIndex = matchStart + match[0].length;
   }
-  
+
   // Add any remaining text
   if (lastIndex < markdownString.length) {
     parts.push(markdownString.substring(lastIndex));
   }
-  
+
   return parts.join('');
 }
 
@@ -78,8 +78,8 @@ function linkifyUrls(text: string) {
   }
   return text.replace(urlRegex, (url) => {
     let href = url;
-    if (!url.startsWith("http")) {
-      href = "http://" + url;
+    if (!url.startsWith('http')) {
+      href = 'http://' + url;
     }
     if (
       markdownLinks.some((link) => link.includes(url)) ||
@@ -178,7 +178,7 @@ export default defineComponent({
       if (!props.text) {
         return false;
       }
-      const words = props.text.split(" ");
+      const words = props.text.split(' ');
       return words.length > props.wordLimit;
     });
 
@@ -234,11 +234,11 @@ export default defineComponent({
       if (showFullText.value) {
         return linkifiedMarkdown.value;
       }
-      const words = linkifiedMarkdown.value.split(" ");
+      const words = linkifiedMarkdown.value.split(' ');
       if (words.length > props.wordLimit) {
         return (
-          words.slice(0, props.wordLimit).join(" ") +
-          (words.length > props.wordLimit ? "..." : "")
+          words.slice(0, props.wordLimit).join(' ') +
+          (words.length > props.wordLimit ? '...' : '')
         );
       }
       return linkifiedMarkdown.value;
@@ -248,7 +248,7 @@ export default defineComponent({
       if (props.disableGallery) {
         return;
       }
-      if (event.target.tagName === "IMG") {
+      if (event.target.tagName === 'IMG') {
         const clickedSrc = event.target.src;
         const clickedIndex = embeddedImages.value.findIndex(
           (image: GalleryItem) => image.href === clickedSrc
@@ -265,17 +265,17 @@ export default defineComponent({
     };
 
     const showWarningModal = ref(false);
-    const pendingUrl = ref("");
+    const pendingUrl = ref('');
 
     const handleClick = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
 
       // Handle image clicks
-      if (target.tagName === "IMG") {
+      if (target.tagName === 'IMG') {
         if (props.disableGallery) {
           return;
         }
-        const clickedSrc = target.getAttribute("src");
+        const clickedSrc = target.getAttribute('src');
         if (clickedSrc) {
           const clickedIndex = embeddedImages.value.findIndex(
             (image: GalleryItem) => image.href === clickedSrc
@@ -289,7 +289,7 @@ export default defineComponent({
       }
 
       // Handle link clicks
-      const link = target.tagName === "A" ? target : target.closest("a");
+      const link = target.tagName === 'A' ? target : target.closest('a');
       if (link && link instanceof HTMLAnchorElement && link.href) {
         // Only show warning for external links
         const isExternalLink =
@@ -306,14 +306,14 @@ export default defineComponent({
 
     const handleModalConfirm = () => {
       if (pendingUrl.value) {
-        window.open(pendingUrl.value, "_blank", "noopener,noreferrer");
+        window.open(pendingUrl.value, '_blank', 'noopener,noreferrer');
       }
       showWarningModal.value = false;
     };
 
     const handleModalClose = () => {
       showWarningModal.value = false;
-      pendingUrl.value = "";
+      pendingUrl.value = '';
     };
 
     return {
@@ -351,7 +351,7 @@ export default defineComponent({
       class="text-sm font-bold text-orange-600 hover:underline dark:text-gray-300"
       @click="toggleShowFullText"
     >
-      {{ showFullText ? "Show Less" : "Show More" }}
+      {{ showFullText ? 'Show Less' : 'Show More' }}
     </button>
     <vue-easy-lightbox
       :visible="visibleRef"

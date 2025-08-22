@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import type { Issue } from "@/__generated__/graphql";
-import ArchiveButton from "./ArchiveButton.vue";
-import SuspendUserButton from "./SuspendUserButton.vue";
-import EyeIcon from "../icons/EyeIcon.vue";
-import XCircleIcon from "../icons/XCircleIcon.vue";
+import { computed } from 'vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import type { Issue } from '@/__generated__/graphql';
+import ArchiveButton from './ArchiveButton.vue';
+import SuspendUserButton from './SuspendUserButton.vue';
+import EyeIcon from '../icons/EyeIcon.vue';
+import XCircleIcon from '../icons/XCircleIcon.vue';
 
 const props = defineProps({
   issue: {
@@ -15,27 +15,27 @@ const props = defineProps({
   discussionId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   eventId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   commentId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   contextText: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   channelUniqueName: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   closeIssueLoading: {
     type: Boolean,
@@ -50,37 +50,38 @@ const props = defineProps({
 });
 
 defineEmits([
-  "close-issue",
-  "open-issue",
-  "archived-successfully",
-  "unarchived-successfully",
-  "suspended-user-successfully",
-  "suspended-mod-successfully",
-  "unsuspended-user-successfully",
-  "unsuspended-mod-successfully"
+  'close-issue',
+  'open-issue',
+  'archived-successfully',
+  'unarchived-successfully',
+  'suspended-user-successfully',
+  'suspended-mod-successfully',
+  'unsuspended-user-successfully',
+  'unsuspended-mod-successfully',
 ]);
 
 // Compute whether actions should be disabled
 const actionsDisabled = computed(() => {
   return !props.issue.isOpen || props.isCurrentUserOriginalPoster;
 });
-
 </script>
 
 <template>
   <RequireAuth>
     <template #has-auth>
-      <div class="flex pt-12 gap-x-2" data-test="mod-wizard">
+      <div class="flex gap-x-2 pt-12" data-test="mod-wizard">
         <div
-          class="flex justify-center items-center w-10 h-10  rounded-lg"
-          :class="[issue.isOpen ? 'bg-orange-600' : 'bg-gray-300 dark:bg-gray-700']"
+          class="flex h-10 w-10 items-center justify-center rounded-lg"
+          :class="[
+            issue.isOpen ? 'bg-orange-600' : 'bg-gray-300 dark:bg-gray-700',
+          ]"
         >
           <div class="">
             <EyeIcon class="h-6 w-6 text-white" />
           </div>
         </div>
         <div
-          class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
+          class="flex-1 flex-col space-y-4 rounded-lg border px-4 py-4"
           :class="[
             issue.isOpen && !isCurrentUserOriginalPoster
               ? 'border-orange-500'
@@ -89,25 +90,30 @@ const actionsDisabled = computed(() => {
         >
           <h1
             v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-            class="text-xl font-bold text-orange-500 border-b border-gray-300 dark:border-gray-600 pb-2"
+            class="border-b border-gray-300 pb-2 text-xl font-bold text-orange-500 dark:border-gray-600"
           >
             Mod Decision Needed
           </h1>
           <h1
             v-else
-            class="text-xl font-bold text-gray-500 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 pb-2"
+            class="border-b border-gray-300 pb-2 text-xl font-bold text-gray-500 dark:border-gray-600 dark:text-gray-300"
           >
             Mod Actions
           </h1>
-          <p v-if="!issue.isOpen" class="text-gray-600 dark:text-gray-400" >
-            {{ "Mod actions are disabled because the issue is closed." }}
+          <p v-if="!issue.isOpen" class="text-gray-600 dark:text-gray-400">
+            {{ 'Mod actions are disabled because the issue is closed.' }}
           </p>
-          <p v-else-if="isCurrentUserOriginalPoster" class="text-gray-600 dark:text-gray-400" >
-            {{ "Mod actions are disabled because you are the author of the original post." }}
+          <p
+            v-else-if="isCurrentUserOriginalPoster"
+            class="text-gray-600 dark:text-gray-400"
+          >
+            {{
+              'Mod actions are disabled because you are the author of the original post.'
+            }}
           </p>
           <RequireAuth :full-width="true">
             <template #has-auth>
-              <div class="flex flex-col space-y-4 mt-4">
+              <div class="mt-4 flex flex-col space-y-4">
                 <ArchiveButton
                   :discussion-id="discussionId"
                   :event-id="eventId"
@@ -128,11 +134,13 @@ const actionsDisabled = computed(() => {
                   :channel-unique-name="channelUniqueName"
                   :disabled="actionsDisabled"
                   @suspended-successfully="$emit('suspended-user-successfully')"
-                  @unsuspended-successfully="$emit('unsuspended-user-successfully')"
+                  @unsuspended-successfully="
+                    $emit('unsuspended-user-successfully')
+                  "
                 />
                 <button
                   v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-                  class="w-full cursor-pointer bg-orange-600 hover:bg-orange-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-orange-600 px-4 py-2 text-white hover:bg-orange-500"
                   :loading="closeIssueLoading"
                   @click="$emit('close-issue')"
                 >
@@ -142,26 +150,31 @@ const actionsDisabled = computed(() => {
               </div>
             </template>
             <template #does-not-have-auth>
-              <div class="flex flex-col space-y-4 mt-4">
+              <div class="mt-4 flex flex-col space-y-4">
                 <p class="text-gray-600 dark:text-gray-400">
                   Please log in to access moderation features
                 </p>
               </div>
             </template>
           </RequireAuth>
-         
         </div>
       </div>
     </template>
     <template #does-not-have-auth>
-      <div class="flex pt-12 gap-x-2">
-        <div class="flex justify-center items-center w-10 h-10 bg-gray-300 dark:bg-gray-700 rounded-lg">
+      <div class="flex gap-x-2 pt-12">
+        <div
+          class="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-300 dark:bg-gray-700"
+        >
           <div class="">
             <EyeIcon class="h-6 w-6 text-white" />
           </div>
         </div>
-        <div class="flex-1 flex-col space-y-4 px-4 py-4 border border-gray-300 dark:border-gray-700 rounded-lg">
-          <h1 class="text-xl font-bold text-gray-500 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 pb-2">
+        <div
+          class="flex-1 flex-col space-y-4 rounded-lg border border-gray-300 px-4 py-4 dark:border-gray-700"
+        >
+          <h1
+            class="border-b border-gray-300 pb-2 text-xl font-bold text-gray-500 dark:border-gray-600 dark:text-gray-300"
+          >
             Mod Actions
           </h1>
           <p class="text-gray-600 dark:text-gray-400">

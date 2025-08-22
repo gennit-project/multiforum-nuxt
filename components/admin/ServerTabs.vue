@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import TabButton from "@/components/channel/TabButton.vue";
-import FlagIcon from "@/components/icons/FlagIcon.vue";
-import CogIcon from "@/components/icons/CogIcon.vue";
-import IdentificationIcon from "../icons/IdentificationIcon.vue";
-import type { Channel } from "@/__generated__/graphql";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import TabButton from '@/components/channel/TabButton.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
+import CogIcon from '@/components/icons/CogIcon.vue';
+import IdentificationIcon from '../icons/IdentificationIcon.vue';
+import type { Channel } from '@/__generated__/graphql';
+import { useRoute } from 'nuxt/app';
 
 type Tab = {
   name: string;
@@ -46,32 +46,32 @@ const tabRoutes = computed(() => {
 });
 
 const iconSize = computed(() =>
-  props.vertical ? "h-6 w-6 shrink-0" : "h-5 w-5 shrink-0"
+  props.vertical ? 'h-6 w-6 shrink-0' : 'h-5 w-5 shrink-0'
 );
 
 const tabs = computed((): Tab[] => {
   const baseTabs: Tab[] = [
     {
-      name: "issues",
-      routeSuffix: "issues",
-      label: "Issues",
+      name: 'issues',
+      routeSuffix: 'issues',
+      label: 'Issues',
       icon: FlagIcon,
-      countProperty: "IssuesAggregate",
+      countProperty: 'IssuesAggregate',
     },
     {
-      name: "settings",
-      routeSuffix: "edit",
-      label: "Settings",
+      name: 'settings',
+      routeSuffix: 'edit',
+      label: 'Settings',
       icon: CogIcon,
       countProperty: null,
     },
     {
-      name: "roles",
-      routeSuffix: "roles",
-      label: "Roles",
+      name: 'roles',
+      routeSuffix: 'roles',
+      label: 'Roles',
       icon: IdentificationIcon,
       countProperty: null,
-    }
+    },
   ];
 
   return baseTabs;

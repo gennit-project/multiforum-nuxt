@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
 import {
   SERVER_SCOPED_ISSUE_COUNT,
   SERVER_SCOPED_CLOSED_ISSUE_COUNT,
-} from "@/graphQLData/mod/queries";
+} from '@/graphQLData/mod/queries';
 
 const route = useRoute();
 const {
@@ -37,14 +37,14 @@ const closedCount = computed(() => {
 
 <template>
   <div
-    class="bg-white dark:bg-gray-900 dark:text-white border-gray-200 dark:border-gray-600"
+    class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white"
   >
     <nav class="flex items-center gap-4 py-3 pl-4">
       <nuxt-link
         :to="{
           name: 'admin-issues',
         }"
-        class="px-4 py-2 border-b-2"
+        class="border-b-2 px-4 py-2"
         :class="{
           'border-black text-black dark:border-white dark:text-white':
             route.name === 'admin-issues',
@@ -58,7 +58,7 @@ const closedCount = computed(() => {
         :to="{
           name: 'admin-issues-closed',
         }"
-        class="px-4 py-2 border-b-2"
+        class="border-b-2 px-4 py-2"
         :class="{
           'border-black text-black dark:border-white dark:text-white':
             route.name === 'admin-issues-closed',

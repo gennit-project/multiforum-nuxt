@@ -1,17 +1,14 @@
 <script lang="ts">
-import { defineComponent, ref, computed } from "vue";
-import { GET_EVENT } from "@/graphQLData/event/queries";
-import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/event/mutations";
-import {
-  useQuery,
-  useMutation,
-} from "@vue/apollo-composable";
-import { useRoute, useRouter } from "nuxt/app";
-import type { CreateEditEventFormValues } from "@/types/Event";
-import { DateTime } from "luxon";
-import getDefaultEventFormValues from "@/utils/defaultEventFormValues";
-import CreateEditEventFields from "@/components/event/form/CreateEditEventFields.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
+import { defineComponent, ref, computed } from 'vue';
+import { GET_EVENT } from '@/graphQLData/event/queries';
+import { UPDATE_EVENT_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/event/mutations';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import { useRoute, useRouter } from 'nuxt/app';
+import type { CreateEditEventFormValues } from '@/types/Event';
+import { DateTime } from 'luxon';
+import getDefaultEventFormValues from '@/utils/defaultEventFormValues';
+import CreateEditEventFields from '@/components/event/form/CreateEditEventFields.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type {
   EventChannel,
   EventUpdateInput,
@@ -19,11 +16,11 @@ import type {
   EventTagsDisconnectFieldInput,
   Event,
   Tag as TagData,
-} from "@/__generated__/graphql";
-import { modProfileNameVar } from "@/cache";
+} from '@/__generated__/graphql';
+import { modProfileNameVar } from '@/cache';
 
 export default defineComponent({
-  name: "EditEvent",
+  name: 'EditEvent',
   components: {
     CreateEditEventFields,
     RequireAuth,
@@ -33,10 +30,10 @@ export default defineComponent({
     const route = useRoute();
     const router = useRouter();
     const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
+      if (typeof route.params.forumId === 'string') {
         return route.params.forumId;
       }
-      return "";
+      return '';
     });
 
     const eventId: string | string[] = route.params.eventId;
@@ -94,33 +91,32 @@ export default defineComponent({
     });
 
     function getFormValuesFromEventData(
-      event: Event,
+      event: Event
     ): CreateEditEventFormValues {
-
       return {
         title: event.title,
-        description: event.description || "",
+        description: event.description || '',
         selectedTags: event.Tags.map((tag: TagData) => {
           return tag.text;
         }),
         selectedChannels: event.EventChannels.map((ec: EventChannel) => {
           return ec.channelUniqueName;
         }),
-        address: event.address || "",
-        locationName: event.locationName || "",
+        address: event.address || '',
+        locationName: event.locationName || '',
         isInPrivateResidence: event.isInPrivateResidence || false,
-        virtualEventUrl: event.virtualEventUrl || "",
+        virtualEventUrl: event.virtualEventUrl || '',
         startTime: event.startTime,
-        startTimeDayOfWeek: event.startTimeDayOfWeek || "",
+        startTimeDayOfWeek: event.startTimeDayOfWeek || '',
         startTimeHourOfDay: event.startTimeHourOfDay || 0,
         endTime: event.endTime,
         canceled: event.canceled,
         deleted: event.deleted || false,
-        cost: event.cost || "",
+        cost: event.cost || '',
         free: event.free || false,
         isHostedByOP: event.isHostedByOP || false,
         isAllDay: event.isAllDay || false,
-        coverImageURL: event.coverImageURL || "",
+        coverImageURL: event.coverImageURL || '',
       };
     }
 
@@ -257,9 +253,9 @@ export default defineComponent({
         Redirect to the event detail page in the first
         channel that the event was submitted to.
       */
-     if (!updateEventError.value) {
+      if (!updateEventError.value) {
         router.push({
-          name: "forums-forumId-events-eventId",
+          name: 'forums-forumId-events-eventId',
           params: {
             forumId: formValues.value.selectedChannels[0],
             eventId,
@@ -295,7 +291,7 @@ export default defineComponent({
         where: {
           id: this.eventId,
         },
-      }
+      };
       this.updateEvent(variables);
     },
     updateFormValues(data: CreateEditEventFormValues) {

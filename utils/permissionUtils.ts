@@ -1,13 +1,13 @@
 /**
  * Permission utility functions for checking user and moderator permissions in forums/channels
- * 
+ *
  * The application has two separate permission systems:
  * 1. User Permissions - Control what regular users can do (create content, upvote, etc.)
  * 2. Moderator Permissions - Control what moderators can do (archive content, give feedback, etc.)
- * 
+ *
  * Both systems follow similar patterns but have different roles and permissions.
  */
-import type { ModChannelRole, ModServerRole } from "@/__generated__/graphql";
+import type { ModChannelRole, ModServerRole } from '@/__generated__/graphql';
 
 // Create a union type of all permission keys from ModChannelRole and ModServerRole
 type ModPermissionKey = keyof Pick<
@@ -24,7 +24,7 @@ type ModPermissionKey = keyof Pick<
 >;
 
 // User permission keys
-type UserPermissionKey = 
+type UserPermissionKey =
   | 'canCreateComment'
   | 'canCreateDiscussion'
   | 'canCreateEvent'
@@ -80,13 +80,13 @@ export type GetAllPermissionsParams = {
 
 /**
  * Checks if the user has permission to perform a specific action in a channel
- * 
+ *
  * This follows the server-side permission checking logic:
  * 1. Check if the user is a channel admin/owner (grants all permissions)
  * 2. Check for suspension status (denies most permissions)
  * 3. Check for elevated mod status and permissions
  * 4. Fall back to standard mod role permissions
- * 
+ *
  * @param params - Object containing all parameters:
  *   - permissionData - Data about the user's roles in the channel
  *   - standardModRole - The standard mod role for the channel/server
@@ -103,23 +103,23 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     elevatedModRole,
     username,
     modProfileName,
-    action
+    action,
   } = params;
-  
+
   // ---------- STEP 1: Initial checks ----------
-  
+
   // If we have no roles defined at all, we can't check permissions
   if (!standardModRole && !elevatedModRole) {
     return false;
   }
-  
+
   // If we have permission data, use it for role determination
   if (permissionData) {
     // ---------- STEP 2: Check if user is a channel owner/admin ----------
     // Channel owners/admins bypass all permission checks and can do anything
-    const isChannelOwner = permissionData.Admins?.some(
-      admin => admin.username === username
-    ) || false;
+    const isChannelOwner =
+      permissionData.Admins?.some((admin) => admin.username === username) ||
+      false;
 
     if (isChannelOwner) {
       return true;
@@ -127,9 +127,10 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
 
     // ---------- STEP 3: Check suspension status ----------
     // Check if the user is a suspended moderator
-    const isSuspendedMod = permissionData.SuspendedMods?.some(
-      mod => mod.modProfileName === modProfileName
-    ) || false;
+    const isSuspendedMod =
+      permissionData.SuspendedMods?.some(
+        (mod) => mod.modProfileName === modProfileName
+      ) || false;
 
     // Suspended mods generally can't perform moderation actions
     if (isSuspendedMod) {
@@ -137,9 +138,10 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     }
 
     // Check if user is suspended in this channel
-    const isSuspendedUser = permissionData.SuspendedUsers?.some(
-      user => user.username === username
-    ) || false;
+    const isSuspendedUser =
+      permissionData.SuspendedUsers?.some(
+        (user) => user.username === username
+      ) || false;
 
     if (isSuspendedUser) {
       // Suspended users can't perform most actions
@@ -148,12 +150,17 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
     }
 
     // ---------- STEP 4: Check if user is an elevated mod ----------
-    const isElevatedMod = permissionData.Moderators?.some(
-      mod => mod.displayName === modProfileName
-    ) || false;
+    const isElevatedMod =
+      permissionData.Moderators?.some(
+        (mod) => mod.displayName === modProfileName
+      ) || false;
 
     // If the user is an elevated mod, use elevated mod role permissions
-    if (isElevatedMod && elevatedModRole && elevatedModRole[action] !== undefined) {
+    if (
+      isElevatedMod &&
+      elevatedModRole &&
+      elevatedModRole[action] !== undefined
+    ) {
       return !!elevatedModRole[action];
     }
   }
@@ -170,7 +177,7 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
 
 /**
  * Gets all permissions for a user in a channel
- * 
+ *
  * @param params - Object containing all parameters:
  *   - permissionData - Data about the user's roles in the channel
  *   - standardModRole - The standard mod role for the channel/server
@@ -182,7 +189,9 @@ export const checkPermission = (params: CheckPermissionParams): boolean => {
  *   - Additional permissions: 'canEditWiki', 'canAddMods', etc.
  *   - Role information: 'isChannelOwner', 'isElevatedMod', 'isSuspendedMod', 'isSuspendedUser'
  */
-export const getAllPermissions = (params: GetAllPermissionsParams): Record<string, boolean> => {
+export const getAllPermissions = (
+  params: GetAllPermissionsParams
+): Record<string, boolean> => {
   if (!params) {
     return {};
   }
@@ -191,9 +200,9 @@ export const getAllPermissions = (params: GetAllPermissionsParams): Record<strin
     standardModRole,
     elevatedModRole,
     username,
-    modProfileName
+    modProfileName,
   } = params;
-  
+
   // Define all possible permissions from ModChannelRole and ModServerRole
   const corePermissions: PermissionKey[] = [
     'canReport',
@@ -204,7 +213,7 @@ export const getAllPermissions = (params: GetAllPermissionsParams): Record<strin
     'canSuspendUser',
     'canOpenSupportTickets',
     'canCloseSupportTickets',
-    'canLockChannel'
+    'canLockChannel',
   ];
 
   // Additional permissions specific to our application
@@ -214,7 +223,7 @@ export const getAllPermissions = (params: GetAllPermissionsParams): Record<strin
     'canRemoveMods',
     'canAddOwners',
     'canRemoveOwners',
-    'canChangeSettings'
+    'canChangeSettings',
   ];
 
   // Combine all permission types
@@ -222,34 +231,37 @@ export const getAllPermissions = (params: GetAllPermissionsParams): Record<strin
 
   // Create an object with all permissions
   const permissions: Record<string, boolean> = {};
-  
-  allActions.forEach(action => {
+
+  allActions.forEach((action) => {
     permissions[action] = checkPermission({
       permissionData,
       standardModRole,
       elevatedModRole,
       username,
       modProfileName,
-      action
+      action,
     });
   });
 
   // Add role information
-  permissions.isChannelOwner = permissionData?.Admins?.some(
-    admin => admin.username === username
-  ) || false;
-  
-  permissions.isElevatedMod = permissionData?.Moderators?.some(
-    mod => mod.displayName === modProfileName
-  ) || false;
-  
-  permissions.isSuspendedMod = permissionData?.SuspendedMods?.some(
-    mod => mod.modProfileName === modProfileName
-  ) || false;
+  permissions.isChannelOwner =
+    permissionData?.Admins?.some((admin) => admin.username === username) ||
+    false;
 
-  permissions.isSuspendedUser = permissionData?.SuspendedUsers?.some(
-    user => user.username === username
-  ) || false;
+  permissions.isElevatedMod =
+    permissionData?.Moderators?.some(
+      (mod) => mod.displayName === modProfileName
+    ) || false;
+
+  permissions.isSuspendedMod =
+    permissionData?.SuspendedMods?.some(
+      (mod) => mod.modProfileName === modProfileName
+    ) || false;
+
+  permissions.isSuspendedUser =
+    permissionData?.SuspendedUsers?.some(
+      (user) => user.username === username
+    ) || false;
 
   return permissions;
 };

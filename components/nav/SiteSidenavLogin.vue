@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { useAuth0 } from "@auth0/auth0-vue";
-import { config } from "@/config";
-import { isAuthenticatedVar } from "@/cache";
-import { useRoute } from "nuxt/app";
+import { useAuth0 } from '@auth0/auth0-vue';
+import { config } from '@/config';
+import { isAuthenticatedVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
 
 defineProps({
   navLinkClasses: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
@@ -16,7 +16,7 @@ const route = useRoute();
 
 const handleLogout = () => {
   // Store the current path in local storage
-  localStorage.setItem("postLogoutRedirect", route.fullPath);
+  localStorage.setItem('postLogoutRedirect', route.fullPath);
   // Redirect to the fixed logout route
   logout({
     logoutParams: {

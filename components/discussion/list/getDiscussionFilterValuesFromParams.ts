@@ -1,5 +1,5 @@
-import type { SearchDiscussionValues } from "@/types/Discussion";
-import type { RouteLocationNormalized } from "vue-router";
+import type { SearchDiscussionValues } from '@/types/Discussion';
+import type { RouteLocationNormalized } from 'vue-router';
 
 type GetFilterValuesInput = {
   route: RouteLocationNormalized;
@@ -7,7 +7,7 @@ type GetFilterValuesInput = {
 };
 
 export const getFilterValuesFromParams = function (
-  input: GetFilterValuesInput,
+  input: GetFilterValuesInput
 ): SearchDiscussionValues {
   // Need to re-clean data when route values change
   // Take the default filter values from the query
@@ -16,7 +16,7 @@ export const getFilterValuesFromParams = function (
   const cleanedValues: SearchDiscussionValues = {
     tags: [],
     channels: channelId ? [channelId] : [],
-    searchInput: "",
+    searchInput: '',
     showArchived: false,
   };
 
@@ -24,36 +24,40 @@ export const getFilterValuesFromParams = function (
     const val = route.query[key];
 
     switch (key) {
-      case "tags":
-        if (typeof val === "string") {
+      case 'tags':
+        if (typeof val === 'string') {
           cleanedValues.tags = [val];
         }
         if (Array.isArray(val)) {
           // If it is an array of strings, which
           // is good, then the type is an object.
-          cleanedValues.tags = val.filter((v): v is string => typeof v === "string");
+          cleanedValues.tags = val.filter(
+            (v): v is string => typeof v === 'string'
+          );
         }
         break;
-      case "channels":
-        if (typeof val === "string") {
+      case 'channels':
+        if (typeof val === 'string') {
           cleanedValues.channels = [val];
         }
         if (Array.isArray(val)) {
           // If it is an array of strings, which
           // is good, then the type is an object.
-          cleanedValues.channels = val.filter((v): v is string => typeof v === "string");
+          cleanedValues.channels = val.filter(
+            (v): v is string => typeof v === 'string'
+          );
         }
         break;
-      case "searchInput":
-        if (typeof val === "string") {
+      case 'searchInput':
+        if (typeof val === 'string') {
           cleanedValues.searchInput = val;
         }
         break;
-      case "showArchived":
-        if (val === "true") {
+      case 'showArchived':
+        if (val === 'true') {
           cleanedValues.showArchived = true;
         }
-        if (val === "false") {
+        if (val === 'false') {
           cleanedValues.showArchived = false;
         }
         break;
@@ -65,9 +69,8 @@ export const getFilterValuesFromParams = function (
   const filterValues: SearchDiscussionValues = {
     tags: tags || [],
     channels: channels || [],
-    searchInput: searchInput || "",
+    searchInput: searchInput || '',
     showArchived,
   };
   return filterValues;
 };
-

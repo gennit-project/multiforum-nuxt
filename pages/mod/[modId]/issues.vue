@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { useRoute } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
-import IssueListItem from "@/components/mod/ModIssueListItem.vue";
-import { GET_MOD, GET_MOD_ISSUES } from "@/graphQLData/mod/queries";
+import { computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import IssueListItem from '@/components/mod/ModIssueListItem.vue';
+import { GET_MOD, GET_MOD_ISSUES } from '@/graphQLData/mod/queries';
 
 const PAGE_LIMIT = 25;
 const route = useRoute();
 const modProfileName = computed(() => {
-  return typeof route.params.modId === "string" ? route.params.modId : "";
+  return typeof route.params.modId === 'string' ? route.params.modId : '';
 });
 
 const { result: modResult, error: getModError } = useQuery(GET_MOD, () => ({
@@ -39,7 +39,7 @@ const {
     offset: 0,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -84,7 +84,7 @@ const issues = computed(() => {
 
 <template>
   <div class="py-3 dark:text-white">
-    <ErrorBanner v-if="error" :text="error.message"/>
+    <ErrorBanner v-if="error" :text="error.message" />
     <ErrorBanner v-if="getModError">
       {{ getModError.message }}
     </ErrorBanner>
@@ -101,11 +101,7 @@ const issues = computed(() => {
       class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
       data-testid="issue-list"
     >
-      <IssueListItem
-        v-for="issue in issues"
-        :key="issue.id"
-        :issue="issue"
-      />
+      <IssueListItem v-for="issue in issues" :key="issue.id" :issue="issue" />
     </ul>
     <div v-if="issueCount">
       <LoadMore

@@ -1,29 +1,29 @@
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import gql from "graphql-tag";
+import { defineComponent, computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import gql from 'graphql-tag';
 
 export default defineComponent({
-  name: "PhotoAvatar",
+  name: 'PhotoAvatar',
   props: {
     src: {
       type: String,
-      required: true
+      required: true,
     },
     alt: {
       type: String,
-      required: true
+      required: true,
     },
     isSquare: {
       type: Boolean,
       required: false,
-      default: false
+      default: false,
     },
     isLarge: {
       type: Boolean,
       required: false,
-      default: false
-    }
+      default: false,
+    },
   },
   setup() {
     const GET_THEME = gql`
@@ -40,7 +40,7 @@ export default defineComponent({
 
     const theme = computed(() => {
       if (themeLoading.value || themeError.value) {
-        return "";
+        return '';
       }
       return themeResult.value?.theme;
     });
@@ -52,11 +52,12 @@ export default defineComponent({
 });
 </script>
 <template>
-  <img 
-    :class="[isLarge ? '' :'h-8 w-8', isSquare ? 'rounded-lg' : 'rounded-full']"
-    :src="src" 
+  <img
+    :class="[
+      isLarge ? '' : 'h-8 w-8',
+      isSquare ? 'rounded-lg' : 'rounded-full',
+    ]"
+    :src="src"
     :alt="alt"
-  >
+  />
 </template>
-
-

@@ -11,8 +11,8 @@ Each test was resetting and re-seeding the database in its `beforeEach` hook, ca
 
 ```js
 beforeEach(function () {
-  deleteAll();  // Clear database
-  seedAll();    // Seed all data
+  deleteAll(); // Clear database
+  seedAll(); // Seed all data
   cy.loginWithCreateEventButton();
 });
 ```
@@ -22,16 +22,16 @@ Data setup is now performed once per test file using `before` hooks, significant
 
 ```js
 // Import the utility functions
-import { setupTestData, loginUser } from "../../support/testSetup";
+import { setupTestData, loginUser } from '../../support/testSetup';
 
-describe("Test suite", () => {
+describe('Test suite', () => {
   // Run once per test file
   setupTestData();
-  
+
   // Handle login before each test
   loginUser('loginWithCreateEventButton');
-  
-  it("test case", () => {
+
+  it('test case', () => {
     // Test code here...
   });
 });
@@ -65,11 +65,13 @@ The `testSetup.ts` utility provides:
 To convert an existing test file:
 
 1. Import the utilities:
+
    ```js
-   import { setupTestData, loginUser } from "../../support/testSetup";
+   import { setupTestData, loginUser } from '../../support/testSetup';
    ```
 
 2. Replace your `beforeEach` data setup with:
+
    ```js
    setupTestData();
    loginUser('loginWithCreateEventButton');

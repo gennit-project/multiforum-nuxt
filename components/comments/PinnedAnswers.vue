@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import type { PropType } from "vue";
-import type { Comment as CommentType } from "@/__generated__/graphql";
-import Comment from "./Comment.vue";
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import type { Comment as CommentType } from '@/__generated__/graphql';
+import Comment from './Comment.vue';
 
 const props = defineProps({
   answers: {
@@ -23,36 +23,36 @@ const props = defineProps({
   },
   originalPoster: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
 const emit = defineEmits([
-  "createComment",
-  "delete-comment",
-  "click-edit-comment",
-  "openEditCommentEditor",
-  "updateEditCommentInput",
-  "updateCreateReplyCommentInput",
-  "showCopiedLinkNotification",
-  "clickReport",
-  "clickFeedback",
-  "clickUndoFeedback",
-  "clickEditFeedback",
-  "handleViewFeedback",
-  "startCommentSave",
-  "openReplyEditor",
-  "hideReplyEditor",
-  "hideEditCommentEditor",
-  "saveEdit",
-  "openModProfile",
-  "scrollToTop",
-  "handleClickArchive",
-  "handleClickArchiveAndSuspend",
-  "handleClickUnarchive",
-  "update-edit-comment-input",
-  "showMarkedAsBestAnswerNotification",
-  "showUnmarkedAsBestAnswerNotification",
+  'createComment',
+  'delete-comment',
+  'click-edit-comment',
+  'openEditCommentEditor',
+  'updateEditCommentInput',
+  'updateCreateReplyCommentInput',
+  'showCopiedLinkNotification',
+  'clickReport',
+  'clickFeedback',
+  'clickUndoFeedback',
+  'clickEditFeedback',
+  'handleViewFeedback',
+  'startCommentSave',
+  'openReplyEditor',
+  'hideReplyEditor',
+  'hideEditCommentEditor',
+  'saveEdit',
+  'openModProfile',
+  'scrollToTop',
+  'handleClickArchive',
+  'handleClickArchiveAndSuspend',
+  'handleClickUnarchive',
+  'update-edit-comment-input',
+  'showMarkedAsBestAnswerNotification',
+  'showUnmarkedAsBestAnswerNotification',
 ]);
 
 const hasAnswers = computed(() => {
@@ -63,19 +63,17 @@ const hasAnswers = computed(() => {
 <template>
   <div
     v-if="hasAnswers"
-    class="mb-6 border-2 border-green-500 dark:border-green-400  p-4 rounded-lg"
+    class="mb-6 rounded-lg border-2 border-green-500 p-4 dark:border-green-400"
   >
-    <div class="mb-4 border-b border-gray-300 dark:border-gray-600 pb-2">
+    <div class="mb-4 border-b border-gray-300 pb-2 dark:border-gray-600">
       <h3
-        class="flex items-center gap-2 text-lg font-semibold text-gray-900 dark:text-gray-100"
+        class="font-semibold flex items-center gap-2 text-lg text-gray-900 dark:text-gray-100"
       >
-        <div class="h-5 w-5 rounded-full bg-green-500"/>
-        Best {{ answers.length === 1 ? "Answer" : "Answers" }}
+        <div class="h-5 w-5 rounded-full bg-green-500" />
+        Best {{ answers.length === 1 ? 'Answer' : 'Answers' }}
       </h3>
-      <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-        {{
-          answers.length === 1 ? "This answer was" : "These answers were"
-        }}
+      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+        {{ answers.length === 1 ? 'This answer was' : 'These answers were' }}
         selected by the discussion author.
       </p>
     </div>

@@ -1,6 +1,6 @@
-import type LocationFilterTypes from "@/components/event/list/filters/locationFilterTypes";
-import type { LocationQuery, Router } from "vue-router";
-import type { Comment, Discussion, Event } from "@/__generated__/graphql";
+import type LocationFilterTypes from '@/components/event/list/filters/locationFilterTypes';
+import type { LocationQuery, Router } from 'vue-router';
+import type { Comment, Discussion, Event } from '@/__generated__/graphql';
 
 type FeedbackPermalinkInput = {
   routeName: string;
@@ -19,88 +19,96 @@ type DiscussionCommentPermalinkInput = {
   forumId: string;
   discussionId: string;
   commentId: string;
-}
-export const getPermalinkToDiscussionComment = (input: DiscussionCommentPermalinkInput) => {
+};
+export const getPermalinkToDiscussionComment = (
+  input: DiscussionCommentPermalinkInput
+) => {
   const { forumId, discussionId, commentId } = input;
   return {
-    name: "forums-forumId-discussions-discussionId-comments-commentId",
+    name: 'forums-forumId-discussions-discussionId-comments-commentId',
     params: {
       forumId,
       discussionId,
       commentId,
     },
   };
-}
+};
 
 type DiscussionPermalinkInput = {
   forumId: string;
   discussionId: string;
-}
+};
 
 export const getPermalinkToDiscussion = (input: DiscussionPermalinkInput) => {
   const { forumId, discussionId } = input;
   return {
-    name: "forums-forumId-discussions-discussionId",
+    name: 'forums-forumId-discussions-discussionId',
     params: {
       forumId,
       discussionId,
     },
   };
-  
-}
+};
 
 type EventCommentPermalinkInput = {
   forumId: string;
   eventId: string;
   commentId: string;
-}
+};
 
-export const getPermalinkToEventComment = (input: EventCommentPermalinkInput) => {
+export const getPermalinkToEventComment = (
+  input: EventCommentPermalinkInput
+) => {
   const { forumId, eventId, commentId } = input;
   return {
-    name: "forums-forumId-events-eventId-comments-commentId",
+    name: 'forums-forumId-events-eventId-comments-commentId',
     params: {
       forumId,
       eventId,
       commentId,
     },
   };
-}
+};
 
 type EventPermalinkInput = {
   forumId: string;
   eventId: string;
-}
+};
 
 export const getPermalinkToEvent = (input: EventPermalinkInput) => {
   const { forumId, eventId } = input;
   return {
-    name: "forums-forumId-events-eventId",
+    name: 'forums-forumId-events-eventId',
     params: {
       forumId,
       eventId,
     },
   };
-}
+};
 
 export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
-  const { 
-    routeName, 
-    forumId, 
-    discussionId, 
-    commentId, 
-    GivesFeedbackOnComment, 
+  const {
+    routeName,
+    forumId,
+    discussionId,
+    commentId,
+    GivesFeedbackOnComment,
     GivesFeedbackOnDiscussion,
     GivesFeedbackOnEvent,
   } = input;
   // If this is feedback on a discussion, give the discussion feedback permalink
-  if (routeName === "forums-forumId-discussions-feedback-discussionId" || GivesFeedbackOnDiscussion) {
+  if (
+    routeName === 'forums-forumId-discussions-feedback-discussionId' ||
+    GivesFeedbackOnDiscussion
+  ) {
     if (!forumId || !commentId || !GivesFeedbackOnDiscussion) {
-      console.error("Missing required parameters for permalink to feedback on discussion");
-      return {}
+      console.error(
+        'Missing required parameters for permalink to feedback on discussion'
+      );
+      return {};
     }
     return {
-      name: "forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId",
+      name: 'forums-forumId-discussions-feedback-discussionId-feedbackPermalink-feedbackId',
       params: {
         forumId,
         discussionId: GivesFeedbackOnDiscussion.id,
@@ -110,13 +118,18 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
 
   // If this is feedback on an event, give the event feedback permalink
-  if (routeName === "forums-forumId-events-feedback-eventId" || GivesFeedbackOnEvent) {
+  if (
+    routeName === 'forums-forumId-events-feedback-eventId' ||
+    GivesFeedbackOnEvent
+  ) {
     if (!forumId || !commentId || !GivesFeedbackOnEvent) {
-      console.error("Missing required parameters for permalink to feedback on event");
-      return {}
+      console.error(
+        'Missing required parameters for permalink to feedback on event'
+      );
+      return {};
     }
     return {
-      name: "forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId",
+      name: 'forums-forumId-events-feedback-eventId-feedbackPermalink-feedbackId',
       params: {
         forumId,
         eventId: GivesFeedbackOnEvent.id,
@@ -126,14 +139,16 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
 
   // If this is feedback on a comment, give the comment feedback permalink
-  if ( !commentId || !forumId || !GivesFeedbackOnComment) {
-    console.error("Missing required parameters for permalink to feedback on comment");
-    return null
+  if (!commentId || !forumId || !GivesFeedbackOnComment) {
+    console.error(
+      'Missing required parameters for permalink to feedback on comment'
+    );
+    return null;
   }
   if (discussionId) {
     // For feedback on comments on a discussion
     return {
-      name: "forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId",
+      name: 'forums-forumId-discussions-commentFeedback-discussionId-commentId-feedbackPermalink-feedbackId',
       params: {
         forumId,
         discussionId,
@@ -144,7 +159,7 @@ export const getFeedbackPermalinkObject = (input: FeedbackPermalinkInput) => {
   }
   // Note: we do not handle the case to permalink to feedback on comments on an event
   // because feedback on event comments is not currently supported in the app.
-  return {}
+  return {};
 };
 
 export type UpdateStateInput = {
@@ -175,7 +190,7 @@ export const updateFilters = (input: UpdateFiltersInput) => {
   Object.entries(params).forEach(([key, value]) => {
     if (
       value === undefined ||
-      value === "" ||
+      value === '' ||
       (Array.isArray(value) && value.length === 0)
     ) {
       // eslint-disable-next-line @typescript-eslint/no-dynamic-delete

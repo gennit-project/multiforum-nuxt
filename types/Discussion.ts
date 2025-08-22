@@ -1,4 +1,3 @@
-
 export interface Image {
   url: string;
   caption: string;
@@ -8,41 +7,39 @@ export interface Image {
   isCoverImage: boolean;
 }
 
-
 export interface CreateEditDiscussionFormValues {
-    title: string;
-    body: string;
-    selectedTags: Array<string>;
-    selectedChannels: Array<string>;
-    author: string;
-    album: {
-      images: {
-        id?: string;
-        url: string;
-        alt: string;
-        caption: string;
-        copyright: string;
-      }[];
-      imageOrder: string[];
-    };
-    downloadableFiles?: {
+  title: string;
+  body: string;
+  selectedTags: Array<string>;
+  selectedChannels: Array<string>;
+  author: string;
+  album: {
+    images: {
       id?: string;
-      fileName: string;
       url: string;
-      kind: string;
-      size: number;
-      license: string;
-      priceModel: string;
-      priceCents: number;
-      priceCurrency: string;
+      alt: string;
+      caption: string;
+      copyright: string;
     }[];
-    downloadLabels?: Record<string, string[]>; // filterGroupKey -> selected option values
+    imageOrder: string[];
+  };
+  downloadableFiles?: {
+    id?: string;
+    fileName: string;
+    url: string;
+    kind: string;
+    size: number;
+    license: string;
+    priceModel: string;
+    priceCents: number;
+    priceCurrency: string;
+  }[];
+  downloadLabels?: Record<string, string[]>; // filterGroupKey -> selected option values
 }
 
 export type SearchDiscussionValues = {
-    tags?: Array<string>
-    channels?: Array<string>
-    searchInput?: string;
-    showArchived?: boolean;
-  };
-  
+  tags?: Array<string>;
+  channels?: Array<string>;
+  searchInput?: string;
+  showArchived?: boolean;
+};

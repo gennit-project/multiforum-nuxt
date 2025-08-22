@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { computed } from "vue";
-import { GET_COMMENT } from "@/graphQLData/comment/queries";
-import { useQuery } from "@vue/apollo-composable";
-import CommentHeader from "@/components/comments/CommentHeader.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import ErrorBanner from "../ErrorBanner.vue";
-import { useRoute } from "nuxt/app";
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { getFeedbackPermalinkObject } from "@/utils/routerUtils";
+import { computed } from 'vue';
+import { GET_COMMENT } from '@/graphQLData/comment/queries';
+import { useQuery } from '@vue/apollo-composable';
+import CommentHeader from '@/components/comments/CommentHeader.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import ErrorBanner from '../ErrorBanner.vue';
+import { useRoute } from 'nuxt/app';
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { getFeedbackPermalinkObject } from '@/utils/routerUtils';
 
 const props = defineProps({
   commentId: {
@@ -16,14 +16,14 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["fetchedOriginalAuthorUsername"]);
+const emit = defineEmits(['fetchedOriginalAuthorUsername']);
 
 const route = useRoute();
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const {
@@ -47,12 +47,12 @@ onCommentResult(({ data }) => {
   if (data?.comments?.length) {
     const originalAuthorUsername = data.comments[0].Author.username;
     if (originalAuthorUsername) {
-      emit("fetchedOriginalAuthorUsername", originalAuthorUsername);
+      emit('fetchedOriginalAuthorUsername', originalAuthorUsername);
     }
 
     const originalAuthorModProfileName = data.comments[0].Author.modProfileName;
     if (originalAuthorModProfileName) {
-      emit("fetchedOriginalAuthorUsername", originalAuthorModProfileName);
+      emit('fetchedOriginalAuthorUsername', originalAuthorModProfileName);
     }
   }
 });

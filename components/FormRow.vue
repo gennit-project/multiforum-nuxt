@@ -2,7 +2,7 @@
 defineProps({
   sectionTitle: {
     type: String,
-    default: "",
+    default: '',
   },
   dangerous: {
     type: Boolean,
@@ -10,7 +10,7 @@ defineProps({
   },
   description: {
     type: String,
-    default: "",
+    default: '',
   },
   required: {
     type: Boolean,
@@ -25,7 +25,7 @@ defineProps({
       v-if="sectionTitle"
       :for="sectionTitle"
       :class="dangerous ? 'text-red-400' : 'text-gray-900 dark:text-gray-200'"
-      class="font-medium block text-sm leading-6 "
+      class="block text-sm font-medium leading-6"
     >
       {{ sectionTitle }}<span v-if="required" class="ml-1 text-red-400">*</span>
     </label>
@@ -36,7 +36,7 @@ defineProps({
       {{ description }}
     </p>
     <div>
-      <slot name="content" v-bind="$attrs"  />
+      <slot name="content" v-bind="$attrs" />
     </div>
   </div>
 </template>

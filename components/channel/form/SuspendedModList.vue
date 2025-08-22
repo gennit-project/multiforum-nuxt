@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_SUSPENDED_MODS_BY_CHANNEL } from "@/graphQLData/mod/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { useRoute } from "nuxt/app";
-import { DateTime } from "luxon";
+import { computed } from 'vue';
+import { GET_SUSPENDED_MODS_BY_CHANNEL } from '@/graphQLData/mod/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { useRoute } from 'nuxt/app';
+import { DateTime } from 'luxon';
 
 const route = useRoute();
 const forumId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const { result, loading, error } = useQuery(
@@ -19,7 +19,7 @@ const { result, loading, error } = useQuery(
     channelUniqueName: forumId.value,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 const suspensions = computed(
@@ -32,7 +32,7 @@ const aggregateCount = computed(
 const humanReadableDate = (dateISO: string): string => {
   return DateTime.fromISO(dateISO).toLocaleString(DateTime.DATETIME_MED);
 };
-defineEmits(["click-remove-mod"]);
+defineEmits(['click-remove-mod']);
 </script>
 <template>
   <div class="flex flex-col gap-3 py-3 dark:text-white">
@@ -55,10 +55,10 @@ defineEmits(["click-remove-mod"]);
       <div
         v-for="suspension in suspensions"
         :key="suspension.username"
-        class="flex items-center justify-between hover:bg-gray-100 dark:hover:bg-gray-700 p-2 rounded"
+        class="flex items-center justify-between rounded p-2 hover:bg-gray-100 dark:hover:bg-gray-700"
       >
-        <div class="flex-col w-full">
-          <div class="flex justify-between gap-2 w-full">
+        <div class="w-full flex-col">
+          <div class="flex w-full justify-between gap-2">
             <nuxt-link
               :to="{
                 name: 'mod-modId',
@@ -71,12 +71,12 @@ defineEmits(["click-remove-mod"]);
                 class="mr-2 h-6 w-6"
               />
               <span class="text-sm">{{
-                `${suspension?.SuspendedMod?.displayName} ${suspension?.username ? `(${suspension?.username})` : ""}`
+                `${suspension?.SuspendedMod?.displayName} ${suspension?.username ? `(${suspension?.username})` : ''}`
               }}</span>
             </nuxt-link>
             <nuxt-link
               v-if="suspension.RelatedIssue"
-              class="rounded border border-orange-500 px-2 py-1 text-orange-500 items-center gap-1"
+              class="items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
               :to="{
                 name: 'forums-forumId-issues-issueId',
                 params: { issueId: suspension.RelatedIssue?.id },

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import type { Channel } from "@/__generated__/graphql";
-import ChannelListItem from "@/components/channel/ChannelListItem.vue";
-import LoadMore from "@/components/LoadMore.vue";
+import type { PropType } from 'vue';
+import type { Channel } from '@/__generated__/graphql';
+import ChannelListItem from '@/components/channel/ChannelListItem.vue';
+import LoadMore from '@/components/LoadMore.vue';
 
 // Define props
 defineProps({
@@ -16,7 +16,7 @@ defineProps({
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
   selectedTags: {
     type: Array as PropType<Array<string>>,
@@ -24,20 +24,23 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["filterByTag", "loadMore"]);
+const emit = defineEmits(['filterByTag', 'loadMore']);
 
 function filterByTag(tag: string) {
-  emit("filterByTag", tag);
+  emit('filterByTag', tag);
 }
 </script>
 
 <template>
   <div>
-    <p v-if="channels.length === 0" class="mt-2 text-sm font-normal dark:text-white">
+    <p
+      v-if="channels.length === 0"
+      class="mt-2 text-sm font-normal dark:text-white"
+    >
       There are no results.
     </p>
     <!-- Mobile layout: single column with dividers -->
-    <div class="block md:hidden divide-y divide-gray-300 dark:divide-gray-600">
+    <div class="block divide-y divide-gray-300 dark:divide-gray-600 md:hidden">
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"
@@ -48,7 +51,7 @@ function filterByTag(tag: string) {
       />
     </div>
     <!-- Desktop layout: masonry columns -->
-    <div class="hidden md:block columns-1 sm:columns-2 lg:columns-3 gap-4">
+    <div class="hidden columns-1 gap-4 sm:columns-2 md:block lg:columns-3">
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"
@@ -68,5 +71,4 @@ function filterByTag(tag: string) {
   </div>
 </template>
 
-<style scoped>
-</style>
+<style scoped></style>

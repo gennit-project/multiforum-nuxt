@@ -1,8 +1,17 @@
 import { describe, it, expect } from 'vitest';
-import { getFilterValuesFromParams, defaultPlace } from '@/components/event/list/filters/getEventFilterValuesFromParams';
-import { chronologicalOrder, reverseChronologicalOrder } from '@/components/event/list/filters/filterStrings';
+import {
+  getFilterValuesFromParams,
+  defaultPlace,
+} from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import {
+  chronologicalOrder,
+  reverseChronologicalOrder,
+} from '@/components/event/list/filters/filterStrings';
 import LocationFilterTypes from '@/components/event/list/filters/locationFilterTypes';
-import { timeShortcutValues, resultOrderTypes } from '@/components/event/list/filters/eventSearchOptions';
+import {
+  timeShortcutValues,
+  resultOrderTypes,
+} from '@/components/event/list/filters/eventSearchOptions';
 
 describe('getEventFilterValuesFromParams', () => {
   it('returns default values when route has no query parameters', () => {
@@ -29,9 +38,9 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('sets hasVirtualEventUrl to true for events-list-search route', () => {
     const input = {
-      route: { 
+      route: {
         query: {},
-        name: 'events-list-search'
+        name: 'events-list-search',
       },
       channelId: '',
     };
@@ -90,11 +99,11 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('parses placeName but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: { 
-        query: { 
+      route: {
+        query: {
           placeName: 'New York City',
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS 
-        } 
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
+        },
       },
       channelId: '',
     };
@@ -106,11 +115,11 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('parses placeAddress but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: { 
-        query: { 
+      route: {
+        query: {
           placeAddress: '123 Main St, New York, NY 10001',
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS
-        } 
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
+        },
       },
       channelId: '',
     };
@@ -122,11 +131,11 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('parses latitude but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: { 
-        query: { 
+      route: {
+        query: {
           latitude: '40.7128',
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS
-        } 
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
+        },
       },
       channelId: '',
     };
@@ -149,18 +158,18 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('parses longitude but requires locationFilter=WITHIN_RADIUS to include it in result', () => {
     const input = {
-      route: { 
-        query: { 
+      route: {
+        query: {
           longitude: '-74.0060',
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS
-        } 
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
+        },
       },
       channelId: '',
     };
 
     const result = getFilterValuesFromParams(input);
 
-    expect(result.longitude).toBe(-74.0060);
+    expect(result.longitude).toBe(-74.006);
   });
 
   it('ignores invalid longitude values', () => {
@@ -297,7 +306,9 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('parses resultsOrder as reverse chronological correctly', () => {
     const input = {
-      route: { query: { resultsOrder: resultOrderTypes.REVERSE_CHRONOLOGICAL } },
+      route: {
+        query: { resultsOrder: resultOrderTypes.REVERSE_CHRONOLOGICAL },
+      },
       channelId: '',
     };
 
@@ -330,10 +341,10 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('uses default radius of 0 when channelId is provided', () => {
     const input = {
-      route: { 
+      route: {
         query: {
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS
-        } 
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
+        },
       },
       channelId: 'test-channel',
     };
@@ -345,11 +356,11 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('uses provided radius when specified in query', () => {
     const input = {
-      route: { 
+      route: {
         query: {
           locationFilter: LocationFilterTypes.WITHIN_RADIUS,
-          radius: '25'
-        } 
+          radius: '25',
+        },
       },
       channelId: 'test-channel',
     };
@@ -361,10 +372,10 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('returns WITHIN_RADIUS location filter with default place values when locationFilter is WITHIN_RADIUS', () => {
     const input = {
-      route: { 
+      route: {
         query: {
-          locationFilter: LocationFilterTypes.WITHIN_RADIUS
-        } 
+          locationFilter: LocationFilterTypes.WITHIN_RADIUS,
+        },
       },
       channelId: '',
     };
@@ -380,10 +391,10 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('returns ONLY_VIRTUAL location filter when specified', () => {
     const input = {
-      route: { 
+      route: {
         query: {
-          locationFilter: LocationFilterTypes.ONLY_VIRTUAL
-        } 
+          locationFilter: LocationFilterTypes.ONLY_VIRTUAL,
+        },
       },
       channelId: '',
     };
@@ -399,10 +410,10 @@ describe('getEventFilterValuesFromParams', () => {
 
   it('returns ONLY_WITH_ADDRESS location filter when specified', () => {
     const input = {
-      route: { 
+      route: {
         query: {
-          locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS
-        } 
+          locationFilter: LocationFilterTypes.ONLY_WITH_ADDRESS,
+        },
       },
       channelId: '',
     };
@@ -426,7 +437,7 @@ describe('getEventFilterValuesFromParams', () => {
           showCanceledEvents: 'false',
           showOnlyFreeEvents: 'true',
           locationFilter: LocationFilterTypes.ONLY_VIRTUAL,
-          showArchived: 'true'
+          showArchived: 'true',
         },
       },
       channelId: '',

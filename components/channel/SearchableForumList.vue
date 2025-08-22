@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import type { Channel } from "@/__generated__/graphql";
-import { GET_CHANNEL_NAMES } from "@/graphQLData/channel/queries";
-import SearchBar from "@/components/SearchBar.vue";
-import type { PropType } from "vue";
-import SearchableForumListItem from "./SearchableForumListItem.vue";
+import { ref, computed, watch } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import type { Channel } from '@/__generated__/graphql';
+import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
+import SearchBar from '@/components/SearchBar.vue';
+import type { PropType } from 'vue';
+import SearchableForumListItem from './SearchableForumListItem.vue';
 
 // Define props
 const props = defineProps({
@@ -19,7 +19,7 @@ const props = defineProps({
   },
   description: {
     type: String,
-    default: "Select forums to submit to",
+    default: 'Select forums to submit to',
   },
   featuredForums: {
     type: Array as PropType<ChannelOption[]>,
@@ -34,8 +34,8 @@ type ChannelOption = {
   description: string;
 };
 
-const emit = defineEmits(["setChannelNames", "toggleSelection"]);
-const searchInput = ref<string>("");
+const emit = defineEmits(['setChannelNames', 'toggleSelection']);
+const searchInput = ref<string>('');
 const selected = ref([...props.selectedChannels]);
 const searchInputComputed = computed(() => `(?i).*${searchInput.value}.*`);
 
@@ -90,7 +90,7 @@ onGetChannelNames(() => {
     icon: channel.channelIconURL,
     description: channel.description,
   }));
-  emit("setChannelNames", channels);
+  emit('setChannelNames', channels);
 });
 
 watch(
@@ -107,7 +107,7 @@ const updateSearchResult = (input: string) => {
 
 <template>
   <div
-    class="absolute z-50 left-0 right-0 top-full max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white dark:bg-gray-800 shadow-lg dark:border-gray-700 dark:text-white touch-scroll-y"
+    class="touch-scroll-y absolute left-0 right-0 top-full z-50 max-h-60 w-full overflow-y-auto rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800 dark:text-white"
   >
     <SearchBar
       class="w-full align-middle"
@@ -119,7 +119,9 @@ const updateSearchResult = (input: string) => {
       @keydown.enter.prevent
       @update-search-input="updateSearchResult"
     />
-    <div v-if="channelsLoading && regularChannels?.length === 0">Loading...</div>
+    <div v-if="channelsLoading && regularChannels?.length === 0">
+      Loading...
+    </div>
     <div v-else-if="channelsError">
       <div v-for="(error, i) of channelsError?.graphQLErrors" :key="i">
         {{ error.message }}
@@ -131,7 +133,7 @@ const updateSearchResult = (input: string) => {
         class="border-b dark:border-gray-600"
       >
         <h3
-          class="pt-3 px-3 uppercase text-sm text-gray-700 dark:text-gray-300"
+          class="px-3 pt-3 text-sm uppercase text-gray-700 dark:text-gray-300"
         >
           Featured Forums
         </h3>
@@ -150,7 +152,7 @@ const updateSearchResult = (input: string) => {
         </div>
       </div>
       <div class="pt-3">
-        <h3 class="px-3 uppercase text-sm text-gray-700 dark:text-gray-300">
+        <h3 class="px-3 text-sm uppercase text-gray-700 dark:text-gray-300">
           All Forums
         </h3>
         <div

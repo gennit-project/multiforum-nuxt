@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { computed, ref } from "vue";
-import type { PropType } from "vue";
-import Tag from "@/components/TagComponent.vue";
-import type { Channel } from "@/__generated__/graphql";
-import ChannelRules from "@/components/channel/Rules.vue";
-import SidebarEventList from "@/components/channel/SidebarEventList.vue";
-import MarkdownPreview from "@/components/MarkdownPreview.vue";
-import { useRouter, useRoute } from "nuxt/app";
-import FontSizeControl from "@/components/channel/FontSizeControl.vue";
-import BecomeAdminModal from "@/components/channel/BecomeAdminModal.vue";
-import { isAuthenticatedVar } from "@/cache";
+import { computed, ref } from 'vue';
+import type { PropType } from 'vue';
+import Tag from '@/components/TagComponent.vue';
+import type { Channel } from '@/__generated__/graphql';
+import ChannelRules from '@/components/channel/Rules.vue';
+import SidebarEventList from '@/components/channel/SidebarEventList.vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
+import { useRouter, useRoute } from 'nuxt/app';
+import FontSizeControl from '@/components/channel/FontSizeControl.vue';
+import BecomeAdminModal from '@/components/channel/BecomeAdminModal.vue';
+import { isAuthenticatedVar } from '@/cache';
 
 const props = defineProps({
   channel: {
@@ -22,7 +22,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["refetchChannelData"]);
+const emit = defineEmits(['refetchChannelData']);
 
 const route = useRoute();
 const router = useRouter();
@@ -32,19 +32,22 @@ const eventChannelsAggregate = computed(() => {
 });
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const channelRules = computed(() => props.channel?.rules ?? "");
+const channelRules = computed(() => props.channel?.rules ?? '');
 
 // Check if we're on the discussion detail page (including comment permalinks)
 const isDiscussionDetailPage = computed(() => {
-  return typeof route.name === "string" && route.name.includes("forums-forumId-discussions-discussionId");
+  return (
+    typeof route.name === 'string' &&
+    route.name.includes('forums-forumId-discussions-discussionId')
+  );
 });
 
 const filterChannelsByTag = (tag: string) => {
   router.push({
-    name: "forums",
+    name: 'forums',
     query: { tag },
   });
 };
@@ -58,7 +61,7 @@ const closeBecomeAdminModal = () => {
 };
 
 const handleBecomeAdminSuccess = () => {
-  emit("refetchChannelData");
+  emit('refetchChannelData');
 };
 </script>
 
@@ -88,9 +91,9 @@ const handleBecomeAdminSuccess = () => {
           :is-square="false"
         />
       </div>
-      <div class="flex items-center w-full gap-4">
+      <div class="flex w-full items-center gap-4">
         <div v-if="channelId" class="flex items-center">
-          <div class="mt-3 mb-1">
+          <div class="mb-1 mt-3">
             <span
               class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
             >
@@ -98,7 +101,7 @@ const handleBecomeAdminSuccess = () => {
             </span>
             <span
               v-if="channel?.uniqueName && channel?.displayName"
-              class="rounded-full bg-white text-sm font-mono text-gray-500 dark:bg-gray-900 dark:text-gray-300"
+              class="rounded-full bg-white font-mono text-sm text-gray-500 dark:bg-gray-900 dark:text-gray-300"
             >
               {{ `${channel.uniqueName}` }}
             </span>
@@ -193,13 +196,13 @@ const handleBecomeAdminSuccess = () => {
           </div>
 
           <div v-else class="my-3 mb-6">
-            <p class="text-sm dark:text-gray-400 mb-3">
+            <p class="mb-3 text-sm dark:text-gray-400">
               This forum does not have any admins.
             </p>
             <button
               v-if="isAuthenticatedVar"
               @click="openBecomeAdminModal"
-              class="bg-blue-500 hover:bg-blue-600 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors duration-200"
+              class="rounded-md bg-blue-500 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-600"
             >
               Become an admin of this forum
             </button>

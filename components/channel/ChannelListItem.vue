@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import type { PropType } from "vue";
-import { computed } from "vue";
-import type { Channel, Tag as TagData } from "@/__generated__/graphql";
-import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
-import Tag from "@/components/TagComponent.vue";
-import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-import DiscussionIcon from "@/components/icons/DiscussionIcon.vue";
+import type { PropType } from 'vue';
+import { computed } from 'vue';
+import type { Channel, Tag as TagData } from '@/__generated__/graphql';
+import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import Tag from '@/components/TagComponent.vue';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 
 const props = defineProps({
   channel: {
@@ -14,7 +14,7 @@ const props = defineProps({
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
   selectedTags: {
     type: Array as PropType<Array<string>>,
@@ -24,16 +24,16 @@ const props = defineProps({
 
 const tags = computed(() => props.channel.Tags.map((tag: TagData) => tag.text));
 
-defineEmits(["filterByTag"]);
+defineEmits(['filterByTag']);
 </script>
 
 <template>
   <div
-    class="break-inside-avoid dark:text-gray-200 p-4 bg-white dark:bg-black md:mb-4 md:border md:border-gray-300 md:dark:border-gray-500 md:rounded-lg md:shadow-sm md:bg-white md:dark:bg-gray-900"
+    class="break-inside-avoid bg-white p-4 dark:bg-black dark:text-gray-200 md:mb-4 md:rounded-lg md:border md:border-gray-300 md:bg-white md:shadow-sm md:dark:border-gray-500 md:dark:bg-gray-900"
   >
     <nuxt-link
       :to="`/forums/${channel.uniqueName}/discussions`"
-      class="block mb-2"
+      class="mb-2 block"
     >
       <AvatarComponent
         :text="channel.uniqueName"
@@ -45,14 +45,14 @@ defineEmits(["filterByTag"]);
       <div>
         <h3
           v-if="channel.displayName"
-          class="font-bold text-gray-700 dark:text-gray-200 break-words"
+          class="break-words font-bold text-gray-700 dark:text-gray-200"
         >
           <HighlightedSearchTerms
             :text="channel.displayName"
             :search-input="searchInput"
           />
         </h3>
-        <p class="text-gray-400 dark:text-gray-300 text-sm break-words">
+        <p class="break-words text-sm text-gray-400 dark:text-gray-300">
           <HighlightedSearchTerms
             :text="channel.uniqueName"
             :search-input="searchInput"
@@ -62,14 +62,14 @@ defineEmits(["filterByTag"]);
     </nuxt-link>
     <p
       v-if="channel.description"
-      class="text-gray-500 dark:text-gray-400 text-sm mb-2 break-words"
+      class="mb-2 break-words text-sm text-gray-500 dark:text-gray-400"
     >
       <HighlightedSearchTerms
         :text="channel.description"
         :search-input="searchInput"
       />
     </p>
-    <div class="flex gap-1 mb-2">
+    <div class="mb-2 flex gap-1">
       <Tag
         v-for="tag in tags"
         :key="tag"

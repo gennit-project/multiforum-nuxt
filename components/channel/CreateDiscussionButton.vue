@@ -1,9 +1,9 @@
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useRoute } from "nuxt/app";
-import RequireAuth from "../auth/RequireAuth.vue";
-import CreateButton from "../CreateButton.vue";
-import PrimaryButton from "@/components/PrimaryButton.vue";
+import { defineComponent, computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import RequireAuth from '../auth/RequireAuth.vue';
+import CreateButton from '../CreateButton.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
 
 export default defineComponent({
   components: {
@@ -15,12 +15,12 @@ export default defineComponent({
     const route = useRoute();
 
     const channelId = computed(() => {
-      if (typeof route.params.forumId === "string") {
+      if (typeof route.params.forumId === 'string') {
         return route.params.forumId;
       }
-      return "";
+      return '';
     });
-    
+
     return {
       channelId,
       route,
@@ -42,10 +42,7 @@ export default defineComponent({
       />
     </template>
     <template #does-not-have-auth>
-      <PrimaryButton
-        class="ml-2"
-        :label="'New Discussion'"
-      />
+      <PrimaryButton class="ml-2" :label="'New Discussion'" />
     </template>
   </RequireAuth>
 </template>

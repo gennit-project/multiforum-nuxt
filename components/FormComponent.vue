@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useRouter } from "nuxt/app";
-import CancelButton from "@/components/CancelButton.vue";
-import SaveButton from "@/components/SaveButton.vue";
-import FormRow from "@/components/FormRow.vue";
+import { useRouter } from 'nuxt/app';
+import CancelButton from '@/components/CancelButton.vue';
+import SaveButton from '@/components/SaveButton.vue';
+import FormRow from '@/components/FormRow.vue';
 
 const props = defineProps({
   formTitle: {
     type: String,
-    default: "",
+    default: '',
   },
   description: {
     type: String,
-    default: "",
+    default: '',
   },
   needsChanges: {
     type: Boolean,
@@ -35,13 +35,13 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["submit", "cancel"]);
+const emit = defineEmits(['submit', 'cancel']);
 const router = useRouter();
 
 function handleCancel() {
   if (props.handleCancelInParent) {
     // Let the parent handle the cancel navigation
-    emit("cancel");
+    emit('cancel');
   } else {
     // Use the default behavior (go back in history)
     router.go(-1);
@@ -57,7 +57,7 @@ function handleCancel() {
     <div>
       <div class="flex justify-between">
         <h2
-          class="font-bold text-xl pt-3 leading-7 text-gray-900 dark:text-gray-100"
+          class="pt-3 text-xl font-bold leading-7 text-gray-900 dark:text-gray-100"
         >
           {{ props.formTitle }}
         </h2>

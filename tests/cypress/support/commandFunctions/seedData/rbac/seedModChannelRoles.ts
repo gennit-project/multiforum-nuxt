@@ -1,10 +1,10 @@
-import type { ModChannelRoleCreateInput } from "../../../../../../__generated__/graphql";
+import type { ModChannelRoleCreateInput } from '../../../../../../__generated__/graphql';
 
 const modChannelRoles: ModChannelRoleCreateInput[] = [
   {
-    name: "BasicModChannelRole",
-    description: "Intended to be a basic mod role for new users",
-    channelUniqueName: "cats",
+    name: 'BasicModChannelRole',
+    description: 'Intended to be a basic mod role for new users',
+    channelUniqueName: 'cats',
     canReport: true,
     canCloseSupportTickets: false,
     canGiveFeedback: true,
@@ -14,9 +14,9 @@ const modChannelRoles: ModChannelRoleCreateInput[] = [
     canOpenSupportTickets: true,
   },
   {
-    name: "AdvancedModChannelRole",
-    description: "Intended to be an advanced mod role for experienced users",
-    channelUniqueName: "cats",
+    name: 'AdvancedModChannelRole',
+    description: 'Intended to be an advanced mod role for experienced users',
+    channelUniqueName: 'cats',
     canReport: true,
     canCloseSupportTickets: true,
     canGiveFeedback: true,
@@ -26,7 +26,5 @@ const modChannelRoles: ModChannelRoleCreateInput[] = [
     canOpenSupportTickets: true,
   },
 ];
-
-
 
 export default modChannelRoles;

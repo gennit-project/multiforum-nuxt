@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useQuery } from "@vue/apollo-composable";
-import { useRouter, useRoute } from "nuxt/app";
-import { useDisplay } from "vuetify";
-import EventPreview from "../list/EventPreview.vue";
-import EventList from "../list/EventList.vue";
-import EventMap, { type MarkerMap } from "./Map.vue";
-import PreviewContainer from "../list/PreviewContainer.vue";
-import CloseButton from "../../CloseButton.vue";
-import ErrorBanner from "../../ErrorBanner.vue";
-import LoadingSpinner from "../../LoadingSpinner.vue";
-import EventFilterBar from "../list/filters/EventFilterBar.vue";
-import TimeShortcuts from "../list/filters/TimeShortcuts.vue";
-import { GET_EVENTS } from "@/graphQLData/event/queries";
-import getEventWhere from "../list/filters/getEventWhere";
-import { getFilterValuesFromParams } from "../list/filters/getEventFilterValuesFromParams";
+import { ref, computed, watch } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { useRouter, useRoute } from 'nuxt/app';
+import { useDisplay } from 'vuetify';
+import EventPreview from '../list/EventPreview.vue';
+import EventList from '../list/EventList.vue';
+import EventMap, { type MarkerMap } from './Map.vue';
+import PreviewContainer from '../list/PreviewContainer.vue';
+import CloseButton from '../../CloseButton.vue';
+import ErrorBanner from '../../ErrorBanner.vue';
+import LoadingSpinner from '../../LoadingSpinner.vue';
+import EventFilterBar from '../list/filters/EventFilterBar.vue';
+import TimeShortcuts from '../list/filters/TimeShortcuts.vue';
+import { GET_EVENTS } from '@/graphQLData/event/queries';
+import getEventWhere from '../list/filters/getEventWhere';
+import { getFilterValuesFromParams } from '../list/filters/getEventFilterValuesFromParams';
 import {
   chronologicalOrder,
   reverseChronologicalOrder,
-} from "../list/filters/filterStrings";
-import { timeShortcutValues } from "../list/filters/eventSearchOptions";
-import placeIcon from "@/assets/images/place-icon.svg";
-import highlightedPlaceIcon from "@/assets/images/highlighted-place-icon.svg";
-import type { Event as EventData } from "@/__generated__/graphql";
-import type { SearchEventValues } from "@/types/Event";
-import type { Ref, PropType } from "vue";
+} from '../list/filters/filterStrings';
+import { timeShortcutValues } from '../list/filters/eventSearchOptions';
+import placeIcon from '@/assets/images/place-icon.svg';
+import highlightedPlaceIcon from '@/assets/images/highlighted-place-icon.svg';
+import type { Event as EventData } from '@/__generated__/graphql';
+import type { SearchEventValues } from '@/types/Event';
+import type { Ref, PropType } from 'vue';
 
 const props = defineProps({
   selectedTags: {
@@ -37,28 +37,28 @@ const props = defineProps({
   },
   channelId: {
     type: String,
-    default: "",
+    default: '',
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 
 defineEmits([
-  "filterByTag",
-  "filterByChannel",
-  "highlightEvent",
-  "openPreview",
-  "unhighlight",
+  'filterByTag',
+  'filterByChannel',
+  'highlightEvent',
+  'openPreview',
+  'unhighlight',
 ]);
 
 const { mdAndUp } = useDisplay();
 const route = useRoute();
 const router = useRouter();
-const showOnlineOnly = route.name === "events-list-search";
+const showOnlineOnly = route.name === 'events-list-search';
 const showInPersonOnly =
-  route.name === "map-search-eventId" || route.name === "map-search";
+  route.name === 'map-search-eventId' || route.name === 'map-search';
 
 const filterValues: Ref<SearchEventValues> = ref(
   getFilterValuesFromParams({
@@ -111,7 +111,7 @@ const {
     resultsOrder: resultsOrder,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -120,16 +120,16 @@ onGetEventResult((value) => {
     return;
   }
   const defaultSelectedEvent = value.data.events[0].id;
-  sendToPreview(defaultSelectedEvent.id, "");
+  sendToPreview(defaultSelectedEvent.id, '');
 });
 
 const sendToPreview = async (eventId: string, eventLocationId: string) => {
   if (eventId) {
     const escapedEventLocationId = eventLocationId
       ? CSS.escape(eventLocationId)
-      : "";
+      : '';
     await router.push({
-      name: "map-search-eventId",
+      name: 'map-search-eventId',
       params: { eventId },
       hash: `#${escapedEventLocationId}`,
       query: route.query,
@@ -145,8 +145,8 @@ const mobileMap = ref<any>({});
 const desktopMap = ref<any>({});
 const colorLocked = ref(false);
 const eventPreviewIsOpen = ref(false);
-const highlightedEventId = ref("");
-const highlightedEventLocationId = ref("");
+const highlightedEventId = ref('');
+const highlightedEventLocationId = ref('');
 const multipleEventPreviewIsOpen = ref(false);
 const selectedEvent = ref<EventData | null>(null);
 const selectedEvents = ref<EventData[]>([]);
@@ -258,25 +258,26 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
     } else if (eventData) {
       selectedEvent.value = eventData;
     } else {
-      throw new Error("Could not find the event data.");
+      throw new Error('Could not find the event data.');
     }
   }
 
   if (markerMap.markers[eventLocationId]) {
     // Use bigger icons on mobile for easier tapping
-    const isMobile = window.innerWidth < 768; 
+    const isMobile = window.innerWidth < 768;
     markerMap.markers[eventLocationId].marker.setIcon({
       url: highlightedPlaceIcon,
-      scaledSize: { 
-        width: isMobile ? 30 : 20, 
-        height: isMobile ? 30 : 20, 
-        equals: () => false 
+      scaledSize: {
+        width: isMobile ? 30 : 20,
+        height: isMobile ? 30 : 20,
+        equals: () => false,
       },
     });
 
     const openSpecificInfowindow = () => {
       const eventTitle =
-        markerMap.markers[eventLocationId].events[highlightedEventId.value].title;
+        markerMap.markers[eventLocationId].events[highlightedEventId.value]
+          .title;
       const eventLocation =
         markerMap.markers[eventLocationId].events[highlightedEventId.value]
           .locationName;
@@ -306,13 +307,15 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
     };
 
     const eventTitle =
-      markerMap.markers[eventLocationId].events[highlightedEventId.value]?.title;
+      markerMap.markers[eventLocationId].events[highlightedEventId.value]
+        ?.title;
     const eventLocation =
-      markerMap.markers[eventLocationId].events[highlightedEventId.value]?.locationName;
+      markerMap.markers[eventLocationId].events[highlightedEventId.value]
+        ?.locationName;
 
     if (clickedMapMarker && numberOfEvents > 1) {
       window.dispatchEvent(
-        new CustomEvent("GenericInfoWindowOpen", {
+        new CustomEvent('GenericInfoWindowOpen', {
           detail: {
             numberOfEvents,
           },
@@ -320,11 +323,13 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
       );
       openGenericInfowindow();
     } else if (clickedMapMarker && numberOfEvents === 1) {
-      const defaultEventId = Object.keys(markerMap.markers[eventLocationId].events)[0];
+      const defaultEventId = Object.keys(
+        markerMap.markers[eventLocationId].events
+      )[0];
       highlightedEventId.value = defaultEventId;
 
       window.dispatchEvent(
-        new CustomEvent("SpecificInfoWindowOpen", {
+        new CustomEvent('SpecificInfoWindowOpen', {
           detail: {
             eventTitle,
             eventLocation,
@@ -336,7 +341,7 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
       highlightedEventId.value = eventId;
 
       window.dispatchEvent(
-        new CustomEvent("SpecificInfoWindowOpen", {
+        new CustomEvent('SpecificInfoWindowOpen', {
           detail: {
             eventTitle,
             eventLocation,
@@ -385,7 +390,7 @@ const highlightEvent = (
     markerMap: desktopMarkerMap.value,
     map: desktopMap.value,
   });
-  
+
   if (shouldNavigate) {
     sendToPreview(eventId, eventLocationId);
   }
@@ -396,24 +401,23 @@ const unhighlightEventOnMap = (markerMap: MarkerMap) => {
     markerMap.infowindow?.close();
     const locationId = highlightedEventLocationId.value;
     const markerData = markerMap.markers[locationId];
-    
+
     if (markerData) {
       // Use bigger icons on mobile for easier tapping
       const isMobile = window.innerWidth < 768;
       markerData.marker?.setIcon({
         url: placeIcon,
-        scaledSize: { 
-          width: isMobile ? 30 : 20, 
-          height: isMobile ? 30 : 20, 
-          equals: () => false 
+        scaledSize: {
+          width: isMobile ? 30 : 20,
+          height: isMobile ? 30 : 20,
+          equals: () => false,
         },
       });
     }
-    highlightedEventId.value = "";
-    highlightedEventLocationId.value = "";
+    highlightedEventId.value = '';
+    highlightedEventLocationId.value = '';
   }
 };
-
 
 const unhighlight = () => {
   unhighlightEventOnMap(mobileMarkerMap.value);
@@ -437,7 +441,8 @@ const closeMultipleEventPreview = () => {
 const openPreview = (event: EventData, openedFromMap = false) => {
   if (openedFromMap) {
     const eventsAtClickedLocation =
-      desktopMarkerMap.value.markers[highlightedEventLocationId.value].numberOfEvents;
+      desktopMarkerMap.value.markers[highlightedEventLocationId.value]
+        .numberOfEvents;
     if (eventsAtClickedLocation > 1) {
       multipleEventPreviewIsOpen.value = true;
     } else {
@@ -450,23 +455,20 @@ const openPreview = (event: EventData, openedFromMap = false) => {
   colorLocked.value = true;
 };
 
-const isClientSide = typeof window !== "undefined";
-
+const isClientSide = typeof window !== 'undefined';
 </script>
 
 <template>
   <div class="flex flex-col">
     <client-only>
       <div
-      :class="[
-        mdAndUp ? 'fixed top-0' : '',
-      ]"
-        class="w-full h-34 mt-12 bg-gray-800 text-white flex items-center justify-center z-10"
+        :class="[mdAndUp ? 'fixed top-0' : '']"
+        class="h-34 z-10 mt-12 flex w-full items-center justify-center bg-gray-800 text-white"
       >
         <div
-          class="w-full flex justify-center z-10 bg-gray-100 dark:bg-gray-900"
+          class="z-10 flex w-full justify-center bg-gray-100 dark:bg-gray-900"
         >
-          <div class="flex max-w-7xl mt-2">
+          <div class="mt-2 flex max-w-7xl">
             <EventFilterBar
               :show-map="true"
               :allow-hiding-main-filters="false"
@@ -485,7 +487,7 @@ const isClientSide = typeof window !== "undefined";
       >
         <div class="w-1/2">
           <div class="space-y-4">
-            <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
+            <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
             <ErrorBanner
               v-else-if="eventError"
               class="block"
@@ -513,8 +515,8 @@ const isClientSide = typeof window !== "undefined";
           </div>
         </div>
 
-        <div class="w-1/2 h-screen bg-gray-300 dark:bg-black fixed right-0">
-          <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
+        <div class="fixed right-0 h-screen w-1/2 bg-gray-300 dark:bg-black">
+          <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
           <ErrorBanner
             v-else-if="eventError"
             class="block"
@@ -537,10 +539,10 @@ const isClientSide = typeof window !== "undefined";
           />
         </div>
       </div>
-      
+
       <!-- Mobile View - Only render if NOT on desktop -->
       <template v-else>
-        <LoadingSpinner v-if="eventLoading" class="my-4 mx-auto" />
+        <LoadingSpinner v-if="eventLoading" class="mx-auto my-4" />
         <ErrorBanner
           v-else-if="eventError"
           class="block"
@@ -554,7 +556,9 @@ const isClientSide = typeof window !== "undefined";
             <EventMap
               v-if="eventResult.events.length > 0"
               :events="eventResult.events"
-              :preview-is-open="eventPreviewIsOpen || multipleEventPreviewIsOpen"
+              :preview-is-open="
+                eventPreviewIsOpen || multipleEventPreviewIsOpen
+              "
               :color-locked="colorLocked"
               :use-mobile-styles="true"
               @highlight-event="highlightEvent"

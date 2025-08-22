@@ -1,32 +1,32 @@
 <script setup lang="ts">
-import { ref, nextTick, onMounted, onBeforeUnmount } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import { Tab, TabGroup, TabList, TabPanel, TabPanels } from "@headlessui/vue";
-import { CREATE_SIGNED_STORAGE_URL } from "@/graphQLData/discussion/mutations";
-import AddImage from "@/components/AddImage.vue";
-import { uploadAndGetEmbeddedLink, getUploadFileName } from "@/utils";
-import ErrorBanner from "./ErrorBanner.vue";
-import { usernameVar } from "@/cache";
-import { MAX_CHARS_IN_COMMENT } from "@/utils/constants";
-import { isFileSizeValid } from "@/utils/index";
-import EmojiPicker from "@/components/comments/EmojiPicker.vue";
-import EyeSlashIcon from "@/components/icons/EyeSlashIcon.vue";
-import CharCounter from "@/components/CharCounter.vue";
-import { 
+import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/vue';
+import { CREATE_SIGNED_STORAGE_URL } from '@/graphQLData/discussion/mutations';
+import AddImage from '@/components/AddImage.vue';
+import { uploadAndGetEmbeddedLink, getUploadFileName } from '@/utils';
+import ErrorBanner from './ErrorBanner.vue';
+import { usernameVar } from '@/cache';
+import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
+import { isFileSizeValid } from '@/utils/index';
+import EmojiPicker from '@/components/comments/EmojiPicker.vue';
+import EyeSlashIcon from '@/components/icons/EyeSlashIcon.vue';
+import CharCounter from '@/components/CharCounter.vue';
+import {
   formatText,
   insertEmoji as insertEmojiAtPosition,
-  type FormatType
-} from "@/utils/textFormatting";
+  type FormatType,
+} from '@/utils/textFormatting';
 
 type FileChangeInput = {
   // event of HTMLInputElement;
-  event: Event & { target: HTMLInputElement | null };   
+  event: Event & { target: HTMLInputElement | null };
   fieldName: string;
-}
+};
 
 type EmojiClickEvent = {
   unicode: string;
-}
+};
 
 // Props
 const props = defineProps({
@@ -40,15 +40,15 @@ const props = defineProps({
   },
   initialValue: {
     type: String,
-    default: "",
+    default: '',
   },
   testId: {
     type: String,
-    default: "texteditor-textarea",
+    default: 'texteditor-textarea',
   },
   placeholder: {
     type: String,
-    default: "Write your comment here...",
+    default: 'Write your comment here...',
   },
   rows: {
     type: Number,
@@ -64,7 +64,7 @@ const props = defineProps({
   },
   fieldName: {
     type: String,
-    default: "",
+    default: '',
   },
 });
 const { mutate: createSignedStorageUrl, error: createSignedStorageUrlError } =
@@ -87,45 +87,45 @@ const focusEditor = () => {
   });
 };
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits(['update']);
 
 const updateText = (newText: string) => {
   text.value = newText;
-  emit("update", newText);
+  emit('update', newText);
 };
 
 const insertEmoji = (event: EmojiClickEvent) => {
   const textarea = editorRef.value;
   if (!textarea) return;
-  
+
   // Extract the unicode emoji character from the event
   const emojiChar = event?.unicode || '';
-  
+
   if (!emojiChar) {
     console.error('Could not extract emoji from event:', event);
     return;
   }
-  
+
   const cursorPositionStart = textarea.selectionStart;
-  
+
   // Use the insertEmoji utility
   const newText = insertEmojiAtPosition({
     text: textarea.value,
     position: cursorPositionStart,
-    emoji: emojiChar
+    emoji: emojiChar,
   });
-  
+
   // Update textarea value
   textarea.value = newText;
-  
+
   // Set cursor position after the emoji
   textarea.selectionStart = cursorPositionStart + emojiChar.length;
   textarea.selectionEnd = cursorPositionStart + emojiChar.length;
-  
+
   // Update model and close picker
   updateText(textarea.value);
   showEmojiPicker.value = false;
-  
+
   // Focus back on textarea
   textarea.focus();
 };
@@ -136,9 +136,9 @@ const toggleEmojiPicker = (event: MouseEvent) => {
   // Position emoji picker directly below the button
   emojiPickerPosition.value = {
     top: `${buttonElement.offsetTop + buttonElement.offsetHeight}px`,
-    left: `${buttonElement.offsetLeft}px`
+    left: `${buttonElement.offsetLeft}px`,
   };
-  
+
   showEmojiPicker.value = !showEmojiPicker.value;
 };
 
@@ -151,12 +151,12 @@ const formatTextArea = (format: string) => {
   const selectedText = textarea.value.substring(start, end);
 
   // Use the format utility with the correct format type
-  const formattedText = formatText({ 
-    text: selectedText, 
-    format: format as FormatType 
+  const formattedText = formatText({
+    text: selectedText,
+    format: format as FormatType,
   });
 
-  textarea.setRangeText(formattedText, start, end, "end");
+  textarea.setRangeText(formattedText, start, end, 'end');
   updateText(textarea.value);
 };
 
@@ -167,7 +167,7 @@ const handlePaste = async (event: ClipboardEvent) => {
   if (!items) return;
 
   for (const item of items) {
-    if (item.type.startsWith("image/")) {
+    if (item.type.startsWith('image/')) {
       const file = item.getAsFile();
       if (file) {
         await handleFormStateDuringUpload(file);
@@ -191,7 +191,7 @@ const handleFormStateDuringUpload = async (file: File) => {
   // Generate unique ID for this upload to help with tracking/replacing the placeholder
   const uploadId = Date.now().toString();
   const placeholderText = `Uploading image...`;
-  
+
   // Make the placeholder clearer for mobile users
   const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
   const markdownLink = `![${safeFileName}](${placeholderText} (id:${uploadId}))`;
@@ -200,7 +200,7 @@ const handleFormStateDuringUpload = async (file: File) => {
     markdownLink,
     cursorPositionStart,
     cursorPositionEnd,
-    "end"
+    'end'
   );
   text.value = textarea.value;
   textarea.value = text.value; // Ensure textarea is synced
@@ -218,20 +218,23 @@ const handleFormStateDuringUpload = async (file: File) => {
         textarea.value.slice(0, placeholderStart) +
         errorMarkdownLink +
         textarea.value.slice(placeholderEnd);
-      
+
       text.value = newText;
       textarea.value = newText;
-      emit("update", text.value);
+      emit('update', text.value);
       return;
     }
 
     // Check if the textarea content still contains our placeholder with the unique ID
     // This ensures we're replacing the correct placeholder even if the user edited meanwhile
     const placeholderIdentifier = `${placeholderText} (id:${uploadId})`;
-    const placeholderRegex = new RegExp(`!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(id:${uploadId}\\)\\)`, 'g');
-    
+    const placeholderRegex = new RegExp(
+      `!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(id:${uploadId}\\)\\)`,
+      'g'
+    );
+
     if (textarea.value.indexOf(placeholderIdentifier) === -1) {
-      console.warn("Upload completed but placeholder was modified or removed");
+      console.warn('Upload completed but placeholder was modified or removed');
 
       // Try to find using regex in case just parts were modified
       const matches = textarea.value.match(placeholderRegex);
@@ -239,18 +242,21 @@ const handleFormStateDuringUpload = async (file: File) => {
         // Found via regex, so replace it
         const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
         const newMarkdownLink = `![${safeFileName}](${embeddedLink})`;
-        const newText = textarea.value.replace(placeholderRegex, newMarkdownLink);
+        const newText = textarea.value.replace(
+          placeholderRegex,
+          newMarkdownLink
+        );
         textarea.value = newText;
         text.value = newText;
-        emit("update", text.value);
+        emit('update', text.value);
         return;
       }
-      
+
       // If regex didn't match either, append at end
       const newMarkdownLink = `![${file.name}](${embeddedLink})`;
-      textarea.value = textarea.value + "\n" + newMarkdownLink;
+      textarea.value = textarea.value + '\n' + newMarkdownLink;
       text.value = textarea.value;
-      emit("update", text.value);
+      emit('update', text.value);
       return;
     }
 
@@ -268,71 +274,90 @@ const handleFormStateDuringUpload = async (file: File) => {
       placeholderStart + newMarkdownLink.length,
       placeholderStart + newMarkdownLink.length
     );
-    emit("update", text.value);
+    emit('update', text.value);
   } catch (error) {
-    console.error("Error during upload:", error);
-    
+    console.error('Error during upload:', error);
+
     // Try to find the placeholder using regex
-    const placeholderRegex = new RegExp(`!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(id:${uploadId}\\)\\)`, 'g');
-    
+    const placeholderRegex = new RegExp(
+      `!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')} \\(id:${uploadId}\\)\\)`,
+      'g'
+    );
+
     let newText = '';
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
     const safeFileName = file.name.replace(/[^\w\s.-]/g, '_');
     const errorMarkdownLink = `![Upload failed: ${safeFileName}](Error: ${errorMessage.substring(0, 50)})`;
-    
+
     if (textarea.value.match(placeholderRegex)) {
       // Placeholder found with regex
       newText = textarea.value.replace(placeholderRegex, errorMarkdownLink);
     } else if (textarea.value.indexOf(placeholderText) !== -1) {
       // Try simpler search
-      const simpleRegex = new RegExp(`!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\)`, 'g');
+      const simpleRegex = new RegExp(
+        `!\\[.*?\\]\\(${placeholderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}.*?\\)`,
+        'g'
+      );
       newText = textarea.value.replace(simpleRegex, errorMarkdownLink);
     } else {
       // Fallback to original position-based replacement
-      newText = textarea.value.slice(0, placeholderStart) + 
-        errorMarkdownLink + 
+      newText =
+        textarea.value.slice(0, placeholderStart) +
+        errorMarkdownLink +
         textarea.value.slice(placeholderEnd);
     }
-    
+
     text.value = newText;
     textarea.value = newText;
-    emit("update", text.value);
+    emit('update', text.value);
   }
 };
 
 const upload = async (file: File) => {
   if (!usernameVar.value) {
-    console.error("No username found");
-    throw new Error("Not logged in or username not found");
+    console.error('No username found');
+    throw new Error('Not logged in or username not found');
   }
 
   try {
-    console.log("Getting signed URL for", file.name, "size:", file.size, "type:", file.type);
-    
+    console.log(
+      'Getting signed URL for',
+      file.name,
+      'size:',
+      file.size,
+      'type:',
+      file.type
+    );
+
     // For mobile devices, ensure the file type is correct even when it's sometimes missing
-    const fileType = file.type || getFileTypeFromName(file.name) || "image/jpeg";
-    console.log("Using file type:", fileType);
-    
+    const fileType =
+      file.type || getFileTypeFromName(file.name) || 'image/jpeg';
+    console.log('Using file type:', fileType);
+
     const filename = getUploadFileName({ username: usernameVar.value, file });
     const signedStorageURLInput = { filename, contentType: fileType };
 
-    console.log("Requesting signed URL with input:", JSON.stringify(signedStorageURLInput));
+    console.log(
+      'Requesting signed URL with input:',
+      JSON.stringify(signedStorageURLInput)
+    );
     const signedUrlResult = await createSignedStorageUrl(signedStorageURLInput);
-    console.log("Signed URL result received");
-    
+    console.log('Signed URL result received');
+
     const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
-    
+
     if (!signedStorageURL) {
-      throw new Error("Failed to get signed URL for upload");
+      throw new Error('Failed to get signed URL for upload');
     }
-    
+
     // Log success of signed URL for debugging
     console.log(`Got signed URL successfully for ${filename}`);
-    
+
     // Test the signed URL parameters
     const urlParts = signedStorageURL.split('?');
-    console.log("URL base:", urlParts[0]);
-    console.log("URL has params:", urlParts.length > 1);
+    console.log('URL base:', urlParts[0]);
+    console.log('URL has params:', urlParts.length > 1);
 
     const embeddedLink = await uploadAndGetEmbeddedLink({
       file,
@@ -340,17 +365,17 @@ const upload = async (file: File) => {
       fileType,
       signedStorageURL,
     });
-    
+
     if (!embeddedLink) {
-      throw new Error("Upload completed but no URL was returned");
+      throw new Error('Upload completed but no URL was returned');
     }
-    
+
     // Log final success for debugging
     console.log(`Upload and link generation complete for ${filename}`);
-    
+
     return embeddedLink;
   } catch (error) {
-    console.error("Error uploading file:", error);
+    console.error('Error uploading file:', error);
     throw error; // Re-throw to allow proper error handling in the calling function
   }
 };
@@ -358,20 +383,20 @@ const upload = async (file: File) => {
 // Helper function to determine file type from name when mobile browsers don't provide it
 const getFileTypeFromName = (filename: string): string | null => {
   if (!filename) return null;
-  
+
   const extension = filename.toLowerCase().split('.').pop();
   if (!extension) return null;
-  
+
   const mimeTypes: Record<string, string> = {
-    'jpg': 'image/jpeg',
-    'jpeg': 'image/jpeg',
-    'png': 'image/png',
-    'gif': 'image/gif',
-    'webp': 'image/webp',
-    'svg': 'image/svg+xml',
-    'bmp': 'image/bmp'
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    png: 'image/png',
+    gif: 'image/gif',
+    webp: 'image/webp',
+    svg: 'image/svg+xml',
+    bmp: 'image/bmp',
   };
-  
+
   return mimeTypes[extension] || null;
 };
 
@@ -384,13 +409,13 @@ onMounted(() => {
 
 onMounted(() => {
   if (editorRef.value) {
-    editorRef.value.addEventListener("paste", handlePaste);
+    editorRef.value.addEventListener('paste', handlePaste);
   }
 });
 
 onBeforeUnmount(() => {
   if (editorRef.value) {
-    editorRef.value.removeEventListener("paste", handlePaste);
+    editorRef.value.removeEventListener('paste', handlePaste);
   }
 });
 
@@ -417,19 +442,19 @@ type FormatButton = {
 };
 
 const formatButtons: FormatButton[] = [
-  { label: "B", format: "bold" },
-  { label: "I", format: "italic" },
-  { label: "U", format: "underline" },
-  { label: "H1", format: "header1" },
-  { label: "H2", format: "header2" },
-  { label: "H3", format: "header3" },
-  { label: "Quote", format: "quote" },
-  { label: "spoiler", format: "spoiler", class: "line-through" },
-  { label: "Emoji", format: "emoji" },
-  { label: "⛶", format: "fullscreen" },
+  { label: 'B', format: 'bold' },
+  { label: 'I', format: 'italic' },
+  { label: 'U', format: 'underline' },
+  { label: 'H1', format: 'header1' },
+  { label: 'H2', format: 'header2' },
+  { label: 'H3', format: 'header3' },
+  { label: 'Quote', format: 'quote' },
+  { label: 'spoiler', format: 'spoiler', class: 'line-through' },
+  { label: 'Emoji', format: 'emoji' },
+  { label: '⛶', format: 'fullscreen' },
 ];
 
-const markdownDocsLink = "https://www.markdownguide.org/basic-syntax/";
+const markdownDocsLink = 'https://www.markdownguide.org/basic-syntax/';
 
 const handleFileChange = async (input: FileChangeInput) => {
   const { event } = input;
@@ -492,57 +517,76 @@ const exitFullScreen = () => {
 <template>
   <div>
     <!-- Full-screen overlay -->
-    <div 
+    <div
       v-if="isFullScreen"
       class="fixed inset-0 z-50 bg-white dark:bg-gray-900"
     >
       <!-- Emoji picker for full-screen -->
-      <div v-if="showEmojiPicker" class="absolute z-50" :style="{ top: emojiPickerPosition.top, left: emojiPickerPosition.left }">
+      <div
+        v-if="showEmojiPicker"
+        class="absolute z-50"
+        :style="{
+          top: emojiPickerPosition.top,
+          left: emojiPickerPosition.left,
+        }"
+      >
         <div class="relative">
-          <EmojiPicker 
-            @emoji-click="insertEmoji" 
-            @close="closeEmojiPicker" 
-          />
+          <EmojiPicker @emoji-click="insertEmoji" @close="closeEmojiPicker" />
         </div>
       </div>
       <!-- Full-screen header -->
-      <div class="flex items-center justify-between p-4 border-b dark:border-gray-600">
+      <div
+        class="flex items-center justify-between border-b p-4 dark:border-gray-600"
+      >
         <h2 class="text-lg font-medium dark:text-white">Full Screen Editor</h2>
-        <button 
+        <button
           @click="exitFullScreen"
           class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
         >
           <i class="fas fa-times text-xl"></i>
         </button>
       </div>
-      
+
       <!-- Full-screen content -->
-      <div class="flex flex-col md:flex-row" style="height: calc(100vh - 4rem);">
+      <div class="flex flex-col md:flex-row" style="height: calc(100vh - 4rem)">
         <!-- Editor side -->
-        <div class="flex-1 flex flex-col border-r dark:border-gray-600 h-1/2 md:h-full">
-          <div class="p-4 border-b dark:border-gray-600">
-            <h3 class="text-md font-medium dark:text-white mb-2">Markdown Editor</h3>
+        <div
+          class="flex h-1/2 flex-1 flex-col border-r dark:border-gray-600 md:h-full"
+        >
+          <div class="border-b p-4 dark:border-gray-600">
+            <h3 class="text-md mb-2 font-medium dark:text-white">
+              Markdown Editor
+            </h3>
             <!-- Format buttons for full-screen -->
-            <div class="flex items-center space-x-1 flex-wrap">
+            <div class="flex flex-wrap items-center space-x-1">
               <button
-                v-for="button in formatButtons.filter(b => b.format !== 'fullscreen')"
+                v-for="button in formatButtons.filter(
+                  (b) => b.format !== 'fullscreen'
+                )"
                 :key="button.label"
                 :class="[
-                  'border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300',
-                  button.class
+                  'border-transparent text-md rounded-md px-2 py-1 font-medium hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+                  button.class,
                 ]"
-                @click.prevent="button.format === 'emoji' ? toggleEmojiPicker($event) : formatTextArea(button.format)"
+                @click.prevent="
+                  button.format === 'emoji'
+                    ? toggleEmojiPicker($event)
+                    : formatTextArea(button.format)
+                "
               >
-                <EyeSlashIcon v-if="button.format === 'spoiler'" class="w-4 h-4" />
+                <EyeSlashIcon
+                  v-if="button.format === 'spoiler'"
+                  class="h-4 w-4"
+                />
                 <span v-else>{{ button.label }}</span>
               </button>
             </div>
           </div>
-          <div class="flex-1 p-4 flex flex-col">
+          <div class="flex flex-1 flex-col p-4">
             <textarea
               ref="editorRef"
               :data-testid="props.testId + '-fullscreen'"
-              class="flex-1 w-full resize-none border border-gray-200 rounded-md text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100 mb-2"
+              class="mb-2 w-full flex-1 resize-none rounded-md border border-gray-200 text-sm dark:border-gray-600 dark:bg-gray-700 dark:text-gray-100"
               :value="text"
               :placeholder="props.placeholder"
               @input="updateText(($event.target as HTMLInputElement).value)"
@@ -553,7 +597,7 @@ const exitFullScreen = () => {
               <a
                 target="_blank"
                 :href="markdownDocsLink"
-                class="text-gray-400 hover:underline dark:text-gray-300 text-sm"
+                class="text-sm text-gray-400 hover:underline dark:text-gray-300"
               >
                 Markdown is supported
               </a>
@@ -561,20 +605,22 @@ const exitFullScreen = () => {
                 v-if="props.allowImageUpload"
                 label="Paste, drop, or click to add files"
                 :field-name="fieldName"
-                @file-change="(input: FileChangeInput) => {
-                  handleFileChange(input);
-                }"
+                @file-change="
+                  (input: FileChangeInput) => {
+                    handleFileChange(input);
+                  }
+                "
               />
             </div>
           </div>
         </div>
-        
+
         <!-- Preview side -->
-        <div class="flex-1 flex flex-col h-1/2 md:h-full">
-          <div class="p-4 border-b dark:border-gray-600">
+        <div class="flex h-1/2 flex-1 flex-col md:h-full">
+          <div class="border-b p-4 dark:border-gray-600">
             <h3 class="text-md font-medium dark:text-white">Preview</h3>
           </div>
-          <div class="flex-1 p-4 overflow-auto">
+          <div class="flex-1 overflow-auto p-4">
             <MarkdownRenderer
               :text="text"
               class="prose prose-sm max-w-none dark:prose-invert"
@@ -585,17 +631,21 @@ const exitFullScreen = () => {
     </div>
 
     <!-- Regular editor form -->
-    <form v-else class="rounded-md border p-2 dark:border-gray-600 relative">
+    <form v-else class="relative rounded-md border p-2 dark:border-gray-600">
       <ErrorBanner
         v-if="createSignedStorageUrlError"
         :text="createSignedStorageUrlError.message"
       />
-      <div v-if="showEmojiPicker" class="absolute z-50" :style="{ top: emojiPickerPosition.top, left: emojiPickerPosition.left }">
+      <div
+        v-if="showEmojiPicker"
+        class="absolute z-50"
+        :style="{
+          top: emojiPickerPosition.top,
+          left: emojiPickerPosition.left,
+        }"
+      >
         <div class="relative">
-          <EmojiPicker 
-            @emoji-click="insertEmoji" 
-            @close="closeEmojiPicker" 
-          />
+          <EmojiPicker @emoji-click="insertEmoji" @close="closeEmojiPicker" />
         </div>
       </div>
       <TabGroup as="div">
@@ -645,21 +695,29 @@ const exitFullScreen = () => {
               Preview
             </Tab>
           </div>
-          <div v-if="!showFormatted" class="flex items-center space-x-1 flex-wrap">
+          <div
+            v-if="!showFormatted"
+            class="flex flex-wrap items-center space-x-1"
+          >
             <button
               v-for="button in formatButtons"
               :key="button.label"
               :class="[
-                'border-transparent rounded-md px-2 py-1 text-md font-medium hover:bg-gray-100 dark:hover:bg-gray-700 dark:text-gray-300',
-                button.class
+                'border-transparent text-md rounded-md px-2 py-1 font-medium hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700',
+                button.class,
               ]"
               @click.prevent="
-                button.format === 'emoji' ? toggleEmojiPicker($event) : 
-                button.format === 'fullscreen' ? toggleFullScreen() : 
-                formatTextArea(button.format)
+                button.format === 'emoji'
+                  ? toggleEmojiPicker($event)
+                  : button.format === 'fullscreen'
+                    ? toggleFullScreen()
+                    : formatTextArea(button.format)
               "
             >
-              <EyeSlashIcon v-if="button.format === 'spoiler'" class="w-4 h-4" />
+              <EyeSlashIcon
+                v-if="button.format === 'spoiler'"
+                class="h-4 w-4"
+              />
               <span v-else>{{ button.label }}</span>
             </button>
           </div>
@@ -677,13 +735,11 @@ const exitFullScreen = () => {
               @dragover.prevent
               @drop="handleDrop"
             />
-            <div
-              class="mt-2 flex-col divide-gray-400 dark:divide-gray-300"
-            >
+            <div class="mt-2 flex-col divide-gray-400 dark:divide-gray-300">
               <a
                 target="_blank"
                 :href="markdownDocsLink"
-                class="text-gray-400 hover:underline dark:text-gray-300 text-sm"
+                class="text-sm text-gray-400 hover:underline dark:text-gray-300"
               >
                 Markdown is supported
               </a>
@@ -691,9 +747,11 @@ const exitFullScreen = () => {
                 v-if="props.allowImageUpload"
                 label="Paste, drop, or click to add files"
                 :field-name="fieldName"
-                @file-change="(input: FileChangeInput) => {
-                  handleFileChange(input);
-                }"
+                @file-change="
+                  (input: FileChangeInput) => {
+                    handleFileChange(input);
+                  }
+                "
               />
             </div>
           </TabPanel>

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { setActivePinia, createPinia, storeToRefs  } from 'pinia';
+import { setActivePinia, createPinia, storeToRefs } from 'pinia';
 import { computed } from 'vue';
 import { mount } from '@vue/test-utils';
 import { useUIStore, type FontSize } from '@/stores/uiStore';
@@ -12,15 +12,15 @@ import { useUIStore, type FontSize } from '@/stores/uiStore';
 // Mock the config
 vi.mock('@/config', () => ({
   config: {
-    environment: 'test'
-  }
+    environment: 'test',
+  },
 }));
 
 // Mock Nuxt composables
 vi.mock('nuxt/app', () => ({
   useCookie: vi.fn(() => ({ value: 'dark' })),
   useRoute: vi.fn(() => ({ path: '/test', query: {} })),
-  useRouter: vi.fn(() => ({ push: vi.fn(), replace: vi.fn() }))
+  useRouter: vi.fn(() => ({ push: vi.fn(), replace: vi.fn() })),
 }));
 
 // We need to create a minimal version of the actual ThemeSwitcher component
@@ -47,17 +47,17 @@ const createThemeSwitcherComponent = () => ({
   setup() {
     const uiStore = useUIStore();
     const { theme } = storeToRefs(uiStore);
-    
+
     const isDarkMode = computed(() => theme.value === 'dark');
-    
+
     const toggleTheme = () => {
       uiStore.setTheme(isDarkMode.value ? 'light' : 'dark');
     };
-    
+
     return {
-      toggleTheme
+      toggleTheme,
     };
-  }
+  },
 });
 
 // Create a simplified FontSizeControl component
@@ -84,23 +84,23 @@ const createFontSizeComponent = () => ({
   `,
   setup() {
     const uiStore = useUIStore();
-    
+
     const options = [
-      { label: "Small", value: "small" },
-      { label: "Medium", value: "medium" },
-      { label: "Large", value: "large" }
+      { label: 'Small', value: 'small' },
+      { label: 'Medium', value: 'medium' },
+      { label: 'Large', value: 'large' },
     ];
-    
-    const updateFontSize = (option: { label: string, value: string }) => {
+
+    const updateFontSize = (option: { label: string; value: string }) => {
       uiStore.setFontSize(option.value as FontSize);
     };
-    
+
     return {
       uiStore,
-      options, 
-      updateFontSize
+      options,
+      updateFontSize,
     };
-  }
+  },
 });
 
 // Create a simplified HamburgerMenuButton component
@@ -120,137 +120,137 @@ const createHamburgerMenuComponent = () => ({
   `,
   setup() {
     const uiStore = useUIStore();
-    
+
     const toggleMenu = () => {
       uiStore.setSideNavIsOpen(!uiStore.sideNavIsOpen);
     };
-    
+
     return { toggleMenu };
-  }
+  },
 });
 
 describe('UIStore Component Integration Tests', () => {
   beforeEach(() => {
     // Set up fresh Pinia instance for each test
     setActivePinia(createPinia());
-    
+
     // Mock environment
     Object.defineProperty(window, 'matchMedia', {
       writable: true,
       value: vi.fn().mockImplementation(() => ({
         matches: false,
-        addEventListener: vi.fn()
-      }))
+        addEventListener: vi.fn(),
+      })),
     });
-    
+
     Object.defineProperty(window, 'localStorage', {
       writable: true,
       value: {
         getItem: vi.fn(),
-        setItem: vi.fn()
-      }
+        setItem: vi.fn(),
+      },
     });
-    
+
     const classListMock = {
       add: vi.fn(),
-      remove: vi.fn()
+      remove: vi.fn(),
     };
-    
+
     if (!document.documentElement) {
       Object.defineProperty(document, 'documentElement', {
         value: { classList: classListMock },
-        writable: true
+        writable: true,
       });
     } else {
       document.documentElement.classList = classListMock as any;
     }
-    
+
     // Mock import.meta
     vi.stubGlobal('import', {
       meta: {
         client: true,
-        server: false
-      }
+        server: false,
+      },
     });
-    
+
     vi.clearAllMocks();
   });
-  
+
   describe('Theme switcher component', () => {
     it('should toggle the store theme when the toggle button is clicked', async () => {
-      // Create the ThemeSwitcher component 
+      // Create the ThemeSwitcher component
       const ThemeSwitcher = createThemeSwitcherComponent();
       const wrapper = mount(ThemeSwitcher);
-      
+
       // Get a reference to the store
       const store = useUIStore();
-      
+
       // Initial theme should be 'dark' (our new default)
       expect(store.themeMode).toBe('dark');
-      
+
       // Click the toggle button (should switch to light)
       await wrapper.find('[data-testid="theme-switcher"]').trigger('click');
-      
+
       // Verify the store was updated to light mode
       expect(store.themeMode).toBe('light');
-      
+
       // Click the toggle button again (should switch back to dark)
       await wrapper.find('[data-testid="theme-switcher"]').trigger('click');
-      
+
       // Verify the store was updated back to dark mode
       expect(store.themeMode).toBe('dark');
     });
   });
-  
+
   describe('Font size control component', () => {
     it('should update the store fontSize when different sizes are selected', async () => {
       // Create the FontSizeControl component
       const FontSizeControl = createFontSizeComponent();
       const wrapper = mount(FontSizeControl);
-      
+
       // Get a reference to the store
       const store = useUIStore();
-      
+
       // Initial font size should be 'small'
       expect(store.fontSize).toBe('small');
-      
+
       // Click the medium font size option
       await wrapper.find('[data-testid="fontSize-medium"]').setValue(true);
       await wrapper.find('[data-testid="fontSize-medium"]').trigger('change');
-      
+
       // Verify the store was updated
       expect(store.fontSize).toBe('medium');
-      
+
       // Click the large font size option
       await wrapper.find('[data-testid="fontSize-large"]').setValue(true);
       await wrapper.find('[data-testid="fontSize-large"]').trigger('change');
-      
+
       // Verify the store was updated
       expect(store.fontSize).toBe('large');
     });
   });
-  
+
   describe('Hamburger menu button component', () => {
     it('should toggle the sideNavIsOpen state in the store when clicked', async () => {
       // Create the HamburgerMenuButton component
       const HamburgerMenuButton = createHamburgerMenuComponent();
       const wrapper = mount(HamburgerMenuButton);
-      
+
       // Get a reference to the store
       const store = useUIStore();
-      
+
       // Initial state should be closed (false)
       expect(store.sideNavIsOpen).toBe(false);
-      
+
       // Click the hamburger button
       await wrapper.trigger('click');
-      
+
       // Verify the store was updated to open (true)
       expect(store.sideNavIsOpen).toBe(true);
-      
+
       // Click the hamburger button again
       await wrapper.trigger('click');
-      
+
       // Verify the store was updated back to closed (false)
       expect(store.sideNavIsOpen).toBe(false);
     });

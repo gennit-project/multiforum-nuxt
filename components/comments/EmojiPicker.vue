@@ -1,16 +1,18 @@
 <script lang="ts" setup>
-import { onMounted, ref, nextTick } from "vue";
-import { VuemojiPicker } from "vuemoji-picker";
-import { useMutation } from "@vue/apollo-composable";
-import { ADD_EMOJI_TO_COMMENT } from "@/graphQLData/comment/mutations";
-import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from "@/graphQLData/discussion/mutations";
+import { onMounted, ref, nextTick } from 'vue';
+import { VuemojiPicker } from 'vuemoji-picker';
+import { useMutation } from '@vue/apollo-composable';
+import { ADD_EMOJI_TO_COMMENT } from '@/graphQLData/comment/mutations';
+import { ADD_EMOJI_TO_DISCUSSION_CHANNEL } from '@/graphQLData/discussion/mutations';
 
-import { usernameVar } from "@/cache";
+import { usernameVar } from '@/cache';
 // Mutation to add emoji to comment
 const { mutate: addEmojiToComment } = useMutation(ADD_EMOJI_TO_COMMENT);
 
 // Mutation to add emoji to discussion channel
-const { mutate: addEmojiToDiscussionChannel } = useMutation(ADD_EMOJI_TO_DISCUSSION_CHANNEL);
+const { mutate: addEmojiToDiscussionChannel } = useMutation(
+  ADD_EMOJI_TO_DISCUSSION_CHANNEL
+);
 
 const emojiPickerRef = ref<InstanceType<typeof VuemojiPicker> | null>(null);
 
@@ -22,20 +24,21 @@ onMounted(() => {
       const emojiPickerElement = rootElement.children[0];
 
       if (emojiPickerElement.shadowRoot) {
-        const inputElement = emojiPickerElement.shadowRoot.querySelector("#search");
+        const inputElement =
+          emojiPickerElement.shadowRoot.querySelector('#search');
 
         if (inputElement) {
           setTimeout(() => {
             inputElement.focus();
           }, 300);
         } else {
-          console.error("Input element not found in shadow DOM");
+          console.error('Input element not found in shadow DOM');
         }
       } else {
-        console.error("Shadow root not found on emoji-picker element");
+        console.error('Shadow root not found on emoji-picker element');
       }
     } else {
-      console.error("emoji-picker child element not found");
+      console.error('emoji-picker child element not found');
     }
   });
 });
@@ -45,41 +48,41 @@ const props = defineProps({
   commentId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   discussionChannelId: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   emojiJson: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
 });
 
 // Handle clicking an emoji and sending mutations based on comment or discussion ID
 function handleEmojiClick(event: any) {
-  console.log("EmojiPicker received event:", event);
-  
+  console.log('EmojiPicker received event:', event);
+
   if (!event) {
-    console.error("No event data received in handleEmojiClick");
+    console.error('No event data received in handleEmojiClick');
     return;
   }
-  
+
   const unicode = event.unicode;
   const emoji = event.emoji;
-  
+
   if (!unicode || !emoji) {
-    console.error("Missing unicode or emoji in handleEmojiClick event", event);
+    console.error('Missing unicode or emoji in handleEmojiClick event', event);
     return;
   }
-  
+
   const emojiLabel = emoji.annotation;
 
   if (!usernameVar.value) {
-    console.error("Username not found");
+    console.error('Username not found');
     return;
   }
 
@@ -102,17 +105,16 @@ function handleEmojiClick(event: any) {
   // Only emit one event type based on how the component is being used
   // We now use emoji-click for the TextEditor and emojiClick for legacy usages
   const eventData = { unicode, emoji: emoji.char };
-  
+
   // Use kebab-case for Vue template event binding (@emoji-click)
-  emit("emoji-click", eventData);
+  emit('emoji-click', eventData);
 }
 
 // Emit events
-const emit = defineEmits(["close", "emoji-click"]);
+const emit = defineEmits(['close', 'emoji-click']);
 function outside() {
-  emit("close");
+  emit('close');
 }
-
 </script>
 
 <template>
@@ -125,7 +127,7 @@ function outside() {
         borderColor: 'transparent',
         buttonHoverBackground: 'transparent',
       }"
-      class="!bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-800 rounded-lg shadow-lg"
+      class="rounded-lg border border-gray-300 !bg-white shadow-lg dark:border-gray-800 dark:bg-gray-700"
       @emoji-click="handleEmojiClick"
     />
   </client-only>

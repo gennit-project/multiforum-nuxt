@@ -1,13 +1,13 @@
 <script lang="ts">
-import { GET_DISCUSSION } from "@/graphQLData/discussion/queries";
-import { GET_CHANNEL } from "@/graphQLData/channel/queries";
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from "@/graphQLData/discussion/mutations";
-import { defineComponent, computed, ref } from "vue";
-import { useRouter, useRoute, useHead } from "nuxt/app";
-import { useQuery, useMutation } from "@vue/apollo-composable";
-import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
-import CreateEditDiscussionFields from "@/components/discussion/form/CreateEditDiscussionFields.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
+import { defineComponent, computed, ref } from 'vue';
+import { useRouter, useRoute, useHead } from 'nuxt/app';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
+import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type {
   Discussion,
   DiscussionChannel,
@@ -17,11 +17,11 @@ import type {
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
   Image,
-} from "@/__generated__/graphql";
-import { modProfileNameVar } from "@/cache";
+} from '@/__generated__/graphql';
+import { modProfileNameVar } from '@/cache';
 
 export default defineComponent({
-  name: "EditDownload",
+  name: 'EditDownload',
   components: {
     CreateEditDiscussionFields,
     RequireAuth,
@@ -32,15 +32,15 @@ export default defineComponent({
     const router = useRouter();
 
     const channelId = computed(() => {
-      if (typeof route.params.forumId !== "string") {
-        return "";
+      if (typeof route.params.forumId !== 'string') {
+        return '';
       }
       return route.params.forumId;
     });
 
     const discussionId = computed(() => {
-      if (typeof route.params.discussionId !== "string") {
-        return "";
+      if (typeof route.params.discussionId !== 'string') {
+        return '';
       }
       return route.params.discussionId;
     });
@@ -72,7 +72,11 @@ export default defineComponent({
     });
 
     const channelData = computed(() => {
-      if (getChannelError.value || getChannelLoading.value || !getChannelResult.value) {
+      if (
+        getChannelError.value ||
+        getChannelLoading.value ||
+        !getChannelResult.value
+      ) {
         return null;
       }
       return getChannelResult.value.channels[0];
@@ -83,13 +87,13 @@ export default defineComponent({
       return discussion.value.Album.Images.map((image: Image) => {
         return {
           id: image.id,
-          url: image.url || "",
-          alt: image.alt || "",
-          caption: image.caption || "",
+          url: image.url || '',
+          alt: image.alt || '',
+          caption: image.caption || '',
           isCoverImage: false,
           hasSensitiveContent: false,
           hasSpoiler: false,
-          copyright: image.copyright || "",
+          copyright: image.copyright || '',
         };
       });
     });
@@ -120,39 +124,40 @@ export default defineComponent({
       if (discussion.value) {
         return {
           title: discussion.value.title,
-          body: discussion.value?.body || "",
+          body: discussion.value?.body || '',
           selectedTags: discussion.value.Tags.map((tag: TagData) => {
             return tag.text;
           }),
           selectedChannels: discussion.value.DiscussionChannels.map(
             (discussionChannel: DiscussionChannel) => {
-              return discussionChannel?.Channel?.uniqueName || "";
+              return discussionChannel?.Channel?.uniqueName || '';
             }
           ),
-          author: discussion.value.Author?.username || "",
+          author: discussion.value.Author?.username || '',
           album: {
             images: orderedImages.value,
             imageOrder: imageOrder.value,
           },
-          downloadableFiles: discussion.value.DownloadableFiles?.map((file) => ({
-            id: file.id || "",
-            fileName: file.fileName || "",
-            url: file.url || "",
-            kind: file.kind || "OTHER",
-            size: file.size || 0,
-            license: file.license?.id || "",
-            priceModel: file.priceModel || "FREE",
-            priceCents: file.priceCents || 0,
-            priceCurrency: file.priceCurrency || "USD",
-          })) || [],
+          downloadableFiles:
+            discussion.value.DownloadableFiles?.map((file) => ({
+              id: file.id || '',
+              fileName: file.fileName || '',
+              url: file.url || '',
+              kind: file.kind || 'OTHER',
+              size: file.size || 0,
+              license: file.license?.id || '',
+              priceModel: file.priceModel || 'FREE',
+              priceCents: file.priceCents || 0,
+              priceCurrency: file.priceCurrency || 'USD',
+            })) || [],
         };
       }
       return {
-        title: "",
-        body: "",
+        title: '',
+        body: '',
         selectedTags: [],
         selectedChannels: [],
-        author: "",
+        author: '',
         album: {
           images: [],
           imageOrder: [],
@@ -178,27 +183,40 @@ export default defineComponent({
       useHead({
         title: `Edit Download | ${channelId.value} | ${serverName}`,
         meta: [
-          { name: 'description', content: `Edit download: ${discussion.title}` },
+          {
+            name: 'description',
+            content: `Edit download: ${discussion.title}`,
+          },
         ],
       });
 
       // Create a map of valid images with their IDs
       const validImages = (discussion.Album?.Images ?? [])
-        .filter((image: Image): image is Image & { id: string; url: string } => Boolean(image.id && image.url))
+        .filter((image: Image): image is Image & { id: string; url: string } =>
+          Boolean(image.id && image.url)
+        )
         .map((image: Image) => ({
           id: image.id,
           url: image.url,
-          alt: image.alt || "",
-          caption: image.caption || "",
-          copyright: image.copyright || "",
+          alt: image.alt || '',
+          caption: image.caption || '',
+          copyright: image.copyright || '',
         }));
 
       // Filter out any null or undefined values from imageOrder and ensure they exist in images
       const validImageOrder = (discussion.Album?.imageOrder ?? []).filter(
         (id: string | null | undefined): id is string =>
-          typeof id === "string" &&
+          typeof id === 'string' &&
           id.length > 0 &&
-          validImages.some((img: { id: string; url: string; alt: string; caption: string; copyright: string }) => img.id === id)
+          validImages.some(
+            (img: {
+              id: string;
+              url: string;
+              alt: string;
+              caption: string;
+              copyright: string;
+            }) => img.id === id
+          )
       );
 
       const formFields: CreateEditDiscussionFormValues = {
@@ -217,17 +235,18 @@ export default defineComponent({
           images: validImages,
           imageOrder: validImageOrder,
         },
-        downloadableFiles: discussion.DownloadableFiles?.map((file: DownloadableFile) => ({
-          id: file.id || "",
-          fileName: file.fileName || "",
-          url: file.url || "",
-          kind: file.kind || "OTHER",
-          size: file.size || 0,
-          license: file.license?.id || "",
-          priceModel: file.priceModel || "FREE",
-          priceCents: file.priceCents || 0,
-          priceCurrency: file.priceCurrency || "USD",
-        })) || [],
+        downloadableFiles:
+          discussion.DownloadableFiles?.map((file: DownloadableFile) => ({
+            id: file.id || '',
+            fileName: file.fileName || '',
+            url: file.url || '',
+            kind: file.kind || 'OTHER',
+            size: file.size || 0,
+            license: file.license?.id || '',
+            priceModel: file.priceModel || 'FREE',
+            priceCents: file.priceCents || 0,
+            priceCurrency: file.priceCurrency || 'USD',
+          })) || [],
       };
       formValues.value = formFields;
       dataLoaded.value = true;
@@ -254,32 +273,35 @@ export default defineComponent({
     // Function to get album update input
     const getAlbumUpdateInput = () => {
       const albumData = formValues.value.album;
-      if (!albumData || (!albumData.images?.length && !albumData.imageOrder?.length)) {
+      if (
+        !albumData ||
+        (!albumData.images?.length && !albumData.imageOrder?.length)
+      ) {
         return {}; // No album data to update
       }
 
       const albumId = discussion.value?.Album?.id;
-      
+
       // If the album doesn't exist yet, CREATE it and connect to existing images
       if (!albumId) {
         const newImages = albumData.images || [];
-        
+
         // Filter out images without IDs (shouldn't happen with our new flow)
-        const validImages = newImages.filter(img => img.id);
-        
+        const validImages = newImages.filter((img) => img.id);
+
         if (validImages.length === 0) {
           return {}; // No valid images to connect
         }
-        
+
         return {
           Album: {
             create: {
               node: {
                 imageOrder: albumData.imageOrder || [],
                 Images: {
-                  connect: validImages.map(img => ({
-                    where: { node: { id: img.id } }
-                  }))
+                  connect: validImages.map((img) => ({
+                    where: { node: { id: img.id } },
+                  })),
                 },
               },
             },
@@ -295,12 +317,14 @@ export default defineComponent({
       const connectImageArray = newImages
         .filter((img) => img.id && !oldImages.some((old) => old.id === img.id))
         .map((img) => ({
-          connect: [{
-            where: { node: { id: img.id } }
-          }]
+          connect: [
+            {
+              where: { node: { id: img.id } },
+            },
+          ],
         }));
 
-      // UPDATE array: existing images that need updates  
+      // UPDATE array: existing images that need updates
       const updateImageArray = newImages
         .filter((img) => img.id && oldImages.some((old) => old.id === img.id))
         .map((img) => ({
@@ -314,23 +338,25 @@ export default defineComponent({
             },
           },
         }));
-        
+
       // DISCONNECT array: old images that are no longer present
       const disconnectImageArray = oldImages
         .filter((old) => !newImages.some((img) => img.id === old.id))
         .map((old) => ({
-          disconnect: [{
-            where: { node: { id: old.id } },
-          }]
+          disconnect: [
+            {
+              where: { node: { id: old.id } },
+            },
+          ],
         }));
-        
+
       // Combine all operations into a single array. Each object is one "Images" operation.
       const imagesOps = [
         ...connectImageArray,
         ...updateImageArray,
         ...disconnectImageArray,
       ];
-      
+
       return {
         Album: {
           update: {
@@ -411,7 +437,7 @@ export default defineComponent({
         channelDisconnections: discussion.value.DiscussionChannels.filter(
           (dc) => {
             return !channelConnections.value.includes(
-              dc.Channel?.uniqueName || ""
+              dc.Channel?.uniqueName || ''
             );
           }
         ).map((dc) => {
@@ -422,7 +448,7 @@ export default defineComponent({
 
     onDone(() => {
       router.push({
-        name: "forums-forumId-downloads-discussionId",
+        name: 'forums-forumId-downloads-discussionId',
         params: {
           forumId: formValues.value.selectedChannels[0],
           discussionId: discussionId.value,
@@ -461,7 +487,7 @@ export default defineComponent({
     },
     handleCancel() {
       this.router.push({
-        name: "forums-forumId-downloads-discussionId",
+        name: 'forums-forumId-downloads-discussionId',
         params: {
           forumId: this.formValues.selectedChannels[0],
           discussionId: this.discussionId,
@@ -502,8 +528,10 @@ export default defineComponent({
       </template>
     </RequireAuth>
     <template #fallback>
-      <div class="flex justify-center items-center min-h-[400px]">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"/>
+      <div class="flex min-h-[400px] items-center justify-center">
+        <div
+          class="h-12 w-12 animate-spin rounded-full border-b-2 border-blue-500"
+        />
       </div>
     </template>
   </ClientOnly>

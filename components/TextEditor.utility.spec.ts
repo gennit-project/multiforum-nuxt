@@ -50,7 +50,9 @@ describe('TextEditor Utility Functions', () => {
 
     it('applies quote formatting', () => {
       expect(formatQuote({ text: 'single line' })).toBe('> single line');
-      expect(formatQuote({ text: 'line 1\nline 2' })).toBe('> line 1\n> line 2');
+      expect(formatQuote({ text: 'line 1\nline 2' })).toBe(
+        '> line 1\n> line 2'
+      );
     });
   });
 
@@ -65,7 +67,7 @@ describe('TextEditor Utility Functions', () => {
         })
       ).toBe('Hello beautiful world');
     });
-    
+
     it('replaces selected text when positions differ', () => {
       expect(
         insertTextAtPosition({
@@ -89,8 +91,12 @@ describe('TextEditor Utility Functions', () => {
   // Emoji insertion
   describe('insertEmoji', () => {
     it('inserts emoji at cursor position', () => {
-      expect(insertEmoji({ text: 'Hello world', position: 5, emoji: '👋' })).toBe('Hello👋 world');
-      expect(insertEmoji({ text: 'Hello', position: 5, emoji: '👋' })).toBe('Hello👋');
+      expect(
+        insertEmoji({ text: 'Hello world', position: 5, emoji: '👋' })
+      ).toBe('Hello👋 world');
+      expect(insertEmoji({ text: 'Hello', position: 5, emoji: '👋' })).toBe(
+        'Hello👋'
+      );
       expect(insertEmoji({ text: '', position: 0, emoji: '👋' })).toBe('👋');
     });
   });
@@ -135,7 +141,10 @@ describe('TextEditor Component Methods', () => {
 
     // Check expectations
     expect(mockComponent.text).toBe('**Hello world**');
-    expect(mockComponent.emit).toHaveBeenCalledWith('update', '**Hello world**');
+    expect(mockComponent.emit).toHaveBeenCalledWith(
+      'update',
+      '**Hello world**'
+    );
   });
 
   it('simulates inserting emoji', () => {
@@ -168,11 +177,15 @@ describe('TextEditor Component Methods', () => {
   describe('image paste handling', () => {
     // Create mock utilities
     const mockCreateSignedStorageUrl = vi.fn().mockResolvedValue({
-      data: { createSignedStorageURL: { url: 'https://example.com/upload-url' } },
+      data: {
+        createSignedStorageURL: { url: 'https://example.com/upload-url' },
+      },
     });
-    
-    const mockUploadAndGetEmbeddedLink = vi.fn().mockResolvedValue('https://example.com/image.jpg');
-    
+
+    const mockUploadAndGetEmbeddedLink = vi
+      .fn()
+      .mockResolvedValue('https://example.com/image.jpg');
+
     // Create a mock component
     const mockComponent = {
       text: 'Hello world',
@@ -184,15 +197,16 @@ describe('TextEditor Component Methods', () => {
         // Simulate the actual behavior
         const filename = 'test-image.jpg';
         const contentType = file.type;
-        
+
         // Get signed URL from server
         const signedUrlResult = await this.mockCreateSignedStorageUrl({
           filename,
           contentType,
         });
-        
-        const signedStorageURL = signedUrlResult?.data?.createSignedStorageURL?.url;
-        
+
+        const signedStorageURL =
+          signedUrlResult?.data?.createSignedStorageURL?.url;
+
         // Simulate upload
         const imageUrl = await this.mockUploadAndGetEmbeddedLink({
           file,
@@ -200,11 +214,14 @@ describe('TextEditor Component Methods', () => {
           fileType: contentType,
           signedStorageURL,
         });
-        
+
         // Insert markdown into text
         const markdownLink = `![${file.name}](${imageUrl})`;
-        this.text = this.text.slice(0, this.cursorPosition) + markdownLink + this.text.slice(this.cursorPosition);
-        
+        this.text =
+          this.text.slice(0, this.cursorPosition) +
+          markdownLink +
+          this.text.slice(this.cursorPosition);
+
         this.emit('update', this.text);
         return this.text;
       },
@@ -212,15 +229,19 @@ describe('TextEditor Component Methods', () => {
 
     it('handles image paste and insertion', async () => {
       // Create a mock file
-      const file = new File(['test data'], 'test-image.jpg', { type: 'image/jpeg' });
-      
+      const file = new File(['test data'], 'test-image.jpg', {
+        type: 'image/jpeg',
+      });
+
       // Call the method
       const result = await mockComponent.handleImagePaste(file);
-      
+
       // Check expectations
       expect(mockComponent.mockCreateSignedStorageUrl).toHaveBeenCalled();
       expect(mockComponent.mockUploadAndGetEmbeddedLink).toHaveBeenCalled();
-      expect(result).toContain('![test-image.jpg](https://example.com/image.jpg)');
+      expect(result).toContain(
+        '![test-image.jpg](https://example.com/image.jpg)'
+      );
       expect(mockComponent.emit).toHaveBeenCalled();
     });
   });

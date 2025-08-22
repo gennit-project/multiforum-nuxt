@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, defineProps, nextTick } from "vue";
-import type { ApolloError } from "@apollo/client/errors";
-import TextEditor from "@/components/TextEditor.vue";
-import FormRow from "@/components/FormRow.vue";
-import TagPicker from "@/components/TagPicker.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import TextInput from "@/components/TextInput.vue";
-import type { CreateEditDiscussionFormValues } from "@/types/Discussion";
-import ForumPicker from "@/components/channel/ForumPicker.vue";
-import TailwindForm from "@/components/FormComponent.vue";
+import { ref, computed, onMounted, defineProps, nextTick } from 'vue';
+import type { ApolloError } from '@apollo/client/errors';
+import TextEditor from '@/components/TextEditor.vue';
+import FormRow from '@/components/FormRow.vue';
+import TagPicker from '@/components/TagPicker.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import TextInput from '@/components/TextInput.vue';
+import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
+import ForumPicker from '@/components/channel/ForumPicker.vue';
+import TailwindForm from '@/components/FormComponent.vue';
 import {
   MAX_CHARS_IN_DISCUSSION_BODY,
   DISCUSSION_TITLE_CHAR_LIMIT,
-} from "@/utils/constants";
-import AlbumEditForm from "../detail/AlbumEditForm.vue";
-import DownloadEditForm from "./DownloadEditForm.vue";
-import type { Channel, Discussion } from "@/__generated__/graphql";
+} from '@/utils/constants';
+import AlbumEditForm from '../detail/AlbumEditForm.vue';
+import DownloadEditForm from './DownloadEditForm.vue';
+import type { Channel, Discussion } from '@/__generated__/graphql';
 
 const props = defineProps<{
   editMode: boolean;
@@ -31,21 +31,21 @@ const props = defineProps<{
   discussion?: Discussion;
 }>();
 
-defineEmits(["submit", "updateFormValues", "cancel"]);
+defineEmits(['submit', 'updateFormValues', 'cancel']);
 
 const formTitle = computed(() => {
   // handle edit mode
   if (props.editMode) {
     if (props.downloadMode) {
-      return "Edit Download";
+      return 'Edit Download';
     }
-    return "Edit Discussion";
+    return 'Edit Discussion';
   }
   // handle create mode
   if (props.downloadMode) {
-    return "Create Download";
+    return 'Create Download';
   }
-  return "Create Discussion";
+  return 'Create Discussion';
 });
 const touched = ref(false);
 const titleInputRef = ref<HTMLElement | null>(null);
@@ -62,15 +62,15 @@ const needsChanges = computed(() => {
 
 const changesRequiredMessage = computed(() => {
   if (!props.formValues?.title) {
-    return "A title is required.";
+    return 'A title is required.';
   } else if (props.formValues?.selectedChannels?.length === 0) {
-    return "Must select at least one forum.";
+    return 'Must select at least one forum.';
   } else if (props.formValues?.body?.length > MAX_CHARS_IN_DISCUSSION_BODY) {
     return `Body cannot exceed ${MAX_CHARS_IN_DISCUSSION_BODY} characters.`;
   } else if (props.formValues?.title.length > DISCUSSION_TITLE_CHAR_LIMIT) {
     return `Title cannot exceed ${DISCUSSION_TITLE_CHAR_LIMIT} characters.`;
   }
-  return "";
+  return '';
 });
 
 onMounted(() => {
@@ -153,10 +153,17 @@ onMounted(() => {
                             []) as any,
                         } as Discussion)
                   "
-                  :channel-data="channelData ? { 
-                    allowedFileTypes: channelData.allowedFileTypes?.filter((type): type is string => type !== null) || [],
-                    FilterGroups: channelData.FilterGroups || []
-                  } : undefined"
+                  :channel-data="
+                    channelData
+                      ? {
+                          allowedFileTypes:
+                            channelData.allowedFileTypes?.filter(
+                              (type): type is string => type !== null
+                            ) || [],
+                          FilterGroups: channelData.FilterGroups || [],
+                        }
+                      : undefined
+                  "
                   @close-editor="() => {}"
                   @update-form-values="
                     (downloadData) => {

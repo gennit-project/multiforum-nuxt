@@ -9,7 +9,7 @@ const props = defineProps<{
   };
 }>();
 
-const emit = defineEmits(["updateFormValues"]);
+const emit = defineEmits(['updateFormValues']);
 
 type RuleInput = {
   summary: string;
@@ -18,25 +18,25 @@ type RuleInput = {
 
 const updateRule = (
   index: number,
-  field: "summary" | "detail",
+  field: 'summary' | 'detail',
   value: string
 ) => {
   const updatedRules: RuleInput[] = [...(props.formValues?.rules || [])];
   updatedRules[index][field] = value;
-  emit("updateFormValues", { rules: updatedRules });
+  emit('updateFormValues', { rules: updatedRules });
 };
 
 const addNewRule = (event: Event) => {
   event.preventDefault();
-  const newRule = { summary: "", detail: "" };
+  const newRule = { summary: '', detail: '' };
   const updatedRules = [...(props.formValues?.rules || []), newRule];
-  emit("updateFormValues", { rules: updatedRules });
+  emit('updateFormValues', { rules: updatedRules });
 };
 
 const deleteRule = (index: number) => {
   const updatedRules = [...(props.formValues?.rules || [])];
   updatedRules.splice(index, 1);
-  emit("updateFormValues", { rules: updatedRules });
+  emit('updateFormValues', { rules: updatedRules });
 };
 </script>
 <template>
@@ -48,10 +48,12 @@ const deleteRule = (index: number) => {
         class="mb-4 flex flex-col gap-2"
       >
         <div class="flex justify-between">
-          <span class="font-bold mt-3 dark:text-white">Rule {{ index + 1 }}</span>
+          <span class="mt-3 font-bold dark:text-white"
+            >Rule {{ index + 1 }}</span
+          >
           <button
             type="button"
-            class="mt-2 rounded border border-orange-500 px-2 py-1 text-orange-500 flex items-center gap-1"
+            class="mt-2 flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
             @click="deleteRule(index)"
           >
             <XmarkIcon class="h-4" />

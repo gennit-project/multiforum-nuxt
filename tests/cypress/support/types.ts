@@ -1,6 +1,6 @@
-import "./commands";
-import type { EventCreateInputWithChannels } from "./commandFunctions/seedData/seedEvents";
-import type { DiscussionCreateInputWithChannels } from "./commandFunctions/seedData/seedDiscussions";
+import './commands';
+import type { EventCreateInputWithChannels } from './commandFunctions/seedData/seedEvents';
+import type { DiscussionCreateInputWithChannels } from './commandFunctions/seedData/seedDiscussions';
 import type {
   ChannelCreateInput,
   TagCreateInput,
@@ -10,9 +10,9 @@ import type {
   ServerConfigCreateInput,
   ModChannelRoleCreateInput,
   CommentCreateInput,
-  NewUserInput
-} from "../../../__generated__/graphql";
-import type { LoginInput } from "./commandFunctions/loginWithButtonClick";
+  NewUserInput,
+} from '../../../__generated__/graphql';
+import type { LoginInput } from './commandFunctions/loginWithButtonClick';
 /* eslint-disable @typescript-eslint/no-namespace */
 
 export type SeedDataInput = {
@@ -45,8 +45,15 @@ declare global {
       getClipboardText: () => Chainable<string>;
       writeClipboardText: () => Chainable<void>;
       authenticateOnCurrentPage(): Chainable<Element>;
-      loginAsUser(userCredentials: { username: string; password: string }): Chainable<Element>;
-      authenticateAsUserOnCurrentPage(userCredentials: { username: string; password: string; displayName?: string }): Chainable<Element>;
+      loginAsUser(userCredentials: {
+        username: string;
+        password: string;
+      }): Chainable<Element>;
+      authenticateAsUserOnCurrentPage(userCredentials: {
+        username: string;
+        password: string;
+        displayName?: string;
+      }): Chainable<Element>;
       clearAllAuthState(): Chainable<Element>;
     }
   }

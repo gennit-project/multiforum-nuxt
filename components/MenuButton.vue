@@ -1,15 +1,15 @@
 <script lang="ts" setup>
-import { ref, nextTick, onMounted, computed } from "vue";
-import type { PropType } from "vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { actionIconMap } from "@/utils";
+import { ref, nextTick, onMounted, computed } from 'vue';
+import type { PropType } from 'vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import { actionIconMap } from '@/utils';
 
-import type { MenuItemType } from "./IconButtonDropdown.vue";
+import type { MenuItemType } from './IconButtonDropdown.vue';
 
 const props = defineProps({
   dataTestid: {
     type: String,
-    default: "",
+    default: '',
   },
   items: {
     type: Array as PropType<MenuItemType[]>,
@@ -29,12 +29,13 @@ const emitEvent = (eventName: string) => {
 
 // Computed class for green styling when comment is marked as best answer
 const buttonClasses = computed(() => {
-  const baseClasses = "shadow-none focus:ring-indigo-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100";
-  
+  const baseClasses =
+    'shadow-none focus:ring-indigo-500 inline-flex justify-start rounded-md px-1 text-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-100';
+
   if (props.isMarkedAsAnswer) {
     return `${baseClasses} text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300`;
   }
-  
+
   return baseClasses;
 });
 
@@ -63,7 +64,7 @@ const adjustMenuPosition = () => {
 
 onMounted(() => {
   adjustMenuPosition();
-  window.addEventListener("resize", adjustMenuPosition);
+  window.addEventListener('resize', adjustMenuPosition);
 });
 
 const handleItemClick = (item: MenuItemType) => {
@@ -73,9 +74,9 @@ const handleItemClick = (item: MenuItemType) => {
 };
 const isMenuOpen = ref(false);
 const menuStyles = {
-  top: shouldOpenUpwards.value ? "auto" : "100%",
-  right: shouldOpenLeftwards.value ? 0 : "auto",
-  bottom: shouldOpenUpwards.value ? "100%" : "auto",
+  top: shouldOpenUpwards.value ? 'auto' : '100%',
+  right: shouldOpenLeftwards.value ? 0 : 'auto',
+  bottom: shouldOpenUpwards.value ? '100%' : 'auto',
   zIndex: 10000,
 };
 </script>
@@ -103,9 +104,8 @@ const menuStyles = {
           <!-- Divider -->
           <v-list-subheader
             v-if="item.isDivider"
-            class="px-4 py-2 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-default"
+            class="font-semibold cursor-default px-4 py-2 text-xs uppercase tracking-wider text-gray-500 dark:text-gray-400"
           >
-          
             {{ item.value }}
           </v-list-subheader>
           <v-list-item
@@ -122,27 +122,27 @@ const menuStyles = {
             <nuxt-link
               v-if="item.value"
               :to="item.value"
-              class="flex gap-2 items-center text-sm"
+              class="flex items-center gap-2 text-sm"
               :class="['text-gray-700 dark:text-white']"
             >
               <component
-                :is="actionIconMap[item.icon]" 
-                v-if="item.icon" 
-                class="h-5 w-5" 
+                :is="actionIconMap[item.icon]"
+                v-if="item.icon"
+                class="h-5 w-5"
               />
               {{ item.label }}
             </nuxt-link>
             <div
               v-else-if="item.event"
               :data-testid="`${dataTestid}-item-${item.label}`"
-               class="flex gap-2 items-center text-sm cursor-pointer"
+              class="flex cursor-pointer items-center gap-2 text-sm"
               :class="['text-gray-700 dark:text-white']"
               @click="emitEvent(item?.event ?? '')"
             >
-            <component
-                :is="actionIconMap[item.icon]" 
-                v-if="item.icon" 
-                class="h-5 w-5" 
+              <component
+                :is="actionIconMap[item.icon]"
+                v-if="item.icon"
+                class="h-5 w-5"
               />
               {{ item.label }}
             </div>

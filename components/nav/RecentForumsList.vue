@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useRouter } from "nuxt/app";
-import AvatarComponent from "@/components/AvatarComponent.vue";
+import { useRouter } from 'nuxt/app';
+import AvatarComponent from '@/components/AvatarComponent.vue';
 
 type ForumItem = {
   uniqueName: string;
@@ -17,7 +17,10 @@ defineProps<{
 
 const router = useRouter();
 
-const navigateToForum = async (forumUniqueName: string, onNavigate?: () => void) => {
+const navigateToForum = async (
+  forumUniqueName: string,
+  onNavigate?: () => void
+) => {
   try {
     await router.push({
       name: 'forums-forumId-discussions',
@@ -27,27 +30,28 @@ const navigateToForum = async (forumUniqueName: string, onNavigate?: () => void)
       onNavigate();
     }
   } catch (error) {
-    console.error("Navigation error:", error);
+    console.error('Navigation error:', error);
   }
 };
 
-const defaultLinkClasses = "pl-6 font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700";
+const defaultLinkClasses =
+  'pl-6 font-semibold group flex items-center gap-x-3 rounded-md py-2 text-sm leading-6 text-gray-700 hover:bg-gray-100 dark:text-gray-100 dark:hover:bg-gray-700';
 </script>
 
 <template>
   <div v-if="forums.length > 0">
     <div
       v-if="showHeader"
-      class="text-bold text-sm mb-2 mt-3 px-6 uppercase leading-6 text-gray-400 dark:text-gray-100"
+      class="text-bold mb-2 mt-3 px-6 text-sm uppercase leading-6 text-gray-400 dark:text-gray-100"
     >
       Recent Forums
     </div>
     <nav>
-      <ul role="list" class="p-0 m-0">
+      <ul role="list" class="m-0 p-0">
         <li
           v-for="forum in forums"
           :key="forum.uniqueName"
-          class="list-none m-0"
+          class="m-0 list-none"
         >
           <button
             type="button"

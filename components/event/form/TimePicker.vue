@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from "vue";
-import { DateTime } from "luxon";
+import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { DateTime } from 'luxon';
 
 const props = defineProps({
   value: {
@@ -9,7 +9,7 @@ const props = defineProps({
   },
   testId: {
     type: String,
-    default: "time-picker",
+    default: 'time-picker',
   },
   disabled: {
     type: Boolean,
@@ -17,7 +17,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["update"]);
+const emit = defineEmits(['update']);
 
 const isDropdownOpen = ref(false);
 const dropdownRef = ref<HTMLElement | null>(null);
@@ -25,14 +25,14 @@ const dropdownRef = ref<HTMLElement | null>(null);
 // Format the display time in 12-hour clock format with error handling
 const formattedTime = computed(() => {
   try {
-    const time = DateTime.fromFormat(props.value, "HH:mm");
+    const time = DateTime.fromFormat(props.value, 'HH:mm');
     if (!time.isValid) {
-      console.warn("Invalid time format:", props.value);
+      console.warn('Invalid time format:', props.value);
       return props.value;
     }
-    return time.toFormat("h:mm a"); // 12-hour format with AM/PM, no leading zeros
+    return time.toFormat('h:mm a'); // 12-hour format with AM/PM, no leading zeros
   } catch (error) {
-    console.error("Error formatting time:", error);
+    console.error('Error formatting time:', error);
     return props.value;
   }
 });
@@ -46,8 +46,8 @@ const timeOptions = computed(() => {
     for (let minute = 0; minute < 60; minute += 15) {
       const time = DateTime.fromObject({ hour, minute });
       options.push({
-        value: time.toFormat("HH:mm"), // 24-hour format for internal use
-        display: time.toFormat("h:mm a"), // 12-hour format without leading zeros for display
+        value: time.toFormat('HH:mm'), // 24-hour format for internal use
+        display: time.toFormat('h:mm a'), // 12-hour format without leading zeros for display
         hour12:
           time.hour > 11
             ? time.hour === 12
@@ -57,7 +57,7 @@ const timeOptions = computed(() => {
               ? 12
               : time.hour,
         minute,
-        period: time.hour >= 12 ? "PM" : "AM",
+        period: time.hour >= 12 ? 'PM' : 'AM',
         dateTime: time,
       });
     }
@@ -67,7 +67,7 @@ const timeOptions = computed(() => {
 });
 
 const selectTime = (value: string) => {
-  emit("update", value);
+  emit('update', value);
   isDropdownOpen.value = false;
 };
 
@@ -90,11 +90,11 @@ const handleClickOutside = (event: MouseEvent) => {
 
 // Add/remove event listeners for click outside functionality
 onMounted(() => {
-  document.addEventListener("click", handleClickOutside);
+  document.addEventListener('click', handleClickOutside);
 });
 
 onUnmounted(() => {
-  document.removeEventListener("click", handleClickOutside);
+  document.removeEventListener('click', handleClickOutside);
 });
 </script>
 
@@ -103,14 +103,14 @@ onUnmounted(() => {
     <!-- Custom input field instead of native time input -->
     <div
       :data-testid="testId"
-      class="border rounded border-gray-200 text-sm focus:border-orange-500 focus:ring-orange-500 w-full sm:w-32 h-10 px-3 pr-8 flex items-center dark:border-gray-700 dark:bg-gray-800 dark:text-white cursor-pointer"
-      :class="{ 'opacity-60 cursor-not-allowed': disabled }"
+      class="flex h-10 w-full cursor-pointer items-center rounded border border-gray-200 px-3 pr-8 text-sm focus:border-orange-500 focus:ring-orange-500 dark:border-gray-700 dark:bg-gray-800 dark:text-white sm:w-32"
+      :class="{ 'cursor-not-allowed opacity-60': disabled }"
       @click="!disabled && toggleDropdown()"
     >
       {{ formattedTime }}
 
       <!-- Time dropdown toggle button -->
-      <div class="absolute right-3 top-1/2 transform -translate-y-1/2">
+      <div class="absolute right-3 top-1/2 -translate-y-1/2 transform">
         <i class="far fa-clock text-gray-500 dark:text-gray-400" />
       </div>
     </div>
@@ -144,7 +144,7 @@ onUnmounted(() => {
               hourOption.period
             "
             :class="[
-              'py-1 px-2 hover:bg-gray-100 dark:hover:bg-gray-700 cursor-pointer text-sm',
+              'cursor-pointer px-2 py-1 text-sm hover:bg-gray-100 dark:hover:bg-gray-700',
               formattedTime === hourOption.display
                 ? 'bg-orange-50 dark:bg-orange-900'
                 : '',

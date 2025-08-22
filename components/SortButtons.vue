@@ -1,7 +1,7 @@
 <script lang="ts">
-import { computed, defineComponent } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import TextButtonDropdown from "@/components/TextButtonDropdown.vue";
+import { computed, defineComponent } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import TextButtonDropdown from '@/components/TextButtonDropdown.vue';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -9,47 +9,47 @@ import {
   sortTypeIcons,
   topSortTypes,
   capitalizeCase,
-} from "@/components/comments/getSortFromQuery";
+} from '@/components/comments/getSortFromQuery';
 
 const topOptions = [
   {
-    label: "Day",
+    label: 'Day',
     value: topSortTypes.TOP_DAY,
   },
   {
-    label: "Week",
+    label: 'Week',
     value: topSortTypes.TOP_WEEK,
   },
   {
-    label: "Month",
+    label: 'Month',
     value: topSortTypes.TOP_MONTH,
   },
   {
-    label: "Year",
+    label: 'Year',
     value: topSortTypes.TOP_YEAR,
   },
   {
-    label: "All Time",
+    label: 'All Time',
     value: topSortTypes.TOP_ALL,
   },
 ];
 const sortOptions = [
   {
-    label: "Hot",
+    label: 'Hot',
     value: availableSortTypes.HOT,
   },
   {
-    label: "New",
+    label: 'New',
     value: availableSortTypes.NEW,
   },
   {
-    label: "Top",
+    label: 'Top',
     value: availableSortTypes.TOP,
   },
 ];
 
 export default defineComponent({
-  name: "SortButtons",
+  name: 'SortButtons',
   components: {
     TextButtonDropdown,
   },

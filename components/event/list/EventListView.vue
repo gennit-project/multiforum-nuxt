@@ -1,30 +1,30 @@
 <script setup lang="ts">
-import { computed, ref, watch } from "vue";
-import { useRoute, useRouter } from "nuxt/app";
-import { useQuery } from "@vue/apollo-composable";
-import EventList from "./EventList.vue";
-import "md-editor-v3/lib/style.css";
-import { GET_EVENTS } from "@/graphQLData/event/queries";
-import getEventWhere from "@/components/event/list/filters/getEventWhere";
-import type { SearchEventValues } from "@/types/Event";
-import { getFilterValuesFromParams } from "./filters/getEventFilterValuesFromParams";
-import ErrorBanner from "../../ErrorBanner.vue";
-import LoadingSpinner from "../../LoadingSpinner.vue";
-import { timeShortcutValues } from "./filters/eventSearchOptions";
+import { computed, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import { useQuery } from '@vue/apollo-composable';
+import EventList from './EventList.vue';
+import 'md-editor-v3/lib/style.css';
+import { GET_EVENTS } from '@/graphQLData/event/queries';
+import getEventWhere from '@/components/event/list/filters/getEventWhere';
+import type { SearchEventValues } from '@/types/Event';
+import { getFilterValuesFromParams } from './filters/getEventFilterValuesFromParams';
+import ErrorBanner from '../../ErrorBanner.vue';
+import LoadingSpinner from '../../LoadingSpinner.vue';
+import { timeShortcutValues } from './filters/eventSearchOptions';
 import {
   chronologicalOrder,
   reverseChronologicalOrder,
-} from "./filters/filterStrings";
-import EventFilterBar from "./filters/EventFilterBar.vue";
-import TimeShortcuts from "./filters/TimeShortcuts.vue";
-import OnlineInPersonShortcuts from "./filters/OnlineInPersonShortcuts.vue";
-import LocationFilterTypes from "./filters/locationFilterTypes";
+} from './filters/filterStrings';
+import EventFilterBar from './filters/EventFilterBar.vue';
+import TimeShortcuts from './filters/TimeShortcuts.vue';
+import OnlineInPersonShortcuts from './filters/OnlineInPersonShortcuts.vue';
+import LocationFilterTypes from './filters/locationFilterTypes';
 
 const route = useRoute();
 const router = useRouter();
 
 const channelId = computed(() => {
-  return typeof route.params.forumId === "string" ? route.params.forumId : "";
+  return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
 const filterValues = ref(
@@ -67,7 +67,7 @@ const {
     },
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 const previewIsOpen = ref(false);
@@ -81,12 +81,12 @@ const loadMore = () => {
     // Prevent cache clearing which causes content shift
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
-      
+
       // Merge the results while preserving existing data
       return {
         ...previousResult,
         events: [...(previousResult?.events || []), ...fetchMoreResult.events],
-        eventsAggregate: fetchMoreResult.eventsAggregate // Update the aggregate count
+        eventsAggregate: fetchMoreResult.eventsAggregate, // Update the aggregate count
       };
     },
   });
@@ -113,11 +113,11 @@ const openPreview = () => {
 const updateFilters = (params: SearchEventValues) => {
   const existingQuery = route.query;
   const cleanedParams: Record<string, string> = {};
-  
+
   Object.keys(params).forEach((key) => {
     const typedKey = key as keyof SearchEventValues;
     const value = params[typedKey];
-    if (value !== undefined && typeof value !== "string") {
+    if (value !== undefined && typeof value !== 'string') {
       cleanedParams[key] = String(value);
     } else if (value !== undefined) {
       cleanedParams[key] = value;
@@ -156,11 +156,12 @@ const filterByChannel = (channel: string) => {
   }
   updateFilters({ channels: [channel] });
 };
-
 </script>
 
 <template>
-  <div class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 lg:px-4">
+  <div
+    class="flex flex-col justify-center gap-2 rounded-lg bg-white dark:bg-gray-800 lg:px-4"
+  >
     <EventFilterBar
       :show-distance-filters="false"
       :allow-hiding-main-filters="true"
@@ -176,8 +177,8 @@ const filterByChannel = (channel: string) => {
       class="mx-auto block"
       :text="eventError.message"
     />
-    
-    <LoadingSpinner v-if="!eventResult && !eventError" class="my-4 mx-auto" />
+
+    <LoadingSpinner v-if="!eventResult && !eventError" class="mx-auto my-4" />
 
     <EventList
       v-if="eventResult?.events"

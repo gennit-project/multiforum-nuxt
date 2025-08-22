@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import VueEasyLightbox from "vue-easy-lightbox";
+import { ref } from 'vue';
+import VueEasyLightbox from 'vue-easy-lightbox';
 
 const props = defineProps({
   src: {
@@ -10,7 +10,7 @@ const props = defineProps({
   alt: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   rounded: {
     type: Boolean,
@@ -36,7 +36,7 @@ const handleImageClick = () => {
       class="cursor-pointer"
       :class="{ 'rounded-full': rounded }"
       @click="handleImageClick"
-    >
+    />
     <vue-easy-lightbox
       v-if="visible"
       :visible="visible"

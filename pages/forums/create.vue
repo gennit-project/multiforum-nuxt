@@ -1,26 +1,26 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue";
-import { useMutation } from "@vue/apollo-composable";
-import { gql } from "@apollo/client/core";
-import CreateEditChannelFields from "@/components/channel/form/CreateEditChannelFields.vue";
-import RequireAuth from "@/components/auth/RequireAuth.vue";
-import { CREATE_CHANNEL } from "@/graphQLData/channel/mutations";
+import { ref, computed } from 'vue';
+import { useMutation } from '@vue/apollo-composable';
+import { gql } from '@apollo/client/core';
+import CreateEditChannelFields from '@/components/channel/form/CreateEditChannelFields.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import { CREATE_CHANNEL } from '@/graphQLData/channel/mutations';
 import type {
   Channel,
   ChannelCreateInput,
   ChannelTagsConnectOrCreateFieldInput,
-} from "@/__generated__/graphql";
-import { usernameVar } from "@/cache";
-import { useRouter } from "nuxt/app";
+} from '@/__generated__/graphql';
+import { usernameVar } from '@/cache';
+import { useRouter } from 'nuxt/app';
 
 const router = useRouter();
 
 const createChannelDefaultValues = {
-  uniqueName: "",
-  displayName: "",
-  description: "",
-  channelIconURL: "",
-  channelBannerURL: "",
+  uniqueName: '',
+  displayName: '',
+  description: '',
+  channelIconURL: '',
+  channelBannerURL: '',
   selectedTags: [],
   rules: [],
   wikiEnabled: false,
@@ -117,7 +117,7 @@ onDone((response) => {
   createChannelLoading.value = false;
 
   router.push({
-    name: "forums-forumId-discussions",
+    name: 'forums-forumId-discussions',
     params: {
       forumId: newChannelId,
     },
@@ -127,7 +127,7 @@ onDone((response) => {
 const submit = async () => {
   createChannelLoading.value = true;
   if (!usernameVar.value) {
-    console.error("No username found");
+    console.error('No username found');
     return;
   }
   createChannel({
@@ -146,7 +146,7 @@ const updateFormValues = (data: any) => {
 <template>
   <NuxtLayout>
     <div class="flex justify-center">
-      <div class="max-w-3xl w-full px-2 bg-white dark:bg-gray-800 mt-2 pt-2">
+      <div class="mt-2 w-full max-w-3xl bg-white px-2 pt-2 dark:bg-gray-800">
         <RequireAuth>
           <template #has-auth>
             <div class="w-full">

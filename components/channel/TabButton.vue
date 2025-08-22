@@ -46,30 +46,34 @@ const isActive = computed(() => {
 
 const classes = computed(() => {
   const baseClasses = [];
-  
+
   // Active state styling
   if (isActive.value) {
     if (props.vertical) {
       // Vertical active tab: background highlight
-      baseClasses.push("bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700 dark:text-gray-100");
+      baseClasses.push(
+        'bg-gray-100 dark:bg-gray-700 pr-2 px-4 text-gray-700 dark:text-gray-100'
+      );
     } else {
       // Horizontal active tab: orange bottom border
-      baseClasses.push("border-b-2 border-orange-500 text-gray-900 dark:text-gray-100");
+      baseClasses.push(
+        'border-b-2 border-orange-500 text-gray-900 dark:text-gray-100'
+      );
     }
   } else {
     // Inactive state styling
-    baseClasses.push("text-gray-500 dark:text-gray-400");
-    
+    baseClasses.push('text-gray-500 dark:text-gray-400');
+
     if (props.vertical) {
       // Vertical inactive tab: padding and hover effects
-      baseClasses.push("pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700");
+      baseClasses.push('pr-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-700');
     } else {
       // Horizontal inactive tab: transparent border
-      baseClasses.push("border-transparent");
+      baseClasses.push('border-transparent');
     }
   }
-  
-  return baseClasses.join(" ");
+
+  return baseClasses.join(' ');
 });
 
 const isHovered = ref(false);
@@ -79,7 +83,7 @@ const isHovered = ref(false);
   <nuxt-link
     :data-testid="dataTestid"
     :to="to"
-    class="pt-2 border-transparent link font-medium group inline-flex items-center gap-1 hover:text-gray-600 dark:text-gray-400"
+    class="border-transparent link group inline-flex items-center gap-1 pt-2 font-medium hover:text-gray-600 dark:text-gray-400"
     :class="classes"
     @mouseenter="isHovered = true"
     @mouseleave="isHovered = false"
@@ -90,7 +94,7 @@ const isHovered = ref(false);
         !vertical && isHovered ? 'bg-gray-100 dark:bg-gray-700' : '',
         showCount && count ? '' : 'pr-4',
       ]"
-      class="md:my-1 sm:my-1 flex h-6 items-center space-x-2 rounded-lg"
+      class="flex h-6 items-center space-x-2 rounded-lg sm:my-1 md:my-1"
     >
       <div class="text-black dark:text-gray-400">
         <slot />
@@ -107,7 +111,7 @@ const isHovered = ref(false);
 </template>
 
 <style>
-  .link.currentPage {
-    @apply text-black dark:text-white;
-  }
+.link.currentPage {
+  @apply text-black dark:text-white;
+}
 </style>

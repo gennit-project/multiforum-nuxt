@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { computed, ref, watch } from "vue";
-import TabButton from "@/components/channel/TabButton.vue";
-import type { User } from "@/__generated__/graphql";
+import { computed, ref, watch } from 'vue';
+import TabButton from '@/components/channel/TabButton.vue';
+import type { User } from '@/__generated__/graphql';
 // import { usernameVar, isAuthenticatedVar } from "@/cache"; // Unused for now
-import { useRoute } from "nuxt/app";
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 
@@ -31,7 +31,7 @@ const props = defineProps({
 
 const channelId = ref(route.params.forumId);
 const usernameInParams = computed(() => {
-  return typeof route.params.username === "string" ? route.params.username : "";
+  return typeof route.params.username === 'string' ? route.params.username : '';
 });
 
 watch(
@@ -45,37 +45,37 @@ watch(
 const tabs = computed(() => {
   const tabList: TabData[] = [
     {
-      name: "Comments",
+      name: 'Comments',
       href: `/u/${usernameInParams.value}/comments`,
       current: true,
       count: props.user?.CommentsAggregate?.count,
     },
     {
-      name: "Discussions",
+      name: 'Discussions',
       href: `/u/${usernameInParams.value}/discussions`,
       current: false,
       count: props.user?.DiscussionsAggregate?.count,
     },
     {
-      name: "Events",
+      name: 'Events',
       href: `/u/${usernameInParams.value}/events`,
       current: false,
       count: props.user?.EventsAggregate?.count,
     },
     {
-      name: "Images",
+      name: 'Images',
       href: `/u/${usernameInParams.value}/images`,
       current: false,
       count: props.user?.ImagesAggregate?.count,
     },
     {
-      name: "Owned Forums",
+      name: 'Owned Forums',
       href: `/u/${usernameInParams.value}/ownedForums`,
       current: false,
       count: props.user?.AdminOfChannelsAggregate?.count,
     },
     {
-      name: "Modded Forums",
+      name: 'Modded Forums',
       href: `/u/${usernameInParams.value}/moddedForums`,
       current: false,
       count: props.user?.ModOfChannelsAggregate?.count,

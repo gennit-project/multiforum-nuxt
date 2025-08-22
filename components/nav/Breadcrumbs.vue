@@ -1,6 +1,6 @@
 <script lang="ts">
-import type { PropType } from "vue";
-import { defineComponent } from "vue";
+import type { PropType } from 'vue';
+import { defineComponent } from 'vue';
 
 interface Link {
   path: string;
@@ -8,7 +8,7 @@ interface Link {
 }
 
 export default defineComponent({
-  name: "BreadCrumbs",
+  name: 'BreadCrumbs',
   props: {
     links: {
       type: Array as PropType<Link[]>,
@@ -22,18 +22,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <nav
-    class="mb-1 mt-2 flex"
-    aria-label="Breadcrumb"
-  >
-    <ol
-      role="list"
-      class="flex items-center space-x-4"
-    >
-      <li
-        v-for="(link, i) in links"
-        :key="link.path"
-      >
+  <nav class="mb-1 mt-2 flex" aria-label="Breadcrumb">
+    <ol role="list" class="flex items-center space-x-4">
+      <li v-for="(link, i) in links" :key="link.path">
         <div class="flex items-center">
           <!-- Heroicon name: solid/chevron-right -->
           <svg

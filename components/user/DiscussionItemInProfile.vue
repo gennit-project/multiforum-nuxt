@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { relativeTime } from "@/utils";
-import Tag from "@/components/TagComponent.vue";
-import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
-import type { Discussion } from "@/__generated__/graphql";
-import { useRouter } from "nuxt/app";
+import { computed } from 'vue';
+import { relativeTime } from '@/utils';
+import Tag from '@/components/TagComponent.vue';
+import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import type { Discussion } from '@/__generated__/graphql';
+import { useRouter } from 'nuxt/app';
 
 const props = defineProps({
   discussion: {
@@ -13,7 +13,7 @@ const props = defineProps({
   },
   searchInput: {
     type: String,
-    default: "",
+    default: '',
   },
   selectedTags: {
     type: Array as () => string[],
@@ -25,7 +25,7 @@ const props = defineProps({
   },
 });
 
-defineEmits(["filterByTag"]);
+defineEmits(['filterByTag']);
 
 const router = useRouter();
 
@@ -34,7 +34,7 @@ const defaultUniqueName = computed(() => {
     !props.discussion.DiscussionChannels ||
     !props.discussion.DiscussionChannels[0]
   ) {
-    return "";
+    return '';
   }
   return props.discussion.DiscussionChannels[0].Channel?.uniqueName;
 });
@@ -43,7 +43,7 @@ const title = props.discussion.title;
 const relativeTimeText = relativeTime(props.discussion.createdAt);
 const authorUsername = props.discussion.Author
   ? props.discussion.Author.username
-  : "Deleted";
+  : 'Deleted';
 const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
 </script>
 
@@ -63,7 +63,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
     <HighlightedSearchTerms :text="title" :search-input="searchInput" />
 
     <p
-      class="font-medium mt-1 space-x-1 flex text-sm text-gray-600 hover:no-underline"
+      class="mt-1 flex space-x-1 text-sm font-medium text-gray-600 hover:no-underline"
     >
       <Tag
         v-for="tag in tags"
@@ -75,7 +75,7 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
       />
     </p>
     <p
-      class="font-medium text-xs text-gray-600 no-underline dark:text-gray-300"
+      class="text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
     >
       {{ `Posted ${relativeTimeText} by ${authorUsername}` }}
     </p>
@@ -87,12 +87,17 @@ const tags = (props.discussion.Tags ?? []).map((tag) => tag.text);
         :to="{
           name: 'forums-forumId-discussions-discussionId',
           params: {
-            forumId: discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName,
+            forumId:
+              discussionChannel.Channel?.uniqueName ||
+              discussionChannel.channelUniqueName,
             discussionId: discussion.id,
           },
         }"
       >
-        View this post in {{ `c/${discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName}` }}
+        View this post in
+        {{
+          `c/${discussionChannel.Channel?.uniqueName || discussionChannel.channelUniqueName}`
+        }}
       </nuxt-link>
     </div>
   </li>

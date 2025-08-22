@@ -1,32 +1,32 @@
 <script lang="ts" setup>
-import type { Event } from "@/__generated__/graphql";
-import BackLink from "@/components/BackLink.vue";
-import { GET_EVENT_FEEDBACK } from "@/graphQLData/event/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { computed } from "vue";
-import { useRoute } from "nuxt/app";
-import EventHeader from "@/components/event/detail/EventHeader.vue";
-import ErrorBanner from "@/components/ErrorBanner.vue";
-import PageNotFound from "@/components/PageNotFound.vue";
-import EventBody from "@/components/event/detail/EventBody.vue";
-import FeedbackSection from "@/components/comments/FeedbackSection.vue";
+import type { Event } from '@/__generated__/graphql';
+import BackLink from '@/components/BackLink.vue';
+import { GET_EVENT_FEEDBACK } from '@/graphQLData/event/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { computed } from 'vue';
+import { useRoute } from 'nuxt/app';
+import EventHeader from '@/components/event/detail/EventHeader.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import PageNotFound from '@/components/PageNotFound.vue';
+import EventBody from '@/components/event/detail/EventBody.vue';
+import FeedbackSection from '@/components/comments/FeedbackSection.vue';
 
 const PAGE_LIMIT = 10;
 
 const route = useRoute();
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 const eventId = computed(() => {
-  if (typeof route.params.eventId === "string") {
+  if (typeof route.params.eventId === 'string') {
     return route.params.eventId;
   }
-  return "";
+  return '';
 });
 
 const {
@@ -95,7 +95,7 @@ const reachedEndOfResults = computed(() => {
 
 <template>
   <div
-    class="w-full max-w-screen-2xl space-y-4 rounded-lg dark:text-white py-2 sm:px-2 md:px-5"
+    class="w-full max-w-screen-2xl space-y-4 rounded-lg py-2 dark:text-white sm:px-2 md:px-5"
   >
     <h1 class="text-wrap text-center text-2xl font-bold dark:text-gray-200">
       Feedback
@@ -106,10 +106,10 @@ const reachedEndOfResults = computed(() => {
       :text="getEventError.message"
     />
     <PageNotFound v-if="!getEventLoading && !getEventError && !event" />
-    <p class="px-2 mb-4">This page collects feedback on this event:</p>
+    <p class="mb-4 px-2">This page collects feedback on this event:</p>
     <div class="ml-2 flex flex-col gap-2 border-l pl-4">
       <h3 class="text-wrap px-2 text-xl font-bold sm:tracking-tight">
-        {{ event && event.title ? event.title : "[Deleted]" }}
+        {{ event && event.title ? event.title : '[Deleted]' }}
       </h3>
 
       <div class="space-y-3 px-2">

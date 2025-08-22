@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client/core";
+import { gql } from '@apollo/client/core';
 
 const CREATE_TAG = gql`
   mutation createTag($input: [TagCreateInput!]!) {

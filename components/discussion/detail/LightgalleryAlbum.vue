@@ -1,16 +1,16 @@
 <script lang="ts" setup>
-  import type { PropType } from "vue";
-  import { ref, computed } from "vue";
-  import Lightgallery from "lightgallery/vue";
-  import lgThumbnail from "lightgallery/plugins/thumbnail";
-  import lgZoom from "lightgallery/plugins/zoom";
-  import { config } from "@/config";
-  import "lightgallery/css/lightgallery.css";
-  import "lightgallery/css/lg-thumbnail.css";
-  import "lightgallery/css/lg-zoom.css";
-  import type { Album } from "@/__generated__/graphql";
-  import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
-  import RightArrowIcon from "@/components/icons/RightArrowIcon.vue";
+import type { PropType } from 'vue';
+import { ref, computed } from 'vue';
+import Lightgallery from 'lightgallery/vue';
+import lgThumbnail from 'lightgallery/plugins/thumbnail';
+import lgZoom from 'lightgallery/plugins/zoom';
+import { config } from '@/config';
+import 'lightgallery/css/lightgallery.css';
+import 'lightgallery/css/lg-thumbnail.css';
+import 'lightgallery/css/lg-zoom.css';
+import type { Album } from '@/__generated__/graphql';
+import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
+import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 
 const props = defineProps({
   album: {
@@ -75,7 +75,7 @@ const canScrollRight = computed(
           :src="image.url || ''"
           :alt="image.alt || ''"
           class="shadow-sm"
-        >
+        />
         <span class="text-center">
           {{ image.alt }}
         </span>
@@ -103,8 +103,8 @@ const canScrollRight = computed(
           <img
             :src="image.url || ''"
             :alt="image.alt || ''"
-            class="max-h-96 max-w-96 shadow-sm object-contain cursor-pointer"
-          >
+            class="max-h-96 max-w-96 cursor-pointer object-contain shadow-sm"
+          />
         </a>
       </lightgallery>
 
@@ -113,7 +113,7 @@ const canScrollRight = computed(
         <!-- Left arrow -->
         <button
           class="flex items-center justify-center p-1 text-white hover:text-gray-300"
-          :class="{ 'opacity-50 cursor-not-allowed': !canScrollLeft }"
+          :class="{ 'cursor-not-allowed opacity-50': !canScrollLeft }"
           :disabled="!canScrollLeft"
           @click="scrollThumbnailsLeft"
         >
@@ -125,10 +125,10 @@ const canScrollRight = computed(
           <div
             v-for="(image, index) in visibleThumbnails"
             :key="`thumbnail-${thumbnailStartIndex + index}`"
-            class="aspect-square h-20 w-20 overflow-hidden rounded border cursor-pointer transition-all"
+            class="aspect-square h-20 w-20 cursor-pointer overflow-hidden rounded border transition-all"
             :class="[
               activeIndex === thumbnailStartIndex + index
-                ? 'border-orange-500 border-2'
+                ? 'border-2 border-orange-500'
                 : 'border-gray-300 dark:border-gray-600',
               'bg-gray-100 dark:bg-gray-700',
             ]"
@@ -138,14 +138,14 @@ const canScrollRight = computed(
               :src="image.url || ''"
               :alt="`Thumbnail ${thumbnailStartIndex + index + 1}`"
               class="h-full w-full object-cover transition-opacity hover:opacity-80"
-            >
+            />
           </div>
         </div>
 
         <!-- Right arrow -->
         <button
           class="flex items-center justify-center p-1 text-white hover:text-gray-300"
-          :class="{ 'opacity-50 cursor-not-allowed': !canScrollRight }"
+          :class="{ 'cursor-not-allowed opacity-50': !canScrollRight }"
           :disabled="!canScrollRight"
           @click="scrollThumbnailsRight"
         >

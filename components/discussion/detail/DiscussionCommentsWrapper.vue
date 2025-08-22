@@ -3,23 +3,23 @@ import type {
   DiscussionChannel,
   CommentCreateInput,
   Comment as CommentType,
-} from "@/__generated__/graphql";
-import type { ApolloCache } from "@apollo/client/core";
-import type { PropType } from "vue";
-import { computed, defineProps, ref } from "vue";
-import { getSortFromQuery } from "@/components/comments/getSortFromQuery";
-import type { CreateEditCommentFormValues } from "@/types/Comment";
-import CommentSection from "@/components/comments/CommentSection.vue";
-import { usernameVar } from "@/cache";
-import { useRoute } from "nuxt/app";
-import { useMutation, useQuery } from "@vue/apollo-composable";
-import { 
-  SUBSCRIBE_TO_DISCUSSION_CHANNEL, 
-  UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL 
-} from "@/graphQLData/discussion/mutations";
-import { GET_USER } from "@/graphQLData/user/queries";
-import Notification from "@/components/NotificationComponent.vue";
-import SubscribeButton from "@/components/SubscribeButton.vue";
+} from '@/__generated__/graphql';
+import type { ApolloCache } from '@apollo/client/core';
+import type { PropType } from 'vue';
+import { computed, defineProps, ref } from 'vue';
+import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
+import type { CreateEditCommentFormValues } from '@/types/Comment';
+import CommentSection from '@/components/comments/CommentSection.vue';
+import { usernameVar } from '@/cache';
+import { useRoute } from 'nuxt/app';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import {
+  SUBSCRIBE_TO_DISCUSSION_CHANNEL,
+  UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL,
+} from '@/graphQLData/discussion/mutations';
+import { GET_USER } from '@/graphQLData/user/queries';
+import Notification from '@/components/NotificationComponent.vue';
+import SubscribeButton from '@/components/SubscribeButton.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -65,7 +65,7 @@ const props = defineProps({
   modName: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   archived: {
     type: Boolean,
@@ -100,7 +100,7 @@ const commentSectionQueryVariables = computed(() => ({
 }));
 
 const createCommentDefaultValues: CreateEditCommentFormValues = {
-  text: "",
+  text: '',
   isRootComment: false,
   depth: 1,
 };
@@ -110,24 +110,28 @@ const createFormValues = ref<CreateEditCommentFormValues>(
 );
 
 const channelId = computed(() => {
-  if (typeof route.params.forumId === "string") {
+  if (typeof route.params.forumId === 'string') {
     return route.params.forumId;
   }
-  return "";
+  return '';
 });
 
 // Query for user data to get notification preferences
-const {
-  result: getUserResult,
-} = useQuery(GET_USER, {
-  username: usernameVar.value,
-}, {
-  enabled: !!usernameVar.value,
-});
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value,
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 // Get user's notification preference for comment replies
 const notifyOnReplyToCommentByDefault = computed(() => {
-  return getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false;
+  return (
+    getUserResult.value?.users[0]?.notifyOnReplyToCommentByDefault ?? false
+  );
 });
 
 const createCommentInput = computed(() => {
@@ -160,7 +164,7 @@ const createCommentInput = computed(() => {
         },
       },
     },
-    text: createFormValues.value.text || "",
+    text: createFormValues.value.text || '',
     CommentAuthor: {
       User: {
         connect: {
@@ -188,11 +192,13 @@ const createCommentInput = computed(() => {
   // Add the logged-in user to SubscribedToNotifications if they want to be notified by default
   if (notifyOnReplyToCommentByDefault.value) {
     input.SubscribedToNotifications = {
-      connect: [{
-        where: {
-          node: { username: usernameVar.value }
-        }
-      }]
+      connect: [
+        {
+          where: {
+            node: { username: usernameVar.value },
+          },
+        },
+      ],
     };
   }
 
@@ -201,14 +207,14 @@ const createCommentInput = computed(() => {
 
 const updateCreateReplyCommentInput = (event: CreateEditCommentFormValues) => {
   if (!event.parentCommentId) {
-    console.error("Parent comment id is required to create a reply comment");
+    console.error('Parent comment id is required to create a reply comment');
     return;
   }
   createFormValues.value = event;
 };
 
 defineEmits<{
-  loadMore: []
+  loadMore: [];
 }>();
 
 const updateCommentSectionQueryResult = (
@@ -223,14 +229,14 @@ const updateCommentSectionQueryResult = (
 
   if (commentToDeleteId) {
     cache.evict({
-      id: cache.identify({ __typename: "Comment", id: commentToDeleteId }),
+      id: cache.identify({ __typename: 'Comment', id: commentToDeleteId }),
     });
   }
 
   if (commentToAddFeedbackTo && newFeedbackComment) {
     cache.modify({
       id: cache.identify({
-        __typename: "Comment",
+        __typename: 'Comment',
         id: commentToAddFeedbackTo.id,
       }),
       fields: {
@@ -245,7 +251,7 @@ const updateCommentSectionQueryResult = (
 const incrementCommentCount = (cache: ApolloCache<any>) => {
   try {
     if (!props.discussionChannel?.id) {
-      console.error("No discussion channel ID found");
+      console.error('No discussion channel ID found');
       return;
     }
 
@@ -253,27 +259,27 @@ const incrementCommentCount = (cache: ApolloCache<any>) => {
     // This is much safer than using writeQuery
     cache.modify({
       id: cache.identify({
-        __typename: "DiscussionChannel",
-        id: props.discussionChannel.id
+        __typename: 'DiscussionChannel',
+        id: props.discussionChannel.id,
       }),
       fields: {
         CommentsAggregate(existing = { count: 0 }) {
           return {
             ...existing,
-            count: (existing.count || 0) + 1
+            count: (existing.count || 0) + 1,
           };
-        }
-      }
+        },
+      },
     });
   } catch (error) {
-    console.error("Error incrementing comment count:", error);
+    console.error('Error incrementing comment count:', error);
   }
 };
 
 const decrementCommentCount = (cache: ApolloCache<any>) => {
   try {
     if (!props.discussionChannel?.id) {
-      console.error("No discussion channel ID found");
+      console.error('No discussion channel ID found');
       return;
     }
 
@@ -281,20 +287,20 @@ const decrementCommentCount = (cache: ApolloCache<any>) => {
     // This is much safer than using writeQuery
     cache.modify({
       id: cache.identify({
-        __typename: "DiscussionChannel",
-        id: props.discussionChannel.id
+        __typename: 'DiscussionChannel',
+        id: props.discussionChannel.id,
       }),
       fields: {
         CommentsAggregate(existing = { count: 0 }) {
           return {
             ...existing,
-            count: Math.max(0, (existing.count || 0) - 1)
+            count: Math.max(0, (existing.count || 0) - 1),
           };
-        }
-      }
+        },
+      },
     });
   } catch (error) {
-    console.error("Error decrementing comment count:", error);
+    console.error('Error decrementing comment count:', error);
   }
 };
 
@@ -303,7 +309,10 @@ const showSubscribedNotification = ref(false);
 const showUnsubscribedNotification = ref(false);
 
 const isSubscribed = computed(() => {
-  if (!props.discussionChannel?.SubscribedToNotifications || !usernameVar.value) {
+  if (
+    !props.discussionChannel?.SubscribedToNotifications ||
+    !usernameVar.value
+  ) {
     return false;
   }
   return props.discussionChannel.SubscribedToNotifications.some(
@@ -317,20 +326,24 @@ const {
   onDone: onSubscribeComplete,
 } = useMutation(SUBSCRIBE_TO_DISCUSSION_CHANNEL, {
   update: (cache, result) => {
-    if (result.data?.subscribeToDiscussionChannel && props.discussionChannel?.id) {
+    if (
+      result.data?.subscribeToDiscussionChannel &&
+      props.discussionChannel?.id
+    ) {
       cache.modify({
         id: cache.identify({
-          __typename: "DiscussionChannel",
-          id: props.discussionChannel.id
+          __typename: 'DiscussionChannel',
+          id: props.discussionChannel.id,
         }),
         fields: {
           SubscribedToNotifications(_) {
-            return result.data.subscribeToDiscussionChannel.SubscribedToNotifications;
-          }
-        }
+            return result.data.subscribeToDiscussionChannel
+              .SubscribedToNotifications;
+          },
+        },
       });
     }
-  }
+  },
 });
 
 onSubscribeComplete(() => {
@@ -343,41 +356,47 @@ const {
   onDone: onUnsubscribeComplete,
 } = useMutation(UNSUBSCRIBE_FROM_DISCUSSION_CHANNEL, {
   update: (cache, result) => {
-    if (result.data?.unsubscribeFromDiscussionChannel && props.discussionChannel?.id) {
+    if (
+      result.data?.unsubscribeFromDiscussionChannel &&
+      props.discussionChannel?.id
+    ) {
       cache.modify({
         id: cache.identify({
-          __typename: "DiscussionChannel",
-          id: props.discussionChannel.id
+          __typename: 'DiscussionChannel',
+          id: props.discussionChannel.id,
         }),
         fields: {
           SubscribedToNotifications(_) {
-            return result.data.unsubscribeFromDiscussionChannel.SubscribedToNotifications;
-          }
-        }
+            return result.data.unsubscribeFromDiscussionChannel
+              .SubscribedToNotifications;
+          },
+        },
       });
     }
-  }
+  },
 });
 
 onUnsubscribeComplete(() => {
   showUnsubscribedNotification.value = true;
 });
 
-const subscriptionLoading = computed(() => subscribeLoading.value || unsubscribeLoading.value);
+const subscriptionLoading = computed(
+  () => subscribeLoading.value || unsubscribeLoading.value
+);
 
 const handleSubscriptionToggle = () => {
   if (!props.discussionChannel?.id) {
-    console.error("No discussion channel ID found");
+    console.error('No discussion channel ID found');
     return;
   }
 
   if (isSubscribed.value) {
     unsubscribeFromDiscussionChannel({
-      discussionChannelId: props.discussionChannel.id
+      discussionChannelId: props.discussionChannel.id,
     });
   } else {
     subscribeToDiscussionChannel({
-      discussionChannelId: props.discussionChannel.id
+      discussionChannelId: props.discussionChannel.id,
     });
   }
 };
@@ -422,7 +441,7 @@ const handleSubscriptionToggle = () => {
     @close-notification="showSubscribedNotification = false"
   />
   <Notification
-    :show="showUnsubscribedNotification" 
+    :show="showUnsubscribedNotification"
     :title="'Successfully unsubscribed from notifications for this discussion'"
     @close-notification="showUnsubscribedNotification = false"
   />

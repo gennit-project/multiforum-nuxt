@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
-import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
-import FormRow from "@/components/FormRow.vue";
-import CheckBox from "@/components/CheckBox.vue";
+import type { PropType } from 'vue';
+import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import FormRow from '@/components/FormRow.vue';
+import CheckBox from '@/components/CheckBox.vue';
 
 const props = defineProps({
   editMode: {
@@ -16,7 +16,7 @@ const props = defineProps({
   },
 });
 
-const emit = defineEmits(["updateFormValues"]);
+const emit = defineEmits(['updateFormValues']);
 </script>
 
 <template>
@@ -34,20 +34,31 @@ const emit = defineEmits(["updateFormValues"]);
               Enable events/calendar tab in individual forums
             </label>
           </div>
-          
+
           <p class="text-sm text-gray-600 dark:text-gray-400">
-            When enabled, forum administrators will be able to turn on event functionality for their individual forums. This allows users to create, share, and manage events with calendar integration.
+            When enabled, forum administrators will be able to turn on event
+            functionality for their individual forums. This allows users to
+            create, share, and manage events with calendar integration.
           </p>
-          
-          <div v-if="!props.formValues?.enableEvents" class="rounded-md bg-gray-50 p-4 dark:bg-gray-800">
+
+          <div
+            v-if="!props.formValues?.enableEvents"
+            class="bg-gray-50 rounded-md p-4 dark:bg-gray-800"
+          >
             <p class="text-sm text-gray-600 dark:text-gray-400">
-              <strong>Note:</strong> When events are disabled, individual forums will not be able to enable their calendar/events functionality, and existing events will not be accessible through the forum interface.
+              <strong>Note:</strong> When events are disabled, individual forums
+              will not be able to enable their calendar/events functionality,
+              and existing events will not be accessible through the forum
+              interface.
             </p>
           </div>
-          
-          <div v-else class="rounded-md bg-blue-50 p-4 dark:bg-blue-900/20">
+
+          <div v-else class="bg-blue-50 rounded-md p-4 dark:bg-blue-900/20">
             <p class="text-sm text-blue-800 dark:text-blue-200">
-              <strong>Events Enabled:</strong> Forum administrators can now enable events and calendar functionality for their individual forums. Users will be able to create events, set schedules, and manage calendar activities within forums that have events enabled.
+              <strong>Events Enabled:</strong> Forum administrators can now
+              enable events and calendar functionality for their individual
+              forums. Users will be able to create events, set schedules, and
+              manage calendar activities within forums that have events enabled.
             </p>
           </div>
         </div>

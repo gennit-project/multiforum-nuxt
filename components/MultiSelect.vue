@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from "vue";
-import type { PropType } from "vue";
+import { ref, computed, watch, nextTick } from 'vue';
+import type { PropType } from 'vue';
 
 export interface MultiSelectOption {
   value: any;
@@ -24,17 +24,17 @@ const props = defineProps({
   // Placeholder text when nothing selected
   placeholder: {
     type: String,
-    default: "Select items...",
+    default: 'Select items...',
   },
   // Description text above the component
   description: {
     type: String,
-    default: "",
+    default: '',
   },
   // Test ID for testing
   testId: {
     type: String,
-    default: "",
+    default: '',
   },
   // Whether to show a search bar
   searchable: {
@@ -44,12 +44,12 @@ const props = defineProps({
   // Search placeholder
   searchPlaceholder: {
     type: String,
-    default: "Search...",
+    default: 'Search...',
   },
   // Custom height for the container
   height: {
     type: String,
-    default: "h-12",
+    default: 'h-12',
   },
   // Whether to show chips for selected items
   showChips: {
@@ -59,7 +59,7 @@ const props = defineProps({
   // Maximum height for the dropdown
   dropdownMaxHeight: {
     type: String,
-    default: "max-h-64",
+    default: 'max-h-64',
   },
   // Loading state
   loading: {
@@ -69,7 +69,7 @@ const props = defineProps({
   // Error message
   error: {
     type: String,
-    default: "",
+    default: '',
   },
   // Whether multiple selection is allowed
   multiple: {
@@ -79,12 +79,12 @@ const props = defineProps({
 });
 
 const emit = defineEmits<{
-  "update:modelValue": [value: any[]];
+  'update:modelValue': [value: any[]];
   search: [query: string];
 }>();
 
 const isDropdownOpen = ref(false);
-const searchQuery = ref("");
+const searchQuery = ref('');
 const selected = ref<any[]>([...props.modelValue]);
 const searchInputRef = ref<HTMLInputElement | null>(null);
 
@@ -102,7 +102,7 @@ const toggleDropdown = () => {
 const closeDropdown = () => {
   isDropdownOpen.value = false;
   // Clear search when closing dropdown to reset filter
-  searchQuery.value = "";
+  searchQuery.value = '';
 };
 
 const toggleSelection = (value: any) => {
@@ -117,7 +117,7 @@ const toggleSelection = (value: any) => {
       selected.value.splice(index, 1);
     }
   }
-  emit("update:modelValue", selected.value);
+  emit('update:modelValue', selected.value);
 };
 
 const removeSelection = (value: any, event?: Event) => {
@@ -125,18 +125,18 @@ const removeSelection = (value: any, event?: Event) => {
     event.stopPropagation();
   }
   selected.value = selected.value.filter((item) => item !== value);
-  emit("update:modelValue", selected.value);
+  emit('update:modelValue', selected.value);
 };
 
 const clearSelection = () => {
   selected.value = [];
-  emit("update:modelValue", selected.value);
+  emit('update:modelValue', selected.value);
 };
 
 const updateSearch = (query: string) => {
   // ONLY update search query for filtering - do NOT affect selection
   searchQuery.value = query;
-  emit("search", query);
+  emit('search', query);
 };
 
 // Filtered options based on search
@@ -225,7 +225,7 @@ const selectedOptions = computed(() => {
         <!-- Single selection display or comma-separated values (when not showing chips) -->
         <div
           v-else-if="!showChips && selectedOptions.length > 0"
-          class="flex items-center flex-1"
+          class="flex flex-1 items-center"
         >
           <!-- Show avatar/icon only for single selection -->
           <img
@@ -240,8 +240,8 @@ const selectedOptions = computed(() => {
           ></i>
 
           <!-- Show comma-separated labels for multiple selections -->
-          <span class="text-gray-900 dark:text-white truncate">
-            {{ selectedOptions.map((option) => option.label).join(", ") }}
+          <span class="truncate text-gray-900 dark:text-white">
+            {{ selectedOptions.map((option) => option.label).join(', ') }}
           </span>
         </div>
 
@@ -253,14 +253,13 @@ const selectedOptions = computed(() => {
           {{ placeholder }}
         </div>
 
-
         <!-- Clear button and dropdown arrow -->
         <div class="ml-auto flex items-center text-gray-400">
           <!-- Clear button -->
           <button
             v-if="selectedOptions.length > 0"
             type="button"
-            class="mr-2 hover:text-red-500 transition-colors"
+            class="mr-2 transition-colors hover:text-red-500"
             @click.stop="clearSelection"
             :title="'Clear selection'"
           >
@@ -285,7 +284,7 @@ const selectedOptions = computed(() => {
         v-if="isDropdownOpen"
         v-click-outside="closeDropdown"
         :class="[
-          'absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg dark:bg-gray-800 dark:border-gray-600',
+          'absolute z-50 mt-1 w-full rounded-md border bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800',
           dropdownMaxHeight,
           'overflow-y-auto',
         ]"
@@ -293,14 +292,14 @@ const selectedOptions = computed(() => {
         <!-- Search bar for dropdown -->
         <div
           v-if="searchable"
-          class="p-2 border-b border-gray-200 dark:border-gray-600"
+          class="border-b border-gray-200 p-2 dark:border-gray-600"
         >
           <input
             ref="searchInputRef"
             v-model="searchQuery"
             type="text"
             :placeholder="searchPlaceholder"
-            class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
             @input="updateSearch(searchQuery)"
             @keydown.stop
             @keyup.stop
@@ -324,11 +323,11 @@ const selectedOptions = computed(() => {
             v-for="option in filteredOptions"
             :key="String(option.value)"
             :class="[
-              'flex items-center px-4 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700',
+              'flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700',
               selected.includes(option.value)
                 ? 'bg-orange-50 dark:bg-orange-900/20'
                 : '',
-              option.disabled ? 'opacity-50 cursor-not-allowed' : '',
+              option.disabled ? 'cursor-not-allowed opacity-50' : '',
             ]"
             @click="!option.disabled && toggleSelection(option.value)"
           >
@@ -339,10 +338,9 @@ const selectedOptions = computed(() => {
                 type="checkbox"
                 :checked="selected.includes(option.value)"
                 :disabled="option.disabled"
-                class="w-4 h-4 text-orange-600 border border-gray-400 rounded focus:ring-orange-500 dark:bg-gray-700 dark:border-gray-500 checked:bg-orange-600 checked:border-orange-600 checked:text-white"
+                class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop
-              >
-
+              />
             </div>
 
             <!-- Avatar -->
@@ -351,7 +349,7 @@ const selectedOptions = computed(() => {
               :src="option.avatar"
               :alt="option.label"
               class="mr-3 h-6 w-6 rounded-full"
-            >
+            />
 
             <!-- Icon -->
             <i v-else-if="option.icon" :class="[option.icon, 'mr-3']"></i>

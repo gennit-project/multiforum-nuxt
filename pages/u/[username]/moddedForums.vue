@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_MODDED_CHANNELS } from "@/graphQLData/user/queries";
-import { useQuery } from "@vue/apollo-composable";
-import ChannelList from "@/components/channel/ChannelList.vue";
-import { useRoute } from "nuxt/app";
+import { computed } from 'vue';
+import { GET_MODDED_CHANNELS } from '@/graphQLData/user/queries';
+import { useQuery } from '@vue/apollo-composable';
+import ChannelList from '@/components/channel/ChannelList.vue';
+import { useRoute } from 'nuxt/app';
 
 const route = useRoute();
 
 const username = computed(() => {
-  if (typeof route.params.username === "string") {
+  if (typeof route.params.username === 'string') {
     return route.params.username;
   }
-  return "";
+  return '';
 });
 
 const { result, loading, error } = useQuery(
@@ -20,7 +20,7 @@ const { result, loading, error } = useQuery(
     username: username.value,
   }),
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 </script>

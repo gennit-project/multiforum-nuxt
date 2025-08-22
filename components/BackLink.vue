@@ -1,24 +1,24 @@
 <script lang="ts">
-import { defineComponent } from "vue";
-import LeftArrowIcon from "@/components/icons/LeftArrowIcon.vue";
+import { defineComponent } from 'vue';
+import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 
 export default defineComponent({
-  name: "BackLink",
+  name: 'BackLink',
   components: {
     LeftArrowIcon,
   },
   props: {
     link: {
       type: String,
-      default: "",
+      default: '',
     },
     dataTestid: {
       type: String,
-      default: "",
+      default: '',
     },
     text: {
       type: String,
-      default: "Back",
+      default: 'Back',
     },
   },
   setup() {},
@@ -29,7 +29,7 @@ export default defineComponent({
   <nuxt-link
     :to="link"
     :data-testid="dataTestid"
-    class="inline-flex text-xs gap-2 border border-gray-3 dark:border-gray-600 rounded-lg items-center justify-center px-2 py-1 bg-white hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white"
+    class="border-gray-3 inline-flex items-center justify-center gap-2 rounded-lg border bg-white px-2 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:hover:bg-gray-700"
   >
     <LeftArrowIcon class="h-4 w-4" />
     <span v-if="text">{{ text }}</span>

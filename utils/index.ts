@@ -1,21 +1,21 @@
-import { gql } from "@apollo/client/core";
-import { config } from "@/config";
-import type { Duration } from "luxon";
-import { DateTime, Interval } from "luxon";
-import LinkIcon from '@/components/icons/LinkIcon.vue'
-import FlagIcon from '@/components/icons/FlagIcon.vue'
-import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue'
-import EyeIcon from '@/components/icons/EyeIcon.vue'
-import PencilIcon from '@/components/icons/PencilIcon.vue'
-import TrashIcon from '@/components/icons/TrashIcon.vue'
-import XmarkIcon from '@/components/icons/XmarkIcon.vue'
-import ArchiveBox from "@/components/icons/ArchiveBox.vue";
-import UnarchiveBox from "@/components/icons/UnarchiveBox.vue";
-import UserPlus from "@/components/icons/UserPlus.vue";
-import UserMinus from "@/components/icons/UserMinus.vue";
-import type { Event, Tag as TagData } from "@/__generated__/graphql"
-import ImageIcon from "@/components/icons/ImageIcon.vue";
-import CheckCircle from "@/components/icons/CheckCircle.vue";
+import { gql } from '@apollo/client/core';
+import { config } from '@/config';
+import type { Duration } from 'luxon';
+import { DateTime, Interval } from 'luxon';
+import LinkIcon from '@/components/icons/LinkIcon.vue';
+import FlagIcon from '@/components/icons/FlagIcon.vue';
+import HandThumbDownIcon from '@/components/icons/HandThumbDownIcon.vue';
+import EyeIcon from '@/components/icons/EyeIcon.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import TrashIcon from '@/components/icons/TrashIcon.vue';
+import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+import ArchiveBox from '@/components/icons/ArchiveBox.vue';
+import UnarchiveBox from '@/components/icons/UnarchiveBox.vue';
+import UserPlus from '@/components/icons/UserPlus.vue';
+import UserMinus from '@/components/icons/UserMinus.vue';
+import type { Event, Tag as TagData } from '@/__generated__/graphql';
+import ImageIcon from '@/components/icons/ImageIcon.vue';
+import CheckCircle from '@/components/icons/CheckCircle.vue';
 
 const MAX_FILE_SIZE_MB = 5;
 const MAX_PROFILE_PIC_SIZE_MB = 1;
@@ -27,15 +27,20 @@ type FileSizeValidationInput = {
   isProfilePic?: boolean;
 };
 
-export function isFileSizeValid(input: FileSizeValidationInput): { valid: boolean; message: string } {
+export function isFileSizeValid(input: FileSizeValidationInput): {
+  valid: boolean;
+  message: string;
+} {
   const { file, isProfilePic = false } = input;
-  const maxSize = isProfilePic ? MAX_PROFILE_PIC_SIZE_BYTES : MAX_FILE_SIZE_BYTES;
+  const maxSize = isProfilePic
+    ? MAX_PROFILE_PIC_SIZE_BYTES
+    : MAX_FILE_SIZE_BYTES;
   const maxSizeMB = isProfilePic ? MAX_PROFILE_PIC_SIZE_MB : MAX_FILE_SIZE_MB;
-  
+
   if (file.size > maxSize) {
     return {
       valid: false,
-      message: `File size must be less than ${maxSizeMB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`
+      message: `File size must be less than ${maxSizeMB}MB. Current file is ${(file.size / (1024 * 1024)).toFixed(1)}MB.`,
     };
   }
   return { valid: true, message: '' };
@@ -64,7 +69,7 @@ const durationHoursAndMinutes = (startISO: string, endISO: string) => {
   const startObj = DateTime.fromISO(startISO);
   const endObj = DateTime.fromISO(endISO);
   const lengthOfTime = Interval.fromDateTimes(startObj, endObj)
-    .toDuration(["hours", "minutes"])
+    .toDuration(['hours', 'minutes'])
     .toObject();
 
   if (lengthOfTime.hours !== undefined) {
@@ -76,7 +81,7 @@ const durationHoursAndMinutes = (startISO: string, endISO: string) => {
 
     if (minutes === 0) {
       if (hours === 1) {
-        return "for 1 hour";
+        return 'for 1 hour';
       }
       return `for ${hours} hours`;
     }
@@ -97,7 +102,7 @@ const formatDuration = (eventDurationObj: Duration) => {
     if (minutes > 0) {
       return `1 hour and ${minutes} minutes`;
     }
-    return "1 hour";
+    return '1 hour';
   }
   if (hours > 1) {
     if (minutes > 0) {
@@ -108,7 +113,9 @@ const formatDuration = (eventDurationObj: Duration) => {
 };
 
 const getDatePieces = (startTimeObj: any, isAllDay?: boolean) => {
-  const timeOfDay = isAllDay ? "all day" : startTimeObj.toLocaleString(DateTime.TIME_SIMPLE);
+  const timeOfDay = isAllDay
+    ? 'all day'
+    : startTimeObj.toLocaleString(DateTime.TIME_SIMPLE);
   const zone = startTimeObj.zoneName;
   const weekday = startTimeObj.weekdayLong;
   const month = startTimeObj.monthLong;
@@ -135,7 +142,7 @@ const formatAbbreviatedDuration = (eventDurationObj: Duration) => {
     if (minutes > 0) {
       return `1h ${minutes}m`;
     }
-    return "1h";
+    return '1h';
   }
   if (hours > 1) {
     if (minutes > 0) {
@@ -149,7 +156,7 @@ const getDurationObj = (startTime: string, endTime: string) => {
   const startTimeObj = DateTime.fromISO(startTime);
   const endTimeObj = DateTime.fromISO(endTime);
   const interval = Interval.fromDateTimes(startTimeObj, endTimeObj);
-  const eventDuration = interval.toDuration(["hours", "minutes"]);
+  const eventDuration = interval.toDuration(['hours', 'minutes']);
   const eventDurationObj = eventDuration.toObject();
   return eventDurationObj;
 };
@@ -181,24 +188,24 @@ const stableRelativeTime = (isoDate: string) => {
   const now = DateTime.now();
   const diff = now.diff(date);
 
-  if (diff.as("years") >= 1) {
-    const years = Math.floor(diff.as("years"));
-    return years === 1 ? "1 year ago" : `${years} years ago`;
-  } else if (diff.as("months") >= 1) {
-    const months = Math.floor(diff.as("months"));
-    return months === 1 ? "1 month ago" : `${months} months ago`;
-  } else if (diff.as("days") >= 1) {
-    const days = Math.floor(diff.as("days"));
-    return days === 1 ? "1 day ago" : `${days} days ago`;
-  } else if (diff.as("hours") >= 1) {
-    const hours = Math.floor(diff.as("hours"));
-    return hours === 1 ? "1 hour ago" : `${hours} hours ago`;
-  } else if (diff.as("minutes") >= 5) {
+  if (diff.as('years') >= 1) {
+    const years = Math.floor(diff.as('years'));
+    return years === 1 ? '1 year ago' : `${years} years ago`;
+  } else if (diff.as('months') >= 1) {
+    const months = Math.floor(diff.as('months'));
+    return months === 1 ? '1 month ago' : `${months} months ago`;
+  } else if (diff.as('days') >= 1) {
+    const days = Math.floor(diff.as('days'));
+    return days === 1 ? '1 day ago' : `${days} days ago`;
+  } else if (diff.as('hours') >= 1) {
+    const hours = Math.floor(diff.as('hours'));
+    return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
+  } else if (diff.as('minutes') >= 5) {
     // Round minutes to nearest 5 to reduce hydration mismatches
-    const minutes = Math.floor(diff.as("minutes") / 5) * 5;
+    const minutes = Math.floor(diff.as('minutes') / 5) * 5;
     return `${minutes} minutes ago`;
   } else {
-    return "just now";
+    return 'just now';
   }
 };
 
@@ -224,29 +231,29 @@ const pluralize = (number: number, word: string) => {
 function timeAgo(jsDate: Date) {
   // Throw an error if the input is not a Date object
   if (!(jsDate instanceof Date)) {
-    throw new Error("Input must be a Date object");
+    throw new Error('Input must be a Date object');
   }
   const then = DateTime.fromJSDate(jsDate);
   const now = DateTime.now();
   const diff = now.diff(then);
 
-  if (diff.as("years") >= 1) {
-    const number = Math.floor(diff.as("years"));
-    return `${pluralize(number, "year")} ago`;
-  } else if (diff.as("months") >= 1) {
-    const number = Math.floor(diff.as("months"));
-    return `${pluralize(number, "month")} ago`;
-  } else if (diff.as("days") >= 1) {
-    const number = Math.floor(diff.as("days"));
-    return `${pluralize(number, "day")} ago`;
-  } else if (diff.as("hours") >= 1) {
-    const number = Math.floor(diff.as("hours"));
-    return `${pluralize(number, "hour")} ago`;
-  } else if (diff.as("minutes") >= 1) {
-    const number = Math.floor(diff.as("minutes"));
-    return `${pluralize(number, "minute")} ago`;
+  if (diff.as('years') >= 1) {
+    const number = Math.floor(diff.as('years'));
+    return `${pluralize(number, 'year')} ago`;
+  } else if (diff.as('months') >= 1) {
+    const number = Math.floor(diff.as('months'));
+    return `${pluralize(number, 'month')} ago`;
+  } else if (diff.as('days') >= 1) {
+    const number = Math.floor(diff.as('days'));
+    return `${pluralize(number, 'day')} ago`;
+  } else if (diff.as('hours') >= 1) {
+    const number = Math.floor(diff.as('hours'));
+    return `${pluralize(number, 'hour')} ago`;
+  } else if (diff.as('minutes') >= 1) {
+    const number = Math.floor(diff.as('minutes'));
+    return `${pluralize(number, 'minute')} ago`;
   } else {
-    return "just now";
+    return 'just now';
   }
 }
 
@@ -265,36 +272,36 @@ type GetEmbeddedLinkInput = {
 export function getUploadFileName(input: UploadFileInput) {
   const { file, username } = input;
   const filenameWithSpaces = `${Date.now()}-${username}-${file.name}`;
-  const withoutSpaces = filenameWithSpaces.replace(/\s/g, "_");
+  const withoutSpaces = filenameWithSpaces.replace(/\s/g, '_');
   return withoutSpaces;
 }
 
 export function encodeSpacesInURL(url: string) {
-  return url.split(" ").join("%20");
+  return url.split(' ').join('%20');
 }
 
 export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const { signedStorageURL, filename, file } = input;
-  
+
   // Log debug info
   console.log('File info:', {
     name: file.name,
     type: file.type,
-    size: file.size
+    size: file.size,
   });
-  
+
   // Check validation
   const sizeCheck = isFileSizeValid({ file });
   if (!sizeCheck.valid) {
     console.error(sizeCheck.message);
     throw new Error(sizeCheck.message);
   }
-  
+
   if (!signedStorageURL) {
-    console.error("No signedStorageURL provided");
+    console.error('No signedStorageURL provided');
     return;
   }
-  
+
   const { googleCloudStorageBucket } = config;
   const encodedFilename = encodeURIComponent(filename);
   const embeddedLink = encodeSpacesInURL(
@@ -305,54 +312,58 @@ export async function uploadAndGetEmbeddedLink(input: GetEmbeddedLinkInput) {
   const contentType =
     file.type ||
     (() => {
-      if (file.name.endsWith(".jpg") || file.name.endsWith(".jpeg")) {
-        return "image/jpeg";
-      } else if (file.name.endsWith(".png")) {
-        return "image/png";
-      } else if (file.name.endsWith(".gif")) {
-        return "image/gif";
+      if (file.name.endsWith('.jpg') || file.name.endsWith('.jpeg')) {
+        return 'image/jpeg';
+      } else if (file.name.endsWith('.png')) {
+        return 'image/png';
+      } else if (file.name.endsWith('.gif')) {
+        return 'image/gif';
       } else {
-        return "application/octet-stream";
+        return 'application/octet-stream';
       }
     })();
 
-  console.log("Using content type:", contentType);
-  console.log("Upload starting...");
-  console.log("SignedStorageURL prefix:", signedStorageURL.split("?")[0]);
+  console.log('Using content type:', contentType);
+  console.log('Upload starting...');
+  console.log('SignedStorageURL prefix:', signedStorageURL.split('?')[0]);
 
   try {
     const response = await fetch(signedStorageURL, {
-      method: "PUT",
+      method: 'PUT',
       body: file,
       headers: {
-        "Content-Type": contentType,
+        'Content-Type': contentType,
       },
     });
 
     console.log('Upload response:', {
       status: response.status,
       statusText: response.statusText,
-      ok: response.ok
+      ok: response.ok,
     });
 
     if (!response.ok) {
-      console.error("Error uploading file:", response.status, response.statusText);
+      console.error(
+        'Error uploading file:',
+        response.status,
+        response.statusText
+      );
       throw new Error(`Upload failed with status ${response.status}`);
     }
 
     // Verify the URL is accessible
     console.log('Upload complete, URL should be:', embeddedLink);
-    
+
     return embeddedLink;
   } catch (error) {
-    console.error("Fetch error during upload:", error);
+    console.error('Fetch error during upload:', error);
     throw error;
   }
 }
 
 export function getDuration(startTime: string, endTime: string) {
   if (DateTime.fromISO(startTime) > DateTime.fromISO(endTime)) {
-    return "";
+    return '';
   }
   // Format time as "1h 30m"
   const obj = Interval.fromDateTimes(
@@ -360,10 +371,10 @@ export function getDuration(startTime: string, endTime: string) {
     DateTime.fromISO(endTime)
   )
     .toDuration()
-    .shiftTo("days", "hours", "minutes")
+    .shiftTo('days', 'hours', 'minutes')
     .toObject();
 
-  let timeString = "";
+  let timeString = '';
   if (obj.days) {
     timeString += `${obj.days}d `;
   }
@@ -374,15 +385,15 @@ export function getDuration(startTime: string, endTime: string) {
     // convert decimal to int
     timeString += `${Math.floor(obj.minutes)}m`;
   }
-  if (timeString === "") {
-    timeString = "0m";
+  if (timeString === '') {
+    timeString = '0m';
   }
   return timeString;
 }
 
 export const getTagLabel = (selectedTags: Array<string>) => {
   if (selectedTags.length === 0) {
-    return "Tags";
+    return 'Tags';
   }
   return `Tags (${selectedTags.length})`;
 };
@@ -402,7 +413,7 @@ export const getLinksInText = (text: string) => {
 
 export const getChannelLabel = (selectedChannels: Array<string>) => {
   if (selectedChannels.length === 0) {
-    return "All Forums";
+    return 'All Forums';
   }
   return `Forums (${selectedChannels.length})`;
 };
@@ -430,7 +441,7 @@ export const updateTagsInCache = (cache: any, updatedTags: Array<TagData>) => {
           const newTagRef = tagRefsOnDiscussion[i];
           const alreadyExists = existingTagRefs.some(
             (ref: any) =>
-              readField("text", ref) === readField("text", newTagRef)
+              readField('text', ref) === readField('text', newTagRef)
           );
           if (!alreadyExists) {
             newTagRefs.push(newTagRef);
@@ -468,13 +479,13 @@ function checkUrl(str: string) {
   // https://stackoverflow.com/questions/5717093/check-if-a-javascript-string-is-a-url
   // http://forums.devshed.com/javascript-development-115/regexp-to-match-url-pattern-493764.html
   const pattern = new RegExp(
-    "^(https?:\\/\\/)" + // protocol
-      "((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|" + // domain name
-      "((\\d{1,3}\\.){3}\\d{1,3}))" + // OR ip (v4) address
-      "(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*" + // port and path
-      "(\\?[;&a-z\\d%_.~+=-]*)?" + // query string
-      "(\\#[-a-z\\d_]*)?$",
-    "i"
+    '^(https?:\\/\\/)' + // protocol
+      '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|' + // domain name
+      '((\\d{1,3}\\.){3}\\d{1,3}))' + // OR ip (v4) address
+      '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*' + // port and path
+      '(\\?[;&a-z\\d%_.~+=-]*)?' + // query string
+      '(\\#[-a-z\\d_]*)?$',
+    'i'
   ); // fragment locator
   const valid = !!pattern.test(str);
   return valid;
@@ -496,7 +507,7 @@ const ALLOWED_ICONS = {
   ADD_ALBUM: 'ADD_ALBUM',
   MARK_BEST_ANSWER: 'MARK_BEST_ANSWER',
   MARK_SENSITIVE: 'MARK_SENSITIVE',
-}
+};
 
 const actionIconMap = {
   [ALLOWED_ICONS.COPY_LINK]: LinkIcon,
@@ -514,7 +525,7 @@ const actionIconMap = {
   [ALLOWED_ICONS.ADD_ALBUM]: ImageIcon,
   [ALLOWED_ICONS.MARK_BEST_ANSWER]: CheckCircle,
   [ALLOWED_ICONS.MARK_SENSITIVE]: EyeIcon,
-}
+};
 
 export {
   ALLOWED_ICONS,

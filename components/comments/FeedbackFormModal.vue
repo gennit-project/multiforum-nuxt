@@ -1,10 +1,10 @@
 <script>
-import { defineComponent } from "vue";
-import GenericModal from "../GenericModal.vue";
+import { defineComponent } from 'vue';
+import GenericModal from '../GenericModal.vue';
 import ExclamationIcon from '@/components/icons/ExclamationIcon.vue';
 
 export default defineComponent({
-  name: "FeedbackFormModal",
+  name: 'FeedbackFormModal',
   components: {
     GenericModal,
     ExclamationIcon,
@@ -13,12 +13,12 @@ export default defineComponent({
     title: {
       type: String,
       require: true,
-      default: "Are you sure?",
+      default: 'Are you sure?',
     },
     body: {
       type: String,
       require: true,
-      default: ''
+      default: '',
     },
     open: {
       type: Boolean,
@@ -26,11 +26,11 @@ export default defineComponent({
     },
     primaryButtonText: {
       type: String,
-      default: "Delete",
+      default: 'Delete',
     },
     secondaryButtonText: {
       type: String,
-      default: "Cancel",
+      default: 'Cancel',
     },
   },
   setup() {},

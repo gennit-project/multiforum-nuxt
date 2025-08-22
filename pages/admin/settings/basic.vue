@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { PropType } from "vue";
-import type { ServerConfigUpdateInput } from "@/__generated__/graphql";
-import FormRow from "@/components/FormRow.vue";
-import TextEditor from "@/components/TextEditor.vue";
+import type { PropType } from 'vue';
+import type { ServerConfigUpdateInput } from '@/__generated__/graphql';
+import FormRow from '@/components/FormRow.vue';
+import TextEditor from '@/components/TextEditor.vue';
 
 defineProps({
   editMode: {
@@ -16,7 +16,7 @@ defineProps({
   },
 });
 
-const emit = defineEmits(["updateFormValues"]);
+const emit = defineEmits(['updateFormValues']);
 </script>
 
 <template>

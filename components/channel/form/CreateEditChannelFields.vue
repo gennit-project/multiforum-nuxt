@@ -1,200 +1,200 @@
 <script setup lang="ts">
-  import { computed, ref, onMounted } from "vue";
-  import type { PropType } from "vue";
-  import type { ApolloError } from "@apollo/client/errors";
-  import ErrorBanner from "@/components/ErrorBanner.vue";
-  import type { CreateEditChannelFormValues } from "@/types/Channel";
-  import TailwindForm from "@/components/FormComponent.vue";
-  import { useRoute, useRouter } from "nuxt/app";
-  import { MAX_CHARS_IN_CHANNEL_NAME } from "@/utils/constants";
-  // Server config query removed since individual settings pages handle validation
+import { computed, ref, onMounted } from 'vue';
+import type { PropType } from 'vue';
+import type { ApolloError } from '@apollo/client/errors';
+import ErrorBanner from '@/components/ErrorBanner.vue';
+import type { CreateEditChannelFormValues } from '@/types/Channel';
+import TailwindForm from '@/components/FormComponent.vue';
+import { useRoute, useRouter } from 'nuxt/app';
+import { MAX_CHARS_IN_CHANNEL_NAME } from '@/utils/constants';
+// Server config query removed since individual settings pages handle validation
 
-  // Import icons
-  import CogIcon from "@/components/icons/CogIcon.vue";
-  import BookIcon from "@/components/icons/BookIcon.vue";
-  import UserAddIcon from "@/components/icons/UserAddIcon.vue";
-  import IdentificationIcon from "@/components/icons/IdentificationIcon.vue";
-  import UserMinus from "@/components/icons/UserMinus.vue";
-  import PencilIcon from "@/components/icons/PencilIcon.vue";
-  import CalendarIcon from "@/components/icons/CalendarIcon.vue";
-  import AnnotationIcon from "@/components/icons/AnnotationIcon.vue";
-  import DownloadIcon from "@/components/icons/DownloadIcon.vue";
+// Import icons
+import CogIcon from '@/components/icons/CogIcon.vue';
+import BookIcon from '@/components/icons/BookIcon.vue';
+import UserAddIcon from '@/components/icons/UserAddIcon.vue';
+import IdentificationIcon from '@/components/icons/IdentificationIcon.vue';
+import UserMinus from '@/components/icons/UserMinus.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
+import CalendarIcon from '@/components/icons/CalendarIcon.vue';
+import AnnotationIcon from '@/components/icons/AnnotationIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 
+interface TabItem {
+  key: string;
+  label: string;
+  icon: any | null;
+  fontAwesome: string | null;
+}
 
-  interface TabItem {
-    key: string;
-    label: string;
-    icon: any | null;
-    fontAwesome: string | null;
+const route = useRoute();
+const props = defineProps({
+  editMode: {
+    type: Boolean,
+    required: true,
+  },
+  createChannelError: {
+    type: Object as PropType<ApolloError | null>,
+    default: null,
+  },
+  createChannelLoading: {
+    type: Boolean,
+    default: false,
+  },
+  editChannelLoading: {
+    type: Boolean,
+    default: false,
+  },
+  formValues: {
+    type: Object as PropType<CreateEditChannelFormValues | null>,
+    required: false,
+    default: null,
+  },
+  getChannelError: {
+    type: Object as PropType<ApolloError | null>,
+    default: null,
+  },
+  updateChannelError: {
+    type: Object as PropType<ApolloError | null>,
+    default: null,
+  },
+  channelLoading: {
+    type: Boolean,
+    default: false,
+  },
+  ownerList: {
+    type: Array,
+    default: () => [],
+  },
+});
+
+const emit = defineEmits(['submit', 'updateFormValues']);
+
+const CHANNEL_ALREADY_EXISTS_ERROR = 'Constraint validation failed';
+
+const tabs = computed(() => {
+  const baseTabs: TabItem[] = [
+    {
+      key: 'basic',
+      label: 'Basic Settings',
+      icon: CogIcon,
+      fontAwesome: null,
+    },
+    {
+      key: 'rules',
+      label: 'Rules',
+      icon: BookIcon,
+      fontAwesome: null,
+    },
+  ];
+
+  // Always show events and downloads tabs
+  baseTabs.push({
+    key: 'events',
+    label: 'Calendar',
+    icon: CalendarIcon,
+    fontAwesome: null,
+  });
+
+  baseTabs.push({
+    key: 'downloads',
+    label: 'Downloads',
+    icon: DownloadIcon,
+    fontAwesome: null,
+  });
+
+  baseTabs.push(
+    {
+      key: 'feedback',
+      label: 'Feedback',
+      icon: AnnotationIcon,
+      fontAwesome: null,
+    },
+    {
+      key: 'wiki',
+      label: 'Wiki',
+      icon: PencilIcon,
+      fontAwesome: null,
+    },
+    {
+      key: 'mods',
+      label: 'Moderators',
+      icon: UserAddIcon,
+      fontAwesome: null,
+    },
+    {
+      key: 'owners',
+      label: 'Forum Admins',
+      icon: null,
+      fontAwesome: 'fa-solid fa-user-shield',
+    },
+    {
+      key: 'roles',
+      label: 'Roles',
+      icon: IdentificationIcon,
+      fontAwesome: null,
+    },
+    {
+      key: 'suspended-users',
+      label: 'User Suspensions',
+      icon: UserMinus,
+      fontAwesome: null,
+    },
+    {
+      key: 'suspended-mods',
+      label: 'Mod Suspensions',
+      icon: UserMinus,
+      fontAwesome: null,
+    }
+  );
+
+  return baseTabs;
+});
+
+const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
+
+const titleIsInvalid = computed(() => {
+  // In edit mode, don't consider title invalid until we have loaded data
+  if (props.editMode && !props.formValues?.uniqueName) {
+    return false;
   }
+  return !isValidTitle(props.formValues?.uniqueName || '');
+});
+const touched = ref(false);
+const titleInputRef = ref<{ focus: () => void } | null>(null);
+const router = useRouter();
+const forumId = computed(() => {
+  if (typeof route.params.forumId === 'string') {
+    return route.params.forumId;
+  }
+  return '';
+});
 
-  const route = useRoute();
-  const props = defineProps({
-    editMode: {
-      type: Boolean,
-      required: true,
-    },
-    createChannelError: {
-      type: Object as PropType<ApolloError | null>,
-      default: null,
-    },
-    createChannelLoading: {
-      type: Boolean,
-      default: false,
-    },
-    editChannelLoading: {
-      type: Boolean,
-      default: false,
-    },
-    formValues: {
-      type: Object as PropType<CreateEditChannelFormValues | null>,
-      required: false,
-      default: null,
-    },
-    getChannelError: {
-      type: Object as PropType<ApolloError | null>,
-      default: null,
-    },
-    updateChannelError: {
-      type: Object as PropType<ApolloError | null>,
-      default: null,
-    },
-    channelLoading: {
-      type: Boolean,
-      default: false,
-    },
-    ownerList: {
-      type: Array,
-      default: () => [],
-    },
-  });
-
-  const emit = defineEmits(["submit", "updateFormValues"]);
-
-  const CHANNEL_ALREADY_EXISTS_ERROR = "Constraint validation failed";
-
-  const tabs = computed(() => {
-    const baseTabs: TabItem[] = [
-      {
-        key: "basic",
-        label: "Basic Settings",
-        icon: CogIcon,
-        fontAwesome: null,
+// On mounted, if in edit mode and no tab is selected, go to /basic
+onMounted(() => {
+  if (props.editMode && route.name === 'forums-forumId-edit') {
+    router.push({
+      name: 'forums-forumId-edit-basic',
+      params: {
+        forumId: forumId.value,
       },
-      {
-        key: "rules",
-        label: "Rules",
-        icon: BookIcon,
-        fontAwesome: null,
-      },
-    ];
-
-    // Always show events and downloads tabs
-    baseTabs.push({
-      key: "events",
-      label: "Calendar",
-      icon: CalendarIcon,
-      fontAwesome: null,
     });
+  }
+  // Auto-focus the forum unique name field in create mode
+  if (!props.editMode && titleInputRef.value?.focus) {
+    titleInputRef.value.focus();
+  }
+});
 
-    baseTabs.push({
-      key: "downloads",
-      label: "Downloads",
-      icon: DownloadIcon,
-      fontAwesome: null,
-    });
+const isDropdownOpen = ref(false);
 
-    baseTabs.push(
-      {
-        key: "feedback",
-        label: "Feedback",
-        icon: AnnotationIcon,
-        fontAwesome: null,
-      },
-      {
-        key: "wiki",
-        label: "Wiki",
-        icon: PencilIcon,
-        fontAwesome: null,
-      },
-      {
-        key: "mods",
-        label: "Moderators",
-        icon: UserAddIcon,
-        fontAwesome: null,
-      },
-      {
-        key: "owners",
-        label: "Forum Admins",
-        icon: null,
-        fontAwesome: "fa-solid fa-user-shield",
-      },
-      {
-        key: "roles",
-        label: "Roles",
-        icon: IdentificationIcon,
-        fontAwesome: null,
-      },
-      {
-        key: "suspended-users",
-        label: "User Suspensions",
-        icon: UserMinus,
-        fontAwesome: null,
-      },
-      {
-        key: "suspended-mods",
-        label: "Mod Suspensions",
-        icon: UserMinus,
-        fontAwesome: null,
-      }
-    );
-
-    return baseTabs;
-  });
-
-  const isValidTitle = (title: string) => /^[a-zA-Z0-9_]+$/.test(title);
-
-  const titleIsInvalid = computed(() => {
-    // In edit mode, don't consider title invalid until we have loaded data
-    if (props.editMode && !props.formValues?.uniqueName) {
-      return false;
-    }
-    return !isValidTitle(props.formValues?.uniqueName || "");
-  });
-  const touched = ref(false);
-  const titleInputRef = ref<{ focus: () => void } | null>(null);
-  const router = useRouter();
-  const forumId = computed(() => {
-    if (typeof route.params.forumId === "string") {
-      return route.params.forumId;
-    }
-    return "";
-  });
-
-  // On mounted, if in edit mode and no tab is selected, go to /basic
-  onMounted(() => {
-    if (props.editMode && route.name === "forums-forumId-edit") {
-      router.push({
-        name: "forums-forumId-edit-basic",
-        params: {
-          forumId: forumId.value,
-        },
-      });
-    }
-    // Auto-focus the forum unique name field in create mode
-    if (!props.editMode && titleInputRef.value?.focus) {
-      titleInputRef.value.focus();
-    }
-  });
-
-  const isDropdownOpen = ref(false);
-
-  const getCurrentTabLabel = computed(() => {
-    const currentTab = tabs.value.find(
-      (tab) => typeof route.name === "string" && route.name?.includes(`edit-${tab.key}`)
-    );
-    return currentTab?.label || "Settings";
-  });
+const getCurrentTabLabel = computed(() => {
+  const currentTab = tabs.value.find(
+    (tab) =>
+      typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+  );
+  return currentTab?.label || 'Settings';
+});
 </script>
 
 <template>
@@ -203,10 +203,7 @@
 
     <div>
       <!-- Error Displays -->
-      <div
-        v-if="updateChannelError"
-        class="mt-6"
-      >
+      <div v-if="updateChannelError" class="mt-6">
         <ErrorBanner :text="updateChannelError.message" />
       </div>
       <div v-if="getChannelError">
@@ -287,13 +284,15 @@
                     v-if="
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`)
                       )?.fontAwesome
                     "
                     :class="[
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`)
                       )?.fontAwesome,
                       'mr-2 text-orange-500',
                     ]"
@@ -303,13 +302,15 @@
                     :is="
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`)
                       )?.icon
                     "
                     v-else-if="
                       tabs.find(
                         (tab) =>
-                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`)
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`)
                       )?.icon
                     "
                     class="mr-2 h-5 w-5 text-orange-500"
@@ -332,9 +333,11 @@
                   class="flex items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700"
                   :class="{
                     'bg-gray-50 text-orange-500 dark:bg-gray-700':
-                      typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`edit-${tab.key}`),
                     'text-gray-700 dark:text-gray-300':
-                      typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      !route.name?.includes(`edit-${tab.key}`),
                   }"
                   :to="{
                     name: `forums-forumId-edit-${tab.key}`,
@@ -352,7 +355,8 @@
                       'mr-2',
                       {
                         'text-orange-500':
-                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
                           typeof route.name === 'string' &&
                           !route.name?.includes(`edit-${tab.key}`),
@@ -366,9 +370,11 @@
                     class="mr-2 h-5 w-5"
                     :class="{
                       'text-orange-500':
-                        typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`edit-${tab.key}`),
                       'text-gray-400 dark:text-gray-400':
-                        typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        !route.name?.includes(`edit-${tab.key}`),
                     }"
                   />
                   {{ tab.label }}
@@ -390,11 +396,14 @@
                   class="flex cursor-pointer items-center px-3 py-2"
                   :class="{
                     'border-r-2 border-orange-500 dark:text-white':
-                      typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`edit-${tab.key}`),
                     'text-gray-900':
-                      typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      route.name?.includes(`edit-${tab.key}`),
                     'text-gray-400 dark:text-gray-400 dark:hover:text-gray-300':
-                      typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
+                      typeof route.name === 'string' &&
+                      !route.name?.includes(`edit-${tab.key}`),
                   }"
                   :to="{
                     name: `forums-forumId-edit-${tab.key}`,
@@ -411,7 +420,8 @@
                       'mr-2',
                       {
                         'text-orange-500':
-                          typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                          typeof route.name === 'string' &&
+                          route.name?.includes(`edit-${tab.key}`),
                         'text-gray-400 dark:text-gray-400':
                           typeof route.name === 'string' &&
                           !route.name?.includes(`edit-${tab.key}`),
@@ -425,9 +435,11 @@
                     class="mr-2 h-5 w-5"
                     :class="{
                       'text-orange-500':
-                        typeof route.name === 'string' && route.name?.includes(`edit-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        route.name?.includes(`edit-${tab.key}`),
                       'text-gray-400 dark:text-gray-400':
-                        typeof route.name === 'string' && !route.name?.includes(`edit-${tab.key}`),
+                        typeof route.name === 'string' &&
+                        !route.name?.includes(`edit-${tab.key}`),
                     }"
                   />
                   {{ tab.label }}
@@ -451,10 +463,7 @@
         </div>
       </TailwindForm>
 
-      <div
-        v-for="(error, i) in getChannelError?.graphQLErrors"
-        :key="i"
-      >
+      <div v-for="(error, i) in getChannelError?.graphQLErrors" :key="i">
         {{ error.message }}
       </div>
     </div>

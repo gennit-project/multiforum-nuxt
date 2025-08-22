@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import LoadingSpinner from "@/components/LoadingSpinner.vue";
-import { computed } from "vue";
+import LoadingSpinner from '@/components/LoadingSpinner.vue';
+import { computed } from 'vue';
 
 const props = defineProps({
   disabled: {
@@ -10,7 +10,7 @@ const props = defineProps({
   label: {
     type: String,
     required: false,
-    default: "",
+    default: '',
   },
   loading: {
     type: Boolean,
@@ -18,7 +18,7 @@ const props = defineProps({
   },
   backgroundColor: {
     type: String,
-    default: "orange",
+    default: 'orange',
   },
 });
 
@@ -26,7 +26,7 @@ const colorClasses = computed(() => {
   if (props.disabled) {
     return 'cursor-default bg-gray-200 text-gray-300 dark:bg-gray-800 dark:text-gray-300';
   }
-  
+
   switch (props.backgroundColor) {
     case 'red':
       return 'bg-red-500 hover:bg-red-600 dark:border dark:border-red-500 dark:bg-red-500 dark:text-white dark:hover:bg-red-600 focus:ring-red-500';
@@ -40,7 +40,6 @@ const colorClasses = computed(() => {
       return 'bg-orange-400 hover:bg-orange-400 dark:border dark:border-orange-500 dark:bg-orange-400 dark:text-black dark:hover:bg-orange-400 focus:ring-orange-500';
   }
 });
-
 </script>
 
 <template>
@@ -49,12 +48,9 @@ const colorClasses = computed(() => {
     :disabled="disabled"
     :class="[
       colorClasses,
-      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100'
+      'max-height-4 inline-flex items-center whitespace-nowrap rounded-md px-4 py-2 text-sm font-medium focus:outline-none focus:ring-offset-2 focus:ring-offset-gray-100',
     ]"
   >
-    <LoadingSpinner
-      v-if="loading"
-      class="mx-2"
-    /><slot />{{ label }}
+    <LoadingSpinner v-if="loading" class="mx-2" /><slot />{{ label }}
   </button>
 </template>

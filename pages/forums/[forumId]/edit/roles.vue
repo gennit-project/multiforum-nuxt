@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import { computed } from "vue";
-import { GET_SERVER_PERMISSIONS } from "@/graphQLData/admin/queries";
-import { useQuery } from "@vue/apollo-composable";
-import { config } from "@/config";
-import RoleSection from "@/components/admin/RoleSection.vue";
+import { computed } from 'vue';
+import { GET_SERVER_PERMISSIONS } from '@/graphQLData/admin/queries';
+import { useQuery } from '@vue/apollo-composable';
+import { config } from '@/config';
+import RoleSection from '@/components/admin/RoleSection.vue';
 
-const {
-  result: getServerResult,
-  error: getServerError,
-} = useQuery(
+const { result: getServerResult, error: getServerError } = useQuery(
   GET_SERVER_PERMISSIONS,
   {
     serverName: config.serverName,
   },
   {
-    fetchPolicy: "cache-first",
+    fetchPolicy: 'cache-first',
   }
 );
 
@@ -28,10 +25,10 @@ const serverConfig = computed(() => {
 
 <template>
   <div class="px-8 dark:text-white">
-    <div v-if="serverConfig" class="space-y-6 max-w-2xl">
+    <div v-if="serverConfig" class="max-w-2xl space-y-6">
       <div class="mb-6">
-        <h1 class="text-xl font-bold mb-2">Forum Roles</h1>
-        <p class="text-gray-600 text-sm dark:text-gray-400">
+        <h1 class="mb-2 text-xl font-bold">Forum Roles</h1>
+        <p class="text-sm text-gray-600 dark:text-gray-400">
           These are the default roles for your forum. They cannot be edited yet,
           but are included here for documentation purposes.
         </p>
@@ -67,8 +64,10 @@ const serverConfig = computed(() => {
         :permissions="serverConfig.DefaultSuspendedModRole"
       />
     </div>
-    <div v-else class="text-center py-12">
-      <p class="text-gray-500 dark:text-gray-400">Could not find the server config data.</p>
+    <div v-else class="py-12 text-center">
+      <p class="text-gray-500 dark:text-gray-400">
+        Could not find the server config data.
+      </p>
     </div>
   </div>
 </template>

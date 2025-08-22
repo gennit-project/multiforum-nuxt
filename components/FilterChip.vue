@@ -1,9 +1,9 @@
 <script>
-import { defineComponent, ref, computed, defineAsyncComponent } from "vue";
-import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
-import { useUIStore } from "@/stores/uiStore";
+import { defineComponent, ref, computed, defineAsyncComponent } from 'vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import { useUIStore } from '@/stores/uiStore';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
-const Popper = defineAsyncComponent(() => import("vue3-popper"));
+const Popper = defineAsyncComponent(() => import('vue3-popper'));
 
 export default defineComponent({
   components: {
@@ -13,23 +13,23 @@ export default defineComponent({
   props: {
     dataTestid: {
       type: String,
-      default: "filter-button",
+      default: 'filter-button',
     },
     label: {
       type: String,
-      default: "No label",
+      default: 'No label',
     },
     highlighted: {
       type: Boolean,
       default: false,
     },
   },
-  emits: ["click"],
+  emits: ['click'],
   setup(props, { emit }) {
     const isOpen = ref(false);
     const uiStore = useUIStore();
     const theme = computed(() => uiStore.theme);
-    
+
     const handleClick = () => {
       isOpen.value = !isOpen.value;
       emit('click');
@@ -45,7 +45,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="flex align-items">
+  <div class="align-items flex">
     <client-only>
       <Popper
         v-model="isOpen"
@@ -55,8 +55,10 @@ export default defineComponent({
         <template #default>
           <button
             :data-testid="dataTestid"
-            :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
-            class="font-small flex align-items whitespace-nowrap rounded-md bg-white px-3 py-2 text-xs text-gray-700 border hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
+            :class="[
+              highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '',
+            ]"
+            class="font-small align-items flex whitespace-nowrap rounded-md border bg-white px-3 py-2 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-900 dark:text-gray-200 dark:hover:bg-gray-600"
             @click="handleClick"
           >
             <slot name="icon" />
@@ -68,9 +70,7 @@ export default defineComponent({
           </button>
         </template>
         <template #content>
-          <div
-            class="rounded-md border bg-white dark:bg-gray-700"
-          >
+          <div class="rounded-md border bg-white dark:bg-gray-700">
             <slot name="content" />
           </div>
         </template>
@@ -78,8 +78,10 @@ export default defineComponent({
       <template #fallback>
         <button
           :data-testid="dataTestid"
-          :class="[highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '']"
-          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md bg-white px-3 py-2.5 text-xs text-gray-700 border hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+          :class="[
+            highlighted ? 'border-orange-500 ring-1 ring-orange-500' : '',
+          ]"
+          class="max-height-3 font-small mr-2 inline-flex whitespace-nowrap rounded-md border bg-white px-3 py-2.5 text-xs text-gray-700 hover:bg-gray-200 focus:border-orange-500 focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
         >
           <slot name="icon" />
           {{ label }}
