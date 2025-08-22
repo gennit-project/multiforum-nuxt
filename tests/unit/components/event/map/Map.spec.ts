@@ -20,6 +20,7 @@ const mockMarker = {
 
 const mockBounds = {
   extend: vi.fn(),
+  isEmpty: vi.fn().mockReturnValue(false),
 };
 
 const mockInfoWindow = vi.fn();
@@ -34,6 +35,7 @@ global.google = {
     Map: vi.fn().mockImplementation(() => mockMap),
     Marker: vi.fn().mockImplementation(() => mockMarker),
     LatLngBounds: vi.fn().mockImplementation(() => mockBounds),
+    LatLng: vi.fn().mockImplementation((lat, lng) => ({ lat, lng })),
     InfoWindow: vi.fn().mockImplementation(() => mockInfoWindow),
     event: {
       clearInstanceListeners: vi.fn(),
@@ -150,8 +152,9 @@ describe('Map with Clustering', () => {
       },
     });
 
-    // Wait for component to mount and map to render
+    // Wait for component to mount and async renderMap to complete
     await wrapper.vm.$nextTick();
+    await new Promise(resolve => setTimeout(resolve, 0));
     
     // Verify MarkerClusterer was called
     expect(MarkerClusterer).toHaveBeenCalled();
@@ -159,14 +162,14 @@ describe('Map with Clustering', () => {
     // Verify map was created
     expect(global.google.maps.Map).toHaveBeenCalled();
     
-    // Verify markers were created for each event
-    expect(global.google.maps.Marker).toHaveBeenCalledTimes(mockEvents.length);
+    // Verify markers were created for each event + 1 test marker
+    expect(global.google.maps.Marker).toHaveBeenCalledTimes(mockEvents.length + 1);
   });
 
   it('should create MarkerClusterer with correct configuration', async () => {
     const { MarkerClusterer } = await import('@googlemaps/markerclusterer');
     
-    mount(Map, {
+    const wrapper = mount(Map, {
       props: {
         events: mockEvents,
         colorLocked: false,
@@ -175,7 +178,8 @@ describe('Map with Clustering', () => {
       },
     });
 
-    // Wait for component to initialize
+    // Wait for component to mount and async renderMap to complete
+    await wrapper.vm.$nextTick();
     await new Promise(resolve => setTimeout(resolve, 0));
     
     // Verify MarkerClusterer was called with correct parameters

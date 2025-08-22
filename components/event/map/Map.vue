@@ -4,7 +4,6 @@ import { Loader } from '@googlemaps/js-api-loader';
 import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
-import nightModeMapStyles from '@/components/event/map/nightModeMapStyles';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Event } from '@/__generated__/graphql';
 
@@ -108,9 +107,6 @@ const clearMarkers = () => {
   };
 };
 
-const getMapStyles = () => {
-  return currentTheme.value === 'dark' ? nightModeMapStyles : [];
-};
 
 const renderMap = async () => {
   await loader.load();

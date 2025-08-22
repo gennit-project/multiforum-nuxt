@@ -5,7 +5,7 @@ import type { Issue } from '@/__generated__/graphql';
 import EyeIcon from '../icons/EyeIcon.vue';
 import TrashIcon from '../icons/TrashIcon.vue';
 import WarningModal from '@/components/WarningModal.vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRouter } from 'nuxt/app';
 
 const props = defineProps({
   issue: {
@@ -45,7 +45,6 @@ const emit = defineEmits([
   'delete-comment',
 ]);
 
-const route = useRoute();
 const router = useRouter();
 const showDeleteConfirmModal = ref(false);
 
@@ -170,7 +169,7 @@ const cancelDelete = () => {
                   ]"
                   @click="handleEditPost"
                 >
-                  <i class="fa fa-external-link h-4 w-4" aria-hidden="true"></i>
+                  <i class="fa fa-external-link h-4 w-4" aria-hidden="true"/>
                   Edit
                   {{
                     contentType === 'discussion'
