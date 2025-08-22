@@ -263,17 +263,6 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
   }
 
   if (markerMap.markers[eventLocationId]) {
-    // Use bigger icons on mobile for easier tapping
-    const isMobile = window.innerWidth < 768;
-    markerMap.markers[eventLocationId].marker.setIcon({
-      url: highlightedPlaceIcon,
-      scaledSize: {
-        width: isMobile ? 30 : 20,
-        height: isMobile ? 30 : 20,
-        equals: () => false,
-      },
-    });
-
     const openSpecificInfowindow = () => {
       const eventTitle =
         markerMap.markers[eventLocationId].events[highlightedEventId.value]
@@ -403,16 +392,8 @@ const unhighlightEventOnMap = (markerMap: MarkerMap) => {
     const markerData = markerMap.markers[locationId];
 
     if (markerData) {
-      // Use bigger icons on mobile for easier tapping
-      const isMobile = window.innerWidth < 768;
-      markerData.marker?.setIcon({
-        url: placeIcon,
-        scaledSize: {
-          width: isMobile ? 30 : 20,
-          height: isMobile ? 30 : 20,
-          equals: () => false,
-        },
-      });
+      // AdvancedMarkerElement doesn't support setIcon - unhighlighting handled via PinElement content
+      // TODO: Implement custom unhighlighting for AdvancedMarkerElement if needed
     }
     highlightedEventId.value = '';
     highlightedEventLocationId.value = '';
