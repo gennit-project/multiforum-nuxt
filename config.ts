@@ -11,6 +11,7 @@ type ConfigType = {
   environment: string;
   googleCloudStorageBucket: string;
   googleMapsApiKey: string;
+  googleMapId: string;
   graphqlUrl: string;
   lightgalleryLicenseKey: string;
   logoutUrl: string;
@@ -32,6 +33,7 @@ const config: ConfigType = {
   environment: import.meta.env.VITE_ENVIRONMENT,
   googleCloudStorageBucket: import.meta.env.VITE_GOOGLE_CLOUD_STORAGE_BUCKET,
   googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
+  googleMapId: import.meta.env.VITE_GOOGLE_MAP_ID,
   graphqlUrl: import.meta.env.VITE_GRAPHQL_URL,
   lightgalleryLicenseKey: import.meta.env.VITE_LIGHTGALLERY_LICENSE_KEY,
   logoutUrl: import.meta.env.VITE_LOGOUT_URL,

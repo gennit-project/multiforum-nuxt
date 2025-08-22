@@ -137,6 +137,12 @@ const renderMap = async () => {
     },
   };
 
+  // Only add mapId if we're not using custom styles (dark theme)
+  // because mapId overrides the styles property
+  if (config.googleMapId && mapStyles.length === 0) {
+    mapConfig.mapId = config.googleMapId;
+  }
+
   map.value = new google.maps.Map(
     props.useMobileStyles ? mobileMapDiv.value! : desktopMapDiv.value!,
     mapConfig
