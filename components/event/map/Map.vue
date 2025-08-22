@@ -5,12 +5,11 @@ import { MarkerClusterer } from '@googlemaps/markerclusterer';
 import { useRouter } from 'nuxt/app';
 import { config } from '@/config';
 import nightModeMapStyles from '@/components/event/map/nightModeMapStyles';
-import placeIcon from '@/assets/images/place-icon.svg';
 import { useAppTheme } from '@/composables/useTheme';
 import type { Event } from '@/__generated__/graphql';
 
 export interface MarkerData {
-  marker: any; // Changed to any since we can have both legacy and advanced markers
+  marker: any | null; // Changed to any since we can have both legacy and advanced markers, null during initialization
   events: { [key: string]: Event };
   numberOfEvents: number;
 }
@@ -136,39 +135,175 @@ const renderMap = async () => {
   const infowindow = new google.maps.InfoWindow();
   const markers: google.maps.Marker[] = [];
 
+  // First pass: group events by location and build markerMap
   props.events.forEach((event) => {
     if (!event.location) return;
 
+    const eventLocationId = `${event.location.latitude}${event.location.longitude}`;
+
+    if (markerMap.markers[eventLocationId]) {
+      markerMap.markers[eventLocationId].events[event.id] = event;
+      markerMap.markers[eventLocationId].numberOfEvents += 1;
+    } else {
+      markerMap.markers[eventLocationId] = {
+        marker: null, // Will be created in second pass
+        events: { [event.id]: event },
+        numberOfEvents: 1,
+      };
+    }
+  });
+
+  // Second pass: create one marker per location with proper click handlers
+  Object.keys(markerMap.markers).forEach((eventLocationId) => {
+    const markerData = markerMap.markers[eventLocationId];
+    const eventsAtLocation = Object.values(markerData.events);
+    const firstEvent = eventsAtLocation[0];
+
+    if (!firstEvent.location) return;
+
     const position = {
-      lat: event.location.latitude,
-      lng: event.location.longitude,
+      lat: firstEvent.location.latitude,
+      lng: firstEvent.location.longitude,
     };
 
-    // IMPORTANT: don't set map here; let the clusterer handle it.
+    // Create marker title based on number of events
+    const title =
+      markerData.numberOfEvents === 1
+        ? `Click to view event: ${firstEvent.title}`
+        : `Click to view ${markerData.numberOfEvents} events at this location`;
+
+    // Create marker with map set - needed for event listeners to work properly
     const marker = new google.maps.Marker({
       position,
-      title: `Click to view event: ${event.title}`,
+      title,
+      map: map.value, // Set map so event listeners attach properly
     });
 
     bounds.extend(new google.maps.LatLng(position.lat, position.lng));
 
-    const eventLocationId = `${event.location.latitude}${event.location.longitude}`;
-
+    // Set up click handlers at the marker/location level
     if (props.useMobileStyles) {
       marker.addListener('click', () => {
-        emit('highlightEvent', eventLocationId, event.id, event, true, true);
-        emit('openPreview', event, true);
+        if (markerData.numberOfEvents === 1) {
+          // Single event - open preview directly
+          emit(
+            'highlightEvent',
+            eventLocationId,
+            firstEvent.id,
+            firstEvent,
+            true,
+            true
+          );
+          emit('openPreview', firstEvent, true);
+        } else {
+          // Multiple events - highlight location and open preview (MapView will handle showing list)
+          emit('highlightEvent', eventLocationId, '', firstEvent, true, true);
+          emit('openPreview', firstEvent, true);
+        }
         emit('lockColors');
+      });
+
+      // Add hover functionality for mobile too
+      marker.addListener('mouseover', () => {
+        console.log('Marker mouseover triggered', {
+          eventLocationId,
+          colorLocked: props.colorLocked,
+        });
+        if (!props.colorLocked) {
+          // Get current marker data from markerMap
+          const currentMarkerData = markerMap.markers[eventLocationId];
+          console.log('Marker data:', currentMarkerData);
+          if (currentMarkerData) {
+            // Show tooltip with event info on hover
+            const content =
+              currentMarkerData.numberOfEvents === 1
+                ? `<div style="text-align:center"><b>${firstEvent.title}</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
+                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
+
+            console.log('Infowindow content:', content);
+            infowindow.setContent(content);
+            infowindow.open({
+              anchor: marker,
+              map: map.value,
+              shouldFocus: false,
+            });
+
+            // For mouseover, just highlight the first event
+            emit(
+              'highlightEvent',
+              eventLocationId,
+              firstEvent.id,
+              firstEvent,
+              true,
+              false
+            );
+          }
+        }
+      });
+
+      marker.addListener('mouseout', () => {
+        if (!props.colorLocked) {
+          if (router.currentRoute.value.fullPath.includes(eventLocationId)) {
+            emit('unHighlight');
+          }
+          infowindow.close();
+        }
       });
     } else {
       marker.addListener('click', () => {
-        emit('openPreview', event, true);
+        if (markerData.numberOfEvents === 1) {
+          // Single event - open preview directly
+          emit(
+            'highlightEvent',
+            eventLocationId,
+            firstEvent.id,
+            firstEvent,
+            true,
+            true
+          );
+          emit('openPreview', firstEvent, true);
+        } else {
+          // Multiple events - highlight location and open preview (MapView will handle showing list)
+          emit('highlightEvent', eventLocationId, '', firstEvent, true, true);
+          emit('openPreview', firstEvent, true);
+        }
         emit('lockColors');
       });
 
       marker.addListener('mouseover', () => {
+        console.log('Marker mouseover triggered', {
+          eventLocationId,
+          colorLocked: props.colorLocked,
+        });
         if (!props.colorLocked) {
-          emit('highlightEvent', eventLocationId, event.id, event, true, true);
+          // Get current marker data from markerMap
+          const currentMarkerData = markerMap.markers[eventLocationId];
+          console.log('Marker data:', currentMarkerData);
+          if (currentMarkerData) {
+            // Show tooltip with event info on hover
+            const content =
+              currentMarkerData.numberOfEvents === 1
+                ? `<div style="text-align:center"><b>${firstEvent.title}</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
+                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
+
+            console.log('Infowindow content:', content);
+            infowindow.setContent(content);
+            infowindow.open({
+              anchor: marker,
+              map: map.value,
+              shouldFocus: false,
+            });
+
+            // For mouseover, just highlight the first event
+            emit(
+              'highlightEvent',
+              eventLocationId,
+              firstEvent.id,
+              firstEvent,
+              true,
+              false
+            );
+          }
         }
       });
 
@@ -182,21 +317,20 @@ const renderMap = async () => {
       });
     }
 
-    // keep your markerMap bookkeeping
-    if (markerMap.markers[eventLocationId]) {
-      markerMap.markers[eventLocationId].events[event.id] = event;
-      markerMap.markers[eventLocationId].numberOfEvents += 1;
-      markerMap.markers[eventLocationId].marker = marker;
-    } else {
-      markerMap.markers[eventLocationId] = {
-        marker,
-        events: { [event.id]: event },
-        numberOfEvents: 1,
-      };
-    }
-
+    // Update markerMap with the created marker
+    markerMap.markers[eventLocationId].marker = marker;
     markers.push(marker);
+
+    console.log(`Created marker for location ${eventLocationId}:`, {
+      marker,
+      eventsCount: markerData.numberOfEvents,
+      hasClickListener: !!marker.gm_bindings_?.click,
+      hasMouseoverListener: !!marker.gm_bindings_?.mouseover,
+    });
   });
+
+  // First remove markers from map so clusterer can manage them properly
+  markers.forEach((marker) => marker.setMap(null));
 
   // Cluster AFTER building markers. Pass map here.
   markerClusterer.value = new MarkerClusterer({
@@ -213,7 +347,25 @@ const renderMap = async () => {
     },
   });
 
+  console.log('MarkerClusterer created with markers:', {
+    markerCount: markers.length,
+    clusterer: markerClusterer.value,
+    firstMarker: markers[0],
+    firstMarkerMap: markers[0]?.getMap(),
+  });
+
   markerMap.infowindow = infowindow;
+
+  // Test marker - create a simple test marker to see if events work
+  const testMarker = new google.maps.Marker({
+    position: { lat: 33.4255, lng: -111.94 },
+    map: map.value,
+    title: 'Test marker - should show console log on hover',
+  });
+
+  testMarker.addListener('mouseover', () => {
+    console.log('TEST MARKER HOVER WORKS!');
+  });
 
   // fit and cap zoom
   if (!bounds.isEmpty()) {
