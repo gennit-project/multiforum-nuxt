@@ -4,6 +4,7 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import EmojiButtons from "@/components/comments/EmojiButtons.vue";
 import NewEmojiButton from "@/components/comments/NewEmojiButton.vue";
 import Tag from "../../TagComponent.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import "md-editor-v3/lib/preview.css";
 import type { PropType } from "vue";
 import type { Discussion } from "@/__generated__/graphql";
@@ -12,7 +13,7 @@ import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
-import { usernameVar } from "@/cache";
+import { usernameVar, isAuthenticatedVar } from "@/cache";
 
 const router = useRouter();
 const uiStore = useUIStore();
@@ -21,12 +22,12 @@ const { fontSize: _fontSize } = storeToRefs(uiStore);
 // Get user preferences for sensitive content
 const { result: getUserResult } = useQuery(
   GET_USER,
-  {
+  () => ({
     username: usernameVar.value || "",
-  },
-  {
-    enabled: !!usernameVar.value,
-  }
+  }),
+  () => ({
+    enabled: isAuthenticatedVar.value && !!usernameVar.value,
+  })
 );
 
 const props = defineProps({
@@ -136,13 +137,25 @@ const hasEmoiji = computed(() => {
       <p class="text-gray-600 dark:text-gray-300 mb-3">
         This content has been marked as potentially sensitive.
       </p>
-      <button
-        type="button"
-        class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
-        @click="revealSensitiveContent"
-      >
-        Reveal sensitive content
-      </button>
+      <RequireAuth>
+        <template #has-auth>
+          <button
+            type="button"
+            class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
+            @click="revealSensitiveContent"
+          >
+            Reveal sensitive content
+          </button>
+        </template>
+        <template #does-not-have-auth>
+          <button
+            type="button"
+            class="bg-black hover:bg-gray-800 text-white px-4 py-2 rounded"
+          >
+            Log in to reveal sensitive content
+          </button>
+        </template>
+      </RequireAuth>
     </div>
 
     <!-- Discussion body (hidden when sensitive and not revealed) -->
@@ -166,8 +179,8 @@ const hasEmoiji = computed(() => {
       />
     </div>
     <div
-      class="flex gap-2"
       v-if="discussion?.Tags && discussion.Tags.length > 0"
+      class="flex gap-2"
     >
       <Tag
         v-for="tag in discussion?.Tags"

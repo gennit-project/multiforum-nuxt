@@ -13,10 +13,11 @@ import HighlightedSearchTerms from "@/components/HighlightedSearchTerms.vue";
 import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
+import RequireAuth from "@/components/auth/RequireAuth.vue";
 import { relativeTime } from "@/utils";
 import { useQuery } from "@vue/apollo-composable";
 import { GET_USER } from "@/graphQLData/user/queries";
-import { usernameVar } from "@/cache";
+import { usernameVar, isAuthenticatedVar } from "@/cache";
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
   import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -56,12 +57,12 @@ const route = useRoute();
 // Get user preferences for sensitive content
 const { result: getUserResult } = useQuery(
   GET_USER,
-  {
+  () => ({
     username: usernameVar.value || "",
-  },
-  {
-    enabled: !!usernameVar.value,
-  }
+  }),
+  () => ({
+    enabled: isAuthenticatedVar.value && !!usernameVar.value,
+  })
 );
 
 const forumId = computed(() => {
@@ -289,13 +290,25 @@ const revealSensitiveContent = () => {
                 <p class="text-gray-600 dark:text-gray-300 mb-3 text-sm">
                   This content has been marked as potentially sensitive.
                 </p>
-                <button
-                  type="button"
-                  class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded text-sm"
-                  @click="revealSensitiveContent"
-                >
-                  Reveal sensitive content
-                </button>
+                <RequireAuth>
+                  <template #has-auth>
+                    <button
+                      type="button"
+                      class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded text-sm"
+                      @click="revealSensitiveContent"
+                    >
+                      Reveal sensitive content
+                    </button>
+                  </template>
+                  <template #does-not-have-auth>
+                    <button
+                      type="button"
+                      class="bg-black hover:bg-gray-800 text-white px-3 py-1 rounded text-sm"
+                    >
+                      Log in to reveal sensitive content
+                    </button>
+                  </template>
+                </RequireAuth>
               </div>
               
               <!-- Discussion content (hidden when sensitive and not revealed) -->
