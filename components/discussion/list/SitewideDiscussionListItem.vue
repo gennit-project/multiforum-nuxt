@@ -14,6 +14,9 @@ import MarkdownPreview from "@/components/MarkdownPreview.vue";
 import ChevronDownIcon from "@/components/icons/ChevronDownIcon.vue";
 import UsernameWithTooltip from "@/components/UsernameWithTooltip.vue";
 import { relativeTime } from "@/utils";
+import { useQuery } from "@vue/apollo-composable";
+import { GET_USER } from "@/graphQLData/user/queries";
+import { usernameVar } from "@/cache";
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
   import("@/components/discussion/detail/DiscussionAlbum.vue")
@@ -49,6 +52,17 @@ const props = defineProps({
 defineEmits(["filterByTag"]);
 
 const route = useRoute();
+
+// Get user preferences for sensitive content
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value || "",
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 const forumId = computed(() => {
   if (!props.discussion) return "";
@@ -134,8 +148,11 @@ const relative = computed(() =>
 // Sensitive content logic
 const sensitiveContentRevealed = ref(false);
 const hasSensitiveContent = computed(() => !!props.discussion?.hasSensitiveContent);
+const userAllowsSensitiveContent = computed(() => {
+  return getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false;
+});
 const shouldShowContent = computed(() => {
-  return !hasSensitiveContent.value || sensitiveContentRevealed.value;
+  return !hasSensitiveContent.value || sensitiveContentRevealed.value || userAllowsSensitiveContent.value;
 });
 
 const revealSensitiveContent = () => {
@@ -266,7 +283,7 @@ const revealSensitiveContent = () => {
             >
               <!-- Sensitive content concealment box -->
               <div
-                v-if="hasSensitiveContent && !sensitiveContentRevealed"
+                v-if="hasSensitiveContent && !sensitiveContentRevealed && !userAllowsSensitiveContent"
                 class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center ml-2 mr-2 mb-2"
               >
                 <p class="text-gray-600 dark:text-gray-300 mb-3 text-sm">

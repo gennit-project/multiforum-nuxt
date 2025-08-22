@@ -34,6 +34,7 @@ export const GET_USER = gql`
       notificationBundleInterval
       notificationBundleEnabled
       notificationBundleContent
+      enableSensitiveContentByDefault
       NotificationsAggregate(
         where: { read: false }
       ) {

@@ -10,10 +10,24 @@ import type { Discussion } from "@/__generated__/graphql";
 import { useRouter } from "nuxt/app";
 import { useUIStore } from "@/stores/uiStore";
 import { storeToRefs } from "pinia";
+import { useQuery } from "@vue/apollo-composable";
+import { GET_USER } from "@/graphQLData/user/queries";
+import { usernameVar } from "@/cache";
 
 const router = useRouter();
 const uiStore = useUIStore();
 const { fontSize: _fontSize } = storeToRefs(uiStore);
+
+// Get user preferences for sensitive content
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value || "",
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 const props = defineProps({
   channelId: {
@@ -72,8 +86,12 @@ const hasSensitiveContent = computed(
   () => !!props.discussion?.hasSensitiveContent
 );
 
+const userAllowsSensitiveContent = computed(() => {
+  return getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false;
+});
+
 const shouldShowContent = computed(() => {
-  return !hasSensitiveContent.value || sensitiveContentRevealed.value;
+  return !hasSensitiveContent.value || sensitiveContentRevealed.value || userAllowsSensitiveContent.value;
 });
 
 const revealSensitiveContent = () => {
@@ -112,7 +130,7 @@ const hasEmoiji = computed(() => {
   <div class="flex flex-col gap-2">
     <!-- Sensitive content concealment box -->
     <div
-      v-if="hasSensitiveContent && !sensitiveContentRevealed"
+      v-if="hasSensitiveContent && !sensitiveContentRevealed && !userAllowsSensitiveContent"
       class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center"
     >
       <p class="text-gray-600 dark:text-gray-300 mb-3">

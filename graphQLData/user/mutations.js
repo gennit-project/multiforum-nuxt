@@ -29,6 +29,7 @@ export const UPDATE_USER = gql`
         notificationBundleInterval
         notificationBundleEnabled
         notificationBundleContent
+        enableSensitiveContentByDefault
       }
     }
   }

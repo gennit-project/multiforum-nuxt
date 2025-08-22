@@ -22,6 +22,7 @@ type NotificationFormValues = {
   notifyOnFeedback: boolean;
   notificationBundleInterval: string;
   notificationBundleEnabled: boolean;
+  enableSensitiveContentByDefault: boolean;
 };
 
 const route = useRoute();
@@ -56,6 +57,7 @@ const getDefaultNotificationValues = (): NotificationFormValues => ({
   notifyOnFeedback: false,
   notificationBundleInterval: "hourly",
   notificationBundleEnabled: true,
+  enableSensitiveContentByDefault: false,
 });
 
 const notificationFormValues = ref<NotificationFormValues>(getDefaultNotificationValues());
@@ -84,6 +86,7 @@ watch(
       notificationFormValues.value.notifyOnFeedback = user.notifyOnFeedback ?? false;
       notificationFormValues.value.notificationBundleInterval = user.notificationBundleInterval ?? "hourly";
       notificationFormValues.value.notificationBundleEnabled = user.notificationBundleEnabled ?? true;
+      notificationFormValues.value.enableSensitiveContentByDefault = user.enableSensitiveContentByDefault ?? false;
       
       dataLoaded.value = true;
     }
@@ -107,6 +110,7 @@ if (getUserResult.value && getUserResult.value.users.length > 0) {
   notificationFormValues.value.notifyOnFeedback = user.notifyOnFeedback ?? false;
   notificationFormValues.value.notificationBundleInterval = user.notificationBundleInterval ?? "hourly";
   notificationFormValues.value.notificationBundleEnabled = user.notificationBundleEnabled ?? true;
+  notificationFormValues.value.enableSensitiveContentByDefault = user.enableSensitiveContentByDefault ?? false;
   
   dataLoaded.value = true;
 }
@@ -128,6 +132,7 @@ const notificationUserUpdateInput = computed(() => {
     notifyOnFeedback: notificationFormValues.value.notifyOnFeedback,
     notificationBundleInterval: notificationFormValues.value.notificationBundleInterval,
     notificationBundleEnabled: notificationFormValues.value.notificationBundleEnabled,
+    enableSensitiveContentByDefault: notificationFormValues.value.enableSensitiveContentByDefault,
   } as UserUpdateInput;
 });
 
@@ -255,6 +260,24 @@ function updateBasicFormValues(data: Partial<EditAccountSettingsFormValues>) {
                       />
                       <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
                         Email me when I receive feedback from moderators
+                      </label>
+                    </div>
+                  </div>
+                </template>
+              </FormRow>
+
+              <!-- Content Preferences -->
+              <FormRow section-title="Content Preferences">
+                <template #content>
+                  <div class="space-y-4">
+                    <div class="flex items-center">
+                      <CheckBox
+                        :test-id="'enable-sensitive-content'"
+                        :checked="notificationFormValues.enableSensitiveContentByDefault"
+                        @update="notificationFormValues.enableSensitiveContentByDefault = $event"
+                      />
+                      <label class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                        I am over 18 and want to view sensitive content by default
                       </label>
                     </div>
                   </div>

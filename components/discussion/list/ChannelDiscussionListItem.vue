@@ -17,6 +17,9 @@ import type {
 import CheckCircleIcon from "@/components/icons/CheckCircleIcon.vue";
 import { storeToRefs } from "pinia";
 import { useUIStore } from "@/stores/uiStore";
+import { useQuery } from "@vue/apollo-composable";
+import { GET_USER } from "@/graphQLData/user/queries";
+import { usernameVar } from "@/cache";
 // UI state is now handled via props
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(() => 
@@ -60,6 +63,17 @@ defineEmits(["filterByTag"]);
 const route = useRoute();
 const uiStore = useUIStore();
 const { fontSize } = storeToRefs(uiStore);
+
+// Get user preferences for sensitive content
+const { result: getUserResult } = useQuery(
+  GET_USER,
+  {
+    username: usernameVar.value || "",
+  },
+  {
+    enabled: !!usernameVar.value,
+  }
+);
 
 const channelIdInParams = computed(() =>
   typeof route.params.forumId === "string" ? route.params.forumId : ""
@@ -126,8 +140,11 @@ const filteredQuery = computed(() => {
 // Sensitive content logic
 const sensitiveContentRevealed = ref(false);
 const hasSensitiveContent = computed(() => !!props.discussion?.hasSensitiveContent);
+const userAllowsSensitiveContent = computed(() => {
+  return getUserResult.value?.users?.[0]?.enableSensitiveContentByDefault || false;
+});
 const shouldShowContent = computed(() => {
-  return !hasSensitiveContent.value || sensitiveContentRevealed.value;
+  return !hasSensitiveContent.value || sensitiveContentRevealed.value || userAllowsSensitiveContent.value;
 });
 
 const revealSensitiveContent = () => {
@@ -234,7 +251,7 @@ const revealSensitiveContent = () => {
             <div v-if="discussion && (discussion.body || discussion.Album) && isExpanded">
               <!-- Sensitive content concealment box -->
               <div
-                v-if="hasSensitiveContent && !sensitiveContentRevealed"
+                v-if="hasSensitiveContent && !sensitiveContentRevealed && !userAllowsSensitiveContent"
                 class="rounded border bg-gray-200 dark:bg-gray-800 p-4 text-center my-2"
               >
                 <p class="text-gray-600 dark:text-gray-300 mb-3 text-sm">
