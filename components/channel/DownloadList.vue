@@ -5,6 +5,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { useUIStore } from '@/stores/uiStore';
 import { storeToRefs } from 'pinia';
 import ChannelDownloadListItem from '../discussion/list/ChannelDownloadListItem.vue';
+import DownloadSkeletonCard from '@/components/download/DownloadSkeletonCard.vue';
 import LoadMore from '../LoadMore.vue';
 import ErrorBanner from '../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -260,12 +261,13 @@ const reachedEndOfResults = computed(() => {
 <template>
   <div class="px-2">
     <slot />
-    <p
-      v-if="!downloadChannelResult && downloadLoading"
-      class="dark:text-gray-200"
+    <!-- Loading skeleton cards -->
+    <div
+      v-if="downloadLoading && (!downloadChannelResult || downloadChannelResult?.getDiscussionsInChannel?.discussionChannels?.length === 0)"
+      class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
     >
-      Loading...
-    </p>
+      <DownloadSkeletonCard v-for="n in 8" :key="n" />
+    </div>
     <ErrorBanner
       v-else-if="downloadError"
       class="max-w-5xl"
