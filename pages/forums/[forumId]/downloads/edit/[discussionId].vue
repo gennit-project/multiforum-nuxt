@@ -1,7 +1,10 @@
 <script lang="ts">
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
-import { UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
+import { 
+  UPDATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS,
+  UPDATE_DISCUSSION_CHANNEL_LABELS
+} from '@/graphQLData/discussion/mutations';
 import { defineComponent, computed, ref } from 'vue';
 import { useRouter, useRoute, useHead } from 'nuxt/app';
 import { useQuery, useMutation } from '@vue/apollo-composable';
@@ -17,6 +20,8 @@ import type {
   DiscussionTagsDisconnectFieldInput,
   DiscussionUpdateInput,
   Image,
+  FilterOption,
+  FilterGroup,
 } from '@/__generated__/graphql';
 import { modProfileNameVar } from '@/cache';
 
@@ -122,6 +127,25 @@ export default defineComponent({
 
     const getDefaultFormValues = (): CreateEditDiscussionFormValues => {
       if (discussion.value) {
+        // Extract existing download labels from DiscussionChannel
+        const downloadLabels: Record<string, string[]> = {};
+        const primaryDiscussionChannel = discussion.value.DiscussionChannels.find(
+          (dc: DiscussionChannel) => dc.Channel?.uniqueName === channelId.value
+        );
+        
+        if (primaryDiscussionChannel?.LabelOptions) {
+          // Group labels by their filter group key
+          primaryDiscussionChannel.LabelOptions.forEach((option: FilterOption) => {
+            const groupKey = option.group?.key;
+            if (groupKey) {
+              if (!downloadLabels[groupKey]) {
+                downloadLabels[groupKey] = [];
+              }
+              downloadLabels[groupKey].push(option.value);
+            }
+          });
+        }
+
         return {
           title: discussion.value.title,
           body: discussion.value?.body || '',
@@ -150,6 +174,7 @@ export default defineComponent({
               priceCents: file.priceCents || 0,
               priceCurrency: file.priceCurrency || 'USD',
             })) || [],
+          downloadLabels,
         };
       }
       return {
@@ -163,6 +188,7 @@ export default defineComponent({
           imageOrder: [],
         },
         downloadableFiles: [],
+        downloadLabels: {},
       };
     };
 
@@ -219,6 +245,29 @@ export default defineComponent({
           )
       );
 
+      // Extract existing download labels from DiscussionChannel
+      const downloadLabels: Record<string, string[]> = {};
+      const primaryDiscussionChannel = discussion.DiscussionChannels.find(
+        (dc: DiscussionChannel) => dc.Channel?.uniqueName === channelId.value
+      );
+      
+      if (primaryDiscussionChannel?.LabelOptions) {
+        // Group labels by their filter group key
+        primaryDiscussionChannel.LabelOptions.forEach((option: FilterOption) => {
+          const groupKey = option.group?.key;
+          if (groupKey) {
+            if (!downloadLabels[groupKey]) {
+              downloadLabels[groupKey] = [];
+            }
+            downloadLabels[groupKey].push(option.value);
+          }
+        });
+      }
+
+      // Preserve any existing downloadLabels that the user might have changed
+      const existingDownloadLabels = formValues.value.downloadLabels || {};
+      const hasExistingLabels = Object.keys(existingDownloadLabels).length > 0;
+      
       const formFields: CreateEditDiscussionFormValues = {
         title: discussion.title,
         body: discussion.body,
@@ -247,7 +296,11 @@ export default defineComponent({
             priceCents: file.priceCents || 0,
             priceCurrency: file.priceCurrency || 'USD',
           })) || [],
+        // Use existing labels if the user has made changes, otherwise use labels from discussion data
+        downloadLabels: hasExistingLabels ? existingDownloadLabels : downloadLabels,
       };
+      console.log('onGetDiscussionResult: hasExistingLabels:', hasExistingLabels);
+      console.log('onGetDiscussionResult: Using downloadLabels:', hasExistingLabels ? existingDownloadLabels : downloadLabels);
       formValues.value = formFields;
       dataLoaded.value = true;
     });
@@ -446,7 +499,63 @@ export default defineComponent({
       },
     }));
 
-    onDone(() => {
+    // Helper function to convert downloadLabels to label option IDs
+    const getSelectedLabelOptionIds = (): string[] => {
+      const selectedIds: string[] = [];
+      const downloadLabels = formValues.value.downloadLabels || {};
+      
+      console.log('Converting downloadLabels to IDs:', downloadLabels);
+      console.log('downloadLabels type:', typeof downloadLabels);
+      console.log('downloadLabels keys:', Object.keys(downloadLabels));
+      console.log('downloadLabels JSON:', JSON.stringify(downloadLabels));
+      
+      // Get all filter groups from channel data
+      const filterGroups = channelData.value?.FilterGroups || [];
+      console.log('Available filter groups:', filterGroups.map(fg => ({ key: fg.key, optionCount: fg.options?.length })));
+      
+      Object.entries(downloadLabels).forEach(([groupKey, selectedValues]) => {
+        console.log(`Processing group "${groupKey}" with values:`, selectedValues);
+        
+        // Find the filter group
+        const group = filterGroups.find((fg: FilterGroup) => fg.key === groupKey);
+        console.log(`Found group for "${groupKey}":`, group ? `Yes (${group.options?.length} options)` : 'No');
+        
+        if (group?.options) {
+          // For each selected value, find the corresponding option ID
+          selectedValues.forEach(value => {
+            const option = group.options?.find((opt: FilterOption) => opt.value === value);
+            console.log(`Looking for option with value "${value}":`, option ? `Found ID ${option.id}` : 'Not found');
+            if (option?.id) {
+              selectedIds.push(option.id);
+            }
+          });
+        }
+      });
+      
+      console.log('Final label option IDs:', selectedIds);
+      return selectedIds;
+    };
+
+    const {
+      mutate: updateDiscussionChannelLabels,
+      error: updateLabelsError,
+      loading: updateLabelsLoading,
+    } = useMutation(UPDATE_DISCUSSION_CHANNEL_LABELS, () => ({
+      variables: {
+        channelUniqueName: channelId.value,
+        discussionId: discussionId.value,
+        labelOptionIds: getSelectedLabelOptionIds(),
+      },
+    }));
+
+    onDone(async () => {
+      // After discussion is updated successfully, update the labels
+      try {
+        await updateDiscussionChannelLabels();
+      } catch (error) {
+        console.error('Error updating labels:', error);
+      }
+      
       router.push({
         name: 'forums-forumId-downloads-discussionId',
         params: {
@@ -469,8 +578,10 @@ export default defineComponent({
       ownerList,
       updateDiscussion,
       updateDiscussionError,
+      updateLabelsError,
       updateDiscussionInput,
       updateDiscussionLoading,
+      updateLabelsLoading,
       router,
     };
   },
@@ -479,11 +590,22 @@ export default defineComponent({
       this.updateDiscussion();
     },
     updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
+      console.log('updateFormValues called with:', data);
+      console.log('data.downloadLabels:', JSON.stringify(data.downloadLabels));
+      console.log('Existing formValues.downloadLabels before update:', JSON.stringify(this.formValues.downloadLabels));
+      
       const existingValues = this.formValues;
       this.formValues = {
         ...existingValues,
         ...data,
       };
+      console.log('Updated formValues:', this.formValues);
+      console.log('Updated formValues.downloadLabels:', JSON.stringify(this.formValues.downloadLabels));
+      
+      // Add a setTimeout to check if the value persists
+      setTimeout(() => {
+        console.log('formValues.downloadLabels after 100ms:', JSON.stringify(this.formValues.downloadLabels));
+      }, 100);
     },
     handleCancel() {
       this.router.push({

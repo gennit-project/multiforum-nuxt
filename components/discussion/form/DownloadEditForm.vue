@@ -40,6 +40,11 @@ const props = defineProps({
     }>,
     default: () => ({ allowedFileTypes: [], FilterGroups: [] }),
   },
+  // Accept existing download labels from parent
+  existingDownloadLabels: {
+    type: Object as PropType<Record<string, string[]>>,
+    default: () => ({}),
+  },
 });
 
 const emit = defineEmits(['closeEditor', 'updateFormValues']);
@@ -160,10 +165,8 @@ onMounted(() => {
 
   formValues.value.downloadableFiles = [...downloadableFiles.value];
 
-  // Initialize download labels from props if in edit mode and discussion has labels
-  // Note: This assumes labels will be stored on the discussion model in the future
-  // For now, initialize as empty
-  formValues.value.downloadLabels = {};
+  // Initialize download labels from props
+  formValues.value.downloadLabels = { ...props.existingDownloadLabels };
 
   console.log('Initialized formValues:', formValues.value);
 });
@@ -473,25 +476,19 @@ function handleSave() {
     JSON.stringify(formValues.value.downloadLabels)
   );
 
-  // For both cases where we're inside CreateEditDiscussionFields (temp-id)
+  // Always emit to parent - let the parent decide how to handle the save
+  console.log('Emitting updateFormValues to parent');
+  emit('updateFormValues', {
+    downloadableFiles: formValues.value.downloadableFiles,
+    downloadLabels: formValues.value.downloadLabels,
+  });
+
+  // Only show success notification if we're in temp-id mode (create/embedded mode)
   if (props.discussion.id === 'temp-id') {
-    // Always emit the form values to update the parent component
-    console.log(
-      'Emitting updateFormValues in CreateEditDiscussionFields context'
-    );
-    emit('updateFormValues', {
-      downloadableFiles: formValues.value.downloadableFiles,
-      downloadLabels: formValues.value.downloadLabels,
-    });
-    // Add a success notification
     savedSuccessfully.value = true;
     setTimeout(() => {
       savedSuccessfully.value = false;
     }, 3000); // Hide after 3 seconds
-  } else {
-    // In actual edit mode for an existing discussion, perform the API mutation
-    console.log('Calling updateDiscussion in edit mode');
-    updateDiscussion();
   }
 }
 </script>
@@ -661,7 +658,14 @@ function handleSave() {
           <DownloadLabelPicker
             :filter-groups="channelData.FilterGroups || []"
             :selected-labels="formValues.downloadLabels"
-            @update:selected-labels="formValues.downloadLabels = $event"
+            @update:selected-labels="
+              (newLabels) => {
+                console.log('DownloadEditForm received label update:', newLabels);
+                formValues.downloadLabels = newLabels;
+                // Emit the changes to parent immediately
+                handleSave();
+              }
+            "
           />
         </template>
       </FormRow>

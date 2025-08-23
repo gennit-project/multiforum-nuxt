@@ -264,6 +264,17 @@ export const GET_DISCUSSION = gql`
             }
           }
         }
+        LabelOptions {
+          id
+          value
+          displayName
+          order
+          group {
+            id
+            key
+            displayName
+          }
+        }
       }
       Tags {
         text

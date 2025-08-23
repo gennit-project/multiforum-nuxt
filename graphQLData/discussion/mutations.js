@@ -527,6 +527,42 @@ export const UPDATE_DISCUSSION_SENSITIVE_CONTENT = gql`
   }
 `;
 
+export const UPDATE_DISCUSSION_CHANNEL_LABELS = gql`
+  mutation updateDiscussionChannelLabels(
+    $channelUniqueName: String!
+    $discussionId: ID!
+    $labelOptionIds: [ID!]!
+  ) {
+    updateDiscussionChannels(
+      where: { 
+        channelUniqueName: $channelUniqueName
+        discussionId: $discussionId 
+      }
+      update: { 
+        LabelOptions: { 
+          connect: { where: { node: { id_IN: $labelOptionIds } } }
+          disconnect: { where: { node: { NOT: { id_IN: $labelOptionIds } } } }
+        }
+      }
+    ) {
+      discussionChannels {
+        id
+        LabelOptions {
+          id
+          value
+          displayName
+          order
+          group {
+            id
+            key
+            displayName
+          }
+        }
+      }
+    }
+  }
+`;
+
 // mutation {
 //   createFilterGroups(input: [{
 //     key: "lot_size",

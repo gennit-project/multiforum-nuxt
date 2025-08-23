@@ -164,6 +164,7 @@ onMounted(() => {
                         }
                       : undefined
                   "
+                  :existing-download-labels="formValues.downloadLabels || {}"
                   @close-editor="() => {}"
                   @update-form-values="
                     (downloadData) => {
