@@ -1,0 +1,44 @@
+title: Multiforum
+email: your-email@example.com
+description: >-
+  A modern platform for community-driven discussions, events, and knowledge sharing.
+  Build forums that connect people around shared interests.
+
+baseurl: ""
+url: "https://multiforum.net"
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap
+  - jekyll-seo-tag
+
+# Navigation
+header_pages:
+  - about.md
+  - blog.md
+  - contact.md
+
+# Blog settings
+show_excerpts: true
+permalink: /blog/:year/:month/:day/:title/
+
+# External links
+multiforum_instance_url: "https://www.topical.space/"
+docs_url: "https://docs.multiforum.net"
+
+# Exclude from processing
+exclude:
+  - .sass-cache/
+  - .jekyll-cache/
+  - gemfiles/
+  - Gemfile
+  - Gemfile.lock
+  - node_modules/
+  - vendor/bundle/
+  - vendor/cache/
+  - vendor/gems/
+  - vendor/ruby/
+  - README.md

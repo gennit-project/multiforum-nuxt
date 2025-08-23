@@ -50,14 +50,14 @@ const {
 
 const {
   mutate: updateDiscussionChannelLabels,
-  loading: updateLabelsLoading,
-  error: updateLabelsError,
+  loading: _updateLabelsLoading,
+  error: _updateLabelsError,
 } = useMutation(UPDATE_DISCUSSION_CHANNEL_LABELS);
 
 const {
   mutate: updateDiscussion,
-  loading: updateDiscussionLoading,
-  error: updateDiscussionError,
+  loading: _updateDiscussionLoading,
+  error: _updateDiscussionError,
 } = useMutation(UPDATE_DISCUSSION);
 
 onDone(async (response) => {
