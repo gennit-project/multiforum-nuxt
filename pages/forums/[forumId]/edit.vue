@@ -107,30 +107,35 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
       where: { node: { text: tag } },
     }));
 
-  // Handle FilterGroups - delete all existing and recreate
-  const existingGroupIds = existingFilterGroups.value.map(
+  // Handle FilterGroups using connect/create/disconnect pattern (like Tags)
+  const existingFilterGroupIds = existingFilterGroups.value.map(
     (group: any) => group.id
   );
-  const filterGroupDisconnections = existingGroupIds.map((id: string) => ({
-    where: { node: { id } },
-    delete: {
-      options: [{ where: {} }],
-    },
-  }));
+  const currentFilterGroupIds = formValues.value.downloadFilterGroups
+    .map((group: any) => group.id)
+    .filter(Boolean); // Only existing groups have IDs
 
-  const filterGroupCreations = formValues.value.downloadFilterGroups.map(
-    (group, index) => ({
+  // Connect to existing groups that are still selected
+  const filterGroupConnections = formValues.value.downloadFilterGroups
+    .filter((group: any) => group.id) // Only existing groups
+    .map((group, index) => ({
+      where: { node: { id: group.id } },
+      // Note: We might need to handle updates here if group properties changed
+    }));
+
+  // Create new groups (those without IDs)  
+  const filterGroupCreations = formValues.value.downloadFilterGroups
+    .filter((group: any) => !group.id) // Only new groups
+    .map((group, index) => ({
       node: {
-        id: group.id,
         key: group.key,
         displayName: group.displayName,
         mode: group.mode,
-        order: index,
+        order: formValues.value.downloadFilterGroups.indexOf(group),
         options: group.options
           ? {
               create: group.options.map((option, optionIndex) => ({
                 node: {
-                  id: option.id,
                   value: option.value,
                   displayName: option.displayName,
                   order: optionIndex,
@@ -139,8 +144,14 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
             }
           : undefined,
       },
-    })
-  );
+    }));
+
+  // Disconnect groups that were removed
+  const filterGroupDisconnections = existingFilterGroupIds
+    .filter((id: string) => !currentFilterGroupIds.includes(id))
+    .map((id: string) => ({
+      where: { node: { id } },
+    }));
 
   return {
     description: formValues.value.description,
@@ -156,8 +167,9 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     FilterGroups: [
       {
-        delete: filterGroupDisconnections,
+        connect: filterGroupConnections,
         create: filterGroupCreations,
+        disconnect: filterGroupDisconnections,
       },
     ],
     Admins: [
@@ -172,6 +184,7 @@ const {
   loading: editChannelLoading,
   error: updateChannelError,
   onDone,
+  onError,
 } = useMutation(UPDATE_CHANNEL);
 
 onDone(() => {
@@ -180,11 +193,26 @@ onDone(() => {
   refetchChannel();
 });
 
+onError((error) => {
+  console.error('Channel update mutation error:', error);
+});
+
 function submit() {
-  updateChannel({
-    where: { uniqueName: channelId },
-    update: channelUpdateInput.value,
-  });
+  try {
+    const updateInput = channelUpdateInput.value;
+    console.log('Channel update input FilterGroups:', {
+      connect: updateInput.FilterGroups?.[0]?.connect?.length || 0,
+      create: updateInput.FilterGroups?.[0]?.create?.length || 0,
+      disconnect: updateInput.FilterGroups?.[0]?.disconnect?.length || 0
+    });
+    
+    updateChannel({
+      where: { uniqueName: channelId },
+      update: updateInput,
+    });
+  } catch (error) {
+    console.error('Error building channel update input:', error);
+  }
 }
 
 function updateFormValues(data: CreateEditChannelFormValues) {

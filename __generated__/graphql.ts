@@ -26601,7 +26601,6 @@ export enum FilterMode {
 export type FilterOption = {
   __typename?: 'FilterOption';
   displayName: Scalars['String']['output'];
-  filterKey?: Maybe<Scalars['String']['output']>;
   group: FilterGroup;
   groupAggregate?: Maybe<FilterOptionFilterGroupGroupAggregationSelection>;
   groupConnection: FilterOptionGroupConnection;
@@ -26696,7 +26695,6 @@ export type FilterOptionEdge = {
 export type FilterOptionEventPayload = {
   __typename?: 'FilterOptionEventPayload';
   displayName: Scalars['String']['output'];
-  filterKey?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   order: Scalars['Int']['output'];
   value: Scalars['String']['output'];
@@ -26908,7 +26906,6 @@ export type FilterOptionRelationshipsSubscriptionWhere = {
 /** Fields to sort FilterOptions by. The order in which sorts are applied is not guaranteed when specifying many fields in one FilterOptionSort object. */
 export type FilterOptionSort = {
   displayName?: InputMaybe<SortDirection>;
-  filterKey?: InputMaybe<SortDirection>;
   id?: InputMaybe<SortDirection>;
   order?: InputMaybe<SortDirection>;
   value?: InputMaybe<SortDirection>;
@@ -26971,12 +26968,6 @@ export type FilterOptionWhere = {
   displayName_IN?: InputMaybe<Array<Scalars['String']['input']>>;
   displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
   displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
-  filterKey?: InputMaybe<Scalars['String']['input']>;
-  filterKey_CONTAINS?: InputMaybe<Scalars['String']['input']>;
-  filterKey_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
-  filterKey_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  filterKey_MATCHES?: InputMaybe<Scalars['String']['input']>;
-  filterKey_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
   group?: InputMaybe<FilterGroupWhere>;
   groupAggregate?: InputMaybe<FilterOptionGroupAggregateInput>;
   groupConnection?: InputMaybe<FilterOptionGroupConnectionWhere>;

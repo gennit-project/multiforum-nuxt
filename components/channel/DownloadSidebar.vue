@@ -99,7 +99,9 @@ const handleDownload = () => {
         class="bg-gray-50 mb-4 rounded-lg border border-orange-400 p-4 dark:border-orange-500 dark:bg-gray-700"
       >
         <!-- File Name -->
-        <h3 class="mb-3 text-lg font-medium text-gray-900 dark:text-white">
+        <h3
+          class="mb-3 break-words text-sm font-medium text-gray-900 dark:text-white"
+        >
           {{ primaryFile.fileName || 'Untitled File' }}
         </h3>
         <!-- File Type and Size -->

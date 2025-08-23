@@ -43,7 +43,7 @@ const addNewGroup = () => {
   }
 
   const newGroup: FilterGroup = {
-    id: `new-${Date.now()}`,
+    id: '', // Empty ID for new groups - server will generate
     key: newGroupForm.value.key,
     displayName: newGroupForm.value.displayName,
     mode: newGroupForm.value.mode,
@@ -71,9 +71,14 @@ const addNewGroup = () => {
 };
 
 const removeGroup = (groupId: string) => {
+  console.log('Removing group with ID:', groupId);
+  console.log('Current groups:', props.filterGroups.map(g => ({ id: g.id, key: g.key })));
+  
   const updatedGroups = props.filterGroups.filter(
     (group) => group.id !== groupId
   );
+  
+  console.log('Updated groups after removal:', updatedGroups.map(g => ({ id: g.id, key: g.key })));
   emit('updateFilterGroups', updatedGroups);
 };
 

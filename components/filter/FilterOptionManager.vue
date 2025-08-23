@@ -110,7 +110,7 @@ const addOption = () => {
   if (!canAddOption.value) return;
 
   const newOption: FilterOption = {
-    id: `new-option-${Date.now()}`,
+    id: '', // Empty ID for new options - server will generate
     value: newOptionForm.value.value,
     displayName: newOptionForm.value.displayName,
     order: props.filterGroup.options?.length || 0,

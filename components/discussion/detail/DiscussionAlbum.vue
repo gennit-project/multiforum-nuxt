@@ -732,7 +732,7 @@ const handleTouchEnd = (event: TouchEvent) => {
                   :class="{
                     hidden: idx !== activeIndex,
                     'max-h-96 max-w-96': !expandedView,
-                    'h-auto w-full': expandedView,
+                    'mx-auto h-auto w-full': expandedView,
                   }"
                   :style="{
                     aspectRatio: '3/2',

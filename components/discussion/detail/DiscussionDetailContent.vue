@@ -413,7 +413,7 @@ const handleEditAlbum = () => {
                       :show-emoji-button="!downloadMode"
                     >
                       <template #album-slot>
-                        <div class="bg-black text-white">
+                        <div class="mt-1 bg-black text-white">
                           <DiscussionAlbum
                             v-if="shouldShowAlbum"
                             :album="discussion?.Album || null"
@@ -435,9 +435,9 @@ const handleEditAlbum = () => {
                               <span>No image available</span>
                               <button
                                 v-if="loggedInUserIsAuthor && usernameVar"
-                                @click="handleClickAddAlbum"
                                 class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
                                 data-testid="add-images-button"
+                                @click="handleClickAddAlbum"
                               >
                                 <ImageIcon class="h-5 w-5" />
                                 <span>Add Image(s)</span>
@@ -636,12 +636,12 @@ const handleEditAlbum = () => {
                   <button
                     type="button"
                     class="hover:bg-gray-50 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                    data-testid="edit-download-button-fallback"
                     @click="
                       router.push(
                         `/forums/${channelId}/downloads/${discussionId}/description`
                       )
                     "
-                    data-testid="edit-download-button-fallback"
                   >
                     <PencilIcon class="h-4 w-4" />
                     Edit Description
