@@ -99,7 +99,11 @@ const route = useRoute();
 const { height } = useDisplay();
 
 // Check if screen is vertically short (less than 700px)
-const isVerticallyShort = computed(() => height.value < 700);
+// Use client-side only to avoid hydration mismatches
+const isVerticallyShort = computed(() => {
+  if (!import.meta.client) return false; // Default to false on server
+  return height.value < 700;
+});
 
 // Drawer state
 const isDrawerOpen = ref(false);
@@ -218,10 +222,11 @@ const getUserActionClasses = (isActive: boolean) => {
 </script>
 
 <template>
-  <div
-    class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
-    :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
-  >
+  <ClientOnly>
+    <div
+      class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
+      :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
+    >
     <!-- Logo -->
     <IconTooltip
       text="Topical - Home"
@@ -415,5 +420,78 @@ const getUserActionClasses = (isActive: boolean) => {
       :is-open="isDrawerOpen"
       @close="isDrawerOpen = false"
     />
-  </div>
+    </div>
+    <template #fallback>
+      <!-- Server-side fallback with default classes (no responsive behavior) -->
+      <div
+        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex py-4"
+      >
+        <!-- Logo -->
+        <IconTooltip text="Topical - Home" class="mb-4">
+          <a
+            href="/"
+            class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
+            @click.prevent="() => navigateTo({ name: 'index' })"
+          >
+            <span class="text-2xl">🐝</span>
+          </a>
+        </IconTooltip>
+
+        <!-- Main Navigation Icons -->
+        <div class="flex flex-col space-y-2">
+          <IconTooltip
+            v-for="item in navigation"
+            :key="item.name"
+            :text="item.name"
+          >
+            <a
+              :href="item.href"
+              :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
+              @click.prevent="() => navigateTo({ name: item.routerName })"
+            >
+              <component
+                :is="item.icon"
+                class="h-6 w-6 text-gray-300"
+                aria-hidden="true"
+              />
+            </a>
+          </IconTooltip>
+        </div>
+
+        <!-- Divider -->
+        <div class="h-px w-8 bg-gray-600 my-4" />
+
+        <!-- Divider -->
+        <div class="h-px w-8 bg-gray-600 my-4" />
+
+        <!-- User Actions -->
+        <div class="mt-auto flex flex-col space-y-2">
+          <!-- Admin Dashboard -->
+          <IconTooltip text="Admin Dashboard">
+            <a
+              href="/admin/issues"
+              :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
+              @click.prevent="() => navigateTo({ name: 'admin-issues' })"
+            >
+              <AdminIcon />
+            </a>
+          </IconTooltip>
+
+          <!-- Login fallback -->
+          <IconTooltip text="Log In">
+            <div :class="getUserActionClasses(false)">
+              <LoginIcon />
+            </div>
+          </IconTooltip>
+        </div>
+
+        <!-- Recent Forums Drawer -->
+        <RecentForumsDrawer
+          :forums="[]"
+          :is-open="false"
+          @close="() => {}"
+        />
+      </div>
+    </template>
+  </ClientOnly>
 </template>
