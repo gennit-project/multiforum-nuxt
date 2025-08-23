@@ -320,8 +320,8 @@ const renderMap = async () => {
     console.log(`Created marker for location ${eventLocationId}:`, {
       marker,
       eventsCount: markerData.numberOfEvents,
-      hasClickListener: !!marker.gm_bindings_?.click,
-      hasMouseoverListener: !!marker.gm_bindings_?.mouseover,
+      hasClickListener: !!(marker as any).gm_bindings_?.click,
+      hasMouseoverListener: !!(marker as any).gm_bindings_?.mouseover,
     });
   });
 

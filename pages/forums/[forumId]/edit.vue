@@ -118,7 +118,7 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   // Connect to existing groups that are still selected
   const filterGroupConnections = formValues.value.downloadFilterGroups
     .filter((group: any) => group.id) // Only existing groups
-    .map((group, index) => ({
+    .map((group, _index) => ({
       where: { node: { id: group.id } },
       // Note: We might need to handle updates here if group properties changed
     }));
@@ -126,8 +126,9 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
   // Create new groups (those without IDs)  
   const filterGroupCreations = formValues.value.downloadFilterGroups
     .filter((group: any) => !group.id) // Only new groups
-    .map((group, index) => ({
+    .map((group, _index) => ({
       node: {
+        id: '', // Empty ID for new groups - server will generate
         key: group.key,
         displayName: group.displayName,
         mode: group.mode,
@@ -136,6 +137,7 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
           ? {
               create: group.options.map((option, optionIndex) => ({
                 node: {
+                  id: '', // Empty ID for new options - server will generate
                   value: option.value,
                   displayName: option.displayName,
                   order: optionIndex,
@@ -166,11 +168,9 @@ const channelUpdateInput = computed<ChannelUpdateInput>(() => {
     allowedFileTypes: formValues.value.allowedFileTypes,
     Tags: [{ connectOrCreate: tagConnections, disconnect: tagDisconnections }],
     FilterGroups: [
-      {
-        connect: filterGroupConnections,
-        create: filterGroupCreations,
-        disconnect: filterGroupDisconnections,
-      },
+      ...(filterGroupConnections.length > 0 ? [{ connect: filterGroupConnections }] : []),
+      ...(filterGroupCreations.length > 0 ? [{ create: filterGroupCreations }] : []),
+      ...(filterGroupDisconnections.length > 0 ? [{ disconnect: filterGroupDisconnections }] : []),
     ],
     Admins: [
       { connect: [{ where: { node: { username: usernameVar.value } } }] },
@@ -264,13 +264,13 @@ const hasError = computed(() => {
               <div class="animate-pulse">
                 <div
                   class="mb-4 h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700"
-                ></div>
+                />
                 <div
                   class="mb-8 h-4 w-1/2 rounded bg-gray-200 dark:bg-gray-700"
-                ></div>
+                />
                 <div class="space-y-4">
-                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"></div>
-                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"></div>
+                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"/>
+                  <div class="h-10 rounded bg-gray-200 dark:bg-gray-700"/>
                 </div>
               </div>
             </div>

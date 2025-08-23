@@ -511,7 +511,7 @@ export default defineComponent({
       
       // Get all filter groups from channel data
       const filterGroups = channelData.value?.FilterGroups || [];
-      console.log('Available filter groups:', filterGroups.map(fg => ({ key: fg.key, optionCount: fg.options?.length })));
+      console.log('Available filter groups:', filterGroups.map((fg: FilterGroup) => ({ key: fg.key, optionCount: fg.options?.length })));
       
       Object.entries(downloadLabels).forEach(([groupKey, selectedValues]) => {
         console.log(`Processing group "${groupKey}" with values:`, selectedValues);

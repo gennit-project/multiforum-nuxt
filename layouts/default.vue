@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
-import TopNav from '@/components/nav/Topnav.vue';
+import TopNav from '@/components/nav/TopNav.vue';
 import SiteSidenav from '@/components/nav/SiteSidenav.vue';
 import VerticalIconNav from '@/components/nav/VerticalIconNav.vue';
 import SiteFooter from '@/components/layout/SiteFooter.vue';
