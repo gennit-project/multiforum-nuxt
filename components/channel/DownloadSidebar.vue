@@ -9,6 +9,7 @@ const props = defineProps({
   discussion: {
     type: Object as PropType<Discussion>,
     required: false,
+    default: null,
   },
 });
 
@@ -61,6 +62,35 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   const decimals = unitIndex === 0 ? 0 : size >= 10 ? 1 : 2;
   return `${size.toFixed(decimals)} ${units[unitIndex]}`;
 };
+
+// Get label options from discussion channels (filter options)
+const labelOptions = computed(() => {
+  const discussionChannel = props.discussion?.DiscussionChannels?.[0];
+  return discussionChannel?.LabelOptions || [];
+});
+
+// Group labels by their group key for display
+const groupedLabels = computed(() => {
+  const groups: Record<string, Array<{ key: string; value: string; displayName: string }>> = {};
+  
+  labelOptions.value.forEach((option) => {
+    const groupKey = option.group?.key;
+    const groupDisplayName = option.group?.displayName;
+    
+    if (groupKey && groupDisplayName) {
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push({
+        key: groupDisplayName,
+        value: option.value || '',
+        displayName: option.displayName || option.value || '',
+      });
+    }
+  });
+  
+  return groups;
+});
 
 const handleDownload = () => {
   if (!primaryFile.value?.url) {
@@ -151,6 +181,36 @@ const handleDownload = () => {
         <p class="text-sm text-gray-600 dark:text-gray-400">
           {{ licenseInfo }}
         </p>
+      </div>
+
+      <!-- Labels Section -->
+      <div 
+        v-if="Object.keys(groupedLabels).length > 0"
+        class="border-t border-gray-200 pt-4 dark:border-gray-700"
+      >
+        <h3 class="mb-2 text-sm font-medium text-gray-900 dark:text-white">
+          Labels
+        </h3>
+        <div class="space-y-2">
+          <div
+            v-for="(labels, groupKey) in groupedLabels"
+            :key="groupKey"
+            class="flex flex-wrap gap-2"
+          >
+            <div
+              v-for="label in labels"
+              :key="`${groupKey}-${label.value}`"
+              class="inline-flex items-center gap-2 text-sm"
+            >
+              <span class="font-medium text-gray-700 dark:text-gray-300">
+                {{ label.key }}:
+              </span>
+              <span class="rounded-full bg-gray-100 px-2 py-1 text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                {{ label.displayName }}
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- No File Available -->
