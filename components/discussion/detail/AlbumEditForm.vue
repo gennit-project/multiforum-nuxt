@@ -59,8 +59,13 @@ const emit = defineEmits<{
 // If we have images with IDs, we're not really in "create" mode for the album,
 // even if the discussion itself is new
 const isCreateMode = computed(() => {
-  // If discussion has a real ID, we're in edit mode
-  if (props.discussion?.id !== 'temp-id' && !discussionIdInParams.value) {
+  // If discussion is undefined or null, we're in create mode
+  if (!props.discussion) {
+    return true;
+  }
+
+  // If discussion has a real ID (not temp-id), we're in edit mode
+  if (props.discussion.id !== 'temp-id' && !discussionIdInParams.value) {
     return false;
   }
 
@@ -288,6 +293,18 @@ function handleUpdateAlbum(newVals: AlbumFormData) {
     'Updated formValues in AlbumEditForm:',
     JSON.stringify(formValues.value.album)
   );
+
+  // In create mode, automatically emit the updated album data to parent
+  console.log('AlbumEditForm: checking isCreateMode:', isCreateMode.value);
+  console.log('AlbumEditForm: discussion id:', props.discussion?.id);
+  if (isCreateMode.value) {
+    console.log('Auto-emitting album data to parent in create mode');
+    emit('updateFormValues', {
+      album: formValues.value.album,
+    });
+  } else {
+    console.log('Not in create mode - not auto-emitting');
+  }
 }
 </script>
 
