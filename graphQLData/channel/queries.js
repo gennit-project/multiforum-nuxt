@@ -297,8 +297,8 @@ export const GET_CHANNEL_DOWNLOAD_COUNT = gql`
   }
 `;
 
-export const GET_CHANNELS = gql`
-  query getSortedChannels(
+export const GET_CHANNELS_DISCUSSIONS = gql`
+  query getSortedChannelsDiscussions(
     $offset: Int
     $limit: Int
     $tags: [String]
@@ -310,6 +310,96 @@ export const GET_CHANNELS = gql`
       limit: $limit
       tags: $tags
       searchInput: $searchInput
+      countDownloads: false
+    ) {
+      channels {
+        uniqueName
+        displayName
+        channelIconURL
+        description
+        Tags {
+          text
+        }
+        EventChannelsAggregate(
+          where: {
+            NOT: { 
+              archived: true,
+              Event: null
+            }
+            Event: { 
+              canceled: false, 
+              endTime_GT: $now,
+            }
+          }
+        ) {
+          count
+        }
+        DiscussionChannelsAggregate(
+          where: {
+            AND: [
+              { NOT: { archived: true } },
+              { NOT: { Discussion: null } },
+              { NOT: {
+                Discussion: { hasDownload: true }
+               } }
+            ]
+          }
+        ) {
+          count
+        }
+      }
+      aggregateChannelCount
+    }
+  }
+`;
+
+export const GET_CHANNELS_DOWNLOADS = gql`
+  query getSortedChannelsDownloads(
+    $offset: Int
+    $limit: Int
+    $tags: [String]
+    $searchInput: String
+  ) {
+    getSortedChannels(
+      offset: $offset
+      limit: $limit
+      tags: $tags
+      searchInput: $searchInput
+      countDownloads: true
+    ) {
+      channels {
+        uniqueName
+        DiscussionChannelsAggregate(
+          where: {
+            AND: [
+              { NOT: { archived: true } },
+              { NOT: { Discussion: null } },
+              { Discussion: { hasDownload: true } }
+            ]
+          }
+        ) {
+          count
+        }
+      }
+    }
+  }
+`;
+
+export const GET_CHANNELS = gql`
+  query getSortedChannels(
+    $offset: Int
+    $limit: Int
+    $tags: [String]
+    $searchInput: String
+    $countDownloads: Boolean
+    $now: DateTime = "${now}"
+  ) {
+    getSortedChannels(
+      offset: $offset
+      limit: $limit
+      tags: $tags
+      searchInput: $searchInput
+      countDownloads: $countDownloads
     ) {
       channels {
         uniqueName

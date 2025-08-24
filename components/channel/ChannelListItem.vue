@@ -6,11 +6,16 @@ import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
 import Tag from '@/components/TagComponent.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 
 const props = defineProps({
   channel: {
     type: Object as PropType<Channel>,
     required: true,
+  },
+  downloadCount: {
+    type: Number,
+    default: 0,
   },
   searchInput: {
     type: String,
@@ -78,13 +83,21 @@ defineEmits(['filterByTag']);
         @click="$emit('filterByTag', tag)"
       />
     </div>
-    <div class="flex justify-between text-sm">
+    <div class="flex flex-wrap gap-x-4 gap-y-1 text-sm">
       <nuxt-link
         :to="`/forums/${channel.uniqueName}/discussions`"
         class="flex items-center gap-1"
       >
         <DiscussionIcon class="h-4 w-4" />
         {{ channel?.DiscussionChannelsAggregate?.count || 0 }} Discussions
+      </nuxt-link>
+      <nuxt-link
+        v-if="downloadCount > 0"
+        :to="`/forums/${channel.uniqueName}/downloads`"
+        class="flex items-center gap-1"
+      >
+        <DownloadIcon class="h-4 w-4" />
+        {{ downloadCount }} Downloads
       </nuxt-link>
       <nuxt-link
         v-if="channel?.EventChannelsAggregate?.count"

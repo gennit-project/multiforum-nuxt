@@ -36930,6 +36930,7 @@ export type QueryGetSiteWideDiscussionListArgs = {
 
 
 export type QueryGetSortedChannelsArgs = {
+  countDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   searchInput?: InputMaybe<Scalars['String']['input']>;

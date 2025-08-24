@@ -7,7 +7,7 @@ import LoadMore from '@/components/LoadMore.vue';
 // Define props
 defineProps({
   channels: {
-    type: Array as PropType<Array<Channel>>,
+    type: Array as PropType<Array<Channel & { downloadCount?: number }>>,
     default: () => [],
   },
   resultCount: {
@@ -45,6 +45,7 @@ function filterByTag(tag: string) {
         v-for="channel in channels"
         :key="channel.uniqueName"
         :channel="channel"
+        :download-count="channel.downloadCount || 0"
         :search-input="searchInput"
         :selected-tags="selectedTags"
         @filter-by-tag="filterByTag"
@@ -56,6 +57,7 @@ function filterByTag(tag: string) {
         v-for="channel in channels"
         :key="channel.uniqueName"
         :channel="channel"
+        :download-count="channel.downloadCount || 0"
         :search-input="searchInput"
         :selected-tags="selectedTags"
         @filter-by-tag="filterByTag"

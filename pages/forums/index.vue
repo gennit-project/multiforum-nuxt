@@ -3,12 +3,15 @@ import { computed, ref, watchEffect } from 'vue';
 import { useRoute, useRouter } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import ChannelList from '@/components/channel/ChannelList.vue';
-import { GET_CHANNELS } from '@/graphQLData/channel/queries';
+import { GET_CHANNELS_DISCUSSIONS, GET_CHANNELS_DOWNLOADS } from '@/graphQLData/channel/queries';
 import TagIcon from '@/components/icons/TagIcon.vue';
 import FilterChip from '@/components/FilterChip.vue';
 import SearchBar from '@/components/SearchBar.vue';
+import SearchableTagList from '@/components/SearchableTagList.vue';
+import ErrorBanner from '@/components/ErrorBanner.vue';
 import { getTagLabel } from '@/utils';
 import type { LocationQueryValue } from 'vue-router';
+import type { Channel } from '@/__generated__/graphql';
 
 const route = useRoute();
 const router = useRouter();
@@ -58,13 +61,14 @@ watchEffect(() => {
   }
 });
 
+// Query for channels with discussion counts
 const {
   result: channelResult,
   loading: channelLoading,
   fetchMore,
   error: channelError,
 } = useQuery(
-  GET_CHANNELS,
+  GET_CHANNELS_DISCUSSIONS,
   {
     limit: 25,
     offset: 0,
@@ -76,11 +80,81 @@ const {
   }
 );
 
+// Query for channels with download counts
+const {
+  result: downloadCountsResult,
+  fetchMore: fetchMoreDownloadCounts,
+} = useQuery(
+  GET_CHANNELS_DOWNLOADS,
+  {
+    limit: 25,
+    offset: 0,
+    tags: selectedTags,
+    searchInput: searchInput,
+  },
+  {
+    fetchPolicy: 'cache-first',
+  }
+);
+
+// Create map of channel name -> discussion count from the discussions query
+const discussionCountMap = computed(() => {
+  const map = new Map<string, number>();
+  const discussionChannels = channelResult.value?.getSortedChannels?.channels || [];
+  
+  discussionChannels.forEach((channel: Channel) => {
+    if (channel.uniqueName) {
+      const discussionCount = channel.DiscussionChannelsAggregate?.count || 0;
+      map.set(channel.uniqueName, discussionCount);
+    }
+  });
+  
+  return map;
+});
+
+// Create map of channel name -> download count from the downloads query  
+const downloadCountMap = computed(() => {
+  const map = new Map<string, number>();
+  const downloadChannels = downloadCountsResult.value?.getSortedChannels?.channels || [];
+  
+  downloadChannels.forEach((channel: Channel) => {
+    if (channel.uniqueName) {
+      const downloadCount = channel.DiscussionChannelsAggregate?.count || 0;
+      map.set(channel.uniqueName, downloadCount);
+    }
+  });
+  
+  return map;
+});
+
+// Merge channels by injecting both counts from the maps
+const mergedChannels = computed(() => {
+  const baseChannels = channelResult.value?.getSortedChannels?.channels || [];
+  
+  return baseChannels.map((channel: Channel) => {
+    const discussionCount = discussionCountMap.value.get(channel.uniqueName) || 0;
+    const downloadCount = downloadCountMap.value.get(channel.uniqueName) || 0;
+    
+    // Create new channel object with corrected discussion count and added download count
+    return {
+      ...channel,
+      DiscussionChannelsAggregate: {
+        ...channel.DiscussionChannelsAggregate,
+        count: discussionCount
+      },
+      downloadCount
+    };
+  });
+});
+
 // Function to load more channels
 const loadMore = () => {
+  // Load more for both queries in parallel
+  const currentOffset = channelResult.value.getSortedChannels?.channels?.length || 0;
+  
   fetchMore({
     variables: {
-      offset: channelResult.value.getSortedChannels?.channels?.length || 0,
+      offset: currentOffset,
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
@@ -93,6 +167,25 @@ const loadMore = () => {
           ],
           aggregateChannelCount:
             fetchMoreResult.getSortedChannels?.aggregateChannelCount || 0,
+        },
+      };
+    },
+  });
+
+  // Also fetch more download counts
+  fetchMoreDownloadCounts({
+    variables: {
+      offset: currentOffset,
+    },
+    updateQuery: (previousResult, { fetchMoreResult }) => {
+      if (!fetchMoreResult) return previousResult;
+      return {
+        ...previousResult,
+        getSortedChannels: {
+          channels: [
+            ...(previousResult.getSortedChannels?.channels || []),
+            ...(fetchMoreResult.getSortedChannels?.channels || []),
+          ],
         },
       };
     },
@@ -146,7 +239,7 @@ const defaultLabels = {
           <ChannelList
             v-if="channelResult && channelResult.getSortedChannels?.channels"
             class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 dark:bg-gray-900 md:p-6"
-            :channels="channelResult.getSortedChannels?.channels || []"
+            :channels="mergedChannels"
             :result-count="
               channelResult.getSortedChannels?.aggregateChannelCount || 0
             "
