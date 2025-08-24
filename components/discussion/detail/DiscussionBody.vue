@@ -9,15 +9,11 @@ import 'md-editor-v3/lib/preview.css';
 import type { PropType } from 'vue';
 import type { Discussion } from '@/__generated__/graphql';
 import { useRouter } from 'nuxt/app';
-import { useUIStore } from '@/stores/uiStore';
-import { storeToRefs } from 'pinia';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 
 const router = useRouter();
-const uiStore = useUIStore();
-const { fontSize: _fontSize } = storeToRefs(uiStore);
 
 // Get user preferences for sensitive content
 const { result: getUserResult } = useQuery(
