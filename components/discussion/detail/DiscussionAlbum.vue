@@ -1084,11 +1084,7 @@ const handleTouchEnd = (event: TouchEvent) => {
       <div
         v-if="isPanelVisible"
         class="z-40 overflow-y-auto bg-gray-900 text-white transition-all duration-300 ease-in-out"
-        :class="{
-          'h-full w-1/4': !mdAndDown,
-          'h-22 absolute bottom-0 left-0 min-h-[70px] w-full shadow-md shadow-black':
-            mdAndDown,
-        }"
+        :class="'h-22 absolute bottom-0 left-0 min-h-[70px] w-full shadow-md shadow-black'"
       >
         <div class="relative p-5">
           <button
