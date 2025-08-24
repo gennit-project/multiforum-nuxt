@@ -165,7 +165,7 @@ const isDownloadDetailPage = computed(() => {
           :current="formValues.title?.length || 0"
           :max="DISCUSSION_TITLE_CHAR_LIMIT"
         />
-        <div class="py-1 text-xs text-gray-500 dark:text-gray-300">
+        <div class="px-1 py-1 text-xs text-gray-500 dark:text-gray-300">
           {{
             isDownloadDetailPage
               ? `published by ${discussion?.Author ? discussion.Author.username : '[Deleted]'} ${formattedDate ? `on ${formattedDate}` : ''} in ${channelId}`
