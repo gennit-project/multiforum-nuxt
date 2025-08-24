@@ -139,7 +139,7 @@ const hasActiveDownloadFilters = computed(() => {
           data-testid="download-filter-button"
           :class="[
             'flex h-9 items-center gap-1 rounded-md border px-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 lg:hidden',
-            hasActiveDownloadFilters
+            hasActiveDownloadFilters || showFilters
               ? 'border-orange-500 text-orange-600 dark:text-orange-400'
               : 'border-gray-800 text-gray-800 dark:border-gray-600 dark:text-gray-300',
           ]"
