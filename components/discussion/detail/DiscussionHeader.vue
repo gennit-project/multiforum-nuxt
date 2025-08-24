@@ -74,8 +74,19 @@ const {
   },
 });
 
+const hasDownload = route.name
+  ? route.name.toString().includes('downloads')
+  : false;
+
 onDoneDeleting(() => {
   if (props.channelId) {
+    if (hasDownload) {
+      router.push({
+        name: 'forums-forumId-downloads',
+        params: { forumId: props.channelId },
+      });
+      return;
+    }
     router.push({
       name: 'forums-forumId-discussions',
       params: { forumId: props.channelId },
@@ -270,6 +281,22 @@ const authorIsAdmin = computed(
 const authorIsMod = computed(
   () => props.discussion?.Author?.ChannelRoles?.[0]?.showModTag || false
 );
+
+const warningModalTitle = computed(() => {
+  if (hasDownload) {
+    return 'Are you sure you want to delete this download?';
+  }
+
+  return 'Are you sure you want to delete this discussion?';
+});
+
+const warningModalBody = computed(() => {
+  if (hasDownload) {
+    return 'This action will permanently delete the download.';
+  }
+
+  return 'This action will permanently delete the discussion.';
+});
 </script>
 
 <template>
@@ -386,8 +413,8 @@ const authorIsMod = computed(
       </div>
     </div>
     <WarningModal
-      :title="'Delete Discussion'"
-      :body="'Are you sure you want to delete this discussion?'"
+      :title="warningModalTitle"
+      :body="warningModalBody"
       :open="deleteModalIsOpen"
       :icon="'trash'"
       :loading="deleteDiscussionLoading"
