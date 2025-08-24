@@ -4,9 +4,10 @@ import { ref, computed, onMounted, onUnmounted } from 'vue';
 import LeftArrowIcon from '@/components/icons/LeftArrowIcon.vue';
 import RightArrowIcon from '@/components/icons/RightArrowIcon.vue';
 import type { Album } from '@/__generated__/graphql';
-import { useDisplay } from 'vuetify';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+// cSpell:ignore Xmark
 import XmarkIcon from '@/components/icons/XmarkIcon.vue';
+import SwitchHorizontalIcon from '@/components/icons/SwitchHorizontalIcon.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import TextEditor from '@/components/TextEditor.vue';
 import SaveButton from '@/components/SaveButton.vue';
@@ -54,9 +55,6 @@ const props = defineProps({
     default: () => [],
   },
 });
-
-// Use Vuetify's display utilities for responsive design
-const { mdAndDown } = useDisplay();
 
 // Carousel navigation state
 const activeIndex = ref(0);
@@ -553,6 +551,12 @@ const handleTouchEnd = (event: TouchEvent) => {
     }
   }
 };
+
+const panelOnSide = ref(true); // Default to bottom panel (true = column layout)
+
+const togglePanelPosition = () => {
+  panelOnSide.value = !panelOnSide.value;
+};
 </script>
 
 <template>
@@ -595,7 +599,7 @@ const handleTouchEnd = (event: TouchEvent) => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          />
+          >
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -739,7 +743,7 @@ const handleTouchEnd = (event: TouchEvent) => {
                     maxWidth: expandedView ? '600px' : '384px',
                     maxHeight: expandedView ? '400px' : '256px',
                   }"
-                />
+                >
                 <div
                   v-if="editingCaptionIndex === idx && idx === activeIndex"
                   class="mt-1 text-center text-xs"
@@ -842,7 +846,7 @@ const handleTouchEnd = (event: TouchEvent) => {
                 :src="image.url || ''"
                 :alt="image.alt || ''"
                 class="h-20 w-20 rounded object-cover shadow-sm"
-              />
+              >
             </div>
           </div>
         </div>
@@ -854,7 +858,7 @@ const handleTouchEnd = (event: TouchEvent) => {
       v-if="isLightboxOpen"
       class="fixed left-0 top-0 z-50 h-full w-full bg-black transition-all duration-300 ease-in-out"
       :class="{
-        'flex-col': mdAndDown,
+        'flex-col': panelOnSide,
         flex: true,
       }"
     >
@@ -862,42 +866,47 @@ const handleTouchEnd = (event: TouchEvent) => {
       <div
         class="relative z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
         :class="{
-          'h-full w-3/4': !mdAndDown && isPanelVisible,
-          'h-full w-full': mdAndDown || !isPanelVisible,
+          'w-3/4 h-full': !panelOnSide && isPanelVisible,
+          'w-full h-full': panelOnSide && !isPanelVisible,
+          'w-full flex-1': panelOnSide && isPanelVisible,
         }"
       >
         <div
           class="z-50 flex items-center justify-between p-2 text-white"
-          :class="{ 'px-3': mdAndDown, 'px-5': !mdAndDown }"
+          :class="{ 'px-3': panelOnSide, 'px-5': !panelOnSide }"
         >
           <div
             class="flex items-center"
-            :class="{ 'gap-2': mdAndDown, 'gap-4': !mdAndDown }"
+            :class="{ 'gap-2': panelOnSide, 'gap-4': !panelOnSide }"
           >
             <button
               class="bg-transparent cursor-pointer border-0 text-white"
-              :class="{ 'text-2xl': mdAndDown, 'text-3xl': !mdAndDown }"
+              :class="{ 'text-2xl': panelOnSide, 'text-3xl': !panelOnSide }"
               @click="closeLightbox"
             >
               ×
             </button>
             <div class="flex-1">
-              <span :class="{ 'text-xs': mdAndDown, 'text-sm': !mdAndDown }">{{
-                `${lightboxIndex + 1} of ${orderedImages.length}`
-              }}</span>
+              <span
+                :class="{ 'text-xs': panelOnSide, 'text-sm': !panelOnSide }"
+                >{{ `${lightboxIndex + 1} of ${orderedImages.length}` }}</span
+              >
             </div>
           </div>
 
           <div
             class="flex items-center"
-            :class="{ 'gap-1': mdAndDown, 'gap-4': !mdAndDown }"
+            :class="{ 'gap-1': panelOnSide, 'gap-4': !panelOnSide }"
           >
             <!-- Zoom controls -->
             <div class="flex items-center rounded bg-opacity-10">
               <button
                 class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
                 :class="[
-                  { 'px-1 py-1 text-sm': mdAndDown, 'px-2 py-1': !mdAndDown },
+                  {
+                    'px-1 py-1 text-sm': panelOnSide,
+                    'px-2 py-1': !panelOnSide,
+                  },
                   { 'cursor-not-allowed opacity-50': zoomLevel <= 1 },
                 ]"
                 title="Zoom out"
@@ -909,11 +918,11 @@ const handleTouchEnd = (event: TouchEvent) => {
               <span
                 class="text-white"
                 :class="{
-                  'px-1 text-xs': mdAndDown,
-                  'px-2 text-sm': !mdAndDown,
+                  'px-1 text-xs': panelOnSide,
+                  'px-2 text-sm': !panelOnSide,
                 }"
                 >{{
-                  mdAndDown
+                  panelOnSide
                     ? Math.round(zoomLevel * 100) + '%'
                     : Math.round(zoomLevel * 100) + '%'
                 }}</span
@@ -921,7 +930,10 @@ const handleTouchEnd = (event: TouchEvent) => {
               <button
                 class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
                 :class="[
-                  { 'px-1 py-1 text-sm': mdAndDown, 'px-2 py-1': !mdAndDown },
+                  {
+                    'px-1 py-1 text-sm': panelOnSide,
+                    'px-2 py-1': !panelOnSide,
+                  },
                   { 'cursor-not-allowed opacity-50': zoomLevel >= 3 },
                 ]"
                 title="Zoom in"
@@ -934,13 +946,13 @@ const handleTouchEnd = (event: TouchEvent) => {
                 v-if="isZoomed"
                 class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
                 :class="{
-                  'px-1 py-1 text-xs': mdAndDown,
-                  'px-2 py-1': !mdAndDown,
+                  'px-1 py-1 text-xs': panelOnSide,
+                  'px-2 py-1': !panelOnSide,
                 }"
                 title="Reset zoom"
                 @click="resetZoom"
               >
-                {{ mdAndDown ? 'R' : 'Reset' }}
+                {{ panelOnSide ? 'R' : 'Reset' }}
               </button>
             </div>
 
@@ -948,34 +960,47 @@ const handleTouchEnd = (event: TouchEvent) => {
             <button
               class="cursor-pointer rounded border-0 bg-gray-800 bg-opacity-10 text-white transition-colors"
               :class="{
-                'px-1 py-1 text-xs': mdAndDown,
-                'px-2 py-1 text-sm': !mdAndDown,
+                'px-1 py-1 text-xs': panelOnSide,
+                'px-2 py-1 text-sm': !panelOnSide,
               }"
               :title="isPanelVisible ? 'Hide panel' : 'Show panel'"
               @click="togglePanel"
             >
               <span v-if="isPanelVisible">{{
-                mdAndDown ? 'Hide' : 'Close panel'
+                panelOnSide ? 'Hide' : 'Close panel'
               }}</span>
-              <span v-else>{{ mdAndDown ? 'Show' : 'Open panel' }}</span>
+              <span v-else>{{ panelOnSide ? 'Show' : 'Open panel' }}</span>
             </button>
             <!-- More Details button - hidden on narrow screens to save space -->
             <NuxtLink
-              v-if="currentImage?.Uploader?.username && !mdAndDown"
+              v-if="currentImage?.Uploader?.username && !panelOnSide"
               :to="`/u/${currentImage.Uploader.username}/images/${currentImage.id}`"
               class="inline-flex items-center rounded bg-blue-600 px-3 py-1 text-sm font-medium text-white transition-colors hover:bg-blue-700"
             >
               More Details
             </NuxtLink>
+            <!-- Panel position toggle button -->
             <button
               type="button"
               class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
-              :class="{ 'h-6 w-6': mdAndDown, 'h-8 w-8': !mdAndDown }"
+              :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
+              :title="panelOnSide ? 'Move panel to side' : 'Move panel to bottom'"
+              @click="togglePanelPosition"
+            >
+              <SwitchHorizontalIcon
+                :class="{ 'h-4 w-4': panelOnSide, 'h-6 w-6': !panelOnSide }"
+              />
+            </button>
+            <!-- Download button -->
+            <button
+              type="button"
+              class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
+              :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
               :href="currentImage.url || ''"
               @click="() => downloadImage(currentImage.url || '')"
             >
               <DownloadIcon
-                :class="{ 'h-4 w-4': mdAndDown, 'h-6 w-6': !mdAndDown }"
+                :class="{ 'h-4 w-4': panelOnSide, 'h-6 w-6': !panelOnSide }"
               />
             </button>
           </div>
@@ -1068,7 +1093,7 @@ const handleTouchEnd = (event: TouchEvent) => {
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
-          />
+          >
 
           <button
             v-if="orderedImages.length > 1"
@@ -1084,7 +1109,10 @@ const handleTouchEnd = (event: TouchEvent) => {
       <div
         v-if="isPanelVisible"
         class="z-40 overflow-y-auto bg-gray-900 text-white transition-all duration-300 ease-in-out"
-        :class="'h-22 absolute bottom-0 left-0 min-h-[70px] w-full shadow-md shadow-black'"
+        :class="{
+          'w-1/4 h-full': !panelOnSide,
+          'w-full min-h-[120px] max-h-[30vh]': panelOnSide,
+        }"
       >
         <div class="relative p-5">
           <button
