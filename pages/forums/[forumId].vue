@@ -5,7 +5,7 @@ import ChannelHeaderDesktop from '@/components/channel/ChannelHeaderDesktop.vue'
 import DiscussionTitleEditForm from '@/components/discussion/detail/DiscussionTitleEditForm.vue';
 import EventTitleEditForm from '@/components/event/detail/EventTitleEditForm.vue';
 import IssueTitleEditForm from '@/components/mod/IssueTitleEditForm.vue';
-import { GET_CHANNEL } from '@/graphQLData/channel/queries';
+import { GET_CHANNEL, GET_CHANNEL_DOWNLOAD_COUNT } from '@/graphQLData/channel/queries';
 import type { Channel, User } from '@/__generated__/graphql';
 import { computed } from 'vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
@@ -104,6 +104,25 @@ const {
 
 const channel = computed(() => {
   return getChannelResult.value?.channels?.[0] ?? null;
+});
+
+// Get download count separately since we can't query the same field twice
+const {
+  result: downloadCountResult,
+} = useQuery(
+  GET_CHANNEL_DOWNLOAD_COUNT,
+  {
+    uniqueName: channelId,
+  },
+  {
+    fetchPolicy: 'cache-first',
+    nextFetchPolicy: 'cache-first',
+    enabled: !!channelId.value,
+  }
+);
+
+const downloadCount = computed(() => {
+  return downloadCountResult.value?.channels?.[0]?.DiscussionChannelsAggregate?.count ?? 0;
 });
 
 const showNotFound = computed(() => {
@@ -320,6 +339,7 @@ definePageMeta({
                     v-if="showChannelTabs"
                     :admin-list="adminList"
                     :channel="channel"
+                    :download-count="downloadCount"
                     class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
                     :desktop="false"
                     :route="route"

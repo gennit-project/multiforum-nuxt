@@ -278,6 +278,25 @@ const now = DateTime.now()
   })
   .toISO();
 
+export const GET_CHANNEL_DOWNLOAD_COUNT = gql`
+  query getChannelDownloadCount($uniqueName: String!) {
+    channels(where: { uniqueName: $uniqueName }) {
+      uniqueName
+      DiscussionChannelsAggregate(
+        where: {
+          AND: [
+            { NOT: { archived: true } },
+            { NOT: { Discussion: null } },
+            { Discussion: { hasDownload: true } }
+          ]
+        }
+      ) {
+        count
+      }
+    }
+  }
+`;
+
 export const GET_CHANNELS = gql`
   query getSortedChannels(
     $offset: Int

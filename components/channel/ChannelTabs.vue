@@ -24,7 +24,7 @@ type Tab = {
   routeSuffix: string;
   label: string;
   icon: Component;
-  countProperty: keyof Channel | null;
+  countProperty: keyof Channel | '__DOWNLOAD_COUNT__' | null;
 };
 
 type TabRoutes = {
@@ -39,6 +39,10 @@ const props = defineProps({
   channel: {
     type: Object as () => Channel,
     required: true,
+  },
+  downloadCount: {
+    type: Number,
+    default: 0,
   },
   vertical: {
     type: Boolean,
@@ -137,7 +141,7 @@ const tabs = computed((): Tab[] => {
       routeSuffix: 'downloads',
       label: 'Downloads',
       icon: DownloadIcon,
-      countProperty: null,
+      countProperty: '__DOWNLOAD_COUNT__',
     });
   }
 
@@ -217,7 +221,7 @@ const tabs = computed((): Tab[] => {
       <TabButton
         v-for="tab in tabs"
         :key="tab.name"
-        :count="tab.countProperty ? channel[tab.countProperty]?.count : 0"
+        :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
         :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
         :is-active="route.path.includes(tab.routeSuffix)"
         :label="tab.label"
@@ -245,11 +249,11 @@ const tabs = computed((): Tab[] => {
                   v-if="
                     showCounts &&
                     activeTab.countProperty &&
-                    channel[activeTab.countProperty]?.count
+                    (activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count)
                   "
                   class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                 >
-                  {{ channel[activeTab.countProperty]?.count }}
+                  {{ activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count }}
                 </span>
               </div>
               <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
@@ -281,11 +285,11 @@ const tabs = computed((): Tab[] => {
                     v-if="
                       showCounts &&
                       tab.countProperty &&
-                      channel[tab.countProperty]?.count
+                      (tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[tab.countProperty]?.count)
                     "
                     class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                   >
-                    {{ channel[tab.countProperty]?.count }}
+                    {{ tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[tab.countProperty]?.count }}
                   </span>
                 </nuxt-link>
               </div>
@@ -305,11 +309,11 @@ const tabs = computed((): Tab[] => {
                 v-if="
                   showCounts &&
                   activeTab.countProperty &&
-                  channel[activeTab.countProperty]?.count
+                  (activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count)
                 "
                 class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
               >
-                {{ channel[activeTab.countProperty]?.count }}
+                {{ activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count }}
               </span>
             </div>
             <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
