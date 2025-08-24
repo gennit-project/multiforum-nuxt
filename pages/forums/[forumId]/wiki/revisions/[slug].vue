@@ -150,7 +150,7 @@ useHead({
 </script>
 
 <template>
-  <div class="mx-auto max-w-7xl p-4">
+  <div class="mx-auto p-4">
     <div v-if="loading" class="flex items-center justify-center p-8">
       <LoadingSpinner size="lg" />
     </div>
@@ -253,7 +253,7 @@ useHead({
               </div>
             </div>
             <div class="flex items-center text-gray-400 dark:text-gray-500">
-              <i class="fas fa-chevron-right"></i>
+              <i class="fas fa-chevron-right" />
             </div>
           </div>
         </div>

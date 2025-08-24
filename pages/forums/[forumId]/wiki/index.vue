@@ -252,7 +252,7 @@ onGetChannelResult((result) => {
       </RequireAuth>
     </div>
 
-    <div v-else class="mx-auto max-w-7xl p-4">
+    <div v-else class="mx-auto max-w-full p-4">
       <!-- Wiki Home Page Content -->
       <div class="mb-4">
         <div class="flex items-center justify-between">
@@ -326,9 +326,14 @@ onGetChannelResult((result) => {
         </div>
       </div>
 
-      <div class="flex gap-8">
-        <!-- Main content -->
-        <div class="min-w-0 flex-1">
+      <!-- Mobile On This Page Dropdown -->
+      <div class="mb-4 block xl:hidden">
+        <OnThisPage :markdown-content="wikiHomePage.body" :is-mobile="true" />
+      </div>
+
+      <div class="flex flex-col gap-6 xl:flex-row">
+        <!-- Main content - first on mobile/tablet, middle on desktop -->
+        <div class="min-w-0 flex-1 xl:order-2">
           <MarkdownRenderer :text="wikiHomePage.body" />
 
           <!-- Bottom edit button - Docusaurus style -->
@@ -345,50 +350,91 @@ onGetChannelResult((result) => {
           </div>
         </div>
 
-        <!-- Right sidebar with On This Page and Child Pages -->
+        <!-- Left sidebar - On This Page (desktop only) -->
         <div
-          class="sticky top-0 hidden max-h-screen w-80 flex-shrink-0 flex-col gap-6 overflow-y-auto lg:flex"
+          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-1 xl:flex"
         >
           <!-- On This Page Navigation -->
-          <OnThisPage :markdown-content="wikiHomePage.body" />
+          <OnThisPage :markdown-content="wikiHomePage.body" :is-mobile="false" />
+        </div>
 
-          <!-- Child Pages -->
+        <!-- Right sidebar - More Wiki Pages (desktop only) -->
+        <div
+          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-3 xl:flex"
+        >
+          <!-- Child Pages - shown in right sidebar at xl screens -->
           <div
             v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
+            class="w-full py-2"
           >
-            <div
-              class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-500 dark:bg-gray-800"
+            <h3
+              class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
             >
-              <h3
-                class="font-semibold mb-4 text-lg text-gray-900 dark:text-white"
+              More Wiki Pages
+            </h3>
+            <div class="space-y-1">
+              <div
+                v-for="childPage in wikiHomePage.ChildPages"
+                :key="childPage.id"
+                class="group"
               >
-                More Wiki Pages
-              </h3>
-              <div class="space-y-2">
-                <div
-                  v-for="childPage in wikiHomePage.ChildPages"
-                  :key="childPage.id"
-                  class="group"
+                <a
+                  :href="`/forums/${forumId}/wiki/${childPage.slug}`"
+                  class="hover:bg-orange-50 block rounded px-1 py-0.5 text-xs font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                  @click.prevent="
+                    router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
+                  "
                 >
-                  <a
-                    :href="`/forums/${forumId}/wiki/${childPage.slug}`"
-                    class="hover:bg-orange-50 block rounded px-2 py-1 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
-                    @click.prevent="
-                      router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
-                    "
-                  >
-                    {{ childPage.title }}
-                  </a>
-                  <p class="ml-2 text-xs text-gray-500 dark:text-gray-400">
-                    Updated
-                    {{
-                      timeAgo(
-                        new Date(childPage.updatedAt || childPage.createdAt)
-                      )
-                    }}
-                  </p>
-                </div>
+                  {{ childPage.title }}
+                </a>
+                <p class="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                  Updated
+                  {{
+                    timeAgo(
+                      new Date(childPage.updatedAt || childPage.createdAt)
+                    )
+                  }}
+                </p>
               </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mobile More Wiki Pages - shown below main content on small/medium screens -->
+      <div
+        v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
+        class="mt-8 block xl:hidden"
+      >
+        <div class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800">
+          <h3
+            class="mb-4 text-lg font-semibold text-gray-900 dark:text-white"
+          >
+            More Wiki Pages
+          </h3>
+          <div class="space-y-3">
+            <div
+              v-for="childPage in wikiHomePage.ChildPages"
+              :key="childPage.id"
+              class="group"
+            >
+              <a
+                :href="`/forums/${forumId}/wiki/${childPage.slug}`"
+                class="hover:bg-orange-50 block rounded px-3 py-2 text-sm font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                @click.prevent="
+                  router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
+                "
+              >
+                {{ childPage.title }}
+              </a>
+              <p class="ml-3 text-xs text-gray-500 dark:text-gray-400">
+                Updated
+                {{
+                  timeAgo(
+                    new Date(childPage.updatedAt || childPage.createdAt)
+                  )
+                }}
+              </p>
             </div>
           </div>
         </div>

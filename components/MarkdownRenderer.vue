@@ -484,6 +484,7 @@ const containerStyle = computed(() => {
       padding: 0.75rem 1rem !important;
       text-align: left !important;
       font-weight: 600 !important;
+      font-size: 0.8rem !important;
       border-bottom: 1px solid #d0d7de !important;
       border-right: 1px solid #d0d7de !important;
       background-color: #f6f8fa !important;
@@ -501,6 +502,7 @@ const containerStyle = computed(() => {
 
     td {
       padding: 0.75rem 1rem !important;
+      font-size: 0.8rem !important;
       border-bottom: 1px solid #d0d7de !important;
       border-right: 1px solid #d0d7de !important;
 
@@ -851,6 +853,7 @@ const containerStyle = computed(() => {
     padding: 0.75rem 1rem !important;
     text-align: left !important;
     font-weight: 600 !important;
+    font-size: 0.8rem !important;
     border-bottom: 1px solid #d0d7de !important;
     border-right: 1px solid #d0d7de !important;
     background-color: #f6f8fa !important;
@@ -868,6 +871,7 @@ const containerStyle = computed(() => {
 
   td {
     padding: 0.75rem 1rem !important;
+    font-size: 0.8rem !important;
     border-bottom: 1px solid #d0d7de !important;
     border-right: 1px solid #d0d7de !important;
 

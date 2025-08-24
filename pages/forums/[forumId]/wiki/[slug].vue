@@ -188,7 +188,7 @@ onGetWikiPageResult((result) => {
       </div>
     </div>
 
-    <div v-else class="mx-auto max-w-7xl p-4">
+    <div v-else class="mx-auto max-w-full p-4">
       <!-- Wiki Page Content -->
       <div class="mb-4">
         <!-- Breadcrumb navigation -->
@@ -241,9 +241,14 @@ onGetWikiPageResult((result) => {
         </div>
       </div>
 
-      <div class="flex gap-8">
-        <!-- Main content -->
-        <div class="min-w-0 flex-1">
+      <!-- Mobile On This Page Dropdown -->
+      <div class="mb-4 block xl:hidden">
+        <OnThisPage :markdown-content="wikiPage.body" :is-mobile="true" />
+      </div>
+
+      <div class="flex flex-col gap-6 xl:flex-row">
+        <!-- Main content - first on mobile/tablet, middle on desktop -->
+        <div class="min-w-0 flex-1 xl:order-2">
           <MarkdownRenderer :text="wikiPage.body" />
 
           <!-- Bottom edit button - Docusaurus style -->
@@ -260,12 +265,19 @@ onGetWikiPageResult((result) => {
           </div>
         </div>
 
-        <!-- Right sidebar with On This Page -->
+        <!-- Left sidebar - On This Page (desktop only) -->
         <div
-          class="sticky top-0 hidden max-h-screen w-80 flex-shrink-0 flex-col gap-6 overflow-y-auto lg:flex"
+          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-1 xl:flex"
         >
           <!-- On This Page Navigation -->
-          <OnThisPage :markdown-content="wikiPage.body" />
+          <OnThisPage :markdown-content="wikiPage.body" :is-mobile="false" />
+        </div>
+
+        <!-- Right sidebar - placeholder for consistency -->
+        <div
+          class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-3 xl:flex"
+        >
+          <!-- This could be used for related pages or other navigation in the future -->
         </div>
       </div>
     </div>
