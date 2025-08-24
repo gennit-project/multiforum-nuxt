@@ -94,15 +94,15 @@ const hasAlbum = computed(() => {
               class="flex h-48 w-full items-center justify-center border border-gray-300 bg-gray-100 text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
             >
               <div class="flex flex-col items-center space-y-3">
-                <span>No image available</span>
+                <span v-if="!loggedInUserIsAuthor">No images available.</span>
                 <button
                   v-if="loggedInUserIsAuthor && usernameVar"
                   class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
-                  data-testid="add-images-button"
+                  data-testid="add-album-button"
                   @click="emit('handleClickAddAlbum')"
                 >
                   <ImageIcon class="h-5 w-5" />
-                  <span>Add Image(s)</span>
+                  <span>Add Images</span>
                 </button>
               </div>
             </div>
