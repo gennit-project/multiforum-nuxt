@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { computed, defineAsyncComponent, ref, watch } from 'vue';
-import { useQuery, useMutation } from '@vue/apollo-composable';
+import { computed, ref, watch } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import {
   GET_DISCUSSION_COMMENTS,
@@ -12,37 +12,22 @@ import type {
   DiscussionChannel,
   Comment,
 } from '@/__generated__/graphql';
-import { ADD_FEEDBACK_COMMENT_TO_DISCUSSION } from '@/graphQLData/discussion/mutations';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import InfoBanner from '@/components/InfoBanner.vue';
-import DiscussionBody from '@/components/discussion/detail/DiscussionBody.vue';
 import DiscussionHeader from '@/components/discussion/detail/DiscussionHeader.vue';
 import DiscussionCommentsWrapper from '@/components/discussion/detail/DiscussionCommentsWrapper.vue';
 import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionChannelLinks.vue';
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
-import DiscussionVotes from '@/components/discussion/vote/DiscussionVotes.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
-import GenericFeedbackFormModal from '@/components/GenericFeedbackFormModal.vue';
-import ConfirmUndoDiscussionFeedbackModal from '@/components/discussion/detail/ConfirmUndoDiscussionFeedbackModal.vue';
-import EditFeedbackModal from '@/components/discussion/detail/EditFeedbackModal.vue';
-import Notification from '@/components/NotificationComponent.vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
 import { usernameVar, modProfileNameVar } from '@/cache';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRoute } from 'nuxt/app';
 import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
-import ImageIcon from '@/components/icons/ImageIcon.vue';
 import AlbumEditForm from './AlbumEditForm.vue';
-import MarkAsAnsweredButton from './MarkAsAnsweredButton.vue';
 import ArchivedDiscussionInfoBanner from './ArchivedDiscussionInfoBanner.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
-import DiscussionTitleVersions from './activityFeed/DiscussionTitleVersions.vue';
-import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
-import MarkdownPreview from '@/components/MarkdownPreview.vue';
-import PencilIcon from '@/components/icons/PencilIcon.vue';
-// Lazy load the album components since they're not needed for initial render
-const DiscussionAlbum = defineAsyncComponent(
-  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
-);
+import DiscussionLayoutManager from './DiscussionLayoutManager.vue';
+import FeedbackModalManager from './FeedbackModalManager.vue';
 
 const COMMENT_LIMIT = 50;
 
@@ -62,7 +47,6 @@ const props = defineProps({
 });
 
 const route = useRoute();
-const router = useRouter();
 const offset = ref(0);
 const channelId = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
@@ -94,22 +78,6 @@ onGetDiscussionResult((newResult) => {
   }
 });
 
-const {
-  mutate: addFeedbackCommentToDiscussion,
-  error: addFeedbackCommentToDiscussionError,
-  loading: addFeedbackCommentToDiscussionLoading,
-  onDone: onAddFeedbackCommentToDiscussionDone,
-} = useMutation(ADD_FEEDBACK_COMMENT_TO_DISCUSSION);
-
-const showFeedbackFormModal = ref(false);
-const showEditFeedbackModal = ref(false);
-const showConfirmUndoFeedbackModal = ref(false);
-const showFeedbackSubmittedSuccessfully = ref(false);
-
-onAddFeedbackCommentToDiscussionDone(() => {
-  showFeedbackFormModal.value = false;
-  showFeedbackSubmittedSuccessfully.value = true;
-});
 
 const commentSort = computed(() => getSortFromQuery(route.query));
 
@@ -137,6 +105,7 @@ const {
 
 const discussionBodyEditMode = ref(false);
 const albumEditMode = ref(false);
+const feedbackModalManager = ref();
 
 const discussion = computed<Discussion | null>(() => {
   const currentDiscussion = getDiscussionResult.value?.discussions[0];
@@ -260,72 +229,26 @@ const reachedEndOfResults = computed(
     loadedRootCommentCount.value >= commentCount.value
 );
 
-const loggedInUserIsAuthor = computed(() => {
-  return discussion.value?.Author?.username === usernameVar.value;
-});
 const discussionAuthor = computed(
   () => discussion.value?.Author?.username || ''
 );
 
-// Check if discussion has downloadable .stl files
-const stlFiles = computed(() => {
-  if (!discussion.value?.DownloadableFiles) return [];
-
-  return discussion.value.DownloadableFiles.filter(
-    (file) =>
-      file.fileName?.toLowerCase().endsWith('.stl') ||
-      file.url?.toLowerCase().endsWith('.stl')
-  );
-});
-
-// Check if discussion should show album (has images OR .stl files)
-const shouldShowAlbum = computed(() => {
-  const hasImages =
-    discussion.value?.Album?.Images && discussion.value.Album.Images.length > 0;
-  const hasStlFiles = stlFiles.value.length > 0;
-
-  return hasImages || hasStlFiles;
-});
-
-const handleClickGiveFeedback = () => {
-  showFeedbackFormModal.value = true;
-};
-
-const feedbackText = ref('');
 const previousOffset = ref(0);
 
-const handleSubmitFeedback = async () => {
-  if (!feedbackText.value) {
-    console.error('No feedback text found.');
-    return;
-  }
-  if (!loggedInUserModName.value) {
-    console.error('No mod name found.');
-    return;
-  }
-  if (!activeDiscussionChannel.value?.channelUniqueName) {
-    console.error('No active discussion channel found.');
-    return;
-  }
-  await addFeedbackCommentToDiscussion({
-    discussionId: props.discussionId,
-    text: feedbackText.value,
-    modProfileName: loggedInUserModName.value,
-    channelId: activeDiscussionChannel.value?.channelUniqueName,
-    discussionChannelId: activeDiscussionChannel.value?.id,
-  });
-  // Refetch the discussion so that the thumbs-down shows
-  // that it's active, meaning the user has given feedback.
-  refetchDiscussion();
+const handleClickGiveFeedback = () => {
+  feedbackModalManager.value?.handleClickGiveFeedback();
 };
-const handleFeedbackInput = (event: string) => {
-  feedbackText.value = event;
-};
+
 const handleClickUndoFeedback = () => {
-  showConfirmUndoFeedbackModal.value = true;
+  feedbackModalManager.value?.handleClickUndoFeedback();
 };
+
 const handleClickEditFeedback = () => {
-  showEditFeedbackModal.value = true;
+  feedbackModalManager.value?.handleClickEditFeedback();
+};
+
+const onFeedbackSubmitted = () => {
+  refetchDiscussion();
 };
 const handleClickEditDiscussionBody = () => {
   discussionBodyEditMode.value = true;
@@ -396,263 +319,29 @@ const handleEditAlbum = () => {
                   :discussion="discussion"
                   @close-editor="albumEditMode = false"
                 />
-                <!-- Download mode layout with sidebar -->
-                <div
-                  v-else-if="downloadMode && discussion"
-                  key="download-layout"
-                  class="flex flex-col gap-4 lg:flex-row lg:gap-6"
-                >
-                  <div class="flex-1">
-                    <DiscussionBody
-                      :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
-                      :channel-id="channelId"
-                      :discussion="discussion"
-                      :discussion-channel-id="activeDiscussionChannel?.id"
-                      :download-mode="downloadMode"
-                      :emoji-json="activeDiscussionChannel?.emoji"
-                      :show-emoji-button="!downloadMode"
-                    >
-                      <template #album-slot>
-                        <div class="mt-1 bg-black text-white">
-                          <DiscussionAlbum
-                            v-if="shouldShowAlbum"
-                            :album="discussion?.Album || null"
-                            :carousel-format="true"
-                            :expanded-view="true"
-                            :discussion-author="
-                              discussion.Author?.username || ''
-                            "
-                            :discussion-id="discussionId"
-                            :stl-files="stlFiles"
-                            @album-updated="refetchDiscussion"
-                            @edit-album="handleEditAlbum"
-                          />
-                          <div
-                            v-else
-                            class="flex h-48 w-full items-center justify-center border border-gray-300 bg-gray-100 text-gray-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-400"
-                          >
-                            <div class="flex flex-col items-center space-y-3">
-                              <span>No image available</span>
-                              <button
-                                v-if="loggedInUserIsAuthor && usernameVar"
-                                class="flex items-center space-x-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-blue-700"
-                                data-testid="add-images-button"
-                                @click="handleClickAddAlbum"
-                              >
-                                <ImageIcon class="h-5 w-5" />
-                                <span>Add Image(s)</span>
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </template>
-                      <template #activity-feed-slot>
-                        <!-- Title Edit History moved to Description tab for downloads -->
-                      </template>
-                      <template #mark-answered-slot>
-                        <MarkAsAnsweredButton
-                          v-if="loggedInUserIsAuthor"
-                          :answered="activeDiscussionChannel?.answered || false"
-                          :channel-id="channelId"
-                          :discussion-channel-id="activeDiscussionChannel?.id"
-                          :discussion-id="discussionId"
-                          @mark-unanswered="refetchDiscussionChannel"
-                        />
-                      </template>
-                      <template #button-slot>
-                        <div class="flex-col items-center">
-                          <DiscussionVotes
-                            v-if="activeDiscussionChannel"
-                            :discussion="discussion"
-                            :discussion-channel="activeDiscussionChannel"
-                            :show-downvote="
-                              !loggedInUserIsAuthor &&
-                              (activeDiscussionChannel?.Channel
-                                ?.feedbackEnabled ??
-                                true)
-                            "
-                            :use-heart-icon="downloadMode"
-                            @handle-click-edit-feedback="
-                              handleClickEditFeedback
-                            "
-                            @handle-click-give-feedback="
-                              handleClickGiveFeedback
-                            "
-                            @handle-click-undo-feedback="
-                              handleClickUndoFeedback
-                            "
-                          />
-                        </div>
-                      </template>
-                    </DiscussionBody>
-                  </div>
-                  <div class="flex-shrink-0">
-                    <DownloadSidebar
-                      v-if="discussion"
-                      :discussion="discussion"
-                    />
-                  </div>
-                </div>
-                <!-- Regular discussion mode layout -->
-                <DiscussionBody
+                <DiscussionLayoutManager
                   v-else
-                  :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
-                  :channel-id="channelId"
                   :discussion="discussion"
-                  :discussion-channel-id="activeDiscussionChannel?.id"
+                  :discussion-id="discussionId"
+                  :channel-id="channelId"
+                  :active-discussion-channel="activeDiscussionChannel"
                   :download-mode="downloadMode"
-                  :emoji-json="activeDiscussionChannel?.emoji"
-                  :show-emoji-button="!downloadMode"
-                >
-                  <template #album-slot>
-                    <div class="bg-black text-white">
-                      <DiscussionAlbum
-                        v-if="shouldShowAlbum"
-                        :album="discussion?.Album || null"
-                        :carousel-format="true"
-                        :discussion-author="discussion.Author?.username || ''"
-                        :discussion-id="discussionId"
-                        :stl-files="stlFiles"
-                        @album-updated="refetchDiscussion"
-                        @edit-album="handleEditAlbum"
-                      />
-                    </div>
-                  </template>
-                  <template #activity-feed-slot>
-                    <DiscussionTitleVersions
-                      v-if="
-                        discussion?.PastTitleVersions &&
-                        discussion.PastTitleVersions.length > 0
-                      "
-                      :discussion="discussion"
-                    />
-                  </template>
-                  <template #mark-answered-slot>
-                    <MarkAsAnsweredButton
-                      v-if="loggedInUserIsAuthor"
-                      :answered="activeDiscussionChannel?.answered || false"
-                      :channel-id="channelId"
-                      :discussion-channel-id="activeDiscussionChannel?.id"
-                      :discussion-id="discussionId"
-                      @mark-unanswered="refetchDiscussionChannel"
-                    />
-                  </template>
-                  <template #button-slot>
-                    <div class="flex-col items-center">
-                      <DiscussionVotes
-                        v-if="activeDiscussionChannel"
-                        :discussion="discussion"
-                        :discussion-channel="activeDiscussionChannel"
-                        :show-downvote="
-                          !loggedInUserIsAuthor &&
-                          (activeDiscussionChannel?.Channel?.feedbackEnabled ??
-                            true)
-                        "
-                        :use-heart-icon="downloadMode"
-                        @handle-click-edit-feedback="handleClickEditFeedback"
-                        @handle-click-give-feedback="handleClickGiveFeedback"
-                        @handle-click-undo-feedback="handleClickUndoFeedback"
-                      />
-                    </div>
-                  </template>
-                </DiscussionBody>
+                  :aggregate-comment-count="aggregateCommentCount"
+                  @discussion-refetch="refetchDiscussion"
+                  @discussion-channel-refetch="refetchDiscussionChannel"
+                  @handle-click-add-album="handleClickAddAlbum"
+                  @edit-album="handleEditAlbum"
+                  @handle-click-edit-feedback="handleClickEditFeedback"
+                  @handle-click-give-feedback="handleClickGiveFeedback"
+                  @handle-click-undo-feedback="handleClickUndoFeedback"
+                />
               </div>
             </div>
           </div>
         </div>
 
-        <div v-if="downloadMode">
-          <!-- Download mode tabs -->
-          <div class="border-b border-gray-200 dark:border-gray-700">
-            <nav class="flex space-x-8 px-2">
-              <nuxt-link
-                :to="{
-                  name: 'forums-forumId-downloads-discussionId',
-                  params: {
-                    forumId: channelId,
-                    discussionId: props.discussionId,
-                  },
-                }"
-                class="border-b-2 px-1 py-2 text-sm font-medium"
-                :class="
-                  typeof $route.name === 'string' &&
-                  ($route.name.includes('description') ||
-                    $route.name === 'forums-forumId-downloads-discussionId')
-                    ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                "
-              >
-                Description
-              </nuxt-link>
-              <nuxt-link
-                :to="{
-                  name: 'forums-forumId-downloads-discussionId-comments',
-                  params: {
-                    forumId: channelId,
-                    discussionId: props.discussionId,
-                  },
-                }"
-                class="border-b-2 px-1 py-2 text-sm font-medium"
-                :class="
-                  typeof $route.name === 'string' &&
-                  $route.name.includes('comments')
-                    ? 'border-orange-500 text-orange-600 dark:text-orange-400'
-                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300'
-                "
-              >
-                Comments ({{ aggregateCommentCount }})
-              </nuxt-link>
-            </nav>
-          </div>
-
-          <!-- Tab content via router-view -->
-          <div class="mt-2 w-full">
-            <NuxtPage :discussion="discussion" />
-            <!-- Fallback to description if no nested route matches -->
-            <div
-              v-if="$route.name === 'forums-forumId-downloads-discussionId'"
-              class="px-2"
-            >
-              <div
-                class="flex flex-col-reverse gap-4 lg:flex-row lg:items-start lg:justify-between"
-              >
-                <!-- Description content -->
-                <div v-if="discussion?.body" class="min-w-0 flex-1">
-                  <MarkdownPreview
-                    :disable-gallery="false"
-                    :text="discussion.body"
-                  />
-                </div>
-                <div
-                  v-else
-                  class="min-w-0 flex-1 py-8 text-center text-gray-500 dark:text-gray-400"
-                >
-                  No description available for this download.
-                </div>
-                <div
-                  v-if="loggedInUserIsAuthor && discussion"
-                  class="flex w-full justify-end lg:w-auto"
-                >
-                  <button
-                    type="button"
-                    class="hover:bg-gray-50 inline-flex items-center gap-2 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                    data-testid="edit-download-button-fallback"
-                    @click="
-                      router.push(
-                        `/forums/${channelId}/downloads/${discussionId}/description`
-                      )
-                    "
-                  >
-                    <PencilIcon class="h-4 w-4" />
-                    Edit Description
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div v-else>
+        <!-- Comments section (shown for non-download mode) -->
+        <div v-if="!downloadMode">
           <div class="my-2 px-2 pt-2">
             <DiscussionCommentsWrapper
               :key="activeDiscussionChannel?.id"
@@ -683,42 +372,19 @@ const handleEditAlbum = () => {
             </DiscussionCommentsWrapper>
           </div>
           <DiscussionChannelLinks
-            v-if="discussion && discussion.DiscussionChannels"
+            v-if="discussion && (discussion as Discussion).DiscussionChannels"
             :channel-id="activeDiscussionChannel?.channelUniqueName || ''"
-            :discussion-channels="discussion.DiscussionChannels"
+            :discussion-channels="(discussion as Discussion).DiscussionChannels"
           />
         </div>
       </div>
     </div>
-    <GenericFeedbackFormModal
-      v-if="showFeedbackFormModal"
-      :error="addFeedbackCommentToDiscussionError?.message"
-      :loading="addFeedbackCommentToDiscussionLoading"
-      :open="showFeedbackFormModal"
-      :primary-button-disabled="!feedbackText"
-      @close="showFeedbackFormModal = false"
-      @primary-button-click="handleSubmitFeedback"
-      @update-feedback="handleFeedbackInput"
-    />
-    <ConfirmUndoDiscussionFeedbackModal
-      v-if="showConfirmUndoFeedbackModal"
-      :key="loggedInUserModName"
+    <FeedbackModalManager
+      ref="feedbackModalManager"
       :discussion-id="discussionId"
-      :mod-name="loggedInUserModName"
-      :open="showConfirmUndoFeedbackModal"
-      @close="showConfirmUndoFeedbackModal = false"
-    />
-    <EditFeedbackModal
-      v-if="showEditFeedbackModal"
-      :discussion-id="discussionId"
-      :mod-name="loggedInUserModName"
-      :open="showEditFeedbackModal"
-      @close="showEditFeedbackModal = false"
-    />
-    <Notification
-      :show="showFeedbackSubmittedSuccessfully"
-      :title="'Your feedback was submitted successfully.'"
-      @close-notification="showFeedbackSubmittedSuccessfully = false"
+      :logged-in-user-mod-name="loggedInUserModName"
+      :active-discussion-channel="activeDiscussionChannel"
+      @feedback-submitted="onFeedbackSubmitted"
     />
   </div>
 </template>
