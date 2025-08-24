@@ -200,7 +200,7 @@ const hasActiveDownloadFilters = computed(() => {
     <!-- Mobile Filter Panel -->
     <div
       v-if="showFilters && filterGroups.length > 0"
-      class="flex flex-col gap-4 bg-gray-100 px-2 py-4 dark:bg-gray-700 dark:text-gray-300 lg:hidden"
+      class="flex flex-col gap-4 bg-gray-100 px-2 py-4 dark:bg-gray-800 dark:text-gray-300 lg:hidden"
     >
       <DownloadFilters :filter-groups="filterGroups" />
 

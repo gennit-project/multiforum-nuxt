@@ -567,7 +567,7 @@ const handleEditAlbum = () => {
             <nav class="flex space-x-8 px-2">
               <nuxt-link
                 :to="{
-                  name: 'forums-forumId-downloads-discussionId-description',
+                  name: 'forums-forumId-downloads-discussionId',
                   params: {
                     forumId: channelId,
                     discussionId: props.discussionId,
