@@ -125,7 +125,7 @@ const canScrollRight = computed(
           <div
             v-for="(image, index) in visibleThumbnails"
             :key="`thumbnail-${thumbnailStartIndex + index}`"
-            class="aspect-square h-20 w-20 cursor-pointer overflow-hidden rounded border transition-all"
+            class="aspect-square h-20 w-20 cursor-pointer rounded border transition-all"
             :class="[
               activeIndex === thumbnailStartIndex + index
                 ? 'border-2 border-orange-500'

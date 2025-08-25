@@ -18,7 +18,7 @@ import {
 defineEmits(['toggleDropdown']);
 
 const route = useRoute();
-const { lgAndUp } = useDisplay();
+const { lgAndUp, smAndDown } = useDisplay();
 
 const channelId = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
@@ -83,7 +83,7 @@ const isOnMapPage = computed(() => {
               <span v-if="!lgAndUp">🐝</span>
               <span
                 class="logo-font font-bold text-white"
-                :class="{ 'ml-1': !lgAndUp }"
+                :class="{ 'ml-1': !lgAndUp, 'ml-8': smAndDown }"
                 >Topical</span
               >
               <template #fallback>
