@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { useRoute, useRouter } from 'nuxt/app';
+import { useRouter } from 'nuxt/app';
 import type { Discussion } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
@@ -25,7 +25,6 @@ const props = defineProps({
   },
 });
 
-const route = useRoute();
 const router = useRouter();
 
 const loggedInUserIsAuthor = computed(() => {

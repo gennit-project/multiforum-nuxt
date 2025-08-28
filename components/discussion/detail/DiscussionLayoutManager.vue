@@ -4,7 +4,7 @@ import DownloadModeLayout from './DownloadModeLayout.vue';
 import RegularDiscussionLayout from './RegularDiscussionLayout.vue';
 import DownloadTabNavigation from './DownloadTabNavigation.vue';
 
-const props = defineProps({
+defineProps({
   discussion: {
     type: Object as () => Discussion,
     required: true,

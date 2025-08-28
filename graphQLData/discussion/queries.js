@@ -25,6 +25,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
     $showArchived: Boolean!
     $options: DiscussionListOptions
     $hasDownload: Boolean
+    $labelFilters: [LabelFilterInput!]
   ) {
     getDiscussionsInChannel(
       channelUniqueName: $channelUniqueName
@@ -33,6 +34,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
       searchInput: $searchInput
       showArchived: $showArchived
       hasDownload: $hasDownload
+      labelFilters: $labelFilters
     ) {
       aggregateDiscussionChannelsCount
       discussionChannels {

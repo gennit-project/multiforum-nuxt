@@ -17,6 +17,7 @@ import {
   getSortFromQuery,
   getTimeFrameFromQuery,
 } from '@/components/comments/getSortFromQuery';
+import { convertUrlParamsToLabelFilters } from '@/utils/downloadFilters';
 import type { Discussion, Album, FilterGroup } from '@/__generated__/graphql';
 
 const DOWNLOAD_PAGE_LIMIT = 25;
@@ -70,6 +71,10 @@ const showArchived = computed(() => {
   return filterValues.value.showArchived;
 });
 
+const labelFilters = computed(() => {
+  return convertUrlParamsToLabelFilters(route);
+});
+
 const {
   result: downloadChannelResult,
   error: downloadError,
@@ -82,6 +87,7 @@ const {
   selectedTags,
   showArchived,
   hasDownload: true,
+  labelFilters,
   options: {
     limit: DOWNLOAD_PAGE_LIMIT,
     offset: 0,
@@ -163,30 +169,6 @@ onMounted(() => {
   }
 });
 
-// Parse download-specific filter values from query params
-const getDownloadFiltersFromQuery = () => {
-  const filters: Record<string, string[]> = {};
-
-  Object.keys(route.query).forEach((key) => {
-    if (key.startsWith('filter_')) {
-      const filterKey = key.replace('filter_', '');
-      const value = route.query[key];
-
-      if (typeof value === 'string' && value.length > 0) {
-        filters[filterKey] = value.split(',');
-      } else if (Array.isArray(value)) {
-        filters[filterKey] = value.filter(
-          (v): v is string => typeof v === 'string'
-        );
-      }
-    }
-  });
-
-  return filters;
-};
-
-const downloadFilters = ref(getDownloadFiltersFromQuery());
-
 watch(
   () => route.query,
   () => {
@@ -195,7 +177,6 @@ watch(
         route,
         channelId: channelId.value,
       });
-      downloadFilters.value = getDownloadFiltersFromQuery();
     }
   }
 );
@@ -209,45 +190,9 @@ const filterByChannel = (channel: string) => {
   emit('filterByChannel', channel);
 };
 
-// Filter downloads based on selected filter groups
+// Use backend-filtered results directly
 const filteredDownloads = computed(() => {
-  const downloads =
-    downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels ||
-    [];
-
-  // If no filters are active, return all downloads
-  const hasActiveFilters = Object.values(downloadFilters.value).some(
-    (values) => values.length > 0
-  );
-  if (!hasActiveFilters) {
-    return downloads;
-  }
-
-  // For now, this is a placeholder for client-side filtering
-  // In a full implementation, this would filter based on discussion tags
-  // that match the filter group key-value pairs
-  return downloads.filter((discussionChannel: any) => {
-    const discussion = discussionChannel.Discussion;
-    if (!discussion?.Tags) return false;
-
-    // Check if discussion tags match any selected filter values
-    const discussionTags = discussion.Tags.map((tag: any) => tag.text);
-
-    // For each active filter group, check if discussion has matching tags
-    return Object.entries(downloadFilters.value).every(
-      ([_filterKey, selectedValues]) => {
-        if (selectedValues.length === 0) return true;
-
-        // Simple tag matching - in a real implementation, this would be more sophisticated
-        // For now, we'll check if any discussion tag contains the filter value
-        return selectedValues.some((filterValue) =>
-          discussionTags.some((tag: string) =>
-            tag.toLowerCase().includes(filterValue.toLowerCase())
-          )
-        );
-      }
-    );
-  });
+  return downloadChannelResult.value?.getDiscussionsInChannel?.discussionChannels || [];
 });
 
 const reachedEndOfResults = computed(() => {
