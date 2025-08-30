@@ -74,7 +74,7 @@
     "tippy.js": "^6.3.7",
     "v-code-diff": "^1.13.1",
     "v-tooltip": "^4.0.0-beta.17",
-    "vite-plugin-vuetify": "^2.1.0",
+    "vite-plugin-vuetify": "^2.1.2",
     "vue": "^3.5.13",
     "vue-apollo": "3.1.2",
     "vue-click-outside": "^1.1.0",
