@@ -33,6 +33,11 @@ config
 cypress/videos
 cypress/screenshots
 cors-config.json
+
+# Coverage reports
+coverage/
+*.lcov
+
 # Sentry Config File
 .env.sentry-build-plugin
 .vercel

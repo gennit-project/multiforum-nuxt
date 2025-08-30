@@ -19,6 +19,9 @@
     "test": "cypress open",
     "test:unit": "vitest",
     "test:unit:run": "vitest run",
+    "coverage": "vitest run --coverage",
+    "coverage:ui": "vitest --coverage --ui",
+    "coverage:open": "npm run coverage && open coverage/index.html",
     "tsc": "vue-tsc --noEmit",
     "verify": "npm run tsc && npm run test:unit:run",
     "lint-verify": "npm run test:unit:run && npm run lint:a11y"
@@ -123,6 +126,7 @@
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "@vitejs/plugin-vue": "^5.2.4",
+    "@vitest/coverage-v8": "^3.2.4",
     "@vue/eslint-config-typescript": "^13.0.0",
     "@vue/test-utils": "^2.4.6",
     "cypress": "^14.3.2",
