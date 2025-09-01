@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
@@ -1171,6 +1171,9 @@ export type Channel = {
   ElevatedModRole?: Maybe<ModChannelRole>;
   ElevatedModRoleAggregate?: Maybe<ChannelModChannelRoleElevatedModRoleAggregationSelection>;
   ElevatedModRoleConnection: ChannelElevatedModRoleConnection;
+  EnabledPlugins: Array<PluginVersion>;
+  EnabledPluginsAggregate?: Maybe<ChannelPluginVersionEnabledPluginsAggregationSelection>;
+  EnabledPluginsConnection: ChannelEnabledPluginsConnection;
   EventChannels: Array<EventChannel>;
   EventChannelsAggregate?: Maybe<ChannelEventChannelEventChannelsAggregationSelection>;
   EventChannelsConnection: ChannelEventChannelsConnection;
@@ -1365,6 +1368,28 @@ export type ChannelElevatedModRoleConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<ChannelElevatedModRoleConnectionSort>>;
   where?: InputMaybe<ChannelElevatedModRoleConnectionWhere>;
+};
+
+
+export type ChannelEnabledPluginsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<PluginVersionOptions>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type ChannelEnabledPluginsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type ChannelEnabledPluginsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ChannelEnabledPluginsConnectionSort>>;
+  where?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
 };
 
 
@@ -2191,6 +2216,7 @@ export type ChannelConnectInput = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleConnectFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsConnectFieldInput>>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleConnectFieldInput>;
+  EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsConnectFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsConnectFieldInput>>;
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsConnectFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesConnectFieldInput>>;
@@ -2236,6 +2262,7 @@ export type ChannelConnectedRelationships = {
   DefaultModRole?: Maybe<ChannelDefaultModRoleConnectedRelationship>;
   DiscussionChannels?: Maybe<ChannelDiscussionChannelsConnectedRelationship>;
   ElevatedModRole?: Maybe<ChannelElevatedModRoleConnectedRelationship>;
+  EnabledPlugins?: Maybe<ChannelEnabledPluginsConnectedRelationship>;
   EventChannels?: Maybe<ChannelEventChannelsConnectedRelationship>;
   FilterGroups?: Maybe<ChannelFilterGroupsConnectedRelationship>;
   Issues?: Maybe<ChannelIssuesConnectedRelationship>;
@@ -2258,6 +2285,7 @@ export type ChannelCreateInput = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleFieldInput>;
   DiscussionChannels?: InputMaybe<ChannelDiscussionChannelsFieldInput>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleFieldInput>;
+  EnabledPlugins?: InputMaybe<ChannelEnabledPluginsFieldInput>;
   EventChannels?: InputMaybe<ChannelEventChannelsFieldInput>;
   FilterGroups?: InputMaybe<ChannelFilterGroupsFieldInput>;
   Issues?: InputMaybe<ChannelIssuesFieldInput>;
@@ -2595,6 +2623,7 @@ export type ChannelDeleteInput = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleDeleteFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsDeleteFieldInput>>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleDeleteFieldInput>;
+  EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsDeleteFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsDeleteFieldInput>>;
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsDeleteFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesDeleteFieldInput>>;
@@ -2624,6 +2653,7 @@ export type ChannelDisconnectInput = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleDisconnectFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsDisconnectFieldInput>>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleDisconnectFieldInput>;
+  EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsDisconnectFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsDisconnectFieldInput>>;
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsDisconnectFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesDisconnectFieldInput>>;
@@ -2936,6 +2966,147 @@ export type ChannelElevatedModRoleUpdateFieldInput = {
   disconnect?: InputMaybe<ChannelElevatedModRoleDisconnectFieldInput>;
   update?: InputMaybe<ChannelElevatedModRoleUpdateConnectionInput>;
   where?: InputMaybe<ChannelElevatedModRoleConnectionWhere>;
+};
+
+export type ChannelEnabledPluginsAggregateInput = {
+  AND?: InputMaybe<Array<ChannelEnabledPluginsAggregateInput>>;
+  NOT?: InputMaybe<ChannelEnabledPluginsAggregateInput>;
+  OR?: InputMaybe<Array<ChannelEnabledPluginsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ChannelEnabledPluginsNodeAggregationWhereInput>;
+};
+
+export type ChannelEnabledPluginsConnectFieldInput = {
+  edge: ChannelPluginPropertiesCreateInput;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<PluginVersionConnectWhere>;
+};
+
+export type ChannelEnabledPluginsConnectedRelationship = {
+  __typename?: 'ChannelEnabledPluginsConnectedRelationship';
+  enabled: Scalars['Boolean']['output'];
+  node: PluginVersionEventPayload;
+  settingsJson?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type ChannelEnabledPluginsConnection = {
+  __typename?: 'ChannelEnabledPluginsConnection';
+  edges: Array<ChannelEnabledPluginsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ChannelEnabledPluginsConnectionSort = {
+  edge?: InputMaybe<ChannelPluginPropertiesSort>;
+  node?: InputMaybe<PluginVersionSort>;
+};
+
+export type ChannelEnabledPluginsConnectionWhere = {
+  AND?: InputMaybe<Array<ChannelEnabledPluginsConnectionWhere>>;
+  NOT?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+  OR?: InputMaybe<Array<ChannelEnabledPluginsConnectionWhere>>;
+  edge?: InputMaybe<ChannelPluginPropertiesWhere>;
+  node?: InputMaybe<PluginVersionWhere>;
+};
+
+export type ChannelEnabledPluginsCreateFieldInput = {
+  edge: ChannelPluginPropertiesCreateInput;
+  node: PluginVersionCreateInput;
+};
+
+export type ChannelEnabledPluginsDeleteFieldInput = {
+  where?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+};
+
+export type ChannelEnabledPluginsDisconnectFieldInput = {
+  where?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+};
+
+export type ChannelEnabledPluginsFieldInput = {
+  connect?: InputMaybe<Array<ChannelEnabledPluginsConnectFieldInput>>;
+  create?: InputMaybe<Array<ChannelEnabledPluginsCreateFieldInput>>;
+};
+
+export type ChannelEnabledPluginsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ChannelEnabledPluginsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ChannelEnabledPluginsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ChannelEnabledPluginsNodeAggregationWhereInput>>;
+  entryPath_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  version_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  version_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ChannelEnabledPluginsRelationship = {
+  __typename?: 'ChannelEnabledPluginsRelationship';
+  cursor: Scalars['String']['output'];
+  node: PluginVersion;
+  properties: ChannelPluginProperties;
+};
+
+export type ChannelEnabledPluginsRelationshipSubscriptionWhere = {
+  edge?: InputMaybe<ChannelPluginPropertiesSubscriptionWhere>;
+  node?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+export type ChannelEnabledPluginsUpdateConnectionInput = {
+  edge?: InputMaybe<ChannelPluginPropertiesUpdateInput>;
+  node?: InputMaybe<PluginVersionUpdateInput>;
+};
+
+export type ChannelEnabledPluginsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ChannelEnabledPluginsConnectFieldInput>>;
+  create?: InputMaybe<Array<ChannelEnabledPluginsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ChannelEnabledPluginsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ChannelEnabledPluginsDisconnectFieldInput>>;
+  update?: InputMaybe<ChannelEnabledPluginsUpdateConnectionInput>;
+  where?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
 };
 
 export type ChannelEventChannelEventChannelsAggregationSelection = {
@@ -4460,6 +4631,63 @@ export type ChannelPendingOwnerInvitesUpdateFieldInput = {
   where?: InputMaybe<ChannelPendingOwnerInvitesConnectionWhere>;
 };
 
+/**
+ * The edge properties for the following fields:
+ * * Channel.EnabledPlugins
+ */
+export type ChannelPluginProperties = {
+  __typename?: 'ChannelPluginProperties';
+  enabled: Scalars['Boolean']['output'];
+  settingsJson?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type ChannelPluginPropertiesCreateInput = {
+  enabled: Scalars['Boolean']['input'];
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type ChannelPluginPropertiesSort = {
+  enabled?: InputMaybe<SortDirection>;
+  settingsJson?: InputMaybe<SortDirection>;
+};
+
+export type ChannelPluginPropertiesSubscriptionWhere = {
+  AND?: InputMaybe<Array<ChannelPluginPropertiesSubscriptionWhere>>;
+  NOT?: InputMaybe<ChannelPluginPropertiesSubscriptionWhere>;
+  OR?: InputMaybe<Array<ChannelPluginPropertiesSubscriptionWhere>>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+  settingsJson_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+};
+
+export type ChannelPluginPropertiesUpdateInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type ChannelPluginPropertiesWhere = {
+  AND?: InputMaybe<Array<ChannelPluginPropertiesWhere>>;
+  NOT?: InputMaybe<ChannelPluginPropertiesWhere>;
+  OR?: InputMaybe<Array<ChannelPluginPropertiesWhere>>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+  settingsJson_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+};
+
+export type ChannelPluginVersionEnabledPluginsAggregationSelection = {
+  __typename?: 'ChannelPluginVersionEnabledPluginsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ChannelPluginVersionEnabledPluginsNodeAggregateSelection>;
+};
+
+export type ChannelPluginVersionEnabledPluginsNodeAggregateSelection = {
+  __typename?: 'ChannelPluginVersionEnabledPluginsNodeAggregateSelection';
+  entryPath: StringAggregateSelection;
+  id: IdAggregateSelection;
+  repoUrl: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
 export type ChannelRelatedChannelsAggregateInput = {
   AND?: InputMaybe<Array<ChannelRelatedChannelsAggregateInput>>;
   NOT?: InputMaybe<ChannelRelatedChannelsAggregateInput>;
@@ -4673,6 +4901,7 @@ export type ChannelRelationInput = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleCreateFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsCreateFieldInput>>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleCreateFieldInput>;
+  EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsCreateFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsCreateFieldInput>>;
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsCreateFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesCreateFieldInput>>;
@@ -4729,6 +4958,7 @@ export type ChannelRelationshipsSubscriptionWhere = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleRelationshipSubscriptionWhere>;
   DiscussionChannels?: InputMaybe<ChannelDiscussionChannelsRelationshipSubscriptionWhere>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleRelationshipSubscriptionWhere>;
+  EnabledPlugins?: InputMaybe<ChannelEnabledPluginsRelationshipSubscriptionWhere>;
   EventChannels?: InputMaybe<ChannelEventChannelsRelationshipSubscriptionWhere>;
   FilterGroups?: InputMaybe<ChannelFilterGroupsRelationshipSubscriptionWhere>;
   Issues?: InputMaybe<ChannelIssuesRelationshipSubscriptionWhere>;
@@ -5815,6 +6045,7 @@ export type ChannelUpdateInput = {
   DefaultModRole?: InputMaybe<ChannelDefaultModRoleUpdateFieldInput>;
   DiscussionChannels?: InputMaybe<Array<ChannelDiscussionChannelsUpdateFieldInput>>;
   ElevatedModRole?: InputMaybe<ChannelElevatedModRoleUpdateFieldInput>;
+  EnabledPlugins?: InputMaybe<Array<ChannelEnabledPluginsUpdateFieldInput>>;
   EventChannels?: InputMaybe<Array<ChannelEventChannelsUpdateFieldInput>>;
   FilterGroups?: InputMaybe<Array<ChannelFilterGroupsUpdateFieldInput>>;
   Issues?: InputMaybe<Array<ChannelIssuesUpdateFieldInput>>;
@@ -6005,6 +6236,23 @@ export type ChannelWhere = {
   ElevatedModRoleConnection?: InputMaybe<ChannelElevatedModRoleConnectionWhere>;
   ElevatedModRoleConnection_NOT?: InputMaybe<ChannelElevatedModRoleConnectionWhere>;
   ElevatedModRole_NOT?: InputMaybe<ModChannelRoleWhere>;
+  EnabledPluginsAggregate?: InputMaybe<ChannelEnabledPluginsAggregateInput>;
+  /** Return Channels where all of the related ChannelEnabledPluginsConnections match this filter */
+  EnabledPluginsConnection_ALL?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+  /** Return Channels where none of the related ChannelEnabledPluginsConnections match this filter */
+  EnabledPluginsConnection_NONE?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+  /** Return Channels where one of the related ChannelEnabledPluginsConnections match this filter */
+  EnabledPluginsConnection_SINGLE?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+  /** Return Channels where some of the related ChannelEnabledPluginsConnections match this filter */
+  EnabledPluginsConnection_SOME?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
+  /** Return Channels where all of the related PluginVersions match this filter */
+  EnabledPlugins_ALL?: InputMaybe<PluginVersionWhere>;
+  /** Return Channels where none of the related PluginVersions match this filter */
+  EnabledPlugins_NONE?: InputMaybe<PluginVersionWhere>;
+  /** Return Channels where one of the related PluginVersions match this filter */
+  EnabledPlugins_SINGLE?: InputMaybe<PluginVersionWhere>;
+  /** Return Channels where some of the related PluginVersions match this filter */
+  EnabledPlugins_SOME?: InputMaybe<PluginVersionWhere>;
   EventChannelsAggregate?: InputMaybe<ChannelEventChannelsAggregateInput>;
   /** Return Channels where all of the related ChannelEventChannelsConnections match this filter */
   EventChannelsConnection_ALL?: InputMaybe<ChannelEventChannelsConnectionWhere>;
@@ -13092,6 +13340,24 @@ export type CreateNotificationsMutationResponse = {
   notifications: Array<Notification>;
 };
 
+export type CreatePluginRunsMutationResponse = {
+  __typename?: 'CreatePluginRunsMutationResponse';
+  info: CreateInfo;
+  pluginRuns: Array<PluginRun>;
+};
+
+export type CreatePluginVersionsMutationResponse = {
+  __typename?: 'CreatePluginVersionsMutationResponse';
+  info: CreateInfo;
+  pluginVersions: Array<PluginVersion>;
+};
+
+export type CreatePluginsMutationResponse = {
+  __typename?: 'CreatePluginsMutationResponse';
+  info: CreateInfo;
+  plugins: Array<Plugin>;
+};
+
 export type CreatePurchasesMutationResponse = {
   __typename?: 'CreatePurchasesMutationResponse';
   info: CreateInfo;
@@ -13138,6 +13404,12 @@ export type CreateServerRolesMutationResponse = {
   __typename?: 'CreateServerRolesMutationResponse';
   info: CreateInfo;
   serverRoles: Array<ServerRole>;
+};
+
+export type CreateServerSecretsMutationResponse = {
+  __typename?: 'CreateServerSecretsMutationResponse';
+  info: CreateInfo;
+  serverSecrets: Array<ServerSecret>;
 };
 
 export type CreateSignedUrlsMutationResponse = {
@@ -28200,6 +28472,49 @@ export type ImagesConnection = {
   totalCount: Scalars['Int']['output'];
 };
 
+/**
+ * The edge properties for the following fields:
+ * * ServerConfig.InstalledVersions
+ */
+export type InstallationProperties = {
+  __typename?: 'InstallationProperties';
+  enabled: Scalars['Boolean']['output'];
+  settingsJson?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type InstallationPropertiesCreateInput = {
+  enabled: Scalars['Boolean']['input'];
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type InstallationPropertiesSort = {
+  enabled?: InputMaybe<SortDirection>;
+  settingsJson?: InputMaybe<SortDirection>;
+};
+
+export type InstallationPropertiesSubscriptionWhere = {
+  AND?: InputMaybe<Array<InstallationPropertiesSubscriptionWhere>>;
+  NOT?: InputMaybe<InstallationPropertiesSubscriptionWhere>;
+  OR?: InputMaybe<Array<InstallationPropertiesSubscriptionWhere>>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+  settingsJson_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+};
+
+export type InstallationPropertiesUpdateInput = {
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+};
+
+export type InstallationPropertiesWhere = {
+  AND?: InputMaybe<Array<InstallationPropertiesWhere>>;
+  NOT?: InputMaybe<InstallationPropertiesWhere>;
+  OR?: InputMaybe<Array<InstallationPropertiesWhere>>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  settingsJson?: InputMaybe<Scalars['JSON']['input']>;
+  settingsJson_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
+};
+
 export type IntAggregateSelection = {
   __typename?: 'IntAggregateSelection';
   average?: Maybe<Scalars['Float']['output']>;
@@ -29635,6 +29950,11 @@ export type IssuesConnection = {
   edges: Array<IssueEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type LabelFilterInput = {
+  groupKey: Scalars['String']['input'];
+  values: Array<Scalars['String']['input']>;
 };
 
 /** SPDX or custom content licence */
@@ -33568,6 +33888,9 @@ export type Mutation = {
   createModerationActions: CreateModerationActionsMutationResponse;
   createModerationProfiles: CreateModerationProfilesMutationResponse;
   createNotifications: CreateNotificationsMutationResponse;
+  createPluginRuns: CreatePluginRunsMutationResponse;
+  createPluginVersions: CreatePluginVersionsMutationResponse;
+  createPlugins: CreatePluginsMutationResponse;
   createPurchases: CreatePurchasesMutationResponse;
   createRecurringEvents: CreateRecurringEventsMutationResponse;
   createRepeatEnds: CreateRepeatEndsMutationResponse;
@@ -33576,6 +33899,7 @@ export type Mutation = {
   createSeedDataResponses: CreateSeedDataResponsesMutationResponse;
   createServerConfigs: CreateServerConfigsMutationResponse;
   createServerRoles: CreateServerRolesMutationResponse;
+  createServerSecrets: CreateServerSecretsMutationResponse;
   createSignedStorageURL?: Maybe<SignedUrl>;
   createSignedUrls: CreateSignedUrlsMutationResponse;
   createSiteWideDiscussionListFormats: CreateSiteWideDiscussionListFormatsMutationResponse;
@@ -33626,6 +33950,9 @@ export type Mutation = {
   deleteModerationActions: DeleteInfo;
   deleteModerationProfiles: DeleteInfo;
   deleteNotifications: DeleteInfo;
+  deletePluginRuns: DeleteInfo;
+  deletePluginVersions: DeleteInfo;
+  deletePlugins: DeleteInfo;
   deletePurchases: DeleteInfo;
   deleteRecurringEvents: DeleteInfo;
   deleteRepeatEnds: DeleteInfo;
@@ -33634,6 +33961,7 @@ export type Mutation = {
   deleteSeedDataResponses: DeleteInfo;
   deleteServerConfigs: DeleteInfo;
   deleteServerRoles: DeleteInfo;
+  deleteServerSecrets: DeleteInfo;
   deleteSignedUrls: DeleteInfo;
   deleteSiteWideDiscussionListFormats: DeleteInfo;
   deleteSuspensions: DeleteInfo;
@@ -33644,6 +33972,7 @@ export type Mutation = {
   dropDataForCypressTests?: Maybe<DropDataResponse>;
   inviteForumMod?: Maybe<Scalars['Boolean']['output']>;
   inviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
+  refreshPlugins: Array<Plugin>;
   removeEmojiFromComment?: Maybe<Comment>;
   removeEmojiFromDiscussionChannel?: Maybe<DiscussionChannel>;
   removeForumMod?: Maybe<Scalars['Boolean']['output']>;
@@ -33714,6 +34043,9 @@ export type Mutation = {
   updateModerationActions: UpdateModerationActionsMutationResponse;
   updateModerationProfiles: UpdateModerationProfilesMutationResponse;
   updateNotifications: UpdateNotificationsMutationResponse;
+  updatePluginRuns: UpdatePluginRunsMutationResponse;
+  updatePluginVersions: UpdatePluginVersionsMutationResponse;
+  updatePlugins: UpdatePluginsMutationResponse;
   updatePurchases: UpdatePurchasesMutationResponse;
   updateRecurringEvents: UpdateRecurringEventsMutationResponse;
   updateRepeatEnds: UpdateRepeatEndsMutationResponse;
@@ -33722,6 +34054,7 @@ export type Mutation = {
   updateSeedDataResponses: UpdateSeedDataResponsesMutationResponse;
   updateServerConfigs: UpdateServerConfigsMutationResponse;
   updateServerRoles: UpdateServerRolesMutationResponse;
+  updateServerSecrets: UpdateServerSecretsMutationResponse;
   updateSignedUrls: UpdateSignedUrlsMutationResponse;
   updateSiteWideDiscussionListFormats: UpdateSiteWideDiscussionListFormatsMutationResponse;
   updateSuspensions: UpdateSuspensionsMutationResponse;
@@ -34029,6 +34362,21 @@ export type MutationCreateNotificationsArgs = {
 };
 
 
+export type MutationCreatePluginRunsArgs = {
+  input: Array<PluginRunCreateInput>;
+};
+
+
+export type MutationCreatePluginVersionsArgs = {
+  input: Array<PluginVersionCreateInput>;
+};
+
+
+export type MutationCreatePluginsArgs = {
+  input: Array<PluginCreateInput>;
+};
+
+
 export type MutationCreatePurchasesArgs = {
   input: Array<PurchaseCreateInput>;
 };
@@ -34066,6 +34414,11 @@ export type MutationCreateServerConfigsArgs = {
 
 export type MutationCreateServerRolesArgs = {
   input: Array<ServerRoleCreateInput>;
+};
+
+
+export type MutationCreateServerSecretsArgs = {
+  input: Array<ServerSecretCreateInput>;
 };
 
 
@@ -34342,6 +34695,21 @@ export type MutationDeleteNotificationsArgs = {
 };
 
 
+export type MutationDeletePluginRunsArgs = {
+  where?: InputMaybe<PluginRunWhere>;
+};
+
+
+export type MutationDeletePluginVersionsArgs = {
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type MutationDeletePluginsArgs = {
+  where?: InputMaybe<PluginWhere>;
+};
+
+
 export type MutationDeletePurchasesArgs = {
   delete?: InputMaybe<PurchaseDeleteInput>;
   where?: InputMaybe<PurchaseWhere>;
@@ -34382,6 +34750,11 @@ export type MutationDeleteServerConfigsArgs = {
 
 export type MutationDeleteServerRolesArgs = {
   where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type MutationDeleteServerSecretsArgs = {
+  where?: InputMaybe<ServerSecretWhere>;
 };
 
 
@@ -34881,6 +35254,24 @@ export type MutationUpdateNotificationsArgs = {
 };
 
 
+export type MutationUpdatePluginRunsArgs = {
+  update?: InputMaybe<PluginRunUpdateInput>;
+  where?: InputMaybe<PluginRunWhere>;
+};
+
+
+export type MutationUpdatePluginVersionsArgs = {
+  update?: InputMaybe<PluginVersionUpdateInput>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type MutationUpdatePluginsArgs = {
+  update?: InputMaybe<PluginUpdateInput>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
 export type MutationUpdatePurchasesArgs = {
   update?: InputMaybe<PurchaseUpdateInput>;
   where?: InputMaybe<PurchaseWhere>;
@@ -34926,6 +35317,12 @@ export type MutationUpdateServerConfigsArgs = {
 export type MutationUpdateServerRolesArgs = {
   update?: InputMaybe<ServerRoleUpdateInput>;
   where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type MutationUpdateServerSecretsArgs = {
+  update?: InputMaybe<ServerSecretUpdateInput>;
+  where?: InputMaybe<ServerSecretWhere>;
 };
 
 
@@ -35131,6 +35528,522 @@ export type PageInfo = {
   hasNextPage: Scalars['Boolean']['output'];
   hasPreviousPage: Scalars['Boolean']['output'];
   startCursor?: Maybe<Scalars['String']['output']>;
+};
+
+export type Plugin = {
+  __typename?: 'Plugin';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PluginAggregateSelection = {
+  __typename?: 'PluginAggregateSelection';
+  count: Scalars['Int']['output'];
+  id: IdAggregateSelection;
+  name: StringAggregateSelection;
+};
+
+export type PluginConnectWhere = {
+  node: PluginWhere;
+};
+
+export type PluginCreateInput = {
+  name: Scalars['String']['input'];
+};
+
+export type PluginCreatedEvent = {
+  __typename?: 'PluginCreatedEvent';
+  createdPlugin: PluginEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginDeletedEvent = {
+  __typename?: 'PluginDeletedEvent';
+  deletedPlugin: PluginEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginEdge = {
+  __typename?: 'PluginEdge';
+  cursor: Scalars['String']['output'];
+  node: Plugin;
+};
+
+export type PluginEventPayload = {
+  __typename?: 'PluginEventPayload';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PluginOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more PluginSort objects to sort Plugins by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<PluginSort>>;
+};
+
+export type PluginRun = {
+  __typename?: 'PluginRun';
+  channelId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  durationMs?: Maybe<Scalars['Int']['output']>;
+  eventType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  message?: Maybe<Scalars['String']['output']>;
+  pluginId: Scalars['String']['output'];
+  scope: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  version: Scalars['String']['output'];
+};
+
+export type PluginRunAggregateSelection = {
+  __typename?: 'PluginRunAggregateSelection';
+  channelId: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  createdAt: DateTimeAggregateSelection;
+  durationMs: IntAggregateSelection;
+  eventType: StringAggregateSelection;
+  id: IdAggregateSelection;
+  message: StringAggregateSelection;
+  pluginId: StringAggregateSelection;
+  scope: StringAggregateSelection;
+  status: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type PluginRunCreateInput = {
+  channelId?: InputMaybe<Scalars['String']['input']>;
+  durationMs?: InputMaybe<Scalars['Int']['input']>;
+  eventType: Scalars['String']['input'];
+  message?: InputMaybe<Scalars['String']['input']>;
+  pluginId: Scalars['String']['input'];
+  scope: Scalars['String']['input'];
+  status: Scalars['String']['input'];
+  version: Scalars['String']['input'];
+};
+
+export type PluginRunCreatedEvent = {
+  __typename?: 'PluginRunCreatedEvent';
+  createdPluginRun: PluginRunEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginRunDeletedEvent = {
+  __typename?: 'PluginRunDeletedEvent';
+  deletedPluginRun: PluginRunEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginRunEdge = {
+  __typename?: 'PluginRunEdge';
+  cursor: Scalars['String']['output'];
+  node: PluginRun;
+};
+
+export type PluginRunEventPayload = {
+  __typename?: 'PluginRunEventPayload';
+  channelId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  durationMs?: Maybe<Scalars['Int']['output']>;
+  eventType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  message?: Maybe<Scalars['String']['output']>;
+  pluginId: Scalars['String']['output'];
+  scope: Scalars['String']['output'];
+  status: Scalars['String']['output'];
+  version: Scalars['String']['output'];
+};
+
+export type PluginRunOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more PluginRunSort objects to sort PluginRuns by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<PluginRunSort>>;
+};
+
+/** Fields to sort PluginRuns by. The order in which sorts are applied is not guaranteed when specifying many fields in one PluginRunSort object. */
+export type PluginRunSort = {
+  channelId?: InputMaybe<SortDirection>;
+  createdAt?: InputMaybe<SortDirection>;
+  durationMs?: InputMaybe<SortDirection>;
+  eventType?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  message?: InputMaybe<SortDirection>;
+  pluginId?: InputMaybe<SortDirection>;
+  scope?: InputMaybe<SortDirection>;
+  status?: InputMaybe<SortDirection>;
+  version?: InputMaybe<SortDirection>;
+};
+
+export type PluginRunSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginRunSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginRunSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginRunSubscriptionWhere>>;
+  channelId?: InputMaybe<Scalars['String']['input']>;
+  channelId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  durationMs?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_GT?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_GTE?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  durationMs_LT?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_LTE?: InputMaybe<Scalars['Int']['input']>;
+  eventType?: InputMaybe<Scalars['String']['input']>;
+  eventType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  eventType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  eventType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  eventType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  message_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<Scalars['String']['input']>;
+  scope_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  scope_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  scope_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  scope_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  scope_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  status_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  status_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  status_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  status_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  status_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+  version_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  version_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  version_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  version_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginRunUpdateInput = {
+  channelId?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  durationMs?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  eventType?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginRunUpdatedEvent = {
+  __typename?: 'PluginRunUpdatedEvent';
+  event: EventType;
+  previousState: PluginRunEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedPluginRun: PluginRunEventPayload;
+};
+
+export type PluginRunWhere = {
+  AND?: InputMaybe<Array<PluginRunWhere>>;
+  NOT?: InputMaybe<PluginRunWhere>;
+  OR?: InputMaybe<Array<PluginRunWhere>>;
+  channelId?: InputMaybe<Scalars['String']['input']>;
+  channelId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  channelId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  channelId_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  channelId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  channelId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  createdAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  durationMs?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_GT?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_GTE?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_IN?: InputMaybe<Array<InputMaybe<Scalars['Int']['input']>>>;
+  durationMs_LT?: InputMaybe<Scalars['Int']['input']>;
+  durationMs_LTE?: InputMaybe<Scalars['Int']['input']>;
+  eventType?: InputMaybe<Scalars['String']['input']>;
+  eventType_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  eventType_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  eventType_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  eventType_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  eventType_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  message_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  message_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  message_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  message_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  message_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  scope?: InputMaybe<Scalars['String']['input']>;
+  scope_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  scope_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  scope_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  scope_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  scope_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  status?: InputMaybe<Scalars['String']['input']>;
+  status_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  status_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  status_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  status_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  status_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+  version_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  version_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  version_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  version_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginRunsConnection = {
+  __typename?: 'PluginRunsConnection';
+  edges: Array<PluginRunEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+/** Fields to sort Plugins by. The order in which sorts are applied is not guaranteed when specifying many fields in one PluginSort object. */
+export type PluginSort = {
+  id?: InputMaybe<SortDirection>;
+  name?: InputMaybe<SortDirection>;
+};
+
+export type PluginSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginSubscriptionWhere>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginUpdateInput = {
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginUpdatedEvent = {
+  __typename?: 'PluginUpdatedEvent';
+  event: EventType;
+  previousState: PluginEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedPlugin: PluginEventPayload;
+};
+
+export type PluginVersion = {
+  __typename?: 'PluginVersion';
+  entryPath: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  repoUrl: Scalars['String']['output'];
+  version: Scalars['String']['output'];
+};
+
+export type PluginVersionAggregateSelection = {
+  __typename?: 'PluginVersionAggregateSelection';
+  count: Scalars['Int']['output'];
+  entryPath: StringAggregateSelection;
+  id: IdAggregateSelection;
+  repoUrl: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type PluginVersionConnectWhere = {
+  node: PluginVersionWhere;
+};
+
+export type PluginVersionCreateInput = {
+  entryPath: Scalars['String']['input'];
+  repoUrl: Scalars['String']['input'];
+  version: Scalars['String']['input'];
+};
+
+export type PluginVersionCreatedEvent = {
+  __typename?: 'PluginVersionCreatedEvent';
+  createdPluginVersion: PluginVersionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginVersionDeletedEvent = {
+  __typename?: 'PluginVersionDeletedEvent';
+  deletedPluginVersion: PluginVersionEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginVersionEdge = {
+  __typename?: 'PluginVersionEdge';
+  cursor: Scalars['String']['output'];
+  node: PluginVersion;
+};
+
+export type PluginVersionEventPayload = {
+  __typename?: 'PluginVersionEventPayload';
+  entryPath: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  repoUrl: Scalars['String']['output'];
+  version: Scalars['String']['output'];
+};
+
+export type PluginVersionOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more PluginVersionSort objects to sort PluginVersions by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<PluginVersionSort>>;
+};
+
+/** Fields to sort PluginVersions by. The order in which sorts are applied is not guaranteed when specifying many fields in one PluginVersionSort object. */
+export type PluginVersionSort = {
+  entryPath?: InputMaybe<SortDirection>;
+  id?: InputMaybe<SortDirection>;
+  repoUrl?: InputMaybe<SortDirection>;
+  version?: InputMaybe<SortDirection>;
+};
+
+export type PluginVersionSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginVersionSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginVersionSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginVersionSubscriptionWhere>>;
+  entryPath?: InputMaybe<Scalars['String']['input']>;
+  entryPath_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  entryPath_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  entryPath_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  entryPath_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  entryPath_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  repoUrl?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  repoUrl_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+  version_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  version_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  version_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  version_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginVersionUpdateInput = {
+  entryPath?: InputMaybe<Scalars['String']['input']>;
+  repoUrl?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginVersionUpdatedEvent = {
+  __typename?: 'PluginVersionUpdatedEvent';
+  event: EventType;
+  previousState: PluginVersionEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedPluginVersion: PluginVersionEventPayload;
+};
+
+export type PluginVersionWhere = {
+  AND?: InputMaybe<Array<PluginVersionWhere>>;
+  NOT?: InputMaybe<PluginVersionWhere>;
+  OR?: InputMaybe<Array<PluginVersionWhere>>;
+  entryPath?: InputMaybe<Scalars['String']['input']>;
+  entryPath_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  entryPath_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  entryPath_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  entryPath_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  entryPath_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  repoUrl?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  repoUrl_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  repoUrl_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version?: InputMaybe<Scalars['String']['input']>;
+  version_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  version_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  version_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  version_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  version_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginVersionsConnection = {
+  __typename?: 'PluginVersionsConnection';
+  edges: Array<PluginVersionEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PluginWhere = {
+  AND?: InputMaybe<Array<PluginWhere>>;
+  NOT?: InputMaybe<PluginWhere>;
+  OR?: InputMaybe<Array<PluginWhere>>;
+  id?: InputMaybe<Scalars['ID']['input']>;
+  id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
+  id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  id_IN?: InputMaybe<Array<Scalars['ID']['input']>>;
+  id_STARTS_WITH?: InputMaybe<Scalars['ID']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  name_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  name_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  name_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  name_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  name_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type PluginsConnection = {
+  __typename?: 'PluginsConnection';
+  edges: Array<PluginEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
 };
 
 /** A point in a coordinate system. For more information, see https://neo4j.com/docs/graphql/4/type-definitions/types/spatial/#point */
@@ -36233,6 +37146,15 @@ export type Query = {
   notifications: Array<Notification>;
   notificationsAggregate: NotificationAggregateSelection;
   notificationsConnection: NotificationsConnection;
+  pluginRuns: Array<PluginRun>;
+  pluginRunsAggregate: PluginRunAggregateSelection;
+  pluginRunsConnection: PluginRunsConnection;
+  pluginVersions: Array<PluginVersion>;
+  pluginVersionsAggregate: PluginVersionAggregateSelection;
+  pluginVersionsConnection: PluginVersionsConnection;
+  plugins: Array<Plugin>;
+  pluginsAggregate: PluginAggregateSelection;
+  pluginsConnection: PluginsConnection;
   purchases: Array<Purchase>;
   purchasesAggregate: PurchaseAggregateSelection;
   purchasesConnection: PurchasesConnection;
@@ -36258,6 +37180,9 @@ export type Query = {
   serverRoles: Array<ServerRole>;
   serverRolesAggregate: ServerRoleAggregateSelection;
   serverRolesConnection: ServerRolesConnection;
+  serverSecrets: Array<ServerSecret>;
+  serverSecretsAggregate: ServerSecretAggregateSelection;
+  serverSecretsConnection: ServerSecretsConnection;
   signedUrls: Array<SignedUrl>;
   signedUrlsAggregate: SignedUrlAggregateSelection;
   signedUrlsConnection: SignedUrlsConnection;
@@ -36904,6 +37829,7 @@ export type QueryGetCommentSectionArgs = {
 export type QueryGetDiscussionsInChannelArgs = {
   channelUniqueName: Scalars['String']['input'];
   hasDownload?: InputMaybe<Scalars['Boolean']['input']>;
+  labelFilters?: InputMaybe<Array<LabelFilterInput>>;
   options?: InputMaybe<DiscussionListOptions>;
   searchInput?: InputMaybe<Scalars['String']['input']>;
   selectedTags?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
@@ -37172,6 +38098,63 @@ export type QueryNotificationsConnectionArgs = {
 };
 
 
+export type QueryPluginRunsArgs = {
+  options?: InputMaybe<PluginRunOptions>;
+  where?: InputMaybe<PluginRunWhere>;
+};
+
+
+export type QueryPluginRunsAggregateArgs = {
+  where?: InputMaybe<PluginRunWhere>;
+};
+
+
+export type QueryPluginRunsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<PluginRunSort>>>;
+  where?: InputMaybe<PluginRunWhere>;
+};
+
+
+export type QueryPluginVersionsArgs = {
+  options?: InputMaybe<PluginVersionOptions>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type QueryPluginVersionsAggregateArgs = {
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type QueryPluginVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<PluginVersionSort>>>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type QueryPluginsArgs = {
+  options?: InputMaybe<PluginOptions>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
+export type QueryPluginsAggregateArgs = {
+  where?: InputMaybe<PluginWhere>;
+};
+
+
+export type QueryPluginsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<PluginSort>>>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
 export type QueryPurchasesArgs = {
   options?: InputMaybe<PurchaseOptions>;
   where?: InputMaybe<PurchaseWhere>;
@@ -37320,6 +38303,25 @@ export type QueryServerRolesConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<ServerRoleSort>>>;
   where?: InputMaybe<ServerRoleWhere>;
+};
+
+
+export type QueryServerSecretsArgs = {
+  options?: InputMaybe<ServerSecretOptions>;
+  where?: InputMaybe<ServerSecretWhere>;
+};
+
+
+export type QueryServerSecretsAggregateArgs = {
+  where?: InputMaybe<ServerSecretWhere>;
+};
+
+
+export type QueryServerSecretsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<ServerSecretSort>>>;
+  where?: InputMaybe<ServerSecretWhere>;
 };
 
 
@@ -38398,6 +39400,9 @@ export type SeedDataResponsesConnection = {
 
 export type ServerConfig = {
   __typename?: 'ServerConfig';
+  AllowedPlugins: Array<Plugin>;
+  AllowedPluginsAggregate?: Maybe<ServerConfigPluginAllowedPluginsAggregationSelection>;
+  AllowedPluginsConnection: ServerConfigAllowedPluginsConnection;
   DefaultElevatedModRole?: Maybe<ModServerRole>;
   DefaultElevatedModRoleAggregate?: Maybe<ServerConfigModServerRoleDefaultElevatedModRoleAggregationSelection>;
   DefaultElevatedModRoleConnection: ServerConfigDefaultElevatedModRoleConnection;
@@ -38413,13 +39418,39 @@ export type ServerConfig = {
   DefaultSuspendedRole?: Maybe<ServerRole>;
   DefaultSuspendedRoleAggregate?: Maybe<ServerConfigServerRoleDefaultSuspendedRoleAggregationSelection>;
   DefaultSuspendedRoleConnection: ServerConfigDefaultSuspendedRoleConnection;
+  InstalledVersions: Array<PluginVersion>;
+  InstalledVersionsAggregate?: Maybe<ServerConfigPluginVersionInstalledVersionsAggregationSelection>;
+  InstalledVersionsConnection: ServerConfigInstalledVersionsConnection;
   allowedFileTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   enableDownloads?: Maybe<Scalars['Boolean']['output']>;
   enableEvents?: Maybe<Scalars['Boolean']['output']>;
+  pluginRegistries?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   rules?: Maybe<Scalars['JSON']['output']>;
   serverDescription?: Maybe<Scalars['String']['output']>;
   serverIconURL?: Maybe<Scalars['String']['output']>;
   serverName?: Maybe<Scalars['String']['output']>;
+};
+
+
+export type ServerConfigAllowedPluginsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<PluginOptions>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
+export type ServerConfigAllowedPluginsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
+export type ServerConfigAllowedPluginsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ServerConfigAllowedPluginsConnectionSort>>;
+  where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
 };
 
 
@@ -38532,6 +39563,28 @@ export type ServerConfigDefaultSuspendedRoleConnectionArgs = {
   where?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectionWhere>;
 };
 
+
+export type ServerConfigInstalledVersionsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<PluginVersionOptions>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type ServerConfigInstalledVersionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type ServerConfigInstalledVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<ServerConfigInstalledVersionsConnectionSort>>;
+  where?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+};
+
 export type ServerConfigAggregateSelection = {
   __typename?: 'ServerConfigAggregateSelection';
   count: Scalars['Int']['output'];
@@ -38540,12 +39593,116 @@ export type ServerConfigAggregateSelection = {
   serverName: StringAggregateSelection;
 };
 
+export type ServerConfigAllowedPluginsAggregateInput = {
+  AND?: InputMaybe<Array<ServerConfigAllowedPluginsAggregateInput>>;
+  NOT?: InputMaybe<ServerConfigAllowedPluginsAggregateInput>;
+  OR?: InputMaybe<Array<ServerConfigAllowedPluginsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ServerConfigAllowedPluginsNodeAggregationWhereInput>;
+};
+
+export type ServerConfigAllowedPluginsConnectFieldInput = {
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<PluginConnectWhere>;
+};
+
+export type ServerConfigAllowedPluginsConnectedRelationship = {
+  __typename?: 'ServerConfigAllowedPluginsConnectedRelationship';
+  node: PluginEventPayload;
+};
+
+export type ServerConfigAllowedPluginsConnection = {
+  __typename?: 'ServerConfigAllowedPluginsConnection';
+  edges: Array<ServerConfigAllowedPluginsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ServerConfigAllowedPluginsConnectionSort = {
+  node?: InputMaybe<PluginSort>;
+};
+
+export type ServerConfigAllowedPluginsConnectionWhere = {
+  AND?: InputMaybe<Array<ServerConfigAllowedPluginsConnectionWhere>>;
+  NOT?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+  OR?: InputMaybe<Array<ServerConfigAllowedPluginsConnectionWhere>>;
+  node?: InputMaybe<PluginWhere>;
+};
+
+export type ServerConfigAllowedPluginsCreateFieldInput = {
+  node: PluginCreateInput;
+};
+
+export type ServerConfigAllowedPluginsDeleteFieldInput = {
+  where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+};
+
+export type ServerConfigAllowedPluginsDisconnectFieldInput = {
+  where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+};
+
+export type ServerConfigAllowedPluginsFieldInput = {
+  connect?: InputMaybe<Array<ServerConfigAllowedPluginsConnectFieldInput>>;
+  create?: InputMaybe<Array<ServerConfigAllowedPluginsCreateFieldInput>>;
+};
+
+export type ServerConfigAllowedPluginsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ServerConfigAllowedPluginsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ServerConfigAllowedPluginsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ServerConfigAllowedPluginsNodeAggregationWhereInput>>;
+  name_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  name_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ServerConfigAllowedPluginsRelationship = {
+  __typename?: 'ServerConfigAllowedPluginsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Plugin;
+};
+
+export type ServerConfigAllowedPluginsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+export type ServerConfigAllowedPluginsUpdateConnectionInput = {
+  node?: InputMaybe<PluginUpdateInput>;
+};
+
+export type ServerConfigAllowedPluginsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ServerConfigAllowedPluginsConnectFieldInput>>;
+  create?: InputMaybe<Array<ServerConfigAllowedPluginsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ServerConfigAllowedPluginsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ServerConfigAllowedPluginsDisconnectFieldInput>>;
+  update?: InputMaybe<ServerConfigAllowedPluginsUpdateConnectionInput>;
+  where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+};
+
 export type ServerConfigConnectInput = {
+  AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsConnectFieldInput>>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleConnectFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleConnectFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleConnectFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleConnectFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectFieldInput>;
+  InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsConnectFieldInput>>;
 };
 
 export type ServerConfigConnectOrCreateInput = {
@@ -38558,22 +39715,27 @@ export type ServerConfigConnectOrCreateInput = {
 
 export type ServerConfigConnectedRelationships = {
   __typename?: 'ServerConfigConnectedRelationships';
+  AllowedPlugins?: Maybe<ServerConfigAllowedPluginsConnectedRelationship>;
   DefaultElevatedModRole?: Maybe<ServerConfigDefaultElevatedModRoleConnectedRelationship>;
   DefaultModRole?: Maybe<ServerConfigDefaultModRoleConnectedRelationship>;
   DefaultServerRole?: Maybe<ServerConfigDefaultServerRoleConnectedRelationship>;
   DefaultSuspendedModRole?: Maybe<ServerConfigDefaultSuspendedModRoleConnectedRelationship>;
   DefaultSuspendedRole?: Maybe<ServerConfigDefaultSuspendedRoleConnectedRelationship>;
+  InstalledVersions?: Maybe<ServerConfigInstalledVersionsConnectedRelationship>;
 };
 
 export type ServerConfigCreateInput = {
+  AllowedPlugins?: InputMaybe<ServerConfigAllowedPluginsFieldInput>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleFieldInput>;
+  InstalledVersions?: InputMaybe<ServerConfigInstalledVersionsFieldInput>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
@@ -39228,11 +40390,13 @@ export type ServerConfigDefaultSuspendedRoleUpdateFieldInput = {
 };
 
 export type ServerConfigDeleteInput = {
+  AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsDeleteFieldInput>>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleDeleteFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleDeleteFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleDeleteFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleDeleteFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleDeleteFieldInput>;
+  InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsDeleteFieldInput>>;
 };
 
 export type ServerConfigDeletedEvent = {
@@ -39243,11 +40407,13 @@ export type ServerConfigDeletedEvent = {
 };
 
 export type ServerConfigDisconnectInput = {
+  AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsDisconnectFieldInput>>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleDisconnectFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleDisconnectFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleDisconnectFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleDisconnectFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleDisconnectFieldInput>;
+  InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsDisconnectFieldInput>>;
 };
 
 export type ServerConfigEdge = {
@@ -39261,10 +40427,152 @@ export type ServerConfigEventPayload = {
   allowedFileTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   enableDownloads?: Maybe<Scalars['Boolean']['output']>;
   enableEvents?: Maybe<Scalars['Boolean']['output']>;
+  pluginRegistries?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
   rules?: Maybe<Scalars['JSON']['output']>;
   serverDescription?: Maybe<Scalars['String']['output']>;
   serverIconURL?: Maybe<Scalars['String']['output']>;
   serverName?: Maybe<Scalars['String']['output']>;
+};
+
+export type ServerConfigInstalledVersionsAggregateInput = {
+  AND?: InputMaybe<Array<ServerConfigInstalledVersionsAggregateInput>>;
+  NOT?: InputMaybe<ServerConfigInstalledVersionsAggregateInput>;
+  OR?: InputMaybe<Array<ServerConfigInstalledVersionsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<ServerConfigInstalledVersionsNodeAggregationWhereInput>;
+};
+
+export type ServerConfigInstalledVersionsConnectFieldInput = {
+  edge: InstallationPropertiesCreateInput;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<PluginVersionConnectWhere>;
+};
+
+export type ServerConfigInstalledVersionsConnectedRelationship = {
+  __typename?: 'ServerConfigInstalledVersionsConnectedRelationship';
+  enabled: Scalars['Boolean']['output'];
+  node: PluginVersionEventPayload;
+  settingsJson?: Maybe<Scalars['JSON']['output']>;
+};
+
+export type ServerConfigInstalledVersionsConnection = {
+  __typename?: 'ServerConfigInstalledVersionsConnection';
+  edges: Array<ServerConfigInstalledVersionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ServerConfigInstalledVersionsConnectionSort = {
+  edge?: InputMaybe<InstallationPropertiesSort>;
+  node?: InputMaybe<PluginVersionSort>;
+};
+
+export type ServerConfigInstalledVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<ServerConfigInstalledVersionsConnectionWhere>>;
+  NOT?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<ServerConfigInstalledVersionsConnectionWhere>>;
+  edge?: InputMaybe<InstallationPropertiesWhere>;
+  node?: InputMaybe<PluginVersionWhere>;
+};
+
+export type ServerConfigInstalledVersionsCreateFieldInput = {
+  edge: InstallationPropertiesCreateInput;
+  node: PluginVersionCreateInput;
+};
+
+export type ServerConfigInstalledVersionsDeleteFieldInput = {
+  where?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+};
+
+export type ServerConfigInstalledVersionsDisconnectFieldInput = {
+  where?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+};
+
+export type ServerConfigInstalledVersionsFieldInput = {
+  connect?: InputMaybe<Array<ServerConfigInstalledVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<ServerConfigInstalledVersionsCreateFieldInput>>;
+};
+
+export type ServerConfigInstalledVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<ServerConfigInstalledVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<ServerConfigInstalledVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<ServerConfigInstalledVersionsNodeAggregationWhereInput>>;
+  entryPath_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  version_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  version_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type ServerConfigInstalledVersionsRelationship = {
+  __typename?: 'ServerConfigInstalledVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: PluginVersion;
+  properties: InstallationProperties;
+};
+
+export type ServerConfigInstalledVersionsRelationshipSubscriptionWhere = {
+  edge?: InputMaybe<InstallationPropertiesSubscriptionWhere>;
+  node?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+export type ServerConfigInstalledVersionsUpdateConnectionInput = {
+  edge?: InputMaybe<InstallationPropertiesUpdateInput>;
+  node?: InputMaybe<PluginVersionUpdateInput>;
+};
+
+export type ServerConfigInstalledVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<ServerConfigInstalledVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<ServerConfigInstalledVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<ServerConfigInstalledVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<ServerConfigInstalledVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<ServerConfigInstalledVersionsUpdateConnectionInput>;
+  where?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
 };
 
 export type ServerConfigModServerRoleDefaultElevatedModRoleAggregationSelection = {
@@ -39310,12 +40618,40 @@ export type ServerConfigOptions = {
   sort?: InputMaybe<Array<ServerConfigSort>>;
 };
 
+export type ServerConfigPluginAllowedPluginsAggregationSelection = {
+  __typename?: 'ServerConfigPluginAllowedPluginsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ServerConfigPluginAllowedPluginsNodeAggregateSelection>;
+};
+
+export type ServerConfigPluginAllowedPluginsNodeAggregateSelection = {
+  __typename?: 'ServerConfigPluginAllowedPluginsNodeAggregateSelection';
+  id: IdAggregateSelection;
+  name: StringAggregateSelection;
+};
+
+export type ServerConfigPluginVersionInstalledVersionsAggregationSelection = {
+  __typename?: 'ServerConfigPluginVersionInstalledVersionsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<ServerConfigPluginVersionInstalledVersionsNodeAggregateSelection>;
+};
+
+export type ServerConfigPluginVersionInstalledVersionsNodeAggregateSelection = {
+  __typename?: 'ServerConfigPluginVersionInstalledVersionsNodeAggregateSelection';
+  entryPath: StringAggregateSelection;
+  id: IdAggregateSelection;
+  repoUrl: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
 export type ServerConfigRelationInput = {
+  AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsCreateFieldInput>>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleCreateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleCreateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleCreateFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleCreateFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleCreateFieldInput>;
+  InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsCreateFieldInput>>;
 };
 
 export type ServerConfigRelationshipCreatedEvent = {
@@ -39353,11 +40689,13 @@ export type ServerConfigRelationshipDeletedSubscriptionWhere = {
 };
 
 export type ServerConfigRelationshipsSubscriptionWhere = {
+  AllowedPlugins?: InputMaybe<ServerConfigAllowedPluginsRelationshipSubscriptionWhere>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleRelationshipSubscriptionWhere>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleRelationshipSubscriptionWhere>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleRelationshipSubscriptionWhere>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleRelationshipSubscriptionWhere>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleRelationshipSubscriptionWhere>;
+  InstalledVersions?: InputMaybe<ServerConfigInstalledVersionsRelationshipSubscriptionWhere>;
 };
 
 export type ServerConfigServerRoleDefaultServerRoleAggregationSelection = {
@@ -39402,6 +40740,8 @@ export type ServerConfigSubscriptionWhere = {
   allowedFileTypes_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pluginRegistries_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
   rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
@@ -39425,16 +40765,21 @@ export type ServerConfigSubscriptionWhere = {
 };
 
 export type ServerConfigUpdateInput = {
+  AllowedPlugins?: InputMaybe<Array<ServerConfigAllowedPluginsUpdateFieldInput>>;
   DefaultElevatedModRole?: InputMaybe<ServerConfigDefaultElevatedModRoleUpdateFieldInput>;
   DefaultModRole?: InputMaybe<ServerConfigDefaultModRoleUpdateFieldInput>;
   DefaultServerRole?: InputMaybe<ServerConfigDefaultServerRoleUpdateFieldInput>;
   DefaultSuspendedModRole?: InputMaybe<ServerConfigDefaultSuspendedModRoleUpdateFieldInput>;
   DefaultSuspendedRole?: InputMaybe<ServerConfigDefaultSuspendedRoleUpdateFieldInput>;
+  InstalledVersions?: InputMaybe<Array<ServerConfigInstalledVersionsUpdateFieldInput>>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   allowedFileTypes_POP?: InputMaybe<Scalars['Int']['input']>;
   allowedFileTypes_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pluginRegistries_POP?: InputMaybe<Scalars['Int']['input']>;
+  pluginRegistries_PUSH?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
   serverIconURL?: InputMaybe<Scalars['String']['input']>;
@@ -39451,6 +40796,23 @@ export type ServerConfigUpdatedEvent = {
 
 export type ServerConfigWhere = {
   AND?: InputMaybe<Array<ServerConfigWhere>>;
+  AllowedPluginsAggregate?: InputMaybe<ServerConfigAllowedPluginsAggregateInput>;
+  /** Return ServerConfigs where all of the related ServerConfigAllowedPluginsConnections match this filter */
+  AllowedPluginsConnection_ALL?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+  /** Return ServerConfigs where none of the related ServerConfigAllowedPluginsConnections match this filter */
+  AllowedPluginsConnection_NONE?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+  /** Return ServerConfigs where one of the related ServerConfigAllowedPluginsConnections match this filter */
+  AllowedPluginsConnection_SINGLE?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+  /** Return ServerConfigs where some of the related ServerConfigAllowedPluginsConnections match this filter */
+  AllowedPluginsConnection_SOME?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
+  /** Return ServerConfigs where all of the related Plugins match this filter */
+  AllowedPlugins_ALL?: InputMaybe<PluginWhere>;
+  /** Return ServerConfigs where none of the related Plugins match this filter */
+  AllowedPlugins_NONE?: InputMaybe<PluginWhere>;
+  /** Return ServerConfigs where one of the related Plugins match this filter */
+  AllowedPlugins_SINGLE?: InputMaybe<PluginWhere>;
+  /** Return ServerConfigs where some of the related Plugins match this filter */
+  AllowedPlugins_SOME?: InputMaybe<PluginWhere>;
   DefaultElevatedModRole?: InputMaybe<ModServerRoleWhere>;
   DefaultElevatedModRoleAggregate?: InputMaybe<ServerConfigDefaultElevatedModRoleAggregateInput>;
   DefaultElevatedModRoleConnection?: InputMaybe<ServerConfigDefaultElevatedModRoleConnectionWhere>;
@@ -39476,12 +40838,31 @@ export type ServerConfigWhere = {
   DefaultSuspendedRoleConnection?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectionWhere>;
   DefaultSuspendedRoleConnection_NOT?: InputMaybe<ServerConfigDefaultSuspendedRoleConnectionWhere>;
   DefaultSuspendedRole_NOT?: InputMaybe<ServerRoleWhere>;
+  InstalledVersionsAggregate?: InputMaybe<ServerConfigInstalledVersionsAggregateInput>;
+  /** Return ServerConfigs where all of the related ServerConfigInstalledVersionsConnections match this filter */
+  InstalledVersionsConnection_ALL?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+  /** Return ServerConfigs where none of the related ServerConfigInstalledVersionsConnections match this filter */
+  InstalledVersionsConnection_NONE?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+  /** Return ServerConfigs where one of the related ServerConfigInstalledVersionsConnections match this filter */
+  InstalledVersionsConnection_SINGLE?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+  /** Return ServerConfigs where some of the related ServerConfigInstalledVersionsConnections match this filter */
+  InstalledVersionsConnection_SOME?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
+  /** Return ServerConfigs where all of the related PluginVersions match this filter */
+  InstalledVersions_ALL?: InputMaybe<PluginVersionWhere>;
+  /** Return ServerConfigs where none of the related PluginVersions match this filter */
+  InstalledVersions_NONE?: InputMaybe<PluginVersionWhere>;
+  /** Return ServerConfigs where one of the related PluginVersions match this filter */
+  InstalledVersions_SINGLE?: InputMaybe<PluginVersionWhere>;
+  /** Return ServerConfigs where some of the related PluginVersions match this filter */
+  InstalledVersions_SOME?: InputMaybe<PluginVersionWhere>;
   NOT?: InputMaybe<ServerConfigWhere>;
   OR?: InputMaybe<Array<ServerConfigWhere>>;
   allowedFileTypes?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
   allowedFileTypes_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   enableDownloads?: InputMaybe<Scalars['Boolean']['input']>;
   enableEvents?: InputMaybe<Scalars['Boolean']['input']>;
+  pluginRegistries?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  pluginRegistries_INCLUDES?: InputMaybe<Scalars['String']['input']>;
   rules?: InputMaybe<Scalars['JSON']['input']>;
   rules_IN?: InputMaybe<Array<InputMaybe<Scalars['JSON']['input']>>>;
   serverDescription?: InputMaybe<Scalars['String']['input']>;
@@ -39709,6 +41090,154 @@ export type ServerRoleWhere = {
 export type ServerRolesConnection = {
   __typename?: 'ServerRolesConnection';
   edges: Array<ServerRoleEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type ServerSecret = {
+  __typename?: 'ServerSecret';
+  ciphertext: Scalars['String']['output'];
+  key: Scalars['String']['output'];
+  pluginId: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ServerSecretAggregateSelection = {
+  __typename?: 'ServerSecretAggregateSelection';
+  ciphertext: StringAggregateSelection;
+  count: Scalars['Int']['output'];
+  key: StringAggregateSelection;
+  pluginId: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type ServerSecretCreateInput = {
+  ciphertext: Scalars['String']['input'];
+  key: Scalars['String']['input'];
+  pluginId: Scalars['String']['input'];
+  updatedAt: Scalars['DateTime']['input'];
+};
+
+export type ServerSecretCreatedEvent = {
+  __typename?: 'ServerSecretCreatedEvent';
+  createdServerSecret: ServerSecretEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ServerSecretDeletedEvent = {
+  __typename?: 'ServerSecretDeletedEvent';
+  deletedServerSecret: ServerSecretEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type ServerSecretEdge = {
+  __typename?: 'ServerSecretEdge';
+  cursor: Scalars['String']['output'];
+  node: ServerSecret;
+};
+
+export type ServerSecretEventPayload = {
+  __typename?: 'ServerSecretEventPayload';
+  ciphertext: Scalars['String']['output'];
+  key: Scalars['String']['output'];
+  pluginId: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ServerSecretOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more ServerSecretSort objects to sort ServerSecrets by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<ServerSecretSort>>;
+};
+
+/** Fields to sort ServerSecrets by. The order in which sorts are applied is not guaranteed when specifying many fields in one ServerSecretSort object. */
+export type ServerSecretSort = {
+  ciphertext?: InputMaybe<SortDirection>;
+  key?: InputMaybe<SortDirection>;
+  pluginId?: InputMaybe<SortDirection>;
+  updatedAt?: InputMaybe<SortDirection>;
+};
+
+export type ServerSecretSubscriptionWhere = {
+  AND?: InputMaybe<Array<ServerSecretSubscriptionWhere>>;
+  NOT?: InputMaybe<ServerSecretSubscriptionWhere>;
+  OR?: InputMaybe<Array<ServerSecretSubscriptionWhere>>;
+  ciphertext?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  ciphertext_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  key?: InputMaybe<Scalars['String']['input']>;
+  key_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  key_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  key_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  key_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  key_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ServerSecretUpdateInput = {
+  ciphertext?: InputMaybe<Scalars['String']['input']>;
+  key?: InputMaybe<Scalars['String']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type ServerSecretUpdatedEvent = {
+  __typename?: 'ServerSecretUpdatedEvent';
+  event: EventType;
+  previousState: ServerSecretEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedServerSecret: ServerSecretEventPayload;
+};
+
+export type ServerSecretWhere = {
+  AND?: InputMaybe<Array<ServerSecretWhere>>;
+  NOT?: InputMaybe<ServerSecretWhere>;
+  OR?: InputMaybe<Array<ServerSecretWhere>>;
+  ciphertext?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  ciphertext_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  ciphertext_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  key?: InputMaybe<Scalars['String']['input']>;
+  key_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  key_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  key_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  key_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  key_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId?: InputMaybe<Scalars['String']['input']>;
+  pluginId_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  pluginId_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  pluginId_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  pluginId_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  pluginId_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_IN?: InputMaybe<Array<Scalars['DateTime']['input']>>;
+  updatedAt_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type ServerSecretsConnection = {
+  __typename?: 'ServerSecretsConnection';
+  edges: Array<ServerSecretEdge>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
@@ -40096,6 +41625,15 @@ export type Subscription = {
   notificationCreated: NotificationCreatedEvent;
   notificationDeleted: NotificationDeletedEvent;
   notificationUpdated: NotificationUpdatedEvent;
+  pluginCreated: PluginCreatedEvent;
+  pluginDeleted: PluginDeletedEvent;
+  pluginRunCreated: PluginRunCreatedEvent;
+  pluginRunDeleted: PluginRunDeletedEvent;
+  pluginRunUpdated: PluginRunUpdatedEvent;
+  pluginUpdated: PluginUpdatedEvent;
+  pluginVersionCreated: PluginVersionCreatedEvent;
+  pluginVersionDeleted: PluginVersionDeletedEvent;
+  pluginVersionUpdated: PluginVersionUpdatedEvent;
   purchaseCreated: PurchaseCreatedEvent;
   purchaseDeleted: PurchaseDeletedEvent;
   purchaseRelationshipCreated: PurchaseRelationshipCreatedEvent;
@@ -40126,6 +41664,9 @@ export type Subscription = {
   serverRoleCreated: ServerRoleCreatedEvent;
   serverRoleDeleted: ServerRoleDeletedEvent;
   serverRoleUpdated: ServerRoleUpdatedEvent;
+  serverSecretCreated: ServerSecretCreatedEvent;
+  serverSecretDeleted: ServerSecretDeletedEvent;
+  serverSecretUpdated: ServerSecretUpdatedEvent;
   signedUrlCreated: SignedUrlCreatedEvent;
   signedUrlDeleted: SignedUrlDeletedEvent;
   signedUrlUpdated: SignedUrlUpdatedEvent;
@@ -40970,6 +42511,51 @@ export type SubscriptionNotificationUpdatedArgs = {
 };
 
 
+export type SubscriptionPluginCreatedArgs = {
+  where?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginDeletedArgs = {
+  where?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginRunCreatedArgs = {
+  where?: InputMaybe<PluginRunSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginRunDeletedArgs = {
+  where?: InputMaybe<PluginRunSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginRunUpdatedArgs = {
+  where?: InputMaybe<PluginRunSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginUpdatedArgs = {
+  where?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginVersionCreatedArgs = {
+  where?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginVersionDeletedArgs = {
+  where?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginVersionUpdatedArgs = {
+  where?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+
 export type SubscriptionPurchaseCreatedArgs = {
   where?: InputMaybe<PurchaseSubscriptionWhere>;
 };
@@ -41102,6 +42688,21 @@ export type SubscriptionServerRoleDeletedArgs = {
 
 export type SubscriptionServerRoleUpdatedArgs = {
   where?: InputMaybe<ServerRoleSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerSecretCreatedArgs = {
+  where?: InputMaybe<ServerSecretSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerSecretDeletedArgs = {
+  where?: InputMaybe<ServerSecretSubscriptionWhere>;
+};
+
+
+export type SubscriptionServerSecretUpdatedArgs = {
+  where?: InputMaybe<ServerSecretSubscriptionWhere>;
 };
 
 
@@ -44391,6 +45992,24 @@ export type UpdateNotificationsMutationResponse = {
   notifications: Array<Notification>;
 };
 
+export type UpdatePluginRunsMutationResponse = {
+  __typename?: 'UpdatePluginRunsMutationResponse';
+  info: UpdateInfo;
+  pluginRuns: Array<PluginRun>;
+};
+
+export type UpdatePluginVersionsMutationResponse = {
+  __typename?: 'UpdatePluginVersionsMutationResponse';
+  info: UpdateInfo;
+  pluginVersions: Array<PluginVersion>;
+};
+
+export type UpdatePluginsMutationResponse = {
+  __typename?: 'UpdatePluginsMutationResponse';
+  info: UpdateInfo;
+  plugins: Array<Plugin>;
+};
+
 export type UpdatePurchasesMutationResponse = {
   __typename?: 'UpdatePurchasesMutationResponse';
   info: UpdateInfo;
@@ -44437,6 +46056,12 @@ export type UpdateServerRolesMutationResponse = {
   __typename?: 'UpdateServerRolesMutationResponse';
   info: UpdateInfo;
   serverRoles: Array<ServerRole>;
+};
+
+export type UpdateServerSecretsMutationResponse = {
+  __typename?: 'UpdateServerSecretsMutationResponse';
+  info: UpdateInfo;
+  serverSecrets: Array<ServerSecret>;
 };
 
 export type UpdateSignedUrlsMutationResponse = {

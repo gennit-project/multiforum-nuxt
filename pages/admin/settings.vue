@@ -37,6 +37,7 @@ const formValues = ref<ServerConfigUpdateInput>({
   allowedFileTypes: [],
   enableDownloads: false,
   enableEvents: false,
+  pluginRegistries: [],
 });
 
 onGetServerResult((result) => {
@@ -56,6 +57,7 @@ onGetServerResult((result) => {
     enableEvents: serverConfig.enableEvents,
     serverDescription: serverConfig.serverDescription,
     allowedFileTypes: serverConfig.allowedFileTypes,
+    pluginRegistries: serverConfig.pluginRegistries,
   });
 
   formValues.value = {
@@ -64,6 +66,7 @@ onGetServerResult((result) => {
     allowedFileTypes: serverConfig.allowedFileTypes || [],
     enableDownloads: Boolean(serverConfig.enableDownloads),
     enableEvents: Boolean(serverConfig.enableEvents),
+    pluginRegistries: serverConfig.pluginRegistries || [],
   };
 
   console.log('Updated form values:', formValues.value);
@@ -79,6 +82,7 @@ const serverUpdateInput = computed(() => {
     allowedFileTypes: formValues.value.allowedFileTypes || [],
     enableDownloads: formValues.value.enableDownloads || false,
     enableEvents: formValues.value.enableEvents || false,
+    pluginRegistries: formValues.value.pluginRegistries || [],
   };
 });
 
@@ -97,7 +101,7 @@ const {
     if (newServerConfig) {
       try {
         // Parse rules if they come back as string
-        let updatedConfig = { ...newServerConfig };
+        const updatedConfig = { ...newServerConfig };
         if (typeof updatedConfig.rules === 'string') {
           try {
             updatedConfig.rules = JSON.parse(updatedConfig.rules);

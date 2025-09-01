@@ -13,7 +13,17 @@ export const UPDATE_SERVER_CONFIG = gql`
         enableDownloads
         enableEvents
         allowedFileTypes
+        pluginRegistries
       }
+    }
+  }
+`;
+
+export const REFRESH_PLUGINS = gql`
+  mutation refreshPlugins {
+    refreshPlugins {
+      id
+      name
     }
   }
 `;

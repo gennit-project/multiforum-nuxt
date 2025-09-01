@@ -68,6 +68,7 @@ export const GET_SERVER_CONFIG = gql`
       allowedFileTypes
       enableDownloads
       enableEvents
+      pluginRegistries
     }
   }
 `;
@@ -145,6 +146,40 @@ export const GET_SERVER_RULES = gql`
     serverConfigs {
       serverName
       rules
+    }
+  }
+`;
+
+export const GET_PLUGINS = gql`
+  query getPlugins($serverName: String!) {
+    serverConfigs(where: { serverName: $serverName }) {
+      AllowedPlugins {
+        id
+        name
+      }
+      InstalledVersions {
+        id
+        version
+        repoUrl
+        entryPath
+      }
+    }
+  }
+`;
+
+export const GET_PLUGIN_BY_ID = gql`
+  query getPluginById($serverName: String!, $pluginId: ID!) {
+    serverConfigs(where: { serverName: $serverName }) {
+      AllowedPlugins(where: { id: $pluginId }) {
+        id
+        name
+      }
+      InstalledVersions {
+        id
+        version
+        repoUrl
+        entryPath
+      }
     }
   }
 `;
