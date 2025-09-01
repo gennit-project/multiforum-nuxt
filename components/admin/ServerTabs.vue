@@ -60,7 +60,7 @@ const tabs = computed((): Tab[] => {
     },
     {
       name: 'settings',
-      routeSuffix: 'edit',
+      routeSuffix: 'settings',
       label: 'Settings',
       icon: CogIcon,
       countProperty: null,
