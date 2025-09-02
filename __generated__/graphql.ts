@@ -2981,6 +2981,7 @@ export type ChannelEnabledPluginsAggregateInput = {
 };
 
 export type ChannelEnabledPluginsConnectFieldInput = {
+  connect?: InputMaybe<Array<PluginVersionConnectInput>>;
   edge: ChannelPluginPropertiesCreateInput;
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
@@ -3020,10 +3021,12 @@ export type ChannelEnabledPluginsCreateFieldInput = {
 };
 
 export type ChannelEnabledPluginsDeleteFieldInput = {
+  delete?: InputMaybe<PluginVersionDeleteInput>;
   where?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
 };
 
 export type ChannelEnabledPluginsDisconnectFieldInput = {
+  disconnect?: InputMaybe<PluginVersionDisconnectInput>;
   where?: InputMaybe<ChannelEnabledPluginsConnectionWhere>;
 };
 
@@ -34701,11 +34704,13 @@ export type MutationDeletePluginRunsArgs = {
 
 
 export type MutationDeletePluginVersionsArgs = {
+  delete?: InputMaybe<PluginVersionDeleteInput>;
   where?: InputMaybe<PluginVersionWhere>;
 };
 
 
 export type MutationDeletePluginsArgs = {
+  delete?: InputMaybe<PluginDeleteInput>;
   where?: InputMaybe<PluginWhere>;
 };
 
@@ -35532,8 +35537,33 @@ export type PageInfo = {
 
 export type Plugin = {
   __typename?: 'Plugin';
+  Versions: Array<PluginVersion>;
+  VersionsAggregate?: Maybe<PluginPluginVersionVersionsAggregationSelection>;
+  VersionsConnection: PluginVersionsConnection;
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+};
+
+
+export type PluginVersionsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<PluginVersionOptions>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type PluginVersionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<PluginVersionWhere>;
+};
+
+
+export type PluginVersionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PluginVersionsConnectionSort>>;
+  where?: InputMaybe<PluginVersionsConnectionWhere>;
 };
 
 export type PluginAggregateSelection = {
@@ -35543,11 +35573,21 @@ export type PluginAggregateSelection = {
   name: StringAggregateSelection;
 };
 
+export type PluginConnectInput = {
+  Versions?: InputMaybe<Array<PluginVersionsConnectFieldInput>>;
+};
+
 export type PluginConnectWhere = {
   node: PluginWhere;
 };
 
+export type PluginConnectedRelationships = {
+  __typename?: 'PluginConnectedRelationships';
+  Versions?: Maybe<PluginVersionsConnectedRelationship>;
+};
+
 export type PluginCreateInput = {
+  Versions?: InputMaybe<PluginVersionsFieldInput>;
   name: Scalars['String']['input'];
 };
 
@@ -35558,11 +35598,19 @@ export type PluginCreatedEvent = {
   timestamp: Scalars['Float']['output'];
 };
 
+export type PluginDeleteInput = {
+  Versions?: InputMaybe<Array<PluginVersionsDeleteFieldInput>>;
+};
+
 export type PluginDeletedEvent = {
   __typename?: 'PluginDeletedEvent';
   deletedPlugin: PluginEventPayload;
   event: EventType;
   timestamp: Scalars['Float']['output'];
+};
+
+export type PluginDisconnectInput = {
+  Versions?: InputMaybe<Array<PluginVersionsDisconnectFieldInput>>;
 };
 
 export type PluginEdge = {
@@ -35582,6 +35630,62 @@ export type PluginOptions = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   /** Specify one or more PluginSort objects to sort Plugins by. The sorts will be applied in the order in which they are arranged in the array. */
   sort?: InputMaybe<Array<PluginSort>>;
+};
+
+export type PluginPluginVersionVersionsAggregationSelection = {
+  __typename?: 'PluginPluginVersionVersionsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<PluginPluginVersionVersionsNodeAggregateSelection>;
+};
+
+export type PluginPluginVersionVersionsNodeAggregateSelection = {
+  __typename?: 'PluginPluginVersionVersionsNodeAggregateSelection';
+  entryPath: StringAggregateSelection;
+  id: IdAggregateSelection;
+  repoUrl: StringAggregateSelection;
+  version: StringAggregateSelection;
+};
+
+export type PluginRelationInput = {
+  Versions?: InputMaybe<Array<PluginVersionsCreateFieldInput>>;
+};
+
+export type PluginRelationshipCreatedEvent = {
+  __typename?: 'PluginRelationshipCreatedEvent';
+  createdRelationship: PluginConnectedRelationships;
+  event: EventType;
+  plugin: PluginEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<PluginRelationshipsSubscriptionWhere>;
+  plugin?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+export type PluginRelationshipDeletedEvent = {
+  __typename?: 'PluginRelationshipDeletedEvent';
+  deletedRelationship: PluginConnectedRelationships;
+  event: EventType;
+  plugin: PluginEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<PluginRelationshipsSubscriptionWhere>;
+  plugin?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+export type PluginRelationshipsSubscriptionWhere = {
+  Versions?: InputMaybe<PluginVersionsRelationshipSubscriptionWhere>;
 };
 
 export type PluginRun = {
@@ -35862,6 +35966,7 @@ export type PluginSubscriptionWhere = {
 };
 
 export type PluginUpdateInput = {
+  Versions?: InputMaybe<Array<PluginVersionsUpdateFieldInput>>;
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -35875,10 +35980,35 @@ export type PluginUpdatedEvent = {
 
 export type PluginVersion = {
   __typename?: 'PluginVersion';
+  Plugin: Plugin;
+  PluginAggregate?: Maybe<PluginVersionPluginPluginAggregationSelection>;
+  PluginConnection: PluginVersionPluginConnection;
   entryPath: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   repoUrl: Scalars['String']['output'];
   version: Scalars['String']['output'];
+};
+
+
+export type PluginVersionPluginArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<PluginOptions>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
+export type PluginVersionPluginAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<PluginWhere>;
+};
+
+
+export type PluginVersionPluginConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<PluginVersionPluginConnectionSort>>;
+  where?: InputMaybe<PluginVersionPluginConnectionWhere>;
 };
 
 export type PluginVersionAggregateSelection = {
@@ -35890,11 +36020,21 @@ export type PluginVersionAggregateSelection = {
   version: StringAggregateSelection;
 };
 
+export type PluginVersionConnectInput = {
+  Plugin?: InputMaybe<PluginVersionPluginConnectFieldInput>;
+};
+
 export type PluginVersionConnectWhere = {
   node: PluginVersionWhere;
 };
 
+export type PluginVersionConnectedRelationships = {
+  __typename?: 'PluginVersionConnectedRelationships';
+  Plugin?: Maybe<PluginVersionPluginConnectedRelationship>;
+};
+
 export type PluginVersionCreateInput = {
+  Plugin?: InputMaybe<PluginVersionPluginFieldInput>;
   entryPath: Scalars['String']['input'];
   repoUrl: Scalars['String']['input'];
   version: Scalars['String']['input'];
@@ -35907,11 +36047,19 @@ export type PluginVersionCreatedEvent = {
   timestamp: Scalars['Float']['output'];
 };
 
+export type PluginVersionDeleteInput = {
+  Plugin?: InputMaybe<PluginVersionPluginDeleteFieldInput>;
+};
+
 export type PluginVersionDeletedEvent = {
   __typename?: 'PluginVersionDeletedEvent';
   deletedPluginVersion: PluginVersionEventPayload;
   event: EventType;
   timestamp: Scalars['Float']['output'];
+};
+
+export type PluginVersionDisconnectInput = {
+  Plugin?: InputMaybe<PluginVersionPluginDisconnectFieldInput>;
 };
 
 export type PluginVersionEdge = {
@@ -35933,6 +36081,165 @@ export type PluginVersionOptions = {
   offset?: InputMaybe<Scalars['Int']['input']>;
   /** Specify one or more PluginVersionSort objects to sort PluginVersions by. The sorts will be applied in the order in which they are arranged in the array. */
   sort?: InputMaybe<Array<PluginVersionSort>>;
+};
+
+export type PluginVersionPluginAggregateInput = {
+  AND?: InputMaybe<Array<PluginVersionPluginAggregateInput>>;
+  NOT?: InputMaybe<PluginVersionPluginAggregateInput>;
+  OR?: InputMaybe<Array<PluginVersionPluginAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<PluginVersionPluginNodeAggregationWhereInput>;
+};
+
+export type PluginVersionPluginConnectFieldInput = {
+  connect?: InputMaybe<PluginConnectInput>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<PluginConnectWhere>;
+};
+
+export type PluginVersionPluginConnectedRelationship = {
+  __typename?: 'PluginVersionPluginConnectedRelationship';
+  node: PluginEventPayload;
+};
+
+export type PluginVersionPluginConnection = {
+  __typename?: 'PluginVersionPluginConnection';
+  edges: Array<PluginVersionPluginRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type PluginVersionPluginConnectionSort = {
+  node?: InputMaybe<PluginSort>;
+};
+
+export type PluginVersionPluginConnectionWhere = {
+  AND?: InputMaybe<Array<PluginVersionPluginConnectionWhere>>;
+  NOT?: InputMaybe<PluginVersionPluginConnectionWhere>;
+  OR?: InputMaybe<Array<PluginVersionPluginConnectionWhere>>;
+  node?: InputMaybe<PluginWhere>;
+};
+
+export type PluginVersionPluginCreateFieldInput = {
+  node: PluginCreateInput;
+};
+
+export type PluginVersionPluginDeleteFieldInput = {
+  delete?: InputMaybe<PluginDeleteInput>;
+  where?: InputMaybe<PluginVersionPluginConnectionWhere>;
+};
+
+export type PluginVersionPluginDisconnectFieldInput = {
+  disconnect?: InputMaybe<PluginDisconnectInput>;
+  where?: InputMaybe<PluginVersionPluginConnectionWhere>;
+};
+
+export type PluginVersionPluginFieldInput = {
+  connect?: InputMaybe<PluginVersionPluginConnectFieldInput>;
+  create?: InputMaybe<PluginVersionPluginCreateFieldInput>;
+};
+
+export type PluginVersionPluginNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PluginVersionPluginNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PluginVersionPluginNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PluginVersionPluginNodeAggregationWhereInput>>;
+  name_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  name_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  name_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type PluginVersionPluginPluginAggregationSelection = {
+  __typename?: 'PluginVersionPluginPluginAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<PluginVersionPluginPluginNodeAggregateSelection>;
+};
+
+export type PluginVersionPluginPluginNodeAggregateSelection = {
+  __typename?: 'PluginVersionPluginPluginNodeAggregateSelection';
+  id: IdAggregateSelection;
+  name: StringAggregateSelection;
+};
+
+export type PluginVersionPluginRelationship = {
+  __typename?: 'PluginVersionPluginRelationship';
+  cursor: Scalars['String']['output'];
+  node: Plugin;
+};
+
+export type PluginVersionPluginRelationshipSubscriptionWhere = {
+  node?: InputMaybe<PluginSubscriptionWhere>;
+};
+
+export type PluginVersionPluginUpdateConnectionInput = {
+  node?: InputMaybe<PluginUpdateInput>;
+};
+
+export type PluginVersionPluginUpdateFieldInput = {
+  connect?: InputMaybe<PluginVersionPluginConnectFieldInput>;
+  create?: InputMaybe<PluginVersionPluginCreateFieldInput>;
+  delete?: InputMaybe<PluginVersionPluginDeleteFieldInput>;
+  disconnect?: InputMaybe<PluginVersionPluginDisconnectFieldInput>;
+  update?: InputMaybe<PluginVersionPluginUpdateConnectionInput>;
+  where?: InputMaybe<PluginVersionPluginConnectionWhere>;
+};
+
+export type PluginVersionRelationInput = {
+  Plugin?: InputMaybe<PluginVersionPluginCreateFieldInput>;
+};
+
+export type PluginVersionRelationshipCreatedEvent = {
+  __typename?: 'PluginVersionRelationshipCreatedEvent';
+  createdRelationship: PluginVersionConnectedRelationships;
+  event: EventType;
+  pluginVersion: PluginVersionEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginVersionRelationshipCreatedSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginVersionRelationshipCreatedSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginVersionRelationshipCreatedSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginVersionRelationshipCreatedSubscriptionWhere>>;
+  createdRelationship?: InputMaybe<PluginVersionRelationshipsSubscriptionWhere>;
+  pluginVersion?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+export type PluginVersionRelationshipDeletedEvent = {
+  __typename?: 'PluginVersionRelationshipDeletedEvent';
+  deletedRelationship: PluginVersionConnectedRelationships;
+  event: EventType;
+  pluginVersion: PluginVersionEventPayload;
+  relationshipFieldName: Scalars['String']['output'];
+  timestamp: Scalars['Float']['output'];
+};
+
+export type PluginVersionRelationshipDeletedSubscriptionWhere = {
+  AND?: InputMaybe<Array<PluginVersionRelationshipDeletedSubscriptionWhere>>;
+  NOT?: InputMaybe<PluginVersionRelationshipDeletedSubscriptionWhere>;
+  OR?: InputMaybe<Array<PluginVersionRelationshipDeletedSubscriptionWhere>>;
+  deletedRelationship?: InputMaybe<PluginVersionRelationshipsSubscriptionWhere>;
+  pluginVersion?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+export type PluginVersionRelationshipsSubscriptionWhere = {
+  Plugin?: InputMaybe<PluginVersionPluginRelationshipSubscriptionWhere>;
 };
 
 /** Fields to sort PluginVersions by. The order in which sorts are applied is not guaranteed when specifying many fields in one PluginVersionSort object. */
@@ -35973,6 +36280,7 @@ export type PluginVersionSubscriptionWhere = {
 };
 
 export type PluginVersionUpdateInput = {
+  Plugin?: InputMaybe<PluginVersionPluginUpdateFieldInput>;
   entryPath?: InputMaybe<Scalars['String']['input']>;
   repoUrl?: InputMaybe<Scalars['String']['input']>;
   version?: InputMaybe<Scalars['String']['input']>;
@@ -35990,6 +36298,11 @@ export type PluginVersionWhere = {
   AND?: InputMaybe<Array<PluginVersionWhere>>;
   NOT?: InputMaybe<PluginVersionWhere>;
   OR?: InputMaybe<Array<PluginVersionWhere>>;
+  Plugin?: InputMaybe<PluginWhere>;
+  PluginAggregate?: InputMaybe<PluginVersionPluginAggregateInput>;
+  PluginConnection?: InputMaybe<PluginVersionPluginConnectionWhere>;
+  PluginConnection_NOT?: InputMaybe<PluginVersionPluginConnectionWhere>;
+  Plugin_NOT?: InputMaybe<PluginWhere>;
   entryPath?: InputMaybe<Scalars['String']['input']>;
   entryPath_CONTAINS?: InputMaybe<Scalars['String']['input']>;
   entryPath_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
@@ -36015,17 +36328,162 @@ export type PluginVersionWhere = {
   version_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type PluginVersionsAggregateInput = {
+  AND?: InputMaybe<Array<PluginVersionsAggregateInput>>;
+  NOT?: InputMaybe<PluginVersionsAggregateInput>;
+  OR?: InputMaybe<Array<PluginVersionsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<PluginVersionsNodeAggregationWhereInput>;
+};
+
+export type PluginVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<PluginVersionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<PluginVersionConnectWhere>;
+};
+
+export type PluginVersionsConnectedRelationship = {
+  __typename?: 'PluginVersionsConnectedRelationship';
+  node: PluginVersionEventPayload;
+};
+
 export type PluginVersionsConnection = {
   __typename?: 'PluginVersionsConnection';
-  edges: Array<PluginVersionEdge>;
+  edges: Array<PluginVersionsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
+};
+
+export type PluginVersionsConnectionSort = {
+  node?: InputMaybe<PluginVersionSort>;
+};
+
+export type PluginVersionsConnectionWhere = {
+  AND?: InputMaybe<Array<PluginVersionsConnectionWhere>>;
+  NOT?: InputMaybe<PluginVersionsConnectionWhere>;
+  OR?: InputMaybe<Array<PluginVersionsConnectionWhere>>;
+  node?: InputMaybe<PluginVersionWhere>;
+};
+
+export type PluginVersionsCreateFieldInput = {
+  node: PluginVersionCreateInput;
+};
+
+export type PluginVersionsDeleteFieldInput = {
+  delete?: InputMaybe<PluginVersionDeleteInput>;
+  where?: InputMaybe<PluginVersionsConnectionWhere>;
+};
+
+export type PluginVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<PluginVersionDisconnectInput>;
+  where?: InputMaybe<PluginVersionsConnectionWhere>;
+};
+
+export type PluginVersionsFieldInput = {
+  connect?: InputMaybe<Array<PluginVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<PluginVersionsCreateFieldInput>>;
+};
+
+export type PluginVersionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<PluginVersionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<PluginVersionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<PluginVersionsNodeAggregationWhereInput>>;
+  entryPath_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  entryPath_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  entryPath_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  repoUrl_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  repoUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  version_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  version_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  version_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  version_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  version_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type PluginVersionsRelationship = {
+  __typename?: 'PluginVersionsRelationship';
+  cursor: Scalars['String']['output'];
+  node: PluginVersion;
+};
+
+export type PluginVersionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+export type PluginVersionsUpdateConnectionInput = {
+  node?: InputMaybe<PluginVersionUpdateInput>;
+};
+
+export type PluginVersionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<PluginVersionsConnectFieldInput>>;
+  create?: InputMaybe<Array<PluginVersionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<PluginVersionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<PluginVersionsDisconnectFieldInput>>;
+  update?: InputMaybe<PluginVersionsUpdateConnectionInput>;
+  where?: InputMaybe<PluginVersionsConnectionWhere>;
 };
 
 export type PluginWhere = {
   AND?: InputMaybe<Array<PluginWhere>>;
   NOT?: InputMaybe<PluginWhere>;
   OR?: InputMaybe<Array<PluginWhere>>;
+  VersionsAggregate?: InputMaybe<PluginVersionsAggregateInput>;
+  /** Return Plugins where all of the related PluginVersionsConnections match this filter */
+  VersionsConnection_ALL?: InputMaybe<PluginVersionsConnectionWhere>;
+  /** Return Plugins where none of the related PluginVersionsConnections match this filter */
+  VersionsConnection_NONE?: InputMaybe<PluginVersionsConnectionWhere>;
+  /** Return Plugins where one of the related PluginVersionsConnections match this filter */
+  VersionsConnection_SINGLE?: InputMaybe<PluginVersionsConnectionWhere>;
+  /** Return Plugins where some of the related PluginVersionsConnections match this filter */
+  VersionsConnection_SOME?: InputMaybe<PluginVersionsConnectionWhere>;
+  /** Return Plugins where all of the related PluginVersions match this filter */
+  Versions_ALL?: InputMaybe<PluginVersionWhere>;
+  /** Return Plugins where none of the related PluginVersions match this filter */
+  Versions_NONE?: InputMaybe<PluginVersionWhere>;
+  /** Return Plugins where one of the related PluginVersions match this filter */
+  Versions_SINGLE?: InputMaybe<PluginVersionWhere>;
+  /** Return Plugins where some of the related PluginVersions match this filter */
+  Versions_SOME?: InputMaybe<PluginVersionWhere>;
   id?: InputMaybe<Scalars['ID']['input']>;
   id_CONTAINS?: InputMaybe<Scalars['ID']['input']>;
   id_ENDS_WITH?: InputMaybe<Scalars['ID']['input']>;
@@ -39606,6 +40064,7 @@ export type ServerConfigAllowedPluginsAggregateInput = {
 };
 
 export type ServerConfigAllowedPluginsConnectFieldInput = {
+  connect?: InputMaybe<Array<PluginConnectInput>>;
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
   where?: InputMaybe<PluginConnectWhere>;
@@ -39639,10 +40098,12 @@ export type ServerConfigAllowedPluginsCreateFieldInput = {
 };
 
 export type ServerConfigAllowedPluginsDeleteFieldInput = {
+  delete?: InputMaybe<PluginDeleteInput>;
   where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
 };
 
 export type ServerConfigAllowedPluginsDisconnectFieldInput = {
+  disconnect?: InputMaybe<PluginDisconnectInput>;
   where?: InputMaybe<ServerConfigAllowedPluginsConnectionWhere>;
 };
 
@@ -40447,6 +40908,7 @@ export type ServerConfigInstalledVersionsAggregateInput = {
 };
 
 export type ServerConfigInstalledVersionsConnectFieldInput = {
+  connect?: InputMaybe<Array<PluginVersionConnectInput>>;
   edge: InstallationPropertiesCreateInput;
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
@@ -40486,10 +40948,12 @@ export type ServerConfigInstalledVersionsCreateFieldInput = {
 };
 
 export type ServerConfigInstalledVersionsDeleteFieldInput = {
+  delete?: InputMaybe<PluginVersionDeleteInput>;
   where?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
 };
 
 export type ServerConfigInstalledVersionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<PluginVersionDisconnectInput>;
   where?: InputMaybe<ServerConfigInstalledVersionsConnectionWhere>;
 };
 
@@ -41627,12 +42091,16 @@ export type Subscription = {
   notificationUpdated: NotificationUpdatedEvent;
   pluginCreated: PluginCreatedEvent;
   pluginDeleted: PluginDeletedEvent;
+  pluginRelationshipCreated: PluginRelationshipCreatedEvent;
+  pluginRelationshipDeleted: PluginRelationshipDeletedEvent;
   pluginRunCreated: PluginRunCreatedEvent;
   pluginRunDeleted: PluginRunDeletedEvent;
   pluginRunUpdated: PluginRunUpdatedEvent;
   pluginUpdated: PluginUpdatedEvent;
   pluginVersionCreated: PluginVersionCreatedEvent;
   pluginVersionDeleted: PluginVersionDeletedEvent;
+  pluginVersionRelationshipCreated: PluginVersionRelationshipCreatedEvent;
+  pluginVersionRelationshipDeleted: PluginVersionRelationshipDeletedEvent;
   pluginVersionUpdated: PluginVersionUpdatedEvent;
   purchaseCreated: PurchaseCreatedEvent;
   purchaseDeleted: PurchaseDeletedEvent;
@@ -42521,6 +42989,16 @@ export type SubscriptionPluginDeletedArgs = {
 };
 
 
+export type SubscriptionPluginRelationshipCreatedArgs = {
+  where?: InputMaybe<PluginRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginRelationshipDeletedArgs = {
+  where?: InputMaybe<PluginRelationshipDeletedSubscriptionWhere>;
+};
+
+
 export type SubscriptionPluginRunCreatedArgs = {
   where?: InputMaybe<PluginRunSubscriptionWhere>;
 };
@@ -42548,6 +43026,16 @@ export type SubscriptionPluginVersionCreatedArgs = {
 
 export type SubscriptionPluginVersionDeletedArgs = {
   where?: InputMaybe<PluginVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginVersionRelationshipCreatedArgs = {
+  where?: InputMaybe<PluginVersionRelationshipCreatedSubscriptionWhere>;
+};
+
+
+export type SubscriptionPluginVersionRelationshipDeletedArgs = {
+  where?: InputMaybe<PluginVersionRelationshipDeletedSubscriptionWhere>;
 };
 
 

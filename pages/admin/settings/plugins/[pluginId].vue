@@ -1,0 +1,557 @@
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { useQuery, useMutation } from '@vue/apollo-composable';
+import FormRow from '@/components/FormRow.vue';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import {
+  GET_AVAILABLE_PLUGINS,
+  GET_INSTALLED_PLUGINS,
+  GET_SERVER_PLUGIN_SECRETS
+} from '@/graphQLData/admin/queries';
+import {
+  INSTALL_PLUGIN_VERSION,
+  ENABLE_SERVER_PLUGIN,
+  SET_SERVER_PLUGIN_SECRET,
+  VALIDATE_SERVER_PLUGIN_SECRET
+} from '@/graphQLData/admin/mutations';
+
+// @ts-ignore - definePageMeta is auto-imported by Nuxt
+definePageMeta({
+  layout: 'default'
+});
+
+const route = useRoute();
+const pluginId = route.params.pluginId as string;
+
+// Simple success/error handlers (can be replaced with toast system later)
+const success = (message: string) => {
+  console.log('SUCCESS:', message);
+  // TODO: Implement proper toast notifications
+};
+
+const error = (message: string) => {
+  console.error('ERROR:', message);
+  // TODO: Implement proper toast notifications
+};
+
+// State
+const selectedVersion = ref<string>('');
+const secretValues = ref<Record<string, string>>({});
+const showSecretInputs = ref<Record<string, boolean>>({});
+
+// Types
+interface PluginSecretStatus {
+  key: string;
+  status: 'NOT_SET' | 'SET_UNTESTED' | 'VALID' | 'INVALID';
+  lastValidatedAt?: string;
+  validationError?: string;
+}
+
+interface InstalledPlugin {
+  plugin: {
+    id: string;
+    name: string;
+  };
+  version: string;
+  scope: string;
+  enabled: boolean;
+  settingsJson: any;
+}
+
+// Queries
+const {
+  result: pluginsResult,
+  error: pluginsError,
+  loading: pluginsLoading
+} = useQuery(GET_AVAILABLE_PLUGINS);
+
+const {
+  result: installedResult,
+  error: installedError,
+  loading: installedLoading,
+  refetch: refetchInstalled
+} = useQuery(GET_INSTALLED_PLUGINS, null, {
+  fetchPolicy: 'cache-and-network'
+});
+
+const {
+  result: secretsResult,
+  loading: secretsLoading,
+  refetch: refetchSecrets
+} = useQuery(GET_SERVER_PLUGIN_SECRETS, { pluginId });
+
+// Mutations
+const { mutate: installMutation, loading: installing } = useMutation(INSTALL_PLUGIN_VERSION);
+const { mutate: enableMutation, loading: enabling } = useMutation(ENABLE_SERVER_PLUGIN);
+const { mutate: setSecretMutation } = useMutation(SET_SERVER_PLUGIN_SECRET);
+const { mutate: validateSecretMutation } = useMutation(VALIDATE_SERVER_PLUGIN_SECRET);
+
+// Computed
+const plugin = computed(() => {
+  const plugins = pluginsResult.value?.plugins || [];
+  return plugins.find((p: any) => p.id === pluginId);
+});
+
+const installedPlugin = computed((): InstalledPlugin | null => {
+  const installed = installedResult.value?.getInstalledPlugins || [];
+  console.log('Debug - installed plugins:', installed);
+  console.log('Debug - looking for pluginId:', pluginId);
+  const found = installed.find((p: InstalledPlugin) => p.plugin.id === pluginId) || null;
+  console.log('Debug - found installed plugin:', found);
+  return found;
+});
+
+const secrets = computed((): PluginSecretStatus[] => {
+  return secretsResult.value?.getServerPluginSecrets || [];
+});
+
+const isInstalled = computed(() => !!installedPlugin.value);
+const isEnabled = computed(() => installedPlugin.value?.enabled ?? false);
+
+const canEnable = computed(() => {
+  if (!isInstalled.value) return false;
+  // Check if all secrets are valid or set (untested)
+  return secrets.value.every(s => s.status === 'VALID' || s.status === 'SET_UNTESTED');
+});
+
+const availableVersions = computed(() => {
+  return plugin.value?.Versions || [];
+});
+
+const installedVersion = computed(() => {
+  return installedPlugin.value?.version;
+});
+
+const isSelectedVersionInstalled = computed(() => {
+  return installedVersion.value === selectedVersion.value;
+});
+
+const hasNewerVersions = computed(() => {
+  if (!installedVersion.value) return true;
+  return availableVersions.value.some((v: any) => v.version !== installedVersion.value);
+});
+
+const canInstall = computed(() => {
+  return !isSelectedVersionInstalled.value && selectedVersion.value;
+});
+
+// Set default version when plugin loads
+watch(availableVersions, (versions) => {
+  if (versions.length > 0 && !selectedVersion.value) {
+    // If installed, default to installed version, otherwise first available
+    if (installedVersion.value) {
+      selectedVersion.value = installedVersion.value;
+    } else {
+      selectedVersion.value = versions[0].version;
+    }
+  }
+}, { immediate: true });
+
+// Update selected version when installed version changes
+watch(installedVersion, (newInstalledVersion) => {
+  if (newInstalledVersion && !selectedVersion.value) {
+    selectedVersion.value = newInstalledVersion;
+  }
+}, { immediate: true });
+
+// Methods
+const handleInstall = async () => {
+  if (!selectedVersion.value) return;
+  
+  try {
+    await installMutation({
+      pluginId,
+      version: selectedVersion.value
+    });
+    
+    success(`Plugin ${plugin.value?.name} v${selectedVersion.value} installed successfully`);
+    
+    // Refetch data
+    await refetchInstalled();
+    await refetchSecrets();
+  } catch (err: any) {
+    console.error('Installation failed:', err);
+    if (err.message.includes('PLUGIN_VERSION_NOT_FOUND')) {
+      error('Plugin version not found in registry');
+    } else if (err.message.includes('INTEGRITY_MISMATCH')) {
+      error('Plugin download failed integrity check');
+    } else {
+      error(`Installation failed: ${err.message}`);
+    }
+  }
+};
+
+const handleToggleEnabled = async (enabled: boolean) => {
+  if (!installedPlugin.value) return;
+  
+  try {
+    await enableMutation({
+      pluginId,
+      version: installedPlugin.value.version,
+      enabled,
+      settingsJson: installedPlugin.value.settingsJson || {}
+    });
+    
+    success(`Plugin ${plugin.value?.name} ${enabled ? 'enabled' : 'disabled'} successfully`);
+    await refetchInstalled();
+  } catch (err: any) {
+    console.error('Enable/disable failed:', err);
+    if (err.message.includes('Missing required secrets')) {
+      error('Cannot enable: missing required secrets');
+    } else if (err.message.includes('PLUGIN_MISCONFIGURED_REQUIRED_SECRET_MISSING')) {
+      error('Plugin misconfigured: required secrets missing');
+    } else {
+      error(`${enabled ? 'Enable' : 'Disable'} failed: ${err.message}`);
+    }
+  }
+};
+
+const handleSetSecret = async (key: string, value: string) => {
+  try {
+    await setSecretMutation({
+      pluginId,
+      key,
+      value
+    });
+    
+    success(`Secret "${key}" set successfully`);
+    
+    // Clear the input and hide it
+    secretValues.value[key] = '';
+    showSecretInputs.value[key] = false;
+    
+    // Refetch secrets to update status
+    await refetchSecrets();
+  } catch (err: any) {
+    console.error('Set secret failed:', err);
+    error(`Failed to set secret "${key}": ${err.message}`);
+  }
+};
+
+const handleValidateSecret = async (key: string) => {
+  try {
+    const result = await validateSecretMutation({
+      pluginId,
+      key
+    });
+    
+    if (result?.data?.validateServerPluginSecret?.isValid) {
+      success(`Secret "${key}" is valid`);
+    } else {
+      const errorMsg = result?.data?.validateServerPluginSecret?.error || 'Unknown error';
+      error(`Secret validation failed: ${errorMsg}`);
+    }
+    
+    // Refetch secrets to update status
+    await refetchSecrets();
+  } catch (err: any) {
+    console.error('Secret validation failed:', err);
+    error(`Secret validation failed: ${err.message}`);
+  }
+};
+
+const getSecretStatusColor = (status: string) => {
+  switch (status) {
+    case 'VALID': return 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200';
+    case 'INVALID': return 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-200';
+    case 'SET_UNTESTED': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200';
+    default: return 'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200';
+  }
+};
+
+const getSecretStatusText = (status: string) => {
+  switch (status) {
+    case 'VALID': return 'Valid';
+    case 'INVALID': return 'Invalid';
+    case 'SET_UNTESTED': return 'Set (untested)';
+    default: return 'Not set';
+  }
+};
+</script>
+
+<template>
+  <div class="px-8">
+    <RequireAuth>
+      <template #has-auth>
+        <!-- Loading State -->
+        <div v-if="pluginsLoading || installedLoading" class="text-center py-8">
+          <div class="inline-flex items-center">
+            <i class="fa-solid fa-spinner animate-spin mr-2" />
+            Loading plugin details...
+          </div>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="pluginsError || installedError" class="text-center py-8">
+          <div class="text-red-600 dark:text-red-400">
+            Error loading plugin: {{ (pluginsError || installedError)?.message }}
+          </div>
+        </div>
+
+        <!-- Plugin Not Found -->
+        <div v-else-if="!plugin" class="text-center py-8">
+          <div class="text-gray-600 dark:text-gray-400">
+            Plugin not found
+          </div>
+        </div>
+
+        <!-- Plugin Detail -->
+        <div v-else class="space-y-6">
+          <!-- Header -->
+          <div class="flex items-center justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+                {{ plugin.name }}
+              </h1>
+              <div class="mt-2 flex space-x-2">
+                <span
+                  v-if="isInstalled"
+                  class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200"
+                >
+                  Installed
+                </span>
+                <span
+                  v-if="isEnabled"
+                  class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200"
+                >
+                  Enabled
+                </span>
+              </div>
+            </div>
+            <NuxtLink
+              to="/admin/settings/plugins"
+              class="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            >
+              <i class="fa-solid fa-arrow-left mr-2" />
+              Back to Plugins
+            </NuxtLink>
+          </div>
+
+          <!-- Installation Section -->
+          <FormRow section-title="Installation">
+            <template #content>
+              <div class="space-y-4">
+                <!-- Currently Installed Info -->
+                <div v-if="isInstalled" class="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4">
+                  <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                      <i class="fa-solid fa-check-circle text-green-400 text-xl" />
+                    </div>
+                    <div class="ml-3">
+                      <h3 class="text-sm font-medium text-green-800 dark:text-green-200">
+                        Plugin Installed
+                      </h3>
+                      <div class="mt-1 text-sm text-green-700 dark:text-green-300">
+                        Currently installed: <span class="font-mono font-semibold">v{{ installedVersion }}</span>
+                        <span v-if="isEnabled" class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-200">
+                          Enabled
+                        </span>
+                        <span v-else class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+                          Disabled
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Version Selection -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    {{ isInstalled ? 'Change Version' : 'Select Version' }}
+                  </label>
+                  <div class="flex space-x-4 items-center">
+                    <select
+                      v-model="selectedVersion"
+                      class="flex-1 rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    >
+                      <option
+                        v-for="version in availableVersions"
+                        :key="version.version"
+                        :value="version.version"
+                      >
+                        v{{ version.version }}
+                        <span v-if="version.version === installedVersion"> (Installed)</span>
+                      </option>
+                    </select>
+
+                    <button
+                      v-if="!isInstalled"
+                      type="button"
+                      class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      :disabled="installing || !selectedVersion"
+                      @click="handleInstall"
+                    >
+                      <i v-if="installing" class="fa-solid fa-spinner animate-spin mr-2" />
+                      Install
+                    </button>
+
+                    <button
+                      v-else-if="canInstall"
+                      type="button"
+                      class="px-4 py-2 bg-orange-600 text-white rounded-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                      :disabled="installing || !selectedVersion"
+                      @click="handleInstall"
+                    >
+                      <i v-if="installing" class="fa-solid fa-spinner animate-spin mr-2" />
+                      Install v{{ selectedVersion }}
+                    </button>
+
+                    <div v-else-if="isSelectedVersionInstalled" class="flex items-center text-sm text-green-600 dark:text-green-400">
+                      <i class="fa-solid fa-check mr-2" />
+                      This version is already installed
+                    </div>
+
+                    <div v-else-if="!hasNewerVersions" class="text-sm text-gray-500 dark:text-gray-400">
+                      No other versions available
+                    </div>
+                  </div>
+
+                  <!-- Version Status Help -->
+                  <div v-if="isInstalled" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    <p v-if="hasNewerVersions">Select a different version to install an update or downgrade.</p>
+                    <p v-else>You have the only available version installed.</p>
+                  </div>
+                </div>
+              </div>
+            </template>
+          </FormRow>
+
+          <!-- Enable/Disable Section -->
+          <FormRow v-if="isInstalled" section-title="Plugin Status">
+            <template #content>
+              <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                  <div>
+                    <label class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                      Enable server-wide
+                    </label>
+                    <p class="text-xs text-gray-500 dark:text-gray-400">
+                      {{ canEnable ? 'Plugin is ready to be enabled' : 'Set required secrets to enable' }}
+                    </p>
+                  </div>
+                  <label class="inline-flex items-center">
+                    <input
+                      type="checkbox"
+                      :checked="isEnabled"
+                      :disabled="!canEnable || enabling"
+                      class="form-checkbox h-4 w-4 text-orange-600 focus:ring-orange-500 border-gray-300 rounded disabled:opacity-50"
+                      @change="(e) => handleToggleEnabled((e.target as HTMLInputElement).checked)"
+                    >
+                    <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                      {{ isEnabled ? 'Enabled' : 'Disabled' }}
+                    </span>
+                    <i v-if="enabling" class="fa-solid fa-spinner animate-spin ml-2" />
+                  </label>
+                </div>
+              </div>
+            </template>
+          </FormRow>
+
+          <!-- Secrets Section -->
+          <FormRow v-if="isInstalled && secrets.length > 0" section-title="Required Secrets">
+            <template #content>
+              <div class="space-y-4">
+                <p class="text-sm text-gray-600 dark:text-gray-400">
+                  Configure server-wide secrets required by this plugin.
+                </p>
+                
+                <div
+                  v-for="secret in secrets"
+                  :key="secret.key"
+                  class="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                >
+                  <div class="flex items-center justify-between mb-3">
+                    <div class="flex items-center space-x-2">
+                      <span class="font-medium text-gray-900 dark:text-white">
+                        {{ secret.key }}
+                      </span>
+                      <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
+                        Server
+                      </span>
+                      <span
+                        class="px-2 py-1 text-xs font-semibold rounded-full"
+                        :class="getSecretStatusColor(secret.status)"
+                      >
+                        {{ getSecretStatusText(secret.status) }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- Secret Input -->
+                  <div v-if="showSecretInputs[secret.key]" class="space-y-2">
+                    <input
+                      v-model="secretValues[secret.key]"
+                      type="password"
+                      placeholder="Enter secret value"
+                      class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                    >
+                    <div class="flex space-x-2">
+                      <button
+                        type="button"
+                        class="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-700"
+                        :disabled="!secretValues[secret.key]"
+                        @click="handleSetSecret(secret.key, secretValues[secret.key])"
+                      >
+                        Save
+                      </button>
+                      <button
+                        type="button"
+                        class="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400"
+                        @click="showSecretInputs[secret.key] = false"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Action Buttons -->
+                  <div v-else class="flex space-x-2">
+                    <button
+                      type="button"
+                      class="px-3 py-1 bg-gray-100 text-gray-700 text-sm rounded hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                      @click="showSecretInputs[secret.key] = true"
+                    >
+                      {{ secret.status === 'NOT_SET' ? 'Set Secret' : 'Update Secret' }}
+                    </button>
+                    <button
+                      v-if="secret.status !== 'NOT_SET'"
+                      type="button"
+                      class="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded hover:bg-blue-200 dark:bg-blue-800 dark:text-blue-300 dark:hover:bg-blue-700"
+                      @click="handleValidateSecret(secret.key)"
+                    >
+                      Test
+                    </button>
+                  </div>
+
+                  <!-- Validation Error -->
+                  <div v-if="secret.validationError" class="mt-2 text-sm text-red-600 dark:text-red-400">
+                    {{ secret.validationError }}
+                  </div>
+
+                  <!-- Last Validated -->
+                  <div v-if="secret.lastValidatedAt" class="mt-2 text-xs text-gray-500 dark:text-gray-400">
+                    Last validated: {{ new Date(secret.lastValidatedAt).toLocaleString() }}
+                  </div>
+                </div>
+              </div>
+            </template>
+          </FormRow>
+
+          <!-- Loading State for Secrets -->
+          <div v-if="secretsLoading" class="text-center py-4">
+            <div class="inline-flex items-center">
+              <i class="fa-solid fa-spinner animate-spin mr-2" />
+              Loading secrets...
+            </div>
+          </div>
+        </div>
+      </template>
+      <template #does-not-have-auth>
+        <div class="p-8 dark:text-white">
+          You don't have permission to see this page.
+        </div>
+      </template>
+    </RequireAuth>
+  </div>
+</template>

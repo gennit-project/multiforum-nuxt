@@ -183,3 +183,85 @@ export const GET_PLUGIN_BY_ID = gql`
     }
   }
 `;
+
+export const GET_AVAILABLE_PLUGINS = gql`
+  query GetPlugins {
+    plugins {
+      id
+      name
+      Versions {
+        id
+        version
+      }
+    }
+  }
+`;
+
+export const GET_INSTALLED_PLUGINS = gql`
+  query GetInstalledPlugins {
+    getInstalledPlugins {
+      plugin {
+        id
+        name
+      }
+      version
+      scope
+      enabled
+      settingsJson
+    }
+  }
+`;
+
+export const GET_SERVER_PLUGIN_SECRETS = gql`
+  query GetServerPluginSecrets($pluginId: String!) {
+    getServerPluginSecrets(pluginId: $pluginId) {
+      key
+      status
+      lastValidatedAt
+      validationError
+    }
+  }
+`;
+
+export const GET_PLUGIN_MANAGEMENT_DATA = gql`
+  query GetPluginManagementData($serverName: String!) {
+    plugins {
+      id
+      name
+      Versions {
+        id
+        version
+        repoUrl
+        entryPath
+      }
+    }
+    serverConfigs(where: { serverName: $serverName }) {
+      serverName
+      pluginRegistries
+      AllowedPlugins {
+        id
+        name
+      }
+      InstalledVersions {
+        id
+        version
+        repoUrl
+        entryPath
+        Plugin {
+          id
+          name
+        }
+      }
+    }
+    getInstalledPlugins {
+      plugin {
+        id
+        name
+      }
+      version
+      scope
+      enabled
+      settingsJson
+    }
+  }
+`;
