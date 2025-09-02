@@ -64,7 +64,7 @@
     "luxon": "^3.6.0",
     "markdown-it": "^14.1.0",
     "md-editor-v3": "^4.21.3",
-    "nuxt": "^3.16.1",
+    "nuxt": "^4.0.3",
     "pinia": "^3.0.2",
     "prismjs": "^1.30.0",
     "random-word-slugs": "^0.1.7",
