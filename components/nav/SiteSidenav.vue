@@ -14,6 +14,8 @@ import { useDisplay } from 'vuetify';
 import CreateAnythingButton from './CreateAnythingButton.vue';
 import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from '@/cache';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';
+import { getLocalStorageItem } from '@/utils/localStorageUtils';
+import type { ForumItem } from '@/types/forum';
 
 const DEFAULT_LIMIT = 5;
 
@@ -66,8 +68,8 @@ const recentForums = computed(() => {
   if (!import.meta.client) {
     return [];
   }
-  const forums = JSON.parse(localStorage.getItem('recentForums') || '""') || [];
-  return forums.sort((a: any, b: any) => b.timestamp - a.timestamp);
+  const forums = getLocalStorageItem<ForumItem[]>('recentForums', []);
+  return forums.sort((a, b) => b.timestamp - a.timestamp);
 });
 
 const visibleRecentForums = computed(() => {

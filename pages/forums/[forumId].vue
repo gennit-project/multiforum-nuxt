@@ -14,6 +14,8 @@ import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import BackLink from '@/components/BackLink.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
+import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorageUtils';
+import type { ForumItem } from '@/types/forum';
 
 const route = useRoute();
 const router = useRouter();
@@ -138,8 +140,7 @@ const addForumToLocalStorage = (channel: Channel) => {
   if (!import.meta.client) {
     return;
   }
-  let recentForums =
-    JSON.parse(localStorage.getItem('recentForums') || '[]') || [];
+  let recentForums = getLocalStorageItem<ForumItem[]>('recentForums', []);
 
   const sideNavItem = {
     uniqueName: channelId.value,
@@ -149,7 +150,7 @@ const addForumToLocalStorage = (channel: Channel) => {
   };
 
   recentForums = recentForums.filter(
-    (forum: any) => forum.uniqueName !== channelId.value
+    (forum) => forum.uniqueName !== channelId.value
   );
 
   recentForums.unshift(sideNavItem);
@@ -158,9 +159,9 @@ const addForumToLocalStorage = (channel: Channel) => {
   recentForums = recentForums.slice(0, 20);
 
   // Clean up invalid entries
-  recentForums = recentForums.filter((forum: any) => typeof forum === 'object');
+  recentForums = recentForums.filter((forum) => typeof forum === 'object');
 
-  localStorage.setItem('recentForums', JSON.stringify(recentForums));
+  setLocalStorageItem('recentForums', recentForums);
 };
 onGetChannelResult((result) => {
   const loadedChannel = result.data?.channels[0];

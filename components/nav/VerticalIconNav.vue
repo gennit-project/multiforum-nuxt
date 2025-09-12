@@ -18,7 +18,9 @@ import IconTooltip from '@/components/common/IconTooltip.vue';
 import RecentForumsDrawer from './RecentForumsDrawer.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
+import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorageUtils';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';
+import type { ForumItem } from '@/types/forum';
 
 const DEFAULT_LIMIT = 5;
 const VERTICAL_NAV_LIMIT = 3;
@@ -57,11 +59,6 @@ const navigation: NavigationItem[] = [
   },
 ];
 
-type ForumItem = {
-  uniqueName: string;
-  channelIconURL?: string | null;
-  timestamp: number;
-};
 
 const recentForums = ref<ForumItem[]>([]);
 
@@ -70,9 +67,9 @@ const loadRecentForums = () => {
     recentForums.value = [];
     return;
   }
-  const forums = JSON.parse(localStorage.getItem('recentForums') || '[]') || [];
+  const forums = getLocalStorageItem<ForumItem[]>('recentForums', []);
   recentForums.value = forums
-    .sort((a: any, b: any) => b.timestamp - a.timestamp)
+    .sort((a, b) => b.timestamp - a.timestamp)
     .slice(0, DEFAULT_LIMIT);
 };
 
@@ -134,24 +131,22 @@ const isActiveUserAction = (routeName: string) => {
 const addCurrentForumToRecent = () => {
   if (!import.meta.client || !currentForumId.value) return;
 
-  const existingForums = JSON.parse(
-    localStorage.getItem('recentForums') || '[]'
-  );
+  const existingForums = getLocalStorageItem<ForumItem[]>('recentForums', []);
 
   // Check if the current forum is already in the visible portion (top VERTICAL_NAV_LIMIT)
   const visibleForums = existingForums.slice(0, VERTICAL_NAV_LIMIT);
   const isAlreadyVisible = visibleForums.some(
-    (forum: any) => forum.uniqueName === currentForumId.value
+    (forum) => forum.uniqueName === currentForumId.value
   );
 
   // If it's already visible, just update the timestamp without changing order
   if (isAlreadyVisible) {
-    const updatedForums = existingForums.map((forum: any) =>
+    const updatedForums = existingForums.map((forum) =>
       forum.uniqueName === currentForumId.value
         ? { ...forum, timestamp: Date.now() }
         : forum
     );
-    localStorage.setItem('recentForums', JSON.stringify(updatedForums));
+    setLocalStorageItem('recentForums', updatedForums);
     loadRecentForums();
     return;
   }
@@ -165,13 +160,13 @@ const addCurrentForumToRecent = () => {
 
   // Remove existing entry if it exists
   const filteredForums = existingForums.filter(
-    (forum: any) => forum.uniqueName !== currentForumId.value
+    (forum) => forum.uniqueName !== currentForumId.value
   );
 
   // Add current forum to the top
   const updatedForums = [currentForum, ...filteredForums];
 
-  localStorage.setItem('recentForums', JSON.stringify(updatedForums));
+  setLocalStorageItem('recentForums', updatedForums);
 
   // Reload the recent forums to update the UI
   loadRecentForums();
