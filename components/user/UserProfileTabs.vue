@@ -94,7 +94,7 @@ const tabs = computed(() => {
       :to="tab.href"
       :label="tab.name"
       :is-active="
-        route && typeof route.name === 'string' && route.name.includes(tab.name)
+        route.path === tab.href || route.path.startsWith(tab.href + '/')
       "
       :count="tab.count || undefined"
       :show-count="showCounts && !!tab.count"
