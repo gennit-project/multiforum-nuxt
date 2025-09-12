@@ -186,9 +186,8 @@ const selectedOptions = computed(() => {
       <div
         :data-testid="testId"
         :class="[
-          'flex w-full cursor-pointer items-center rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
-          height,
-          showChips ? 'min-h-10 flex-wrap' : '',
+          'flex w-full cursor-pointer rounded-lg border px-4 text-left dark:border-gray-700 dark:bg-gray-700',
+          showChips ? 'min-h-10 flex-wrap items-center' : 'min-h-12 items-start py-2',
         ]"
         @click="toggleDropdown"
       >
@@ -208,9 +207,9 @@ const selectedOptions = computed(() => {
               :src="option.avatar"
               :alt="option.label"
               class="mr-1 h-4 w-4 rounded-full"
-            />
+            >
             <!-- Icon if provided -->
-            <i v-else-if="option.icon" :class="[option.icon, 'mr-1']"></i>
+            <i v-else-if="option.icon" :class="[option.icon, 'mr-1']"/>
 
             <span>{{ option.label }}</span>
             <span
@@ -225,22 +224,22 @@ const selectedOptions = computed(() => {
         <!-- Single selection display or comma-separated values (when not showing chips) -->
         <div
           v-else-if="!showChips && selectedOptions.length > 0"
-          class="flex flex-1 items-center"
+          class="flex flex-1 items-start"
         >
           <!-- Show avatar/icon only for single selection -->
           <img
             v-if="selectedOptions.length === 1 && selectedOptions[0].avatar"
             :src="selectedOptions[0].avatar"
             :alt="selectedOptions[0].label"
-            class="mr-2 h-6 w-6 rounded-full"
-          />
+            class="mr-2 h-6 w-6 flex-shrink-0 rounded-full"
+          >
           <i
             v-else-if="selectedOptions.length === 1 && selectedOptions[0].icon"
-            :class="[selectedOptions[0].icon, 'mr-2']"
-          ></i>
+            :class="[selectedOptions[0].icon, 'mr-2 flex-shrink-0']"
+          />
 
           <!-- Show comma-separated labels for multiple selections -->
-          <span class="truncate text-gray-900 dark:text-white">
+          <span class="break-words text-gray-900 dark:text-white">
             {{ selectedOptions.map((option) => option.label).join(', ') }}
           </span>
         </div>
@@ -260,10 +259,10 @@ const selectedOptions = computed(() => {
             v-if="selectedOptions.length > 0"
             type="button"
             class="mr-2 transition-colors hover:text-red-500"
-            @click.stop="clearSelection"
             :title="'Clear selection'"
+            @click.stop="clearSelection"
           >
-            <i class="fa-solid fa-times"></i>
+            <i class="fa-solid fa-times"/>
           </button>
 
           <!-- Dropdown arrow -->
@@ -274,7 +273,7 @@ const selectedOptions = computed(() => {
                   ? 'fa-solid fa-chevron-up'
                   : 'fa-solid fa-chevron-down'
               "
-            ></i>
+            />
           </div>
         </div>
       </div>
@@ -306,7 +305,7 @@ const selectedOptions = computed(() => {
             @click.stop
             @focus.stop
             @blur.stop
-          />
+          >
         </div>
 
         <!-- Loading state -->
@@ -340,7 +339,7 @@ const selectedOptions = computed(() => {
                 :disabled="option.disabled"
                 class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
                 @click.stop
-              />
+              >
             </div>
 
             <!-- Avatar -->
@@ -349,10 +348,10 @@ const selectedOptions = computed(() => {
               :src="option.avatar"
               :alt="option.label"
               class="mr-3 h-6 w-6 rounded-full"
-            />
+            >
 
             <!-- Icon -->
-            <i v-else-if="option.icon" :class="[option.icon, 'mr-3']"></i>
+            <i v-else-if="option.icon" :class="[option.icon, 'mr-3']"/>
 
             <!-- Label -->
             <span class="flex-1 text-sm text-gray-900 dark:text-white">
@@ -363,7 +362,7 @@ const selectedOptions = computed(() => {
             <i
               v-if="!multiple && selected.includes(option.value)"
               class="fa-solid fa-check text-orange-600"
-            ></i>
+            />
           </div>
         </div>
 
