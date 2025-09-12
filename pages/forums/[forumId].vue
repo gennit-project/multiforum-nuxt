@@ -334,38 +334,17 @@ definePageMeta({
               class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
             >
               <div class="flex-1 md:px-2">
-                <ClientOnly>
-                  <ChannelTabs
-                    v-if="showChannelTabs"
-                    :admin-list="adminList"
-                    :channel="channel"
-                    :download-count="downloadCount"
-                    class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
-                    :desktop="false"
-                    :route="route"
-                    :show-counts="true"
-                    :vertical="false"
-                  />
-                  <template #fallback>
-                    <div
-                      class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
-                    >
-                      <nav
-                        aria-label="Tabs"
-                        class="space-x-2 overflow-x-auto text-sm"
-                      >
-                        <!-- Show basic tabs as fallback during SSR -->
-                        <div class="flex space-x-2 p-2">
-                          <div
-                            class="bg-orange-50 rounded-lg px-3 py-2 text-sm font-medium text-orange-700 dark:bg-orange-900/20 dark:text-orange-300"
-                          >
-                            Loading...
-                          </div>
-                        </div>
-                      </nav>
-                    </div>
-                  </template>
-                </ClientOnly>
+                <ChannelTabs
+                  v-if="showChannelTabs"
+                  :admin-list="adminList"
+                  :channel="channel"
+                  :download-count="downloadCount"
+                  class="w-full border-b border-gray-300 dark:border-gray-600 md:ml-2"
+                  :desktop="false"
+                  :route="route"
+                  :show-counts="true"
+                  :vertical="false"
+                />
                 <NuxtPage />
               </div>
               <aside

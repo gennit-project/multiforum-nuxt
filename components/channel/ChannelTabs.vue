@@ -9,12 +9,13 @@ import CogIcon from '@/components/icons/CogIcon.vue';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
-import { modProfileNameVar, usernameVar } from '@/cache';
+import { modProfileNameVar, usernameVar, isLoadingAuthVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import { useDisplay } from 'vuetify';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
+import { useSSRAuth } from '@/composables/useSSRAuth';
 // Import Popper dynamically to avoid SSR issues with regeneratorRuntime
 import { defineAsyncComponent } from 'vue';
 const Popper = defineAsyncComponent(() => import('vue3-popper'));
@@ -91,7 +92,18 @@ const loggedInUsername = computed(() => {
   return usernameVar.value || '';
 });
 
-// Since component is now wrapped in ClientOnly, we can directly access auth state
+const { hasAuthHint, usernameHint } = useSSRAuth();
+
+// Check if auth is still loading or if we should show auth-dependent tabs
+const shouldShowAuthTabs = computed(() => {
+  // In SSR, we can use auth hints to show tabs if user was previously logged in
+  if (!import.meta.client) {
+    return hasAuthHint.value;
+  }
+  
+  // On client-side, show auth tabs if not loading and user is authenticated
+  return !isLoadingAuthVar.value && (usernameVar.value || hasAuthHint.value);
+});
 
 const tabRoutes = computed(() => {
   const routes: TabRoutes = {
@@ -166,32 +178,39 @@ const tabs = computed((): Tab[] => {
     });
   }
 
-  // Now we can safely access auth state since component is client-only
-  const adminList = props.channel.Admins.map((user) => user.username || '');
-  const modList = (props.channel.Moderators ?? []).map(
-    (modProfile) => modProfile.displayName
-  );
-  const isAdmin = adminList.includes(loggedInUsername.value);
-  const isMod = modList.includes(modProfileNameVar.value);
+  // Add auth-dependent tabs only if we should show them
+  if (shouldShowAuthTabs.value) {
+    const adminList = props.channel.Admins.map((user) => user.username || '');
+    const modList = (props.channel.Moderators ?? []).map(
+      (modProfile) => modProfile.displayName
+    );
+    
+    // For SSR, use auth hints; for client, use current auth state
+    const currentUsername = !import.meta.client ? usernameHint.value : loggedInUsername.value;
+    const currentModName = !import.meta.client ? '' : modProfileNameVar.value; // Mod name not stored in hints for security
+    
+    const isAdmin = adminList.includes(currentUsername);
+    const isMod = currentModName ? modList.includes(currentModName) : false;
 
-  if (isAdmin) {
-    baseTabs.push({
-      name: 'settings',
-      routeSuffix: 'edit',
-      label: 'Settings',
-      icon: CogIcon,
-      countProperty: null,
-    });
-  }
+    if (isAdmin) {
+      baseTabs.push({
+        name: 'settings',
+        routeSuffix: 'edit',
+        label: 'Settings',
+        icon: CogIcon,
+        countProperty: null,
+      });
+    }
 
-  if (isAdmin || isMod) {
-    baseTabs.push({
-      name: 'moderation',
-      routeSuffix: 'issues',
-      label: 'Issues',
-      icon: FlagIcon,
-      countProperty: 'IssuesAggregate',
-    });
+    if (isAdmin || isMod) {
+      baseTabs.push({
+        name: 'moderation',
+        routeSuffix: 'issues',
+        label: 'Issues',
+        icon: FlagIcon,
+        countProperty: 'IssuesAggregate',
+      });
+    }
   }
 
   if (smAndDown.value) {
