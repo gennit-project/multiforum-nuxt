@@ -149,8 +149,7 @@ const mergedChannels = computed(() => {
 
 // Function to load more channels
 const loadMore = () => {
-  // Load more for both queries in parallel
-  const currentOffset = channelResult.value.getSortedChannels?.channels?.length || 0;
+  const currentOffset = channelResult.value?.getSortedChannels?.channels?.length || 0;
   
   fetchMore({
     variables: {
@@ -158,15 +157,15 @@ const loadMore = () => {
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
+      
       return {
         ...previousResult,
         getSortedChannels: {
+          ...fetchMoreResult.getSortedChannels,
           channels: [
             ...(previousResult.getSortedChannels?.channels || []),
             ...(fetchMoreResult.getSortedChannels?.channels || []),
           ],
-          aggregateChannelCount:
-            fetchMoreResult.getSortedChannels?.aggregateChannelCount || 0,
         },
       };
     },
@@ -179,9 +178,11 @@ const loadMore = () => {
     },
     updateQuery: (previousResult, { fetchMoreResult }) => {
       if (!fetchMoreResult) return previousResult;
+      
       return {
         ...previousResult,
         getSortedChannels: {
+          ...fetchMoreResult.getSortedChannels,
           channels: [
             ...(previousResult.getSortedChannels?.channels || []),
             ...(fetchMoreResult.getSortedChannels?.channels || []),
@@ -245,11 +246,28 @@ const defaultLabels = {
             "
             :search-input="searchInput"
             :selected-tags="selectedTags"
+            :loading="channelLoading"
             @filter-by-tag="setSelectedTags"
             @load-more="loadMore"
           />
-          <div v-if="channelLoading" class="mx-auto max-w-5xl flex-1">
-            Loading...
+          <div 
+            v-else-if="channelLoading && (!channelResult || !channelResult.getSortedChannels?.channels)" 
+            class="mx-auto max-w-5xl flex-1"
+          >
+            <div
+              class="mx-auto max-w-4xl flex-1 rounded-lg bg-gray-100 dark:bg-gray-900 md:p-6"
+            >
+              <div class="animate-pulse">
+                <div
+                  class="mb-4 h-8 w-1/4 rounded bg-gray-200 dark:bg-gray-700"
+                />
+                <div class="space-y-4">
+                  <div class="h-20 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div class="h-20 rounded bg-gray-200 dark:bg-gray-700" />
+                  <div class="h-20 rounded bg-gray-200 dark:bg-gray-700" />
+                </div>
+              </div>
+            </div>
           </div>
           <template #fallback>
             <div

@@ -22,6 +22,10 @@ defineProps({
     type: Array as PropType<Array<string>>,
     default: () => [],
   },
+  loading: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emit = defineEmits(['filterByTag', 'loadMore']);
@@ -66,6 +70,7 @@ function filterByTag(tag: string) {
     <div class="m-10 grid justify-items-stretch">
       <LoadMore
         class="justify-self-center font-normal"
+        :loading="loading"
         :reached-end-of-results="resultCount === channels.length"
         @load-more="$emit('loadMore')"
       />
