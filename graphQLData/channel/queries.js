@@ -285,8 +285,8 @@ export const GET_CHANNEL_DOWNLOAD_COUNT = gql`
       DiscussionChannelsAggregate(
         where: {
           AND: [
-            { NOT: { archived: true } },
-            { NOT: { Discussion: null } },
+            { OR: [{ archived: true }, { archived: null }] }
+            { NOT: { Discussion: null } }
             { Discussion: { hasDownload: true } }
           ]
         }
@@ -372,8 +372,8 @@ export const GET_CHANNELS_DOWNLOADS = gql`
         DiscussionChannelsAggregate(
           where: {
             AND: [
-              { NOT: { archived: true } },
-              { NOT: { Discussion: null } },
+              { NOT: { archived: true } }
+              { NOT: { Discussion: null } }
               { Discussion: { hasDownload: true } }
             ]
           }
