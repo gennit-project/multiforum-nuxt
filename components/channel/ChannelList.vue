@@ -43,20 +43,8 @@ function filterByTag(tag: string) {
     >
       There are no results.
     </p>
-    <!-- Mobile layout: single column with dividers -->
-    <div class="block divide-y divide-gray-300 dark:divide-gray-600 md:hidden">
-      <ChannelListItem
-        v-for="channel in channels"
-        :key="channel.uniqueName"
-        :channel="channel"
-        :download-count="channel.downloadCount || 0"
-        :search-input="searchInput"
-        :selected-tags="selectedTags"
-        @filter-by-tag="filterByTag"
-      />
-    </div>
-    <!-- Desktop layout: masonry columns -->
-    <div class="hidden columns-1 gap-4 sm:columns-2 md:block lg:columns-3">
+    <!-- Row-based layout -->
+    <div class="divide-y divide-gray-200 border-t border-gray-200 dark:divide-gray-700 dark:border-gray-700">
       <ChannelListItem
         v-for="channel in channels"
         :key="channel.uniqueName"
