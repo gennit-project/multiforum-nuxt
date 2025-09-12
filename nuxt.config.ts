@@ -46,6 +46,7 @@ export default defineNuxtConfig({
     autoImport: true,
   },
   modules: [
+    '@sentry/nuxt/module',
     [
       '@nuxtjs/apollo',
       {
@@ -245,6 +246,22 @@ export default defineNuxtConfig({
       },
     ],
   ],
+  sentry: {
+    dsn: process.env.VITE_SENTRY_DSN,
+    authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
+    environment: process.env.VITE_ENVIRONMENT || 'development',
+    integrations: [
+      'replayIntegration',
+    ],
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    replaysSessionSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    replaysOnErrorSampleRate: 1.0,
+    sourceMapsUploadOptions: {
+      org: 'none-y1x',
+      project: 'javascript-nuxt',
+      authToken: process.env.VITE_SENTRY_AUTH_TOKEN,
+    },
+  },
   nitro: {
     preset: 'vercel',
     // Enable CDN caching
