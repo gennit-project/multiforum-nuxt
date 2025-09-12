@@ -17,6 +17,7 @@ import { UPDATE_IMAGE } from '@/graphQLData/discussion/mutations';
 import { usernameVar } from '@/cache';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
+import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
 
 const props = defineProps({
   album: {
@@ -664,189 +665,192 @@ const togglePanelPosition = () => {
       <!-- Carousel view -->
       <div
         v-else
-        class="flex flex-col rounded-lg border *:border-gray-300 dark:border-gray-700"
+        class="rounded-lg border *:border-gray-300 dark:border-gray-700"
+        :class="{
+          'flex flex-col': true,
+          'lg:flex-row': expandedView && orderedImages.length > 1,
+        }"
       >
-        <!-- Image container -->
-        <div class="flex items-center justify-center">
+        <!-- Thumbnails on the left for large screens in expanded view -->
+        <div
+          v-if="expandedView && orderedImages.length > 1"
+          class="order-2 lg:order-1 lg:flex-shrink-0"
+        >
           <div
-            class="mb-4 flex touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
-            :class="{
-              'max-h-96 max-w-96': !expandedView,
-              'max-h-[400px] w-full': expandedView,
-            }"
-            @touchstart="handleTouchStart"
-            @touchend="handleTouchEnd"
+            class="flex gap-2 overflow-x-auto pb-2 lg:max-h-[400px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-2"
           >
-            <div
+            <CarouselThumbnail
               v-for="(image, idx) in orderedImages"
-              :key="image?.id || idx"
-              class="flex w-auto flex-shrink-0"
+              :key="`thumb-${image?.id || idx}`"
+              :image="image"
+              :is-active="idx === activeIndex"
+              :size="80"
+              @click="activeIndex = idx"
+            />
+          </div>
+        </div>
+
+        <!-- Main content area -->
+        <div class="order-1 flex flex-col lg:order-2 lg:flex-1">
+          <!-- Image container -->
+          <div class="flex items-center justify-center">
+            <div
+              class="mb-4 flex touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
+              :class="{
+                'max-h-96 max-w-96': !expandedView,
+                'max-h-[400px] w-full': expandedView,
+              }"
+              @touchstart="handleTouchStart"
+              @touchend="handleTouchEnd"
             >
               <div
-                class="min-h-10 cursor-pointer"
-                :class="{
-                  'max-h-96 max-w-96': !expandedView,
-                  'w-full': expandedView,
-                }"
-                @click="openLightbox(idx)"
+                v-for="(image, idx) in orderedImages"
+                :key="image?.id || idx"
+                class="flex w-auto flex-shrink-0"
               >
-                <ModelViewer
-                  v-if="
-                    image &&
-                    image.url &&
-                    hasGlbExtension(image.url) &&
-                    idx === activeIndex
-                  "
-                  :model-url="image.url"
-                  :height="expandedView ? '400px' : '256px'"
-                  :width="expandedView ? '600px' : '384px'"
-                  class="object-contain shadow-sm"
-                  :style="{
-                    aspectRatio: '3/2',
-                    maxWidth: expandedView ? '600px' : '384px',
-                    maxHeight: expandedView ? '400px' : '256px',
+                <div
+                  class="min-h-10 cursor-pointer"
+                  :class="{
+                    'max-h-96 max-w-96': !expandedView,
+                    'w-full': expandedView,
                   }"
-                  :show-fullscreen-button="false"
-                />
-                <ClientOnly
-                  v-else-if="
-                    image &&
-                    image.url &&
-                    hasStlExtension(image.url) &&
-                    idx === activeIndex
-                  "
+                  @click="openLightbox(idx)"
                 >
-                  <StlViewer
-                    :src="image.url"
-                    :width="expandedView ? 600 : 384"
-                    :height="expandedView ? 400 : 256"
+                  <ModelViewer
+                    v-if="
+                      image &&
+                      image.url &&
+                      hasGlbExtension(image.url) &&
+                      idx === activeIndex
+                    "
+                    :model-url="image.url"
+                    :height="expandedView ? '400px' : '256px'"
+                    :width="expandedView ? '600px' : '384px'"
                     class="object-contain shadow-sm"
                     :style="{
                       aspectRatio: '3/2',
                       maxWidth: expandedView ? '600px' : '384px',
                       maxHeight: expandedView ? '400px' : '256px',
                     }"
+                    :show-fullscreen-button="false"
                   />
-                </ClientOnly>
-                <img
-                  v-else-if="image"
-                  :src="image.url || ''"
-                  :alt="image.alt || ''"
-                  class="object-contain shadow-sm"
-                  :class="{
-                    hidden: idx !== activeIndex,
-                    'max-h-96 max-w-96': !expandedView,
-                    'mx-auto h-auto w-full': expandedView,
-                  }"
-                  :style="{
-                    aspectRatio: '3/2',
-                    maxWidth: expandedView ? '600px' : '384px',
-                    maxHeight: expandedView ? '400px' : '256px',
-                  }"
-                >
-                <div
-                  v-if="editingCaptionIndex === idx && idx === activeIndex"
-                  class="mt-1 text-center text-xs"
-                >
-                  <TextEditor
-                    :initial-value="editingCaption"
-                    placeholder="Write a caption..."
-                    :rows="2"
-                    @update="(text) => (editingCaption = text)"
-                  />
-                  <div class="mt-1 flex justify-center gap-2">
-                    <SaveButton
-                      size="xs"
-                      :disabled="updateLoading"
-                      :loading="updateLoading"
-                      @click="saveCaption"
-                    />
-                    <CancelButton size="xs" @click="cancelEditingCaption" />
-                  </div>
-                </div>
-                <div
-                  v-else
-                  class="group relative text-center text-xs"
-                  :class="{ hidden: idx !== activeIndex }"
-                >
-                  <span v-if="image?.caption">
-                    {{ image.caption }}
-                  </span>
-                  <span
-                    v-else-if="!isLoggedInAuthor"
-                    class="italic text-gray-400"
-                    >No caption</span
+                  <ClientOnly
+                    v-else-if="
+                      image &&
+                      image.url &&
+                      hasStlExtension(image.url) &&
+                      idx === activeIndex
+                    "
                   >
+                    <StlViewer
+                      :src="image.url"
+                      :width="expandedView ? 600 : 384"
+                      :height="expandedView ? 400 : 256"
+                      class="object-contain shadow-sm"
+                      :style="{
+                        aspectRatio: '3/2',
+                        maxWidth: expandedView ? '600px' : '384px',
+                        maxHeight: expandedView ? '400px' : '256px',
+                      }"
+                    />
+                  </ClientOnly>
+                  <img
+                    v-else-if="image"
+                    :src="image.url || ''"
+                    :alt="image.alt || ''"
+                    class="object-contain shadow-sm"
+                    :class="{
+                      hidden: idx !== activeIndex,
+                      'max-h-96 max-w-96': !expandedView,
+                      'mx-auto h-auto w-full': expandedView,
+                    }"
+                    :style="{
+                      aspectRatio: '3/2',
+                      maxWidth: expandedView ? '600px' : '384px',
+                      maxHeight: expandedView ? '400px' : '256px',
+                    }"
+                  >
+                  <div
+                    v-if="editingCaptionIndex === idx && idx === activeIndex"
+                    class="mt-1 text-center text-xs"
+                  >
+                    <TextEditor
+                      :initial-value="editingCaption"
+                      placeholder="Write a caption..."
+                      :rows="2"
+                      @update="(text) => (editingCaption = text)"
+                    />
+                    <div class="mt-1 flex justify-center gap-2">
+                      <SaveButton
+                        size="xs"
+                        :disabled="updateLoading"
+                        :loading="updateLoading"
+                        @click="saveCaption"
+                      />
+                      <CancelButton size="xs" @click="cancelEditingCaption" />
+                    </div>
+                  </div>
+                  <div
+                    v-else
+                    class="group relative text-center text-xs"
+                    :class="{ hidden: idx !== activeIndex }"
+                  >
+                    <span v-if="image?.caption">
+                      {{ image.caption }}
+                    </span>
+                    <span
+                      v-else-if="!isLoggedInAuthor"
+                      class="italic text-gray-400"
+                      >No caption</span
+                    >
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <!-- Counter and navigation row -->
-        <div class="flex items-center justify-between p-2">
-          <span class="text-sm">{{
-            `${activeIndex + 1} of ${orderedImages.length}`
-          }}</span>
+          <!-- Counter and navigation row -->
+          <div class="flex items-center justify-between p-2">
+            <span class="text-sm">{{
+              `${activeIndex + 1} of ${orderedImages.length}`
+            }}</span>
 
-          <div class="flex items-center gap-2">
-            <!-- Navigation Buttons -->
-            <div v-if="orderedImages.length > 1" class="flex gap-2">
-              <button
-                type="button"
-                class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
-                @click="goLeft"
-              >
-                <LeftArrowIcon class="h-4 w-4" />
-              </button>
+            <div class="flex items-center gap-2">
+              <!-- Navigation Buttons -->
+              <div v-if="orderedImages.length > 1" class="flex gap-2">
+                <button
+                  type="button"
+                  class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
+                  @click="goLeft"
+                >
+                  <LeftArrowIcon class="h-4 w-4" />
+                </button>
 
-              <button
-                class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
-                type="button"
-                @click="goRight"
-              >
-                <RightArrowIcon class="h-4 w-4" />
-              </button>
+                <button
+                  class="flex h-8 items-center justify-center px-2 hover:bg-gray-500"
+                  type="button"
+                  @click="goRight"
+                >
+                  <RightArrowIcon class="h-4 w-4" />
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Thumbnails row for expanded view -->
-        <div v-if="expandedView && orderedImages.length > 1" class="mt-4 px-4">
-          <div class="flex gap-2 overflow-x-auto pb-2">
-            <div
-              v-for="(image, idx) in orderedImages"
-              :key="`thumb-${image?.id || idx}`"
-              class="flex-shrink-0 cursor-pointer rounded border-2 transition-all"
-              :class="{
-                'border-orange-500': idx === activeIndex,
-                'border-gray-300 hover:border-gray-400': idx !== activeIndex,
-              }"
-              @click="activeIndex = idx"
-            >
-              <ModelViewer
-                v-if="image && image.url && hasGlbExtension(image.url)"
-                :model-url="image.url"
-                height="80px"
-                width="80px"
-                class="rounded"
+          <!-- Thumbnails row for non-expanded view or small screens -->
+          <div
+            v-if="!expandedView && orderedImages.length > 1"
+            class="mt-4 px-4"
+          >
+            <div class="flex gap-2 overflow-x-auto pb-2">
+              <CarouselThumbnail
+                v-for="(image, idx) in orderedImages"
+                :key="`thumb-${image?.id || idx}`"
+                :image="image"
+                :is-active="idx === activeIndex"
+                :size="80"
+                @click="activeIndex = idx"
               />
-              <ClientOnly
-                v-else-if="image && image.url && hasStlExtension(image.url)"
-              >
-                <StlViewer
-                  :src="image.url"
-                  :width="80"
-                  :height="80"
-                  class="rounded"
-                />
-              </ClientOnly>
-              <img
-                v-else-if="image"
-                :src="image.url || ''"
-                :alt="image.alt || ''"
-                class="h-20 w-20 rounded object-cover shadow-sm"
-              >
             </div>
           </div>
         </div>
@@ -866,8 +870,8 @@ const togglePanelPosition = () => {
       <div
         class="relative z-40 flex flex-col overflow-hidden transition-all duration-300 ease-in-out"
         :class="{
-          'w-3/4 h-full': !panelOnSide && isPanelVisible,
-          'w-full h-full': panelOnSide && !isPanelVisible,
+          'h-full w-3/4': !panelOnSide && isPanelVisible,
+          'h-full w-full': panelOnSide && !isPanelVisible,
           'w-full flex-1': panelOnSide && isPanelVisible,
         }"
       >
@@ -984,7 +988,9 @@ const togglePanelPosition = () => {
               type="button"
               class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20"
               :class="{ 'h-6 w-6': panelOnSide, 'h-8 w-8': !panelOnSide }"
-              :title="panelOnSide ? 'Move panel to side' : 'Move panel to bottom'"
+              :title="
+                panelOnSide ? 'Move panel to side' : 'Move panel to bottom'
+              "
               @click="togglePanelPosition"
             >
               <SwitchHorizontalIcon
@@ -1110,8 +1116,8 @@ const togglePanelPosition = () => {
         v-if="isPanelVisible"
         class="z-40 overflow-y-auto bg-gray-900 text-white transition-all duration-300 ease-in-out"
         :class="{
-          'w-1/4 h-full': !panelOnSide,
-          'w-full min-h-[120px] max-h-[30vh]': panelOnSide,
+          'h-full w-1/4': !panelOnSide,
+          'max-h-[30vh] min-h-[120px] w-full': panelOnSide,
         }"
       >
         <div class="relative p-5">
