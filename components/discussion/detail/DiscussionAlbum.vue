@@ -693,7 +693,7 @@ const togglePanelPosition = () => {
         <!-- Main content area -->
         <div class="order-1 flex flex-col lg:order-2 lg:flex-1">
           <!-- Image container -->
-          <div class="flex items-center justify-center">
+          <div class="flex items-center justify-center overflow-x-auto">
             <div
               class="touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
               @touchstart="handleTouchStart"
@@ -754,8 +754,8 @@ const togglePanelPosition = () => {
                     }"
                     :style="{
                       maxWidth: expandedView ? '100%' : '384px',
-                      maxHeight: expandedView ? '400px' : '256px',
-                      height: expandedView ? '400px' : 'auto',
+                      maxHeight: expandedView ? '500px' : '256px',
+                      height: expandedView ? '500px' : 'auto',
                     }"
                   />
                   <div
