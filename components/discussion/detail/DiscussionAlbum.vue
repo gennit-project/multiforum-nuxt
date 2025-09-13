@@ -695,10 +695,10 @@ const togglePanelPosition = () => {
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
-              class="mb-4 flex touch-pan-x justify-center overflow-x-auto overflow-y-hidden rounded dark:text-white"
+              class="mb-4 touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
               :class="{
                 'max-h-96 max-w-96': !expandedView,
-                'max-h-[400px] w-full': expandedView,
+                'w-full': expandedView,
               }"
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
@@ -761,7 +761,7 @@ const togglePanelPosition = () => {
                     :class="{
                       hidden: idx !== activeIndex,
                       'max-h-96 max-w-96': !expandedView,
-                      'mx-auto h-auto w-full': expandedView,
+                      'h-auto w-full': expandedView,
                     }"
                     :style="{
                       maxWidth: expandedView ? '600px' : '384px',

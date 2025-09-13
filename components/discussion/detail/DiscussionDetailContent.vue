@@ -274,7 +274,7 @@ const handleEditAlbum = () => {
         !discussion && !activeDiscussionChannel && !getDiscussionLoading
       "
     />
-    <div v-else class="w-full max-w-7xl space-y-2 py-2">
+    <div v-else class="w-full space-y-2 py-2">
       <div class="w-full space-y-2 overflow-hidden">
         <ErrorBanner
           v-if="getDiscussionError"
