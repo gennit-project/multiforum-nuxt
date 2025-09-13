@@ -5,6 +5,7 @@ import path from 'path';
 import { inMemoryCacheOptions } from './cache';
 
 export default defineNuxtConfig({
+  srcDir: '.',
   app: {
     head: {
       title: config.serverDisplayName,
