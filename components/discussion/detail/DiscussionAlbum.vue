@@ -695,11 +695,7 @@ const togglePanelPosition = () => {
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
-              class="mb-4 touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
-              :class="{
-                'max-h-96 max-w-96': !expandedView,
-                'w-full': expandedView,
-              }"
+              class="touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
@@ -707,14 +703,7 @@ const togglePanelPosition = () => {
                 v-for="(image, idx) in orderedImages"
                 :key="image?.id || idx"
               >
-                <div
-                  class="min-h-10 cursor-pointer"
-                  :class="{
-                    'max-h-96 max-w-96': !expandedView,
-                    'w-full': expandedView,
-                  }"
-                  @click="openLightbox(idx)"
-                >
+                <div class="cursor-pointer" @click="openLightbox(idx)">
                   <ModelViewer
                     v-if="
                       image &&
@@ -760,12 +749,13 @@ const togglePanelPosition = () => {
                     class="shadow-sm"
                     :class="{
                       hidden: idx !== activeIndex,
-                      'max-h-96 max-w-96': !expandedView,
-                      'h-auto w-full': expandedView,
+                      'max-h-96 max-w-96 object-contain': !expandedView,
+                      'w-full object-cover': expandedView,
                     }"
                     :style="{
-                      maxWidth: expandedView ? '600px' : '384px',
+                      maxWidth: expandedView ? '100%' : '384px',
                       maxHeight: expandedView ? '400px' : '256px',
+                      height: expandedView ? '400px' : 'auto',
                     }"
                   />
                   <div
