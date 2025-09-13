@@ -684,7 +684,7 @@ const togglePanelPosition = () => {
               :key="`thumb-${image?.id || idx}`"
               :image="image"
               :is-active="idx === activeIndex"
-              :size="80"
+              :size="120"
               @click="activeIndex = idx"
             />
           </div>

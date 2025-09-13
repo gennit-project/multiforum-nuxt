@@ -36,7 +36,7 @@ const sizeStyle = computed(() => ({
 
 <template>
   <div
-    class="flex-shrink-0 cursor-pointer rounded border-2 transition-all overflow-hidden lg:mb-2 lg:last:mb-0"
+    class="flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border-2 transition-all lg:mb-2 lg:last:mb-0"
     :class="{
       'border-orange-500': isActive,
       'border-gray-300 hover:border-gray-400': !isActive,
@@ -52,9 +52,7 @@ const sizeStyle = computed(() => ({
       class="rounded"
       :style="sizeStyle"
     />
-    <ClientOnly
-      v-else-if="image && image.url && hasStlExtension(image.url)"
-    >
+    <ClientOnly v-else-if="image && image.url && hasStlExtension(image.url)">
       <StlViewer
         :src="image.url"
         :width="size"
@@ -67,8 +65,8 @@ const sizeStyle = computed(() => ({
       v-else-if="image"
       :src="image.url || ''"
       :alt="image.alt || ''"
-      class="rounded object-cover shadow-sm w-full h-full"
+      class="h-full w-full rounded object-cover shadow-sm"
       :style="sizeStyle"
-    >
+    />
   </div>
 </template>
