@@ -600,7 +600,7 @@ const togglePanelPosition = () => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -695,7 +695,7 @@ const togglePanelPosition = () => {
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
-              class="mb-4 flex touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
+              class="mb-4 flex touch-pan-x justify-center overflow-x-auto overflow-y-hidden rounded dark:text-white"
               :class="{
                 'max-h-96 max-w-96': !expandedView,
                 'max-h-[400px] w-full': expandedView,
@@ -706,7 +706,6 @@ const togglePanelPosition = () => {
               <div
                 v-for="(image, idx) in orderedImages"
                 :key="image?.id || idx"
-                class="flex w-auto flex-shrink-0"
               >
                 <div
                   class="min-h-10 cursor-pointer"
@@ -758,18 +757,17 @@ const togglePanelPosition = () => {
                     v-else-if="image"
                     :src="image.url || ''"
                     :alt="image.alt || ''"
-                    class="object-contain shadow-sm"
+                    class="shadow-sm"
                     :class="{
                       hidden: idx !== activeIndex,
                       'max-h-96 max-w-96': !expandedView,
                       'mx-auto h-auto w-full': expandedView,
                     }"
                     :style="{
-                      aspectRatio: '3/2',
                       maxWidth: expandedView ? '600px' : '384px',
                       maxHeight: expandedView ? '400px' : '256px',
                     }"
-                  >
+                  />
                   <div
                     v-if="editingCaptionIndex === idx && idx === activeIndex"
                     class="mt-1 text-center text-xs"
@@ -1099,7 +1097,7 @@ const togglePanelPosition = () => {
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
-          >
+          />
 
           <button
             v-if="orderedImages.length > 1"
