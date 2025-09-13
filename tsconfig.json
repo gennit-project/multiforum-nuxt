@@ -79,7 +79,8 @@
     "cache.ts",
     ".nuxt/nuxt.d.ts",
     "components/event/list/filters/getEventFilterValuesFromParams.spec.ts",
-    "components/discussion/list/getDiscussionFilterValuesFromParams.spec.ts"
+    "components/discussion/list/getDiscussionFilterValuesFromParams.spec.ts",
+    "components/event/map/Map.spec.ts"
   ],
   "exclude": ["node_modules", ".nuxt", "dist", "cypress/**/*"]
 }

@@ -4,12 +4,22 @@ import type { Discussion } from '@/__generated__/graphql';
 import PrimaryButton from '@/components/PrimaryButton.vue';
 import DownloadSuccessPopover from '@/components/download/DownloadSuccessPopover.vue';
 import { computed, ref } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_DOWNLOAD_LABELS } from '@/graphQLData/discussion/queries';
 
 const props = defineProps({
   discussion: {
     type: Object as PropType<Discussion>,
     required: false,
     default: null,
+  },
+  discussionId: {
+    type: String,
+    required: true,
+  },
+  channelUniqueName: {
+    type: String,
+    required: true,
   },
 });
 
@@ -63,9 +73,22 @@ const formatFileSize = (sizeInBytes: number | null | undefined): string => {
   return `${size.toFixed(decimals)} ${units[unitIndex]}`;
 };
 
-// Get label options from discussion channels (filter options)
+// Query for label options
+const { result: labelQueryResult } = useQuery(
+  GET_DOWNLOAD_LABELS,
+  {
+    discussionId: props.discussionId,
+    channelUniqueName: props.channelUniqueName,
+  },
+  {
+    enabled: !!props.discussionId && !!props.channelUniqueName,
+  }
+);
+
+// Get label options from query result
 const labelOptions = computed(() => {
-  const discussionChannel = props.discussion?.DiscussionChannels?.[0];
+  const discussionChannels = labelQueryResult.value?.discussions?.[0]?.DiscussionChannels;
+  const discussionChannel = discussionChannels?.[0];
   return discussionChannel?.LabelOptions || [];
 });
 
@@ -73,7 +96,7 @@ const labelOptions = computed(() => {
 const groupedLabels = computed(() => {
   const groups: Record<string, Array<{ key: string; value: string; displayName: string }>> = {};
   
-  labelOptions.value.forEach((option) => {
+  labelOptions.value.forEach((option: any) => {
     const groupKey = option.group?.key;
     const groupDisplayName = option.group?.displayName;
     

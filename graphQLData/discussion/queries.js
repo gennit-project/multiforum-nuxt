@@ -417,6 +417,37 @@ export const GET_SPECIFIC_DISCUSSION_FEEDBACK = gql`
   }
 `;
 
+export const GET_DOWNLOAD_LABELS = gql`
+  query getDownloadLabels(
+    $discussionId: ID!,
+    $channelUniqueName: String!
+  ) {
+    discussions(
+      where: {
+        id: $discussionId
+      }
+    ) {
+      id 
+      DiscussionChannels(where: {
+        channelUniqueName: $channelUniqueName
+      }) {
+        channelUniqueName
+        LabelOptions {
+          id
+          value
+          displayName
+          order
+          group {
+            id
+            key
+            displayName
+          }
+        }
+      }
+    }
+  }
+`;
+
 // # Retrieve everything needed to render the sidebar
 // query GetChannelFilters($name: String!) {
 //   channel(where: { uniqueName: $name }) {
