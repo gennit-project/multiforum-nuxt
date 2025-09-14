@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { FilterMode } from '@/__generated__/graphql';
 import FilterOptionManager from './FilterOptionManager.vue';
+import yaml from 'js-yaml';
 // import CheckBox from "@/components/CheckBox.vue"; // Unused for now
 
 const props = defineProps({
@@ -25,6 +26,9 @@ const newGroupForm = ref({
 });
 
 const showNewGroupForm = ref(false);
+const viewMode = ref<'form' | 'yaml'>('form');
+const yamlContent = ref('');
+const yamlError = ref('');
 
 const filterModeOptions = [
   {
@@ -36,6 +40,98 @@ const filterModeOptions = [
     label: 'Exclusion (hide downloads with these labels)',
   },
 ];
+
+// YAML conversion utilities
+type YamlFilterGroup = {
+  key: string;
+  displayName: string;
+  mode: 'INCLUDE' | 'EXCLUDE';
+  order: number;
+  options: {
+    value: string;
+    displayName: string;
+    order: number;
+  }[];
+};
+
+const convertFilterGroupsToYaml = (filterGroups: FilterGroup[]): string => {
+  const cleanGroups: YamlFilterGroup[] = filterGroups.map((group) => ({
+    key: group.key,
+    displayName: group.displayName,
+    mode: group.mode,
+    order: group.order,
+    options: (group.options || []).map((option) => ({
+      value: option.value,
+      displayName: option.displayName,
+      order: option.order,
+    })),
+  }));
+  
+  try {
+    return yaml.dump(cleanGroups, { 
+      indent: 2,
+      lineWidth: -1,
+      noRefs: true,
+      sortKeys: false 
+    });
+  } catch (error) {
+    console.error('Error converting to YAML:', error);
+    return '';
+  }
+};
+
+const convertYamlToFilterGroups = (yamlString: string): { success: boolean; filterGroups?: FilterGroup[]; error?: string } => {
+  try {
+    const parsed = yaml.load(yamlString) as YamlFilterGroup[];
+    
+    if (!Array.isArray(parsed)) {
+      return { success: false, error: 'YAML must contain an array of filter groups' };
+    }
+
+    const filterGroups: FilterGroup[] = parsed.map((group, index) => {
+      if (!group.key || !group.displayName) {
+        throw new Error(`Group at index ${index} is missing required fields (key, displayName)`);
+      }
+
+      if (!['INCLUDE', 'EXCLUDE'].includes(group.mode)) {
+        throw new Error(`Group "${group.key}" has invalid mode. Must be INCLUDE or EXCLUDE`);
+      }
+
+      return {
+        id: '', // Empty ID for new/edited groups - server will handle
+        key: group.key,
+        displayName: group.displayName,
+        mode: group.mode as FilterMode,
+        order: group.order ?? index,
+        options: (group.options || []).map((option, optionIndex) => ({
+          id: '', // Empty ID for new/edited options - server will handle
+          value: option.value,
+          displayName: option.displayName,
+          order: option.order ?? optionIndex,
+          // Required GraphQL fields
+          __typename: 'FilterOption' as const,
+          group: {} as any, // Will be populated by parent
+          groupAggregate: null,
+          groupConnection: {} as any,
+        })),
+        // Required GraphQL fields
+        __typename: 'FilterGroup' as const,
+        channel: {} as any,
+        channelAggregate: null,
+        channelConnection: {} as any,
+        optionsAggregate: null,
+        optionsConnection: {} as any,
+      };
+    });
+
+    return { success: true, filterGroups };
+  } catch (error) {
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Invalid YAML format' 
+    };
+  }
+};
 
 const addNewGroup = () => {
   if (!newGroupForm.value.key || !newGroupForm.value.displayName) {
@@ -122,25 +218,96 @@ const canAddGroup = computed(() => {
     isKeyUnique(newGroupForm.value.key)
   );
 });
+
+// YAML Editor Functions
+const switchToYamlView = () => {
+  yamlContent.value = convertFilterGroupsToYaml(props.filterGroups);
+  yamlError.value = '';
+  viewMode.value = 'yaml';
+};
+
+const switchToFormView = () => {
+  viewMode.value = 'form';
+};
+
+const applyYamlChanges = () => {
+  const result = convertYamlToFilterGroups(yamlContent.value);
+  
+  if (result.success && result.filterGroups) {
+    yamlError.value = '';
+    emit('updateFilterGroups', result.filterGroups);
+    viewMode.value = 'form';
+  } else {
+    yamlError.value = result.error || 'Unknown error occurred';
+  }
+};
+
+const cancelYamlChanges = () => {
+  yamlContent.value = convertFilterGroupsToYaml(props.filterGroups);
+  yamlError.value = '';
+  viewMode.value = 'form';
+};
+
+// Watch for changes to filterGroups when in YAML mode to keep YAML in sync
+watch(() => props.filterGroups, (newGroups) => {
+  if (viewMode.value === 'yaml') {
+    yamlContent.value = convertFilterGroupsToYaml(newGroups);
+  }
+}, { deep: true });
 </script>
 
 <template>
   <div class="space-y-6">
     <div>
-      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
-        Download Filters
-      </h3>
-      <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
-        Configure filter groups that will appear in the downloads sidebar. Users
-        can filter downloads by selecting options within these groups.
-      </p>
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+            Download Filters
+          </h3>
+          <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+            Configure filter groups that will appear in the downloads sidebar. Users
+            can filter downloads by selecting options within these groups.
+          </p>
+        </div>
+        
+        <!-- View Mode Toggle -->
+        <div 
+          class="flex rounded-md shadow-sm"
+          :class="{ 'pointer-events-none opacity-50': disabled }"
+        >
+          <button
+            type="button"
+            class="relative inline-flex items-center px-4 py-2 text-sm font-medium border focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :class="viewMode === 'form'
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600'"
+            :disabled="disabled"
+            @click="switchToFormView"
+          >
+            Form Editor
+          </button>
+          <button
+            type="button"
+            class="relative -ml-px inline-flex items-center px-4 py-2 text-sm font-medium border focus:z-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            :class="viewMode === 'yaml'
+              ? 'bg-blue-600 text-white border-blue-600'
+              : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600'"
+            :disabled="disabled"
+            @click="switchToYamlView"
+          >
+            YAML Editor
+          </button>
+        </div>
+      </div>
     </div>
 
-    <!-- Add New Filter Group Section -->
-    <div
-      class="space-y-4"
-      :class="{ 'pointer-events-none opacity-50': disabled }"
-    >
+    <!-- Form Editor View -->
+    <div v-if="viewMode === 'form'" class="space-y-6">
+      <!-- Add New Filter Group Section -->
+      <div
+        class="space-y-4"
+        :class="{ 'pointer-events-none opacity-50': disabled }"
+      >
       <div class="flex items-center justify-between">
         <h4 class="text-md font-medium text-gray-900 dark:text-white">
           Filter Groups
@@ -203,7 +370,7 @@ const canAddGroup = computed(() => {
                   (!isValidKey(newGroupForm.key) ||
                     !isKeyUnique(newGroupForm.key)),
               }"
-            />
+            >
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Only letters, numbers, and underscores allowed. Must be unique.
             </p>
@@ -236,7 +403,7 @@ const canAddGroup = computed(() => {
               type="text"
               placeholder="e.g. Lot Size"
               class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
-            />
+            >
             <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">
               Human-readable name shown to users.
             </p>
@@ -301,11 +468,90 @@ const canAddGroup = computed(() => {
       <p class="text-sm">Add a filter group above to get started.</p>
     </div>
 
-    <div v-if="disabled" class="bg-gray-50 rounded-md p-4 dark:bg-gray-800">
-      <p class="text-sm text-gray-600 dark:text-gray-400">
-        <strong>Note:</strong> Filter configuration is disabled because
-        downloads are not enabled for this forum.
-      </p>
+      <div v-if="disabled" class="bg-gray-50 rounded-md p-4 dark:bg-gray-800">
+        <p class="text-sm text-gray-600 dark:text-gray-400">
+          <strong>Note:</strong> Filter configuration is disabled because
+          downloads are not enabled for this forum.
+        </p>
+      </div>
+    </div>
+
+    <!-- YAML Editor View -->
+    <div v-else-if="viewMode === 'yaml'" class="space-y-4">
+      <div class="flex items-center justify-between">
+        <h4 class="text-md font-medium text-gray-900 dark:text-white">
+          YAML Editor
+        </h4>
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+          Edit filter groups as YAML for faster bulk configuration
+        </div>
+      </div>
+
+      <!-- YAML Textarea -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            Filter Groups Configuration
+          </label>
+          <textarea
+            v-model="yamlContent"
+            class="block w-full rounded-md border border-gray-300 px-3 py-2 font-mono text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+            :class="{ 'border-red-500': yamlError }"
+            rows="20"
+            placeholder="# Filter groups configuration
+- key: example_category
+  displayName: Example Category
+  mode: INCLUDE
+  order: 0
+  options:
+    - value: option1
+      displayName: Option 1
+      order: 0
+    - value: option2
+      displayName: Option 2
+      order: 1"
+            :disabled="disabled"
+          />
+        </div>
+
+        <!-- Error Message -->
+        <div v-if="yamlError" class="rounded-md bg-red-50 p-3 dark:bg-red-900">
+          <div class="text-sm text-red-700 dark:text-red-200">
+            <strong>YAML Error:</strong> {{ yamlError }}
+          </div>
+        </div>
+
+        <!-- Help Text -->
+        <div class="text-sm text-gray-600 dark:text-gray-400">
+          <p><strong>Required fields:</strong></p>
+          <ul class="mt-1 list-disc list-inside space-y-1">
+            <li><code>key</code>: Unique identifier (letters, numbers, underscores only)</li>
+            <li><code>displayName</code>: Human-readable name</li>
+            <li><code>mode</code>: Either "INCLUDE" or "EXCLUDE"</li>
+            <li><code>order</code>: Display order (number)</li>
+            <li><code>options</code>: Array of filter options with <code>value</code>, <code>displayName</code>, and <code>order</code></li>
+          </ul>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex space-x-3">
+          <button
+            type="button"
+            class="border-transparent rounded-md border bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+            :disabled="disabled || !yamlContent.trim()"
+            @click="applyYamlChanges"
+          >
+            Apply Changes
+          </button>
+          <button
+            type="button"
+            class="hover:bg-gray-50 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:border-gray-500 dark:bg-gray-600 dark:text-white dark:hover:bg-gray-700"
+            @click="cancelYamlChanges"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
