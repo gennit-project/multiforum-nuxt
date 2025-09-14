@@ -10,8 +10,6 @@ import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
-import { useDisplay } from 'vuetify';
-import CreateAnythingButton from './CreateAnythingButton.vue';
 import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from '@/cache';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';
 import { getLocalStorageItem } from '@/utils/localStorageUtils';
@@ -92,7 +90,6 @@ const user = computed(() => getUserResult.value?.users[0] || null);
 
 const profilePicURL = computed(() => user.value?.profilePicURL || '');
 
-const { smAndDown } = useDisplay();
 
 const router = useRouter();
 
@@ -135,9 +132,6 @@ const routeAndClose = async (route: RouteLocationAsRelativeGeneric) => {
               <XIcon class="h-6 w-6" aria-hidden="true" />
             </button>
           </div>
-        </div>
-        <div class="flex justify-end">
-          <CreateAnythingButton v-if="smAndDown" class="mb-4 px-6" />
         </div>
         <nav class="mt-4">
           <ul role="list" class="m-0 p-0">

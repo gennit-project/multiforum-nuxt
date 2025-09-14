@@ -45,6 +45,10 @@ const props = defineProps({
     type: Boolean,
     default: false, // Default to false for backward compatibility
   },
+  downloadMode: {
+    type: Boolean,
+    default: false, // Default to false for backward compatibility
+  },
   startInLightbox: {
     type: Boolean,
     default: false,
@@ -600,7 +604,7 @@ const togglePanelPosition = () => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          />
+          >
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -669,6 +673,7 @@ const togglePanelPosition = () => {
         :class="{
           'flex flex-col': true,
           'lg:flex-row': expandedView && orderedImages.length > 1,
+          'max-w-full overflow-hidden': !expandedView,
         }"
       >
         <!-- Thumbnails on the left for large screens in expanded view -->
@@ -693,9 +698,13 @@ const togglePanelPosition = () => {
         <!-- Main content area -->
         <div class="order-1 flex flex-col lg:order-2 lg:flex-1">
           <!-- Image container -->
-          <div class="flex items-center justify-center overflow-x-auto">
+          <div class="flex items-center justify-center">
             <div
-              class="touch-pan-x overflow-x-auto overflow-y-hidden rounded dark:text-white"
+              class="touch-pan-x overflow-hidden rounded dark:text-white"
+              :class="{
+                'w-full': expandedView,
+                'max-w-96': !expandedView,
+              }"
               @touchstart="handleTouchStart"
               @touchend="handleTouchEnd"
             >
@@ -754,10 +763,18 @@ const togglePanelPosition = () => {
                     }"
                     :style="{
                       maxWidth: expandedView ? '100%' : '384px',
-                      maxHeight: expandedView ? '500px' : '256px',
-                      height: expandedView ? '500px' : 'auto',
+                      maxHeight: expandedView
+                        ? downloadMode
+                          ? '500px'
+                          : '400px'
+                        : '256px',
+                      height: expandedView
+                        ? downloadMode
+                          ? '500px'
+                          : '400px'
+                        : 'auto',
                     }"
-                  />
+                  >
                   <div
                     v-if="editingCaptionIndex === idx && idx === activeIndex"
                     class="mt-1 text-center text-xs"
@@ -798,7 +815,7 @@ const togglePanelPosition = () => {
           </div>
 
           <!-- Counter and navigation row -->
-          <div class="flex items-center justify-between p-2">
+          <div class="flex items-center justify-between overflow-x-auto p-2">
             <span class="text-sm">{{
               `${activeIndex + 1} of ${orderedImages.length}`
             }}</span>
@@ -828,9 +845,10 @@ const togglePanelPosition = () => {
           <!-- Thumbnails row for non-expanded view or small screens -->
           <div
             v-if="!expandedView && orderedImages.length > 1"
-            class="mt-4 px-4"
+            class="mt-4 w-full overflow-x-auto px-4"
+            style="max-width: 100%;"
           >
-            <div class="flex gap-2 overflow-x-auto pb-2">
+            <div class="flex gap-2 pb-2" style="min-width: max-content;">
               <CarouselThumbnail
                 v-for="(image, idx) in orderedImages"
                 :key="`thumb-${image?.id || idx}`"
@@ -1087,7 +1105,7 @@ const togglePanelPosition = () => {
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
-          />
+          >
 
           <button
             v-if="orderedImages.length > 1"

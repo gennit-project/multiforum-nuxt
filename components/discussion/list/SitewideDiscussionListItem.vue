@@ -197,7 +197,7 @@ const revealSensitiveContent = () => {
           </div>
         </nuxt-link>
         <div class="flex gap-2">
-          <div class="flex-1">
+          <div>
             <nuxt-link v-if="discussion" :to="getDetailLink()">
               <div class="flex items-center gap-2">
                 <span
@@ -344,19 +344,23 @@ const revealSensitiveContent = () => {
                   :word-limit="50"
                   :disable-gallery="false"
                   :image-max-height="'200px'"
-                  class="ml-2 max-w-full overflow-hidden break-words pb-2"
+                  class="ml-2 max-w-full break-words pb-2"
                 />
                 <div
                   v-if="discussion.Album"
-                  class="my-4 max-w-full overflow-x-auto bg-black"
+                  class="my-4 bg-black"
+                  style="width: 100%; max-width: 100%; overflow: hidden;"
                 >
-                  <DiscussionAlbum
-                    :album="discussion.Album"
-                    :carousel-format="true"
-                    :discussion-author="authorUsername"
-                    :discussion-id="discussion.id"
-                    :show-edit-album="false"
-                  />
+                  <div style="max-width: 384px; margin: 0 auto;">
+                    <DiscussionAlbum
+                      :album="discussion.Album"
+                      :carousel-format="true"
+                      :discussion-author="authorUsername"
+                      :discussion-id="discussion.id"
+                      :show-edit-album="false"
+                      :expanded-view="false"
+                    />
+                  </div>
                 </div>
               </template>
             </div>
