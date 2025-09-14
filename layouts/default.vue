@@ -23,7 +23,7 @@ const route = useRoute();
 const showFooter = !route.name?.toString().includes('map');
 
 // Responsive display
-const { lgAndUp } = useDisplay();
+const { lgAndUp, mdAndUp } = useDisplay();
 
 // UI state management
 const showUserProfileDropdown = ref(false);
@@ -103,13 +103,10 @@ const handleSessionExpiredLogin = () => {
             <SiteFooter
               v-if="showFooter"
               class="mt-auto"
-              :class="{ 'pl-16': lgAndUp }"
+              :class="{ 'pl-16': mdAndUp }"
             />
             <template #fallback>
-              <SiteFooter
-                v-if="showFooter"
-                class="mt-auto"
-              />
+              <SiteFooter v-if="showFooter" class="mt-auto" />
             </template>
           </ClientOnly>
         </div>
