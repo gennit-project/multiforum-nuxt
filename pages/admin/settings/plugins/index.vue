@@ -3,20 +3,20 @@ import { ref, computed, onMounted } from 'vue';
 import type { PropType } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import FormRow from '@/components/FormRow.vue';
-import { 
+import {
   REFRESH_PLUGINS,
   ALLOW_PLUGIN,
-  DISALLOW_PLUGIN
+  DISALLOW_PLUGIN,
 } from '@/graphQLData/admin/mutations';
-import { 
+import {
   GET_PLUGIN_MANAGEMENT_DATA,
-  GET_INSTALLED_PLUGINS 
+  GET_INSTALLED_PLUGINS,
 } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
-import type { 
-  ServerConfigUpdateInput, 
-  Plugin, 
-  PluginVersion
+import type {
+  ServerConfigUpdateInput,
+  Plugin,
+  PluginVersion,
 } from '@/__generated__/graphql';
 
 const props = defineProps({
@@ -40,7 +40,12 @@ const newRegistry = ref('');
 interface PluginState {
   id: string;
   name: string;
-  status: 'available' | 'allowed' | 'installed' | 'installed_disabled' | 'installed_enabled';
+  status:
+    | 'available'
+    | 'allowed'
+    | 'installed'
+    | 'installed_disabled'
+    | 'installed_enabled';
   installedVersion?: {
     id: string;
     version: string;
@@ -78,12 +83,10 @@ const {
 );
 
 // Also fetch installed plugins separately for real-time updates
-const {
-  result: installedPluginsResult,
-  refetch: refetchInstalledPlugins,
-} = useQuery(GET_INSTALLED_PLUGINS, null, {
-  fetchPolicy: 'cache-and-network'
-});
+const { result: installedPluginsResult, refetch: refetchInstalledPlugins } =
+  useQuery(GET_INSTALLED_PLUGINS, null, {
+    fetchPolicy: 'cache-and-network',
+  });
 
 // Computed property to process plugin data into PluginState[]
 const pluginStates = computed((): PluginState[] => {
@@ -96,23 +99,33 @@ const pluginStates = computed((): PluginState[] => {
   const allPlugins = data.plugins || [];
   const allowedPlugins = serverConfig.AllowedPlugins || [];
   // Use the separate installed plugins query for real-time updates
-  const installedPlugins = installedPluginsResult.value?.getInstalledPlugins || [];
+  const installedPlugins =
+    installedPluginsResult.value?.getInstalledPlugins || [];
 
   return allPlugins.map((plugin: Plugin): PluginState => {
     const isAllowed = allowedPlugins.some((p: Plugin) => p.id === plugin.id);
-    
+
     // Find installed plugin using the new backend API
-    const installedPlugin = installedPlugins.find((installed: InstalledPlugin) => {
-      return installed.plugin.id === plugin.id;
-    });
-    
+    const installedPlugin = installedPlugins.find(
+      (installed: InstalledPlugin) => {
+        return installed.plugin.id === plugin.id;
+      }
+    );
+
     // Get available versions from the Plugin.Versions relationship
     const availableVersions = plugin.Versions || [];
 
-    let status: 'available' | 'allowed' | 'installed' | 'installed_disabled' | 'installed_enabled';
-    
+    let status:
+      | 'available'
+      | 'allowed'
+      | 'installed'
+      | 'installed_disabled'
+      | 'installed_enabled';
+
     if (installedPlugin) {
-      status = installedPlugin.enabled ? 'installed_enabled' : 'installed_disabled';
+      status = installedPlugin.enabled
+        ? 'installed_enabled'
+        : 'installed_disabled';
     } else if (isAllowed) {
       status = 'allowed';
     } else {
@@ -123,12 +136,14 @@ const pluginStates = computed((): PluginState[] => {
       id: plugin.id,
       name: plugin.name,
       status,
-      installedVersion: installedPlugin ? {
-        id: installedPlugin.plugin.id, // Using plugin ID as fallback
-        version: installedPlugin.version,
-        enabled: installedPlugin.enabled,
-        settings: installedPlugin.settingsJson || {},
-      } : undefined,
+      installedVersion: installedPlugin
+        ? {
+            id: installedPlugin.plugin.id, // Using plugin ID as fallback
+            version: installedPlugin.version,
+            enabled: installedPlugin.enabled,
+            settings: installedPlugin.settingsJson || {},
+          }
+        : undefined,
       availableVersions,
     };
   });
@@ -171,9 +186,11 @@ const removeRegistry = (index: number) => {
   pluginRegistries.value = currentRegistries;
 };
 
-// Plugin management mutations  
-const { mutate: allowPluginMutation, loading: allowPluginLoading } = useMutation(ALLOW_PLUGIN);
-const { mutate: disallowPluginMutation, loading: disallowPluginLoading } = useMutation(DISALLOW_PLUGIN);
+// Plugin management mutations
+const { mutate: allowPluginMutation, loading: allowPluginLoading } =
+  useMutation(ALLOW_PLUGIN);
+const { mutate: disallowPluginMutation, loading: disallowPluginLoading } =
+  useMutation(DISALLOW_PLUGIN);
 
 const refreshPlugins = async () => {
   try {
@@ -330,9 +347,9 @@ onMounted(() => {
           </p>
 
           <!-- Loading State -->
-          <div v-if="pluginManagementLoading" class="text-center py-4">
+          <div v-if="pluginManagementLoading" class="py-4 text-center">
             <div class="inline-flex items-center">
-              <i class="fa-solid fa-spinner animate-spin mr-2" />
+              <i class="fa-solid fa-spinner mr-2 animate-spin" />
               Loading plugins...
             </div>
           </div>
@@ -345,113 +362,122 @@ onMounted(() => {
             Error loading plugins: {{ pluginManagementError.message }}
           </div>
 
-          <!-- Plugin Table -->
-          <div v-else-if="pluginStates.length > 0" class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead class="bg-gray-50 dark:bg-gray-800">
-                <tr>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Plugin Name
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Status
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Installed Version
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Available Versions
-                  </th>
-                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-400">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-900 dark:divide-gray-700">
-                <tr v-for="plugin in pluginStates" :key="plugin.id">
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+          <!-- Plugin Cards -->
+          <div v-else-if="pluginStates.length > 0" class="space-y-4">
+            <div
+              v-for="plugin in pluginStates"
+              :key="plugin.id"
+              class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-600 dark:bg-gray-800"
+            >
+              <div class="flex flex-col space-y-3 sm:flex-row sm:items-start sm:justify-between sm:space-y-0">
+                <div class="flex-1">
+                  <h3 class="text-base font-medium text-gray-900 dark:text-white">
                     <NuxtLink
                       :to="`/admin/settings/plugins/${plugin.id}`"
-                      class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300 font-medium"
+                      class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
                     >
                       {{ plugin.name }}
                     </NuxtLink>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    <span
-                      class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full"
-                      :class="{
-                        'bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200': plugin.status === 'available',
-                        'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200': plugin.status === 'allowed',
-                        'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200': plugin.status === 'installed_enabled',
-                        'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200': plugin.status === 'installed_disabled',
-                      }"
-                    >
-                      {{ plugin.status === 'installed_enabled' ? 'Enabled' : 
-                          plugin.status === 'installed_disabled' ? 'Installed' : 
-                          plugin.status }}
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {{ plugin.installedVersion?.version || '-' }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {{ plugin.availableVersions.length }} versions
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div class="flex justify-end space-x-2">
-                      <!-- Available Plugin Actions -->
-                      <button
-                        v-if="plugin.status === 'available'"
-                        type="button"
-                        class="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
-                        :disabled="allowPluginLoading"
-                        @click="allowPlugin(plugin.id)"
+                  </h3>
+                  <div class="mt-2 flex flex-wrap items-center gap-4 text-sm text-gray-500 dark:text-gray-300">
+                    <div class="flex items-center">
+                      <span class="mr-2 text-xs font-medium text-gray-400">Status:</span>
+                      <span
+                        class="inline-flex rounded-full px-2 text-xs font-semibold leading-5"
+                        :class="{
+                          'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200':
+                            plugin.status === 'available',
+                          'bg-yellow-100 text-yellow-800 dark:bg-yellow-800 dark:text-yellow-200':
+                            plugin.status === 'allowed',
+                          'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-200':
+                            plugin.status === 'installed_enabled',
+                          'bg-orange-100 text-orange-800 dark:bg-orange-800 dark:text-orange-200':
+                            plugin.status === 'installed_disabled',
+                        }"
                       >
-                        <i v-if="allowPluginLoading" class="fa-solid fa-spinner animate-spin mr-1" />
-                        Allow
-                      </button>
-
-                      <!-- Allowed Plugin Actions -->
-                      <template v-else-if="plugin.status === 'allowed'">
-                        <NuxtLink
-                          :to="`/admin/settings/plugins/${plugin.id}`"
-                          class="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
-                        >
-                          Install
-                        </NuxtLink>
-                        <button
-                          type="button"
-                          class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                          :disabled="disallowPluginLoading"
-                          @click="disallowPlugin(plugin.id)"
-                        >
-                          <i v-if="disallowPluginLoading" class="fa-solid fa-spinner animate-spin mr-1" />
-                          Disallow
-                        </button>
-                      </template>
-
-                      <!-- Installed Plugin Actions -->
-                      <template v-else-if="plugin.status === 'installed_enabled' || plugin.status === 'installed_disabled'">
-                        <NuxtLink
-                          :to="`/admin/settings/plugins/${plugin.id}`"
-                          class="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        >
-                          Manage
-                        </NuxtLink>
-                      </template>
+                        {{
+                          plugin.status === 'installed_enabled'
+                            ? 'Enabled'
+                            : plugin.status === 'installed_disabled'
+                              ? 'Installed'
+                              : plugin.status
+                        }}
+                      </span>
                     </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+                    <div v-if="plugin.installedVersion?.version">
+                      <span class="text-xs font-medium text-gray-400">Version:</span>
+                      {{ plugin.installedVersion.version }}
+                    </div>
+                    <div>
+                      <span class="text-xs font-medium text-gray-400">Available:</span>
+                      {{ plugin.availableVersions.length }} versions
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="flex flex-wrap gap-2 sm:ml-4">
+                  <!-- Available Plugin Actions -->
+                  <button
+                    v-if="plugin.status === 'available'"
+                    type="button"
+                    class="rounded-md bg-orange-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2"
+                    :disabled="allowPluginLoading"
+                    @click="allowPlugin(plugin.id)"
+                  >
+                    <i
+                      v-if="allowPluginLoading"
+                      class="fa-solid fa-spinner mr-1 animate-spin"
+                    />
+                    Allow
+                  </button>
+
+                  <!-- Allowed Plugin Actions -->
+                  <template v-else-if="plugin.status === 'allowed'">
+                    <NuxtLink
+                      :to="`/admin/settings/plugins/${plugin.id}`"
+                      class="rounded-md bg-green-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                    >
+                      Install
+                    </NuxtLink>
+                    <button
+                      type="button"
+                      class="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                      :disabled="disallowPluginLoading"
+                      @click="disallowPlugin(plugin.id)"
+                    >
+                      <i
+                        v-if="disallowPluginLoading"
+                        class="fa-solid fa-spinner mr-1 animate-spin"
+                      />
+                      Disallow
+                    </button>
+                  </template>
+
+                  <!-- Installed Plugin Actions -->
+                  <template
+                    v-else-if="
+                      plugin.status === 'installed_enabled' ||
+                      plugin.status === 'installed_disabled'
+                    "
+                  >
+                    <NuxtLink
+                      :to="`/admin/settings/plugins/${plugin.id}`"
+                      class="rounded-md bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    >
+                      Manage
+                    </NuxtLink>
+                  </template>
+                </div>
+              </div>
+            </div>
           </div>
 
           <!-- No Plugins State -->
-          <div v-else class="text-center py-8">
+          <div v-else class="py-8 text-center">
             <div class="text-gray-500 dark:text-gray-400">
               <p>No plugins available yet.</p>
-              <p class="text-sm mt-2">
+              <p class="mt-2 text-sm">
                 Add a plugin registry and refresh to discover plugins.
               </p>
             </div>
