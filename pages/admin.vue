@@ -24,6 +24,10 @@ const serverConfig = computed(() => {
   }
   return getServerResult.value?.serverConfigs[0] || null;
 });
+
+const isSettingsPage = computed(() => {
+  return route.name?.toString().includes('admin-settings');
+});
 </script>
 
 <template>
@@ -42,12 +46,16 @@ const serverConfig = computed(() => {
         />
         <div class="relative w-full">
           <div class="flex flex-col divide-x dark:divide-gray-500 md:flex-row">
-            <div class="min-w-0 flex-1 bg-white p-4 dark:bg-gray-800 md:p-6">
+            <div
+              :class="isSettingsPage ? 'w-full' : 'min-w-0 flex-1'"
+              class="bg-white p-4 dark:bg-gray-800 md:p-6"
+            >
               <div class="max-w-full">
                 <NuxtPage />
               </div>
             </div>
             <aside
+              v-if="!isSettingsPage"
               class="w-full flex-shrink-0 bg-white dark:bg-gray-800 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
             >
               <ServerSidebar
