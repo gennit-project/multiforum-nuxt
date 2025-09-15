@@ -104,7 +104,7 @@
     "@nuxt/components": "^2.2.1",
     "@nuxt/eslint-config": "^1.9.0",
     "@nuxt/image": "^1.10.0",
-    "@nuxt/schema": "^3.16.1",
+    "@nuxt/schema": "^4.1.2",
     "@nuxt/types": "^2.18.1",
     "@nuxtjs/apollo": "^5.0.0-alpha.15",
     "@nuxtjs/eslint-module": "^4.1.0",
