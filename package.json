@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "22.x"
+    "node": "24.x"
   },
   "scripts": {
     "build": "nuxt build",
@@ -120,7 +120,7 @@
     "@types/identicon.js": "^2.3.5",
     "@types/luxon": "^3.4.2",
     "@types/markdown-it": "^14.1.2",
-    "@types/node": "^22.13.13",
+    "@types/node": "^24.0.0",
     "@types/prismjs": "^1.26.5",
     "@types/webfontloader": "^1.6.38",
     "@types/webpack-env": "^1.18.8",
