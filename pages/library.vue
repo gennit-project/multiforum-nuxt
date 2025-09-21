@@ -56,7 +56,8 @@ const defaultCollections = computed(() => [
 </script>
 
 <template>
-  <div>
+  <NuxtLayout>
+    <div class="min-h-screen bg-white dark:bg-black dark:text-white">
     <RequireAuth>
       <template #has-auth>
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -144,5 +145,6 @@ const defaultCollections = computed(() => [
         </div>
       </template>
     </RequireAuth>
-  </div>
+    </div>
+  </NuxtLayout>
 </template>
