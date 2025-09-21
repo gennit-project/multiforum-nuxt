@@ -7,12 +7,6 @@ import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 
 useTitle('Library - Multiforum');
 
-const user = computed(() => {
-  return {
-    username: usernameVar.value,
-  };
-});
-
 // For now, we'll show a placeholder for forum collections
 // TODO: Implement GraphQL queries for collections
 const forumCollections = computed(() => [
@@ -54,12 +48,12 @@ const forumCollections = computed(() => [
             <!-- Forum Collections Section -->
             <div class="mb-8">
               <div class="mb-4 flex items-center justify-between">
-                <h2 class="text-xl font-semibold text-gray-900 dark:text-white">
+                <h2 class="font-semibold text-xl text-gray-900 dark:text-white">
                   Forum Collections
                 </h2>
                 <button
                   type="button"
-                  class="rounded-md bg-orange-500 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  class="font-semibold rounded-md bg-orange-500 px-3 py-2 text-sm text-white shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
                 >
                   New Collection
                 </button>
@@ -67,10 +61,12 @@ const forumCollections = computed(() => [
 
               <div
                 v-if="forumCollections.length === 0"
-                class="rounded-lg border border-gray-200 bg-gray-50 p-8 text-center dark:border-gray-700 dark:bg-gray-800"
+                class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center dark:border-gray-700 dark:bg-gray-800"
               >
                 <ChannelIcon class="mx-auto h-12 w-12 text-gray-400" />
-                <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-white">
+                <h3
+                  class="mt-4 text-lg font-medium text-gray-900 dark:text-white"
+                >
                   No forum collections yet
                 </h3>
                 <p class="mt-2 text-gray-600 dark:text-gray-300">
@@ -78,16 +74,13 @@ const forumCollections = computed(() => [
                 </p>
                 <button
                   type="button"
-                  class="mt-4 rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-orange-600"
+                  class="font-semibold mt-4 rounded-md bg-orange-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-orange-600"
                 >
                   Create Your First Collection
                 </button>
               </div>
 
-              <div
-                v-else
-                class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
-              >
+              <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div
                   v-for="collection in forumCollections"
                   :key="collection.id"
@@ -95,17 +88,25 @@ const forumCollections = computed(() => [
                 >
                   <div class="flex items-start justify-between">
                     <div class="flex-1">
-                      <h3 class="text-lg font-medium text-gray-900 dark:text-white">
+                      <h3
+                        class="text-lg font-medium text-gray-900 dark:text-white"
+                      >
                         {{ collection.name }}
                       </h3>
                       <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                         {{ collection.description }}
                       </p>
-                      <div class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400">
+                      <div
+                        class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400"
+                      >
                         <ChannelIcon class="mr-1 h-4 w-4" />
-                        {{ collection.itemCount }} forum{{ collection.itemCount !== 1 ? 's' : '' }}
+                        {{ collection.itemCount }} forum{{
+                          collection.itemCount !== 1 ? 's' : ''
+                        }}
                         <span class="mx-2">•</span>
-                        <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
+                        <span class="capitalize">{{
+                          collection.visibility.toLowerCase()
+                        }}</span>
                       </div>
                     </div>
                     <button
@@ -114,8 +115,14 @@ const forumCollections = computed(() => [
                     >
                       <span class="sr-only">Options</span>
                       <!-- Three dots icon -->
-                      <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z" />
+                      <svg
+                        class="h-5 w-5"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          d="M10 6a2 2 0 110-4 2 2 0 010 4zM10 12a2 2 0 110-4 2 2 0 010 4zM10 18a2 2 0 110-4 2 2 0 010 4z"
+                        />
                       </svg>
                     </button>
                   </div>
@@ -125,12 +132,15 @@ const forumCollections = computed(() => [
 
             <!-- Other Collection Types (placeholder for future) -->
             <div class="space-y-8">
-              <div class="rounded-lg border border-gray-200 bg-gray-50 p-6 dark:border-gray-700 dark:bg-gray-800">
+              <div
+                class="bg-gray-50 rounded-lg border border-gray-200 p-6 dark:border-gray-700 dark:bg-gray-800"
+              >
                 <h2 class="text-lg font-medium text-gray-900 dark:text-white">
                   Coming Soon
                 </h2>
                 <p class="mt-2 text-gray-600 dark:text-gray-300">
-                  Discussion collections, image galleries, and download libraries will be available soon.
+                  Discussion collections, image galleries, and download
+                  libraries will be available soon.
                 </p>
               </div>
             </div>
