@@ -144,6 +144,7 @@ export default defineNuxtConfig({
               return { uri };
             },
 
+            devtools: { enabled: process.env.NODE_ENV === 'development' },
             defaultOptions: {
               watchQuery: {
                 errorPolicy: 'all',

@@ -29,95 +29,97 @@ const channelId = computed(() => {
   return '';
 });
 
-const { onResult: onGetDiscussionResult } = useQuery(GET_DISCUSSION, {
+const { result: discussionResult } = useQuery(GET_DISCUSSION, {
   id: discussionId,
   loggedInModName: modProfileNameVar.value,
   channelUniqueName: channelId.value,
 });
 
-onGetDiscussionResult((result) => {
+// Reactive meta data that updates when discussion data changes
+const metaData = computed(() => {
   try {
-    if (!result?.data?.discussions) {
-      return;
+    if (!discussionResult.value?.discussions) {
+      return {
+        title: `Discussion | ${channelId.value}`,
+        description: `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`,
+      };
     }
-    if (result.data.discussions.length === 0) {
-      // Handle the case where the discussion is not found
-      useHead({
+
+    if (discussionResult.value.discussions.length === 0) {
+      return {
         title: `Discussion Not Found${channelId.value ? ` | ${channelId.value}` : ''}`,
         description: 'The requested discussion could not be found.',
-      });
-      return;
-    } else {
-      const discussion = result.data.discussions[0];
-      const title = discussion.title || 'Discussion';
-      const description = discussion.body
-        ? discussion.body.substring(0, 160) +
-          (discussion.body.length > 160 ? '...' : '')
-        : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
-      const baseUrl = import.meta.env.VITE_BASE_URL;
-      const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-      const imageUrl = discussion.coverImageURL || '';
-
-      // Set all meta tags using useHead
-      useHead({
-        title: `${title} | ${channelId.value} | ${serverName}`,
-        meta: [
-          { name: 'description', content: description },
-
-          // OpenGraph tags
-          { property: 'og:title', content: title },
-          { property: 'og:description', content: description },
-          { property: 'og:type', content: 'article' },
-          {
-            property: 'og:url',
-            content: `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
-          },
-          { property: 'og:site_name', content: serverName },
-          ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
-
-          // Twitter Card tags
-          {
-            name: 'twitter:card',
-            content: imageUrl ? 'summary_large_image' : 'summary',
-          },
-          { name: 'twitter:title', content: title },
-          { name: 'twitter:description', content: description },
-          ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
-        ],
-        script: [
-          {
-            type: 'application/ld+json',
-            children: JSON.stringify({
-              '@context': 'https://schema.org',
-              '@type': 'DiscussionForumPosting',
-              headline: title,
-              description: description,
-              author: {
-                '@type': 'Person',
-                name:
-                  discussion.Author?.displayName ||
-                  discussion.Author?.username ||
-                  'Anonymous',
-              },
-              datePublished: discussion.createdAt,
-              dateModified: discussion.updatedAt || discussion.createdAt,
-              publisher: {
-                '@type': 'Organization',
-                name: serverName,
-                url: baseUrl,
-              },
-              mainEntityOfPage: {
-                '@type': 'WebPage',
-                '@id': `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
-              },
-            }),
-          },
-        ],
-      });
+      };
     }
+
+    const discussion = discussionResult.value.discussions[0];
+    const title = discussion.title || 'Discussion';
+    const description = discussion.body
+      ? discussion.body.substring(0, 160) +
+        (discussion.body.length > 160 ? '...' : '')
+      : `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`;
+    const baseUrl = import.meta.env.VITE_BASE_URL;
+    const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+    const imageUrl = discussion.coverImageURL || '';
+
+    return {
+      title: `${title} | ${channelId.value} | ${serverName}`,
+      meta: [
+        { name: 'description', content: description },
+
+        // OpenGraph tags
+        { property: 'og:title', content: title },
+        { property: 'og:description', content: description },
+        { property: 'og:type', content: 'article' },
+        {
+          property: 'og:url',
+          content: `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
+        },
+        { property: 'og:site_name', content: serverName },
+        ...(imageUrl ? [{ property: 'og:image', content: imageUrl }] : []),
+
+        // Twitter Card tags
+        {
+          name: 'twitter:card',
+          content: imageUrl ? 'summary_large_image' : 'summary',
+        },
+        { name: 'twitter:title', content: title },
+        { name: 'twitter:description', content: description },
+        ...(imageUrl ? [{ name: 'twitter:image', content: imageUrl }] : []),
+      ],
+      script: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'DiscussionForumPosting',
+            headline: title,
+            description: description,
+            author: {
+              '@type': 'Person',
+              name:
+                discussion.Author?.displayName ||
+                discussion.Author?.username ||
+                'Anonymous',
+            },
+            datePublished: discussion.createdAt,
+            dateModified: discussion.updatedAt || discussion.createdAt,
+            publisher: {
+              '@type': 'Organization',
+              name: serverName,
+              url: baseUrl,
+            },
+            mainEntityOfPage: {
+              '@type': 'WebPage',
+              '@id': `${baseUrl}/forums/${channelId.value}/discussions/${discussionId.value}`,
+            },
+          }),
+        },
+      ],
+    };
   } catch (error) {
     console.error('Error setting meta tags:', error);
-    useHead({
+    return {
       title: 'Discussion',
       meta: [
         {
@@ -125,9 +127,12 @@ onGetDiscussionResult((result) => {
           content: `View this discussion on ${import.meta.env.VITE_SERVER_DISPLAY_NAME}`,
         },
       ],
-    });
+    };
   }
 });
+
+// Set meta tags reactively
+useHead(metaData);
 </script>
 
 <template>
