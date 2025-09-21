@@ -6,7 +6,6 @@ export default defineComponent({
   components: {
     PrimaryButton,
   },
-  emits: ['click'],
   props: {
     disabled: {
       type: Boolean,
@@ -21,6 +20,7 @@ export default defineComponent({
       default: 'Save',
     },
   },
+  emits: ['click'],
   setup() {},
 });
 </script>

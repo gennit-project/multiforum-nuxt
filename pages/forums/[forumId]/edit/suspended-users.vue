@@ -110,12 +110,12 @@ const humanReadableDate = (dateISO: string): string => {
               </nuxt-link>
             </div>
             <div
-              class="text-sm text-gray-500 dark:text-gray-300"
               v-if="!user.suspendedIndefinitely"
+              class="text-sm text-gray-500 dark:text-gray-300"
             >
               {{ `Suspended until ${humanReadableDate(user.suspendedUntil)}` }}
             </div>
-            <div class="text-sm text-gray-500 dark:text-gray-300" v-else>
+            <div v-else class="text-sm text-gray-500 dark:text-gray-300">
               {{
                 `Suspended indefinitely as of ${humanReadableDate(user.createdAt)}`
               }}

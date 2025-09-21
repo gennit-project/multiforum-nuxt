@@ -192,7 +192,7 @@ const handleClose = () => {
     <template #icon>
       <i
         class="fa-solid fa-plus-minus text-lg text-orange-600 dark:text-orange-400"
-      ></i>
+      />
     </template>
     <template #content>
       <div class="flex flex-col gap-4">
@@ -235,7 +235,7 @@ const handleClose = () => {
                 class="h-full min-h-[200px] overflow-auto rounded border border-red-300 bg-white p-3 dark:border-red-700 dark:bg-gray-800"
               >
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="diffHtml.left"></div>
+                <div v-html="diffHtml.left"/>
               </div>
             </div>
 
@@ -252,7 +252,7 @@ const handleClose = () => {
                 class="h-full min-h-[200px] overflow-auto rounded border border-green-300 bg-white p-3 dark:border-green-700 dark:bg-gray-800"
               >
                 <!-- eslint-disable-next-line vue/no-v-html -->
-                <div v-html="diffHtml.right"></div>
+                <div v-html="diffHtml.right"/>
               </div>
             </div>
           </div>
@@ -264,13 +264,13 @@ const handleClose = () => {
             <span class="flex items-center">
               <span
                 class="mr-1 inline-block h-3 w-3 bg-red-500/20 dark:bg-red-500/30"
-              ></span>
+              />
               Removed content
             </span>
             <span class="flex items-center">
               <span
                 class="mr-1 inline-block h-3 w-3 bg-green-500/20 dark:bg-green-500/30"
-              ></span>
+              />
               Added content
             </span>
           </div>

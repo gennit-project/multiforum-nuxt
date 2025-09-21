@@ -24,7 +24,7 @@ defineProps({
     <h2 v-if="sectionTitle" class="font-semibold border-b pb-2 text-lg">
       {{ sectionTitle }}
     </h2>
-    <hr class="mb-4" />
+    <hr class="mb-4" >
     <div class="rounded-lg py-2">
       <h3 class="font-medium">
         {{ roleTitle }}

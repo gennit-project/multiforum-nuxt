@@ -1,5 +1,5 @@
-import { FetchResult } from '@apollo/client';
-import { ApolloError } from '@apollo/client/errors';
+import type { FetchResult } from '@apollo/client';
+import type { ApolloError } from '@apollo/client/errors';
 
 /**
  * Helper function to handle GraphQL errors related to authentication

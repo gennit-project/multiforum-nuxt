@@ -37,7 +37,7 @@ const truncate = (description: string) => {
       :checked="selected.includes(channel.uniqueName)"
       class="h-4 w-4 border border-gray-300 text-orange-600 dark:border-gray-600"
       @change="() => emit('toggleSelection', channel.uniqueName)"
-    />
+    >
     <div class="flex items-center space-x-2">
       <AvatarComponent
         v-if="channel.icon"

@@ -922,7 +922,7 @@ const hasStlExtension = (url: string) => {
         accept="image/*"
         style="display: none"
         @change="handleFileInputChange"
-      />
+      >
     </div>
     <div
       v-else

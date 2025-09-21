@@ -1,8 +1,8 @@
+import type { FilterGroup } from '@/__generated__/graphql';
 type RuleInput = {
   summary: string;
   detail: string;
 };
-import type { FilterGroup } from '@/__generated__/graphql';
 
 export type CreateEditChannelFormValues = {
   uniqueName: string;

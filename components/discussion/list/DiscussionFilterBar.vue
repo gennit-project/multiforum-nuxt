@@ -223,8 +223,8 @@ const isExpanded = computed(() => {
               // hover shade (one step darker) – always present
               'hover:bg-orange-200 hover:text-orange-900 dark:hover:bg-orange-600 dark:hover:text-white',
             ]"
-            @click="expandAll"
             title="Expand all discussions"
+            @click="expandAll"
           >
             <i class="fa-solid fa-expand text-xs" />
           </button>
@@ -238,8 +238,8 @@ const isExpanded = computed(() => {
                 : 'bg-orange-300 text-orange-900 dark:bg-orange-700 dark:text-white',
               'hover:bg-orange-200 hover:text-orange-900 dark:hover:bg-orange-600 dark:hover:text-white',
             ]"
-            @click="collapseAll"
             title="Collapse all discussions"
+            @click="collapseAll"
           >
             <i class="fa-solid fa-compress text-xs" />
           </button>
@@ -304,7 +304,7 @@ const isExpanded = computed(() => {
         </div>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
     <div
       v-if="showSearch"
       class="flex flex-col gap-2 bg-gray-100 py-2 dark:bg-gray-700 dark:text-gray-300"

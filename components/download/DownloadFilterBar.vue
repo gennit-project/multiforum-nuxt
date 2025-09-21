@@ -178,7 +178,7 @@ const hasActiveDownloadFilters = computed(() => {
         </RequireAuth>
       </div>
     </div>
-    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" />
+    <hr class="mt-2 border border-t-gray-500 dark:border-t-gray-600" >
 
     <!-- Search Panel -->
     <div

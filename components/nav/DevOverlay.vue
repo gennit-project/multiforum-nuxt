@@ -20,8 +20,8 @@ const hideOverlay = () => {
       </div>
       <button
         type="button"
-        @click="hideOverlay"
         class="font-semibold rounded-lg bg-orange-600 px-8 py-3 text-lg text-white transition-colors hover:bg-orange-700"
+        @click="hideOverlay"
       >
         Enter
       </button>

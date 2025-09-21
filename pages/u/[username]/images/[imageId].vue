@@ -197,7 +197,7 @@ watchEffect(() => {
             :src="image.url"
             :alt="image.alt ?? 'Image'"
             class="h-auto max-w-full rounded-lg shadow-lg"
-          />
+          >
         </div>
 
         <!-- Uploader info -->

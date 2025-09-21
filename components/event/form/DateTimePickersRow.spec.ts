@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { mount, VueWrapper } from '@vue/test-utils';
+import type { VueWrapper } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import DateTimePickersRow from '@/components/event/form/DateTimePickersRow.vue';
 import DatePicker from '@/components/event/form/DatePicker.vue';
 import TimePicker from '@/components/event/form/TimePicker.vue';

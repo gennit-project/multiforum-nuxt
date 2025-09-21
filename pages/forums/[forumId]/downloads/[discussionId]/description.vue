@@ -114,8 +114,8 @@ const handleCancel = () => {
         v-if="isOwnDiscussion && !editMode"
         type="button"
         class="hover:bg-gray-50 inline-flex items-center gap-2 self-start rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 lg:self-end"
-        @click="handleEdit"
         data-testid="edit-download-button"
+        @click="handleEdit"
       >
         <PencilIcon class="h-4 w-4" />
         Edit Description

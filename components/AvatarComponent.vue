@@ -68,7 +68,7 @@ const identiconData = computed(() => {
         isSmall ? 'h-8 w-8' : '',
         isSquare ? 'rounded-lg' : 'rounded-full',
       ]"
-    />
+    >
     <img
       v-else
       class="border dark:border-gray-600"
@@ -80,6 +80,6 @@ const identiconData = computed(() => {
       ]"
       :src="identiconData"
       :alt="text"
-    />
+    >
   </div>
 </template>

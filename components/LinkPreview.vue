@@ -52,7 +52,7 @@ export default {
         :src="imageUrl"
         :alt="title"
         @error="showImage = false"
-      />
+      >
     </a>
     <div class="px-6 py-4">
       <a :href="url" target="_blank" rel="noopener"
