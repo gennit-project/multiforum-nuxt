@@ -5,6 +5,7 @@ import HamburgerMenuButton from '@/components/nav/HamburgerMenuButton.vue';
 import UserProfileDropdownMenu from '@/components/nav/UserProfileDropdownMenu.vue';
 import ThemeSwitcher from '@/components/nav/ThemeSwitcher.vue';
 import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
+import CirclePlusIcon from '@/components/icons/CirclePlusIcon.vue';
 // import LogoIcon from "@/components/icons/LogoIcon.vue"; // Unused for now
 import { useRoute } from 'nuxt/app';
 import LoginButton from './LoginButton.vue';
@@ -13,6 +14,7 @@ import {
   usernameVar,
   sideNavIsOpenVar,
   notificationCountVar,
+  isAuthenticatedVar,
 } from '@/cache';
 
 defineEmits(['toggleDropdown']);
@@ -61,6 +63,12 @@ const isOnMapPage = computed(() => {
   }
   return false;
 });
+
+const handleAddToCollection = () => {
+  // TODO: Implement addToFavorites mutation
+  console.log('Adding channel to favorites:', channelId.value);
+  // This would call the addToFavorites mutation with itemType: 'CHANNEL'
+};
 </script>
 
 <template>
@@ -103,6 +111,15 @@ const isOnMapPage = computed(() => {
             >
               {{ channelId }}
             </nuxt-link>
+            <button
+              v-if="isAuthenticatedVar"
+              type="button"
+              :aria-label="`Add ${channelId} to collection`"
+              class="ml-1 rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-700 hover:text-orange-400"
+              @click="handleAddToCollection"
+            >
+              <CirclePlusIcon class="h-4 w-4" />
+            </button>
           </div>
           <div
             v-else-if="routeInfoLabel"

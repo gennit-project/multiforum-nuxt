@@ -8,6 +8,7 @@ import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import ListIcon from '@/components/icons/ListIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import AdminIcon from '@/components/icons/AdminIcon.vue';
@@ -56,6 +57,12 @@ const navigation: NavigationItem[] = [
     href: '/forums',
     icon: ChannelIcon,
     routerName: 'forums',
+  },
+  {
+    name: 'Library',
+    href: '/library',
+    icon: ListIcon,
+    routerName: 'library',
   },
 ];
 
@@ -252,7 +259,7 @@ const getUserActionClasses = (isActive: boolean) => {
         <a
           :href="item.href"
           :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-          @click.prevent="() => navigateTo({ name: item.routerName })"
+          @click.prevent="() => item.routerName === 'library' ? navigateTo({ path: item.href }) : navigateTo({ name: item.routerName })"
         >
           <component
             :is="item.icon"
@@ -442,7 +449,7 @@ const getUserActionClasses = (isActive: boolean) => {
             <a
               :href="item.href"
               :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-              @click.prevent="() => navigateTo({ name: item.routerName })"
+              @click.prevent="() => item.routerName === 'library' ? navigateTo({ path: item.href }) : navigateTo({ name: item.routerName })"
             >
               <component
                 :is="item.icon"

@@ -1,30 +1,56 @@
 <script setup lang="ts">
-import { useTitle } from '@unhead/vue';
 import { computed } from 'vue';
+import { useHead } from 'nuxt/app';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 
-useTitle('Library - Multiforum');
+useHead({
+  title: 'Library - Multiforum'
+});
 
-// For now, we'll show a placeholder for forum collections
+// For now, we'll show default favorites collections for each data type
 // TODO: Implement GraphQL queries for collections
-const forumCollections = computed(() => [
+const defaultCollections = computed(() => [
   {
-    id: '1',
-    name: 'My Favorite Forums',
-    description: 'Forums I visit regularly',
-    itemCount: 5,
+    id: 'favorite-channels',
+    name: 'Favorite Forums',
+    description: 'Your favorite forums',
+    itemCount: 0,
     visibility: 'PRIVATE',
     collectionType: 'CHANNELS',
   },
   {
-    id: '2',
-    name: 'Game Development',
-    description: 'Forums related to game development',
-    itemCount: 3,
-    visibility: 'PUBLIC',
-    collectionType: 'CHANNELS',
+    id: 'favorite-discussions',
+    name: 'Favorite Discussions',
+    description: 'Your favorite discussions',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'DISCUSSIONS',
+  },
+  {
+    id: 'favorite-images',
+    name: 'Favorite Images',
+    description: 'Your favorite images',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'IMAGES',
+  },
+  {
+    id: 'favorite-downloads',
+    name: 'Favorite Downloads',
+    description: 'Your favorite downloads',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'DOWNLOADS',
+  },
+  {
+    id: 'favorite-comments',
+    name: 'Favorite Comments',
+    description: 'Your favorite comments',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'COMMENTS',
   },
 ]);
 </script>
@@ -45,11 +71,11 @@ const forumCollections = computed(() => [
               </p>
             </div>
 
-            <!-- Forum Collections Section -->
+            <!-- Default Collections Section -->
             <div class="mb-8">
               <div class="mb-4 flex items-center justify-between">
                 <h2 class="font-semibold text-xl text-gray-900 dark:text-white">
-                  Forum Collections
+                  Your Collections
                 </h2>
                 <button
                   type="button"
@@ -59,30 +85,9 @@ const forumCollections = computed(() => [
                 </button>
               </div>
 
-              <div
-                v-if="forumCollections.length === 0"
-                class="bg-gray-50 rounded-lg border border-gray-200 p-8 text-center dark:border-gray-700 dark:bg-gray-800"
-              >
-                <ChannelIcon class="mx-auto h-12 w-12 text-gray-400" />
-                <h3
-                  class="mt-4 text-lg font-medium text-gray-900 dark:text-white"
-                >
-                  No forum collections yet
-                </h3>
-                <p class="mt-2 text-gray-600 dark:text-gray-300">
-                  Start collecting your favorite forums to organize them better.
-                </p>
-                <button
-                  type="button"
-                  class="font-semibold mt-4 rounded-md bg-orange-500 px-4 py-2 text-sm text-white shadow-sm hover:bg-orange-600"
-                >
-                  Create Your First Collection
-                </button>
-              </div>
-
-              <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div
-                  v-for="collection in forumCollections"
+                  v-for="collection in defaultCollections"
                   :key="collection.id"
                   class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
@@ -100,13 +105,9 @@ const forumCollections = computed(() => [
                         class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400"
                       >
                         <ChannelIcon class="mr-1 h-4 w-4" />
-                        {{ collection.itemCount }} forum{{
-                          collection.itemCount !== 1 ? 's' : ''
-                        }}
+                        {{ collection.itemCount }} item{{ collection.itemCount !== 1 ? 's' : '' }}
                         <span class="mx-2">•</span>
-                        <span class="capitalize">{{
-                          collection.visibility.toLowerCase()
-                        }}</span>
+                        <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
                       </div>
                     </div>
                     <button
@@ -127,21 +128,6 @@ const forumCollections = computed(() => [
                     </button>
                   </div>
                 </div>
-              </div>
-            </div>
-
-            <!-- Other Collection Types (placeholder for future) -->
-            <div class="space-y-8">
-              <div
-                class="bg-gray-50 rounded-lg border border-gray-200 p-6 dark:border-gray-700 dark:bg-gray-800"
-              >
-                <h2 class="text-lg font-medium text-gray-900 dark:text-white">
-                  Coming Soon
-                </h2>
-                <p class="mt-2 text-gray-600 dark:text-gray-300">
-                  Discussion collections, image galleries, and download
-                  libraries will be available soon.
-                </p>
               </div>
             </div>
           </div>

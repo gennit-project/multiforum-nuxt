@@ -9,6 +9,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { useRouter, useRoute } from 'nuxt/app';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import BecomeAdminModal from '@/components/channel/BecomeAdminModal.vue';
+import CirclePlusIcon from '@/components/icons/CirclePlusIcon.vue';
 import { isAuthenticatedVar } from '@/cache';
 
 const props = defineProps({
@@ -63,6 +64,13 @@ const closeBecomeAdminModal = () => {
 const handleBecomeAdminSuccess = () => {
   emit('refetchChannelData');
 };
+
+const handleAddToCollection = () => {
+  // TODO: Implement addToFavorites mutation
+  // For now, just show a toast message
+  console.log('Adding channel to favorites:', channelId.value);
+  // This would call the addToFavorites mutation with itemType: 'CHANNEL'
+};
 </script>
 
 <template>
@@ -93,7 +101,7 @@ const handleBecomeAdminSuccess = () => {
       </div>
       <div class="flex w-full items-center gap-4">
         <div v-if="channelId" class="flex items-center">
-          <div class="mb-1 mt-3">
+          <div class="mb-1 mt-3 flex-1">
             <span
               class="flex space-y-2 rounded-full border-gray-700 text-xl leading-6 text-black dark:bg-gray-900 dark:text-gray-200"
             >
@@ -106,6 +114,16 @@ const handleBecomeAdminSuccess = () => {
               {{ `${channel.uniqueName}` }}
             </span>
           </div>
+        </div>
+        <div v-if="isAuthenticatedVar" class="flex items-center">
+          <button
+            type="button"
+            :aria-label="`Add ${channel?.displayName || channelId} to collection`"
+            class="rounded-full p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400"
+            @click="handleAddToCollection"
+          >
+            <CirclePlusIcon class="h-5 w-5" />
+          </button>
         </div>
       </div>
       <MarkdownPreview
