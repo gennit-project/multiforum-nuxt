@@ -133,7 +133,7 @@ function getDefaultVariant(emojiLabel: string) {
               toggleCommentEmoji({
                 emojiLabel,
                 unicode: getDefaultVariant(emojiLabel) || '',
-                username: usernameVar.value || '',
+                username: (usernameVar as string) || '',
                 commentId: commentId,
               });
             }
@@ -142,7 +142,7 @@ function getDefaultVariant(emojiLabel: string) {
                 discussionChannelId: discussionChannelId,
                 emojiLabel,
                 unicode: getDefaultVariant(emojiLabel) || '',
-                username: usernameVar.value || '',
+                username: (usernameVar as string) || '',
               });
             }
           }

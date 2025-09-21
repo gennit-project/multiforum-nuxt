@@ -8,6 +8,7 @@ import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import ListIcon from '@/components/icons/ListIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from '@/cache';
@@ -48,6 +49,12 @@ const navigation: NavigationItem[] = [
     href: '/forums',
     icon: ChannelIcon,
     routerName: 'forums',
+  },
+  {
+    name: 'Library',
+    href: '/library',
+    icon: ListIcon,
+    routerName: 'library',
   },
 ];
 
