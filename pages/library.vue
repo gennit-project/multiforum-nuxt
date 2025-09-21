@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useHead } from 'nuxt/app';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
@@ -8,6 +8,19 @@ import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 useHead({
   title: 'Library - Multiforum'
 });
+
+// Filter state
+const activeFilter = ref('all');
+
+// Filter options
+const filterOptions = [
+  { key: 'all', label: 'All' },
+  { key: 'DISCUSSIONS', label: 'Discussions' },
+  { key: 'IMAGES', label: 'Images' },
+  { key: 'COMMENTS', label: 'Comments' },
+  { key: 'DOWNLOADS', label: 'Downloads' },
+  { key: 'CHANNELS', label: 'Forums' },
+];
 
 // For now, we'll show default favorites collections for each data type
 // TODO: Implement GraphQL queries for collections
@@ -53,6 +66,16 @@ const defaultCollections = computed(() => [
     collectionType: 'COMMENTS',
   },
 ]);
+
+// Filtered collections based on active filter
+const filteredCollections = computed(() => {
+  if (activeFilter.value === 'all') {
+    return defaultCollections.value;
+  }
+  return defaultCollections.value.filter(
+    collection => collection.collectionType === activeFilter.value
+  );
+});
 </script>
 
 <template>
@@ -72,6 +95,26 @@ const defaultCollections = computed(() => [
               </p>
             </div>
 
+            <!-- Filter Chips -->
+            <div class="mb-6">
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="filter in filterOptions"
+                  :key="filter.key"
+                  type="button"
+                  @click="activeFilter = filter.key"
+                  :class="[
+                    'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                    activeFilter === filter.key
+                      ? 'bg-orange-500 text-white shadow-sm'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
+                  ]"
+                >
+                  {{ filter.label }}
+                </button>
+              </div>
+            </div>
+
             <!-- Default Collections Section -->
             <div class="mb-8">
               <div class="mb-4 flex items-center justify-between">
@@ -88,7 +131,7 @@ const defaultCollections = computed(() => [
 
               <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div
-                  v-for="collection in defaultCollections"
+                  v-for="collection in filteredCollections"
                   :key="collection.id"
                   class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
