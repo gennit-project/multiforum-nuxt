@@ -272,7 +272,7 @@ const copyLink = async () => {
 
 const isAdmin = computed(() => {
   const serverRoles = props.eventData.Poster?.ServerRoles;
-  return serverRoles && serverRoles?.length > 0 && serverRoles[0].showAdminTag;
+  return serverRoles && serverRoles?.length > 0 && serverRoles[0]?.showAdminTag;
 });
 
 const menuItems = computed(() => {

@@ -36,11 +36,11 @@ const titleVersionsWithCurrent = computed(() => {
         : pastVersions[i + 1];
 
     transitions.push({
-      id: oldVersion.id,
-      author: oldVersion.Author?.username || '[Deleted]',
-      oldTitle: oldVersion.body,
-      newTitle: newerVersion.body,
-      timestamp: new Date(oldVersion.createdAt),
+      id: oldVersion?.id || '',
+      author: oldVersion?.Author?.username || '[Deleted]',
+      oldTitle: oldVersion?.body || '',
+      newTitle: newerVersion?.body || '',
+      timestamp: new Date(oldVersion?.createdAt || Date.now()),
       isLatest: i === pastVersions.length - 1,
     });
   }

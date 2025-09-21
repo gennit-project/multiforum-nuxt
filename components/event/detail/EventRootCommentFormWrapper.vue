@@ -144,7 +144,7 @@ const {
 onDone((result) => {
   if (result.errors?.length) {
     console.error('Error creating comment:', result.errors);
-    createCommentPermissionError.value = result.errors[0].message;
+    createCommentPermissionError.value = result.errors[0]?.message || 'Unknown error';
     createCommentLoading.value = false;
     return;
   }

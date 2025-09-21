@@ -267,6 +267,7 @@ const startTouchDrag = (event: TouchEvent) => {
   isDragging.value = true;
 
   const touch = event.touches[0];
+  if (!touch) return;
   startX.value = touch.clientX - translateX.value;
   startY.value = touch.clientY - translateY.value;
 };
@@ -277,6 +278,7 @@ const onTouchDrag = (event: TouchEvent) => {
   event.preventDefault();
 
   const touch = event.touches[0];
+  if (!touch) return;
   translateX.value = touch.clientX - startX.value;
   translateY.value = touch.clientY - startY.value;
 };
@@ -490,7 +492,9 @@ const touchEndX = ref(0);
 
 const handleTouchStart = (event: TouchEvent) => {
   // Store the initial touch position
-  touchStartX.value = event.touches[0].clientX;
+  const touch = event.touches[0];
+  if (!touch) return;
+  touchStartX.value = touch.clientX;
 
   // If we're in the lightbox view and zoomed in, let the image panning handle this
   if (isLightboxOpen.value && isZoomed.value) {
@@ -534,7 +538,9 @@ const handleTouchEnd = (event: TouchEvent) => {
     }
   }
 
-  touchEndX.value = event.changedTouches[0].clientX;
+  const touch = event.changedTouches[0];
+  if (!touch) return;
+  touchEndX.value = touch.clientX;
   const swipeDistance = touchEndX.value - touchStartX.value;
 
   // Only trigger if the swipe is significant enough (e.g., > 50px)

@@ -197,7 +197,7 @@ const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
           existingClosedIssuesByChannelData.channels[0];
         const newClosedIssuesByChannel = {
           ...existingClosedIssuesByChannel,
-          Issues: [...existingClosedIssuesByChannel.Issues, activeIssue.value],
+          Issues: [...(existingClosedIssuesByChannel?.Issues || []), activeIssue.value],
         };
 
         cache.writeQuery({
@@ -305,7 +305,7 @@ const { mutate: reopenIssue, loading: reopenIssueLoading } = useMutation(
           existingClosedIssuesByChannelData.channels[0];
         const newClosedIssuesByChannel = {
           ...existingClosedIssuesByChannel,
-          Issues: existingClosedIssuesByChannel.Issues.filter(
+          Issues: (existingClosedIssuesByChannel?.Issues || []).filter(
             (issue: Issue) => issue.id !== activeIssueId.value
           ),
         };

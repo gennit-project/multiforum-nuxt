@@ -263,11 +263,11 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
   if (markerMap.markers[eventLocationId]) {
     const openSpecificInfowindow = () => {
       const eventTitle =
-        markerMap.markers[eventLocationId].events[highlightedEventId.value]
-          .title;
+        markerMap.markers[eventLocationId]?.events[highlightedEventId.value]
+          ?.title;
       const eventLocation =
-        markerMap.markers[eventLocationId].events[highlightedEventId.value]
-          .locationName;
+        markerMap.markers[eventLocationId]?.events[highlightedEventId.value]
+          ?.locationName;
 
       let infowindowContent = `<b>${eventTitle}</b>`;
 
@@ -276,7 +276,7 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
       }
       markerMap.infowindow?.setContent(infowindowContent);
       markerMap.infowindow?.open({
-        anchor: markerMap.markers[eventLocationId].marker,
+        anchor: markerMap.markers[eventLocationId]?.marker,
         map,
         shouldFocus: false,
       });
@@ -287,7 +287,7 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
     const openGenericInfowindow = () => {
       markerMap.infowindow?.setContent(`${numberOfEvents} events`);
       markerMap.infowindow?.open({
-        anchor: markerMap.markers[eventLocationId].marker,
+        anchor: markerMap.markers[eventLocationId]?.marker,
         map,
         shouldFocus: false,
       });
@@ -311,9 +311,9 @@ const highlightEventOnMap = (input: HighlightEventInput) => {
       openGenericInfowindow();
     } else if (clickedMapMarker && numberOfEvents === 1) {
       const defaultEventId = Object.keys(
-        markerMap.markers[eventLocationId].events
+        markerMap.markers[eventLocationId]?.events || {}
       )[0];
-      highlightedEventId.value = defaultEventId;
+      highlightedEventId.value = defaultEventId || '';
 
       window.dispatchEvent(
         new CustomEvent('SpecificInfoWindowOpen', {
@@ -421,7 +421,7 @@ const openPreview = (event: EventData, openedFromMap = false) => {
   if (openedFromMap) {
     const eventsAtClickedLocation =
       desktopMarkerMap.value.markers[highlightedEventLocationId.value]
-        .numberOfEvents;
+        ?.numberOfEvents || 0;
     if (eventsAtClickedLocation > 1) {
       multipleEventPreviewIsOpen.value = true;
     } else {

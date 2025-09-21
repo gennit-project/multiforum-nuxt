@@ -55,7 +55,7 @@ export default defineComponent({
         return false;
       }
       const serverRole = serverRoles[0];
-      if (serverRole.showAdminTag) {
+      if (serverRole?.showAdminTag) {
         return true;
       }
       return false;
@@ -70,7 +70,7 @@ export default defineComponent({
         return false;
       }
       const channelRole = channelRoles[0];
-      if (channelRole.showModTag) {
+      if (channelRole?.showModTag) {
         return true;
       }
       return false;

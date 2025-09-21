@@ -192,9 +192,13 @@ const moveGroup = (groupId: string, direction: 'up' | 'down') => {
   if (index === -1) return;
 
   if (direction === 'up' && index > 0) {
-    [groups[index], groups[index - 1]] = [groups[index - 1], groups[index]];
+    const temp = groups[index];
+    groups[index] = groups[index - 1]!;
+    groups[index - 1] = temp!;
   } else if (direction === 'down' && index < groups.length - 1) {
-    [groups[index], groups[index + 1]] = [groups[index + 1], groups[index]];
+    const temp = groups[index];
+    groups[index] = groups[index + 1]!;
+    groups[index + 1] = temp!;
   }
 
   // Update order values

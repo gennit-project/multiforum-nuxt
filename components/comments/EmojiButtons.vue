@@ -65,7 +65,7 @@ function isActive(emojiLabel: string) {
   const variants = emojiObject.value[emojiLabel] || {};
   for (const unicode in variants) {
     const usernames = variants[unicode];
-    if (usernames.includes(usernameVar.value)) {
+    if (usernames && usernames.includes(usernameVar.value)) {
       active = true;
     }
   }
@@ -91,7 +91,7 @@ function toggleDiscussionChannelEmoji(emojiVoteInput: EmojiVoteInput) {
 function getCount(emojiLabel: string) {
   let sumUsernames = 0;
   for (const unicode in emojiObject.value[emojiLabel]) {
-    sumUsernames += emojiObject.value[emojiLabel][unicode].length;
+    sumUsernames += emojiObject.value[emojiLabel][unicode]?.length || 0;
   }
   return sumUsernames;
 }
@@ -132,8 +132,8 @@ function getDefaultVariant(emojiLabel: string) {
             if (commentId) {
               toggleCommentEmoji({
                 emojiLabel,
-                unicode: getDefaultVariant(emojiLabel),
-                username: usernameVar,
+                unicode: getDefaultVariant(emojiLabel) || '',
+                username: usernameVar.value || '',
                 commentId: commentId,
               });
             }
@@ -141,8 +141,8 @@ function getDefaultVariant(emojiLabel: string) {
               toggleDiscussionChannelEmoji({
                 discussionChannelId: discussionChannelId,
                 emojiLabel,
-                unicode: getDefaultVariant(emojiLabel),
-                username: usernameVar,
+                unicode: getDefaultVariant(emojiLabel) || '',
+                username: usernameVar.value || '',
               });
             }
           }

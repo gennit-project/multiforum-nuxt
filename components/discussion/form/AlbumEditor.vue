@@ -335,8 +335,11 @@ const updateImageField = (
   if (actualIndex === -1) return;
 
   const updatedImages = [...props.formValues.album.images];
+  const existingImage = updatedImages[actualIndex];
+  if (!existingImage) return;
+
   updatedImages[actualIndex] = {
-    ...updatedImages[actualIndex],
+    ...existingImage,
     [fieldName]: newValue,
   };
 
@@ -386,10 +389,14 @@ const moveImageUp = (index: number) => {
 
   const updatedImageOrder = [...props.formValues.album.imageOrder];
   // Swap with the item above in the imageOrder array
-  [updatedImageOrder[index], updatedImageOrder[index - 1]] = [
-    updatedImageOrder[index - 1],
-    updatedImageOrder[index],
-  ];
+  const currentItem = updatedImageOrder[index];
+  const previousItem = updatedImageOrder[index - 1];
+  if (currentItem && previousItem) {
+    [updatedImageOrder[index], updatedImageOrder[index - 1]] = [
+      previousItem,
+      currentItem,
+    ];
+  }
 
   emit('updateFormValues', {
     album: {
@@ -409,10 +416,14 @@ const moveImageDown = (index: number) => {
 
   const updatedImageOrder = [...imageOrder];
   // Swap with the item below in the imageOrder array
-  [updatedImageOrder[index], updatedImageOrder[index + 1]] = [
-    updatedImageOrder[index + 1],
-    updatedImageOrder[index],
-  ];
+  const currentItem = updatedImageOrder[index];
+  const nextItem = updatedImageOrder[index + 1];
+  if (currentItem && nextItem) {
+    [updatedImageOrder[index], updatedImageOrder[index + 1]] = [
+      nextItem,
+      currentItem,
+    ];
+  }
 
   emit('updateFormValues', {
     album: {

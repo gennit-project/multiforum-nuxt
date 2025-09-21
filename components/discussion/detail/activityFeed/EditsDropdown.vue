@@ -84,7 +84,7 @@ const allEdits = computed(() => {
         createdAt: version.createdAt,
         isCurrent: false,
         oldVersion: version,
-        newVersion: nextVersion,
+        newVersion: nextVersion || currentVersion,
       });
     });
   }

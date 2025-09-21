@@ -89,6 +89,7 @@ const clearMarkers = () => {
 
   for (const key in markerMap.markers) {
     const markerData = markerMap.markers[key];
+    if (!markerData) continue;
     const marker = markerData.marker;
 
     if (marker) {
@@ -152,10 +153,11 @@ const renderMap = async () => {
   // Second pass: create one marker per location with proper click handlers
   Object.keys(markerMap.markers).forEach((eventLocationId) => {
     const markerData = markerMap.markers[eventLocationId];
+    if (!markerData) return;
     const eventsAtLocation = Object.values(markerData.events);
     const firstEvent = eventsAtLocation[0];
 
-    if (!firstEvent.location) return;
+    if (!firstEvent?.location) return;
 
     const position = {
       lat: firstEvent.location.latitude,
@@ -165,7 +167,7 @@ const renderMap = async () => {
     // Create marker title based on number of events
     const title =
       markerData.numberOfEvents === 1
-        ? `Click to view event: ${firstEvent.title}`
+        ? `Click to view event: ${firstEvent?.title || 'Untitled Event'}`
         : `Click to view ${markerData.numberOfEvents} events at this location`;
 
     // Create marker with map set - needed for event listeners to work properly
@@ -180,7 +182,7 @@ const renderMap = async () => {
     // Set up click handlers at the marker/location level
     if (props.useMobileStyles) {
       marker.addListener('click', () => {
-        if (markerData.numberOfEvents === 1) {
+        if (markerData.numberOfEvents === 1 && firstEvent) {
           // Single event - open preview directly
           emit(
             'highlightEvent',
@@ -191,7 +193,7 @@ const renderMap = async () => {
             true
           );
           emit('openPreview', firstEvent, true);
-        } else {
+        } else if (firstEvent) {
           // Multiple events - highlight location and open preview (MapView will handle showing list)
           emit('highlightEvent', eventLocationId, '', firstEvent, true, true);
           emit('openPreview', firstEvent, true);
@@ -213,8 +215,8 @@ const renderMap = async () => {
             // Show tooltip with event info on hover
             const content =
               currentMarkerData.numberOfEvents === 1
-                ? `<div style="text-align:center"><b>${firstEvent.title}</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
-                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
+                ? `<div style="text-align:center"><b>${firstEvent?.title || 'Untitled Event'}</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
+                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
 
             console.log('Infowindow content:', content);
             infowindow.setContent(content);
@@ -225,14 +227,16 @@ const renderMap = async () => {
             });
 
             // For mouseover, just highlight the first event
-            emit(
-              'highlightEvent',
-              eventLocationId,
-              firstEvent.id,
-              firstEvent,
-              true,
-              false
-            );
+            if (firstEvent) {
+              emit(
+                'highlightEvent',
+                eventLocationId,
+                firstEvent.id,
+                firstEvent,
+                true,
+                false
+              );
+            }
           }
         }
       });
@@ -247,7 +251,7 @@ const renderMap = async () => {
       });
     } else {
       marker.addListener('click', () => {
-        if (markerData.numberOfEvents === 1) {
+        if (markerData.numberOfEvents === 1 && firstEvent) {
           // Single event - open preview directly
           emit(
             'highlightEvent',
@@ -258,7 +262,7 @@ const renderMap = async () => {
             true
           );
           emit('openPreview', firstEvent, true);
-        } else {
+        } else if (firstEvent) {
           // Multiple events - highlight location and open preview (MapView will handle showing list)
           emit('highlightEvent', eventLocationId, '', firstEvent, true, true);
           emit('openPreview', firstEvent, true);
@@ -279,8 +283,8 @@ const renderMap = async () => {
             // Show tooltip with event info on hover
             const content =
               currentMarkerData.numberOfEvents === 1
-                ? `<div style="text-align:center"><b>${firstEvent.title}</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
-                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
+                ? `<div style="text-align:center"><b>${firstEvent?.title || 'Untitled Event'}</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`
+                : `<div style="text-align:center"><b>${currentMarkerData.numberOfEvents} events</b>${firstEvent?.locationName ? `<br>at ${firstEvent.locationName}` : ''}</div>`;
 
             console.log('Infowindow content:', content);
             infowindow.setContent(content);
@@ -291,14 +295,16 @@ const renderMap = async () => {
             });
 
             // For mouseover, just highlight the first event
-            emit(
-              'highlightEvent',
-              eventLocationId,
-              firstEvent.id,
-              firstEvent,
-              true,
-              false
-            );
+            if (firstEvent) {
+              emit(
+                'highlightEvent',
+                eventLocationId,
+                firstEvent.id,
+                firstEvent,
+                true,
+                false
+              );
+            }
           }
         }
       });
@@ -314,12 +320,14 @@ const renderMap = async () => {
     }
 
     // Update markerMap with the created marker
-    markerMap.markers[eventLocationId].marker = marker;
+    if (markerMap.markers[eventLocationId]) {
+      markerMap.markers[eventLocationId].marker = marker;
+    }
     markers.push(marker);
 
     console.log(`Created marker for location ${eventLocationId}:`, {
       marker,
-      eventsCount: markerData.numberOfEvents,
+      eventsCount: markerData?.numberOfEvents,
       hasClickListener: !!(marker as any).gm_bindings_?.click,
       hasMouseoverListener: !!(marker as any).gm_bindings_?.mouseover,
     });

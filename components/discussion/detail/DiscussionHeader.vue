@@ -117,7 +117,7 @@ const defaultChannel = computed(() => {
   }
   const channelInRoute = route.params.forumId;
   return (
-    channelInRoute || props.discussion?.DiscussionChannels[0].channelUniqueName
+    channelInRoute || props.discussion?.DiscussionChannels?.[0]?.channelUniqueName
   );
 });
 

@@ -107,7 +107,7 @@ const handleClickEventListItem = (event: Event) => {
       name: 'forums-forumId-events-eventId',
       params: {
         eventId: event.id,
-        forumId: event.EventChannels[0].channelUniqueName,
+        forumId: event.EventChannels?.[0]?.channelUniqueName || '',
       },
     });
   }

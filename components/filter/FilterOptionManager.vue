@@ -145,9 +145,13 @@ const moveOption = (optionId: string, direction: 'up' | 'down') => {
   if (index === -1) return;
 
   if (direction === 'up' && index > 0) {
-    [options[index], options[index - 1]] = [options[index - 1], options[index]];
+    const temp = options[index];
+    options[index] = options[index - 1]!;
+    options[index - 1] = temp!;
   } else if (direction === 'down' && index < options.length - 1) {
-    [options[index], options[index + 1]] = [options[index + 1], options[index]];
+    const temp = options[index];
+    options[index] = options[index + 1]!;
+    options[index + 1] = temp!;
   }
 
   // Update order values

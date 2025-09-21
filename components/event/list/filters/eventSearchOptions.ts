@@ -133,7 +133,9 @@ export const createDefaultSelectedWeekdays = () => {
 
   for (let i = 0; i < weekdays.length; i++) {
     const weekday = weekdays[i];
-    weekdaysObj[weekday.number] = false;
+    if (weekday) {
+      weekdaysObj[weekday.number] = false;
+    }
   }
   return weekdaysObj;
 };
@@ -144,8 +146,11 @@ export const createDefaultSelectedHourRanges = () => {
   const ranges = {} as SelectedHourRanges;
 
   for (let i = 0; i < hourRangesData.length; i++) {
-    const label = hourRangesData[i]['12-hour-label'];
-    ranges[label] = false;
+    const hourRange = hourRangesData[i];
+    if (hourRange) {
+      const label = hourRange['12-hour-label'];
+      ranges[label] = false;
+    }
   }
   return ranges;
 };
@@ -157,7 +162,9 @@ export const createDefaultSelectedWeeklyHourRanges = () => {
 
   for (let i = 0; i < weekdays.length; i++) {
     const weekday = weekdays[i];
-    weeklyTimeSlots[weekday.number] = createDefaultSelectedHourRanges();
+    if (weekday) {
+      weeklyTimeSlots[weekday.number] = createDefaultSelectedHourRanges();
+    }
   }
   return weeklyTimeSlots;
 };
@@ -170,8 +177,11 @@ const createHourRangesObject = () => {
   const ranges = {} as SelectedHourRangeObject;
 
   for (let i = 0; i < hourRangesData.length; i++) {
-    const label = hourRangesData[i]['12-hour-label'];
-    ranges[label] = hourRangesData[i];
+    const hourRange = hourRangesData[i];
+    if (hourRange) {
+      const label = hourRange['12-hour-label'];
+      ranges[label] = hourRange;
+    }
   }
   return ranges;
 };
@@ -184,7 +194,9 @@ const createWeekdayObject = () => {
 
   for (let i = 0; i < weekdays.length; i++) {
     const dayData = weekdays[i];
-    dayObj[dayData.number] = dayData.name;
+    if (dayData) {
+      dayObj[dayData.number] = dayData.name;
+    }
   }
   return dayObj;
 };
@@ -259,7 +271,9 @@ const createWeekdayMap = () => {
   const weekdayMap = {} as any;
   for (let i = 0; i < weekdays.length; i++) {
     const weekdayData = weekdays[i];
-    weekdayMap[weekdayData.number] = weekdayData.name;
+    if (weekdayData) {
+      weekdayMap[weekdayData.number] = weekdayData.name;
+    }
   }
   return weekdayMap;
 };
