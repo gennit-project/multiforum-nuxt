@@ -491,7 +491,7 @@ const getSecretStatusText = (status: string) => {
                         type="button"
                         class="px-3 py-1 bg-orange-600 text-white text-sm rounded hover:bg-orange-700"
                         :disabled="!secretValues[secret.key]"
-                        @click="handleSetSecret(secret.key, secretValues[secret.key])"
+                        @click="handleSetSecret(secret.key, secretValues[secret.key] || '')"
                       >
                         Save
                       </button>

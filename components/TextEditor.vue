@@ -484,7 +484,9 @@ const handleDrop = async (event: DragEvent) => {
 
   // Assuming you want to handle only the first dropped file.
   const file = files[0];
-  handleFormStateDuringUpload(file);
+  if (file) {
+    handleFormStateDuringUpload(file);
+  }
 };
 
 const selectedTab = ref(0);
@@ -540,10 +542,10 @@ const exitFullScreen = () => {
       >
         <h2 class="text-lg font-medium dark:text-white">Full Screen Editor</h2>
         <button
-          @click="exitFullScreen"
           class="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+          @click="exitFullScreen"
         >
-          <i class="fas fa-times text-xl"></i>
+          <i class="fas fa-times text-xl"/>
         </button>
       </div>
 

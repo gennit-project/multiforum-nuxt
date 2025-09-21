@@ -36,15 +36,15 @@ const topOptions = [
 const sortOptions = [
   {
     label: 'Hot',
-    value: availableSortTypes.HOT,
+    value: availableSortTypes.HOT || 'hot',
   },
   {
     label: 'New',
-    value: availableSortTypes.NEW,
+    value: availableSortTypes.NEW || 'new',
   },
   {
     label: 'Top',
-    value: availableSortTypes.TOP,
+    value: availableSortTypes.TOP || 'top',
   },
 ];
 

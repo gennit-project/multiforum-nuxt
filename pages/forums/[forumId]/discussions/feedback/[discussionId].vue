@@ -195,7 +195,7 @@ const {
           FeedbackComments: [...prevFeedbackComments, newFeedbackComment],
           FeedbackCommentsAggregate: {
             count:
-              (prevQueryResult?.discussions[0].FeedbackCommentsAggregate
+              (prevQueryResult?.discussions[0]?.FeedbackCommentsAggregate
                 ?.count || 0) + 1,
             __typename: 'FeedbackCommentsAggregate',
           },

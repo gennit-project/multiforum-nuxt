@@ -69,11 +69,11 @@ const allEdits = computed(() => {
 
   if (wikiPage.value?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
-    const currentVersion = {
+    const currentVersion: TextVersion = {
       id: 'current',
-      body: wikiPage.value.body ?? undefined,
+      body: wikiPage.value.body,
       createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-      Author: wikiPage.value.VersionAuthor ?? undefined,
+      Author: wikiPage.value.VersionAuthor,
       AuthorConnection: {
         edges: [],
         pageInfo: { hasNextPage: false, hasPreviousPage: false },
@@ -84,6 +84,7 @@ const allEdits = computed(() => {
     // Add an entry for the most recent edit only if content actually changed
     if (wikiPage.value.PastVersions.length > 0) {
       const mostRecentPastVersion = wikiPage.value.PastVersions[0];
+      if (!mostRecentPastVersion) return edits;
       const currentContent = wikiPage.value.body ?? undefined;
       const pastContent = mostRecentPastVersion.body ?? undefined;
 
@@ -106,11 +107,16 @@ const allEdits = computed(() => {
       // Skip the most recent past version since we handled it above
       if (index === 0) return;
 
-      const previousVersion = wikiPage.value.PastVersions[index + 1] || {
+      const previousVersion: TextVersion = wikiPage.value.PastVersions[index + 1] || {
         id: 'initial',
         body: '', // Show diff from empty if this was the first edit
         createdAt: version.createdAt,
         Author: null,
+        AuthorConnection: {
+          edges: [],
+          pageInfo: { hasNextPage: false, hasPreviousPage: false },
+          totalCount: 0,
+        },
       };
 
       edits.push({
@@ -332,7 +338,7 @@ useHead({
               <i
                 v-if="isDeleting || deleteLoading"
                 class="fas fa-spinner fa-spin mr-2"
-              ></i>
+              />
               Delete Revision
             </button>
           </div>
@@ -402,7 +408,7 @@ useHead({
                 class="flex h-96 items-center justify-center text-gray-500 dark:text-gray-400"
               >
                 <div class="text-center">
-                  <i class="fas fa-spinner fa-spin mb-2 text-2xl"></i>
+                  <i class="fas fa-spinner fa-spin mb-2 text-2xl"/>
                   <p>Loading diff viewer...</p>
                 </div>
               </div>

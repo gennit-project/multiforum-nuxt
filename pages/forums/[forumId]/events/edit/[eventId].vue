@@ -36,7 +36,7 @@ export default defineComponent({
       return '';
     });
 
-    const eventId: string | string[] = route.params.eventId;
+    const eventId = route.params.eventId as string;
 
     const dataLoaded = ref(false);
     const loggedInUserModName = computed(() => modProfileNameVar.value);

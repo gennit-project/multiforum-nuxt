@@ -77,13 +77,13 @@ const validationErrorMessage = computed(() => {
   if (usernameIsInvalid.value) {
     return 'Username can only contain letters, numbers, and underscores.';
   }
-  if (newUsername.value.length > MAX_CHARS_IN_USERNAME) {
+  if (newUsername.value && newUsername.value.length > MAX_CHARS_IN_USERNAME) {
     return `Username must be less than ${MAX_CHARS_IN_USERNAME} characters.`;
   }
   return '';
 });
 
-const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value));
+const usernameIsInvalid = computed(() => !isValidUsername(newUsername.value || ''));
 
 // Age validation logic
 const calculateAge = (birthDate: string): number => {
@@ -181,7 +181,7 @@ const canSave = computed(() => {
   if (usernameIsInvalid.value) {
     return false;
   }
-  if (newUsername.value.length > MAX_CHARS_IN_USERNAME) {
+  if (newUsername.value && newUsername.value.length > MAX_CHARS_IN_USERNAME) {
     return false;
   }
   if (birthdayIsEmpty.value) {
@@ -217,7 +217,7 @@ const canSave = computed(() => {
           ]"
           class="block w-full flex-1 rounded border-gray-300 pb-2.5 pt-2.5 dark:bg-gray-800 sm:text-sm"
           @update:model-value="updateUsername"
-        />
+        >
         <div
           v-if="usernameIsTaken || usernameIsInvalid"
           class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3"
@@ -231,7 +231,7 @@ const canSave = computed(() => {
           {{ validationErrorMessage }}
         </p>
         <CharCounter
-          :current="newUsername.length"
+          :current="newUsername?.length || 0"
           :max="MAX_CHARS_IN_USERNAME"
           class="text-xs"
         />

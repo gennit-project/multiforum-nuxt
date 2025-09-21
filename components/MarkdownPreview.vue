@@ -117,9 +117,10 @@ function parseMarkdownForImages(text: string) {
   let match;
   while ((match = regex.exec(renderedText)) !== null) {
     const src = match[1];
+    if (!src) continue;
     const galleryItem: GalleryItem = {
       href: src,
-      src,
+      src: src,
       thumbnail: src,
       width: import.meta.client ? window.innerWidth : 0,
       height: import.meta.client ? window.innerHeight : 0,

@@ -262,17 +262,17 @@ const tabs = computed((): Tab[] => {
               data-testid="mobile-channel-nav-dropdown"
             >
               <div class="flex items-center space-x-2">
-                <component :is="activeTab.icon" class="h-5 w-5 shrink-0" />
-                <span>{{ activeTab.label }}</span>
+                <component :is="activeTab?.icon" class="h-5 w-5 shrink-0" />
+                <span>{{ activeTab?.label }}</span>
                 <span
                   v-if="
                     showCounts &&
-                    activeTab.countProperty &&
-                    (activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count)
+                    activeTab?.countProperty &&
+                    (activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count)
                   "
                   class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
                 >
-                  {{ activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count }}
+                  {{ activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count }}
                 </span>
               </div>
               <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
@@ -322,17 +322,17 @@ const tabs = computed((): Tab[] => {
             data-testid="mobile-channel-nav-dropdown"
           >
             <div class="flex items-center space-x-2">
-              <component :is="activeTab.icon" class="h-5 w-5 shrink-0" />
-              <span>{{ activeTab.label }}</span>
+              <component :is="activeTab?.icon" class="h-5 w-5 shrink-0" />
+              <span>{{ activeTab?.label }}</span>
               <span
                 v-if="
                   showCounts &&
-                  activeTab.countProperty &&
-                  (activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count)
+                  activeTab?.countProperty &&
+                  (activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count)
                 "
                 class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
               >
-                {{ activeTab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab.countProperty]?.count }}
+                {{ activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count }}
               </span>
             </div>
             <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />

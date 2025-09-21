@@ -110,12 +110,12 @@ const buildGridDataFromContributions = () => {
       const dateStr = currentDate.toISOString().split('T')[0];
 
       // Check if we have activity data for this day
-      if (activityMap[dateStr]) {
+      if (dateStr && activityMap[dateStr]) {
         week.push(activityMap[dateStr]);
       } else {
         // Create an empty day entry
         week.push({
-          date: dateStr,
+          date: dateStr || '',
           count: 0,
           activities: [],
         });
@@ -354,8 +354,12 @@ const cellCount = computed(() => {
               : 'border-gray-300 bg-white text-gray-800'
           "
         >
-          <option v-for="year in availableYears" :key="year" :value="year">
-            {{ year }}
+          <option
+            v-for="yearNumber in availableYears"
+            :key="yearNumber"
+            :value="year"
+          >
+            {{ yearNumber }}
           </option>
         </select>
       </div>

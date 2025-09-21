@@ -228,14 +228,14 @@ const selectedOptions = computed(() => {
         >
           <!-- Show avatar/icon only for single selection -->
           <img
-            v-if="selectedOptions.length === 1 && selectedOptions[0].avatar"
-            :src="selectedOptions[0].avatar"
-            :alt="selectedOptions[0].label"
+            v-if="selectedOptions.length === 1 && selectedOptions[0]?.avatar"
+            :src="selectedOptions[0]?.avatar"
+            :alt="selectedOptions[0]?.label"
             class="mr-2 h-6 w-6 flex-shrink-0 rounded-full"
           >
           <i
-            v-else-if="selectedOptions.length === 1 && selectedOptions[0].icon"
-            :class="[selectedOptions[0].icon, 'mr-2 flex-shrink-0']"
+            v-else-if="selectedOptions.length === 1 && selectedOptions[0]?.icon"
+            :class="[selectedOptions[0]?.icon, 'mr-2 flex-shrink-0']"
           />
 
           <!-- Show comma-separated labels for multiple selections -->

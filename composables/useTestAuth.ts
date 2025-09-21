@@ -78,12 +78,6 @@ export const useTestAuth = () => {
     // Log environment for debugging
     console.log('Running auth state refresh, NODE_ENV:', process.env.NODE_ENV);
 
-    // Check if we're in a test environment (Cypress or NODE_ENV)
-    const isTestEnv =
-      process.env.NODE_ENV === 'test' ||
-      process.env.NODE_ENV === 'development' ||
-      (typeof window !== 'undefined' && window.Cypress);
-
     try {
       // Get the token from localStorage (set by Cypress)
       const token = localStorage.getItem('token');
@@ -97,7 +91,9 @@ export const useTestAuth = () => {
       try {
         auth0 = useAuth0();
       } catch (error) {
-        console.log('Auth0 not available, proceeding with manual state sync');
+        console.log(
+          'Auth0 not available, proceeding with manual state sync. ' + error
+        );
       }
 
       // If Auth0 is available, try to sync its state
@@ -158,7 +154,7 @@ export const useTestAuth = () => {
         // Parse the JWT token to get user info
         const tokenParts = token.split('.');
         if (tokenParts.length === 3) {
-          const payload = JSON.parse(atob(tokenParts[1]));
+          const payload = JSON.parse(atob(tokenParts[1] || ''));
           const userEmail = payload.email;
 
           if (userEmail) {

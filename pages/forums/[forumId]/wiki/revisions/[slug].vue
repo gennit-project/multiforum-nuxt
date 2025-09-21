@@ -4,7 +4,6 @@ import { useRoute, useRouter, useHead } from 'nuxt/app';
 import { GET_WIKI_PAGE } from '@/graphQLData/channel/queries';
 import { useQuery } from '@vue/apollo-composable';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
-import ErrorBanner from '@/components/ErrorBanner.vue';
 import { timeAgo } from '@/utils';
 import type { WikiPage, TextVersion } from '@/__generated__/graphql';
 
@@ -56,11 +55,11 @@ const allEdits = computed(() => {
 
   if (wikiPage.value?.PastVersions?.length) {
     // Create current version entry (as TextVersion structure)
-    const currentVersion = {
+    const currentVersion: TextVersion = {
       id: 'current',
-      body: wikiPage.value.body ?? undefined,
+      body: wikiPage.value.body,
       createdAt: wikiPage.value.updatedAt || wikiPage.value.createdAt,
-      Author: wikiPage.value.VersionAuthor ?? undefined,
+      Author: wikiPage.value.VersionAuthor,
       AuthorConnection: {
         edges: [],
         pageInfo: { hasNextPage: false, hasPreviousPage: false },
@@ -71,6 +70,7 @@ const allEdits = computed(() => {
     // Add an entry for the most recent edit only if content actually changed
     if (wikiPage.value.PastVersions.length > 0) {
       const mostRecentPastVersion = wikiPage.value.PastVersions[0];
+      if (!mostRecentPastVersion) return edits;
       const currentContent = wikiPage.value.body ?? undefined;
       const pastContent = mostRecentPastVersion.body ?? undefined;
 
@@ -214,7 +214,7 @@ useHead({
       <!-- Revisions list -->
       <div v-else class="space-y-4">
         <div
-          v-for="(edit, index) in allEdits"
+          v-for="edit in allEdits"
           :key="edit.id"
           class="hover:bg-gray-50 cursor-pointer rounded-lg border border-gray-200 p-6 transition-colors dark:border-gray-700 dark:hover:bg-gray-800/50"
           @click="

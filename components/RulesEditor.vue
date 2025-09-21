@@ -22,7 +22,9 @@ const updateRule = (
   value: string
 ) => {
   const updatedRules: RuleInput[] = [...(props.formValues?.rules || [])];
-  updatedRules[index][field] = value;
+  if (updatedRules[index]) {
+    updatedRules[index][field] = value;
+  }
   emit('updateFormValues', { rules: updatedRules });
 };
 

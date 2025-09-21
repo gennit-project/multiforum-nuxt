@@ -1,4 +1,4 @@
-import { computed, ref, type Ref } from 'vue';
+import { computed, type Ref } from 'vue';
 
 export interface MarkdownHeading {
   id: string;
@@ -15,8 +15,8 @@ export function useMarkdownHeadings(markdownContent: Ref<string>) {
     const matches = Array.from(markdownContent.value.matchAll(headingRegex));
 
     return matches.map((match, index) => {
-      const level = match[1].length;
-      const text = match[2].trim();
+      const level = match[1]?.length || 1;
+      const text = match[2]?.trim() || '';
 
       // Create a URL-friendly anchor from the heading text
       const anchor = text

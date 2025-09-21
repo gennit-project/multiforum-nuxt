@@ -4,7 +4,7 @@ import { ref } from 'vue';
 const props = defineProps({
   fieldName: {
     type: String,
-    required: true,
+    required: false,
     default: '',
   },
   label: {
@@ -36,8 +36,9 @@ const onFileSelected = (event: Event) => {
 
   const input = event.target as HTMLInputElement;
   if (input && input.files && input.files.length > 0) {
+    const file = input.files[0];
     console.log(
-      `File selected: ${input.files[0].name}, type: ${input.files[0].type}, size: ${input.files[0].size}`
+      `File selected: ${file?.name}, type: ${file?.type}, size: ${file?.size}`
     );
   }
 
@@ -73,7 +74,7 @@ const onFileSelected = (event: Event) => {
         :disabled="disabled"
         @change="onFileSelected"
         @click="clearFileInput"
-      />
+      >
     </label>
   </div>
 </template>

@@ -120,13 +120,13 @@ const dateObj = computed(() => {
     }
 
     if (happeningNow(event)) {
-      res.happeningNow.push(event);
+      res.happeningNow?.push(event);
     } else if (happeningToday(event)) {
-      res.happeningToday.push(event);
+      res.happeningToday?.push(event);
     } else if (happeningTomorrow(event)) {
-      res.happeningTomorrow.push(event);
+      res.happeningTomorrow?.push(event);
     } else if (afterTomorrow(event)) {
-      res.afterTomorrow.push(event);
+      res.afterTomorrow?.push(event);
     }
   }
 
@@ -136,14 +136,16 @@ const dateObj = computed(() => {
 const dateSectionObj = computed(() => {
   const res: Record<string, Event[]> = {};
 
-  for (let i = 0; i < dateObj.value.afterTomorrow.length; i++) {
-    const event = dateObj.value.afterTomorrow[i];
+  for (let i = 0; i < (dateObj.value.afterTomorrow?.length || 0); i++) {
+    const event = dateObj.value.afterTomorrow?.[i];
 
-    const date = getDateSectionFormat(event.startTime ?? '');
+    const date = getDateSectionFormat(event?.startTime ?? '');
     if (!res[date]) {
       res[date] = [];
     }
-    res[date].push(event);
+    if (event) {
+      res[date].push(event);
+    }
   }
 
   return res;
@@ -151,7 +153,7 @@ const dateSectionObj = computed(() => {
 </script>
 
 <template>
-  <div v-if="dateObj.happeningNow.length > 0" class="flex flex-col">
+  <div v-if="dateObj.happeningNow?.length > 0" class="flex flex-col">
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -188,7 +190,7 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.happeningToday.length > 0" class="flex flex-col">
+  <div v-if="dateObj.happeningToday?.length > 0" class="flex flex-col">
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -216,7 +218,7 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.happeningTomorrow.length > 0" class="flex flex-col">
+  <div v-if="dateObj.happeningTomorrow?.length > 0" class="flex flex-col">
     <span
       class="my-1 mb-1 flex items-center text-sm font-bold leading-6 text-gray-500 dark:text-gray-400"
     >
@@ -244,7 +246,7 @@ const dateSectionObj = computed(() => {
     </div>
   </div>
 
-  <div v-if="dateObj.afterTomorrow.length > 0">
+  <div v-if="dateObj.afterTomorrow?.length > 0">
     <div
       v-for="(events, date) in dateSectionObj"
       :key="date"

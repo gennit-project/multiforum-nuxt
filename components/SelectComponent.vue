@@ -36,7 +36,7 @@ function handleSelect(event: SelectOptionData) {
     <div class="relative mt-1">
       <ListboxButton
         class="relative w-full cursor-default rounded-md border border-gray-300 bg-white pl-3 pr-10 text-left shadow-sm focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 dark:bg-gray-800 dark:text-gray-200"
-        :label="props.label ?? selected.label"
+        :label="props.label ?? selected?.label"
       >
         <span
           class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2"
