@@ -23,7 +23,7 @@ type EditItem = {
   author: string;
   createdAt: any;
   isCurrent: boolean;
-  oldVersionData: TextVersion;
+  oldVersionData: TextVersion | undefined;
   newVersionData: TextVersion;
 };
 

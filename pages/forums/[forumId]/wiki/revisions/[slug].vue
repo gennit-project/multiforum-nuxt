@@ -93,12 +93,7 @@ const allEdits = computed(() => {
       // Skip the most recent past version since we handled it above
       if (index === 0) return;
 
-      const previousVersion = wikiPage.value.PastVersions[index + 1] || {
-        id: 'initial',
-        body: '', // Show diff from empty if this was the first edit
-        createdAt: version.createdAt,
-        Author: null,
-      };
+      const previousVersion = wikiPage.value.PastVersions[index + 1];
 
       edits.push({
         id: version.id,

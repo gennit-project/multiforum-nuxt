@@ -1,5 +1,4 @@
 <script lang="ts" setup>
-// @ts-ignore - definePageMeta is auto-imported by Nuxt
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_MOD } from '@/graphQLData/mod/queries';
@@ -7,6 +6,7 @@ import ModProfileSidebar from '@/components/mod/ModProfileSidebar.vue';
 import { useRoute } from 'nuxt/app';
 import ModProfileTabs from '../../components/mod/ModProfileTabs.vue';
 
+// @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
   middleware: 'mod-profile-redirect',
 });

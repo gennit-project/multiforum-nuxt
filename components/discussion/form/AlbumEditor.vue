@@ -225,6 +225,7 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     let successCount = 0;
     for (let i = 0; i < filesToProcess.length; i++) {
       const file = filesToProcess[i];
+      if (!file) continue;
       uploadStatus.value = `Uploading ${i + 1}/${filesToProcess.length} images...`;
       const success = await uploadFile(file);
       if (success) successCount++;
@@ -246,6 +247,7 @@ const handleMultipleFiles = async (files: FileList | File[]) => {
     let successCount = 0;
     for (let i = 0; i < filesArray.length; i++) {
       const file = filesArray[i];
+      if (!file) continue;
       uploadStatus.value = `Uploading ${i + 1}/${filesArray.length} images...`;
       const success = await uploadFile(file);
       if (success) successCount++;
