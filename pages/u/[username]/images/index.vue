@@ -98,16 +98,6 @@ const loadMoreImages = async () => {
 
 <template>
   <div class="w-full">
-    <!-- Header -->
-    <div class="mb-6">
-      <h1 class="mb-2 text-2xl font-bold">Images by {{ username }}</h1>
-      <p class="text-gray-600 dark:text-gray-400">
-        {{ images.length }} of {{ totalImageCount }}
-        {{ totalImageCount === 1 ? 'image' : 'images' }}
-        {{ hasMoreImages ? '' : 'uploaded' }}
-      </p>
-    </div>
-
     <!-- Initial loading state -->
     <div
       v-if="userImagesLoading && images.length === 0"
