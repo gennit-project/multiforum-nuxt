@@ -15,7 +15,8 @@ import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import { getAllPermissions } from '@/utils/permissionUtils';
 import { getDiscussionHeaderMenuItems } from '@/utils/headerPermissionUtils';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { usernameVar, modProfileNameVar, isAuthenticatedVar } from '@/cache';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
@@ -376,6 +377,12 @@ const warningModalBody = computed(() => {
             Cancel
           </button>
         </div>
+        <AddToDiscussionFavorites
+          v-if="discussion && isAuthenticatedVar"
+          :discussion-id="discussion.id"
+          :discussion-title="discussion.title"
+          size="small"
+        />
         <MenuButton
           v-if="showActionMenu && discussion && menuItems.length > 0"
           :items="menuItems"
