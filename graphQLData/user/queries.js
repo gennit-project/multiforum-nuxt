@@ -217,6 +217,59 @@ export const GET_USER_FAVORITE_CHANNELS = gql`
   }
 `;
 
+export const GET_USER_FAVORITE_DISCUSSIONS = gql`
+  query getUserFavoriteDiscussions($username: String!) {
+    users(where: { username: $username }) {
+      username
+      FavoriteDiscussions(options: { sort: { createdAt: DESC } }) {
+        id
+        title
+        body
+        createdAt
+        updatedAt
+        Author {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+          ServerRoles {
+            showAdminTag
+          }
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+          archived
+          answered
+          locked
+          weightedVotesCount
+          Channel {
+            uniqueName
+            displayName
+          }
+          CommentsAggregate {
+            count
+          }
+        }
+        Tags {
+          text
+        }
+        Album {
+          id
+          Images {
+            id
+            url
+            caption
+          }
+        }
+        hasSensitiveContent
+      }
+    }
+  }
+`;
+
 export const USER_LOOKUP = gql`
   query getUser($username: String!) {
     getUser(username: $username) {

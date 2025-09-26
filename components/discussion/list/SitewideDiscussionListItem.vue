@@ -14,6 +14,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { relativeTime } from '@/utils';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_USER } from '@/graphQLData/user/queries';
@@ -198,32 +199,34 @@ const revealSensitiveContent = () => {
         </nuxt-link>
         <div class="flex gap-2">
           <div>
-            <nuxt-link v-if="discussion" :to="getDetailLink()">
-              <div class="flex items-center gap-2">
-                <span
-                  :class="
-                    discussionIdInParams === discussionId ? 'text-black' : ''
-                  "
-                  class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
-                >
-                  <HighlightedSearchTerms
-                    :text="title"
-                    :search-input="searchInput"
-                  />
-                </span>
-                <span
-                  v-if="hasSensitiveContent"
-                  class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
-                >
-                  Sensitive
-                </span>
-              </div>
-            </nuxt-link>
+            <div class="flex items-center gap-2">
+              <nuxt-link v-if="discussion" :to="getDetailLink()">
+                <div class="flex items-center gap-2">
+                  <span
+                    :class="
+                      discussionIdInParams === discussionId ? 'text-black' : ''
+                    "
+                    class="cursor-pointer text-sm hover:text-gray-500 dark:text-gray-100 dark:hover:text-gray-300"
+                  >
+                    <HighlightedSearchTerms
+                      :text="title"
+                      :search-input="searchInput"
+                    />
+                  </span>
+                  <span
+                    v-if="hasSensitiveContent"
+                    class="rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
+                  >
+                    Sensitive
+                  </span>
+                </div>
+              </nuxt-link>
+            </div>
             <div
               class="pt-1 text-xs text-gray-500 no-underline dark:text-gray-300"
             >
               <!-- Use div instead of p to avoid invalid HTML (button inside p) -->
-              <div class="whitespace-normal">
+              <div class="flex items-center whitespace-normal">
                 <!-- Comment count -->
                 <nuxt-link
                   v-if="discussion && !submittedToMultipleChannels"
@@ -252,7 +255,6 @@ const revealSensitiveContent = () => {
                   </span>
                 </MenuButton>
 
-                <!-- Dot separator and posted info all inline -->
                 <span class="mx-1 inline">•</span>
                 Posted {{ relative }} by
                 <UsernameWithTooltip
@@ -264,6 +266,12 @@ const revealSensitiveContent = () => {
                   :comment-karma="discussion?.Author?.commentKarma ?? 0"
                   :discussion-karma="discussion?.Author?.discussionKarma ?? 0"
                   :account-created="discussion?.Author?.createdAt"
+                />
+                <AddToDiscussionFavorites
+                  v-if="discussion && isAuthenticatedVar"
+                  :discussion-id="discussion.id"
+                  :discussion-title="discussion.title"
+                  size="small"
                 />
               </div>
             </div>
@@ -349,9 +357,9 @@ const revealSensitiveContent = () => {
                 <div
                   v-if="discussion.Album"
                   class="my-4 bg-black"
-                  style="width: 100%; max-width: 100%; overflow: hidden;"
+                  style="width: 100%; max-width: 100%; overflow: hidden"
                 >
-                  <div style="max-width: 384px; margin: 0 auto;">
+                  <div style="max-width: 384px; margin: 0 auto">
                     <DiscussionAlbum
                       :album="discussion.Album"
                       :carousel-format="true"
