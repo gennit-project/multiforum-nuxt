@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, watchEffect } from 'vue';
+import { computed, watchEffect, ref, onMounted, onUnmounted } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute, useHead } from 'nuxt/app';
 import { GET_IMAGE_DETAILS } from '@/graphQLData/image/queries';
@@ -56,6 +56,9 @@ const isCorrectUserPage = computed(() => {
   return uploader.value?.username === username.value;
 });
 
+// Custom lightbox state
+const isLightboxOpen = ref(false);
+
 // Check file types
 const hasGlbExtension = (url: string) => {
   return url?.toLowerCase().endsWith('.glb');
@@ -63,6 +66,96 @@ const hasGlbExtension = (url: string) => {
 
 const hasStlExtension = (url: string) => {
   return url?.toLowerCase().endsWith('.stl');
+};
+
+// Zoom functionality
+const zoomLevel = ref(1);
+const isZoomed = computed(() => zoomLevel.value > 1);
+
+// Image panning
+const isDragging = ref(false);
+const startX = ref(0);
+const startY = ref(0);
+const translateX = ref(0);
+const translateY = ref(0);
+
+const startDrag = (event: MouseEvent) => {
+  if (!isZoomed.value) return;
+
+  if (event.button !== 0) return;
+
+  event.preventDefault();
+  isDragging.value = true;
+  startX.value = event.clientX - translateX.value;
+  startY.value = event.clientY - translateY.value;
+};
+
+const onDrag = (event: MouseEvent) => {
+  if (!isDragging.value) return;
+
+  event.preventDefault();
+  translateX.value = event.clientX - startX.value;
+  translateY.value = event.clientY - startY.value;
+};
+
+const stopDrag = () => {
+  isDragging.value = false;
+};
+
+// Reset translation when changing zoom
+const resetTranslation = () => {
+  translateX.value = 0;
+  translateY.value = 0;
+};
+
+// Lightbox functions
+const openLightbox = () => {
+  if (image.value?.url && !hasGlbExtension(image.value.url) && !hasStlExtension(image.value.url)) {
+    isLightboxOpen.value = true;
+    zoomLevel.value = 1;
+    resetTranslation();
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+const closeLightbox = () => {
+  isLightboxOpen.value = false;
+  zoomLevel.value = 1;
+  resetTranslation();
+  document.body.style.overflow = '';
+};
+
+// Zoom functions
+const zoomIn = () => {
+  if (zoomLevel.value < 3) {
+    zoomLevel.value += 0.5;
+  }
+};
+
+const zoomOut = () => {
+  if (zoomLevel.value > 1) {
+    zoomLevel.value -= 0.5;
+  }
+};
+
+const resetZoom = () => {
+  zoomLevel.value = 1;
+  resetTranslation();
+};
+
+// Keyboard navigation
+const handleKeyDown = (e: KeyboardEvent) => {
+  if (isLightboxOpen.value) {
+    if (e.key === 'Escape') {
+      closeLightbox();
+    } else if (e.key === '+') {
+      zoomIn();
+    } else if (e.key === '-') {
+      zoomOut();
+    } else if (e.key === '0') {
+      resetZoom();
+    }
+  }
 };
 
 const downloadImage = (imageUrl: string) => {
@@ -105,6 +198,21 @@ watchEffect(() => {
     description: `Image uploaded by ${uploaderName}: ${imageCaption}${image.value.longDescription ? '. ' + image.value.longDescription : ''}`,
     image: image.value.url || '',
   });
+});
+
+onMounted(() => {
+  window.addEventListener('keydown', handleKeyDown);
+  window.addEventListener('mouseup', stopDrag);
+  window.addEventListener('mouseleave', stopDrag);
+  window.addEventListener('mousemove', onDrag);
+});
+
+onUnmounted(() => {
+  window.removeEventListener('keydown', handleKeyDown);
+  window.removeEventListener('mouseup', stopDrag);
+  window.removeEventListener('mouseleave', stopDrag);
+  window.removeEventListener('mousemove', onDrag);
+  document.body.style.overflow = '';
 });
 </script>
 
@@ -196,8 +304,18 @@ watchEffect(() => {
             v-else-if="image.url"
             :src="image.url"
             :alt="image.alt ?? 'Image'"
-            class="h-auto max-w-full rounded-lg shadow-lg"
+            class="h-auto max-w-full rounded-lg shadow-lg cursor-pointer transition-transform hover:scale-105"
+            title="Click to view in lightbox"
+            @click="openLightbox"
           >
+        </div>
+
+        <!-- Click hint for regular images -->
+        <div
+          v-if="image.url && !hasGlbExtension(image.url) && !hasStlExtension(image.url)"
+          class="mt-2 text-center text-sm text-gray-500 dark:text-gray-400"
+        >
+          💡 Click the image to view in fullscreen with zoom controls
         </div>
 
         <!-- Uploader info -->
@@ -290,6 +408,113 @@ watchEffect(() => {
               </p>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Custom lightbox -->
+      <div
+        v-if="isLightboxOpen"
+        class="fixed left-0 top-0 z-50 h-full w-full bg-black flex items-center justify-center"
+      >
+        <!-- Header controls -->
+        <div class="absolute left-0 top-0 z-50 flex w-full items-center justify-between p-5 text-white">
+          <div class="flex items-center gap-4">
+            <button
+              class="bg-transparent cursor-pointer border-0 text-white text-3xl"
+              @click="closeLightbox"
+            >
+              ×
+            </button>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <!-- Zoom controls -->
+            <div class="flex items-center rounded bg-opacity-10">
+              <button
+                class="cursor-pointer text-white transition-colors hover:bg-opacity-20 px-2 py-1"
+                :class="{ 'cursor-not-allowed opacity-50': zoomLevel <= 1 }"
+                title="Zoom out"
+                :disabled="zoomLevel <= 1"
+                @click="zoomOut"
+              >
+                −
+              </button>
+              <span class="text-white px-2 text-sm">
+                {{ Math.round(zoomLevel * 100) }}%
+              </span>
+              <button
+                class="cursor-pointer text-white transition-colors hover:bg-opacity-20 px-2 py-1"
+                :class="{ 'cursor-not-allowed opacity-50': zoomLevel >= 3 }"
+                title="Zoom in"
+                :disabled="zoomLevel >= 3"
+                @click="zoomIn"
+              >
+                +
+              </button>
+              <button
+                v-if="isZoomed"
+                class="cursor-pointer text-white transition-colors hover:bg-opacity-20 px-2 py-1"
+                title="Reset zoom"
+                @click="resetZoom"
+              >
+                Reset
+              </button>
+            </div>
+
+            <!-- Download button -->
+            <button
+              type="button"
+              class="flex cursor-pointer items-center justify-center rounded text-xl text-white no-underline hover:bg-white hover:bg-opacity-20 h-8 w-8"
+              @click="() => downloadImage(image?.url || '')"
+            >
+              <DownloadIcon class="h-6 w-6" />
+            </button>
+          </div>
+        </div>
+
+        <!-- Image container -->
+        <div class="relative flex h-full w-full items-center justify-center overflow-hidden">
+          <ModelViewer
+            v-if="image && image.url && hasGlbExtension(image.url)"
+            :model-url="image.url"
+            height="100%"
+            width="100%"
+            class="h-full w-full object-contain transition-all duration-300 ease-in-out"
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
+              cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
+            }"
+            @mousedown="startDrag"
+          />
+          <div
+            v-else-if="image && image.url && hasStlExtension(image.url)"
+            class="flex h-full w-full items-center justify-center"
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
+              cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
+            }"
+            @mousedown="startDrag"
+          >
+            <ClientOnly>
+              <StlViewer
+                :src="image.url"
+                :width="800"
+                :height="600"
+                class="object-contain transition-all duration-300 ease-in-out"
+              />
+            </ClientOnly>
+          </div>
+          <img
+            v-else-if="image && image.url"
+            :src="image.url"
+            :alt="image.alt ?? 'Image'"
+            class="h-full w-full object-contain transition-all duration-300 ease-in-out"
+            :style="{
+              transform: `scale(${zoomLevel}) translate(${translateX}px, ${translateY}px)`,
+              cursor: isZoomed ? (isDragging ? 'grabbing' : 'grab') : 'auto',
+            }"
+            @mousedown="startDrag"
+          >
         </div>
       </div>
     </div>
