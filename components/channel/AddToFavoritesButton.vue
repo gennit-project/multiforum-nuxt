@@ -7,6 +7,7 @@ import {
   REMOVE_FAVORITE_CHANNEL,
 } from '@/graphQLData/user/mutations';
 import { usernameVar } from '@/cache';
+import { useToastStore } from '@/stores/toastStore';
 
 const props = defineProps({
   channelUniqueName: {
@@ -36,6 +37,8 @@ const GET_USER_FAVORITES = gql`
 
 const isFavorited = ref(false);
 const isAnimating = ref(false);
+const isLoading = ref(false);
+const toastStore = useToastStore();
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITES,
@@ -66,27 +69,43 @@ const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_CHANNEL);
 const handleToggleFavorite = async () => {
   if (!usernameVar.value) return;
 
+  // Optimistic update - toggle immediately
+  isFavorited.value = !isFavorited.value;
+
+  // Start animation if adding to favorites
+  if (isFavorited.value) {
+    isAnimating.value = true;
+    setTimeout(() => {
+      isAnimating.value = false;
+    }, 300);
+  }
+
+  isLoading.value = true;
+
   try {
-    if (isFavorited.value) {
+    if (!isFavorited.value) {
+      // We're removing from favorites
       await removeFavorite({
         channel: props.channelUniqueName,
         username: usernameVar.value,
       });
-      isFavorited.value = false;
+      toastStore.showToast('Removed from favorites.');
     } else {
+      // We're adding to favorites
       await addFavorite({
         channel: props.channelUniqueName,
         username: usernameVar.value,
       });
-      isFavorited.value = true;
-      isAnimating.value = true;
-      setTimeout(() => {
-        isAnimating.value = false;
-      }, 300);
+      toastStore.showToast('Added to favorites.');
     }
     refetchFavorites();
   } catch (error) {
     console.error('Error toggling favorite:', error);
+    // Revert optimistic update on error
+    isFavorited.value = !isFavorited.value;
+    toastStore.showToast('Error updating favorites. Please try again.', 'error');
+  } finally {
+    isLoading.value = false;
   }
 };
 

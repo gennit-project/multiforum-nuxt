@@ -7,6 +7,7 @@ import SiteSidenav from '@/components/nav/SiteSidenav.vue';
 import VerticalIconNav from '@/components/nav/VerticalIconNav.vue';
 import SiteFooter from '@/components/layout/SiteFooter.vue';
 import DevOverlay from '@/components/nav/DevOverlay.vue';
+import ToastNotification from '@/components/ToastNotification.vue';
 import { config } from '@/config';
 import {
   sideNavIsOpenVar,
@@ -56,6 +57,7 @@ const handleSessionExpiredLogin = () => {
 <template>
   <v-app>
     <DevOverlay v-if="isDevelopment" />
+    <ToastNotification />
     <main class="flex min-h-screen flex-col">
       <!-- Session expired banner -->
       <div
