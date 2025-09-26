@@ -9,6 +9,7 @@ import DiscussionVotes from '../vote/DiscussionVotes.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { stableRelativeTime } from '@/utils';
 import type {
   Discussion,
@@ -217,21 +218,29 @@ const revealSensitiveContent = () => {
                 </span>
               </nuxt-link>
               <div
-                class="text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
+                class="flex items-center gap-2 text-xs font-medium text-gray-600 no-underline dark:text-gray-300"
               >
-                <span class="mr-1 text-xs text-gray-500 dark:text-gray-300">{{
-                  `Posted ${relativeTimeAgo} by`
-                }}</span>
-                <UsernameWithTooltip
-                  v-if="authorUsername"
-                  :is-admin="authorIsAdmin"
-                  :is-mod="authorIsMod"
-                  :username="authorUsername"
-                  :src="authorProfilePicURL ?? ''"
-                  :display-name="authorDisplayName ?? ''"
-                  :comment-karma="authorCommentKarma"
-                  :discussion-karma="authorDiscussionKarma"
-                  :account-created="authorAccountCreated"
+                <div class="flex items-center">
+                  <span class="mr-1 text-xs text-gray-500 dark:text-gray-300">{{
+                    `Posted ${relativeTimeAgo} by`
+                  }}</span>
+                  <UsernameWithTooltip
+                    v-if="authorUsername"
+                    :is-admin="authorIsAdmin"
+                    :is-mod="authorIsMod"
+                    :username="authorUsername"
+                    :src="authorProfilePicURL ?? ''"
+                    :display-name="authorDisplayName ?? ''"
+                    :comment-karma="authorCommentKarma"
+                    :discussion-karma="authorDiscussionKarma"
+                    :account-created="authorAccountCreated"
+                  />
+                </div>
+                <AddToDiscussionFavorites
+                  v-if="discussion && isAuthenticatedVar"
+                  :discussion-id="discussion.id"
+                  :discussion-title="discussion.title"
+                  size="small"
                 />
               </div>
 
