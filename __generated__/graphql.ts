@@ -36680,7 +36680,7 @@ export type Mutation = {
   deleteWikiPages: DeleteInfo;
   dropDataForCypressTests?: Maybe<DropDataResponse>;
   enableServerPlugin: InstalledPlugin;
-  initializeUserFavorites: Collection;
+  initializeUserFavorites: Scalars['Boolean']['output'];
   installPluginVersion: InstalledPlugin;
   inviteForumMod?: Maybe<Scalars['Boolean']['output']>;
   inviteForumOwner?: Maybe<Scalars['Boolean']['output']>;
@@ -40651,9 +40651,6 @@ export type Query = {
   moderationProfiles: Array<ModerationProfile>;
   moderationProfilesAggregate: ModerationProfileAggregateSelection;
   moderationProfilesConnection: ModerationProfilesConnection;
-  myCollections: Array<Collection>;
-  myFavorites?: Maybe<Collection>;
-  myOwnedDownloads: Array<PluginVersion>;
   notifications: Array<Notification>;
   notificationsAggregate: NotificationAggregateSelection;
   notificationsConnection: NotificationsConnection;
@@ -49936,9 +49933,18 @@ export type User = {
   FavoriteChannels: Array<Channel>;
   FavoriteChannelsAggregate?: Maybe<UserChannelFavoriteChannelsAggregationSelection>;
   FavoriteChannelsConnection: UserFavoriteChannelsConnection;
-  FavoriteCollection?: Maybe<Collection>;
-  FavoriteCollectionAggregate?: Maybe<UserCollectionFavoriteCollectionAggregationSelection>;
-  FavoriteCollectionConnection: UserFavoriteCollectionConnection;
+  FavoriteComments: Array<Comment>;
+  FavoriteCommentsAggregate?: Maybe<UserCommentFavoriteCommentsAggregationSelection>;
+  FavoriteCommentsConnection: UserFavoriteCommentsConnection;
+  FavoriteDiscussions: Array<Discussion>;
+  FavoriteDiscussionsAggregate?: Maybe<UserDiscussionFavoriteDiscussionsAggregationSelection>;
+  FavoriteDiscussionsConnection: UserFavoriteDiscussionsConnection;
+  FavoriteDownloads: Array<Discussion>;
+  FavoriteDownloadsAggregate?: Maybe<UserDiscussionFavoriteDownloadsAggregationSelection>;
+  FavoriteDownloadsConnection: UserFavoriteDownloadsConnection;
+  FavoriteImages: Array<Image>;
+  FavoriteImagesAggregate?: Maybe<UserImageFavoriteImagesAggregationSelection>;
+  FavoriteImagesConnection: UserFavoriteImagesConnection;
   Images: Array<Image>;
   ImagesAggregate?: Maybe<UserImageImagesAggregationSelection>;
   ImagesConnection: UserImagesConnection;
@@ -49951,8 +49957,8 @@ export type User = {
   Notifications: Array<Notification>;
   NotificationsAggregate?: Maybe<UserNotificationNotificationsAggregationSelection>;
   NotificationsConnection: UserNotificationsConnection;
-  OwnedDownloads: Array<PluginVersion>;
-  OwnedDownloadsAggregate?: Maybe<UserPluginVersionOwnedDownloadsAggregationSelection>;
+  OwnedDownloads: Array<Discussion>;
+  OwnedDownloadsAggregate?: Maybe<UserDiscussionOwnedDownloadsAggregationSelection>;
   OwnedDownloadsConnection: UserOwnedDownloadsConnection;
   PendingModInvites: Array<Channel>;
   PendingModInvitesAggregate?: Maybe<UserChannelPendingModInvitesAggregationSelection>;
@@ -50251,25 +50257,91 @@ export type UserFavoriteChannelsConnectionArgs = {
 };
 
 
-export type UserFavoriteCollectionArgs = {
+export type UserFavoriteCommentsArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
-  options?: InputMaybe<CollectionOptions>;
-  where?: InputMaybe<CollectionWhere>;
+  options?: InputMaybe<CommentOptions>;
+  where?: InputMaybe<CommentWhere>;
 };
 
 
-export type UserFavoriteCollectionAggregateArgs = {
+export type UserFavoriteCommentsAggregateArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
-  where?: InputMaybe<CollectionWhere>;
+  where?: InputMaybe<CommentWhere>;
 };
 
 
-export type UserFavoriteCollectionConnectionArgs = {
+export type UserFavoriteCommentsConnectionArgs = {
   after?: InputMaybe<Scalars['String']['input']>;
   directed?: InputMaybe<Scalars['Boolean']['input']>;
   first?: InputMaybe<Scalars['Int']['input']>;
-  sort?: InputMaybe<Array<UserFavoriteCollectionConnectionSort>>;
-  where?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
+  sort?: InputMaybe<Array<UserFavoriteCommentsConnectionSort>>;
+  where?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+};
+
+
+export type UserFavoriteDiscussionsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
+  where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type UserFavoriteDiscussionsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type UserFavoriteDiscussionsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserFavoriteDiscussionsConnectionSort>>;
+  where?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+};
+
+
+export type UserFavoriteDownloadsArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<DiscussionOptions>;
+  where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type UserFavoriteDownloadsAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<DiscussionWhere>;
+};
+
+
+export type UserFavoriteDownloadsConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserFavoriteDownloadsConnectionSort>>;
+  where?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+};
+
+
+export type UserFavoriteImagesArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  options?: InputMaybe<ImageOptions>;
+  where?: InputMaybe<ImageWhere>;
+};
+
+
+export type UserFavoriteImagesAggregateArgs = {
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  where?: InputMaybe<ImageWhere>;
+};
+
+
+export type UserFavoriteImagesConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  directed?: InputMaybe<Scalars['Boolean']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<UserFavoriteImagesConnectionSort>>;
+  where?: InputMaybe<UserFavoriteImagesConnectionWhere>;
 };
 
 
@@ -50363,14 +50435,14 @@ export type UserNotificationsConnectionArgs = {
 
 export type UserOwnedDownloadsArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
-  options?: InputMaybe<PluginVersionOptions>;
-  where?: InputMaybe<PluginVersionWhere>;
+  options?: InputMaybe<DiscussionOptions>;
+  where?: InputMaybe<DiscussionWhere>;
 };
 
 
 export type UserOwnedDownloadsAggregateArgs = {
   directed?: InputMaybe<Scalars['Boolean']['input']>;
-  where?: InputMaybe<PluginVersionWhere>;
+  where?: InputMaybe<DiscussionWhere>;
 };
 
 
@@ -51496,21 +51568,6 @@ export type UserCollectionCollectionsNodeAggregateSelection = {
   updatedAt: DateTimeAggregateSelection;
 };
 
-export type UserCollectionFavoriteCollectionAggregationSelection = {
-  __typename?: 'UserCollectionFavoriteCollectionAggregationSelection';
-  count: Scalars['Int']['output'];
-  node?: Maybe<UserCollectionFavoriteCollectionNodeAggregateSelection>;
-};
-
-export type UserCollectionFavoriteCollectionNodeAggregateSelection = {
-  __typename?: 'UserCollectionFavoriteCollectionNodeAggregateSelection';
-  createdAt: DateTimeAggregateSelection;
-  description: StringAggregateSelection;
-  id: IdAggregateSelection;
-  name: StringAggregateSelection;
-  updatedAt: DateTimeAggregateSelection;
-};
-
 export type UserCollectionsAggregateInput = {
   AND?: InputMaybe<Array<UserCollectionsAggregateInput>>;
   NOT?: InputMaybe<UserCollectionsAggregateInput>;
@@ -51659,6 +51716,21 @@ export type UserCommentCommentsAggregationSelection = {
 
 export type UserCommentCommentsNodeAggregateSelection = {
   __typename?: 'UserCommentCommentsNodeAggregateSelection';
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  text: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+  weightedVotesCount: FloatAggregateSelection;
+};
+
+export type UserCommentFavoriteCommentsAggregationSelection = {
+  __typename?: 'UserCommentFavoriteCommentsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserCommentFavoriteCommentsNodeAggregateSelection>;
+};
+
+export type UserCommentFavoriteCommentsNodeAggregateSelection = {
+  __typename?: 'UserCommentFavoriteCommentsNodeAggregateSelection';
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
   text: StringAggregateSelection;
@@ -51838,7 +51910,10 @@ export type UserConnectInput = {
   Email?: InputMaybe<UserEmailConnectFieldInput>;
   Events?: InputMaybe<Array<UserEventsConnectFieldInput>>;
   FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsConnectFieldInput>>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionConnectFieldInput>;
+  FavoriteComments?: InputMaybe<Array<UserFavoriteCommentsConnectFieldInput>>;
+  FavoriteDiscussions?: InputMaybe<Array<UserFavoriteDiscussionsConnectFieldInput>>;
+  FavoriteDownloads?: InputMaybe<Array<UserFavoriteDownloadsConnectFieldInput>>;
+  FavoriteImages?: InputMaybe<Array<UserFavoriteImagesConnectFieldInput>>;
   Images?: InputMaybe<Array<UserImagesConnectFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsConnectFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileConnectFieldInput>;
@@ -51890,7 +51965,10 @@ export type UserConnectedRelationships = {
   Email?: Maybe<UserEmailConnectedRelationship>;
   Events?: Maybe<UserEventsConnectedRelationship>;
   FavoriteChannels?: Maybe<UserFavoriteChannelsConnectedRelationship>;
-  FavoriteCollection?: Maybe<UserFavoriteCollectionConnectedRelationship>;
+  FavoriteComments?: Maybe<UserFavoriteCommentsConnectedRelationship>;
+  FavoriteDiscussions?: Maybe<UserFavoriteDiscussionsConnectedRelationship>;
+  FavoriteDownloads?: Maybe<UserFavoriteDownloadsConnectedRelationship>;
+  FavoriteImages?: Maybe<UserFavoriteImagesConnectedRelationship>;
   Images?: Maybe<UserImagesConnectedRelationship>;
   ModOfChannels?: Maybe<UserModOfChannelsConnectedRelationship>;
   ModerationProfile?: Maybe<UserModerationProfileConnectedRelationship>;
@@ -51920,7 +51998,10 @@ export type UserCreateInput = {
   Email?: InputMaybe<UserEmailFieldInput>;
   Events?: InputMaybe<UserEventsFieldInput>;
   FavoriteChannels?: InputMaybe<UserFavoriteChannelsFieldInput>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionFieldInput>;
+  FavoriteComments?: InputMaybe<UserFavoriteCommentsFieldInput>;
+  FavoriteDiscussions?: InputMaybe<UserFavoriteDiscussionsFieldInput>;
+  FavoriteDownloads?: InputMaybe<UserFavoriteDownloadsFieldInput>;
+  FavoriteImages?: InputMaybe<UserFavoriteImagesFieldInput>;
   Images?: InputMaybe<UserImagesFieldInput>;
   ModOfChannels?: InputMaybe<UserModOfChannelsFieldInput>;
   ModerationProfile?: InputMaybe<UserModerationProfileFieldInput>;
@@ -52125,7 +52206,10 @@ export type UserDeleteInput = {
   Email?: InputMaybe<UserEmailDeleteFieldInput>;
   Events?: InputMaybe<Array<UserEventsDeleteFieldInput>>;
   FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsDeleteFieldInput>>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionDeleteFieldInput>;
+  FavoriteComments?: InputMaybe<Array<UserFavoriteCommentsDeleteFieldInput>>;
+  FavoriteDiscussions?: InputMaybe<Array<UserFavoriteDiscussionsDeleteFieldInput>>;
+  FavoriteDownloads?: InputMaybe<Array<UserFavoriteDownloadsDeleteFieldInput>>;
+  FavoriteImages?: InputMaybe<Array<UserFavoriteImagesDeleteFieldInput>>;
   Images?: InputMaybe<Array<UserImagesDeleteFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsDeleteFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileDeleteFieldInput>;
@@ -52162,7 +52246,10 @@ export type UserDisconnectInput = {
   Email?: InputMaybe<UserEmailDisconnectFieldInput>;
   Events?: InputMaybe<Array<UserEventsDisconnectFieldInput>>;
   FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsDisconnectFieldInput>>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionDisconnectFieldInput>;
+  FavoriteComments?: InputMaybe<Array<UserFavoriteCommentsDisconnectFieldInput>>;
+  FavoriteDiscussions?: InputMaybe<Array<UserFavoriteDiscussionsDisconnectFieldInput>>;
+  FavoriteDownloads?: InputMaybe<Array<UserFavoriteDownloadsDisconnectFieldInput>>;
+  FavoriteImages?: InputMaybe<Array<UserFavoriteImagesDisconnectFieldInput>>;
   Images?: InputMaybe<Array<UserImagesDisconnectFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsDisconnectFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileDisconnectFieldInput>;
@@ -52203,6 +52290,51 @@ export type UserDiscussionDiscussionsAggregationSelection = {
 
 export type UserDiscussionDiscussionsNodeAggregateSelection = {
   __typename?: 'UserDiscussionDiscussionsNodeAggregateSelection';
+  body: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type UserDiscussionFavoriteDiscussionsAggregationSelection = {
+  __typename?: 'UserDiscussionFavoriteDiscussionsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserDiscussionFavoriteDiscussionsNodeAggregateSelection>;
+};
+
+export type UserDiscussionFavoriteDiscussionsNodeAggregateSelection = {
+  __typename?: 'UserDiscussionFavoriteDiscussionsNodeAggregateSelection';
+  body: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type UserDiscussionFavoriteDownloadsAggregationSelection = {
+  __typename?: 'UserDiscussionFavoriteDownloadsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserDiscussionFavoriteDownloadsNodeAggregateSelection>;
+};
+
+export type UserDiscussionFavoriteDownloadsNodeAggregateSelection = {
+  __typename?: 'UserDiscussionFavoriteDownloadsNodeAggregateSelection';
+  body: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  title: StringAggregateSelection;
+  updatedAt: DateTimeAggregateSelection;
+};
+
+export type UserDiscussionOwnedDownloadsAggregationSelection = {
+  __typename?: 'UserDiscussionOwnedDownloadsAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserDiscussionOwnedDownloadsNodeAggregateSelection>;
+};
+
+export type UserDiscussionOwnedDownloadsNodeAggregateSelection = {
+  __typename?: 'UserDiscussionOwnedDownloadsNodeAggregateSelection';
   body: StringAggregateSelection;
   createdAt: DateTimeAggregateSelection;
   id: IdAggregateSelection;
@@ -53048,71 +53180,71 @@ export type UserFavoriteChannelsUpdateFieldInput = {
   where?: InputMaybe<UserFavoriteChannelsConnectionWhere>;
 };
 
-export type UserFavoriteCollectionAggregateInput = {
-  AND?: InputMaybe<Array<UserFavoriteCollectionAggregateInput>>;
-  NOT?: InputMaybe<UserFavoriteCollectionAggregateInput>;
-  OR?: InputMaybe<Array<UserFavoriteCollectionAggregateInput>>;
+export type UserFavoriteCommentsAggregateInput = {
+  AND?: InputMaybe<Array<UserFavoriteCommentsAggregateInput>>;
+  NOT?: InputMaybe<UserFavoriteCommentsAggregateInput>;
+  OR?: InputMaybe<Array<UserFavoriteCommentsAggregateInput>>;
   count?: InputMaybe<Scalars['Int']['input']>;
   count_GT?: InputMaybe<Scalars['Int']['input']>;
   count_GTE?: InputMaybe<Scalars['Int']['input']>;
   count_LT?: InputMaybe<Scalars['Int']['input']>;
   count_LTE?: InputMaybe<Scalars['Int']['input']>;
-  node?: InputMaybe<UserFavoriteCollectionNodeAggregationWhereInput>;
+  node?: InputMaybe<UserFavoriteCommentsNodeAggregationWhereInput>;
 };
 
-export type UserFavoriteCollectionConnectFieldInput = {
-  connect?: InputMaybe<CollectionConnectInput>;
+export type UserFavoriteCommentsConnectFieldInput = {
+  connect?: InputMaybe<Array<CommentConnectInput>>;
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
-  where?: InputMaybe<CollectionConnectWhere>;
+  where?: InputMaybe<CommentConnectWhere>;
 };
 
-export type UserFavoriteCollectionConnectedRelationship = {
-  __typename?: 'UserFavoriteCollectionConnectedRelationship';
-  node: CollectionEventPayload;
+export type UserFavoriteCommentsConnectedRelationship = {
+  __typename?: 'UserFavoriteCommentsConnectedRelationship';
+  node: CommentEventPayload;
 };
 
-export type UserFavoriteCollectionConnection = {
-  __typename?: 'UserFavoriteCollectionConnection';
-  edges: Array<UserFavoriteCollectionRelationship>;
+export type UserFavoriteCommentsConnection = {
+  __typename?: 'UserFavoriteCommentsConnection';
+  edges: Array<UserFavoriteCommentsRelationship>;
   pageInfo: PageInfo;
   totalCount: Scalars['Int']['output'];
 };
 
-export type UserFavoriteCollectionConnectionSort = {
-  node?: InputMaybe<CollectionSort>;
+export type UserFavoriteCommentsConnectionSort = {
+  node?: InputMaybe<CommentSort>;
 };
 
-export type UserFavoriteCollectionConnectionWhere = {
-  AND?: InputMaybe<Array<UserFavoriteCollectionConnectionWhere>>;
-  NOT?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
-  OR?: InputMaybe<Array<UserFavoriteCollectionConnectionWhere>>;
-  node?: InputMaybe<CollectionWhere>;
+export type UserFavoriteCommentsConnectionWhere = {
+  AND?: InputMaybe<Array<UserFavoriteCommentsConnectionWhere>>;
+  NOT?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+  OR?: InputMaybe<Array<UserFavoriteCommentsConnectionWhere>>;
+  node?: InputMaybe<CommentWhere>;
 };
 
-export type UserFavoriteCollectionCreateFieldInput = {
-  node: CollectionCreateInput;
+export type UserFavoriteCommentsCreateFieldInput = {
+  node: CommentCreateInput;
 };
 
-export type UserFavoriteCollectionDeleteFieldInput = {
-  delete?: InputMaybe<CollectionDeleteInput>;
-  where?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
+export type UserFavoriteCommentsDeleteFieldInput = {
+  delete?: InputMaybe<CommentDeleteInput>;
+  where?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
 };
 
-export type UserFavoriteCollectionDisconnectFieldInput = {
-  disconnect?: InputMaybe<CollectionDisconnectInput>;
-  where?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
+export type UserFavoriteCommentsDisconnectFieldInput = {
+  disconnect?: InputMaybe<CommentDisconnectInput>;
+  where?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
 };
 
-export type UserFavoriteCollectionFieldInput = {
-  connect?: InputMaybe<UserFavoriteCollectionConnectFieldInput>;
-  create?: InputMaybe<UserFavoriteCollectionCreateFieldInput>;
+export type UserFavoriteCommentsFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteCommentsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteCommentsCreateFieldInput>>;
 };
 
-export type UserFavoriteCollectionNodeAggregationWhereInput = {
-  AND?: InputMaybe<Array<UserFavoriteCollectionNodeAggregationWhereInput>>;
-  NOT?: InputMaybe<UserFavoriteCollectionNodeAggregationWhereInput>;
-  OR?: InputMaybe<Array<UserFavoriteCollectionNodeAggregationWhereInput>>;
+export type UserFavoriteCommentsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserFavoriteCommentsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserFavoriteCommentsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserFavoriteCommentsNodeAggregationWhereInput>>;
   createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -53123,36 +53255,181 @@ export type UserFavoriteCollectionNodeAggregationWhereInput = {
   createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
   createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
-  description_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  description_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  description_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  description_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  description_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  description_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  description_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  description_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  description_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  description_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  description_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  description_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  description_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  description_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  description_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  name_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  name_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  name_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  name_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  name_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  name_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  name_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  name_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  name_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  name_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  name_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  name_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  name_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  name_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  name_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  text_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  text_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  text_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  weightedVotesCount_AVERAGE_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_AVERAGE_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MAX_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_MIN_LTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_GT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_GTE?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_LT?: InputMaybe<Scalars['Float']['input']>;
+  weightedVotesCount_SUM_LTE?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type UserFavoriteCommentsRelationship = {
+  __typename?: 'UserFavoriteCommentsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Comment;
+};
+
+export type UserFavoriteCommentsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<CommentSubscriptionWhere>;
+};
+
+export type UserFavoriteCommentsUpdateConnectionInput = {
+  node?: InputMaybe<CommentUpdateInput>;
+};
+
+export type UserFavoriteCommentsUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteCommentsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteCommentsCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserFavoriteCommentsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserFavoriteCommentsDisconnectFieldInput>>;
+  update?: InputMaybe<UserFavoriteCommentsUpdateConnectionInput>;
+  where?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+};
+
+export type UserFavoriteDiscussionsAggregateInput = {
+  AND?: InputMaybe<Array<UserFavoriteDiscussionsAggregateInput>>;
+  NOT?: InputMaybe<UserFavoriteDiscussionsAggregateInput>;
+  OR?: InputMaybe<Array<UserFavoriteDiscussionsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserFavoriteDiscussionsNodeAggregationWhereInput>;
+};
+
+export type UserFavoriteDiscussionsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiscussionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type UserFavoriteDiscussionsConnectedRelationship = {
+  __typename?: 'UserFavoriteDiscussionsConnectedRelationship';
+  node: DiscussionEventPayload;
+};
+
+export type UserFavoriteDiscussionsConnection = {
+  __typename?: 'UserFavoriteDiscussionsConnection';
+  edges: Array<UserFavoriteDiscussionsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserFavoriteDiscussionsConnectionSort = {
+  node?: InputMaybe<DiscussionSort>;
+};
+
+export type UserFavoriteDiscussionsConnectionWhere = {
+  AND?: InputMaybe<Array<UserFavoriteDiscussionsConnectionWhere>>;
+  NOT?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+  OR?: InputMaybe<Array<UserFavoriteDiscussionsConnectionWhere>>;
+  node?: InputMaybe<DiscussionWhere>;
+};
+
+export type UserFavoriteDiscussionsCreateFieldInput = {
+  node: DiscussionCreateInput;
+};
+
+export type UserFavoriteDiscussionsDeleteFieldInput = {
+  delete?: InputMaybe<DiscussionDeleteInput>;
+  where?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+};
+
+export type UserFavoriteDiscussionsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiscussionDisconnectInput>;
+  where?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+};
+
+export type UserFavoriteDiscussionsFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteDiscussionsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteDiscussionsCreateFieldInput>>;
+};
+
+export type UserFavoriteDiscussionsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserFavoriteDiscussionsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserFavoriteDiscussionsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserFavoriteDiscussionsNodeAggregationWhereInput>>;
+  body_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  body_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  title_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
   updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
   updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
@@ -53165,27 +53442,402 @@ export type UserFavoriteCollectionNodeAggregationWhereInput = {
   updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-export type UserFavoriteCollectionRelationship = {
-  __typename?: 'UserFavoriteCollectionRelationship';
+export type UserFavoriteDiscussionsRelationship = {
+  __typename?: 'UserFavoriteDiscussionsRelationship';
   cursor: Scalars['String']['output'];
-  node: Collection;
+  node: Discussion;
 };
 
-export type UserFavoriteCollectionRelationshipSubscriptionWhere = {
-  node?: InputMaybe<CollectionSubscriptionWhere>;
+export type UserFavoriteDiscussionsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
 };
 
-export type UserFavoriteCollectionUpdateConnectionInput = {
-  node?: InputMaybe<CollectionUpdateInput>;
+export type UserFavoriteDiscussionsUpdateConnectionInput = {
+  node?: InputMaybe<DiscussionUpdateInput>;
 };
 
-export type UserFavoriteCollectionUpdateFieldInput = {
-  connect?: InputMaybe<UserFavoriteCollectionConnectFieldInput>;
-  create?: InputMaybe<UserFavoriteCollectionCreateFieldInput>;
-  delete?: InputMaybe<UserFavoriteCollectionDeleteFieldInput>;
-  disconnect?: InputMaybe<UserFavoriteCollectionDisconnectFieldInput>;
-  update?: InputMaybe<UserFavoriteCollectionUpdateConnectionInput>;
-  where?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
+export type UserFavoriteDiscussionsUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteDiscussionsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteDiscussionsCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserFavoriteDiscussionsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserFavoriteDiscussionsDisconnectFieldInput>>;
+  update?: InputMaybe<UserFavoriteDiscussionsUpdateConnectionInput>;
+  where?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+};
+
+export type UserFavoriteDownloadsAggregateInput = {
+  AND?: InputMaybe<Array<UserFavoriteDownloadsAggregateInput>>;
+  NOT?: InputMaybe<UserFavoriteDownloadsAggregateInput>;
+  OR?: InputMaybe<Array<UserFavoriteDownloadsAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserFavoriteDownloadsNodeAggregationWhereInput>;
+};
+
+export type UserFavoriteDownloadsConnectFieldInput = {
+  connect?: InputMaybe<Array<DiscussionConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<DiscussionConnectWhere>;
+};
+
+export type UserFavoriteDownloadsConnectedRelationship = {
+  __typename?: 'UserFavoriteDownloadsConnectedRelationship';
+  node: DiscussionEventPayload;
+};
+
+export type UserFavoriteDownloadsConnection = {
+  __typename?: 'UserFavoriteDownloadsConnection';
+  edges: Array<UserFavoriteDownloadsRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserFavoriteDownloadsConnectionSort = {
+  node?: InputMaybe<DiscussionSort>;
+};
+
+export type UserFavoriteDownloadsConnectionWhere = {
+  AND?: InputMaybe<Array<UserFavoriteDownloadsConnectionWhere>>;
+  NOT?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+  OR?: InputMaybe<Array<UserFavoriteDownloadsConnectionWhere>>;
+  node?: InputMaybe<DiscussionWhere>;
+};
+
+export type UserFavoriteDownloadsCreateFieldInput = {
+  node: DiscussionCreateInput;
+};
+
+export type UserFavoriteDownloadsDeleteFieldInput = {
+  delete?: InputMaybe<DiscussionDeleteInput>;
+  where?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+};
+
+export type UserFavoriteDownloadsDisconnectFieldInput = {
+  disconnect?: InputMaybe<DiscussionDisconnectInput>;
+  where?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+};
+
+export type UserFavoriteDownloadsFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteDownloadsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteDownloadsCreateFieldInput>>;
+};
+
+export type UserFavoriteDownloadsNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserFavoriteDownloadsNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserFavoriteDownloadsNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserFavoriteDownloadsNodeAggregationWhereInput>>;
+  body_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  body_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  title_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type UserFavoriteDownloadsRelationship = {
+  __typename?: 'UserFavoriteDownloadsRelationship';
+  cursor: Scalars['String']['output'];
+  node: Discussion;
+};
+
+export type UserFavoriteDownloadsRelationshipSubscriptionWhere = {
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
+};
+
+export type UserFavoriteDownloadsUpdateConnectionInput = {
+  node?: InputMaybe<DiscussionUpdateInput>;
+};
+
+export type UserFavoriteDownloadsUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteDownloadsConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteDownloadsCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserFavoriteDownloadsDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserFavoriteDownloadsDisconnectFieldInput>>;
+  update?: InputMaybe<UserFavoriteDownloadsUpdateConnectionInput>;
+  where?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+};
+
+export type UserFavoriteImagesAggregateInput = {
+  AND?: InputMaybe<Array<UserFavoriteImagesAggregateInput>>;
+  NOT?: InputMaybe<UserFavoriteImagesAggregateInput>;
+  OR?: InputMaybe<Array<UserFavoriteImagesAggregateInput>>;
+  count?: InputMaybe<Scalars['Int']['input']>;
+  count_GT?: InputMaybe<Scalars['Int']['input']>;
+  count_GTE?: InputMaybe<Scalars['Int']['input']>;
+  count_LT?: InputMaybe<Scalars['Int']['input']>;
+  count_LTE?: InputMaybe<Scalars['Int']['input']>;
+  node?: InputMaybe<UserFavoriteImagesNodeAggregationWhereInput>;
+};
+
+export type UserFavoriteImagesConnectFieldInput = {
+  connect?: InputMaybe<Array<ImageConnectInput>>;
+  /** Whether or not to overwrite any matching relationship with the new properties. */
+  overwrite?: Scalars['Boolean']['input'];
+  where?: InputMaybe<ImageConnectWhere>;
+};
+
+export type UserFavoriteImagesConnectedRelationship = {
+  __typename?: 'UserFavoriteImagesConnectedRelationship';
+  node: ImageEventPayload;
+};
+
+export type UserFavoriteImagesConnection = {
+  __typename?: 'UserFavoriteImagesConnection';
+  edges: Array<UserFavoriteImagesRelationship>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserFavoriteImagesConnectionSort = {
+  node?: InputMaybe<ImageSort>;
+};
+
+export type UserFavoriteImagesConnectionWhere = {
+  AND?: InputMaybe<Array<UserFavoriteImagesConnectionWhere>>;
+  NOT?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+  OR?: InputMaybe<Array<UserFavoriteImagesConnectionWhere>>;
+  node?: InputMaybe<ImageWhere>;
+};
+
+export type UserFavoriteImagesCreateFieldInput = {
+  node: ImageCreateInput;
+};
+
+export type UserFavoriteImagesDeleteFieldInput = {
+  delete?: InputMaybe<ImageDeleteInput>;
+  where?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+};
+
+export type UserFavoriteImagesDisconnectFieldInput = {
+  disconnect?: InputMaybe<ImageDisconnectInput>;
+  where?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+};
+
+export type UserFavoriteImagesFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteImagesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteImagesCreateFieldInput>>;
+};
+
+export type UserFavoriteImagesNodeAggregationWhereInput = {
+  AND?: InputMaybe<Array<UserFavoriteImagesNodeAggregationWhereInput>>;
+  NOT?: InputMaybe<UserFavoriteImagesNodeAggregationWhereInput>;
+  OR?: InputMaybe<Array<UserFavoriteImagesNodeAggregationWhereInput>>;
+  alt_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  alt_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  alt_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  alt_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  alt_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  alt_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  alt_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  alt_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  alt_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  alt_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  alt_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  alt_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  alt_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  alt_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  alt_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  caption_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  caption_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  caption_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  caption_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  caption_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  caption_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  caption_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  caption_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  caption_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  caption_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  caption_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  caption_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  caption_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  caption_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  caption_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  copyright_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  copyright_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  copyright_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  copyright_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  copyright_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  copyright_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  copyright_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  copyright_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  copyright_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  copyright_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  copyright_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  copyright_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  copyright_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  copyright_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  copyright_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  longDescription_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  longDescription_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  longDescription_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  longDescription_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  longDescription_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  longDescription_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  longDescription_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  originalCaption_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  originalCaption_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  originalCaption_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  originalCaption_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  originalCaption_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  originalCaption_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  originalContext_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  originalContext_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  originalContext_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  originalContext_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  originalContext_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  originalContext_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  scanCheckedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  scanCheckedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  url_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  url_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  url_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  url_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  url_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  url_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  url_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  url_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  url_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  url_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  url_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  url_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  url_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  url_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  url_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UserFavoriteImagesRelationship = {
+  __typename?: 'UserFavoriteImagesRelationship';
+  cursor: Scalars['String']['output'];
+  node: Image;
+};
+
+export type UserFavoriteImagesRelationshipSubscriptionWhere = {
+  node?: InputMaybe<ImageSubscriptionWhere>;
+};
+
+export type UserFavoriteImagesUpdateConnectionInput = {
+  node?: InputMaybe<ImageUpdateInput>;
+};
+
+export type UserFavoriteImagesUpdateFieldInput = {
+  connect?: InputMaybe<Array<UserFavoriteImagesConnectFieldInput>>;
+  create?: InputMaybe<Array<UserFavoriteImagesCreateFieldInput>>;
+  delete?: InputMaybe<Array<UserFavoriteImagesDeleteFieldInput>>;
+  disconnect?: InputMaybe<Array<UserFavoriteImagesDisconnectFieldInput>>;
+  update?: InputMaybe<UserFavoriteImagesUpdateConnectionInput>;
+  where?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+};
+
+export type UserImageFavoriteImagesAggregationSelection = {
+  __typename?: 'UserImageFavoriteImagesAggregationSelection';
+  count: Scalars['Int']['output'];
+  node?: Maybe<UserImageFavoriteImagesNodeAggregateSelection>;
+};
+
+export type UserImageFavoriteImagesNodeAggregateSelection = {
+  __typename?: 'UserImageFavoriteImagesNodeAggregateSelection';
+  alt: StringAggregateSelection;
+  caption: StringAggregateSelection;
+  copyright: StringAggregateSelection;
+  createdAt: DateTimeAggregateSelection;
+  id: IdAggregateSelection;
+  longDescription: StringAggregateSelection;
+  originalCaption: StringAggregateSelection;
+  originalContext: StringAggregateSelection;
+  scanCheckedAt: DateTimeAggregateSelection;
+  url: StringAggregateSelection;
 };
 
 export type UserImageImagesAggregationSelection = {
@@ -54226,15 +54878,15 @@ export type UserOwnedDownloadsAggregateInput = {
 };
 
 export type UserOwnedDownloadsConnectFieldInput = {
-  connect?: InputMaybe<Array<PluginVersionConnectInput>>;
+  connect?: InputMaybe<Array<DiscussionConnectInput>>;
   /** Whether or not to overwrite any matching relationship with the new properties. */
   overwrite?: Scalars['Boolean']['input'];
-  where?: InputMaybe<PluginVersionConnectWhere>;
+  where?: InputMaybe<DiscussionConnectWhere>;
 };
 
 export type UserOwnedDownloadsConnectedRelationship = {
   __typename?: 'UserOwnedDownloadsConnectedRelationship';
-  node: PluginVersionEventPayload;
+  node: DiscussionEventPayload;
 };
 
 export type UserOwnedDownloadsConnection = {
@@ -54245,27 +54897,27 @@ export type UserOwnedDownloadsConnection = {
 };
 
 export type UserOwnedDownloadsConnectionSort = {
-  node?: InputMaybe<PluginVersionSort>;
+  node?: InputMaybe<DiscussionSort>;
 };
 
 export type UserOwnedDownloadsConnectionWhere = {
   AND?: InputMaybe<Array<UserOwnedDownloadsConnectionWhere>>;
   NOT?: InputMaybe<UserOwnedDownloadsConnectionWhere>;
   OR?: InputMaybe<Array<UserOwnedDownloadsConnectionWhere>>;
-  node?: InputMaybe<PluginVersionWhere>;
+  node?: InputMaybe<DiscussionWhere>;
 };
 
 export type UserOwnedDownloadsCreateFieldInput = {
-  node: PluginVersionCreateInput;
+  node: DiscussionCreateInput;
 };
 
 export type UserOwnedDownloadsDeleteFieldInput = {
-  delete?: InputMaybe<PluginVersionDeleteInput>;
+  delete?: InputMaybe<DiscussionDeleteInput>;
   where?: InputMaybe<UserOwnedDownloadsConnectionWhere>;
 };
 
 export type UserOwnedDownloadsDisconnectFieldInput = {
-  disconnect?: InputMaybe<PluginVersionDisconnectInput>;
+  disconnect?: InputMaybe<DiscussionDisconnectInput>;
   where?: InputMaybe<UserOwnedDownloadsConnectionWhere>;
 };
 
@@ -54278,95 +54930,70 @@ export type UserOwnedDownloadsNodeAggregationWhereInput = {
   AND?: InputMaybe<Array<UserOwnedDownloadsNodeAggregationWhereInput>>;
   NOT?: InputMaybe<UserOwnedDownloadsNodeAggregationWhereInput>;
   OR?: InputMaybe<Array<UserOwnedDownloadsNodeAggregationWhereInput>>;
-  entryPath_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  entryPath_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  entryPath_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  entryPath_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  entryPath_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  entryPath_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  entryPath_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  integritySha256_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  integritySha256_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  integritySha256_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  integritySha256_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  integritySha256_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  integritySha256_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  repoUrl_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  repoUrl_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  repoUrl_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  repoUrl_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  repoUrl_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  repoUrl_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  tarballGsUri_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  tarballGsUri_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  tarballGsUri_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  tarballGsUri_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  tarballGsUri_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  tarballGsUri_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  version_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
-  version_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
-  version_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
-  version_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
-  version_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
-  version_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  version_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  version_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  version_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  version_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
-  version_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
-  version_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
-  version_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
-  version_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
-  version_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  body_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  body_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  body_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  createdAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  createdAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  title_AVERAGE_LENGTH_EQUAL?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_GTE?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LT?: InputMaybe<Scalars['Float']['input']>;
+  title_AVERAGE_LENGTH_LTE?: InputMaybe<Scalars['Float']['input']>;
+  title_LONGEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_LONGEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_EQUAL?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_GTE?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LT?: InputMaybe<Scalars['Int']['input']>;
+  title_SHORTEST_LENGTH_LTE?: InputMaybe<Scalars['Int']['input']>;
+  updatedAt_MAX_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MAX_LTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_EQUAL?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_GTE?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LT?: InputMaybe<Scalars['DateTime']['input']>;
+  updatedAt_MIN_LTE?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type UserOwnedDownloadsRelationship = {
   __typename?: 'UserOwnedDownloadsRelationship';
   cursor: Scalars['String']['output'];
-  node: PluginVersion;
+  node: Discussion;
 };
 
 export type UserOwnedDownloadsRelationshipSubscriptionWhere = {
-  node?: InputMaybe<PluginVersionSubscriptionWhere>;
+  node?: InputMaybe<DiscussionSubscriptionWhere>;
 };
 
 export type UserOwnedDownloadsUpdateConnectionInput = {
-  node?: InputMaybe<PluginVersionUpdateInput>;
+  node?: InputMaybe<DiscussionUpdateInput>;
 };
 
 export type UserOwnedDownloadsUpdateFieldInput = {
@@ -54790,22 +55417,6 @@ export type UserPendingOwnerInvitesUpdateFieldInput = {
   where?: InputMaybe<UserPendingOwnerInvitesConnectionWhere>;
 };
 
-export type UserPluginVersionOwnedDownloadsAggregationSelection = {
-  __typename?: 'UserPluginVersionOwnedDownloadsAggregationSelection';
-  count: Scalars['Int']['output'];
-  node?: Maybe<UserPluginVersionOwnedDownloadsNodeAggregateSelection>;
-};
-
-export type UserPluginVersionOwnedDownloadsNodeAggregateSelection = {
-  __typename?: 'UserPluginVersionOwnedDownloadsNodeAggregateSelection';
-  entryPath: StringAggregateSelection;
-  id: IdAggregateSelection;
-  integritySha256: StringAggregateSelection;
-  repoUrl: StringAggregateSelection;
-  tarballGsUri: StringAggregateSelection;
-  version: StringAggregateSelection;
-};
-
 export type UserPurchasePurchasesAggregationSelection = {
   __typename?: 'UserPurchasePurchasesAggregationSelection';
   count: Scalars['Int']['output'];
@@ -55173,7 +55784,10 @@ export type UserRelationInput = {
   Email?: InputMaybe<UserEmailCreateFieldInput>;
   Events?: InputMaybe<Array<UserEventsCreateFieldInput>>;
   FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsCreateFieldInput>>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionCreateFieldInput>;
+  FavoriteComments?: InputMaybe<Array<UserFavoriteCommentsCreateFieldInput>>;
+  FavoriteDiscussions?: InputMaybe<Array<UserFavoriteDiscussionsCreateFieldInput>>;
+  FavoriteDownloads?: InputMaybe<Array<UserFavoriteDownloadsCreateFieldInput>>;
+  FavoriteImages?: InputMaybe<Array<UserFavoriteImagesCreateFieldInput>>;
   Images?: InputMaybe<Array<UserImagesCreateFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsCreateFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileCreateFieldInput>;
@@ -55237,7 +55851,10 @@ export type UserRelationshipsSubscriptionWhere = {
   Email?: InputMaybe<UserEmailRelationshipSubscriptionWhere>;
   Events?: InputMaybe<UserEventsRelationshipSubscriptionWhere>;
   FavoriteChannels?: InputMaybe<UserFavoriteChannelsRelationshipSubscriptionWhere>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionRelationshipSubscriptionWhere>;
+  FavoriteComments?: InputMaybe<UserFavoriteCommentsRelationshipSubscriptionWhere>;
+  FavoriteDiscussions?: InputMaybe<UserFavoriteDiscussionsRelationshipSubscriptionWhere>;
+  FavoriteDownloads?: InputMaybe<UserFavoriteDownloadsRelationshipSubscriptionWhere>;
+  FavoriteImages?: InputMaybe<UserFavoriteImagesRelationshipSubscriptionWhere>;
   Images?: InputMaybe<UserImagesRelationshipSubscriptionWhere>;
   ModOfChannels?: InputMaybe<UserModOfChannelsRelationshipSubscriptionWhere>;
   ModerationProfile?: InputMaybe<UserModerationProfileRelationshipSubscriptionWhere>;
@@ -55720,7 +56337,10 @@ export type UserUpdateInput = {
   Email?: InputMaybe<UserEmailUpdateFieldInput>;
   Events?: InputMaybe<Array<UserEventsUpdateFieldInput>>;
   FavoriteChannels?: InputMaybe<Array<UserFavoriteChannelsUpdateFieldInput>>;
-  FavoriteCollection?: InputMaybe<UserFavoriteCollectionUpdateFieldInput>;
+  FavoriteComments?: InputMaybe<Array<UserFavoriteCommentsUpdateFieldInput>>;
+  FavoriteDiscussions?: InputMaybe<Array<UserFavoriteDiscussionsUpdateFieldInput>>;
+  FavoriteDownloads?: InputMaybe<Array<UserFavoriteDownloadsUpdateFieldInput>>;
+  FavoriteImages?: InputMaybe<Array<UserFavoriteImagesUpdateFieldInput>>;
   Images?: InputMaybe<Array<UserImagesUpdateFieldInput>>;
   ModOfChannels?: InputMaybe<Array<UserModOfChannelsUpdateFieldInput>>;
   ModerationProfile?: InputMaybe<UserModerationProfileUpdateFieldInput>;
@@ -56229,11 +56849,74 @@ export type UserWhere = {
   FavoriteChannels_SINGLE?: InputMaybe<ChannelWhere>;
   /** Return Users where some of the related Channels match this filter */
   FavoriteChannels_SOME?: InputMaybe<ChannelWhere>;
-  FavoriteCollection?: InputMaybe<CollectionWhere>;
-  FavoriteCollectionAggregate?: InputMaybe<UserFavoriteCollectionAggregateInput>;
-  FavoriteCollectionConnection?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
-  FavoriteCollectionConnection_NOT?: InputMaybe<UserFavoriteCollectionConnectionWhere>;
-  FavoriteCollection_NOT?: InputMaybe<CollectionWhere>;
+  FavoriteCommentsAggregate?: InputMaybe<UserFavoriteCommentsAggregateInput>;
+  /** Return Users where all of the related UserFavoriteCommentsConnections match this filter */
+  FavoriteCommentsConnection_ALL?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+  /** Return Users where none of the related UserFavoriteCommentsConnections match this filter */
+  FavoriteCommentsConnection_NONE?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+  /** Return Users where one of the related UserFavoriteCommentsConnections match this filter */
+  FavoriteCommentsConnection_SINGLE?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+  /** Return Users where some of the related UserFavoriteCommentsConnections match this filter */
+  FavoriteCommentsConnection_SOME?: InputMaybe<UserFavoriteCommentsConnectionWhere>;
+  /** Return Users where all of the related Comments match this filter */
+  FavoriteComments_ALL?: InputMaybe<CommentWhere>;
+  /** Return Users where none of the related Comments match this filter */
+  FavoriteComments_NONE?: InputMaybe<CommentWhere>;
+  /** Return Users where one of the related Comments match this filter */
+  FavoriteComments_SINGLE?: InputMaybe<CommentWhere>;
+  /** Return Users where some of the related Comments match this filter */
+  FavoriteComments_SOME?: InputMaybe<CommentWhere>;
+  FavoriteDiscussionsAggregate?: InputMaybe<UserFavoriteDiscussionsAggregateInput>;
+  /** Return Users where all of the related UserFavoriteDiscussionsConnections match this filter */
+  FavoriteDiscussionsConnection_ALL?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+  /** Return Users where none of the related UserFavoriteDiscussionsConnections match this filter */
+  FavoriteDiscussionsConnection_NONE?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+  /** Return Users where one of the related UserFavoriteDiscussionsConnections match this filter */
+  FavoriteDiscussionsConnection_SINGLE?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+  /** Return Users where some of the related UserFavoriteDiscussionsConnections match this filter */
+  FavoriteDiscussionsConnection_SOME?: InputMaybe<UserFavoriteDiscussionsConnectionWhere>;
+  /** Return Users where all of the related Discussions match this filter */
+  FavoriteDiscussions_ALL?: InputMaybe<DiscussionWhere>;
+  /** Return Users where none of the related Discussions match this filter */
+  FavoriteDiscussions_NONE?: InputMaybe<DiscussionWhere>;
+  /** Return Users where one of the related Discussions match this filter */
+  FavoriteDiscussions_SINGLE?: InputMaybe<DiscussionWhere>;
+  /** Return Users where some of the related Discussions match this filter */
+  FavoriteDiscussions_SOME?: InputMaybe<DiscussionWhere>;
+  FavoriteDownloadsAggregate?: InputMaybe<UserFavoriteDownloadsAggregateInput>;
+  /** Return Users where all of the related UserFavoriteDownloadsConnections match this filter */
+  FavoriteDownloadsConnection_ALL?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+  /** Return Users where none of the related UserFavoriteDownloadsConnections match this filter */
+  FavoriteDownloadsConnection_NONE?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+  /** Return Users where one of the related UserFavoriteDownloadsConnections match this filter */
+  FavoriteDownloadsConnection_SINGLE?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+  /** Return Users where some of the related UserFavoriteDownloadsConnections match this filter */
+  FavoriteDownloadsConnection_SOME?: InputMaybe<UserFavoriteDownloadsConnectionWhere>;
+  /** Return Users where all of the related Discussions match this filter */
+  FavoriteDownloads_ALL?: InputMaybe<DiscussionWhere>;
+  /** Return Users where none of the related Discussions match this filter */
+  FavoriteDownloads_NONE?: InputMaybe<DiscussionWhere>;
+  /** Return Users where one of the related Discussions match this filter */
+  FavoriteDownloads_SINGLE?: InputMaybe<DiscussionWhere>;
+  /** Return Users where some of the related Discussions match this filter */
+  FavoriteDownloads_SOME?: InputMaybe<DiscussionWhere>;
+  FavoriteImagesAggregate?: InputMaybe<UserFavoriteImagesAggregateInput>;
+  /** Return Users where all of the related UserFavoriteImagesConnections match this filter */
+  FavoriteImagesConnection_ALL?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+  /** Return Users where none of the related UserFavoriteImagesConnections match this filter */
+  FavoriteImagesConnection_NONE?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+  /** Return Users where one of the related UserFavoriteImagesConnections match this filter */
+  FavoriteImagesConnection_SINGLE?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+  /** Return Users where some of the related UserFavoriteImagesConnections match this filter */
+  FavoriteImagesConnection_SOME?: InputMaybe<UserFavoriteImagesConnectionWhere>;
+  /** Return Users where all of the related Images match this filter */
+  FavoriteImages_ALL?: InputMaybe<ImageWhere>;
+  /** Return Users where none of the related Images match this filter */
+  FavoriteImages_NONE?: InputMaybe<ImageWhere>;
+  /** Return Users where one of the related Images match this filter */
+  FavoriteImages_SINGLE?: InputMaybe<ImageWhere>;
+  /** Return Users where some of the related Images match this filter */
+  FavoriteImages_SOME?: InputMaybe<ImageWhere>;
   ImagesAggregate?: InputMaybe<UserImagesAggregateInput>;
   /** Return Users where all of the related UserImagesConnections match this filter */
   ImagesConnection_ALL?: InputMaybe<UserImagesConnectionWhere>;
@@ -56301,14 +56984,14 @@ export type UserWhere = {
   OwnedDownloadsConnection_SINGLE?: InputMaybe<UserOwnedDownloadsConnectionWhere>;
   /** Return Users where some of the related UserOwnedDownloadsConnections match this filter */
   OwnedDownloadsConnection_SOME?: InputMaybe<UserOwnedDownloadsConnectionWhere>;
-  /** Return Users where all of the related PluginVersions match this filter */
-  OwnedDownloads_ALL?: InputMaybe<PluginVersionWhere>;
-  /** Return Users where none of the related PluginVersions match this filter */
-  OwnedDownloads_NONE?: InputMaybe<PluginVersionWhere>;
-  /** Return Users where one of the related PluginVersions match this filter */
-  OwnedDownloads_SINGLE?: InputMaybe<PluginVersionWhere>;
-  /** Return Users where some of the related PluginVersions match this filter */
-  OwnedDownloads_SOME?: InputMaybe<PluginVersionWhere>;
+  /** Return Users where all of the related Discussions match this filter */
+  OwnedDownloads_ALL?: InputMaybe<DiscussionWhere>;
+  /** Return Users where none of the related Discussions match this filter */
+  OwnedDownloads_NONE?: InputMaybe<DiscussionWhere>;
+  /** Return Users where one of the related Discussions match this filter */
+  OwnedDownloads_SINGLE?: InputMaybe<DiscussionWhere>;
+  /** Return Users where some of the related Discussions match this filter */
+  OwnedDownloads_SOME?: InputMaybe<DiscussionWhere>;
   PendingModInvitesAggregate?: InputMaybe<UserPendingModInvitesAggregateInput>;
   /** Return Users where all of the related UserPendingModInvitesConnections match this filter */
   PendingModInvitesConnection_ALL?: InputMaybe<UserPendingModInvitesConnectionWhere>;
