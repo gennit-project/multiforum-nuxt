@@ -8,6 +8,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
@@ -284,9 +285,12 @@ const getAuthorInfo = (discussion: any) => {
 
                   <!-- Discussion preview -->
                   <div v-if="discussion.body" class="mb-4">
-                    <p class="line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
-                      {{ discussion.body }}
-                    </p>
+                    <div class="line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
+                      <MarkdownRenderer
+                        :text="discussion.body"
+                        font-size="small"
+                      />
+                    </div>
                   </div>
 
                   <!-- Meta information -->

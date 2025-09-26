@@ -7,6 +7,7 @@ import { usernameVar } from '@/cache';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
+import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { relativeTime } from '@/utils';
 import {
   getCommentPermalink,
@@ -217,9 +218,10 @@ const favoriteComments = computed(() => {
                   <div class="mb-4">
                     <NuxtLink :to="getCommentPermalink(comment)" class="block">
                       <div class="prose prose-sm max-w-none dark:prose-invert">
-                        <p class="text-gray-700 dark:text-gray-300">
-                          {{ comment.text }}
-                        </p>
+                        <MarkdownRenderer
+                          :text="comment.text"
+                          font-size="small"
+                        />
                       </div>
                     </NuxtLink>
                   </div>
