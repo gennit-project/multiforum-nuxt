@@ -7,6 +7,7 @@ import { GET_USER_FAVORITE_DISCUSSIONS } from '@/graphQLData/user/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
@@ -207,13 +208,20 @@ const getAuthorInfo = (discussion: any) => {
                   </div>
 
                   <!-- Discussion title -->
-                  <div class="mb-3">
+                  <div class="mb-3 flex items-center justify-between">
                     <NuxtLink
                       :to="getDiscussionLink(discussion)"
-                      class="text-lg font-semibold text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400"
+                      class="text-lg font-semibold text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400 flex-1 min-w-0"
                     >
                       {{ discussion.title }}
                     </NuxtLink>
+                    <div class="flex-shrink-0 ml-4">
+                      <AddToDiscussionFavorites
+                        :discussion-id="discussion.id"
+                        :discussion-title="discussion.title"
+                        size="medium"
+                      />
+                    </div>
                   </div>
 
                   <!-- Discussion preview -->

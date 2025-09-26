@@ -8,6 +8,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import ExpandableImage from '@/components/ExpandableImage.vue';
 import Tag from '@/components/TagComponent.vue';
+import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 
 useHead({
   title: 'Favorite Forums - Library',
@@ -133,73 +134,86 @@ const formatCount = (
 
               <!-- Forums grid -->
               <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <NuxtLink
+                <div
                   v-for="channel in favoriteChannels"
                   :key="channel.uniqueName"
-                  :to="`/forums/${channel.uniqueName}`"
-                  class="block rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                  class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
-                  <div class="flex items-start space-x-4">
-                    <!-- Channel Icon -->
-                    <div class="flex-shrink-0">
-                      <ExpandableImage
-                        v-if="channel.channelIconURL"
-                        :src="channel.channelIconURL"
-                        :alt="channel.displayName || channel.uniqueName"
-                        :rounded="true"
-                        class="h-12 w-12"
-                      />
-                      <AvatarComponent
-                        v-else
-                        :text="channel.displayName || channel.uniqueName"
-                        :src="''"
-                        class="h-12 w-12"
-                        :is-square="false"
-                      />
-                    </div>
-
-                    <!-- Channel Info -->
-                    <div class="min-w-0 flex-1">
-                      <h3
-                        class="text-lg font-medium text-gray-900 transition-colors hover:text-orange-500 dark:text-white dark:hover:text-orange-400"
-                      >
-                        {{ channel.displayName || channel.uniqueName }}
-                      </h3>
-                      <p
-                        v-if="channel.displayName"
-                        class="font-mono text-sm text-gray-500 dark:text-gray-400"
-                      >
-                        {{ channel.uniqueName }}
-                      </p>
-                      <p
-                        v-if="channel.description"
-                        class="mt-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-300"
-                      >
-                        {{ channel.description }}
-                      </p>
-
-                      <!-- Tags -->
-                      <div
-                        v-if="channel.Tags && channel.Tags.length > 0"
-                        class="mt-3 flex flex-wrap gap-1"
-                      >
-                        <Tag
-                          v-for="tag in channel.Tags.slice(0, 3)"
-                          :key="tag.text"
-                          :tag="tag.text"
-                          class="text-xs"
-                          @click.prevent=""
+                  <div class="flex items-start justify-between">
+                    <NuxtLink
+                      :to="`/forums/${channel.uniqueName}`"
+                      class="flex items-start space-x-4 flex-1 min-w-0"
+                    >
+                      <!-- Channel Icon -->
+                      <div class="flex-shrink-0">
+                        <ExpandableImage
+                          v-if="channel.channelIconURL"
+                          :src="channel.channelIconURL"
+                          :alt="channel.displayName || channel.uniqueName"
+                          :rounded="true"
+                          class="h-12 w-12"
                         />
-                        <span
-                          v-if="channel.Tags.length > 3"
-                          class="text-xs text-gray-500 dark:text-gray-400"
-                        >
-                          +{{ channel.Tags.length - 3 }} more
-                        </span>
+                        <AvatarComponent
+                          v-else
+                          :text="channel.displayName || channel.uniqueName"
+                          :src="''"
+                          class="h-12 w-12"
+                          :is-square="false"
+                        />
                       </div>
+
+                      <!-- Channel Info -->
+                      <div class="min-w-0 flex-1">
+                        <h3
+                          class="text-lg font-medium text-gray-900 transition-colors hover:text-orange-500 dark:text-white dark:hover:text-orange-400"
+                        >
+                          {{ channel.displayName || channel.uniqueName }}
+                        </h3>
+                        <p
+                          v-if="channel.displayName"
+                          class="font-mono text-sm text-gray-500 dark:text-gray-400"
+                        >
+                          {{ channel.uniqueName }}
+                        </p>
+                        <p
+                          v-if="channel.description"
+                          class="mt-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-300"
+                        >
+                          {{ channel.description }}
+                        </p>
+
+                        <!-- Tags -->
+                        <div
+                          v-if="channel.Tags && channel.Tags.length > 0"
+                          class="mt-3 flex flex-wrap gap-1"
+                        >
+                          <Tag
+                            v-for="tag in channel.Tags.slice(0, 3)"
+                            :key="tag.text"
+                            :tag="tag.text"
+                            class="text-xs"
+                            @click.prevent=""
+                          />
+                          <span
+                            v-if="channel.Tags.length > 3"
+                            class="text-xs text-gray-500 dark:text-gray-400"
+                          >
+                            +{{ channel.Tags.length - 3 }} more
+                          </span>
+                        </div>
+                      </div>
+                    </NuxtLink>
+
+                    <!-- Favorites Button -->
+                    <div class="flex-shrink-0 ml-4">
+                      <AddToChannelFavorites
+                        :channel-unique-name="channel.uniqueName"
+                        :channel-display-name="channel.displayName || ''"
+                        size="medium"
+                      />
                     </div>
                   </div>
-                </NuxtLink>
+                </div>
               </div>
             </div>
           </div>
