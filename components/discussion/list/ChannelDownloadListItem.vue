@@ -17,6 +17,8 @@ import CheckCircleIcon from '@/components/icons/CheckCircleIcon.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import { storeToRefs } from 'pinia';
 import { useUIStore } from '@/stores/uiStore';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import { isAuthenticatedVar } from '@/cache';
 
 // Define props
 const props = defineProps({
@@ -266,7 +268,7 @@ const filteredQuery = computed(() => {
                   :use-heart-icon="true"
                 />
 
-                <div class="flex items-center justify-start gap-6">
+                <div class="flex items-center justify-start gap-2">
                   <nuxt-link
                     class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
                     :to="{
@@ -281,6 +283,13 @@ const filteredQuery = computed(() => {
                     <i class="fa-regular fa-comment text-xs" />
                     <span class="text-sm">{{ commentCount }}</span>
                   </nuxt-link>
+                  <AddToDiscussionFavorites
+                    v-if="discussion && isAuthenticatedVar"
+                    :discussion-id="discussion.id"
+                    :discussion-title="discussion.title"
+                    entity-name="Download"
+                    size="small"
+                  />
                 </div>
               </div>
             </div>

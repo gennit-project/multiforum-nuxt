@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
 import { usernameVar } from '@/cache';
+import { gql } from '@apollo/client/core';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
@@ -12,16 +12,16 @@ import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
 useHead({
-  title: 'Favorite Discussions - Library',
+  title: 'Favorite Downloads - Library',
 });
 
-// We need to create a new query that filters out downloads
-const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
-  query getUserFavoriteDiscussionsNoDownloads($username: String!) {
+// Query specifically for downloads (hasDownload: true)
+const GET_USER_FAVORITE_DOWNLOADS = gql`
+  query getUserFavoriteDownloads($username: String!) {
     users(where: { username: $username }) {
       username
       FavoriteDiscussions(
-        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+        where: { hasDownload: true }
         options: { sort: { createdAt: DESC } }
       ) {
         id
@@ -61,6 +61,7 @@ const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
         }
         Album {
           id
+          imageOrder
           Images {
             id
             url
@@ -74,7 +75,7 @@ const GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS = gql`
 `;
 
 const { result, loading, error } = useQuery(
-  GET_USER_FAVORITE_DISCUSSIONS_NO_DOWNLOADS,
+  GET_USER_FAVORITE_DOWNLOADS,
   () => ({
     username: usernameVar.value,
   }),
@@ -83,7 +84,7 @@ const { result, loading, error } = useQuery(
   })
 );
 
-const favoriteDiscussions = computed(() => {
+const favoriteDownloads = computed(() => {
   return result.value?.users?.[0]?.FavoriteDiscussions || [];
 });
 
@@ -96,11 +97,11 @@ const formatCount = (
   return `${value} ${value === 1 ? singular : plural}`;
 };
 
-const getDiscussionLink = (discussion: any) => {
-  const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as any;
+const getDownloadLink = (download: any) => {
+  const firstChannel = safeArrayFirst(download.DiscussionChannels) as any;
   if (!firstChannel?.channelUniqueName) return '/';
 
-  return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
+  return `/forums/${firstChannel.channelUniqueName}/downloads/${download.id}`;
 };
 
 const getChannelLink = (channelUniqueName: string | undefined) => {
@@ -114,8 +115,8 @@ const getTotalCommentCount = (discussionChannels: any[]) => {
   }, 0);
 };
 
-const getAuthorInfo = (discussion: any) => {
-  const author = discussion?.Author;
+const getAuthorInfo = (download: any) => {
+  const author = download?.Author;
   if (!author) return null;
 
   return {
@@ -127,6 +128,22 @@ const getAuthorInfo = (discussion: any) => {
     createdAt: author.createdAt || '',
     isAdmin: author.ServerRoles?.[0]?.showAdminTag || false,
   };
+};
+
+// Get the first image from the album if available
+const getFirstAlbumImage = (download: any) => {
+  const album = download?.Album;
+  if (!album?.Images?.length) return null;
+
+  // If imageOrder exists and has items, use the first ordered image
+  if (album.imageOrder?.length && album.imageOrder.length > 0) {
+    const firstImageId = album.imageOrder[0];
+    const orderedImage = album.Images.find((img: any) => img.id === firstImageId);
+    return orderedImage?.url || null;
+  }
+
+  // Fallback to first image in the Images array
+  return album.Images[0]?.url || null;
 };
 </script>
 
@@ -161,10 +178,10 @@ const getAuthorInfo = (discussion: any) => {
                   </NuxtLink>
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                  Favorite Discussions
+                  Favorite Downloads
                 </h1>
                 <p class="mt-2 text-gray-600 dark:text-gray-300">
-                  Your collection of favorite discussions and posts.
+                  Your collection of favorite downloads and files.
                 </p>
               </div>
 
@@ -174,7 +191,7 @@ const getAuthorInfo = (discussion: any) => {
                   class="inline-block h-8 w-8 animate-spin rounded-full border-b-2 border-orange-500"
                 />
                 <p class="mt-2 text-gray-600 dark:text-gray-400">
-                  Loading your favorite discussions...
+                  Loading your favorite downloads...
                 </p>
               </div>
 
@@ -184,13 +201,13 @@ const getAuthorInfo = (discussion: any) => {
                 class="bg-red-50 rounded-lg p-4 dark:bg-red-900/20"
               >
                 <p class="text-red-800 dark:text-red-300">
-                  Error loading favorite discussions: {{ error.message }}
+                  Error loading favorite downloads: {{ error.message }}
                 </p>
               </div>
 
               <!-- Empty state -->
               <div
-                v-else-if="favoriteDiscussions.length === 0"
+                v-else-if="favoriteDownloads.length === 0"
                 class="py-12 text-center"
               >
                 <svg
@@ -203,148 +220,151 @@ const getAuthorInfo = (discussion: any) => {
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="2"
-                    d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                    d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"
                   />
                 </svg>
                 <h3
                   class="mt-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  No favorite discussions yet
+                  No favorite downloads yet
                 </h3>
                 <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                  Start adding discussions to your favorites to see them here.
+                  Start adding downloads to your favorites to see them here.
                 </p>
                 <div class="mt-6">
                   <NuxtLink
-                    to="/"
+                    to="/downloads"
                     class="inline-flex items-center rounded-md bg-orange-500 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-orange-600"
                   >
-                    Browse Discussions
+                    Browse Downloads
                   </NuxtLink>
                 </div>
               </div>
 
-              <!-- Discussions list -->
-              <div v-else class="space-y-4">
+              <!-- Downloads grid -->
+              <div v-else class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <div
-                  v-for="discussion in favoriteDiscussions"
-                  :key="discussion.id"
-                  class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                  v-for="download in favoriteDownloads"
+                  :key="download.id"
+                  class="rounded-lg border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
                 >
-                  <!-- Discussion header -->
-                  <div class="mb-4">
-                    <div class="flex items-center justify-between">
-                      <div class="flex items-center space-x-2">
-                        <!-- Channel info -->
-                        <NuxtLink
-                          v-if="discussion.DiscussionChannels?.[0]"
-                          :to="getChannelLink(discussion.DiscussionChannels[0].channelUniqueName)"
-                          class="flex items-center text-sm text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                        >
-                          <AvatarComponent
-                            :text="discussion.DiscussionChannels[0].channelUniqueName"
-                            :is-square="true"
-                            class="mr-2 h-5 w-5"
-                          />
-                          <span>{{ discussion.DiscussionChannels[0].channelUniqueName }}</span>
-                        </NuxtLink>
+                  <!-- Download image preview -->
+                  <NuxtLink
+                    :to="getDownloadLink(download)"
+                    class="block aspect-video w-full overflow-hidden rounded-t-lg bg-gray-100 dark:bg-gray-700"
+                  >
+                    <img
+                      v-if="getFirstAlbumImage(download)"
+                      :src="getFirstAlbumImage(download)"
+                      :alt="download.title"
+                      class="h-full w-full object-cover"
+                    >
+                    <div
+                      v-else
+                      class="flex h-full w-full items-center justify-center text-gray-400"
+                    >
+                      <svg
+                        class="h-12 w-12"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                        />
+                      </svg>
+                    </div>
+                  </NuxtLink>
 
-                        <!-- Sensitive content indicator -->
-                        <span
-                          v-if="discussion.hasSensitiveContent"
-                          class="rounded-full border border-orange-600 px-2 py-1 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-400"
-                        >
-                          Sensitive
-                        </span>
-                      </div>
+                  <div class="p-4">
+                    <!-- Download header -->
+                    <div class="mb-2 flex items-center justify-between">
+                      <NuxtLink
+                        v-if="download.DiscussionChannels?.[0]"
+                        :to="getChannelLink(download.DiscussionChannels[0].channelUniqueName)"
+                        class="flex items-center text-xs text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                      >
+                        <AvatarComponent
+                          :text="download.DiscussionChannels[0].channelUniqueName"
+                          :is-square="true"
+                          class="mr-1 h-4 w-4"
+                        />
+                        <span>{{ download.DiscussionChannels[0].channelUniqueName }}</span>
+                      </NuxtLink>
 
-                      <!-- Date -->
-                      <span class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ relativeTime(discussion.createdAt) }}
+                      <span class="text-xs text-gray-500 dark:text-gray-400">
+                        {{ relativeTime(download.createdAt) }}
                       </span>
                     </div>
-                  </div>
 
-                  <!-- Discussion title -->
-                  <div class="mb-3 flex items-center justify-between">
-                    <NuxtLink
-                      :to="getDiscussionLink(discussion)"
-                      class="text-lg font-semibold text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400 flex-1 min-w-0"
-                    >
-                      {{ discussion.title }}
-                    </NuxtLink>
-                    <div class="flex-shrink-0 ml-4">
-                      <AddToDiscussionFavorites
-                        :discussion-id="discussion.id"
-                        :discussion-title="discussion.title"
-                        size="medium"
-                      />
+                    <!-- Download title -->
+                    <div class="mb-2 flex items-center justify-between">
+                      <NuxtLink
+                        :to="getDownloadLink(download)"
+                        class="text-base font-semibold text-gray-900 hover:text-orange-600 dark:text-white dark:hover:text-orange-400 flex-1 min-w-0"
+                      >
+                        {{ download.title }}
+                      </NuxtLink>
+                      <div class="flex-shrink-0 ml-2">
+                        <AddToDiscussionFavorites
+                          :discussion-id="download.id"
+                          :discussion-title="download.title"
+                          entity-name="Download"
+                          size="small"
+                        />
+                      </div>
                     </div>
-                  </div>
 
-                  <!-- Discussion preview -->
-                  <div v-if="discussion.body" class="mb-4">
-                    <p class="line-clamp-3 text-sm text-gray-600 dark:text-gray-300">
-                      {{ discussion.body }}
-                    </p>
-                  </div>
-
-                  <!-- Meta information -->
-                  <div class="flex items-center justify-between">
-                    <div class="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                    <!-- Meta information -->
+                    <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
                       <!-- Author -->
                       <div class="flex items-center">
                         <span class="mr-1">by</span>
                         <UsernameWithTooltip
-                          v-if="getAuthorInfo(discussion)"
-                          :username="getAuthorInfo(discussion)!.username"
-                          :display-name="getAuthorInfo(discussion)!.displayName"
-                          :src="getAuthorInfo(discussion)!.profilePicURL"
-                          :is-admin="getAuthorInfo(discussion)!.isAdmin"
-                          :comment-karma="getAuthorInfo(discussion)!.commentKarma"
-                          :discussion-karma="getAuthorInfo(discussion)!.discussionKarma"
-                          :account-created="getAuthorInfo(discussion)!.createdAt"
+                          v-if="getAuthorInfo(download)"
+                          :username="getAuthorInfo(download)!.username"
+                          :display-name="getAuthorInfo(download)!.displayName"
+                          :src="getAuthorInfo(download)!.profilePicURL"
+                          :is-admin="getAuthorInfo(download)!.isAdmin"
+                          :comment-karma="getAuthorInfo(download)!.commentKarma"
+                          :discussion-karma="getAuthorInfo(download)!.discussionKarma"
+                          :account-created="getAuthorInfo(download)!.createdAt"
                         />
                         <span v-else>Deleted</span>
                       </div>
 
                       <!-- Comment count -->
                       <NuxtLink
-                        :to="getDiscussionLink(discussion)"
+                        :to="getDownloadLink(download)"
                         class="flex items-center hover:text-gray-700 dark:hover:text-gray-300"
                       >
                         <i class="fa-regular fa-comment mr-1" />
-                        {{ formatCount(getTotalCommentCount(discussion.DiscussionChannels), 'comment', 'comments') }}
+                        {{ formatCount(getTotalCommentCount(download.DiscussionChannels), 'comment', 'comments') }}
                       </NuxtLink>
+                    </div>
 
-                      <!-- Multiple channels indicator -->
-                      <span
-                        v-if="discussion.DiscussionChannels.length > 1"
+                    <!-- Tags -->
+                    <div
+                      v-if="download.Tags && download.Tags.length > 0"
+                      class="mt-3 flex flex-wrap gap-1"
+                    >
+                      <TagComponent
+                        v-for="tag in download.Tags.slice(0, 3)"
+                        :key="tag.text"
+                        :tag="tag.text"
                         class="text-xs"
+                        @click.prevent=""
+                      />
+                      <span
+                        v-if="download.Tags.length > 3"
+                        class="text-xs text-gray-500 dark:text-gray-400"
                       >
-                        in {{ discussion.DiscussionChannels.length }} forums
+                        +{{ download.Tags.length - 3 }} more
                       </span>
                     </div>
-                  </div>
-
-                  <!-- Tags -->
-                  <div
-                    v-if="discussion.Tags && discussion.Tags.length > 0"
-                    class="mt-4 flex flex-wrap gap-2"
-                  >
-                    <TagComponent
-                      v-for="tag in discussion.Tags.slice(0, 5)"
-                      :key="tag.text"
-                      :tag="tag.text"
-                      class="text-xs"
-                      @click.prevent=""
-                    />
-                    <span
-                      v-if="discussion.Tags.length > 5"
-                      class="text-xs text-gray-500 dark:text-gray-400"
-                    >
-                      +{{ discussion.Tags.length - 5 }} more
-                    </span>
                   </div>
                 </div>
               </div>
@@ -357,7 +377,7 @@ const getAuthorInfo = (discussion: any) => {
               Sign In Required
             </h1>
             <p class="mt-4 text-gray-600 dark:text-gray-300">
-              Please sign in to view your favorite discussions.
+              Please sign in to view your favorite downloads.
             </p>
           </div>
         </template>
@@ -365,12 +385,3 @@ const getAuthorInfo = (discussion: any) => {
     </div>
   </NuxtLayout>
 </template>
-
-<style scoped>
-.line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-</style>

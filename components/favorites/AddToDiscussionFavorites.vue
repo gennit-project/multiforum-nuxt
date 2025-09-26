@@ -23,6 +23,10 @@ const props = defineProps({
     type: String,
     default: 'medium',
   },
+  entityName: {
+    type: String,
+    default: 'Discussion',
+  },
 });
 
 const GET_USER_FAVORITE_DISCUSSION = gql`
@@ -81,14 +85,14 @@ const handleToggleFavorite = async () => {
         discussionId: props.discussionId,
         username: usernameVar.value,
       });
-      toastStore.showToast('Discussion removed from favorites.');
+      toastStore.showToast(`${props.entityName} removed from favorites.`);
     } else {
       // We're adding to favorites
       await addFavorite({
         discussionId: props.discussionId,
         username: usernameVar.value,
       });
-      toastStore.showToast('Discussion added to favorites.');
+      toastStore.showToast(`${props.entityName} added to favorites.`);
     }
     refetchFavorites();
   } catch (error) {

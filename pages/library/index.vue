@@ -35,10 +35,18 @@ const defaultCollections = computed(() => [
   {
     id: 'favorite-discussions',
     name: 'Favorite Discussions',
-    description: 'Your favorite discussions',
+    description: 'Your favorite discussions and posts',
     itemCount: 0,
     visibility: 'PRIVATE',
     collectionType: 'DISCUSSIONS',
+  },
+  {
+    id: 'favorite-downloads',
+    name: 'Favorite Downloads',
+    description: 'Your favorite downloads and files',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'DOWNLOADS',
   },
   {
     id: 'favorite-images',
@@ -47,14 +55,6 @@ const defaultCollections = computed(() => [
     itemCount: 0,
     visibility: 'PRIVATE',
     collectionType: 'IMAGES',
-  },
-  {
-    id: 'favorite-downloads',
-    name: 'Favorite Downloads',
-    description: 'Your favorite downloads',
-    itemCount: 0,
-    visibility: 'PRIVATE',
-    collectionType: 'DOWNLOADS',
   },
   {
     id: 'favorite-comments',
