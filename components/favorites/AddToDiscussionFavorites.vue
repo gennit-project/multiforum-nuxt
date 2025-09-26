@@ -1,0 +1,118 @@
+<script setup lang="ts">
+import { ref, computed, watch } from 'vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
+import { gql } from '@apollo/client/core';
+import {
+  ADD_FAVORITE_DISCUSSION,
+  REMOVE_FAVORITE_DISCUSSION,
+} from '@/graphQLData/user/mutations';
+import { usernameVar } from '@/cache';
+import { useToastStore } from '@/stores/toastStore';
+import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
+
+const props = defineProps({
+  discussionId: {
+    type: String,
+    required: true,
+  },
+  discussionTitle: {
+    type: String,
+    default: '',
+  },
+  size: {
+    type: String,
+    default: 'medium',
+  },
+});
+
+const GET_USER_FAVORITE_DISCUSSION = gql`
+  query getUserFavoriteDiscussion($username: String!, $discussionId: ID!) {
+    users(where: { username: $username }) {
+      username
+      FavoriteDiscussions(where: { id: $discussionId }) {
+        id
+        title
+      }
+    }
+  }
+`;
+
+const isFavorited = ref(false);
+const isLoading = ref(false);
+const toastStore = useToastStore();
+
+const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
+  GET_USER_FAVORITE_DISCUSSION,
+  () => ({
+    username: usernameVar.value,
+    discussionId: props.discussionId,
+  }),
+  () => ({
+    enabled: !!usernameVar.value && !!props.discussionId,
+  })
+);
+
+watch(
+  favoritesResult,
+  (newResult) => {
+    if (newResult?.users?.[0]?.FavoriteDiscussions) {
+      isFavorited.value = newResult.users[0].FavoriteDiscussions.some(
+        (discussion: any) => discussion.id === props.discussionId
+      );
+    }
+  },
+  { immediate: true }
+);
+
+const { mutate: addFavorite } = useMutation(ADD_FAVORITE_DISCUSSION);
+const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_DISCUSSION);
+
+const handleToggleFavorite = async () => {
+  if (!usernameVar.value) return;
+
+  // Optimistic update - toggle immediately
+  isFavorited.value = !isFavorited.value;
+  isLoading.value = true;
+
+  try {
+    if (!isFavorited.value) {
+      // We're removing from favorites
+      await removeFavorite({
+        discussionId: props.discussionId,
+        username: usernameVar.value,
+      });
+      toastStore.showToast('Discussion removed from favorites.');
+    } else {
+      // We're adding to favorites
+      await addFavorite({
+        discussionId: props.discussionId,
+        username: usernameVar.value,
+      });
+      toastStore.showToast('Discussion added to favorites.');
+    }
+    refetchFavorites();
+  } catch (error) {
+    console.error('Error toggling favorite:', error);
+    // Revert optimistic update on error
+    isFavorited.value = !isFavorited.value;
+    toastStore.showToast('Error updating favorites. Please try again.', 'error');
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+const displayName = computed(() => {
+  return props.discussionTitle ? `"${props.discussionTitle}"` : 'discussion';
+});
+</script>
+
+<template>
+  <AddToFavoritesButton
+    :is-favorited="isFavorited"
+    :is-loading="isLoading"
+    :display-name="displayName"
+    entity-type="discussion"
+    :size="size"
+    @toggle="handleToggleFavorite"
+  />
+</template>

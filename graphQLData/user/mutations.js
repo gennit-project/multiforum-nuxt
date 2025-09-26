@@ -126,3 +126,175 @@ export const REMOVE_FAVORITE_CHANNEL = gql`
     }
   }
 `;
+
+export const ADD_FAVORITE_DISCUSSION = gql`
+  mutation addFavoriteDiscussion($discussionId: ID!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteDiscussions: {
+          connect: [
+            {
+              where: {
+                node: {
+                  id: $discussionId
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteDiscussions {
+          id
+          title
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_FAVORITE_DISCUSSION = gql`
+  mutation removeFavoriteDiscussion($discussionId: ID!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteDiscussions: {
+          disconnect: [
+            {
+              where: {
+                node: {
+                  id: $discussionId
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteDiscussions {
+          id
+          title
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_FAVORITE_COMMENT = gql`
+  mutation addFavoriteComment($commentId: ID!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteComments: {
+          connect: [
+            {
+              where: {
+                node: {
+                  id: $commentId
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteComments {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_FAVORITE_COMMENT = gql`
+  mutation removeFavoriteComment($commentId: ID!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteComments: {
+          disconnect: [
+            {
+              where: {
+                node: {
+                  id: $commentId
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteComments {
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const ADD_FAVORITE_IMAGE = gql`
+  mutation addFavoriteImage($imageId: ID!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteImages: {
+          connect: [
+            {
+              where: {
+                node: {
+                  id: $imageId
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteImages {
+          id
+          url
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_FAVORITE_IMAGE = gql`
+  mutation removeFavoriteImage($imageId: ID!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteImages: {
+          disconnect: [
+            {
+              where: {
+                node: {
+                  id: $imageId
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteImages {
+          id
+          url
+        }
+      }
+    }
+  }
+`;

@@ -9,7 +9,7 @@ import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import { useRouter, useRoute } from 'nuxt/app';
 import FontSizeControl from '@/components/channel/FontSizeControl.vue';
 import BecomeAdminModal from '@/components/channel/BecomeAdminModal.vue';
-import AddToFavoritesButton from '@/components/channel/AddToFavoritesButton.vue';
+import AddToChannelFavorites from '@/components/favorites/AddToChannelFavorites.vue';
 import { isAuthenticatedVar } from '@/cache';
 
 const props = defineProps({
@@ -110,7 +110,7 @@ const handleBecomeAdminSuccess = () => {
           </div>
         </div>
         <div v-if="isAuthenticatedVar" class="flex items-center">
-          <AddToFavoritesButton
+          <AddToChannelFavorites
             :channel-unique-name="channelId"
             :channel-display-name="channel?.displayName || ''"
             size="medium"
