@@ -24,10 +24,10 @@ const props = defineProps({
 });
 
 const GET_USER_FAVORITES = gql`
-  query getUserFavorites($username: String!) {
+  query getUserFavorites($username: String!, $channelUniqueName: String!) {
     users(where: { username: $username }) {
       username
-      FavoriteChannels {
+      FavoriteChannels(where: { uniqueName: $channelUniqueName }) {
         uniqueName
       }
     }
@@ -41,6 +41,7 @@ const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITES,
   () => ({
     username: usernameVar.value,
+    channelUniqueName: props.channelUniqueName,
   }),
   () => ({
     enabled: !!usernameVar.value,
