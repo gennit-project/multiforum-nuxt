@@ -4,8 +4,7 @@ import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_USER_IMAGES } from '@/graphQLData/image/queries';
 import type { Image } from '@/__generated__/graphql';
-import ModelViewer from '@/components/ModelViewer.vue';
-import StlViewer from '@/components/download/StlViewer.vue';
+import ImageListItem from '@/components/image/ImageListItem.vue';
 
 const route = useRoute();
 
@@ -89,18 +88,7 @@ const loadMoreImages = async () => {
   }
 };
 
-// Check file types
-const hasGlbExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.glb');
-};
-
-const hasStlExtension = (url: string) => {
-  return url?.toLowerCase().endsWith('.stl');
-};
-
-const getImageAlt = (image: Image) => {
-  return image.alt || image.caption || 'Image';
-};
+// Utility functions moved to ImageListItem component
 </script>
 
 <template>
@@ -149,76 +137,12 @@ const getImageAlt = (image: Image) => {
       <div
         class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
       >
-        <div
+        <ImageListItem
           v-for="image in images"
           :key="image.id"
-          class="group relative cursor-pointer overflow-hidden rounded-lg bg-white shadow transition-shadow hover:shadow-lg dark:bg-gray-800"
-        >
-          <NuxtLink :to="`/u/${username}/images/${image.id}`" class="block">
-            <!-- Image container with fixed aspect ratio -->
-            <div
-              class="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700"
-            >
-              <!-- 3D Model viewer for GLB files -->
-              <ModelViewer
-                v-if="image.url && hasGlbExtension(image.url)"
-                :model-url="image.url"
-                height="100%"
-                width="100%"
-                class="h-full w-full object-cover"
-              />
-              <!-- STL viewer for STL files -->
-              <ClientOnly v-else-if="image.url && hasStlExtension(image.url)">
-                <StlViewer
-                  :src="image.url"
-                  :width="300"
-                  :height="300"
-                  class="h-full w-full object-cover"
-                />
-              </ClientOnly>
-              <!-- Regular image -->
-              <img
-                v-else-if="image.url"
-                :src="image.url"
-                :alt="getImageAlt(image) ?? 'Image'"
-                class="h-full w-full object-cover"
-                loading="lazy"
-              >
-
-              <!-- Overlay with sensitive content warning -->
-              <div
-                v-if="image.hasSensitiveContent || image.hasSpoiler"
-                class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50"
-              >
-                <div class="p-2 text-center text-white">
-                  <div v-if="image.hasSensitiveContent" class="text-xs">
-                    ⚠️ Sensitive
-                  </div>
-                  <div v-if="image.hasSpoiler" class="text-xs">🚫 Spoiler</div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Card content -->
-            <div class="p-4">
-              <div
-                v-if="image.caption"
-                class="mb-2 line-clamp-2 text-sm font-medium text-gray-900 dark:text-white"
-              >
-                {{ image.caption }}
-              </div>
-              <div
-                v-else-if="image.alt"
-                class="mb-2 line-clamp-2 text-sm text-gray-600 dark:text-gray-400"
-              >
-                {{ image.alt }}
-              </div>
-              <div class="text-xs text-gray-500 dark:text-gray-500">
-                {{ new Date(image.createdAt).toLocaleDateString() }}
-              </div>
-            </div>
-          </NuxtLink>
-        </div>
+          :image="image"
+          :username="username"
+        />
       </div>
 
       <!-- Load more button -->
