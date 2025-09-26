@@ -15,13 +15,13 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  displayName: {
-    type: String,
-    default: 'comment',
-  },
   size: {
     type: String,
     default: 'medium',
+  },
+  entityName: {
+    type: String,
+    default: 'Comment',
   },
 });
 
@@ -80,14 +80,14 @@ const handleToggleFavorite = async () => {
         commentId: props.commentId,
         username: usernameVar.value,
       });
-      toastStore.showToast('Comment removed from favorites.');
+      toastStore.showToast(`${props.entityName} removed from favorites.`);
     } else {
       // We're adding to favorites
       await addFavorite({
         commentId: props.commentId,
         username: usernameVar.value,
       });
-      toastStore.showToast('Comment added to favorites.');
+      toastStore.showToast(`${props.entityName} added to favorites.`);
     }
     refetchFavorites();
   } catch (error) {
@@ -105,7 +105,7 @@ const handleToggleFavorite = async () => {
   <AddToFavoritesButton
     :is-favorited="isFavorited"
     :is-loading="isLoading"
-    :display-name="displayName"
+    display-name="comment"
     entity-type="comment"
     :size="size"
     @toggle="handleToggleFavorite"
