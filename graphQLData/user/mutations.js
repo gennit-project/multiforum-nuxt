@@ -70,3 +70,59 @@ export const MARK_NOTIFICATIONS_AS_READ = gql`
     }
   }
 `;
+
+export const ADD_FAVORITE_CHANNEL = gql`
+  mutation addFavoriteChannel($channel: String!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteChannels: {
+          connect: [
+            {
+              where: {
+                node: {
+                  uniqueName: $channel
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteChannels {
+          uniqueName
+        }
+      }
+    }
+  }
+`;
+
+export const REMOVE_FAVORITE_CHANNEL = gql`
+  mutation removeFavoriteChannel($channel: String!, $username: String!) {
+    updateUsers(
+      where: { username: $username }
+      update: {
+        FavoriteChannels: {
+          disconnect: [
+            {
+              where: {
+                node: {
+                  uniqueName: $channel
+                }
+              }
+            }
+          ]
+        }
+      }
+    ) {
+      users {
+        username
+        FavoriteChannels {
+          uniqueName
+        }
+      }
+    }
+  }
+`;

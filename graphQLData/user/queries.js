@@ -200,6 +200,23 @@ export const DOES_USER_EXIST = gql`
   }
 `;
 
+export const GET_USER_FAVORITE_CHANNELS = gql`
+  query getUserFavoriteChannels($username: String!) {
+    users(where: { username: $username }) {
+      username
+      FavoriteChannels {
+        uniqueName
+        displayName
+        description
+        channelIconURL
+        Tags {
+          text
+        }
+      }
+    }
+  }
+`;
+
 export const USER_LOOKUP = gql`
   query getUser($username: String!) {
     getUser(username: $username) {

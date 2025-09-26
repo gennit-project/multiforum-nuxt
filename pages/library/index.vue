@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useHead } from 'nuxt/app';
-import { usernameVar, isAuthenticatedVar } from '@/cache';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 
@@ -102,13 +101,13 @@ const filteredCollections = computed(() => {
                   v-for="filter in filterOptions"
                   :key="filter.key"
                   type="button"
-                  @click="activeFilter = filter.key"
                   :class="[
                     'rounded-full px-4 py-2 text-sm font-medium transition-colors',
                     activeFilter === filter.key
                       ? 'bg-orange-500 text-white shadow-sm'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600'
                   ]"
+                  @click="activeFilter = filter.key"
                 >
                   {{ filter.label }}
                 </button>
@@ -137,11 +136,16 @@ const filteredCollections = computed(() => {
                 >
                   <div class="flex items-start justify-between">
                     <div class="flex-1">
-                      <h3
-                        class="text-lg font-medium text-gray-900 dark:text-white"
+                      <NuxtLink
+                        :to="`/library/${collection.id}`"
+                        class="block"
                       >
-                        {{ collection.name }}
-                      </h3>
+                        <h3
+                          class="text-lg font-medium text-gray-900 dark:text-white hover:text-orange-500 dark:hover:text-orange-400 transition-colors"
+                        >
+                          {{ collection.name }}
+                        </h3>
+                      </NuxtLink>
                       <p class="mt-2 text-sm text-gray-600 dark:text-gray-300">
                         {{ collection.description }}
                       </p>
