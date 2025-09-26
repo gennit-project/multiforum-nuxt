@@ -47,6 +47,9 @@ export const GET_USER_IMAGES = gql`
           displayName
         }
       }
+      ImagesAggregate {
+        count
+      }
     }
   }
 `;

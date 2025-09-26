@@ -14,6 +14,7 @@ const username = computed(() => {
 
 const pageSize = 24; // Show 24 images per page
 const currentOffset = ref(0);
+const isLoadingMore = ref(false);
 
 const {
   result: userImagesResult,
@@ -33,7 +34,7 @@ const {
 );
 
 const user = computed(() => {
-  if (userImagesLoading.value || userImagesError.value) return null;
+  if (userImagesError.value) return null;
   if (userImagesResult.value && userImagesResult.value.users.length > 0) {
     return userImagesResult.value.users[0];
   }
@@ -45,18 +46,19 @@ const images = computed((): Image[] => {
   return user.value.Images;
 });
 
+const totalImageCount = computed(() => {
+  return user.value?.ImagesAggregate?.count || 0;
+});
+
 const hasMoreImages = computed(() => {
-  // If we got a full page of results, there might be more
-  return (
-    images.value.length === currentOffset.value + pageSize &&
-    images.value.length >= pageSize
-  );
+  return images.value.length < totalImageCount.value;
 });
 
 const loadMoreImages = async () => {
-  if (!hasMoreImages.value || userImagesLoading.value) return;
+  if (!hasMoreImages.value || isLoadingMore.value) return;
 
   const newOffset = currentOffset.value + pageSize;
+  isLoadingMore.value = true;
 
   try {
     await fetchMore({
@@ -76,6 +78,7 @@ const loadMoreImages = async () => {
             {
               ...previousResult.users[0],
               Images: [...previousResult.users[0].Images, ...newImages],
+              ImagesAggregate: fetchMoreResult.users[0].ImagesAggregate,
             },
           ],
         };
@@ -85,6 +88,8 @@ const loadMoreImages = async () => {
     currentOffset.value = newOffset;
   } catch (error) {
     console.error('Error loading more images:', error);
+  } finally {
+    isLoadingMore.value = false;
   }
 };
 
@@ -97,12 +102,13 @@ const loadMoreImages = async () => {
     <div class="mb-6">
       <h1 class="mb-2 text-2xl font-bold">Images by {{ username }}</h1>
       <p class="text-gray-600 dark:text-gray-400">
-        {{ images.length }} {{ images.length === 1 ? 'image' : 'images' }}
-        {{ hasMoreImages ? '(showing more as you scroll)' : 'uploaded' }}
+        {{ images.length }} of {{ totalImageCount }}
+        {{ totalImageCount === 1 ? 'image' : 'images' }}
+        {{ hasMoreImages ? '' : 'uploaded' }}
       </p>
     </div>
 
-    <!-- Loading state -->
+    <!-- Initial loading state -->
     <div
       v-if="userImagesLoading && images.length === 0"
       class="flex h-64 items-center justify-center"
@@ -149,11 +155,11 @@ const loadMoreImages = async () => {
       <div v-if="hasMoreImages" class="flex justify-center">
         <button
           type="button"
-          :disabled="userImagesLoading"
+          :disabled="isLoadingMore"
           class="rounded-lg bg-blue-600 px-6 py-3 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50"
           @click="loadMoreImages"
         >
-          <span v-if="userImagesLoading">Loading...</span>
+          <span v-if="isLoadingMore">Loading...</span>
           <span v-else>Load More Images</span>
         </button>
       </div>
