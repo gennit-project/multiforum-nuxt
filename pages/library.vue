@@ -5,7 +5,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 
 useHead({
-  title: 'Library - Multiforum',
+  title: 'Library',
 });
 
 // Filter state
@@ -132,45 +132,30 @@ const filteredCollections = computed(() => {
                     </button>
                   </div>
 
-                  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <div
+                  <nav class="space-y-1">
+                    <NuxtLink
                       v-for="collection in filteredCollections"
                       :key="collection.id"
-                      class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                      :to="`/library/${collection.id}`"
+                      class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                      active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
                     >
-                      <div class="flex items-start justify-between">
-                        <div class="flex-1">
-                          <NuxtLink
-                            :to="`/library/${collection.id}`"
-                            class="block"
-                          >
-                            <h3
-                              class="text-lg font-medium text-gray-900 transition-colors hover:text-orange-500 dark:text-white dark:hover:text-orange-400"
-                            >
-                              {{ collection.name }}
-                            </h3>
-                          </NuxtLink>
-                          <p
-                            class="mt-2 text-sm text-gray-600 dark:text-gray-300"
-                          >
-                            {{ collection.description }}
-                          </p>
-                          <div
-                            class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400"
-                          >
-                            <ChannelIcon class="mr-1 h-4 w-4" />
+                      <div class="flex items-center">
+                        <ChannelIcon class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400" />
+                        <div>
+                          <div class="font-medium">{{ collection.name }}</div>
+                          <div class="text-xs text-gray-500 dark:text-gray-400">
                             {{ collection.itemCount }} item{{
                               collection.itemCount !== 1 ? 's' : ''
                             }}
-                            <span class="mx-2">•</span>
-                            <span class="capitalize">{{
-                              collection.visibility.toLowerCase()
-                            }}</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
+                      <span class="text-xs text-gray-400 capitalize">
+                        {{ collection.visibility.toLowerCase() }}
+                      </span>
+                    </NuxtLink>
+                  </nav>
                 </div>
               </div>
             </div>
