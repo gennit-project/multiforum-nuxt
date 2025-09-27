@@ -1,8 +1,14 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useHead } from 'nuxt/app';
+import { useLazyQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+import {
+  GET_USER_FAVORITE_COUNTS,
+  GET_USER_FAVORITE_DOWNLOADS_COUNT,
+} from '@/graphQLData/user/queries';
+import { usernameVar } from '@/cache';
 
 useHead({
   title: 'Library',
@@ -21,14 +27,81 @@ const filterOptions = [
   { key: 'CHANNELS', label: 'Forums' },
 ];
 
-// For now, we'll show default favorites collections for each data type
-// TODO: Implement GraphQL queries for collections
+// Reactive state for counts
+const favoriteCounts = ref({
+  channels: 0,
+  discussions: 0,
+  downloads: 0,
+  images: 0,
+  comments: 0,
+});
+
+// GraphQL queries for favorite counts
+const username = computed(() => usernameVar.value);
+
+const { load: loadFavoriteCounts, onResult: onFavoriteCountsResult } =
+  useLazyQuery(
+    GET_USER_FAVORITE_COUNTS,
+    () => ({
+      username: username.value,
+    }),
+    {
+      enabled: computed(() => !!username.value),
+    }
+  );
+
+const {
+  load: loadFavoriteDownloadsCounts,
+  onResult: onFavoriteDownloadsResult,
+} = useLazyQuery(
+  GET_USER_FAVORITE_DOWNLOADS_COUNT,
+  () => ({
+    username: username.value,
+  }),
+  {
+    enabled: computed(() => !!username.value),
+  }
+);
+
+// Handle query results
+onFavoriteCountsResult((result) => {
+  if (result.data?.users?.[0]) {
+    const user = result.data.users[0];
+    favoriteCounts.value.channels = user.FavoriteChannelsAggregate?.count || 0;
+    favoriteCounts.value.discussions =
+      user.FavoriteDiscussionsAggregate?.count || 0;
+    favoriteCounts.value.images = user.FavoriteImagesAggregate?.count || 0;
+    favoriteCounts.value.comments = user.FavoriteCommentsAggregate?.count || 0;
+  }
+});
+
+onFavoriteDownloadsResult((result) => {
+  if (result.data?.users?.[0]) {
+    const user = result.data.users[0];
+    favoriteCounts.value.downloads =
+      user.FavoriteDiscussionsAggregate?.count || 0;
+  }
+});
+
+// Load data when username is available
+watch(
+  username,
+  (newUsername) => {
+    if (newUsername) {
+      loadFavoriteCounts();
+      loadFavoriteDownloadsCounts();
+    }
+  },
+  { immediate: true }
+);
+
+// Collections with real counts
 const defaultCollections = computed(() => [
   {
     id: 'favorite-channels',
     name: 'Favorite Forums',
     description: 'Your favorite forums',
-    itemCount: 0,
+    itemCount: favoriteCounts.value.channels,
     visibility: 'PRIVATE',
     collectionType: 'CHANNELS',
   },
@@ -36,7 +109,7 @@ const defaultCollections = computed(() => [
     id: 'favorite-discussions',
     name: 'Favorite Discussions',
     description: 'Your favorite discussions and posts',
-    itemCount: 0,
+    itemCount: favoriteCounts.value.discussions,
     visibility: 'PRIVATE',
     collectionType: 'DISCUSSIONS',
   },
@@ -44,7 +117,7 @@ const defaultCollections = computed(() => [
     id: 'favorite-downloads',
     name: 'Favorite Downloads',
     description: 'Your favorite downloads and files',
-    itemCount: 0,
+    itemCount: favoriteCounts.value.downloads,
     visibility: 'PRIVATE',
     collectionType: 'DOWNLOADS',
   },
@@ -52,7 +125,7 @@ const defaultCollections = computed(() => [
     id: 'favorite-images',
     name: 'Favorite Images',
     description: 'Your favorite images',
-    itemCount: 0,
+    itemCount: favoriteCounts.value.images,
     visibility: 'PRIVATE',
     collectionType: 'IMAGES',
   },
@@ -60,7 +133,7 @@ const defaultCollections = computed(() => [
     id: 'favorite-comments',
     name: 'Favorite Comments',
     description: 'Your favorite comments',
-    itemCount: 0,
+    itemCount: favoriteCounts.value.comments,
     visibility: 'PRIVATE',
     collectionType: 'COMMENTS',
   },
@@ -141,7 +214,9 @@ const filteredCollections = computed(() => {
                       active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
                     >
                       <div class="flex items-center">
-                        <ChannelIcon class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400" />
+                        <ChannelIcon
+                          class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
+                        />
                         <div>
                           <div class="font-medium">{{ collection.name }}</div>
                           <div class="text-xs text-gray-500 dark:text-gray-400">
@@ -151,7 +226,7 @@ const filteredCollections = computed(() => {
                           </div>
                         </div>
                       </div>
-                      <span class="text-xs text-gray-400 capitalize">
+                      <span class="text-xs capitalize text-gray-400">
                         {{ collection.visibility.toLowerCase() }}
                       </span>
                     </NuxtLink>

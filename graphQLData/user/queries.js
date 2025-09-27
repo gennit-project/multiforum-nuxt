@@ -526,3 +526,36 @@ export const USER_IS_MOD_OR_OWNER_IN_CHANNEL = gql`
     }
   }
 `;
+
+export const GET_USER_FAVORITE_COUNTS = gql`
+  query getUserFavoriteCounts($username: String!) {
+    users(where: { username: $username }) {
+      username
+      FavoriteChannelsAggregate {
+        count
+      }
+      FavoriteImagesAggregate {
+        count
+      }
+      FavoriteCommentsAggregate {
+        count
+      }
+      FavoriteDiscussionsAggregate(
+        where: { OR: [{ hasDownload: false }, { hasDownload: null }] }
+      ) {
+        count
+      }
+    }
+  }
+`;
+
+export const GET_USER_FAVORITE_DOWNLOADS_COUNT = gql`
+  query getUserFavoriteDownloadsCount($username: String!) {
+    users(where: { username: $username }) {
+      username
+      FavoriteDiscussionsAggregate(where: { hasDownload: true }) {
+        count
+      }
+    }
+  }
+`;
