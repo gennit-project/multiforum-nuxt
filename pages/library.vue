@@ -1,0 +1,193 @@
+<script setup lang="ts">
+import { computed, ref } from 'vue';
+import { useHead } from 'nuxt/app';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import ChannelIcon from '@/components/icons/ChannelIcon.vue';
+
+useHead({
+  title: 'Library - Multiforum',
+});
+
+// Filter state
+const activeFilter = ref('all');
+
+// Filter options
+const filterOptions = [
+  { key: 'all', label: 'All' },
+  { key: 'DISCUSSIONS', label: 'Discussions' },
+  { key: 'IMAGES', label: 'Images' },
+  { key: 'COMMENTS', label: 'Comments' },
+  { key: 'DOWNLOADS', label: 'Downloads' },
+  { key: 'CHANNELS', label: 'Forums' },
+];
+
+// For now, we'll show default favorites collections for each data type
+// TODO: Implement GraphQL queries for collections
+const defaultCollections = computed(() => [
+  {
+    id: 'favorite-channels',
+    name: 'Favorite Forums',
+    description: 'Your favorite forums',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'CHANNELS',
+  },
+  {
+    id: 'favorite-discussions',
+    name: 'Favorite Discussions',
+    description: 'Your favorite discussions and posts',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'DISCUSSIONS',
+  },
+  {
+    id: 'favorite-downloads',
+    name: 'Favorite Downloads',
+    description: 'Your favorite downloads and files',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'DOWNLOADS',
+  },
+  {
+    id: 'favorite-images',
+    name: 'Favorite Images',
+    description: 'Your favorite images',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'IMAGES',
+  },
+  {
+    id: 'favorite-comments',
+    name: 'Favorite Comments',
+    description: 'Your favorite comments',
+    itemCount: 0,
+    visibility: 'PRIVATE',
+    collectionType: 'COMMENTS',
+  },
+]);
+
+// Filtered collections based on active filter
+const filteredCollections = computed(() => {
+  if (activeFilter.value === 'all') {
+    return defaultCollections.value;
+  }
+  return defaultCollections.value.filter(
+    (collection) => collection.collectionType === activeFilter.value
+  );
+});
+</script>
+
+<template>
+  <NuxtLayout>
+    <div class="min-h-screen bg-white dark:bg-black dark:text-white">
+      <RequireAuth>
+        <template #has-auth>
+          <div class="flex">
+            <div class="max-w-sm px-4 sm:px-6 lg:px-8">
+              <div class="py-8">
+                <!-- Header -->
+                <div class="mb-8">
+                  <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                    Library
+                  </h1>
+                  <p class="mt-2 text-gray-600 dark:text-gray-300">
+                    Manage your saved collections of forums, discussions, and
+                    more.
+                  </p>
+                </div>
+
+                <!-- Filter Chips -->
+                <div class="mb-6">
+                  <div class="flex flex-wrap gap-2">
+                    <button
+                      v-for="filter in filterOptions"
+                      :key="filter.key"
+                      type="button"
+                      :class="[
+                        'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                        activeFilter === filter.key
+                          ? 'bg-orange-500 text-white shadow-sm'
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
+                      ]"
+                      @click="activeFilter = filter.key"
+                    >
+                      {{ filter.label }}
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Default Collections Section -->
+                <div class="mb-8">
+                  <div class="mb-4 flex items-center justify-between">
+                    <h2
+                      class="font-semibold text-xl text-gray-900 dark:text-white"
+                    >
+                      Your Collections
+                    </h2>
+                    <button
+                      type="button"
+                      class="font-semibold rounded-md bg-orange-500 px-3 py-2 text-sm text-white shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                      New Collection
+                    </button>
+                  </div>
+
+                  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <div
+                      v-for="collection in filteredCollections"
+                      :key="collection.id"
+                      class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+                    >
+                      <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                          <NuxtLink
+                            :to="`/library/${collection.id}`"
+                            class="block"
+                          >
+                            <h3
+                              class="text-lg font-medium text-gray-900 transition-colors hover:text-orange-500 dark:text-white dark:hover:text-orange-400"
+                            >
+                              {{ collection.name }}
+                            </h3>
+                          </NuxtLink>
+                          <p
+                            class="mt-2 text-sm text-gray-600 dark:text-gray-300"
+                          >
+                            {{ collection.description }}
+                          </p>
+                          <div
+                            class="mt-4 flex items-center text-sm text-gray-500 dark:text-gray-400"
+                          >
+                            <ChannelIcon class="mr-1 h-4 w-4" />
+                            {{ collection.itemCount }} item{{
+                              collection.itemCount !== 1 ? 's' : ''
+                            }}
+                            <span class="mx-2">•</span>
+                            <span class="capitalize">{{
+                              collection.visibility.toLowerCase()
+                            }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="flex-1"><NuxtPage /></div>
+          </div>
+        </template>
+        <template #does-not-have-auth>
+          <div class="mx-auto max-w-md text-center">
+            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+              Sign In Required
+            </h1>
+            <p class="mt-4 text-gray-600 dark:text-gray-300">
+              Please sign in to access your library and collections.
+            </p>
+          </div>
+        </template>
+      </RequireAuth>
+    </div>
+  </NuxtLayout>
+</template>
