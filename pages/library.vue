@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue';
 import { useHead } from 'nuxt/app';
-import { useLazyQuery } from '@vue/apollo-composable';
+import { useQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
 } from '@/graphQLData/user/queries';
-import { usernameVar } from '@/cache';
+import { usernameVar, isAuthenticatedVar } from '@/cache';
 
 useHead({
   title: 'Library',
@@ -27,73 +27,69 @@ const filterOptions = [
   { key: 'CHANNELS', label: 'Forums' },
 ];
 
-// Reactive state for counts
-const favoriteCounts = ref({
-  channels: 0,
-  discussions: 0,
-  downloads: 0,
-  images: 0,
-  comments: 0,
-});
-
 // GraphQL queries for favorite counts
 const username = computed(() => usernameVar.value);
+const isAuthenticated = computed(() => isAuthenticatedVar.value);
 
-const { load: loadFavoriteCounts, onResult: onFavoriteCountsResult } =
-  useLazyQuery(
-    GET_USER_FAVORITE_COUNTS,
-    () => ({
-      username: username.value,
-    }),
-    {
-      enabled: computed(() => !!username.value),
-    }
-  );
+// Use useQuery with computed enabled option for automatic reactive loading
+const { result: favoriteCountsResult, refetch: refetchCounts } = useQuery(
+  GET_USER_FAVORITE_COUNTS,
+  () => ({
+    username: username.value,
+  }),
+  () => ({
+    enabled: !!username.value && isAuthenticated.value,
+    fetchPolicy: 'cache-and-network',
+  })
+);
 
-const {
-  load: loadFavoriteDownloadsCounts,
-  onResult: onFavoriteDownloadsResult,
-} = useLazyQuery(
+const { result: favoriteDownloadsResult, refetch: refetchDownloads } = useQuery(
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
   () => ({
     username: username.value,
   }),
-  {
-    enabled: computed(() => !!username.value),
-  }
+  () => ({
+    enabled: !!username.value && isAuthenticated.value,
+    fetchPolicy: 'cache-and-network',
+  })
 );
 
-// Handle query results
-onFavoriteCountsResult((result) => {
-  if (result.data?.users?.[0]) {
-    const user = result.data.users[0];
-    favoriteCounts.value.channels = user.FavoriteChannelsAggregate?.count || 0;
-    favoriteCounts.value.discussions =
-      user.FavoriteDiscussionsAggregate?.count || 0;
-    favoriteCounts.value.images = user.FavoriteImagesAggregate?.count || 0;
-    favoriteCounts.value.comments = user.FavoriteCommentsAggregate?.count || 0;
-  }
-});
-
-onFavoriteDownloadsResult((result) => {
-  if (result.data?.users?.[0]) {
-    const user = result.data.users[0];
-    favoriteCounts.value.downloads =
-      user.FavoriteDiscussionsAggregate?.count || 0;
-  }
-});
-
-// Load data when username is available
+// Refetch data when username becomes available
 watch(
-  username,
-  (newUsername) => {
-    if (newUsername) {
-      loadFavoriteCounts();
-      loadFavoriteDownloadsCounts();
+  () => [username.value, isAuthenticated.value],
+  ([newUsername, newIsAuthenticated]) => {
+    if (newUsername && newIsAuthenticated) {
+      refetchCounts();
+      refetchDownloads();
     }
-  },
-  { immediate: true }
+  }
 );
+
+// Compute counts from query results
+const favoriteCounts = computed(() => {
+  const counts = {
+    channels: 0,
+    discussions: 0,
+    downloads: 0,
+    images: 0,
+    comments: 0,
+  };
+
+  if (favoriteCountsResult.value?.users?.[0]) {
+    const user = favoriteCountsResult.value.users[0];
+    counts.channels = user.FavoriteChannelsAggregate?.count || 0;
+    counts.discussions = user.FavoriteDiscussionsAggregate?.count || 0;
+    counts.images = user.FavoriteImagesAggregate?.count || 0;
+    counts.comments = user.FavoriteCommentsAggregate?.count || 0;
+  }
+
+  if (favoriteDownloadsResult.value?.users?.[0]) {
+    const user = favoriteDownloadsResult.value.users[0];
+    counts.downloads = user.FavoriteDiscussionsAggregate?.count || 0;
+  }
+
+  return counts;
+});
 
 // Collections with real counts
 const defaultCollections = computed(() => [
@@ -156,7 +152,7 @@ const filteredCollections = computed(() => {
       <RequireAuth>
         <template #has-auth>
           <div class="flex">
-            <div class="max-w-sm px-4 sm:px-6 lg:px-8">
+            <div class="max-w-72 px-4">
               <div class="py-8">
                 <!-- Header -->
                 <div class="mb-8">
@@ -177,7 +173,7 @@ const filteredCollections = computed(() => {
                       :key="filter.key"
                       type="button"
                       :class="[
-                        'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                        'rounded-full px-3 py-1 text-sm font-medium transition-colors',
                         activeFilter === filter.key
                           ? 'bg-orange-500 text-white shadow-sm'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
@@ -197,12 +193,6 @@ const filteredCollections = computed(() => {
                     >
                       Your Collections
                     </h2>
-                    <button
-                      type="button"
-                      class="font-semibold rounded-md bg-orange-500 px-3 py-2 text-sm text-white shadow-sm hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    >
-                      New Collection
-                    </button>
                   </div>
 
                   <nav class="space-y-1">
