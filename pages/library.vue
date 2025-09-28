@@ -65,6 +65,16 @@ watch(
   }
 );
 
+// Check if data is still loading
+const isLoading = computed(() => {
+  return (
+    !favoriteCountsResult.value &&
+    !favoriteDownloadsResult.value &&
+    isAuthenticated.value &&
+    !!username.value
+  );
+});
+
 // Compute counts from query results
 const favoriteCounts = computed(() => {
   const counts = {
@@ -152,18 +162,14 @@ const filteredCollections = computed(() => {
       <RequireAuth>
         <template #has-auth>
           <div class="flex">
-            <div class="max-w-72 px-4">
+            <div class="max-w-72">
               <div class="py-8">
                 <!-- Header -->
-                <div class="mb-8">
-                  <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
-                    Library
-                  </h1>
-                  <p class="mt-2 text-gray-600 dark:text-gray-300">
-                    Manage your saved collections of forums, discussions, and
-                    more.
-                  </p>
-                </div>
+                <h1
+                  class="mb-2 text-xl font-bold text-gray-900 dark:text-white"
+                >
+                  Library
+                </h1>
 
                 <!-- Filter Chips -->
                 <div class="mb-6">
@@ -173,7 +179,7 @@ const filteredCollections = computed(() => {
                       :key="filter.key"
                       type="button"
                       :class="[
-                        'rounded-full px-3 py-1 text-sm font-medium transition-colors',
+                        'font-sm rounded-full px-3 py-1 text-sm transition-colors',
                         activeFilter === filter.key
                           ? 'bg-orange-500 text-white shadow-sm'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
@@ -196,30 +202,61 @@ const filteredCollections = computed(() => {
                   </div>
 
                   <nav class="space-y-1">
-                    <NuxtLink
-                      v-for="collection in filteredCollections"
-                      :key="collection.id"
-                      :to="`/library/${collection.id}`"
-                      class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                      active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
-                    >
-                      <div class="flex items-center">
-                        <ChannelIcon
-                          class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
-                        />
-                        <div>
-                          <div class="font-medium">{{ collection.name }}</div>
-                          <div class="text-xs text-gray-500 dark:text-gray-400">
-                            {{ collection.itemCount }} item{{
-                              collection.itemCount !== 1 ? 's' : ''
-                            }}
+                    <!-- Skeleton loaders when loading -->
+                    <template v-if="isLoading">
+                      <div
+                        v-for="i in 5"
+                        :key="`skeleton-${i}`"
+                        class="flex items-center justify-between rounded-md px-3 py-2"
+                      >
+                        <div class="flex items-center">
+                          <div
+                            class="mr-3 h-5 w-5 animate-pulse rounded bg-gray-300 dark:bg-gray-600"
+                          />
+                          <div>
+                            <div
+                              class="h-4 w-32 animate-pulse rounded bg-gray-300 dark:bg-gray-600"
+                            />
+                            <div
+                              class="mt-1 h-3 w-20 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                            />
                           </div>
                         </div>
+                        <div
+                          class="h-3 w-12 animate-pulse rounded bg-gray-200 dark:bg-gray-700"
+                        />
                       </div>
-                      <span class="text-xs capitalize text-gray-400">
-                        {{ collection.visibility.toLowerCase() }}
-                      </span>
-                    </NuxtLink>
+                    </template>
+
+                    <!-- Actual collections when loaded -->
+                    <template v-else>
+                      <NuxtLink
+                        v-for="collection in filteredCollections"
+                        :key="collection.id"
+                        :to="`/library/${collection.id}`"
+                        class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                        active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
+                      >
+                        <div class="flex items-center">
+                          <ChannelIcon
+                            class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
+                          />
+                          <div>
+                            <div class="font-medium">{{ collection.name }}</div>
+                            <div
+                              class="text-xs text-gray-500 dark:text-gray-400"
+                            >
+                              {{ collection.itemCount }} item{{
+                                collection.itemCount !== 1 ? 's' : ''
+                              }}
+                            </div>
+                          </div>
+                        </div>
+                        <span class="text-xs capitalize text-gray-400">
+                          {{ collection.visibility.toLowerCase() }}
+                        </span>
+                      </NuxtLink>
+                    </template>
                   </nav>
                 </div>
               </div>
