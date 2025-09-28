@@ -6,7 +6,7 @@ const toastStore = useToastStore();
 
 <template>
   <Teleport to="body">
-    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 space-y-2">
+    <div class="fixed bottom-4 left-1/2 -translate-x-1/2 z-[100] space-y-2">
       <TransitionGroup
         enter-active-class="transition ease-out duration-300"
         enter-from-class="translate-y-2 opacity-0"
