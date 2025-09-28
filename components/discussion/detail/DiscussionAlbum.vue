@@ -18,6 +18,7 @@ import { usernameVar } from '@/cache';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import CarouselThumbnail from '@/components/discussion/detail/CarouselThumbnail.vue';
+import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 
 const props = defineProps({
   album: {
@@ -1021,6 +1022,13 @@ const togglePanelPosition = () => {
                 :class="{ 'h-4 w-4': panelOnSide, 'h-6 w-6': !panelOnSide }"
               />
             </button>
+            <!-- Add to Favorites button -->
+            <AddImageToFavorites
+              v-if="currentImage?.id && !currentImage.isStlFile"
+              :image-id="currentImage.id"
+              :image-title="currentImage.caption || currentImage.alt || 'Image'"
+              :size="panelOnSide ? 'small' : 'medium'"
+            />
           </div>
         </div>
 
