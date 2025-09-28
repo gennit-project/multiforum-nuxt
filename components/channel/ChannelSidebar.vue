@@ -64,7 +64,6 @@ const closeBecomeAdminModal = () => {
 const handleBecomeAdminSuccess = () => {
   emit('refetchChannelData');
 };
-
 </script>
 
 <template>
@@ -109,7 +108,7 @@ const handleBecomeAdminSuccess = () => {
             </span>
           </div>
         </div>
-        <div v-if="isAuthenticatedVar" class="flex items-center">
+        <div class="flex items-center">
           <AddToChannelFavorites
             :channel-unique-name="channelId"
             :channel-display-name="channel?.displayName || ''"

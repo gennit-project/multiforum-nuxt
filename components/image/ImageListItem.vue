@@ -4,7 +4,6 @@ import type { Image } from '@/__generated__/graphql';
 import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
-import { isAuthenticatedVar } from '@/cache';
 
 const props = defineProps({
   image: {
@@ -39,11 +38,12 @@ const getImageAlt = (image: Image) => {
   <div
     class="group relative cursor-pointer overflow-hidden rounded-lg bg-white shadow transition-shadow hover:shadow-lg dark:bg-gray-800"
   >
-    <NuxtLink :to="`/u/${props.username}/images/${props.image.id}`" class="block">
+    <NuxtLink
+      :to="`/u/${props.username}/images/${props.image.id}`"
+      class="block"
+    >
       <!-- Image container with fixed aspect ratio -->
-      <div
-        class="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700"
-      >
+      <div class="aspect-square overflow-hidden bg-gray-100 dark:bg-gray-700">
         <!-- 3D Model viewer for GLB files -->
         <ModelViewer
           v-if="props.image.url && hasGlbExtension(props.image.url)"
@@ -53,7 +53,9 @@ const getImageAlt = (image: Image) => {
           class="h-full w-full object-cover"
         />
         <!-- STL viewer for STL files -->
-        <ClientOnly v-else-if="props.image.url && hasStlExtension(props.image.url)">
+        <ClientOnly
+          v-else-if="props.image.url && hasStlExtension(props.image.url)"
+        >
           <StlViewer
             :src="props.image.url"
             :width="300"
@@ -106,7 +108,7 @@ const getImageAlt = (image: Image) => {
 
           <!-- Favorite button -->
           <div
-            v-if="props.showFavoriteButton && isAuthenticatedVar"
+            v-if="props.showFavoriteButton"
             class="flex-shrink-0"
             @click.stop.prevent
           >
@@ -128,4 +130,5 @@ const getImageAlt = (image: Image) => {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}</style>
+}
+</style>

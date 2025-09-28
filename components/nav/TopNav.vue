@@ -14,7 +14,6 @@ import {
   usernameVar,
   sideNavIsOpenVar,
   notificationCountVar,
-  isAuthenticatedVar,
 } from '@/cache';
 
 defineEmits(['toggleDropdown']);
@@ -63,7 +62,6 @@ const isOnMapPage = computed(() => {
   }
   return false;
 });
-
 </script>
 
 <template>
@@ -107,7 +105,6 @@ const isOnMapPage = computed(() => {
               {{ channelId }}
             </nuxt-link>
             <AddToChannelFavorites
-              v-if="isAuthenticatedVar"
               :channel-unique-name="channelId"
               size="small"
               class="ml-1"
