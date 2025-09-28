@@ -42,7 +42,7 @@ const isAnimating = ref(false);
 const showTooltip = ref(false);
 const showPopover = ref(false);
 const tooltipPosition = ref({ top: false, right: false });
-const popoverPosition = ref({ top: false, right: false });
+const popoverPosition = ref({ top: 0, left: 0 });
 const buttonRef = ref<HTMLElement>();
 const tooltipRef = ref<HTMLElement>();
 
@@ -257,6 +257,7 @@ const tooltipClasses = computed(() => {
           :item-type="entityType"
           :is-visible="showPopover"
           :position="popoverPosition"
+          :is-already-favorite="isFavorited"
           @close="closePopover"
         />
       </div>
@@ -305,6 +306,7 @@ const tooltipClasses = computed(() => {
           :item-type="entityType"
           :is-visible="showPopover"
           :position="popoverPosition"
+          :is-already-favorite="isFavorited"
           @close="closePopover"
         />
       </div>

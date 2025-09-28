@@ -234,13 +234,12 @@ const getUserActionClasses = (isActive: boolean) => {
       text="Topical - Home"
       :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
     >
-      <a
-        href="/"
+      <NuxtLink
+        to="/"
         class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
-        @click.prevent="() => navigateTo({ name: 'index' })"
       >
         <span class="text-2xl">🐝</span>
-      </a>
+      </NuxtLink>
     </IconTooltip>
 
     <!-- Main Navigation Icons -->
@@ -256,17 +255,16 @@ const getUserActionClasses = (isActive: boolean) => {
         :key="item.name"
         :text="item.name"
       >
-        <a
-          :href="item.href"
+        <NuxtLink
+          :to="item.routerName === 'library' ? item.href : { name: item.routerName }"
           :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-          @click.prevent="() => item.routerName === 'library' ? navigateTo({ path: item.href }) : navigateTo({ name: item.routerName })"
         >
           <component
             :is="item.icon"
             class="h-6 w-6 text-gray-300"
             aria-hidden="true"
           />
-        </a>
+        </NuxtLink>
       </IconTooltip>
     </div>
 
@@ -289,16 +287,12 @@ const getUserActionClasses = (isActive: boolean) => {
           :key="forum.uniqueName"
           :text="forum.uniqueName"
         >
-          <a
-            :href="`/forums/${forum.uniqueName}/discussions`"
+          <NuxtLink
+            :to="{
+              name: 'forums-forumId-discussions',
+              params: { forumId: forum.uniqueName },
+            }"
             :class="getForumIconClasses(currentForumId === forum.uniqueName)"
-            @click.prevent="
-              () =>
-                navigateTo({
-                  name: 'forums-forumId-discussions',
-                  params: { forumId: forum.uniqueName },
-                })
-            "
           >
             <AvatarComponent
               class="h-8 w-8"
@@ -307,7 +301,7 @@ const getUserActionClasses = (isActive: boolean) => {
               :is-small="true"
               :is-square="false"
             />
-          </a>
+          </NuxtLink>
         </IconTooltip>
 
         <!-- More Button -->
@@ -341,29 +335,24 @@ const getUserActionClasses = (isActive: boolean) => {
     >
       <!-- Admin Dashboard (always shown) -->
       <IconTooltip text="Admin Dashboard">
-        <a
-          href="/admin/issues"
+        <NuxtLink
+          to="/admin/issues"
           :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
-          @click.prevent="() => navigateTo({ name: 'admin-issues' })"
         >
           <AdminIcon />
-        </a>
+        </NuxtLink>
       </IconTooltip>
 
       <!-- Authentication-dependent actions -->
       <ClientOnly>
         <!-- Profile -->
         <IconTooltip v-if="isAuthenticatedVar && usernameVar" text="My Profile">
-          <a
-            :href="`/u/${usernameVar}`"
+          <NuxtLink
+            :to="{
+              name: 'u-username',
+              params: { username: usernameVar },
+            }"
             :class="getUserActionClasses(isActiveUserAction('u-username'))"
-            @click.prevent="
-              () =>
-                navigateTo({
-                  name: 'u-username',
-                  params: { username: usernameVar },
-                })
-            "
           >
             <AvatarComponent
               v-if="profilePicURL"
@@ -373,7 +362,7 @@ const getUserActionClasses = (isActive: boolean) => {
               class="h-8 w-8"
             />
             <UserIcon v-else />
-          </a>
+          </NuxtLink>
         </IconTooltip>
 
         <!-- Settings -->
@@ -381,13 +370,12 @@ const getUserActionClasses = (isActive: boolean) => {
           v-if="isAuthenticatedVar && usernameVar"
           text="Account Settings"
         >
-          <a
-            href="/account_settings"
+          <NuxtLink
+            to="/account_settings"
             :class="getUserActionClasses(isActiveUserAction('account_settings'))"
-            @click.prevent="() => navigateTo({ name: 'account_settings' })"
           >
             <SettingsIcon />
-          </a>
+          </NuxtLink>
         </IconTooltip>
 
         <!-- Sign Out -->
@@ -430,13 +418,12 @@ const getUserActionClasses = (isActive: boolean) => {
       >
         <!-- Logo -->
         <IconTooltip text="Topical - Home" class="mb-4">
-          <a
-            href="/"
+          <NuxtLink
+            to="/"
             class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
-            @click.prevent="() => navigateTo({ name: 'index' })"
           >
             <span class="text-2xl">🐝</span>
-          </a>
+          </NuxtLink>
         </IconTooltip>
 
         <!-- Main Navigation Icons -->
@@ -446,17 +433,16 @@ const getUserActionClasses = (isActive: boolean) => {
             :key="item.name"
             :text="item.name"
           >
-            <a
-              :href="item.href"
+            <NuxtLink
+              :to="item.routerName === 'library' ? item.href : { name: item.routerName }"
               :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
-              @click.prevent="() => item.routerName === 'library' ? navigateTo({ path: item.href }) : navigateTo({ name: item.routerName })"
             >
               <component
                 :is="item.icon"
                 class="h-6 w-6 text-gray-300"
                 aria-hidden="true"
               />
-            </a>
+            </NuxtLink>
           </IconTooltip>
         </div>
 
@@ -470,13 +456,12 @@ const getUserActionClasses = (isActive: boolean) => {
         <div class="mt-auto flex flex-col space-y-2">
           <!-- Admin Dashboard -->
           <IconTooltip text="Admin Dashboard">
-            <a
-              href="/admin/issues"
+            <NuxtLink
+              to="/admin/issues"
               :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
-              @click.prevent="() => navigateTo({ name: 'admin-issues' })"
             >
               <AdminIcon />
-            </a>
+            </NuxtLink>
           </IconTooltip>
 
           <!-- Login fallback -->

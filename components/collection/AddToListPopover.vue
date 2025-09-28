@@ -22,6 +22,16 @@ import {
   REMOVE_IMAGE_FROM_COLLECTION,
   REMOVE_CHANNEL_FROM_COLLECTION
 } from '@/graphQLData/collection/mutations';
+import {
+  ADD_FAVORITE_DISCUSSION,
+  REMOVE_FAVORITE_DISCUSSION,
+  ADD_FAVORITE_COMMENT,
+  REMOVE_FAVORITE_COMMENT,
+  ADD_FAVORITE_IMAGE,
+  REMOVE_FAVORITE_IMAGE,
+  ADD_FAVORITE_CHANNEL,
+  REMOVE_FAVORITE_CHANNEL
+} from '@/graphQLData/user/mutations';
 
 const props = defineProps({
   itemId: {
@@ -40,6 +50,10 @@ const props = defineProps({
   position: {
     type: Object,
     default: () => ({ top: 0, left: 0 }),
+  },
+  isAlreadyFavorite: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -147,7 +161,17 @@ const itemInCollections = computed(() => {
 });
 
 const isItemInFavorites = computed(() => {
-  return favoritesList.value?.items?.some((item: any) => item.id === props.itemId) || false;
+  // If it's already favorited (from the button state), show it as checked
+  if (props.isAlreadyFavorite) return true;
+
+  // Otherwise check if it's in the favorites list from the query
+  if (props.itemType === 'channel') {
+    // Channels use uniqueName instead of id
+    return favoritesList.value?.items?.some((item: any) => item.uniqueName === props.itemId) || false;
+  } else {
+    // Other item types use id
+    return favoritesList.value?.items?.some((item: any) => item.id === props.itemId) || false;
+  }
 });
 
 // Mutations
@@ -160,6 +184,16 @@ const { mutate: removeDiscussionFromCollection } = useMutation(REMOVE_DISCUSSION
 const { mutate: removeCommentFromCollection } = useMutation(REMOVE_COMMENT_FROM_COLLECTION);
 const { mutate: removeImageFromCollection } = useMutation(REMOVE_IMAGE_FROM_COLLECTION);
 const { mutate: removeChannelFromCollection } = useMutation(REMOVE_CHANNEL_FROM_COLLECTION);
+
+// Favorites mutations
+const { mutate: addFavoriteDiscussion } = useMutation(ADD_FAVORITE_DISCUSSION);
+const { mutate: removeFavoriteDiscussion } = useMutation(REMOVE_FAVORITE_DISCUSSION);
+const { mutate: addFavoriteComment } = useMutation(ADD_FAVORITE_COMMENT);
+const { mutate: removeFavoriteComment } = useMutation(REMOVE_FAVORITE_COMMENT);
+const { mutate: addFavoriteImage } = useMutation(ADD_FAVORITE_IMAGE);
+const { mutate: removeFavoriteImage } = useMutation(REMOVE_FAVORITE_IMAGE);
+const { mutate: addFavoriteChannel } = useMutation(ADD_FAVORITE_CHANNEL);
+const { mutate: removeFavoriteChannel } = useMutation(REMOVE_FAVORITE_CHANNEL);
 
 // Search functionality
 watch(searchTerm, () => {
@@ -205,6 +239,36 @@ const getRemoveMutation = () => {
   }
 };
 
+const getAddFavoriteMutation = () => {
+  switch (props.itemType) {
+    case 'discussion':
+      return addFavoriteDiscussion;
+    case 'comment':
+      return addFavoriteComment;
+    case 'image':
+      return addFavoriteImage;
+    case 'channel':
+      return addFavoriteChannel;
+    default:
+      throw new Error(`Unknown item type: ${props.itemType}`);
+  }
+};
+
+const getRemoveFavoriteMutation = () => {
+  switch (props.itemType) {
+    case 'discussion':
+      return removeFavoriteDiscussion;
+    case 'comment':
+      return removeFavoriteComment;
+    case 'image':
+      return removeFavoriteImage;
+    case 'channel':
+      return removeFavoriteChannel;
+    default:
+      throw new Error(`Unknown item type: ${props.itemType}`);
+  }
+};
+
 const handleCreateNewCollection = async () => {
   if (!newCollectionName.value.trim()) return;
 
@@ -240,33 +304,71 @@ const handleCreateNewCollection = async () => {
 };
 
 const handleToggleInCollection = async (collection: any) => {
-  const isInCollection = itemInCollections.value.some((c: any) => c.id === collection.id);
+  // Check if this is the favorites list (has an id starting with 'favorites-')
+  if (collection.id && collection.id.startsWith('favorites-')) {
+    // Handle favorites list
+    const isCurrentlyFavorited = isItemInFavorites.value;
 
-  isLoading.value = true;
-  try {
-    if (isInCollection) {
-      const removeMutation = getRemoveMutation();
-      await removeMutation({
-        collectionId: collection.id,
-        itemId: props.itemId,
-      });
-      toastStore.showToast(`Removed from "${collection.name}"`);
-    } else {
-      const addMutation = getAddMutation();
-      await addMutation({
-        collectionId: collection.id,
-        itemId: props.itemId,
-      });
-      toastStore.showToast(`Added to "${collection.name}"`);
+    isLoading.value = true;
+    try {
+      if (isCurrentlyFavorited) {
+        // Remove from favorites
+        const removeMutation = getRemoveFavoriteMutation();
+        const params = props.itemType === 'channel'
+          ? { channel: props.itemId, username: usernameVar.value }
+          : { [`${props.itemType}Id`]: props.itemId, username: usernameVar.value };
+
+        await removeMutation(params);
+        toastStore.showToast(`Removed from "${collection.name}"`);
+      } else {
+        // Add to favorites
+        const addMutation = getAddFavoriteMutation();
+        const params = props.itemType === 'channel'
+          ? { channel: props.itemId, username: usernameVar.value }
+          : { [`${props.itemType}Id`]: props.itemId, username: usernameVar.value };
+
+        await addMutation(params);
+        toastStore.showToast(`Added to "${collection.name}"`);
+      }
+
+      // Refresh the data
+      refetchCollections();
+    } catch (error) {
+      console.error('Error toggling favorites:', error);
+      toastStore.showToast('Error updating favorites', 'error');
+    } finally {
+      isLoading.value = false;
     }
+  } else {
+    // Handle regular collections
+    const isInCollection = itemInCollections.value.some((c: any) => c.id === collection.id);
 
-    // Refresh the data
-    refetchCollections();
-  } catch (error) {
-    console.error('Error toggling collection:', error);
-    toastStore.showToast('Error updating collection', 'error');
-  } finally {
-    isLoading.value = false;
+    isLoading.value = true;
+    try {
+      if (isInCollection) {
+        const removeMutation = getRemoveMutation();
+        await removeMutation({
+          collectionId: collection.id,
+          itemId: props.itemId,
+        });
+        toastStore.showToast(`Removed from "${collection.name}"`);
+      } else {
+        const addMutation = getAddMutation();
+        await addMutation({
+          collectionId: collection.id,
+          itemId: props.itemId,
+        });
+        toastStore.showToast(`Added to "${collection.name}"`);
+      }
+
+      // Refresh the data
+      refetchCollections();
+    } catch (error) {
+      console.error('Error toggling collection:', error);
+      toastStore.showToast('Error updating collection', 'error');
+    } finally {
+      isLoading.value = false;
+    }
   }
 };
 
@@ -324,7 +426,7 @@ const popoverStyles = computed(() => {
         type="text"
         placeholder="Search lists..."
         class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+      >
     </div>
 
     <!-- Create New List -->
@@ -346,7 +448,7 @@ const popoverStyles = computed(() => {
           class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           @keyup.enter="handleCreateNewCollection"
           @keyup.escape="isCreatingNew = false"
-        />
+        >
         <div class="flex gap-2">
           <button
             class="flex-1 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
@@ -366,7 +468,7 @@ const popoverStyles = computed(() => {
     </div>
 
     <!-- Divider -->
-    <hr class="border-gray-200 dark:border-gray-600 mb-3" />
+    <hr class="border-gray-200 dark:border-gray-600 mb-3" >
 
     <!-- Lists -->
     <div class="max-h-64 overflow-y-auto space-y-1">
@@ -385,12 +487,12 @@ const popoverStyles = computed(() => {
           :checked="isItemInFavorites"
           class="rounded text-blue-600 focus:ring-blue-500"
           readonly
-        />
+        >
       </div>
 
       <!-- Divider between Favorites and Collections -->
       <div v-if="favoritesList && (!searchTerm || filteredCollections.length > 0 || !searchTerm)" class="my-2">
-        <hr class="border-gray-200 dark:border-gray-600" />
+        <hr class="border-gray-200 dark:border-gray-600" >
         <div class="mt-2 mb-1 px-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
           Collections
         </div>
@@ -413,7 +515,7 @@ const popoverStyles = computed(() => {
           :checked="itemInCollections.some((c: any) => c.id === collection.id)"
           class="rounded text-blue-600 focus:ring-blue-500"
           readonly
-        />
+        >
       </div>
 
       <!-- No Search Results -->
@@ -438,7 +540,7 @@ const popoverStyles = computed(() => {
       v-if="isLoading"
       class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center rounded-lg"
     >
-      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"/>
     </div>
   </div>
   </Teleport>
