@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, nextTick } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 
 const props = defineProps({
@@ -30,6 +30,10 @@ const emit = defineEmits<{
 }>();
 
 const isAnimating = ref(false);
+const showTooltip = ref(false);
+const tooltipPosition = ref({ top: false, right: false });
+const buttonRef = ref<HTMLElement>();
+const tooltipRef = ref<HTMLElement>();
 
 const handleClick = () => {
   if (!props.isLoading) {
@@ -43,6 +47,38 @@ const handleClick = () => {
       }, 300);
     }
   }
+};
+
+const updateTooltipPosition = async () => {
+  if (!buttonRef.value || !showTooltip.value) return;
+
+  await nextTick();
+  if (!tooltipRef.value) return;
+
+  const buttonRect = buttonRef.value.getBoundingClientRect();
+  const tooltipRect = tooltipRef.value.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Check if tooltip would go off the right edge
+  const wouldOverflowRight = buttonRect.left + tooltipRect.width > viewportWidth - 10;
+
+  // Check if tooltip would go off the bottom edge
+  const wouldOverflowBottom = buttonRect.bottom + tooltipRect.height > viewportHeight - 10;
+
+  tooltipPosition.value = {
+    right: wouldOverflowRight,
+    top: wouldOverflowBottom,
+  };
+};
+
+const handleMouseEnter = () => {
+  showTooltip.value = true;
+  nextTick(() => updateTooltipPosition());
+};
+
+const handleMouseLeave = () => {
+  showTooltip.value = false;
 };
 
 const sizeClasses = computed(() => {
@@ -62,79 +98,131 @@ const buttonLabel = computed(() => {
     ? `Remove ${itemName} from favorites`
     : `Add ${itemName} to favorites`;
 });
+
+const tooltipText = computed(() => {
+  return props.isFavorited ? 'Remove from favorites' : 'Add to favorites';
+});
+
+const tooltipClasses = computed(() => {
+  const baseClasses = 'absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg pointer-events-none transition-opacity duration-200 whitespace-nowrap dark:bg-gray-700';
+  const positionClasses = [];
+
+  if (tooltipPosition.value.top) {
+    positionClasses.push('bottom-full mb-1');
+  } else {
+    positionClasses.push('top-full mt-1');
+  }
+
+  if (tooltipPosition.value.right) {
+    positionClasses.push('right-0');
+  } else {
+    positionClasses.push('left-0');
+  }
+
+  return `${baseClasses} ${positionClasses.join(' ')}`;
+});
 </script>
 
 <template>
   <RequireAuth :full-width="false">
     <template #has-auth>
-      <button
-        type="button"
-        :aria-label="buttonLabel"
-        :disabled="isLoading"
-        class="add-to-favorites-button rounded-full p-1 transition-all duration-200"
-        :class="{
-          'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400':
-            !isFavorited,
-          'text-green-500 hover:text-green-600': isFavorited,
-          'animate-pulse-once': isAnimating,
-          'opacity-50 cursor-not-allowed': isLoading,
-        }"
-        @click="handleClick"
-      >
-        <svg
-          v-if="!isFavorited"
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          :class="sizeClasses"
+      <div class="relative inline-block">
+        <button
+          ref="buttonRef"
+          type="button"
+          :aria-label="buttonLabel"
+          :disabled="isLoading"
+          class="add-to-favorites-button rounded-full p-1 transition-all duration-200"
+          :class="{
+            'text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400':
+              !isFavorited,
+            'text-green-500 hover:text-green-600': isFavorited,
+            'animate-pulse-once': isAnimating,
+            'opacity-50 cursor-not-allowed': isLoading,
+          }"
+          @click="handleClick"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-          />
-        </svg>
-        <svg
-          v-else
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          :class="sizeClasses"
+          <svg
+            v-if="!isFavorited"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            :class="sizeClasses"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+          <svg
+            v-else
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            :class="sizeClasses"
+          >
+            <!-- White background circle -->
+            <circle cx="12" cy="12" r="9.75" fill="white" />
+            <!-- Green circle with checkmark -->
+            <path
+              fill="currentColor"
+              fill-rule="evenodd"
+              d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
+              clip-rule="evenodd"
+            />
+          </svg>
+        </button>
+
+        <!-- Tooltip -->
+        <div
+          v-if="showTooltip"
+          ref="tooltipRef"
+          :class="tooltipClasses"
+          :style="{ opacity: showTooltip ? 1 : 0 }"
         >
-          <!-- White background circle -->
-          <circle cx="12" cy="12" r="9.75" fill="white" />
-          <!-- Green circle with checkmark -->
-          <path
-            fill="currentColor"
-            fill-rule="evenodd"
-            d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z"
-            clip-rule="evenodd"
-          />
-        </svg>
-      </button>
+          {{ tooltipText }}
+        </div>
+      </div>
     </template>
     <template #does-not-have-auth>
-      <button
-        type="button"
-        :aria-label="`Add ${displayName || entityType} to favorites`"
-        class="add-to-favorites-button rounded-full p-1 transition-all duration-200 text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400 cursor-pointer"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke-width="1.5"
-          stroke="currentColor"
-          :class="sizeClasses"
+      <div class="relative inline-block">
+        <button
+          type="button"
+          :aria-label="`Add ${displayName || entityType} to favorites`"
+          class="add-to-favorites-button rounded-full p-1 transition-all duration-200 text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400 cursor-pointer"
+          @mouseenter="handleMouseEnter"
+          @mouseleave="handleMouseLeave"
         >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-          />
-        </svg>
-      </button>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            :class="sizeClasses"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+            />
+          </svg>
+        </button>
+
+        <!-- Tooltip for unauthenticated users -->
+        <div
+          v-if="showTooltip"
+          ref="tooltipRef"
+          :class="tooltipClasses"
+          :style="{ opacity: showTooltip ? 1 : 0 }"
+        >
+          Add to favorites
+        </div>
+      </div>
     </template>
   </RequireAuth>
 </template>
