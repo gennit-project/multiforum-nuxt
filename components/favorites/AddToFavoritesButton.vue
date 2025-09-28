@@ -77,16 +77,31 @@ const updatePopoverPosition = async () => {
   const buttonRect = buttonRef.value.getBoundingClientRect();
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
+  const popoverWidth = 320; // Width of the popover
+  const popoverHeight = 400; // Estimated height of the popover
 
-  // Check if popover would go off the right edge (assuming 320px width)
-  const wouldOverflowRight = buttonRect.left + 320 > viewportWidth - 10;
+  // Calculate position
+  let left = buttonRect.left;
+  let top = buttonRect.bottom + 8; // 8px spacing below button
 
-  // Check if popover would go off the bottom edge (assuming 400px height)
-  const wouldOverflowBottom = buttonRect.bottom + 400 > viewportHeight - 10;
+  // Check if popover would go off the right edge
+  if (left + popoverWidth > viewportWidth - 10) {
+    left = buttonRect.right - popoverWidth; // Align to right edge of button
+  }
+
+  // Check if popover would go off the bottom edge
+  if (top + popoverHeight > viewportHeight - 10) {
+    top = buttonRect.top - popoverHeight - 8; // Position above button
+  }
+
+  // Ensure it doesn't go off the left edge
+  if (left < 10) {
+    left = 10;
+  }
 
   popoverPosition.value = {
-    right: wouldOverflowRight,
-    top: wouldOverflowBottom,
+    top: top,
+    left: left,
   };
 };
 
@@ -249,9 +264,11 @@ const tooltipClasses = computed(() => {
     <template #does-not-have-auth>
       <div class="relative inline-block">
         <button
+          ref="buttonRef"
           type="button"
           :aria-label="`Add ${displayName || entityType} to favorites`"
           class="add-to-favorites-button rounded-full p-1 transition-all duration-200 text-gray-400 hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400 cursor-pointer"
+          @click="handleClick"
           @mouseenter="handleMouseEnter"
           @mouseleave="handleMouseLeave"
         >

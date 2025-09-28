@@ -5,7 +5,10 @@ import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
 import type { CollectionType, CollectionVisibility } from '@/__generated__/graphql';
 import {
-  GET_USER_COLLECTIONS,
+  GET_USER_COLLECTIONS_DISCUSSIONS,
+  GET_USER_COLLECTIONS_COMMENTS,
+  GET_USER_COLLECTIONS_IMAGES,
+  GET_USER_COLLECTIONS_CHANNELS,
   CHECK_ITEM_IN_COLLECTIONS
 } from '@/graphQLData/collection/queries';
 import {
@@ -36,7 +39,7 @@ const props = defineProps({
   },
   position: {
     type: Object,
-    default: () => ({ top: false, right: false }),
+    default: () => ({ top: 0, left: 0 }),
   },
 });
 
@@ -60,12 +63,27 @@ const collectionTypeMap: Record<string, CollectionType> = {
 
 const collectionType = computed(() => collectionTypeMap[props.itemType]);
 
+// Select the appropriate query based on item type
+const getCollectionQuery = () => {
+  switch (props.itemType) {
+    case 'discussion':
+      return GET_USER_COLLECTIONS_DISCUSSIONS;
+    case 'comment':
+      return GET_USER_COLLECTIONS_COMMENTS;
+    case 'image':
+      return GET_USER_COLLECTIONS_IMAGES;
+    case 'channel':
+      return GET_USER_COLLECTIONS_CHANNELS;
+    default:
+      return GET_USER_COLLECTIONS_DISCUSSIONS;
+  }
+};
+
 // Fetch user collections
 const { result: collectionsResult, refetch: refetchCollections } = useQuery(
-  GET_USER_COLLECTIONS,
+  getCollectionQuery(),
   () => ({
     username: usernameVar.value,
-    collectionType: collectionType.value,
     searchTerm: searchTerm.value || undefined,
   }),
   () => ({
@@ -254,13 +272,17 @@ const handleToggleInCollection = async (collection: any) => {
 
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
-  if (!target.closest('.add-to-list-popover')) {
+  // Don't close if clicking inside the popover or the button that triggered it
+  if (!target.closest('.add-to-list-popover') && !target.closest('.add-to-favorites-button')) {
     emit('close');
   }
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
+  // Use setTimeout to avoid immediate closure on the same click that opened it
+  setTimeout(() => {
+    document.addEventListener('click', handleClickOutside);
+  }, 0);
 });
 
 onUnmounted(() => {
@@ -268,27 +290,20 @@ onUnmounted(() => {
 });
 
 const popoverClasses = computed(() => {
-  const baseClasses = 'add-to-list-popover absolute z-50 w-80 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-4';
-  const positionClasses = [];
+  return 'add-to-list-popover fixed z-[9999] w-80 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-4';
+});
 
-  if (props.position.top) {
-    positionClasses.push('bottom-full mb-2');
-  } else {
-    positionClasses.push('top-full mt-2');
-  }
-
-  if (props.position.right) {
-    positionClasses.push('right-0');
-  } else {
-    positionClasses.push('left-0');
-  }
-
-  return `${baseClasses} ${positionClasses.join(' ')}`;
+const popoverStyles = computed(() => {
+  return {
+    top: `${props.position.top}px`,
+    left: `${props.position.left}px`,
+  };
 });
 </script>
 
 <template>
-  <div v-if="isVisible" :class="popoverClasses">
+  <Teleport to="body">
+    <div v-if="isVisible" :class="popoverClasses" :style="popoverStyles" @click.stop>
     <!-- Header -->
     <div class="flex items-center justify-between mb-3">
       <h3 class="text-sm font-medium text-gray-900 dark:text-white">
@@ -355,11 +370,11 @@ const popoverClasses = computed(() => {
 
     <!-- Lists -->
     <div class="max-h-64 overflow-y-auto space-y-1">
-      <!-- Favorites List -->
+      <!-- Favorites List (Always shown) -->
       <div
         v-if="favoritesList"
         class="flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-        @click="handleToggleInCollection(favoritesList)"
+        @click.stop="handleToggleInCollection(favoritesList)"
       >
         <div class="flex items-center">
           <span class="text-yellow-500 mr-2">★</span>
@@ -373,12 +388,20 @@ const popoverClasses = computed(() => {
         />
       </div>
 
+      <!-- Divider between Favorites and Collections -->
+      <div v-if="favoritesList && (!searchTerm || filteredCollections.length > 0 || !searchTerm)" class="my-2">
+        <hr class="border-gray-200 dark:border-gray-600" />
+        <div class="mt-2 mb-1 px-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+          Collections
+        </div>
+      </div>
+
       <!-- Custom Collections -->
       <div
         v-for="collection in filteredCollections"
         :key="collection.id"
         class="flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-        @click="handleToggleInCollection(collection)"
+        @click.stop="handleToggleInCollection(collection)"
       >
         <div class="flex items-center">
           <span class="text-gray-500 mr-2">📝</span>
@@ -393,20 +416,20 @@ const popoverClasses = computed(() => {
         />
       </div>
 
-      <!-- No Results -->
+      <!-- No Search Results -->
       <div
         v-if="filteredCollections.length === 0 && searchTerm"
         class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center"
       >
-        No lists found for "{{ searchTerm }}"
+        No collections found for "{{ searchTerm }}"
       </div>
 
-      <!-- Empty State -->
+      <!-- Empty Collections State -->
       <div
-        v-if="filteredCollections.length === 0 && !searchTerm && !favoritesList"
+        v-if="filteredCollections.length === 0 && !searchTerm"
         class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center"
       >
-        No lists yet. Create your first list above!
+        No collections yet. Create your first collection above!
       </div>
     </div>
 
@@ -418,6 +441,7 @@ const popoverClasses = computed(() => {
       <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <style scoped>
