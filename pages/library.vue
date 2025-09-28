@@ -266,7 +266,7 @@ const filteredCollections = computed(() => {
         </template>
         <template #does-not-have-auth>
           <div class="mx-auto max-w-md text-center">
-            <h1 class="text-2xl font-bold text-gray-900 dark:text-white">
+            <h1 class="mt-8 text-2xl font-bold text-gray-900 dark:text-white">
               Sign In Required
             </h1>
             <p class="mt-4 text-gray-600 dark:text-gray-300">

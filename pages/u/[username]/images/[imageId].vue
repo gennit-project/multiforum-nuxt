@@ -8,6 +8,7 @@ import ModelViewer from '@/components/ModelViewer.vue';
 import StlViewer from '@/components/download/StlViewer.vue';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
+import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 
 // @ts-ignore - definePageMeta is auto-imported by Nuxt
 definePageMeta({
@@ -270,15 +271,24 @@ onUnmounted(() => {
             ← Back to {{ username }}'s Images
           </NuxtLink>
 
-          <button
-            v-if="image.url"
-            type="button"
-            class="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
-            @click="downloadImage(image.url)"
-          >
-            <DownloadIcon class="h-5 w-5" />
-            Download
-          </button>
+          <div class="flex items-center gap-2">
+            <AddImageToFavorites
+              v-if="image.id"
+              :image-id="image.id"
+              :image-title="image.caption || image.alt || 'Image'"
+              size="medium"
+            />
+
+            <button
+              v-if="image.url"
+              type="button"
+              class="flex items-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700"
+              @click="downloadImage(image.url)"
+            >
+              <DownloadIcon class="h-5 w-5" />
+              Download
+            </button>
+          </div>
         </div>
 
         <!-- Image display -->
