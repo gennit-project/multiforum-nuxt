@@ -3,13 +3,16 @@ import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
-import type { CollectionType, CollectionVisibility } from '@/__generated__/graphql';
+import type {
+  CollectionType,
+  CollectionVisibility,
+} from '@/__generated__/graphql';
 import {
   GET_USER_COLLECTIONS_DISCUSSIONS,
   GET_USER_COLLECTIONS_COMMENTS,
   GET_USER_COLLECTIONS_IMAGES,
   GET_USER_COLLECTIONS_CHANNELS,
-  CHECK_ITEM_IN_COLLECTIONS
+  CHECK_ITEM_IN_COLLECTIONS,
 } from '@/graphQLData/collection/queries';
 import {
   CREATE_COLLECTION,
@@ -20,7 +23,7 @@ import {
   REMOVE_DISCUSSION_FROM_COLLECTION,
   REMOVE_COMMENT_FROM_COLLECTION,
   REMOVE_IMAGE_FROM_COLLECTION,
-  REMOVE_CHANNEL_FROM_COLLECTION
+  REMOVE_CHANNEL_FROM_COLLECTION,
 } from '@/graphQLData/collection/mutations';
 import {
   ADD_FAVORITE_DISCUSSION,
@@ -30,7 +33,7 @@ import {
   ADD_FAVORITE_IMAGE,
   REMOVE_FAVORITE_IMAGE,
   ADD_FAVORITE_CHANNEL,
-  REMOVE_FAVORITE_CHANNEL
+  REMOVE_FAVORITE_CHANNEL,
 } from '@/graphQLData/user/mutations';
 
 const props = defineProps({
@@ -41,7 +44,8 @@ const props = defineProps({
   itemType: {
     type: String,
     required: true,
-    validator: (value: string) => ['discussion', 'comment', 'image', 'channel'].includes(value),
+    validator: (value: string) =>
+      ['discussion', 'comment', 'image', 'channel'].includes(value),
   },
   isVisible: {
     type: Boolean,
@@ -124,7 +128,11 @@ const collections = computed(() => {
 
 const favoritesList = computed(() => {
   const user = collectionsResult.value?.users?.[0];
-  if (!user) return null;
+  if (!user) return {
+    id: 'favorites',
+    name: 'Favorites',
+    items: []
+  };
 
   switch (props.itemType) {
     case 'discussion':
@@ -152,7 +160,11 @@ const favoritesList = computed(() => {
         items: user.FavoriteChannels || [],
       };
     default:
-      return null;
+      return {
+        id: 'favorites',
+        name: 'Favorites',
+        items: []
+      };
   }
 });
 
@@ -167,27 +179,52 @@ const isItemInFavorites = computed(() => {
   // Otherwise check if it's in the favorites list from the query
   if (props.itemType === 'channel') {
     // Channels use uniqueName instead of id
-    return favoritesList.value?.items?.some((item: any) => item.uniqueName === props.itemId) || false;
+    return (
+      favoritesList.value?.items?.some(
+        (item: any) => item.uniqueName === props.itemId
+      ) || false
+    );
   } else {
     // Other item types use id
-    return favoritesList.value?.items?.some((item: any) => item.id === props.itemId) || false;
+    return (
+      favoritesList.value?.items?.some((item: any) => item.id === props.itemId) ||
+      false
+    );
   }
 });
 
 // Mutations
 const { mutate: createCollection } = useMutation(CREATE_COLLECTION);
-const { mutate: addDiscussionToCollection } = useMutation(ADD_DISCUSSION_TO_COLLECTION);
-const { mutate: addCommentToCollection } = useMutation(ADD_COMMENT_TO_COLLECTION);
+
+const { mutate: addDiscussionToCollection } = useMutation(
+  ADD_DISCUSSION_TO_COLLECTION
+);
+const { mutate: addCommentToCollection } = useMutation(
+  ADD_COMMENT_TO_COLLECTION
+);
 const { mutate: addImageToCollection } = useMutation(ADD_IMAGE_TO_COLLECTION);
-const { mutate: addChannelToCollection } = useMutation(ADD_CHANNEL_TO_COLLECTION);
-const { mutate: removeDiscussionFromCollection } = useMutation(REMOVE_DISCUSSION_FROM_COLLECTION);
-const { mutate: removeCommentFromCollection } = useMutation(REMOVE_COMMENT_FROM_COLLECTION);
-const { mutate: removeImageFromCollection } = useMutation(REMOVE_IMAGE_FROM_COLLECTION);
-const { mutate: removeChannelFromCollection } = useMutation(REMOVE_CHANNEL_FROM_COLLECTION);
+const { mutate: addChannelToCollection } = useMutation(
+  ADD_CHANNEL_TO_COLLECTION
+);
+
+const { mutate: removeDiscussionFromCollection } = useMutation(
+  REMOVE_DISCUSSION_FROM_COLLECTION
+);
+const { mutate: removeCommentFromCollection } = useMutation(
+  REMOVE_COMMENT_FROM_COLLECTION
+);
+const { mutate: removeImageFromCollection } = useMutation(
+  REMOVE_IMAGE_FROM_COLLECTION
+);
+const { mutate: removeChannelFromCollection } = useMutation(
+  REMOVE_CHANNEL_FROM_COLLECTION
+);
 
 // Favorites mutations
 const { mutate: addFavoriteDiscussion } = useMutation(ADD_FAVORITE_DISCUSSION);
-const { mutate: removeFavoriteDiscussion } = useMutation(REMOVE_FAVORITE_DISCUSSION);
+const { mutate: removeFavoriteDiscussion } = useMutation(
+  REMOVE_FAVORITE_DISCUSSION
+);
 const { mutate: addFavoriteComment } = useMutation(ADD_FAVORITE_COMMENT);
 const { mutate: removeFavoriteComment } = useMutation(REMOVE_FAVORITE_COMMENT);
 const { mutate: addFavoriteImage } = useMutation(ADD_FAVORITE_IMAGE);
@@ -314,18 +351,26 @@ const handleToggleInCollection = async (collection: any) => {
       if (isCurrentlyFavorited) {
         // Remove from favorites
         const removeMutation = getRemoveFavoriteMutation();
-        const params = props.itemType === 'channel'
-          ? { channel: props.itemId, username: usernameVar.value }
-          : { [`${props.itemType}Id`]: props.itemId, username: usernameVar.value };
+        const params =
+          props.itemType === 'channel'
+            ? { channel: props.itemId, username: usernameVar.value }
+            : {
+                [`${props.itemType}Id`]: props.itemId,
+                username: usernameVar.value,
+              };
 
         await removeMutation(params);
         toastStore.showToast(`Removed from "${collection.name}"`);
       } else {
         // Add to favorites
         const addMutation = getAddFavoriteMutation();
-        const params = props.itemType === 'channel'
-          ? { channel: props.itemId, username: usernameVar.value }
-          : { [`${props.itemType}Id`]: props.itemId, username: usernameVar.value };
+        const params =
+          props.itemType === 'channel'
+            ? { channel: props.itemId, username: usernameVar.value }
+            : {
+                [`${props.itemType}Id`]: props.itemId,
+                username: usernameVar.value,
+              };
 
         await addMutation(params);
         toastStore.showToast(`Added to "${collection.name}"`);
@@ -341,7 +386,9 @@ const handleToggleInCollection = async (collection: any) => {
     }
   } else {
     // Handle regular collections
-    const isInCollection = itemInCollections.value.some((c: any) => c.id === collection.id);
+    const isInCollection = itemInCollections.value.some(
+      (c: any) => c.id === collection.id
+    );
 
     isLoading.value = true;
     try {
@@ -375,7 +422,10 @@ const handleToggleInCollection = async (collection: any) => {
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as HTMLElement;
   // Don't close if clicking inside the popover or the button that triggered it
-  if (!target.closest('.add-to-list-popover') && !target.closest('.add-to-favorites-button')) {
+  if (
+    !target.closest('.add-to-list-popover') &&
+    !target.closest('.add-to-favorites-button')
+  ) {
     emit('close');
   }
 };
@@ -405,144 +455,169 @@ const popoverStyles = computed(() => {
 
 <template>
   <Teleport to="body">
-    <div v-if="isVisible" :class="popoverClasses" :style="popoverStyles" @click.stop>
-    <!-- Header -->
-    <div class="flex items-center justify-between mb-3">
-      <h3 class="text-sm font-medium text-gray-900 dark:text-white">
-        Add to List
-      </h3>
-      <button
-        class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-        @click="emit('close')"
-      >
-        ×
-      </button>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="mb-3">
-      <input
-        v-model="searchTerm"
-        type="text"
-        placeholder="Search lists..."
-        class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-    </div>
-
-    <!-- Create New List -->
-    <div class="mb-3">
-      <div v-if="!isCreatingNew">
+    <div
+      v-if="isVisible"
+      :class="popoverClasses"
+      :style="popoverStyles"
+      @click.stop
+    >
+      <!-- Header -->
+      <div class="mb-3 flex items-center justify-between">
+        <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+          Add to List
+        </h3>
         <button
-          class="w-full flex items-center px-3 py-2 text-sm text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-md transition-colors"
-          @click="isCreatingNew = true"
+          class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          @click="emit('close')"
         >
-          <span class="mr-2">+</span>
-          New List
+          ×
         </button>
       </div>
-      <div v-else class="space-y-2">
+
+      <!-- Search Bar -->
+      <div class="mb-3">
         <input
-          v-model="newCollectionName"
+          v-model="searchTerm"
           type="text"
-          placeholder="Enter list name..."
-          class="w-full px-3 py-2 text-sm border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          @keyup.enter="handleCreateNewCollection"
-          @keyup.escape="isCreatingNew = false"
-        >
-        <div class="flex gap-2">
+          placeholder="Search lists..."
+          class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+        />
+      </div>
+
+      <!-- Create New List -->
+      <div class="mb-3">
+        <div v-if="!isCreatingNew">
           <button
-            class="flex-1 px-3 py-1 text-sm bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-            :disabled="!newCollectionName.trim() || isLoading"
-            @click="handleCreateNewCollection"
+            class="hover:bg-blue-50 flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
+            @click="isCreatingNew = true"
           >
-            Create
-          </button>
-          <button
-            class="flex-1 px-3 py-1 text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700"
-            @click="isCreatingNew = false; newCollectionName = ''"
-          >
-            Cancel
+            <span class="mr-2">+</span>
+            New List
           </button>
         </div>
-      </div>
-    </div>
-
-    <!-- Divider -->
-    <hr class="border-gray-200 dark:border-gray-600 mb-3" >
-
-    <!-- Lists -->
-    <div class="max-h-64 overflow-y-auto space-y-1">
-      <!-- Favorites List (Always shown) -->
-      <div
-        v-if="favoritesList"
-        class="flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-        @click.stop="handleToggleInCollection(favoritesList)"
-      >
-        <div class="flex items-center">
-          <span class="text-yellow-500 mr-2">★</span>
-          <span class="text-gray-900 dark:text-white">{{ favoritesList.name }}</span>
+        <div v-else class="space-y-2">
+          <input
+            v-model="newCollectionName"
+            type="text"
+            placeholder="Enter list name..."
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+            @keyup.enter="handleCreateNewCollection"
+            @keyup.escape="isCreatingNew = false"
+          />
+          <div class="flex gap-2">
+            <button
+              class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+              :disabled="!newCollectionName.trim() || isLoading"
+              @click="handleCreateNewCollection"
+            >
+              Create
+            </button>
+            <button
+              class="hover:bg-gray-50 flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+              @click="
+                isCreatingNew = false;
+                newCollectionName = '';
+              "
+            >
+              Cancel
+            </button>
+          </div>
         </div>
-        <input
-          type="checkbox"
-          :checked="isItemInFavorites"
-          class="rounded text-blue-600 focus:ring-blue-500"
-          readonly
+      </div>
+
+      <!-- Divider -->
+      <hr class="mb-3 border-gray-200 dark:border-gray-600" />
+
+      <!-- Lists -->
+      <div class="max-h-64 space-y-1 overflow-y-auto">
+        <!-- Favorites List (Always shown) -->
+        <div
+          class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+          @click.stop="handleToggleInCollection(favoritesList)"
         >
-      </div>
-
-      <!-- Divider between Favorites and Collections -->
-      <div v-if="favoritesList && (!searchTerm || filteredCollections.length > 0 || !searchTerm)" class="my-2">
-        <hr class="border-gray-200 dark:border-gray-600" >
-        <div class="mt-2 mb-1 px-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          Collections
+          <div class="flex items-center">
+            <span class="mr-2 text-yellow-500">★</span>
+            <span class="text-gray-900 dark:text-white">{{
+              favoritesList.name
+            }}</span>
+          </div>
+          <input
+            type="checkbox"
+            :checked="isItemInFavorites"
+            class="rounded text-blue-600 focus:ring-blue-500"
+            readonly
+          />
         </div>
-      </div>
 
-      <!-- Custom Collections -->
-      <div
-        v-for="collection in filteredCollections"
-        :key="collection.id"
-        class="flex items-center justify-between px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 rounded-md cursor-pointer"
-        @click.stop="handleToggleInCollection(collection)"
-      >
-        <div class="flex items-center">
-          <span class="text-gray-500 mr-2">📝</span>
-          <span class="text-gray-900 dark:text-white">{{ collection.name }}</span>
-          <span class="text-xs text-gray-500 ml-2">({{ collection.itemCount }})</span>
-        </div>
-        <input
-          type="checkbox"
-          :checked="itemInCollections.some((c: any) => c.id === collection.id)"
-          class="rounded text-blue-600 focus:ring-blue-500"
-          readonly
+        <!-- Divider between Favorites and Collections -->
+        <div
+          v-if="
+            favoritesList &&
+            (!searchTerm || filteredCollections.length > 0 || !searchTerm)
+          "
+          class="my-2"
         >
+          <hr class="border-gray-200 dark:border-gray-600" />
+          <div
+            class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+          >
+            Collections
+          </div>
+        </div>
+
+        <!-- Custom Collections -->
+        <div
+          v-for="collection in filteredCollections"
+          :key="collection.id"
+          class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+          @click.stop="handleToggleInCollection(collection)"
+        >
+          <div class="flex items-center">
+            <span class="mr-2 text-gray-500">📝</span>
+            <span class="text-gray-900 dark:text-white">{{
+              collection.name
+            }}</span>
+            <span class="ml-2 text-xs text-gray-500"
+              >({{ collection.itemCount }})</span
+            >
+          </div>
+          <input
+            type="checkbox"
+            :checked="
+              itemInCollections.some((c: any) => c.id === collection.id)
+            "
+            class="rounded text-blue-600 focus:ring-blue-500"
+            readonly
+          />
+        </div>
+
+        <!-- No Search Results -->
+        <div
+          v-if="filteredCollections.length === 0 && searchTerm"
+          class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
+        >
+          No collections found for "{{ searchTerm }}"
+        </div>
+
+        <!-- Empty Collections State -->
+        <div
+          v-if="filteredCollections.length === 0 && !searchTerm"
+          class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
+        >
+          No collections yet. Create your first collection above!
+        </div>
       </div>
 
-      <!-- No Search Results -->
+      <!-- Loading Overlay -->
       <div
-        v-if="filteredCollections.length === 0 && searchTerm"
-        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center"
+        v-if="isLoading"
+        class="absolute inset-0 flex items-center justify-center rounded-lg bg-white/50 dark:bg-gray-800/50"
       >
-        No collections found for "{{ searchTerm }}"
-      </div>
-
-      <!-- Empty Collections State -->
-      <div
-        v-if="filteredCollections.length === 0 && !searchTerm"
-        class="px-3 py-2 text-sm text-gray-500 dark:text-gray-400 text-center"
-      >
-        No collections yet. Create your first collection above!
+        <div
+          class="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"
+        />
       </div>
     </div>
-
-    <!-- Loading Overlay -->
-    <div
-      v-if="isLoading"
-      class="absolute inset-0 bg-white/50 dark:bg-gray-800/50 flex items-center justify-center rounded-lg"
-    >
-      <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"/>
-    </div>
-  </div>
   </Teleport>
 </template>
 
