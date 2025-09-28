@@ -88,15 +88,6 @@ const favoriteDownloads = computed(() => {
   return result.value?.users?.[0]?.FavoriteDiscussions || [];
 });
 
-const formatCount = (
-  count: number | undefined,
-  singular: string,
-  plural: string
-) => {
-  const value = count || 0;
-  return `${value} ${value === 1 ? singular : plural}`;
-};
-
 const getDownloadLink = (download: any) => {
   const firstChannel = safeArrayFirst(download.DiscussionChannels) as any;
   if (!firstChannel?.channelUniqueName) return '/';
@@ -107,12 +98,6 @@ const getDownloadLink = (download: any) => {
 const getChannelLink = (channelUniqueName: string | undefined) => {
   if (!channelUniqueName) return '/';
   return `/forums/${channelUniqueName}`;
-};
-
-const getTotalCommentCount = (discussionChannels: any[]) => {
-  return discussionChannels.reduce((total, dc) => {
-    return total + (dc.CommentsAggregate?.count || 0);
-  }, 0);
 };
 
 const getAuthorInfo = (download: any) => {
