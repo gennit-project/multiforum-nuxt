@@ -6,6 +6,10 @@ import StlViewer from '@/components/download/StlViewer.vue';
 import AddToImageFavorites from '@/components/favorites/AddToImageFavorites.vue';
 
 const props = defineProps({
+  allowAddToList: {
+    type: Boolean,
+    default: true,
+  },
   image: {
     type: Object as PropType<Image>,
     required: true,
@@ -70,7 +74,7 @@ const getImageAlt = (image: Image) => {
           :alt="getImageAlt(props.image) ?? 'Image'"
           class="h-full w-full object-cover"
           loading="lazy"
-        >
+        />
 
         <!-- Overlay with sensitive content warning -->
         <div
@@ -113,6 +117,7 @@ const getImageAlt = (image: Image) => {
             @click.stop.prevent
           >
             <AddToImageFavorites
+              :allow-add-to-list="allowAddToList"
               :image-id="props.image.id"
               :image-caption="props.image.caption || ''"
               size="small"
