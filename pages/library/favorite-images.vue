@@ -133,6 +133,7 @@ const user = computed(() => {
                 <ImageListItem
                   v-for="image in favoriteImages"
                   :key="image.id"
+                  :allow-add-to-list="false"
                   :image="image"
                   :username="user?.username || ''"
                   :show-favorite-button="true"

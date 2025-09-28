@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, nextTick } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
+import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 
 const props = defineProps({
   isFavorited: {
@@ -23,6 +24,14 @@ const props = defineProps({
     type: String,
     default: 'medium',
   },
+  allowAddToList: {
+    type: Boolean,
+    default: true,
+  },
+  itemId: {
+    type: String,
+    default: '',
+  },
 });
 
 const emit = defineEmits<{
@@ -31,22 +40,58 @@ const emit = defineEmits<{
 
 const isAnimating = ref(false);
 const showTooltip = ref(false);
+const showPopover = ref(false);
 const tooltipPosition = ref({ top: false, right: false });
+const popoverPosition = ref({ top: false, right: false });
 const buttonRef = ref<HTMLElement>();
 const tooltipRef = ref<HTMLElement>();
 
 const handleClick = () => {
   if (!props.isLoading) {
-    emit('toggle');
+    if (props.allowAddToList) {
+      // Show popover for list selection
+      showPopover.value = !showPopover.value;
+      if (showPopover.value) {
+        nextTick(() => updatePopoverPosition());
+      }
+    } else {
+      // Traditional favorites toggle
+      emit('toggle');
 
-    // Start animation if toggling to favorited
-    if (!props.isFavorited) {
-      isAnimating.value = true;
-      setTimeout(() => {
-        isAnimating.value = false;
-      }, 300);
+      // Start animation if toggling to favorited
+      if (!props.isFavorited) {
+        isAnimating.value = true;
+        setTimeout(() => {
+          isAnimating.value = false;
+        }, 300);
+      }
     }
   }
+};
+
+const updatePopoverPosition = async () => {
+  if (!buttonRef.value || !showPopover.value) return;
+
+  await nextTick();
+
+  const buttonRect = buttonRef.value.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+
+  // Check if popover would go off the right edge (assuming 320px width)
+  const wouldOverflowRight = buttonRect.left + 320 > viewportWidth - 10;
+
+  // Check if popover would go off the bottom edge (assuming 400px height)
+  const wouldOverflowBottom = buttonRect.bottom + 400 > viewportHeight - 10;
+
+  popoverPosition.value = {
+    right: wouldOverflowRight,
+    top: wouldOverflowBottom,
+  };
+};
+
+const closePopover = () => {
+  showPopover.value = false;
 };
 
 const updateTooltipPosition = async () => {
@@ -100,6 +145,9 @@ const buttonLabel = computed(() => {
 });
 
 const tooltipText = computed(() => {
+  if (props.allowAddToList) {
+    return 'Add to List';
+  }
   return props.isFavorited ? 'Remove from favorites' : 'Add to favorites';
 });
 
@@ -179,13 +227,23 @@ const tooltipClasses = computed(() => {
 
         <!-- Tooltip -->
         <div
-          v-if="showTooltip"
+          v-if="showTooltip && !showPopover"
           ref="tooltipRef"
           :class="tooltipClasses"
           :style="{ opacity: showTooltip ? 1 : 0 }"
         >
           {{ tooltipText }}
         </div>
+
+        <!-- Add to List Popover -->
+        <AddToListPopover
+          v-if="allowAddToList"
+          :item-id="itemId"
+          :item-type="entityType"
+          :is-visible="showPopover"
+          :position="popoverPosition"
+          @close="closePopover"
+        />
       </div>
     </template>
     <template #does-not-have-auth>
@@ -215,13 +273,23 @@ const tooltipClasses = computed(() => {
 
         <!-- Tooltip for unauthenticated users -->
         <div
-          v-if="showTooltip"
+          v-if="showTooltip && !showPopover"
           ref="tooltipRef"
           :class="tooltipClasses"
           :style="{ opacity: showTooltip ? 1 : 0 }"
         >
-          Add to favorites
+          {{ allowAddToList ? 'Add to List' : 'Add to favorites' }}
         </div>
+
+        <!-- Add to List Popover for unauthenticated users -->
+        <AddToListPopover
+          v-if="allowAddToList"
+          :item-id="itemId"
+          :item-type="entityType"
+          :is-visible="showPopover"
+          :position="popoverPosition"
+          @close="closePopover"
+        />
       </div>
     </template>
   </RequireAuth>

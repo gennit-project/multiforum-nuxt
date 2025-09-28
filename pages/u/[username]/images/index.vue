@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, ref, defineProps } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useRoute } from 'nuxt/app';
 import { GET_USER_IMAGES } from '@/graphQLData/image/queries';
@@ -44,6 +44,13 @@ const user = computed(() => {
 const images = computed((): Image[] => {
   if (!user.value?.Images) return [];
   return user.value.Images;
+});
+
+defineProps({
+  allowAddToList: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const totalImageCount = computed(() => {

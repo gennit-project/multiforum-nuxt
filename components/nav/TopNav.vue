@@ -106,6 +106,7 @@ const isOnMapPage = computed(() => {
             </nuxt-link>
             <AddToChannelFavorites
               :channel-unique-name="channelId"
+              :allow-add-to-list="true"
               size="small"
               class="ml-1"
             />

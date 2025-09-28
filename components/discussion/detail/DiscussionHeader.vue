@@ -118,7 +118,8 @@ const defaultChannel = computed(() => {
   }
   const channelInRoute = route.params.forumId;
   return (
-    channelInRoute || props.discussion?.DiscussionChannels?.[0]?.channelUniqueName
+    channelInRoute ||
+    props.discussion?.DiscussionChannels?.[0]?.channelUniqueName
   );
 });
 
@@ -378,7 +379,8 @@ const warningModalBody = computed(() => {
           </button>
         </div>
         <AddToDiscussionFavorites
-          v-if="discussion && isAuthenticatedVar"
+          v-if="discussion"
+          :allow-add-to-list="true"
           :discussion-id="discussion.id"
           :discussion-title="discussion.title"
           size="small"

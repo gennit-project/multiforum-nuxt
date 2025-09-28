@@ -110,6 +110,7 @@ const handleBecomeAdminSuccess = () => {
         </div>
         <div class="flex items-center">
           <AddToChannelFavorites
+            :allow-add-to-list="true"
             :channel-unique-name="channelId"
             :channel-display-name="channel?.displayName || ''"
             size="medium"

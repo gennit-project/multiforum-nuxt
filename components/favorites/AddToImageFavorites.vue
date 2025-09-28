@@ -11,6 +11,10 @@ import { useToastStore } from '@/stores/toastStore';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const props = defineProps({
+  allowAddToList: {
+    type: Boolean,
+    default: false,
+  },
   imageId: {
     type: String,
     required: true,
@@ -99,7 +103,10 @@ const handleToggleFavorite = async () => {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error
     isFavorited.value = !isFavorited.value;
-    toastStore.showToast('Error updating favorites. Please try again.', 'error');
+    toastStore.showToast(
+      'Error updating favorites. Please try again.',
+      'error'
+    );
   } finally {
     isLoading.value = false;
   }
@@ -112,11 +119,13 @@ const displayName = computed(() => {
 
 <template>
   <AddToFavoritesButton
+    :allow-add-to-list="allowAddToList"
     :is-favorited="isFavorited"
     :is-loading="isLoading"
     :display-name="displayName"
     entity-type="image"
     :size="size"
+    :item-id="imageId"
     @toggle="handleToggleFavorite"
   />
 </template>

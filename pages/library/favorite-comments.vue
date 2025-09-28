@@ -258,6 +258,7 @@ const favoriteComments = computed(() => {
 
                   <div class="flex-shrink-0">
                     <AddToCommentFavorites
+                      :allow-add-to-list="false"
                       :comment-id="comment.id"
                       size="medium"
                     />

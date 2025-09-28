@@ -296,6 +296,7 @@ const getFirstAlbumImage = (download: any) => {
                     </NuxtLink>
                     <div class="ml-2 flex-shrink-0">
                       <AddToDiscussionFavorites
+                        :allow-add-to-list="false"
                         :discussion-id="download.id"
                         :discussion-title="download.title"
                         entity-name="Download"

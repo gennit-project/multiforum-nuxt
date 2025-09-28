@@ -99,7 +99,10 @@ const handleToggleFavorite = async () => {
     console.error('Error toggling favorite:', error);
     // Revert optimistic update on error
     isFavorited.value = !isFavorited.value;
-    toastStore.showToast('Error updating favorites. Please try again.', 'error');
+    toastStore.showToast(
+      'Error updating favorites. Please try again.',
+      'error'
+    );
   } finally {
     isLoading.value = false;
   }
@@ -112,11 +115,13 @@ const displayName = computed(() => {
 
 <template>
   <AddToFavoritesButton
+    :allow-add-to-list="true"
     :is-favorited="isFavorited"
     :is-loading="isLoading"
     :display-name="displayName"
     entity-type="discussion"
     :size="size"
+    :item-id="discussionId"
     @toggle="handleToggleFavorite"
   />
 </template>

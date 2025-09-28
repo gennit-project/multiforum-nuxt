@@ -185,6 +185,7 @@ const formatCount = (
                   <!-- Favorites Button -->
                   <div class="ml-4 flex-shrink-0">
                     <AddToChannelFavorites
+                      :allow-add-to-list="false"
                       :channel-unique-name="channel.uniqueName"
                       :channel-display-name="channel.displayName || ''"
                       size="medium"

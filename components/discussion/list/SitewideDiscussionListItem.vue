@@ -268,7 +268,8 @@ const revealSensitiveContent = () => {
                   :account-created="discussion?.Author?.createdAt"
                 />
                 <AddToDiscussionFavorites
-                  v-if="discussion && isAuthenticatedVar"
+                  v-if="discussion"
+                  :allow-add-to-list="true"
                   :discussion-id="discussion.id"
                   :discussion-title="discussion.title"
                   size="small"

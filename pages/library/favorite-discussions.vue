@@ -262,6 +262,7 @@ const getAuthorInfo = (discussion: any) => {
                   </NuxtLink>
                   <div class="ml-4 flex-shrink-0">
                     <AddToDiscussionFavorites
+                      :allow-add-to-list="false"
                       :discussion-id="discussion.id"
                       :discussion-title="discussion.title"
                       size="medium"

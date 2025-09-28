@@ -113,6 +113,7 @@ const displayName = computed(() => {
     :display-name="displayName"
     entity-type="image"
     :size="size"
+    :item-id="imageId"
     @toggle="handleToggleFavorite"
   />
 </template>

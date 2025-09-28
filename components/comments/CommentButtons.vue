@@ -231,6 +231,7 @@ function toggleEmojiPicker() {
       </span>
       <AddToCommentFavorites
         v-if="commentData && isAuthenticatedVar"
+        :allow-add-to-list="true"
         :comment-id="commentData.id"
         size="small"
       />
