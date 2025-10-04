@@ -62,6 +62,43 @@ const { result, loading, error } = useQuery(
 const contributors = computed(() => {
   return result.value?.getChannelContributions || [];
 });
+
+// Calculate max Y-axis value across all contributors
+const maxYValue = computed(() => {
+  if (!contributors.value.length) return 0;
+
+  let max = 0;
+  contributors.value.forEach(contributor => {
+    contributor.dayData.forEach((day: any) => {
+      if (day.count > max) {
+        max = day.count;
+      }
+    });
+  });
+
+  return max;
+});
+
+// Calculate discussion and comment counts for each contributor
+const contributorStats = computed(() => {
+  return contributors.value.map(contributor => {
+    let discussionCount = 0;
+    let commentCount = 0;
+
+    contributor.dayData.forEach((day: any) => {
+      day.activities.forEach((activity: any) => {
+        discussionCount += (activity.Discussions || []).length;
+        commentCount += (activity.Comments || []).length;
+      });
+    });
+
+    return {
+      username: contributor.username,
+      discussionCount,
+      commentCount,
+    };
+  });
+});
 </script>
 
 <template>
@@ -123,12 +160,16 @@ const contributors = computed(() => {
               {{ contributor.displayName || contributor.username }}
             </h3>
             <p class="truncate text-xs text-gray-500 dark:text-gray-400">
-              @{{ contributor.username }} · {{ contributor.totalContributions }} contribution{{ contributor.totalContributions !== 1 ? 's' : '' }}
+              @{{ contributor.username }} ·
+              <span v-if="contributorStats[index]">
+                {{ contributorStats[index].discussionCount }} discussion{{ contributorStats[index].discussionCount !== 1 ? 's' : '' }},
+                {{ contributorStats[index].commentCount }} comment{{ contributorStats[index].commentCount !== 1 ? 's' : '' }}
+              </span>
             </p>
           </div>
         </div>
 
-        <ChannelContributionChart :day-data="contributor.dayData" />
+        <ChannelContributionChart :day-data="contributor.dayData" :max-y-value="maxYValue" />
       </div>
     </div>
 
@@ -136,10 +177,10 @@ const contributors = computed(() => {
     <div v-else class="rounded-lg bg-gray-50 p-12 text-center dark:bg-gray-800">
       <i class="fa-solid fa-users mb-4 text-4xl text-gray-400"></i>
       <h3 class="mb-2 text-lg font-medium text-gray-900 dark:text-white">
-        No contributors yet
+        No results in the selected time period
       </h3>
       <p class="text-sm text-gray-500 dark:text-gray-400">
-        Be the first to contribute to this forum!
+        Try selecting a different time range to see contribution activity.
       </p>
     </div>
   </div>

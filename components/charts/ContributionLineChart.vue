@@ -28,6 +28,7 @@ ChartJS.register(
 const props = defineProps<{
   dayData: DayData[];
   darkMode?: boolean;
+  maxYValue?: number;
 }>();
 
 const chartData = computed(() => {
@@ -108,6 +109,7 @@ const chartOptions = computed(() => ({
     },
     y: {
       beginAtZero: true,
+      max: props.maxYValue || undefined,
       grid: {
         color: props.darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
       },

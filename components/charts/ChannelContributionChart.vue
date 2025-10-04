@@ -6,6 +6,7 @@ import type { DayData } from '@/types/contribution';
 
 const props = defineProps<{
   dayData: DayData[];
+  maxYValue?: number;
 }>();
 
 // Get the theme from UI store
@@ -16,7 +17,7 @@ const isDarkMode = computed(() => uiStore.theme === 'dark');
 <template>
   <div>
     <ClientOnly>
-      <ContributionLineChart :day-data="dayData" :dark-mode="isDarkMode" />
+      <ContributionLineChart :day-data="dayData" :dark-mode="isDarkMode" :max-y-value="maxYValue" />
     </ClientOnly>
   </div>
 </template>
