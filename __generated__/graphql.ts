@@ -14979,6 +14979,12 @@ export type CreateTextVersionsMutationResponse = {
   textVersions: Array<TextVersion>;
 };
 
+export type CreateUserContributionDataMutationResponse = {
+  __typename?: 'CreateUserContributionDataMutationResponse';
+  info: CreateInfo;
+  userContributionData: Array<UserContributionData>;
+};
+
 export type CreateUsersMutationResponse = {
   __typename?: 'CreateUsersMutationResponse';
   info: CreateInfo;
@@ -36611,6 +36617,7 @@ export type Mutation = {
   createSuspensions: CreateSuspensionsMutationResponse;
   createTags: CreateTagsMutationResponse;
   createTextVersions: CreateTextVersionsMutationResponse;
+  createUserContributionData: CreateUserContributionDataMutationResponse;
   createUsers: CreateUsersMutationResponse;
   createValidationResults: CreateValidationResultsMutationResponse;
   createWikiPages: CreateWikiPagesMutationResponse;
@@ -36675,6 +36682,7 @@ export type Mutation = {
   deleteSuspensions: DeleteInfo;
   deleteTags: DeleteInfo;
   deleteTextVersions: DeleteInfo;
+  deleteUserContributionData: DeleteInfo;
   deleteUsers: DeleteInfo;
   deleteValidationResults: DeleteInfo;
   deleteWikiPages: DeleteInfo;
@@ -36779,6 +36787,7 @@ export type Mutation = {
   updateSuspensions: UpdateSuspensionsMutationResponse;
   updateTags: UpdateTagsMutationResponse;
   updateTextVersions: UpdateTextVersionsMutationResponse;
+  updateUserContributionData: UpdateUserContributionDataMutationResponse;
   updateUsers: UpdateUsersMutationResponse;
   updateValidationResults: UpdateValidationResultsMutationResponse;
   updateWikiPages: UpdateWikiPagesMutationResponse;
@@ -37201,6 +37210,11 @@ export type MutationCreateTextVersionsArgs = {
 };
 
 
+export type MutationCreateUserContributionDataArgs = {
+  input: Array<UserContributionDataCreateInput>;
+};
+
+
 export type MutationCreateUsersArgs = {
   input: Array<UserCreateInput>;
 };
@@ -37547,6 +37561,11 @@ export type MutationDeleteTagsArgs = {
 export type MutationDeleteTextVersionsArgs = {
   delete?: InputMaybe<TextVersionDeleteInput>;
   where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type MutationDeleteUserContributionDataArgs = {
+  where?: InputMaybe<UserContributionDataWhere>;
 };
 
 
@@ -38184,6 +38203,12 @@ export type MutationUpdateTagsArgs = {
 export type MutationUpdateTextVersionsArgs = {
   update?: InputMaybe<TextVersionUpdateInput>;
   where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type MutationUpdateUserContributionDataArgs = {
+  update?: InputMaybe<UserContributionDataUpdateInput>;
+  where?: InputMaybe<UserContributionDataWhere>;
 };
 
 
@@ -40606,6 +40631,7 @@ export type Query = {
   filterOptions: Array<FilterOption>;
   filterOptionsAggregate: FilterOptionAggregateSelection;
   filterOptionsConnection: FilterOptionsConnection;
+  getChannelContributions: Array<UserContributionData>;
   getCommentReplies?: Maybe<CommentRepliesFormat>;
   getCommentSection?: Maybe<CommentSectionFormat>;
   getDiscussionsInChannel?: Maybe<DiscussionChannelListFormat>;
@@ -40710,6 +40736,9 @@ export type Query = {
   textVersions: Array<TextVersion>;
   textVersionsAggregate: TextVersionAggregateSelection;
   textVersionsConnection: TextVersionsConnection;
+  userContributionData: Array<UserContributionData>;
+  userContributionDataAggregate: UserContributionDataAggregateSelection;
+  userContributionDataConnection: UserContributionDataConnection;
   users: Array<User>;
   usersAggregate: UserAggregateSelection;
   usersConnection: UsersConnection;
@@ -41312,6 +41341,15 @@ export type QueryFilterOptionsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<FilterOptionSort>>>;
   where?: InputMaybe<FilterOptionWhere>;
+};
+
+
+export type QueryGetChannelContributionsArgs = {
+  channelUniqueName: Scalars['String']['input'];
+  endDate?: InputMaybe<Scalars['String']['input']>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  startDate?: InputMaybe<Scalars['String']['input']>;
+  year?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -41975,6 +42013,25 @@ export type QueryTextVersionsConnectionArgs = {
   first?: InputMaybe<Scalars['Int']['input']>;
   sort?: InputMaybe<Array<InputMaybe<TextVersionSort>>>;
   where?: InputMaybe<TextVersionWhere>;
+};
+
+
+export type QueryUserContributionDataArgs = {
+  options?: InputMaybe<UserContributionDataOptions>;
+  where?: InputMaybe<UserContributionDataWhere>;
+};
+
+
+export type QueryUserContributionDataAggregateArgs = {
+  where?: InputMaybe<UserContributionDataWhere>;
+};
+
+
+export type QueryUserContributionDataConnectionArgs = {
+  after?: InputMaybe<Scalars['String']['input']>;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  sort?: InputMaybe<Array<InputMaybe<UserContributionDataSort>>>;
+  where?: InputMaybe<UserContributionDataWhere>;
 };
 
 
@@ -45394,6 +45451,9 @@ export type Subscription = {
   textVersionRelationshipCreated: TextVersionRelationshipCreatedEvent;
   textVersionRelationshipDeleted: TextVersionRelationshipDeletedEvent;
   textVersionUpdated: TextVersionUpdatedEvent;
+  userContributionDataCreated: UserContributionDataCreatedEvent;
+  userContributionDataDeleted: UserContributionDataDeletedEvent;
+  userContributionDataUpdated: UserContributionDataUpdatedEvent;
   userCreated: UserCreatedEvent;
   userDeleted: UserDeletedEvent;
   userRelationshipCreated: UserRelationshipCreatedEvent;
@@ -46567,6 +46627,21 @@ export type SubscriptionTextVersionRelationshipDeletedArgs = {
 
 export type SubscriptionTextVersionUpdatedArgs = {
   where?: InputMaybe<TextVersionSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserContributionDataCreatedArgs = {
+  where?: InputMaybe<UserContributionDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserContributionDataDeletedArgs = {
+  where?: InputMaybe<UserContributionDataSubscriptionWhere>;
+};
+
+
+export type SubscriptionUserContributionDataUpdatedArgs = {
+  where?: InputMaybe<UserContributionDataSubscriptionWhere>;
 };
 
 
@@ -49880,6 +49955,12 @@ export type UpdateTextVersionsMutationResponse = {
   textVersions: Array<TextVersion>;
 };
 
+export type UpdateUserContributionDataMutationResponse = {
+  __typename?: 'UpdateUserContributionDataMutationResponse';
+  info: UpdateInfo;
+  userContributionData: Array<UserContributionData>;
+};
+
 export type UpdateUsersMutationResponse = {
   __typename?: 'UpdateUsersMutationResponse';
   info: UpdateInfo;
@@ -51984,6 +52065,158 @@ export type UserConnectedRelationships = {
   defaultLicense?: Maybe<UserDefaultLicenseConnectedRelationship>;
   library?: Maybe<UserLibraryConnectedRelationship>;
   purchases?: Maybe<UserPurchasesConnectedRelationship>;
+};
+
+export type UserContributionData = {
+  __typename?: 'UserContributionData';
+  dayData: Array<DayData>;
+  displayName?: Maybe<Scalars['String']['output']>;
+  profilePicURL?: Maybe<Scalars['String']['output']>;
+  totalContributions: Scalars['Int']['output'];
+  username: Scalars['String']['output'];
+};
+
+export type UserContributionDataAggregateSelection = {
+  __typename?: 'UserContributionDataAggregateSelection';
+  count: Scalars['Int']['output'];
+  displayName: StringAggregateSelection;
+  profilePicURL: StringAggregateSelection;
+  totalContributions: IntAggregateSelection;
+  username: StringAggregateSelection;
+};
+
+export type UserContributionDataConnection = {
+  __typename?: 'UserContributionDataConnection';
+  edges: Array<UserContributionDataEdge>;
+  pageInfo: PageInfo;
+  totalCount: Scalars['Int']['output'];
+};
+
+export type UserContributionDataCreateInput = {
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  totalContributions: Scalars['Int']['input'];
+  username: Scalars['String']['input'];
+};
+
+export type UserContributionDataCreatedEvent = {
+  __typename?: 'UserContributionDataCreatedEvent';
+  createdUserContributionData: UserContributionDataEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type UserContributionDataDeletedEvent = {
+  __typename?: 'UserContributionDataDeletedEvent';
+  deletedUserContributionData: UserContributionDataEventPayload;
+  event: EventType;
+  timestamp: Scalars['Float']['output'];
+};
+
+export type UserContributionDataEdge = {
+  __typename?: 'UserContributionDataEdge';
+  cursor: Scalars['String']['output'];
+  node: UserContributionData;
+};
+
+export type UserContributionDataEventPayload = {
+  __typename?: 'UserContributionDataEventPayload';
+  displayName?: Maybe<Scalars['String']['output']>;
+  profilePicURL?: Maybe<Scalars['String']['output']>;
+  totalContributions: Scalars['Int']['output'];
+  username: Scalars['String']['output'];
+};
+
+export type UserContributionDataOptions = {
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  /** Specify one or more UserContributionDataSort objects to sort UserContributionData by. The sorts will be applied in the order in which they are arranged in the array. */
+  sort?: InputMaybe<Array<UserContributionDataSort>>;
+};
+
+/** Fields to sort UserContributionData by. The order in which sorts are applied is not guaranteed when specifying many fields in one UserContributionDataSort object. */
+export type UserContributionDataSort = {
+  displayName?: InputMaybe<SortDirection>;
+  profilePicURL?: InputMaybe<SortDirection>;
+  totalContributions?: InputMaybe<SortDirection>;
+  username?: InputMaybe<SortDirection>;
+};
+
+export type UserContributionDataSubscriptionWhere = {
+  AND?: InputMaybe<Array<UserContributionDataSubscriptionWhere>>;
+  NOT?: InputMaybe<UserContributionDataSubscriptionWhere>;
+  OR?: InputMaybe<Array<UserContributionDataSubscriptionWhere>>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  profilePicURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  totalContributions?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_GT?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_GTE?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  totalContributions_LT?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  username_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserContributionDataUpdateInput = {
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  totalContributions?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_DECREMENT?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_INCREMENT?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UserContributionDataUpdatedEvent = {
+  __typename?: 'UserContributionDataUpdatedEvent';
+  event: EventType;
+  previousState: UserContributionDataEventPayload;
+  timestamp: Scalars['Float']['output'];
+  updatedUserContributionData: UserContributionDataEventPayload;
+};
+
+export type UserContributionDataWhere = {
+  AND?: InputMaybe<Array<UserContributionDataWhere>>;
+  NOT?: InputMaybe<UserContributionDataWhere>;
+  OR?: InputMaybe<Array<UserContributionDataWhere>>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  displayName_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  displayName_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  displayName_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  displayName_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  displayName_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_IN?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
+  profilePicURL_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  profilePicURL_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
+  totalContributions?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_GT?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_GTE?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_IN?: InputMaybe<Array<Scalars['Int']['input']>>;
+  totalContributions_LT?: InputMaybe<Scalars['Int']['input']>;
+  totalContributions_LTE?: InputMaybe<Scalars['Int']['input']>;
+  username?: InputMaybe<Scalars['String']['input']>;
+  username_CONTAINS?: InputMaybe<Scalars['String']['input']>;
+  username_ENDS_WITH?: InputMaybe<Scalars['String']['input']>;
+  username_IN?: InputMaybe<Array<Scalars['String']['input']>>;
+  username_MATCHES?: InputMaybe<Scalars['String']['input']>;
+  username_STARTS_WITH?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UserCreateInput = {

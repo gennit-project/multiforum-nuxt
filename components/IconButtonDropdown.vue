@@ -34,9 +34,10 @@ const router = useRouter();
 
 const handleItemClick = (item: MenuItemType) => {
   if (item.event) {
-    emit(item.event);
+    emit(item.event, item.value);
+  } else {
+    router.push(item.value);
   }
-  router.push(item.value);
 };
 </script>
 

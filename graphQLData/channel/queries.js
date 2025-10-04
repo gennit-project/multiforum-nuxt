@@ -411,12 +411,12 @@ export const GET_CHANNELS = gql`
         }
         EventChannelsAggregate(
           where: {
-            NOT: { 
+            NOT: {
               archived: true,
               Event: null
             }
-            Event: { 
-              canceled: false, 
+            Event: {
+              canceled: false,
               endTime_GT: $now,
             }
           }
@@ -438,6 +438,72 @@ export const GET_CHANNELS = gql`
         }
       }
       aggregateChannelCount
+    }
+  }
+`;
+
+export const GET_CHANNEL_CONTRIBUTIONS = gql`
+  query getChannelContributions(
+    $channelUniqueName: String!
+    $startDate: String
+    $endDate: String
+    $year: Int
+    $limit: Int
+  ) {
+    getChannelContributions(
+      channelUniqueName: $channelUniqueName
+      startDate: $startDate
+      endDate: $endDate
+      year: $year
+      limit: $limit
+    ) {
+      username
+      displayName
+      profilePicURL
+      totalContributions
+      dayData {
+        date
+        count
+        activities {
+          id
+          type
+          description
+          Comments {
+            id
+            text
+            createdAt
+            Channel {
+              uniqueName
+              displayName
+              description
+              channelIconURL
+            }
+            CommentAuthor {
+              username
+              profilePicURL
+            }
+            DiscussionChannel {
+              id
+              discussionId
+              channelUniqueName
+            }
+          }
+          Discussions {
+            id
+            title
+            createdAt
+            Author {
+              username
+              profilePicURL
+            }
+            DiscussionChannels {
+              id
+              channelUniqueName
+              discussionId
+            }
+          }
+        }
+      }
     }
   }
 `;

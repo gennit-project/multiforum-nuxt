@@ -311,10 +311,12 @@ const handleCreateNewCollection = async () => {
 
   isLoading.value = true;
   try {
+    const now = new Date().toISOString();
     const result = await createCollection({
       name: newCollectionName.value.trim(),
       collectionType: collectionType.value,
       visibility: 'PUBLIC' as CollectionVisibility,
+      updatedAt: now,
     });
 
     if (result?.data?.createCollections?.collections?.[0]) {

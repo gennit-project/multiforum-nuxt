@@ -6,6 +6,7 @@ export const CREATE_COLLECTION = gql`
     $description: String
     $collectionType: CollectionType!
     $visibility: CollectionVisibility!
+    $updatedAt: DateTime!
   ) {
     createCollections(
       input: [
@@ -15,6 +16,7 @@ export const CREATE_COLLECTION = gql`
           collectionType: $collectionType
           visibility: $visibility
           itemOrder: []
+          updatedAt: $updatedAt
           CreatedBy: {
             connect: {
               where: { node: {} }

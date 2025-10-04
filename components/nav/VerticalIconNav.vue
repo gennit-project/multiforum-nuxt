@@ -19,7 +19,10 @@ import IconTooltip from '@/components/common/IconTooltip.vue';
 import RecentForumsDrawer from './RecentForumsDrawer.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
-import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorageUtils';
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '@/utils/localStorageUtils';
 import SiteSidenavLogout from './SiteSidenavLogout.vue';
 import type { ForumItem } from '@/types/forum';
 
@@ -65,7 +68,6 @@ const navigation: NavigationItem[] = [
     routerName: 'library',
   },
 ];
-
 
 const recentForums = ref<ForumItem[]>([]);
 
@@ -216,7 +218,7 @@ const getForumIconClasses = (isActive: boolean) => {
 
 const getUserActionClasses = (isActive: boolean) => {
   const baseClasses =
-    'w-12 h-12 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
+    'rounded-full my-2 bg-gray-800 hover:bg-gray-700 flex items-center justify-center transition-colors duration-200 cursor-pointer';
   return isActive
     ? `${baseClasses} ring-1 ring-orange-500 ring-offset-1 ring-offset-gray-900`
     : baseClasses;
@@ -229,192 +231,201 @@ const getUserActionClasses = (isActive: boolean) => {
       class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
       :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
     >
-    <!-- Logo -->
-    <IconTooltip
-      text="Topical - Home"
-      :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
-    >
-      <NuxtLink
-        to="/"
-        class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
-      >
-        <span class="text-2xl">🐝</span>
-      </NuxtLink>
-    </IconTooltip>
-
-    <!-- Main Navigation Icons -->
-    <div
-      class="flex flex-col"
-      :class="{
-        'space-y-1': isVerticallyShort,
-        'space-y-2': !isVerticallyShort,
-      }"
-    >
+      <!-- Logo -->
       <IconTooltip
-        v-for="item in navigation"
-        :key="item.name"
-        :text="item.name"
+        text="Topical - Home"
+        :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
       >
         <NuxtLink
-          :to="item.routerName === 'library' ? item.href : { name: item.routerName }"
-          :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
+          to="/"
+          class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
         >
-          <component
-            :is="item.icon"
-            class="h-6 w-6 text-gray-300"
-            aria-hidden="true"
-          />
+          <span class="text-2xl">🐝</span>
         </NuxtLink>
       </IconTooltip>
-    </div>
 
-    <!-- Divider -->
-    <div
-      v-if="!isVerticallyShort"
-      class="h-px w-8 bg-gray-600"
-      :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
-    />
-
-    <!-- Recent Forums (hidden when vertically short) -->
-    <ClientOnly>
+      <!-- Main Navigation Icons -->
       <div
-        v-if="recentForums.length > 0 && !isVerticallyShort"
-        class="flex flex-col space-y-1"
+        class="flex flex-col"
+        :class="{
+          'space-y-1': isVerticallyShort,
+          'space-y-2': !isVerticallyShort,
+        }"
       >
-        <!-- Limited Recent Forums -->
         <IconTooltip
-          v-for="forum in limitedRecentForums"
-          :key="forum.uniqueName"
-          :text="forum.uniqueName"
+          v-for="item in navigation"
+          :key="item.name"
+          :text="item.name"
         >
           <NuxtLink
-            :to="{
-              name: 'forums-forumId-discussions',
-              params: { forumId: forum.uniqueName },
-            }"
-            :class="getForumIconClasses(currentForumId === forum.uniqueName)"
+            :to="
+              item.routerName === 'library'
+                ? item.href
+                : { name: item.routerName }
+            "
+            :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
           >
-            <AvatarComponent
-              class="h-8 w-8"
-              :text="forum.uniqueName || ''"
-              :src="forum?.channelIconURL ?? ''"
-              :is-small="true"
-              :is-square="false"
+            <component
+              :is="item.icon"
+              class="h-6 w-6 text-gray-300"
+              aria-hidden="true"
             />
           </NuxtLink>
         </IconTooltip>
-
-        <!-- More Button -->
-        <div v-if="hasMoreForums" class="flex flex-col items-center">
-          <IconTooltip text="More Forums">
-            <div
-              :class="getUserActionClasses(false)"
-              @click="isDrawerOpen = true"
-            >
-              <MoreIcon />
-            </div>
-          </IconTooltip>
-          <span class="mt-1 text-xs text-gray-400">More</span>
-        </div>
       </div>
-    </ClientOnly>
 
-    <!-- Divider -->
-    <div
-      class="h-px w-8 bg-gray-600"
-      :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
-    />
+      <!-- Divider -->
+      <div
+        v-if="!isVerticallyShort"
+        class="h-px w-8 bg-gray-600"
+        :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
+      />
 
-    <!-- User Actions -->
-    <div
-      class="mt-auto flex flex-col"
-      :class="{
-        'space-y-1': isVerticallyShort,
-        'space-y-2': !isVerticallyShort,
-      }"
-    >
-      <!-- Admin Dashboard (always shown) -->
-      <IconTooltip text="Admin Dashboard">
-        <NuxtLink
-          to="/admin/issues"
-          :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
-        >
-          <AdminIcon />
-        </NuxtLink>
-      </IconTooltip>
-
-      <!-- Authentication-dependent actions -->
+      <!-- Recent Forums (hidden when vertically short) -->
       <ClientOnly>
-        <!-- Profile -->
-        <IconTooltip v-if="isAuthenticatedVar && usernameVar" text="My Profile">
-          <NuxtLink
-            :to="{
-              name: 'u-username',
-              params: { username: usernameVar },
-            }"
-            :class="getUserActionClasses(isActiveUserAction('u-username'))"
-          >
-            <AvatarComponent
-              v-if="profilePicURL"
-              :text="usernameVar"
-              :src="profilePicURL"
-              :is-small="true"
-              class="h-8 w-8"
-            />
-            <UserIcon v-else />
-          </NuxtLink>
-        </IconTooltip>
-
-        <!-- Settings -->
-        <IconTooltip
-          v-if="isAuthenticatedVar && usernameVar"
-          text="Account Settings"
+        <div
+          v-if="recentForums.length > 0 && !isVerticallyShort"
+          class="flex flex-col space-y-1"
         >
-          <NuxtLink
-            to="/account_settings"
-            :class="getUserActionClasses(isActiveUserAction('account_settings'))"
+          <!-- Limited Recent Forums -->
+          <IconTooltip
+            v-for="forum in limitedRecentForums"
+            :key="forum.uniqueName"
+            :text="forum.uniqueName"
           >
-            <SettingsIcon />
+            <NuxtLink
+              :to="{
+                name: 'forums-forumId-discussions',
+                params: { forumId: forum.uniqueName },
+              }"
+              :class="getForumIconClasses(currentForumId === forum.uniqueName)"
+            >
+              <AvatarComponent
+                class="h-8 w-8"
+                :text="forum.uniqueName || ''"
+                :src="forum?.channelIconURL ?? ''"
+                :is-small="true"
+                :is-square="false"
+              />
+            </NuxtLink>
+          </IconTooltip>
+
+          <!-- More Button -->
+          <div v-if="hasMoreForums" class="flex flex-col items-center">
+            <IconTooltip text="More Forums">
+              <div
+                :class="getUserActionClasses(false)"
+                @click="isDrawerOpen = true"
+              >
+                <MoreIcon />
+              </div>
+            </IconTooltip>
+            <span class="mt-1 text-xs text-gray-400">More</span>
+          </div>
+        </div>
+      </ClientOnly>
+
+      <!-- Divider -->
+      <div
+        class="h-px w-8 bg-gray-600"
+        :class="{ 'my-2': isVerticallyShort, 'my-4': !isVerticallyShort }"
+      />
+
+      <!-- User Actions -->
+      <div
+        class="mt-auto flex flex-col"
+        :class="{
+          'space-y-1': isVerticallyShort,
+          'space-y-2': !isVerticallyShort,
+        }"
+      >
+        <!-- Admin Dashboard (always shown) -->
+        <IconTooltip text="Admin Dashboard">
+          <NuxtLink
+            to="/admin/issues"
+            :class="getUserActionClasses(isActiveUserAction('admin-issues'))"
+          >
+            <AdminIcon />
           </NuxtLink>
         </IconTooltip>
 
-        <!-- Sign Out -->
-        <IconTooltip v-if="isAuthenticatedVar" text="Sign Out">
-          <SiteSidenavLogout
-            :nav-link-classes="getUserActionClasses(false)"
-            :show-icon-only="true"
-          />
-        </IconTooltip>
+        <!-- Authentication-dependent actions -->
+        <ClientOnly>
+          <!-- Profile -->
+          <IconTooltip
+            v-if="isAuthenticatedVar && usernameVar"
+            text="My Profile"
+          >
+            <NuxtLink
+              :to="{
+                name: 'u-username',
+                params: { username: usernameVar },
+              }"
+              :class="getUserActionClasses(isActiveUserAction('u-username'))"
+            >
+              <AvatarComponent
+                v-if="profilePicURL"
+                :text="usernameVar"
+                :src="profilePicURL"
+                :is-small="true"
+                class="h-8 w-8"
+              />
+              <UserIcon v-else />
+            </NuxtLink>
+          </IconTooltip>
 
-        <!-- Sign In -->
-        <IconTooltip v-if="!isAuthenticatedVar" text="Log In">
-          <div :class="getUserActionClasses(false)">
-            <LoginIcon />
-          </div>
-        </IconTooltip>
+          <!-- Settings -->
+          <IconTooltip
+            v-if="isAuthenticatedVar && usernameVar"
+            text="Account Settings"
+          >
+            <NuxtLink
+              to="/account_settings"
+              :class="
+                getUserActionClasses(isActiveUserAction('account_settings'))
+              "
+            >
+              <SettingsIcon />
+            </NuxtLink>
+          </IconTooltip>
 
-        <template #fallback>
-          <!-- Fallback: Show login icon as default -->
-          <IconTooltip text="Log In">
+          <!-- Sign Out -->
+          <IconTooltip v-if="isAuthenticatedVar" text="Sign Out">
+            <SiteSidenavLogout
+              :nav-link-classes="getUserActionClasses(false)"
+              :show-icon-only="true"
+            />
+          </IconTooltip>
+
+          <!-- Sign In -->
+          <IconTooltip v-if="!isAuthenticatedVar" text="Log In">
             <div :class="getUserActionClasses(false)">
               <LoginIcon />
             </div>
           </IconTooltip>
-        </template>
-      </ClientOnly>
-    </div>
 
-    <!-- Recent Forums Drawer -->
-    <RecentForumsDrawer
-      :forums="recentForums"
-      :is-open="isDrawerOpen"
-      @close="isDrawerOpen = false"
-    />
+          <template #fallback>
+            <!-- Fallback: Show login icon as default -->
+            <IconTooltip text="Log In">
+              <div :class="getUserActionClasses(false)">
+                <LoginIcon />
+              </div>
+            </IconTooltip>
+          </template>
+        </ClientOnly>
+      </div>
+
+      <!-- Recent Forums Drawer -->
+      <RecentForumsDrawer
+        :forums="recentForums"
+        :is-open="isDrawerOpen"
+        @close="isDrawerOpen = false"
+      />
     </div>
     <template #fallback>
       <!-- Server-side fallback with default classes (no responsive behavior) -->
       <div
-        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex py-4"
+        class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 py-4 lg:flex"
       >
         <!-- Logo -->
         <IconTooltip text="Topical - Home" class="mb-4">
@@ -434,7 +445,11 @@ const getUserActionClasses = (isActive: boolean) => {
             :text="item.name"
           >
             <NuxtLink
-              :to="item.routerName === 'library' ? item.href : { name: item.routerName }"
+              :to="
+                item.routerName === 'library'
+                  ? item.href
+                  : { name: item.routerName }
+              "
               :class="getIconCircleClasses(isActiveNavItem(item.routerName))"
             >
               <component
@@ -447,10 +462,10 @@ const getUserActionClasses = (isActive: boolean) => {
         </div>
 
         <!-- Divider -->
-        <div class="h-px w-8 bg-gray-600 my-4" />
+        <div class="my-4 h-px w-8 bg-gray-600" />
 
         <!-- Divider -->
-        <div class="h-px w-8 bg-gray-600 my-4" />
+        <div class="my-4 h-px w-8 bg-gray-600" />
 
         <!-- User Actions -->
         <div class="mt-auto flex flex-col space-y-2">
@@ -473,11 +488,7 @@ const getUserActionClasses = (isActive: boolean) => {
         </div>
 
         <!-- Recent Forums Drawer -->
-        <RecentForumsDrawer
-          :forums="[]"
-          :is-open="false"
-          @close="() => {}"
-        />
+        <RecentForumsDrawer :forums="[]" :is-open="false" @close="() => {}" />
       </div>
     </template>
   </ClientOnly>

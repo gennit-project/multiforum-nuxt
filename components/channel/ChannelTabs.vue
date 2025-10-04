@@ -8,6 +8,7 @@ import FlagIcon from '@/components/icons/FlagIcon.vue';
 import CogIcon from '@/components/icons/CogIcon.vue';
 import InfoIcon from '@/components/icons/InfoIcon.vue';
 import BookIcon from '@/components/icons/BookIcon.vue';
+import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { modProfileNameVar, usernameVar, isLoadingAuthVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
@@ -114,6 +115,7 @@ const tabRoutes = computed(() => {
     settings: `/forums/${forumId.value}/edit`,
     moderation: `/forums/${forumId.value}/issues`,
     wiki: `/forums/${forumId.value}/wiki`,
+    contributors: `/forums/${forumId.value}/contributors`,
   };
   return routes;
 });
@@ -177,6 +179,15 @@ const tabs = computed((): Tab[] => {
       countProperty: null,
     });
   }
+
+  // Add contributors tab (visible to everyone)
+  baseTabs.push({
+    name: 'contributors',
+    routeSuffix: 'contributors',
+    label: 'Contributors',
+    icon: UserIcon,
+    countProperty: null,
+  });
 
   // Add auth-dependent tabs only if we should show them
   if (shouldShowAuthTabs.value) {
