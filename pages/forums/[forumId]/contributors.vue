@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
+import { gql } from '@apollo/client/core';
 import { GET_CHANNEL_CONTRIBUTIONS } from '@/graphQLData/channel/queries';
 import ChannelContributionChart from '@/components/charts/ChannelContributionChart.vue';
 import IconButtonDropdown from '@/components/IconButtonDropdown.vue';
@@ -10,6 +11,29 @@ import { DateTime } from 'luxon';
 
 const route = useRoute();
 const forumId = computed(() => route.params.forumId as string);
+
+// Query to get channel creation date
+const GET_CHANNEL_CREATED_DATE = gql`
+  query getChannelCreatedDate($uniqueName: String!) {
+    channels(where: { uniqueName: $uniqueName }) {
+      createdAt
+    }
+  }
+`;
+
+const { result: channelResult } = useQuery(
+  GET_CHANNEL_CREATED_DATE,
+  () => ({
+    uniqueName: forumId.value,
+  }),
+  () => ({
+    enabled: !!forumId.value,
+  })
+);
+
+const channelCreatedAt = computed(() => {
+  return channelResult.value?.channels?.[0]?.createdAt;
+});
 
 // Time period selector - default to last 3 months
 const timeOptions: MenuItemType[] = [
@@ -33,7 +57,12 @@ const handlePeriodSelect = (value: string) => {
 
 const dateRange = computed(() => {
   if (selectedMonths.value === null) {
-    return { startDate: null, endDate: null };
+    // All Time - use forum creation date
+    const endDate = DateTime.now().toISODate();
+    const startDate = channelCreatedAt.value
+      ? DateTime.fromISO(channelCreatedAt.value).toISODate()
+      : DateTime.now().minus({ years: 3 }).toISODate(); // fallback to 3 years if creation date unavailable
+    return { startDate, endDate };
   }
   const endDate = DateTime.now().toISODate();
   const startDate = DateTime.now().minus({ months: selectedMonths.value }).toISODate();
