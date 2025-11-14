@@ -13,6 +13,10 @@ export default defineNuxtConfig({
       __dirname,
       'utils/patchedApolloClientCore.ts'
     ),
+    '@apollo/client/core/index.js': path.resolve(
+      __dirname,
+      'utils/patchedApolloClientCore.ts'
+    ),
   },
   app: {
     head: {
