@@ -6,6 +6,14 @@ import { inMemoryCacheOptions } from './cache';
 
 export default defineNuxtConfig({
   srcDir: '.',
+  alias: {
+    '@': path.resolve(__dirname),
+    'fast-deep-equal': 'fast-deep-equal/es6/index.js',
+    '@apollo/client/core': path.resolve(
+      __dirname,
+      'utils/patchedApolloClientCore.ts'
+    ),
+  },
   app: {
     head: {
       title: config.serverDisplayName,
@@ -369,12 +377,6 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [vuetify({ autoImport: true })],
-    resolve: {
-      alias: {
-        '@': path.resolve(__dirname),
-        'fast-deep-equal': 'fast-deep-equal/es6/index.js',
-      },
-    },
     define: {
       global: 'globalThis',
     },
