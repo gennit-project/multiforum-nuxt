@@ -12,7 +12,6 @@ import UserIcon from '@/components/icons/UserIcon.vue';
 import type { Channel } from '@/__generated__/graphql';
 import { modProfileNameVar, usernameVar, isLoadingAuthVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
-import { useDisplay } from 'vuetify';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
@@ -27,6 +26,7 @@ type Tab = {
   label: string;
   icon: Component;
   countProperty: keyof Channel | '__DOWNLOAD_COUNT__' | null;
+  mobileOnly?: boolean;
 };
 
 type TabRoutes = {
@@ -123,8 +123,6 @@ const tabRoutes = computed(() => {
 const iconSize = computed(() =>
   props.vertical ? 'h-6 w-6 shrink-0' : 'h-5 w-5 shrink-0'
 );
-
-const { smAndDown, mdAndUp } = useDisplay();
 
 // Find the current active tab
 const activeTab = computed(() => {
@@ -224,32 +222,35 @@ const tabs = computed((): Tab[] => {
     }
   }
 
-  if (smAndDown.value) {
-    baseTabs.push({
-      name: 'about',
-      routeSuffix: 'about',
-      label: 'About',
-      icon: InfoIcon,
-      countProperty: null,
-    });
-  }
+  baseTabs.push({
+    name: 'about',
+    routeSuffix: 'about',
+    label: 'About',
+    icon: InfoIcon,
+    countProperty: null,
+    mobileOnly: true,
+  });
 
   return baseTabs;
 });
+
+const desktopTabs = computed(() => tabs.value.filter((tab) => !tab.mobileOnly));
+const mobileTabs = tabs;
 </script>
 
 <template>
   <div>
     <!-- Desktop/Tablet Tabs (md and up) -->
     <nav
-      v-if="mdAndUp"
       aria-label="Tabs"
-      :class="
-        vertical ? 'text-md flex flex-col' : 'space-x-2 overflow-x-auto text-sm'
-      "
+      :class="[
+        vertical
+          ? 'text-md hidden flex-col md:flex'
+          : 'hidden space-x-2 overflow-x-auto text-sm md:flex',
+      ]"
     >
       <TabButton
-        v-for="tab in tabs"
+        v-for="tab in desktopTabs"
         :key="tab.name"
         :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
         :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
@@ -264,7 +265,7 @@ const tabs = computed((): Tab[] => {
     </nav>
 
     <!-- Mobile Dropdown (sm and down) -->
-    <div v-else class="relative">
+    <div class="relative md:hidden">
       <ClientOnly>
         <Popper>
           <template #default>
@@ -296,7 +297,7 @@ const tabs = computed((): Tab[] => {
             >
               <div class="py-1">
                 <nuxt-link
-                  v-for="tab in tabs"
+                  v-for="tab in mobileTabs"
                   :key="tab.name"
                   :to="tabRoutes[tab.name]"
                   :data-testid="`mobile-dropdown-${tab.name}`"

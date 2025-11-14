@@ -95,6 +95,27 @@ export default defineNuxtConfig({
                       };
                     });
 
+                    const hadExistingSession = () => {
+                      if (import.meta.server) return false;
+                      try {
+                        const hasLocalToken = !!localStorage.getItem('token');
+                        const hasRefreshMarker = !!sessionStorage.getItem(
+                          'tokenRefreshedAt'
+                        );
+                        const hasAuthHint =
+                          typeof document !== 'undefined' &&
+                          document.cookie
+                            ?.split(';')
+                            .some((cookie) =>
+                              cookie.trim().startsWith('auth_hint=')
+                            );
+
+                        return hasLocalToken || hasRefreshMarker || hasAuthHint;
+                      } catch {
+                        return false;
+                      }
+                    };
+
                     /* ---- errorLink: retry once on 401/UNAUTHENTICATED ---- */
                     const { fromPromise } = await import(
                       '@apollo/client/link/utils'
@@ -109,6 +130,12 @@ export default defineNuxtConfig({
                           );
 
                         if (!unauth) return;
+
+                        const expectAuthenticated = hadExistingSession();
+                        if (!expectAuthenticated) {
+                          // User never had a session, let the request fail gracefully.
+                          return;
+                        }
 
                         // Force‑refresh, bypassing the SDK cache
                         return fromPromise(
@@ -125,10 +152,29 @@ export default defineNuxtConfig({
                                 },
                               }));
                             })
-                            .catch(() => {
-                              // SSO cookie is gone → just reload; user either comes back in
-                              // silently or is sent to /authorize.
-                              window.location.reload();
+                            .catch(async () => {
+                              if (
+                                typeof window !== 'undefined' &&
+                                typeof (window as any).refreshAuthToken ===
+                                  'function'
+                              ) {
+                                try {
+                                  const refreshed = await (
+                                    window as any
+                                  ).refreshAuthToken();
+                                  if (refreshed) {
+                                    return;
+                                  }
+                                } catch {
+                                  // ignore and fall through to reload
+                                }
+                              }
+
+                              if (typeof window !== 'undefined') {
+                                window.location.reload();
+                              }
+
+                              throw new Error('silent refresh failed');
                             })
                         ).flatMap(() => forward(operation));
                       }
