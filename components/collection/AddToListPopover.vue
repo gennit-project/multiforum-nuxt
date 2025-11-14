@@ -12,6 +12,7 @@ import {
   GET_USER_COLLECTIONS_COMMENTS,
   GET_USER_COLLECTIONS_IMAGES,
   GET_USER_COLLECTIONS_CHANNELS,
+  GET_USER_COLLECTIONS_DOWNLOADS,
   CHECK_ITEM_IN_COLLECTIONS,
 } from '@/graphQLData/collection/queries';
 import {
@@ -20,10 +21,12 @@ import {
   ADD_COMMENT_TO_COLLECTION,
   ADD_IMAGE_TO_COLLECTION,
   ADD_CHANNEL_TO_COLLECTION,
+  ADD_DOWNLOAD_TO_COLLECTION,
   REMOVE_DISCUSSION_FROM_COLLECTION,
   REMOVE_COMMENT_FROM_COLLECTION,
   REMOVE_IMAGE_FROM_COLLECTION,
   REMOVE_CHANNEL_FROM_COLLECTION,
+  REMOVE_DOWNLOAD_FROM_COLLECTION,
 } from '@/graphQLData/collection/mutations';
 import {
   ADD_FAVORITE_DISCUSSION,
@@ -45,7 +48,7 @@ const props = defineProps({
     type: String,
     required: true,
     validator: (value: string) =>
-      ['discussion', 'comment', 'image', 'channel'].includes(value),
+      ['discussion', 'comment', 'image', 'channel', 'download'].includes(value),
   },
   isVisible: {
     type: Boolean,
@@ -77,6 +80,7 @@ const collectionTypeMap: Record<string, CollectionType> = {
   comment: 'COMMENTS' as CollectionType,
   image: 'IMAGES' as CollectionType,
   channel: 'CHANNELS' as CollectionType,
+  download: 'DOWNLOADS' as CollectionType,
 };
 
 const collectionType = computed(() => collectionTypeMap[props.itemType]);
@@ -92,6 +96,8 @@ const getCollectionQuery = () => {
       return GET_USER_COLLECTIONS_IMAGES;
     case 'channel':
       return GET_USER_COLLECTIONS_CHANNELS;
+    case 'download':
+      return GET_USER_COLLECTIONS_DOWNLOADS;
     default:
       return GET_USER_COLLECTIONS_DISCUSSIONS;
   }
@@ -159,6 +165,12 @@ const favoritesList = computed(() => {
         name: 'Favorites',
         items: user.FavoriteChannels || [],
       };
+    case 'download':
+      return {
+        id: 'favorites-downloads',
+        name: 'Favorites',
+        items: user.FavoriteDiscussions || [],
+      };
     default:
       return {
         id: 'favorites',
@@ -206,6 +218,9 @@ const { mutate: addImageToCollection } = useMutation(ADD_IMAGE_TO_COLLECTION);
 const { mutate: addChannelToCollection } = useMutation(
   ADD_CHANNEL_TO_COLLECTION
 );
+const { mutate: addDownloadToCollection } = useMutation(
+  ADD_DOWNLOAD_TO_COLLECTION
+);
 
 const { mutate: removeDiscussionFromCollection } = useMutation(
   REMOVE_DISCUSSION_FROM_COLLECTION
@@ -218,6 +233,9 @@ const { mutate: removeImageFromCollection } = useMutation(
 );
 const { mutate: removeChannelFromCollection } = useMutation(
   REMOVE_CHANNEL_FROM_COLLECTION
+);
+const { mutate: removeDownloadFromCollection } = useMutation(
+  REMOVE_DOWNLOAD_FROM_COLLECTION
 );
 
 // Favorites mutations
@@ -256,6 +274,8 @@ const getAddMutation = () => {
       return addImageToCollection;
     case 'channel':
       return addChannelToCollection;
+    case 'download':
+      return addDownloadToCollection;
     default:
       throw new Error(`Unknown item type: ${props.itemType}`);
   }
@@ -271,6 +291,8 @@ const getRemoveMutation = () => {
       return removeImageFromCollection;
     case 'channel':
       return removeChannelFromCollection;
+    case 'download':
+      return removeDownloadFromCollection;
     default:
       throw new Error(`Unknown item type: ${props.itemType}`);
   }
@@ -286,6 +308,8 @@ const getAddFavoriteMutation = () => {
       return addFavoriteImage;
     case 'channel':
       return addFavoriteChannel;
+    case 'download':
+      return addFavoriteDiscussion; // Downloads use the same mutation as discussions
     default:
       throw new Error(`Unknown item type: ${props.itemType}`);
   }
@@ -301,6 +325,8 @@ const getRemoveFavoriteMutation = () => {
       return removeFavoriteImage;
     case 'channel':
       return removeFavoriteChannel;
+    case 'download':
+      return removeFavoriteDiscussion; // Downloads use the same mutation as discussions
     default:
       throw new Error(`Unknown item type: ${props.itemType}`);
   }
@@ -356,6 +382,8 @@ const handleToggleInCollection = async (collection: any) => {
         const params =
           props.itemType === 'channel'
             ? { channel: props.itemId, username: usernameVar.value }
+            : props.itemType === 'download'
+            ? { discussionId: props.itemId, username: usernameVar.value }
             : {
                 [`${props.itemType}Id`]: props.itemId,
                 username: usernameVar.value,
@@ -369,6 +397,8 @@ const handleToggleInCollection = async (collection: any) => {
         const params =
           props.itemType === 'channel'
             ? { channel: props.itemId, username: usernameVar.value }
+            : props.itemType === 'download'
+            ? { discussionId: props.itemId, username: usernameVar.value }
             : {
                 [`${props.itemType}Id`]: props.itemId,
                 username: usernameVar.value,

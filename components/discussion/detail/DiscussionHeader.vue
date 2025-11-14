@@ -383,6 +383,8 @@ const warningModalBody = computed(() => {
           :allow-add-to-list="true"
           :discussion-id="discussion.id"
           :discussion-title="discussion.title"
+          :entity-name="downloadMode ? 'Download' : 'Discussion'"
+          :entity-type="downloadMode ? 'download' : 'discussion'"
           size="small"
         />
         <MenuButton

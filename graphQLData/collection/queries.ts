@@ -102,6 +102,31 @@ export const GET_USER_COLLECTIONS_CHANNELS = gql`
   }
 `;
 
+export const GET_USER_COLLECTIONS_DOWNLOADS = gql`
+  query GetUserCollectionsDownloads($username: String!, $searchTerm: String) {
+    users(where: { username: $username }) {
+      username
+      Collections(
+        where: { collectionType: DOWNLOADS, name_CONTAINS: $searchTerm }
+        options: { sort: [{ createdAt: DESC }] }
+      ) {
+        id
+        name
+        description
+        collectionType
+        visibility
+        itemCount
+        createdAt
+        updatedAt
+      }
+      FavoriteDiscussions(where: { hasDownload: true }) {
+        id
+        title
+      }
+    }
+  }
+`;
+
 export const GET_COLLECTION_ITEMS = gql`
   query GetCollectionItems($collectionId: ID!) {
     collections(where: { id: $collectionId }) {

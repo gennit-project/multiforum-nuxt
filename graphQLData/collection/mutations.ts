@@ -218,3 +218,48 @@ export const REMOVE_CHANNEL_FROM_COLLECTION = gql`
     }
   }
 `;
+
+export const ADD_DOWNLOAD_TO_COLLECTION = gql`
+  mutation AddDownloadToCollection($collectionId: ID!, $itemId: ID!) {
+    updateCollections(
+      where: { id: $collectionId }
+      update: {
+        itemOrder_PUSH: [$itemId]
+        Downloads: {
+          connect: {
+            where: { node: { id: $itemId } }
+          }
+        }
+      }
+    ) {
+      collections {
+        id
+        name
+        itemCount
+        itemOrder
+      }
+    }
+  }
+`;
+
+export const REMOVE_DOWNLOAD_FROM_COLLECTION = gql`
+  mutation RemoveDownloadFromCollection($collectionId: ID!, $itemId: ID!) {
+    updateCollections(
+      where: { id: $collectionId }
+      update: {
+        Downloads: {
+          disconnect: {
+            where: { node: { id: $itemId } }
+          }
+        }
+      }
+    ) {
+      collections {
+        id
+        name
+        itemCount
+        itemOrder
+      }
+    }
+  }
+`;

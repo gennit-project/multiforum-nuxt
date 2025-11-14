@@ -27,6 +27,14 @@ const props = defineProps({
     type: String,
     default: 'Discussion',
   },
+  entityType: {
+    type: String,
+    default: 'discussion',
+  },
+  allowAddToList: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 const GET_USER_FAVORITE_DISCUSSION = gql`
@@ -115,11 +123,11 @@ const displayName = computed(() => {
 
 <template>
   <AddToFavoritesButton
-    :allow-add-to-list="true"
+    :allow-add-to-list="allowAddToList"
     :is-favorited="isFavorited"
     :is-loading="isLoading"
     :display-name="displayName"
-    entity-type="discussion"
+    :entity-type="entityType"
     :size="size"
     :item-id="discussionId"
     @toggle="handleToggleFavorite"
