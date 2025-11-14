@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRoute } from 'nuxt/app';
-import { useQuery } from '@vue/apollo-composable';
 import DownloadList from '@/components/channel/DownloadList.vue';
 import DownloadFilterBar from '@/components/download/DownloadFilterBar.vue';
 import DownloadFilters from '@/components/download/DownloadFilters.vue';
@@ -10,6 +9,7 @@ import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { config } from '@/config';
 import { DateTime } from 'luxon';
+import { useAsyncQuery } from '@nuxtjs/apollo/dist/runtime/composables';
 
 const route = useRoute();
 
@@ -17,42 +17,39 @@ const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-// Get channel data to check if downloads are enabled for this forum
 const {
-  result: channelResult,
-  loading: channelLoading,
+  data: channelData,
+  pending: channelLoading,
   error: channelError,
-} = useQuery(
+} = await useAsyncQuery(
   GET_CHANNEL,
   {
     uniqueName: channelId,
     now: DateTime.local().startOf('hour').toISO(),
   },
+  'default',
+  void 0,
   {
-    fetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
+    watch: [channelId],
   }
 );
 
-// Get server config to check if downloads are enabled server-wide
 const {
-  result: serverConfigResult,
-  loading: serverConfigLoading,
+  data: serverConfigData,
+  pending: serverConfigLoading,
   error: serverConfigError,
-} = useQuery(
+} = await useAsyncQuery(
   GET_SERVER_CONFIG,
   {
     serverName: config.serverName,
   },
-  {
-    fetchPolicy: 'cache-first',
-  }
+  'default'
 );
 
-const channel = computed(() => channelResult.value?.channels[0]);
+const channel = computed(() => channelData.value?.channels?.[0]);
 
 const serverConfig = computed(() => {
-  return serverConfigResult.value?.serverConfigs?.[0] || null;
+  return serverConfigData.value?.serverConfigs?.[0] || null;
 });
 
 const serverDownloadsEnabled = computed(() => {

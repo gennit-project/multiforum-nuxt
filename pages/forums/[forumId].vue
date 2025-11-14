@@ -5,17 +5,23 @@ import ChannelHeaderDesktop from '@/components/channel/ChannelHeaderDesktop.vue'
 import DiscussionTitleEditForm from '@/components/discussion/detail/DiscussionTitleEditForm.vue';
 import EventTitleEditForm from '@/components/event/detail/EventTitleEditForm.vue';
 import IssueTitleEditForm from '@/components/mod/IssueTitleEditForm.vue';
-import { GET_CHANNEL, GET_CHANNEL_DOWNLOAD_COUNT } from '@/graphQLData/channel/queries';
+import {
+  GET_CHANNEL,
+  GET_CHANNEL_DOWNLOAD_COUNT,
+} from '@/graphQLData/channel/queries';
 import type { Channel, User } from '@/__generated__/graphql';
-import { computed } from 'vue';
+import { computed, ref, watch } from 'vue';
 import ChannelSidebar from '@/components/channel/ChannelSidebar.vue';
 import { useRoute, useRouter, useHead } from 'nuxt/app';
-import { useQuery } from '@vue/apollo-composable';
 import { DateTime } from 'luxon';
 import BackLink from '@/components/BackLink.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
-import { getLocalStorageItem, setLocalStorageItem } from '@/utils/localStorageUtils';
+import {
+  getLocalStorageItem,
+  setLocalStorageItem,
+} from '@/utils/localStorageUtils';
 import type { ForumItem } from '@/types/forum';
+import { useAsyncQuery } from '@nuxtjs/apollo/dist/runtime/composables';
 
 const route = useRoute();
 const router = useRouter();
@@ -86,45 +92,43 @@ const channelId = computed(() => {
 });
 
 const {
-  result: getChannelResult,
-  onResult: onGetChannelResult,
-  loading: channelLoading,
-  refetch: refetchChannel,
-} = useQuery(
+  data: channelData,
+  pending: channelLoading,
+  refresh: refreshChannel,
+} = await useAsyncQuery(
   GET_CHANNEL,
   {
     uniqueName: channelId,
-    // Using luxon, round down to the nearest hour
     now: DateTime.local().startOf('hour').toISO(),
   },
+  'default',
+  void 0,
   {
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
+    watch: [channelId],
   }
 );
 
-const channel = computed(() => {
-  return getChannelResult.value?.channels?.[0] ?? null;
-});
+const channel = computed(() => channelData.value?.channels?.[0] ?? null);
 
 // Get download count separately since we can't query the same field twice
-const {
-  result: downloadCountResult,
-} = useQuery(
-  GET_CHANNEL_DOWNLOAD_COUNT,
-  {
-    uniqueName: channelId,
-  },
-  {
-    fetchPolicy: 'cache-first',
-    nextFetchPolicy: 'cache-first',
-    enabled: !!channelId.value,
-  }
-);
+const { data: downloadCountData, refresh: refreshDownloadCount } =
+  await useAsyncQuery(
+    GET_CHANNEL_DOWNLOAD_COUNT,
+    {
+      uniqueName: channelId,
+    },
+    'default',
+    void 0,
+    {
+      watch: [channelId],
+    }
+  );
 
 const downloadCount = computed(() => {
-  return downloadCountResult.value?.channels?.[0]?.DiscussionChannelsAggregate?.count ?? 0;
+  return (
+    downloadCountData.value?.channels?.[0]?.DiscussionChannelsAggregate?.count ??
+    0
+  );
 });
 
 const showNotFound = computed(() => {
@@ -133,7 +137,8 @@ const showNotFound = computed(() => {
 });
 
 const handleRefetchChannelData = () => {
-  refetchChannel();
+  refreshChannel();
+  refreshDownloadCount();
 };
 
 const addForumToLocalStorage = (channel: Channel) => {
@@ -163,61 +168,67 @@ const addForumToLocalStorage = (channel: Channel) => {
 
   setLocalStorageItem('recentForums', recentForums);
 };
-onGetChannelResult((result) => {
-  const loadedChannel = result.data?.channels[0];
-  if (!loadedChannel) {
-    return;
-  }
-  addForumToLocalStorage(loadedChannel);
-  // redirect to /discussions if we are at the channel root
-  if (route.name === 'forums-forumId') {
-    router.push({
-      name: 'forums-forumId-discussions',
-      params: {
-        forumId: channelId.value,
-      },
+const headApplied = ref(false);
+watch(
+  () => channel.value,
+  (loadedChannel) => {
+    if (!loadedChannel) {
+      return;
+    }
+    addForumToLocalStorage(loadedChannel);
+    if (import.meta.client && route.name === 'forums-forumId') {
+      router.push({
+        name: 'forums-forumId-discussions',
+        params: {
+          forumId: channelId.value,
+        },
+      });
+    }
+
+    if (headApplied.value) {
+      return;
+    }
+    headApplied.value = true;
+    const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
+    const forumDescription = loadedChannel.description
+      ? loadedChannel.description.substring(0, 160) +
+        (loadedChannel.description.length > 160 ? '...' : '')
+      : `${forumName} - Community Forum`;
+    const baseUrl = import.meta.env.VITE_BASE_URL;
+    const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+    const imageUrl =
+      loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
+
+    useHead({
+      title: `${forumName} | ${serverName}`,
+      description: forumDescription,
+      image: imageUrl,
+      type: 'website',
     });
-  }
-  const forumName = loadedChannel.displayName || loadedChannel.uniqueName;
-  const forumDescription = loadedChannel.description
-    ? loadedChannel.description.substring(0, 160) +
-      (loadedChannel.description.length > 160 ? '...' : '')
-    : `${forumName} - Community Forum`;
-  const baseUrl = import.meta.env.VITE_BASE_URL;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
-  const imageUrl =
-    loadedChannel.channelIconURL || loadedChannel.channelBannerURL || '';
 
-  // Set basic SEO meta tags
-  useHead({
-    title: `${forumName} | ${serverName}`,
-    description: forumDescription,
-    image: imageUrl,
-    type: 'website',
-  });
-
-  // Add structured data for rich results
-  useHead({
-    script: [
-      {
-        type: 'application/ld+json',
-        children: JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'DiscussionForumPosting',
-          name: forumName,
-          description: forumDescription,
-          image: imageUrl,
-          url: `${baseUrl}/forums/${channelId.value}`,
-          publisher: {
-            '@type': 'Organization',
-            name: serverName,
-            url: baseUrl,
-          },
-        }),
-      },
-    ],
-  });
-});
+    useHead({
+      script: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'DiscussionForumPosting',
+            name: forumName,
+            description: forumDescription,
+            image: imageUrl,
+            url: `${baseUrl}/forums/${channelId.value}`,
+            publisher: {
+              '@type': 'Organization',
+              name: serverName,
+              url: baseUrl,
+            },
+          }),
+        },
+      ],
+    });
+  },
+  { immediate: true }
+);
 const adminList = computed(() => {
   return channel.value
     ? channel.value.Admins.map((user: User) => user?.username)
