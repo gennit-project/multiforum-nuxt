@@ -9,7 +9,6 @@ import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import type { FilterGroup } from '@/__generated__/graphql';
 import { config } from '@/config';
 import { DateTime } from 'luxon';
-import { useAsyncQuery } from '@nuxtjs/apollo/dist/runtime/composables';
 
 const route = useRoute();
 

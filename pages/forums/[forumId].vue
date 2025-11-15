@@ -21,7 +21,6 @@ import {
   setLocalStorageItem,
 } from '@/utils/localStorageUtils';
 import type { ForumItem } from '@/types/forum';
-import { useAsyncQuery } from '@nuxtjs/apollo/dist/runtime/composables';
 
 const route = useRoute();
 const router = useRouter();
