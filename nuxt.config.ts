@@ -9,14 +9,6 @@ export default defineNuxtConfig({
   alias: {
     '@': path.resolve(__dirname),
     'fast-deep-equal': 'fast-deep-equal/es6/index.js',
-    '@apollo/client/core': path.resolve(
-      __dirname,
-      'utils/patchedApolloClientCore.ts'
-    ),
-    '@apollo/client/core/index.js': path.resolve(
-      __dirname,
-      'utils/patchedApolloClientCore.ts'
-    ),
   },
   app: {
     head: {
@@ -385,14 +377,6 @@ export default defineNuxtConfig({
       alias: {
         '@': path.resolve(__dirname),
         'fast-deep-equal': 'fast-deep-equal/es6/index.js',
-        '@apollo/client/core': path.resolve(
-          __dirname,
-          'utils/patchedApolloClientCore.ts'
-        ),
-        '@apollo/client/core/index.js': path.resolve(
-          __dirname,
-          'utils/patchedApolloClientCore.ts'
-        ),
       },
     },
     define: {
