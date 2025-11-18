@@ -350,7 +350,7 @@ definePageMeta({
               </div>
               <aside
                 v-if="channelId && showChannelSidebar"
-                class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/4 md:overflow-y-auto"
+                class="flex-shrink-0 md:sticky md:top-0 md:max-h-screen md:w-1/3 md:overflow-y-auto"
               >
                 <ChannelSidebar
                   v-if="channel"

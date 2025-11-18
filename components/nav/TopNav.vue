@@ -67,7 +67,7 @@ const isOnMapPage = computed(() => {
 <template>
   <nav
     class="z-20 h-12 border-b border-b-gray-600 bg-gray-900 pr-4 lg:ml-16"
-    :class="[isOnMapPage ? 'fixed' : '']"
+    :class="[isOnMapPage ? 'fixed w-full' : '']"
   >
     <div class="flex items-center justify-between px-2 py-1">
       <div class="flex items-center">

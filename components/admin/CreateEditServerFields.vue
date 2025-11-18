@@ -260,7 +260,7 @@ const getCurrentTabLabel = computed(() => {
           <div class="flex w-full">
             <!-- Left Sidebar (hidden on mobile) -->
             <div
-              class="bg-gray-50 mr-4 hidden w-1/4 border-r border-gray-300 dark:border-gray-300 lg:block"
+              class="bg-gray-50 mr-4 hidden w-1/3 border-r border-gray-300 dark:border-gray-300 lg:block"
             >
               <ul class="flex flex-col space-y-2">
                 <router-link

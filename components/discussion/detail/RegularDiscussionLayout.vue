@@ -73,11 +73,13 @@ const hasAlbum = computed(() => {
     :show-emoji-button="true"
   >
     <template #album-slot>
-      <div class="bg-black text-white">
+      <div class="mt-1 bg-black text-white">
         <DiscussionAlbum
           v-if="hasAlbum"
           :album="discussion?.Album || null"
           :carousel-format="true"
+          :expanded-view="true"
+          :download-mode="true"
           :discussion-author="discussion.Author?.username || ''"
           :discussion-id="discussionId"
           :stl-files="stlFiles"
