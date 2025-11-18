@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
+import { ref, computed, nextTick, watch } from 'vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import AddToListPopover from '@/components/collection/AddToListPopover.vue';
 
@@ -42,30 +42,57 @@ const isAnimating = ref(false);
 const showTooltip = ref(false);
 const showPopover = ref(false);
 const tooltipPosition = ref({ top: false, right: false });
-const popoverPosition = ref({ top: 0, left: 0 });
+
+type PopoverPosition = {
+  top: number;
+  left: number;
+  placement?: 'above' | 'below';
+  triggerRect?: {
+    top: number;
+    bottom: number;
+    height: number;
+    width: number;
+  };
+};
+
+const popoverPosition = ref<PopoverPosition>({
+  top: 0,
+  left: 0,
+  placement: 'below',
+  triggerRect: {
+    top: 0,
+    bottom: 0,
+    height: 0,
+    width: 0,
+  },
+});
 const buttonRef = ref<HTMLElement>();
 const tooltipRef = ref<HTMLElement>();
 
 const handleClick = () => {
-  if (!props.isLoading) {
-    if (props.allowAddToList) {
-      // Show popover for list selection
-      showPopover.value = !showPopover.value;
-      if (showPopover.value) {
-        nextTick(() => updatePopoverPosition());
-      }
-    } else {
-      // Traditional favorites toggle
-      emit('toggle');
+  if (props.isLoading) return;
 
-      // Start animation if toggling to favorited
-      if (!props.isFavorited) {
-        isAnimating.value = true;
-        setTimeout(() => {
-          isAnimating.value = false;
-        }, 300);
-      }
+  const shouldOpenPopover = props.allowAddToList && props.isFavorited;
+
+  if (shouldOpenPopover) {
+    // Already favorited – open collection popover
+    showPopover.value = !showPopover.value;
+    if (showPopover.value) {
+      nextTick(() => updatePopoverPosition());
     }
+    return;
+  }
+
+  // Traditional favorites toggle
+  showPopover.value = false;
+  emit('toggle');
+
+  // Start animation if toggling to favorited
+  if (!props.isFavorited) {
+    isAnimating.value = true;
+    setTimeout(() => {
+      isAnimating.value = false;
+    }, 300);
   }
 };
 
@@ -83,6 +110,7 @@ const updatePopoverPosition = async () => {
   // Calculate position
   let left = buttonRect.left;
   let top = buttonRect.bottom + 8; // 8px spacing below button
+  let placement: 'above' | 'below' = 'below';
 
   // Check if popover would go off the right edge
   if (left + popoverWidth > viewportWidth - 10) {
@@ -92,6 +120,7 @@ const updatePopoverPosition = async () => {
   // Check if popover would go off the bottom edge
   if (top + popoverHeight > viewportHeight - 10) {
     top = buttonRect.top - popoverHeight - 8; // Position above button
+    placement = 'above';
   }
 
   // Ensure it doesn't go off the left edge
@@ -100,8 +129,15 @@ const updatePopoverPosition = async () => {
   }
 
   popoverPosition.value = {
-    top: top,
-    left: left,
+    top,
+    left,
+    placement,
+    triggerRect: {
+      top: buttonRect.top,
+      bottom: buttonRect.bottom,
+      height: buttonRect.height,
+      width: buttonRect.width,
+    },
   };
 };
 
@@ -154,6 +190,13 @@ const sizeClasses = computed(() => {
 
 const buttonLabel = computed(() => {
   const itemName = props.displayName || props.entityType;
+
+  if (props.allowAddToList) {
+    return props.isFavorited
+      ? `Manage ${itemName} favorites and collections`
+      : `Add ${itemName} to favorites`;
+  }
+
   return props.isFavorited
     ? `Remove ${itemName} from favorites`
     : `Add ${itemName} to favorites`;
@@ -161,7 +204,7 @@ const buttonLabel = computed(() => {
 
 const tooltipText = computed(() => {
   if (props.allowAddToList) {
-    return 'Add to List';
+    return props.isFavorited ? 'Add to collections' : 'Add to favorites';
   }
   return props.isFavorited ? 'Remove from favorites' : 'Add to favorites';
 });
@@ -184,6 +227,15 @@ const tooltipClasses = computed(() => {
 
   return `${baseClasses} ${positionClasses.join(' ')}`;
 });
+
+watch(
+  () => props.isFavorited,
+  (newValue) => {
+    if (!newValue) {
+      showPopover.value = false;
+    }
+  }
+);
 </script>
 
 <template>

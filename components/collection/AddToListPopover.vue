@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import type { PropType } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
@@ -39,6 +40,18 @@ import {
   REMOVE_FAVORITE_CHANNEL,
 } from '@/graphQLData/user/mutations';
 
+type PopoverPosition = {
+  top: number;
+  left: number;
+  placement?: 'above' | 'below';
+  triggerRect?: {
+    top: number;
+    bottom: number;
+    height: number;
+    width: number;
+  };
+};
+
 const props = defineProps({
   itemId: {
     type: String,
@@ -55,7 +68,7 @@ const props = defineProps({
     default: false,
   },
   position: {
-    type: Object,
+    type: Object as PropType<PopoverPosition>,
     default: () => ({ top: 0, left: 0 }),
   },
   isAlreadyFavorite: {
@@ -68,11 +81,16 @@ const emit = defineEmits<{
   close: [];
 }>();
 
+const popoverRef = ref<HTMLElement | null>(null);
 const searchTerm = ref('');
 const isCreatingNew = ref(false);
 const newCollectionName = ref('');
 const isLoading = ref(false);
 const toastStore = useToastStore();
+const adjustedPosition = ref({
+  top: props.position?.top || 0,
+  left: props.position?.left || 0,
+});
 
 // Map frontend item types to GraphQL enum values
 const collectionTypeMap: Record<string, CollectionType> = {
@@ -205,6 +223,77 @@ const isItemInFavorites = computed(() => {
   }
 });
 
+const filteredCollections = computed(() => {
+  if (!searchTerm.value) return collections.value;
+  return collections.value.filter((collection: any) =>
+    collection.name.toLowerCase().includes(searchTerm.value.toLowerCase())
+  );
+});
+
+const updateAdjustedPosition = async () => {
+  if (typeof window === 'undefined' || !props.isVisible) return;
+  await nextTick();
+  if (!popoverRef.value) return;
+
+  const popoverRect = popoverRef.value.getBoundingClientRect();
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const padding = 12;
+  const triggerRect = props.position?.triggerRect;
+  const preferredPlacement = props.position?.placement || 'below';
+
+  let left = props.position?.left ?? 0;
+  let top = props.position?.top ?? 0;
+
+  const placeBelow = () =>
+    (triggerRect?.bottom ?? props.position?.top ?? 0) + 8;
+  const placeAbove = () =>
+    (triggerRect?.top ?? props.position?.top ?? 0) - popoverRect.height - 8;
+
+  if (triggerRect) {
+    if (preferredPlacement === 'above') {
+      let candidateTop = placeAbove();
+      if (
+        candidateTop < padding &&
+        placeBelow() + popoverRect.height <= viewportHeight - padding
+      ) {
+        candidateTop = placeBelow();
+      }
+      top = candidateTop;
+    } else {
+      let candidateTop = placeBelow();
+      if (
+        candidateTop + popoverRect.height > viewportHeight - padding &&
+        placeAbove() >= padding
+      ) {
+        candidateTop = placeAbove();
+      }
+      top = candidateTop;
+    }
+  }
+
+  if (top + popoverRect.height > viewportHeight - padding) {
+    top = viewportHeight - popoverRect.height - padding;
+  }
+  if (top < padding) {
+    top = padding;
+  }
+
+  if (left + popoverRect.width > viewportWidth - padding) {
+    left = viewportWidth - popoverRect.width - padding;
+  }
+  if (left < padding) {
+    left = padding;
+  }
+
+  adjustedPosition.value = { top, left };
+};
+
+const handleViewportChange = () => {
+  if (!props.isVisible) return;
+  updateAdjustedPosition();
+};
+
 // Mutations
 const { mutate: createCollection } = useMutation(CREATE_COLLECTION);
 
@@ -257,12 +346,29 @@ watch(searchTerm, () => {
   }
 });
 
-const filteredCollections = computed(() => {
-  if (!searchTerm.value) return collections.value;
-  return collections.value.filter((collection: any) =>
-    collection.name.toLowerCase().includes(searchTerm.value.toLowerCase())
-  );
-});
+watch(
+  () => ({
+    top: props.position?.top,
+    left: props.position?.left,
+    placement: props.position?.placement,
+    isVisible: props.isVisible,
+  }),
+  (state) => {
+    if (state.isVisible) {
+      updateAdjustedPosition();
+    }
+  },
+  { immediate: true }
+);
+
+watch(
+  [filteredCollections, () => isCreatingNew.value, () => isLoading.value],
+  () => {
+    if (props.isVisible) {
+      updateAdjustedPosition();
+    }
+  }
+);
 
 const getAddMutation = () => {
   switch (props.itemType) {
@@ -467,10 +573,20 @@ onMounted(() => {
   setTimeout(() => {
     document.addEventListener('click', handleClickOutside);
   }, 0);
+
+  if (typeof window !== 'undefined') {
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('scroll', handleViewportChange, true);
+  }
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
+
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', handleViewportChange);
+    window.removeEventListener('scroll', handleViewportChange, true);
+  }
 });
 
 const popoverClasses = computed(() => {
@@ -479,8 +595,8 @@ const popoverClasses = computed(() => {
 
 const popoverStyles = computed(() => {
   return {
-    top: `${props.position.top}px`,
-    left: `${props.position.left}px`,
+    top: `${adjustedPosition.value.top}px`,
+    left: `${adjustedPosition.value.left}px`,
   };
 });
 </script>
@@ -489,6 +605,7 @@ const popoverStyles = computed(() => {
   <Teleport to="body">
     <div
       v-if="isVisible"
+      ref="popoverRef"
       :class="popoverClasses"
       :style="popoverStyles"
       @click.stop
