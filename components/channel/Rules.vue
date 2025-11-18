@@ -59,11 +59,11 @@ export default defineComponent({
     <div
       v-for="(rule, i) in openRules"
       :key="rule.summary"
-      class="my-2 pt-2 dark:border-gray-700 dark:text-gray-100"
+      class="my-2 pt-2 text-xs dark:border-gray-700 dark:text-gray-100"
     >
       <div
         v-if="rule.summary"
-        class="flex items-center text-sm"
+        class="flex items-center"
         :class="[rule.detail ? 'cursor-pointer' : '']"
         @click="
           () => {
@@ -81,7 +81,6 @@ export default defineComponent({
             'fa-solid',
             'h-3',
             'w-3',
-            'text-xs',
             isOpen(rule.summary) ? 'fa-chevron-up' : 'fa-chevron-down',
             'ml-2',
           ]"
