@@ -132,7 +132,9 @@ const isOnMapPage = computed(() => {
           <LoginButton />
         </div>
         <div class="flex items-center space-x-2 md:mr-2">
-          <CreateAnythingButton :background-color="'dark'" />
+          <div class="lg:hidden">
+            <CreateAnythingButton :background-color="'dark'" />
+          </div>
           <nuxt-link
             data-testid="notification-bell"
             to="/notifications"

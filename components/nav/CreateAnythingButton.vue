@@ -5,7 +5,7 @@ import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { useRoute, useRouter } from 'nuxt/app';
 
 // Props
-defineProps({
+const createButtonProps = defineProps({
   usePrimaryButton: {
     type: Boolean,
     default: false,
@@ -14,6 +14,10 @@ defineProps({
     type: String,
     default: 'light',
     validator: (value: string) => ['light', 'dark'].includes(value),
+  },
+  iconOnly: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -95,6 +99,25 @@ const handleItemClick = (item: any) => {
   item.action();
   isMenuOpen.value = false;
 };
+
+const buttonClasses = computed(() => {
+  if (createButtonProps.iconOnly) {
+    return 'flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 text-gray-900 font-semibold hover:bg-orange-400 focus:outline-none focus:ring-2 focus:ring-orange-300 focus:ring-offset-2 focus:ring-offset-gray-900';
+  }
+
+  const baseClasses =
+    'inline-flex items-center gap-1 rounded-md border border-gray-800 px-2 py-2 text-xs focus:outline-none dark:border-gray-600';
+
+  if (createButtonProps.usePrimaryButton) {
+    return `${baseClasses} !border !border-gray-800 dark:!border-gray-600`;
+  }
+
+  if (createButtonProps.backgroundColor === 'light') {
+    return `${baseClasses} bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700`;
+  }
+
+  return `${baseClasses} bg-gray-800 text-gray-100 hover:bg-gray-700`;
+});
 </script>
 
 <template>
@@ -106,24 +129,27 @@ const handleItemClick = (item: any) => {
             <button
               type="button"
               v-bind="props"
-              class="inline-flex items-center gap-1 rounded-md border border-gray-800 px-2 py-2 text-xs focus:outline-none dark:border-gray-600"
-              :class="[
-                backgroundColor === 'light'
-                  ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
-                  : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
-              ]"
+              :class="buttonClasses"
               @click="adjustMenuPosition"
               @mouseover="showTooltip = true"
             >
-              <span class="flex items-center whitespace-nowrap">
+              <span
+                v-if="!iconOnly"
+                class="flex items-center whitespace-nowrap"
+              >
                 {{ usePrimaryButton ? 'Create' : '+ Add' }}
               </span>
+              <span v-else aria-hidden="true" class="text-2xl leading-none">
+                +
+              </span>
+              <span v-if="iconOnly" class="sr-only">Create new</span>
               <ChevronDownIcon
+                v-if="!iconOnly"
                 class="-mr-1 ml-1 mt-0.5 h-3 w-3"
                 aria-hidden="true"
               />
               <v-tooltip
-                v-if="showTooltip && !usePrimaryButton"
+                v-if="showTooltip && !usePrimaryButton && !iconOnly"
                 location="bottom"
                 activator="parent"
               >
@@ -158,20 +184,18 @@ const handleItemClick = (item: any) => {
         </v-menu>
         <template #fallback>
           <button
-            class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-800 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
-            :class="[
-              usePrimaryButton
-                ? '!border !border-gray-800 dark:!border-gray-600'
-                : backgroundColor === 'light'
-                  ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
-                  : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
-            ]"
+            :class="buttonClasses"
             data-testid="fake-create-anything-button"
           >
-            <span class="flex items-center">
+            <span v-if="!iconOnly" class="flex items-center">
               + {{ usePrimaryButton ? 'Create' : '' }}
             </span>
+            <span v-else aria-hidden="true" class="text-2xl leading-none">
+              +
+            </span>
+            <span v-if="iconOnly" class="sr-only">Create new</span>
             <ChevronDownIcon
+              v-if="!iconOnly"
               class="-mr-1 ml-1 mt-0.5 h-3 w-3"
               aria-hidden="true"
             />
@@ -181,21 +205,19 @@ const handleItemClick = (item: any) => {
     </template>
 
     <template #does-not-have-auth>
-      <button
-        class="inline-flex items-center gap-x-1.5 rounded-md border border-gray-800 px-3 py-2 text-xs focus:outline-none dark:border-gray-600"
-        :class="[
-          usePrimaryButton
-            ? '!border !border-gray-800 dark:!border-gray-600'
-            : backgroundColor === 'light'
-              ? 'bg-white text-gray-800 hover:bg-gray-200 dark:bg-gray-900 dark:text-gray-100 dark:hover:bg-gray-700'
-              : 'bg-gray-800 text-gray-100 hover:bg-gray-700',
-        ]"
-        data-testid="fake-create-anything-button"
-      >
-        <span class="flex items-center">
+      <button :class="buttonClasses" data-testid="fake-create-anything-button">
+        <span v-if="!iconOnly" class="flex items-center">
           + {{ usePrimaryButton ? 'Create' : '' }}
         </span>
-        <ChevronDownIcon class="-mr-1 ml-1 mt-0.5 h-3 w-3" aria-hidden="true" />
+        <span v-else aria-hidden="true" class="text-2xl leading-none">
+          +
+        </span>
+        <span v-if="iconOnly" class="sr-only">Create new</span>
+        <ChevronDownIcon
+          v-if="!iconOnly"
+          class="-mr-1 ml-1 mt-0.5 h-3 w-3"
+          aria-hidden="true"
+        />
       </button>
       <client-only>
         <v-tooltip v-if="showFooter" activator="parent" location="bottom">

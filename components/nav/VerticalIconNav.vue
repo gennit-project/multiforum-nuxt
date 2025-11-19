@@ -9,6 +9,7 @@ import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
+import CreateAnythingButton from '@/components/nav/CreateAnythingButton.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import AdminIcon from '@/components/icons/AdminIcon.vue';
@@ -228,17 +229,12 @@ const getUserActionClasses = (isActive: boolean) => {
       class="fixed left-0 top-0 z-[18] hidden h-full w-16 flex-col items-center border-r border-gray-600 bg-gray-900 lg:flex"
       :class="{ 'py-2': isVerticallyShort, 'py-4': !isVerticallyShort }"
     >
-      <!-- Logo -->
+      <!-- Create Button -->
       <IconTooltip
-        text="Topical - Home"
+        text="Create new"
         :class="{ 'mb-2': isVerticallyShort, 'mb-4': !isVerticallyShort }"
       >
-        <NuxtLink
-          to="/"
-          class="flex h-12 w-12 cursor-pointer items-center justify-center rounded-full bg-orange-500 transition-colors duration-200 hover:bg-orange-600"
-        >
-          <span class="text-2xl">🐝</span>
-        </NuxtLink>
+        <CreateAnythingButton icon-only />
       </IconTooltip>
 
       <!-- Main Navigation Icons -->
