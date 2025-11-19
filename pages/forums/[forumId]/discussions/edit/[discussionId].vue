@@ -315,6 +315,7 @@ export default defineComponent({
     return {
       channelId,
       dataLoaded,
+      discussion,
       discussionId,
       existingTags,
       formValues,
@@ -364,6 +365,7 @@ export default defineComponent({
           :key="dataLoaded.toString()"
           :edit-mode="true"
           :discussion-loading="getDiscussionLoading"
+          :discussion="discussion"
           :get-discussion-error="getDiscussionError"
           :update-discussion-error="updateDiscussionError"
           :form-values="formValues"
