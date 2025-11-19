@@ -1,0 +1,286 @@
+<script lang="ts" setup>
+import { computed } from 'vue';
+import type { PropType } from 'vue';
+import { useRoute } from 'nuxt/app';
+import HighlightedSearchTerms from '@/components/HighlightedSearchTerms.vue';
+import TagComponent from '@/components/TagComponent.vue';
+import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
+import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
+import ImageIcon from '@/components/icons/ImageIcon.vue';
+import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
+import { relativeTime } from '@/utils';
+import type { Discussion, DiscussionChannel, Tag } from '@/__generated__/graphql';
+
+type AlbumPayload = {
+  discussion: Discussion;
+  album: Discussion['Album'];
+};
+
+const props = defineProps({
+  discussion: {
+    type: Object as PropType<Discussion>,
+    required: true,
+  },
+  searchInput: {
+    type: String,
+    default: '',
+  },
+  selectedTags: {
+    type: Array as () => string[],
+    default: () => [],
+  },
+});
+
+const emit = defineEmits<{
+  (e: 'filterByTag', tag: string): void;
+  (e: 'openAlbum', payload: AlbumPayload): void;
+}>();
+
+const route = useRoute();
+
+const filteredQuery = computed(() => {
+  const query = { ...route.query };
+  Object.keys(query).forEach((key) => {
+    if (!query[key]) {
+      Reflect.deleteProperty(query, key);
+    }
+  });
+  return query;
+});
+
+const primaryChannel = computed<DiscussionChannel | null>(() => {
+  return props.discussion?.DiscussionChannels?.[0] || null;
+});
+
+const defaultLink = computed(() => {
+  if (!primaryChannel.value) {
+    return {};
+  }
+  return {
+    name: 'forums-forumId-downloads-discussionId',
+    params: {
+      forumId: primaryChannel.value.channelUniqueName,
+      discussionId: props.discussion.id,
+    },
+    query: filteredQuery.value,
+  };
+});
+
+const commentCount = computed(() => {
+  if (!props.discussion?.DiscussionChannels?.length) return 0;
+  return props.discussion.DiscussionChannels.reduce((total, channel) => {
+    return total + (channel.CommentsAggregate?.count || 0);
+  }, 0);
+});
+
+const channelCount = computed(
+  () => props.discussion?.DiscussionChannels?.length || 0
+);
+
+const submittedToMultipleChannels = computed(() => channelCount.value > 1);
+
+const discussionDetailOptions = computed(() => {
+  if (!props.discussion?.DiscussionChannels?.length) {
+    return [];
+  }
+  return props.discussion.DiscussionChannels.map((dc) => {
+    const comments = dc.CommentsAggregate?.count || 0;
+    return {
+      label: `${comments} ${comments === 1 ? 'comment' : 'comments'} in ${dc.channelUniqueName}`,
+      value: `/forums/${dc.channelUniqueName}/downloads/${props.discussion.id}`,
+      event: '',
+    };
+  });
+});
+
+const tags = computed(
+  () => props.discussion?.Tags?.map((tag: Tag) => tag.text) || []
+);
+
+const hasSensitiveContent = computed(
+  () => !!props.discussion?.hasSensitiveContent
+);
+
+const authorUsername = computed(
+  () => props.discussion?.Author?.username || 'Deleted'
+);
+const authorDisplayName = computed(
+  () => props.discussion?.Author?.displayName || ''
+);
+const authorProfilePicURL = computed(
+  () => props.discussion?.Author?.profilePicURL || ''
+);
+const authorCommentKarma = computed(
+  () => props.discussion?.Author?.commentKarma || 0
+);
+const authorDiscussionKarma = computed(
+  () => props.discussion?.Author?.discussionKarma || 0
+);
+const authorAccountCreated = computed(
+  () => props.discussion?.Author?.createdAt || ''
+);
+
+const authorIsAdmin = computed(() => {
+  const author = props.discussion?.Author;
+  return author?.ServerRoles?.[0]?.showAdminTag || false;
+});
+
+const firstAlbumImage = computed(() => {
+  const album = props.discussion?.Album;
+  if (!album?.Images?.length) return null;
+  if (album.imageOrder?.length) {
+    const orderedImage = album.Images.find(
+      (img) => img.id === album.imageOrder?.[0]
+    );
+    if (orderedImage?.url) return orderedImage.url;
+  }
+  return album.Images[0]?.url || null;
+});
+
+const relativeCreated = computed(() => {
+  if (!props.discussion?.createdAt) return '';
+  return relativeTime(props.discussion.createdAt);
+});
+
+const handleOpenAlbum = () => {
+  if (props.discussion?.Album) {
+    emit('openAlbum', {
+      discussion: props.discussion,
+      album: props.discussion.Album,
+    });
+  }
+};
+</script>
+
+<template>
+  <li
+    class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+  >
+    <div class="relative">
+      <nuxt-link
+        v-if="primaryChannel"
+        class="block overflow-hidden rounded-md border border-gray-100 dark:border-gray-700"
+        :to="defaultLink"
+      >
+        <div class="aspect-square w-full bg-gray-50 dark:bg-gray-800">
+          <img
+            v-if="firstAlbumImage"
+            :src="firstAlbumImage"
+            :alt="discussion.title || 'Download preview'"
+            class="h-full w-full object-cover"
+          >
+          <div
+            v-else
+            class="flex h-full w-full items-center justify-center text-center text-sm text-gray-500 dark:text-gray-400"
+          >
+            No image available
+          </div>
+        </div>
+      </nuxt-link>
+      <button
+        v-if="discussion?.Album?.Images?.length"
+        class="absolute right-2 top-2 rounded-md bg-black/60 p-2 text-white transition hover:bg-black/80"
+        title="View album"
+        @click.stop="handleOpenAlbum"
+      >
+        <ImageIcon class="h-4 w-4" />
+      </button>
+    </div>
+
+    <div class="flex flex-col gap-3">
+      <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300">
+        <AvatarComponent
+          v-if="primaryChannel"
+          :is-square="true"
+          :text="primaryChannel.channelUniqueName"
+          class="h-6 w-6"
+        />
+        <nuxt-link
+          v-if="primaryChannel"
+          :to="defaultLink"
+          class="text-orange-700 hover:underline dark:text-orange-300"
+        >
+          {{ primaryChannel.channelUniqueName }}
+        </nuxt-link>
+      </div>
+
+      <div>
+        <nuxt-link
+          v-if="primaryChannel"
+          :to="defaultLink"
+          class="text-lg font-semibold leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
+        >
+          <HighlightedSearchTerms
+            :text="discussion.title || '[Deleted]'"
+            :search-input="searchInput"
+          />
+        </nuxt-link>
+        <span
+          v-if="hasSensitiveContent"
+          class="ml-2 rounded-full border border-orange-600 px-2 text-xs text-orange-600 dark:border-orange-400 dark:text-orange-300"
+        >
+          Sensitive
+        </span>
+      </div>
+
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        Posted {{ relativeCreated }} by
+        <UsernameWithTooltip
+          v-if="authorUsername"
+          :username="authorUsername"
+          :display-name="authorDisplayName"
+          :src="authorProfilePicURL"
+          :comment-karma="authorCommentKarma"
+          :discussion-karma="authorDiscussionKarma"
+          :account-created="authorAccountCreated"
+          :is-admin="authorIsAdmin"
+        />
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <TagComponent
+          v-for="tag in tags"
+          :key="tag"
+          :tag="tag"
+          :active="selectedTags.includes(tag)"
+          @click="$emit('filterByTag', tag)"
+        />
+      </div>
+
+      <div
+        class="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-300 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="flex items-center gap-2">
+          <nuxt-link
+            v-if="primaryChannel && !submittedToMultipleChannels"
+            :to="defaultLink"
+            class="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+          >
+            <i class="fa-regular fa-comment text-xs" />
+            <span>{{ commentCount }} comments</span>
+          </nuxt-link>
+          <MenuButton
+            v-else-if="submittedToMultipleChannels"
+            :items="discussionDetailOptions"
+          >
+            <span class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 dark:bg-gray-800">
+              <i class="fa-regular fa-comment text-xs" />
+              {{ commentCount }}
+              {{ commentCount === 1 ? 'comment' : 'comments' }} in
+              {{ channelCount }}
+              {{ channelCount === 1 ? 'forum' : 'forums' }}
+              <ChevronDownIcon class="h-4 w-4" />
+            </span>
+          </MenuButton>
+        </div>
+        <AddToDiscussionFavorites
+          :allow-add-to-list="true"
+          :discussion-id="discussion.id"
+          :discussion-title="discussion.title || ''"
+          entity-name="Download"
+          size="small"
+        />
+      </div>
+    </div>
+  </li>
+</template>

@@ -32,10 +32,6 @@ defineProps({
     type: Number,
     default: 0,
   },
-  showMap: {
-    type: Boolean,
-    default: false,
-  },
 });
 
 // Nuxt route and router

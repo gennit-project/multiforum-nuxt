@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed } from 'vue';
 import { Line } from 'vue-chartjs';
 import {
   Chart as ChartJS,
@@ -99,7 +99,9 @@ const chartOptions = computed(() => ({
   scales: {
     x: {
       grid: {
-        color: props.darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        color: props.darkMode
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.1)',
       },
       ticks: {
         color: props.darkMode ? 'rgb(156, 163, 175)' : 'rgb(107, 114, 128)',
@@ -111,7 +113,9 @@ const chartOptions = computed(() => ({
       beginAtZero: true,
       max: props.maxYValue || undefined,
       grid: {
-        color: props.darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+        color: props.darkMode
+          ? 'rgba(255, 255, 255, 0.1)'
+          : 'rgba(0, 0, 0, 0.1)',
       },
       ticks: {
         color: props.darkMode ? 'rgb(156, 163, 175)' : 'rgb(107, 114, 128)',

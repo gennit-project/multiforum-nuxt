@@ -38,6 +38,8 @@ const routeInfoLabel = computed(() => {
   switch (route.name) {
     case 'discussions':
       return 'discussions';
+    case 'downloads':
+      return 'downloads';
     case 'events-list-search':
       return 'online events';
     case 'forums':

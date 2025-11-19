@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
-import { useRouter, useRoute } from 'nuxt/app';
+import { useRoute } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import { useDisplay } from 'vuetify';
-import type { RouteLocationAsRelativeGeneric } from 'vue-router';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import ListIcon from '@/components/icons/ListIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
@@ -56,6 +56,12 @@ const navigation: NavigationItem[] = [
     routerName: 'discussions',
   },
   {
+    name: 'Downloads',
+    href: '/downloads',
+    icon: DownloadIcon,
+    routerName: 'downloads',
+  },
+  {
     name: 'All Forums',
     href: '/forums',
     icon: ChannelIcon,
@@ -100,7 +106,6 @@ const { result: getUserResult } = useQuery(
 const user = computed(() => getUserResult.value?.users[0] || null);
 const profilePicURL = computed(() => user.value?.profilePicURL || '');
 
-const router = useRouter();
 const route = useRoute();
 const { height } = useDisplay();
 
@@ -191,14 +196,6 @@ watch(
   },
   { immediate: true }
 );
-
-const navigateTo = async (route: RouteLocationAsRelativeGeneric) => {
-  try {
-    await router.push(route);
-  } catch (error) {
-    console.error('Navigation error:', error);
-  }
-};
 
 const getIconCircleClasses = (isActive: boolean) => {
   const baseClasses =

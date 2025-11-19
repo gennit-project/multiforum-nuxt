@@ -20,7 +20,7 @@ import DiscussionChannelLinks from '@/components/discussion/detail/DiscussionCha
 import DiscussionRootCommentFormWrapper from '@/components/discussion/form/DiscussionRootCommentFormWrapper.vue';
 import PageNotFound from '@/components/PageNotFound.vue';
 import { getSortFromQuery } from '@/components/comments/getSortFromQuery';
-import { usernameVar, modProfileNameVar } from '@/cache';
+import { modProfileNameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import DiscussionBodyEditForm from './DiscussionBodyEditForm.vue';
 import AlbumEditForm from './AlbumEditForm.vue';
@@ -123,10 +123,12 @@ watch(commentSort, () =>
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
 
-const setLastValidCommentSection = (section: {
-  DiscussionChannel: DiscussionChannel | null;
-  Comments: Comment[];
-} | null) => {
+const setLastValidCommentSection = (
+  section: {
+    DiscussionChannel: DiscussionChannel | null;
+    Comments: Comment[];
+  } | null
+) => {
   lastValidCommentSection.value = section;
 };
 
@@ -144,7 +146,10 @@ onGetDiscussionChannelResult((newResult) => {
       DiscussionChannel: newResult.data.getCommentSection.DiscussionChannel,
       Comments: newResult.data.getCommentSection.Comments || [],
     });
-  } else if (!getDiscussionChannelLoading.value && !getDiscussionChannelError.value) {
+  } else if (
+    !getDiscussionChannelLoading.value &&
+    !getDiscussionChannelError.value
+  ) {
     setLastValidCommentSection(null);
   }
 });

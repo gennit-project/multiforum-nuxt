@@ -7,6 +7,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import CalendarIcon from '@/components/icons/CalendarIcon.vue';
 import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
+import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import ListIcon from '@/components/icons/ListIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
@@ -43,6 +44,12 @@ const navigation: NavigationItem[] = [
     href: '/discussions',
     icon: DiscussionIcon,
     routerName: 'discussions',
+  },
+  {
+    name: 'Downloads',
+    href: '/downloads',
+    icon: DownloadIcon,
+    routerName: 'downloads',
   },
   {
     name: 'All Forums',

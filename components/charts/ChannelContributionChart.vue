@@ -4,7 +4,7 @@ import { useUIStore } from '@/stores/uiStore';
 import ContributionLineChart from './ContributionLineChart.vue';
 import type { DayData } from '@/__generated__/graphql';
 
-const props = defineProps<{
+defineProps<{
   dayData: DayData[];
   maxYValue?: number;
 }>();
@@ -17,7 +17,11 @@ const isDarkMode = computed(() => uiStore.theme === 'dark');
 <template>
   <div>
     <ClientOnly>
-      <ContributionLineChart :day-data="dayData" :dark-mode="isDarkMode" :max-y-value="maxYValue" />
+      <ContributionLineChart
+        :day-data="dayData"
+        :dark-mode="isDarkMode"
+        :max-y-value="maxYValue"
+      />
     </ClientOnly>
   </div>
 </template>

@@ -15,7 +15,7 @@ import BrokenRulesModal from '@/components/mod/BrokenRulesModal.vue';
 import EllipsisHorizontal from '@/components/icons/EllipsisHorizontal.vue';
 import { getAllPermissions } from '@/utils/permissionUtils';
 import { getDiscussionHeaderMenuItems } from '@/utils/headerPermissionUtils';
-import { usernameVar, modProfileNameVar, isAuthenticatedVar } from '@/cache';
+import { usernameVar, modProfileNameVar } from '@/cache';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import UnarchiveModal from '@/components/mod/UnarchiveModal.vue';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
