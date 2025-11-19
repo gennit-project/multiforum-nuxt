@@ -62,6 +62,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(['loadMore']);
+
 const route = useRoute();
 
 const eventId = computed(() => props.event?.id);
@@ -390,6 +392,7 @@ const handleSubscriptionToggle = () => {
     @increment-comment-count="incrementCommentCount"
     @update-comment-section-query-result="updateCommentSectionQueryResult"
     @update-create-reply-comment-input="updateCreateReplyCommentInput"
+    @load-more="emit('loadMore')"
   >
     <template #subscription-button>
       <SubscribeButton

@@ -5,7 +5,7 @@ import type { Event as EventData, EventChannel } from '@/__generated__/graphql';
 import { useRoute } from 'nuxt/app';
 import { DateTime } from 'luxon';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
-import { relativeTime } from '@/utils';
+import { stableRelativeTime } from '@/utils';
 
 export default defineComponent({
   components: {
@@ -76,12 +76,29 @@ export default defineComponent({
       return false;
     });
 
+    const postedText = computed(() => {
+      if (!props.eventData?.createdAt) {
+        return '';
+      }
+      return `posted this event ${stableRelativeTime(
+        '' + props.eventData.createdAt
+      )}`;
+    });
+
+    const editedText = computed(() => {
+      if (!props.eventData?.updatedAt) {
+        return '';
+      }
+      return `Edited ${stableRelativeTime('' + props.eventData.updatedAt)}`;
+    });
+
     return {
       channelId,
       posterIsMod,
       eventId,
       posterIsAdmin,
-      relativeTime,
+      postedText,
+      editedText,
       route,
     };
   },
@@ -97,40 +114,21 @@ export default defineComponent({
 <template>
   <div class="mt-4 text-xs text-gray-700 dark:text-gray-200">
     <div v-if="showPoster" class="organizer flex items-center gap-1">
-      <nuxt-link
-        v-if="eventData.Poster"
-        class="underline"
-        :to="{
-          name: 'u-username',
-          params: { username: eventData.Poster.username },
-        }"
-      >
-        <UsernameWithTooltip
-          v-if="eventData.Poster.username"
-          :is-admin="posterIsAdmin"
-          :is-mod="posterIsMod"
-          :username="eventData.Poster.username"
-          :src="eventData.Poster.profilePicURL ?? ''"
-          :display-name="eventData.Poster.displayName || ''"
-          :comment-karma="eventData.Poster.commentKarma ?? 0"
-          :discussion-karma="eventData.Poster.discussionKarma ?? 0"
-          :account-created="eventData.Poster.createdAt"
-        />
-      </nuxt-link>
+      <UsernameWithTooltip
+        v-if="eventData.Poster?.username"
+        :is-admin="posterIsAdmin"
+        :is-mod="posterIsMod"
+        :username="eventData.Poster.username"
+        :src="eventData.Poster.profilePicURL ?? ''"
+        :display-name="eventData.Poster.displayName || ''"
+        :comment-karma="eventData.Poster.commentKarma ?? 0"
+        :discussion-karma="eventData.Poster.discussionKarma ?? 0"
+        :account-created="eventData.Poster.createdAt"
+      />
       <span v-else>[Deleted]</span>
-      {{
-        `${
-          eventData.createdAt
-            ? `posted this event ${relativeTime('' + eventData.createdAt)}`
-            : ''
-        }`
-      }}
-      <span v-if="eventData.updatedAt"> &#8226; </span>
-      {{
-        eventData.updatedAt
-          ? `Edited ${relativeTime('' + eventData.updatedAt)}`
-          : ''
-      }}
+      <span v-if="postedText">{{ postedText }}</span>
+      <span v-if="postedText && editedText"> &#8226; </span>
+      <span v-if="editedText">{{ editedText }}</span>
     </div>
     <div class="time-zone">
       {{ `Time zone: ${getTimeZone(eventData.startTime)}` }}
