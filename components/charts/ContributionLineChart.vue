@@ -12,7 +12,7 @@ import {
   Legend,
   Filler,
 } from 'chart.js';
-import type { DayData } from '@/types/contribution';
+import type { Activity, DayData } from '@/__generated__/graphql';
 
 ChartJS.register(
   CategoryScale,
@@ -39,7 +39,7 @@ const chartData = computed(() => {
     const date = day.date;
     const existing = dataMap.get(date) || { comments: 0, discussions: 0 };
 
-    day.activities.forEach((activity: any) => {
+    day.activities.forEach((activity: Activity) => {
       existing.comments += activity.Comments?.length || 0;
       existing.discussions += activity.Discussions?.length || 0;
     });

@@ -7,6 +7,11 @@ import ChannelContributionChart from '@/components/charts/ChannelContributionCha
 import IconButtonDropdown from '@/components/IconButtonDropdown.vue';
 import type { MenuItemType } from '@/components/IconButtonDropdown.vue';
 import { DateTime } from 'luxon';
+import type {
+  Activity,
+  DayData,
+  UserContributionData,
+} from '@/__generated__/graphql';
 
 const route = useRoute();
 const forumId = computed(() => route.params.forumId as string);
@@ -20,15 +25,21 @@ const timeOptions: MenuItemType[] = [
   { label: 'All Time', value: 'null', event: 'select-period' },
 ];
 
-const selectedMonths = ref(3);
+const selectedMonths = ref<number | null>(3);
 
 const selectedLabel = computed(() => {
   const option = timeOptions.find(opt => parseInt(opt.value) === selectedMonths.value || (opt.value === 'null' && selectedMonths.value === null));
   return option?.label || 'Last 3 Months';
 });
 
-const handlePeriodSelect = (value: string) => {
-  selectedMonths.value = value === 'null' ? null : parseInt(value);
+const handlePeriodSelect = (...args: unknown[]) => {
+  const [value] = args;
+
+  if (typeof value !== 'string') {
+    return;
+  }
+
+  selectedMonths.value = value === 'null' ? null : parseInt(value, 10);
 };
 
 const dateRange = computed(() => {
@@ -45,7 +56,15 @@ const dateRange = computed(() => {
 });
 
 // Fetch channel contributors
-const { result, loading, error } = useQuery(
+const { result, loading, error } = useQuery<
+  { getChannelContributions: UserContributionData[] },
+  {
+    channelUniqueName: string;
+    startDate: string;
+    endDate: string;
+    limit: number;
+  }
+>(
   GET_CHANNEL_CONTRIBUTIONS,
   () => ({
     channelUniqueName: forumId.value,
@@ -59,8 +78,8 @@ const { result, loading, error } = useQuery(
   })
 );
 
-const contributors = computed(() => {
-  return result.value?.getChannelContributions || [];
+const contributors = computed<UserContributionData[]>(() => {
+  return result.value?.getChannelContributions ?? [];
 });
 
 // Calculate max Y-axis value across all contributors
@@ -68,8 +87,8 @@ const maxYValue = computed(() => {
   if (!contributors.value.length) return 0;
 
   let max = 0;
-  contributors.value.forEach(contributor => {
-    contributor.dayData.forEach((day: any) => {
+  contributors.value.forEach((contributor: UserContributionData) => {
+    contributor.dayData.forEach((day: DayData) => {
       if (day.count > max) {
         max = day.count;
       }
@@ -85,8 +104,8 @@ const contributorStats = computed(() => {
     let discussionCount = 0;
     let commentCount = 0;
 
-    contributor.dayData.forEach((day: any) => {
-      day.activities.forEach((activity: any) => {
+    contributor.dayData.forEach((day: DayData) => {
+      day.activities.forEach((activity: Activity) => {
         discussionCount += (activity.Discussions || []).length;
         commentCount += (activity.Comments || []).length;
       });
