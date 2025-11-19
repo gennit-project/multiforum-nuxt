@@ -8,7 +8,7 @@ import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
-import ListIcon from '@/components/icons/ListIcon.vue';
+import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import UserIcon from '@/components/icons/UserIcon.vue';
 import SettingsIcon from '@/components/icons/SettingsIcon.vue';
 import AdminIcon from '@/components/icons/AdminIcon.vue';
@@ -70,7 +70,7 @@ const navigation: NavigationItem[] = [
   {
     name: 'Library',
     href: '/library',
-    icon: ListIcon,
+    icon: BookmarkIcon,
     routerName: 'library',
   },
 ];

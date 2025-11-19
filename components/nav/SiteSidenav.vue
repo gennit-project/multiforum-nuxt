@@ -9,7 +9,7 @@ import LocationIcon from '@/components/icons/LocationIcon.vue';
 import DiscussionIcon from '@/components/icons/DiscussionIcon.vue';
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import ChannelIcon from '@/components/icons/ChannelIcon.vue';
-import ListIcon from '@/components/icons/ListIcon.vue';
+import BookmarkIcon from '@/components/icons/BookmarkIcon.vue';
 import XIcon from '@/components/icons/XmarkIcon.vue';
 import { GET_USER } from '@/graphQLData/user/queries';
 import { usernameVar, isAuthenticatedVar, setSideNavIsOpenVar } from '@/cache';
@@ -60,7 +60,7 @@ const navigation: NavigationItem[] = [
   {
     name: 'Library',
     href: '/library',
-    icon: ListIcon,
+    icon: BookmarkIcon,
     routerName: 'library',
   },
 ];
