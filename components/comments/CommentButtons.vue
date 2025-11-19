@@ -11,7 +11,7 @@ import CancelButton from '@/components/CancelButton.vue';
 import EmojiButtons from './EmojiButtons.vue';
 import NewEmojiButton from './NewEmojiButton.vue';
 import AddToCommentFavorites from '@/components/favorites/AddToCommentFavorites.vue';
-import { usernameVar, modProfileNameVar, isAuthenticatedVar } from '@/cache';
+import { usernameVar, modProfileNameVar } from '@/cache';
 import { MAX_CHARS_IN_COMMENT } from '@/utils/constants';
 
 const props = defineProps({
@@ -230,7 +230,7 @@ function toggleEmojiPicker() {
         {{ `Show ${replyCount} ${replyCount === 1 ? 'Reply' : 'Replies'}` }}
       </span>
       <AddToCommentFavorites
-        v-if="commentData && isAuthenticatedVar"
+        v-if="commentData"
         :allow-add-to-list="true"
         :comment-id="commentData.id"
         size="small"
