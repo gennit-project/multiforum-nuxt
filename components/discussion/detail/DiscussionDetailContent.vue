@@ -80,18 +80,24 @@ onGetDiscussionResult((newResult) => {
 
 const commentSort = computed(() => getSortFromQuery(route.query));
 
+const lastValidCommentSection = ref<{
+  DiscussionChannel: DiscussionChannel | null;
+  Comments: Comment[];
+} | null>(null);
+
 const {
   result: getDiscussionChannelResult,
   error: getDiscussionChannelError,
   loading: getDiscussionChannelLoading,
   fetchMore: fetchMoreComments,
   refetch: refetchDiscussionChannel,
+  onResult: onGetDiscussionChannelResult,
 } = useQuery(
   GET_DISCUSSION_COMMENTS,
   () => ({
     discussionId: props.discussionId,
     channelUniqueName: channelId.value,
-    username: usernameVar.value,
+    username: undefined,
     modName: loggedInUserModName.value,
     offset: offset.value,
     limit: COMMENT_LIMIT,
@@ -117,11 +123,41 @@ watch(commentSort, () =>
   fetchMoreComments({ variables: { sort: commentSort.value } })
 );
 
+const setLastValidCommentSection = (section: {
+  DiscussionChannel: DiscussionChannel | null;
+  Comments: Comment[];
+} | null) => {
+  lastValidCommentSection.value = section;
+};
+
+if (getDiscussionChannelResult.value?.getCommentSection) {
+  setLastValidCommentSection({
+    DiscussionChannel:
+      getDiscussionChannelResult.value.getCommentSection.DiscussionChannel,
+    Comments: getDiscussionChannelResult.value.getCommentSection.Comments || [],
+  });
+}
+
+onGetDiscussionChannelResult((newResult) => {
+  if (newResult?.data?.getCommentSection) {
+    setLastValidCommentSection({
+      DiscussionChannel: newResult.data.getCommentSection.DiscussionChannel,
+      Comments: newResult.data.getCommentSection.Comments || [],
+    });
+  } else if (!getDiscussionChannelLoading.value && !getDiscussionChannelError.value) {
+    setLastValidCommentSection(null);
+  }
+});
+
+watch(
+  () => props.discussionId,
+  () => {
+    setLastValidCommentSection(null);
+  }
+);
+
 const activeDiscussionChannel = computed<DiscussionChannel | null>(() => {
-  return (
-    getDiscussionChannelResult.value?.getCommentSection?.DiscussionChannel ||
-    null
-  );
+  return lastValidCommentSection.value?.DiscussionChannel || null;
 });
 
 const answers = computed(() => {
@@ -145,11 +181,7 @@ const locked = computed(() => {
   return activeDiscussionChannel.value?.locked || false;
 });
 
-const comments = computed(() =>
-  getDiscussionChannelError.value
-    ? []
-    : getDiscussionChannelResult.value?.getCommentSection?.Comments || []
-);
+const comments = computed(() => lastValidCommentSection.value?.Comments || []);
 
 const loadedRootCommentCount = computed(() => {
   const rootComments = comments.value.filter(

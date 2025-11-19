@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watchEffect } from 'vue';
+import { ref, computed, watch, watchEffect } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import Comment from './Comment.vue';
 import LoadMore from '../LoadMore.vue';
@@ -176,6 +176,32 @@ const showSuccessfullyArchived = ref(false);
 const showSuccessfullyArchivedAndSuspended = ref(false);
 const showSuccessfullyUnarchived = ref(false);
 const locked = ref(props.locked);
+
+const hasLoadedComments = ref(
+  (props.comments?.length || 0) > 0 || !props.loading
+);
+
+watch(
+  () => props.comments?.length || 0,
+  (length) => {
+    if (length > 0) {
+      hasLoadedComments.value = true;
+    }
+  }
+);
+
+watch(
+  () => props.loading,
+  (isLoading) => {
+    if (!isLoading) {
+      hasLoadedComments.value = true;
+    }
+  }
+);
+
+const shouldShowLoadingSpinner = computed(
+  () => props.loading && !hasLoadedComments.value
+);
 
 const editFormValues = ref<CreateEditCommentFormValues>({
   text: commentToEdit.value?.text || '',
@@ -690,7 +716,7 @@ const lengthOfCommentInProgress = computed(() => {
       >
         <LockIcon class="h-5 w-5" />
       </InfoBanner>
-      <LoadingSpinner v-if="loading" class="ml-2" />
+      <LoadingSpinner v-if="shouldShowLoadingSpinner" class="ml-2" />
       <NuxtPage
         v-if="showNuxtPage"
         :aggregate-comment-count="aggregateCommentCount"
