@@ -173,11 +173,12 @@ const clickUp = () => {
       </div>
     </template>
     <template #does-not-have-auth>
-      <div class="flex gap-1">
+      <div class="flex items-center gap-2 text-sm">
         <VoteButton
           :active="upvoteActive"
           :count="upvoteCount"
           :is-permalinked="isPermalinked"
+          :loading="upvoteLoading"
           :test-id="'upvote-discussion-button'"
           :tooltip-text="upvoteTooltipUnauthenticated"
         >
@@ -186,16 +187,26 @@ const clickUp = () => {
             <span class="text-sm">{{ upvoteCount }}</span>
           </span>
         </VoteButton>
-        <VoteButton
+
+        <MenuButton
           v-if="showDownvote"
-          :active="downvoteActive"
-          :is-permalinked="isPermalinked"
-          :show-count="false"
-          :test-id="'downvote-discussion-button'"
-          :tooltip-text="'Give semi-anonymous feedback'"
+          data-testid="discussion-thumbs-down-menu-button"
+          :items="thumbsDownMenuItems"
+          :disabled="true"
         >
-          <HandThumbDownIcon class="h-4 w-4" />
-        </VoteButton>
+          <VoteButton
+            :active="downvoteActive"
+            :is-permalinked="isPermalinked"
+            :loading="downvoteLoading"
+            :show-count="false"
+            :test-id="'downvote-discussion-button'"
+            :tooltip-text="'Give semi-anonymous feedback'"
+          >
+            <div>
+              <HandThumbDownIcon class="h-4 w-4" />
+            </div>
+          </VoteButton>
+        </MenuButton>
       </div>
     </template>
   </RequireAuth>

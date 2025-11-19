@@ -19,6 +19,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const emits = defineEmits<(e: string) => void>(); // Accept any event type
@@ -88,9 +92,18 @@ const menuStyles = {
         <button
           :data-testid="dataTestid"
           variant="text"
-          v-bind="props"
-          :class="buttonClasses"
-          @click="adjustMenuPosition"
+          v-bind="disabled ? {} : props"
+          :class="[
+            buttonClasses,
+            disabled ? 'cursor-not-allowed opacity-60' : '',
+          ]"
+          @click="
+            () => {
+              if (!disabled) {
+                adjustMenuPosition();
+              }
+            }
+          "
         >
           <slot>
             Options
