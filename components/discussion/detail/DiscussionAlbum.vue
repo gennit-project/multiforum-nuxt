@@ -853,9 +853,8 @@ const togglePanelPosition = () => {
           <div
             v-if="!expandedView && orderedImages.length > 1"
             class="mt-4 w-full overflow-x-auto px-4"
-            style="max-width: 100%"
           >
-            <div class="flex gap-2 pb-2" style="min-width: max-content">
+            <div class="flex gap-2 pb-2">
               <CarouselThumbnail
                 v-for="(image, idx) in orderedImages"
                 :key="`thumb-${image?.id || idx}`"

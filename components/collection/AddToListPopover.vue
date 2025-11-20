@@ -15,6 +15,7 @@ import {
   GET_USER_COLLECTIONS_CHANNELS,
   GET_USER_COLLECTIONS_DOWNLOADS,
   CHECK_ITEM_IN_COLLECTIONS,
+  CHECK_CHANNEL_IN_COLLECTIONS,
 } from '@/graphQLData/collection/queries';
 import {
   CREATE_COLLECTION,
@@ -134,8 +135,15 @@ const { result: collectionsResult, refetch: refetchCollections } = useQuery(
 );
 
 // Check which collections already contain this item
+// Use different query for channels vs other item types due to type differences
+const checkItemQuery = computed(() =>
+  props.itemType === 'channel'
+    ? CHECK_CHANNEL_IN_COLLECTIONS
+    : CHECK_ITEM_IN_COLLECTIONS
+);
+
 const { result: itemInCollectionsResult } = useQuery(
-  CHECK_ITEM_IN_COLLECTIONS,
+  checkItemQuery,
   () => ({
     username: usernameVar.value,
     itemId: props.itemId,
@@ -151,12 +159,14 @@ const collections = computed(() => {
 });
 
 const favoritesList = computed(() => {
-  const user = collectionsResult.value?.users?.[0];
-  if (!user) return {
-    id: 'favorites',
+  const defaultFavorites = {
+    id: `favorites-${props.itemType || 'items'}`,
     name: 'Favorites',
-    items: []
+    items: [],
   };
+
+  const user = collectionsResult.value?.users?.[0];
+  if (!user) return defaultFavorites;
 
   switch (props.itemType) {
     case 'discussion':
@@ -190,11 +200,7 @@ const favoritesList = computed(() => {
         items: user.FavoriteDiscussions || [],
       };
     default:
-      return {
-        id: 'favorites',
-        name: 'Favorites',
-        items: []
-      };
+      return defaultFavorites;
   }
 });
 
@@ -441,6 +447,8 @@ const getRemoveFavoriteMutation = () => {
 const handleCreateNewCollection = async () => {
   if (!newCollectionName.value.trim()) return;
 
+  if (!usernameVar.value) return;
+
   isLoading.value = true;
   try {
     const now = new Date().toISOString();
@@ -449,6 +457,7 @@ const handleCreateNewCollection = async () => {
       collectionType: collectionType.value,
       visibility: 'PUBLIC' as CollectionVisibility,
       updatedAt: now,
+      username: usernameVar.value,
     });
 
     if (result?.data?.createCollections?.collections?.[0]) {

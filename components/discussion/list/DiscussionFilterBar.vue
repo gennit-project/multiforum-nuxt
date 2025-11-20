@@ -275,7 +275,7 @@ const isExpanded = computed(() => {
           <SearchIcon />
         </button>
         <SortButtons />
-        <div>
+        <div v-if="!isDownloadPage">
           <RequireAuth :full-width="false">
             <template #has-auth>
               <PrimaryButton

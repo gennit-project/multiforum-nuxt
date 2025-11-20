@@ -134,21 +134,88 @@ export const GET_COLLECTION_ITEMS = gql`
       name
       description
       collectionType
+      visibility
+      itemCount
       itemOrder
       Discussions {
         id
         title
+        body
         createdAt
+        hasDownload
+        hasSensitiveContent
+        Author {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+          ServerRoles {
+            showAdminTag
+          }
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+          archived
+          answered
+          CommentsAggregate {
+            count
+          }
+        }
+        Tags {
+          text
+        }
       }
       Comments {
         id
         text
         createdAt
+        CommentAuthor {
+          ... on User {
+            username
+            displayName
+            profilePicURL
+            commentKarma
+            discussionKarma
+            createdAt
+            ServerRoles {
+              showAdminTag
+            }
+          }
+        }
       }
       Downloads {
         id
         title
+        body
         createdAt
+        hasDownload
+        hasSensitiveContent
+        Author {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+          ServerRoles {
+            showAdminTag
+          }
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+          archived
+          answered
+          CommentsAggregate {
+            count
+          }
+        }
+        Tags {
+          text
+        }
       }
       Images {
         id
@@ -166,6 +233,7 @@ export const GET_COLLECTION_ITEMS = gql`
   }
 `;
 
+// For discussions, comments, downloads, images (use ID!)
 export const CHECK_ITEM_IN_COLLECTIONS = gql`
   query CheckItemInCollections(
     $username: String!
@@ -177,7 +245,12 @@ export const CHECK_ITEM_IN_COLLECTIONS = gql`
       Collections(
         where: {
           collectionType: $collectionType
-          ${getCollectionItemFilter()}
+          OR: [
+            { Discussions_SOME: { id: $itemId } }
+            { Comments_SOME: { id: $itemId } }
+            { Downloads_SOME: { id: $itemId } }
+            { Images_SOME: { id: $itemId } }
+          ]
         }
       ) {
         id
@@ -188,15 +261,44 @@ export const CHECK_ITEM_IN_COLLECTIONS = gql`
   }
 `;
 
-// Helper function to get the appropriate collection item filter
-function getCollectionItemFilter() {
-  return `
-    OR: [
-      { Discussions_SOME: { id: $itemId } }
-      { Comments_SOME: { id: $itemId } }
-      { Downloads_SOME: { id: $itemId } }
-      { Images_SOME: { id: $itemId } }
-      { Channels_SOME: { id: $itemId } }
-    ]
-  `;
-}
+// For channels (use String! for uniqueName)
+export const CHECK_CHANNEL_IN_COLLECTIONS = gql`
+  query CheckChannelInCollections(
+    $username: String!
+    $itemId: String!
+    $collectionType: CollectionType!
+  ) {
+    users(where: { username: $username }) {
+      username
+      Collections(
+        where: {
+          collectionType: $collectionType
+          Channels_SOME: { uniqueName: $itemId }
+        }
+      ) {
+        id
+        name
+        collectionType
+      }
+    }
+  }
+`;
+
+// Get all user collections (for library page)
+export const GET_ALL_USER_COLLECTIONS = gql`
+  query GetAllUserCollections($username: String!) {
+    users(where: { username: $username }) {
+      username
+      Collections(options: { sort: [{ createdAt: DESC }] }) {
+        id
+        name
+        description
+        collectionType
+        visibility
+        itemCount
+        createdAt
+        updatedAt
+      }
+    }
+  }
+`;

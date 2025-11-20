@@ -7,6 +7,7 @@ export const CREATE_COLLECTION = gql`
     $collectionType: CollectionType!
     $visibility: CollectionVisibility!
     $updatedAt: DateTime!
+    $username: String!
   ) {
     createCollections(
       input: [
@@ -19,7 +20,7 @@ export const CREATE_COLLECTION = gql`
           updatedAt: $updatedAt
           CreatedBy: {
             connect: {
-              where: { node: {} }
+              where: { node: { username: $username } }
             }
           }
         }
@@ -113,7 +114,6 @@ export const ADD_CHANNEL_TO_COLLECTION = gql`
     updateCollections(
       where: { id: $collectionId }
       update: {
-        itemOrder_PUSH: [$itemId]
         Channels: {
           connect: {
             where: { node: { uniqueName: $itemId } }

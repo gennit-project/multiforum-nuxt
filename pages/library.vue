@@ -8,6 +8,7 @@ import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
 } from '@/graphQLData/user/queries';
+import { GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
 import { usernameVar, isAuthenticatedVar } from '@/cache';
 
 useHead({
@@ -54,6 +55,18 @@ const { result: favoriteDownloadsResult, refetch: refetchDownloads } = useQuery(
   })
 );
 
+const { result: customCollectionsResult, refetch: refetchCustomCollections } =
+  useQuery(
+    GET_ALL_USER_COLLECTIONS,
+    () => ({
+      username: username.value,
+    }),
+    () => ({
+      enabled: !!username.value && isAuthenticated.value,
+      fetchPolicy: 'cache-and-network',
+    })
+  );
+
 // Refetch data when username becomes available
 watch(
   () => [username.value, isAuthenticated.value],
@@ -61,6 +74,7 @@ watch(
     if (newUsername && newIsAuthenticated) {
       refetchCounts();
       refetchDownloads();
+      refetchCustomCollections();
     }
   }
 );
@@ -70,6 +84,7 @@ const isLoading = computed(() => {
   return (
     !favoriteCountsResult.value &&
     !favoriteDownloadsResult.value &&
+    !customCollectionsResult.value &&
     isAuthenticated.value &&
     !!username.value
   );
@@ -145,14 +160,33 @@ const defaultCollections = computed(() => [
   },
 ]);
 
+// Get custom collections from query
+const customCollections = computed(() => {
+  return customCollectionsResult.value?.users?.[0]?.Collections || [];
+});
+
+// Combine favorites and custom collections
+const allCollections = computed(() => {
+  return [...defaultCollections.value, ...customCollections.value];
+});
+
 // Filtered collections based on active filter
 const filteredCollections = computed(() => {
   if (activeFilter.value === 'all') {
-    return defaultCollections.value;
+    return allCollections.value;
   }
-  return defaultCollections.value.filter(
+  return allCollections.value.filter(
     (collection) => collection.collectionType === activeFilter.value
   );
+});
+
+// Split collections into favorites and custom for display
+const filteredFavorites = computed(() => {
+  return filteredCollections.value.filter((c) => c.id.startsWith('favorite-'));
+});
+
+const filteredCustom = computed(() => {
+  return filteredCollections.value.filter((c) => !c.id.startsWith('favorite-'));
 });
 </script>
 
@@ -191,11 +225,11 @@ const filteredCollections = computed(() => {
                   </div>
                 </div>
 
-                <!-- Default Collections Section -->
+                <!-- Collections Section -->
                 <div class="mb-8">
                   <div class="mb-4 flex items-center justify-between">
                     <h2
-                      class="font-semibold text-xl text-gray-900 dark:text-white"
+                      class="text-xl font-semibold text-gray-900 dark:text-white"
                     >
                       Your Collections
                     </h2>
@@ -230,32 +264,94 @@ const filteredCollections = computed(() => {
 
                     <!-- Actual collections when loaded -->
                     <template v-else>
-                      <NuxtLink
-                        v-for="collection in filteredCollections"
-                        :key="collection.id"
-                        :to="`/library/${collection.id}`"
-                        class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                        active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
-                      >
-                        <div class="flex items-center">
-                          <ChannelIcon
-                            class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
-                          />
-                          <div>
-                            <div class="font-medium">{{ collection.name }}</div>
-                            <div
-                              class="text-xs text-gray-500 dark:text-gray-400"
-                            >
-                              {{ collection.itemCount }} item{{
-                                collection.itemCount !== 1 ? 's' : ''
-                              }}
+                      <!-- Favorites Section -->
+                      <div v-if="filteredFavorites.length > 0">
+                        <div
+                          class="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                        >
+                          Favorites
+                        </div>
+                        <NuxtLink
+                          v-for="collection in filteredFavorites"
+                          :key="collection.id"
+                          :to="`/library/${collection.id}`"
+                          class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                          active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
+                        >
+                          <div class="flex items-center">
+                            <ChannelIcon
+                              class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
+                            />
+                            <div>
+                              <div class="font-medium">
+                                {{ collection.name }}
+                              </div>
+                              <div
+                                class="text-xs text-gray-500 dark:text-gray-400"
+                              >
+                                {{ collection.itemCount }} item{{
+                                  collection.itemCount !== 1 ? 's' : ''
+                                }}
+                              </div>
                             </div>
                           </div>
+                          <span class="text-xs capitalize text-gray-400">
+                            {{ collection.visibility.toLowerCase() }}
+                          </span>
+                        </NuxtLink>
+                      </div>
+
+                      <!-- Custom Collections Section -->
+                      <div
+                        v-if="filteredCustom.length > 0"
+                        :class="{ 'mt-6': filteredFavorites.length > 0 }"
+                      >
+                        <div
+                          class="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                        >
+                          Custom Collections
                         </div>
-                        <span class="text-xs capitalize text-gray-400">
-                          {{ collection.visibility.toLowerCase() }}
-                        </span>
-                      </NuxtLink>
+                        <NuxtLink
+                          v-for="collection in filteredCustom"
+                          :key="collection.id"
+                          :to="`/library/${collection.id}`"
+                          class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
+                          active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
+                        >
+                          <div class="flex items-center">
+                            <ChannelIcon
+                              class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
+                            />
+                            <div>
+                              <div class="font-medium">
+                                {{ collection.name }}
+                              </div>
+                              <div
+                                class="text-xs text-gray-500 dark:text-gray-400"
+                              >
+                                {{ collection.itemCount }} item{{
+                                  collection.itemCount !== 1 ? 's' : ''
+                                }}
+                              </div>
+                            </div>
+                          </div>
+                          <span class="text-xs capitalize text-gray-400">
+                            {{ collection.visibility.toLowerCase() }}
+                          </span>
+                        </NuxtLink>
+                      </div>
+
+                      <!-- Empty state -->
+                      <div
+                        v-if="
+                          filteredFavorites.length === 0 &&
+                          filteredCustom.length === 0
+                        "
+                        class="px-3 py-8 text-center text-sm text-gray-500 dark:text-gray-400"
+                      >
+                        No collections yet. Start adding items to create your
+                        first collection!
+                      </div>
                     </template>
                   </nav>
                 </div>

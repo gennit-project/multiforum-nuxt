@@ -165,11 +165,11 @@ const revealSensitiveContent = () => {
 <template>
   <li class="mb-2 flex border-gray-800 pt-2 md:rounded-lg">
     <div
-      class="flex w-full flex-row justify-start gap-4 overflow-hidden rounded-lg"
+      class="flex min-w-0 w-full flex-row justify-start gap-4 overflow-hidden rounded-lg"
     >
-      <div v-if="discussion" class="w-full flex-col">
-        <div class="flex gap-3">
-          <div class="w-full flex-col">
+      <div v-if="discussion" class="min-w-0 w-full flex-col">
+        <div class="flex min-w-0 gap-3">
+          <div class="min-w-0 w-full flex-col">
             <div>
               <nuxt-link
                 :to="{
@@ -335,7 +335,7 @@ const revealSensitiveContent = () => {
                 </div>
                 <div
                   v-if="discussion.Album && discussion.Album?.Images.length > 0"
-                  class="my-4 overflow-x-auto bg-black"
+                  class="my-4 max-w-full overflow-x-auto bg-black"
                 >
                   <DiscussionAlbum
                     :album="discussion.Album"
