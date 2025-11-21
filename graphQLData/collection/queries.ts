@@ -233,9 +233,9 @@ export const GET_COLLECTION_ITEMS = gql`
   }
 `;
 
-// For discussions, comments, downloads, images (use ID!)
-export const CHECK_ITEM_IN_COLLECTIONS = gql`
-  query CheckItemInCollections(
+// Check if a discussion is in collections
+export const CHECK_DISCUSSION_IN_COLLECTIONS = gql`
+  query CheckDiscussionInCollections(
     $username: String!
     $itemId: ID!
     $collectionType: CollectionType!
@@ -245,12 +245,7 @@ export const CHECK_ITEM_IN_COLLECTIONS = gql`
       Collections(
         where: {
           collectionType: $collectionType
-          OR: [
-            { Discussions_SOME: { id: $itemId } }
-            { Comments_SOME: { id: $itemId } }
-            { Downloads_SOME: { id: $itemId } }
-            { Images_SOME: { id: $itemId } }
-          ]
+          Discussions_SOME: { id: $itemId }
         }
       ) {
         id
@@ -261,7 +256,76 @@ export const CHECK_ITEM_IN_COLLECTIONS = gql`
   }
 `;
 
-// For channels (use String! for uniqueName)
+// Check if a comment is in collections
+export const CHECK_COMMENT_IN_COLLECTIONS = gql`
+  query CheckCommentInCollections(
+    $username: String!
+    $itemId: ID!
+    $collectionType: CollectionType!
+  ) {
+    users(where: { username: $username }) {
+      username
+      Collections(
+        where: {
+          collectionType: $collectionType
+          Comments_SOME: { id: $itemId }
+        }
+      ) {
+        id
+        name
+        collectionType
+      }
+    }
+  }
+`;
+
+// Check if a download is in collections
+export const CHECK_DOWNLOAD_IN_COLLECTIONS = gql`
+  query CheckDownloadInCollections(
+    $username: String!
+    $itemId: ID!
+    $collectionType: CollectionType!
+  ) {
+    users(where: { username: $username }) {
+      username
+      Collections(
+        where: {
+          collectionType: $collectionType
+          Downloads_SOME: { id: $itemId }
+        }
+      ) {
+        id
+        name
+        collectionType
+      }
+    }
+  }
+`;
+
+// Check if an image is in collections
+export const CHECK_IMAGE_IN_COLLECTIONS = gql`
+  query CheckImageInCollections(
+    $username: String!
+    $itemId: ID!
+    $collectionType: CollectionType!
+  ) {
+    users(where: { username: $username }) {
+      username
+      Collections(
+        where: {
+          collectionType: $collectionType
+          Images_SOME: { id: $itemId }
+        }
+      ) {
+        id
+        name
+        collectionType
+      }
+    }
+  }
+`;
+
+// Check if a channel is in collections (use String! for uniqueName)
 export const CHECK_CHANNEL_IN_COLLECTIONS = gql`
   query CheckChannelInCollections(
     $username: String!

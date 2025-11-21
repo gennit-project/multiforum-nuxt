@@ -14,7 +14,10 @@ import {
   GET_USER_COLLECTIONS_IMAGES,
   GET_USER_COLLECTIONS_CHANNELS,
   GET_USER_COLLECTIONS_DOWNLOADS,
-  CHECK_ITEM_IN_COLLECTIONS,
+  CHECK_DISCUSSION_IN_COLLECTIONS,
+  CHECK_COMMENT_IN_COLLECTIONS,
+  CHECK_DOWNLOAD_IN_COLLECTIONS,
+  CHECK_IMAGE_IN_COLLECTIONS,
   CHECK_CHANNEL_IN_COLLECTIONS,
 } from '@/graphQLData/collection/queries';
 import {
@@ -135,12 +138,23 @@ const { result: collectionsResult, refetch: refetchCollections } = useQuery(
 );
 
 // Check which collections already contain this item
-// Use different query for channels vs other item types due to type differences
-const checkItemQuery = computed(() =>
-  props.itemType === 'channel'
-    ? CHECK_CHANNEL_IN_COLLECTIONS
-    : CHECK_ITEM_IN_COLLECTIONS
-);
+// Use specific query for each item type to avoid false positives
+const checkItemQuery = computed(() => {
+  switch (props.itemType) {
+    case 'discussion':
+      return CHECK_DISCUSSION_IN_COLLECTIONS;
+    case 'comment':
+      return CHECK_COMMENT_IN_COLLECTIONS;
+    case 'download':
+      return CHECK_DOWNLOAD_IN_COLLECTIONS;
+    case 'image':
+      return CHECK_IMAGE_IN_COLLECTIONS;
+    case 'channel':
+      return CHECK_CHANNEL_IN_COLLECTIONS;
+    default:
+      return CHECK_DISCUSSION_IN_COLLECTIONS;
+  }
+});
 
 const { result: itemInCollectionsResult } = useQuery(
   checkItemQuery,
