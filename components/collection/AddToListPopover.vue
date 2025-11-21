@@ -7,7 +7,10 @@ import { useToastStore } from '@/stores/toastStore';
 import type { CollectionVisibility } from '@/__generated__/graphql';
 import { useCollectionMutations } from '@/composables/useCollectionMutations';
 import { useCollectionQueries } from '@/composables/useCollectionQueries';
-import { usePopoverPositioning, type PopoverPosition } from '@/composables/usePopoverPositioning';
+import {
+  usePopoverPositioning,
+  type PopoverPosition,
+} from '@/composables/usePopoverPositioning';
 
 const props = defineProps({
   itemId: {
@@ -46,9 +49,8 @@ const isLoading = ref(false);
 const toastStore = useToastStore();
 
 // Use composables
-const { collectionType, getCollectionQuery, getCheckItemQuery } = useCollectionQueries(
-  props.itemType as any
-);
+const { collectionType, getCollectionQuery, getCheckItemQuery } =
+  useCollectionQueries(props.itemType as any);
 const {
   createCollection,
   getAddMutation,
@@ -155,8 +157,9 @@ const isItemInFavorites = computed(() => {
   } else {
     // Other item types use id
     return (
-      favoritesList.value?.items?.some((item: any) => item.id === props.itemId) ||
-      false
+      favoritesList.value?.items?.some(
+        (item: any) => item.id === props.itemId
+      ) || false
     );
   }
 });
@@ -177,7 +180,6 @@ const { adjustedPosition } = usePopoverPositioning({
   isVisible: isVisibleRef,
   contentDependencies: [filteredCollections, isCreatingNew, isLoading],
 });
-
 
 // Search functionality
 watch(searchTerm, () => {
@@ -240,11 +242,11 @@ const handleToggleInCollection = async (collection: any) => {
           props.itemType === 'channel'
             ? { channel: props.itemId, username: usernameVar.value }
             : props.itemType === 'download'
-            ? { discussionId: props.itemId, username: usernameVar.value }
-            : {
-                [`${props.itemType}Id`]: props.itemId,
-                username: usernameVar.value,
-              };
+              ? { discussionId: props.itemId, username: usernameVar.value }
+              : {
+                  [`${props.itemType}Id`]: props.itemId,
+                  username: usernameVar.value,
+                };
 
         await removeMutation(params);
         toastStore.showToast(`Removed from "${collection.name}"`);
@@ -255,11 +257,11 @@ const handleToggleInCollection = async (collection: any) => {
           props.itemType === 'channel'
             ? { channel: props.itemId, username: usernameVar.value }
             : props.itemType === 'download'
-            ? { discussionId: props.itemId, username: usernameVar.value }
-            : {
-                [`${props.itemType}Id`]: props.itemId,
-                username: usernameVar.value,
-              };
+              ? { discussionId: props.itemId, username: usernameVar.value }
+              : {
+                  [`${props.itemType}Id`]: props.itemId,
+                  username: usernameVar.value,
+                };
 
         await addMutation(params);
         toastStore.showToast(`Added to "${collection.name}"`);
@@ -371,7 +373,7 @@ const popoverStyles = computed(() => {
           type="text"
           placeholder="Search lists..."
           class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
-        >
+        />
       </div>
 
       <!-- Create New List -->
@@ -393,7 +395,7 @@ const popoverStyles = computed(() => {
             class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
             @keyup.enter="handleCreateNewCollection"
             @keyup.escape="isCreatingNew = false"
-          >
+          />
           <div class="flex gap-2">
             <button
               class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
@@ -416,7 +418,7 @@ const popoverStyles = computed(() => {
       </div>
 
       <!-- Divider -->
-      <hr class="mb-3 border-gray-200 dark:border-gray-600" >
+      <hr class="mb-3 border-gray-200 dark:border-gray-600" />
 
       <!-- Lists -->
       <div class="max-h-64 space-y-1 overflow-y-auto">
@@ -436,7 +438,7 @@ const popoverStyles = computed(() => {
             :checked="isItemInFavorites"
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly
-          >
+          />
         </div>
 
         <!-- Divider between Favorites and Collections -->
@@ -447,7 +449,7 @@ const popoverStyles = computed(() => {
           "
           class="my-2"
         >
-          <hr class="border-gray-200 dark:border-gray-600" >
+          <hr class="border-gray-200 dark:border-gray-600" />
           <div
             class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
           >
@@ -463,7 +465,6 @@ const popoverStyles = computed(() => {
           @click.stop="handleToggleInCollection(collection)"
         >
           <div class="flex items-center">
-            <span class="mr-2 text-gray-500">📝</span>
             <span class="text-gray-900 dark:text-white">{{
               collection.name
             }}</span>
@@ -478,7 +479,7 @@ const popoverStyles = computed(() => {
             "
             class="rounded text-blue-600 focus:ring-blue-500"
             readonly
-          >
+          />
         </div>
 
         <!-- No Search Results -->
