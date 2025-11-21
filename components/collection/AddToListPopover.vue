@@ -58,6 +58,7 @@ const {
 } = useCollectionMutations(props.itemType as any);
 
 // Fetch user collections
+// Use cache-and-network to prevent cache collision with itemInCollections query
 const { result: collectionsResult, refetch: refetchCollections } = useQuery(
   getCollectionQuery(),
   () => ({
@@ -66,10 +67,12 @@ const { result: collectionsResult, refetch: refetchCollections } = useQuery(
   }),
   () => ({
     enabled: !!usernameVar.value && props.isVisible,
+    fetchPolicy: 'cache-and-network',
   })
 );
 
 // Check which collections already contain this item
+// Use network-only to get fresh data and avoid cache conflicts with main collections query
 const { result: itemInCollectionsResult } = useQuery(
   getCheckItemQuery(),
   () => ({
@@ -79,6 +82,7 @@ const { result: itemInCollectionsResult } = useQuery(
   }),
   () => ({
     enabled: !!usernameVar.value && props.isVisible,
+    fetchPolicy: 'network-only',
   })
 );
 
