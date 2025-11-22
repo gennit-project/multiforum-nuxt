@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue';
 import { useHead } from 'nuxt/app';
 import { useQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import ChannelIcon from '@/components/icons/ChannelIcon.vue';
 import {
   GET_USER_FAVORITE_COUNTS,
   GET_USER_FAVORITE_DOWNLOADS_COUNT,
@@ -188,6 +187,24 @@ const filteredFavorites = computed(() => {
 const filteredCustom = computed(() => {
   return filteredCollections.value.filter((c) => !c.id.startsWith('favorite-'));
 });
+
+// Get color for collection type
+const getCollectionTypeInfo = (collectionType: string) => {
+  switch (collectionType) {
+    case 'DISCUSSIONS':
+      return { color: 'bg-blue-100 text-blue-700 border border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' };
+    case 'IMAGES':
+      return { color: 'bg-purple-100 text-purple-700 border border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700' };
+    case 'COMMENTS':
+      return { color: 'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' };
+    case 'DOWNLOADS':
+      return { color: 'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700' };
+    case 'CHANNELS':
+      return { color: 'bg-pink-100 text-pink-700 border border-pink-300 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-700' };
+    default:
+      return { color: 'bg-gray-100 text-gray-700 border border-gray-300 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-700' };
+  }
+};
 </script>
 
 <template>
@@ -275,29 +292,20 @@ const filteredCustom = computed(() => {
                           v-for="collection in filteredFavorites"
                           :key="collection.id"
                           :to="`/library/${collection.id}`"
-                          class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                          active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
+                          class="block rounded-md px-3 py-2 text-sm transition-colors"
+                          active-class="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 font-semibold"
                         >
-                          <div class="flex items-center">
-                            <ChannelIcon
-                              class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
-                            />
-                            <div>
-                              <div class="font-medium">
-                                {{ collection.name }}
-                              </div>
-                              <div
-                                class="text-xs text-gray-500 dark:text-gray-400"
+                          <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-medium">
+                              {{ collection.name.replace('Favorite ', '') }}
+                              <span class="text-gray-500 dark:text-gray-400"
+                                >({{ collection.itemCount }})</span
                               >
-                                {{ collection.itemCount }} item{{
-                                  collection.itemCount !== 1 ? 's' : ''
-                                }}
-                              </div>
-                            </div>
+                            </span>
+                            <span class="text-xs capitalize text-gray-400">
+                              · {{ collection.visibility.toLowerCase() }}
+                            </span>
                           </div>
-                          <span class="text-xs capitalize text-gray-400">
-                            {{ collection.visibility.toLowerCase() }}
-                          </span>
                         </NuxtLink>
                       </div>
 
@@ -315,29 +323,33 @@ const filteredCustom = computed(() => {
                           v-for="collection in filteredCustom"
                           :key="collection.id"
                           :to="`/library/${collection.id}`"
-                          class="flex items-center justify-between rounded-md px-3 py-2 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
-                          active-class="bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400"
+                          class="block rounded-md px-3 py-2 text-sm transition-colors"
+                          active-class="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 font-semibold"
                         >
-                          <div class="flex items-center">
-                            <ChannelIcon
-                              class="mr-3 h-5 w-5 flex-shrink-0 text-gray-400"
-                            />
-                            <div>
-                              <div class="font-medium">
-                                {{ collection.name }}
-                              </div>
-                              <div
-                                class="text-xs text-gray-500 dark:text-gray-400"
+                          <div class="flex flex-wrap items-center gap-2">
+                            <span class="font-medium">
+                              {{ collection.name }}
+                              <span class="text-gray-500 dark:text-gray-400"
+                                >({{ collection.itemCount }})</span
                               >
-                                {{ collection.itemCount }} item{{
-                                  collection.itemCount !== 1 ? 's' : ''
-                                }}
-                              </div>
-                            </div>
+                            </span>
+                            <span
+                              :class="[
+                                'rounded-full px-2 py-0.5 text-xs font-medium',
+                                getCollectionTypeInfo(collection.collectionType)
+                                  .color,
+                              ]"
+                            >
+                              {{
+                                collection.collectionType
+                                  .toLowerCase()
+                                  .replace('_', ' ')
+                              }}
+                            </span>
+                            <span class="text-xs capitalize text-gray-400">
+                              · {{ collection.visibility.toLowerCase() }}
+                            </span>
                           </div>
-                          <span class="text-xs capitalize text-gray-400">
-                            {{ collection.visibility.toLowerCase() }}
-                          </span>
                         </NuxtLink>
                       </div>
 
