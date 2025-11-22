@@ -167,6 +167,14 @@ export const GET_COLLECTION_ITEMS = gql`
         Tags {
           text
         }
+        Album {
+          id
+          Images {
+            id
+            url
+            caption
+          }
+        }
       }
       Comments {
         id
@@ -215,6 +223,14 @@ export const GET_COLLECTION_ITEMS = gql`
         }
         Tags {
           text
+        }
+        Album {
+          id
+          Images {
+            id
+            url
+            caption
+          }
         }
       }
       Images {

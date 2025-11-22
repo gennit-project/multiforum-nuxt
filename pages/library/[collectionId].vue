@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useRoute } from 'vue-router';
-import { usernameVar } from '@/cache';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_COLLECTION_ITEMS } from '@/graphQLData/collection/queries';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
@@ -13,6 +12,11 @@ import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+
+// Lazy load the album component since it's not needed for initial render
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 const route = useRoute();
 const collectionId = computed(() => route.params.collectionId as string);
@@ -37,32 +41,11 @@ useHead({
   title: computed(() => `${collectionName.value} - Library`),
 });
 
-const formatCount = (
-  count: number | undefined,
-  singular: string,
-  plural: string
-) => {
-  const value = count || 0;
-  return `${value} ${value === 1 ? singular : plural}`;
-};
-
 const getDiscussionLink = (discussion: any) => {
   const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as any;
   if (!firstChannel?.channelUniqueName) return '/';
 
   return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
-};
-
-const getChannelLink = (channelUniqueName: string | undefined) => {
-  if (!channelUniqueName) return '/';
-  return `/forums/${channelUniqueName}`;
-};
-
-const getTotalCommentCount = (discussionChannels: any[]) => {
-  if (!discussionChannels) return 0;
-  return discussionChannels.reduce((total, dc) => {
-    return total + (dc.CommentsAggregate?.count || 0);
-  }, 0);
 };
 
 const getAuthorInfo = (item: any) => {
@@ -255,6 +238,22 @@ const collectionTypeLabel = computed(() => {
                         size="medium"
                       />
                     </div>
+                  </div>
+
+                  <!-- Album -->
+                  <div
+                    v-if="discussion.Album && discussion.Album?.Images.length > 0"
+                    class="mb-4 max-w-full overflow-x-auto bg-black"
+                  >
+                    <DiscussionAlbum
+                      :album="discussion.Album"
+                      :discussion-id="discussion.id"
+                      :discussion-author="
+                        getAuthorInfo(discussion)?.username || 'Deleted'
+                      "
+                      :carousel-format="true"
+                      :show-edit-album="false"
+                    />
                   </div>
 
                   <!-- Meta information -->

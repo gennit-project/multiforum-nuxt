@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { gql } from '@apollo/client/core';
 import { useHead } from 'nuxt/app';
@@ -11,6 +11,11 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+
+// Lazy load the album component since it's not needed for initial render
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 useHead({
   title: 'Favorite Discussions - Library',
@@ -280,6 +285,22 @@ const getAuthorInfo = (discussion: any) => {
                       font-size="small"
                     />
                   </div>
+                </div>
+
+                <!-- Album -->
+                <div
+                  v-if="discussion.Album && discussion.Album?.Images.length > 0"
+                  class="mb-4 max-w-full overflow-x-auto bg-black"
+                >
+                  <DiscussionAlbum
+                    :album="discussion.Album"
+                    :discussion-id="discussion.id"
+                    :discussion-author="
+                      getAuthorInfo(discussion)?.username || 'Deleted'
+                    "
+                    :carousel-format="true"
+                    :show-edit-album="false"
+                  />
                 </div>
 
                 <!-- Meta information -->
