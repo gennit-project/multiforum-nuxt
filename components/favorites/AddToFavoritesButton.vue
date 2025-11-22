@@ -41,7 +41,7 @@ const emit = defineEmits<{
 const isAnimating = ref(false);
 const showTooltip = ref(false);
 const showPopover = ref(false);
-const tooltipPosition = ref({ top: false, right: false });
+const tooltipPosition = ref({ top: 0, left: 0, placement: 'below' as 'below' | 'above' });
 
 type PopoverPosition = {
   top: number;
@@ -156,16 +156,30 @@ const updateTooltipPosition = async () => {
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
 
+  // Calculate horizontal position (center tooltip under button)
+  let left = buttonRect.left + (buttonRect.width / 2) - (tooltipRect.width / 2);
+
   // Check if tooltip would go off the right edge
-  const wouldOverflowRight = buttonRect.left + tooltipRect.width > viewportWidth - 10;
+  if (left + tooltipRect.width > viewportWidth - 10) {
+    left = viewportWidth - tooltipRect.width - 10;
+  }
+
+  // Check if tooltip would go off the left edge
+  if (left < 10) {
+    left = 10;
+  }
+
+  // Calculate vertical position
+  let top = buttonRect.bottom + 8; // 8px spacing below button
+  let placement: 'below' | 'above' = 'below';
 
   // Check if tooltip would go off the bottom edge
-  const wouldOverflowBottom = buttonRect.bottom + tooltipRect.height > viewportHeight - 10;
+  if (top + tooltipRect.height > viewportHeight - 10) {
+    top = buttonRect.top - tooltipRect.height - 8; // Position above button
+    placement = 'above';
+  }
 
-  tooltipPosition.value = {
-    right: wouldOverflowRight,
-    top: wouldOverflowBottom,
-  };
+  tooltipPosition.value = { top, left, placement };
 };
 
 const handleMouseEnter = () => {
@@ -210,22 +224,7 @@ const tooltipText = computed(() => {
 });
 
 const tooltipClasses = computed(() => {
-  const baseClasses = 'absolute z-50 px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg pointer-events-none transition-opacity duration-200 whitespace-nowrap dark:bg-gray-700';
-  const positionClasses = [];
-
-  if (tooltipPosition.value.top) {
-    positionClasses.push('bottom-full mb-1');
-  } else {
-    positionClasses.push('top-full mt-1');
-  }
-
-  if (tooltipPosition.value.right) {
-    positionClasses.push('right-0');
-  } else {
-    positionClasses.push('left-0');
-  }
-
-  return `${baseClasses} ${positionClasses.join(' ')}`;
+  return 'fixed px-2 py-1 text-xs text-white bg-gray-900 rounded shadow-lg pointer-events-none transition-opacity duration-200 whitespace-nowrap dark:bg-gray-700';
 });
 
 watch(
@@ -293,14 +292,21 @@ watch(
         </button>
 
         <!-- Tooltip -->
-        <div
-          v-if="showTooltip && !showPopover"
-          ref="tooltipRef"
-          :class="tooltipClasses"
-          :style="{ opacity: showTooltip ? 1 : 0 }"
-        >
-          {{ tooltipText }}
-        </div>
+        <Teleport to="body">
+          <div
+            v-if="showTooltip && !showPopover"
+            ref="tooltipRef"
+            :class="tooltipClasses"
+            :style="{
+              opacity: showTooltip ? 1 : 0,
+              top: `${tooltipPosition.top}px`,
+              left: `${tooltipPosition.left}px`,
+              zIndex: 9999,
+            }"
+          >
+            {{ tooltipText }}
+          </div>
+        </Teleport>
 
         <!-- Add to List Popover -->
         <AddToListPopover
@@ -342,14 +348,21 @@ watch(
         </button>
 
         <!-- Tooltip for unauthenticated users -->
-        <div
-          v-if="showTooltip && !showPopover"
-          ref="tooltipRef"
-          :class="tooltipClasses"
-          :style="{ opacity: showTooltip ? 1 : 0 }"
-        >
-          {{ allowAddToList ? 'Add to List' : 'Add to favorites' }}
-        </div>
+        <Teleport to="body">
+          <div
+            v-if="showTooltip && !showPopover"
+            ref="tooltipRef"
+            :class="tooltipClasses"
+            :style="{
+              opacity: showTooltip ? 1 : 0,
+              top: `${tooltipPosition.top}px`,
+              left: `${tooltipPosition.left}px`,
+              zIndex: 9999,
+            }"
+          >
+            {{ allowAddToList ? 'Add to List' : 'Add to favorites' }}
+          </div>
+        </Teleport>
 
         <!-- Add to List Popover for unauthenticated users -->
         <AddToListPopover
