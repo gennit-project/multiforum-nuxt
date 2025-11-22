@@ -185,19 +185,32 @@ watchEffect(() => {
   if (!image.value || !uploader.value) {
     useHead({
       title: 'Image Not Found',
-      description: 'The requested image could not be found.',
+      meta: [
+        { name: 'description', content: 'The requested image could not be found.' },
+      ],
     });
     return;
   }
 
   const imageCaption = image.value.caption || image.value.alt || 'Image';
   const uploaderName = uploader.value.displayName || uploader.value.username;
-  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME;
+  const serverName = import.meta.env.VITE_SERVER_DISPLAY_NAME || 'Multiforum';
+
+  const description = `Image uploaded by ${uploaderName}: ${imageCaption}${image.value.longDescription ? '. ' + image.value.longDescription : ''}`;
 
   useHead({
     title: `${imageCaption} by ${uploaderName} | ${serverName}`,
-    description: `Image uploaded by ${uploaderName}: ${imageCaption}${image.value.longDescription ? '. ' + image.value.longDescription : ''}`,
-    image: image.value.url || '',
+    meta: [
+      { name: 'description', content: description },
+      { property: 'og:title', content: imageCaption },
+      { property: 'og:description', content: description },
+      { property: 'og:image', content: image.value.url || '' },
+      { property: 'og:type', content: 'article' },
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: imageCaption },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: image.value.url || '' },
+    ],
   });
 });
 
