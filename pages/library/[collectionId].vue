@@ -369,11 +369,16 @@ const collectionTypeLabel = computed(() => {
                   :key="image.id"
                   class="group relative"
                 >
-                  <img
-                    :src="image.url"
-                    :alt="image.alt || image.caption || 'Image'"
-                    class="h-48 w-full rounded-lg object-cover shadow-sm"
+                  <NuxtLink
+                    :to="`/u/${image.Uploader?.username}/images/${image.id}`"
+                    class="block"
                   >
+                    <img
+                      :src="image.url"
+                      :alt="image.alt || image.caption || 'Image'"
+                      class="h-48 w-full rounded-lg object-cover shadow-sm transition-transform hover:scale-105"
+                    >
+                  </NuxtLink>
                   <p
                     v-if="image.caption"
                     class="mt-2 text-sm text-gray-600 dark:text-gray-300"

@@ -239,6 +239,9 @@ export const GET_COLLECTION_ITEMS = gql`
         alt
         caption
         createdAt
+        Uploader {
+          username
+        }
       }
       Channels {
         displayName
