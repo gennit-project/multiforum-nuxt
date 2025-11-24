@@ -9,7 +9,11 @@ import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavo
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import ChevronDownIcon from '@/components/icons/ChevronDownIcon.vue';
 import { relativeTime } from '@/utils';
-import type { Discussion, DiscussionChannel, Tag } from '@/__generated__/graphql';
+import type {
+  Discussion,
+  DiscussionChannel,
+  Tag,
+} from '@/__generated__/graphql';
 
 type AlbumPayload = {
   discussion: Discussion;
@@ -154,7 +158,7 @@ const handleOpenAlbum = () => {
 
 <template>
   <li
-    class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-3 shadow-sm dark:border-gray-700 dark:bg-gray-900"
+    class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900"
   >
     <div class="relative">
       <nuxt-link
@@ -162,7 +166,7 @@ const handleOpenAlbum = () => {
         class="block overflow-hidden rounded-md border border-gray-100 dark:border-gray-700"
         :to="defaultLink"
       >
-        <div class="aspect-square w-full bg-gray-50 dark:bg-gray-800">
+        <div class="bg-gray-50 aspect-square w-full dark:bg-gray-800">
           <img
             v-if="firstAlbumImage"
             :src="firstAlbumImage"
@@ -177,18 +181,39 @@ const handleOpenAlbum = () => {
           </div>
         </div>
       </nuxt-link>
-      <button
-        v-if="discussion?.Album?.Images?.length"
-        class="absolute right-2 top-2 rounded-md bg-black/60 p-2 text-white transition hover:bg-black/80"
-        title="View album"
-        @click.stop="handleOpenAlbum"
-      >
-        <ImageIcon class="h-4 w-4" />
-      </button>
+
+      <!-- Top right buttons container -->
+      <div class="absolute right-2 top-2 z-10 flex gap-2">
+        <!-- Add to Favorites Button -->
+        <div
+          class="rounded-md bg-black bg-opacity-50 p-1.5 transition-all duration-200 hover:bg-opacity-70"
+          @click.stop
+        >
+          <AddToDiscussionFavorites
+            :allow-add-to-list="true"
+            :discussion-id="discussion.id"
+            :discussion-title="discussion.title || ''"
+            entity-name="Download"
+            size="small"
+          />
+        </div>
+
+        <!-- Album View Button -->
+        <button
+          v-if="discussion?.Album?.Images?.length"
+          class="rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
+          title="View album"
+          @click.stop="handleOpenAlbum"
+        >
+          <ImageIcon class="h-4 w-4" />
+        </button>
+      </div>
     </div>
 
-    <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300">
+    <div class="flex flex-col gap-3 p-3">
+      <div
+        class="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-300"
+      >
         <AvatarComponent
           v-if="primaryChannel"
           :is-square="true"
@@ -208,7 +233,7 @@ const handleOpenAlbum = () => {
         <nuxt-link
           v-if="primaryChannel"
           :to="defaultLink"
-          class="text-lg font-semibold leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
+          class="font-semibold text-lg leading-tight text-gray-900 hover:text-gray-600 dark:text-white"
         >
           <HighlightedSearchTerms
             :text="discussion.title || '[Deleted]'"
@@ -247,39 +272,30 @@ const handleOpenAlbum = () => {
         />
       </div>
 
-      <div
-        class="flex flex-col gap-3 text-sm text-gray-600 dark:text-gray-300 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <div class="flex items-center gap-2">
-          <nuxt-link
-            v-if="primaryChannel && !submittedToMultipleChannels"
-            :to="defaultLink"
-            class="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+      <div class="text-sm text-gray-600 dark:text-gray-300">
+        <nuxt-link
+          v-if="primaryChannel && !submittedToMultipleChannels"
+          :to="defaultLink"
+          class="flex items-center gap-2 rounded-full bg-gray-100 px-3 py-1 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
+        >
+          <i class="fa-regular fa-comment text-xs" />
+          <span>{{ commentCount }} comments</span>
+        </nuxt-link>
+        <MenuButton
+          v-else-if="submittedToMultipleChannels"
+          :items="discussionDetailOptions"
+        >
+          <span
+            class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 dark:bg-gray-800"
           >
             <i class="fa-regular fa-comment text-xs" />
-            <span>{{ commentCount }} comments</span>
-          </nuxt-link>
-          <MenuButton
-            v-else-if="submittedToMultipleChannels"
-            :items="discussionDetailOptions"
-          >
-            <span class="flex cursor-pointer items-center gap-1 rounded-full bg-gray-100 px-3 py-1 dark:bg-gray-800">
-              <i class="fa-regular fa-comment text-xs" />
-              {{ commentCount }}
-              {{ commentCount === 1 ? 'comment' : 'comments' }} in
-              {{ channelCount }}
-              {{ channelCount === 1 ? 'forum' : 'forums' }}
-              <ChevronDownIcon class="h-4 w-4" />
-            </span>
-          </MenuButton>
-        </div>
-        <AddToDiscussionFavorites
-          :allow-add-to-list="true"
-          :discussion-id="discussion.id"
-          :discussion-title="discussion.title || ''"
-          entity-name="Download"
-          size="small"
-        />
+            {{ commentCount }}
+            {{ commentCount === 1 ? 'comment' : 'comments' }} in
+            {{ channelCount }}
+            {{ channelCount === 1 ? 'forum' : 'forums' }}
+            <ChevronDownIcon class="h-4 w-4" />
+          </span>
+        </MenuButton>
       </div>
     </div>
   </li>
