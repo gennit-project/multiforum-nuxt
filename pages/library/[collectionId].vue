@@ -1,15 +1,18 @@
 <script setup lang="ts">
-import { computed, defineAsyncComponent } from 'vue';
-import { useQuery } from '@vue/apollo-composable';
+import { computed, defineAsyncComponent, ref } from 'vue';
+import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_COLLECTION_ITEMS } from '@/graphQLData/collection/queries';
+import { UPDATE_COLLECTION, DELETE_COLLECTION } from '@/graphQLData/collection/mutations';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
 import AddToDiscussionFavorites from '@/components/favorites/AddToDiscussionFavorites.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import AvatarComponent from '@/components/AvatarComponent.vue';
+import GenericModal from '@/components/GenericModal.vue';
+import WarningModal from '@/components/WarningModal.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
 
@@ -101,6 +104,60 @@ const collectionTypeLabel = computed(() => {
       return 'Items';
   }
 });
+
+// Rename modal state
+const showRenameModal = ref(false);
+const newCollectionName = ref('');
+const newCollectionDescription = ref('');
+
+// Delete modal state
+const showDeleteModal = ref(false);
+
+const router = useRouter();
+
+// Mutations
+const { mutate: updateCollection, loading: updateLoading, error: updateError } = useMutation(UPDATE_COLLECTION);
+const { mutate: deleteCollection, loading: deleteLoading, error: deleteError } = useMutation(DELETE_COLLECTION);
+
+// Open rename modal with current values
+const openRenameModal = () => {
+  newCollectionName.value = collection.value?.name || '';
+  newCollectionDescription.value = collection.value?.description || '';
+  showRenameModal.value = true;
+};
+
+// Handle rename
+const handleRename = async () => {
+  if (!newCollectionName.value.trim()) {
+    return;
+  }
+
+  try {
+    await updateCollection({
+      collectionId: collectionId.value,
+      name: newCollectionName.value.trim(),
+      description: newCollectionDescription.value.trim(),
+    });
+
+    showRenameModal.value = false;
+  } catch (err) {
+    console.error('Error updating collection:', err);
+  }
+};
+
+// Handle delete
+const handleDelete = async () => {
+  try {
+    await deleteCollection({
+      collectionId: collectionId.value,
+    });
+
+    showDeleteModal.value = false;
+    router.push('/library');
+  } catch (err) {
+    console.error('Error deleting collection:', err);
+  }
+};
 </script>
 
 <template>
@@ -174,18 +231,68 @@ const collectionTypeLabel = computed(() => {
                   </svg>
                   Back to Library
                 </NuxtLink>
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
-                  {{ collection.name }}
-                </h1>
-                <p
-                  v-if="collection.description"
-                  class="mt-2 text-gray-600 dark:text-gray-300"
-                >
-                  {{ collection.description }}
-                </p>
-                <div class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                  <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
-                  <span>{{ collection.itemCount }} {{ collectionTypeLabel.toLowerCase() }}</span>
+
+                <!-- Title and actions -->
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <h1 class="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
+                      {{ collection.name }}
+                    </h1>
+                    <p
+                      v-if="collection.description"
+                      class="mt-2 text-gray-600 dark:text-gray-300"
+                    >
+                      {{ collection.description }}
+                    </p>
+                    <div class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                      <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
+                      <span>{{ collection.itemCount }} {{ collectionTypeLabel.toLowerCase() }}</span>
+                    </div>
+                  </div>
+
+                  <!-- Action buttons -->
+                  <div class="ml-4 flex flex-shrink-0 gap-2">
+                    <button
+                      type="button"
+                      class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                      @click="openRenameModal"
+                    >
+                      <svg
+                        class="h-4 w-4 mr-1.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        />
+                      </svg>
+                      Rename
+                    </button>
+                    <button
+                      type="button"
+                      class="inline-flex items-center rounded-md border border-red-300 bg-white px-3 py-2 text-sm font-medium text-red-600 shadow-sm hover:bg-red-50 dark:border-red-600 dark:bg-gray-700 dark:text-red-400 dark:hover:bg-red-900/20"
+                      @click="showDeleteModal = true"
+                    >
+                      <svg
+                        class="h-4 w-4 mr-1.5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                      </svg>
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -410,6 +517,83 @@ const collectionTypeLabel = computed(() => {
             </template>
           </div>
         </div>
+
+        <!-- Rename Modal -->
+        <GenericModal
+          :open="showRenameModal"
+          title="Rename Collection"
+          primary-button-text="Save"
+          secondary-button-text="Cancel"
+          :loading="updateLoading"
+          :error="(updateError as any)?.message || ''"
+          :primary-button-disabled="!newCollectionName.trim()"
+          @close="showRenameModal = false"
+          @primary-button-click="handleRename"
+        >
+          <template #icon>
+            <svg
+              class="h-6 w-6 text-orange-600 dark:text-orange-400"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+              />
+            </svg>
+          </template>
+          <template #content>
+            <div class="space-y-4">
+              <div>
+                <label
+                  for="collection-name"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Collection Name
+                </label>
+                <input
+                  id="collection-name"
+                  v-model="newCollectionName"
+                  type="text"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  placeholder="Enter collection name"
+                />
+              </div>
+              <div>
+                <label
+                  for="collection-description"
+                  class="block text-sm font-medium text-gray-700 dark:text-gray-300"
+                >
+                  Description (optional)
+                </label>
+                <textarea
+                  id="collection-description"
+                  v-model="newCollectionDescription"
+                  rows="3"
+                  class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
+                  placeholder="Enter description"
+                />
+              </div>
+            </div>
+          </template>
+        </GenericModal>
+
+        <!-- Delete Modal -->
+        <WarningModal
+          :open="showDeleteModal"
+          title="Delete Collection"
+          body="Are you sure you want to delete this collection? This action cannot be undone."
+          primary-button-text="Delete"
+          secondary-button-text="Cancel"
+          :loading="deleteLoading"
+          :error="(deleteError as any)?.message || ''"
+          icon="trash"
+          @close="showDeleteModal = false"
+          @primary-button-click="handleDelete"
+        />
       </template>
       <template #does-not-have-auth>
         <div class="mx-auto max-w-md py-12 text-center">
