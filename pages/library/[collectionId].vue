@@ -107,8 +107,8 @@ const collectionTypeLabel = computed(() => {
   <div class="min-h-screen bg-white dark:bg-black dark:text-white">
     <RequireAuth>
       <template #has-auth>
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div class="py-8">
+        <div class="w-full px-4 sm:px-6 lg:px-8">
+          <div class="py-6 md:py-8">
             <!-- Loading state -->
             <div v-if="loading" class="py-8 text-center">
               <div
@@ -154,7 +154,27 @@ const collectionTypeLabel = computed(() => {
             <template v-else>
               <!-- Header -->
               <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">
+                <!-- Back button for mobile -->
+                <NuxtLink
+                  to="/library"
+                  class="mb-4 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200 md:hidden"
+                >
+                  <svg
+                    class="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M15 19l-7-7 7-7"
+                    />
+                  </svg>
+                  Back to Library
+                </NuxtLink>
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white md:text-3xl">
                   {{ collection.name }}
                 </h1>
                 <p
@@ -300,7 +320,7 @@ const collectionTypeLabel = computed(() => {
               <!-- Channels list -->
               <div
                 v-else-if="collection.collectionType === 'CHANNELS'"
-                class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3"
               >
                 <NuxtLink
                   v-for="channel in items"
@@ -362,7 +382,7 @@ const collectionTypeLabel = computed(() => {
               <!-- Images list -->
               <div
                 v-else-if="collection.collectionType === 'IMAGES'"
-                class="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+                class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
               >
                 <div
                   v-for="image in items"

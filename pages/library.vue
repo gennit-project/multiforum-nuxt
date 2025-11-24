@@ -230,8 +230,14 @@ const getCollectionTypeInfo = (collectionType: string) => {
     <div class="min-h-screen bg-white dark:bg-black dark:text-white">
       <RequireAuth>
         <template #has-auth>
-          <div class="flex">
-            <div class="max-w-72">
+          <div class="flex flex-col px-3 md:flex-row">
+            <!-- Sidebar - hidden on mobile when viewing collection detail -->
+            <div
+              :class="[
+                'md:w-100 w-72 md:flex-shrink-0',
+                $route.params.collectionId ? 'hidden md:block' : 'block',
+              ]"
+            >
               <div class="py-8">
                 <!-- Header -->
                 <h1
@@ -302,7 +308,7 @@ const getCollectionTypeInfo = (collectionType: string) => {
                       <!-- Favorites Section -->
                       <div v-if="filteredFavorites.length > 0">
                         <div
-                          class="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                          class="mb-2 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
                         >
                           Favorites
                         </div>
@@ -310,7 +316,7 @@ const getCollectionTypeInfo = (collectionType: string) => {
                           v-for="collection in filteredFavorites"
                           :key="collection.id"
                           :to="`/library/${collection.id}`"
-                          class="block rounded-md px-3 py-2 text-sm transition-colors"
+                          class="block rounded-md py-2 text-sm transition-colors"
                           active-class="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 font-semibold"
                         >
                           <div class="flex flex-wrap items-center gap-2">
@@ -333,7 +339,7 @@ const getCollectionTypeInfo = (collectionType: string) => {
                         :class="{ 'mt-6': filteredFavorites.length > 0 }"
                       >
                         <div
-                          class="mb-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+                          class="mb-2 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
                         >
                           Custom Collections
                         </div>
@@ -341,7 +347,7 @@ const getCollectionTypeInfo = (collectionType: string) => {
                           v-for="collection in filteredCustom"
                           :key="collection.id"
                           :to="`/library/${collection.id}`"
-                          class="block rounded-md px-3 py-2 text-sm transition-colors"
+                          class="block rounded-md py-2 text-sm transition-colors"
                           active-class="bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-300 font-semibold"
                         >
                           <div class="flex flex-wrap items-center gap-2">
@@ -387,7 +393,12 @@ const getCollectionTypeInfo = (collectionType: string) => {
                 </div>
               </div>
             </div>
-            <div class="flex-1"><NuxtPage /></div>
+            <!-- Main content area -->
+            <div
+              class="w-full flex-1 md:border-l md:border-gray-200 md:dark:border-gray-700"
+            >
+              <NuxtPage />
+            </div>
           </div>
         </template>
         <template #does-not-have-auth>
