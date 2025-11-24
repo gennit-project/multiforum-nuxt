@@ -165,20 +165,38 @@ const filteredQuery = computed(() => {
             </div>
           </nuxt-link>
 
-          <!-- Album View Button -->
-          <button
-            v-if="
-              discussion?.Album?.Images?.length &&
-              discussion.Album.Images.length > 0
-            "
-            class="absolute right-2 top-2 z-10 rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
-            title="View album"
-            @click.stop="
-              $emit('openAlbum', { discussion, album: discussion?.Album })
-            "
-          >
-            <ImageIcon class="h-4 w-4" />
-          </button>
+          <!-- Top right buttons container -->
+          <div class="absolute right-2 top-2 z-10 flex gap-2">
+            <!-- Add to Favorites Button -->
+            <div
+              v-if="discussion"
+              class="rounded-md bg-black bg-opacity-50 p-1.5 transition-all duration-200 hover:bg-opacity-70"
+              @click.stop
+            >
+              <AddToDiscussionFavorites
+                :allow-add-to-list="true"
+                :discussion-id="discussion.id"
+                :discussion-title="discussion.title"
+                entity-name="Download"
+                size="small"
+              />
+            </div>
+
+            <!-- Album View Button -->
+            <button
+              v-if="
+                discussion?.Album?.Images?.length &&
+                discussion.Album.Images.length > 0
+              "
+              class="rounded-md bg-black bg-opacity-50 p-2 text-white transition-all duration-200 hover:bg-opacity-70"
+              title="View album"
+              @click.stop="
+                $emit('openAlbum', { discussion, album: discussion?.Album })
+              "
+            >
+              <ImageIcon class="h-4 w-4" />
+            </button>
+          </div>
         </div>
         <div class="flex gap-3">
           <div class="w-full flex-col">
@@ -267,30 +285,20 @@ const filteredQuery = computed(() => {
                   :use-heart-icon="true"
                 />
 
-                <div class="flex items-center justify-start gap-2">
-                  <nuxt-link
-                    class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
-                    :to="{
-                      name: 'forums-forumId-downloads-discussionId',
-                      params: {
-                        forumId: defaultUniqueName,
-                        discussionId: discussionChannel.discussionId,
-                      },
-                      query: filteredQuery,
-                    }"
-                  >
-                    <i class="fa-regular fa-comment text-xs" />
-                    <span class="text-sm">{{ commentCount }}</span>
-                  </nuxt-link>
-                  <AddToDiscussionFavorites
-                    v-if="discussion"
-                    :allow-add-to-list="true"
-                    :discussion-id="discussion.id"
-                    :discussion-title="discussion.title"
-                    entity-name="Download"
-                    size="small"
-                  />
-                </div>
+                <nuxt-link
+                  class="flex items-center gap-2 rounded-full bg-gray-100 px-2 py-0.5 dark:bg-gray-700 dark:hover:bg-gray-600"
+                  :to="{
+                    name: 'forums-forumId-downloads-discussionId',
+                    params: {
+                      forumId: defaultUniqueName,
+                      discussionId: discussionChannel.discussionId,
+                    },
+                    query: filteredQuery,
+                  }"
+                >
+                  <i class="fa-regular fa-comment text-xs" />
+                  <span class="text-sm">{{ commentCount }}</span>
+                </nuxt-link>
               </div>
             </div>
           </div>
