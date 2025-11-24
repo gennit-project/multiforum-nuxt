@@ -192,17 +192,35 @@ const filteredCustom = computed(() => {
 const getCollectionTypeInfo = (collectionType: string) => {
   switch (collectionType) {
     case 'DISCUSSIONS':
-      return { color: 'bg-blue-100 text-blue-700 border border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700' };
+      return {
+        color:
+          'bg-blue-100 text-blue-700 border border-blue-300 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-700',
+      };
     case 'IMAGES':
-      return { color: 'bg-purple-100 text-purple-700 border border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700' };
+      return {
+        color:
+          'bg-purple-100 text-purple-700 border border-purple-300 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-700',
+      };
     case 'COMMENTS':
-      return { color: 'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700' };
+      return {
+        color:
+          'bg-green-100 text-green-700 border border-green-300 dark:bg-green-900/30 dark:text-green-400 dark:border-green-700',
+      };
     case 'DOWNLOADS':
-      return { color: 'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700' };
+      return {
+        color:
+          'bg-orange-100 text-orange-700 border border-orange-300 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-700',
+      };
     case 'CHANNELS':
-      return { color: 'bg-pink-100 text-pink-700 border border-pink-300 dark:bg-pink-900/30 dark:text-pink-400 dark:border-pink-700' };
+      return {
+        color:
+          'bg-red-100 text-red-700 border border-red-300 dark:bg-red-900/30 dark:text-red-400 dark:border-red-700',
+      };
     default:
-      return { color: 'bg-gray-100 text-gray-700 border border-gray-300 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-700' };
+      return {
+        color:
+          'bg-gray-100 text-gray-700 border border-gray-300 dark:bg-gray-900/30 dark:text-gray-400 dark:border-gray-700',
+      };
   }
 };
 </script>
@@ -232,7 +250,7 @@ const getCollectionTypeInfo = (collectionType: string) => {
                       :class="[
                         'font-sm rounded-full px-3 py-1 text-sm transition-colors',
                         activeFilter === filter.key
-                          ? 'bg-orange-500 text-white shadow-sm'
+                          ? 'bg-orange-500 text-black shadow-sm'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600',
                       ]"
                       @click="activeFilter = filter.key"
@@ -246,7 +264,7 @@ const getCollectionTypeInfo = (collectionType: string) => {
                 <div class="mb-8">
                   <div class="mb-4 flex items-center justify-between">
                     <h2
-                      class="text-xl font-semibold text-gray-900 dark:text-white"
+                      class="font-semibold text-xl text-gray-900 dark:text-white"
                     >
                       Your Collections
                     </h2>
