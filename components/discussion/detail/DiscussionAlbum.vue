@@ -60,6 +60,10 @@ const props = defineProps({
     >,
     default: () => [],
   },
+  showThumbnails: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 // Carousel navigation state
@@ -611,7 +615,7 @@ const togglePanelPosition = () => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          >
+          />
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -781,7 +785,7 @@ const togglePanelPosition = () => {
                           : '400px'
                         : 'auto',
                     }"
-                  >
+                  />
                   <div
                     v-if="editingCaptionIndex === idx && idx === activeIndex"
                     class="mt-1 text-center text-xs"
@@ -851,7 +855,7 @@ const togglePanelPosition = () => {
 
           <!-- Thumbnails row for non-expanded view or small screens -->
           <div
-            v-if="!expandedView && orderedImages.length > 1"
+            v-if="showThumbnails && !expandedView && orderedImages.length > 1"
             class="mt-4 w-full overflow-x-auto px-4"
           >
             <div class="flex gap-2 pb-2">
@@ -1118,7 +1122,7 @@ const togglePanelPosition = () => {
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
-          >
+          />
 
           <button
             v-if="orderedImages.length > 1"
