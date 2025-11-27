@@ -615,7 +615,7 @@ const togglePanelPosition = () => {
             :src="image.url || ''"
             :alt="image.alt || ''"
             class="shadow-sm"
-          />
+          >
           <div
             v-if="editingCaptionIndex === idx"
             class="mt-1 text-center text-xs"
@@ -785,7 +785,7 @@ const togglePanelPosition = () => {
                           : '400px'
                         : 'auto',
                     }"
-                  />
+                  >
                   <div
                     v-if="editingCaptionIndex === idx && idx === activeIndex"
                     class="mt-1 text-center text-xs"
@@ -1122,7 +1122,7 @@ const togglePanelPosition = () => {
             @touchstart="isZoomed ? startTouchDrag : handleTouchStart"
             @touchend="isZoomed ? undefined : handleTouchEnd"
             @touchmove="isZoomed ? onTouchDrag : undefined"
-          />
+          >
 
           <button
             v-if="orderedImages.length > 1"
@@ -1145,7 +1145,7 @@ const togglePanelPosition = () => {
       >
         <div class="relative p-5">
           <button
-            class="bg-transparent absolute right-2 top-2 rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
+            class="bg-transparent absolute right-2 top-4 rounded-full border-0 p-1 text-white transition-colors hover:bg-gray-800"
             title="Close panel"
             @click="togglePanel"
           >
@@ -1216,7 +1216,7 @@ const togglePanelPosition = () => {
               </NuxtLink>
             </div>
           </div>
-          <div v-else class="relative mt-2 italic text-gray-400">
+          <div v-else class="relative italic text-gray-400">
             <span v-if="!isLoggedInAuthor"
               >No caption available for this image.</span
             >
