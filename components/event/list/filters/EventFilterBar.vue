@@ -259,14 +259,6 @@ const toggleSelectedTag = (tag: string) => {
   setSelectedTags(filterValues.value.tags);
 };
 
-// Add a ref to track if the forum list is open
-const forumListOpen = ref(false);
-
-// Add a method to handle opening/closing
-const toggleForumList = () => {
-  forumListOpen.value = !forumListOpen.value;
-};
-
 type ChannelOption = {
   uniqueName: string;
   displayName: string;
@@ -352,14 +344,12 @@ const updateShowArchived = (event: Event) => {
               :data-testid="'forum-filter-button'"
               :highlighted="channelLabel !== defaultFilterLabels.channels"
               :label="channelLabel"
-              @click="toggleForumList"
             >
               <template #icon>
                 <ChannelIcon class="-ml-0.5 mr-2 h-4 w-4" />
               </template>
               <template #content>
                 <div
-                  v-if="forumListOpen"
                   class="relative w-96 bg-white dark:bg-gray-700"
                   data-testid="forum-list-dropdown"
                 >
@@ -541,14 +531,12 @@ const updateShowArchived = (event: Event) => {
             :data-testid="'forum-filter-button'"
             :highlighted="channelLabel !== defaultFilterLabels.channels"
             :label="channelLabel"
-            @click="toggleForumList"
           >
             <template #icon>
               <ChannelIcon aria-hidden="true" class="-ml-0.5 mr-2 h-4 w-4" />
             </template>
             <template #content>
               <div
-                v-if="forumListOpen"
                 class="relative w-80 max-w-screen-sm bg-white dark:bg-gray-700"
                 data-testid="forum-list-dropdown-mobile"
               >
