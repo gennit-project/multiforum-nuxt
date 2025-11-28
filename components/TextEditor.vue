@@ -133,10 +133,26 @@ const insertEmoji = (event: EmojiClickEvent) => {
 const toggleEmojiPicker = (event: MouseEvent) => {
   const buttonElement = event.currentTarget as HTMLElement;
 
-  // Position emoji picker directly below the button
+  // Calculate initial position below the button
+  const top = buttonElement.offsetTop + buttonElement.offsetHeight;
+  let left = buttonElement.offsetLeft;
+
+  // Check if the picker would overflow the right edge of the viewport
+  // Emoji picker is approximately 350px wide
+  const EMOJI_PICKER_WIDTH = 350;
+  const viewportWidth = window.innerWidth;
+  const rightEdge = left + EMOJI_PICKER_WIDTH;
+
+  // If the picker would overflow, align it to the right edge instead
+  if (rightEdge > viewportWidth) {
+    // Position it so the right edge aligns with the viewport, with some padding
+    left = Math.max(0, viewportWidth - EMOJI_PICKER_WIDTH - 16);
+  }
+
+  // Position emoji picker below the button, adjusted for viewport constraints
   emojiPickerPosition.value = {
-    top: `${buttonElement.offsetTop + buttonElement.offsetHeight}px`,
-    left: `${buttonElement.offsetLeft}px`,
+    top: `${top}px`,
+    left: `${left}px`,
   };
 
   showEmojiPicker.value = !showEmojiPicker.value;
