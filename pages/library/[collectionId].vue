@@ -4,7 +4,7 @@ import { useQuery, useMutation } from '@vue/apollo-composable';
 import { useHead } from 'nuxt/app';
 import { useRoute, useRouter } from 'vue-router';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
-import { GET_COLLECTION_ITEMS } from '@/graphQLData/collection/queries';
+import { GET_COLLECTION_ITEMS, GET_ALL_USER_COLLECTIONS } from '@/graphQLData/collection/queries';
 import { UPDATE_COLLECTION, DELETE_COLLECTION } from '@/graphQLData/collection/mutations';
 import UsernameWithTooltip from '@/components/UsernameWithTooltip.vue';
 import TagComponent from '@/components/TagComponent.vue';
@@ -15,6 +15,7 @@ import GenericModal from '@/components/GenericModal.vue';
 import WarningModal from '@/components/WarningModal.vue';
 import { relativeTime } from '@/utils';
 import { safeArrayFirst } from '@/utils/ssrSafetyUtils';
+import { usernameVar } from '@/cache';
 
 // Lazy load the album component since it's not needed for initial render
 const DiscussionAlbum = defineAsyncComponent(
@@ -148,9 +149,22 @@ const handleRename = async () => {
 // Handle delete
 const handleDelete = async () => {
   try {
-    await deleteCollection({
-      collectionId: collectionId.value,
-    });
+    await deleteCollection(
+      {
+        collectionId: collectionId.value,
+      },
+      {
+        refetchQueries: [
+          {
+            query: GET_ALL_USER_COLLECTIONS,
+            variables: {
+              username: usernameVar.value,
+            },
+          },
+        ],
+        awaitRefetchQueries: true,
+      }
+    );
 
     showDeleteModal.value = false;
     router.push('/library');
@@ -560,7 +574,7 @@ const handleDelete = async () => {
                   type="text"
                   class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-orange-500 focus:outline-none focus:ring-orange-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white sm:text-sm"
                   placeholder="Enter collection name"
-                />
+                >
               </div>
               <div>
                 <label
