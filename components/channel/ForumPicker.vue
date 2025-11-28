@@ -2,10 +2,11 @@
 import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { GET_CHANNEL_NAMES } from '@/graphQLData/channel/queries';
+import { GET_CHANNEL_NAMES, GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/channel/queries';
 import MultiSelect from '@/components/MultiSelect.vue';
-import type { MultiSelectOption } from '@/components/MultiSelect.vue';
+import type { MultiSelectOption, MultiSelectSection } from '@/components/MultiSelect.vue';
 import type { Channel } from '@/__generated__/graphql';
+import { usernameVar, isAuthenticatedVar } from '@/cache';
 
 // Props definition - used in template
 const props = defineProps({
@@ -42,6 +43,18 @@ const { loading: channelsLoading, result: channelsResult } = useQuery(
   }
 );
 
+// Query for favorite channels (only when user is authenticated)
+const { result: favoritesResult } = useQuery(
+  GET_USER_FAVORITE_CHANNELS,
+  computed(() => ({
+    username: usernameVar.value,
+  })),
+  {
+    enabled: computed(() => !!usernameVar.value),
+    fetchPolicy: 'cache-first',
+  }
+);
+
 const channelOptions = computed<MultiSelectOption[]>(() => {
   const channels = channelsResult.value?.channels || [];
   const mappedChannels = channels.map((channel: Channel) => ({
@@ -71,6 +84,40 @@ const channelOptions = computed<MultiSelectOption[]>(() => {
   return mappedChannels;
 });
 
+// Create sections with favorites and all channels
+const channelSections = computed<MultiSelectSection[]>(() => {
+  const sections: MultiSelectSection[] = [];
+
+  // Favorites section
+  const favoriteChannels = favoritesResult.value?.users?.[0]?.FavoriteChannels || [];
+
+  let favoritesEmptyMessage = 'You have no favorite forums.';
+  if (!isAuthenticatedVar.value) {
+    favoritesEmptyMessage = "Can't show favorite forums because you are not logged in.";
+  }
+
+  const favoriteOptions = favoriteChannels.map((channel: any) => ({
+    value: channel.uniqueName,
+    label: channel.displayName || channel.uniqueName,
+    avatar: channel.channelIconURL || '',
+  }));
+
+  sections.push({
+    title: 'Favorite Forums',
+    options: favoriteOptions,
+    emptyMessage: favoritesEmptyMessage,
+    selectAllLabel: favoriteOptions.length > 0 ? 'Select all favorite forums' : undefined,
+  });
+
+  // All Forums section
+  sections.push({
+    title: 'All Forums',
+    options: channelOptions.value,
+  });
+
+  return sections;
+});
+
 const handleUpdateChannels = (newChannels: string[]) => {
   emit('setSelectedChannels', newChannels);
 };
@@ -85,7 +132,7 @@ const handleSearch = (query: string) => {
 <template>
   <MultiSelect
     :model-value="props.selectedChannels"
-    :options="channelOptions"
+    :sections="channelSections"
     :description="props.description"
     :loading="channelsLoading"
     :test-id="props.testId"

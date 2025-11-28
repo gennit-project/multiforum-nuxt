@@ -14,6 +14,13 @@ vi.mock('@vue/apollo-composable', () => ({
 // Mock GraphQL queries
 vi.mock('@/graphQLData/channel/queries', () => ({
   GET_CHANNEL_NAMES: {},
+  GET_USER_FAVORITE_CHANNELS: {},
+}));
+
+// Mock cache
+vi.mock('@/cache', () => ({
+  usernameVar: ref(''),
+  isAuthenticatedVar: ref(false),
 }));
 
 // Use real MultiSelect component

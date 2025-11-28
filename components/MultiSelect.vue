@@ -10,15 +10,27 @@ export interface MultiSelectOption {
   disabled?: boolean;
 }
 
+export interface MultiSelectSection {
+  title: string;
+  options: MultiSelectOption[];
+  emptyMessage?: string;
+  selectAllLabel?: string; // If provided, shows a "select all" option
+}
+
 const props = defineProps({
   // Selected values
   modelValue: {
     type: Array as PropType<any[]>,
     default: () => [],
   },
-  // Available options
+  // Available options (legacy, for backwards compatibility)
   options: {
     type: Array as PropType<MultiSelectOption[]>,
+    default: () => [],
+  },
+  // Sections (new approach with favorite channels, etc.)
+  sections: {
+    type: Array as PropType<MultiSelectSection[]>,
     default: () => [],
   },
   // Placeholder text when nothing selected
@@ -87,6 +99,7 @@ const isDropdownOpen = ref(false);
 const searchQuery = ref('');
 const selected = ref<any[]>([...props.modelValue]);
 const searchInputRef = ref<HTMLInputElement | null>(null);
+const expandedSections = ref<Set<number>>(new Set());
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -120,6 +133,36 @@ const toggleSelection = (value: any) => {
   emit('update:modelValue', selected.value);
 };
 
+const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
+  const sectionValues = sectionOptions.map((opt) => opt.value);
+  const allSelected = sectionValues.every((val) => selected.value.includes(val));
+
+  if (allSelected) {
+    // Deselect all items from this section
+    selected.value = selected.value.filter((val) => !sectionValues.includes(val));
+  } else {
+    // Select all items from this section (deduplicate)
+    const newSelections = [...new Set([...selected.value, ...sectionValues])];
+    selected.value = newSelections;
+  }
+  emit('update:modelValue', selected.value);
+};
+
+const isSectionFullySelected = (sectionOptions: MultiSelectOption[]) => {
+  const sectionValues = sectionOptions.map((opt) => opt.value);
+  return sectionValues.length > 0 && sectionValues.every((val) => selected.value.includes(val));
+};
+
+const toggleSectionExpansion = (sectionIndex: number) => {
+  if (expandedSections.value.has(sectionIndex)) {
+    expandedSections.value.delete(sectionIndex);
+  } else {
+    expandedSections.value.add(sectionIndex);
+  }
+  // Force reactivity update
+  expandedSections.value = new Set(expandedSections.value);
+};
+
 const removeSelection = (value: any, event?: Event) => {
   if (event) {
     event.stopPropagation();
@@ -139,7 +182,31 @@ const updateSearch = (query: string) => {
   emit('search', query);
 };
 
-// Filtered options based on search
+// Combine all options from both legacy options and sections
+const allOptions = computed(() => {
+  const optionsFromSections = props.sections.flatMap(
+    (section) => section.options
+  );
+  return [...props.options, ...optionsFromSections];
+});
+
+// Filtered sections based on search
+const filteredSections = computed(() => {
+  if (!props.searchable || !searchQuery.value) {
+    return props.sections;
+  }
+
+  // When searching, filter options within each section
+  // Keep sections even if they have no matching options (to show empty message)
+  return props.sections.map((section) => ({
+    ...section,
+    options: section.options.filter((option) =>
+      option.label.toLowerCase().includes(searchQuery.value.toLowerCase())
+    ),
+  }));
+});
+
+// Filtered options based on search (for legacy options prop)
 const filteredOptions = computed(() => {
   if (!props.searchable || !searchQuery.value) {
     return props.options;
@@ -152,7 +219,7 @@ const filteredOptions = computed(() => {
 
 // Get option by value
 const getOptionByValue = (value: any): MultiSelectOption | undefined => {
-  return props.options.find((option) => option.value === value);
+  return allOptions.value.find((option) => option.value === value);
 };
 
 // Watch for external changes to modelValue
@@ -316,7 +383,130 @@ const selectedOptions = computed(() => {
           Loading...
         </div>
 
-        <!-- Options -->
+        <!-- Sections view -->
+        <div v-else-if="props.sections.length > 0">
+          <div v-for="(section, sectionIndex) in filteredSections" :key="sectionIndex">
+            <!-- Section title -->
+            <div class="bg-gray-50 px-4 py-2 text-xs font-semibold uppercase text-gray-600 dark:bg-gray-900 dark:text-gray-400">
+              {{ section.title }}
+            </div>
+
+            <!-- Select All option (if section has selectAllLabel) -->
+            <div v-if="section.selectAllLabel && section.options.length > 0">
+              <div
+                :class="[
+                  'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
+                  isSectionFullySelected(section.options)
+                    ? 'bg-orange-50 dark:bg-orange-900/20'
+                    : '',
+                ]"
+                @click="toggleSelectAll(section.options)"
+              >
+                <!-- Checkbox for select all -->
+                <div class="relative mr-3">
+                  <input
+                    type="checkbox"
+                    :checked="isSectionFullySelected(section.options)"
+                    class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                    @click.stop
+                  >
+                </div>
+
+                <!-- Label -->
+                <span class="flex-1 text-sm font-medium text-gray-900 dark:text-white">
+                  {{ section.selectAllLabel }}
+                </span>
+
+                <!-- Count badge -->
+                <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                  {{ section.options.length }}
+                </span>
+              </div>
+
+              <!-- Preview list of forums -->
+              <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+                <span v-if="section.options.length <= 3">
+                  {{ section.options.map(opt => opt.value).join(', ') }}
+                </span>
+                <span v-else-if="!expandedSections.has(sectionIndex)">
+                  {{ section.options.slice(0, 3).map(opt => opt.value).join(', ') }}
+                  <button
+                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    @click.stop="toggleSectionExpansion(sectionIndex)"
+                  >
+                    (show all)
+                  </button>
+                </span>
+                <span v-else>
+                  {{ section.options.map(opt => opt.value).join(', ') }}
+                  <button
+                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    @click.stop="toggleSectionExpansion(sectionIndex)"
+                  >
+                    (show less)
+                  </button>
+                </span>
+              </div>
+            </div>
+
+            <!-- Section options -->
+            <div v-if="section.options.length > 0 && !section.selectAllLabel" class="py-1">
+              <div
+                v-for="option in section.options"
+                :key="String(option.value)"
+                :class="[
+                  'flex cursor-pointer items-center px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700',
+                  selected.includes(option.value)
+                    ? 'bg-orange-50 dark:bg-orange-900/20'
+                    : '',
+                  option.disabled ? 'cursor-not-allowed opacity-50' : '',
+                ]"
+                @click="!option.disabled && toggleSelection(option.value)"
+              >
+                <!-- Checkbox for multiple selection -->
+                <div class="relative mr-3">
+                  <input
+                    v-if="multiple"
+                    type="checkbox"
+                    :checked="selected.includes(option.value)"
+                    :disabled="option.disabled"
+                    class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                    @click.stop
+                  >
+                </div>
+
+                <!-- Avatar -->
+                <img
+                  v-if="option.avatar"
+                  :src="option.avatar"
+                  :alt="option.label"
+                  class="mr-3 h-6 w-6 rounded-full"
+                >
+
+                <!-- Icon -->
+                <i v-else-if="option.icon" :class="[option.icon, 'mr-3']"/>
+
+                <!-- Label -->
+                <span class="flex-1 text-sm text-gray-900 dark:text-white">
+                  {{ option.label }}
+                </span>
+
+                <!-- Selected indicator for single selection -->
+                <i
+                  v-if="!multiple && selected.includes(option.value)"
+                  class="fa-solid fa-check text-orange-600"
+                />
+              </div>
+            </div>
+
+            <!-- Empty section message -->
+            <div v-else class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+              {{ section.emptyMessage || 'No items' }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Legacy options view (for backwards compatibility) -->
         <div v-else-if="filteredOptions.length > 0" class="py-1">
           <div
             v-for="option in filteredOptions"

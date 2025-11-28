@@ -507,3 +507,16 @@ export const GET_CHANNEL_CONTRIBUTIONS = gql`
     }
   }
 `;
+
+export const GET_USER_FAVORITE_CHANNELS = gql`
+  query GetUserFavoriteChannels($username: String!) {
+    users(where: { username: $username }) {
+      username
+      FavoriteChannels {
+        displayName
+        uniqueName
+        channelIconURL
+      }
+    }
+  }
+`;
