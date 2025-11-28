@@ -385,3 +385,25 @@ export const GET_ALL_USER_COLLECTIONS = gql`
     }
   }
 `;
+
+// Get user's channel collections with the channels in each collection
+export const GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS = gql`
+  query GetUserChannelCollectionsWithChannels($username: String!) {
+    users(where: { username: $username }) {
+      username
+      Collections(
+        where: { collectionType: CHANNELS }
+        options: { sort: [{ createdAt: DESC }] }
+      ) {
+        id
+        name
+        itemCount
+        Channels {
+          uniqueName
+          displayName
+          channelIconURL
+        }
+      }
+    }
+  }
+`;

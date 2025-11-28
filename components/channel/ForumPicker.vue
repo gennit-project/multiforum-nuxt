@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import type { PropType } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import { GET_CHANNEL_NAMES, GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/channel/queries';
+import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
 import MultiSelect from '@/components/MultiSelect.vue';
 import type { MultiSelectOption, MultiSelectSection } from '@/components/MultiSelect.vue';
 import type { Channel } from '@/__generated__/graphql';
@@ -55,6 +56,18 @@ const { result: favoritesResult } = useQuery(
   }
 );
 
+// Query for channel collections (only when user is authenticated)
+const { result: collectionsResult } = useQuery(
+  GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS,
+  computed(() => ({
+    username: usernameVar.value,
+  })),
+  {
+    enabled: computed(() => !!usernameVar.value),
+    fetchPolicy: 'cache-first',
+  }
+);
+
 const channelOptions = computed<MultiSelectOption[]>(() => {
   const channels = channelsResult.value?.channels || [];
   const mappedChannels = channels.map((channel: Channel) => ({
@@ -84,7 +97,7 @@ const channelOptions = computed<MultiSelectOption[]>(() => {
   return mappedChannels;
 });
 
-// Create sections with favorites and all channels
+// Create sections with favorites, collections, and all channels
 const channelSections = computed<MultiSelectSection[]>(() => {
   const sections: MultiSelectSection[] = [];
 
@@ -107,6 +120,24 @@ const channelSections = computed<MultiSelectSection[]>(() => {
     options: favoriteOptions,
     emptyMessage: favoritesEmptyMessage,
     selectAllLabel: favoriteOptions.length > 0 ? 'Select all favorite forums' : undefined,
+  });
+
+  // Channel collections sections
+  const collections = collectionsResult.value?.users?.[0]?.Collections || [];
+  collections.forEach((collection: any) => {
+    const collectionChannels = (collection.Channels || []).map((channel: any) => ({
+      value: channel.uniqueName,
+      label: channel.displayName || channel.uniqueName,
+      avatar: channel.channelIconURL || '',
+    }));
+
+    if (collectionChannels.length > 0) {
+      sections.push({
+        title: collection.name,
+        options: collectionChannels,
+        selectAllLabel: `Select all from ${collection.name}`,
+      });
+    }
   });
 
   // All Forums section

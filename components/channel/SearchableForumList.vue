@@ -3,6 +3,7 @@ import { ref, computed, watch } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import type { Channel } from '@/__generated__/graphql';
 import { GET_CHANNEL_NAMES, GET_USER_FAVORITE_CHANNELS } from '@/graphQLData/channel/queries';
+import { GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS } from '@/graphQLData/collection/queries';
 import SearchBar from '@/components/SearchBar.vue';
 import type { PropType } from 'vue';
 import SearchableForumListItem from './SearchableForumListItem.vue';
@@ -63,6 +64,86 @@ const { result: favoritesResult } = useQuery(
     fetchPolicy: 'cache-first',
   }
 );
+
+// Query for channel collections (only when user is authenticated)
+const { result: collectionsResult } = useQuery(
+  GET_USER_CHANNEL_COLLECTIONS_WITH_CHANNELS,
+  computed(() => ({
+    username: usernameVar.value,
+  })),
+  {
+    enabled: computed(() => !!usernameVar.value),
+    fetchPolicy: 'cache-first',
+  }
+);
+
+// Track which collections are expanded (show all channels)
+const expandedCollections = ref<Set<string>>(new Set());
+
+// Get channel collections with their channels
+const channelCollections = computed(() => {
+  const collections = collectionsResult.value?.users?.[0]?.Collections || [];
+
+  return collections.map((collection: any) => {
+    const channels = (collection.Channels || []).map((channel: any) => ({
+      uniqueName: channel.uniqueName,
+      displayName: channel.displayName || channel.uniqueName,
+      icon: channel.channelIconURL || '',
+    }));
+
+    // Filter by search if there's a search query
+    const filteredChannels = searchInput.value
+      ? channels.filter((channel: ChannelOption) =>
+          channel.uniqueName.toLowerCase().includes(searchInput.value.toLowerCase()) ||
+          channel.displayName.toLowerCase().includes(searchInput.value.toLowerCase())
+        )
+      : channels;
+
+    return {
+      id: collection.id,
+      name: collection.name,
+      channels: filteredChannels,
+      allChannels: channels, // Keep all channels for selection logic
+    };
+  }).filter((collection: any) => collection.channels.length > 0 || !searchInput.value);
+});
+
+const toggleCollectionExpansion = (collectionId: string) => {
+  if (expandedCollections.value.has(collectionId)) {
+    expandedCollections.value.delete(collectionId);
+  } else {
+    expandedCollections.value.add(collectionId);
+  }
+  // Force reactivity update
+  expandedCollections.value = new Set(expandedCollections.value);
+};
+
+const toggleSelectAllCollection = (collection: { id: string; allChannels: ChannelOption[] }) => {
+  const collectionValues = collection.allChannels.map((ch: ChannelOption) => ch.uniqueName);
+  const currentSelected = props.selectedChannels || [];
+
+  const shouldDeselect = collectionValues.every((val: string) => currentSelected.includes(val));
+
+  if (shouldDeselect) {
+    collectionValues.forEach((uniqueName: string) => {
+      if (currentSelected.includes(uniqueName)) {
+        emit('toggleSelection', uniqueName);
+      }
+    });
+  } else {
+    collectionValues.forEach((uniqueName: string) => {
+      if (!currentSelected.includes(uniqueName)) {
+        emit('toggleSelection', uniqueName);
+      }
+    });
+  }
+};
+
+const isCollectionFullySelected = (collection: { allChannels: ChannelOption[] }) => {
+  const collectionValues = collection.allChannels.map((ch: ChannelOption) => ch.uniqueName);
+  const currentSelected = props.selectedChannels || [];
+  return collectionValues.length > 0 && collectionValues.every((val: string) => currentSelected.includes(val));
+};
 
 // Get favorite channels
 const favoriteChannels = computed(() => {
@@ -263,6 +344,79 @@ const areAllFavoritesSelected = computed(() => {
                 <button
                   class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
                   @click.stop="showAllFavorites = false"
+                >
+                  (show less)
+                </button>
+              </span>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      <!-- Channel Collections Sections -->
+      <div
+        v-for="collection in channelCollections"
+        :key="collection.id"
+        class="border-b dark:border-gray-600"
+      >
+        <h3
+          class="px-3 pt-3 text-sm uppercase text-gray-700 dark:text-gray-300"
+        >
+          {{ collection.name }}
+        </h3>
+        <div v-if="collection.channels.length === 0" class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">
+          No forums in this collection.
+        </div>
+        <template v-else>
+          <!-- Select All Collection Option -->
+          <div>
+            <div
+              :class="[
+                'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
+                isCollectionFullySelected(collection) ? 'bg-orange-50 dark:bg-orange-900/20' : '',
+              ]"
+              @click="toggleSelectAllCollection(collection)"
+            >
+              <!-- Checkbox for select all -->
+              <div class="relative mr-3">
+                <input
+                  type="checkbox"
+                  :checked="isCollectionFullySelected(collection)"
+                  class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                  @click.stop="toggleSelectAllCollection(collection)"
+                >
+              </div>
+
+              <!-- Label -->
+              <span class="flex-1 text-sm font-medium text-gray-900 dark:text-white">
+                Select all from {{ collection.name }}
+              </span>
+
+              <!-- Count badge -->
+              <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                {{ collection.allChannels.length }}
+              </span>
+            </div>
+
+            <!-- Preview list of forums -->
+            <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
+              <span v-if="collection.allChannels.length <= 3">
+                {{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
+              </span>
+              <span v-else-if="!expandedCollections.has(collection.id)">
+                {{ collection.allChannels.slice(0, 3).map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
+                <button
+                  class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                  @click.stop="toggleCollectionExpansion(collection.id)"
+                >
+                  (show all)
+                </button>
+              </span>
+              <span v-else>
+                {{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
+                <button
+                  class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                  @click.stop="toggleCollectionExpansion(collection.id)"
                 >
                   (show less)
                 </button>
