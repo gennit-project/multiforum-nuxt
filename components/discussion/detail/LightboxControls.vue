@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import DownloadIcon from '@/components/icons/DownloadIcon.vue';
 import SwitchHorizontalIcon from '@/components/icons/SwitchHorizontalIcon.vue';
+import RefreshIcon from '@/components/icons/RefreshIcon.vue';
 import AddImageToFavorites from '@/components/favorites/AddImageToFavorites.vue';
 
 defineProps({
@@ -95,7 +96,7 @@ const downloadImage = (imageUrl: string) => {
 
 <template>
   <div
-    class="z-50 flex items-center justify-between p-2 text-white"
+    class="z-50 flex min-w-0 items-center justify-between overflow-visible p-2 text-white"
     :class="{ 'px-3': panelOnSide, 'px-5': !panelOnSide }"
   >
     <div
@@ -117,11 +118,11 @@ const downloadImage = (imageUrl: string) => {
     </div>
 
     <div
-      class="flex items-center"
+      class="flex flex-nowrap items-center overflow-visible"
       :class="{ 'gap-1': panelOnSide, 'gap-4': !panelOnSide }"
     >
       <!-- Zoom controls -->
-      <div class="flex items-center rounded bg-opacity-10">
+      <div class="flex flex-shrink-0 items-center rounded bg-opacity-10">
         <button
           class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
           :class="[
@@ -162,15 +163,20 @@ const downloadImage = (imageUrl: string) => {
         </button>
         <button
           v-if="isZoomed"
-          class="cursor-pointer text-white transition-colors hover:bg-opacity-20"
+          class="flex cursor-pointer items-center justify-center text-white transition-colors hover:bg-opacity-20"
           :class="{
-            'px-1 py-1 text-xs': panelOnSide,
-            'px-2 py-1': !panelOnSide,
+            'h-5 w-5': panelOnSide,
+            'h-6 w-6': !panelOnSide,
           }"
           title="Reset zoom"
           @click="emit('reset-zoom')"
         >
-          {{ panelOnSide ? 'R' : 'Reset' }}
+          <RefreshIcon
+            :class="{
+              'h-3 w-3': panelOnSide,
+              'h-4 w-4': !panelOnSide,
+            }"
+          />
         </button>
       </div>
 
