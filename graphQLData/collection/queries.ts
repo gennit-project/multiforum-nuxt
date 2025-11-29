@@ -193,6 +193,18 @@ export const GET_COLLECTION_ITEMS = gql`
             }
           }
         }
+        DiscussionChannel {
+          id
+          channelUniqueName
+          Discussion {
+            id
+            title
+          }
+          Channel {
+            uniqueName
+            displayName
+          }
+        }
       }
       Downloads {
         id

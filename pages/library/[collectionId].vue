@@ -477,6 +477,29 @@ const handleDelete = async () => {
                   :key="comment.id"
                   class="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800"
                 >
+                  <!-- Forum and discussion context -->
+                  <div
+                    v-if="comment.DiscussionChannel"
+                    class="mb-3 text-sm text-gray-500 dark:text-gray-400"
+                  >
+                    <span>In </span>
+                    <NuxtLink
+                      :to="`/forums/${comment.DiscussionChannel.channelUniqueName}`"
+                      class="font-medium text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    >
+                      {{ comment.DiscussionChannel.Channel?.displayName || comment.DiscussionChannel.channelUniqueName }}
+                    </NuxtLink>
+                    <span v-if="comment.DiscussionChannel.Discussion">
+                      on
+                      <NuxtLink
+                        :to="`/forums/${comment.DiscussionChannel.channelUniqueName}/discussions/${comment.DiscussionChannel.Discussion.id}`"
+                        class="font-medium text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
+                      >
+                        {{ comment.DiscussionChannel.Discussion.title }}
+                      </NuxtLink>
+                    </span>
+                  </div>
+
                   <div class="text-sm text-gray-600 dark:text-gray-300">
                     <MarkdownRenderer :text="comment.text" font-size="small" />
                   </div>
@@ -495,7 +518,36 @@ const handleDelete = async () => {
                       />
                       <span v-else>Deleted</span>
                     </div>
-                    <span>{{ relativeTime(comment.createdAt) }}</span>
+                    <div class="flex items-center gap-3">
+                      <span>{{ relativeTime(comment.createdAt) }}</span>
+                      <NuxtLink
+                        v-if="comment.DiscussionChannel?.Discussion"
+                        :to="{
+                          name: 'forums-forumId-discussions-discussionId-comments-commentId',
+                          params: {
+                            forumId: comment.DiscussionChannel.channelUniqueName,
+                            discussionId: comment.DiscussionChannel.Discussion.id,
+                            commentId: comment.id,
+                          },
+                        }"
+                        class="text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                        title="Permalink to comment"
+                      >
+                        <svg
+                          class="h-4 w-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                          />
+                        </svg>
+                      </NuxtLink>
+                    </div>
                   </div>
                 </div>
               </div>
