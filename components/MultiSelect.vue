@@ -8,6 +8,7 @@ export interface MultiSelectOption {
   icon?: string;
   avatar?: string;
   disabled?: boolean;
+  channels?: string[]; // For collection options: list of channel uniqueNames
 }
 
 export interface MultiSelectSection {
@@ -15,6 +16,7 @@ export interface MultiSelectSection {
   options: MultiSelectOption[];
   emptyMessage?: string;
   selectAllLabel?: string; // If provided, shows a "select all" option
+  isCollectionSection?: boolean; // If true, renders as collection list with inline channel names
 }
 
 const props = defineProps({
@@ -100,6 +102,7 @@ const searchQuery = ref('');
 const selected = ref<any[]>([...props.modelValue]);
 const searchInputRef = ref<HTMLInputElement | null>(null);
 const expandedSections = ref<Set<number>>(new Set());
+const expandedCollections = ref<Set<string>>(new Set());
 
 const toggleDropdown = () => {
   isDropdownOpen.value = !isDropdownOpen.value;
@@ -151,6 +154,35 @@ const toggleSelectAll = (sectionOptions: MultiSelectOption[]) => {
 const isSectionFullySelected = (sectionOptions: MultiSelectOption[]) => {
   const sectionValues = sectionOptions.map((opt) => opt.value);
   return sectionValues.length > 0 && sectionValues.every((val) => selected.value.includes(val));
+};
+
+// For collection sections: toggle all channels in a collection
+const toggleCollectionChannels = (channels: string[]) => {
+  const allSelected = channels.every((ch) => selected.value.includes(ch));
+
+  if (allSelected) {
+    // Deselect all channels from this collection
+    selected.value = selected.value.filter((val) => !channels.includes(val));
+  } else {
+    // Select all channels from this collection (deduplicate)
+    const newSelections = [...new Set([...selected.value, ...channels])];
+    selected.value = newSelections;
+  }
+  emit('update:modelValue', selected.value);
+};
+
+const isCollectionFullySelected = (channels: string[]) => {
+  return channels.length > 0 && channels.every((ch) => selected.value.includes(ch));
+};
+
+const toggleCollectionExpansion = (collectionId: string) => {
+  if (expandedCollections.value.has(collectionId)) {
+    expandedCollections.value.delete(collectionId);
+  } else {
+    expandedCollections.value.add(collectionId);
+  }
+  // Force reactivity update
+  expandedCollections.value = new Set(expandedCollections.value);
 };
 
 const toggleSectionExpansion = (sectionIndex: number) => {
@@ -268,17 +300,7 @@ const selectedOptions = computed(() => {
             :key="String(option.value)"
             class="mr-2 mt-1 inline-flex items-center rounded-full bg-orange-100 px-2 py-1 text-sm text-orange-700 dark:bg-orange-700 dark:text-orange-100"
           >
-            <!-- Avatar if provided -->
-            <img
-              v-if="option.avatar"
-              :src="option.avatar"
-              :alt="option.label"
-              class="mr-1 h-4 w-4 rounded-full"
-            >
-            <!-- Icon if provided -->
-            <i v-else-if="option.icon" :class="[option.icon, 'mr-1']"/>
-
-            <span>{{ option.label }}</span>
+            <span class="font-mono">{{ option.value }}</span>
             <span
               class="ml-1 cursor-pointer hover:text-red-500"
               @click="removeSelection(option.value, $event)"
@@ -408,7 +430,7 @@ const selectedOptions = computed(() => {
                     type="checkbox"
                     :checked="isSectionFullySelected(section.options)"
                     class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                    @click.stop
+                    @click.stop="toggleSelectAll(section.options)"
                   >
                 </div>
 
@@ -449,8 +471,52 @@ const selectedOptions = computed(() => {
               </div>
             </div>
 
-            <!-- Section options -->
-            <div v-if="section.options.length > 0 && !section.selectAllLabel" class="py-1">
+            <!-- Collection section (renders each collection as a row with inline channel list) -->
+            <div v-if="section.isCollectionSection && section.options.length > 0">
+              <div
+                v-for="collectionOption in section.options"
+                :key="String(collectionOption.value)"
+                :class="[
+                  'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
+                  isCollectionFullySelected((collectionOption as any).channels || [])
+                    ? 'bg-orange-50 dark:bg-orange-900/20'
+                    : '',
+                ]"
+                @click="toggleCollectionChannels((collectionOption as any).channels || [])"
+              >
+                <!-- Checkbox -->
+                <div class="relative mr-3">
+                  <input
+                    type="checkbox"
+                    :checked="isCollectionFullySelected((collectionOption as any).channels || [])"
+                    class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                    @click.stop="toggleCollectionChannels((collectionOption as any).channels || [])"
+                  >
+                </div>
+
+                <!-- Collection name and channel preview -->
+                <div class="flex-1 text-sm">
+                  <span class="font-medium text-gray-900 dark:text-white">{{ collectionOption.label }}</span>
+                  <span class="ml-1 text-gray-500 dark:text-gray-400">
+                    (<span v-if="((collectionOption as any).channels || []).length <= 3">{{ ((collectionOption as any).channels || []).join(', ') }}</span><span v-else-if="!expandedCollections.has(String(collectionOption.value))">{{ ((collectionOption as any).channels || []).slice(0, 3).join(', ') }}<button
+                        class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                        @click.stop="toggleCollectionExpansion(String(collectionOption.value))"
+                      >show more</button></span><span v-else>{{ ((collectionOption as any).channels || []).join(', ') }}<button
+                        class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                        @click.stop="toggleCollectionExpansion(String(collectionOption.value))"
+                      >show less</button></span>)
+                  </span>
+                </div>
+
+                <!-- Count badge -->
+                <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+                  {{ ((collectionOption as any).channels || []).length }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Section options (regular items, not for collections or selectAll sections) -->
+            <div v-if="section.options.length > 0 && !section.selectAllLabel && !section.isCollectionSection" class="py-1">
               <div
                 v-for="option in section.options"
                 :key="String(option.value)"
@@ -475,21 +541,18 @@ const selectedOptions = computed(() => {
                   >
                 </div>
 
-                <!-- Avatar -->
-                <img
-                  v-if="option.avatar"
-                  :src="option.avatar"
-                  :alt="option.label"
-                  class="mr-3 h-6 w-6 rounded-full"
-                >
-
-                <!-- Icon -->
-                <i v-else-if="option.icon" :class="[option.icon, 'mr-3']"/>
-
-                <!-- Label -->
-                <span class="flex-1 text-sm text-gray-900 dark:text-white">
-                  {{ option.label }}
-                </span>
+                <!-- Compact label: uniqueName (displayName) -->
+                <div class="flex-1 text-sm">
+                  <span class="font-mono text-gray-900 dark:text-white">
+                    {{ option.value }}
+                  </span>
+                  <span
+                    v-if="option.label && option.label !== option.value"
+                    class="text-gray-500 dark:text-gray-400"
+                  >
+                    ({{ option.label }})
+                  </span>
+                </div>
 
                 <!-- Selected indicator for single selection -->
                 <i
@@ -499,8 +562,11 @@ const selectedOptions = computed(() => {
               </div>
             </div>
 
-            <!-- Empty section message -->
-            <div v-else class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+            <!-- Empty section message (only shown when section has no options and no selectAllLabel) -->
+            <div
+              v-if="section.options.length === 0 && !section.selectAllLabel && !section.isCollectionSection"
+              class="px-4 py-3 text-sm text-gray-500 dark:text-gray-400"
+            >
               {{ section.emptyMessage || 'No items' }}
             </div>
           </div>

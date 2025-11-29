@@ -112,7 +112,6 @@ const channelSections = computed<MultiSelectSection[]>(() => {
   const favoriteOptions = favoriteChannels.map((channel: any) => ({
     value: channel.uniqueName,
     label: channel.displayName || channel.uniqueName,
-    avatar: channel.channelIconURL || '',
   }));
 
   sections.push({
@@ -122,23 +121,27 @@ const channelSections = computed<MultiSelectSection[]>(() => {
     selectAllLabel: favoriteOptions.length > 0 ? 'Select all favorite forums' : undefined,
   });
 
-  // Channel collections sections
+  // Channel collections - consolidated under single heading
   const collections = collectionsResult.value?.users?.[0]?.Collections || [];
-  collections.forEach((collection: any) => {
-    const collectionChannels = (collection.Channels || []).map((channel: any) => ({
-      value: channel.uniqueName,
-      label: channel.displayName || channel.uniqueName,
-      avatar: channel.channelIconURL || '',
+  const collectionsWithChannels = collections.filter((collection: any) =>
+    collection.Channels && collection.Channels.length > 0
+  );
+
+  if (collectionsWithChannels.length > 0) {
+    // Create options for each collection (for select all functionality)
+    const collectionOptions = collectionsWithChannels.map((collection: any) => ({
+      value: collection.id,
+      label: collection.name,
+      // Store the channel uniqueNames for select all functionality
+      channels: (collection.Channels || []).map((ch: any) => ch.uniqueName),
     }));
 
-    if (collectionChannels.length > 0) {
-      sections.push({
-        title: collection.name,
-        options: collectionChannels,
-        selectAllLabel: `Select all from ${collection.name}`,
-      });
-    }
-  });
+    sections.push({
+      title: 'Forum Lists From Your Collections',
+      options: collectionOptions,
+      isCollectionSection: true, // Custom flag to render differently
+    } as MultiSelectSection & { isCollectionSection?: boolean });
+  }
 
   // All Forums section
   sections.push({
