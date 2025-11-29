@@ -134,8 +134,9 @@ const activeTab = computed(() => {
   );
 });
 
-const tabs = computed((): Tab[] => {
-  const baseTabs: Tab[] = [
+// Base tabs that are always shown (SSR-safe, no client-specific conditions)
+const baseTabs = computed((): Tab[] => {
+  const result: Tab[] = [
     {
       name: 'discussions',
       routeSuffix: 'discussions',
@@ -145,12 +146,9 @@ const tabs = computed((): Tab[] => {
     },
   ];
 
-  // Only show downloads tab if both server and channel have downloads enabled
-  if (
-    serverDownloadsEnabled.value &&
-    props.channel?.downloadsEnabled === true
-  ) {
-    baseTabs.push({
+  // Channel-level flags are safe to use (they come from props/server data)
+  if (props.channel?.downloadsEnabled === true) {
+    result.push({
       name: 'downloads',
       routeSuffix: 'downloads',
       label: 'Downloads',
@@ -159,9 +157,8 @@ const tabs = computed((): Tab[] => {
     });
   }
 
-  // Only show events tab if both server and channel have events enabled
-  if (serverEventsEnabled.value && props.channel?.eventsEnabled === true) {
-    baseTabs.push({
+  if (props.channel?.eventsEnabled === true) {
+    result.push({
       name: 'events',
       routeSuffix: 'events',
       label: 'Calendar',
@@ -171,7 +168,7 @@ const tabs = computed((): Tab[] => {
   }
 
   if (props.channel?.wikiEnabled) {
-    baseTabs.push({
+    result.push({
       name: 'wiki',
       routeSuffix: 'wiki',
       label: 'Wiki',
@@ -181,12 +178,30 @@ const tabs = computed((): Tab[] => {
   }
 
   // Add contributors tab (visible to everyone)
-  baseTabs.push({
+  result.push({
     name: 'contributors',
     routeSuffix: 'contributors',
     label: 'Contributors',
     icon: UserIcon,
     countProperty: null,
+  });
+
+  return result;
+});
+
+// Full tabs including client-specific conditions (used only on client)
+const tabs = computed((): Tab[] => {
+  const result = [...baseTabs.value];
+
+  // Filter based on server config (only available after query resolves on client)
+  const filteredResult = result.filter((tab) => {
+    if (tab.name === 'downloads' && !serverDownloadsEnabled.value) {
+      return false;
+    }
+    if (tab.name === 'events' && !serverEventsEnabled.value) {
+      return false;
+    }
+    return true;
   });
 
   // Add auth-dependent tabs only if we should show them
@@ -195,16 +210,16 @@ const tabs = computed((): Tab[] => {
     const modList = (props.channel.Moderators ?? []).map(
       (modProfile) => modProfile.displayName
     );
-    
+
     // For SSR, use auth hints; for client, use current auth state
     const currentUsername = !import.meta.client ? usernameHint.value : loggedInUsername.value;
     const currentModName = !import.meta.client ? '' : modProfileNameVar.value; // Mod name not stored in hints for security
-    
+
     const isAdmin = adminList.includes(currentUsername);
     const isMod = currentModName ? modList.includes(currentModName) : false;
 
     if (isAdmin) {
-      baseTabs.push({
+      filteredResult.push({
         name: 'settings',
         routeSuffix: 'edit',
         label: 'Settings',
@@ -214,7 +229,7 @@ const tabs = computed((): Tab[] => {
     }
 
     if (isAdmin || isMod) {
-      baseTabs.push({
+      filteredResult.push({
         name: 'moderation',
         routeSuffix: 'issues',
         label: 'Issues',
@@ -225,7 +240,7 @@ const tabs = computed((): Tab[] => {
   }
 
   if (smAndDown.value) {
-    baseTabs.push({
+    filteredResult.push({
       name: 'about',
       routeSuffix: 'about',
       label: 'About',
@@ -234,38 +249,38 @@ const tabs = computed((): Tab[] => {
     });
   }
 
-  return baseTabs;
+  return filteredResult;
 });
 </script>
 
 <template>
   <div>
-    <!-- Desktop/Tablet Tabs (md and up) -->
-    <nav
-      v-if="mdAndUp"
-      aria-label="Tabs"
-      :class="
-        vertical ? 'text-md flex flex-col' : 'space-x-2 overflow-x-auto text-sm'
-      "
-    >
-      <TabButton
-        v-for="tab in tabs"
-        :key="tab.name"
-        :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
-        :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
-        :is-active="route.path.includes(tab.routeSuffix)"
-        :label="tab.label"
-        :show-count="showCounts && !!tab.countProperty"
-        :to="tabRoutes[tab.name]"
-        :vertical="vertical"
+    <ClientOnly>
+      <!-- Desktop/Tablet Tabs (md and up) -->
+      <nav
+        v-if="mdAndUp"
+        aria-label="Tabs"
+        :class="
+          vertical ? 'text-md flex flex-col' : 'space-x-2 overflow-x-auto text-sm'
+        "
       >
-        <component :is="tab.icon" :class="iconSize" />
-      </TabButton>
-    </nav>
+        <TabButton
+          v-for="tab in tabs"
+          :key="tab.name"
+          :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
+          :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
+          :is-active="route.path.includes(tab.routeSuffix)"
+          :label="tab.label"
+          :show-count="showCounts && !!tab.countProperty"
+          :to="tabRoutes[tab.name]"
+          :vertical="vertical"
+        >
+          <component :is="tab.icon" :class="iconSize" />
+        </TabButton>
+      </nav>
 
-    <!-- Mobile Dropdown (sm and down) -->
-    <div v-else class="relative">
-      <ClientOnly>
+      <!-- Mobile Dropdown (sm and down) -->
+      <div v-else class="relative">
         <Popper>
           <template #default>
             <button
@@ -326,30 +341,31 @@ const tabs = computed((): Tab[] => {
             </div>
           </template>
         </Popper>
-        <template #fallback>
-          <!-- Fallback content for SSR - show a simple button that doesn't work but looks right -->
-          <button
-            class="hover:bg-gray-50 flex w-full items-center justify-between rounded-lg bg-white px-4 py-2 text-sm font-medium text-gray-700 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700"
-            data-testid="mobile-channel-nav-dropdown"
+      </div>
+
+      <!-- SSR Fallback: Show desktop-style tabs using SSR-stable baseTabs -->
+      <template #fallback>
+        <nav
+          aria-label="Tabs"
+          :class="
+            vertical ? 'text-md flex flex-col' : 'space-x-2 overflow-x-auto text-sm'
+          "
+        >
+          <TabButton
+            v-for="tab in baseTabs"
+            :key="tab.name"
+            :count="tab.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : (tab.countProperty ? channel[tab.countProperty]?.count : 0)"
+            :data-testid="`forum-tab-${desktop ? 'desktop' : 'mobile'}-${tab.name}`"
+            :is-active="route.path.includes(tab.routeSuffix)"
+            :label="tab.label"
+            :show-count="showCounts && !!tab.countProperty"
+            :to="tabRoutes[tab.name]"
+            :vertical="vertical"
           >
-            <div class="flex items-center space-x-2">
-              <component :is="activeTab?.icon" class="h-5 w-5 shrink-0" />
-              <span>{{ activeTab?.label }}</span>
-              <span
-                v-if="
-                  showCounts &&
-                  activeTab?.countProperty &&
-                  (activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count)
-                "
-                class="rounded-lg bg-gray-200 px-2 py-1 text-xs text-gray-700 dark:bg-gray-600 dark:text-white"
-              >
-                {{ activeTab?.countProperty === '__DOWNLOAD_COUNT__' ? downloadCount : channel[activeTab?.countProperty]?.count }}
-              </span>
-            </div>
-            <i class="fa-solid fa-chevron-down ml-2 h-4 w-4" />
-          </button>
-        </template>
-      </ClientOnly>
-    </div>
+            <component :is="tab.icon" :class="iconSize" />
+          </TabButton>
+        </nav>
+      </template>
+    </ClientOnly>
   </div>
 </template>

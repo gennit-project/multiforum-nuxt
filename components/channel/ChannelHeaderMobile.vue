@@ -49,15 +49,17 @@ const handleAddToCollection = () => {
         {{ channelId }}
       </h1>
     </div>
-    <div v-if="isAuthenticatedVar" class="flex items-center pr-4">
-      <button
-        type="button"
-        :aria-label="`Add ${channel?.displayName || channelId} to collection`"
-        class="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400"
-        @click="handleAddToCollection"
-      >
-        <CirclePlusIcon class="h-6 w-6" />
-      </button>
-    </div>
+    <ClientOnly>
+      <div v-if="isAuthenticatedVar" class="flex items-center pr-4">
+        <button
+          type="button"
+          :aria-label="`Add ${channel?.displayName || channelId} to collection`"
+          class="rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-orange-500 dark:hover:bg-gray-800 dark:hover:text-orange-400"
+          @click="handleAddToCollection"
+        >
+          <CirclePlusIcon class="h-6 w-6" />
+        </button>
+      </div>
+    </ClientOnly>
   </div>
 </template>
