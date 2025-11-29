@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import type { PropType } from 'vue';
-import AvatarComponent from '@/components/AvatarComponent.vue';
 
 type ChannelOption = {
   uniqueName: string;
@@ -21,12 +20,6 @@ defineProps({
 });
 
 const emit = defineEmits(['toggleSelection']);
-
-const truncate = (description: string) => {
-  return description.length > 100
-    ? description.substring(0, 100) + '...'
-    : description;
-};
 </script>
 
 <template>
@@ -38,39 +31,19 @@ const truncate = (description: string) => {
       class="h-4 w-4 border border-gray-300 text-orange-600 dark:border-gray-600"
       @change="() => emit('toggleSelection', channel.uniqueName)"
     >
-    <div class="flex items-center space-x-2">
-      <AvatarComponent
-        v-if="channel.icon"
-        class="z-10 w-10"
-        :is-small="true"
-        :text="channel.uniqueName"
-        :src="channel.icon"
-      />
-      <AvatarComponent
-        v-else
-        class="z-10 w-10"
-        :is-small="true"
-        :text="channel.uniqueName"
-      />
-      <div class="flex-1 flex-col text-sm">
-        <span
-          v-if="!channel.displayName"
-          class="font-mono font-bold"
-          :data-testid="`forum-picker-${channel.uniqueName}`"
-        >
-          {{ channel.uniqueName }}
-        </span>
-        <div v-else>
-          <span class="font-bold">{{ channel.displayName }}</span>
-          &#8226;
-          <span
-            class="font-mono"
-            :data-testid="`forum-picker-${channel.uniqueName}`"
-            >{{ channel.uniqueName }}</span
-          >
-        </div>
-        <div>{{ truncate(channel.description || '') }}</div>
-      </div>
+    <div class="flex-1 text-sm">
+      <span
+        class="font-mono"
+        :data-testid="`forum-picker-${channel.uniqueName}`"
+      >
+        {{ channel.uniqueName }}
+      </span>
+      <span
+        v-if="channel.displayName && channel.displayName !== channel.uniqueName"
+        class="text-gray-500 dark:text-gray-400"
+      >
+        ({{ channel.displayName }})
+      </span>
     </div>
   </label>
 </template>
