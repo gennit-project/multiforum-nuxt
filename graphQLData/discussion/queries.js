@@ -23,6 +23,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
     $searchInput: String!
     $selectedTags: [String!]
     $showArchived: Boolean!
+    $showUnanswered: Boolean
     $options: DiscussionListOptions
     $hasDownload: Boolean
     $labelFilters: [LabelFilterInput!]
@@ -33,6 +34,7 @@ export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
       selectedTags: $selectedTags
       searchInput: $searchInput
       showArchived: $showArchived
+      showUnanswered: $showUnanswered
       hasDownload: $hasDownload
       labelFilters: $labelFilters
     ) {

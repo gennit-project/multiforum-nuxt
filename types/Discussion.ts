@@ -42,4 +42,5 @@ export type SearchDiscussionValues = {
   channels?: Array<string>;
   searchInput?: string;
   showArchived?: boolean;
+  showUnanswered?: boolean;
 };

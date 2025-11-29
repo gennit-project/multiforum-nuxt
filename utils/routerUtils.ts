@@ -175,6 +175,7 @@ export type UpdateStateInput = {
   showOnlyFreeEvents?: boolean;
   locationFilter?: LocationFilterTypes;
   showArchived?: boolean;
+  showUnanswered?: boolean;
 };
 
 type UpdateFiltersInput = {

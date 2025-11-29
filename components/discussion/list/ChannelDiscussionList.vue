@@ -10,7 +10,7 @@ import ErrorBanner from '../../ErrorBanner.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
 import { usernameVar } from '@/cache';
-import { getFilterValuesFromParams } from '@/components/event/list/filters/getEventFilterValuesFromParams';
+import { getFilterValuesFromParams } from '@/components/discussion/list/getDiscussionFilterValuesFromParams';
 import {
   getSortFromQuery,
   getTimeFrameFromQuery,
@@ -59,6 +59,10 @@ const showArchived = computed(() => {
   return filterValues.value.showArchived;
 });
 
+const showUnanswered = computed(() => {
+  return filterValues.value.showUnanswered;
+});
+
 const {
   result: discussionChannelResult,
   error: discussionError,
@@ -70,6 +74,7 @@ const {
   searchInput,
   selectedTags,
   showArchived,
+  showUnanswered,
   options: {
     limit: DISCUSSION_PAGE_LIMIT,
     offset: 0,

@@ -18,6 +18,7 @@ export const getFilterValuesFromParams = function (
     channels: channelId ? [channelId] : [],
     searchInput: '',
     showArchived: false,
+    showUnanswered: false,
   };
 
   for (const key in route?.query || {}) {
@@ -61,16 +62,26 @@ export const getFilterValuesFromParams = function (
           cleanedValues.showArchived = false;
         }
         break;
+      case 'showUnanswered':
+        if (val === 'true') {
+          cleanedValues.showUnanswered = true;
+        }
+        if (val === 'false') {
+          cleanedValues.showUnanswered = false;
+        }
+        break;
     }
   }
 
-  const { tags, channels, searchInput, showArchived } = cleanedValues;
+  const { tags, channels, searchInput, showArchived, showUnanswered } =
+    cleanedValues;
 
   const filterValues: SearchDiscussionValues = {
     tags: tags || [],
     channels: channels || [],
     searchInput: searchInput || '',
     showArchived,
+    showUnanswered,
   };
   return filterValues;
 };

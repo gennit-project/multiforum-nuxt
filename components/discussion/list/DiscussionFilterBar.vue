@@ -142,6 +142,15 @@ const updateShowArchived = (event: Event) => {
   });
 };
 
+const updateShowUnanswered = (event: Event) => {
+  const checkbox = event.target as HTMLInputElement;
+  updateFilters({
+    router,
+    route,
+    params: { showUnanswered: checkbox.checked },
+  });
+};
+
 const showFilters = ref(false);
 const showSearch = ref(false);
 
@@ -350,6 +359,15 @@ const isExpanded = computed(() => {
             ? 'Show archived downloads'
             : 'Show archived discussions'
         }}
+      </div>
+      <div v-if="isForumScoped && !isDownloadPage" class="flex items-center gap-2 pr-2 text-sm">
+        <CheckBox
+          data-testid="show-unanswered-discussions"
+          class="align-middle"
+          :checked="filterValues.showUnanswered"
+          @input="updateShowUnanswered"
+        />
+        Show unanswered discussions
       </div>
     </div>
   </div>

@@ -33,6 +33,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channels: [],
       searchInput: '',
       showArchived: false,
+      showUnanswered: false,
     });
   });
 
@@ -124,6 +125,28 @@ describe('getDiscussionFilterValuesFromParams', () => {
     expect(result.showArchived).toBe(false);
   });
 
+  it('parses showUnanswered as true correctly', () => {
+    const input = {
+      route: createMockRoute({ showUnanswered: 'true' }),
+      channelId: '',
+    };
+
+    const result = getFilterValuesFromParams(input);
+
+    expect(result.showUnanswered).toBe(true);
+  });
+
+  it('parses showUnanswered as false correctly', () => {
+    const input = {
+      route: createMockRoute({ showUnanswered: 'false' }),
+      channelId: '',
+    };
+
+    const result = getFilterValuesFromParams(input);
+
+    expect(result.showUnanswered).toBe(false);
+  });
+
   it('handles multiple query parameters correctly', () => {
     const input = {
       route: createMockRoute({
@@ -142,6 +165,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channels: ['frontend'],
       searchInput: 'component',
       showArchived: true,
+      showUnanswered: false,
     });
   });
 
@@ -176,6 +200,7 @@ describe('getDiscussionFilterValuesFromParams', () => {
       channels: [],
       searchInput: '',
       showArchived: false,
+      showUnanswered: false,
     });
   });
 });
