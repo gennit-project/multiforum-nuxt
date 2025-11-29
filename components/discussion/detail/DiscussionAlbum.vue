@@ -69,6 +69,12 @@ const activeIndex = ref(0);
 const isLightboxOpen = ref(false);
 const lightboxIndex = ref(0);
 
+// Compute the main image height based on props - used for both main image and thumbnail column
+const mainImageHeight = computed(() => {
+  if (!props.expandedView) return 256;
+  return props.downloadMode ? 500 : 400;
+});
+
 const orderedImages = computed(() => {
   let albumImages: any[] = [];
 
@@ -381,7 +387,8 @@ onMounted(() => {
           class="order-2 lg:order-1 lg:flex-shrink-0"
         >
           <div
-            class="flex gap-2 overflow-x-auto pb-2 lg:max-h-[400px] lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-2"
+            class="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-2"
+            :style="{ maxHeight: `${mainImageHeight}px` }"
           >
             <CarouselThumbnail
               v-for="(image, idx) in orderedImages"
@@ -462,16 +469,8 @@ onMounted(() => {
                     }"
                     :style="{
                       maxWidth: expandedView ? '100%' : '384px',
-                      maxHeight: expandedView
-                        ? downloadMode
-                          ? '500px'
-                          : '400px'
-                        : '256px',
-                      height: expandedView
-                        ? downloadMode
-                          ? '500px'
-                          : '400px'
-                        : 'auto',
+                      maxHeight: `${mainImageHeight}px`,
+                      height: expandedView ? `${mainImageHeight}px` : 'auto',
                     }"
                   >
                   <div
