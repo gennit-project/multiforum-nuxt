@@ -495,17 +495,13 @@ onMounted(() => {
                   </div>
                   <div
                     v-else
-                    class="group relative text-center text-xs"
+                    class="group relative min-h-[1.5rem] text-center text-xs"
                     :class="{ hidden: idx !== activeIndex }"
                   >
                     <span v-if="image?.caption">
                       {{ image.caption }}
                     </span>
-                    <span
-                      v-else-if="!isLoggedInAuthor"
-                      class="italic text-gray-400"
-                      >No caption</span
-                    >
+                    <span v-else>&nbsp;</span>
                   </div>
                 </div>
               </div>
