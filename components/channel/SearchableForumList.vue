@@ -353,77 +353,58 @@ const areAllFavoritesSelected = computed(() => {
         </template>
       </div>
 
-      <!-- Channel Collections Sections -->
+      <!-- Channel Collections Section -->
       <div
-        v-for="collection in channelCollections"
-        :key="collection.id"
+        v-if="channelCollections.length > 0"
         class="border-b dark:border-gray-600"
       >
         <h3
           class="px-3 pt-3 text-sm uppercase text-gray-700 dark:text-gray-300"
         >
-          {{ collection.name }}
+          Forum Lists From Your Collections
         </h3>
-        <div v-if="collection.channels.length === 0" class="px-3 py-3 text-sm text-gray-500 dark:text-gray-400">
-          No forums in this collection.
-        </div>
-        <template v-else>
-          <!-- Select All Collection Option -->
-          <div>
-            <div
-              :class="[
-                'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
-                isCollectionFullySelected(collection) ? 'bg-orange-50 dark:bg-orange-900/20' : '',
-              ]"
-              @click="toggleSelectAllCollection(collection)"
-            >
-              <!-- Checkbox for select all -->
-              <div class="relative mr-3">
-                <input
-                  type="checkbox"
-                  :checked="isCollectionFullySelected(collection)"
-                  class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
-                  @click.stop="toggleSelectAllCollection(collection)"
-                >
-              </div>
+        <div
+          v-for="collection in channelCollections"
+          :key="collection.id"
+        >
+          <div
+            v-if="collection.channels.length > 0"
+            :class="[
+              'flex cursor-pointer items-center border-b px-4 py-2 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-700',
+              isCollectionFullySelected(collection) ? 'bg-orange-50 dark:bg-orange-900/20' : '',
+            ]"
+            @click="toggleSelectAllCollection(collection)"
+          >
+            <!-- Checkbox for select all -->
+            <div class="relative mr-3">
+              <input
+                type="checkbox"
+                :checked="isCollectionFullySelected(collection)"
+                class="h-4 w-4 rounded border border-gray-400 text-orange-600 checked:border-orange-600 checked:bg-orange-600 checked:text-white focus:ring-orange-500 dark:border-gray-500 dark:bg-gray-700"
+                @click.stop="toggleSelectAllCollection(collection)"
+              >
+            </div>
 
-              <!-- Label -->
-              <span class="flex-1 text-sm font-medium text-gray-900 dark:text-white">
-                Select all from {{ collection.name }}
-              </span>
-
-              <!-- Count badge -->
-              <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
-                {{ collection.allChannels.length }}
+            <!-- Label and forum list inline -->
+            <div class="flex-1 text-sm">
+              <span class="font-medium text-gray-900 dark:text-white">{{ collection.name }}</span>
+              <span class="ml-1 text-gray-500 dark:text-gray-400">
+                (<span v-if="collection.allChannels.length <= 3">{{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}</span><span v-else-if="!expandedCollections.has(collection.id)">{{ collection.allChannels.slice(0, 3).map((ch: ChannelOption) => ch.uniqueName).join(', ') }}<button
+                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    @click.stop="toggleCollectionExpansion(collection.id)"
+                  >show more</button></span><span v-else>{{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}<button
+                    class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
+                    @click.stop="toggleCollectionExpansion(collection.id)"
+                  >show less</button></span>)
               </span>
             </div>
 
-            <!-- Preview list of forums -->
-            <div class="px-4 py-2 text-xs text-gray-600 dark:text-gray-400">
-              <span v-if="collection.allChannels.length <= 3">
-                {{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
-              </span>
-              <span v-else-if="!expandedCollections.has(collection.id)">
-                {{ collection.allChannels.slice(0, 3).map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
-                <button
-                  class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                  @click.stop="toggleCollectionExpansion(collection.id)"
-                >
-                  (show all)
-                </button>
-              </span>
-              <span v-else>
-                {{ collection.allChannels.map((ch: ChannelOption) => ch.uniqueName).join(', ') }}
-                <button
-                  class="ml-1 text-orange-600 hover:text-orange-700 dark:text-orange-400 dark:hover:text-orange-300"
-                  @click.stop="toggleCollectionExpansion(collection.id)"
-                >
-                  (show less)
-                </button>
-              </span>
-            </div>
+            <!-- Count badge -->
+            <span class="ml-2 rounded-full bg-gray-200 px-2 py-0.5 text-xs text-gray-600 dark:bg-gray-600 dark:text-gray-300">
+              {{ collection.allChannels.length }}
+            </span>
           </div>
-        </template>
+        </div>
       </div>
 
       <div
