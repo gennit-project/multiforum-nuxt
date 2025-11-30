@@ -41,17 +41,41 @@ export const seedAll = () => {
   // The order is important here because some
   // have a dependency on the previous seed data.
 
-  cy.seedDataForCypressTests({
-    channels,
-    comments: [], // May add some seed comments later if needed.
-    discussions,
-    events,
-    tags,
-    users,
-    channelRoles,
-    modChannelRoles,
-    serverRoles,
-    modServerRoles,
-    serverConfigs,
-  }).then((response) => validateResponse(response, 'seedDataForCypressTests'));
+  const attemptSeed = (attempt = 1) => {
+    return cy
+      .seedDataForCypressTests({
+        channels,
+        comments: [], // May add some seed comments later if needed.
+        discussions,
+        events,
+        tags,
+        users,
+        channelRoles,
+        modChannelRoles,
+        serverRoles,
+        modServerRoles,
+        serverConfigs,
+      })
+      .then((response) => {
+        const hasConstraintError = Boolean(
+          response?.body?.errors?.some((err: any) =>
+            (err?.message || '').includes('Constraint validation failed')
+          )
+        );
+
+        // Sometimes Neo4j leaves constraint debris if the drop mutation races;
+        // a quick re-drop and retry usually clears it.
+        if (hasConstraintError && attempt < 2) {
+          cy.log(
+            'Constraint validation hit during seed; retrying after re-drop (attempt 2)'
+          );
+          deleteAll();
+          return attemptSeed(attempt + 1);
+        }
+
+        return validateResponse(response, 'seedDataForCypressTests');
+      });
+  };
+
+  return attemptSeed();
 };

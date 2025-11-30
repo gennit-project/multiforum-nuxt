@@ -2,7 +2,7 @@ import { getConstantsForCypress } from '../constants';
 import { setupTestData } from '../../support/testSetup';
 
 const constants = getConstantsForCypress(Cypress.env('baseUrl'));
-const { CHANNEL_CREATION_FORM } = constants;
+const { CHANNEL_CREATION_FORM, DISCUSSION_LIST } = constants;
 
 describe('Basic channel operations', () => {
   // Set up test data once for all tests in this file
@@ -25,11 +25,14 @@ describe('Basic channel operations', () => {
       }
     });
 
-    // Visit the page first
-    cy.visit(CHANNEL_CREATION_FORM);
-
-    // Authenticate programmatically on current page
+    // Authenticate on a safe page first so the create form loads with a valid session
+    cy.visit(DISCUSSION_LIST);
     cy.authenticateOnCurrentPage();
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
+
+    // Now open the channel creation form with auth already applied
+    cy.visit(CHANNEL_CREATION_FORM);
+    cy.wait('@graphqlRequest').its('response.statusCode').should('eq', 200);
 
     // Wait for the page to load and form to be ready
     cy.get('input[data-testid="title-input"]').should('be.visible');

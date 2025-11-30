@@ -1,5 +1,5 @@
 const dropDataForCypressTests = () => {
-  cy.authenticatedGraphQL(
+  return cy.authenticatedGraphQL(
     `
     mutation dropDataForCypressTests {
         dropDataForCypressTests {

@@ -174,7 +174,10 @@ const hasEmoiji = computed(() => {
     </div>
 
     <!-- Album slot (hidden when sensitive and not revealed) -->
-    <div v-if="shouldShowContent && (hasAlbum || downloadMode)">
+    <div
+      v-if="shouldShowContent && (hasAlbum || downloadMode)"
+      class="w-full min-w-0 overflow-hidden"
+    >
       <slot name="album-slot" />
     </div>
     <div v-if="showEmojiButton && hasEmoiji" :key="emojiJson" class="flex">

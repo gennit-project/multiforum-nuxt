@@ -67,6 +67,6 @@ const sizeStyle = computed(() => ({
       :alt="image.alt || ''"
       class="h-full w-full rounded object-cover shadow-sm"
       :style="sizeStyle"
-    >
+    />
   </div>
 </template>

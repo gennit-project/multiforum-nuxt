@@ -15,7 +15,7 @@ const seedDataForCypressTests = (input: SeedDataInput) => {
     serverConfigs,
   } = input;
 
-  cy.authenticatedGraphQL(
+  return cy.authenticatedGraphQL(
     `
     mutation seedDataForCypress(
       $channels: [ChannelCreateInput!]!, 
