@@ -10,11 +10,16 @@ import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
+import FontSizeControl from '@/components/channel/FontSizeControl.vue';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
 
 const route = useRoute();
 const router = useRouter();
 const forumId = route.params.forumId as string;
+const uiStore = useUIStore();
+const { fontSize } = storeToRefs(uiStore);
 
 // Query channel data (includes WikiHomePage and wikiEnabled)
 const {
@@ -331,10 +336,15 @@ onGetChannelResult((result) => {
         <OnThisPage :markdown-content="wikiHomePage.body" :is-mobile="true" />
       </div>
 
+      <!-- Mobile font size control -->
+      <div class="mb-4 block xl:hidden">
+        <FontSizeControl />
+      </div>
+
       <div class="flex flex-col gap-6 xl:flex-row">
         <!-- Main content - first on mobile/tablet, middle on desktop -->
         <div class="min-w-0 flex-1 xl:order-2">
-          <MarkdownRenderer :text="wikiHomePage.body" />
+          <MarkdownRenderer :text="wikiHomePage.body" :font-size="fontSize" />
 
           <!-- Bottom edit button - Docusaurus style -->
           <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
@@ -358,43 +368,47 @@ onGetChannelResult((result) => {
           <OnThisPage :markdown-content="wikiHomePage.body" :is-mobile="false" />
         </div>
 
-        <!-- Right sidebar - More Wiki Pages (desktop only) -->
+        <!-- Right sidebar - controls and more pages (desktop only) -->
         <div
           class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-3 xl:flex"
         >
-          <!-- Child Pages - shown in right sidebar at xl screens -->
-          <div
-            v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
-            class="w-full py-2"
-          >
-            <h3
-              class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          <div class="w-full space-y-6 py-2">
+            <FontSizeControl />
+
+            <!-- Child Pages - shown in right sidebar at xl screens -->
+            <div
+              v-if="wikiHomePage.ChildPages && wikiHomePage.ChildPages.length > 0"
+              class="w-full"
             >
-              More Wiki Pages
-            </h3>
-            <div class="space-y-1">
-              <div
-                v-for="childPage in wikiHomePage.ChildPages"
-                :key="childPage.id"
-                class="group"
+              <h3
+                class="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400"
               >
-                <a
-                  :href="`/forums/${forumId}/wiki/${childPage.slug}`"
-                  class="hover:bg-orange-50 block rounded px-1 py-0.5 text-xs font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
-                  @click.prevent="
-                    router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
-                  "
+                More Wiki Pages
+              </h3>
+              <div class="space-y-1">
+                <div
+                  v-for="childPage in wikiHomePage.ChildPages"
+                  :key="childPage.id"
+                  class="group"
                 >
-                  {{ childPage.title }}
-                </a>
-                <p class="ml-1 text-xs text-gray-500 dark:text-gray-400">
-                  Updated
-                  {{
-                    timeAgo(
-                      new Date(childPage.updatedAt || childPage.createdAt)
-                    )
-                  }}
-                </p>
+                  <a
+                    :href="`/forums/${forumId}/wiki/${childPage.slug}`"
+                    class="hover:bg-orange-50 block rounded px-1 py-0.5 text-xs font-medium text-orange-600 transition-colors hover:text-orange-700 dark:text-orange-400 dark:hover:bg-orange-900/20 dark:hover:text-orange-300"
+                    @click.prevent="
+                      router.push(`/forums/${forumId}/wiki/${childPage.slug}`)
+                    "
+                  >
+                    {{ childPage.title }}
+                  </a>
+                  <p class="ml-1 text-xs text-gray-500 dark:text-gray-400">
+                    Updated
+                    {{
+                      timeAgo(
+                        new Date(childPage.updatedAt || childPage.createdAt)
+                      )
+                    }}
+                  </p>
+                </div>
               </div>
             </div>
           </div>

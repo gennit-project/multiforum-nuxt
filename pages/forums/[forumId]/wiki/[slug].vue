@@ -8,12 +8,17 @@ import PrimaryButton from '@/components/PrimaryButton.vue';
 import LoadingSpinner from '@/components/LoadingSpinner.vue';
 import MarkdownRenderer from '@/components/MarkdownRenderer.vue';
 import OnThisPage from '@/components/wiki/OnThisPage.vue';
+import FontSizeControl from '@/components/channel/FontSizeControl.vue';
+import { useUIStore } from '@/stores/uiStore';
+import { storeToRefs } from 'pinia';
 import { timeAgo } from '@/utils';
 
 const route = useRoute();
 const router = useRouter();
 const forumId = route.params.forumId as string;
 const slug = route.params.slug as string;
+const uiStore = useUIStore();
+const { fontSize } = storeToRefs(uiStore);
 
 // Query wiki page data for the specific slug
 const {
@@ -246,10 +251,15 @@ onGetWikiPageResult((result) => {
         <OnThisPage :markdown-content="wikiPage.body" :is-mobile="true" />
       </div>
 
+      <!-- Mobile font size control -->
+      <div class="mb-4 block xl:hidden">
+        <FontSizeControl />
+      </div>
+
       <div class="flex flex-col gap-6 xl:flex-row">
         <!-- Main content - first on mobile/tablet, middle on desktop -->
         <div class="min-w-0 flex-1 xl:order-2">
-          <MarkdownRenderer :text="wikiPage.body" />
+          <MarkdownRenderer :text="wikiPage.body" :font-size="fontSize" />
 
           <!-- Bottom edit button - Docusaurus style -->
           <div class="mt-8 border-t border-gray-200 pt-6 dark:border-gray-700">
@@ -273,11 +283,13 @@ onGetWikiPageResult((result) => {
           <OnThisPage :markdown-content="wikiPage.body" :is-mobile="false" />
         </div>
 
-        <!-- Right sidebar - placeholder for consistency -->
+        <!-- Right sidebar - controls (desktop only) -->
         <div
           class="sticky top-0 hidden max-h-screen w-64 flex-shrink-0 overflow-y-auto xl:order-3 xl:flex"
         >
-          <!-- This could be used for related pages or other navigation in the future -->
+          <div class="w-full py-2">
+            <FontSizeControl class="mb-6" />
+          </div>
         </div>
       </div>
     </div>
