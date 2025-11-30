@@ -39,6 +39,7 @@ const formValues = ref<CreateEditDiscussionFormValues>({
     images: [],
     imageOrder: [],
   },
+  crosspostId: null,
 });
 
 const {
@@ -232,6 +233,13 @@ const submitForm = async () => {
       ...(downloadableFileConnections.length > 0 && {
         DownloadableFiles: {
           connect: downloadableFileConnections,
+        },
+      }),
+      ...(formValues.value.crosspostId && {
+        CrosspostedDiscussion: {
+          connect: {
+            where: { node: { id: formValues.value.crosspostId } },
+          },
         },
       }),
     };

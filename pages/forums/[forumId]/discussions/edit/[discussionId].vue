@@ -121,6 +121,7 @@ export default defineComponent({
             images: orderedImages.value,
             imageOrder: imageOrder.value, // Add imageOrder
           },
+          crosspostId: discussion.value.CrosspostedDiscussion?.id || null,
         };
       }
       return {
@@ -133,6 +134,7 @@ export default defineComponent({
           images: [],
           imageOrder: [], // Add empty imageOrder
         },
+        crosspostId: null,
       };
     };
 
@@ -203,6 +205,7 @@ export default defineComponent({
           images: validImages,
           imageOrder: validImageOrder, // Add the validated imageOrder
         },
+        crosspostId: discussion.CrosspostedDiscussion?.id || null,
       };
       formValues.value = formFields;
       dataLoaded.value = true;
@@ -371,6 +374,9 @@ export default defineComponent({
           :form-values="formValues"
           :update-discussion-loading="updateDiscussionLoading"
           :download-mode="false"
+          :crossposted-discussion="discussion?.CrosspostedDiscussion || null"
+          :crosspost-error="getDiscussionError"
+          :crosspost-loading="getDiscussionLoading"
           @submit="submit"
           @update-form-values="updateFormValues"
           @cancel="handleCancel"

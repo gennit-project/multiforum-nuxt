@@ -22,6 +22,10 @@ const mockComponents = {
     template: '<div><slot /><slot name="content" /></div>',
     props: ['sectionTitle', 'required', 'description'],
   },
+  CrosspostedDiscussionEmbed: {
+    template: '<div data-testid="crosspost-embed"></div>',
+    props: ['discussion', 'showEmbedNotice'],
+  },
   TextInput: {
     template: `
       <div>
@@ -126,6 +130,7 @@ const defaultFormValues: CreateEditDiscussionFormValues = {
     images: [],
     imageOrder: [],
   },
+  crosspostId: null,
 };
 
 describe('CreateEditDiscussionFields Component', () => {

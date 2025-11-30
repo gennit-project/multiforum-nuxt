@@ -1,11 +1,12 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
-import { useMutation } from '@vue/apollo-composable';
+import { ref, computed, watch } from 'vue';
+import { useMutation, useQuery } from '@vue/apollo-composable';
 import type {
   DiscussionChannel,
   DiscussionCreateInput,
 } from '@/__generated__/graphql';
 import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
+import { GET_CROSSPOST_PREVIEW } from '@/graphQLData/discussion/queries';
 import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
@@ -26,6 +27,17 @@ const channelId: string = route.params.forumId
   ? String(route.params.forumId)
   : '';
 
+const crosspostDiscussionId = computed(() => {
+  const crosspostParam = route.query.crosspost;
+  if (Array.isArray(crosspostParam)) {
+    return crosspostParam[0] || null;
+  }
+  if (typeof crosspostParam === 'string') {
+    return crosspostParam;
+  }
+  return null;
+});
+
 const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
   title: '',
   body: '',
@@ -36,9 +48,39 @@ const createDiscussionDefaultValues: CreateEditDiscussionFormValues = {
     images: [], // Will be populated with uploaded images that have IDs
     imageOrder: [],
   },
+  crosspostId: crosspostDiscussionId.value,
 };
 
 const formValues = ref(createDiscussionDefaultValues);
+
+watch(
+  () => crosspostDiscussionId.value,
+  (newVal) => {
+    formValues.value = {
+      ...formValues.value,
+      crosspostId: newVal,
+    };
+  }
+);
+
+const {
+  result: crosspostPreviewResult,
+  loading: crosspostPreviewLoading,
+  error: crosspostPreviewError,
+} = useQuery(
+  GET_CROSSPOST_PREVIEW,
+  () => ({
+    id: crosspostDiscussionId.value,
+  }),
+  {
+    enabled: computed(() => !!crosspostDiscussionId.value),
+    fetchPolicy: 'cache-first',
+  }
+);
+
+const crosspostPreviewDiscussion = computed(() => {
+  return crosspostPreviewResult.value?.discussions?.[0] || null;
+});
 
 const discussionCreateInput = computed<DiscussionCreateInput>(() => {
   const tagConnections = formValues.value.selectedTags.map((tag: string) => ({
@@ -84,6 +126,16 @@ const discussionCreateInput = computed<DiscussionCreateInput>(() => {
               where: { node: { id: image.id } },
             })),
           },
+        },
+      },
+    };
+  }
+
+  if (formValues.value.crosspostId) {
+    result.CrosspostedDiscussion = {
+      connect: {
+        where: {
+          node: { id: formValues.value.crosspostId },
         },
       },
     };
@@ -241,6 +293,9 @@ function updateFormValues(data: Partial<CreateEditDiscussionFormValues>) {
         :edit-mode="false"
         :form-values="formValues"
         :download-mode="false"
+        :crossposted-discussion="crosspostPreviewDiscussion"
+        :crosspost-error="crosspostPreviewError"
+        :crosspost-loading="crosspostPreviewLoading"
         @submit="submit"
         @update-form-values="updateFormValues"
       />

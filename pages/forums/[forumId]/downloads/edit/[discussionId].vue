@@ -175,6 +175,7 @@ export default defineComponent({
               priceCurrency: file.priceCurrency || 'USD',
             })) || [],
           downloadLabels,
+          crosspostId: discussion.value.CrosspostedDiscussion?.id || null,
         };
       }
       return {
@@ -189,6 +190,7 @@ export default defineComponent({
         },
         downloadableFiles: [],
         downloadLabels: {},
+        crosspostId: null,
       };
     };
 
@@ -284,6 +286,7 @@ export default defineComponent({
           images: validImages,
           imageOrder: validImageOrder,
         },
+        crosspostId: discussion.CrosspostedDiscussion?.id || null,
         downloadableFiles:
           discussion.DownloadableFiles?.map((file: DownloadableFile) => ({
             id: file.id || '',
@@ -638,6 +641,9 @@ export default defineComponent({
           :download-mode="true"
           :discussion="discussion"
           :channel-data="channelData"
+          :crossposted-discussion="discussion?.CrosspostedDiscussion || null"
+          :crosspost-error="getDiscussionError"
+          :crosspost-loading="getDiscussionLoading"
           @submit="submit"
           @update-form-values="updateFormValues"
           @cancel="handleCancel"

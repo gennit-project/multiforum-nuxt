@@ -35,6 +35,7 @@ export interface CreateEditDiscussionFormValues {
     priceCurrency: string;
   }[];
   downloadLabels?: Record<string, string[]>; // filterGroupKey -> selected option values
+  crosspostId?: string | null;
 }
 
 export type SearchDiscussionValues = {

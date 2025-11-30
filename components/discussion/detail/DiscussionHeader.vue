@@ -3,7 +3,7 @@ import { ref, computed } from 'vue';
 import { useMutation, useQuery } from '@vue/apollo-composable';
 import { useRoute, useRouter } from 'nuxt/app';
 import { DateTime } from 'luxon';
-import { stableRelativeTime } from '@/utils';
+import { stableRelativeTime, ALLOWED_ICONS } from '@/utils';
 import {
   DELETE_DISCUSSION,
   UPDATE_DISCUSSION_SENSITIVE_CONTENT,
@@ -22,6 +22,7 @@ import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { USER_IS_MOD_OR_OWNER_IN_CHANNEL } from '@/graphQLData/user/queries';
 import { GET_SERVER_CONFIG } from '@/graphQLData/admin/queries';
 import { config } from '@/config';
+import LinkIcon from '@/components/icons/LinkIcon.vue';
 import EditsDropdown from './activityFeed/EditsDropdown.vue';
 import type { Discussion } from '@/__generated__/graphql';
 
@@ -116,7 +117,11 @@ const defaultChannel = computed(() => {
   if (!props.discussion) {
     return '';
   }
-  const channelInRoute = route.params.forumId;
+  const channelInRoute = Array.isArray(route.params.forumId)
+    ? route.params.forumId[0]
+    : typeof route.params.forumId === 'string'
+      ? route.params.forumId
+      : '';
   return (
     channelInRoute ||
     props.discussion?.DiscussionChannels?.[0]?.channelUniqueName
@@ -244,6 +249,44 @@ const copyLink = async () => {
   setTimeout(() => {
     showCopiedLinkNotification.value = false;
   }, 2000);
+};
+
+const shareMenuItems = computed(() => {
+  if (!props.discussion?.id) {
+    return [];
+  }
+  return [
+    {
+      label: 'Copy Link',
+      event: 'copyLink',
+      icon: ALLOWED_ICONS.COPY_LINK,
+    },
+    {
+      label: 'Crosspost',
+      event: 'crosspost',
+    },
+  ];
+});
+
+const handleCrosspost = () => {
+  if (!props.discussion?.id) {
+    return;
+  }
+
+  const forumId = defaultChannel.value;
+  if (!forumId) {
+    router.push({
+      name: 'discussions-create',
+      query: { crosspost: props.discussion.id },
+    });
+    return;
+  }
+
+  router.push({
+    name: 'forums-forumId-discussions-create',
+    params: { forumId },
+    query: { crosspost: props.discussion.id },
+  });
 };
 const deleteModalIsOpen = ref(false);
 
@@ -388,10 +431,23 @@ const warningModalBody = computed(() => {
           size="small"
         />
         <MenuButton
+          v-if="discussion"
+          :items="shareMenuItems"
+          :data-testid="'discussion-share-menu-button'"
+          @copy-link="copyLink"
+          @crosspost="handleCrosspost"
+        >
+          <div
+            class="flex items-center gap-1 rounded px-2 py-1 text-xs font-semibold text-gray-600 hover:text-black dark:text-gray-300 dark:hover:text-white"
+          >
+            <LinkIcon class="h-4 w-4" />
+            <span>Share</span>
+          </div>
+        </MenuButton>
+        <MenuButton
           v-if="showActionMenu && discussion && menuItems.length > 0"
           :items="menuItems"
           :data-testid="'discussion-menu-button'"
-          @copy-link="copyLink"
           @handle-edit="
             router.push(
               discussion.hasDownload

@@ -16,6 +16,27 @@ export const AUTHOR_FIELDS = gql`
   }
 `;
 
+export const CROSSPOST_PREVIEW_FIELDS = gql`
+  fragment CrosspostPreviewFields on Discussion {
+    id
+    title
+    body
+    createdAt
+    Author {
+      username
+      displayName
+      profilePicURL
+    }
+    DiscussionChannels {
+      channelUniqueName
+      Channel {
+        uniqueName
+        displayName
+      }
+    }
+  }
+`;
+
 // For channel list view
 export const GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA = gql`
   query getDiscussionsInChannel(
@@ -198,6 +219,7 @@ export const IS_DISCUSSION_ANSWERED = gql`
 
 export const GET_DISCUSSION = gql`
   ${AUTHOR_FIELDS}
+  ${CROSSPOST_PREVIEW_FIELDS}
   query getDiscussion(
     $id: ID!
     $loggedInModName: String
@@ -325,11 +347,24 @@ export const GET_DISCUSSION = gql`
         body
         createdAt
       }
+      CrosspostedDiscussion {
+        ...CrosspostPreviewFields
+      }
+    }
+  }
+`;
+
+export const GET_CROSSPOST_PREVIEW = gql`
+  ${CROSSPOST_PREVIEW_FIELDS}
+  query getCrosspostPreview($id: ID!) {
+    discussions(where: { id: $id }) {
+      ...CrosspostPreviewFields
     }
   }
 `;
 
 export const GET_DISCUSSION_FEEDBACK = gql`
+  ${CROSSPOST_PREVIEW_FIELDS}
   query getDiscussionFeedback(
     $id: ID!
     $limit: Int
@@ -363,6 +398,9 @@ export const GET_DISCUSSION_FEEDBACK = gql`
         id
         fileName
         url
+      }
+      CrosspostedDiscussion {
+        ...CrosspostPreviewFields
       }
       FeedbackCommentsAggregate {
         count

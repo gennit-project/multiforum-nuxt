@@ -7,6 +7,7 @@ import MarkAsAnsweredButton from '@/components/discussion/detail/MarkAsAnsweredB
 import DownloadSidebar from '@/components/channel/DownloadSidebar.vue';
 import ImageIcon from '@/components/icons/ImageIcon.vue';
 import { usernameVar } from '@/cache';
+import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 
 const DiscussionAlbum = defineAsyncComponent(
   () => import('@/components/discussion/detail/DiscussionAlbum.vue')
@@ -66,7 +67,11 @@ const hasAlbum = computed(() => {
 
 <template>
   <div class="flex flex-col gap-4 lg:flex-row lg:gap-6">
-    <div class="flex-1">
+    <div class="flex-1 space-y-4">
+      <CrosspostedDiscussionEmbed
+        v-if="discussion?.CrosspostedDiscussion"
+        :discussion="discussion.CrosspostedDiscussion"
+      />
       <DiscussionBody
         :key="`discussion-body-${discussion?.id}-${discussion?.hasSensitiveContent}`"
         :channel-id="channelId"

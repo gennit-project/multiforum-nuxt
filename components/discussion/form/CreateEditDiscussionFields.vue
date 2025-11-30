@@ -16,6 +16,7 @@ import {
 import AlbumEditForm from '../detail/AlbumEditForm.vue';
 import DownloadEditForm from './DownloadEditForm.vue';
 import type { Channel, Discussion } from '@/__generated__/graphql';
+import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 
 const props = defineProps<{
   editMode: boolean;
@@ -29,6 +30,9 @@ const props = defineProps<{
   updateDiscussionLoading?: boolean;
   channelData?: Channel;
   discussion?: Discussion;
+  crosspostedDiscussion?: Discussion | null;
+  crosspostError?: ApolloError | null;
+  crosspostLoading?: boolean;
 }>();
 
 defineEmits(['submit', 'updateFormValues', 'cancel']);
@@ -57,6 +61,20 @@ const needsChanges = computed(() => {
     props.formValues?.title &&
     props.formValues?.body?.length <= MAX_CHARS_IN_DISCUSSION_BODY &&
     props.formValues?.title.length <= DISCUSSION_TITLE_CHAR_LIMIT
+  );
+});
+
+const embeddedCrosspost = computed<Discussion | null>(() => {
+  return (
+    props.crosspostedDiscussion || props.discussion?.CrosspostedDiscussion || null
+  );
+});
+
+const showCrosspostSection = computed(() => {
+  return Boolean(
+    props.formValues?.crosspostId ||
+      embeddedCrosspost.value ||
+      props.crosspostLoading
   );
 });
 
@@ -137,6 +155,37 @@ onMounted(() => {
                   :current="formValues.title?.length || 0"
                   :max="DISCUSSION_TITLE_CHAR_LIMIT"
                 />
+              </template>
+            </FormRow>
+
+            <FormRow
+              v-if="showCrosspostSection"
+              :section-title="'Crosspost'"
+              :description="'The original discussion will be embedded below and cannot be edited here.'"
+            >
+              <template #content>
+                <div
+                  v-if="crosspostLoading"
+                  class="text-sm text-gray-600 dark:text-gray-300"
+                >
+                  Loading crossposted discussion...
+                </div>
+                <ErrorBanner
+                  v-else-if="crosspostError"
+                  :text="crosspostError.message"
+                />
+                <CrosspostedDiscussionEmbed
+                  v-else-if="embeddedCrosspost"
+                  :discussion="embeddedCrosspost"
+                  :show-embed-notice="true"
+                />
+                <p
+                  v-else
+                  class="text-sm text-gray-600 dark:text-gray-300"
+                >
+                  We could not load the crossposted discussion. Publish will not
+                  include it unless the link is valid.
+                </p>
               </template>
             </FormRow>
 

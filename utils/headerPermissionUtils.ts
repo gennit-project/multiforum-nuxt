@@ -51,14 +51,6 @@ export const getDiscussionHeaderMenuItems = (params: {
     });
   }
 
-  // Always add copy link
-  menuItems.push({
-    label: 'Copy Link',
-    event: 'copyLink',
-    icon: ALLOWED_ICONS.COPY_LINK,
-    value: discussionId,
-  });
-
   // Return early if user is not logged in
   if (!isLoggedIn) {
     return menuItems;

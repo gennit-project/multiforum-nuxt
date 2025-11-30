@@ -42,10 +42,9 @@ describe('headerPermissionUtils', () => {
         discussionId,
       });
 
-      // Should only have view feedback and copy link options
-      expect(menuItems.length).toBe(2);
+      // Should only have view feedback option
+      expect(menuItems.length).toBe(1);
       expect(menuItems[0].event).toBe('handleViewFeedback');
-      expect(menuItems[1].event).toBe('copyLink');
 
       // Should not have edit/delete or moderation actions
       const modActionsDivider = menuItems.find(
@@ -64,9 +63,8 @@ describe('headerPermissionUtils', () => {
         feedbackEnabled: false,
       });
 
-      // Should only have copy link option
-      expect(menuItems.length).toBe(1);
-      expect(menuItems[0].event).toBe('copyLink');
+      // Should have no options
+      expect(menuItems.length).toBe(0);
 
       // Should not have view feedback
       const viewFeedbackOption = menuItems.find(
@@ -84,8 +82,8 @@ describe('headerPermissionUtils', () => {
         discussionId,
       });
 
-      // Should have 6 items: view feedback, copy link, edit, mark as sensitive content, add album, delete
-      expect(menuItems.length).toBe(6);
+      // Should have 5 items: view feedback, edit, mark as sensitive content, add album, delete
+      expect(menuItems.length).toBe(5);
 
       // Verify edit and delete options
       const editOption = menuItems.find((item) => item.event === 'handleEdit');
@@ -124,7 +122,7 @@ describe('headerPermissionUtils', () => {
       });
 
       // Should have base items plus mod actions divider and mod actions
-      expect(menuItems.length).toBe(6); // 2 base + divider + 3 mod actions
+      expect(menuItems.length).toBe(5); // 1 base + divider + 3 mod actions
 
       // Verify mod actions divider
       const modActionsDivider = menuItems.find(
@@ -168,7 +166,7 @@ describe('headerPermissionUtils', () => {
       });
 
       // Should only have base items, no mod actions
-      expect(menuItems.length).toBe(2);
+      expect(menuItems.length).toBe(1);
 
       // No mod actions divider
       const modActionsDivider = menuItems.find(
@@ -270,7 +268,7 @@ describe('headerPermissionUtils', () => {
       });
 
       // Should have base items plus edit/delete, but no mod actions
-      expect(menuItems.length).toBe(6);
+      expect(menuItems.length).toBe(5);
 
       // Should have edit and delete options
       const editOption = menuItems.find((item) => item.event === 'handleEdit');

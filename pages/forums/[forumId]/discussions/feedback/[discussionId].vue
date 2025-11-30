@@ -13,6 +13,7 @@ import { GET_FEEDBACK_ON_COMMENT } from '@/graphQLData/comment/queries';
 import { modProfileNameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import type { Comment } from '__generated__/graphql';
+import CrosspostedDiscussionEmbed from '@/components/discussion/detail/CrosspostedDiscussionEmbed.vue';
 
 const PAGE_LIMIT = 10;
 
@@ -294,6 +295,12 @@ watch(() => route.params, updateParams, { immediate: true });
               :channel-id="channelId"
               :show-action-menu="false"
             />
+            <div class="mt-3">
+              <CrosspostedDiscussionEmbed
+                v-if="discussion?.CrosspostedDiscussion"
+                :discussion="discussion.CrosspostedDiscussion"
+              />
+            </div>
             <DiscussionBody
               :discussion="discussion"
               :channel-id="channelId"
