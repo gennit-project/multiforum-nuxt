@@ -1,6 +1,11 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, defineAsyncComponent } from 'vue';
+import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import type { Discussion } from '@/__generated__/graphql';
+
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 const props = defineProps<{
   discussion: Discussion | null;
@@ -20,13 +25,6 @@ const channelDisplayName = computed(() => {
   );
 });
 
-const bodyPreview = computed(() => {
-  if (!props.discussion?.body) return '';
-  const trimmedBody = props.discussion.body.trim();
-  if (trimmedBody.length <= 200) return trimmedBody;
-  return `${trimmedBody.slice(0, 200)}...`;
-});
-
 const discussionLink = computed(() => {
   if (!props.discussion?.id || !primaryChannel.value?.channelUniqueName) {
     return null;
@@ -38,6 +36,12 @@ const discussionLink = computed(() => {
       discussionId: props.discussion.id,
     },
   };
+});
+
+const hasAlbum = computed(() => {
+  return (
+    props.discussion?.Album?.Images && props.discussion.Album.Images.length > 0
+  );
 });
 </script>
 
@@ -79,11 +83,24 @@ const discussionLink = computed(() => {
         v-if="bodyPreview"
         class="text-sm text-gray-700 dark:text-gray-200"
       >
-        {{ bodyPreview }}
+        <MarkdownPreview :text="discussion?.body || ''" :disable-gallery="false" />
       </p>
       <p v-else class="text-sm text-gray-500 dark:text-gray-300">
         No description provided.
       </p>
+      <div
+        v-if="hasAlbum"
+        class="mt-3 overflow-hidden rounded-md bg-black text-white"
+      >
+        <DiscussionAlbum
+          :album="discussion?.Album || null"
+          :carousel-format="true"
+          :expanded-view="true"
+          :download-mode="false"
+          :discussion-author="discussion?.Author?.username || ''"
+          :discussion-id="discussion?.id || ''"
+        />
+      </div>
     </div>
     <p
       v-if="showEmbedNotice"

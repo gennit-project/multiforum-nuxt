@@ -22,6 +22,21 @@ export const CROSSPOST_PREVIEW_FIELDS = gql`
     title
     body
     createdAt
+    Album {
+      id
+      imageOrder
+      Images {
+        id
+        url
+        alt
+        caption
+        copyright
+        Uploader {
+          username
+          displayName
+        }
+      }
+    }
     Author {
       username
       displayName
