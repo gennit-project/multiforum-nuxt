@@ -374,7 +374,7 @@ onMounted(() => {
       <!-- Carousel view -->
       <div
         v-else
-        class="rounded-lg border *:border-gray-300 dark:border-gray-700"
+        class="w-full min-w-0 rounded-lg border *:border-gray-300 dark:border-gray-700"
         :class="{
           'flex flex-col': true,
           'lg:flex-row': expandedView && orderedImages.length > 1,
@@ -387,7 +387,7 @@ onMounted(() => {
           class="order-2 lg:order-1 lg:flex-shrink-0"
         >
           <div
-            class="flex gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-2"
+            class="flex w-full max-w-full gap-2 overflow-x-auto pb-2 lg:flex-col lg:overflow-y-auto lg:overflow-x-visible lg:pb-0 lg:pr-2"
             :style="{ maxHeight: `${mainImageHeight}px` }"
           >
             <CarouselThumbnail
@@ -402,13 +402,13 @@ onMounted(() => {
         </div>
 
         <!-- Main content area -->
-        <div class="order-1 flex flex-col lg:order-2 lg:flex-1">
+        <div class="order-1 flex min-w-0 flex-col lg:order-2 lg:flex-1">
           <!-- Image container -->
           <div class="flex items-center justify-center">
             <div
               class="touch-pan-x overflow-hidden rounded dark:text-white"
               :class="{
-                'w-full': expandedView,
+                'w-full min-w-0 max-w-full': expandedView,
                 'max-w-96': !expandedView,
               }"
               @touchstart="handleTouchStart"
@@ -428,10 +428,10 @@ onMounted(() => {
                     "
                     :model-url="image.url"
                     :height="expandedView ? '400px' : '256px'"
-                    :width="expandedView ? '600px' : '384px'"
                     class="object-contain shadow-sm"
                     :style="{
                       aspectRatio: '3/2',
+                      width: '100%',
                       maxWidth: expandedView ? '600px' : '384px',
                       maxHeight: expandedView ? '400px' : '256px',
                     }"
@@ -447,11 +447,13 @@ onMounted(() => {
                   >
                     <StlViewer
                       :src="image.url"
-                      :width="expandedView ? 600 : 384"
+                      width="100%"
                       :height="expandedView ? 400 : 256"
+                      :max-width="expandedView ? '600px' : '384px'"
                       class="object-contain shadow-sm"
                       :style="{
                         aspectRatio: '3/2',
+                        width: '100%',
                         maxWidth: expandedView ? '600px' : '384px',
                         maxHeight: expandedView ? '400px' : '256px',
                       }"
@@ -509,7 +511,7 @@ onMounted(() => {
           </div>
 
           <!-- Counter and navigation row -->
-          <div class="flex items-center justify-between overflow-x-auto p-2">
+          <div class="flex w-full items-center justify-between overflow-x-auto p-2">
             <span class="text-sm">{{
               `${activeIndex + 1} of ${orderedImages.length}`
             }}</span>
@@ -539,9 +541,9 @@ onMounted(() => {
           <!-- Thumbnails row for non-expanded view or small screens -->
           <div
             v-if="showThumbnails && !expandedView && orderedImages.length > 1"
-            class="mt-4 w-full overflow-x-auto px-4"
+            class="mt-4 w-full min-w-0 overflow-x-auto px-4"
           >
-            <div class="flex gap-2 pb-2">
+            <div class="flex w-full max-w-full gap-2 pb-2">
               <CarouselThumbnail
                 v-for="(image, idx) in orderedImages"
                 :key="`thumb-${image?.id || idx}`"

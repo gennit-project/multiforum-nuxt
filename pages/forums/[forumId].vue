@@ -334,7 +334,7 @@ definePageMeta({
             <div
               class="flex flex-col divide-x divide-gray-300 dark:divide-gray-500 md:flex-row"
             >
-              <div class="flex-1 md:px-2">
+              <div class="flex-1 min-w-0 md:px-2">
                 <ChannelTabs
                   v-if="showChannelTabs"
                   :admin-list="adminList"
