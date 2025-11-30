@@ -88,10 +88,18 @@ export default defineComponent({
       </div>
       <div v-if="isOpen(rule.summary)" class="mt-2">
         <MarkdownRenderer
-          class="text-gray-600 dark:text-gray-300"
+          class="rule-detail text-gray-600 dark:text-gray-300"
           :text="rule.detail"
         />
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.rule-detail :deep(.markdown-body),
+.rule-detail :deep(.markdown-body p),
+.rule-detail :deep(.markdown-body li) {
+  font-size: 0.75rem !important;
+}
+</style>
