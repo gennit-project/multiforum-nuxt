@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, defineAsyncComponent } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import BackLink from '@/components/BackLink.vue';
 import DiscussionBody from '@/components/discussion/detail/DiscussionBody.vue';
@@ -17,6 +17,10 @@ import type { Comment } from '__generated__/graphql';
 const PAGE_LIMIT = 10;
 
 const route = useRoute();
+
+const DiscussionAlbum = defineAsyncComponent(
+  () => import('@/components/discussion/detail/DiscussionAlbum.vue')
+);
 
 const contextLink = ref('');
 const channelId = ref(
@@ -56,6 +60,21 @@ const commentToGiveFeedbackOn = ref<Comment | null>(null);
 
 const discussion = computed(() => {
   return getDiscussionResult.value?.discussions[0] || null;
+});
+
+const stlFiles = computed(() => {
+  const files = discussion.value?.DownloadableFiles || [];
+  return files.filter(
+    (file) =>
+      file.fileName?.toLowerCase().endsWith('.stl') ||
+      file.url?.toLowerCase().endsWith('.stl')
+  );
+});
+
+const hasAlbum = computed(() => {
+  const hasImages =
+    (discussion.value?.Album?.Images?.length || 0) > 0;
+  return hasImages || stlFiles.value.length > 0;
 });
 
 const feedbackComments = computed(
@@ -280,7 +299,25 @@ watch(() => route.params, updateParams, { immediate: true });
               :channel-id="channelId"
               :show-emoji-button="false"
               :word-limit="100"
-            />
+            >
+              <template #album-slot>
+                <div
+                  v-if="hasAlbum"
+                  class="mt-2 w-full min-w-0 overflow-hidden rounded bg-black text-white"
+                >
+                  <DiscussionAlbum
+                    :album="discussion?.Album || null"
+                    :carousel-format="true"
+                    :discussion-author="discussion?.Author?.username || ''"
+                    :discussion-id="discussion?.id || ''"
+                    :download-mode="true"
+                    :expanded-view="true"
+                    :show-edit-album="false"
+                    :stl-files="stlFiles"
+                  />
+                </div>
+              </template>
+            </DiscussionBody>
           </div>
         </div>
       </div>

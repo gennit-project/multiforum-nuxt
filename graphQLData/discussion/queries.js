@@ -340,8 +340,29 @@ export const GET_DISCUSSION_FEEDBACK = gql`
       id
       title
       body
+      hasSensitiveContent
       Author {
         username
+      }
+      Album {
+        id
+        imageOrder
+        Images {
+          id
+          url
+          alt
+          caption
+          copyright
+          Uploader {
+            username
+            displayName
+          }
+        }
+      }
+      DownloadableFiles {
+        id
+        fileName
+        url
       }
       FeedbackCommentsAggregate {
         count
