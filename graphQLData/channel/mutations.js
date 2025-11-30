@@ -25,6 +25,7 @@ export const UPDATE_CHANNEL = gql`
     updateChannels(where: $where, update: $update) {
       channels {
         uniqueName
+        displayName
         description
         channelIconURL
         channelBannerURL
