@@ -349,6 +349,40 @@ Any UI component should respect the permissions provided by these roles without 
 - The "Moderation Actions" menu section should appear for any user who has at least one moderation permission
 - Ensure menu items are generated correctly in each header component by checking for specific permissions, not just moderator status
 
+### Suspension System
+
+The application enforces suspensions at both channel and server levels. Suspensions can be time-limited or indefinite.
+
+#### How Suspensions Work
+
+1. **Suspension Creation**: When a moderator suspends a user (e.g., via "Archive and Suspend" on a discussion), a `Suspension` node is created with:
+   - `suspendedUntil` - Expiration date (for time-limited suspensions)
+   - `suspendedIndefinitely` - Flag for permanent suspensions
+   - Link to the related moderation issue
+
+2. **Suspension Detection**: The backend checks for active suspensions when users attempt actions:
+   - A suspension is active if `suspendedIndefinitely` is true OR `suspendedUntil` is in the future
+   - Expired suspensions are automatically cleaned up (disconnected from channel relationships)
+
+3. **Permission Enforcement**:
+   - **Channel-level**: Suspended users use `SuspendedRole` permissions (typically very restricted)
+   - **Server-level**: Users with any active suspension use `DefaultSuspendedRole` for server actions (e.g., creating new forums)
+
+4. **User Notifications**: When a suspended user is blocked from an action, they receive an in-app notification explaining:
+   - Which channel they're suspended in
+   - What action was blocked
+   - Reference to the related moderation issue
+
+#### Suspension-Related E2E Tests
+
+Tests for suspension functionality are located in `tests/cypress/e2e/suspensions/`:
+- `suspendedUserPermissions.spec.cy.ts` - Tests that suspended users can't create discussions, comments, or events
+- `serverLevelSuspension.spec.cy.ts` - Tests that suspended users can't create new forums
+
+#### Unsuspension
+
+Users can be unsuspended through the moderation issue interface, which removes the suspension relationship from the channel.
+
 ### Testing Moderator Permissions
 
 When testing moderator permissions:
