@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useQuery, useMutation } from '@vue/apollo-composable';
 import {
   GET_CLOSED_ISSUES_BY_CHANNEL,
@@ -33,6 +33,7 @@ import { modProfileNameVar, usernameVar } from '@/cache';
 import { useRoute } from 'nuxt/app';
 import XCircleIcon from '../icons/XCircleIcon.vue';
 import ArrowPathIcon from '../icons/ArrowPath.vue';
+import MarkdownPreview from '../MarkdownPreview.vue';
 
 // Setup
 const route = useRoute();
@@ -483,11 +484,41 @@ const issue = computed<Issue | null>(
   () => getIssueResult.value?.issues[0] || null
 );
 
+const hasRelatedContent = computed(() => {
+  return (
+    !!activeIssue.value?.relatedDiscussionId ||
+    !!activeIssue.value?.relatedEventId ||
+    !!activeIssue.value?.relatedCommentId
+  );
+});
+
 // Get the username of the original author of the reported content
 const originalAuthorUsername = ref('');
 
 // Get the mod profile name of the original author, if applicable
 const originalModProfileName = ref('');
+
+watch(
+  () => activeIssue.value,
+  (currentIssue) => {
+    if (!currentIssue || hasRelatedContent.value) return;
+
+    if (
+      !originalAuthorUsername.value &&
+      currentIssue.Author?.__typename === 'User'
+    ) {
+      originalAuthorUsername.value = currentIssue.Author.username || '';
+    }
+
+    if (
+      !originalModProfileName.value &&
+      currentIssue.Author?.__typename === 'ModerationProfile'
+    ) {
+      originalModProfileName.value = currentIssue.Author.displayName || '';
+    }
+  },
+  { immediate: true }
+);
 
 // Determine if the current user is the original author via username
 const isOriginalUserAuthor = computed(() => {
@@ -649,11 +680,7 @@ const handleDeleteComment = (commentId: string) => {
     />
     <div v-else-if="activeIssue" class="mt-2 flex flex-col gap-2 px-4">
       <h2
-        v-if="
-          activeIssue?.relatedDiscussionId ||
-          activeIssue?.relatedEventId ||
-          activeIssue?.relatedCommentId
-        "
+        v-if="hasRelatedContent"
         class="text-xl font-bold"
       >
         {{
@@ -662,11 +689,12 @@ const handleDeleteComment = (commentId: string) => {
               ? 'discussion'
               : activeIssue?.relatedEventId
                 ? 'event'
-                : 'comment'
+            : 'comment'
           }`
         }}
       </h2>
       <div
+        v-if="hasRelatedContent || activeIssue?.body"
         id="original-post-container"
         class="rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-600"
       >
@@ -692,6 +720,14 @@ const handleDeleteComment = (commentId: string) => {
           @fetched-original-author-username="originalAuthorUsername = $event"
           @fetched-original-mod-profile-name="originalModProfileName = $event"
         />
+        <div v-if="activeIssue?.body" class="py-2">
+          <h3 class="text-lg font-semibold">Issue details</h3>
+          <MarkdownPreview
+            :text="activeIssue.body"
+            :word-limit="1000"
+            :disable-gallery="true"
+          />
+        </div>
       </div>
     </div>
 

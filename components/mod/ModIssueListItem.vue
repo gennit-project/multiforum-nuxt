@@ -12,6 +12,18 @@ defineProps({
 const formatDate = (date: string) => {
   return DateTime.fromISO(date).toLocaleString(DateTime.DATE_FULL);
 };
+
+const issueAuthorName = (issue: Issue) => {
+  if (issue.Author?.__typename === 'ModerationProfile') {
+    return issue.Author.displayName || '[Deleted]';
+  }
+
+  if (issue.Author?.__typename === 'User') {
+    return issue.Author.username || '[Deleted]';
+  }
+
+  return '[Deleted]';
+};
 </script>
 
 <template>
@@ -46,7 +58,7 @@ const formatDate = (date: string) => {
         <div class="text-xs text-gray-500 dark:text-gray-200">
           {{
             `Opened on ${formatDate(issue.createdAt)} by ${
-              issue.Author?.displayName || '[Deleted]'
+              issueAuthorName(issue)
             } in ${issue.Channel?.uniqueName || '[Deleted]'}`
           }}
         </div>

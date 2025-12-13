@@ -1,6 +1,38 @@
 import { gql } from '@apollo/client/core';
 import { ISSUE_FIELDS } from './queries';
 
+export const CREATE_ISSUE = gql`
+  mutation createIssue($input: [IssueCreateInput!]!) {
+    createIssues(input: $input) {
+      issues {
+        id
+        title
+        body
+        isOpen
+        flaggedServerRuleViolation
+        createdAt
+        updatedAt
+        relatedCommentId
+        relatedDiscussionId
+        relatedEventId
+        channelUniqueName
+        Channel {
+          uniqueName
+        }
+        Author {
+          __typename
+          ... on ModerationProfile {
+            displayName
+          }
+          ... on User {
+            username
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const CLOSE_ISSUE = gql`
   mutation closeIssue($id: ID!) {
     updateIssues(where: { id: $id }, update: { isOpen: false }) {

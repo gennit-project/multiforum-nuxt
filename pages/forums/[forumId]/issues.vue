@@ -1,13 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
-import { useRoute } from 'nuxt/app';
+import { useRoute, useRouter } from 'nuxt/app';
 import {
   COUNT_CLOSED_ISSUES,
   COUNT_OPEN_ISSUES,
 } from '@/graphQLData/mod/queries';
+import RequireAuth from '@/components/auth/RequireAuth.vue';
+import PrimaryButton from '@/components/PrimaryButton.vue';
 
 const route = useRoute();
+const router = useRouter();
 
 const channelId = computed(() => {
   if (typeof route.params.forumId !== 'string') {
@@ -58,34 +61,58 @@ const closedCount = computed(() => {
   <div
     class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white"
   >
-    <nav v-if="!issueId" class="flex items-center gap-4 py-3 pl-4">
-      <nuxt-link
-        :to="{ name: 'forums-forumId-issues', params: { forumId: channelId } }"
-        class="border-b-2 px-4 py-2"
-        :class="{
-          'border-black text-black dark:border-white dark:text-white':
-            route.name === 'forums-forumId-issues',
-          'border-gray-500 text-gray-500 dark:text-gray-400':
-            route.name !== 'forums-forumId-issues',
-        }"
-      >
-        <i class="far fa-dot-circle" /> {{ openCount }} Open
-      </nuxt-link>
-      <nuxt-link
-        :to="{
-          name: 'forums-forumId-issues-closed',
-          params: { forumId: channelId },
-        }"
-        class="border-b-2 px-4 py-2"
-        :class="{
-          'border-black text-black dark:border-white dark:text-white':
-            route.name === 'forums-forumId-issues-closed',
-          'border-gray-500 text-gray-500 dark:text-gray-400':
-            route.name !== 'forums-forumId-issues-closed',
-        }"
-      >
-        <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
-      </nuxt-link>
+    <nav
+      v-if="!issueId"
+      class="flex items-center justify-between gap-4 py-3 pl-4 pr-4"
+    >
+      <div class="flex items-center gap-4">
+        <nuxt-link
+          :to="{
+            name: 'forums-forumId-issues',
+            params: { forumId: channelId },
+          }"
+          class="border-b-2 px-4 py-2"
+          :class="{
+            'border-black text-black dark:border-white dark:text-white':
+              route.name === 'forums-forumId-issues',
+            'border-gray-500 text-gray-500 dark:text-gray-400':
+              route.name !== 'forums-forumId-issues',
+          }"
+        >
+          <i class="far fa-dot-circle" /> {{ openCount }} Open
+        </nuxt-link>
+        <nuxt-link
+          :to="{
+            name: 'forums-forumId-issues-closed',
+            params: { forumId: channelId },
+          }"
+          class="border-b-2 px-4 py-2"
+          :class="{
+            'border-black text-black dark:border-white dark:text-white':
+              route.name === 'forums-forumId-issues-closed',
+            'border-gray-500 text-gray-500 dark:text-gray-400':
+              route.name !== 'forums-forumId-issues-closed',
+          }"
+        >
+          <i class="fa-regular fa-circle-check" /> {{ closedCount }} Closed
+        </nuxt-link>
+      </div>
+      <RequireAuth :full-width="false">
+        <template #has-auth>
+          <PrimaryButton
+            :label="'New Issue'"
+            @click="
+              router.push({
+                name: 'forums-forumId-issues-create',
+                params: { forumId: channelId },
+              })
+            "
+          />
+        </template>
+        <template #does-not-have-auth>
+          <PrimaryButton :label="'New Issue'" />
+        </template>
+      </RequireAuth>
     </nav>
     <NuxtPage />
   </div>
