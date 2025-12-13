@@ -5,6 +5,9 @@ import type { Discussion } from '@/__generated__/graphql';
 import MarkdownPreview from '@/components/MarkdownPreview.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
 import { usernameVar } from '@/cache';
+import { useQuery } from '@vue/apollo-composable';
+import { GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD } from '@/graphQLData/collection/queries';
+import PublicCollectionListItem from '@/components/collection/PublicCollectionListItem.vue';
 
 const props = defineProps({
   discussionId: {
@@ -29,6 +32,24 @@ const router = useRouter();
 
 const loggedInUserIsAuthor = computed(() => {
   return props.discussion?.Author?.username === usernameVar.value;
+});
+
+const {
+  result: publicCollectionsResult,
+  loading: publicCollectionsLoading,
+  error: publicCollectionsError,
+} = useQuery(
+  GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD,
+  {
+    downloadId: props.discussionId,
+  },
+  {
+    enabled: !!props.discussionId,
+  }
+);
+
+const publicCollections = computed(() => {
+  return publicCollectionsResult.value?.publicCollectionsContaining || [];
 });
 </script>
 
@@ -121,6 +142,37 @@ const loggedInUserIsAuthor = computed(() => {
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div class="mt-6 px-2">
+    <h3 class="mb-3 text-base font-semibold text-gray-900 dark:text-white">
+      Public collections featuring this download
+    </h3>
+    <div
+      v-if="publicCollectionsLoading"
+      class="text-sm text-gray-600 dark:text-gray-300"
+    >
+      Loading collections...
+    </div>
+    <div
+      v-else-if="publicCollectionsError"
+      class="text-sm text-red-600 dark:text-red-400"
+    >
+      Unable to load collections right now.
+    </div>
+    <div
+      v-else-if="publicCollections.length === 0"
+      class="text-sm text-gray-600 dark:text-gray-400"
+    >
+      Not in any public collections yet.
+    </div>
+    <div v-else class="grid gap-3 md:grid-cols-2">
+      <PublicCollectionListItem
+        v-for="collection in publicCollections"
+        :key="collection.id"
+        :collection="collection"
+      />
     </div>
   </div>
 </template>

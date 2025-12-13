@@ -264,6 +264,119 @@ export const GET_COLLECTION_ITEMS = gql`
   }
 `;
 
+export const GET_PUBLIC_COLLECTIONS_FOR_DOWNLOAD = gql`
+  query GetPublicCollectionsForDownload($downloadId: ID!) {
+    publicCollectionsContaining(itemId: $downloadId, itemType: DOWNLOAD) {
+      id
+      name
+      description
+      visibility
+      collectionType
+      itemCount
+      createdAt
+      CreatedBy {
+        username
+        displayName
+        profilePicURL
+      }
+      Downloads(options: { limit: 5 }) {
+        id
+        title
+        createdAt
+        hasSensitiveContent
+        Album {
+          id
+          imageOrder
+          Images {
+            id
+            url
+            caption
+          }
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+          CommentsAggregate {
+            count
+          }
+          Channel {
+            uniqueName
+            displayName
+          }
+        }
+        Tags {
+          text
+        }
+        Author {
+          username
+          displayName
+          profilePicURL
+          commentKarma
+          discussionKarma
+          createdAt
+          ServerRoles {
+            showAdminTag
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PUBLIC_COLLECTION_BY_ID = gql`
+  query GetPublicCollectionById(
+    $collectionId: ID!
+    $downloadLimit: Int = 20
+    $downloadOffset: Int = 0
+  ) {
+    collections(where: { id: $collectionId, visibility: PUBLIC }) {
+      id
+      name
+      description
+      visibility
+      collectionType
+      itemCount
+      createdAt
+      CreatedBy {
+        username
+        displayName
+        profilePicURL
+      }
+      DownloadsAggregate {
+        count
+      }
+      Downloads(
+        options: {
+          limit: $downloadLimit
+          offset: $downloadOffset
+          sort: [{ createdAt: DESC }]
+        }
+      ) {
+        id
+        title
+        createdAt
+        hasSensitiveContent
+        Album {
+          id
+          imageOrder
+          Images {
+            id
+            url
+            caption
+          }
+        }
+        DiscussionChannels {
+          id
+          channelUniqueName
+        }
+        Tags {
+          text
+        }
+      }
+    }
+  }
+`;
+
 // Check if a discussion is in collections
 export const CHECK_DISCUSSION_IN_COLLECTIONS = gql`
   query CheckDiscussionInCollections(
