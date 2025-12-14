@@ -20,7 +20,6 @@ export const GET_SERVER_CONFIG = gql`
       DefaultModRole {
         name
         description
-        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -36,7 +35,6 @@ export const GET_SERVER_CONFIG = gql`
       DefaultElevatedModRole {
         name
         description
-        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -63,7 +61,6 @@ export const GET_SERVER_CONFIG = gql`
       DefaultSuspendedModRole {
         name
         description
-        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -92,7 +89,6 @@ export const GET_SERVER_PERMISSIONS = gql`
       DefaultModRole {
         name
         description
-        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -108,7 +104,6 @@ export const GET_SERVER_PERMISSIONS = gql`
       DefaultElevatedModRole {
         name
         description
-        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
@@ -124,7 +119,6 @@ export const GET_SERVER_PERMISSIONS = gql`
       DefaultSuspendedModRole {
         name
         description
-        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
