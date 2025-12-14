@@ -393,7 +393,7 @@ const getCurrentTabLabel = computed(() => {
                 <router-link
                   v-for="tab in tabs"
                   :key="tab.key"
-                  class="flex cursor-pointer items-center px-3 py-2"
+                  class="flex cursor-pointer items-center py-2 text-xs"
                   :class="{
                     'border-r-2 border-orange-500 dark:text-white':
                       typeof route.name === 'string' &&
@@ -432,7 +432,7 @@ const getCurrentTabLabel = computed(() => {
                   <component
                     :is="tab.icon"
                     v-else-if="tab.icon"
-                    class="mr-2 h-5 w-5"
+                    class="mr-2 h-4 w-4"
                     :class="{
                       'text-orange-500':
                         typeof route.name === 'string' &&
