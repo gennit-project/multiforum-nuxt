@@ -11,6 +11,7 @@ const {
   result: getServerResult,
   error: getServerError,
   loading: getServerLoading,
+  refetch: refetchServerConfig,
 } = useQuery(
   GET_SERVER_PERMISSIONS,
   {
@@ -51,6 +52,7 @@ const serverConfig = computed(() => {
               :types="['server']"
               :title="'Standard User Roles'"
               :show-title="false"
+              :on-updated="() => refetchServerConfig()"
             />
           </section>
 
@@ -63,6 +65,7 @@ const serverConfig = computed(() => {
               :types="['mod']"
               :title="'Mod Roles'"
               :show-title="false"
+              :on-updated="() => refetchServerConfig()"
             />
             <div class="pt-2">
               <ModChannelRolesEditor />

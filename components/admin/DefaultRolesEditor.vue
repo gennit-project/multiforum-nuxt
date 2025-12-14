@@ -28,6 +28,7 @@ const props = defineProps<{
   title?: string;
   types?: Array<'server' | 'mod'>;
   showTitle?: boolean;
+  onUpdated?: () => void;
 }>();
 
 const roleHelpCopy: Record<string, string> = {
@@ -75,26 +76,34 @@ const roleState = reactive<
     { name: string; description: string; values: Record<string, boolean> }
   >
 >({});
-const mutationError = ref('');
 const editingRoleKey = ref<string | null>(null);
 const showModal = ref(false);
-const awaitingMutation = ref(false);
 
-const { mutate: updateServerRole, onDone: onUpdateServerRoleDone } = useMutation(
-  UPDATE_SERVER_ROLE
-);
-const { mutate: updateModRole, onDone: onUpdateModRoleDone } = useMutation(
-  UPDATE_MOD_SERVER_ROLE
-);
+const {
+  mutate: updateServerRole,
+  onDone: onUpdateServerRoleDone,
+  loading: updateServerRoleLoading,
+  error: updateServerRoleError,
+} = useMutation(UPDATE_SERVER_ROLE);
+const {
+  mutate: updateModRole,
+  onDone: onUpdateModRoleDone,
+  loading: updateModRoleLoading,
+  error: updateModRoleError,
+} = useMutation(UPDATE_MOD_SERVER_ROLE);
+
+const mutationLoading = computed(() => {
+  const def = editingDefinition.value;
+  if (!def) return false;
+  return def.type === 'server'
+    ? updateServerRoleLoading.value
+    : updateModRoleLoading.value;
+});
 
 const handleMutationDone = () => {
-  if (!lastMutationKey.value) return;
-  const key = lastMutationKey.value;
-  setSaving(key, false);
   showModal.value = false;
   editingRoleKey.value = null;
-  lastMutationKey.value = null;
-  mutationError.value = '';
+  props.onUpdated?.();
 };
 
 onUpdateServerRoleDone(handleMutationDone);
@@ -169,10 +178,6 @@ const formatPermissionName = (name: string) =>
     .join(' ')
     .replace(/^./, (c) => c.toUpperCase());
 
-const setSaving = (key: string, value: boolean) => {
-  saving[key] = value;
-};
-
 const editingDefinition = computed(() =>
   definitions.value.find((def) => def.key === editingRoleKey.value)
 );
@@ -202,9 +207,6 @@ const saveRole = async () => {
   const def = editingDefinition.value;
   if (!def?.node) return;
   const state = roleState[def.key];
-  mutationError.value = '';
-  setSaving(def.key, true);
-  lastMutationKey.value = def.key;
   try {
     const input = {
       name: state.name,
@@ -229,13 +231,7 @@ const saveRole = async () => {
       });
     }
   } catch {
-    mutationError.value = 'Unable to save changes. Please try again.';
-    lastMutationKey.value = null;
     resetEditingState();
-  } finally {
-    if (!lastMutationKey.value) {
-      setSaving(def.key, false);
-    }
   }
 };
 </script>
@@ -296,11 +292,15 @@ const saveRole = async () => {
     </div>
 
     <p
-      v-if="mutationError"
+      v-if="updateServerRoleError || updateModRoleError"
       class="text-sm text-red-600"
       data-test="default-roles-error"
     >
-      {{ mutationError }}
+      {{
+        updateServerRoleError?.message ||
+          updateModRoleError?.message ||
+          'Unable to save changes. Please try again.'
+      }}
     </p>
 
     <GenericModal
@@ -309,8 +309,8 @@ const saveRole = async () => {
       :title="editingDefinition?.label || 'Edit Role'"
       primary-button-text="Save"
       secondary-button-text="Cancel"
-      :loading="currentSaving"
-      :primary-button-disabled="currentSaving"
+      :loading="mutationLoading"
+      :primary-button-disabled="mutationLoading"
       @close="closeModal"
       @primary-button-click="saveRole"
     >
@@ -332,7 +332,7 @@ const saveRole = async () => {
               v-model="roleState[editingDefinition.key].name"
               type="text"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-              :disabled="currentSaving"
+              :disabled="mutationLoading"
             />
           </div>
           <div class="space-y-1">
@@ -345,7 +345,7 @@ const saveRole = async () => {
               v-model="roleState[editingDefinition.key].description"
               rows="3"
               class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
-              :disabled="currentSaving"
+              :disabled="mutationLoading"
             />
           </div>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -361,7 +361,7 @@ const saveRole = async () => {
                 v-model="roleState[editingDefinition.key].values[perm]"
                 type="checkbox"
                 class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-gray-600 dark:accent-blue-400"
-                :disabled="currentSaving"
+                :disabled="mutationLoading"
               />
             </label>
           </div>

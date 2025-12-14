@@ -5,6 +5,7 @@ import DefaultRolesEditor from './DefaultRolesEditor.vue';
 
 const updateServerRole = vi.fn();
 const updateModServerRole = vi.fn();
+const refetchMock = vi.fn();
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
@@ -12,13 +13,17 @@ vi.mock('@vue/apollo-composable', () => ({
       fn && (fn.definitions?.[0]?.name?.value || '').includes('ModServerRole');
     const mutateFn = isMod ? updateModServerRole : updateServerRole;
     const doneHandlers: Array<() => void> = [];
+    const loading = ref(false);
     return {
       mutate: async (vars?: any) => {
+        loading.value = true;
         const res = await mutateFn(vars);
         doneHandlers.forEach((cb) => cb());
+        loading.value = false;
         return res;
       },
       onDone: (cb: () => void) => doneHandlers.push(cb),
+      loading,
     };
   },
 }));
@@ -112,7 +117,7 @@ describe('DefaultRolesEditor', () => {
 
   it('opens modal and saves via server role mutation', async () => {
     const wrapper = mount(DefaultRolesEditor, {
-      props: { serverConfig: serverConfig.value },
+      props: { serverConfig: serverConfig.value, onUpdated: refetchMock },
     });
     const editBtn = wrapper.find('[data-test="edit-DefaultServerRole"]');
     await editBtn.trigger('click');
@@ -128,6 +133,7 @@ describe('DefaultRolesEditor', () => {
       name: 'ServerRole',
       input: expect.objectContaining({ name: 'ServerRoleUpdated' }),
     });
+    expect(refetchMock).toHaveBeenCalled();
   });
 
   it('uses mod server role mutation for mod defaults', async () => {

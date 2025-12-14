@@ -182,6 +182,7 @@
 
 - **Vue Components**: Use script setup API with TypeScript and properly typed props/emits
 - **Error Handling**: Use try/catch with specific error types, validate GraphQL responses
+- **Apollo useMutation**: Always leverage `useMutation`’s built-in `loading`, `error`, and `onDone` hooks instead of recreating that state yourself. Bind UI disabled/loading states directly to the mutation’s `loading` ref and surface errors via the `error` ref.
 - **Naming**: camelCase for variables/functions, PascalCase for components/interfaces
 - **Imports**: Group imports by type (Vue, libraries, local components, utils)
 - **Testing**: Each feature requires Cypress tests, seed data before tests and clean up after
