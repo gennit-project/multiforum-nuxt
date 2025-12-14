@@ -32,7 +32,7 @@ export default defineComponent({
       if (getIssuesByChannelLoading.value || getIssuesByChannelError.value) {
         return [];
       }
-      const channelData = getIssuesByChannelResult.value.channels[0];
+      const channelData = getIssuesByChannelResult.value?.channels?.[0];
 
       if (!channelData || !channelData.Issues) {
         return [];
@@ -43,23 +43,38 @@ export default defineComponent({
     return {
       channelId,
       issues,
+      getIssuesByChannelLoading,
     };
   },
 });
 </script>
 
 <template>
-  <ul
-    class="divide-y border-t border-gray-200 dark:border-gray-800 dark:text-white"
-    data-testid="issue-list"
-  >
-    <ModIssueListItem
-      v-for="issue in issues"
-      :key="issue.id"
-      :issue="issue"
-      :channel-id="channelId"
-    />
-  </ul>
+  <div class="border-t border-gray-200 dark:border-gray-800 dark:text-white">
+    <div
+      v-if="!getIssuesByChannelLoading && issues.length === 0"
+      class="px-4 py-6 text-sm text-gray-600 dark:text-gray-300"
+    >
+      There are no issues yet.
+      <nuxt-link
+        :to="{
+          name: 'forums-forumId-issues-create',
+          params: { forumId: channelId },
+        }"
+        class="text-blue-600 hover:underline dark:text-blue-400"
+      >
+        Create one?
+      </nuxt-link>
+    </div>
+    <ul class="divide-y" data-testid="issue-list">
+      <ModIssueListItem
+        v-for="issue in issues"
+        :key="issue.id"
+        :issue="issue"
+        :channel-id="channelId"
+      />
+    </ul>
+  </div>
 </template>
 
 <style scoped>
