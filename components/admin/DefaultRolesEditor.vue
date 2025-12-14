@@ -198,7 +198,7 @@ const togglePermission = async (
       No default roles found.
     </div>
 
-    <div v-else class="grid grid-cols-1 gap-4 lg:grid-cols-2">
+    <div v-else class="grid grid-cols-1 gap-4">
       <div
         v-for="def in definitions"
         :key="def.key"
