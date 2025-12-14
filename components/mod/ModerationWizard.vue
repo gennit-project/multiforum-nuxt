@@ -9,6 +9,7 @@ import EyeIcon from '../icons/EyeIcon.vue';
 import XCircleIcon from '../icons/XCircleIcon.vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { modProfileNameVar } from '@/cache';
+import PencilIcon from '../icons/PencilIcon.vue';
 
 const props = defineProps({
   issue: {
@@ -255,15 +256,21 @@ const editActions = computed(() => {
                       </p>
                     </div>
 
-                    <div v-if="editActions.length" class="flex flex-wrap gap-2">
+                    <div v-if="editActions.length" class="flex flex-col gap-2">
                       <button
                         v-for="action in editActions"
                         :key="action.testId"
                         type="button"
                         :data-test="action.testId"
-                        class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:border-blue-400 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                        class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm font-semibold text-white transition"
+                        :class="[
+                          actionsDisabled
+                            ? 'cursor-not-allowed bg-gray-500'
+                            : 'cursor-pointer bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400',
+                        ]"
                         :disabled="actionsDisabled"
                       >
+                        <PencilIcon class="h-4 w-4" />
                         {{ action.label }}
                       </button>
                     </div>
