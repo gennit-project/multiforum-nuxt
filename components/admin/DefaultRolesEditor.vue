@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { computed, reactive, watch, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
-import { UPDATE_MOD_SERVER_ROLE, UPDATE_SERVER_ROLE } from '@/graphQLData/admin/mutations';
+import {
+  UPDATE_MOD_SERVER_ROLE,
+  UPDATE_SERVER_ROLE,
+} from '@/graphQLData/admin/mutations';
 import PermissionsList from '@/components/admin/PermissionsList.vue';
 import GenericModal from '@/components/GenericModal.vue';
 import PencilIcon from '@/components/icons/PencilIcon.vue';
@@ -24,6 +27,7 @@ const props = defineProps<{
   serverConfig: Record<string, any> | null;
   title?: string;
   types?: Array<'server' | 'mod'>;
+  showTitle?: boolean;
 }>();
 
 const serverPermissionKeys = [
@@ -53,7 +57,9 @@ const modPermissionKeys = [
   'canLockChannel',
 ];
 
-const roleState = reactive<Record<string, { name: string; values: Record<string, boolean> }>>({});
+const roleState = reactive<
+  Record<string, { name: string; values: Record<string, boolean> }>
+>({});
 const mutationError = ref('');
 const saving = reactive<Record<string, boolean>>({});
 const editingRoleKey = ref<string | null>(null);
@@ -190,9 +196,11 @@ const saveRole = async () => {
 </script>
 
 <template>
-  <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-    <div class="space-y-1">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
+  <div
+    class="dark:border-slate-800 dark:bg-slate-950 space-y-4 rounded-lg border-gray-200 bg-white shadow-sm"
+  >
+    <div v-if="showTitle !== false" class="space-y-1">
+      <h2 class="font-semibold text-lg text-gray-900 dark:text-gray-100">
         {{ title || 'Default Roles' }}
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -212,15 +220,15 @@ const saveRole = async () => {
       <div
         v-for="def in definitions"
         :key="def.key"
-        class="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-800 dark:bg-slate-900"
+        class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 flex flex-col gap-3 rounded-md border border-gray-200 p-4"
       >
         <div class="flex items-center justify-between gap-2">
-          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+          <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
             {{ def.label }}
           </h3>
           <button
             type="button"
-            class="flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100 dark:hover:bg-slate-700"
+            class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:text-gray-100"
             :data-test="`edit-${def.key}`"
             @click="openModal(def.key)"
           >
@@ -248,13 +256,15 @@ const saveRole = async () => {
     >
       <div v-if="editingDefinition" class="space-y-4">
         <div class="space-y-1">
-          <label class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+          <label
+            class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+          >
             Role name
           </label>
           <input
             v-model="roleState[editingDefinition.key].name"
             type="text"
-            class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100"
+            class="dark:border-slate-700 dark:bg-slate-800 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:text-gray-100"
             :disabled="saving[editingDefinition.key]"
           >
         </div>
@@ -262,7 +272,7 @@ const saveRole = async () => {
           <label
             v-for="perm in editingDefinition.permissions"
             :key="perm"
-            class="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+            class="dark:border-slate-700 dark:bg-slate-900 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm"
           >
             <span class="text-gray-800 dark:text-gray-100">
               {{ formatPermissionName(perm) }}
@@ -277,14 +287,14 @@ const saveRole = async () => {
         <div class="flex justify-end gap-2">
           <button
             type="button"
-            class="rounded border border-gray-300 px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100 dark:hover:bg-slate-700"
+            class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 rounded border border-gray-300 px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-gray-100"
             @click="closeModal"
           >
             Cancel
           </button>
           <button
             type="button"
-            class="rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+            class="font-semibold rounded bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
             :disabled="saving[editingDefinition.key]"
             data-test="save-role"
             @click="saveRole"

@@ -50,6 +50,7 @@ const serverConfig = computed(() => {
               :server-config="serverConfig"
               :types="['server']"
               :title="'Standard User Roles'"
+              :show-title="false"
             />
           </section>
 
@@ -61,6 +62,7 @@ const serverConfig = computed(() => {
               :server-config="serverConfig"
               :types="['mod']"
               :title="'Mod Roles'"
+              :show-title="false"
             />
             <div class="pt-2">
               <ModChannelRolesEditor />
