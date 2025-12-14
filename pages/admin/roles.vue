@@ -4,7 +4,6 @@ import { GET_SERVER_PERMISSIONS } from '@/graphQLData/admin/queries';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
-import RoleSection from '@/components/admin/RoleSection.vue';
 import DefaultRolesEditor from '@/components/admin/DefaultRolesEditor.vue';
 import ModChannelRolesEditor from '@/components/admin/ModChannelRolesEditor.vue';
 
@@ -34,7 +33,7 @@ const serverConfig = computed(() => {
   <div class="px-8 dark:text-white">
     <RequireAuth :loading="getServerLoading">
       <template #has-auth>
-        <div v-if="serverConfig" class="max-w-2xl space-y-6">
+        <div v-if="serverConfig" class="max-w-4xl space-y-8">
           <div class="mb-6">
             <h1 class="mb-2 text-2xl font-bold">Server Roles</h1>
             <p class="text-gray-600 dark:text-gray-300">
@@ -42,45 +41,31 @@ const serverConfig = computed(() => {
               below, and adjust channel-specific moderator roles afterward.
             </p>
           </div>
-          <DefaultRolesEditor :server-config="serverConfig" />
-          <RoleSection
-            v-if="serverConfig.DefaultServerRole"
-            :section-title="'Default Server Role'"
-            :role-title="serverConfig.DefaultServerRole.name"
-            :role-description="serverConfig.DefaultServerRole.description"
-            :permissions="serverConfig.DefaultServerRole"
-          />
-          <RoleSection
-            v-if="serverConfig.DefaultModRole"
-            :section-title="'Default Mod Role'"
-            :role-title="serverConfig.DefaultModRole.name"
-            :role-description="serverConfig.DefaultModRole.description"
-            :permissions="serverConfig.DefaultModRole"
-          />
-          <RoleSection
-            v-if="serverConfig.DefaultElevatedModRole"
-            :section-title="'Default Elevated Mod Role'"
-            :role-title="serverConfig.DefaultElevatedModRole.name"
-            :role-description="serverConfig.DefaultElevatedModRole.description"
-            :permissions="serverConfig.DefaultElevatedModRole"
-          />
-          <RoleSection
-            v-if="serverConfig.DefaultSuspendedRole"
-            :section-title="'Default Suspended Role'"
-            :role-title="serverConfig.DefaultSuspendedRole.name"
-            :role-description="serverConfig.DefaultSuspendedRole.description"
-            :permissions="serverConfig.DefaultSuspendedRole"
-          />
-          <RoleSection
-            v-if="serverConfig.DefaultSuspendedModRole"
-            :section-title="'Default Suspended Mod Role'"
-            :role-title="serverConfig.DefaultSuspendedModRole.name"
-            :role-description="serverConfig.DefaultSuspendedModRole.description"
-            :permissions="serverConfig.DefaultSuspendedModRole"
-          />
-          <div class="mt-10">
-            <ModChannelRolesEditor />
-          </div>
+
+          <section class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Standard User Roles
+            </h2>
+            <DefaultRolesEditor
+              :server-config="serverConfig"
+              :types="['server']"
+              :title="'Standard User Roles'"
+            />
+          </section>
+
+          <section class="space-y-4">
+            <h2 class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+              Mod Roles
+            </h2>
+            <DefaultRolesEditor
+              :server-config="serverConfig"
+              :types="['mod']"
+              :title="'Mod Roles'"
+            />
+            <div class="pt-2">
+              <ModChannelRolesEditor />
+            </div>
+          </section>
         </div>
       </template>
       <template #does-not-have-auth>

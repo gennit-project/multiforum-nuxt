@@ -2,6 +2,9 @@
 import { computed, reactive, watch, ref } from 'vue';
 import { useMutation } from '@vue/apollo-composable';
 import { UPDATE_MOD_SERVER_ROLE, UPDATE_SERVER_ROLE } from '@/graphQLData/admin/mutations';
+import PermissionsList from '@/components/admin/PermissionsList.vue';
+import GenericModal from '@/components/GenericModal.vue';
+import PencilIcon from '@/components/icons/PencilIcon.vue';
 
 interface RoleNode {
   name?: string | null;
@@ -19,6 +22,8 @@ interface RoleDefinition {
 
 const props = defineProps<{
   serverConfig: Record<string, any> | null;
+  title?: string;
+  types?: Array<'server' | 'mod'>;
 }>();
 
 const serverPermissionKeys = [
@@ -51,6 +56,8 @@ const modPermissionKeys = [
 const roleState = reactive<Record<string, { name: string; values: Record<string, boolean> }>>({});
 const mutationError = ref('');
 const saving = reactive<Record<string, boolean>>({});
+const editingRoleKey = ref<string | null>(null);
+const showModal = ref(false);
 
 const { mutate: updateServerRole } = useMutation(UPDATE_SERVER_ROLE);
 const { mutate: updateModRole } = useMutation(UPDATE_MOD_SERVER_ROLE);
@@ -58,6 +65,7 @@ const { mutate: updateModRole } = useMutation(UPDATE_MOD_SERVER_ROLE);
 const definitions = computed<RoleDefinition[]>(() => {
   if (!props.serverConfig) return [];
   const cfg = props.serverConfig;
+  const allowedTypes = props.types ?? ['server', 'mod'];
   return [
     {
       key: 'DefaultServerRole',
@@ -94,7 +102,7 @@ const definitions = computed<RoleDefinition[]>(() => {
       permissions: modPermissionKeys,
       node: cfg.DefaultSuspendedModRole,
     },
-  ].filter((def) => !!def.node);
+  ].filter((def) => !!def.node && allowedTypes.includes(def.type));
 });
 
 watch(
@@ -126,58 +134,57 @@ const setSaving = (key: string, value: boolean) => {
   saving[key] = value;
 };
 
-const saveName = async (def: RoleDefinition) => {
-  if (!def.node) return;
+const editingDefinition = computed(() =>
+  definitions.value.find((def) => def.key === editingRoleKey.value)
+);
+
+const openModal = (key: string) => {
+  editingRoleKey.value = key;
+  showModal.value = true;
+};
+
+const resetEditingState = () => {
+  const def = editingDefinition.value;
+  if (!def?.node) return;
+  roleState[def.key].name = def.node.name || '';
+  def.permissions.forEach((perm) => {
+    roleState[def.key].values[perm] = !!def.node?.[perm];
+  });
+};
+
+const closeModal = () => {
+  resetEditingState();
+  showModal.value = false;
+  editingRoleKey.value = null;
+};
+
+const saveRole = async () => {
+  const def = editingDefinition.value;
+  if (!def?.node) return;
   const state = roleState[def.key];
-  if (!state || state.name === def.node.name) return;
   mutationError.value = '';
   setSaving(def.key, true);
   try {
-    if (def.type === 'server') {
-      await updateServerRole({
-        name: def.node.name,
-        input: { name: state.name },
-      });
-    } else {
-      await updateModRole({
-        name: def.node.name,
-        input: { name: state.name },
-      });
-    }
-    def.node.name = state.name;
-  } catch {
-    mutationError.value = 'Unable to save changes. Please try again.';
-    state.name = def.node.name || '';
-  } finally {
-    setSaving(def.key, false);
-  }
-};
-
-const togglePermission = async (
-  def: RoleDefinition,
-  permission: string,
-  value: boolean
-) => {
-  if (!def.node) return;
-  const state = roleState[def.key];
-  if (!state) return;
-  const previous = state.values[permission];
-  state.values[permission] = value;
-  mutationError.value = '';
-  setSaving(`${def.key}-${permission}`, true);
-  try {
-    const input = { [permission]: value };
+    const input = {
+      name: state.name,
+      ...state.values,
+    };
     if (def.type === 'server') {
       await updateServerRole({ name: def.node.name, input });
     } else {
       await updateModRole({ name: def.node.name, input });
     }
-    def.node[permission] = value;
+    def.node.name = state.name;
+    def.permissions.forEach((perm) => {
+      def.node![perm] = state.values[perm];
+    });
+    showModal.value = false;
+    editingRoleKey.value = null;
   } catch {
-    state.values[permission] = previous;
     mutationError.value = 'Unable to save changes. Please try again.';
+    resetEditingState();
   } finally {
-    setSaving(`${def.key}-${permission}`, false);
+    setSaving(def.key, false);
   }
 };
 </script>
@@ -186,7 +193,7 @@ const togglePermission = async (
   <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-950">
     <div class="space-y-1">
       <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
-        Default Server Roles
+        {{ title || 'Default Roles' }}
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
         Edit the fallback roles used across all channels. Changes apply
@@ -194,62 +201,35 @@ const togglePermission = async (
       </p>
     </div>
 
-    <div v-if="!definitions.length" class="text-sm text-gray-600 dark:text-gray-300">
+    <div
+      v-if="!definitions.length"
+      class="text-sm text-gray-600 dark:text-gray-300"
+    >
       No default roles found.
     </div>
 
-    <div v-else class="grid grid-cols-1 gap-4">
+    <div v-else class="space-y-4">
       <div
         v-for="def in definitions"
         :key="def.key"
         class="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-800 dark:bg-slate-900"
       >
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-2">
           <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
             {{ def.label }}
           </h3>
-        </div>
-        <div class="space-y-1">
-          <label class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-            Role name
-          </label>
-          <input
-            v-model="roleState[def.key].name"
-            type="text"
-            class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100"
-            :disabled="saving[def.key]"
-            @blur="saveName(def)"
-            @keyup.enter="saveName(def)"
+          <button
+            type="button"
+            class="flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100 dark:hover:bg-slate-700"
+            :data-test="`edit-${def.key}`"
+            @click="openModal(def.key)"
           >
-          <p class="text-xs text-gray-600 dark:text-gray-400">
-            This is the default fallback role.
-          </p>
+            <PencilIcon class="h-4 w-4" />
+            Edit
+          </button>
         </div>
 
-        <div class="grid grid-cols-1 gap-2">
-          <label
-            v-for="perm in def.permissions"
-            :key="perm"
-            class="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
-          >
-            <span class="text-gray-800 dark:text-gray-100">
-              {{ formatPermissionName(perm) }}
-            </span>
-            <input
-              type="checkbox"
-              class="h-4 w-4 accent-blue-600 dark:accent-blue-400"
-              :checked="roleState[def.key]?.values[perm]"
-              :disabled="saving[`${def.key}-${perm}`]"
-              @change="
-                togglePermission(
-                  def,
-                  perm,
-                  ($event.target as HTMLInputElement).checked
-                )
-              "
-            >
-          </label>
-        </div>
+        <PermissionsList :permissions="def.node || {}" />
       </div>
     </div>
 
@@ -260,5 +240,59 @@ const togglePermission = async (
     >
       {{ mutationError }}
     </p>
+
+    <GenericModal
+      :open="showModal"
+      :title="editingDefinition?.label || 'Edit Role'"
+      @close="closeModal"
+    >
+      <div v-if="editingDefinition" class="space-y-4">
+        <div class="space-y-1">
+          <label class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
+            Role name
+          </label>
+          <input
+            v-model="roleState[editingDefinition.key].name"
+            type="text"
+            class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100"
+            :disabled="saving[editingDefinition.key]"
+          >
+        </div>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <label
+            v-for="perm in editingDefinition.permissions"
+            :key="perm"
+            class="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900"
+          >
+            <span class="text-gray-800 dark:text-gray-100">
+              {{ formatPermissionName(perm) }}
+            </span>
+            <input
+              v-model="roleState[editingDefinition.key].values[perm]"
+              type="checkbox"
+              class="h-4 w-4 accent-blue-600 dark:accent-blue-400"
+            >
+          </label>
+        </div>
+        <div class="flex justify-end gap-2">
+          <button
+            type="button"
+            class="rounded border border-gray-300 px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:border-slate-700 dark:bg-slate-800 dark:text-gray-100 dark:hover:bg-slate-700"
+            @click="closeModal"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            class="rounded bg-blue-600 px-3 py-2 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
+            :disabled="saving[editingDefinition.key]"
+            data-test="save-role"
+            @click="saveRole"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </GenericModal>
   </div>
 </template>

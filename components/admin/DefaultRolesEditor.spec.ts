@@ -15,6 +15,29 @@ vi.mock('@vue/apollo-composable', () => ({
   },
 }));
 
+vi.mock('@/components/admin/PermissionsList.vue', () => ({
+  default: {
+    name: 'PermissionsList',
+    template: '<div><slot /></div>',
+    props: ['permissions'],
+  },
+}));
+
+vi.mock('@/components/GenericModal.vue', () => ({
+  default: {
+    name: 'GenericModal',
+    props: ['open', 'title'],
+    template: `
+      <div v-if="open">
+        <div class="modal">
+          <slot></slot>
+          <button data-test="modal-close" @click="$emit('close')">Close</button>
+        </div>
+      </div>
+    `,
+  },
+}));
+
 describe('DefaultRolesEditor', () => {
   beforeEach(() => {
     updateServerRole.mockReset();
@@ -61,25 +84,32 @@ describe('DefaultRolesEditor', () => {
     expect(wrapper.text()).toContain('Default Mod Role');
   });
 
-  it('toggles a permission and calls the right mutation', async () => {
+  it('opens modal and saves via server role mutation', async () => {
     const wrapper = mount(DefaultRolesEditor, {
       props: { serverConfig: serverConfig.value },
     });
+    const editBtn = wrapper.find('[data-test="edit-DefaultServerRole"]');
+    await editBtn.trigger('click');
+    const nameInput = wrapper.find('input[type="text"]');
+    await nameInput.setValue('ServerRoleUpdated');
     const checkbox = wrapper.find('input[type="checkbox"]');
     await checkbox.setValue(true);
-    expect(updateServerRole).toHaveBeenCalled();
+    const saveBtn = wrapper.find('[data-test="save-role"]');
+    await saveBtn.trigger('click');
+    expect(updateServerRole).toHaveBeenCalledWith({
+      name: 'ServerRole',
+      input: expect.objectContaining({ name: 'ServerRoleUpdated' }),
+    });
   });
 
-  it('updates a role name on blur', async () => {
+  it('uses mod server role mutation for mod defaults', async () => {
     const wrapper = mount(DefaultRolesEditor, {
       props: { serverConfig: serverConfig.value },
     });
-    const input = wrapper.find('input[type="text"]');
-    await input.setValue('ServerRoleUpdated');
-    await input.trigger('blur');
-    expect(updateServerRole).toHaveBeenCalledWith({
-      name: 'ServerRole',
-      input: { name: 'ServerRoleUpdated' },
-    });
+    const editBtn = wrapper.find('[data-test="edit-DefaultModRole"]');
+    await editBtn.trigger('click');
+    const saveBtn = wrapper.find('[data-test="save-role"]');
+    await saveBtn.trigger('click');
+    expect(updateModServerRole).toHaveBeenCalled();
   });
 });
