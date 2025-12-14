@@ -107,12 +107,20 @@ const formattedDate = computed(() => {
     <div
       class="mb-3 mt-3 flex w-full flex-col md:flex-row md:items-center md:justify-between md:space-x-2"
     >
-      <v-skeleton-loader
-        v-if="getIssueLoading"
-        class="flex-1"
-        type="text"
-        :theme="theme"
-      />
+      <div v-if="getIssueLoading" class="flex-1">
+        <div class="flex flex-col gap-2 px-1">
+          <v-skeleton-loader
+            class="w-3/4"
+            type="text"
+            :theme="theme"
+          />
+          <v-skeleton-loader
+            class="w-1/3"
+            type="text"
+            :theme="theme"
+          />
+        </div>
+      </div>
       <div v-else ref="issueDetail" class="flex-1">
         <slot />
         <h2
