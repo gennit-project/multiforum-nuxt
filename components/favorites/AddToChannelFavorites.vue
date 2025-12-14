@@ -8,6 +8,7 @@ import {
 } from '@/graphQLData/user/mutations';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
+import { useAddToListModalStore } from '@/stores/addToListModalStore';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const props = defineProps({
@@ -43,6 +44,7 @@ const GET_USER_FAVORITES = gql`
 const isFavorited = ref(false);
 const isLoading = ref(false);
 const toastStore = useToastStore();
+const addToListModalStore = useAddToListModalStore();
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITES,
@@ -70,6 +72,25 @@ watch(
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_CHANNEL);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_CHANNEL);
 
+const showAddedToast = () => {
+  const message = 'Added to Favorites.';
+
+  if (!props.allowAddToList) {
+    toastStore.showToast(message);
+    return;
+  }
+
+  toastStore.showToast(message, 'success', {
+    label: 'Organize',
+    onClick: () =>
+      addToListModalStore.open({
+        itemId: props.channelUniqueName,
+        itemType: 'channel',
+        isAlreadyFavorite: true,
+      }),
+  });
+};
+
 const handleToggleFavorite = async () => {
   if (!usernameVar.value) return;
 
@@ -91,7 +112,7 @@ const handleToggleFavorite = async () => {
         channel: props.channelUniqueName,
         username: usernameVar.value,
       });
-      toastStore.showToast('Added to favorites.');
+      showAddedToast();
     }
     refetchFavorites();
   } catch (error) {

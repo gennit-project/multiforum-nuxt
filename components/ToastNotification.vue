@@ -18,14 +18,27 @@ const toastStore = useToastStore();
         <div
           v-for="toast in toastStore.toasts"
           :key="toast.id"
-          class="flex items-center justify-between gap-4 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg min-w-[200px] max-w-[400px]"
+          class="flex items-center justify-between gap-3 bg-gray-900 text-white px-4 py-3 rounded-lg shadow-lg min-w-[200px] max-w-[420px]"
           :class="{
             'bg-gray-900': toast.type === 'info' || !toast.type,
             'bg-green-700': toast.type === 'success',
             'bg-red-700': toast.type === 'error',
           }"
         >
-          <span class="text-sm font-medium">{{ toast.message }}</span>
+          <div class="flex flex-1 items-center gap-3">
+            <span class="text-sm font-medium">{{ toast.message }}</span>
+            <button
+              v-if="toast.action"
+              type="button"
+              class="text-xs font-semibold underline underline-offset-2 text-blue-200 hover:text-blue-100"
+              @click="
+                toast.action?.onClick();
+                toastStore.dismissToast(toast.id);
+              "
+            >
+              {{ toast.action.label }}
+            </button>
+          </div>
           <button
             type="button"
             class="flex-shrink-0 text-gray-300 hover:text-white transition-colors"

@@ -5,14 +5,24 @@ export interface Toast {
   id: string;
   message: string;
   type?: 'success' | 'error' | 'info';
+  action?: ToastAction;
+}
+
+export interface ToastAction {
+  label: string;
+  onClick: () => void;
 }
 
 export const useToastStore = defineStore('toast', () => {
   const toasts = ref<Toast[]>([]);
 
-  function showToast(message: string, type: Toast['type'] = 'success') {
+  function showToast(
+    message: string,
+    type: Toast['type'] = 'success',
+    action?: ToastAction
+  ) {
     const id = Date.now().toString();
-    const toast: Toast = { id, message, type };
+    const toast: Toast = { id, message, type, action };
     toasts.value.push(toast);
   }
 

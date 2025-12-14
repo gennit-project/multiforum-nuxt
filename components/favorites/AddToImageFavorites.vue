@@ -8,6 +8,7 @@ import {
 } from '@/graphQLData/user/mutations';
 import { usernameVar } from '@/cache';
 import { useToastStore } from '@/stores/toastStore';
+import { useAddToListModalStore } from '@/stores/addToListModalStore';
 import AddToFavoritesButton from '@/components/favorites/AddToFavoritesButton.vue';
 
 const props = defineProps({
@@ -48,6 +49,7 @@ const GET_USER_FAVORITE_IMAGE = gql`
 const isFavorited = ref(false);
 const isLoading = ref(false);
 const toastStore = useToastStore();
+const addToListModalStore = useAddToListModalStore();
 
 const { result: favoritesResult, refetch: refetchFavorites } = useQuery(
   GET_USER_FAVORITE_IMAGE,
@@ -75,6 +77,25 @@ watch(
 const { mutate: addFavorite } = useMutation(ADD_FAVORITE_IMAGE);
 const { mutate: removeFavorite } = useMutation(REMOVE_FAVORITE_IMAGE);
 
+const showAddedToast = () => {
+  const message = `${props.entityName} added to Favorites.`;
+
+  if (!props.allowAddToList) {
+    toastStore.showToast(message);
+    return;
+  }
+
+  toastStore.showToast(message, 'success', {
+    label: 'Organize',
+    onClick: () =>
+      addToListModalStore.open({
+        itemId: props.imageId,
+        itemType: 'image',
+        isAlreadyFavorite: true,
+      }),
+  });
+};
+
 const handleToggleFavorite = async () => {
   if (!usernameVar.value) return;
 
@@ -96,7 +117,7 @@ const handleToggleFavorite = async () => {
         imageId: props.imageId,
         username: usernameVar.value,
       });
-      toastStore.showToast(`${props.entityName} added to favorites.`);
+      showAddedToast();
     }
     refetchFavorites();
   } catch (error) {

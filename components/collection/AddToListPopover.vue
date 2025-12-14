@@ -35,6 +35,10 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
+  variant: {
+    type: String as PropType<'popover' | 'modal'>,
+    default: 'popover',
+  },
 });
 
 const emit = defineEmits<{
@@ -182,6 +186,8 @@ const { adjustedPosition } = usePopoverPositioning({
   contentDependencies: [filteredCollections, isCreatingNew, isLoading],
 });
 
+const isModal = computed(() => props.variant === 'modal');
+
 // Search functionality
 watch(searchTerm, () => {
   if (usernameVar.value && props.isVisible) {
@@ -314,6 +320,8 @@ const handleToggleInCollection = async (collection: any) => {
 };
 
 const handleClickOutside = (event: MouseEvent) => {
+  if (isModal.value) return;
+
   const target = event.target as HTMLElement;
   // Don't close if clicking inside the popover or the button that triggered it
   if (
@@ -324,22 +332,37 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 };
 
+const handleKeydown = (event: KeyboardEvent) => {
+  if (event.key === 'Escape' && props.isVisible) {
+    emit('close');
+  }
+};
+
 onMounted(() => {
   // Use setTimeout to avoid immediate closure on the same click that opened it
   setTimeout(() => {
     document.addEventListener('click', handleClickOutside);
   }, 0);
+  document.addEventListener('keydown', handleKeydown);
 });
 
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener('keydown', handleKeydown);
 });
 
 const popoverClasses = computed(() => {
-  return 'add-to-list-popover fixed z-[9999] w-80 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-4';
+  return [
+    'add-to-list-popover z-[9999] w-80 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg shadow-lg p-4',
+    isModal.value ? 'relative' : 'fixed',
+  ]
+    .filter(Boolean)
+    .join(' ');
 });
 
 const popoverStyles = computed(() => {
+  if (isModal.value) return {};
+
   return {
     top: `${adjustedPosition.value.top}px`,
     left: `${adjustedPosition.value.left}px`,
@@ -350,7 +373,174 @@ const popoverStyles = computed(() => {
 <template>
   <Teleport to="body">
     <div
-      v-if="isVisible"
+      v-if="isVisible && isModal"
+      class="fixed inset-0 z-[9998] flex items-center justify-center bg-black/50 px-4"
+      @click="emit('close')"
+    >
+      <div
+        ref="popoverRef"
+        :class="popoverClasses"
+        @click.stop
+      >
+        <!-- Header -->
+        <div class="mb-3 flex items-center justify-between">
+          <h3 class="text-sm font-medium text-gray-900 dark:text-white">
+            Add to List
+          </h3>
+          <button
+            class="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            @click="emit('close')"
+          >
+            ×
+          </button>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="mb-3">
+          <input
+            v-model="searchTerm"
+            type="text"
+            placeholder="Search lists..."
+            class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+          >
+        </div>
+
+        <!-- Create New List -->
+        <div class="mb-3">
+          <div v-if="!isCreatingNew">
+            <button
+              class="hover:bg-blue-50 flex w-full items-center rounded-md px-3 py-2 text-sm text-blue-600 transition-colors dark:text-blue-400 dark:hover:bg-blue-900/20"
+              @click="isCreatingNew = true"
+            >
+              <span class="mr-2">+</span>
+              New List
+            </button>
+          </div>
+          <div v-else class="space-y-2">
+            <input
+              v-model="newCollectionName"
+              type="text"
+              placeholder="Enter list name..."
+              class="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+              @keyup.enter="handleCreateNewCollection"
+              @keyup.escape="isCreatingNew = false"
+            >
+            <div class="flex gap-2">
+              <button
+                class="flex-1 rounded-md bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+                :disabled="!newCollectionName.trim() || isLoading"
+                @click="handleCreateNewCollection"
+              >
+                Create
+              </button>
+              <button
+                class="hover:bg-gray-50 flex-1 rounded-md border border-gray-300 px-3 py-1 text-sm text-gray-700 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+                @click="
+                  isCreatingNew = false;
+                  newCollectionName = '';
+                "
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <hr class="mb-3 border-gray-200 dark:border-gray-600" >
+
+        <!-- Lists -->
+        <div class="max-h-64 space-y-1 overflow-y-auto">
+          <!-- Favorites List (Always shown) -->
+          <div
+            class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+            @click.stop="handleToggleInCollection(favoritesList)"
+          >
+            <div class="flex items-center">
+              <span class="mr-2 text-yellow-500">★</span>
+              <span class="text-gray-900 dark:text-white">{{
+                favoritesList.name
+              }}</span>
+            </div>
+            <input
+              type="checkbox"
+              :checked="isItemInFavorites"
+              class="rounded text-blue-600 focus:ring-blue-500"
+              readonly
+            >
+          </div>
+
+          <!-- Divider between Favorites and Collections -->
+          <div
+            v-if="
+              favoritesList &&
+              (!searchTerm || filteredCollections.length > 0 || !searchTerm)
+            "
+            class="my-2"
+          >
+            <hr class="border-gray-200 dark:border-gray-600" >
+            <div
+              class="mb-1 mt-2 px-3 text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-400"
+            >
+              Collections
+            </div>
+          </div>
+
+          <!-- Custom Collections -->
+          <div
+            v-for="collection in filteredCollections"
+            :key="collection.id"
+            class="hover:bg-gray-50 flex cursor-pointer items-center justify-between rounded-md px-3 py-2 text-sm dark:hover:bg-gray-700"
+            @click.stop="handleToggleInCollection(collection)"
+          >
+            <div class="flex items-center">
+              <span class="text-gray-900 dark:text-white">{{
+                collection.name
+              }}</span>
+              <span class="ml-2 text-xs text-gray-500"
+                >({{ collection.itemCount }})</span
+              >
+            </div>
+            <input
+              type="checkbox"
+              :checked="
+                itemInCollections.some((c: any) => c.id === collection.id)
+              "
+              class="rounded text-blue-600 focus:ring-blue-500"
+              readonly
+            >
+          </div>
+
+          <!-- No Search Results -->
+          <div
+            v-if="filteredCollections.length === 0 && searchTerm"
+            class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
+          >
+            No collections found for "{{ searchTerm }}"
+          </div>
+
+          <!-- Empty Collections State -->
+          <div
+            v-if="filteredCollections.length === 0 && !searchTerm"
+            class="px-3 py-2 text-center text-sm text-gray-500 dark:text-gray-400"
+          >
+            No collections yet. Create your first collection above!
+          </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div
+          v-if="isLoading"
+          class="absolute inset-0 flex items-center justify-center rounded-lg bg-white/50 dark:bg-gray-800/50"
+        >
+          <div
+            class="h-6 w-6 animate-spin rounded-full border-b-2 border-blue-600"
+          />
+        </div>
+      </div>
+    </div>
+    <div
+      v-else-if="isVisible"
       ref="popoverRef"
       :class="popoverClasses"
       :style="popoverStyles"
