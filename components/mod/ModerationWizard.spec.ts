@@ -393,6 +393,15 @@ describe('ModerationWizard Component', () => {
     expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(false);
   });
 
+  it('disables edit button when lacking edit permission', async () => {
+    const wrapper = mountComponent({
+      canEditDiscussions: false,
+    });
+
+    const editButton = wrapper.find('[data-test="edit-discussion"]');
+    expect(editButton.attributes('disabled')).toBeDefined();
+  });
+
   it('hides destructive actions when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
 

@@ -257,6 +257,15 @@ const saveEdits = async () => {
     loadingSave.value = false;
   }
 };
+
+defineExpose({
+  selectedForumRules,
+  selectedServerRules,
+  editReason,
+  titleValue,
+  bodyValue,
+  saveEdits,
+});
 </script>
 
 <template>
