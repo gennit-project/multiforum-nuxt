@@ -25,7 +25,7 @@ const DiscussionAlbum = defineAsyncComponent(
 const route = useRoute();
 const collectionId = computed(() => route.params.collectionId as string);
 
-const { result, loading, error } = useQuery(
+const { result, loading, error, refetch: refetchCollection } = useQuery(
   GET_COLLECTION_ITEMS,
   () => ({
     collectionId: collectionId.value,
@@ -49,7 +49,13 @@ const getDiscussionLink = (discussion: any) => {
   const firstChannel = safeArrayFirst(discussion.DiscussionChannels) as any;
   if (!firstChannel?.channelUniqueName) return '/';
 
-  return `/forums/${firstChannel.channelUniqueName}/discussions/${discussion.id}`;
+  const isDownload =
+    discussion?.hasDownload === true ||
+    collection.value?.collectionType === 'DOWNLOADS';
+
+  const basePath = isDownload ? 'downloads' : 'discussions';
+
+  return `/forums/${firstChannel.channelUniqueName}/${basePath}/${discussion.id}`;
 };
 
 const getAuthorInfo = (item: any) => {
@@ -119,6 +125,8 @@ const router = useRouter();
 // Mutations
 const { mutate: updateCollection, loading: updateLoading, error: updateError } = useMutation(UPDATE_COLLECTION);
 const { mutate: deleteCollection, loading: deleteLoading, error: deleteError } = useMutation(DELETE_COLLECTION);
+const visibilityUpdating = ref(false);
+const visibilityError = ref<string | null>(null);
 
 // Open rename modal with current values
 const openRenameModal = () => {
@@ -143,6 +151,28 @@ const handleRename = async () => {
     showRenameModal.value = false;
   } catch (err) {
     console.error('Error updating collection:', err);
+  }
+};
+
+const handleToggleVisibility = async () => {
+  if (!collection.value) return;
+
+  const currentVisibility = collection.value.visibility;
+  const nextVisibility = currentVisibility === 'PUBLIC' ? 'PRIVATE' : 'PUBLIC';
+
+  visibilityUpdating.value = true;
+  visibilityError.value = null;
+  try {
+    await updateCollection({
+      collectionId: collectionId.value,
+      visibility: nextVisibility,
+    });
+    await refetchCollection();
+  } catch (err: any) {
+    console.error('Error updating visibility:', err);
+    visibilityError.value = err?.message || 'Failed to update visibility.';
+  } finally {
+    visibilityUpdating.value = false;
   }
 };
 
@@ -258,19 +288,46 @@ const handleDelete = async () => {
                     >
                       {{ collection.description }}
                     </p>
-                    <div class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
-                      <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
-                      <span>{{ collection.itemCount }} {{ collectionTypeLabel.toLowerCase() }}</span>
-                    </div>
+                  <div class="mt-2 flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400">
+                    <span class="capitalize">{{ collection.visibility.toLowerCase() }}</span>
+                    <span>{{ collection.itemCount }} {{ collectionTypeLabel.toLowerCase() }}</span>
                   </div>
+                  <p
+                    v-if="visibilityError"
+                    class="mt-1 text-sm text-red-600 dark:text-red-400"
+                  >
+                    {{ visibilityError }}
+                  </p>
+                </div>
 
-                  <!-- Action buttons -->
-                  <div class="ml-4 flex flex-shrink-0 gap-2">
-                    <button
-                      type="button"
-                      class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
-                      @click="openRenameModal"
+                <!-- Action buttons -->
+                <div class="ml-4 flex flex-shrink-0 gap-2">
+                  <button
+                    type="button"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-70 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    :disabled="visibilityUpdating || updateLoading"
+                    @click="handleToggleVisibility"
+                  >
+                    <svg
+                      class="h-4 w-4 mr-1.5"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
                     >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                      />
+                    </svg>
+                    {{ collection.visibility === 'PUBLIC' ? 'Make Private' : 'Make Public' }}
+                  </button>
+                  <button
+                    type="button"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
+                    @click="openRenameModal"
+                  >
                       <svg
                         class="h-4 w-4 mr-1.5"
                         fill="none"

@@ -129,7 +129,7 @@ const {
             },
           });
         }
-      } catch (e) {
+      } catch {
         // Cache might not have this query yet; ignore.
       }
 
@@ -146,7 +146,7 @@ const {
             data: { issuesAggregate: { count: currentCount + 1 } },
           });
         }
-      } catch (e) {
+      } catch {
         // Cache might not have this query yet; ignore.
       }
     }
@@ -162,7 +162,7 @@ const {
           data: { issuesAggregate: { count: currentServerCount + 1 } },
         });
       }
-    } catch (e) {
+    } catch {
       // Cache might not have this query yet; ignore.
     }
   },

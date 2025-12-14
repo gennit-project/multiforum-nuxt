@@ -5,8 +5,10 @@ import type {
   DiscussionChannel,
   DiscussionCreateInput,
 } from '@/__generated__/graphql';
-import { GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA } from '@/graphQLData/discussion/queries';
-import { GET_CROSSPOST_PREVIEW } from '@/graphQLData/discussion/queries';
+import {
+  GET_DISCUSSIONS_WITH_DISCUSSION_CHANNEL_DATA,
+  GET_CROSSPOST_PREVIEW,
+} from '@/graphQLData/discussion/queries';
 import { CREATE_DISCUSSION_WITH_CHANNEL_CONNECTIONS } from '@/graphQLData/discussion/mutations';
 import CreateEditDiscussionFields from '@/components/discussion/form/CreateEditDiscussionFields.vue';
 import type { CreateEditDiscussionFormValues } from '@/types/Discussion';
