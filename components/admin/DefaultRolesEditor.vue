@@ -30,6 +30,19 @@ const props = defineProps<{
   showTitle?: boolean;
 }>();
 
+const roleHelpCopy: Record<string, string> = {
+  DefaultServerRole:
+    'By default in a new forum, users have these permissions.',
+  DefaultSuspendedRole:
+    'By default in a new forum with no configuration, suspended users have these permissions.',
+  DefaultModRole:
+    'By default in a new forum, new users have these default content moderation permissions.',
+  DefaultElevatedModRole:
+    'By default in a new forum, users added as moderators at the forum scope have these permissions.',
+  DefaultSuspendedModRole:
+    'By default in a new forum, mod profiles who are suspended have these permissions.',
+};
+
 const serverPermissionKeys = [
   'canCreateChannel',
   'canCreateDiscussion',
@@ -226,6 +239,9 @@ const saveRole = async () => {
           <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
             {{ def.label }}
           </h3>
+          <p class="flex-1 text-xs text-gray-600 dark:text-gray-400">
+            {{ roleHelpCopy[def.key] || '' }}
+          </p>
           <button
             type="button"
             class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:text-gray-100"
