@@ -18,14 +18,14 @@ const { result: getDiscussionIssueResult } = useQuery(GET_DISCUSSION_ISSUE, {
   discussionChannelId: props.discussionChannelId,
 });
 
-const issueId = computed(() => {
+const issueNumber = computed(() => {
   return getDiscussionIssueResult.value?.discussionChannels[0]?.RelatedIssues[0]
-    ?.id;
+    ?.issueNumber;
 });
 
 const markdownLinkToIssue = computed(() => {
-  if (issueId.value) {
-    return `[archived](/forums/${props.channelId}/issues/${issueId.value})`;
+  if (issueNumber.value !== undefined && issueNumber.value !== null) {
+    return `[archived](/forums/${props.channelId}/issues/${issueNumber.value})`;
   }
   return null;
 });

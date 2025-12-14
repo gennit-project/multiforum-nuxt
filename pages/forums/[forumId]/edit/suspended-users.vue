@@ -102,8 +102,8 @@ const humanReadableDate = (dateISO: string): string => {
                 v-if="user.RelatedIssue"
                 class="flex items-center gap-1 rounded border border-orange-500 px-2 py-1 text-orange-500"
                 :to="{
-                  name: 'forums-forumId-issues-issueId',
-                  params: { issueId: user.RelatedIssue?.id },
+                  name: 'forums-forumId-issues-issueNumber',
+                  params: { issueNumber: user.RelatedIssue?.issueNumber },
                 }"
               >
                 Related Issue

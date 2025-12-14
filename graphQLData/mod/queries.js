@@ -210,6 +210,7 @@ export const GET_SUSPENDED_MODS_BY_CHANNEL = gql`
         }
         RelatedIssue {
           id
+          issueNumber
         }
       }
     }
@@ -331,6 +332,7 @@ export const GET_DISCUSSION_ISSUE = gql`
       id
       RelatedIssues {
         id
+        issueNumber
       }
     }
   }
@@ -342,6 +344,7 @@ export const GET_EVENT_ISSUE = gql`
       id
       RelatedIssues {
         id
+        issueNumber
       }
     }
   }
@@ -382,6 +385,7 @@ export const GET_SUSPENDED_USERS_IN_CHANNEL = gql`
         }
         RelatedIssue {
           id
+          issueNumber
         }
       }
     }
@@ -394,6 +398,7 @@ export const GET_COMMENT_ISSUE = gql`
       id
       RelatedIssues {
         id
+        issueNumber
       }
     }
   }

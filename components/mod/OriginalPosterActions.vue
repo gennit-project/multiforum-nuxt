@@ -75,8 +75,12 @@ const editRoute = computed(() => {
   if (props.commentId) {
     // For comments, navigate to the comment permalink where they can edit inline
     return {
-      name: 'forums-forumId-issues-issueId-comments-commentId',
-      params: { forumId, issueId: props.issue.id, commentId: props.commentId },
+      name: 'forums-forumId-issues-issueNumber-comments-commentId',
+      params: {
+        forumId,
+        issueNumber: props.issue.issueNumber,
+        commentId: props.commentId,
+      },
     };
   }
   return null;

@@ -24,8 +24,10 @@ const titleEditMode = ref(false);
 const channelId = computed(() =>
   typeof route.params.forumId === 'string' ? route.params.forumId : ''
 );
-const issueId = computed(() =>
-  typeof route.params.issueId === 'string' ? route.params.issueId : ''
+const issueNumber = computed(() =>
+  typeof route.params.issueNumber === 'string'
+    ? Number.parseInt(route.params.issueNumber, 10)
+    : null
 );
 
 const {
@@ -33,11 +35,17 @@ const {
   error: getIssueError,
   loading: getIssueLoading,
   onResult: onGetIssueResult,
-} = useQuery(GET_ISSUE, {
-  id: issueId,
-  loggedInModName: modProfileNameVar.value || '',
-  channelUniqueName: channelId.value,
-});
+} = useQuery(
+  GET_ISSUE,
+  () => ({
+    channelUniqueName: channelId.value,
+    issueNumber: issueNumber.value,
+    loggedInModName: modProfileNameVar.value || '',
+  }),
+  () => ({
+    enabled: issueNumber.value !== null,
+  })
+);
 
 const issue = computed<Issue | null>(() => {
   const issue = getIssueResult.value?.issues[0];
@@ -68,7 +76,7 @@ const {
   onDone,
 } = useMutation(UPDATE_ISSUE, () => ({
   variables: {
-    issueWhere: { id: issueId.value },
+    issueWhere: { id: getIssueResult.value?.issues?.[0]?.id },
     updateIssueInput: formValues.value,
   },
 }));

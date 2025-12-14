@@ -174,7 +174,7 @@ const emit = defineEmits([
 
 const route = useRoute();
 const router = useRouter();
-const { discussionId, eventId, issueId } = route.params;
+const { discussionId, eventId, issueNumber } = route.params;
 
 const forumId = computed(() => {
   if (props.commentData?.Channel?.uniqueName) {
@@ -390,7 +390,7 @@ const canShowPermalink = computed(() => {
     props.commentData.Event ||
     props.commentData.Issue ||
     props.commentData.Channel ||
-    (issueId && forumId.value && props.commentData.id) || // For issue comments
+    (issueNumber && forumId.value && props.commentData.id) || // For issue comments
     (discussionId && forumId.value) || // For discussion comments
     (eventId && forumId.value) // For event comments
   );
@@ -466,12 +466,13 @@ const permalinkObject = computed(() => {
       },
     };
   }
-  const issueIdInLink = issueId || props.commentData?.Issue?.id;
-  if (issueIdInLink && channelUniqueName) {
+  const issueNumberInLink =
+    issueNumber || props.commentData?.Issue?.issueNumber;
+  if (issueNumberInLink && channelUniqueName) {
     result = {
-      name: 'forums-forumId-issues-issueId-comments-commentId',
+      name: 'forums-forumId-issues-issueNumber-comments-commentId',
       params: {
-        issueId: issueIdInLink,
+        issueNumber: issueNumberInLink,
         forumId: channelUniqueName,
         commentId: props.commentData.id,
       },

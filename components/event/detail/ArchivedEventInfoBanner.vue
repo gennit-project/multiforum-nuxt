@@ -18,13 +18,13 @@ const { result: getEventIssueResult } = useQuery(GET_EVENT_ISSUE, {
   eventChannelId: props.eventChannelId,
 });
 
-const issueId = computed(() => {
-  return getEventIssueResult.value?.eventChannels[0]?.RelatedIssues[0]?.id;
+const issueNumber = computed(() => {
+  return getEventIssueResult.value?.eventChannels[0]?.RelatedIssues[0]?.issueNumber;
 });
 
 const markdownLinkToIssue = computed(() => {
-  if (issueId.value) {
-    return `[archived](/forums/${props.channelId}/issues/${issueId.value})`;
+  if (issueNumber.value !== undefined && issueNumber.value !== null) {
+    return `[archived](/forums/${props.channelId}/issues/${issueNumber.value})`;
   }
   return null;
 });

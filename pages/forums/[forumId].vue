@@ -30,7 +30,7 @@ const showEventTitle = computed(() =>
   route.name?.toString().includes('forums-forumId-events-eventId')
 );
 const showIssueTitle = computed(() =>
-  route.name?.toString().includes('forums-forumId-issues-issueId')
+  route.name?.toString().includes('forums-forumId-issues-issueNumber')
 );
 
 const showChannelTabs = computed(() => {

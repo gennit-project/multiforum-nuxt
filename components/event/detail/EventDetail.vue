@@ -392,7 +392,7 @@ watchEffect(() => {
             />
             <ArchivedEventInfoBanner
               v-if="
-                isArchived && route.name !== 'forums-forumId-issues-issueId'
+                isArchived && route.name !== 'forums-forumId-issues-issueNumber'
               "
               :channel-id="channelId"
               :event-channel-id="activeEventChannel?.id || ''"

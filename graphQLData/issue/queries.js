@@ -7,6 +7,7 @@ export const GET_ISSUE_FOR_COMMENT = gql`
       id
       RelatedIssues {
         id
+        issueNumber
       }
     }
   }
@@ -16,6 +17,7 @@ export const ISSUE_FIELDS = gql`
   # ${COMMENT_VOTE_FIELDS}
   fragment IssueFields on Issue {
     id
+    issueNumber
     title
     body
     isOpen
@@ -24,6 +26,7 @@ export const ISSUE_FIELDS = gql`
     relatedCommentId
     relatedDiscussionId
     relatedEventId
+    channelUniqueName
     Author {
       __typename
       ... on ModerationProfile {
@@ -82,8 +85,10 @@ export const ISSUE_FIELDS = gql`
 
 export const GET_ISSUE = gql`
   ${ISSUE_FIELDS}
-  query getIssue($id: ID!) {
-    issues(where: { id: $id }) {
+  query getIssue($channelUniqueName: String!, $issueNumber: Int!) {
+    issues(
+      where: { channelUniqueName: $channelUniqueName, issueNumber: $issueNumber }
+    ) {
       ...IssueFields
     }
   }
@@ -133,6 +138,7 @@ export const GET_ISSUES_BY_DISCUSSION = gql`
       id
       title
       RelatedIssues {
+        issueNumber
         title
         Author {
           __typename
@@ -154,6 +160,7 @@ export const GET_ISSUES_BY_CHANNEL = gql`
       uniqueName
       Issues(where: { isOpen: true }, options: { sort: { createdAt: DESC } }) {
         id
+        issueNumber
         title
         body
         Author {
@@ -185,6 +192,7 @@ export const GET_CLOSED_ISSUES_BY_CHANNEL = gql`
       uniqueName
       Issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {
         id
+        issueNumber
         title
         body
         Author {
@@ -214,6 +222,7 @@ export const GET_ISSUES_BY_SERVER = gql`
   query getIssues {
     issues {
       id
+      issueNumber
       title
       authorName
       Author {
@@ -243,6 +252,7 @@ export const GET_ISSUES_BY_EVENT = gql`
       id
       title
       RelatedIssues {
+        issueNumber
         title
         Author {
           ... on ModerationProfile {
@@ -263,6 +273,7 @@ export const GET_ISSUES_BY_COMMENT = gql`
       id
       text
       RelatedIssues {
+        issueNumber
         title
         Author {
           __typename
@@ -282,6 +293,7 @@ export const GET_ISSUES = gql`
   query getIssues($issueWhere: IssueWhere) {
     issues(where: $issueWhere, options: { sort: { createdAt: DESC } }) {
       id
+      issueNumber
       title
       body
       isOpen
@@ -311,6 +323,7 @@ export const GET_CLOSED_ISSUES = gql`
   query getClosedIssues {
     issues(where: { isOpen: false }, options: { sort: { createdAt: DESC } }) {
       id
+      issueNumber
       title
       body
       isOpen

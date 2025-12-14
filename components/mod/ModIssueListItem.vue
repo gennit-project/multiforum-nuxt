@@ -1,6 +1,8 @@
 <script setup lang="ts">
-import type { Issue } from '@/__generated__/graphql';
+import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import { DateTime } from 'luxon';
+
+type Issue = GeneratedIssue & { issueNumber: number };
 
 defineProps({
   issue: {
@@ -39,9 +41,9 @@ const issueAuthorName = (issue: Issue) => {
           <nuxt-link
             class="hover:underline dark:text-gray-200"
             :to="{
-              name: 'forums-forumId-issues-issueId',
+              name: 'forums-forumId-issues-issueNumber',
               params: {
-                issueId: issue.id,
+                issueNumber: issue.issueNumber,
                 forumId: issue.Channel?.uniqueName,
               },
             }"

@@ -20,7 +20,7 @@ import {
 } from '@/graphQLData/mod/queries';
 import { GET_CHANNEL } from '@/graphQLData/channel/queries';
 import { DateTime } from 'luxon';
-import type { Issue } from '@/__generated__/graphql';
+import type { Issue as GeneratedIssue } from '@/__generated__/graphql';
 import ErrorBanner from '@/components/ErrorBanner.vue';
 import 'md-editor-v3/lib/style.css';
 import PageNotFound from '@/components/PageNotFound.vue';
@@ -36,16 +36,23 @@ import XCircleIcon from '../icons/XCircleIcon.vue';
 import ArrowPathIcon from '../icons/ArrowPath.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
 
+type Issue = GeneratedIssue & { issueNumber: number };
+
 // Setup
 const route = useRoute();
 
-// Route and issueId computations
+// Route and issueNumber computations
 const channelId = computed(() => {
   return typeof route.params.forumId === 'string' ? route.params.forumId : '';
 });
 
-const issueId = computed(() => {
-  return typeof route.params.issueId === 'string' ? route.params.issueId : '';
+const issueNumber = computed(() => {
+  const value = route.params.issueNumber;
+  if (typeof value === 'string') {
+    const parsed = Number.parseInt(value, 10);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
 });
 
 // Fetch issue data
@@ -54,7 +61,12 @@ const {
   error: getIssueError,
   loading: getIssueLoading,
   refetch: refetchIssue,
-} = useQuery(GET_ISSUE, { id: issueId.value });
+} = useQuery(GET_ISSUE, () => ({
+  channelUniqueName: channelId.value,
+  issueNumber: issueNumber.value,
+}), () => ({
+  enabled: issueNumber.value !== null,
+}));
 
 // Setup a query to get channel data (we'll use this for refetching after actions)
 const { refetch: refetchChannel } = useQuery(
@@ -432,7 +444,11 @@ const { mutate: addIssueActivityFeedItem } = useMutation(
       // Attempt to read the existing issues from the cache
       const existingIssueData = cache.readQuery({
         query: GET_ISSUE,
-        variables: { id: updatedIssue.id },
+        variables: {
+          channelUniqueName:
+            updatedIssue.channelUniqueName || channelId.value,
+          issueNumber: updatedIssue.issueNumber,
+        },
       });
 
       if (
@@ -451,7 +467,11 @@ const { mutate: addIssueActivityFeedItem } = useMutation(
 
         cache.writeQuery({
           query: GET_ISSUE,
-          variables: { id: updatedIssue.id },
+          variables: {
+            channelUniqueName:
+              updatedIssue.channelUniqueName || channelId.value,
+            issueNumber: updatedIssue.issueNumber,
+          },
           data: {
             issues: newIssues,
           },
@@ -473,7 +493,10 @@ const {
     // Attempt to read the existing issues from the cache
     const existingIssueData = cache.readQuery({
       query: GET_ISSUE,
-      variables: { id: updatedIssue.id },
+      variables: {
+        channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
+        issueNumber: updatedIssue.issueNumber,
+      },
     });
 
     if (
@@ -492,7 +515,11 @@ const {
 
       cache.writeQuery({
         query: GET_ISSUE,
-        variables: { id: updatedIssue.id },
+        variables: {
+          channelUniqueName:
+            updatedIssue.channelUniqueName || channelId.value,
+          issueNumber: updatedIssue.issueNumber,
+        },
         data: {
           issues: newIssues,
         },
@@ -513,7 +540,10 @@ const {
     // Attempt to read the existing issues from the cache
     const existingIssueData = cache.readQuery({
       query: GET_ISSUE,
-      variables: { id: updatedIssue.id },
+      variables: {
+        channelUniqueName: updatedIssue.channelUniqueName || channelId.value,
+        issueNumber: updatedIssue.issueNumber,
+      },
     });
 
     if (
@@ -532,7 +562,11 @@ const {
 
       cache.writeQuery({
         query: GET_ISSUE,
-        variables: { id: updatedIssue.id },
+        variables: {
+          channelUniqueName:
+            updatedIssue.channelUniqueName || channelId.value,
+          issueNumber: updatedIssue.issueNumber,
+        },
         data: {
           issues: newIssues,
         },

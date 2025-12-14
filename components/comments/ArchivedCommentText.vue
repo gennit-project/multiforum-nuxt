@@ -19,13 +19,13 @@ const { result: getCommentIssueResult } = useQuery(GET_COMMENT_ISSUE, {
   commentId: props.commentId,
 });
 
-const issueId = computed(() => {
-  return getCommentIssueResult.value?.comments[0]?.RelatedIssues[0]?.id;
+const issueNumber = computed(() => {
+  return getCommentIssueResult.value?.comments[0]?.RelatedIssues[0]?.issueNumber;
 });
 
 const markdownLinkToIssue = computed(() => {
-  if (issueId.value) {
-    return `[archived](/forums/${props.channelId}/issues/${issueId.value})`;
+  if (issueNumber.value !== undefined && issueNumber.value !== null) {
+    return `[archived](/forums/${props.channelId}/issues/${issueNumber.value})`;
   }
   return null;
 });

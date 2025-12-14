@@ -101,10 +101,10 @@ const {
   onDone: onCreateIssueDone,
 } = useMutation(CREATE_ISSUE, () => ({
   variables: {
-    input: [issueInput.value],
+    input: issueInput.value,
   },
   update: (cache, { data }) => {
-    const createdIssue = data?.createIssues?.issues?.[0];
+    const createdIssue = data?.createIssue;
     if (!createdIssue) return;
 
     if (selectedChannelId.value) {
@@ -169,7 +169,7 @@ const {
 }));
 
 onCreateIssueDone((result) => {
-  const newIssue = result?.data?.createIssues?.issues?.[0];
+  const newIssue = result?.data?.createIssue;
   if (!newIssue) return;
 
   const forumId =
@@ -179,13 +179,13 @@ onCreateIssueDone((result) => {
 
   if (forumId) {
     router.push({
-      name: 'forums-forumId-issues-issueId',
-      params: { forumId, issueId: newIssue.id },
+      name: 'forums-forumId-issues-issueNumber',
+      params: { forumId, issueNumber: newIssue.issueNumber },
     });
   } else {
     router.push({
-      name: 'admin-issues-issueId',
-      params: { issueId: newIssue.id },
+      name: 'admin-issues-issueNumber',
+      params: { issueNumber: newIssue.issueNumber },
     });
   }
 });

@@ -413,6 +413,7 @@ export const GET_ACTIVITY_FEED_COMMENT = gql`
           }
           Issue {
             id
+            issueNumber
             __typename
           }
           Channel {

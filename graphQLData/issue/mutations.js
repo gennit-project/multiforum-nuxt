@@ -2,31 +2,30 @@ import { gql } from '@apollo/client/core';
 import { ISSUE_FIELDS } from './queries';
 
 export const CREATE_ISSUE = gql`
-  mutation createIssue($input: [IssueCreateInput!]!) {
-    createIssues(input: $input) {
-      issues {
-        id
-        title
-        body
-        isOpen
-        flaggedServerRuleViolation
-        createdAt
-        updatedAt
-        relatedCommentId
-        relatedDiscussionId
-        relatedEventId
-        channelUniqueName
-        Channel {
-          uniqueName
+  mutation createIssue($input: IssueCreateInput!) {
+    createIssue(input: $input) {
+      id
+      issueNumber
+      title
+      body
+      isOpen
+      flaggedServerRuleViolation
+      createdAt
+      updatedAt
+      relatedCommentId
+      relatedDiscussionId
+      relatedEventId
+      channelUniqueName
+      Channel {
+        uniqueName
+      }
+      Author {
+        __typename
+        ... on ModerationProfile {
+          displayName
         }
-        Author {
-          __typename
-          ... on ModerationProfile {
-            displayName
-          }
-          ... on User {
-            username
-          }
+        ... on User {
+          username
         }
       }
     }
@@ -38,6 +37,7 @@ export const CLOSE_ISSUE = gql`
     updateIssues(where: { id: $id }, update: { isOpen: false }) {
       issues {
         id
+        issueNumber
         title
         isOpen
       }
@@ -50,6 +50,7 @@ export const REOPEN_ISSUE = gql`
     updateIssues(where: { id: $id }, update: { isOpen: true }) {
       issues {
         id
+        issueNumber
         title
         isOpen
       }
@@ -226,6 +227,7 @@ export const REPORT_DISCUSSION = gql`
       channelUniqueName: $channelUniqueName
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -246,6 +248,7 @@ export const ARCHIVE_DISCUSSION = gql`
       channelUniqueName: $channelUniqueName
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -262,6 +265,7 @@ export const UNARCHIVE_DISCUSSION = gql`
       explanation: $explanation
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -282,6 +286,7 @@ export const REPORT_EVENT = gql`
       channelUniqueName: $channelUniqueName
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -298,6 +303,7 @@ export const UNARCHIVE_EVENT = gql`
       explanation: $explanation
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -318,6 +324,7 @@ export const ARCHIVE_EVENT = gql`
       channelUniqueName: $channelUniqueName
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -338,6 +345,7 @@ export const REPORT_COMMENT = gql`
       channelUniqueName: $channelUniqueName
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -356,6 +364,7 @@ export const ARCHIVE_COMMENT = gql`
       selectedServerRules: $selectedServerRules
     ) {
       id
+      issueNumber
     }
   }
 `;
@@ -364,6 +373,7 @@ export const UNARCHIVE_COMMENT = gql`
   mutation unarchiveComment($commentId: ID!, $explanation: String!) {
     unarchiveComment(commentId: $commentId, explanation: $explanation) {
       id
+      issueNumber
     }
   }
 `;

@@ -19,11 +19,11 @@ const channelId = computed(() => {
   return route.params.forumId;
 });
 
-const issueId = computed(() => {
-  if (typeof route.params.issueId !== 'string') {
+const issueNumber = computed(() => {
+  if (typeof route.params.issueNumber !== 'string') {
     return '';
   }
-  return route.params.issueId;
+  return route.params.issueNumber;
 });
 
 const {
@@ -62,7 +62,7 @@ const closedCount = computed(() => {
     class="border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-900 dark:text-white"
   >
     <nav
-      v-if="!issueId"
+      v-if="!issueNumber"
       class="flex items-center justify-between gap-4 py-3 pl-4 pr-4"
     >
       <div class="flex items-center gap-4">
