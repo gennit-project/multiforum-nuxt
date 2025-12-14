@@ -1,11 +1,14 @@
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { Issue } from '@/__generated__/graphql';
 import ArchiveButton from './ArchiveButton.vue';
 import SuspendUserButton from './SuspendUserButton.vue';
 import EyeIcon from '../icons/EyeIcon.vue';
 import XCircleIcon from '../icons/XCircleIcon.vue';
+import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
+import { modProfileNameVar } from '@/cache';
 
 const props = defineProps({
   issue: {
@@ -47,6 +50,11 @@ const props = defineProps({
     required: false,
     default: false,
   },
+  relatedDiscussionHasDownload: {
+    type: Boolean,
+    required: false,
+    default: null,
+  },
 });
 
 defineEmits([
@@ -63,6 +71,72 @@ defineEmits([
 // Compute whether actions should be disabled
 const actionsDisabled = computed(() => {
   return !props.issue.isOpen || props.isCurrentUserOriginalPoster;
+});
+
+const shouldFetchDiscussion = computed(() => {
+  return !!props.discussionId;
+});
+
+const { result: getDiscussionResult } = useQuery(
+  GET_DISCUSSION,
+  () => ({
+    id: props.discussionId,
+    loggedInModName: modProfileNameVar.value,
+    channelUniqueName: props.channelUniqueName,
+  }),
+  () => ({
+    enabled:
+      shouldFetchDiscussion.value &&
+      props.relatedDiscussionHasDownload === null &&
+      !!props.channelUniqueName,
+    fetchPolicy: 'cache-first',
+  })
+);
+
+const discussionHasDownload = computed(() => {
+  if (props.relatedDiscussionHasDownload !== null) {
+    return props.relatedDiscussionHasDownload;
+  }
+
+  return (
+    getDiscussionResult.value?.discussions?.[0]?.hasDownload === true || false
+  );
+});
+
+const relatedContentType = computed(() => {
+  if (props.commentId) return 'comment';
+  if (props.eventId) return 'event';
+  if (props.discussionId) {
+    return discussionHasDownload.value ? 'download' : 'discussion';
+  }
+  return null;
+});
+
+const editActions = computed(() => {
+  switch (relatedContentType.value) {
+    case 'comment':
+      return [{ label: 'Edit Comment', testId: 'edit-comment' }];
+    case 'discussion':
+      return [
+        { label: 'Edit Discussion Title', testId: 'edit-discussion-title' },
+        { label: 'Edit Discussion Body', testId: 'edit-discussion-body' },
+      ];
+    case 'download':
+      return [
+        { label: 'Edit Download Title', testId: 'edit-download-title' },
+        {
+          label: 'Edit Download Description',
+          testId: 'edit-download-description',
+        },
+      ];
+    case 'event':
+      return [
+        { label: 'Edit Event Title', testId: 'edit-event-title' },
+        { label: 'Edit Event Description', testId: 'edit-event-description' },
+      ];
+    default:
+      return [];
+  }
 });
 </script>
 
@@ -181,14 +255,16 @@ const actionsDisabled = computed(() => {
                       </p>
                     </div>
 
-                    <div class="flex flex-wrap gap-2">
+                    <div v-if="editActions.length" class="flex flex-wrap gap-2">
                       <button
+                        v-for="action in editActions"
+                        :key="action.testId"
                         type="button"
-                        data-test="edit-original-post"
+                        :data-test="action.testId"
                         class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:border-blue-400 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-500 dark:hover:text-blue-300"
                         :disabled="actionsDisabled"
                       >
-                        Edit original post (placeholder)
+                        {{ action.label }}
                       </button>
                     </div>
 

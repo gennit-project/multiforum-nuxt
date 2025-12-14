@@ -107,14 +107,16 @@ const ModerationWizard = {
                 </p>
               </div>
 
-              <div class="flex flex-wrap gap-2">
+              <div v-if="editActions.length" class="flex flex-wrap gap-2">
                 <button
+                  v-for="action in editActions"
+                  :key="action.testId"
                   type="button"
-                  data-testid="edit-original-post"
+                  :data-test="action.testId"
                   class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800"
                   :disabled="actionsDisabled"
                 >
-                  Edit original post (placeholder)
+                  {{ action.label }}
                 </button>
               </div>
 
@@ -127,7 +129,7 @@ const ModerationWizard = {
                 </p>
                 <div class="flex flex-col gap-2">
                   <div
-                    data-testid="archive-button"
+                    data-test="archive-button"
                     :data-issue="JSON.stringify(issue)"
                     :data-discussion-id="discussionId"
                     :data-event-id="eventId"
@@ -141,7 +143,7 @@ const ModerationWizard = {
                   </div>
 
                   <div
-                    data-testid="suspend-user-button"
+                    data-test="suspend-user-button"
                     :data-issue="JSON.stringify(issue)"
                     :data-discussion-title="contextText"
                     :data-discussion-id="discussionId"
@@ -169,6 +171,10 @@ const ModerationWizard = {
     discussionId: {
       type: String,
       default: '',
+    },
+    discussionHasDownload: {
+      type: Boolean,
+      default: null,
     },
     eventId: {
       type: String,
@@ -198,6 +204,43 @@ const ModerationWizard = {
   computed: {
     actionsDisabled() {
       return !this.issue.isOpen || this.isCurrentUserOriginalPoster;
+    },
+    relatedContentType() {
+      if (this.commentId) return 'comment';
+      if (this.eventId) return 'event';
+      if (this.discussionId) {
+        return this.discussionHasDownload ? 'download' : 'discussion';
+      }
+      return null;
+    },
+    editActions() {
+      switch (this.relatedContentType) {
+        case 'comment':
+          return [{ label: 'Edit Comment', testId: 'edit-comment' }];
+        case 'discussion':
+          return [
+            { label: 'Edit Discussion Title', testId: 'edit-discussion-title' },
+            { label: 'Edit Discussion Body', testId: 'edit-discussion-body' },
+          ];
+        case 'download':
+          return [
+            { label: 'Edit Download Title', testId: 'edit-download-title' },
+            {
+              label: 'Edit Download Description',
+              testId: 'edit-download-description',
+            },
+          ];
+        case 'event':
+          return [
+            { label: 'Edit Event Title', testId: 'edit-event-title' },
+            {
+              label: 'Edit Event Description',
+              testId: 'edit-event-description',
+            },
+          ];
+        default:
+          return [];
+      }
     },
   },
   emits: [
@@ -235,6 +278,7 @@ describe('ModerationWizard Component', () => {
       props: {
         issue: openIssue,
         channelUniqueName: 'test-channel',
+        discussionId: 'discussion-123',
         ...props,
       },
     });
@@ -250,11 +294,14 @@ describe('ModerationWizard Component', () => {
     expect(wrapper.text()).toContain('If yes (violation)');
 
     // Check if buttons are present
-    expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(true);
-    expect(wrapper.find('[data-testid="suspend-user-button"]').exists()).toBe(
+    expect(wrapper.find('[data-test="archive-button"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="suspend-user-button"]').exists()).toBe(
       true
     );
-    expect(wrapper.find('[data-testid="edit-original-post"]').exists()).toBe(
+    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+      true
+    );
+    expect(wrapper.find('[data-test="edit-discussion-body"]').exists()).toBe(
       true
     );
 
@@ -281,11 +328,59 @@ describe('ModerationWizard Component', () => {
     expect(closeButton).toBeUndefined();
 
     // Action blocks are hidden for closed issues
-    expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test="archive-button"]').exists()).toBe(false);
     expect(
-      wrapper.find('[data-testid="suspend-user-button"]').exists()
+      wrapper.find('[data-test="suspend-user-button"]').exists()
     ).toBe(false);
-    expect(wrapper.find('[data-testid="edit-original-post"]').exists()).toBe(
+    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+      false
+    );
+  });
+
+  it('renders comment edit action when the related content is a comment', async () => {
+    const wrapper = mountComponent({
+      commentId: 'comment-123',
+      discussionId: '',
+      eventId: '',
+    });
+
+    expect(wrapper.find('[data-test="edit-comment"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+      false
+    );
+    expect(
+      wrapper.find('[data-test="edit-download-title"]').exists()
+    ).toBe(false);
+  });
+
+  it('renders download edit actions when discussion has a download', async () => {
+    const wrapper = mountComponent({
+      discussionId: 'discussion-123',
+      discussionHasDownload: true,
+    });
+
+    expect(
+      wrapper.find('[data-test="edit-download-title"]').exists()
+    ).toBe(true);
+    expect(
+      wrapper.find('[data-test="edit-download-description"]').exists()
+    ).toBe(true);
+    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+      false
+    );
+  });
+
+  it('renders event edit actions when the related content is an event', async () => {
+    const wrapper = mountComponent({
+      discussionId: '',
+      eventId: 'event-123',
+    });
+
+    expect(wrapper.find('[data-test="edit-event-title"]').exists()).toBe(true);
+    expect(
+      wrapper.find('[data-test="edit-event-description"]').exists()
+    ).toBe(true);
+    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
       false
     );
   });
@@ -293,13 +388,13 @@ describe('ModerationWizard Component', () => {
   it('hides destructive actions when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
 
-    expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(false);
+    expect(wrapper.find('[data-test="archive-button"]').exists()).toBe(false);
   });
 
   it('hides suspend action when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
 
-    expect(wrapper.find('[data-testid="suspend-user-button"]').exists()).toBe(
+    expect(wrapper.find('[data-test="suspend-user-button"]').exists()).toBe(
       false
     );
   });
@@ -323,7 +418,7 @@ describe('ModerationWizard Component', () => {
       channelUniqueName: 'test-channel',
     });
 
-    const archiveButton = wrapper.find('[data-testid="archive-button"]');
+    const archiveButton = wrapper.find('[data-test="archive-button"]');
     expect(JSON.parse(archiveButton.attributes('data-issue') || '')).toEqual(
       openIssue
     );
@@ -346,7 +441,7 @@ describe('ModerationWizard Component', () => {
       channelUniqueName: 'test-channel',
     });
 
-    const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
+    const suspendButton = wrapper.find('[data-test="suspend-user-button"]');
     expect(JSON.parse(suspendButton.attributes('data-issue') || '')).toEqual(
       openIssue
     );
@@ -365,7 +460,7 @@ describe('ModerationWizard Component', () => {
   it('forwards archived-successfully event from ArchiveButton', async () => {
     const wrapper = mountComponent({ issue: openIssue });
 
-    const archiveButton = wrapper.find('[data-testid="archive-button"]');
+    const archiveButton = wrapper.find('[data-test="archive-button"]');
     await archiveButton.trigger('click');
 
     expect(wrapper.emitted('archived-successfully')).toBeTruthy();
@@ -384,7 +479,7 @@ describe('ModerationWizard Component', () => {
   it('forwards suspended-user-successfully event from SuspendUserButton', async () => {
     const wrapper = mountComponent({ issue: openIssue });
 
-    const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
+    const suspendButton = wrapper.find('[data-test="suspend-user-button"]');
     await suspendButton.trigger('click');
 
     expect(wrapper.emitted('suspended-user-successfully')).toBeTruthy();
