@@ -92,6 +92,12 @@ const newContent = computed(
     ''
 );
 
+const editReason = computed(() => {
+  const newReason = (props.newVersion as Record<string, any>).editReason;
+  const oldReason = (props.oldVersion as Record<string, any>).editReason;
+  return newReason || oldReason || '';
+});
+
 // Computed property that generates the diff HTML
 const diffHtml = computed(() => {
   const dmp = new DiffMatchPatch.diff_match_patch();
@@ -215,6 +221,16 @@ const handleClose = () => {
 
             <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
               To version by {{ newVersionUsername }} ({{ newVersionDate }})
+            </div>
+
+            <div
+              v-if="editReason"
+              class="text-xs text-gray-600 dark:text-gray-400"
+            >
+              <span class="font-semibold text-gray-700 dark:text-gray-200"
+                >Edit reason:</span
+              >
+              {{ editReason }}
             </div>
           </div>
         </div>

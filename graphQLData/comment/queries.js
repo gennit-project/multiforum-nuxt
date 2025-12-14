@@ -46,6 +46,7 @@ export const COMMENT_FIELDS = gql`
     PastVersions {
       id
       body
+      editReason
       createdAt
       Author {
         username

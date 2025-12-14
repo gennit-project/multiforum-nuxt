@@ -167,6 +167,9 @@ export const GET_CHANNEL = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -177,6 +180,9 @@ export const GET_CHANNEL = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -187,6 +193,9 @@ export const GET_CHANNEL = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets

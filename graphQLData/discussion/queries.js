@@ -352,6 +352,7 @@ export const GET_DISCUSSION = gql`
           username
         }
         body
+        editReason
         createdAt
       }
       PastBodyVersions(options: { sort: [{ createdAt: DESC }] }) {
@@ -360,6 +361,7 @@ export const GET_DISCUSSION = gql`
           username
         }
         body
+        editReason
         createdAt
       }
       CrosspostedDiscussion {

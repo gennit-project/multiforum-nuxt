@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useQuery } from '@vue/apollo-composable';
 import RequireAuth from '@/components/auth/RequireAuth.vue';
 import type { Issue } from '@/__generated__/graphql';
@@ -10,6 +10,7 @@ import XCircleIcon from '../icons/XCircleIcon.vue';
 import { GET_DISCUSSION } from '@/graphQLData/discussion/queries';
 import { modProfileNameVar } from '@/cache';
 import PencilIcon from '../icons/PencilIcon.vue';
+import EditContentModal from './EditContentModal.vue';
 
 const props = defineProps({
   issue: {
@@ -55,6 +56,18 @@ const props = defineProps({
     type: Boolean,
     required: false,
     default: null,
+  },
+  canEditComments: {
+    type: Boolean,
+    default: false,
+  },
+  canEditDiscussions: {
+    type: Boolean,
+    default: false,
+  },
+  canEditEvents: {
+    type: Boolean,
+    default: false,
   },
 });
 
@@ -119,25 +132,42 @@ const editActions = computed(() => {
       return [{ label: 'Edit Comment', testId: 'edit-comment' }];
     case 'discussion':
       return [
-        { label: 'Edit Discussion Title', testId: 'edit-discussion-title' },
-        { label: 'Edit Discussion Body', testId: 'edit-discussion-body' },
+        { label: 'Edit title and/or body', testId: 'edit-discussion' },
       ];
     case 'download':
       return [
-        { label: 'Edit Download Title', testId: 'edit-download-title' },
         {
-          label: 'Edit Download Description',
-          testId: 'edit-download-description',
+          label: 'Edit title and/or description',
+          testId: 'edit-download',
         },
       ];
     case 'event':
       return [
-        { label: 'Edit Event Title', testId: 'edit-event-title' },
-        { label: 'Edit Event Description', testId: 'edit-event-description' },
+        { label: 'Edit title and/or description', testId: 'edit-event' },
       ];
     default:
       return [];
   }
+});
+
+const editModalOpen = ref(false);
+
+const hasEditPermission = computed(() => {
+  switch (relatedContentType.value) {
+    case 'comment':
+      return props.canEditComments;
+    case 'discussion':
+    case 'download':
+      return props.canEditDiscussions;
+    case 'event':
+      return props.canEditEvents;
+    default:
+      return false;
+  }
+});
+
+const editButtonDisabled = computed(() => {
+  return actionsDisabled.value || !hasEditPermission.value;
 });
 </script>
 
@@ -264,11 +294,17 @@ const editActions = computed(() => {
                         :data-test="action.testId"
                         class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
                         :class="[
-                          actionsDisabled
+                          editButtonDisabled
                             ? 'cursor-not-allowed bg-gray-500'
                             : 'hover:bg-indigo-500 cursor-pointer bg-orange-500 dark:bg-orange-800 dark:hover:bg-orange-700',
                         ]"
-                        :disabled="actionsDisabled"
+                        :disabled="editButtonDisabled"
+                        :title="
+                          !hasEditPermission
+                            ? 'You do not have permission to edit this content.'
+                            : ''
+                        "
+                        @click="editModalOpen = true"
                       >
                         <PencilIcon class="h-4 w-4" />
                         {{ action.label }}
@@ -323,6 +359,18 @@ const editActions = computed(() => {
                   </div>
                 </div>
               </div>
+              <EditContentModal
+                v-if="relatedContentType"
+                :open="editModalOpen"
+                :target-type="relatedContentType"
+                :issue-id="issue.id"
+                :comment-id="commentId"
+                :discussion-id="discussionId"
+                :event-id="eventId"
+                :channel-unique-name="channelUniqueName"
+                @close="editModalOpen = false"
+                @saved="$emit('archived-successfully')"
+              />
             </template>
             <template #does-not-have-auth>
               <div class="mt-4 flex flex-col space-y-4">

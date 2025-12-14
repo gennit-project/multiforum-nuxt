@@ -35,6 +35,7 @@ import { useRoute } from 'nuxt/app';
 import XCircleIcon from '../icons/XCircleIcon.vue';
 import ArrowPathIcon from '../icons/ArrowPath.vue';
 import MarkdownPreview from '../MarkdownPreview.vue';
+import { getAllPermissions } from '@/utils/permissionUtils';
 
 type Issue = GeneratedIssue & { issueNumber: number };
 
@@ -69,15 +70,18 @@ const {
 }));
 
 // Setup a query to get channel data (we'll use this for refetching after actions)
-const { refetch: refetchChannel } = useQuery(
+const {
+  result: getChannelResult,
+  refetch: refetchChannel,
+} = useQuery(
   GET_CHANNEL,
   () => ({
     uniqueName: channelId.value,
     now: DateTime.local().startOf('hour').toISO(),
   }),
   () => ({
-    fetchPolicy: 'network-only', // Always fetch from network when refetching
-    enabled: false, // Skip initial execution, we'll only use for refetch
+    fetchPolicy: 'cache-first',
+    enabled: !!channelId.value,
   })
 );
 
@@ -101,6 +105,31 @@ const isIssueAuthor = computed(() => {
   }
 
   return false;
+});
+
+const standardModRole = computed(() => {
+  return getChannelResult.value?.channels?.[0]?.DefaultModRole || null;
+});
+
+const elevatedModRole = computed(() => {
+  return getChannelResult.value?.channels?.[0]?.ElevatedModRole || null;
+});
+
+const permissionData = computed(() => {
+  if (getChannelResult.value?.channels?.[0]) {
+    return getChannelResult.value.channels[0];
+  }
+  return null;
+});
+
+const modPermissions = computed(() => {
+  return getAllPermissions({
+    permissionData: permissionData.value,
+    standardModRole: standardModRole.value,
+    elevatedModRole: elevatedModRole.value,
+    username: usernameVar.value,
+    modProfileName: modProfileNameVar.value,
+  });
 });
 
 const isEditingIssueBody = ref(false);
@@ -920,6 +949,9 @@ const handleDeleteComment = (commentId: string) => {
             :channel-unique-name="channelId"
             :close-issue-loading="closeIssueLoading"
             :is-current-user-original-poster="isCurrentUserOriginalPoster"
+            :can-edit-comments="modPermissions.canEditComments"
+            :can-edit-discussions="modPermissions.canEditDiscussions"
+            :can-edit-events="modPermissions.canEditEvents"
             @archived-successfully="refetchIssue"
             @unarchived-successfully="refetchIssue"
             @suspended-user-successfully="refetchIssue"

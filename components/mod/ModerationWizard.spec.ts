@@ -94,31 +94,31 @@ const ModerationWizard = {
               </button>
             </div>
 
-            <div
-              class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4"
-              :class="[actionsDisabled ? 'opacity-60 grayscale' : 'opacity-100']"
-            >
-              <div class="space-y-1">
-                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
-                  If yes (violation)
-                </p>
-                <p class="text-sm text-gray-700">
-                  Address the violation by editing the original post or taking stronger action.
-                </p>
-              </div>
+          <div
+            class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4"
+            :class="[actionsDisabled ? 'opacity-60 grayscale' : 'opacity-100']"
+          >
+            <div class="space-y-1">
+              <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                If yes (violation)
+              </p>
+              <p class="text-sm text-gray-700">
+                Address the violation by editing the original post or taking stronger action.
+              </p>
+            </div>
 
-              <div v-if="editActions.length" class="flex flex-wrap gap-2">
-                <button
-                  v-for="action in editActions"
-                  :key="action.testId"
-                  type="button"
-                  :data-test="action.testId"
-                  class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800"
-                  :disabled="actionsDisabled"
-                >
-                  {{ action.label }}
-                </button>
-              </div>
+            <div v-if="editActions.length" class="flex flex-wrap gap-2">
+              <button
+                v-for="action in editActions"
+                :key="action.testId"
+                type="button"
+                :data-test="action.testId"
+                class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800"
+                :disabled="editButtonDisabled"
+              >
+                {{ action.label }}
+              </button>
+            </div>
 
               <div class="space-y-2 rounded-md border border-amber-300 bg-amber-50 p-3">
                 <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
@@ -200,6 +200,18 @@ const ModerationWizard = {
       type: Boolean,
       default: false,
     },
+    canEditComments: {
+      type: Boolean,
+      default: true,
+    },
+    canEditDiscussions: {
+      type: Boolean,
+      default: true,
+    },
+    canEditEvents: {
+      type: Boolean,
+      default: true,
+    },
   },
   computed: {
     actionsDisabled() {
@@ -219,27 +231,35 @@ const ModerationWizard = {
           return [{ label: 'Edit Comment', testId: 'edit-comment' }];
         case 'discussion':
           return [
-            { label: 'Edit Discussion Title', testId: 'edit-discussion-title' },
-            { label: 'Edit Discussion Body', testId: 'edit-discussion-body' },
+            { label: 'Edit title and/or body', testId: 'edit-discussion' },
           ];
         case 'download':
           return [
-            { label: 'Edit Download Title', testId: 'edit-download-title' },
             {
-              label: 'Edit Download Description',
-              testId: 'edit-download-description',
+              label: 'Edit title and/or description',
+              testId: 'edit-download',
             },
           ];
         case 'event':
           return [
-            { label: 'Edit Event Title', testId: 'edit-event-title' },
-            {
-              label: 'Edit Event Description',
-              testId: 'edit-event-description',
-            },
+            { label: 'Edit title and/or description', testId: 'edit-event' },
           ];
         default:
           return [];
+      }
+    },
+    editButtonDisabled() {
+      if (this.actionsDisabled) return true;
+      switch (this.relatedContentType) {
+        case 'comment':
+          return !this.canEditComments;
+        case 'discussion':
+        case 'download':
+          return !this.canEditDiscussions;
+        case 'event':
+          return !this.canEditEvents;
+        default:
+          return true;
       }
     },
   },
@@ -279,6 +299,9 @@ describe('ModerationWizard Component', () => {
         issue: openIssue,
         channelUniqueName: 'test-channel',
         discussionId: 'discussion-123',
+        canEditComments: true,
+        canEditDiscussions: true,
+        canEditEvents: true,
         ...props,
       },
     });
@@ -298,10 +321,7 @@ describe('ModerationWizard Component', () => {
     expect(wrapper.find('[data-test="suspend-user-button"]').exists()).toBe(
       true
     );
-    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
-      true
-    );
-    expect(wrapper.find('[data-test="edit-discussion-body"]').exists()).toBe(
+    expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(
       true
     );
 
@@ -332,7 +352,7 @@ describe('ModerationWizard Component', () => {
     expect(
       wrapper.find('[data-test="suspend-user-button"]').exists()
     ).toBe(false);
-    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+    expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(
       false
     );
   });
@@ -345,12 +365,10 @@ describe('ModerationWizard Component', () => {
     });
 
     expect(wrapper.find('[data-test="edit-comment"]').exists()).toBe(true);
-    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+    expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(
       false
     );
-    expect(
-      wrapper.find('[data-test="edit-download-title"]').exists()
-    ).toBe(false);
+    expect(wrapper.find('[data-test="edit-download"]').exists()).toBe(false);
   });
 
   it('renders download edit actions when discussion has a download', async () => {
@@ -359,13 +377,8 @@ describe('ModerationWizard Component', () => {
       discussionHasDownload: true,
     });
 
-    expect(
-      wrapper.find('[data-test="edit-download-title"]').exists()
-    ).toBe(true);
-    expect(
-      wrapper.find('[data-test="edit-download-description"]').exists()
-    ).toBe(true);
-    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
+    expect(wrapper.find('[data-test="edit-download"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(
       false
     );
   });
@@ -376,13 +389,8 @@ describe('ModerationWizard Component', () => {
       eventId: 'event-123',
     });
 
-    expect(wrapper.find('[data-test="edit-event-title"]').exists()).toBe(true);
-    expect(
-      wrapper.find('[data-test="edit-event-description"]').exists()
-    ).toBe(true);
-    expect(wrapper.find('[data-test="edit-discussion-title"]').exists()).toBe(
-      false
-    );
+    expect(wrapper.find('[data-test="edit-event"]').exists()).toBe(true);
+    expect(wrapper.find('[data-test="edit-discussion"]').exists()).toBe(false);
   });
 
   it('hides destructive actions when the issue is closed', async () => {
