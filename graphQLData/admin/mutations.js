@@ -212,3 +212,46 @@ export const UPDATE_MOD_CHANNEL_ROLE = gql`
     }
   }
 `;
+
+export const UPDATE_SERVER_ROLE = gql`
+  mutation UpdateServerRole($name: String!, $input: ServerRoleUpdateInput!) {
+    updateServerRoles(where: { name: $name }, update: $input) {
+      serverRoles {
+        name
+        description
+        canCreateChannel
+        canCreateDiscussion
+        canCreateEvent
+        canCreateComment
+        canUpvoteDiscussion
+        canUpvoteComment
+        canUploadFile
+        canGiveFeedback
+        showAdminTag
+      }
+    }
+  }
+`;
+
+export const UPDATE_MOD_SERVER_ROLE = gql`
+  mutation UpdateModServerRole($name: String!, $input: ModServerRoleUpdateInput!) {
+    updateModServerRoles(where: { name: $name }, update: $input) {
+      modServerRoles {
+        name
+        description
+        canLockChannel
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
+    }
+  }
+`;

@@ -5,6 +5,7 @@ import RequireAuth from '@/components/auth/RequireAuth.vue';
 import { useQuery } from '@vue/apollo-composable';
 import { config } from '@/config';
 import RoleSection from '@/components/admin/RoleSection.vue';
+import DefaultRolesEditor from '@/components/admin/DefaultRolesEditor.vue';
 import ModChannelRolesEditor from '@/components/admin/ModChannelRolesEditor.vue';
 
 const {
@@ -37,11 +38,11 @@ const serverConfig = computed(() => {
           <div class="mb-6">
             <h1 class="mb-2 text-2xl font-bold">Server Roles</h1>
             <p class="text-gray-600 dark:text-gray-300">
-              These are the default roles for your server. They are included
-              here for documentation, and channel-specific moderator roles can
-              be edited below.
+              These are the default roles for your server. Edit the defaults
+              below, and adjust channel-specific moderator roles afterward.
             </p>
           </div>
+          <DefaultRolesEditor :server-config="serverConfig" />
           <RoleSection
             v-if="serverConfig.DefaultServerRole"
             :section-title="'Default Server Role'"
