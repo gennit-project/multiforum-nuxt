@@ -12,6 +12,7 @@ import {
   ADD_ISSUE_ACTIVITY_FEED_ITEM,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_MOD,
   ADD_ISSUE_ACTIVITY_FEED_ITEM_WITH_COMMENT_AS_USER,
+  UPDATE_ISSUE,
 } from '@/graphQLData/issue/mutations';
 import {
   COUNT_CLOSED_ISSUES,
@@ -74,6 +75,76 @@ const activeIssue = computed<Issue | null>(() => {
 });
 
 const activeIssueId = computed(() => activeIssue.value?.id || '');
+
+const isIssueAuthor = computed(() => {
+  const author = activeIssue.value?.Author;
+  if (!author) return false;
+
+  if (author.__typename === 'User') {
+    return !!usernameVar.value && author.username === usernameVar.value;
+  }
+
+  if (author.__typename === 'ModerationProfile') {
+    return !!modProfileNameVar.value && author.displayName === modProfileNameVar.value;
+  }
+
+  return false;
+});
+
+const isEditingIssueBody = ref(false);
+const editedIssueBody = ref('');
+
+watch(
+  () => activeIssue.value?.body,
+  (newBody) => {
+    editedIssueBody.value = newBody || '';
+  },
+  { immediate: true }
+);
+
+const {
+  mutate: updateIssueBody,
+  loading: updateIssueBodyLoading,
+  error: updateIssueBodyError,
+} = useMutation(UPDATE_ISSUE, () => ({
+  variables: {
+    issueWhere: { id: activeIssueId.value },
+    updateIssueInput: { body: editedIssueBody.value },
+  },
+}));
+
+const issueBodyHasChanges = computed(() => {
+  return (editedIssueBody.value || '') !== (activeIssue.value?.body || '');
+});
+
+const startIssueBodyEdit = () => {
+  if (!isIssueAuthor.value) return;
+  editedIssueBody.value = activeIssue.value?.body || '';
+  isEditingIssueBody.value = true;
+};
+
+const cancelIssueBodyEdit = () => {
+  editedIssueBody.value = activeIssue.value?.body || '';
+  isEditingIssueBody.value = false;
+};
+
+const saveIssueBody = async () => {
+  if (!activeIssue.value) return;
+  if (!editedIssueBody.value.trim()) return;
+
+  if (!issueBodyHasChanges.value) {
+    isEditingIssueBody.value = false;
+    return;
+  }
+
+  try {
+    await updateIssueBody();
+    await refetchIssue();
+    isEditingIssueBody.value = false;
+  } catch (error) {
+    console.error('Error updating issue body', error);
+  }
+};
 
 const { mutate: closeIssue, loading: closeIssueLoading } = useMutation(
   CLOSE_ISSUE,
@@ -492,6 +563,14 @@ const hasRelatedContent = computed(() => {
   );
 });
 
+const shouldShowIssueDetailsSection = computed(() => {
+  return (
+    hasRelatedContent.value ||
+    !!activeIssue.value?.body ||
+    isIssueAuthor.value
+  );
+});
+
 // Get the username of the original author of the reported content
 const originalAuthorUsername = ref('');
 
@@ -694,7 +773,7 @@ const handleDeleteComment = (commentId: string) => {
         }}
       </h2>
       <div
-        v-if="hasRelatedContent || activeIssue?.body"
+        v-if="shouldShowIssueDetailsSection"
         id="original-post-container"
         class="rounded-lg border border-gray-200 px-4 py-2 dark:border-gray-600"
       >
@@ -720,12 +799,52 @@ const handleDeleteComment = (commentId: string) => {
           @fetched-original-author-username="originalAuthorUsername = $event"
           @fetched-original-mod-profile-name="originalModProfileName = $event"
         />
-        <div v-if="activeIssue?.body" class="py-2">
-          <h3 class="text-lg font-semibold">Issue details</h3>
+        <div v-if="activeIssue?.body || isIssueAuthor" class="py-2">
+          <div class="mb-2 flex items-center justify-between gap-2">
+            <h3 class="text-lg font-semibold">Issue details</h3>
+            <div v-if="isIssueAuthor" class="flex items-center gap-2">
+              <GenericButton
+                v-if="!isEditingIssueBody"
+                :text="'Edit'"
+                @click="startIssueBodyEdit"
+              />
+              <template v-else>
+                <GenericButton
+                  :text="'Cancel'"
+                  @click="cancelIssueBodyEdit"
+                />
+                <SaveButton
+                  :label="'Save'"
+                  :disabled="
+                    updateIssueBodyLoading ||
+                    !editedIssueBody.trim() ||
+                    !issueBodyHasChanges
+                  "
+                  :loading="updateIssueBodyLoading"
+                  @click="saveIssueBody"
+                />
+              </template>
+            </div>
+          </div>
           <MarkdownPreview
+            v-if="activeIssue?.body && !isEditingIssueBody"
             :text="activeIssue.body"
             :word-limit="1000"
             :disable-gallery="true"
+          />
+          <div v-else-if="isEditingIssueBody" class="space-y-2">
+            <TextEditor
+              :key="`issue-body-editor-${activeIssue?.id}`"
+              :rows="6"
+              :placeholder="'Update the issue details...'"
+              :initial-value="editedIssueBody"
+              @update="editedIssueBody = $event"
+            />
+          </div>
+          <ErrorBanner
+            v-if="updateIssueBodyError"
+            class="mt-2"
+            :text="updateIssueBodyError.message"
           />
         </div>
       </div>
