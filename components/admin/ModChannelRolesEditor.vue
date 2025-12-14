@@ -101,10 +101,10 @@ const onTogglePermission = async (
 
 <template>
   <div
-    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-slate-800"
+    class="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900"
   >
     <div class="mb-4 space-y-1">
-      <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-gray-100">
         Channel Mod Roles
       </h2>
       <p class="text-sm text-gray-600 dark:text-gray-300">
@@ -119,14 +119,17 @@ const onTogglePermission = async (
     <div v-else-if="error" class="text-sm text-red-600">
       Unable to load roles right now.
     </div>
-    <div v-else-if="!sortedRoles.length" class="text-sm text-gray-600 dark:text-gray-300">
+    <div
+      v-else-if="!sortedRoles.length"
+      class="text-sm text-gray-600 dark:text-gray-300"
+    >
       No moderator roles found.
     </div>
     <div v-else class="space-y-4">
       <div
         v-for="role in sortedRoles"
         :key="role.name"
-        class="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-gray-700 dark:bg-slate-900/60"
+        class="rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-700 dark:bg-slate-800"
       >
         <div class="flex flex-wrap items-start justify-between gap-3">
           <div class="space-y-1">
@@ -160,7 +163,7 @@ const onTogglePermission = async (
             </span>
             <input
               type="checkbox"
-              class="h-4 w-4 accent-blue-600"
+              class="h-4 w-4 accent-blue-600 dark:accent-blue-400"
               :checked="!!role[permission]"
               :disabled="loading || isUpdating(role.name, permission)"
               @change="
