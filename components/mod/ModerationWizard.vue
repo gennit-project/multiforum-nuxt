@@ -114,39 +114,131 @@ const actionsDisabled = computed(() => {
           <RequireAuth :full-width="true">
             <template #has-auth>
               <div class="mt-4 flex flex-col space-y-4">
-                <ArchiveButton
-                  :discussion-id="discussionId"
-                  :event-id="eventId"
-                  :comment-id="commentId"
-                  :context-text="contextText"
-                  :channel-unique-name="channelUniqueName"
-                  :issue="issue"
-                  :disabled="actionsDisabled"
-                  @archived-successfully="$emit('archived-successfully')"
-                  @unarchived-successfully="$emit('unarchived-successfully')"
-                />
-                <SuspendUserButton
-                  :issue="issue"
-                  :discussion-title="contextText"
-                  :discussion-id="discussionId"
-                  :event-title="contextText"
-                  :event-id="eventId"
-                  :channel-unique-name="channelUniqueName"
-                  :disabled="actionsDisabled"
-                  @suspended-successfully="$emit('suspended-user-successfully')"
-                  @unsuspended-successfully="
-                    $emit('unsuspended-user-successfully')
-                  "
-                />
-                <button
+                <div
                   v-if="issue.isOpen && !isCurrentUserOriginalPoster"
-                  class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white hover:bg-orange-500"
-                  :loading="closeIssueLoading"
-                  @click="$emit('close-issue')"
+                  class="bg-blue-50 rounded-lg border border-blue-200 p-4 shadow-sm dark:border-blue-500/30 dark:bg-blue-500/10"
                 >
-                  <XCircleIcon />
-                  Close Issue (No Action Needed)
-                </button>
+                  <div class="space-y-1">
+                    <p
+                      class="font-semibold text-xs uppercase tracking-wide text-blue-700 dark:text-blue-200"
+                    >
+                      Decision point
+                    </p>
+                    <p
+                      class="font-semibold text-base text-blue-800 dark:text-blue-100"
+                    >
+                      Is there a rule violation?
+                    </p>
+                    <p class="text-sm text-blue-700/90 dark:text-blue-200/80">
+                      Choose the path below based on your assessment.
+                    </p>
+                  </div>
+                </div>
+
+                <div
+                  v-if="issue.isOpen && !isCurrentUserOriginalPoster"
+                  class="grid grid-cols-1 gap-4 lg:grid-cols-2"
+                >
+                  <div
+                    class="space-y-3 rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-900/60"
+                  >
+                    <div class="space-y-1">
+                      <p
+                        class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        If no (no violation)
+                      </p>
+                      <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Close the issue to log that no moderation action is
+                        needed.
+                      </p>
+                    </div>
+                    <button
+                      class="flex w-full cursor-pointer items-center justify-center gap-2 rounded bg-blue-600 px-4 py-2 text-white transition hover:bg-orange-500"
+                      :loading="closeIssueLoading"
+                      @click="$emit('close-issue')"
+                    >
+                      <XCircleIcon />
+                      Close Issue (No Action Needed)
+                    </button>
+                  </div>
+
+                  <div
+                    class="bg-gray-50 space-y-3 rounded-lg border border-gray-200 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800/50"
+                    :class="[
+                      actionsDisabled ? 'opacity-60 grayscale' : 'opacity-100',
+                    ]"
+                  >
+                    <div class="space-y-1">
+                      <p
+                        class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+                      >
+                        If yes (violation)
+                      </p>
+                      <p class="text-sm text-gray-700 dark:text-gray-300">
+                        Address the violation by editing the original post or
+                        taking stronger action.
+                      </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        type="button"
+                        data-test="edit-original-post"
+                        class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800 shadow-sm transition hover:border-blue-400 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100 dark:hover:border-blue-500 dark:hover:text-blue-300"
+                        :disabled="actionsDisabled"
+                      >
+                        Edit original post (placeholder)
+                      </button>
+                    </div>
+
+                    <div
+                      class="border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 space-y-2 rounded-md border p-3"
+                    >
+                      <p
+                        class="font-semibold text-amber-700 dark:text-amber-300 text-xs uppercase tracking-wide"
+                      >
+                        Destructive actions
+                      </p>
+                      <p class="text-amber-800 dark:text-amber-200 text-sm">
+                        Only use these when the post clearly breaks rules and
+                        the problem cannot be resolved by editing.
+                      </p>
+                      <div class="flex flex-col gap-2">
+                        <ArchiveButton
+                          :discussion-id="discussionId"
+                          :event-id="eventId"
+                          :comment-id="commentId"
+                          :context-text="contextText"
+                          :channel-unique-name="channelUniqueName"
+                          :issue="issue"
+                          :disabled="actionsDisabled"
+                          @archived-successfully="
+                            $emit('archived-successfully')
+                          "
+                          @unarchived-successfully="
+                            $emit('unarchived-successfully')
+                          "
+                        />
+                        <SuspendUserButton
+                          :issue="issue"
+                          :discussion-title="contextText"
+                          :discussion-id="discussionId"
+                          :event-title="contextText"
+                          :event-id="eventId"
+                          :channel-unique-name="channelUniqueName"
+                          :disabled="actionsDisabled"
+                          @suspended-successfully="
+                            $emit('suspended-user-successfully')
+                          "
+                          @unsuspended-successfully="
+                            $emit('unsuspended-user-successfully')
+                          "
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </template>
             <template #does-not-have-auth>

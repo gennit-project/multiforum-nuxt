@@ -26,66 +26,137 @@ const ModerationWizard = {
   name: 'ModerationWizard',
   template: `
     <div>
-      <div v-if="issue.isOpen" class="flex justify-center items-center w-10 h-10 rounded-lg bg-blue-600">
+      <div v-if="issue.isOpen" class="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600">
         <div data-testid="eye-icon"></div>
       </div>
-      <div v-else class="flex justify-center items-center w-10 h-10 rounded-lg bg-gray-300 dark:bg-gray-700">
+      <div v-else class="flex items-center justify-center h-10 w-10 rounded-lg bg-gray-300 dark:bg-gray-700">
         <div data-testid="eye-icon"></div>
       </div>
-      
-      <div 
+
+      <div
         class="flex-1 flex-col space-y-4 px-4 py-4 border rounded-lg"
-        :class="[issue.isOpen ? 'border-blue-500' : 'border-gray-300 dark:border-gray-700']"
+        :class="[issue.isOpen && !isCurrentUserOriginalPoster ? 'border-blue-500' : 'border-gray-300 dark:border-gray-700']"
       >
-        <h1 v-if="issue.isOpen" class="text-xl font-bold text-blue-500">
+        <h1 v-if="issue.isOpen && !isCurrentUserOriginalPoster" class="text-xl font-bold text-blue-500">
           Mod Action Needed
         </h1>
         <h1 v-else class="text-xl font-bold text-gray-500 dark:text-gray-300">
           Mod Actions
         </h1>
-        
+
         <p v-if="!issue.isOpen" class="text-gray-600 dark:text-gray-400">
           Mod actions are disabled because the issue is closed.
         </p>
-        
+        <p v-else-if="isCurrentUserOriginalPoster" class="text-gray-600 dark:text-gray-400">
+          Mod actions are disabled because you are the author of the original post.
+        </p>
+
         <div class="flex flex-col space-y-4 mt-4">
-          <div 
-            data-testid="archive-button" 
-            :data-issue="JSON.stringify(issue)"
-            :data-discussion-id="discussionId"
-            :data-event-id="eventId"
-            :data-comment-id="commentId"
-            :data-context-text="contextText"
-            :data-channel-unique-name="channelUniqueName"
-            :data-disabled="!issue.isOpen"
-            @click="$emit('archived-successfully')"
+          <div
+            v-if="issue.isOpen && !isCurrentUserOriginalPoster"
+            class="rounded-lg border border-blue-200 bg-blue-50 p-4"
           >
-            Archive Button
+            <div class="space-y-1">
+              <p class="text-xs font-semibold uppercase tracking-wide text-blue-700">
+                Decision point
+              </p>
+              <p class="text-base font-semibold text-blue-800">
+                Is there a rule violation?
+              </p>
+              <p class="text-sm text-blue-700/90">
+                Choose the path below based on your assessment.
+              </p>
+            </div>
           </div>
-          
-          <div 
-            data-testid="suspend-user-button"
-            :data-issue="JSON.stringify(issue)"
-            :data-discussion-title="contextText"
-            :data-discussion-id="discussionId"
-            :data-event-title="contextText"
-            :data-event-id="eventId"
-            :data-channel-unique-name="channelUniqueName"
-            :data-disabled="!issue.isOpen"
-            @click="$emit('suspended-user-successfully')"
+
+          <div
+            v-if="issue.isOpen && !isCurrentUserOriginalPoster"
+            class="grid grid-cols-1 gap-4 lg:grid-cols-2"
           >
-            Suspend User Button
+            <div
+              class="space-y-3 rounded-lg border border-gray-200 bg-white p-4"
+            >
+              <div class="space-y-1">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  If no (no violation)
+                </p>
+                <p class="text-sm text-gray-700">
+                  Close the issue to log that no moderation action is needed.
+                </p>
+              </div>
+              <button
+                class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
+                :loading="closeIssueLoading"
+                @click="$emit('close-issue')"
+              >
+                <div data-testid="x-circle-icon"></div>
+                Close Issue (No Action Needed)
+              </button>
+            </div>
+
+            <div
+              class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4"
+              :class="[actionsDisabled ? 'opacity-60 grayscale' : 'opacity-100']"
+            >
+              <div class="space-y-1">
+                <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                  If yes (violation)
+                </p>
+                <p class="text-sm text-gray-700">
+                  Address the violation by editing the original post or taking stronger action.
+                </p>
+              </div>
+
+              <div class="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  data-testid="edit-original-post"
+                  class="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-800"
+                  :disabled="actionsDisabled"
+                >
+                  Edit original post (placeholder)
+                </button>
+              </div>
+
+              <div class="space-y-2 rounded-md border border-amber-300 bg-amber-50 p-3">
+                <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">
+                  Destructive actions
+                </p>
+                <p class="text-sm text-amber-800">
+                  Only use these when the post clearly breaks rules.
+                </p>
+                <div class="flex flex-col gap-2">
+                  <div
+                    data-testid="archive-button"
+                    :data-issue="JSON.stringify(issue)"
+                    :data-discussion-id="discussionId"
+                    :data-event-id="eventId"
+                    :data-comment-id="commentId"
+                    :data-context-text="contextText"
+                    :data-channel-unique-name="channelUniqueName"
+                    :data-disabled="actionsDisabled"
+                    @click="$emit('archived-successfully')"
+                  >
+                    Archive Button
+                  </div>
+
+                  <div
+                    data-testid="suspend-user-button"
+                    :data-issue="JSON.stringify(issue)"
+                    :data-discussion-title="contextText"
+                    :data-discussion-id="discussionId"
+                    :data-event-title="contextText"
+                    :data-event-id="eventId"
+                    :data-channel-unique-name="channelUniqueName"
+                    :data-disabled="actionsDisabled"
+                    @click="$emit('suspended-user-successfully')"
+                  >
+                    Suspend User Button
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          
-          <button
-            v-if="issue.isOpen"
-            class="w-full cursor-pointer bg-blue-600 hover:bg-blue-500 text-white py-2 px-4 rounded flex items-center gap-2 justify-center"
-            :loading="closeIssueLoading"
-            @click="$emit('close-issue')"
-          >
-            <div data-testid="x-circle-icon"></div>
-            Close Issue (No Action Needed)
-          </button>
         </div>
       </div>
     </div>
@@ -118,6 +189,15 @@ const ModerationWizard = {
     closeIssueLoading: {
       type: Boolean,
       default: false,
+    },
+    isCurrentUserOriginalPoster: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  computed: {
+    actionsDisabled() {
+      return !this.issue.isOpen || this.isCurrentUserOriginalPoster;
     },
   },
   emits: [
@@ -164,18 +244,25 @@ describe('ModerationWizard Component', () => {
     const wrapper = mountComponent({ issue: openIssue });
 
     // Check if the component renders with the correct title for an open issue
-    expect(wrapper.text()).toContain('Mod Decision Needed');
+    expect(wrapper.text()).toContain('Mod Action Needed');
+    expect(wrapper.text()).toContain('Is there a rule violation?');
+    expect(wrapper.text()).toContain('If no (no violation)');
+    expect(wrapper.text()).toContain('If yes (violation)');
 
     // Check if buttons are present
     expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(true);
     expect(wrapper.find('[data-testid="suspend-user-button"]').exists()).toBe(
       true
     );
+    expect(wrapper.find('[data-testid="edit-original-post"]').exists()).toBe(
+      true
+    );
 
     // Check if close issue button is present
-    const closeButton = wrapper.find('button');
-    expect(closeButton.exists()).toBe(true);
-    expect(closeButton.text()).toContain('Close Issue (No Action Needed)');
+    const closeButton = wrapper
+      .findAll('button')
+      .find((btn) => btn.text().includes('Close Issue (No Action Needed)'));
+    expect(closeButton).toBeDefined();
   });
 
   it('renders with a closed issue', async () => {
@@ -188,22 +275,33 @@ describe('ModerationWizard Component', () => {
     );
 
     // Check if close issue button is not present
-    const closeButton = wrapper.find('button');
-    expect(closeButton.exists()).toBe(false);
+    const closeButton = wrapper
+      .findAll('button')
+      .find((btn) => btn.text().includes('Close Issue (No Action Needed)'));
+    expect(closeButton).toBeUndefined();
+
+    // Action blocks are hidden for closed issues
+    expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(false);
+    expect(
+      wrapper.find('[data-testid="suspend-user-button"]').exists()
+    ).toBe(false);
+    expect(wrapper.find('[data-testid="edit-original-post"]').exists()).toBe(
+      false
+    );
   });
 
-  it('passes the disabled prop to ArchiveButton when the issue is closed', async () => {
+  it('hides destructive actions when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
 
-    const archiveButton = wrapper.find('[data-testid="archive-button"]');
-    expect(archiveButton.attributes('data-disabled')).toBe('true');
+    expect(wrapper.find('[data-testid="archive-button"]').exists()).toBe(false);
   });
 
-  it('passes the disabled prop to SuspendUserButton when the issue is closed', async () => {
+  it('hides suspend action when the issue is closed', async () => {
     const wrapper = mountComponent({ issue: closedIssue });
 
-    const suspendButton = wrapper.find('[data-testid="suspend-user-button"]');
-    expect(suspendButton.attributes('data-disabled')).toBe('true');
+    expect(wrapper.find('[data-testid="suspend-user-button"]').exists()).toBe(
+      false
+    );
   });
 
   it('emits close-issue event when the close button is clicked', async () => {
