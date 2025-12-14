@@ -240,10 +240,10 @@ const saveRole = async () => {
 
     <div v-else class="space-y-4">
       <div
-      v-for="def in definitions"
-      :key="def.key"
-      class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 flex flex-col gap-3 rounded-md border border-gray-200 p-4"
-    >
+        v-for="def in definitions"
+        :key="def.key"
+        class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 flex flex-col gap-3 rounded-md border border-gray-200 p-4"
+      >
       <div class="flex items-center justify-between gap-2">
         <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
           {{ def.label }}
@@ -260,6 +260,12 @@ const saveRole = async () => {
       </div>
       <p class="text-xs text-gray-600 dark:text-gray-400">
         {{ roleHelpCopy[def.key] || '' }}
+      </p>
+      <p
+        v-if="def.node?.description"
+        class="text-xs text-gray-700 dark:text-gray-300"
+      >
+        {{ def.node.description }}
       </p>
 
       <PermissionsList :permissions="def.node || {}" />
@@ -290,6 +296,9 @@ const saveRole = async () => {
       </template>
       <template #content>
         <div v-if="editingDefinition" class="space-y-4">
+          <p class="text-xs text-gray-600 dark:text-gray-300">
+            {{ roleHelpCopy[editingDefinition.key] || '' }}
+          </p>
           <div class="space-y-1">
             <label
               class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"

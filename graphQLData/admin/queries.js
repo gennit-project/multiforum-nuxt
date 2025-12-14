@@ -23,6 +23,7 @@ export const GET_SERVER_CONFIG = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canLockChannel
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -38,6 +39,7 @@ export const GET_SERVER_CONFIG = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canLockChannel
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -64,6 +66,7 @@ export const GET_SERVER_CONFIG = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canLockChannel
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -92,6 +95,7 @@ export const GET_SERVER_PERMISSIONS = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canLockChannel
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -107,6 +111,7 @@ export const GET_SERVER_PERMISSIONS = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canLockChannel
         canEditComments
         canEditDiscussions
         canEditEvents
@@ -122,6 +127,7 @@ export const GET_SERVER_PERMISSIONS = gql`
         canHideComment
         canHideEvent
         canHideDiscussion
+        canLockChannel
         canEditComments
         canEditDiscussions
         canEditEvents
