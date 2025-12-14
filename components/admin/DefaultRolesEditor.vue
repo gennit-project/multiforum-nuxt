@@ -71,12 +71,18 @@ const modPermissionKeys = [
 ];
 
 const roleState = reactive<
-  Record<string, { name: string; values: Record<string, boolean> }>
+  Record<
+    string,
+    { name: string; description: string; values: Record<string, boolean> }
+  >
 >({});
 const mutationError = ref('');
 const saving = reactive<Record<string, boolean>>({});
 const editingRoleKey = ref<string | null>(null);
 const showModal = ref(false);
+const currentSaving = computed(
+  () => (editingDefinition.value ? !!saving[editingDefinition.value.key] : false)
+);
 
 const { mutate: updateServerRole } = useMutation(UPDATE_SERVER_ROLE);
 const { mutate: updateModRole } = useMutation(UPDATE_MOD_SERVER_ROLE);
@@ -131,6 +137,7 @@ watch(
       if (!def.node) return;
       roleState[def.key] = {
         name: def.node.name || '',
+        description: def.node.description || '',
         values: def.permissions.reduce<Record<string, boolean>>((acc, perm) => {
           acc[perm] = !!def.node?.[perm];
           return acc;
@@ -166,6 +173,7 @@ const resetEditingState = () => {
   const def = editingDefinition.value;
   if (!def?.node) return;
   roleState[def.key].name = def.node.name || '';
+  roleState[def.key].description = def.node.description || '';
   def.permissions.forEach((perm) => {
     roleState[def.key].values[perm] = !!def.node?.[perm];
   });
@@ -186,6 +194,7 @@ const saveRole = async () => {
   try {
     const input = {
       name: state.name,
+      description: state.description,
       ...state.values,
     };
     if (def.type === 'server') {
@@ -231,31 +240,31 @@ const saveRole = async () => {
 
     <div v-else class="space-y-4">
       <div
-        v-for="def in definitions"
-        :key="def.key"
-        class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 flex flex-col gap-3 rounded-md border border-gray-200 p-4"
-      >
-        <div class="flex items-center justify-between gap-2">
-          <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
-            {{ def.label }}
-          </h3>
-          <p class="flex-1 text-xs text-gray-600 dark:text-gray-400">
-            {{ roleHelpCopy[def.key] || '' }}
-          </p>
-          <button
-            type="button"
-            class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:text-gray-100"
-            :data-test="`edit-${def.key}`"
-            @click="openModal(def.key)"
-          >
-            <PencilIcon class="h-4 w-4" />
-            Edit
-          </button>
-        </div>
-
-        <PermissionsList :permissions="def.node || {}" />
+      v-for="def in definitions"
+      :key="def.key"
+      class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 flex flex-col gap-3 rounded-md border border-gray-200 p-4"
+    >
+      <div class="flex items-center justify-between gap-2">
+        <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+          {{ def.label }}
+        </h3>
+        <button
+          type="button"
+          class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:text-gray-100"
+          :data-test="`edit-${def.key}`"
+          @click="openModal(def.key)"
+        >
+          <PencilIcon class="h-4 w-4" />
+          Edit
+        </button>
       </div>
+      <p class="text-xs text-gray-600 dark:text-gray-400">
+        {{ roleHelpCopy[def.key] || '' }}
+      </p>
+
+      <PermissionsList :permissions="def.node || {}" />
     </div>
+  </div>
 
     <p
       v-if="mutationError"
@@ -267,58 +276,65 @@ const saveRole = async () => {
 
     <GenericModal
       :open="showModal"
+      data-testid="default-roles-modal"
       :title="editingDefinition?.label || 'Edit Role'"
+      primary-button-text="Save"
+      secondary-button-text="Cancel"
+      :loading="currentSaving"
+      :primary-button-disabled="currentSaving"
       @close="closeModal"
+      @primaryButtonClick="saveRole"
     >
-      <div v-if="editingDefinition" class="space-y-4">
-        <div class="space-y-1">
-          <label
-            class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
-          >
-            Role name
-          </label>
-          <input
-            v-model="roleState[editingDefinition.key].name"
-            type="text"
-            class="dark:border-slate-700 dark:bg-slate-800 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:text-gray-100"
-            :disabled="saving[editingDefinition.key]"
-          >
-        </div>
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-          <label
-            v-for="perm in editingDefinition.permissions"
-            :key="perm"
-            class="dark:border-slate-700 dark:bg-slate-900 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm"
-          >
-            <span class="text-gray-800 dark:text-gray-100">
-              {{ formatPermissionName(perm) }}
-            </span>
-            <input
-              v-model="roleState[editingDefinition.key].values[perm]"
-              type="checkbox"
-              class="h-4 w-4 accent-blue-600 dark:accent-blue-400"
+      <template #icon>
+        <PencilIcon class="h-6 w-6 text-orange-500" />
+      </template>
+      <template #content>
+        <div v-if="editingDefinition" class="space-y-4">
+          <div class="space-y-1">
+            <label
+              class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
             >
-          </label>
+              Role name
+            </label>
+            <input
+              v-model="roleState[editingDefinition.key].name"
+              type="text"
+              class="dark:border-slate-700 dark:bg-slate-800 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:text-gray-100"
+              :disabled="currentSaving"
+            >
+          </div>
+          <div class="space-y-1">
+            <label
+              class="font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400"
+            >
+              Role description
+            </label>
+            <textarea
+              v-model="roleState[editingDefinition.key].description"
+              rows="3"
+              class="dark:border-slate-700 dark:bg-slate-800 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:text-gray-100"
+              :disabled="currentSaving"
+            />
+          </div>
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            <label
+              v-for="perm in editingDefinition.permissions"
+              :key="perm"
+              class="dark:border-slate-700 dark:bg-slate-900 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm"
+            >
+              <span class="text-gray-800 dark:text-gray-100">
+                {{ formatPermissionName(perm) }}
+              </span>
+              <input
+                v-model="roleState[editingDefinition.key].values[perm]"
+                type="checkbox"
+                class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-slate-600 dark:accent-blue-400"
+                :disabled="currentSaving"
+              >
+            </label>
+          </div>
         </div>
-        <div class="flex justify-end gap-2">
-          <button
-            type="button"
-            class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 rounded border border-gray-300 px-3 py-2 text-sm text-gray-800 hover:bg-gray-100 dark:text-gray-100"
-            @click="closeModal"
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            class="font-semibold rounded bg-blue-600 px-3 py-2 text-sm text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-60"
-            :disabled="saving[editingDefinition.key]"
-            data-test="save-role"
-            @click="saveRole"
-          >
-            Save
-          </button>
-        </div>
-      </div>
+      </template>
     </GenericModal>
   </div>
 </template>

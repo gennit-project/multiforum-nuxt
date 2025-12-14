@@ -26,12 +26,30 @@ vi.mock('@/components/admin/PermissionsList.vue', () => ({
 vi.mock('@/components/GenericModal.vue', () => ({
   default: {
     name: 'GenericModal',
-    props: ['open', 'title'],
+    props: [
+      'open',
+      'title',
+      'dataTestid',
+      'primaryButtonText',
+      'secondaryButtonText',
+      'loading',
+      'primaryButtonDisabled',
+    ],
+    emits: ['close', 'primaryButtonClick'],
     template: `
       <div v-if="open">
         <div class="modal">
-          <slot></slot>
-          <button data-test="modal-close" @click="$emit('close')">Close</button>
+          <slot name="icon"></slot>
+          <slot name="content"></slot>
+          <button
+            :data-testid="\`\${dataTestid}-primary-button\`"
+            @click="$emit('primaryButtonClick')"
+          >
+            {{ primaryButtonText || 'Delete' }}
+          </button>
+          <button data-test="modal-close" @click="$emit('close')">
+            {{ secondaryButtonText || 'Cancel' }}
+          </button>
         </div>
       </div>
     `,
@@ -94,7 +112,9 @@ describe('DefaultRolesEditor', () => {
     await nameInput.setValue('ServerRoleUpdated');
     const checkbox = wrapper.find('input[type="checkbox"]');
     await checkbox.setValue(true);
-    const saveBtn = wrapper.find('[data-test="save-role"]');
+    const saveBtn = wrapper.find(
+      '[data-testid="default-roles-modal-primary-button"]'
+    );
     await saveBtn.trigger('click');
     expect(updateServerRole).toHaveBeenCalledWith({
       name: 'ServerRole',
@@ -108,7 +128,9 @@ describe('DefaultRolesEditor', () => {
     });
     const editBtn = wrapper.find('[data-test="edit-DefaultModRole"]');
     await editBtn.trigger('click');
-    const saveBtn = wrapper.find('[data-test="save-role"]');
+    const saveBtn = wrapper.find(
+      '[data-testid="default-roles-modal-primary-button"]'
+    );
     await saveBtn.trigger('click');
     expect(updateModServerRole).toHaveBeenCalled();
   });
