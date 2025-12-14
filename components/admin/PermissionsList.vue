@@ -18,7 +18,7 @@ const formatPermissionName = (name: string) => {
 </script>
 
 <template>
-  <div class="mt-2 space-y-1">
+  <div class="mt-2 space-y-1 text-gray-800 dark:text-gray-100">
     <div
       v-for="(value, key) in permissions"
       :key="key"
@@ -37,7 +37,9 @@ const formatPermissionName = (name: string) => {
         class="h-4 w-4 text-red-500"
         aria-label="Permission denied"
       />
-      <span class="ml-2 text-sm">{{ formatPermissionName(key) }}</span>
+      <span class="ml-2 text-sm text-gray-800 dark:text-gray-100">
+        {{ formatPermissionName(key) }}
+      </span>
     </div>
   </div>
 </template>

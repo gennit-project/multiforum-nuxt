@@ -31,8 +31,7 @@ const props = defineProps<{
 }>();
 
 const roleHelpCopy: Record<string, string> = {
-  DefaultServerRole:
-    'By default in a new forum, users have these permissions.',
+  DefaultServerRole: 'By default in a new forum, users have these permissions.',
   DefaultSuspendedRole:
     'By default in a new forum with no configuration, suspended users have these permissions.',
   DefaultModRole:
@@ -77,15 +76,29 @@ const roleState = reactive<
   >
 >({});
 const mutationError = ref('');
-const saving = reactive<Record<string, boolean>>({});
 const editingRoleKey = ref<string | null>(null);
 const showModal = ref(false);
-const currentSaving = computed(
-  () => (editingDefinition.value ? !!saving[editingDefinition.value.key] : false)
+const awaitingMutation = ref(false);
+
+const { mutate: updateServerRole, onDone: onUpdateServerRoleDone } = useMutation(
+  UPDATE_SERVER_ROLE
+);
+const { mutate: updateModRole, onDone: onUpdateModRoleDone } = useMutation(
+  UPDATE_MOD_SERVER_ROLE
 );
 
-const { mutate: updateServerRole } = useMutation(UPDATE_SERVER_ROLE);
-const { mutate: updateModRole } = useMutation(UPDATE_MOD_SERVER_ROLE);
+const handleMutationDone = () => {
+  if (!lastMutationKey.value) return;
+  const key = lastMutationKey.value;
+  setSaving(key, false);
+  showModal.value = false;
+  editingRoleKey.value = null;
+  lastMutationKey.value = null;
+  mutationError.value = '';
+};
+
+onUpdateServerRoleDone(handleMutationDone);
+onUpdateModRoleDone(handleMutationDone);
 
 const definitions = computed<RoleDefinition[]>(() => {
   if (!props.serverConfig) return [];
@@ -191,6 +204,7 @@ const saveRole = async () => {
   const state = roleState[def.key];
   mutationError.value = '';
   setSaving(def.key, true);
+  lastMutationKey.value = def.key;
   try {
     const input = {
       name: state.name,
@@ -202,24 +216,33 @@ const saveRole = async () => {
     } else {
       await updateModRole({ name: def.node.name, input });
     }
-    def.node.name = state.name;
-    def.permissions.forEach((perm) => {
-      def.node![perm] = state.values[perm];
-    });
-    showModal.value = false;
-    editingRoleKey.value = null;
+    roleState[def.key] = {
+      name: state.name,
+      description: state.description,
+      values: { ...state.values },
+    };
+    if (def.node) {
+      def.node.name = state.name;
+      def.node.description = state.description;
+      def.permissions.forEach((perm) => {
+        def.node![perm] = state.values[perm];
+      });
+    }
   } catch {
     mutationError.value = 'Unable to save changes. Please try again.';
+    lastMutationKey.value = null;
     resetEditingState();
   } finally {
-    setSaving(def.key, false);
+    if (!lastMutationKey.value) {
+      setSaving(def.key, false);
+    }
   }
 };
 </script>
 
 <template>
   <div
-    class="dark:border-slate-800 dark:bg-slate-950 space-y-4 rounded-lg border-gray-200 bg-white shadow-sm"
+    class="space-y-4 rounded-lg border shadow-sm dark:border-gray-800 dark:bg-gray-800"
   >
     <div v-if="showTitle !== false" class="space-y-1">
       <h2 class="font-semibold text-lg text-gray-900 dark:text-gray-100">
@@ -242,35 +265,35 @@ const saveRole = async () => {
       <div
         v-for="def in definitions"
         :key="def.key"
-        class="bg-gray-50 dark:border-slate-800 dark:bg-slate-900 flex flex-col gap-3 rounded-md border border-gray-200 p-4"
+        class="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-100 p-4 dark:border-gray-900 dark:bg-black"
       >
-      <div class="flex items-center justify-between gap-2">
-        <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
-          {{ def.label }}
-        </h3>
-        <button
-          type="button"
-          class="dark:border-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:text-gray-100"
-          :data-test="`edit-${def.key}`"
-          @click="openModal(def.key)"
+        <div class="flex items-center justify-between gap-2">
+          <h3 class="font-semibold text-sm text-gray-900 dark:text-gray-100">
+            {{ def.label }}
+          </h3>
+          <button
+            type="button"
+            class="flex items-center gap-1 rounded border border-gray-300 bg-white px-2 py-1 text-xs font-medium text-gray-800 hover:bg-gray-100 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100 dark:hover:bg-gray-700"
+            :data-test="`edit-${def.key}`"
+            @click="openModal(def.key)"
+          >
+            <PencilIcon class="h-4 w-4" />
+            Edit
+          </button>
+        </div>
+        <p class="text-xs text-gray-600 dark:text-gray-400">
+          {{ roleHelpCopy[def.key] || '' }}
+        </p>
+        <p
+          v-if="def.node?.description"
+          class="text-xs text-gray-700 dark:text-gray-300"
         >
-          <PencilIcon class="h-4 w-4" />
-          Edit
-        </button>
-      </div>
-      <p class="text-xs text-gray-600 dark:text-gray-400">
-        {{ roleHelpCopy[def.key] || '' }}
-      </p>
-      <p
-        v-if="def.node?.description"
-        class="text-xs text-gray-700 dark:text-gray-300"
-      >
-        {{ def.node.description }}
-      </p>
+          {{ def.node.description }}
+        </p>
 
-      <PermissionsList :permissions="def.node || {}" />
+        <PermissionsList :permissions="def.node || {}" />
+      </div>
     </div>
-  </div>
 
     <p
       v-if="mutationError"
@@ -289,7 +312,7 @@ const saveRole = async () => {
       :loading="currentSaving"
       :primary-button-disabled="currentSaving"
       @close="closeModal"
-      @primaryButtonClick="saveRole"
+      @primary-button-click="saveRole"
     >
       <template #icon>
         <PencilIcon class="h-6 w-6 text-orange-500" />
@@ -308,9 +331,9 @@ const saveRole = async () => {
             <input
               v-model="roleState[editingDefinition.key].name"
               type="text"
-              class="dark:border-slate-700 dark:bg-slate-800 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:text-gray-100"
+              class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               :disabled="currentSaving"
-            >
+            />
           </div>
           <div class="space-y-1">
             <label
@@ -321,7 +344,7 @@ const saveRole = async () => {
             <textarea
               v-model="roleState[editingDefinition.key].description"
               rows="3"
-              class="dark:border-slate-700 dark:bg-slate-800 w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:text-gray-100"
+              class="w-full rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none dark:border-gray-700 dark:bg-gray-800 dark:text-gray-100"
               :disabled="currentSaving"
             />
           </div>
@@ -329,7 +352,7 @@ const saveRole = async () => {
             <label
               v-for="perm in editingDefinition.permissions"
               :key="perm"
-              class="dark:border-slate-700 dark:bg-slate-900 flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm"
+              class="flex items-center justify-between rounded border border-gray-200 bg-white px-3 py-2 text-sm dark:border-gray-700 dark:bg-gray-900"
             >
               <span class="text-gray-800 dark:text-gray-100">
                 {{ formatPermissionName(perm) }}
@@ -337,9 +360,9 @@ const saveRole = async () => {
               <input
                 v-model="roleState[editingDefinition.key].values[perm]"
                 type="checkbox"
-                class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-slate-600 dark:accent-blue-400"
+                class="h-4 w-4 rounded border border-gray-300 accent-blue-600 dark:border-gray-600 dark:accent-blue-400"
                 :disabled="currentSaving"
-              >
+              />
             </label>
           </div>
         </div>

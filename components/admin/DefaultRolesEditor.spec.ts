@@ -8,10 +8,18 @@ const updateModServerRole = vi.fn();
 
 vi.mock('@vue/apollo-composable', () => ({
   useMutation: (fn: any) => {
-    if (fn && (fn.definitions?.[0]?.name?.value || '').includes('ModServerRole')) {
-      return { mutate: updateModServerRole };
-    }
-    return { mutate: updateServerRole };
+    const isMod =
+      fn && (fn.definitions?.[0]?.name?.value || '').includes('ModServerRole');
+    const mutateFn = isMod ? updateModServerRole : updateServerRole;
+    const doneHandlers: Array<() => void> = [];
+    return {
+      mutate: async (vars?: any) => {
+        const res = await mutateFn(vars);
+        doneHandlers.forEach((cb) => cb());
+        return res;
+      },
+      onDone: (cb: () => void) => doneHandlers.push(cb),
+    };
   },
 }));
 
