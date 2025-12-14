@@ -189,3 +189,26 @@ export const VALIDATE_SERVER_PLUGIN_SECRET = gql`
     }
   }
 `;
+
+export const UPDATE_MOD_CHANNEL_ROLE = gql`
+  mutation UpdateModChannelRole($name: String!, $input: ModChannelRoleUpdateInput!) {
+    updateModChannelRoles(where: { name: $name }, update: $input) {
+      modChannelRoles {
+        name
+        description
+        channelUniqueName
+        canHideComment
+        canHideEvent
+        canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
+        canGiveFeedback
+        canOpenSupportTickets
+        canCloseSupportTickets
+        canReport
+        canSuspendUser
+      }
+    }
+  }
+`;

@@ -20,9 +20,13 @@ export const GET_SERVER_CONFIG = gql`
       DefaultModRole {
         name
         description
+        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -32,9 +36,13 @@ export const GET_SERVER_CONFIG = gql`
       DefaultElevatedModRole {
         name
         description
+        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -55,9 +63,13 @@ export const GET_SERVER_CONFIG = gql`
       DefaultSuspendedModRole {
         name
         description
+        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -80,9 +92,13 @@ export const GET_SERVER_PERMISSIONS = gql`
       DefaultModRole {
         name
         description
+        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -92,9 +108,13 @@ export const GET_SERVER_PERMISSIONS = gql`
       DefaultElevatedModRole {
         name
         description
+        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -104,9 +124,13 @@ export const GET_SERVER_PERMISSIONS = gql`
       DefaultSuspendedModRole {
         name
         description
+        channelUniqueName
         canHideComment
         canHideEvent
         canHideDiscussion
+        canEditComments
+        canEditDiscussions
+        canEditEvents
         canGiveFeedback
         canOpenSupportTickets
         canCloseSupportTickets
@@ -146,6 +170,27 @@ export const GET_SERVER_RULES = gql`
     serverConfigs {
       serverName
       rules
+    }
+  }
+`;
+
+export const GET_MOD_CHANNEL_ROLES = gql`
+  query GetModChannelRoles {
+    modChannelRoles {
+      name
+      description
+      channelUniqueName
+      canHideComment
+      canHideEvent
+      canHideDiscussion
+      canEditComments
+      canEditDiscussions
+      canEditEvents
+      canGiveFeedback
+      canOpenSupportTickets
+      canCloseSupportTickets
+      canReport
+      canSuspendUser
     }
   }
 `;
