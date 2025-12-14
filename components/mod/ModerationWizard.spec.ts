@@ -38,7 +38,7 @@ const ModerationWizard = {
         :class="[issue.isOpen ? 'border-blue-500' : 'border-gray-300 dark:border-gray-700']"
       >
         <h1 v-if="issue.isOpen" class="text-xl font-bold text-blue-500">
-          Mod Decision Needed
+          Mod Action Needed
         </h1>
         <h1 v-else class="text-xl font-bold text-gray-500 dark:text-gray-300">
           Mod Actions
