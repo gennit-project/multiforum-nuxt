@@ -262,11 +262,11 @@ const editActions = computed(() => {
                         :key="action.testId"
                         type="button"
                         :data-test="action.testId"
-                        class="flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm font-semibold text-white transition"
+                        class="font-semibold flex w-full items-center justify-center gap-2 rounded px-4 py-2 text-sm text-white transition"
                         :class="[
                           actionsDisabled
                             ? 'cursor-not-allowed bg-gray-500'
-                            : 'cursor-pointer bg-indigo-600 hover:bg-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400',
+                            : 'hover:bg-indigo-500 cursor-pointer bg-orange-500 dark:bg-orange-800 dark:hover:bg-orange-700',
                         ]"
                         :disabled="actionsDisabled"
                       >
@@ -276,14 +276,14 @@ const editActions = computed(() => {
                     </div>
 
                     <div
-                      class="border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 space-y-2 rounded-md border p-3"
+                      class="border-amber-300 bg-amber-50 dark:border-amber-500/50 dark:bg-amber-500/10 space-y-2 rounded-md"
                     >
                       <p
-                        class="font-semibold text-amber-700 dark:text-amber-300 text-xs uppercase tracking-wide"
+                        class="font-semibold text-xs uppercase tracking-wide text-gray-700 dark:text-gray-300"
                       >
                         Destructive actions
                       </p>
-                      <p class="text-amber-800 dark:text-amber-200 text-sm">
+                      <p class="text-sm text-gray-800 dark:text-gray-300">
                         Only use these when the post clearly breaks rules and
                         the problem cannot be resolved by editing.
                       </p>
