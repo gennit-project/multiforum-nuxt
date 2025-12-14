@@ -204,6 +204,11 @@ const togglePermission = async (
         :key="def.key"
         class="flex flex-col gap-3 rounded-md border border-gray-200 bg-gray-50 p-4 dark:border-slate-800 dark:bg-slate-900"
       >
+        <div class="flex items-center justify-between">
+          <h3 class="text-sm font-semibold text-gray-900 dark:text-gray-100">
+            {{ def.label }}
+          </h3>
+        </div>
         <div class="space-y-1">
           <label class="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
             Role name
@@ -217,11 +222,11 @@ const togglePermission = async (
             @keyup.enter="saveName(def)"
           >
           <p class="text-xs text-gray-600 dark:text-gray-400">
-            {{ def.label }}
+            This is the default fallback role.
           </p>
         </div>
 
-        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <div class="grid grid-cols-1 gap-2">
           <label
             v-for="perm in def.permissions"
             :key="perm"
